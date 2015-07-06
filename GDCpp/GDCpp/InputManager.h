@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <set>
 #include <SFML/Window.hpp>
 
 /**
@@ -80,6 +81,11 @@ public:
     bool IsKeyPressed(std::string key) const;
 
     /**
+     * \brief Return true if the specified key name was just released.
+     */
+    bool WasKeyReleased(std::string key) const;
+
+    /**
      * \brief Return true if any key was pressed since the last call
      * to NextFrame.
      */
@@ -123,14 +129,18 @@ public:
 
 private:
     sf::Window * window;
+
     int lastPressedKey; ///< SFML key code of the last pressed key.
-    int mouseWheelDelta;
     bool keyWasPressed; ///< True if a key was pressed during the last step.
+    std::set<int> releasedKeys; ///< All SFML key code that were just released for this frame.
+    std::vector<sf::Uint32> charactersEntered; ///< The characters entered for this frame.
+
+    int mouseWheelDelta;
+    std::map<std::string, bool> buttonsPressed; ///< The buttons pressed for this frame.
+    std::map<std::string, bool> oldButtonsPressed; ///< The buttons pressed during the last frame.
+
     bool windowHasFocus; ///< True if the render target has the focus.
     bool disableInputWhenNotFocused; ///< True if input should be ignored when focus is lost.
-    std::vector<sf::Uint32> charactersEntered; ///< The characters entered during this frame.
-    std::map<std::string, bool> buttonsPressed; ///< The buttons pressed during this frame.
-    std::map<std::string, bool> oldButtonsPressed; ///< The buttons pressed during the last frame.
 };
 
 #endif

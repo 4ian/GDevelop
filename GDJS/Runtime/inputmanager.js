@@ -19,6 +19,7 @@
 gdjs.InputManager = function()
 {
     this._pressedKeys = new Hashtable();
+    this._releasedKeys = new Hashtable();
     this._lastPressedKey = 0;
     this._pressedMouseButtons = new Array(5);
     this._releasedMouseButtons = new Array(5);
@@ -49,6 +50,7 @@ gdjs.InputManager.prototype.onKeyPressed = function(keyCode) {
  */
 gdjs.InputManager.prototype.onKeyReleased = function(keyCode) {
     this._pressedKeys.put(keyCode, false);
+    this._releasedKeys.put(keyCode, true);
 };
 
 /**
@@ -67,6 +69,15 @@ gdjs.InputManager.prototype.getLastPressedKey = function() {
  */
 gdjs.InputManager.prototype.isKeyPressed = function(keyCode) {
     return this._pressedKeys.containsKey(keyCode) && this._pressedKeys.get(keyCode);
+};
+
+/**
+ * Return true if the key corresponding to keyCode was released during the last frame.
+ * @method wasKeyReleased
+ * @param keyCode {Number} The key code to be tested.
+ */
+gdjs.InputManager.prototype.wasKeyReleased = function(keyCode) {
+    return this._releasedKeys.containsKey(keyCode) && this._releasedKeys.get(keyCode);
 };
 
 /**
@@ -291,6 +302,7 @@ gdjs.InputManager.prototype.onFrameEnded = function() {
 
     this._startedTouches.length = 0;
     this._endedTouches.length = 0;
+    this._releasedKeys.clear();
     this._releasedMouseButtons.length = 0;
 };
 

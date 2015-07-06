@@ -10,6 +10,7 @@
 class RuntimeScene;
 
 bool IsKeyPressed(RuntimeScene & scene, std::string key);
+bool WasKeyReleased(RuntimeScene & scene, std::string key);
 bool AnyKeyIsPressed(RuntimeScene & scene);
 std::string LastPressedKey(RuntimeScene & scene);
 

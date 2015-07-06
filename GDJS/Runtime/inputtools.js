@@ -29,6 +29,20 @@ gdjs.evtTools.input.isKeyPressed = function(runtimeScene, key) {
 };
 
 /**
+ * Return true if the specified key was just released
+ *
+ * @method isKeyPressed
+ * @private
+ */
+gdjs.evtTools.input.wasKeyReleased = function(runtimeScene, key) {
+    if (gdjs.evtTools.input.keysNameToCode.hasOwnProperty(key)) {
+        return runtimeScene.getGame().getInputManager().wasKeyReleased(gdjs.evtTools.input.keysNameToCode[key]);
+    }
+
+    return false;
+};
+
+/**
  * Return the name of the last key pressed in the game
  * @method lastPressedKey
  * @private

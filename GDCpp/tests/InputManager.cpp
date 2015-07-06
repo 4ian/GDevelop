@@ -30,14 +30,27 @@ TEST_CASE( "InputManager", "[game-engine]" ) {
 		keyEvent.type = sf::Event::KeyPressed;
 		keyEvent.key = {sf::Keyboard::A, false, false, false, false};
 
+		sf::Event keyReleaseEvent;
+		keyReleaseEvent.type = sf::Event::KeyReleased;
+		keyReleaseEvent.key = {sf::Keyboard::A, false, false, false, false};
+
 		sf::Event focusLost;
 		focusLost.type = sf::Event::LostFocus;
 
 		m.HandleEvent(keyEvent);
 		REQUIRE(m.AnyKeyIsPressed() == true);
+		REQUIRE(m.WasKeyReleased("a") == false);
+		REQUIRE(m.WasKeyReleased("b") == false);
 
 		m.NextFrame();
 		REQUIRE(m.AnyKeyIsPressed() == false);
+		REQUIRE(m.WasKeyReleased("a") == false);
+		REQUIRE(m.WasKeyReleased("b") == false);
+
+		m.NextFrame();
+		m.HandleEvent(keyReleaseEvent);
+		REQUIRE(m.WasKeyReleased("a") == true);
+		REQUIRE(m.WasKeyReleased("b") == false);
 
 		m.NextFrame();
 		m.HandleEvent(focusLost);

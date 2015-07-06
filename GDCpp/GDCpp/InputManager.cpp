@@ -8,8 +8,8 @@
 InputManager::InputManager(sf::Window * win) :
     window(win),
     lastPressedKey(0),
-    mouseWheelDelta(0),
     keyWasPressed(false),
+    mouseWheelDelta(0),
     windowHasFocus(true),
     disableInputWhenNotFocused(true)
 {
@@ -17,10 +17,11 @@ InputManager::InputManager(sf::Window * win) :
 
 void InputManager::NextFrame()
 {
-	mouseWheelDelta = 0;
-	keyWasPressed = false;
-	charactersEntered.clear();
+    keyWasPressed = false;
+    charactersEntered.clear();
+    releasedKeys.clear();
 
+	mouseWheelDelta = 0;
     oldButtonsPressed = buttonsPressed;
     buttonsPressed.clear();
     const auto & buttonMap = GetButtonNameToSfButtonMap();
@@ -32,14 +33,16 @@ void InputManager::NextFrame()
 
 void InputManager::HandleEvent(sf::Event & event)
 {
-	if (event.type == sf::Event::KeyPressed)
-	{
-    	if (!windowHasFocus && disableInputWhenNotFocused)
-    		return;
+    if (event.type == sf::Event::KeyPressed)
+    {
+        if (!windowHasFocus && disableInputWhenNotFocused)
+            return;
 
         lastPressedKey = event.key.code;
         keyWasPressed = true;
-	}
+    }
+	else if (event.type == sf::Event::KeyReleased)
+        releasedKeys.insert(event.key.code);
     else if (event.type == sf::Event::TextEntered)
     {
     	if (!windowHasFocus && disableInputWhenNotFocused)
@@ -64,6 +67,16 @@ bool InputManager::IsKeyPressed(std::string key) const
     auto it = keyMap.find(key);
     if (it != keyMap.end())
         return sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(it->second));
+
+    return false;
+}
+
+bool InputManager::WasKeyReleased(std::string key) const
+{
+    const auto & keyMap = GetKeyNameToSfKeyMap();
+    auto it = keyMap.find(key);
+    if (it != keyMap.end())
+        return releasedKeys.find(it->second) != releasedKeys.end();
 
     return false;
 }

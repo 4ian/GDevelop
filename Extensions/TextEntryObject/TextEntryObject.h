@@ -30,7 +30,7 @@ class wxBitmap;
 class GD_EXTENSION_API TextEntryObject : public gd::Object
 {
 public :
-    TextEntryObject(std::string name_);
+    TextEntryObject(gd::String name_);
     virtual ~TextEntryObject() {};
     virtual gd::Object * Clone() const { return new TextEntryObject(*this); }
 
@@ -57,28 +57,27 @@ public :
     virtual RuntimeObject * Clone() const { return new RuntimeTextEntryObject(*this);}
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
     virtual void UpdateTime(float);
 
-    inline void SetString(std::string str) { text = str; };
-    const std::string & GetString() const { return text; };
+    inline void SetString(gd::String str) { text = str; };
+    const gd::String & GetString() const { return text; };
 
     void Activate( bool activate = true ) { activated = activate; };
     bool IsActivated() const { return activated; };
 
 private:
 
-    std::string text;
+    gd::String text;
     const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
     bool activated;
 };
 
-gd::Object * CreateTextEntryObject(std::string name);
+gd::Object * CreateTextEntryObject(gd::String name);
 RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // TEXTENTRYOBJECT_H
-

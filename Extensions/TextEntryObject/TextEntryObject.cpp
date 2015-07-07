@@ -33,7 +33,7 @@ sf::Texture TextEntryObject::edittimeIconImage;
 sf::Sprite TextEntryObject::edittimeIcon;
 #endif
 
-TextEntryObject::TextEntryObject(std::string name_) :
+TextEntryObject::TextEntryObject(gd::String name_) :
     Object(name_)
 {
 }
@@ -59,17 +59,18 @@ void RuntimeTextEntryObject::UpdateTime(float)
     {
         //Skip some non displayable characters
         if (characters[i] > 30 && (characters[i] < 127 || characters[i] > 159))
-            text += gd::utf8::FromSfString(sf::String(characters[i]));
+        {
+            std::cout << characters[i] << std::endl;
+            text += static_cast<char32_t>(characters[i]);
+        }
         else if (characters[i] == 8)
         {
+            std::cout << "Backspace" << std::endl;
             //Backspace : find the previous codepoint and remove it
             if(text.empty())
                 continue;
 
-            std::string::iterator it = text.end();
-            utf8::prior(it, text.begin());
-
-            text.erase(it, text.end());
+            text.pop_back();
         }
     }
 }
@@ -96,13 +97,13 @@ bool TextEntryObject::GenerateThumbnail(const gd::Project & project, wxBitmap & 
     return true;
 }
 
-void RuntimeTextEntryObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeTextEntryObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Text in memory");    value = GetString();}
     else if ( propertyNb == 1 ) {name = _("Activated \?");      value = activated ? _("Yes") : _("No");}
 }
 
-bool RuntimeTextEntryObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeTextEntryObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
     else if ( propertyNb == 1 ) { activated = (newValue != _("No")); return true; }
@@ -121,9 +122,7 @@ RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Obj
     return new RuntimeTextEntryObject(scene, object);
 }
 
-gd::Object * CreateTextEntryObject(std::string name)
+gd::Object * CreateTextEntryObject(gd::String name)
 {
     return new TextEntryObject(name);
 }
-
-

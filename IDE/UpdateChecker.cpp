@@ -54,11 +54,11 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
             input->Read(out);
         }
         else
-            gd::LogWarning( GD_T( "Error while downloading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
+            gd::LogWarning( _( "Error while downloading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
 
         delete input;
     } else {
-        gd::LogWarning( GD_T( "Unable to connect to the server so as to check for updates.\nPlease check your internet connection, your firewall and if you can go on GD website.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
+        gd::LogWarning( _( "Unable to connect to the server so as to check for updates.\nPlease check your internet connection, your firewall and if you can go on GD website.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
         return;
     }
 
@@ -66,7 +66,7 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
     TiXmlDocument doc( updateInfoFileName.ToLocale().c_str() );
     if ( !doc.LoadFile() )
     {
-        gd::LogWarning( GD_T( "Error while loading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
+        gd::LogWarning( _( "Error while loading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
         return;
     }
 

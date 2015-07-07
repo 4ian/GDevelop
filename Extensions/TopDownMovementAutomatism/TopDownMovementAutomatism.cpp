@@ -187,44 +187,44 @@ std::map<std::string, gd::PropertyDescriptor> TopDownMovementAutomatism::GetProp
 {
     std::map<std::string, gd::PropertyDescriptor> properties;
 
-    properties[GD_T("Allows diagonals")].SetValue(allowDiagonals ? "true" : "false").SetType("Boolean");
-    properties[GD_T("Acceleration")].SetValue(ToString(acceleration));
-    properties[GD_T("Deceleration")].SetValue(ToString(deceleration));
-    properties[GD_T("Max. speed")].SetValue(ToString(maxSpeed));
-    properties[GD_T("Rotate speed")].SetValue(ToString(angularMaxSpeed));
-    properties[GD_T("Rotate object")].SetValue(rotateObject ? "true" : "false").SetType("Boolean");
-    properties[GD_T("Angle offset")].SetValue(ToString(angleOffset));
-    properties[GD_T("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
+    properties[_("Allows diagonals")].SetValue(allowDiagonals ? "true" : "false").SetType("Boolean");
+    properties[_("Acceleration")].SetValue(ToString(acceleration));
+    properties[_("Deceleration")].SetValue(ToString(deceleration));
+    properties[_("Max. speed")].SetValue(ToString(maxSpeed));
+    properties[_("Rotate speed")].SetValue(ToString(angularMaxSpeed));
+    properties[_("Rotate object")].SetValue(rotateObject ? "true" : "false").SetType("Boolean");
+    properties[_("Angle offset")].SetValue(ToString(angleOffset));
+    properties[_("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
 
     return properties;
 }
 
 bool TopDownMovementAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
 {
-    if ( name == GD_T("Default controls") ) {
+    if ( name == _("Default controls") ) {
         ignoreDefaultControls = (value == "0");
         return true;
     }
-    if ( name == GD_T("Allows diagonals") ) {
+    if ( name == _("Allows diagonals") ) {
         allowDiagonals = (value != "0");
         return true;
     }
-    if ( name == GD_T("Rotate object") ) {
+    if ( name == _("Rotate object") ) {
         rotateObject = (value != "0");
         return true;
     }
 
     if ( ToDouble(value) < 0 ) return false;
 
-    if ( name == GD_T("Acceleration") )
+    if ( name == _("Acceleration") )
         acceleration = ToDouble(value);
-    else if ( name == GD_T("Deceleration") )
+    else if ( name == _("Deceleration") )
         deceleration = ToDouble(value);
-    else if ( name == GD_T("Max. speed") )
+    else if ( name == _("Max. speed") )
         maxSpeed = ToDouble(value);
-    else if ( name == GD_T("Rotate speed") )
+    else if ( name == _("Rotate speed") )
         angularMaxSpeed = ToDouble(value);
-    else if ( name == GD_T("Angle offset") )
+    else if ( name == _("Angle offset") )
         angleOffset = ToDouble(value);
     else
         return false;

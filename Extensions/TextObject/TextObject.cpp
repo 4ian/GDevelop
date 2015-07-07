@@ -344,12 +344,12 @@ void RuntimeTextObject::SetSmooth(bool smooth)
 #if defined(GD_IDE_ONLY)
 void RuntimeTextObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = GD_T("Text");                     value = GetString();}
-    else if ( propertyNb == 1 ) {name = GD_T("Font");                    value = GetFontFilename();}
-    else if ( propertyNb == 2 ) {name = GD_T("Font Size");      value = gd::String::FromFloat(GetCharacterSize());}
-    else if ( propertyNb == 3 ) {name = GD_T("Color");       value = gd::String::FromFloat(GetColorR())+";"+gd::String::FromFloat(GetColorG())+";"+gd::String::FromFloat(GetColorB());}
-    else if ( propertyNb == 4 ) {name = GD_T("Opacity");       value = gd::String::FromFloat(GetOpacity());}
-    else if ( propertyNb == 5 ) {name = GD_T("Smoothing");       value = smoothed ? GD_T("Yes") : GD_T("No");}
+    if      ( propertyNb == 0 ) {name = _("Text");                     value = GetString();}
+    else if ( propertyNb == 1 ) {name = _("Font");                    value = GetFontFilename();}
+    else if ( propertyNb == 2 ) {name = _("Font Size");      value = gd::String::FromFloat(GetCharacterSize());}
+    else if ( propertyNb == 3 ) {name = _("Color");       value = gd::String::FromFloat(GetColorR())+";"+gd::String::FromFloat(GetColorG())+";"+gd::String::FromFloat(GetColorB());}
+    else if ( propertyNb == 4 ) {name = _("Opacity");       value = gd::String::FromFloat(GetOpacity());}
+    else if ( propertyNb == 5 ) {name = _("Smoothing");       value = smoothed ? _("Yes") : _("No");}
 }
 
 bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
@@ -383,7 +383,7 @@ bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, gd::String newVa
         SetColor(r.ToInt(), g.ToInt(), b.ToInt());
     }
     else if ( propertyNb == 4 ) { SetOpacity(newValue.ToFloat()); }
-    else if ( propertyNb == 5 ) { SetSmooth(!(newValue == GD_T("No"))); }
+    else if ( propertyNb == 5 ) { SetSmooth(!(newValue == _("No"))); }
 
     return true;
 }

@@ -22,8 +22,8 @@ public:
     Extension()
     {
         SetExtensionInformation("AES",
-                              GD_T("AES encryption algorithm"),
-                              GD_T("Extension to encrypt files with AES algorithm."),
+                              _("AES encryption algorithm"),
+                              _("Extension to encrypt files with AES algorithm."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -32,14 +32,14 @@ public:
         AddAction("EncryptFile",
                        _("Crypt a file"),
                        _("Crypt a file with AES."),
-                       GD_T("Crypt file _PARAM0_ to _PARAM1_ with AES"),
+                       _("Crypt file _PARAM0_ to _PARAM1_ with AES"),
                        _("Encryption"),
                        "CppPlatform/Extensions/AESicon24.png",
                        "CppPlatform/Extensions/AESicon16.png")
 
-            .AddParameter("file", GD_T("Source file"))
-            .AddParameter("file", GD_T("Destination file"))
-            .AddParameter("string", GD_T("Password ( 24 characters )"))
+            .AddParameter("file", _("Source file"))
+            .AddParameter("file", _("Destination file"))
+            .AddParameter("string", _("Password ( 24 characters )"))
 
             .SetFunctionName("GDpriv::AES::EncryptFile").SetIncludeFile("AES/AESTools.h");
 
@@ -47,14 +47,14 @@ public:
         AddAction("DecryptFile",
                        _("Decrypt a file"),
                        _("Decrypt a file with AES."),
-                       GD_T("Decrypt file _PARAM0_ to _PARAM1_ with AES"),
+                       _("Decrypt file _PARAM0_ to _PARAM1_ with AES"),
                        _("Encryption"),
                        "CppPlatform/Extensions/AESicon24.png",
                        "CppPlatform/Extensions/AESicon16.png")
 
-            .AddParameter("file", GD_T("Source file"))
-            .AddParameter("file", GD_T("Destination file"))
-            .AddParameter("string", GD_T("Password ( 24 characters )"))
+            .AddParameter("file", _("Source file"))
+            .AddParameter("file", _("Destination file"))
+            .AddParameter("string", _("Password ( 24 characters )"))
 
             .SetFunctionName("GDpriv::AES::DecryptFile").SetIncludeFile("AES/AESTools.h");
 

@@ -145,7 +145,7 @@ void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
     filename.SetExt("ogg");
     wxRenameFile(originalFile+".ogg", filename.GetFullPath());
 
-    gd::LogMessage(GD_T("The encoding is finished. The OGG  file is located in the same directory as the MP3 file."));
+    gd::LogMessage(_("The encoding is finished. The OGG  file is located in the same directory as the MP3 file."));
 
 }
 
@@ -169,5 +169,5 @@ void mp3ogg::OnEncoderWAVBtClick(wxCommandEvent& event)
     filename.SetExt("wav");
     wxRenameFile(rep+".wav", filename.GetFullPath());
 
-    gd::LogMessage(GD_T("The encoding is finished. The WAV file is located in the same directory as the MP3 file."));
+    gd::LogMessage(_("The encoding is finished. The WAV file is located in the same directory as the MP3 file."));
 }

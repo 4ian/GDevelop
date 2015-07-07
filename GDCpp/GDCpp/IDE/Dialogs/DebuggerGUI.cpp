@@ -409,7 +409,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( !object->RuntimeObject::ChangeProperty(propNb, newValue) )
         {
-            gd::LogWarning(GD_T("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
+            gd::LogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
         }
     }
     //A specific property
@@ -424,7 +424,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( !object->ChangeProperty(propNb, newValue) )
         {
-            gd::LogWarning(GD_T("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
+            gd::LogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
         }
     }
     else //Or a variable
@@ -491,7 +491,7 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
 
     if ( !extension->ChangeProperty(scene, propNb, newValue) )
     {
-        gd::LogWarning(GD_T("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
+        gd::LogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
     }
 }
 
@@ -583,7 +583,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
     if ( variableName == "" ) return;
     if ( scene.GetVariables().Has(variableName) )
     {
-        gd::LogMessage(GD_T("A variable with this name already exists!"));
+        gd::LogMessage(_("A variable with this name already exists!"));
         return;
     }
 
@@ -602,7 +602,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
     if ( variableName == "" ) return;
     if ( scene.game->GetVariables().Has(variableName) )
     {
-        gd::LogMessage(GD_T("A variable with this name already exists!"));
+        gd::LogMessage(_("A variable with this name already exists!"));
         return;
     }
 
@@ -630,7 +630,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
 
     if ( newObject == std::shared_ptr<RuntimeObject> () )
     {
-        gd::LogWarning(GD_T("Unable to create object."));
+        gd::LogWarning(_("Unable to create object."));
         return;
     }
 

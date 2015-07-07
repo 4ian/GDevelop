@@ -65,7 +65,7 @@ addQuotes(addQuotes_)
 	for (unsigned int i =0;i<layout.GetLayersCount();++i)
 	{
 	    gd::String name = layout.GetLayer(i).GetName();
-	    if ( name == "" ) name = GD_T("Base layer");
+	    if ( name == "" ) name = _("Base layer");
 		layersList->Insert(name, 0);
 	}
 }
@@ -79,7 +79,7 @@ ChooseLayerDialog::~ChooseLayerDialog()
 void ChooseLayerDialog::OnokBtClick(wxCommandEvent& event)
 {
     chosenLayer = layersList->GetStringSelection();
-    if ( chosenLayer == GD_T("Base layer") ) chosenLayer = "";
+    if ( chosenLayer == _("Base layer") ) chosenLayer = "";
 
     if ( addQuotes ) chosenLayer = "\""+chosenLayer+"\"";
 

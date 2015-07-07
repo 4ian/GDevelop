@@ -354,7 +354,7 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
     if ( FileDialog.ShowModal() == wxID_OK )
     {
-        gd::LogStatus( GD_T( "Adding images" ) );
+        gd::LogStatus( _( "Adding images" ) );
 
         wxArrayString files;
         FileDialog.GetPaths( files );
@@ -367,7 +367,7 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
         AddResources(filenames);
 
-        gd::LogStatus( GD_T( "Resources successfully added" ) );
+        gd::LogStatus( _( "Resources successfully added" ) );
     }
 
 }
@@ -386,7 +386,7 @@ std::vector<gd::String> ResourcesEditor::CopyAndAddResources(std::vector<gd::Str
             wxString name = wxFileName::FileName(filenames[i]).GetFullName();
             wxFileName destinationFile = wxFileName::FileName(destinationDir.GetPath()+"/"+name);
 
-            gd::LogStatus( GD_T( "Copy of" ) + " " + name );
+            gd::LogStatus( _( "Copy of" ) + " " + name );
 
             //Copy the resource
             wxCopyFile(filenames[i], destinationFile.GetFullPath(), true);
@@ -422,7 +422,7 @@ std::vector<gd::String> ResourcesEditor::AddResources(const std::vector<gd::Stri
             file.MakeRelativeTo(projectDirectory);
 
         gd::String name = file.GetFullName();
-        gd::LogStatus( GD_T( "Adding " ) + name );
+        gd::LogStatus( _( "Adding " ) + name );
 
         //Add to all images
         if ( project.GetResourcesManager().AddResource(name, file.GetFullPath()) )
@@ -448,7 +448,7 @@ std::vector<gd::String> ResourcesEditor::AddResources(const std::vector<gd::Stri
 
     if ( !alreadyExistingResources.empty() )
     {
-        gd::LogMessage(GD_T("Some images in the list have already the same name, and have not been added:")+"\n"+alreadyExistingResources);
+        gd::LogMessage(_("Some images in the list have already the same name, and have not been added:")+"\n"+alreadyExistingResources);
     }
 
     return resourceNames;
@@ -480,7 +480,7 @@ void ResourcesEditor::OnremoveFolderOnlySelected(wxCommandEvent& event)
         resourcesTree->Delete(m_itemSelected);
     }
     else
-        gd::LogStatus( GD_T( "No image selected" ) );
+        gd::LogStatus( _( "No image selected" ) );
 }
 
 /**
@@ -535,7 +535,7 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
         }
         else
         {
-            gd::LogStatus( GD_T( "No image selected" ) );
+            gd::LogStatus( _( "No image selected" ) );
         }
     }
 }
@@ -545,7 +545,7 @@ void ResourcesEditor::OnModNameImageBtClick( wxCommandEvent& event )
     if ( m_itemSelected.IsOk() && resourcesTree->GetChildrenCount( m_itemSelected ) == 0 )
         resourcesTree->EditLabel( m_itemSelected );
     else
-        gd::LogStatus( GD_T( "No image selected" ) );
+        gd::LogStatus( _( "No image selected" ) );
 }
 
 void ResourcesEditor::OnresourcesTreeItemMenu( wxTreeEvent& event )
@@ -784,7 +784,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
             {
                 if ( project.GetResourcesManager().HasResource(propertyNewValue) )
                 {
-                    gd::LogWarning( GD_T( "Unable to rename the image: another image has already this name." ) );
+                    gd::LogWarning( _( "Unable to rename the image: another image has already this name." ) );
                     event.Veto();
                     return;
                 }
@@ -797,7 +797,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
             {
                 if ( project.GetResourcesManager().HasFolder(propertyNewValue) )
                 {
-                    gd::LogWarning( GD_T( "Unable to rename the folder: another folder has already this name." ) );
+                    gd::LogWarning( _( "Unable to rename the folder: another folder has already this name." ) );
                     event.Veto();
                     return;
                 }
@@ -846,7 +846,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
         {
             if ( project.GetResourcesManager().HasFolder(newName) )
             {
-                gd::LogWarning( GD_T( "Unable to rename the folder: another folder has already this name." ) );
+                gd::LogWarning( _( "Unable to rename the folder: another folder has already this name." ) );
                 event.Veto();
                 return;
             }
@@ -860,7 +860,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
         {
             if ( project.GetResourcesManager().HasResource(newName) )
             {
-                gd::LogWarning( GD_T( "Unable to rename the image: another image has already this name." ) );
+                gd::LogWarning( _( "Unable to rename the image: another image has already this name." ) );
                 event.Veto();
                 return;
             }
@@ -988,7 +988,7 @@ void ResourcesEditor::OnShowPropertyGridBtClick( wxCommandEvent& event )
 
 void ResourcesEditor::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"));
 }
 
 void ResourcesEditor::OnresourcesTreeItemActivated(wxTreeEvent& event)
@@ -1226,11 +1226,11 @@ void ResourcesEditor::ForceRefreshRibbonAndConnect()
 
 void ResourcesEditor::OnAddFolderSelected(wxCommandEvent& event)
 {
-    gd::String newName = GD_T("New folder");
+    gd::String newName = _("New folder");
     unsigned int i = 1;
     while( project.GetResourcesManager().HasFolder(newName) )
     {
-        newName = GD_T("New folder") + " " + gd::String::FromInt(i);
+        newName = _("New folder") + " " + gd::String::FromInt(i);
         ++i;
     }
 

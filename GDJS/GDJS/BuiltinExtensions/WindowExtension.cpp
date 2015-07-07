@@ -18,8 +18,8 @@ WindowExtension::WindowExtension()
     gd::BuiltinExtensionsImplementer::ImplementsWindowExtension(*this);
 
     SetExtensionInformation("BuiltinWindow",
-                          GD_T("Window features"),
-                          GD_T("Built-in extension allowing to manipulate the game's window"),
+                          _("Window features"),
+                          _("Built-in extension allowing to manipulate the game's window"),
                           "Florian Rival",
                           "Open source (MIT License)");
 

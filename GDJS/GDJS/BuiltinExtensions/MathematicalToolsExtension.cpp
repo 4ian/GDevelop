@@ -20,8 +20,8 @@ MathematicalToolsExtension::MathematicalToolsExtension()
     gd::BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(*this);
 
     SetExtensionInformation("BuiltinMathematicalTools",
-                          GD_T("Mathematical tools"),
-                          GD_T("Built-in extension providing mathematical tools"),
+                          _("Mathematical tools"),
+                          _("Built-in extension providing mathematical tools"),
                           "Florian Rival",
                           "Open source (MIT License)");
 

@@ -57,7 +57,7 @@ namespace gd
 
 Project::Project() :
     #if defined(GD_IDE_ONLY)
-    name(GD_T("Project")),
+    name(_("Project")),
     #endif
     windowWidth(800),
     windowHeight(600),
@@ -499,21 +499,21 @@ void Project::UnserializeFrom(const SerializerElement & element)
     int revision = gdVersionElement.GetIntAttribute("revision", 0, "Revision");
 
     if ( GDMajorVersion > gd::VersionWrapper::Major() )
-        gd::LogWarning( GD_T( "The version of GDevelop used to create this game seems to be a new version.\nGDevelop may fail to open the game, or data may be missing.\nYou should check if a new version of GDevelop is available." ) );
+        gd::LogWarning( _( "The version of GDevelop used to create this game seems to be a new version.\nGDevelop may fail to open the game, or data may be missing.\nYou should check if a new version of GDevelop is available." ) );
     else
     {
         if ( (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion >  gd::VersionWrapper::Minor()) ||
              (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build >  gd::VersionWrapper::Build()) ||
              (GDMajorVersion == gd::VersionWrapper::Major() && GDMinorVersion == gd::VersionWrapper::Minor() && build == gd::VersionWrapper::Build() && revision > gd::VersionWrapper::Revision()) )
         {
-            gd::LogWarning( GD_T( "The version of GDevelop used to create this game seems to be greater.\nGDevelop may fail to open the game, or data may be missing.\nYou should check if a new version of GDevelop is available." ) );
+            gd::LogWarning( _( "The version of GDevelop used to create this game seems to be greater.\nGDevelop may fail to open the game, or data may be missing.\nYou should check if a new version of GDevelop is available." ) );
         }
     }
 
     //Compatibility code
     if ( GDMajorVersion <= 1 )
     {
-        gd::LogError( GD_T("The game was saved with version of GDevelop which is too old. Please open and save the game with one of the first version of GDevelop 2. You will then be able to open your game with this GDevelop version."));
+        gd::LogError( _("The game was saved with version of GDevelop which is too old. Please open and save the game with one of the first version of GDevelop 2. You will then be able to open your game with this GDevelop version."));
         return;
     }
     //End of Compatibility code
@@ -598,9 +598,9 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #if defined(GD_IDE_ONLY)
     if ( VersionWrapper::IsOlder(GDMajorVersion, 0, 0, 0, 3, 0, 0, 0) )
     {
-        updateText += GD_T("Sprite scaling has changed since GD 2: The resizing is made so that the origin point of the object won't move whatever the scale of the object.\n");
-        updateText += GD_T("You may have to slightly change the position of some objects if you have changed their size.\n\n");
-        updateText += GD_T("Thank you for your understanding.\n");
+        updateText += _("Sprite scaling has changed since GD 2: The resizing is made so that the origin point of the object won't move whatever the scale of the object.\n");
+        updateText += _("You may have to slightly change the position of some objects if you have changed their size.\n\n");
+        updateText += _("Thank you for your understanding.\n");
 
     }
     #endif
@@ -623,8 +623,8 @@ void Project::UnserializeFrom(const SerializerElement & element)
         {
             GetUsedExtensions().erase( std::remove( GetUsedExtensions().begin(), GetUsedExtensions().end(), "AStarAutomatism" ), GetUsedExtensions().end() );
             GetUsedExtensions().push_back("PathfindingAutomatism");
-            updateText += GD_T("The project is using the pathfinding automatism. This automatism has been replaced by a new one:\n");
-            updateText += GD_T("You must add the new 'Pathfinding' automatism to the objects that need to be moved, and add the 'Pathfinding Obstacle' to the objects that must act as obstacles.");
+            updateText += _("The project is using the pathfinding automatism. This automatism has been replaced by a new one:\n");
+            updateText += _("You must add the new 'Pathfinding' automatism to the objects that need to be moved, and add the 'Pathfinding Obstacle' to the objects that must act as obstacles.");
         }
     }
     #endif
@@ -714,7 +714,7 @@ bool Project::LoadFromFile(const gd::String & filename)
     if ( !doc.LoadFile(filename.ToLocale().c_str(), TIXML_ENCODING_UTF8) )
     {
         gd::String errorTinyXmlDesc = doc.ErrorDesc();
-        gd::String error = GD_T( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +GD_T("Make sure the file exists and that you have the right to open the file.");
+        gd::String error = _( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
 
         gd::LogError( error );
         return false;
@@ -791,7 +791,7 @@ bool Project::LoadFromJSONFile(const gd::String & filename)
     std::ifstream ifs(filename.ToLocale().c_str());
     if (!ifs.is_open())
     {
-        gd::String error = GD_T( "Unable to open the file") + GD_T("Make sure the file exists and that you have the right to open the file.");
+        gd::String error = _( "Unable to open the file") + _("Make sure the file exists and that you have the right to open the file.");
         gd::LogError( error );
         return false;
     }
@@ -902,7 +902,7 @@ bool Project::SaveToFile(const gd::String & filename)
     //Write XML to file
     if ( !doc.SaveFile( filename.ToLocale().c_str() ) )
     {
-        gd::LogError( GD_T( "Unable to save file ") + filename + GD_T("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
+        gd::LogError( _( "Unable to save file ") + filename + _("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
         return false;
     }
 
@@ -920,7 +920,7 @@ bool Project::SaveToJSONFile(const gd::String & filename)
     ofstream ofs(filename.ToLocale().c_str());
     if (!ofs.is_open())
     {
-        gd::LogError( GD_T( "Unable to save file ")+ filename + GD_T("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
+        gd::LogError( _( "Unable to save file ")+ filename + _("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
         return false;
     }
 
@@ -938,7 +938,7 @@ bool Project::ValidateObjectName(const gd::String & name)
 
 gd::String Project::GetBadObjectNameWarning()
 {
-    return GD_T("Please use only letters, digits\nand underscores ( _ ).");
+    return _("Please use only letters, digits\nand underscores ( _ ).");
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)

@@ -18,8 +18,8 @@ StringInstructionsExtension::StringInstructionsExtension()
     gd::BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(*this);
 
     SetExtensionInformation("BuiltinStringInstructions",
-                          GD_T("Text manipulation"),
-                          GD_T("Built-in extension providing expressions related to strings."),
+                          _("Text manipulation"),
+                          _("Built-in extension providing expressions related to strings."),
                           "Florian Rival",
                           "Open source (MIT License)");
 

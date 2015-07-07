@@ -22,16 +22,16 @@ This project is released under the MIT License.
 Extension::Extension()
 {
     SetExtensionInformation("ParticleSystem",
-                          GD_T("Particle system"),
-                          GD_T("Extension allowing to display a large number of small particles."),
+                          _("Particle system"),
+                          _("Extension allowing to display a large number of small particles."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
     //Declaration of all objects available
     {
         gd::ObjectMetadata & obj = AddObject("ParticleEmitter",
-                   GD_T("Particles emitter"),
-                   GD_T("Displays a large number of small particles to create visual effects"),
+                   _("Particles emitter"),
+                   _("Displays a large number of small particles to create visual effects"),
                    "CppPlatform/Extensions/particleSystemicon.png",
                    &CreateParticleEmitterObject);
 

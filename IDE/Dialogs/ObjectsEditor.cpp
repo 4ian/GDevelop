@@ -140,7 +140,7 @@ namespace
                 //Notify the game of the new group
                 for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                     project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, &layout, name);
-                gd::LogStatus( GD_T( "The group was correctly added." ) );
+                gd::LogStatus( _( "The group was correctly added." ) );
 
                 //Expand the new group item
                 treeCtrl->Expand(itemAdded);
@@ -615,7 +615,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         unsigned int nameCheckResult = nameChecker.HasObjectOrGroupNamed(newName, globalObject);
         if ( nameCheckResult != gd::ObjectOrGroupFinder::No )
         {
-            gd::LogWarning( GD_T( "Unable to rename the object : \n" ) + GetExistingObjectsErrorMessage(nameCheckResult, nameChecker.GetLayoutsWithSameObjectName()) );
+            gd::LogWarning( _( "Unable to rename the object : \n" ) + GetExistingObjectsErrorMessage(nameCheckResult, nameChecker.GetLayoutsWithSameObjectName()) );
 
             event.Veto();
             return;
@@ -701,7 +701,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         unsigned int nameCheckResult = nameChecker.HasObjectOrGroupNamed(event.GetLabel(), globalGroup);
         if ( nameCheckResult != gd::ObjectOrGroupFinder::No )
         {
-            gd::LogWarning( GD_T( "Unable to rename the group : \n" ) + GetExistingObjectsErrorMessage(nameCheckResult, nameChecker.GetLayoutsWithSameObjectName()) );
+            gd::LogWarning( _( "Unable to rename the group : \n" ) + GetExistingObjectsErrorMessage(nameCheckResult, nameChecker.GetLayoutsWithSameObjectName()) );
 
             event.Veto();
             return;
@@ -897,9 +897,9 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     gd::ObjectOrGroupFinder nameChecker(project, &layout);
 
     //Find a new unique name for the object
-    gd::String name = GD_T("NewObject");
+    gd::String name = _("NewObject");
     for (unsigned int i = 2; nameChecker.HasObjectOrGroupNamed(name)!=gd::ObjectOrGroupFinder::No ;++i)
-        name = GD_T("NewObject")+gd::String::FromUInt(i);
+        name = _("NewObject")+gd::String::FromUInt(i);
 
     //Add a new object of selected type to objects list
     gd::Object & object = layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(),
@@ -921,7 +921,7 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     objectsList->EditLabel(itemAdded);
     renamedItemOldName = name; //With wxGTK, calling EditLabel do not update renamedItemOldName with the name of the new object.
 
-    gd::LogStatus( GD_T( "The object was correctly added" ) );
+    gd::LogStatus( _( "The object was correctly added" ) );
     objectsList->Expand(objectsRootItem);
 }
 
@@ -933,11 +933,11 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 
     gd::ObjectOrGroupFinder nameChecker(project, &layout);
 
-    gd::String name = GD_T("NewGroup");
+    gd::String name = _("NewGroup");
     for (unsigned int i = 2;
         nameChecker.HasObjectOrGroupNamed(name) != gd::ObjectOrGroupFinder::No;
         ++i)
-        name = GD_T("NewGroup")+gd::String::FromUInt(i);
+        name = _("NewGroup")+gd::String::FromUInt(i);
 
     newGroup.SetName( name );
 
@@ -954,7 +954,7 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 
     for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, &layout, name);
-    gd::LogStatus( GD_T( "The group was correctly added." ) );
+    gd::LogStatus( _( "The group was correctly added." ) );
 
     //Make sure that the group root item is expanded
     objectsList->Expand(groupsRootItem);
@@ -1272,9 +1272,9 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
         //Add a number to the new name if necessary
         if ( nameChecker.HasObjectOrGroupNamed(name, globalObject /* Only search other layouts if it's a global object */) != gd::ObjectOrGroupFinder::No )
         {
-            name =  GD_T( "CopyOf" ) + object->GetName();
+            name =  _( "CopyOf" ) + object->GetName();
             for (unsigned int i = 2;nameChecker.HasObjectOrGroupNamed(name, globalObject /* Only search other layouts if it's a global object */)!=gd::ObjectOrGroupFinder::No;++i)
-                name = GD_T("CopyOf")+ object->GetName()+gd::String::FromUInt(i);
+                name = _("CopyOf")+ object->GetName()+gd::String::FromUInt(i);
         }
 
         //Name the object
@@ -1298,9 +1298,9 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
         //Add a number to the new name if necessary
         if ( nameChecker.HasObjectOrGroupNamed(name, globalGroup /* Only search other layouts if it's a global object */) != gd::ObjectOrGroupFinder::No )
         {
-            name =  GD_T( "CopyOf" ) + name;
+            name =  _( "CopyOf" ) + name;
             for (unsigned int i = 2;nameChecker.HasObjectOrGroupNamed(name, globalGroup /* Only search other layouts if it's a global object */)!=gd::ObjectOrGroupFinder::No;++i)
-                name = GD_T("CopyOf")+ groupPasted.GetName()+gd::String::FromUInt(i);
+                name = _("CopyOf")+ groupPasted.GetName()+gd::String::FromUInt(i);
         }
         groupPasted.SetName(name);
         objectsGroups.push_back( groupPasted );
@@ -1340,7 +1340,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
         //Test if there is a global object/group or an object/group in another layout with the same name
         //Indeed the object in the same layout with the same name is not taken into account because it's the object we want to set global.
         {
-            gd::String errorMessage = GD_T("Can't set \"") + objectName + GD_T("\" global because :\n") +
+            gd::String errorMessage = _("Can't set \"") + objectName + _("\" global because :\n") +
                 GetExistingObjectsErrorMessage(searchSameNames & ~gd::ObjectOrGroupFinder::InLayout, nameChecker.GetLayoutsWithSameObjectName() );
             gd::LogWarning(errorMessage);
             return;
@@ -1383,7 +1383,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
         //Test if there is a global object/group or an object/group in another layout with the same name
         //Indeed the object in the same layout with the same name is not taken into account because it's the object we want to set global.
         {
-            gd::String errorMessage = GD_T("Can't set \"") + groupName + GD_T("\" global because :\n") +
+            gd::String errorMessage = _("Can't set \"") + groupName + _("\" global because :\n") +
                 GetExistingObjectsErrorMessage(searchSameNames & ~gd::ObjectOrGroupFinder::InLayout, nameChecker.GetLayoutsWithSameObjectName() );
             gd::LogWarning(errorMessage);
 
@@ -1615,11 +1615,11 @@ gd::String ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheckR
         errorMessage += " - ";
 
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInLayout) != 0)
-            errorMessage += GD_T("an object") + " ";
+            errorMessage += _("an object") + " ";
         else
-            errorMessage += GD_T("a group") + " ";
+            errorMessage += _("a group") + " ";
 
-        errorMessage += GD_T("with the same name exists in the current scene");
+        errorMessage += _("with the same name exists in the current scene");
     }
     if((nameCheckResult & gd::ObjectOrGroupFinder::InAnotherLayout) != 0)
     {
@@ -1629,13 +1629,13 @@ gd::String ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheckR
         errorMessage += " - ";
 
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInAnotherLayout) != 0)
-            errorMessage += GD_T("objects") + " ";
+            errorMessage += _("objects") + " ";
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsGroupInAnotherLayout) != 0)
             errorMessage += ((nameCheckResult & gd::ObjectOrGroupFinder::AsObjectInAnotherLayout) != 0) ?
-                GD_T("/ groups") :
-                GD_T("groups") + " ";
+                _("/ groups") :
+                _("groups") + " ";
 
-        errorMessage += GD_T("with the same name exist in these scenes : ");
+        errorMessage += _("with the same name exist in these scenes : ");
 
         for(auto it = layoutsWithSameName.begin(); it != layoutsWithSameName.end(); ++it)
         {
@@ -1650,9 +1650,9 @@ gd::String ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheckR
         errorMessage += " - ";
 
         if((nameCheckResult & gd::ObjectOrGroupFinder::AsGlobalObject) != 0)
-            errorMessage += GD_T("a global object with the same name exists");
+            errorMessage += _("a global object with the same name exists");
         else
-            errorMessage += GD_T("a global group with the same name exists");
+            errorMessage += _("a global group with the same name exists");
     }
 
     return errorMessage;

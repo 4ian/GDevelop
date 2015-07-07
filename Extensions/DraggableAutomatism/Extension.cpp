@@ -13,15 +13,15 @@ This project is released under the MIT License.
 void DeclareDraggableAutomatismExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("DraggableAutomatism",
-                              GD_T("Draggable Automatism"),
-                              GD_T("Automatism allowing to move objects with the mouse"),
+                              _("Draggable Automatism"),
+                              _("Automatism allowing to move objects with the mouse"),
                               "Florian Rival",
                               "Open source (MIT License)");
 
     gd::AutomatismMetadata & aut = extension.AddAutomatism("Draggable",
-          GD_T("Draggable object"),
-          GD_T("Draggable"),
-          GD_T("Allows objects to be moved using the mouse."),
+          _("Draggable object"),
+          _("Draggable"),
+          _("Allows objects to be moved using the mouse."),
           "",
           "CppPlatform/Extensions/draggableicon.png",
           "DraggableAutomatism",
@@ -34,13 +34,13 @@ void DeclareDraggableAutomatismExtension(gd::PlatformExtension & extension)
     aut.AddCondition("Dragged",
                    _("Being dragged"),
                    _("Check if the object is being dragged"),
-                   GD_T("_PARAM0_ is being dragged"),
+                   _("_PARAM0_ is being dragged"),
                    _(""),
                    "CppPlatform/Extensions/draggableicon24.png",
                    "CppPlatform/Extensions/draggableicon16.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("automatism", GD_T("Automatism"), "Draggable", false)
+        .AddParameter("object", _("Object"))
+        .AddParameter("automatism", _("Automatism"), "Draggable", false)
 
         .SetFunctionName("IsDragged").SetIncludeFile("DraggableAutomatism/DraggableAutomatism.h");
     #endif

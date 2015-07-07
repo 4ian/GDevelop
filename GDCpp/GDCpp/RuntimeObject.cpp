@@ -80,16 +80,16 @@ void RuntimeObject::Init(const RuntimeObject & object)
 #if defined(GD_IDE_ONLY)
 void RuntimeObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = GD_T("Position");      value = gd::String::FromFloat(GetX())+";"+gd::String::FromFloat(GetY());}
-    else if ( propertyNb == 1 ) {name = GD_T("Angle");         value = gd::String::FromFloat(GetAngle())+u8"°";}
-    else if ( propertyNb == 2 ) {name = GD_T("Size");        value = gd::String::FromFloat(GetWidth())+";"+gd::String::FromFloat(GetHeight());}
-    else if ( propertyNb == 3 ) {name = GD_T("Visibility");    value = hidden ? GD_T("Hidden") : GD_T("Displayed");}
-    else if ( propertyNb == 4 ) {name = GD_T("Layer");        value = layer;}
-    else if ( propertyNb == 5 ) {name = GD_T("Z order");          value = gd::String::FromInt(zOrder);}
-    else if ( propertyNb == 6 ) {name = GD_T("Speed");       value = gd::String::FromFloat(TotalForceLength());}
-    else if ( propertyNb == 7 ) {name = GD_T("Angle of moving"); value = gd::String::FromFloat(TotalForceAngle());}
-    else if ( propertyNb == 8 ) {name = GD_T("X coordinate of moving");     value = gd::String::FromFloat(TotalForceX());}
-    else if ( propertyNb == 9 ) {name = GD_T("Y coordinate of moving"); value = gd::String::FromFloat(TotalForceY());}
+    if      ( propertyNb == 0 ) {name = _("Position");      value = gd::String::FromFloat(GetX())+";"+gd::String::FromFloat(GetY());}
+    else if ( propertyNb == 1 ) {name = _("Angle");         value = gd::String::FromFloat(GetAngle())+u8"°";}
+    else if ( propertyNb == 2 ) {name = _("Size");        value = gd::String::FromFloat(GetWidth())+";"+gd::String::FromFloat(GetHeight());}
+    else if ( propertyNb == 3 ) {name = _("Visibility");    value = hidden ? _("Hidden") : _("Displayed");}
+    else if ( propertyNb == 4 ) {name = _("Layer");        value = layer;}
+    else if ( propertyNb == 5 ) {name = _("Z order");          value = gd::String::FromInt(zOrder);}
+    else if ( propertyNb == 6 ) {name = _("Speed");       value = gd::String::FromFloat(TotalForceLength());}
+    else if ( propertyNb == 7 ) {name = _("Angle of moving"); value = gd::String::FromFloat(TotalForceAngle());}
+    else if ( propertyNb == 8 ) {name = _("X coordinate of moving");     value = gd::String::FromFloat(TotalForceX());}
+    else if ( propertyNb == 9 ) {name = _("Y coordinate of moving"); value = gd::String::FromFloat(TotalForceY());}
 }
 
 bool RuntimeObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
@@ -111,7 +111,7 @@ bool RuntimeObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
     else if ( propertyNb == 2 ) {return false;}
     else if ( propertyNb == 3 )
     {
-        if ( newValue == GD_T("Hidden") )
+        if ( newValue == _("Hidden") )
         {
             SetHidden();
         }

@@ -331,7 +331,7 @@ void ImportImage::OnFermerBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void ImportImage::OnBrowseGIFBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choose the animated GIF to decompose"), "", "", "GIF animé (*.gif)|*.gif");
+    wxFileDialog dialog(this, _("Choose the animated GIF to decompose"), "", "", "GIF animï¿½ (*.gif)|*.gif");
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
@@ -340,7 +340,7 @@ void ImportImage::OnBrowseGIFBtClick(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-///Mise à jour en temps réel du nombre d'image d'un fichier gif
+///Mise ï¿½ jour en temps rï¿½el du nombre d'image d'un fichier gif
 ////////////////////////////////////////////////////////////
 void ImportImage::OnFileGIFEditText(wxCommandEvent& event)
 {
@@ -352,14 +352,14 @@ void ImportImage::OnFileGIFEditText(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-///Décomposition du fichier GIF
+///Dï¿½composition du fichier GIF
 ////////////////////////////////////////////////////////////
 void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
 {
     wxAnimation animation;
     if ( !animation.LoadFile(FileGIFEdit->GetValue()) )
     {
-        gd::LogWarning(GD_T("Unable to open the GIF file!"));
+        gd::LogWarning(_("Unable to open the GIF file!"));
         return;
     }
 
@@ -372,7 +372,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+gd::ToString(i)+".png", wxBITMAP_TYPE_PNG);
     }
 
-    gd::LogMessage(GD_T("Decomposition of the GIF completed!"));
+    gd::LogMessage(_("Decomposition of the GIF completed!"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -400,7 +400,7 @@ void ImportImage::OnBrowseSSBtClick(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-///Mise à jour en temps réel de la taille d'une image après décomposition
+///Mise ï¿½ jour en temps rï¿½el de la taille d'une image aprï¿½s dï¿½composition
 ////////////////////////////////////////////////////////////
 void ImportImage::OnfileRPGEditText(wxCommandEvent& event)
 {
@@ -412,14 +412,14 @@ void ImportImage::OnfileRPGEditText(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-///Décomposition de la feuille de sprite RPG Maker
+///Dï¿½composition de la feuille de sprite RPG Maker
 ////////////////////////////////////////////////////////////
 void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
 {
     wxImage image;
     if ( !image.LoadFile(fileRPGEdit->GetValue()) )
     {
-        gd::LogWarning(GD_T("Unable to open the file !"));
+        gd::LogWarning(_("Unable to open the file !"));
         return;
     }
 
@@ -430,13 +430,13 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
     {
         for (unsigned int i = 0;i<4;++i)
         {
-            //On récupère la sous image
+            //On rï¿½cupï¿½re la sous image
             wxImage subImage = image.GetSubImage(wxRect(image.GetWidth()/4*i,
                                                         image.GetHeight()/4*j,
                                                         image.GetWidth()/4,
                                                         image.GetHeight()/4));
 
-            //La direction est noté sous forme Down, Left, Right, Up
+            //La direction est notï¿½ sous forme Down, Left, Right, Up
             string direc = "";
             if ( j == 0 ) direc = "D";
             if ( j == 1 ) direc = "L";
@@ -446,18 +446,18 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
         }
     }
 
-    gd::LogMessage(GD_T("The decomposition of the image is completed !"));
+    gd::LogMessage(_("The decomposition of the image is completed !"));
 }
 
 ////////////////////////////////////////////////////////////
-///Décomposition d'une feuille de sprite générique
+///Dï¿½composition d'une feuille de sprite gï¿½nï¿½rique
 ////////////////////////////////////////////////////////////
 void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
 {
     wxImage image;
     if ( !image.LoadFile(fileSSEdit->GetValue()) )
     {
-        gd::LogWarning(GD_T("Unable to open the file !"));
+        gd::LogWarning(_("Unable to open the file !"));
         return;
     }
 
@@ -473,14 +473,14 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     int lineNb = ToInt(static_cast<string>(linesSSEdit->GetValue()));
     if ( lineNb <= 0 )
     {
-        gd::LogWarning(GD_T("The number of lines is invalid: The minimum is one line."));
+        gd::LogWarning(_("The number of lines is invalid: The minimum is one line."));
         return;
     }
 
     int columnNb = ToInt(static_cast<string>(columnsSSEdit->GetValue()));
     if ( columnNb <= 0 )
     {
-        gd::LogWarning(GD_T("The number of columns is invalid: The minimum is one column."));
+        gd::LogWarning(_("The number of columns is invalid: The minimum is one column."));
         return;
     }
 
@@ -491,24 +491,24 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     int height = ToInt(static_cast<string>(heightSSEdit->GetValue()));
     if ( width <= 0 || height <= 0)
     {
-        gd::LogWarning(GD_T("The size of a sprite is invalid."));
+        gd::LogWarning(_("The size of a sprite is invalid."));
         return;
     }
 
     int spaceH = ToInt(static_cast<string>(spaceHSSEdit->GetValue()));
     if ( spaceH < 0 )
     {
-        gd::LogWarning(GD_T("The horizontal spacing is invalid (must be greater than or equal to 0)."));
+        gd::LogWarning(_("The horizontal spacing is invalid (must be greater than or equal to 0)."));
         return;
     }
     int spaceV = ToInt(static_cast<string>(spaceVSSEdit->GetValue()));
     if ( spaceV < 0 )
     {
-        gd::LogWarning(GD_T("The vertical spacing is invalid (must be greater than or equal to 0)."));
+        gd::LogWarning(_("The vertical spacing is invalid (must be greater than or equal to 0)."));
         return;
     }
 
-    //Décomposition ligne par ligne
+    //Dï¿½composition ligne par ligne
     int Y = origineY;
     for (unsigned int line = 0;line<static_cast<unsigned>(lineNb);++line)
     {

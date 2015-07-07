@@ -79,7 +79,7 @@ void VariableParser::S()
 	ReadToken();
 	if (currentTokenType != TS_VARNAME)
 	{
-	    firstErrorStr = GD_T("Expecting a variable name.");
+	    firstErrorStr = _("Expecting a variable name.");
 	    firstErrorPos = currentPosition;
 	    return;
 	}
@@ -109,7 +109,7 @@ void VariableParser::X()
 		ReadToken();
 		if (currentTokenType != TS_CLOSING_BRACKET)
 		{
-		    firstErrorStr = GD_T("Expecting ]");
+		    firstErrorStr = _("Expecting ]");
 		    firstErrorPos = currentPosition;
 		    return;
 		}

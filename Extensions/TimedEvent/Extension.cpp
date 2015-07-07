@@ -31,8 +31,8 @@ public:
     Extension()
     {
         SetExtensionInformation("TimedEvent",
-                              GD_T("Timed events"),
-                              GD_T("Event which launch its conditions and actions only after a amount of time is reached."),
+                              _("Timed events"),
+                              _("Event which launch its conditions and actions only after a amount of time is reached."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -183,7 +183,7 @@ public:
                 if ( name.find("GDNamedTimedEvent_") == 0 && name.length() > 18 )
                     name = name.substr(18, name.length());
                 else
-                    name = GD_T("No name");
+                    name = _("No name");
 
                 value = ToString(static_cast<double>(iter->second.GetTime())/1000000.0)+"s";
 

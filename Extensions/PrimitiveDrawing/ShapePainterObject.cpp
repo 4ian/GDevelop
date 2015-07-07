@@ -163,11 +163,11 @@ void ShapePainterObject::EditObject( wxWindow* parent, gd::Project & game, gd::M
 
 void RuntimeShapePainterObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = GD_T("Fill color");    value = ToString(GetFillColorR())+";"+ToString(GetFillColorG())+";"+ToString(GetFillColorB());}
-    else if ( propertyNb == 1 ) {name = GD_T("Fill opacity");    value = ToString(GetFillOpacity());}
-    else if ( propertyNb == 2 ) {name = GD_T("Outline size");         value = ToString(GetOutlineSize());}
-    else if ( propertyNb == 3 ) {name = GD_T("Outline color");        value = ToString(GetOutlineColorR())+";"+ToString(GetOutlineColorG())+";"+ToString(GetOutlineColorB());}
-    else if ( propertyNb == 4 ) {name = GD_T("Outline opacity");        value = ToString(GetOutlineOpacity());}
+    if      ( propertyNb == 0 ) {name = _("Fill color");    value = ToString(GetFillColorR())+";"+ToString(GetFillColorG())+";"+ToString(GetFillColorB());}
+    else if ( propertyNb == 1 ) {name = _("Fill opacity");    value = ToString(GetFillOpacity());}
+    else if ( propertyNb == 2 ) {name = _("Outline size");         value = ToString(GetOutlineSize());}
+    else if ( propertyNb == 3 ) {name = _("Outline color");        value = ToString(GetOutlineColorR())+";"+ToString(GetOutlineColorG())+";"+ToString(GetOutlineColorB());}
+    else if ( propertyNb == 4 ) {name = _("Outline opacity");        value = ToString(GetOutlineOpacity());}
 }
 
 bool RuntimeShapePainterObject::ChangeProperty(unsigned int propertyNb, string newValue)

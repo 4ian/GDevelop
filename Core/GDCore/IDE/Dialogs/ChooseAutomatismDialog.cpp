@@ -119,7 +119,7 @@ bool ChooseAutomatismDialog::DeduceAutomatism()
 			MetadataProvider::GetAutomatismMetadata(project.GetCurrentPlatform(), automatismTypeAllowed);
 
 		if (metadata.GetFullName().empty())
-			gd::LogMessage(GD_T("This object doesn't have the appropriate automatism attached to it.\nCheck that you selected the right object or add the automatism in the object properties."));
+			gd::LogMessage(_("This object doesn't have the appropriate automatism attached to it.\nCheck that you selected the right object or add the automatism in the object properties."));
 		else
 		{
 			gd::LogMessage(

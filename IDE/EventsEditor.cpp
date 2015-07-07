@@ -1267,7 +1267,7 @@ void EventsEditor::AddEvent(gd::EventItem & previousEventItem)
         ChangesMadeOnEvents();
     }
     else
-        gd::LogError(GD_T("Unable to create standard event."));
+        gd::LogError(_("Unable to create standard event."));
 }
 
 void EventsEditor::OnaddEventBtClick(wxCommandEvent& event)
@@ -1314,7 +1314,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
         ChangesMadeOnEvents();
     }
     else
-        gd::LogError(GD_T("Unable to create a comment event."));
+        gd::LogError(_("Unable to create a comment event."));
 }
 
 /**
@@ -1334,7 +1334,7 @@ void EventsEditor::AddSubEvent(gd::EventItem & parentEventItem)
         ChangesMadeOnEvents();
     }
     else
-        gd::LogError(GD_T("Unable to create standard event."));
+        gd::LogError(_("Unable to create standard event."));
 }
 
 void EventsEditor::OnaddSubEventBtClick(wxCommandEvent& event)
@@ -1606,7 +1606,7 @@ void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
 
 void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"));
 }
 
 void EventsEditor::OnEventStoreBtClick( wxCommandEvent& event )
@@ -1650,7 +1650,7 @@ void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)
     {
         if ( !profilingActivated && !sceneCanvas->GetProfileDialog()->profilingActivated)
         {
-            gd::LogMessage(GD_T("Profiling is not activated. Activate profiling thanks to the Profiling window when previewing a scene."));
+            gd::LogMessage(_("Profiling is not activated. Activate profiling thanks to the Profiling window when previewing a scene."));
             return;
         }
     }

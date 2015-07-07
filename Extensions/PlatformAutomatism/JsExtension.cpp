@@ -26,8 +26,8 @@ public:
     PlatformAutomatismJsExtension()
     {
         SetExtensionInformation("PlatformAutomatism",
-                              GD_T("Platform Automatism"),
-                              GD_T("Allows to use controllable objects which can run and jump on platforms."),
+                              _("Platform Automatism"),
+                              _("Allows to use controllable objects which can run and jump on platforms."),
                               "Florian Rival",
                               "Open source (MIT License)");
         DeclarePlatformAutomatismExtension(*this);

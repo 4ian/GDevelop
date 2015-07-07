@@ -344,7 +344,7 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
 
 void SearchEvents::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event_find"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event_find"));
 }
 
 void SearchEvents::OnKeyDown(wxKeyEvent& event)

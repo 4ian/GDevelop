@@ -18,8 +18,8 @@ NetworkExtension::NetworkExtension()
     gd::BuiltinExtensionsImplementer::ImplementsNetworkExtension(*this);
 
     SetExtensionInformation("BuiltinNetwork",
-                          GD_T("Basic internet features"),
-                          GD_T("Built-in extension providing network features."),
+                          _("Basic internet features"),
+                          _("Built-in extension providing network features."),
                           "Florian Rival",
                           "Open source (MIT License)");
 

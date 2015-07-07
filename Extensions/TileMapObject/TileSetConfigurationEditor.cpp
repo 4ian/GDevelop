@@ -79,7 +79,7 @@ void TileSetConfigurationEditor::OnSetTextureButtonClicked(wxCommandEvent& event
 {
     if ( !m_auimgr->GetPane(resourcesEditorPnl).IsShown() )
     {
-        gd::LogMessage(GD_T("Please display the image bank's editor and select an image before clicking on this button."));
+        gd::LogMessage(_("Please display the image bank's editor and select an image before clicking on this button."));
         return;
     }
 
@@ -115,7 +115,7 @@ void TileSetConfigurationEditor::OnTileSetParameterUpdated(wxSpinEvent& event)
 
 void TileSetConfigurationEditor::OnHelpButtonClicked(wxHyperlinkEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilesetconfig"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilesetconfig"));
 }
 
 #endif

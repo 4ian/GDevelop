@@ -150,12 +150,12 @@ void GridSetupDialog::OnokBtClick(wxCommandEvent& event)
     snap = snapCheck->GetValue();
     if ( ToInt(static_cast<string>(widthEdit->GetValue())) < 1)
     {
-        gd::LogWarning(GD_T("The width of the grid is wrong."));
+        gd::LogWarning(_("The width of the grid is wrong."));
         return;
     }
     if ( ToInt(static_cast<string>(heightEdit->GetValue())) < 1)
     {
-        gd::LogWarning(GD_T("The height of the grid is wrong."));
+        gd::LogWarning(_("The height of the grid is wrong."));
         return;
     }
 
@@ -191,7 +191,7 @@ void GridSetupDialog::OncolorPanelLeftUp(wxMouseEvent& event)
 
 void GridSetupDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"));
 }
 
 

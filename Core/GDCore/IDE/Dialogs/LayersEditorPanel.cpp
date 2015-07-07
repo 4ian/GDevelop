@@ -99,7 +99,7 @@ void LayersEditorPanel::Refresh()
     for (unsigned int i = 0; i < m_layout.GetLayersCount(); ++i)
     {
         gd::String name = m_layout.GetLayer(i).GetName();
-        if ( name == "" ) name = GD_T("Base layer");
+        if ( name == "" ) name = _("Base layer");
         m_layersList->InsertItem(0, name);
 
         if ( m_layout.GetLayer(i).GetVisibility() )
@@ -240,7 +240,7 @@ void LayersEditorPanel::OnlayersListItemRClick(wxListEvent& event)
 
 void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
 {
-    gd::String name = GD_T("New layer");
+    gd::String name = _("New layer");
 
     bool alreadyExist = false;
     unsigned int nb = 0;
@@ -252,7 +252,7 @@ void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
     while ( alreadyExist )
     {
         ++nb;
-        name = GD_T("New layer ") + gd::String::FromUInt(nb);
+        name = _("New layer ") + gd::String::FromUInt(nb);
 
         alreadyExist = false;
         for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
@@ -309,7 +309,7 @@ void LayersEditorPanel::OnDeleteLayerClicked(wxCommandEvent& event)
             return;
         }
     }
-    gd::LogWarning(GD_T("Can't find the layer to delete !"));
+    gd::LogWarning(_("Can't find the layer to delete !"));
 }
 
 void LayersEditorPanel::OnEditLayerClicked(wxCommandEvent& event)
@@ -319,7 +319,7 @@ void LayersEditorPanel::OnEditLayerClicked(wxCommandEvent& event)
 
 void LayersEditorPanel::OnHelpClicked(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
 }
 
 void LayersEditorPanel::OnLayerDownClicked(wxCommandEvent& event)
@@ -344,7 +344,7 @@ void LayersEditorPanel::OnLayerDownClicked(wxCommandEvent& event)
             return;
         }
     }
-    gd::LogWarning(GD_T("Can't find the layer to move  !"));
+    gd::LogWarning(_("Can't find the layer to move  !"));
 }
 
 void LayersEditorPanel::OnLayerUpClicked(wxCommandEvent& event)
@@ -369,7 +369,7 @@ void LayersEditorPanel::OnLayerUpClicked(wxCommandEvent& event)
             return;
         }
     }
-    gd::LogWarning(GD_T("Can't find the layer to move  !"));
+    gd::LogWarning(_("Can't find the layer to move  !"));
 }
 
 void LayersEditorPanel::OnRefreshClicked(wxCommandEvent& event)

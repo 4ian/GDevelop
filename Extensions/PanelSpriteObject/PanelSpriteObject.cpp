@@ -295,12 +295,12 @@ void PanelSpriteObject::EditObject( wxWindow* parent, gd::Project & game, gd::Ma
 
 void RuntimePanelSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = GD_T("Width");       value = ToString(width);}
-    else if ( propertyNb == 1 ) {name = GD_T("Height");       value = ToString(height);}
-    else if ( propertyNb == 2 ) {name = GD_T("Left Margin");       value = ToString(leftMargin);}
-    else if ( propertyNb == 3 ) {name = GD_T("Top Margin");       value = ToString(topMargin);}
-    else if ( propertyNb == 4 ) {name = GD_T("Right Margin");       value = ToString(rightMargin);}
-    else if ( propertyNb == 5 ) {name = GD_T("Bottom Margin");       value = ToString(bottomMargin);}
+    if      ( propertyNb == 0 ) {name = _("Width");       value = ToString(width);}
+    else if ( propertyNb == 1 ) {name = _("Height");       value = ToString(height);}
+    else if ( propertyNb == 2 ) {name = _("Left Margin");       value = ToString(leftMargin);}
+    else if ( propertyNb == 3 ) {name = _("Top Margin");       value = ToString(topMargin);}
+    else if ( propertyNb == 4 ) {name = _("Right Margin");       value = ToString(rightMargin);}
+    else if ( propertyNb == 5 ) {name = _("Bottom Margin");       value = ToString(bottomMargin);}
 }
 
 bool RuntimePanelSpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)

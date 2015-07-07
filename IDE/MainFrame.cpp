@@ -617,9 +617,9 @@ void MainFrame::OnClose( wxCloseEvent& event )
             if (whatToDo == wxCANCEL) return;
             else if ( whatToDo == wxYES ) {
                 if (!Save(*games[i], games[i]->GetProjectFile()))
-                    gd::LogError( GD_T("Save failed!") );
+                    gd::LogError( _("Save failed!") );
                 else
-                    gd::LogStatus( GD_T("Project properly saved.") );
+                    gd::LogStatus( _("Project properly saved.") );
             }
         }
 
@@ -811,7 +811,7 @@ void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
 
         wxString autosaveFilename = filename.GetPath() + "/" + filename.GetName()+".gdg.autosave";
         if ( !games[i]->SaveToFile(autosaveFilename) )
-            gd::LogStatus( GD_T("Autosave failed!") );
+            gd::LogStatus( _("Autosave failed!") );
     }
 }
 

@@ -15,14 +15,14 @@ This project is released under the MIT License.
 void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("TiledSpriteObject",
-                              GD_T("Tiled Sprite Object"),
-                              GD_T("Extension allowing to use tiled sprite objects."),
+                              _("Tiled Sprite Object"),
+                              _("Extension allowing to use tiled sprite objects."),
                               "Victor Levasseur and Florian Rival",
                               "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject("TiledSprite",
-               GD_T("Tiled Sprite"),
-               GD_T("Displays an image repeated over an area"),
+               _("Tiled Sprite"),
+               _("Displays an image repeated over an area"),
                "CppPlatform/Extensions/TiledSpriteIcon.png",
                &CreateTiledSpriteObject);
 
@@ -32,26 +32,26 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
     obj.AddAction("Width",
                    _("Width"),
                    _("Modify the width of a Tiled Sprite."),
-                   GD_T("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
                    _("Size and angle"),
                    "res/actions/scaleWidth24.png",
                    "res/actions/scaleWidth.png")
 
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .SetFunctionName("SetWidth").SetManipulatedType("number").SetGetter("GetWidth").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddCondition("Width",
                    _("Width"),
                    _("Test the width of a Tiled Sprite."),
-                   GD_T("The width of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The width of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Size and angle"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Value to test"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
         .SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
@@ -59,27 +59,27 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
     obj.AddAction("Height",
                    _("Height"),
                    _("Modify the height of a Tiled Sprite."),
-                   GD_T("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
                    _("Size and angle"),
                    "res/actions/scaleHeight24.png",
                    "res/actions/scaleHeight.png")
 
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .SetFunctionName("SetHeight").SetManipulatedType("number").SetGetter("GetHeight").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
 
     obj.AddCondition("Height",
                    _("Height"),
                    _("Test the height of a Tiled Sprite."),
-                   GD_T("The height of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The height of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Size and angle"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Value to test"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
         .SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
@@ -87,14 +87,14 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
     obj.AddAction("Angle",
                    _("Angle"),
                    _("Modify the angle of a Tiled Sprite."),
-                   GD_T("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
                    _("Size and angle"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
 
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetFunctionName("SetAngle").SetManipulatedType("number").SetGetter("GetAngle").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
@@ -102,27 +102,27 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
     obj.AddCondition("Angle",
                    _("Angle"),
                    _("Test the angle of a Tiled Sprite."),
-                   GD_T("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
 
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Value to test"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .SetHidden() //Now available for all objects
         .SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddAction("XOffset",
                    _("Image X Offset"),
                    _("Modify the offset used on the X axis when displaying the image."),
-                   GD_T("Do _PARAM1__PARAM2_ to the X offset of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the X offset of _PARAM0_"),
                    _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetFunctionName("SetXOffset").SetManipulatedType("number").SetGetter("GetXOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
@@ -130,26 +130,26 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
     obj.AddCondition("XOffset",
                    _("Image X Offset"),
                    _("Test the offset used on the X axis when displaying the image."),
-                   GD_T("The X offset of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The X offset of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Value to test"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
         .SetFunctionName("GetXOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddAction("YOffset",
                    _("Image Y Offset"),
                    _("Modify the offset used on the Y axis when displaying the image."),
-                   GD_T("Do _PARAM1__PARAM2_ to the Y offset of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the Y offset of _PARAM0_"),
                    _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetFunctionName("SetYOffset").SetManipulatedType("number").SetGetter("GetYOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
@@ -157,13 +157,13 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
     obj.AddCondition("YOffset",
                    _("Image Y Offset"),
                    _("Test the offset used on the Y axis when displaying the image."),
-                   GD_T("The Y offset of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The Y offset of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", GD_T("Object"), "TiledSprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Value to test"))
+        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
         .SetFunctionName("GetYOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
     #endif

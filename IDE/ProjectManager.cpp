@@ -700,7 +700,7 @@ void ProjectManager::EditSourceFile(gd::Project * game, gd::String filename, siz
     //As we're opening a "real" file, first check if it exists
     if ( !wxFileExists(filename) )
     {
-        gd::LogWarning(GD_T("Unable to open ")+filename+GD_T(", the file does not exists"));
+        gd::LogWarning(_("Unable to open ")+filename+_(", the file does not exists"));
         return;
     }
 
@@ -735,7 +735,7 @@ void ProjectManager::EditSourceFile(gd::Project * game, gd::String filename, siz
     CodeEditor * editorScene = new CodeEditor(mainEditor.GetEditorsNotebook(), filename, associatedGame, mainEditor.GetMainFrameWrapper());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, wxFileName(filename).GetFullName(), true, gd::SkinHelper::GetIcon("source_cpp", 16)) )
     {
-        gd::LogError(GD_T("Unable to add a new tab !"));
+        gd::LogError(_("Unable to add a new tab !"));
     }
     if ( line != gd::String::npos ) editorScene->SelectLine(line);
 }
@@ -749,13 +749,13 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) )
     {
-        gd::LogWarning(GD_T("Choose a scene to edit in the project's manager"));
+        gd::LogWarning(_("Choose a scene to edit in the project's manager"));
         return;
     }
 
     if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
-        gd::LogWarning(GD_T("Scene not found."));
+        gd::LogWarning(_("Scene not found."));
         return;
     }
 
@@ -792,7 +792,7 @@ void ProjectManager::EditLayout(gd::Project & project, gd::Layout & layout)
     EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), project, layout, mainEditor.GetMainFrameWrapper());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+layout.GetName(), true, gd::SkinHelper::GetIcon("scene", 16)) )
     {
-        gd::LogError(GD_T("Unable to add a new tab !"));
+        gd::LogError(_("Unable to add a new tab !"));
     }
 }
 
@@ -805,13 +805,13 @@ void ProjectManager::OneditScenePropMenuItemSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) )
     {
-        gd::LogWarning(GD_T("Choose a scene to edit in the project's manager"));
+        gd::LogWarning(_("Choose a scene to edit in the project's manager"));
         return;
     }
 
     if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
-        gd::LogWarning(GD_T("Scene not found."));
+        gd::LogWarning(_("Scene not found."));
         return;
     }
 
@@ -830,13 +830,13 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) )
     {
-        gd::LogWarning(GD_T("Choose a scene to edit in the project's manager"));
+        gd::LogWarning(_("Choose a scene to edit in the project's manager"));
         return;
     }
 
     if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
-        gd::LogWarning(GD_T("Scene not found."));
+        gd::LogWarning(_("Scene not found."));
         return;
     }
     gd::Layout & layout = game->GetLayout(data->GetSecondString());
@@ -893,7 +893,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
     {
   		if (newName.find_first_of("/\\?%*:|\"<>")!=gd::String::npos)
   		{
-  			gd::LogMessage(GD_T("You can not use this name, it contains invalid characters."));
+  			gd::LogMessage(_("You can not use this name, it contains invalid characters."));
   			event.Veto();
   			return;
   		}
@@ -905,7 +905,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
     {
         if ( !game->HasLayoutNamed(data->GetSecondString()) )
         {
-            gd::LogWarning(GD_T("Scene not found."));
+            gd::LogWarning(_("Scene not found."));
             return;
         }
 
@@ -913,7 +913,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
         if ( game->HasLayoutNamed(newName) )
         {
-            gd::LogWarning( GD_T( "Unable to rename: a scene has already the same name." ) );
+            gd::LogWarning( _( "Unable to rename: a scene has already the same name." ) );
             event.Veto();
             return;
         }
@@ -939,13 +939,13 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
     {
         if ( !game->HasExternalEventsNamed(itemTextBeforeEditing) )
         {
-            gd::LogWarning(GD_T("Unable to found events."));
+            gd::LogWarning(_("Unable to found events."));
             return;
         }
 
         if ( game->HasExternalEventsNamed(newName) )
         {
-            gd::LogWarning( GD_T( "Unable to rename: some external events have already the same name." ) );
+            gd::LogWarning( _( "Unable to rename: some external events have already the same name." ) );
             event.Veto();
             return;
         }
@@ -971,13 +971,13 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
     {
         if ( !game->HasExternalLayoutNamed(itemTextBeforeEditing) )
         {
-            gd::LogWarning(GD_T("Unable to found events."));
+            gd::LogWarning(_("Unable to found events."));
             return;
         }
 
         if ( game->HasExternalLayoutNamed(newName) )
         {
-            gd::LogWarning( GD_T( "Unable to rename: some external events have already the same name." ) );
+            gd::LogWarning( _( "Unable to rename: some external events have already the same name." ) );
             event.Veto();
             return;
         }
@@ -1034,11 +1034,11 @@ void ProjectManager::AddLayoutToProject(gd::Project * project, unsigned int posi
     if ( !project ) return;
 
     //Finding a new, unique name for the scene
-    gd::String newSceneName = GD_T("New scene");
+    gd::String newSceneName = _("New scene");
     int i = 2;
     while(project->HasLayoutNamed(newSceneName))
     {
-        newSceneName = GD_T("New scene") + " " + ToString(i);
+        newSceneName = _("New scene") + " " + ToString(i);
         ++i;
     }
 
@@ -1050,7 +1050,7 @@ void ProjectManager::AddLayoutToProject(gd::Project * project, unsigned int posi
             project->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutAdded(*project, project->GetLayout(newSceneName));
     }
     else
-        gd::LogError(GD_T("Unable to add the new layout!"));
+        gd::LogError(_("Unable to add the new layout!"));
 }
 
 /**
@@ -1106,7 +1106,7 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     gd::String sceneName = data->GetSecondString();
     if ( !game->HasLayoutNamed(sceneName) )
     {
-        gd::LogWarning(GD_T("Scene not found."));
+        gd::LogWarning(_("Scene not found."));
         return;
     }
 
@@ -1155,7 +1155,7 @@ void ProjectManager::OncopySceneMenuItemSelected(wxCommandEvent& event)
 
     if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
-        gd::LogWarning(GD_T("Scene not found."));
+        gd::LogWarning(_("Scene not found."));
         return;
     }
 
@@ -1174,7 +1174,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     gd::String layoutName = data->GetSecondString();
     if ( !game->HasLayoutNamed(layoutName) )
     {
-        gd::LogWarning(GD_T("Scene not found."));
+        gd::LogWarning(_("Scene not found."));
         return;
     }
 
@@ -1228,7 +1228,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasLayoutNamed(newLayoutName))
     {
-        newLayoutName = GD_T("Copy of") + " " + newLayout.GetName() + (i == 1 ? "" : " "+ToString(i));
+        newLayoutName = _("Copy of") + " " + newLayout.GetName() + (i == 1 ? "" : " "+ToString(i));
         ++i;
     }
 
@@ -1463,7 +1463,7 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
 
     if ( !game->HasExternalEventsNamed(data->GetSecondString()) )
     {
-        gd::LogWarning(GD_T("Unable to found external events."));
+        gd::LogWarning(_("Unable to found external events."));
         return;
     }
 
@@ -1492,7 +1492,7 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
     ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalEvents(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, gd::SkinHelper::GetIcon("events", 16)) )
     {
-        gd::LogError(GD_T("Unable to add a new tab !"));
+        gd::LogError(_("Unable to add a new tab !"));
     }
 }
 
@@ -1529,11 +1529,11 @@ void ProjectManager::OnRibbonAddExternalEventsSelected(wxRibbonButtonBarEvent& e
 void ProjectManager::AddExternalEventsToGame(gd::Project * project)
 {
     //Finding a new, unique name for the scene
-    gd::String newName = GD_T("External events");
+    gd::String newName = _("External events");
     int i = 2;
     while(project->HasExternalEventsNamed(newName))
     {
-        newName = GD_T("External events") + " " + ToString(i);
+        newName = _("External events") + " " + ToString(i);
         ++i;
     }
 
@@ -1556,7 +1556,7 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     gd::String externalEventsName = data->GetSecondString();
     if ( !game->HasExternalEventsNamed(externalEventsName) )
     {
-        gd::LogWarning(GD_T("Unable to found events."));
+        gd::LogWarning(_("Unable to found events."));
         return;
     }
 
@@ -1590,7 +1590,7 @@ void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
 
     if ( !game->HasExternalEventsNamed(data->GetSecondString()) )
     {
-        gd::LogWarning(GD_T("Unable to found events."));
+        gd::LogWarning(_("Unable to found events."));
         return;
     }
 
@@ -1606,7 +1606,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
     gd::String externalEventsName = data->GetSecondString();
     if ( !game->HasExternalEventsNamed(externalEventsName) )
     {
-        gd::LogWarning(GD_T("Unable to found events."));
+        gd::LogWarning(_("Unable to found events."));
         return;
     }
 
@@ -1648,7 +1648,7 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasExternalEventsNamed(newName))
     {
-        newName = GD_T("Copy of") + " " + newEvents.GetName() + " " + ( i==1 ? "" : ToString(i));
+        newName = _("Copy of") + " " + newEvents.GetName() + " " + ( i==1 ? "" : ToString(i));
         ++i;
     }
 
@@ -1671,11 +1671,11 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
 void ProjectManager::AddExternalLayoutToGame(gd::Project * project)
 {
     //Finding a new, unique name for the scene
-    gd::String newName = GD_T("External layout");
+    gd::String newName = _("External layout");
     int i = 2;
     while(project->HasExternalLayoutNamed(newName))
     {
-        newName = GD_T("External layout") + " " + ToString(i);
+        newName = _("External layout") + " " + ToString(i);
         ++i;
     }
 
@@ -1715,7 +1715,7 @@ void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
 
     if ( !game->HasExternalLayoutNamed(data->GetSecondString()) )
     {
-        gd::LogWarning(GD_T("Unable to found external events."));
+        gd::LogWarning(_("Unable to found external events."));
         return;
     }
 
@@ -1744,7 +1744,7 @@ void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
     ExternalLayoutEditor * editor = new ExternalLayoutEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalLayout(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, gd::SkinHelper::GetIcon("scene", 16)) )
     {
-        gd::LogError(GD_T("Unable to add a new tab !"));
+        gd::LogError(_("Unable to add a new tab !"));
     }
 }
 
@@ -1762,7 +1762,7 @@ void ProjectManager::OnDeleteExternalLayoutSelected(wxCommandEvent& event)
     gd::String externalLayoutName = data->GetSecondString();
     if ( !game->HasExternalLayoutNamed(externalLayoutName) )
     {
-        gd::LogWarning(GD_T("Unable to found external layout."));
+        gd::LogWarning(_("Unable to found external layout."));
         return;
     }
 
@@ -1796,7 +1796,7 @@ void ProjectManager::OnCopyExternalLayoutSelected(wxCommandEvent& event)
 
     if ( !game->HasExternalLayoutNamed(data->GetSecondString()) )
     {
-        gd::LogWarning(GD_T("Unable to found external layout."));
+        gd::LogWarning(_("Unable to found external layout."));
         return;
     }
 
@@ -1812,7 +1812,7 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
     gd::String externalLayoutName = data->GetSecondString();
     if ( !game->HasExternalLayoutNamed(externalLayoutName) )
     {
-        gd::LogWarning(GD_T("Unable to found external layout."));
+        gd::LogWarning(_("Unable to found external layout."));
         return;
     }
 
@@ -1854,7 +1854,7 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasExternalLayoutNamed(newName))
     {
-        newName = GD_T("Copy of") + " " + newExternalLayout.GetName() + " " + (i==1 ? "" : ToString(i));
+        newName = _("Copy of") + " " + newExternalLayout.GetName() + " " + (i==1 ? "" : ToString(i));
         ++i;
     }
 
@@ -1906,7 +1906,7 @@ void ProjectManager::OnDeleteSourceFileSelected(wxCommandEvent& event)
     gd::String name = data->GetSecondString();
     if (!game->HasSourceFile(name))
     {
-        gd::LogWarning(GD_T("File not found"));
+        gd::LogWarning(_("File not found"));
         return;
     }
 
@@ -1977,7 +1977,7 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
  */
 void ProjectManager::OnRibbonHelpSelected(wxRibbonButtonBarEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://wiki.compilgames.net/doku.php/en/game_develop/documentation"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation"));
 }
 
 namespace {

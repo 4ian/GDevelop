@@ -324,7 +324,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
     //Setup shared datas
 	if ( !scene || scene->automatismsInitialSharedDatas.find(automatism.GetName()) == scene->automatismsInitialSharedDatas.end())
 	{
-	    gd::LogError(GD_T("Unable to access to shared datas."));
+	    gd::LogError(_("Unable to access to shared datas."));
 	    return;
 	}
 
@@ -332,7 +332,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
 
     if ( sharedDatas == std::shared_ptr<ScenePathDatas>() )
     {
-	    gd::LogError(GD_T("Unable to access to shared datas : Bad data type."));
+	    gd::LogError(_("Unable to access to shared datas : Bad data type."));
 	    return;
     }
 

@@ -100,22 +100,22 @@ void PathfindingObstacleAutomatism::SerializeTo(gd::SerializerElement & element)
 std::map<std::string, gd::PropertyDescriptor> PathfindingObstacleAutomatism::GetProperties(gd::Project & project) const
 {
     std::map<std::string, gd::PropertyDescriptor> properties;
-    properties[GD_T("Impassable obstacle")].SetValue(impassable ? "true" : "false").SetType("Boolean");
-    properties[GD_T("Cost (if not impassable)")].SetValue(ToString(cost));
+    properties[_("Impassable obstacle")].SetValue(impassable ? "true" : "false").SetType("Boolean");
+    properties[_("Cost (if not impassable)")].SetValue(ToString(cost));
 
     return properties;
 }
 
 bool PathfindingObstacleAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
 {
-    if ( name == GD_T("Impassable obstacle") ) {
+    if ( name == _("Impassable obstacle") ) {
         impassable = (value != "0");
         return true;
     }
 
     if ( ToDouble(value) < 0 ) return false;
 
-    if ( name == GD_T("Cost (if not impassable)") )
+    if ( name == _("Cost (if not impassable)") )
         cost = ToDouble(value);
     else
         return false;

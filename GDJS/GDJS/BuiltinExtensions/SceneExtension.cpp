@@ -20,8 +20,8 @@ SceneExtension::SceneExtension()
     gd::BuiltinExtensionsImplementer::ImplementsSceneExtension(*this);
 
     SetExtensionInformation("BuiltinScene",
-                          GD_T("Scene management features"),
-                          GD_T("Built-in extension allowing to manipulate scenes"),
+                          _("Scene management features"),
+                          _("Built-in extension allowing to manipulate scenes"),
                           "Florian Rival",
                           "Open source (MIT License)");
 

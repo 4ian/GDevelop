@@ -35,8 +35,8 @@ public:
     Extension()
     {
         SetExtensionInformation("Function",
-                              GD_T("Function events"),
-                              GD_T("Extension allowing to use events behaving as functions."),
+                              _("Function events"),
+                              _("Extension allowing to use events behaving as functions."),
                               "Florian Rival",
                               "Open source (MIT License)");
 

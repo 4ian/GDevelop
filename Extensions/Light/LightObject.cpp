@@ -229,10 +229,10 @@ void LightObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 
 void RuntimeLightObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if ( propertyNb == 0 ) {name = GD_T("Color");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
-    else if ( propertyNb == 1 ) {name = GD_T("Intensity");       value = ToString(GetIntensity());}
-    else if ( propertyNb == 2 ) {name = GD_T("Radius");       value = ToString(GetRadius());}
-    else if ( propertyNb == 2 ) {name = GD_T("Quality");       value = ToString(GetQuality());}
+    if ( propertyNb == 0 ) {name = _("Color");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
+    else if ( propertyNb == 1 ) {name = _("Intensity");       value = ToString(GetIntensity());}
+    else if ( propertyNb == 2 ) {name = _("Radius");       value = ToString(GetRadius());}
+    else if ( propertyNb == 2 ) {name = _("Quality");       value = ToString(GetQuality());}
 }
 
 bool RuntimeLightObject::ChangeProperty(unsigned int propertyNb, string newValue)

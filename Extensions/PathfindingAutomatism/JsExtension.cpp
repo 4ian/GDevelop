@@ -23,8 +23,8 @@ public:
     JsExtension()
     {
         SetExtensionInformation("PathfindingAutomatism",
-                              GD_T("Pathfinding automatism"),
-                              GD_T("Compute paths for objects avoiding obstacles."),
+                              _("Pathfinding automatism"),
+                              _("Compute paths for objects avoiding obstacles."),
                               "Florian Rival",
                               "Open source (MIT License)");
         CloneExtension("GDevelop C++ platform", "PathfindingAutomatism");

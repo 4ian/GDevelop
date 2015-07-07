@@ -393,7 +393,7 @@ void ProjectExtensionsDialog::OnFermerBtClick(wxCommandEvent& event)
 
 void ProjectExtensionsDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/extensions"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/extensions"));
 }
 
 void ProjectExtensionsDialog::OnResize(wxSizeEvent& event)
@@ -413,7 +413,7 @@ void ProjectExtensionsDialog::OnremovePlatformMenuItemSelected(wxCommandEvent& e
 {
     if ( !project.RemovePlatform(currentPlatform->GetName()) )
     {
-        gd::LogWarning(GD_T("Unable to remove this platform: The project must use at least one plaform."));
+        gd::LogWarning(_("Unable to remove this platform: The project must use at least one plaform."));
     }
     RefreshPlatformList();
     RefreshExtensionList();

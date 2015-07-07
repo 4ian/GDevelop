@@ -201,7 +201,7 @@ void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
             {
                 group.AddObject( dialog.GetChosenObjects()[i] );
                 ObjetsList->AppendItem( ObjetsList->GetRootItem(), dialog.GetChosenObjects()[i] );
-            } else { gd::LogWarning(GD_T("Object ")+dialog.GetChosenObjects()[i]+GD_T(" is already in this group."));}
+            } else { gd::LogWarning(_("Object ")+dialog.GetChosenObjects()[i]+_(" is already in this group."));}
         }
 
         modificationCount += dialog.GetChosenObjects().size();
@@ -232,5 +232,5 @@ void EditObjectGroup::OnDelObjetSelected(wxCommandEvent& event)
 
 void EditObjectGroup::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group"));
 }

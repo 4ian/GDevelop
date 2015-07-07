@@ -20,8 +20,8 @@ TimeExtension::TimeExtension()
     gd::BuiltinExtensionsImplementer::ImplementsTimeExtension(*this);
 
     SetExtensionInformation("BuiltinTime",
-                          GD_T("Time"),
-                          GD_T("Built-in extension providing actions and conditions about the time."),
+                          _("Time"),
+                          _("Built-in extension providing actions and conditions about the time."),
                           "Florian Rival",
                           "Open source (MIT License)");
 

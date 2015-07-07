@@ -680,7 +680,7 @@ gd::String EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata
 {
     if ( parameterMetadata.type == "expression" )
     {
-        gd::AdvancedTextEntryDialog dialog(this, GD_T("Parameter"), parameterMetadata.description, "0", AdvancedTextEntryDialog::MathExpression, &project, &layout);
+        gd::AdvancedTextEntryDialog dialog(this, _("Parameter"), parameterMetadata.description, "0", AdvancedTextEntryDialog::MathExpression, &project, &layout);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -688,7 +688,7 @@ gd::String EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata
     }
     else if ( parameterMetadata.type == "string" )
     {
-        gd::AdvancedTextEntryDialog dialog(this, GD_T("Parameter"), parameterMetadata.description, "\"\"", AdvancedTextEntryDialog::TextExpression, &project, &layout);
+        gd::AdvancedTextEntryDialog dialog(this, _("Parameter"), parameterMetadata.description, "\"\"", AdvancedTextEntryDialog::TextExpression, &project, &layout);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else

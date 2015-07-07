@@ -18,8 +18,8 @@ AudioExtension::AudioExtension()
     gd::BuiltinExtensionsImplementer::ImplementsAudioExtension(*this);
 
     SetExtensionInformation("BuiltinAudio",
-                          GD_T("Audio"),
-                          GD_T("Builtin audio extension"),
+                          _("Audio"),
+                          _("Builtin audio extension"),
                           "Florian Rival",
                           "Open source (MIT License)");
 

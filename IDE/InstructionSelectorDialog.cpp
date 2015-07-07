@@ -457,7 +457,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
 
     if (ParaEdit.size() < instructionMetadata.parameters.size())
     {
-        gd::LogWarning(GD_T("The instruction has to many parameters. This can be a bug of GDevelop.\nRead Help to know how report a bug."));
+        gd::LogWarning(_("The instruction has to many parameters. This can be a bug of GDevelop.\nRead Help to know how report a bug."));
         return;
     }
 
@@ -525,8 +525,8 @@ void InstructionSelectorDialog::OnCancelBtClick(wxCommandEvent& event)
 void InstructionSelectorDialog::OnHelpBtClick(wxCommandEvent& event)
 {
     gd::HelpFileAccess::Get()->OpenURL(editingAction ?
-        GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action") :
-        GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"));
+        _("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action") :
+        _("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"));
 }
 
 void InstructionSelectorDialog::OnmoreBtClick(wxCommandEvent& event)

@@ -81,7 +81,7 @@ void MainFrame::CreateNewProject()
             wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
             if ( newProject->GetLayoutsCount() > 0 ) projectManager->EditLayout(*newProject, newProject->GetLayout(0));
         }
-        else gd::LogError(GD_T("Unable to find the platform associated with the template.\n\nPlease report this error to GDevelop developer."));
+        else gd::LogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to GDevelop developer."));
     }
     else if ( dialog.UserWantToBrowseExamples() )
     {
@@ -234,9 +234,9 @@ void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
     else
     {
         if (Save(*GetCurrentGame(), GetCurrentGame()->GetProjectFile()))
-            gd::LogStatus( GD_T("Save ended."));
+            gd::LogStatus( _("Save ended."));
         else
-            gd::LogError( GD_T("Save failed!") );
+            gd::LogError( _("Save failed!") );
 
         SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
         return;
@@ -283,7 +283,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
                 //oui, donc on l'enregistre
                 games[i]->SetProjectFile(path);
 
-                if ( !Save(*games[i], games[i]->GetProjectFile()) ) gd::LogError( GD_T("Save failed!") );
+                if ( !Save(*games[i], games[i]->GetProjectFile()) ) gd::LogError( _("Save failed!") );
                 SetLastUsedFile( games[i]->GetProjectFile() );
 
                 if ( games[i] == GetCurrentGame() )
@@ -293,11 +293,11 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
         }
         else
         {
-            if ( !Save(*games[i], games[i]->GetProjectFile()) ) gd::LogError( GD_T("Save failed!") );
+            if ( !Save(*games[i], games[i]->GetProjectFile()) ) gd::LogError( _("Save failed!") );
         }
     }
 
-    gd::LogStatus( GD_T("Saves ended."));
+    gd::LogStatus( _("Saves ended."));
 }
 void MainFrame::OnMenuSaveAllSelected(wxCommandEvent& event)
 {
@@ -365,7 +365,7 @@ void MainFrame::SaveAs()
 
         if ( !Save(*GetCurrentGame(), GetCurrentGame()->GetProjectFile()) )
         {
-            gd::LogError( GD_T("The project could not be saved properly!") );
+            gd::LogError( _("The project could not be saved properly!") );
         }
 
         SetLastUsedFile( GetCurrentGame()->GetProjectFile() );

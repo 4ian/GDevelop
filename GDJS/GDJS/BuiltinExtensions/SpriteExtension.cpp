@@ -16,8 +16,8 @@ SpriteExtension::SpriteExtension()
     gd::BuiltinExtensionsImplementer::ImplementsSpriteExtension(*this);
 
     SetExtensionInformation("Sprite",
-                          GD_T("Sprite"),
-                          GD_T("Extension for adding animated objects in the scene, which can contain animations with directions within each."),
+                          _("Sprite"),
+                          _("Extension for adding animated objects in the scene, which can contain animations with directions within each."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -78,33 +78,33 @@ SpriteExtension::SpriteExtension()
     //Objects instructions:
     {
         obj.AddAction("CopyImageOnImageOfSprite",
-                       GD_T("Copy an image on the current one of an object"),
-                       GD_T("Copy an image on the current image of an object.\nNote that the source image must be preferably kept loaded in memory."),
-                       GD_T("Copy image _PARAM2_ on the current of _PARAM0_ at _PARAM3_;_PARAM4_"),
-                       GD_T("Effects"),
+                       _("Copy an image on the current one of an object"),
+                       _("Copy an image on the current image of an object.\nNote that the source image must be preferably kept loaded in memory."),
+                       _("Copy image _PARAM2_ on the current of _PARAM0_ at _PARAM3_;_PARAM4_"),
+                       _("Effects"),
                        "res/copy24.png",
                        "res/copyicon.png")
 
-            .AddParameter("object", GD_T("Object"), "Sprite", false)
+            .AddParameter("object", _("Object"), "Sprite", false)
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("string", GD_T("Name of the source image"), "",false)
-            .AddParameter("expression", GD_T("X position"), "",false)
-            .AddParameter("expression", GD_T("Y position"), "",false)
-            .AddParameter("yesorno", GD_T("Should the copy take in account the source transparency\?"), "",false)
+            .AddParameter("string", _("Name of the source image"), "",false)
+            .AddParameter("expression", _("X position"), "",false)
+            .AddParameter("expression", _("Y position"), "",false)
+            .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false)
             .SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 
 
 
         obj.AddAction("CreateMaskFromColorOnActualImage", //Actual is indeed a mistake : Current should have been chosen.
-                       GD_T("Make a color of the image of an object transparent"),
-                       GD_T("Make a color of the image of an object transparent."),
-                       GD_T("Make color _PARAM1_ of the current image of _PARAM0_ transparent"),
-                       GD_T("Effects"),
+                       _("Make a color of the image of an object transparent"),
+                       _("Make a color of the image of an object transparent."),
+                       _("Make color _PARAM1_ of the current image of _PARAM0_ transparent"),
+                       _("Effects"),
                        "res/actions/opacity24.png",
                        "res/actions/opacity.png")
 
-            .AddParameter("object", GD_T("Object"), "Sprite", false)
-            .AddParameter("color", GD_T("Color to make transparent"), "",false)
+            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("color", _("Color to make transparent"), "",false)
             .SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     }
 

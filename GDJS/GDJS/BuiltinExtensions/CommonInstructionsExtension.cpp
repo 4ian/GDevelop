@@ -38,8 +38,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(*this);
 
     SetExtensionInformation("BuiltinCommonInstructions",
-                          GD_T("Standard events"),
-                          GD_T("Built-in extension providing standard events."),
+                          _("Standard events"),
+                          _("Built-in extension providing standard events."),
                           "Florian Rival",
                           "Open source (MIT License)");
 

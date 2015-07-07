@@ -297,11 +297,11 @@ void ChooseVariableDialog::OncancelBtClick(wxCommandEvent& event)
 void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
 {
     //Find a new unique name
-    gd::String newName = GD_T("NewVariable");
+    gd::String newName = _("NewVariable");
     unsigned int tries = 2;
     while ( temporaryContainer->Has(newName) )
     {
-        newName = GD_T("NewVariable")+gd::String::FromUInt(tries);
+        newName = _("NewVariable")+gd::String::FromUInt(tries);
         tries++;
     }
 
@@ -310,7 +310,7 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
 
     if ( temporaryContainer->Has(newName) )
     {
-        gd::LogMessage(GD_T("A variable with this name already exists!"));
+        gd::LogMessage(_("A variable with this name already exists!"));
         return;
     }
 
@@ -391,7 +391,7 @@ void ChooseVariableDialog::OnRightClick(wxTreeListEvent& event)
  */
 void ChooseVariableDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/global_variables"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/global_variables"));
 }
 
 /**
@@ -487,7 +487,7 @@ void ChooseVariableDialog::OnRenameSelected(wxCommandEvent& event)
     {
         if ( parentVariable->HasChild(newName) )
         {
-            gd::LogMessage(GD_T("A child variable with this name already exists!"));
+            gd::LogMessage(_("A child variable with this name already exists!"));
             return;
         }
 
@@ -499,7 +499,7 @@ void ChooseVariableDialog::OnRenameSelected(wxCommandEvent& event)
     {
         if ( temporaryContainer->Has(newName) )
         {
-            gd::LogMessage(GD_T("A variable with this name already exists!"));
+            gd::LogMessage(_("A variable with this name already exists!"));
             return;
         }
 
@@ -516,9 +516,9 @@ void ChooseVariableDialog::OnAddChildSelected(wxCommandEvent& event)
     UpdateSelectedAndParentVariable();
     if(!selectedVariable) return;
 
-    gd::String newChildName = GD_T("NewChild");
+    gd::String newChildName = _("NewChild");
     for(unsigned int i = 2;selectedVariable->HasChild(newChildName);++i )
-        newChildName = GD_T("NewChild")+ToString(i);
+        newChildName = _("NewChild")+ToString(i);
 
     selectedVariable->GetChild(newChildName);
     UpdateSelectedAndParentVariable();

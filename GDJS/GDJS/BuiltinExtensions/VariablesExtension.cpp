@@ -25,8 +25,8 @@ VariablesExtension::VariablesExtension()
     gd::BuiltinExtensionsImplementer::ImplementsVariablesExtension(*this);
 
     SetExtensionInformation("BuiltinVariables",
-                          GD_T("Variable features"),
-                          GD_T("Built-in extension allowing to manipulate variables"),
+                          _("Variable features"),
+                          _("Built-in extension allowing to manipulate variables"),
                           "Florian Rival",
                           "Open source (MIT License)");
 

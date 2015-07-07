@@ -30,10 +30,10 @@ class wxString;
  * This does not mean that it can not be encoded in UTF8. In fact, on most Linux OSes, the locale is UTF8, so, paths will still be encoded in UTF8.
  * On Windows, the locale is not UTF8 but an ASCII codepage so paths will be encoded in an ASCII codepage.
  *
- * \section utf8translations How to handle translations correctly ? Difference between _() and GD_T() ?
+ * \section utf8translations How to handle translations correctly ? Difference between _() and _() ?
  * As all std::strings are encoded in UTF8, GDevelop can not rely on the default conversion between std::string and wxString.
  * So, each of these two macros creates a translatable string but not the same type of string.
- * - GD_T() creates a translatable string as an std::string (useful for actions/conditions declaration and everywhere a std::string is needed)
+ * - _() creates a translatable string as an std::string (useful for actions/conditions declaration and everywhere a std::string is needed)
  * - _() creates a translatable string as an wxString (useful everywhere a wxString is needed, like in GUI)
  * \warning If you use the wrong macro, the compilation might still work but strange behaviors with special characters might occur (particulary on Windows).
  *

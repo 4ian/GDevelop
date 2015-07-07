@@ -87,7 +87,7 @@ ObjectsOnBadLayerDialog::ObjectsOnBadLayerDialog(wxWindow* parent, const std::ve
 	for (unsigned int i =0;i<availableLayers.size();++i)
 	{
 	    gd::String name = availableLayers[i];
-	    if ( name == "" ) name = GD_T("Base layer");
+	    if ( name == "" ) name = _("Base layer");
 		Choice1->Insert(name, 0);
 	}
 	Choice1->SetSelection(0);
@@ -110,7 +110,7 @@ void ObjectsOnBadLayerDialog::OnMoveClick(wxCommandEvent& event)
     if ( Choice1->GetStringSelection() != "" )
     {
         moveOnLayerNamed = Choice1->GetStringSelection();
-        if ( moveOnLayerNamed == GD_T("Base layer") )  moveOnLayerNamed = "";
+        if ( moveOnLayerNamed == _("Base layer") )  moveOnLayerNamed = "";
         EndModal(2);
     }
 }

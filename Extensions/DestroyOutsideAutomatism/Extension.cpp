@@ -13,15 +13,15 @@ This project is released under the MIT License.
 void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("DestroyOutsideAutomatism",
-                              GD_T("Destroy Outside Screen Automatism"),
-                              GD_T("Automatism destroying object when they go outside the screen"),
+                              _("Destroy Outside Screen Automatism"),
+                              _("Automatism destroying object when they go outside the screen"),
                               "Florian Rival",
                               "Open source (MIT License)");
 
     gd::AutomatismMetadata & aut = extension.AddAutomatism("DestroyOutside",
-          GD_T("Destroy when outside the screen"),
-          GD_T("DestroyOutside"),
-          GD_T("Automatically destroy the object when it goes outside the screen"),
+          _("Destroy when outside the screen"),
+          _("DestroyOutside"),
+          _("Automatically destroy the object when it goes outside the screen"),
           "",
           "CppPlatform/Extensions/destroyoutsideicon.png",
           "DestroyOutsideAutomatism",
@@ -34,28 +34,28 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
     aut.AddCondition("ExtraBorder",
                    _("Additional border"),
                    _("Compare the additional border that the object must cross before being deleted."),
-                   GD_T("The additional border of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("The additional border of _PARAM0_ is _PARAM2__PARAM3_"),
                    _(""),
                    "CppPlatform/Extensions/destroyoutsideicon24.png",
                    "CppPlatform/Extensions/destroyoutsideicon16.png")
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("automatism", GD_T("Automatism"), "DestroyOutside", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Value to test"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("automatism", _("Automatism"), "DestroyOutside", false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
         .SetFunctionName("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
 
     aut.AddAction("ExtraBorder",
                    _("Additional border"),
                    _("Change the additional border that the object must cross before being deleted."),
-                   GD_T("Do _PARAM2__PARAM3_ to the additional border of _PARAM0_"),
+                   _("Do _PARAM2__PARAM3_ to the additional border of _PARAM0_"),
                    _(""),
                    "CppPlatform/Extensions/destroyoutsideicon24.png",
                    "CppPlatform/Extensions/destroyoutsideicon16.png")
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("automatism", GD_T("Automatism"), "DestroyOutside", false)
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("automatism", _("Automatism"), "DestroyOutside", false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetFunctionName("SetExtraBorder").SetManipulatedType("number")
         .SetGetter("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");

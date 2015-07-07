@@ -563,40 +563,40 @@ std::map<std::string, gd::PropertyDescriptor> PlatformerObjectAutomatism::GetPro
 {
     std::map<std::string, gd::PropertyDescriptor> properties;
 
-    properties[GD_T("Gravity")].SetValue(ToString(gravity));
-    properties[GD_T("Jump speed")].SetValue(ToString(jumpSpeed));
-    properties[GD_T("Max. falling speed")].SetValue(ToString(maxFallingSpeed));
-    properties[GD_T("Acceleration")].SetValue(ToString(acceleration));
-    properties[GD_T("Deceleration")].SetValue(ToString(deceleration));
-    properties[GD_T("Max. speed")].SetValue(ToString(maxSpeed));
-    properties[GD_T("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
-    properties[GD_T("Slope max. angle")].SetValue(ToString(slopeMaxAngle));
+    properties[_("Gravity")].SetValue(ToString(gravity));
+    properties[_("Jump speed")].SetValue(ToString(jumpSpeed));
+    properties[_("Max. falling speed")].SetValue(ToString(maxFallingSpeed));
+    properties[_("Acceleration")].SetValue(ToString(acceleration));
+    properties[_("Deceleration")].SetValue(ToString(deceleration));
+    properties[_("Max. speed")].SetValue(ToString(maxSpeed));
+    properties[_("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
+    properties[_("Slope max. angle")].SetValue(ToString(slopeMaxAngle));
 
     return properties;
 }
 
 bool PlatformerObjectAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
 {
-    if ( name == GD_T("Default controls") ) {
+    if ( name == _("Default controls") ) {
         ignoreDefaultControls = (value == "0");
         return true;
     }
 
     if ( ToDouble(value) < 0 ) return false;
 
-    if ( name == GD_T("Gravity") )
+    if ( name == _("Gravity") )
         gravity = ToDouble(value);
-    else if ( name == GD_T("Max. falling speed") )
+    else if ( name == _("Max. falling speed") )
         maxFallingSpeed = ToDouble(value);
-    else if ( name == GD_T("Acceleration") )
+    else if ( name == _("Acceleration") )
         acceleration = ToDouble(value);
-    else if ( name == GD_T("Deceleration") )
+    else if ( name == _("Deceleration") )
         deceleration = ToDouble(value);
-    else if ( name == GD_T("Max. speed") )
+    else if ( name == _("Max. speed") )
         maxSpeed = ToDouble(value);
-    else if ( name == GD_T("Jump speed") )
+    else if ( name == _("Jump speed") )
         jumpSpeed = ToDouble(value);
-    else if ( name == GD_T("Slope max. angle") )
+    else if ( name == _("Slope max. angle") )
         return SetSlopeMaxAngle(ToDouble(value));
     else
         return false;

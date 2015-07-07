@@ -31,8 +31,8 @@ public:
 
     virtual gd::String GetName() const { return "GDevelop C++ platform"; }
     #if defined(GD_IDE_ONLY)
-    virtual gd::String GetFullName() const { return GD_T("Native (Windows or Linux games)"); }
-    virtual gd::String GetSubtitle() const { return GD_T("C++ and OpenGL based games for Windows or Linux."); }
+    virtual gd::String GetFullName() const { return _("Native (Windows or Linux games)"); }
+    virtual gd::String GetSubtitle() const { return _("C++ and OpenGL based games for Windows or Linux."); }
     virtual gd::String GetDescription() const;
     #endif
 

@@ -26,8 +26,8 @@ public:
     DraggableAutomatismJsExtension()
     {
         SetExtensionInformation("DraggableAutomatism",
-                              GD_T("Draggable Automatism"),
-                              GD_T("Automatism allowing to move objects with the mouse"),
+                              _("Draggable Automatism"),
+                              _("Automatism allowing to move objects with the mouse"),
                               "Florian Rival",
                               "Open source (MIT License)");
 

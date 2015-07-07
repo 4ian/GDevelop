@@ -24,8 +24,8 @@ public:
     JsExtension()
     {
         SetExtensionInformation("PhysicsAutomatism",
-                              GD_T("Physics automatism"),
-                              GD_T("Automatism allowing to move objects as if they were subject to the laws of physics."),
+                              _("Physics automatism"),
+                              _("Automatism allowing to move objects as if they were subject to the laws of physics."),
                               "Florian Rival",
                               "Open source (MIT License)");
         CloneExtension("GDevelop C++ platform", "PhysicsAutomatism");
@@ -78,68 +78,68 @@ public:
 
         /*
             aut.AddAction("SetPolygonScaleX",
-                           GD_T("Change collision polygon X scale"),
-                           GD_T("Change the X scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
-                           GD_T("Change collision polygon of _PARAM0_ X scale to _PARAM2_"),
-                           GD_T("Collision polygon"),
+                           _("Change collision polygon X scale"),
+                           _("Change the X scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
+                           _("Change collision polygon of _PARAM0_ X scale to _PARAM2_"),
+                           _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
-                .AddParameter("object", GD_T("Object"))
-                .AddParameter("automatism", GD_T("Automatism"), "PhysicsAutomatism")
-                .AddParameter("expression", GD_T("Scale"))
+                .AddParameter("object", _("Object"))
+                .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
+                .AddParameter("expression", _("Scale"))
                 .AddCodeOnlyParameter("currentScene", "")
                 .SetFunctionName("SetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetPolygonScaleY",
-                           GD_T("Change collision polygon Y scale"),
-                           GD_T("Change the Y scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
-                           GD_T("Change collision polygon of _PARAM0_ Y scale to _PARAM2_"),
-                           GD_T("Collision polygon"),
+                           _("Change collision polygon Y scale"),
+                           _("Change the Y scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
+                           _("Change collision polygon of _PARAM0_ Y scale to _PARAM2_"),
+                           _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
-                .AddParameter("object", GD_T("Object"))
-                .AddParameter("automatism", GD_T("Automatism"), "PhysicsAutomatism")
-                .AddParameter("expression", GD_T("Scale"))
+                .AddParameter("object", _("Object"))
+                .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
+                .AddParameter("expression", _("Scale"))
                 .AddCodeOnlyParameter("currentScene", "")
                 .SetFunctionName("SetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("GetPolygonScaleX",
-                           GD_T("Collision polygon X scale"),
-                           GD_T("Test the value of the collision polygon X scale."),
-                           GD_T("Collision polygon of _PARAM0_ X scale is _PARAM2__PARAM3_"),
-                           GD_T("Collision polygon"),
+                           _("Collision polygon X scale"),
+                           _("Test the value of the collision polygon X scale."),
+                           _("Collision polygon of _PARAM0_ X scale is _PARAM2__PARAM3_"),
+                           _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
-                .AddParameter("object", GD_T("Object"))
-                .AddParameter("automatism", GD_T("Automatism"), "PhysicsAutomatism")
-                .AddParameter("relationalOperator", GD_T("Comparison sign"))
-                .AddParameter("expression", GD_T("Value to test"))
+                .AddParameter("object", _("Object"))
+                .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
+                .AddParameter("relationalOperator", _("Comparison sign"))
+                .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
                 .SetFunctionName("GetPolygonScaleX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("GetPolygonScaleY",
-                           GD_T("Collision polygon Y scale"),
-                           GD_T("Test the value of the collision polygon Y scale."),
-                           GD_T("Collision polygon of _PARAM0_ Y scale is _PARAM2__PARAM3_"),
-                           GD_T("Collision polygon"),
+                           _("Collision polygon Y scale"),
+                           _("Test the value of the collision polygon Y scale."),
+                           _("Collision polygon of _PARAM0_ Y scale is _PARAM2__PARAM3_"),
+                           _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
-                .AddParameter("object", GD_T("Object"))
-                .AddParameter("automatism", GD_T("Automatism"), "PhysicsAutomatism")
-                .AddParameter("relationalOperator", GD_T("Comparison sign"))
-                .AddParameter("expression", GD_T("Value to test"))
+                .AddParameter("object", _("Object"))
+                .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
+                .AddParameter("relationalOperator", _("Comparison sign"))
+                .AddParameter("expression", _("Value to test"))
                 .AddCodeOnlyParameter("currentScene", "")
                 .SetFunctionName("GetPolygonScaleY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
-            aut.AddExpression("PolygonScaleX", GD_T("Collision polygon X scale"), GD_T("Collision polygon X scale"), GD_T("Collision polygon"), "res/physics16.png")
-                .AddParameter("object", GD_T("Object"))
-                .AddParameter("automatism", GD_T("Automatism"), "PhysicsAutomatism")
+            aut.AddExpression("PolygonScaleX", _("Collision polygon X scale"), _("Collision polygon X scale"), _("Collision polygon"), "res/physics16.png")
+                .AddParameter("object", _("Object"))
+                .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
                 .SetFunctionName("GetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
-            aut.AddExpression("PolygonScaleY", GD_T("Collision polygon Y scale"), GD_T("Collision polygon Y scale"), GD_T("Collision polygon"), "res/physics16.png")
-                .AddParameter("object", GD_T("Object"))
-                .AddParameter("automatism", GD_T("Automatism"), "PhysicsAutomatism")
+            aut.AddExpression("PolygonScaleY", _("Collision polygon Y scale"), _("Collision polygon Y scale"), _("Collision polygon"), "res/physics16.png")
+                .AddParameter("object", _("Object"))
+                .AddParameter("automatism", _("Automatism"), "PhysicsAutomatism")
                 .AddCodeOnlyParameter("currentScene", "")
                 .SetFunctionName("GetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 */

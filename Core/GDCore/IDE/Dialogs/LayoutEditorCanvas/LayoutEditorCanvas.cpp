@@ -442,7 +442,7 @@ void LayoutEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
     if ( !editing ) return;
 
     if ( !currentPreviewer ) {
-        gd::LogMessage(GD_T("This platform does not support launching previews."));
+        gd::LogMessage(_("This platform does not support launching previews."));
         return;
     }
 

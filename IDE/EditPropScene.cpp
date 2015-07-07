@@ -117,7 +117,7 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
 	FlexGridSizer7->AddGrowableCol(0);
 	fovEdit = new wxTextCtrl(this, ID_TEXTCTRL2, _("90"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	FlexGridSizer7->Add(fovEdit, 1, wxTOP|wxBOTTOM|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("�"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer7->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT6, _("First clipping plane distance :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));

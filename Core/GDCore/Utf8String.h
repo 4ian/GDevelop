@@ -17,31 +17,6 @@
 #include "GDCore/Utf8Tools.h"
 #include "GDCore/Utf8/utf8.h"
 
-/**
- * \name Utility macros
- * \{
- */
-
-/**
- * \relates gd::utf8::String
- * Use this macro to create a gd::utf8::String from a literal.
- * \note You don't need to add the u8 literal as it's already added by the macro.
- */
-#define GD_U8(x) gd::utf8::String::FromUTF8(u8##x)
-
-/**
- * \relates gd::utf8::String
- * Use this macro to create a gd::utf8::String from a literal encoded in the current
- * locale (ANSI on Windows, already UTF8 on Linux).
- * \note You should consider using GD_U8 to generate a gd::utf8::String from an UTF8
- * literal.
- */
-#define GD_LOC(x) gd::utf8::String::FromLocale( (x) )
-
-/**
- * \}
- */
-
 namespace sf {class String;};
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 class wxString;

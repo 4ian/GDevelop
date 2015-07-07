@@ -8,7 +8,6 @@
 
 #include <SFML/System/String.hpp>
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/string.h>
@@ -60,12 +59,28 @@ String& String::operator=(const char *characters)
 
 String& String::operator=(const sf::String &string)
 {
-    m_string = gd::utf8::FromSfString(string);
+    m_string.clear();
+
+    //In theory, an UTF8 character can be up to 6 bytes (even if the current Unicode standard,
+    //the last character is 4 bytes long).
+    //So, reverse the maximum possible size to avoid reallocations.
+    m_string.reserve( string.getSize() * 6 );
+
+    //Push_back all characters inside the string.
+    for( sf::String::ConstIterator it = string.begin(); it != string.end(); ++it )
+    {
+        push_back( *it );
+    }
+
+    m_string.shrink_to_fit();
+
     return *this;
 }
 
 String& String::operator=(const std::u32string &string)
 {
+    m_string.clear();
+
     //In theory, an UTF8 character can be up to 6 bytes (even if the current Unicode standard,
     //the last character is 4 bytes long).
     //So, reverse the maximum possible size to avoid reallocations.
@@ -86,7 +101,7 @@ String& String::operator=(const std::u32string &string)
 
 String& String::operator=(const wxString &string)
 {
-    m_string = gd::utf8::FromWxString(string);
+    m_string =  std::string(string.ToUTF8().data());
     return *this;
 }
 
@@ -94,7 +109,7 @@ String& String::operator=(const wxString &string)
 
 String::size_type String::size() const
 {
-    return StrLength(m_string);
+    return std::distance(begin(), end());
 }
 
 String::iterator String::begin()
@@ -206,7 +221,11 @@ String String::FromSfString( const sf::String &sfString )
 
 sf::String String::ToSfString() const
 {
-    return gd::utf8::ToSfString(m_string);
+    sf::String str;
+    for(const_iterator it = begin(); it != end(); ++it)
+        str += sf::String(static_cast<sf::Uint32>(*it));
+
+    return str;
 }
 
 String::operator sf::String() const
@@ -223,7 +242,7 @@ String String::FromWxString( const wxString &wxStr)
 
 wxString String::ToWxString() const
 {
-    return gd::utf8::ToWxString(m_string);
+    return wxString::FromUTF8(m_string.c_str());
 }
 
 String::operator wxString() const

@@ -23,6 +23,8 @@ Binaries/Packaging/debian-source-package/gdevelop/
 Binaries/Packaging/opensuse-build-service/gdevelop/
 Binaries/Packaging/opensuse-build-service/final/
 Binaries/Packaging/GDevelop.app
+Binaries/Packaging/GDevelop.zip
+Binaries/Packaging/GDevelop.pkg
 Binaries/Packaging/logs
 /GDevelop.js
 *.depend

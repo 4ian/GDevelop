@@ -44,3 +44,12 @@ CppPlatform/Extensions/
 quit
 EOF
 done
+
+###Code signing and pkg building
+#See http://kuvacode.com/blog/building-for-the-mac-app-store for more information
+
+#Now sign the package:
+codesign -f -v --deep -s "3rd Party Mac Developer Application: Florian Rival" "GDevelop.app"
+
+#And create the pkg:
+productbuild --component "GDevelop.app" /Applications --sign "3rd Party Mac Developer Installer: Florian Rival" --product "GDevelop.app/Contents/Info.plist" GDevelop.pkg

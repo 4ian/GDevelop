@@ -14,7 +14,6 @@
 #include <vector>
 #include <SFML/System/String.hpp>
 
-#include "GDCore/Utf8Tools.h"
 #include "GDCore/Utf8/utf8.h"
 
 namespace sf {class String;};

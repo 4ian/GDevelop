@@ -185,14 +185,26 @@ int String::ToDouble() const
 
 String String::FromLocale( const std::string &localizedString )
 {
-    String str;
-    str.m_string = gd::utf8::FromLocaleString(localizedString);
-    return str;
+#if defined(WINDOWS)
+    return FromSfString(sf::String(localizedString)); //Don't need to use the current locale, on Windows, std::locale is always the C locale
+#else
+    if(std::locale("").name().find("UTF-8") != std::string::npos)
+        FromUTF8(localizedString); //UTF8 is already the current locale
+    else
+        return FromSfString(sf::String(localizedString, std::locale(""))); //Use the current locale (std::locale("")) for conversion
+#endif
 }
 
 std::string String::ToLocale() const
 {
-    return gd::utf8::ToLocaleString(m_string);
+#if defined(WINDOWS)
+    return ToSfString().toAnsiString();
+#else
+    if(std::locale("").name().find("UTF-8") != std::string::npos)
+        return m_string; //UTF8 is already the current locale on Linux
+    else
+        return ToSfString().toAnsiString(std::locale("")); //Use the current locale for conversion
+#endif
 }
 
 String String::FromUTF32( const std::u32string &string )
@@ -395,7 +407,25 @@ std::vector<String> String::Split( String::value_type delimiter ) const
 String String::substr( String::size_type start, String::size_type length ) const
 {
     String str;
-    str.m_string = SubStr(m_string, start, length);
+
+    const_iterator startIt = begin();
+    while(start > 0 && startIt != end())
+    {
+        ++startIt;
+        --start;
+    }
+    if(start > 0) //We reach the end of the string before the start position
+        throw std::out_of_range("[gd::String::substr] starting pos greater than size");
+
+    const_iterator endIt = startIt;
+    while(length > 0 && endIt != end())
+    {
+        ++endIt;
+        --length;
+    }
+
+    str.m_string = std::string( startIt.base(), endIt.base() );
+
     return str;
 }
 

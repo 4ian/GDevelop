@@ -3,7 +3,7 @@
 rm -rf GDevelop.app 2>&1 >/dev/null
 cp -r macos-bundle-skeleton GDevelop.app
 cp -r ../Output/Release_Darwin/ GDevelop.app/Contents/Resources/
-cp -rf ../../ExtLibs/SFML/extlibs/libs-osx/Frameworks GDevelop.app/Contents/
+cp -R ../../ExtLibs/SFML/extlibs/libs-osx/Frameworks GDevelop.app/Contents/
 
 type dylibbundler >/dev/null 2>&1 || { echo >&2 "Can't find dylibbundler, required to change libraries install names. Aborting..."; exit 1; }
 
@@ -47,9 +47,16 @@ done
 
 ###Code signing and pkg building
 #See http://kuvacode.com/blog/building-for-the-mac-app-store for more information
+cd ../../..
+
+#TODO:
+rm GDevelop.app/Contents/Resources/CppPlatform/Runtime/ExeLinux
 
 #Now sign the package:
-codesign -f -v --deep -s "3rd Party Mac Developer Application: Florian Rival" "GDevelop.app"
+codesign -f -v --deep -s "3rd Party Mac Developer Application: Florian Rival" "GDevelop.app/Contents/Resources/GDIDE" --entitlements GDevelop.entitlements
+codesign -f -v --deep -s "3rd Party Mac Developer Application: Florian Rival" "GDevelop.app/Contents/Frameworks/sndfile.framework" --entitlements GDevelop.entitlements
+codesign -f -v --deep -s "3rd Party Mac Developer Application: Florian Rival" "GDevelop.app/Contents/Frameworks/freetype.framework" --entitlements GDevelop.entitlements
+codesign -f -v --deep -s "3rd Party Mac Developer Application: Florian Rival" "GDevelop.app" --entitlements GDevelop.entitlements
 
 #And create the pkg:
 productbuild --component "GDevelop.app" /Applications --sign "3rd Party Mac Developer Installer: Florian Rival" --product "GDevelop.app/Contents/Info.plist" GDevelop.pkg

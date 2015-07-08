@@ -22,7 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
 
     extension.AddCondition("Timer",
                    _("Value of a timer"),
-                   _("Test the time elapsed of a timer."),
+                   _("Test the elapsed time of a timer."),
                    _("The timer _PARAM2_ is greater than _PARAM1_ seconds"),
                    _("Timers and time"),
                    "res/conditions/timer24.png",

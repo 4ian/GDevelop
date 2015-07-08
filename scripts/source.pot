@@ -18875,7 +18875,7 @@ msgid "Delete the selection\tDEL"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:232
-msgid "Add an automatims to the object"
+msgid "Add an automatism to the object"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234

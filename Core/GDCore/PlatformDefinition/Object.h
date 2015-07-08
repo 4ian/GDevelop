@@ -226,7 +226,7 @@ public:
 
     /**
      * \brief Add the specified automatism to the object
-     * \note The object takes ownership of the automatims.
+     * \note The object takes ownership of the automatism.
      * \return true if the automatism was added, false otherwise (automatism with the same name already in the object)
      */
     bool AddAutomatism(gd::Automatism * automatism);

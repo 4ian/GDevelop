@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-07 06:37-0400\n"
+"PO-Revision-Date: 2015-07-09 03:02-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1185,7 +1185,7 @@ msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/m
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:618
 msgid "Unable to rename the object : \n"
-msgstr "Unable to rename the object : \n"
+msgstr "Nicht in der Lage, das Objekt umzubenennen: \n"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:627
 msgid "Invalid name"
@@ -1193,7 +1193,7 @@ msgstr "Ungültiger Name"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:704
 msgid "Unable to rename the group : \n"
-msgstr "Unable to rename the group : \n"
+msgstr "Nicht in der Lage die Gruppe umzubenennen: \n"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:784
 msgid "Unfold the group to see the objects inside it."
@@ -1234,11 +1234,11 @@ msgstr "Kopie von"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1343 ../IDE/Dialogs/ObjectsEditor.cpp:1387
 msgid "Can't set \""
-msgstr "Can't set \""
+msgstr "\" kann nicht festgelegt werden"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1343 ../IDE/Dialogs/ObjectsEditor.cpp:1387
 msgid "\" global because :\n"
-msgstr "\" global because :\n"
+msgstr "global, weil:"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1442
 msgid "Create a new group"
@@ -1251,15 +1251,15 @@ msgstr "Gruppen"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1619
 msgid "an object"
-msgstr "an object"
+msgstr "ein Objekt"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1621
 msgid "a group"
-msgstr "a group"
+msgstr "eine Gruppe"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1623
 msgid "with the same name exists in the current scene"
-msgstr "with the same name exists in the current scene"
+msgstr "existiert in der aktuellen Szene mit dem selben Namen"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1633
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:237
@@ -1268,23 +1268,23 @@ msgstr "Objekte"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1636
 msgid "/ groups"
-msgstr "/ groups"
+msgstr "/ Gruppen"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1637
 msgid "groups"
-msgstr "groups"
+msgstr "Gruppen"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1639
 msgid "with the same name exist in these scenes : "
-msgstr "with the same name exist in these scenes : "
+msgstr "existieren mit dem selben Namen in diesen Szenen: "
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1654
 msgid "a global object with the same name exists"
-msgstr "a global object with the same name exists"
+msgstr "ein globales Objekt mit demselben Namen ist vorhanden"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1656
 msgid "a global group with the same name exists"
-msgstr "a global group with the same name exists"
+msgstr "eine globale Gruppe mit demselben Namen ist vorhanden"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:140
 #: ../Extensions//TextObject/TextObjectEditor.cpp:193
@@ -3342,7 +3342,7 @@ msgstr "Sprache:"
 
 #: ../IDE/Preferences.cpp:271
 msgid "English"
-msgstr "English"
+msgstr "Englisch"
 
 #: ../IDE/Preferences.cpp:279
 msgid "New projects"
@@ -3652,7 +3652,7 @@ msgstr "C++ Kompilierung"
 
 #: ../IDE/Preferences.cpp:631
 msgid "Check for the news"
-msgstr "Check for the news"
+msgstr "Überprüfe auf die News"
 
 #: ../IDE/Preferences.cpp:654
 msgid "Events editors"
@@ -4208,7 +4208,7 @@ msgstr "Pausierte Musik:"
 
 #: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:439
 msgid "C++ code (Experimental)"
-msgstr "C++ code (Experimental)"
+msgstr "C++ Code (experimentell)"
 
 #: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:440
 msgid "Execute C++ code"
@@ -5682,7 +5682,7 @@ msgstr "http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtousei
 
 #: ../GDJS/GDJS//Dialogs/ProjectExportDialog.cpp:95
 msgid "The export folder is not empty"
-msgstr "The export folder is not empty"
+msgstr "Der Exportordner ist nicht leer"
 
 #: ../GDJS/GDJS//Dialogs/ProjectExportDialog.cpp:105
 msgid "Choose a folder, empty if possible, where the game should be exported."
@@ -5935,7 +5935,7 @@ msgstr "Verweis erstellen"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:98
 msgid "Reference to the element preceeding the element to be accessed"
-msgstr "Reference to the element preceeding the element to be accessed"
+msgstr "Verweis auf das vorangehende Element auf das zugegriffen werden soll"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:99
 msgid "Tag name filter "
@@ -7381,7 +7381,7 @@ msgstr "Parameter der aktuellen Funktion"
 #: ../Extensions//Function/Extension.cpp:170
 #: ../Extensions//Function/JsExtension.cpp:105
 msgid "Return the text contained in a parameter of the currently launched function"
-msgstr "Return the text contained in a parameter of the currently launched function"
+msgstr "Gebe den Text in einem Parameter der aktuell gestarten Funktion zurück"
 
 #: ../Extensions//Function/Extension.cpp:173
 #: ../Extensions//Function/JsExtension.cpp:108
@@ -8204,7 +8204,7 @@ msgstr "Test the height of a Panel Sprite."
 #: ../Extensions//PanelSpriteObject/Extension.cpp:75
 #: ../Extensions//TiledSpriteObject/Extension.cpp:74
 msgid "The height of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "The height of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Die Höhe von _PARAM0_ist_PARAM1__PARAM2_"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:87
 msgid "Modify the angle of a Panel Sprite."
@@ -8214,7 +8214,7 @@ msgstr "Modify the angle of a Panel Sprite."
 #: ../Extensions//TextObject/Extension.cpp:218
 #: ../Extensions//TiledSpriteObject/Extension.cpp:88
 msgid "Do _PARAM1__PARAM2_ to the angle of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to the angle of _PARAM0_"
+msgstr "Machen Sie _PARAM1__PARAM2_ zum Winkel von _PARAM0_"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:100
 msgid "Test the angle of a Panel Sprite."
@@ -8224,7 +8224,7 @@ msgstr "Test the angle of a Panel Sprite."
 #: ../Extensions//TextObject/Extension.cpp:231
 #: ../Extensions//TiledSpriteObject/Extension.cpp:103
 msgid "The angle of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "The angle of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Der Winkel von _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:113
 #: ../Extensions//PanelSpriteObject/Extension.cpp:120
@@ -8552,8 +8552,8 @@ msgstr "Erstellungsradius"
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:266
 msgid "Modify creation radius of particles.\n"
 "Particles have to be recreated in order to take changes in account."
-msgstr "Modifiziere deine Kreation mit ein Partikelradius.\n"
-"Partikel müssen neu erstellt werden, um den Account zu wechseln."
+msgstr "Ändert den Radius der Partikelbildung.\n"
+"Partikel müssen neu gebildet werden, um Änderungen zu berücksichtigen."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:267
 msgid "Do _PARAM1__PARAM2_ to creation radius of _PARAM0_"
@@ -8575,7 +8575,7 @@ msgstr "Mindestlebensdauer"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:294
 msgid "Modify particles minimum lifetime.Particles have to be recreated in order to take changes in account."
-msgstr "Modify particles minimum lifetime.Particles have to be recreated in order to take changes in account."
+msgstr "Ändert die minimale Partikel-Lebenszeit. Die Partikel müssen neu gebildet werden, um Änderungen zu berücksichtigen."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:295
 msgid "Do _PARAM1__PARAM2_ to minimum lifetime of particles of _PARAM0_"
@@ -10322,7 +10322,7 @@ msgstr "Breite der Zellen"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:86
 msgid "Change the width of the cells of the virtual grid."
-msgstr "Change the width of the cells of the virtual grid."
+msgstr "Ändern Sie die Zellenbreite des virtuellen Rasters."
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:87
 msgid "Do _PARAM2__PARAM3_ to the width of the virtual cells of _PARAM0_"
@@ -10361,7 +10361,7 @@ msgstr "Höhe der Zellen"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:112
 msgid "Change the height of the cells of the virtual grid."
-msgstr "Change the height of the cells of the virtual grid."
+msgstr "Ändern Sie die Zellenhöhe des virtuellen Rasters."
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:113
 msgid "Do _PARAM2__PARAM3_ to the height of the virtual cells of _PARAM0_"
@@ -12046,7 +12046,7 @@ msgstr "Primitive drawing"
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:17
 msgid "Extension allowing to draw shapes and manipulate images."
-msgstr "Extension allowing to draw shapes and manipulate images."
+msgstr "Die Erweiterung erlaubt es, Formen zu zeichnen und Bilder zu manipulieren."
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:22
 msgid "Shape painter"
@@ -15148,7 +15148,7 @@ msgstr "Change camera zoom to _PARAM1_ ( layer : _PARAM2_, camera : _PARAM3_ )"
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:208
 msgid "Value ( 1:Initial zoom, 2:Zoom x2, 0.5:Unzoom x2...)"
-msgstr "Value ( 1:Initial zoom, 2:Zoom x2, 0.5:Unzoom x2...)"
+msgstr "Wert ( 1:anfängliche Vergrößerung, 2:Vegrößerung x2, 0.5:Verkleinerung x2...)"
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:213
 msgid "Center the camera on an object within limits"
@@ -16172,11 +16172,11 @@ msgstr "Put the cursor in the middle of the screen vertically."
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:71
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:73
 msgid "Hide the cursor"
-msgstr "Hide the cursor"
+msgstr "Mauspfeil ausblenden"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:72
 msgid "Hide the cursor."
-msgstr "Hide the cursor."
+msgstr "Mauspfeil ausblenden."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:81
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:83
@@ -18122,7 +18122,7 @@ msgstr "Choose this object"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectDialog.cpp:85
 msgid "To add some objects, use the objects editor"
-msgstr "To add some objects, use the objects editor"
+msgstr "Benutzen Sie den Objekt-Editor, um Objekte hinzuzufügen."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectDialog.cpp:87
 msgid "Choose this group"
@@ -18130,7 +18130,7 @@ msgstr "Choose this group"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectDialog.cpp:96
 msgid "To add some groups, use the objects groups editor"
-msgstr "To add some groups, use the objects groups editor"
+msgstr "Benutzen Sie den Gruppen-Editor, um Gruppen hinzuzufügen."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:65
 msgid "Choose an object type"
@@ -18156,7 +18156,7 @@ msgstr "Choose a variable"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:108
 msgid "Edit initial value"
-msgstr "Edit initial value"
+msgstr "Ausgangswert bearbeiten"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:113
 msgid "Add a child variable"
@@ -18169,7 +18169,7 @@ msgstr "Remove"
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:143
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:469
 msgid "Initial value"
-msgstr "Initial value"
+msgstr "Ausgangswert"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:146
 msgid "Add a variable"
@@ -18177,7 +18177,7 @@ msgstr "Add a variable"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:147
 msgid "Edit the initial value of the variable"
-msgstr "Edit the initial value of the variable"
+msgstr "Ausgangswert der Variablen bearbeiten"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:148
 msgid "Rename variable"
@@ -18237,7 +18237,7 @@ msgstr "Adding undeclared variables"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:469
 msgid "Enter the initial value of the variable"
-msgstr "Enter the initial value of the variable"
+msgstr "Ausgangswert der Variablen eingeben"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:481
 msgid "Enter the new name of the variable"
@@ -18716,7 +18716,7 @@ msgstr "Publish your own events on GDevApp.com"
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:67
 msgid "Grid parameters"
-msgstr "Grid parameters"
+msgstr "Rasterparameter"
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:71
 msgid "Grid offset X:"
@@ -18728,23 +18728,23 @@ msgstr "Grid offset Y:"
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:83
 msgid "Width of a cell:"
-msgstr "Width of a cell:"
+msgstr "Zellenbreite:"
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:89
 msgid "Height of a cell:"
-msgstr "Height of a cell:"
+msgstr "Zellenhöhe:"
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:96
 msgid "Snap to grid"
-msgstr "Snap to grid"
+msgstr "Am Raster ausrichten"
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:153
 msgid "The width of the grid is wrong."
-msgstr "The width of the grid is wrong."
+msgstr "Die breite des Rasters ist falsch."
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:158
 msgid "The height of the grid is wrong."
-msgstr "The height of the grid is wrong."
+msgstr "Die Höhe des Rasters ist falsch."
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:194
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:230
@@ -18764,7 +18764,7 @@ msgstr "(Multiples values)"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:86
 msgid "Instance properties"
-msgstr "Instance properties"
+msgstr "Instanz-Eigenschaften"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:90
 msgid "Z Order"
@@ -18772,7 +18772,7 @@ msgstr "Z Order"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:92
 msgid "Locked"
-msgstr "Locked"
+msgstr "Gesperrt"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:104
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:106
@@ -18787,7 +18787,7 @@ msgstr "Locked"
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1001
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1003
 msgid "Click to edit..."
-msgstr "Click to edit..."
+msgstr "Zum Ändern klicken..."
 
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:69
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:251
@@ -18921,8 +18921,8 @@ msgid "Delete the selection\tDEL"
 msgstr "Delete the selection\tDEL"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:232
-msgid "Add an automatims to the object"
-msgstr "Add an automatims to the object"
+msgid "Add an automatism to the object"
+msgstr "Add an automatism to the object"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:262
@@ -18939,7 +18939,7 @@ msgstr "Unlock the object under the cursor"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:285
 msgid "Preview for "
-msgstr "Preview for "
+msgstr "Vorschau für "
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:286
 msgid "Launch a preview for this platform"
@@ -18947,7 +18947,7 @@ msgstr "Launch a preview for this platform"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:291
 msgid "No preview available for "
-msgstr "No preview available for "
+msgstr "Keine Vorschau verfügbar für "
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:291
 msgid "No preview can be done for this platform"
@@ -18963,11 +18963,11 @@ msgstr "Mode"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:521
 msgid "Stop the preview"
-msgstr "Stop the preview"
+msgstr "Vorschau anhalten"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:521
 msgid "Stop the preview and go back to editing"
-msgstr "Stop the preview and go back to editing"
+msgstr "Vorschau anhalten und zur Bearbeitung zurückkehren"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:522
 msgid "Launch a preview"
@@ -18975,11 +18975,11 @@ msgstr "Launch a preview"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:557
 msgid "Objects editor"
-msgstr "Objects editor"
+msgstr "Objekt-Editor"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:557
 msgid "Show the list of objects of the scene"
-msgstr "Show the list of objects of the scene"
+msgstr "Liste der Objekte der Szene anzeigen"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:558
 msgid "Show the layers editor"
@@ -18987,11 +18987,11 @@ msgstr "Show the layers editor"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:559
 msgid "Instances"
-msgstr "Instances"
+msgstr "Instanzen"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:559
 msgid "Open a list of all instances of objects put on the scene"
-msgstr "Open a list of all instances of objects put on the scene"
+msgstr "Liste aller Instanzen von Objekten in der Szene öffnen"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:560
 msgid "Undo the last change"
@@ -18999,15 +18999,15 @@ msgstr "Undo the last change"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:562
 msgid "Grid"
-msgstr "Grid"
+msgstr "Rasteransicht"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:563
 msgid "Edit the grid"
-msgstr "Edit the grid"
+msgstr "Raster bearbeiten"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:563
 msgid "Edit the size of the grid"
-msgstr "Edit the size of the grid"
+msgstr "Rastergröße ändern"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:564
 msgid "Mask"
@@ -19019,7 +19019,7 @@ msgstr "Show a mask corresponding to the size of the game window"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:565
 msgid "Return to the initial position ( 0;0 )"
-msgstr "Return to the initial position ( 0;0 )"
+msgstr "Zur Ausgangsposition zurückkehren ( 0;0 )"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:565
 msgid "Go back to the origin of the scene"
@@ -19027,11 +19027,11 @@ msgstr "Go back to the origin of the scene"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:566
 msgid "Initial zoom"
-msgstr "Initial zoom"
+msgstr "anfängliche Vergrößerung"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:566
 msgid "Go back to the initial zoom level"
-msgstr "Go back to the initial zoom level"
+msgstr "Zurück zur anfänglichen Vergrößerungsstufe"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:587
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:605
@@ -19041,7 +19041,7 @@ msgstr "Put the object(s) on the layer \""
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:1067
 #, c-format
 msgid "Position %f;%f. SHIFT for multiple selection, right click for more options."
-msgstr "Position %f;%f. SHIFT for multiple selection, right click for more options."
+msgstr "Position %f;%f. UMSCHALT für Mehrfachauswahl, Rechtsklick für weitere Optionen."
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:1360
 msgid "Are you sure you want to clear the Undo History?"
@@ -19073,43 +19073,43 @@ msgstr "on the layer :"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:39
 msgid "General object properties"
-msgstr "General object properties"
+msgstr "Allgemeine Objekteigenschaften"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:41
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:241
 msgid "Object name"
-msgstr "Object name"
+msgstr "Objektname"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:48
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:161
 msgid "Object variables"
-msgstr "Object variables"
+msgstr "Objektvariablen"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:55
 msgid "Add automatism"
-msgstr "Add automatism"
+msgstr "Automatismus hinzufügen"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:61
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:62
 msgid "Remove..."
-msgstr "Remove..."
+msgstr "Entfernen..."
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:79
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:80
 msgid "Rename..."
-msgstr "Rename..."
+msgstr "Umbenennen..."
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:179
 msgid "Choose the automatism to delete"
-msgstr "Choose the automatism to delete"
+msgstr "Wählen Sie den zu löschenden Automatismus"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:198
 msgid "Enter a new name for the automatism"
-msgstr "Enter a new name for the automatism"
+msgstr "Geben Sie einen neuen Namen für den Automatismus ein"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:198
 msgid "Rename an automatism"
-msgstr "Rename an automatism"
+msgstr "Automatismus umbenennen"
 
 #: ../Core/GDCore/IDE/Dialogs/ParameterControlsHelper.cpp:46
 msgid "Parameter:"
@@ -19126,8 +19126,8 @@ msgstr "Use extension modules for GDevelop"
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:106
 msgid "Right click to add or remove a platform.\n"
 "Platforms which are not used by the project are grayed."
-msgstr "Right click to add or remove a platform.\n"
-"Platforms which are not used by the project are grayed."
+msgstr "Rechtsklicken um eine Plattform hinzuzufügen.\n"
+"Nicht vom Projekt genutzte Plattformen sind grau."
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:112
 msgid "Extensions available :"
@@ -19136,8 +19136,8 @@ msgstr "Extensions available :"
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:118
 msgid "Built-in extensions are automatically used by the project\n"
 "and are not shown here."
-msgstr "Built-in extensions are automatically used by the project\n"
-"and are not shown here."
+msgstr "Integrierte Erweiterungen werden vom Projekt\n"
+"automatisch genutzt und hier nicht angezeigt."
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:125
 msgid "Information about the extension"
@@ -19193,23 +19193,23 @@ msgstr "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manua
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:416
 msgid "Unable to remove this platform: The project must use at least one plaform."
-msgstr "Unable to remove this platform: The project must use at least one plaform."
+msgstr "Plattform kann nicht entfernt werden: Das Projekt muss mindestens eine Plattform nutzen."
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp:31
 msgid "Project updated"
-msgstr "Project updated"
+msgstr "Projekt aktualisiert"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp:36
 msgid "If you save your project using this version of GDevelop, you won't be able to use it with\n"
 "a previous version of GDevelop due to these changes :"
-msgstr "If you save your project using this version of GDevelop, you won't be able to use it with\n"
-"a previous version of GDevelop due to these changes :"
+msgstr "Wenn Sie Ihr Projekt mit dieser Version von GDevelop speichern, können Sie es nicht mit\n"
+"einer früheren Version von GDevelop nutzen, da Folgendes geändert wurde:"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp:40
 msgid "Remember to always make regular saves of your projects so as to have backup if something\n"
 "goes wrong."
-msgstr "Remember to always make regular saves of your projects so as to have backup if something\n"
-"goes wrong."
+msgstr "Denken Sie daran, Ihr Projekt regelmäßig zu speichern, um im Falle eines Fehlers\n"
+"ein Backup zu haben."
 
 #: ../Core/GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp:55
 msgid "Resources library"
@@ -19336,7 +19336,7 @@ msgstr "Unable to rename the folder: another folder has already this name."
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:930
 msgid "All images"
-msgstr "All images"
+msgstr "Alle Bilder"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:960
 msgid "These resources seems to be useless:\n"
@@ -19359,20 +19359,20 @@ msgstr "Programs (*.exe)|*.exe"
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1048
 msgid "Choose a resource in the\n"
 "list to display it.\n\n"
-msgstr "Choose a resource in the\n"
-"list to display it.\n\n"
+msgstr "Wählen Sie eine Ressource aus der\n"
+"Liste, um sie anzuzeigen.\n\n"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1049
 msgid "You can add and\n"
 "modify resources using the ribbon."
-msgstr "You can add and\n"
-"modify resources using the ribbon."
+msgstr "Sie können Ressourcen mit\n"
+"der Leiste hinzufügen und ändern."
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1049
 msgid "You can add and\n"
 "modify resources using the toolbar"
-msgstr "You can add and\n"
-"modify resources using the toolbar"
+msgstr "Sie können Ressourcen mit\n"
+"der Werkzeugleiste hinzufügen und ändern"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1227
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1231
@@ -19476,8 +19476,8 @@ msgstr " could not be loaded.\n"
 #: ../Core/GDCore/IDE/ProjectResourcesCopier.cpp:43
 msgid "Some resources are using absolute filenames.\n"
 "Do you want them to be copied in the new folder of the project? If you choose No, they won't be modified."
-msgstr "Some resources are using absolute filenames.\n"
-"Do you want them to be copied in the new folder of the project? If you choose No, they won't be modified."
+msgstr "Einige Ressourcen nutzen absolute Dateinamen.\n"
+"Sollen diese in den neuen Projektordner kopiert werden? Wählen Sie \"Nein\", werden sie nicht modifiziert."
 
 #: ../Core/GDCore/IDE/ProjectResourcesCopier.cpp:44
 msgid "Some resources are using absolute filenames."
@@ -19505,7 +19505,7 @@ msgstr "Hoppla, es scheint, dass der Ordner nicht angezeigt werden konnte. Öffn
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:57
 msgid "Project"
-msgstr "Project"
+msgstr "Projekt"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:499
 msgid "The version of GDevelop used to create this game seems to be a new version.\n"

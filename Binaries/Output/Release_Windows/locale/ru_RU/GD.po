@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-07 06:38-0400\n"
+"PO-Revision-Date: 2015-07-09 03:03-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1183,7 +1183,7 @@ msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/m
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:618
 msgid "Unable to rename the object : \n"
-msgstr "Unable to rename the object : \n"
+msgstr "Невозможно переименовать объект: \n"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:627
 msgid "Invalid name"
@@ -1249,15 +1249,15 @@ msgstr "Список групп"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1619
 msgid "an object"
-msgstr "an object"
+msgstr "объект"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1621
 msgid "a group"
-msgstr "a group"
+msgstr "группа"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1623
 msgid "with the same name exists in the current scene"
-msgstr "with the same name exists in the current scene"
+msgstr "с таким названием существует на данной сцене"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1633
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:237
@@ -18228,7 +18228,7 @@ msgstr "scene variables"
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:193
 #, c-format
 msgid "Edit the variables (%s)"
-msgstr "Edit the variables (%s)"
+msgstr "Редактировать переменные (%s)"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:299
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:303
@@ -18649,7 +18649,7 @@ msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/m
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:54
 msgid "Edit the \"Repeat\" event"
-msgstr "Edit the \"Repeat\" event"
+msgstr "Редактировать событие \"Повтор\""
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:60
 msgid "Number of repetitions of the event :"
@@ -18944,8 +18944,8 @@ msgid "Delete the selection\tDEL"
 msgstr "Удалить выделение\tDEL"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:232
-msgid "Add an automatims to the object"
-msgstr "Добавить автоматизм к объекту"
+msgid "Add an automatism to the object"
+msgstr "Add an automatism to the object"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:262

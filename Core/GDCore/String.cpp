@@ -300,6 +300,21 @@ String::operator wxString() const
 
 #endif
 
+bool String::IsValid() const
+{
+    return ::utf8::is_valid(m_string.begin(), m_string.end());
+}
+
+String& String::ReplaceInvalid( char32_t replacement )
+{
+    std::string validStr;
+    ::utf8::replace_invalid(m_string.begin(), m_string.end(), std::back_inserter(validStr), replacement);
+
+    m_string = validStr;
+
+    return *this;
+}
+
 String::value_type String::operator[]( const String::size_type position ) const
 {
     const_iterator it = begin();

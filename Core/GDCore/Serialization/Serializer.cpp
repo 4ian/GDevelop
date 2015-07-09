@@ -71,9 +71,9 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 	{
 		if ( attr->Name() != NULL )
 		{
-			gd::String name = gd::String::FromUTF8(attr->Name());
+			gd::String name = gd::String::FromUTF8(attr->Name()).ReplaceInvalid();
 			if (attr->Value())
-				element.SetAttribute(name, gd::String::FromUTF8(attr->Value()));
+				element.SetAttribute(name, gd::String::FromUTF8(attr->Value()).ReplaceInvalid());
 		}
 
 		attr = attr->Next();
@@ -84,7 +84,7 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 	{
 		if (child->Value())
 		{
-			gd::String name = gd::String::FromUTF8(child->Value());
+			gd::String name = gd::String::FromUTF8(child->Value()).ReplaceInvalid();
 			SerializerElement & childElement = element.AddChild(name);
 			FromXML(childElement, child);
 		}
@@ -95,7 +95,7 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 	if (xmlElement->GetText())
 	{
 		SerializerValue value;
-		value.Set(gd::String::FromUTF8(xmlElement->GetText()));
+		value.Set(gd::String::FromUTF8(xmlElement->GetText()).ReplaceInvalid());
 		element.SetValue(value);
 	}
 
@@ -424,7 +424,7 @@ namespace
                 if ( pos >= jsonStr.length() || jsonStr[pos] != ':' ) return std::string::npos;
 
                 pos++;
-                pos = ParseJSONObject(jsonStr, pos, element.AddChild(gd::String::FromUTF8(childName)));
+                pos = ParseJSONObject(jsonStr, pos, element.AddChild(gd::String::FromUTF8(childName).ReplaceInvalid()));
 
                 pos = SkipBlankChar(jsonStr, pos);
                 if ( pos >= jsonStr.length()) return std::string::npos;
@@ -469,7 +469,7 @@ namespace
                 return std::string::npos;
             }
 
-            element.SetValue(gd::String::FromUTF8(str));
+            element.SetValue(gd::String::FromUTF8(str).ReplaceInvalid());
             return pos+1;
         }
         else //Number or boolean

@@ -395,6 +395,26 @@ public:
  */
 
 /**
+ * \name UTF8 tools
+ * \{
+ */
+
+    /**
+     * \return true if the string is valid.
+     */
+    bool IsValid() const;
+
+    /**
+     * Searches the string for invalid characters and replaces them with **replacement**.
+     * \return *this
+     */
+    String& ReplaceInvalid( char32_t replacement = 0xfffd );
+
+/**
+ * \}
+ */
+
+/**
  * \name Element access / Internal string access
  * \{
  */

@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY)
 #ifndef EVENTSCODENAMEMANGLER_H
 #define EVENTSCODENAMEMANGLER_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 /**
  * Manage name mangling, so as to ensure all names used in code are valid.

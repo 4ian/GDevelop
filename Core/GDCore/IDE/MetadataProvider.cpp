@@ -10,7 +10,7 @@
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/ObjectMetadata.h"
 #include <algorithm>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 using namespace std;
 

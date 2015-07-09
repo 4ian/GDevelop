@@ -20,7 +20,7 @@
 //*)
 #include <string>
 #include <vector>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 using namespace std;
 

@@ -6,7 +6,7 @@
 
 #include "Layout.h"
 #include <algorithm>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"

@@ -5,11 +5,11 @@
  */
 #ifndef OBJECTMETADATA_H
 #define OBJECTMETADATA_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <map>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif

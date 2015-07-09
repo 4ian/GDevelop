@@ -7,7 +7,7 @@
 #ifndef GDCORE_SERIALIZERVALUE_H
 #define GDCORE_SERIALIZERVALUE_H
 #include <string>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 namespace gd {
 

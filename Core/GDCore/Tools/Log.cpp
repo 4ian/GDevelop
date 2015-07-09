@@ -9,7 +9,7 @@
 #else
 #include <iostream>
 #endif
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 namespace gd {
 

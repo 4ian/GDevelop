@@ -7,7 +7,7 @@
 #ifndef UPDATECHECKER_H
 #define UPDATECHECKER_H
 #include <string>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 /**
  * \brief Class to download and retrieve information

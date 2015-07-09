@@ -7,7 +7,7 @@
 #ifndef GDCORE_EXTERNALEVENTS_H
 #define GDCORE_EXTERNALEVENTS_H
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <memory>
 #include <ctime>
 #include "GDCore/Events/EventsList.h"

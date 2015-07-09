@@ -13,7 +13,7 @@
 #include <wx/panel.h>
 //*)
 #include <string>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>

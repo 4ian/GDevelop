@@ -6,7 +6,7 @@
 #ifndef SOURCEFILE_H
 #define SOURCEFILE_H
 #include <ctime>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <memory>
 namespace gd { class SerializerElement; }
 class BaseEvent;

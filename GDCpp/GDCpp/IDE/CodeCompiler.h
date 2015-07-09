@@ -14,7 +14,7 @@
 #include <set>
 #include <SFML/System.hpp>
 #include <memory>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 #include <wx/event.h>
 #include <wx/process.h>
 #include <wx/thread.h>

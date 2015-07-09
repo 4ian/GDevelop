@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h>
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <iostream>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Utf8Tools.h"

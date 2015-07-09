@@ -7,7 +7,7 @@
 #define MUSIC_H
 #include <SFML/Audio.hpp>
 #include <string>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 /**
  * \brief Represents a music to be played

@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_VARIABLESCONTAINER_H
 #define GDCORE_VARIABLESCONTAINER_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include "GDCore/PlatformDefinition/Variable.h"
 namespace gd { class SerializerElement; }

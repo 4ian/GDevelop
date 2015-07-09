@@ -12,7 +12,7 @@
 #include <wx/gdicmn.h>
 #include <wx/dc.h>
 #include <wx/dcmemory.h>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 namespace gd
 {

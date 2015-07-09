@@ -22,7 +22,7 @@ namespace gd { class Layout; }
 #include "GDCore/PlatformDefinition/Layout.h"
 #include <string>
 #include <vector>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 using namespace std;
 

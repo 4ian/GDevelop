@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_INITIALINSTANCE_H
 #define GDCORE_INITIALINSTANCE_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <map>
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 namespace gd { class PropertyDescriptor; }

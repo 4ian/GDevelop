@@ -6,7 +6,7 @@
 #ifndef GDCORE_LINKEVENT_H
 #define GDCORE_LINKEVENT_H
 #include "GDCore/Events/Event.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 namespace gd
 {

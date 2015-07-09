@@ -7,7 +7,7 @@
 #ifndef EditExpressionDialog_H
 #define EditExpressionDialog_H
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 //(*Headers(EditExpressionDialog)
 #include <wx/treectrl.h>

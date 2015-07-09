@@ -5,7 +5,7 @@
 
 #ifndef GDCORE_VERSIONWRAPPER_H
 #define GDCORE_VERSIONWRAPPER_H
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 namespace gd
 {

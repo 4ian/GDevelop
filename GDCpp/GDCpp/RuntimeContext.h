@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 class RuntimeObject;
 class RuntimeScene;
 class RuntimeVariablesContainer;

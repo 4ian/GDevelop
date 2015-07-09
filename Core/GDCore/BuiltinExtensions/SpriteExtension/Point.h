@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_POINT_H
 #define GDCORE_POINT_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 /**
  * \brief Named point used by Sprite.

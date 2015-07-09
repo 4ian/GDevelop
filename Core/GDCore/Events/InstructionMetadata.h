@@ -7,14 +7,14 @@
 #ifndef INSTRUCTIONMETADATA_H
 #define INSTRUCTIONMETADATA_H
 #if defined(GD_IDE_ONLY)
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include "GDCore/Events/Instruction.h"
 #include <memory>
 #include <functional>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 class wxBitmap;
 namespace gd { class Project; }
 namespace gd { class Layout; }

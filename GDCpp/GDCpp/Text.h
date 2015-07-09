@@ -6,7 +6,7 @@
 #ifndef TEXT_H
 #define TEXT_H
 #include <SFML/Graphics.hpp>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 /**
  * \brief Old class for drawing objects.

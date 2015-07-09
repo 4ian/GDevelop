@@ -6,7 +6,7 @@
 #ifndef SOUND_H
 #define SOUND_H
 #include <SFML/Audio.hpp>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 /**
  * \brief Represents a sound to be played

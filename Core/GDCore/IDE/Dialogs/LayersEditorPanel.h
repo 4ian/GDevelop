@@ -15,7 +15,7 @@ namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class Layer; }
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 namespace gd
 {

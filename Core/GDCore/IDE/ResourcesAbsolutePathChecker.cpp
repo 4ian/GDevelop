@@ -6,7 +6,7 @@
 
 #include "ResourcesAbsolutePathChecker.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 namespace gd
 {

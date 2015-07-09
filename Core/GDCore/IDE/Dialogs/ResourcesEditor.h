@@ -18,7 +18,7 @@
 #include <wx/srchctrl.h>
 #include <wx/aui/aui.h>
 #include <memory>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 namespace gd { class ResourceLibraryDialog; }
 namespace gd { class Project; }

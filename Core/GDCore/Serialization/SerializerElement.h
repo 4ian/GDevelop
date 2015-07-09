@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 #include "GDCore/Serialization/SerializerValue.h"
 
 namespace gd {

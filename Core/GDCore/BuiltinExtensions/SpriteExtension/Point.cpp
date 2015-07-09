@@ -5,7 +5,7 @@
  */
 
 #include "GDCore/BuiltinExtensions/SpriteExtension/Point.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 Point::Point(const gd::String & name_) :
 	name(name_),

@@ -8,7 +8,7 @@
 #ifndef FULLPROJECTCOMPILER_H
 #define FULLPROJECTCOMPILER_H
 #include <string>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 namespace gd { class Project; }
 
 namespace GDpriv

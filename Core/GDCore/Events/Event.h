@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <memory>
 #include <memory>

@@ -6,7 +6,7 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/Expression.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <iostream>
 #include <vector>
 #include <assert.h>

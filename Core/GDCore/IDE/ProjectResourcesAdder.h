@@ -6,7 +6,7 @@
 #ifndef PROJECTRESOURCESADDER_H
 #define PROJECTRESOURCESADDER_H
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 namespace gd { class Project; }
 
 namespace gd

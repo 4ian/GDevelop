@@ -35,7 +35,7 @@ documentation and/or software.
 
 #include <string>
 #include <iostream>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 // a small class for calculating MD5 hashes of strings or byte arrays
 // it is not meant to be fast or secure

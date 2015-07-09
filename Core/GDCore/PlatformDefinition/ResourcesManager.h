@@ -6,7 +6,7 @@
 #ifndef GDCORE_RESOURCESMANAGER_H
 #define GDCORE_RESOURCESMANAGER_H
 #include <memory>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 namespace gd { class Project; }
 namespace gd { class ResourceFolder; }

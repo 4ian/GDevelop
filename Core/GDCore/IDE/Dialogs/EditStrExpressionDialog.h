@@ -18,7 +18,7 @@
 #include <wx/dialog.h>
 #include <wx/stc/stc.h>
 //*)
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include "GDCore/Events/ExpressionMetadata.h"
 namespace gd { class Project; }

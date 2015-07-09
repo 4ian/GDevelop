@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_CHANGESNOTIFIER_H
 #define GDCORE_CHANGESNOTIFIER_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <iostream>
 namespace gd { class Project; }

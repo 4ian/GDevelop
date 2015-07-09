@@ -3,7 +3,7 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <set>
 #include <utility>

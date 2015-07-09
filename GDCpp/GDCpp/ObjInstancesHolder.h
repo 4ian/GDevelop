@@ -7,7 +7,7 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 class RuntimeObject;
 

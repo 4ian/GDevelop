@@ -8,7 +8,7 @@
 #ifndef IMAGESUSEDINVENTORIZER_H
 #define IMAGESUSEDINVENTORIZER_H
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <set>
 #include "GDCore/IDE/ArbitraryResourceWorker.h"

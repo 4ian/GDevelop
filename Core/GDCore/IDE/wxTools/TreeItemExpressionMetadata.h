@@ -7,7 +7,7 @@
 #ifndef GDCORE_TreeItemExpressionMetadata_H
 #define GDCORE_TreeItemExpressionMetadata_H
 #include "GDCore/Events/ExpressionMetadata.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <wx/treectrl.h>
 
 namespace gd

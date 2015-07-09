@@ -6,7 +6,7 @@
 
 #if defined(GD_IDE_ONLY)
 #include <algorithm>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <utility>
 #include <iostream>

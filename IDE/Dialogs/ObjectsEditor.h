@@ -23,7 +23,7 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 class LayoutEditorPropertiesPnl;
 
 namespace gd {

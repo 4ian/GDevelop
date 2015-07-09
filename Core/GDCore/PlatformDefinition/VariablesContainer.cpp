@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include <iostream>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <algorithm>
 #include "GDCore/PlatformDefinition/Variable.h"
 #include "GDCore/TinyXml/tinyxml.h"

@@ -7,7 +7,7 @@
 #ifndef GDCORE_OBJECTGROUP_H
 #define GDCORE_OBJECTGROUP_H
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <utility>
 namespace gd { class SerializerElement; }
 

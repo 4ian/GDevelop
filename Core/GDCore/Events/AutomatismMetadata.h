@@ -5,7 +5,7 @@
  */
 #ifndef AUTOMATISMMETADATA_H
 #define AUTOMATISMMETADATA_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <map>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"

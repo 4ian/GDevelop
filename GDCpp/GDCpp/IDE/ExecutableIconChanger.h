@@ -5,7 +5,7 @@
 #define EXECUTABLEICONCHANGER_H
 
 #include <string>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 #if defined(WINDOWS)
 struct ICONHEADER;

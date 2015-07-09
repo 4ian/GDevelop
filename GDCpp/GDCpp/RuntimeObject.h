@@ -11,7 +11,7 @@
 #include <map>
 #include "GDCpp/RuntimeVariablesContainer.h"
 #include "GDCpp/Force.h"
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 namespace gd { class Automatism; }
 namespace gd { class InitialInstance; }
 namespace gd { class Object; }

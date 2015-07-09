@@ -8,7 +8,7 @@
 #define AUTOMATISMSSHAREDDATA_H
 
 #include <memory>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 class AutomatismsRuntimeSharedData;
 namespace gd { class SerializerElement; }
 

@@ -6,7 +6,7 @@
 #ifndef MANUALTIMER_H
 #define MANUALTIMER_H
 #include <string>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 /**
  * \brief Manual timer updated using ManualTimer::UpdateTime member function.

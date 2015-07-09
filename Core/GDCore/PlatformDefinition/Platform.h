@@ -8,7 +8,7 @@
 #define GDCORE_PLATFORM_H
 #include <memory>
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <map>
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"

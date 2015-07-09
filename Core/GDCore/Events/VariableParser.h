@@ -6,7 +6,7 @@
 #ifndef GDCORE_VARIABLEPARSER_H
 #define GDCORE_VARIABLEPARSER_H
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 namespace gd { class Layout; }
 namespace gd { class Project; }

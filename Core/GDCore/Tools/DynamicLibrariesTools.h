@@ -8,7 +8,7 @@
 #define DYNAMICLIBRARIESTOOLS_H
 
 #include <string>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 #if defined(WINDOWS)
     #ifndef _WINDEF_

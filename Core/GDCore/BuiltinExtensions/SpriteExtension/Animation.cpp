@@ -7,7 +7,7 @@
 #include "GDCore/BuiltinExtensions/SpriteExtension/Animation.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/Direction.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 
 namespace gd {

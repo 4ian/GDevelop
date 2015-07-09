@@ -7,7 +7,7 @@
 #ifndef GDCORE_ABSTRACTFILESYSTEM
 #define GDCORE_ABSTRACTFILESYSTEM
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 #undef CopyFile //Remove a Windows macro
 

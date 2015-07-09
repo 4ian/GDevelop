@@ -6,7 +6,7 @@
 #ifndef EXPRESSIONMETADATA_H
 #define EXPRESSIONMETADATA_H
 #if defined(GD_IDE_ONLY)
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include <memory>

@@ -17,7 +17,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 class NewProjectDialog: public wxDialog
 {

@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 #include <memory>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 class AutomatismsRuntimeSharedData;
 namespace gd { class AutomatismsSharedData; }
 

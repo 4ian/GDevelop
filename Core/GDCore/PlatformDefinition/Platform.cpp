@@ -8,7 +8,7 @@
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/PlatformDefinition/Object.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 using namespace std;
 

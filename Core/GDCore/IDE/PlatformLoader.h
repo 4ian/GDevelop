@@ -6,7 +6,7 @@
 
 #ifndef PLATFORMLOADER_H
 #define PLATFORMLOADER_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <memory>
 namespace gd { class Platform; }
 

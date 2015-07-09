@@ -6,7 +6,7 @@
 #ifndef GDCORE_OBJECT_H
 #define GDCORE_OBJECT_H
 #include <memory>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <map>
 #include "GDCore/PlatformDefinition/VariablesContainer.h"

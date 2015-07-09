@@ -6,7 +6,7 @@
 
 #include "ObjectGroup.h"
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <algorithm>
 #include "GDCore/Serialization/SerializerElement.h"
 

@@ -6,7 +6,7 @@
 
 #ifndef SPRITE_H
 #define SPRITE_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <memory>
 #include <SFML/Graphics/Sprite.hpp>
 #include "GDCore/BuiltinExtensions/SpriteExtension/Point.h"

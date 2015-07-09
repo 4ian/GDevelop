@@ -19,7 +19,7 @@
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include <algorithm>

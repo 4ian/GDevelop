@@ -6,7 +6,7 @@
 
 #include "SceneNameMangler.h"
 #include "GDCore/CommonTools.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 namespace gd
 {

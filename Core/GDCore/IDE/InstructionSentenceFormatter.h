@@ -7,7 +7,7 @@
 #if defined(GD_IDE_ONLY)
 #ifndef TRANSLATEACTION_H
 #define TRANSLATEACTION_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <map>
 #include <utility>

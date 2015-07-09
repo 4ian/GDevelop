@@ -8,7 +8,7 @@
 #define GDCORE_EXPRESSIONSCORRECTNESSTESTING_H
 
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include "GDCore/Events/ExpressionParser.h"
 namespace gd { class ExpressionMetadata; }
 namespace gd { class Expression; }

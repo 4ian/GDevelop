@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_EXTERNALLAYOUT_H
 #define GDCORE_EXTERNALLAYOUT_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include <memory>
 namespace gd { class SerializerElement; }

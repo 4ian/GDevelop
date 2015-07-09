@@ -7,7 +7,7 @@
 #include "EventsRenderingHelper.h"
 #include <utility>
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/renderer.h>

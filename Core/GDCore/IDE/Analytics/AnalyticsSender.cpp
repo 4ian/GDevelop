@@ -10,7 +10,7 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include <SFML/Network.hpp>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <iostream>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/config.h>

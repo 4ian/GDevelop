@@ -8,7 +8,7 @@
 #ifndef GDCORE_CHOOSEOBJECTDIALOG_H
 #define GDCORE_CHOOSEOBJECTDIALOG_H
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 //(*Headers(ChooseObjectDialog)
 #include <wx/treectrl.h>

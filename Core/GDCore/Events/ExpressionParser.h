@@ -6,7 +6,7 @@
 #ifndef GDCORE_EXPRESSIONPARSER_H
 #define GDCORE_EXPRESSIONPARSER_H
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 namespace gd { class Expression; }
 namespace gd { class ParserCallbacks; }

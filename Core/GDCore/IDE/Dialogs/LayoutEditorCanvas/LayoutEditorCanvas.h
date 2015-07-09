@@ -19,7 +19,7 @@
 #include <wx/gdicmn.h>
 #include <wx/panel.h>
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 namespace gd { class MainFrameWrapper; }
 namespace gd { class InitialInstancesContainer; }
 namespace gd { class InitialInstance; }

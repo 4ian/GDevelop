@@ -25,7 +25,7 @@
 #include <wx/bmpbuttn.h>
 #include "GDCore/Events/Expression.h"
 #include "GDCore/IDE/Dialogs/ParameterControlsHelper.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 namespace gd { class Layout; }
 namespace gd { class Project; }
 namespace gd { class InstructionMetadata; }

@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/IDE/PlatformLoader.h"
 #include "GDCore/IDE/PlatformManager.h"

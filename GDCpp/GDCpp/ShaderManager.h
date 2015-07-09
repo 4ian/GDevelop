@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <SFML/Graphics.hpp>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 namespace gd { class Project; }
 

@@ -6,7 +6,7 @@
 #ifndef GDCORE_LOG_H
 #define GDCORE_LOG_H
 #include <string>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/log.h>
 #endif

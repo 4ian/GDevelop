@@ -5,7 +5,7 @@
  */
 
 #include "GDCore/PlatformDefinition/Variable.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <sstream>
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/TinyXml/tinyxml.h"

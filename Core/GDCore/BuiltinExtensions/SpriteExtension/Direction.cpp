@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include <iostream>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include "GDCore/BuiltinExtensions/SpriteExtension/Direction.h"
 #include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"

@@ -7,7 +7,7 @@
 #define RESSOURCESLOADER_H
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #undef LoadImage //Undef macro from windows.h
 
 namespace gd

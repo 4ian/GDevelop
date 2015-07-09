@@ -20,7 +20,7 @@
 #include <wx/dialog.h>
 //*)
 #include <wx/srchctrl.h>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 namespace gd { class Project; }
 namespace gd { class Layout; }
 

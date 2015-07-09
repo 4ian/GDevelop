@@ -6,7 +6,7 @@
 
 #include <map>
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <fstream>
 #include <stdio.h>
 #include <SFML/System/Utf.hpp>

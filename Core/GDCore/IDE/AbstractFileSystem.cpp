@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <algorithm>
 #include "AbstractFileSystem.h"
 #include "GDCore/CommonTools.h"

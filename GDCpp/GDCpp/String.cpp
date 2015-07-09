@@ -4,4 +4,6 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/Utf8String.h"
+#if !defined(GD_IDE_ONLY)
+#include "GDCore/String.cpp"
+#endif

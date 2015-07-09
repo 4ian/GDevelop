@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 #include "catch.hpp"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 #include "GDCore/Utf8Tools.h"
 #include <SFML/System/String.hpp>
 

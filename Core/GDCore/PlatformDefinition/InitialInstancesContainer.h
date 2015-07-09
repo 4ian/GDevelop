@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_INITIALINSTANCESCONTAINER_H
 #define GDCORE_INITIALINSTANCESCONTAINER_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <list>
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 namespace gd { class InitialInstanceFunctor; }

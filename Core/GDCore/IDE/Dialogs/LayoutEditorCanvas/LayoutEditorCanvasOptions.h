@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef SCENECANVASSETTINGS_H
 #define SCENECANVASSETTINGS_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 namespace gd { class SerializerElement; }
 
 namespace gd

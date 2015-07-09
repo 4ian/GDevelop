@@ -11,7 +11,7 @@
 #include <string>
 #include <memory>
 #include <map>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 /**
  * \brief Helper class wrapping a tinyxml document in RAII fashion

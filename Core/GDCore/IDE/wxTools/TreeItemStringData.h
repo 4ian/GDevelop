@@ -7,7 +7,7 @@
 #ifndef GDCORE_TreeItemStringData_H
 #define GDCORE_TreeItemStringData_H
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <wx/treectrl.h>
 
 namespace gd

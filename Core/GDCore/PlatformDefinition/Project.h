@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_PROJECT_H
 #define GDCORE_PROJECT_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 class wxPropertyGrid;
 class wxPropertyGridEvent;

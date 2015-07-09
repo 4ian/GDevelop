@@ -5,7 +5,7 @@
  */
 #ifndef EVENTSVARIABLESFINDER_H
 #define EVENTSVARIABLESFINDER_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <set>
 #include "GDCore/Events/Event.h"

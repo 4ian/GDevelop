@@ -8,7 +8,7 @@
 #define PROJECTEXPORTDIALOG_H
 #include "GDJSDialogs.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 namespace gd { class Project; }
 
 namespace gdjs

@@ -5,7 +5,7 @@
  */
 #include "ExpressionMetadata.h"
 #include "GDCore/CommonTools.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #if !defined(GD_NO_WX_GUI)
 #include <wx/file.h>
 #include <wx/bitmap.h>

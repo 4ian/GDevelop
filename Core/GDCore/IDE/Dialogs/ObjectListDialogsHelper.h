@@ -7,7 +7,7 @@
 #ifndef GDCORE_OBJECTLISTDIALOGSHELPER_H
 #define GDCORE_OBJECTLISTDIALOGSHELPER_H
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <functional>
 #include <vector>
 namespace gd { class Project; }

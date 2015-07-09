@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_EXPRESSION_H
 #define GDCORE_EXPRESSION_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 namespace gd
 {

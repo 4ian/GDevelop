@@ -10,7 +10,7 @@
 #include <vector>
 #include <cmath>
 #include <SFML/System/String.hpp>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 #if defined(GD_IDE_ONLY)
 class wxString;
 #endif

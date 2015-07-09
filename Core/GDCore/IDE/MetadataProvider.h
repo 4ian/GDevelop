@@ -5,7 +5,7 @@
  */
 #ifndef METADATAPROVIDER_H
 #define METADATAPROVIDER_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include "GDCore/Events/InstructionMetadata.h"
 namespace gd { class AutomatismMetadata; }
 namespace gd { class ObjectMetadata; }

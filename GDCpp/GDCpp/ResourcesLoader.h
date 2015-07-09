@@ -17,7 +17,7 @@ class Music;
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 #undef LoadImage //Undef macro from windows.h
 
 namespace gd

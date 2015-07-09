@@ -15,7 +15,7 @@
 #include <wx/dialog.h>
 //*)
 #include "GDCore/PlatformDefinition/Layout.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 
 namespace gd

@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_VARIABLE_H
 #define GDCORE_VARIABLE_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <map>
 namespace gd { class SerializerElement; }
 class TiXmlElement;

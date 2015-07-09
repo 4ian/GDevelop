@@ -5,7 +5,7 @@
  */
 
 #include "ResourcesMergingHelper.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <iostream>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Log.h"

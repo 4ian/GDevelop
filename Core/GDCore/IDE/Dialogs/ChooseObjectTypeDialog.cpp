@@ -6,7 +6,7 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 //(*InternalHeaders(ChooseObjectTypeDialog)
 #include <wx/bitmap.h>

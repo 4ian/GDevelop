@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 class RuntimeScene;
 class RuntimeObject;

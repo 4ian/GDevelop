@@ -18,7 +18,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 namespace gd { class Project; }
 namespace gd { class ExternalLayout; }
 namespace gd { class LayersEditorPanel; }

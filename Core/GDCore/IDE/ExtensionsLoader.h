@@ -6,9 +6,9 @@
 
 #ifndef EXTENSIONSLOADER_H
 #define EXTENSIONSLOADER_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 namespace gd { class Platform; }
 
 namespace gd

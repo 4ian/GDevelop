@@ -10,7 +10,7 @@
 #include <string>
 #include <set>
 #include <SFML/Window.hpp>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 /**
  * \brief Manage the events and mouse, keyboard

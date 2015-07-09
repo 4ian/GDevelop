@@ -11,7 +11,7 @@ This project is released under the MIT License.
 #include <SFML/Graphics/Text.hpp>
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 class ImageManager;
 class RuntimeScene;
 namespace gd { class Object; }

@@ -7,7 +7,7 @@
 #ifndef HTTPSERVER_H
 #define HTTPSERVER_H
 #include <string>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 struct mg_context;
 
 namespace gdjs

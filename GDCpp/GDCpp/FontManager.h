@@ -8,7 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 /**
  * \brief FontManager loads and manages SFML fonts.

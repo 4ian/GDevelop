@@ -38,7 +38,7 @@
 #include <wx/msw/winundef.h>
 #endif
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 #include "EditorScene.h"
 #include "RecentList.h"
 namespace gd { class Project; }

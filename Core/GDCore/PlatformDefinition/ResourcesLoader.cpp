@@ -1,7 +1,7 @@
 #include "GDCore/PlatformDefinition/ResourcesLoader.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <fstream>
 #include <iostream>
 #include <utility>

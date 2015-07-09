@@ -9,7 +9,7 @@
 #if !defined(GD_NO_WX_GUI)
 #include <wx/colour.h>
 #endif
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 namespace gd
 {

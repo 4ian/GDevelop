@@ -1,7 +1,7 @@
 #ifndef GDCORE_PROPERTYDESCRIPTOR
 #define GDCORE_PROPERTYDESCRIPTOR
 
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 
 namespace gd

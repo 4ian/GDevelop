@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 namespace gd { class EventsList; }
 namespace gd { class BaseEvent; }
 namespace gd { class Project; }

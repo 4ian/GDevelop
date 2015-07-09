@@ -6,7 +6,7 @@
 #ifndef GDCORE_EVENTSREFACTORER_H
 #define GDCORE_EVENTSREFACTORER_H
 #include <vector>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <memory>
 #include "GDCore/Events/Instruction.h"
 namespace gd { class EventsList; }

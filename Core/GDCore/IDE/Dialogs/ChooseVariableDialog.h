@@ -27,7 +27,7 @@ namespace gd { class Layout; }
 namespace gd { class Variable; }
 #include <wx/toolbar.h>
 #include <memory>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 namespace gd
 {

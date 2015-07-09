@@ -13,7 +13,7 @@
 
 #include <string>
 #include <vector>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 class ChoixBouton: public wxDialog
 {

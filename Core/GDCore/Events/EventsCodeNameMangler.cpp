@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/CommonTools.h"
 #include "EventsCodeNameMangler.h"
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 
 EventsCodeNameMangler *EventsCodeNameMangler::_singleton = NULL;
 

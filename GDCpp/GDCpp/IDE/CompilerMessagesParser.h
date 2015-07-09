@@ -10,7 +10,7 @@
 #define COMPILERERRORSPARSER_H
 #include <string>
 #include <vector>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 namespace GDpriv
 {

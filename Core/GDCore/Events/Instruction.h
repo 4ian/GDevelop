@@ -5,11 +5,11 @@
  */
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Tools/SPtrList.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 namespace gd
 {

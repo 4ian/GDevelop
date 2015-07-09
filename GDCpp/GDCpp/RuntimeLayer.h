@@ -6,7 +6,7 @@
 #ifndef RUNTIMELAYER_H
 #define RUNTIMELAYER_H
 #include <SFML/Graphics.hpp>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 namespace gd { class Camera; }
 namespace gd { class Layer; }
 

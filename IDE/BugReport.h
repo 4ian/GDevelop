@@ -14,7 +14,7 @@
 //*)
 #include <vector>
 #include <string>
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 
 class BugReport: public wxDialog
 {

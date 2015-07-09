@@ -7,13 +7,13 @@
 #ifndef GDCORE_PLATFORMEXTENSION_H
 #define GDCORE_PLATFORMEXTENSION_H
 #include <map>
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <memory>
 #include "GDCore/Events/ObjectMetadata.h"
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/EventMetadata.h"
-#include "GDCore/Utf8String.h"
+#include "GDCore/String.h"
 namespace gd { class Instruction; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }

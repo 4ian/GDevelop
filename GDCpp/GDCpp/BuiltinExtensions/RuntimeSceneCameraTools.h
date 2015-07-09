@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "GDCpp/Utf8String.h"
+#include "GDCpp/String.h"
 
 class RuntimeObject;
 class RuntimeScene;

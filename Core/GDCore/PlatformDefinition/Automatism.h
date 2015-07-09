@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_AUTOMATISM_H
 #define GDCORE_AUTOMATISM_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <map>
 #if defined(GD_IDE_ONLY)
 namespace gd { class PropertyDescriptor; }

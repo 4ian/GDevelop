@@ -5,7 +5,7 @@
  */
 #ifndef EventsParametersLister_H
 #define EventsParametersLister_H
-#include <GDCore/Utf8String.h>
+#include "GDCore/String.h"
 #include <vector>
 #include <map>
 #include <memory>

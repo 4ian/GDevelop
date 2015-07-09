@@ -607,37 +607,12 @@ public:
      */
     int compare( const String &other ) const;
 
-    /**
-     * Test equality of two strings.
-     */
-    bool operator==( const String &other ) const;
-
-    /**
-     * Test equality of two strings.
-     */
-    bool operator==( const char *character ) const;
-
-    /**
-     * Test inequality of two strings.
-     */
-    bool operator!=( const String &other ) const;
-
-    /**
-     * Test inequality of two strings.
-     */
-    bool operator!=( const char *characters ) const;
-
-    /**
-     * Compare two strings.
-     */
-    bool operator<( const String &other ) const;
-
 /**
  * \}
  */
 
 private:
-    std::string m_string; ///< Internal container
+    std::string m_string; ///< Internal std::string container
 
 };
 
@@ -685,15 +660,93 @@ String GD_CORE_API operator+(const wxString &lhs, const String &rhs);
 #endif
 
 /**
+ * \}
+ */
+
+/**
+ * \name Relational operators
+ * \{
+ */
+
+///\relates String
+bool GD_CORE_API operator==( const String &lhs, const String &rhs );
+///\relates String
+bool GD_CORE_API operator==( const String &lhs, const char *rhs );
+///\relates String
+bool GD_CORE_API operator==( const char *lhs, const String &rhs );
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+///\relates String
+bool GD_CORE_API operator==( const String &lhs, const wxString &rhs);
+///\relates String
+bool GD_CORE_API operator==( const wxString &lhs, const String &rhs);
+#endif
+
+///\relates String
+bool GD_CORE_API operator!=( const String &lhs, const String &rhs );
+///\relates String
+bool GD_CORE_API operator!=( const String &lhs, const char *rhs );
+///\relates String
+bool GD_CORE_API operator!=( const char *lhs, const String &rhs );
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+///\relates String
+bool GD_CORE_API operator!=( const String &lhs, const wxString &rhs);
+///\relates String
+bool GD_CORE_API operator!=( const wxString &lhs, const String &rhs);
+#endif
+
+///\relates String
+bool GD_CORE_API operator<( const String &lhs, const String &rhs );
+///\relates String
+bool GD_CORE_API operator<( const String &lhs, const char *rhs );
+///\relates String
+bool GD_CORE_API operator<( const char *lhs, const String &rhs );
+
+///\relates String
+bool GD_CORE_API operator<=( const String &lhs, const String &rhs );
+///\relates String
+bool GD_CORE_API operator<=( const String &lhs, const char *rhs );
+///\relates String
+bool GD_CORE_API operator<=( const char *lhs, const String &rhs );
+
+///\relates String
+bool GD_CORE_API operator>( const String &lhs, const String &rhs );
+///\relates String
+bool GD_CORE_API operator>( const String &lhs, const char *rhs );
+///\relates String
+bool GD_CORE_API operator>( const char *lhs, const String &rhs );
+
+///\relates String
+bool GD_CORE_API operator>=( const String &lhs, const String &rhs );
+///\relates String
+bool GD_CORE_API operator>=( const String &lhs, const char *rhs );
+///\relates String
+bool GD_CORE_API operator>=( const char *lhs, const String &rhs );
+
+/**
+ * \}
+ */
+
+/**
+ * \name Stream operators
+ * \{
+ */
+
+/**
  * \relates String
- * Output the string in a stream.
- * \note The string is converted to the current locale before.
+ * Outputs the string in a stream.
+ * \note The string is converted to the current locale before. If you want to stream the string
+ * as UTF8, do :
+ * \code
+ * std::cout << myString.Raw();
+ * \endcode
  */
 std::ostream& GD_CORE_API operator<<(std::ostream &os, const String &str);
 
 /**
  * \relates String
- * Extracts a string from an input string.
+ * Extracts a string from an input string assuming the stream inputs characters encoded in the
+ * current locale.
  * \note The content of the string is replaced.
  */
 std::istream& GD_CORE_API operator>>(std::istream &is, String &str);

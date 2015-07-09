@@ -580,31 +580,6 @@ int String::compare( const String &other ) const
     return m_string.compare( other.m_string );
 }
 
-bool String::operator==( const String &other ) const
-{
-    return (m_string == other.m_string);
-}
-
-bool String::operator==( const char *characters ) const
-{
-    return (m_string == std::string(characters));
-}
-
-bool String::operator!=( const String &other ) const
-{
-    return (m_string != other.m_string);
-}
-
-bool String::operator!=( const char *characters ) const
-{
-    return (m_string != std::string(characters));
-}
-
-bool String::operator<( const String &other ) const
-{
-    return m_string < other.m_string;
-}
-
 String GD_CORE_API operator+(String lhs, const String &rhs)
 {
     lhs += rhs;
@@ -640,6 +615,120 @@ String GD_CORE_API operator+(const wxString &lhs, const String &rhs)
 }
 
 #endif
+
+bool GD_CORE_API operator==( const String &lhs, const String &rhs )
+{
+    return (lhs.compare(rhs) == 0);
+}
+
+bool GD_CORE_API operator==( const String &lhs, const char *rhs )
+{
+    return (lhs == String(rhs));
+}
+
+bool GD_CORE_API operator==( const char *lhs, const gd::String &rhs )
+{
+    return (String(lhs) == rhs);
+}
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+bool GD_CORE_API operator==( const String &lhs, const wxString &rhs)
+{
+    return (lhs == String(rhs));
+}
+
+bool GD_CORE_API operator==( const wxString &lhs, const String &rhs)
+{
+    return (String(lhs) == rhs);
+}
+#endif
+
+bool GD_CORE_API operator!=( const String &lhs, const String &rhs )
+{
+    return !(lhs == rhs);
+}
+
+bool GD_CORE_API operator!=( const String &lhs, const char *rhs )
+{
+    return !(lhs == rhs);
+}
+
+bool GD_CORE_API operator!=( const char *lhs, const String &rhs )
+{
+    return !(lhs == rhs);
+}
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+bool GD_CORE_API operator!=( const String &lhs, const wxString &rhs)
+{
+    return !(lhs == rhs);
+}
+
+bool GD_CORE_API operator!=( const wxString &lhs, const String &rhs)
+{
+    return !(lhs == rhs);
+}
+#endif
+
+bool GD_CORE_API operator<( const String &lhs, const String &rhs )
+{
+    return (lhs.compare(rhs) < 0);
+}
+
+bool GD_CORE_API operator<( const String &lhs, const char *rhs )
+{
+    return (lhs < String(rhs));
+}
+
+bool GD_CORE_API operator<( const char *lhs, const String &rhs )
+{
+    return (String(lhs) < rhs);
+}
+
+bool GD_CORE_API operator<=( const String &lhs, const String &rhs )
+{
+    return (lhs.compare(rhs) <= 0);
+}
+
+bool GD_CORE_API operator<=( const String &lhs, const char *rhs )
+{
+    return (lhs <= String(rhs));
+}
+
+bool GD_CORE_API operator<=( const char *lhs, const String &rhs )
+{
+    return (String(lhs) <= rhs);
+}
+
+bool GD_CORE_API operator>( const String &lhs, const String &rhs )
+{
+    return (lhs.compare(rhs) > 0);
+}
+
+bool GD_CORE_API operator>( const String &lhs, const char *rhs )
+{
+    return (lhs > String(rhs));
+}
+
+bool GD_CORE_API operator>( const char *lhs, const String &rhs )
+{
+    return (String(lhs) > rhs);
+}
+
+bool GD_CORE_API operator>=( const String &lhs, const String &rhs )
+{
+    return (lhs.compare(rhs) >= 0);
+}
+
+bool GD_CORE_API operator>=( const String &lhs, const char *rhs )
+{
+    return (lhs >= String(rhs));
+}
+
+bool GD_CORE_API operator>=( const char *lhs, const String &rhs )
+{
+    return (String(lhs) >= rhs);
+}
 
 std::ostream& GD_CORE_API operator<<(std::ostream& os, const String& str)
 {

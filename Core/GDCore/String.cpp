@@ -189,7 +189,7 @@ String String::FromLocale( const std::string &localizedString )
     return FromSfString(sf::String(localizedString)); //Don't need to use the current locale, on Windows, std::locale is always the C locale
 #else
     if(std::locale("").name().find("UTF-8") != std::string::npos)
-        FromUTF8(localizedString); //UTF8 is already the current locale
+        return FromUTF8(localizedString); //UTF8 is already the current locale
     else
         return FromSfString(sf::String(localizedString, std::locale(""))); //Use the current locale (std::locale("")) for conversion
 #endif

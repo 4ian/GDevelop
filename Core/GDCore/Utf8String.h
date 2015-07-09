@@ -286,7 +286,7 @@ public:
  */
 
     /**
-     * Returns a String created from a std::string encoded in the current
+     * \return a String created from a std::string encoded in the current
      * locale.
      *
      * See \ref Conversions2 for more information.
@@ -299,16 +299,21 @@ public:
     static String FromUTF32( const std::u32string &string );
 
     /**
-     * Returns a String created from a sf::String (UTF32).
+     * \return a String created from a sf::String (UTF32).
      *
      * See \ref Conversions1 for more information.
      */
     static String FromSfString( const sf::String &sfString );
 
     /**
-     * Returns a String created an UTF8 encoded std::string.
+     * \return a String created an UTF8 encoded std::string.
      */
     static String FromUTF8( const std::string &utf8Str );
+
+    /**
+     * \return a String created from a std::wstring (UTF32 on Linux and UCS-2 on Windows)
+     */
+    static String FromWide( const std::wstring &wstr );
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -360,6 +365,12 @@ public:
      * \return a UTF8 encoded std::string from the current string.
      */
     std::string ToUTF8() const;
+
+    /**
+     * \return a wide string (std::wstring) encoded in UTF32 on Linux and in UCS-2 on Windows
+     * \note On Windows, this is possibly a lossy conversion.
+     */
+    std::wstring ToWide() const;
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 

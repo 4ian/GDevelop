@@ -195,6 +195,37 @@ String String::FromLocale( const std::string &localizedString )
 #endif
 }
 
+String String::FromUTF32( const std::u32string &string )
+{
+    String str;
+    str = string; //operator=(const std::u32string&)
+
+    return str;
+}
+
+String String::FromSfString( const sf::String &sfString )
+{
+    return String(sfString);
+}
+
+String String::FromUTF8( const std::string &utf8Str )
+{
+    return String(utf8Str.c_str());
+}
+
+String String::FromWide( const std::wstring &wstr )
+{
+    String str;
+
+    #ifdef WINDOWS //std::wstring is an UTF16 string on Windows
+    ::utf8::utf16to8(wstr.begin(), wstr.end(), std::back_inserter(str.Raw()));
+    #else //and a UTF32 string on other OSes
+    ::utf8::utf32to8(wstr.begin(), wstr.end(), std::back_inserter(str.Raw()));
+    #endif
+
+    return str;
+}
+
 std::string String::ToLocale() const
 {
 #if defined(WINDOWS)
@@ -207,14 +238,6 @@ std::string String::ToLocale() const
 #endif
 }
 
-String String::FromUTF32( const std::u32string &string )
-{
-    String str;
-    str = string; //operator=(const std::u32string&)
-
-    return str;
-}
-
 std::u32string String::ToUTF32() const
 {
     std::u32string u32str;
@@ -224,11 +247,6 @@ std::u32string String::ToUTF32() const
     }
 
     return u32str;
-}
-
-String String::FromSfString( const sf::String &sfString )
-{
-    return String(sfString);
 }
 
 sf::String String::ToSfString() const
@@ -243,6 +261,24 @@ sf::String String::ToSfString() const
 String::operator sf::String() const
 {
     return ToSfString();
+}
+
+std::string String::ToUTF8() const
+{
+    return m_string;
+}
+
+std::wstring String::ToWide() const
+{
+    std::wstring wstr;
+
+    #ifdef WINDOWS //std::wstring is an UTF16 string on Windows
+    ::utf8::utf8to16(m_string.begin(), m_string.end(), std::back_inserter(wstr));
+    #else //and a UTF32 string on other OSes
+    ::utf8::utf8to32(m_string.begin(), m_string.end(), std::back_inserter(wstr));
+    #endif
+
+    return wstr;
 }
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -263,16 +299,6 @@ String::operator wxString() const
 }
 
 #endif
-
-String String::FromUTF8( const std::string &utf8Str )
-{
-    return String(utf8Str.c_str());
-}
-
-std::string String::ToUTF8() const
-{
-    return m_string;
-}
 
 String::value_type String::operator[]( const String::size_type position ) const
 {

@@ -523,7 +523,7 @@ void PlatformerObjectAutomatism::DoStepPostEvents(RuntimeScene & scene)
     }
 }
 
-void PlatformerObjectAutomatism::SimulateControl(const std::string & input)
+void PlatformerObjectAutomatism::SimulateControl(const gd::String & input)
 {
     if ( input == "Left" ) leftKey = true;
     else if ( input == "Right" ) rightKey = true;
@@ -559,45 +559,45 @@ void PlatformerObjectAutomatism::SerializeTo(gd::SerializerElement & element) co
 
 }
 
-std::map<std::string, gd::PropertyDescriptor> PlatformerObjectAutomatism::GetProperties(gd::Project & project) const
+std::map<gd::String, gd::PropertyDescriptor> PlatformerObjectAutomatism::GetProperties(gd::Project & project) const
 {
-    std::map<std::string, gd::PropertyDescriptor> properties;
+    std::map<gd::String, gd::PropertyDescriptor> properties;
 
-    properties[_("Gravity")].SetValue(ToString(gravity));
-    properties[_("Jump speed")].SetValue(ToString(jumpSpeed));
-    properties[_("Max. falling speed")].SetValue(ToString(maxFallingSpeed));
-    properties[_("Acceleration")].SetValue(ToString(acceleration));
-    properties[_("Deceleration")].SetValue(ToString(deceleration));
-    properties[_("Max. speed")].SetValue(ToString(maxSpeed));
+    properties[_("Gravity")].SetValue(gd::String::FromDouble(gravity));
+    properties[_("Jump speed")].SetValue(gd::String::FromDouble(jumpSpeed));
+    properties[_("Max. falling speed")].SetValue(gd::String::FromDouble(maxFallingSpeed));
+    properties[_("Acceleration")].SetValue(gd::String::FromDouble(acceleration));
+    properties[_("Deceleration")].SetValue(gd::String::FromDouble(deceleration));
+    properties[_("Max. speed")].SetValue(gd::String::FromDouble(maxSpeed));
     properties[_("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
-    properties[_("Slope max. angle")].SetValue(ToString(slopeMaxAngle));
+    properties[_("Slope max. angle")].SetValue(gd::String::FromDouble(slopeMaxAngle));
 
     return properties;
 }
 
-bool PlatformerObjectAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
+bool PlatformerObjectAutomatism::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
     if ( name == _("Default controls") ) {
         ignoreDefaultControls = (value == "0");
         return true;
     }
 
-    if ( ToDouble(value) < 0 ) return false;
+    if ( value.ToDouble() < 0 ) return false;
 
     if ( name == _("Gravity") )
-        gravity = ToDouble(value);
+        gravity = value.ToDouble();
     else if ( name == _("Max. falling speed") )
-        maxFallingSpeed = ToDouble(value);
+        maxFallingSpeed = value.ToDouble();
     else if ( name == _("Acceleration") )
-        acceleration = ToDouble(value);
+        acceleration = value.ToDouble();
     else if ( name == _("Deceleration") )
-        deceleration = ToDouble(value);
+        deceleration = value.ToDouble();
     else if ( name == _("Max. speed") )
-        maxSpeed = ToDouble(value);
+        maxSpeed = value.ToDouble();
     else if ( name == _("Jump speed") )
-        jumpSpeed = ToDouble(value);
+        jumpSpeed = value.ToDouble();
     else if ( name == _("Slope max. angle") )
-        return SetSlopeMaxAngle(ToDouble(value));
+        return SetSlopeMaxAngle(value.ToDouble());
     else
         return false;
 

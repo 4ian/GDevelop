@@ -166,7 +166,7 @@ void TiledSpriteObjectEditor::OncancelBtClick(wxCommandEvent& event)
  */
 void TiledSpriteObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-	object.textureName = ToString(frontTextureEdit->GetValue());
+	object.textureName = frontTextureEdit->GetValue();
 
 	object.SetWidth(ToInt(ToString(widthEdit->GetValue())));
 	object.SetHeight(ToInt(ToString(heightEdit->GetValue())));
@@ -200,4 +200,3 @@ void TiledSpriteObjectEditor::OnimageBankBtClick(wxCommandEvent& event)
 }
 
 #endif
-

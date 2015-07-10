@@ -56,12 +56,12 @@ public:
      * \brief Change the platform type
      * \param platformType The new platform type ("Platform", "Jumpthru" or "Ladder").
      */
-    void ChangePlatformType(const std::string & platformType_);
+    void ChangePlatformType(const gd::String & platformType_);
 
     virtual void UnserializeFrom(const gd::SerializerElement & element);
     #if defined(GD_IDE_ONLY)
-    virtual std::map<std::string, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
-    virtual bool UpdateProperty(const std::string & name, const std::string & value, gd::Project & project);
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
+    virtual bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project);
     virtual void SerializeTo(gd::SerializerElement & element) const;
     #endif
 

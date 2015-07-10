@@ -47,7 +47,7 @@ public:
     void SetCanJump() { canJump = true; };
 
     void IgnoreDefaultControls(bool ignore = true) { ignoreDefaultControls = ignore; };
-    void SimulateControl(const std::string & input);
+    void SimulateControl(const gd::String & input);
     void SimulateLeftKey() { leftKey = true; };
     void SimulateRightKey() { rightKey = true; };
     void SimulateLadderKey() { ladderKey = true; };
@@ -74,8 +74,8 @@ public:
      */
     virtual void SerializeTo(gd::SerializerElement & element) const;
 
-    virtual std::map<std::string, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
-    virtual bool UpdateProperty(const std::string & name, const std::string & value, gd::Project & project);
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
+    virtual bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project);
     #endif
 
 private:

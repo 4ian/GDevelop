@@ -67,7 +67,7 @@ void PlatformAutomatism::DoStepPostEvents(RuntimeScene & scene)
 
 }
 
-void PlatformAutomatism::ChangePlatformType(const std::string & platformType_)
+void PlatformAutomatism::ChangePlatformType(const gd::String & platformType_)
 {
     if ( platformType_ == "Ladder" ) platformType = Ladder;
     else if ( platformType_ == "Jumpthru" ) platformType = Jumpthru;
@@ -93,7 +93,7 @@ void PlatformAutomatism::OnDeActivate()
 
 void PlatformAutomatism::UnserializeFrom(const gd::SerializerElement & element)
 {
-    std::string platformTypeStr = element.GetStringAttribute("platformType");
+    gd::String platformTypeStr = element.GetStringAttribute("platformType");
     platformType = platformTypeStr == "Ladder" ?  Ladder : (platformTypeStr == "Jumpthru" ?
         Jumpthru : NormalPlatform);
 }
@@ -109,11 +109,11 @@ void PlatformAutomatism::SerializeTo(gd::SerializerElement & element) const
         element.SetAttribute("platformType", "NormalPlatform");
 }
 
-std::map<std::string, gd::PropertyDescriptor> PlatformAutomatism::GetProperties(gd::Project & project) const
+std::map<gd::String, gd::PropertyDescriptor> PlatformAutomatism::GetProperties(gd::Project & project) const
 {
-    std::map<std::string, gd::PropertyDescriptor> properties;
+    std::map<gd::String, gd::PropertyDescriptor> properties;
 
-    std::string platformTypeStr = _("Platform");
+    gd::String platformTypeStr = _("Platform");
     if ( platformType == Ladder)
         platformTypeStr = _("Ladder");
     else if ( platformType == Jumpthru )
@@ -129,7 +129,7 @@ std::map<std::string, gd::PropertyDescriptor> PlatformAutomatism::GetProperties(
     return properties;
 }
 
-bool PlatformAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
+bool PlatformAutomatism::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
     if ( name == _("Type") )
     {

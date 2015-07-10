@@ -42,9 +42,9 @@ public:
 
         {
 
-            std::map<std::string, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PlatformAutomatism::PlatformerObjectAutomatism");
-            std::map<std::string, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PlatformAutomatism::PlatformerObjectAutomatism");
-            std::map<std::string, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PlatformAutomatism::PlatformerObjectAutomatism");
+            std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PlatformAutomatism::PlatformerObjectAutomatism");
+            std::map<gd::String, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PlatformAutomatism::PlatformerObjectAutomatism");
+            std::map<gd::String, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PlatformAutomatism::PlatformerObjectAutomatism");
 
             autConditions["PlatformAutomatism::IsMoving"].SetFunctionName("isMoving");
             autConditions["PlatformAutomatism::IsOnFloor"].SetFunctionName("isOnFloor");
@@ -82,7 +82,7 @@ public:
             autActions["PlatformAutomatism::IgnoreDefaultControls"].SetFunctionName("ignoreDefaultControls");
         }
         {
-            std::map<std::string, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PlatformAutomatism::PlatformAutomatism");
+            std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PlatformAutomatism::PlatformAutomatism");
 
             autActions["PlatformAutomatism::ChangePlatformType"].SetFunctionName("changePlatformType");
         }

@@ -44,7 +44,7 @@ using namespace std;
  * TileMapObject
  */
 
-TileMapObject::TileMapObject(std::string name_) :
+TileMapObject::TileMapObject(gd::String name_) :
     Object(name_),
     tileSet(),
     tileMap(),
@@ -152,7 +152,7 @@ void TileMapObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFr
 }
 #endif
 
-gd::Object * CreateTileMapObject(std::string name)
+gd::Object * CreateTileMapObject(gd::String name)
 {
     return new TileMapObject(name);
 }

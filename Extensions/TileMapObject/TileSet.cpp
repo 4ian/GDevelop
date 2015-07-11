@@ -57,13 +57,13 @@ void TileHitbox::SerializeTo(gd::SerializerElement &element) const
     element.SetAttribute("collidable", collidable);
 
     //Serialize the polygon
-    std::string polygonStr;
+    gd::String polygonStr;
     for(std::vector<sf::Vector2f>::const_iterator vertexIt = hitbox.vertices.begin(); vertexIt != hitbox.vertices.end(); vertexIt++)
     {
         if(vertexIt != hitbox.vertices.begin())
             polygonStr += "|";
 
-        polygonStr += gd::ToString(vertexIt->x) + ";" + gd::ToString(vertexIt->y);
+        polygonStr += gd::String::FromFloat(vertexIt->x) + ";" + gd::String::FromFloat(vertexIt->y);
     }
     element.SetAttribute("polygon", polygonStr);
 }
@@ -74,17 +74,17 @@ void TileHitbox::UnserializeFrom(const gd::SerializerElement &element, sf::Vecto
 
     hitbox.vertices.clear();
 
-    std::string defaultPolygonStr = "0;0|"
-                                    + gd::ToString(defaultTileSize.x) + ";0|"
-                                    + gd::ToString(defaultTileSize.x) + ";" + gd::ToString(defaultTileSize.y) + "|"
-                                    + "0;" + gd::ToString(defaultTileSize.y);
-    std::string polygonStr = element.GetStringAttribute("polygon", defaultPolygonStr);
+    gd::String defaultPolygonStr = "0;0|"
+                                    + gd::String::FromFloat(defaultTileSize.x) + ";0|"
+                                    + gd::String::FromFloat(defaultTileSize.x) + ";" + gd::String::FromFloat(defaultTileSize.y) + "|"
+                                    + "0;" + gd::String::FromFloat(defaultTileSize.y);
+    gd::String polygonStr = element.GetStringAttribute("polygon", defaultPolygonStr);
 
-    std::vector<std::string> vertices = gd::SplitString<std::string>(polygonStr, '|');
-    for(std::vector<std::string>::iterator vertexIt = vertices.begin(); vertexIt != vertices.end(); vertexIt++)
+    std::vector<gd::String> vertices = polygonStr.Split(U'|');
+    for(std::vector<gd::String>::iterator vertexIt = vertices.begin(); vertexIt != vertices.end(); vertexIt++)
     {
-        hitbox.vertices.push_back(sf::Vector2f(gd::ToFloat(gd::SplitString<std::string>(*vertexIt, ';')[0]),
-                                               gd::ToFloat(gd::SplitString<std::string>(*vertexIt, ';')[1])
+        hitbox.vertices.push_back(sf::Vector2f(vertexIt->Split(U';')[0].ToFloat(),
+                                               vertexIt->Split(U';')[1].ToFloat()
                                               ));
     }
 }

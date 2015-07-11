@@ -134,7 +134,7 @@ void TileMapObjectEditor::OnOkButtonPressed(wxCommandEvent& event)
 
 void TileMapObjectEditor::OnTileSetConfigureButtonClicked(wxCommandEvent& event)
 {
-    std::string oldTextureName = tileSet.textureName;
+    gd::String oldTextureName = tileSet.textureName;
 
     TileSetConfigurationEditor dialog(this, tileSet, game, mainFrameWrapper);
     dialog.ShowModal();

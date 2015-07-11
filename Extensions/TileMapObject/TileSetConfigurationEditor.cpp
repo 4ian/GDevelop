@@ -60,7 +60,7 @@ TileSetConfigurationEditor::~TileSetConfigurationEditor()
 
 void TileSetConfigurationEditor::UpdatePreviewTileSetPanel()
 {
-    previewTileSet.textureName = gd::ToString(m_textureNameTextCtrl->GetValue());
+    previewTileSet.textureName = m_textureNameTextCtrl->GetValue();
     previewTileSet.tileSize.x = m_tileWidthSpin->GetValue();
     previewTileSet.tileSize.y = m_tileHeightSpin->GetValue();
     previewTileSet.tileSpacing.x = m_spacingWidthSpin->GetValue();
@@ -94,7 +94,7 @@ void TileSetConfigurationEditor::OnCancelButtonClicked(wxCommandEvent& event)
 
 void TileSetConfigurationEditor::OnOkButtonClicked(wxCommandEvent& event)
 {
-    tileSet.textureName = gd::ToString(m_textureNameTextCtrl->GetValue());
+    tileSet.textureName = m_textureNameTextCtrl->GetValue();
     tileSet.tileSize.x = m_tileWidthSpin->GetValue();
     tileSet.tileSize.y = m_tileHeightSpin->GetValue();
     tileSet.tileSpacing.x = m_spacingWidthSpin->GetValue();

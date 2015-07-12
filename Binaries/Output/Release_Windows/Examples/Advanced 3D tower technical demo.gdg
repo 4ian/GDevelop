@@ -55,7 +55,7 @@
             <resource alwaysLoaded="false" file="mur 6.png" kind="image" name="mur 6.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="mur 7.png" kind="image" name="mur 7.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="mur 8.png" kind="image" name="mur 8.png" smoothed="true" userAdded="true" />
-            <resource alwaysLoaded="false" file="" kind="image" name="lumière.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="lumière.png" kind="image" name="lumière.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="towerground.png" kind="image" name="towerground.png" smoothed="true" userAdded="true" />
         </resources>
         <resourceFolders />

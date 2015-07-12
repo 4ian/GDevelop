@@ -119,9 +119,9 @@ public:
     \param vec the vector containing coordinates
     \param coordsSep the separator between coordinates
     \param composantSep the separator between the X and Y composant of a coordinate
-    \return a std::string representing the vector
+    \return a gd::String representing the vector
     */
-    static std::string GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char coordsSep = '\n', char composantSep = ';');
+    static gd::String GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char32_t coordsSep = U'\n', char32_t composantSep = U';');
 
     /**
     Return a vector created with a string containing coordinates
@@ -130,9 +130,9 @@ public:
     \param composantSep the separator between the X and Y composant of a coordinate
     \return a std::vector< sf::Vector2f >
     */
-    static std::vector<sf::Vector2f> GetCoordsVectorFromString(const std::string &str, char coordsSep = '\n', char composantSep = ';');
+    static std::vector<sf::Vector2f> GetCoordsVectorFromString(const gd::String &str, char32_t coordsSep = U'\n', char32_t composantSep = U';');
 
-    bool CollisionWith( std::map <std::string, std::vector<RuntimeObject*> *> otherObjectsLists, RuntimeScene & scene);
+    bool CollisionWith( std::map <gd::String, std::vector<RuntimeObject*> *> otherObjectsLists, RuntimeScene & scene);
 
 private:
 
@@ -173,4 +173,3 @@ private:
 };
 
 #endif // PHYSICAUTOMATISM_H
-

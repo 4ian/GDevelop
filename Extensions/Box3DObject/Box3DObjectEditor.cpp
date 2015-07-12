@@ -226,12 +226,12 @@ void Box3DObjectEditor::OncancelBtClick(wxCommandEvent& event)
  */
 void Box3DObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-	object.frontTextureName = string(frontTextureEdit->GetValue().mb_str());
-	object.topTextureName = string(topTextureEdit->GetValue().mb_str());
-	object.bottomTextureName = string(bottomTextureEdit->GetValue().mb_str());
-	object.leftTextureName = string(leftTextureEdit->GetValue().mb_str());
-	object.rightTextureName = string(rightTextureEdit->GetValue().mb_str());
-	object.backTextureName = string(backTextureEdit->GetValue().mb_str());
+	object.frontTextureName = frontTextureEdit->GetValue();
+	object.topTextureName = topTextureEdit->GetValue();
+	object.bottomTextureName = bottomTextureEdit->GetValue();
+	object.leftTextureName = leftTextureEdit->GetValue();
+	object.rightTextureName = rightTextureEdit->GetValue();
+	object.backTextureName = backTextureEdit->GetValue();
 
 	object.SetWidth(ToInt(string(widthEdit->GetValue().mb_str())));
 	object.SetHeight(ToInt(string(heightEdit->GetValue().mb_str())));
@@ -324,4 +324,3 @@ void Box3DObjectEditor::OnimageBankBtClick(wxCommandEvent& event)
 }
 
 #endif
-

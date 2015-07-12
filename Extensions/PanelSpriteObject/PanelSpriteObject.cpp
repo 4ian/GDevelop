@@ -32,7 +32,7 @@ This project is released under the MIT License.
 
 using namespace std;
 
-PanelSpriteObject::PanelSpriteObject(std::string name_) :
+PanelSpriteObject::PanelSpriteObject(gd::String name_) :
     Object(name_),
     textureName(""),
     width(32),
@@ -293,24 +293,24 @@ void PanelSpriteObject::EditObject( wxWindow* parent, gd::Project & game, gd::Ma
 #endif
 }
 
-void RuntimePanelSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimePanelSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Width");       value = ToString(width);}
-    else if ( propertyNb == 1 ) {name = _("Height");       value = ToString(height);}
-    else if ( propertyNb == 2 ) {name = _("Left Margin");       value = ToString(leftMargin);}
-    else if ( propertyNb == 3 ) {name = _("Top Margin");       value = ToString(topMargin);}
-    else if ( propertyNb == 4 ) {name = _("Right Margin");       value = ToString(rightMargin);}
-    else if ( propertyNb == 5 ) {name = _("Bottom Margin");       value = ToString(bottomMargin);}
+    if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::FromFloat(width);}
+    else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::FromFloat(height);}
+    else if ( propertyNb == 2 ) {name = _("Left Margin");       value = gd::String::FromFloat(leftMargin);}
+    else if ( propertyNb == 3 ) {name = _("Top Margin");       value = gd::String::FromFloat(topMargin);}
+    else if ( propertyNb == 4 ) {name = _("Right Margin");       value = gd::String::FromFloat(rightMargin);}
+    else if ( propertyNb == 5 ) {name = _("Bottom Margin");       value = gd::String::FromFloat(bottomMargin);}
 }
 
-bool RuntimePanelSpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimePanelSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
-    if      ( propertyNb == 0 ) {width = ToFloat(newValue);}
-    else if ( propertyNb == 1 ) {height = ToFloat(newValue);}
-    else if ( propertyNb == 2 ) {leftMargin = ToFloat(newValue);}
-    else if ( propertyNb == 3 ) {topMargin = ToFloat(newValue);}
-    else if ( propertyNb == 4 ) {rightMargin = ToFloat(newValue);}
-    else if ( propertyNb == 5 ) {bottomMargin = ToFloat(newValue);}
+    if      ( propertyNb == 0 ) {width = newValue.ToFloat();}
+    else if ( propertyNb == 1 ) {height = newValue.ToFloat();}
+    else if ( propertyNb == 2 ) {leftMargin = newValue.ToFloat();}
+    else if ( propertyNb == 3 ) {topMargin = newValue.ToFloat();}
+    else if ( propertyNb == 4 ) {rightMargin = newValue.ToFloat();}
+    else if ( propertyNb == 5 ) {bottomMargin = newValue.ToFloat();}
 
     return true;
 }
@@ -322,7 +322,7 @@ unsigned int RuntimePanelSpriteObject::GetNumberOfProperties() const
 #endif
 
 
-void RuntimePanelSpriteObject::ChangeAndReloadImage(const std::string &txtName, const RuntimeScene &scene)
+void RuntimePanelSpriteObject::ChangeAndReloadImage(const gd::String &txtName, const RuntimeScene &scene)
 {
     textureName = txtName;
     texture = scene.GetImageManager()->GetSFMLTexture(textureName);
@@ -333,8 +333,7 @@ RuntimeObject * CreateRuntimePanelSpriteObject(RuntimeScene & scene, const gd::O
     return new RuntimePanelSpriteObject(scene, object);
 }
 
-gd::Object * CreatePanelSpriteObject(std::string name)
+gd::Object * CreatePanelSpriteObject(gd::String name)
 {
     return new PanelSpriteObject(name);
 }
-

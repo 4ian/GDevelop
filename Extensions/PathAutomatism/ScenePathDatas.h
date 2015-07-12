@@ -9,6 +9,7 @@ This project is released under the MIT License.
 #define SCENEPATHDATAS_H
 
 #include "GDCpp/AutomatismsSharedData.h"
+#include "GDCpp/String.h"
 #include "RuntimeScenePathDatas.h"
 #include <SFML/System/Vector2.hpp>
 #include <map>
@@ -35,10 +36,9 @@ public:
 
     virtual void UnserializeFrom(const gd::SerializerElement & element);
 
-    std::map<std::string, std::vector<sf::Vector2f> > globalPaths; ///< Map containing all the global paths
+    std::map<gd::String, std::vector<sf::Vector2f> > globalPaths; ///< Map containing all the global paths
 
 private:
 };
 
 #endif // SCENEPATHDATAS_H
-

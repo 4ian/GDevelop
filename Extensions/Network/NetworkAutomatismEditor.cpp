@@ -151,10 +151,9 @@ void NetworkAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     automatism.width = widthCheck->GetValue();
     automatism.height = heightCheck->GetValue();
 
-    automatism.dataPrefix = ToString(dataPrefixEdit->GetValue());
+    automatism.dataPrefix = dataPrefixEdit->GetValue();
 
     EndModal(1);
 }
 
 #endif
-

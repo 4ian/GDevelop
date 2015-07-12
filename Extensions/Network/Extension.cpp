@@ -231,7 +231,7 @@ public:
     #if defined(GD_IDE_ONLY)
     bool HasDebuggingProperties() const { return true; };
 
-    void GetPropertyForDebugger(unsigned int propertyNb, std::string & name, std::string & value) const
+    void GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
     {
         if ( propertyNb == 0 )
         {
@@ -242,7 +242,7 @@ public:
         }
     }
 
-    bool ChangeProperty(unsigned int propertyNb, std::string newValue)
+    bool ChangeProperty(unsigned int propertyNb, gd::String newValue)
     {
         if ( propertyNb == 0 ) return false;
     }

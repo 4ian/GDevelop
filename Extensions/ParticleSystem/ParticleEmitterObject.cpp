@@ -84,7 +84,7 @@ ParticleEmitterBase::ParticleEmitterBase() :
 
 }
 
-ParticleEmitterObject::ParticleEmitterObject(std::string name_) :
+ParticleEmitterObject::ParticleEmitterObject(gd::String name_) :
     Object(name_)
     #if defined(GD_IDE_ONLY)
     ,particleEditionSimpleMode(true),
@@ -149,43 +149,43 @@ void ParticleEmitterBase::UnserializeFrom(const gd::SerializerElement & element)
     maxParticleNb = element.GetIntAttribute("maxParticleNb", 5000);
 
     {
-        std::string result = element.GetStringAttribute("rendererType");
+        gd::String result = element.GetStringAttribute("rendererType");
         if ( result == "Line") rendererType = Line;
         else if ( result == "Quad") rendererType = Quad;
         else rendererType = Point;
     }
     {
-        std::string result = element.GetStringAttribute("redParam");
+        gd::String result = element.GetStringAttribute("redParam");
         if ( result == "Mutable") redParam = Mutable;
         else if ( result == "Random") redParam = Random;
         else redParam = Enabled;
     }
     {
-        std::string result = element.GetStringAttribute("greenParam");
+        gd::String result = element.GetStringAttribute("greenParam");
         if ( result == "Mutable") greenParam = Mutable;
         else if ( result == "Random") greenParam = Random;
         else greenParam = Enabled;
     }
     {
-        std::string result = element.GetStringAttribute("blueParam");
+        gd::String result = element.GetStringAttribute("blueParam");
         if ( result == "Mutable") blueParam = Mutable;
         else if ( result == "Random") blueParam = Random;
         else blueParam = Enabled;
     }
     {
-        std::string result = element.GetStringAttribute("alphaParam");
+        gd::String result = element.GetStringAttribute("alphaParam");
         if ( result == "Mutable") alphaParam = Mutable;
         else if ( result == "Random") alphaParam = Random;
         else alphaParam = Enabled;
     }
     {
-        std::string result = element.GetStringAttribute("sizeParam");
+        gd::String result = element.GetStringAttribute("sizeParam");
         if ( result == "Mutable") sizeParam = Mutable;
         else if ( result == "Random") sizeParam = Random;
         else sizeParam = Nothing;
     }
     {
-        std::string result = element.GetStringAttribute("angleParam");
+        gd::String result = element.GetStringAttribute("angleParam");
         if ( result == "Mutable") angleParam = Mutable;
         else if ( result == "Random") angleParam = Random;
         else angleParam = Nothing;
@@ -245,37 +245,37 @@ void ParticleEmitterBase::SerializeTo(gd::SerializerElement & element) const
     element.SetAttribute("textureParticleName", textureParticleName);
     element.SetAttribute("maxParticleNb", (int)maxParticleNb);
 
-    std::string rendererTypeStr = "Point";
+    gd::String rendererTypeStr = "Point";
     if ( rendererType == Line ) rendererTypeStr = "Line";
     else if ( rendererType == Quad ) rendererTypeStr = "Quad";
     element.SetAttribute("rendererType", rendererTypeStr);
 
-    std::string redParamStr = "Enabled";
+    gd::String redParamStr = "Enabled";
     if ( redParam == Mutable ) redParamStr = "Mutable";
     else if ( redParam == Random ) redParamStr = "Random";
     element.SetAttribute("redParam", redParamStr);
 
-    std::string greenParamStr = "Enabled";
+    gd::String greenParamStr = "Enabled";
     if ( greenParam == Mutable ) greenParamStr = "Mutable";
     else if ( greenParam == Random ) greenParamStr = "Random";
     element.SetAttribute("greenParam", greenParamStr);
 
-    std::string blueParamStr = "Enabled";
+    gd::String blueParamStr = "Enabled";
     if ( blueParam == Mutable ) blueParamStr = "Mutable";
     else if ( blueParam == Random ) blueParamStr = "Random";
     element.SetAttribute("blueParam", blueParamStr);
 
-    std::string alphaParamStr = "Enabled";
+    gd::String alphaParamStr = "Enabled";
     if ( alphaParam == Mutable ) alphaParamStr = "Mutable";
     else if ( alphaParam == Random ) alphaParamStr = "Random";
     element.SetAttribute("alphaParam", alphaParamStr);
 
-    std::string sizeParamStr = "Nothing";
+    gd::String sizeParamStr = "Nothing";
     if ( sizeParam == Mutable ) sizeParamStr = "Mutable";
     else if ( sizeParam == Random ) sizeParamStr = "Random";
     element.SetAttribute("sizeParam", sizeParamStr);
 
-    std::string angleParamStr = "Nothing";
+    gd::String angleParamStr = "Nothing";
     if ( angleParam == Mutable ) angleParamStr = "Mutable";
     else if ( angleParam == Random ) angleParamStr = "Random";
     element.SetAttribute("angleParam", angleParamStr);
@@ -571,7 +571,7 @@ void ParticleEmitterObject::DrawInitialInstance(gd::InitialInstance & instance, 
 
 void ParticleEmitterObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    std::string texture = GetParticleTexture();
+    gd::String texture = GetParticleTexture();
     worker.ExposeImage(texture);
     SetParticleTexture(texture);
 }
@@ -593,14 +593,14 @@ void ParticleEmitterObject::EditObject( wxWindow* parent, gd::Project & game, gd
 #endif
 }
 
-void RuntimeParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
     if ( !GetParticleSystem() || !GetParticleSystem()->particleSystem ) return;
 
-    if      ( propertyNb == 0 ) {name = _("Particles number");      value = ToString(GetParticleSystem()->particleSystem->getNbParticles());}
+    if      ( propertyNb == 0 ) {name = _("Particles number");      value = gd::String::FromUInt(GetParticleSystem()->particleSystem->getNbParticles());}
 }
 
-bool RuntimeParticleEmitterObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeParticleEmitterObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) { return false; }
 
@@ -730,31 +730,31 @@ float RuntimeParticleEmitterObject::GetAngle() const
     return atan2f(GetEmitterYDirection(), GetEmitterXDirection())*180.0f/3.14159f;
 }
 
-void ParticleEmitterBase::SetParticleColor1( const std::string & color )
+void ParticleEmitterBase::SetParticleColor1( const gd::String & color )
 {
-    vector < string > colors = SplitString <string> (color, ';');
+    std::vector< gd::String > colors = color.Split(U';');
 
     if ( colors.size() < 3 ) return; //Color is incorrect
 
-    SetParticleRed1(ToInt(colors[0]));
-    SetParticleGreen1(ToInt(colors[1]));
-    SetParticleBlue1(ToInt(colors[2]));
+    SetParticleRed1(colors[0].ToInt());
+    SetParticleGreen1(colors[1].ToInt());
+    SetParticleBlue1(colors[2].ToInt());
 }
-void ParticleEmitterBase::SetParticleColor2( const std::string & color )
+void ParticleEmitterBase::SetParticleColor2( const gd::String & color )
 {
-    vector < string > colors = SplitString <string> (color, ';');
+    std::vector< gd::String > colors = color.Split(U';');
 
     if ( colors.size() < 3 ) return; //Color is incorrect
 
-    SetParticleRed2(ToInt(colors[0]));
-    SetParticleGreen2(ToInt(colors[1]));
-    SetParticleBlue2(ToInt(colors[2]));
+    SetParticleRed2(colors[0].ToInt());
+    SetParticleGreen2(colors[1].ToInt());
+    SetParticleBlue2(colors[2].ToInt());
 }
 
 /**
  * Change the texture
  */
-void ParticleEmitterBase::SetTexture( RuntimeScene & scene, const std::string & textureParticleName_ )
+void ParticleEmitterBase::SetTexture( RuntimeScene & scene, const gd::String & textureParticleName_ )
 {
     textureParticleName = textureParticleName_;
     if ( particleSystem && rendererType == Quad )
@@ -832,7 +832,7 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase & other)
     destroyWhenNoParticles = other.destroyWhenNoParticles;
 }
 
-gd::Object * CreateParticleEmitterObject(std::string name)
+gd::Object * CreateParticleEmitterObject(gd::String name)
 {
     return new ParticleEmitterObject(name);
 }
@@ -841,4 +841,3 @@ RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const g
 {
     return new RuntimeParticleEmitterObject(scene, object);
 }
-

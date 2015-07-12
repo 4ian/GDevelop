@@ -46,11 +46,11 @@ public:
     const gd::InstructionsList & GetActions() const { return actions; };
     gd::InstructionsList & GetActions() { return actions; };
 
-    std::string GetName() const { return name; };
-    void SetName(std::string name_) { name = name_; };
+    gd::String GetName() const { return name; };
+    void SetName(gd::String name_) { name = name_; };
 
-    std::string GetTimeoutExpression() const { return timeout.GetPlainString(); };
-    void SetTimeoutExpression(std::string timeout_) { timeout = gd::Expression(timeout_); };
+    gd::String GetTimeoutExpression() const { return timeout.GetPlainString(); };
+    void SetTimeoutExpression(gd::String timeout_) { timeout = gd::Expression(timeout_); };
 
     virtual std::vector < gd::InstructionsList* > GetAllConditionsVectors();
     virtual std::vector < gd::InstructionsList* > GetAllActionsVectors();
@@ -80,7 +80,7 @@ public:
     std::vector< TimedEvent* > codeGenerationChildren;
 
 private:
-    std::string name;
+    gd::String name;
     gd::Expression timeout;
     gd::InstructionsList conditions;
     gd::InstructionsList actions;

@@ -70,7 +70,7 @@ public:
 
     /** Used by GD events generated code : Prefer using original SetOutlineColor
      */
-    void SetOutlineColor( const std::string & color );
+    void SetOutlineColor( const gd::String & color );
 
     void SetFillOpacity(float val);
     inline float GetFillOpacity() const {return fillOpacity;};
@@ -82,7 +82,7 @@ public:
 
     /** Used by GD events generated code : Prefer using original SetFillColor
      */
-    void SetFillColor( const std::string & color );
+    void SetFillColor( const gd::String & color );
 
     inline void SetCoordinatesAbsolute() { absoluteCoordinates = true; }
     inline void SetCoordinatesRelative() { absoluteCoordinates = false; }
@@ -111,7 +111,7 @@ private:
 class GD_EXTENSION_API ShapePainterObject : public gd::Object, public ShapePainterObjectBase
 {
 public:
-    ShapePainterObject(std::string name_);
+    ShapePainterObject(gd::String name_);
     virtual ~ShapePainterObject() {};
     virtual gd::Object * Clone() const { return new ShapePainterObject(*this); }
 
@@ -154,8 +154,8 @@ public:
     void DrawCircle( float x, float y, float radius );
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
@@ -164,7 +164,7 @@ private:
 };
 
 RuntimeObject * CreateRuntimeShapePainterObject(RuntimeScene & scene, const gd::Object & object);
-gd::Object * CreateShapePainterObject(std::string name);
+gd::Object * CreateShapePainterObject(gd::String name);
 
 #endif // DRAWEROBJECT_H
 

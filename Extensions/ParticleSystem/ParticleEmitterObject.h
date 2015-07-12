@@ -41,12 +41,12 @@ public:
 
     /** Change texture at runtime
      */
-    void SetTexture( RuntimeScene & scene, const std::string & textureParticleName );
+    void SetTexture( RuntimeScene & scene, const gd::String & textureParticleName );
 
     /** Change texture name without changing it effectively at runtime
      */
-    void SetParticleTexture(std::string imageName) { textureParticleName = imageName; };
-    std::string GetParticleTexture() const { return textureParticleName; };
+    void SetParticleTexture(gd::String imageName) { textureParticleName = imageName; };
+    gd::String GetParticleTexture() const { return textureParticleName; };
 
     /**
      * \brief Initialize the particle system with the current objects settings.
@@ -93,8 +93,8 @@ public:
     void SetSizeParameterType(ParticleParameterType type) { sizeParam = type; };
     void SetAngleParameterType(ParticleParameterType type) { angleParam = type; };
 
-    void SetParticleColor1( const std::string & color );
-    void SetParticleColor2( const std::string & color );
+    void SetParticleColor1( const gd::String & color );
+    void SetParticleColor2( const gd::String & color );
 
     void SetParticleRed1(float newValue) { particleRed1= newValue; UpdateRedParameters();};
     void SetParticleRed2(float newValue) { particleRed2= newValue; UpdateRedParameters();};
@@ -180,7 +180,7 @@ public:
 private:
     void Init(const ParticleEmitterBase & other);
 
-    std::string textureParticleName;
+    gd::String textureParticleName;
     RendererType rendererType;
     float rendererParam1;
     float rendererParam2;
@@ -217,7 +217,7 @@ class GD_EXTENSION_API ParticleEmitterObject : public gd::Object, public Particl
 {
 public :
 
-    ParticleEmitterObject(std::string name_);
+    ParticleEmitterObject(gd::String name_);
     virtual ~ParticleEmitterObject() {};
     virtual gd::Object * Clone() const { return new ParticleEmitterObject(*this);}
 
@@ -270,8 +270,8 @@ public :
     virtual float GetAngle() const;
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
@@ -284,8 +284,7 @@ private:
     const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
 };
 
-gd::Object * CreateParticleEmitterObject(std::string name);
+gd::Object * CreateParticleEmitterObject(gd::String name);
 RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // PARTICLEEMITTEROBJECT_H
-

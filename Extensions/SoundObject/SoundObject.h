@@ -40,7 +40,7 @@ class GD_EXTENSION_API SoundObject : public gd::Object
 {
 public :
 
-    SoundObject(std::string name_);
+    SoundObject(gd::String name_);
     virtual ~SoundObject() {};
     virtual gd::Object * Clone() const { return new SoundObject(*this);}
 
@@ -51,18 +51,18 @@ public :
     static void LoadEdittimeIcon();
 
     virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual std::map<std::string, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene);
-    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & game, gd::Layout & scene);
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene);
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & game, gd::Layout & scene);
     #endif
 
     float GetZPos() const { return zPos; };
     void SetZPos(float zpos_) { zPos = zpos_; };
 
-    void SetSoundFileName(const std::string & soundfilename);
-    const std::string & GetSoundFileName() const { return fileName; };
+    void SetSoundFileName(const gd::String & soundfilename);
+    const gd::String & GetSoundFileName() const { return fileName; };
 
-    void SetSoundType(const std::string & type_) {type = type_;};
-    const std::string & GetSoundType() const { return type; };
+    void SetSoundType(const gd::String & type_) {type = type_;};
+    const gd::String & GetSoundType() const { return type; };
 
     void SetVolume(float volume_) { volume = volume_; };
     float GetVolume() const { return volume; };
@@ -80,8 +80,8 @@ public :
     float GetPitch() const { return pitch; };
 
 private:
-    std::string fileName;
-    std::string type;
+    gd::String fileName;
+    gd::String type;
     float zPos;
     float volume;
     float attenuation;
@@ -113,18 +113,18 @@ public :
     virtual bool ExtraInitializationFromInitialInstance(const gd::InitialInstance & position);
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
     virtual void OnPositionChanged();
 
-    void SetSoundType(const std::string & type_);
-    const std::string & GetSoundType() const;
+    void SetSoundType(const gd::String & type_);
+    const gd::String & GetSoundType() const;
 
-    void SetSoundFileName(const std::string & soundfilename);
-    const std::string & GetSoundFileName() const { return fileName; };
+    void SetSoundFileName(const gd::String & soundfilename);
+    const gd::String & GetSoundFileName() const { return fileName; };
 
     bool ReloadSound(const RuntimeScene &scene);
 
@@ -155,15 +155,15 @@ public :
     float GetPitch() const;
 
 private:
-    std::string fileName;
+    gd::String fileName;
 
-    std::string m_type;
+    gd::String m_type;
     SoundWrapperBase *m_sound;
 
     void Init(const RuntimeSoundObject &other);
 };
 
-gd::Object * CreateSoundObject(std::string name);
+gd::Object * CreateSoundObject(gd::String name);
 RuntimeObject * CreateRuntimeSoundObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // SoundObject_H

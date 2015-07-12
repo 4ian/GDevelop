@@ -150,7 +150,7 @@ void TopDownMovementAutomatism::DoStepPreEvents(RuntimeScene & scene)
     downKey = false;
 }
 
-void TopDownMovementAutomatism::SimulateControl(const std::string & input)
+void TopDownMovementAutomatism::SimulateControl(const gd::String & input)
 {
     if ( input == "Left" ) leftKey = true;
     else if ( input == "Right" ) rightKey = true;
@@ -183,23 +183,23 @@ void TopDownMovementAutomatism::SerializeTo(gd::SerializerElement & element) con
     element.SetAttribute("ignoreDefaultControls", ignoreDefaultControls);
 }
 
-std::map<std::string, gd::PropertyDescriptor> TopDownMovementAutomatism::GetProperties(gd::Project & project) const
+std::map<gd::String, gd::PropertyDescriptor> TopDownMovementAutomatism::GetProperties(gd::Project & project) const
 {
-    std::map<std::string, gd::PropertyDescriptor> properties;
+    std::map<gd::String, gd::PropertyDescriptor> properties;
 
     properties[_("Allows diagonals")].SetValue(allowDiagonals ? "true" : "false").SetType("Boolean");
-    properties[_("Acceleration")].SetValue(ToString(acceleration));
-    properties[_("Deceleration")].SetValue(ToString(deceleration));
-    properties[_("Max. speed")].SetValue(ToString(maxSpeed));
-    properties[_("Rotate speed")].SetValue(ToString(angularMaxSpeed));
+    properties[_("Acceleration")].SetValue(gd::String::FromFloat(acceleration));
+    properties[_("Deceleration")].SetValue(gd::String::FromFloat(deceleration));
+    properties[_("Max. speed")].SetValue(gd::String::FromFloat(maxSpeed));
+    properties[_("Rotate speed")].SetValue(gd::String::FromFloat(angularMaxSpeed));
     properties[_("Rotate object")].SetValue(rotateObject ? "true" : "false").SetType("Boolean");
-    properties[_("Angle offset")].SetValue(ToString(angleOffset));
+    properties[_("Angle offset")].SetValue(gd::String::FromFloat(angleOffset));
     properties[_("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
 
     return properties;
 }
 
-bool TopDownMovementAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
+bool TopDownMovementAutomatism::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
     if ( name == _("Default controls") ) {
         ignoreDefaultControls = (value == "0");
@@ -214,18 +214,18 @@ bool TopDownMovementAutomatism::UpdateProperty(const std::string & name, const s
         return true;
     }
 
-    if ( ToDouble(value) < 0 ) return false;
+    if ( value.ToFloat() < 0 ) return false;
 
     if ( name == _("Acceleration") )
-        acceleration = ToDouble(value);
+        acceleration = value.ToFloat();
     else if ( name == _("Deceleration") )
-        deceleration = ToDouble(value);
+        deceleration = value.ToFloat();
     else if ( name == _("Max. speed") )
-        maxSpeed = ToDouble(value);
+        maxSpeed = value.ToFloat();
     else if ( name == _("Rotate speed") )
-        angularMaxSpeed = ToDouble(value);
+        angularMaxSpeed = value.ToFloat();
     else if ( name == _("Angle offset") )
-        angleOffset = ToDouble(value);
+        angleOffset = value.ToFloat();
     else
         return false;
 

@@ -65,7 +65,7 @@ public:
                 if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || timeOutCode.empty()) timeOutCode = "0";
 
                 //Prepare name
-                gd::String codeName = !event.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(event.GetName()) : "GDTimedEvent_"+ToString(&event);
+                gd::String codeName = !event.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(event.GetName()) : "GDTimedEvent_"+gd::String::FromLocale(ToString(&event));
 
                 gd::String outputCode;
 
@@ -147,12 +147,12 @@ public:
 
                         gd::String code;
                         {
-                            gd::String codeName = !timedEvent.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.GetName()) : "GDTimedEvent_"+ToString(&timedEvent);
+                            gd::String codeName = !timedEvent.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.GetName()) : "GDTimedEvent_"+gd::String::FromLocale(ToString(&timedEvent));
                             code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
                         }
                         for (unsigned int j = 0;j<timedEvent.codeGenerationChildren.size();++j)
                         {
-                            gd::String codeName = !timedEvent.codeGenerationChildren[j]->GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.codeGenerationChildren[j]->GetName()) : "GDTimedEvent_"+ToString(timedEvent.codeGenerationChildren[j]);
+                            gd::String codeName = !timedEvent.codeGenerationChildren[j]->GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.codeGenerationChildren[j]->GetName()) : "GDTimedEvent_"+gd::String::FromLocale(ToString(timedEvent.codeGenerationChildren[j]));
                             code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
                         }
                         return code;
@@ -185,7 +185,7 @@ public:
                 else
                     name = _("No name");
 
-                value = ToString(static_cast<double>(iter->second.GetTime())/1000000.0)+"s";
+                value = gd::String::FromDouble(static_cast<double>(iter->second.GetTime())/1000000.0)+"s";
 
                 return;
             }
@@ -202,7 +202,7 @@ public:
         {
             if ( propertyNb == i )
             {
-                iter->second.SetTime(ToDouble(newValue)*1000000.0);
+                iter->second.SetTime(newValue.ToDouble()*1000000.0);
 
                 return true;
             }

@@ -8,6 +8,7 @@ This project is released under the MIT License.
 #ifndef RUNTIMESCENEPATHDATAS_H
 #define RUNTIMESCENEPATHDATAS_H
 #include "GDCpp/AutomatismsRuntimeSharedData.h"
+#include "GDCpp/String.h"
 #include <map>
 #include <vector>
 #include <SFML/System/Vector2.hpp>
@@ -25,10 +26,9 @@ class GD_EXTENSION_API RuntimeScenePathDatas : public AutomatismsRuntimeSharedDa
         virtual ~RuntimeScenePathDatas();
         virtual std::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return std::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeScenePathDatas(*this));}
 
-        std::map<std::string, std::vector<sf::Vector2f> > globalPaths; ///< Map containing all the global paths
+        std::map<gd::String, std::vector<sf::Vector2f> > globalPaths; ///< Map containing all the global paths
 
     private:
 };
 
 #endif // RUNTIMESCENEPATHDATAS_H
-

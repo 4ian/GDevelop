@@ -24,7 +24,7 @@ namespace AdvancedXML
 
     RefManager::~RefManager()
     {
-        std::map<std::string, TiXmlNode*>::iterator it;
+        std::map<gd::String, TiXmlNode*>::iterator it;
         for(it = m_refs.begin(); it != m_refs.end(); it++)
         {
             if(it->second)
@@ -52,17 +52,17 @@ namespace AdvancedXML
         }
     }
 
-    TiXmlNode* RefManager::GetRef(const std::string &refName)
+    TiXmlNode* RefManager::GetRef(const gd::String &refName)
     {
         return m_refs[refName];
     }
 
-    void RefManager::SetRef(const std::string &refName, TiXmlNode *node)
+    void RefManager::SetRef(const gd::String &refName, TiXmlNode *node)
     {
         m_refs[refName] = node;
     }
 
-    void RefManager::DeleteChildRefs(const std::string &parentRef)
+    void RefManager::DeleteChildRefs(const gd::String &parentRef)
     {
         TiXmlNode *parentNode = GetRef(parentRef);
 
@@ -72,7 +72,7 @@ namespace AdvancedXML
             while(childNode)
             {
                 //Search the element in the map
-                std::map<std::string, TiXmlNode*>::iterator findedEle = m_refs.begin();
+                std::map<gd::String, TiXmlNode*>::iterator findedEle = m_refs.begin();
                 while(findedEle->second != childNode && findedEle != m_refs.end())
                 {
                     findedEle++;
@@ -90,15 +90,15 @@ namespace AdvancedXML
         }
     }
 
-    void RefManager::CreateNewDocument(const std::string &refname)
+    void RefManager::CreateNewDocument(const gd::String &refname)
     {
         TiXmlDocument *doc = new TiXmlDocument();
         m_refs[refname] = doc;
     }
 
-    void RefManager::LoadDocument(const std::string &filename, const std::string &refName)
+    void RefManager::LoadDocument(const gd::String &filename, const gd::String &refName)
     {
-        TiXmlDocument *doc = new TiXmlDocument(filename.c_str());
+        TiXmlDocument *doc = new TiXmlDocument(filename.ToLocale().c_str());
 
         if(doc->LoadFile())
             m_refs[refName] = doc;
@@ -106,16 +106,16 @@ namespace AdvancedXML
             m_refs[refName] = 0;
     }
 
-    void RefManager::SaveDocument(const std::string &filename, const std::string &refName)
+    void RefManager::SaveDocument(const gd::String &filename, const gd::String &refName)
     {
         if(!GetRef(refName))
             return;
 
         TiXmlDocument *doc = GetRef(refName)->ToDocument();
-        if(doc) doc->SaveFile(filename.c_str());
+        if(doc) doc->SaveFile(filename.ToLocale().c_str());
     }
 
-    void RefManager::CreateRef(const std::string &baseRef, const std::string &newRef, const std::string &path)
+    void RefManager::CreateRef(const gd::String &baseRef, const gd::String &newRef, const gd::String &path)
     {
         /** Note :  .. => Browse to its parent
                     .  => Browse to the document it lives in
@@ -129,7 +129,7 @@ namespace AdvancedXML
         if(!baseNode)
             return;
 
-        std::vector<std::string> pathArgs = SplitString<std::string>(path, '/');
+        std::vector<gd::String> pathArgs = path.Split('/');
         TiXmlNode *currentNode = baseNode;
 
         for(unsigned int a = 0;
@@ -171,4 +171,3 @@ namespace AdvancedXML
         m_refs[newRef] = currentNode;
     }
 }
-

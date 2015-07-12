@@ -203,7 +203,7 @@ void SoundObjectEditor::OnValidateButtonClick(wxCommandEvent& event)
     object.SetPitch(ToFloat(ToString(pitchTextCtrl->GetValue())));
     object.SetMinDistance(MinDistanceSpinCtrl->GetValue());
     object.SetLooping(LoopCheckBox->IsChecked());
-    object.SetSoundFileName(ToString(FileNameTextCtrl->GetValue()));
+    object.SetSoundFileName(FileNameTextCtrl->GetValue());
 
     EndModal(1);
 }
@@ -226,4 +226,3 @@ void SoundObjectEditor::OnButton1Click(wxCommandEvent& event)
     }
 }
 #endif
-

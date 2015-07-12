@@ -233,7 +233,7 @@ public:
                        "res/imageicon.png")
 
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("string", _("File where save capture"), "", true).SetDefaultValue("").CantUseUtf8()
+            .AddParameter("string", _("File where save capture"), "", true).SetDefaultValue("")
             .AddParameter("string", _("Name of the image where capture must be saved"), "", true).SetDefaultValue("")
 
             .SetFunctionName("GDpriv::PrimitiveDrawingTools::CaptureScreen").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
@@ -263,7 +263,7 @@ public:
                        "res/imageicon.png")
 
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("file", _("File")).CantUseUtf8()
+            .AddParameter("file", _("File"))
             .AddParameter("string", _("Name of the image"))
 
             .SetFunctionName("GDpriv::PrimitiveDrawingTools::OpenSFMLTextureFromFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
@@ -277,7 +277,7 @@ public:
                        "res/imageicon.png")
 
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("file", _("File")).CantUseUtf8()
+            .AddParameter("file", _("File"))
             .AddParameter("string", _("Name of the image"))
 
             .SetFunctionName("GDpriv::PrimitiveDrawingTools::SaveSFMLTextureToFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");

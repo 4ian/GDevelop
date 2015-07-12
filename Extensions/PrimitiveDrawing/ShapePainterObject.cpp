@@ -48,7 +48,7 @@ ShapePainterObjectBase::ShapePainterObjectBase() :
 {
 }
 
-ShapePainterObject::ShapePainterObject(std::string name_) :
+ShapePainterObject::ShapePainterObject(gd::String name_) :
     gd::Object(name_)
 {
 }
@@ -161,34 +161,34 @@ void ShapePainterObject::EditObject( wxWindow* parent, gd::Project & game, gd::M
 #endif
 }
 
-void RuntimeShapePainterObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeShapePainterObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Fill color");    value = ToString(GetFillColorR())+";"+ToString(GetFillColorG())+";"+ToString(GetFillColorB());}
-    else if ( propertyNb == 1 ) {name = _("Fill opacity");    value = ToString(GetFillOpacity());}
-    else if ( propertyNb == 2 ) {name = _("Outline size");         value = ToString(GetOutlineSize());}
-    else if ( propertyNb == 3 ) {name = _("Outline color");        value = ToString(GetOutlineColorR())+";"+ToString(GetOutlineColorG())+";"+ToString(GetOutlineColorB());}
-    else if ( propertyNb == 4 ) {name = _("Outline opacity");        value = ToString(GetOutlineOpacity());}
+    if      ( propertyNb == 0 ) {name = _("Fill color");    value = gd::String::FromFloat(GetFillColorR())+";"+gd::String::FromFloat(GetFillColorG())+";"+gd::String::FromFloat(GetFillColorB());}
+    else if ( propertyNb == 1 ) {name = _("Fill opacity");    value = gd::String::FromFloat(GetFillOpacity());}
+    else if ( propertyNb == 2 ) {name = _("Outline size");         value = gd::String::FromFloat(GetOutlineSize());}
+    else if ( propertyNb == 3 ) {name = _("Outline color");        value = gd::String::FromFloat(GetOutlineColorR())+";"+gd::String::FromFloat(GetOutlineColorG())+";"+gd::String::FromFloat(GetOutlineColorB());}
+    else if ( propertyNb == 4 ) {name = _("Outline opacity");        value = gd::String::FromFloat(GetOutlineOpacity());}
 }
 
-bool RuntimeShapePainterObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeShapePainterObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
     if ( propertyNb == 0 )
     {
-        std::vector < std::string > colors = SplitString<std::string>(newValue, ';');
+        std::vector < gd::String > colors = newValue.Split(U';');
         if ( colors.size() < 3 ) return false; //Color is not valid
 
-        SetFillColor(ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]));
+        SetFillColor(colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt());
     }
-    else if ( propertyNb == 1 ) { SetFillOpacity(ToFloat(newValue)); }
-    else if ( propertyNb == 2 ) { SetOutlineSize(ToInt(newValue)); }
+    else if ( propertyNb == 1 ) { SetFillOpacity(newValue.ToFloat()); }
+    else if ( propertyNb == 2 ) { SetOutlineSize(newValue.ToInt()); }
     else if ( propertyNb == 3 )
     {
-        std::vector < std::string > colors = SplitString<std::string>(newValue, ';');
+        std::vector < gd::String > colors = newValue.Split(U';');
         if ( colors.size() < 3 ) return false; //Color is not valid
 
-        SetOutlineColor(ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]));
+        SetOutlineColor(colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt());
     }
-    else if ( propertyNb == 4 ) { SetOutlineOpacity(ToFloat(newValue)); }
+    else if ( propertyNb == 4 ) { SetOutlineOpacity(newValue.ToFloat()); }
 
     return true;
 }
@@ -242,27 +242,27 @@ void ShapePainterObjectBase::SetOutlineOpacity(float val)
 /**
  * Change the fill color
  */
-void ShapePainterObjectBase::SetFillColor( const std::string & color )
+void ShapePainterObjectBase::SetFillColor( const gd::String & color )
 {
-    vector < string > colors = SplitString <string> (color, ';');
+    std::vector < gd::String > colors = color.Split(U';');
     if ( colors.size() < 3 ) return;
 
-    fillColorR = ToInt(colors[0]);
-    fillColorG = ToInt(colors[1]);
-    fillColorB = ToInt(colors[2]);
+    fillColorR = colors[0].ToInt();
+    fillColorG = colors[1].ToInt();
+    fillColorB = colors[2].ToInt();
 }
 
 /**
  * Change the color of the outline
  */
-void ShapePainterObjectBase::SetOutlineColor( const std::string & color )
+void ShapePainterObjectBase::SetOutlineColor( const gd::String & color )
 {
-    vector < string > colors = SplitString <string> (color, ';');
+    std::vector < gd::String > colors = color.Split(U';');
     if ( colors.size() < 3 ) return;
 
-    outlineColorR = ToInt(colors[0]);
-    outlineColorG = ToInt(colors[1]);
-    outlineColorB = ToInt(colors[2]);
+    outlineColorR = colors[0].ToInt();
+    outlineColorG = colors[1].ToInt();
+    outlineColorB = colors[2].ToInt();
 }
 
 void RuntimeShapePainterObject::DrawRectangle( float x, float y, float x2, float y2 )
@@ -317,8 +317,7 @@ RuntimeObject * CreateRuntimeShapePainterObject(RuntimeScene & scene, const gd::
     return new RuntimeShapePainterObject(scene, object);
 }
 
-gd::Object * CreateShapePainterObject(std::string name)
+gd::Object * CreateShapePainterObject(gd::String name)
 {
     return new ShapePainterObject(name);
 }
-

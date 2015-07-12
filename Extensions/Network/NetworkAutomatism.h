@@ -46,7 +46,7 @@ public:
 
     static std::map < const gd::Layout* , SceneNetworkDatas > scenesNetworkDatas; ///< Static map associating scene to datas
 
-    std::string dataPrefix;
+    gd::String dataPrefix;
     bool xPosition; ///< True if X position must be send/updated
     bool yPosition; ///< True if Y position must be send/updated
     bool angle; ///< True if agnle must be send/updated
@@ -61,7 +61,7 @@ public:
     /**
      * Generate a unique identifier for all objects of list, using automatism named automatismName.
      */
-    static void GenerateObjectNetworkIdentifier(std::map <std::string, std::vector<RuntimeObject*> *> objectsLists, const std::string & automatismName);
+    static void GenerateObjectNetworkIdentifier(std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists, const gd::String & automatismName);
 
 private:
 

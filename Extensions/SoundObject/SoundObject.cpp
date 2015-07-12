@@ -34,7 +34,7 @@ sf::Sprite SoundObject::soundSprite;
 
 using namespace std;
 
-SoundObject::SoundObject(std::string name_) :
+SoundObject::SoundObject(gd::String name_) :
     Object(name_),
     type("Sound"),
     zPos(0),
@@ -115,7 +115,7 @@ void SoundObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerE
 }
 
 
-void SoundObject::SetSoundFileName(const std::string & soundfilename)
+void SoundObject::SetSoundFileName(const gd::String & soundfilename)
 {
     fileName = soundfilename;
     #if defined(GD_IDE_ONLY)
@@ -150,19 +150,19 @@ void SoundObject::LoadEdittimeIcon()
     soundSprite.setTexture(soundIcon);
 }
 
-std::map<std::string, gd::PropertyDescriptor> SoundObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene)
+std::map<gd::String, gd::PropertyDescriptor> SoundObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene)
 {
-    std::map<std::string, gd::PropertyDescriptor> properties;
+    std::map<gd::String, gd::PropertyDescriptor> properties;
     properties[_("Z")] = position.floatInfos.find("z") != position.floatInfos.end() ?
-                                   ToString(position.floatInfos.find("z")->second) :
+                                   gd::String::FromFloat(position.floatInfos.find("z")->second) :
                                    "0";
 
     return properties;
 }
 
-bool SoundObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & game, gd::Layout & scene)
+bool SoundObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & game, gd::Layout & scene)
 {
-    if ( name == _("Z") ) position.floatInfos["z"] = ToFloat(value);
+    if ( name == _("Z") ) position.floatInfos["z"] = value.ToFloat();
 
     return true;
 }
@@ -189,22 +189,22 @@ void SoundObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 #endif
 }
 
-void RuntimeSoundObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeSoundObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Sound level");                    value = ToString(GetVolume());}
-    else if ( propertyNb == 1 ) {name = _("Minimal distance");         value = ToString(GetMinDistance());}
-    else if ( propertyNb == 2 ) {name = _("Attenuation");               value = ToString(GetAttenuation());}
+    if      ( propertyNb == 0 ) {name = _("Sound level");                    value = gd::String::FromFloat(GetVolume());}
+    else if ( propertyNb == 1 ) {name = _("Minimal distance");         value = gd::String::FromFloat(GetMinDistance());}
+    else if ( propertyNb == 2 ) {name = _("Attenuation");               value = gd::String::FromFloat(GetAttenuation());}
     else if ( propertyNb == 3 ) {name = _("Loop");                 value = IsLooping() ? _("Yes") : _("No");}
-    else if ( propertyNb == 4 ) {name = _("Z Position");                          value = ToString(GetZPos());}
+    else if ( propertyNb == 4 ) {name = _("Z Position");                          value = gd::String::FromFloat(GetZPos());}
 }
 
-bool RuntimeSoundObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeSoundObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
-    if(propertyNb == 0) {SetVolume(ToFloat(newValue));}
-    else if (propertyNb == 1) {SetMinDistance(ToFloat(newValue));}
-    else if (propertyNb == 2) {SetAttenuation(ToFloat(newValue));}
+    if(propertyNb == 0) {SetVolume(newValue.ToFloat());}
+    else if (propertyNb == 1) {SetMinDistance(newValue.ToFloat());}
+    else if (propertyNb == 2) {SetAttenuation(newValue.ToFloat());}
     else if (propertyNb == 3) {SetLooping(!(newValue == _("No")));}
-    else if (propertyNb == 4) {SetZPos(ToFloat(newValue));}
+    else if (propertyNb == 4) {SetZPos(newValue.ToFloat());}
     return true;
 }
 
@@ -226,7 +226,7 @@ void RuntimeSoundObject::OnPositionChanged()
     m_sound->SetPosition(sf::Vector3f(GetX(), GetY(), GetZPos()));
 }
 
-void RuntimeSoundObject::SetSoundFileName(const std::string & soundfilename)
+void RuntimeSoundObject::SetSoundFileName(const gd::String & soundfilename)
 {
     fileName = soundfilename;
     if(m_sound)
@@ -244,7 +244,7 @@ void RuntimeSoundObject::SetZPos(float zpos)
         m_sound->SetPosition(sf::Vector3f(m_sound->GetPosition().x, m_sound->GetPosition().y, zpos));
 }
 
-void RuntimeSoundObject::SetSoundType(const std::string &type)
+void RuntimeSoundObject::SetSoundType(const gd::String &type)
 {
     if(type == "Music")
     {
@@ -264,7 +264,7 @@ void RuntimeSoundObject::SetSoundType(const std::string &type)
     }
 }
 
-const std::string & RuntimeSoundObject::GetSoundType() const
+const gd::String & RuntimeSoundObject::GetSoundType() const
 {
     return m_type;
 }
@@ -359,7 +359,7 @@ RuntimeObject * CreateRuntimeSoundObject(RuntimeScene & scene, const gd::Object 
     return new RuntimeSoundObject(scene, object);
 }
 
-gd::Object * CreateSoundObject(std::string name)
+gd::Object * CreateSoundObject(gd::String name)
 {
     return new SoundObject(name);
 }

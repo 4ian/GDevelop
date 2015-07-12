@@ -34,7 +34,7 @@ This project is released under the MIT License.
 
 using namespace std;
 
-Box3DObject::Box3DObject(std::string name_) :
+Box3DObject::Box3DObject(gd::String name_) :
     Object(name_),
     frontTextureName(""),
     topTextureName(""),
@@ -357,53 +357,53 @@ void Box3DObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 #endif
 }
 
-std::map<std::string, gd::PropertyDescriptor> Box3DObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene)
+std::map<gd::String, gd::PropertyDescriptor> Box3DObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene)
 {
-    std::map<std::string, gd::PropertyDescriptor> properties;
+    std::map<gd::String, gd::PropertyDescriptor> properties;
     properties[_("Z")] = position.floatInfos.find("z") != position.floatInfos.end() ?
-                                   ToString(position.floatInfos.find("z")->second) :
+                                   gd::String::FromFloat(position.floatInfos.find("z")->second) :
                                    "0";
 
     properties[_("Pitch")] = position.floatInfos.find("pitch") != position.floatInfos.end() ?
-                                   ToString(position.floatInfos.find("pitch")->second) :
+                                   gd::String::FromFloat(position.floatInfos.find("pitch")->second) :
                                    "0";
 
     properties[_("Roll")] = position.floatInfos.find("roll") != position.floatInfos.end() ?
-                                   ToString(position.floatInfos.find("roll")->second) :
+                                   gd::String::FromFloat(position.floatInfos.find("roll")->second) :
                                    "0";
 
     return properties;
 }
 
-bool Box3DObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & game, gd::Layout & scene)
+bool Box3DObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & game, gd::Layout & scene)
 {
-    if ( name == _("Z") ) position.floatInfos["z"] = ToFloat(value);
-    if ( name == _("Pitch") ) position.floatInfos["pitch"] = ToFloat(value);
-    if ( name == _("Roll") ) position.floatInfos["roll"] = ToFloat(value);
+    if ( name == _("Z") ) position.floatInfos["z"] = value.ToFloat();
+    if ( name == _("Pitch") ) position.floatInfos["pitch"] = value.ToFloat();
+    if ( name == _("Roll") ) position.floatInfos["roll"] = value.ToFloat();
 
     return true;
 }
 
-void RuntimeBox3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeBox3DObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Width");       value = ToString(width);}
-    else if ( propertyNb == 1 ) {name = _("Height");       value = ToString(height);}
-    else if ( propertyNb == 2 ) {name = _("Depth");    value = ToString(depth);}
-    else if ( propertyNb == 3 ) {name = _("Z Coordinate");  value = ToString(zPosition);}
-    else if ( propertyNb == 4 ) {name = _("Yaw");           value = ToString(yaw);}
-    else if ( propertyNb == 5 ) {name = _("Pitch");         value = ToString(pitch);}
-    else if ( propertyNb == 6 ) {name = _("Roll");          value = ToString(roll);}
+    if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::FromFloat(width);}
+    else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::FromFloat(height);}
+    else if ( propertyNb == 2 ) {name = _("Depth");    value = gd::String::FromFloat(depth);}
+    else if ( propertyNb == 3 ) {name = _("Z Coordinate");  value = gd::String::FromFloat(zPosition);}
+    else if ( propertyNb == 4 ) {name = _("Yaw");           value = gd::String::FromFloat(yaw);}
+    else if ( propertyNb == 5 ) {name = _("Pitch");         value = gd::String::FromFloat(pitch);}
+    else if ( propertyNb == 6 ) {name = _("Roll");          value = gd::String::FromFloat(roll);}
 }
 
-bool RuntimeBox3DObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeBox3DObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
-    if      ( propertyNb == 0 ) {width = ToInt(newValue);}
-    else if ( propertyNb == 1 ) {height = ToInt(newValue);}
-    else if ( propertyNb == 2 ) {depth = ToInt(newValue);}
-    else if ( propertyNb == 3 ) {zPosition = ToInt(newValue);}
-    else if ( propertyNb == 4 ) {yaw = ToInt(newValue);}
-    else if ( propertyNb == 5 ) {pitch = ToInt(newValue);}
-    else if ( propertyNb == 6 ) {roll = ToInt(newValue);}
+    if      ( propertyNb == 0 ) {width = newValue.ToInt();}
+    else if ( propertyNb == 1 ) {height = newValue.ToInt();}
+    else if ( propertyNb == 2 ) {depth = newValue.ToInt();}
+    else if ( propertyNb == 3 ) {zPosition = newValue.ToInt();}
+    else if ( propertyNb == 4 ) {yaw = newValue.ToInt();}
+    else if ( propertyNb == 5 ) {pitch = newValue.ToInt();}
+    else if ( propertyNb == 6 ) {roll = newValue.ToInt();}
 
     return true;
 }
@@ -419,8 +419,7 @@ RuntimeObject * CreateRuntimeBox3DObject(RuntimeScene & scene, const gd::Object 
     return new RuntimeBox3DObject(scene, object);
 }
 
-gd::Object * CreateBox3DObject(std::string name)
+gd::Object * CreateBox3DObject(gd::String name)
 {
     return new Box3DObject(name);
 }
-

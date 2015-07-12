@@ -83,19 +83,19 @@ public:
     /**
     Get a path stored by the automatism
     */
-    const std::vector<sf::Vector2f>& GetPath(const std::string &_name) const;
+    const std::vector<sf::Vector2f>& GetPath(const gd::String &_name) const;
 
     /**
     Modify a path of the automatism but doesn't change the current path
     (note : need to call ChangeCurrentPath even if the path is the current.)
     */
-    void SetPath(const std::string &_name, std::vector<sf::Vector2f> _path);
+    void SetPath(const gd::String &_name, std::vector<sf::Vector2f> _path);
 
     /**
     Set a new path to the automatism
     */
-    void ChangeCurrentPath(const std::string &_name);
-    const std::string& GetCurrentPathName() const;
+    void ChangeCurrentPath(const gd::String &_name);
+    const gd::String& GetCurrentPathName() const;
 
     /**
     Make a copy of the path to make it usable to the automatism.
@@ -108,15 +108,15 @@ public:
     /**
     Return a vector containing the name of all the local paths.
     */
-    std::vector<std::string> GetListOfPathsNames() const;
+    std::vector<gd::String> GetListOfPathsNames() const;
 
     void SetCurrentSegment(unsigned int seg);
     int GetCurrentSegment();
     float GetPositionOnSegment(); ///< position belongs to 0 to 1 (percentage of the current segment)
     void SetPositionOnSegment(float pos);
 
-    static std::string GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char coordsSep = '\n', char composantSep = ';');
-    static std::vector<sf::Vector2f> GetCoordsVectorFromString(const std::string &str, char coordsSep = '\n', char composantSep = ';');
+    static gd::String GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char32_t coordsSep = U'\n', char32_t composantSep = U';');
+    static std::vector<sf::Vector2f> GetCoordsVectorFromString(const gd::String &str, char32_t coordsSep = U'\n', char32_t composantSep = U';');
 
 private:
 
@@ -126,7 +126,7 @@ private:
     float GetAngleOfSegment(sf::Vector2f &seg);
 
     //sf::Vector2f has been chosen to represent position, but any simple vector2 class would do the job.
-    std::string pathName; ///< Name of the current path (the path may be not loaded, especially in Edit mode)
+    gd::String pathName; ///< Name of the current path (the path may be not loaded, especially in Edit mode)
     std::vector<sf::Vector2f> path; ///< Copy of current path (used for movement to allow the automatism to reverse it)
 
     sf::Vector2f offset; ///< Offset of the path relative to the scene's origin
@@ -145,10 +145,9 @@ private:
     int futureSegment; ///< if the current segment has to be changed, it contains a positive number, otherwise -1.
     float futurePosition; ///< if the current position on segment has to be changed, it contains a positive number, otherwise -1.
 
-    std::map<std::string, std::vector<sf::Vector2f> > localePaths; ///< Contains all the object path
+    std::map<gd::String, std::vector<sf::Vector2f> > localePaths; ///< Contains all the object path
 
     RuntimeScenePathDatas * runtimeScenesPathDatas;
 };
 
 #endif // PATHAUTOMATISM_H
-

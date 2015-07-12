@@ -34,9 +34,9 @@ public:
             .SetIncludeFile("PhysicsAutomatism/box2djs/box2d.js")
             .AddIncludeFile("PhysicsAutomatism/physicsruntimeautomatism.js");
 
-        std::map<std::string, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PhysicsAutomatism::PhysicsAutomatism");
-        std::map<std::string, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PhysicsAutomatism::PhysicsAutomatism");
-        std::map<std::string, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PhysicsAutomatism::PhysicsAutomatism");
+        std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PhysicsAutomatism::PhysicsAutomatism");
+        std::map<gd::String, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PhysicsAutomatism::PhysicsAutomatism");
+        std::map<gd::String, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PhysicsAutomatism::PhysicsAutomatism");
 
         autActions["PhysicsAutomatism::SetStatic"].SetFunctionName("setStatic");
         autActions["PhysicsAutomatism::SetDynamic"].SetFunctionName("setDynamic");

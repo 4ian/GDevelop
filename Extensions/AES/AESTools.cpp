@@ -5,6 +5,8 @@ Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
+#include "AESTools.h"
+
 #include "GDCpp/Tools/AES.h"
 #include <iostream>
 #include <fstream>
@@ -18,15 +20,15 @@ namespace GDpriv
 namespace AES
 {
 
-void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::string & destFile, std::string passwordWith24characters )
+void GD_EXTENSION_API EncryptFile( const gd::String & srcFile, const gd::String & destFile, gd::String passwordWith24characters )
 {
-    while ( passwordWith24characters.length() < 24 )
+    while ( passwordWith24characters.Raw().length() < 24 ) //Test the real size as bytes
         passwordWith24characters += " ";
-    if ( passwordWith24characters.length() > 24 )
-        passwordWith24characters.resize(24);
+    if ( passwordWith24characters.Raw().length() > 24 )
+        passwordWith24characters.Raw().resize(24);
 
-    ifstream ifile(srcFile.c_str(),ios_base::binary);
-    ofstream ofile(destFile.c_str(),ios_base::binary);
+    ifstream ifile(srcFile.ToLocale().c_str(),ios_base::binary);
+    ofstream ofile(destFile.ToLocale().c_str(),ios_base::binary);
 
     // get file size
     ifile.seekg(0,ios_base::end);
@@ -55,15 +57,15 @@ void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::strin
     ifile.close();
 }
 
-void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::string & destFile, std::string passwordWith24characters )
+void GD_EXTENSION_API DecryptFile( const gd::String & srcFile, const gd::String & destFile, gd::String passwordWith24characters )
 {
-    while ( passwordWith24characters.length() < 24 )
+    while ( passwordWith24characters.Raw().length() < 24 ) //Test the real size as bytes
         passwordWith24characters += " ";
-    if ( passwordWith24characters.length() > 24 )
-        passwordWith24characters.resize(24);
+    if ( passwordWith24characters.Raw().length() > 24 )
+        passwordWith24characters.Raw().resize(24);
 
-    ifstream ifile(srcFile.c_str(),ios_base::binary);
-    ofstream ofile(destFile.c_str(),ios_base::binary);
+    ifstream ifile(srcFile.ToLocale().c_str(),ios_base::binary);
+    ofstream ofile(destFile.ToLocale().c_str(),ios_base::binary);
 
     // get file size
     ifile.seekg(0,ios_base::end);
@@ -94,4 +96,3 @@ void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::strin
 
 }
 }
-

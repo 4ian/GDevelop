@@ -43,16 +43,16 @@ namespace CommonDialogs
 /**
  * Display a simple message box.
  */
-void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & message, const std::string & title )
+void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const gd::String & message, const gd::String & title )
 {
     sf::Clock timeSpent;
 
     //Display the box
     #if defined(WINDOWS)
-    MessageBoxW(NULL, gd::utf8::ToWString(message).c_str(), gd::utf8::ToWString(title).c_str(), MB_ICONINFORMATION);
+    MessageBoxW(NULL, message.ToWide().c_str(), title.ToWide().c_str(), MB_ICONINFORMATION);
     #endif
     #if defined(LINUX) || defined(MACOS)
-    nw::MsgBox msgBox(gd::utf8::ToLocaleString(title), gd::utf8::ToLocaleString(message));
+    nw::MsgBox msgBox(title.ToLocale(), message.ToLocale());
     msgBox.wait_until_closed();
     #endif
 
@@ -62,17 +62,17 @@ void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & 
 /**
  * Display an "open file" dialog
  */
-void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variable, const std::string & title, std::string filters )
+void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variable, const gd::String & title, gd::String filters )
 {
     sf::Clock timeSpent;
 
-    string result;
+    gd::String result;
 
     //Display the dialog
     #if defined(WINDOWS)
     //Process filters to match windows dialogs filters style.
-    filters = filters+'\0';
-    std::replace(filters.begin(), filters.end(), '|', '\0');
+    filters.Raw() = filters.Raw()+'\0';
+    std::replace(filters.Raw().begin(), filters.Raw().end(), '|', '\0');
 
     OPENFILENAMEW toGetFileName; //Struct for the dialog
     wchar_t filePath[MAX_PATH];
@@ -83,17 +83,18 @@ void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variabl
     toGetFileName.hwndOwner = NULL;
     toGetFileName.lpstrFile = filePath;
     toGetFileName.nMaxFile = MAX_PATH;
-    toGetFileName.lpstrFilter = filters == "\0" ? NULL : gd::utf8::ToWString(filters).c_str();
+    toGetFileName.lpstrFilter = filters == "\0" ? NULL : filters.ToWide().c_str();
     toGetFileName.nFilterIndex = 1;
     toGetFileName.Flags = OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;;
 
     if(GetOpenFileNameW(&toGetFileName) == TRUE)
-        result = gd::utf8::FromWString(filePath);
+        result = gd::String::FromWide(filePath);
     #endif
     #if defined(LINUX) || defined(MACOS)
-    nw::OpenFile * dialog = new nw::OpenFile(gd::utf8::ToLocaleString(title), true, result);
+    std::string strResult;
+    nw::OpenFile * dialog = new nw::OpenFile(title.ToLocale(), true, strResult);
     dialog->wait_until_closed();
-    result = gd::utf8::FromLocaleString(result); //Convert the path to UTF8
+    result = gd::String::FromLocale(strResult);
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
@@ -105,21 +106,21 @@ void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variabl
 /**
  * Show a message box with Yes/No buttons
  */
-void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, gd::Variable & variable, const std::string & message, const std::string & title )
+void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, gd::Variable & variable, const gd::String & message, const gd::String & title )
 {
     sf::Clock timeSpent;
 
-    string result;
+    gd::String result;
 
     //Display the box
     #if defined(WINDOWS)
-    if( MessageBoxW(NULL, gd::utf8::ToWString(message).c_str(), gd::utf8::ToWString(title).c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
+    if( MessageBoxW(NULL, message.ToWide().c_str(), title.ToWide().c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
         result = "yes";
     else
         result = "no";
     #endif
     #if defined(LINUX) || defined(MACOS)
-    nw::YesNoMsgBox dialog(gd::utf8::ToLocaleString(title), gd::utf8::ToLocaleString(message), result);
+    nw::YesNoMsgBox dialog(title.ToLocale(), message.ToLocale(), result.Raw());
     dialog.wait_until_closed();
     #endif
 
@@ -423,21 +424,22 @@ BOOL CInputBox::DoModal(LPCWSTR szCaption, LPCWSTR szPrompt)
 /**
  * Show a dialog so as to get a text from user
  */
-bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, gd::Variable & variable, const std::string & message, const std::string & title )
+bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, gd::Variable & variable, const gd::String & message, const gd::String & title )
 {
     sf::Clock timeSpent;
-    string result;
+    gd::String result;
 
     //Display the box
     #if defined(WINDOWS)
     CInputBox ibox(NULL);
-    if (ibox.DoModal(gd::utf8::ToWString(title).c_str(), gd::utf8::ToWString(message).c_str()))
-        result = gd::utf8::FromWString(ibox.Text);
+    if (ibox.DoModal(title.ToWide().c_str(), message.ToWide().c_str()))
+        result = gd::String::FromWide(ibox.Text);
     #endif
     #if defined(LINUX) || defined(MACOS)
-    nw::TextInput dialog(title, message, result);
+    std::string strResult;
+    nw::TextInput dialog(title.ToLocale(), message.ToLocale(), strResult);
     dialog.wait_until_closed();
-    result = gd::utf8::FromLocaleString(result); //Convert from locale
+    result = gd::String::FromLocale(strResult); //Convert from locale
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
@@ -450,4 +452,3 @@ bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, gd::Variable & variab
 
 }
 } //namespace GDpriv
-

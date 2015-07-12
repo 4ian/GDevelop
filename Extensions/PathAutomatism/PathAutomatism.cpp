@@ -189,7 +189,7 @@ void PathAutomatism::SerializeTo(gd::SerializerElement & element) const
 void PathAutomatism::SerializePathsTo(gd::SerializerElement & element) const
 {
     element.ConsiderAsArrayOf("path");
-    for(std::map<std::string, std::vector<sf::Vector2f> >::const_iterator it = localePaths.begin(); it != localePaths.end(); it++)
+    for(std::map<gd::String, std::vector<sf::Vector2f> >::const_iterator it = localePaths.begin(); it != localePaths.end(); it++)
     {
         gd::SerializerElement & pathElement = element.AddChild("path");
 
@@ -284,17 +284,17 @@ void PathAutomatism::Reverse()
     timeOnSegment = totalSegmentTime - tempTimeOnSegment;
 }
 
-const std::vector<sf::Vector2f>& PathAutomatism::GetPath(const std::string &_name) const
+const std::vector<sf::Vector2f>& PathAutomatism::GetPath(const gd::String &_name) const
 {
     return localePaths.at(_name);
 }
 
-void PathAutomatism::SetPath(const std::string &_name, std::vector<sf::Vector2f> _path)
+void PathAutomatism::SetPath(const gd::String &_name, std::vector<sf::Vector2f> _path)
 {
     localePaths[_name] = _path;
 }
 
-void PathAutomatism::ChangeCurrentPath(const std::string &_name)
+void PathAutomatism::ChangeCurrentPath(const gd::String &_name)
 {
     pathName = _name;
     isPathLoaded = false;
@@ -302,7 +302,7 @@ void PathAutomatism::ChangeCurrentPath(const std::string &_name)
     Reset();
 }
 
-const std::string& PathAutomatism::GetCurrentPathName() const
+const gd::String& PathAutomatism::GetCurrentPathName() const
 {
     return pathName;
 }
@@ -326,10 +326,10 @@ void PathAutomatism::LoadPath(RuntimeScene & scene)
     isPathLoaded = true;
 }
 
-std::vector<std::string> PathAutomatism::GetListOfPathsNames() const
+std::vector<gd::String> PathAutomatism::GetListOfPathsNames() const
 {
-    std::vector<std::string> names;
-    for(std::map<std::string, std::vector<sf::Vector2f> >::const_iterator it = localePaths.begin(); it != localePaths.end(); it++)
+    std::vector<gd::String> names;
+    for(std::map<gd::String, std::vector<sf::Vector2f> >::const_iterator it = localePaths.begin(); it != localePaths.end(); it++)
     {
         names.push_back((*it).first);
     }
@@ -363,34 +363,36 @@ void PathAutomatism::SetPositionOnSegment(float pos)
     futurePosition = pos;
 }
 
-std::string PathAutomatism::GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char coordsSep, char composantSep)
+gd::String PathAutomatism::GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char32_t coordsSep, char32_t composantSep)
 {
-    std::string coordsStr;
+    gd::String coordsStr;
 
 	for (unsigned int a = 0; a < vec.size(); a++)
 	{
-	    coordsStr += ToString<float>(vec.at(a).x) + composantSep + ToString<float>(vec.at(a).y);
+	    coordsStr += gd::String::FromFloat(vec.at(a).x);
+        coordsStr.push_back(composantSep);
+        coordsStr += gd::String::FromFloat(vec.at(a).y);
 	    if(a != vec.size() - 1)
-            coordsStr += coordsSep;
+            coordsStr.push_back(coordsSep);
 	}
 
 	return coordsStr;
 }
 
-std::vector<sf::Vector2f> PathAutomatism::GetCoordsVectorFromString(const std::string &str, char coordsSep, char composantSep)
+std::vector<sf::Vector2f> PathAutomatism::GetCoordsVectorFromString(const gd::String &str, char32_t coordsSep, char32_t composantSep)
 {
     std::vector<sf::Vector2f> coordsVec;
 
-    std::vector<std::string> coordsDecomposed = SplitString<std::string>(str, coordsSep);
+    std::vector<gd::String> coordsDecomposed = str.Split(coordsSep);
 
     for(unsigned int a = 0; a < coordsDecomposed.size(); a++)
     {
-        std::vector<std::string> coordXY = SplitString<std::string>(coordsDecomposed.at(a), composantSep);
+        std::vector<gd::String> coordXY = coordsDecomposed.at(a).Split(composantSep);
 
         if(coordXY.size() != 2)
             continue;
 
-        sf::Vector2f newCoord(ToFloat<std::string>(coordXY.at(0)), ToFloat<std::string>(coordXY.at(1)));
+        sf::Vector2f newCoord(coordXY.at(0).ToFloat(), coordXY.at(1).ToFloat());
         coordsVec.push_back(newCoord);
     }
 
@@ -412,4 +414,3 @@ float PathAutomatism::GetAngleOfSegment(sf::Vector2f &seg)
         return -acos(seg.x / norm) * 180.0 / PI;
     }
 }
-

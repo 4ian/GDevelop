@@ -339,7 +339,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
     paths.clear();
 
     //Load global paths
-    for(std::map<std::string, std::vector<sf::Vector2f> >::iterator it = sharedDatas->globalPaths.begin(); it != sharedDatas->globalPaths.end(); it++)
+    for(std::map<gd::String, std::vector<sf::Vector2f> >::iterator it = sharedDatas->globalPaths.begin(); it != sharedDatas->globalPaths.end(); it++)
     {
         PathInfo newPathInfo;
         newPathInfo.name = it->first;
@@ -350,7 +350,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
     }
 
     //Loading paths from the object
-    std::vector<std::string> listOfPathsNames = automatism.GetListOfPathsNames();
+    std::vector<gd::String> listOfPathsNames = automatism.GetListOfPathsNames();
     for(unsigned int a = 0; a < listOfPathsNames.size(); a++)
     {
         PathInfo newPathInfo;
@@ -361,10 +361,10 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
         }
         else
         {
-            std::string futureName;
+            gd::String futureName;
             do
             {
-                futureName = ToString(wxGetTextFromUser(_("A global path with the same name already exists.\nTo avoid name conflict, please rename the local path:"), _("Path conflict"), listOfPathsNames[a], this));
+                futureName = wxGetTextFromUser(_("A global path with the same name already exists.\nTo avoid name conflict, please rename the local path:"), _("Path conflict"), listOfPathsNames[a], this);
             } while (listOfPathsNames[a] == futureName);
 
             newPathInfo.name = futureName;
@@ -399,14 +399,14 @@ PathAutomatismEditor::~PathAutomatismEditor()
 
 void PathAutomatismEditor::OnpathChoiceSelect(wxCommandEvent& event)
 {
-    ChangePathOfPreview(GetNameWithoutPrefix(ToString(pathChoice->GetString(pathChoice->GetSelection()))));
+    ChangePathOfPreview(GetNameWithoutPrefix(pathChoice->GetString(pathChoice->GetSelection())));
 }
 
-void PathAutomatismEditor::ChangePathOfPreview(const std::string &name)
+void PathAutomatismEditor::ChangePathOfPreview(const gd::String &name)
 {
     if(paths.count(name) == 0)
     {
-        wxMessageBox("Couldn't find " + wxString(name.c_str()) + ".", "Error");
+        wxMessageBox("Couldn't find " + name + ".", "Error");
         return;
     }
 
@@ -438,19 +438,19 @@ void PathAutomatismEditor::ChangePathOfPreview(const std::string &name)
 
 void PathAutomatismEditor::UpdateComboBoxWithPathsName()
 {
-    std::string previousSelectedName = ToString(pathChoice->GetString(pathChoice->GetSelection()));
+    gd::String previousSelectedName = pathChoice->GetString(pathChoice->GetSelection());
 
     pathChoice->Clear();
 
-    for(std::map<std::string, PathInfo>::iterator it = paths.begin(); it != paths.end(); it++)
+    for(std::map<gd::String, PathInfo>::iterator it = paths.begin(); it != paths.end(); it++)
     {
         if(!it->second.isGlobal)
         {
-            pathChoice->Append(wxString(it->second.name.c_str()));
+            pathChoice->Append(it->second.name);
         }
         else
         {
-            pathChoice->Append(wxString("global: " + it->second.name));
+            pathChoice->Append("global: " + it->second.name);
         }
 
     }
@@ -461,7 +461,7 @@ void PathAutomatismEditor::UpdateComboBoxWithPathsName()
 
 void PathAutomatismEditor::OnBitmapButton3Click1(wxCommandEvent& event)
 {
-    std::string newPathName = ToString(wxGetTextFromUser(_("Name of the new path:"), _("New path"), "newPath"));
+    gd::String newPathName = wxGetTextFromUser(_("Name of the new path:"), _("New path"), "newPath");
 
     if(PathExists(newPathName))
     {
@@ -505,14 +505,14 @@ void PathAutomatismEditor::OnBitmapButton4Click(wxCommandEvent& event)
 
 void PathAutomatismEditor::OnBitmapButton5Click(wxCommandEvent& event)
 {
-    std::string originalName = pathInfo->name;
+    gd::String originalName = pathInfo->name;
     if(originalName == "")
     {
         wxMessageBox(_("Object's main path cannot be renamed"), _("Error"));
         return;
     }
 
-    std::string newName = ToString(wxGetTextFromUser(_("New path name:"), _("Rename a path"), originalName));
+    gd::String newName = wxGetTextFromUser(_("New path name:"), _("Rename a path"), originalName);
 
     if(PathExists(newName) && newName != originalName)
     {
@@ -520,7 +520,7 @@ void PathAutomatismEditor::OnBitmapButton5Click(wxCommandEvent& event)
         return;
     }
 
-    replace_key< std::map<std::string, PathInfo> >(paths, originalName, newName);
+    replace_key< std::map<gd::String, PathInfo> >(paths, originalName, newName);
     paths.at(newName).name = newName;
 
     UpdateComboBoxWithPathsName();
@@ -538,7 +538,7 @@ void PathAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     automatism.DeleteAllPaths();
     sharedDatas->globalPaths.clear();
 
-    for(std::map<std::string, PathInfo>::iterator it = paths.begin(); it != paths.end(); it++)
+    for(std::map<gd::String, PathInfo>::iterator it = paths.begin(); it != paths.end(); it++)
     {
         if(!it->second.isGlobal)
         {
@@ -777,7 +777,7 @@ void PathAutomatismEditor::OnpreviewPnlRightUp(wxMouseEvent& event)
 
             if(menuSelection == coordsBtID)
             {
-                wxMessageBox(_("Point position:") + gd::String::FromDouble(path->at(selectedPoint).x) + GD_U8(";") + gd::String::FromDouble(path->at(selectedPoint).y));
+                wxMessageBox(_("Point position:") + gd::String::FromDouble(path->at(selectedPoint).x) + ";" + gd::String::FromDouble(path->at(selectedPoint).y));
             }
             else if(menuSelection == positionBtID)
             {
@@ -838,7 +838,7 @@ void PathAutomatismEditor::OnBitmapButton6Click1(wxCommandEvent& event)
 }
 
 
-bool PathAutomatismEditor::PathExists(const std::string &name)
+bool PathAutomatismEditor::PathExists(const gd::String &name)
 {
     return (paths.count(name) != 0);
 }
@@ -962,9 +962,9 @@ void PathAutomatismEditor::OnglobalCheckClick(wxCommandEvent& event)
     ChangePathOfPreview(pathInfo->name);
 }
 
-std::string PathAutomatismEditor::GetNameWithoutPrefix(std::string name)
+gd::String PathAutomatismEditor::GetNameWithoutPrefix(gd::String name)
 {
-    std::string result;
+    gd::String result;
 
     if(name.substr(0, 8) != "global: ")
     {
@@ -972,8 +972,9 @@ std::string PathAutomatismEditor::GetNameWithoutPrefix(std::string name)
     }
     else
     {
-        result.resize(name.size() - 8);
-        std::copy(name.begin() + 8, name.end(), result.begin());
+        gd::String::iterator namePlusEightIt = name.begin();
+        std::advance(namePlusEightIt, 8);
+        std::copy(namePlusEightIt, name.end(), std::back_inserter(result));
 
         return result;
     }
@@ -1026,4 +1027,3 @@ void PathAutomatismEditor::OnpreviewPnlEraseBackground(wxEraseEvent& event)
 }
 
 #endif
-

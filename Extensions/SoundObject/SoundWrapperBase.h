@@ -20,7 +20,7 @@ class SoundWrapperBase
         SoundWrapperBase();
         virtual ~SoundWrapperBase();
 
-        bool LoadFromFile(const std::string &filename, const RuntimeScene &scene);
+        bool LoadFromFile(const gd::String &filename, const RuntimeScene &scene);
 
         virtual void Play() = 0;
         virtual bool IsPlaying() const = 0;
@@ -49,16 +49,16 @@ class SoundWrapperBase
         virtual void SetPitch(float pitch) = 0;
         virtual float GetPitch() const = 0;
 
-        virtual std::string GetType() const = 0;
+        virtual gd::String GetType() const = 0;
 
-        std::string GetFileName() const {return m_filename;}
-        void SetFileName(const std::string &filename) {m_filename = filename;}
+        gd::String GetFileName() const {return m_filename;}
+        void SetFileName(const gd::String &filename) {m_filename = filename;}
 
 
     protected:
-        virtual bool LoadFromFileImpl(const std::string &filename, const RuntimeScene &scene) = 0;
+        virtual bool LoadFromFileImpl(const gd::String &filename, const RuntimeScene &scene) = 0;
 
-        std::string m_filename;
+        gd::String m_filename;
 
     private:
 };
@@ -96,10 +96,10 @@ class SoundWrapper : public SoundWrapperBase
         virtual void SetPitch(float pitch);
         virtual float GetPitch() const;
 
-        virtual std::string GetType() const {return "Sound";}
+        virtual gd::String GetType() const {return "Sound";}
 
     protected:
-        virtual bool LoadFromFileImpl(const std::string &filename, const RuntimeScene &scene);
+        virtual bool LoadFromFileImpl(const gd::String &filename, const RuntimeScene &scene);
 
     private:
         sf::Sound m_sound;
@@ -139,10 +139,10 @@ class MusicWrapper : public SoundWrapperBase
         virtual void SetPitch(float pitch);
         virtual float GetPitch() const;
 
-        virtual std::string GetType() const {return "Music";}
+        virtual gd::String GetType() const {return "Music";}
 
     protected:
-        virtual bool LoadFromFileImpl(const std::string &filename, const RuntimeScene &scene);
+        virtual bool LoadFromFileImpl(const gd::String &filename, const RuntimeScene &scene);
 
     private:
         sf::Music m_music;

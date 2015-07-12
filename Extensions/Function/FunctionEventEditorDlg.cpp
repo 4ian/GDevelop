@@ -133,8 +133,8 @@ FunctionEventEditorDlg::~FunctionEventEditorDlg()
 
 void FunctionEventEditorDlg::OnokBtClick(wxCommandEvent& event)
 {
-    eventEdited.SetObjectsPassedAsArgument(ToString(objectEdit->GetValue()));
-    eventEdited.SetName(ToString(nameEdit->GetValue()));
+    eventEdited.SetObjectsPassedAsArgument(objectEdit->GetValue());
+    eventEdited.SetName(nameEdit->GetValue());
 
     EndModal(1);
 }
@@ -155,4 +155,3 @@ void FunctionEventEditorDlg::OnobjectBtClick(wxCommandEvent& event)
 
 
 #endif
-

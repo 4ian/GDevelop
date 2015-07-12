@@ -12,6 +12,7 @@ This project is released under the MIT License.
 #include <vector>
 #include <map>
 #include <string>
+#include "GDCore/String.h"
 #include <SFML/System/Vector2.hpp>
 
 //(*Headers(PathAutomatismEditor)
@@ -40,7 +41,7 @@ class ScenePathDatas;
 ///Class storing datas about a path for the editor (only used by the editor, not by the runtime game).
 struct PathInfo
 {
-    std::string name; ///< Path's name
+    gd::String name; ///< Path's name
     std::vector<sf::Vector2f> path; ///< Path's points
     bool isGlobal; ///< Is this a global path ?
 };
@@ -171,10 +172,10 @@ class PathAutomatismEditor: public wxDialog
 		void UpdateContextMessage();
 		void UpdateComboBoxWithPathsName();
 
-		void ChangePathOfPreview(const std::string &name);
-		bool PathExists(const std::string &name);
+		void ChangePathOfPreview(const gd::String &name);
+		bool PathExists(const gd::String &name);
 
-		std::string GetNameWithoutPrefix(std::string name);
+		gd::String GetNameWithoutPrefix(gd::String name);
 
 		gd::Project & game;
         gd::Layout * scene;
@@ -183,8 +184,8 @@ class PathAutomatismEditor: public wxDialog
 
         PathInfo *pathInfo;
 		std::vector<sf::Vector2f> *path; ///< Pointer to the path edited, making it more easy and fast to be accessed
-		std::map<std::string, PathInfo> paths; ///< Contains all paths.
-		std::string currentPathName; ///< Contain the name of the current path
+		std::map<gd::String, PathInfo> paths; ///< Contains all paths.
+		gd::String currentPathName; ///< Contain the name of the current path
 
         //Contextual menu
 		wxMenuItem *coordsBt;
@@ -246,4 +247,3 @@ void replace_key(CONTAINER& container,
 
 #endif
 #endif
-

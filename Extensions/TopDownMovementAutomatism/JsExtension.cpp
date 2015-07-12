@@ -30,9 +30,9 @@ public:
         GetAutomatismMetadata("TopDownMovementAutomatism::TopDownMovementAutomatism")
             .SetIncludeFile("TopDownMovementAutomatism/topdownmovementruntimeautomatism.js");
 
-        std::map<std::string, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("TopDownMovementAutomatism::TopDownMovementAutomatism");
-        std::map<std::string, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("TopDownMovementAutomatism::TopDownMovementAutomatism");
-        std::map<std::string, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("TopDownMovementAutomatism::TopDownMovementAutomatism");
+        std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("TopDownMovementAutomatism::TopDownMovementAutomatism");
+        std::map<gd::String, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("TopDownMovementAutomatism::TopDownMovementAutomatism");
+        std::map<gd::String, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("TopDownMovementAutomatism::TopDownMovementAutomatism");
 
         autConditions["TopDownMovementAutomatism::IsMoving"].SetFunctionName("isMoving");
 

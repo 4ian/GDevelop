@@ -9,6 +9,7 @@ This project is released under the MIT License.
 #define RECEIVEDDATAMANAGER_H
 #include <map>
 #include <string>
+#include "GDCpp/String.h"
 
 /**
  * Singleton where is stocked receveid data from other peers.
@@ -36,8 +37,8 @@ class GD_EXTENSION_API ReceivedDataManager
         }
     }
 
-    std::map<std::string, double> values;
-    std::map<std::string, std::string> strings;
+    std::map<gd::String, double> values;
+    std::map<gd::String, gd::String> strings;
 
     protected:
     private:
@@ -49,4 +50,3 @@ class GD_EXTENSION_API ReceivedDataManager
 };
 
 #endif // RECEIVEDDATAMANAGER_H
-

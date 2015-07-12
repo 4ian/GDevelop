@@ -30,7 +30,7 @@ class GD_EXTENSION_API PanelSpriteObject : public gd::Object
 {
 public :
 
-    PanelSpriteObject(std::string name_);
+    PanelSpriteObject(gd::String name_);
     virtual ~PanelSpriteObject();
     virtual gd::Object * Clone() const { return new PanelSpriteObject(*this);}
 
@@ -64,7 +64,7 @@ public :
     bool IsSmooth() const { return smooth; };
     void SetSmooth(bool enable) { smooth = enable; };
 
-    std::string textureName;
+    gd::String textureName;
 
 private:
 
@@ -117,13 +117,13 @@ public :
     float GetBottomMargin() const { return bottomMargin; };
     void SetBottomMargin(float newMargin) { bottomMargin = newMargin; };
 
-    void ChangeAndReloadImage(const std::string &texture, const RuntimeScene &scene);
+    void ChangeAndReloadImage(const gd::String &texture, const RuntimeScene &scene);
 
-    std::string textureName;
+    gd::String textureName;
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
@@ -144,7 +144,7 @@ private:
 };
 
 RuntimeObject * CreateRuntimePanelSpriteObject(RuntimeScene & scene, const gd::Object & object);
-gd::Object * CreatePanelSpriteObject(std::string name);
+gd::Object * CreatePanelSpriteObject(gd::String name);
 
 #endif // TILEDSPRITEOBJECT_H
 

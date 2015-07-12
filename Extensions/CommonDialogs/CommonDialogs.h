@@ -8,7 +8,8 @@ This project is released under the MIT License.
 #ifndef COMMONDIALOGS_H_INCLUDED
 #define COMMONDIALOGS_H_INCLUDED
 
-#include <string>
+#include "GDCpp/String.h"
+
 class RuntimeScene;
 namespace gd { class Variable; }
 
@@ -17,13 +18,12 @@ namespace GDpriv
 namespace CommonDialogs
 {
 
-void ShowMessageBox( RuntimeScene & scene, const std::string & message, const std::string & title );
-void ShowOpenFile( RuntimeScene & scene, gd::Variable & variable, const std::string & title, std::string filters );
-void ShowYesNoMsgBox( RuntimeScene & scene, gd::Variable & variable, const std::string & message, const std::string & title );
-void ShowTextInput( RuntimeScene & scene, gd::Variable & variable, const std::string & message, const std::string & title );
+void ShowMessageBox( RuntimeScene & scene, const gd::String & message, const gd::String & title );
+void ShowOpenFile( RuntimeScene & scene, gd::Variable & variable, const gd::String & title, gd::String filters );
+void ShowYesNoMsgBox( RuntimeScene & scene, gd::Variable & variable, const gd::String & message, const gd::String & title );
+void ShowTextInput( RuntimeScene & scene, gd::Variable & variable, const gd::String & message, const gd::String & title );
 
 }
 }
 
 #endif // COMMONDIALOGS_H_INCLUDED
-

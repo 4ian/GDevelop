@@ -35,9 +35,9 @@ public:
 
         {
 
-            std::map<std::string, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PathfindingAutomatism::PathfindingAutomatism");
-            std::map<std::string, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PathfindingAutomatism::PathfindingAutomatism");
-            std::map<std::string, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PathfindingAutomatism::PathfindingAutomatism");
+            std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PathfindingAutomatism::PathfindingAutomatism");
+            std::map<gd::String, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PathfindingAutomatism::PathfindingAutomatism");
+            std::map<gd::String, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PathfindingAutomatism::PathfindingAutomatism");
 
             autConditions["PathfindingAutomatism::PathFound"].SetFunctionName("pathFound");
             autActions["PathfindingAutomatism::SetDestination"].SetFunctionName("moveTo");
@@ -90,9 +90,9 @@ public:
             .AddIncludeFile("PathfindingAutomatism/pathfindingobstacleruntimeautomatism.js");
 
         {
-            std::map<std::string, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PathfindingAutomatism::PathfindingObstacleAutomatism");
-            std::map<std::string, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PathfindingAutomatism::PathfindingObstacleAutomatism");
-            std::map<std::string, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PathfindingAutomatism::PathfindingObstacleAutomatism");
+            std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForAutomatism("PathfindingAutomatism::PathfindingObstacleAutomatism");
+            std::map<gd::String, gd::InstructionMetadata > & autConditions = GetAllConditionsForAutomatism("PathfindingAutomatism::PathfindingObstacleAutomatism");
+            std::map<gd::String, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForAutomatism("PathfindingAutomatism::PathfindingObstacleAutomatism");
 
             autActions["PathfindingObstacleAutomatism::Cost"].SetFunctionName("setCost").SetGetter("getCost");
             autConditions["PathfindingObstacleAutomatism::Cost"].SetFunctionName("getCost");

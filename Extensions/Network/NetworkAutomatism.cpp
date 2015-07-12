@@ -51,11 +51,11 @@ void NetworkAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     if ( !sending )
     {
-        if ( xPosition ) object->SetX(ReceivedDataManager::Get()->values[dataPrefix+ToString(objectNetworkId)+"/X"]);
-        if ( yPosition ) object->SetY(ReceivedDataManager::Get()->values[dataPrefix+ToString(objectNetworkId)+"/Y"]);
-        if ( angle ) object->SetAngle(ReceivedDataManager::Get()->values[dataPrefix+ToString(objectNetworkId)+"/Angle"]);
-        if ( width ) object->SetWidth(ReceivedDataManager::Get()->values[dataPrefix+ToString(objectNetworkId)+"/Width"]);
-        if ( height ) object->SetHeight(ReceivedDataManager::Get()->values[dataPrefix+ToString(objectNetworkId)+"/Height"]);
+        if ( xPosition ) object->SetX(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/X"]);
+        if ( yPosition ) object->SetY(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Y"]);
+        if ( angle ) object->SetAngle(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Angle"]);
+        if ( width ) object->SetWidth(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Width"]);
+        if ( height ) object->SetHeight(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Height"]);
     }
 }
 
@@ -70,7 +70,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+ToString(objectNetworkId)+"/X"
+                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/X"
                 << static_cast<double>(object->GetX());
 
         NetworkManager::Get()->Send(packet);
@@ -79,7 +79,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+ToString(objectNetworkId)+"/Y"
+                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Y"
                 << static_cast<double>(object->GetY());
 
         NetworkManager::Get()->Send(packet);
@@ -88,7 +88,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+ToString(objectNetworkId)+"/Angle"
+                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Angle"
                 << static_cast<double>(object->GetAngle());
 
         NetworkManager::Get()->Send(packet);
@@ -97,7 +97,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+ToString(objectNetworkId)+"/Width"
+                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Width"
                 << static_cast<double>(object->GetWidth());
 
         NetworkManager::Get()->Send(packet);
@@ -106,7 +106,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+ToString(objectNetworkId)+"/Height"
+                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Height"
                 << static_cast<double>(object->GetHeight());
 
         NetworkManager::Get()->Send(packet);
@@ -116,10 +116,10 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
 /**
  * Generate an object network identifier, unique for each object.
  */
-void NetworkAutomatism::GenerateObjectNetworkIdentifier( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, const std::string & automatismName)
+void NetworkAutomatism::GenerateObjectNetworkIdentifier( std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists1, const gd::String & automatismName)
 {
     std::vector<RuntimeObject*> objects1;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    for (std::map <gd::String, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -160,4 +160,3 @@ void NetworkAutomatism::UnserializeFrom(const gd::SerializerElement & element)
     height = element.GetBoolAttribute("height");
     dataPrefix = element.GetStringAttribute("dataPrefix");
 }
-

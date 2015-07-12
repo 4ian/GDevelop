@@ -37,7 +37,7 @@ sf::Texture LightObject::edittimeIconImage;
 sf::Sprite LightObject::edittimeIcon;
 #endif
 
-LightObject::LightObject(std::string name_) :
+LightObject::LightObject(gd::String name_) :
     Object(name_),
     light(sf::Vector2f(0,0)/*(Useless)*/, 150, 128, 16, sf::Color(255,255,255)),
     globalLight(false),
@@ -227,19 +227,19 @@ void LightObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 #endif
 }
 
-void RuntimeLightObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeLightObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if ( propertyNb == 0 ) {name = _("Color");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
-    else if ( propertyNb == 1 ) {name = _("Intensity");       value = ToString(GetIntensity());}
-    else if ( propertyNb == 2 ) {name = _("Radius");       value = ToString(GetRadius());}
-    else if ( propertyNb == 2 ) {name = _("Quality");       value = ToString(GetQuality());}
+    if ( propertyNb == 0 ) {name = _("Color");       value = gd::String::FromInt(GetColor().r)+";"+gd::String::FromInt(GetColor().g)+";"+gd::String::FromInt(GetColor().b);}
+    else if ( propertyNb == 1 ) {name = _("Intensity");       value = gd::String::FromInt(GetIntensity());}
+    else if ( propertyNb == 2 ) {name = _("Radius");       value = gd::String::FromInt(GetRadius());}
+    else if ( propertyNb == 2 ) {name = _("Quality");       value = gd::String::FromInt(GetQuality());}
 }
 
-bool RuntimeLightObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeLightObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
     if ( propertyNb == 0 )
     {
-        string r, gb, g, b;
+        gd::String r, gb, g, b;
         {
             size_t separationPos = newValue.find(";");
 
@@ -260,11 +260,11 @@ bool RuntimeLightObject::ChangeProperty(unsigned int propertyNb, string newValue
             b = gb.substr(separationPos+1, gb.length());
         }
 
-        SetColor(sf::Color(ToInt(r), ToInt(g), ToInt(b)));
+        SetColor(sf::Color(r.ToInt(), g.ToInt(), b.ToInt()));
     }
-    else if ( propertyNb == 1 ) { SetIntensity(ToFloat(newValue)); }
-    else if ( propertyNb == 2 ) { SetRadius(ToFloat(newValue)); }
-    else if ( propertyNb == 3 ) { SetQuality(ToInt(newValue)); }
+    else if ( propertyNb == 1 ) { SetIntensity(newValue.ToFloat()); }
+    else if ( propertyNb == 2 ) { SetRadius(newValue.ToFloat()); }
+    else if ( propertyNb == 3 ) { SetQuality(newValue.ToInt()); }
 
     return true;
 }
@@ -280,22 +280,22 @@ void RuntimeLightObject::OnPositionChanged()
     light.SetPosition(sf::Vector2f(GetX(),GetY()));
 }
 
-void RuntimeLightObject::SetColor(const std::string & colorStr)
+void RuntimeLightObject::SetColor(const gd::String & colorStr)
 {
-    vector < string > colors = SplitString<string>(colorStr, ';');
+    vector < gd::String > colors = colorStr.Split(U';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
-    SetColor(sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]) ));
+    SetColor(sf::Color( colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt() ));
 }
 
-void RuntimeLightObject::SetGlobalColor(const std::string & colorStr)
+void RuntimeLightObject::SetGlobalColor(const gd::String & colorStr)
 {
-    vector < string > colors = SplitString<string>(colorStr, ';');
+    vector < gd::String > colors = colorStr.Split(U';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
-    SetGlobalColor(sf::Color( ToInt(colors[0]),ToInt(colors[1]),ToInt(colors[2]) ));
+    SetGlobalColor(sf::Color( colors[0].ToInt(),colors[1].ToInt(),colors[2].ToInt() ));
 }
 
 RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object & object)
@@ -303,9 +303,7 @@ RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object 
     return new RuntimeLightObject(scene, object);
 }
 
-gd::Object * CreateLightObject(std::string name)
+gd::Object * CreateLightObject(gd::String name)
 {
     return new LightObject(name);
 }
-
-

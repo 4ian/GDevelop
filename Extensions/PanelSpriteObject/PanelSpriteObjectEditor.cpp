@@ -231,7 +231,7 @@ void PanelSpriteObjectEditor::OncancelBtClick(wxCommandEvent& event)
  */
 void PanelSpriteObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-	object.textureName = ToString(frontTextureEdit->GetValue());
+	object.textureName = frontTextureEdit->GetValue();
 
 	object.SetWidth(ToInt(ToString(widthEdit->GetValue())));
 	object.SetHeight(ToInt(ToString(heightEdit->GetValue())));
@@ -271,4 +271,3 @@ void PanelSpriteObjectEditor::OnimageBankBtClick(wxCommandEvent& event)
 }
 
 #endif
-

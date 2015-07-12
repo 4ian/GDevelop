@@ -627,24 +627,24 @@ void PathfindingAutomatism::SerializeTo(gd::SerializerElement & element) const
     element.SetAttribute("extraBorder", extraBorder);
 }
 
-std::map<std::string, gd::PropertyDescriptor> PathfindingAutomatism::GetProperties(gd::Project & project) const
+std::map<gd::String, gd::PropertyDescriptor> PathfindingAutomatism::GetProperties(gd::Project & project) const
 {
-    std::map<std::string, gd::PropertyDescriptor> properties;
+    std::map<gd::String, gd::PropertyDescriptor> properties;
 
     properties[_("Allows diagonals")].SetValue(allowDiagonals ? "true" : "false").SetType("Boolean");
-    properties[_("Acceleration")].SetValue(ToString(acceleration));
-    properties[_("Max. speed")].SetValue(ToString(maxSpeed));
-    properties[_("Rotate speed")].SetValue(ToString(angularMaxSpeed));
+    properties[_("Acceleration")].SetValue(gd::String::FromFloat(acceleration));
+    properties[_("Max. speed")].SetValue(gd::String::FromFloat(maxSpeed));
+    properties[_("Rotate speed")].SetValue(gd::String::FromFloat(angularMaxSpeed));
     properties[_("Rotate object")].SetValue(rotateObject ? "true" : "false").SetType("Boolean");
-    properties[_("Angle offset")].SetValue(ToString(angleOffset));
-    properties[_("Virtual cell width")].SetValue(ToString(cellWidth));
-    properties[_("Virtual cell height")].SetValue(ToString(cellHeight));
-    properties[_("Extra border size")].SetValue(ToString(extraBorder));
+    properties[_("Angle offset")].SetValue(gd::String::FromFloat(angleOffset));
+    properties[_("Virtual cell width")].SetValue(gd::String::FromFloat(cellWidth));
+    properties[_("Virtual cell height")].SetValue(gd::String::FromFloat(cellHeight));
+    properties[_("Extra border size")].SetValue(gd::String::FromFloat(extraBorder));
 
     return properties;
 }
 
-bool PathfindingAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
+bool PathfindingAutomatism::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
     if ( name == _("Allows diagonals") ) {
         allowDiagonals = (value != "0");
@@ -655,24 +655,24 @@ bool PathfindingAutomatism::UpdateProperty(const std::string & name, const std::
         return true;
     }
     if ( name == _("Extra border size") ) {
-        extraBorder = ToDouble(value);
+        extraBorder = value.ToFloat();
         return true;
     }
 
-    if ( ToDouble(value) < 0 ) return false;
+    if ( value.ToFloat() < 0 ) return false;
 
     if ( name == _("Acceleration") )
-        acceleration = ToDouble(value);
+        acceleration = value.ToFloat();
     else if ( name == _("Max. speed") )
-        maxSpeed = ToDouble(value);
+        maxSpeed = value.ToFloat();
     else if ( name == _("Rotate speed") )
-        angularMaxSpeed = ToDouble(value);
+        angularMaxSpeed = value.ToFloat();
     else if ( name == _("Angle offset") )
-        angleOffset = ToDouble(value);
+        angleOffset = value.ToFloat();
     else if ( name == _("Virtual cell width") )
-        cellWidth = ToInt(value);
+        cellWidth = value.ToUInt();
     else if ( name == _("Virtual cell height") )
-        cellHeight = ToInt(value);
+        cellHeight = value.ToUInt();
     else
         return false;
 

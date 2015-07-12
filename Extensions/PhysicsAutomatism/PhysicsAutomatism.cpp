@@ -543,13 +543,13 @@ double PhysicsAutomatism::GetAngularDamping( const RuntimeScene & scene)
 /**
  * Test if there is a contact with another object
  */
-bool PhysicsAutomatism::CollisionWith( std::map <std::string, std::vector<RuntimeObject*> *> otherObjectsLists, RuntimeScene & scene)
+bool PhysicsAutomatism::CollisionWith( std::map <gd::String, std::vector<RuntimeObject*> *> otherObjectsLists, RuntimeScene & scene)
 {
     if ( !body ) CreateBody(scene);
 
     //Getting a list of all objects which are tested
     std::vector<RuntimeObject*> objects;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = otherObjectsLists.begin();it!=otherObjectsLists.end();++it)
+    for (std::map <gd::String, std::vector<RuntimeObject*> *>::const_iterator it = otherObjectsLists.begin();it!=otherObjectsLists.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -679,7 +679,7 @@ void PhysicsAutomatism::UnserializeFrom(const gd::SerializerElement & element)
     linearDamping = element.GetDoubleAttribute("linearDamping");
     angularDamping = element.GetDoubleAttribute("angularDamping");
 
-    std::string shape = element.GetStringAttribute("shapeType");
+    gd::String shape = element.GetStringAttribute("shapeType");
     if ( shape == "Circle" )
         shapeType = Circle;
     else if (shape == "CustomPolygon")
@@ -696,42 +696,43 @@ void PhysicsAutomatism::UnserializeFrom(const gd::SerializerElement & element)
     polygonWidth = element.GetDoubleAttribute("polygonWidth");
     polygonHeight = element.GetDoubleAttribute("polygonHeight");
 
-    std::string coordsStr = element.GetStringAttribute("coordsList");
+    gd::String coordsStr = element.GetStringAttribute("coordsList");
     SetPolygonCoords(PhysicsAutomatism::GetCoordsVectorFromString(coordsStr, '/', ';'));
 }
 
 
-std::string PhysicsAutomatism::GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char coordsSep, char composantSep)
+gd::String PhysicsAutomatism::GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char32_t coordsSep, char32_t composantSep)
 {
-    std::string coordsStr;
+    gd::String coordsStr;
 
 	for (unsigned int a = 0; a < vec.size(); a++)
 	{
-	    coordsStr += ToString<float>(vec.at(a).x) + composantSep + ToString<float>(vec.at(a).y);
+	    coordsStr += gd::String::FromFloat(vec.at(a).x);
+        coordsStr.push_back(composantSep);
+        coordsStr += gd::String::FromFloat(vec.at(a).y);
 	    if(a != vec.size() - 1)
-            coordsStr += coordsSep;
+            coordsStr.push_back(coordsSep);
 	}
 
 	return coordsStr;
 }
 
-std::vector<sf::Vector2f> PhysicsAutomatism::GetCoordsVectorFromString(const std::string &str, char coordsSep, char composantSep)
+std::vector<sf::Vector2f> PhysicsAutomatism::GetCoordsVectorFromString(const gd::String &str, char32_t coordsSep, char32_t composantSep)
 {
     std::vector<sf::Vector2f> coordsVec;
 
-    std::vector<std::string> coordsDecomposed = SplitString<std::string>(str, coordsSep);
+    std::vector<gd::String> coordsDecomposed = str.Split(coordsSep);
 
     for(unsigned int a = 0; a < coordsDecomposed.size(); a++)
     {
-        std::vector<std::string> coordXY = SplitString<std::string>(coordsDecomposed.at(a), composantSep);
+        std::vector<gd::String> coordXY = coordsDecomposed.at(a).Split(composantSep);
 
         if(coordXY.size() != 2)
             continue;
 
-        sf::Vector2f newCoord(ToFloat<std::string>(coordXY.at(0)), ToFloat<std::string>(coordXY.at(1)));
+        sf::Vector2f newCoord(coordXY.at(0).ToFloat(), coordXY.at(1).ToFloat());
         coordsVec.push_back(newCoord);
     }
 
     return coordsVec;
 }
-

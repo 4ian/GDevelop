@@ -243,7 +243,7 @@ CustomPolygonDialog::~CustomPolygonDialog()
 void CustomPolygonDialog::OnokBtClick(wxCommandEvent& event)
 {
     coordsVec.clear();
-    coordsVec = PhysicsAutomatism::GetCoordsVectorFromString(ToString(pointsEdit->GetValue()));
+    coordsVec = PhysicsAutomatism::GetCoordsVectorFromString(pointsEdit->GetValue());
 
     positioning = OnOriginRadioBt->GetValue() ? 0 : 2;
 
@@ -278,7 +278,7 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
 
     //Draw Collision Polygon
 
-    std::vector<sf::Vector2f> coordsVec = PhysicsAutomatism::GetCoordsVectorFromString(ToString(pointsEdit->GetValue()));
+    std::vector<sf::Vector2f> coordsVec = PhysicsAutomatism::GetCoordsVectorFromString(pointsEdit->GetValue());
     if ( coordsVec.empty() ) return; //Bail out now if no point to draw
 
     //Constructing the wxWidgets polygon.
@@ -354,9 +354,9 @@ void CustomPolygonDialog::OnpreviewPnlMouseMove(wxMouseEvent& event)
 
     wxSize panelSize = previewPnl->GetSize();
     cursorPosTxt->SetLabel(_("Cursor position:")+" "
-                           +ToString(event.GetPosition().x+xOffset)
+                           +gd::String::FromFloat(event.GetPosition().x+xOffset)
                            +";"
-                           +ToString(event.GetPosition().y+yOffset));
+                           +gd::String::FromFloat(event.GetPosition().y+yOffset));
 }
 
 
@@ -414,7 +414,7 @@ void CustomPolygonDialog::UpdateObjectInitialSizeRelatedControls()
     polygonWidthTextCtrl->Enable(autoResizingCheckBox->GetValue());
 }
 
-//Décalage
+//Dï¿½calage
 void CustomPolygonDialog::OnButton1Click(wxCommandEvent& event)
 {
     wxString xOffsetStr = wxGetTextFromUser(_("X offset"), _("Move..."), "0", this);
@@ -433,7 +433,7 @@ void CustomPolygonDialog::OnButton1Click(wxCommandEvent& event)
     else
         yOffset = ToFloat(ToString(yOffsetStr));
 
-    std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(std::string(pointsEdit->GetValue().mb_str()));
+    std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(pointsEdit->GetValue());
     for(unsigned int a = 0; a < pointList.size(); a++)
     {
         pointList.at(a).x += xOffset;
@@ -461,14 +461,14 @@ void CustomPolygonDialog::OnButton2Click(wxCommandEvent& event)
     else
         yScale = ToFloat(ToString(yScaleStr));
 
-    std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(std::string(pointsEdit->GetValue().mb_str()));
+    std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(pointsEdit->GetValue());
     for(unsigned int a = 0; a < pointList.size(); a++)
     {
         pointList.at(a).x *= xScale;
         pointList.at(a).y *= yScale;
     }
 
-    pointsEdit->SetValue(wxString(PhysicsAutomatism::GetStringFromCoordsVector(pointList)));
+    pointsEdit->SetValue(PhysicsAutomatism::GetStringFromCoordsVector(pointList));
 }
 
 void CustomPolygonDialog::OnButton3Click(wxCommandEvent& event)
@@ -481,10 +481,10 @@ void CustomPolygonDialog::OnButton3Click(wxCommandEvent& event)
         return;
 
     float angleRad = -ToFloat(ToString(angleStr)) * M_PI/180;
-    sf::Vector2f origin(ToFloat(SplitString<std::string>(ToString(originStr), ';').at(0)),
-                        ToFloat(SplitString<std::string>(ToString(originStr), ';').at(1)));
+    sf::Vector2f origin(gd::String::FromWxString(originStr).Split(U';').at(0).ToFloat(),
+                        gd::String::FromWxString(originStr).Split(U';').at(1).ToFloat());
 
-    std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(std::string(pointsEdit->GetValue().mb_str()));
+    std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(pointsEdit->GetValue());
     for(unsigned int a = 0; a < pointList.size(); a++)
     {
         sf::Vector2f pointProjOnOrigin(pointList.at(a).x - origin.x,
@@ -495,7 +495,7 @@ void CustomPolygonDialog::OnButton3Click(wxCommandEvent& event)
 
     }
 
-    pointsEdit->SetValue(wxString(PhysicsAutomatism::GetStringFromCoordsVector(pointList)));
+    pointsEdit->SetValue(PhysicsAutomatism::GetStringFromCoordsVector(pointList));
 }
 
 void CustomPolygonDialog::OnButton4Click(wxCommandEvent& event)
@@ -505,14 +505,14 @@ void CustomPolygonDialog::OnButton4Click(wxCommandEvent& event)
     if(precision == -1)
         return;
 
-    std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(std::string(pointsEdit->GetValue().mb_str()));
+    std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(pointsEdit->GetValue());
     for(unsigned int a = 0; a < pointList.size(); a++)
     {
         pointList.at(a).x = round(pointList.at(a).x * pow(10, precision)) / pow(10, precision);
         pointList.at(a).y = round(pointList.at(a).y * pow(10, precision)) / pow(10, precision);
     }
 
-    pointsEdit->SetValue(wxString(PhysicsAutomatism::GetStringFromCoordsVector(pointList)));
+    pointsEdit->SetValue(PhysicsAutomatism::GetStringFromCoordsVector(pointList));
 }
 
 #endif

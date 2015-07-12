@@ -999,7 +999,7 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     else if ( angleMutableCheck->GetValue() ) object.SetAngleParameterType(ParticleEmitterObject::Mutable);
     else object.SetAngleParameterType(ParticleEmitterObject::Nothing);
 
-    object.SetParticleTexture(string(textureEdit->GetValue().mb_str()));
+    object.SetParticleTexture(textureEdit->GetValue());
 
     //Save last used pages
     object.emissionEditionSimpleMode = false;
@@ -1208,4 +1208,3 @@ void ParticleEmitterObjectEditor::OnsizeMutableCheckSelect(wxCommandEvent& event
 }
 
 #endif
-

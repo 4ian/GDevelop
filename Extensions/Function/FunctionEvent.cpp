@@ -153,7 +153,7 @@ gd::BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, g
     return ChangesMade;
 }
 
-const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const std::string & functionName)
+const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const gd::String & functionName)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
@@ -181,7 +181,7 @@ const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::Project 
     return NULL;
 }
 
-std::string FunctionEvent::MangleFunctionName(const gd::Layout & layout, const FunctionEvent & functionEvent)
+gd::String FunctionEvent::MangleFunctionName(const gd::Layout & layout, const FunctionEvent & functionEvent)
 {
     //To generate a "unique" name for the function, the name is mangled and suffixed with the
     //pointer to the (original) event of the function.

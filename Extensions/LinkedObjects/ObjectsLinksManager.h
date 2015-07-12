@@ -62,4 +62,3 @@ private:
 }
 
 #endif // OBJECTSLINKSMANAGER_H
-

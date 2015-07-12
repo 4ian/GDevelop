@@ -97,26 +97,26 @@ void PathfindingObstacleAutomatism::SerializeTo(gd::SerializerElement & element)
     element.SetAttribute("cost", cost);
 }
 
-std::map<std::string, gd::PropertyDescriptor> PathfindingObstacleAutomatism::GetProperties(gd::Project & project) const
+std::map<gd::String, gd::PropertyDescriptor> PathfindingObstacleAutomatism::GetProperties(gd::Project & project) const
 {
-    std::map<std::string, gd::PropertyDescriptor> properties;
+    std::map<gd::String, gd::PropertyDescriptor> properties;
     properties[_("Impassable obstacle")].SetValue(impassable ? "true" : "false").SetType("Boolean");
-    properties[_("Cost (if not impassable)")].SetValue(ToString(cost));
+    properties[_("Cost (if not impassable)")].SetValue(gd::String::FromFloat(cost));
 
     return properties;
 }
 
-bool PathfindingObstacleAutomatism::UpdateProperty(const std::string & name, const std::string & value, gd::Project & project)
+bool PathfindingObstacleAutomatism::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
     if ( name == _("Impassable obstacle") ) {
         impassable = (value != "0");
         return true;
     }
 
-    if ( ToDouble(value) < 0 ) return false;
+    if ( value.ToFloat() < 0 ) return false;
 
     if ( name == _("Cost (if not impassable)") )
-        cost = ToDouble(value);
+        cost = value.ToFloat();
     else
         return false;
 

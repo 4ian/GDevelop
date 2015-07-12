@@ -14,7 +14,7 @@ void ScenePathDatas::SerializeTo(gd::SerializerElement & element) const
 {
     gd::SerializerElement & pathsElement = element.AddChild("paths");
     pathsElement.ConsiderAsArrayOf("path");
-    for(std::map<std::string, std::vector<sf::Vector2f> >::const_iterator it = globalPaths.begin(); it != globalPaths.end(); it++)
+    for(std::map<gd::String, std::vector<sf::Vector2f> >::const_iterator it = globalPaths.begin(); it != globalPaths.end(); it++)
     {
         gd::SerializerElement & pathElement = pathsElement.AddChild("path");
 

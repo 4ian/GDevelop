@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-09 03:02-0400\n"
+"PO-Revision-Date: 2015-07-12 04:35-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -123,7 +123,7 @@ msgstr " (Sauvegarde non trouvée !)"
 
 #: ../IDE/BugReport.cpp:192
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd"
-msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/knownbugs/gd"
+msgstr "http://www.wiki.compilgames.net/doku.php/fr/gdevelop/knownbugs/gd"
 
 #: ../IDE/BugReport.cpp:256
 msgid "Thanks for reporting the error!"
@@ -431,7 +431,7 @@ msgstr "Avancé"
 #: ../IDE/GeneratePassword.cpp:157 ../IDE/SigneModification.cpp:79
 #: ../IDE/SigneTest.cpp:86 ../IDE/TrueOrFalse.cpp:100
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/parameters"
-msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manual/events_editor/parameters"
+msgstr "http://www.wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/events_editor/parameters"
 
 #: ../IDE/ChoiceJoyAxis.cpp:51
 msgid "Choose joystick's axis"
@@ -1182,7 +1182,7 @@ msgstr "Ouvrir l'aide en ligne"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:418
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_object"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_object"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:618
 msgid "Unable to rename the object : \n"
@@ -1488,7 +1488,7 @@ msgstr " est déjà dans ce groupe."
 
 #: ../IDE/EditObjectGroup.cpp:235
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_group"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_group"
 
 #: ../IDE/EditorScene.cpp:73
 msgid "Edit the layout of the scene"
@@ -1597,7 +1597,7 @@ msgstr "500"
 
 #: ../IDE/EditPropScene.cpp:233
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_projman"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_projman"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_projman"
 
 #: ../IDE/EventsEditor.cpp:172 ../IDE/EventsEditor.cpp:174
 #: ../IDE/EventsEditor.cpp:423
@@ -1784,7 +1784,7 @@ msgstr "Impossible de créer un évènement commentaire."
 
 #: ../IDE/EventsEditor.cpp:1608
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_event"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_event"
 
 #: ../IDE/EventsEditor.cpp:1652
 msgid "Profiling is not activated. Activate profiling thanks to the Profiling window when previewing a scene."
@@ -2801,23 +2801,11 @@ msgstr "L'instruction contient une ou plusieurs erreurs."
 
 #: ../IDE/InstructionSelectorDialog.cpp:523
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action"
-msgstr "This window is shown when you're adding or editing an action.\n"
-"\n"
-"Choose an action\n"
-"\n"
-"Choose the action in the list on the left hand side of the window.\n"
-"Actions are sorted in categories.\n"
-"\n"
-"Set up the parameters\n"
-"\n"
-"When an action is chosen, its name and a description are displayed on the right, along with the parameters that must be completed for using the action.\n"
-"For each parameter, you can click on the button at the right of the parameter field so as to open an editor. For example, if the parameter is an expression, the button will open an expression editor.\n"
-"\n"
-"You can find a list of some paramaters here."
+msgstr "http://www.wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/events_editor/action"
 
 #: ../IDE/InstructionSelectorDialog.cpp:524
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"
-msgstr "This window is shown when you're adding or editing an action."
+msgstr "http://www.wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/events_editor/condition"
 
 #: ../IDE/MainFrame.cpp:167 ../IDE/MainFrame.cpp:190
 #: ../IDE/MainFrame_Files.cpp:135
@@ -3118,11 +3106,11 @@ msgstr "Le projet n'a pas pû être sauvegardé !"
 
 #: ../IDE/MainFrame_Help.cpp:20 ../IDE/ProjectManager.cpp:1978
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation"
 
 #: ../IDE/MainFrame_Help.cpp:28
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials/beginnertutorial"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/tutoriels"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/tutoriels"
 
 #: ../IDE/MAJ.cpp:71
 msgid "Your version :"
@@ -3217,7 +3205,7 @@ msgstr "Impossible de se connecter au serveur de vérification des mises à jour
 
 #: ../IDE/MAJ.cpp:266
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/update"
-msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manual/update"
+msgstr "http://www.wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/update"
 
 #: ../IDE/mp3ogg.cpp:54
 msgid "Convert MP3 to OGG Vorbis"
@@ -3695,7 +3683,7 @@ msgstr "GDevelop doit être relancé pour prendre en compte certaines modificati
 
 #: ../IDE/Preferences.cpp:1506
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation"
 
 #: ../IDE/Preferences.cpp:1511
 msgid "Choose a temporary folder for deployment"
@@ -4095,7 +4083,7 @@ msgstr "%i résultats."
 
 #: ../IDE/SearchEvents.cpp:347
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event_find"
-msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_event_find"
+msgstr "http://www.wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_event_find"
 
 #: ../IDE/SigneModification.cpp:30
 msgid "Choose the modification's sign"
@@ -4919,7 +4907,7 @@ msgstr "Impossible de créer le répertoire où le jeu doit être compilé.\n"
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:261
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/distribution/compilation"
-msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manual/distribution/compilation"
+msgstr "http://www.wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/distribution/compilation"
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:266
 msgid "Choose a folder, empty if possible, where create your game."
@@ -5703,7 +5691,7 @@ msgstr "Mettre ces objets dans la variable 'objects' :"
 
 #: ../GDJS/GDJS//Dialogs/IntelXDKPackageDialog.cpp:13
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtouseintelxdk"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/tutoriels/utiliserintelxdk"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/tutoriels/utiliserintelxdk"
 
 #: ../GDJS/GDJS//Dialogs/ProjectExportDialog.cpp:95
 msgid "The export folder is not empty"
@@ -16896,7 +16884,7 @@ msgstr "Glissez déposez les images depuis la banque d'images pour les ajouter �
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1810
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/built_sprite"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/built_sprite"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:25
 msgid "Animated object which can be used for most elements of a game"
@@ -18139,7 +18127,7 @@ msgstr "Activer l'extension"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:276
 msgid "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_object"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_object"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_object"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseLayerDialog.cpp:40
 msgid "Choose a layer "
@@ -18267,7 +18255,7 @@ msgstr "Nom de la nouvelle variable"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:393
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/global_variables"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/global_variables"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/global_variables"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:430
 msgid "These variables are used but not declared:\n"
@@ -18318,7 +18306,7 @@ msgstr "Couleur du texte"
 
 #: ../Core/GDCore/IDE/Dialogs/EditComment.cpp:150
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/comment_events"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/comment_events"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/comment_events"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:121
 msgid "Edit the expression"
@@ -18557,7 +18545,7 @@ msgstr "Paramètre"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:974
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_expr"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_expr"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_expr"
 
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:55
 msgid "Edit the \"For each object\" event"
@@ -18569,7 +18557,7 @@ msgstr "Répeter l'évènement pour chaque objet :"
 
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:131
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/foreach_events"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/foreach_events"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/foreach_events"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:76
 msgid "Modify the parameters of the layer"
@@ -18625,7 +18613,7 @@ msgstr "Impossible d'enlever l'unique camera du calque."
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:428
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/editors/scene_editor/edit_layer"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/editors/scene_editor/edit_layer"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:61
 msgid "Create a link to another scene"
@@ -18667,7 +18655,7 @@ msgstr "Pensez à mettre à jour les numéros des évènements du lien\n"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:151
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/link_events"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/link_events"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/link_events"
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:54
 msgid "Edit the \"Repeat\" event"
@@ -18679,7 +18667,7 @@ msgstr "Nombre de répétitions :"
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:130
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/repeat_events"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/repeat_events"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/repeat_events"
 
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:77
 msgid "Edit the text"
@@ -18691,7 +18679,7 @@ msgstr "L'expression est mal formulée. Êtes vous sûr de vouloir valider cette
 
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:622
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_text"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_text"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_text"
 
 #: ../Core/GDCore/IDE/Dialogs/EventStoreDialog.cpp:36
 msgid "Please choose a template in the list."
@@ -18794,7 +18782,7 @@ msgstr "La hauteur de la grille est incorrecte."
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:194
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:230
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/editors/scene_editor/edit_scene_edit"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:55
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:56
@@ -18902,7 +18890,7 @@ msgstr "Impossible de trouver le calque à supprimer !"
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:322
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/editors/scene_editor/edit_layer"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/editors/scene_editor/edit_layer"
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:347
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:372
@@ -18967,7 +18955,7 @@ msgstr "Supprimer la sélection\tDEL"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:232
 msgid "Add an automatism to the object"
-msgstr "Add an automatism to the object"
+msgstr "Ajouter un automatisme à l'objet"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:262
@@ -19094,7 +19082,7 @@ msgstr "Etes vous sur de vouloir supprimer l'historique d'annulation ?"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:761
 msgid "http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"
-msgstr "http://www.wiki.compilprojects.net/doku.php/project_develop/documentation/manual/edit_layout"
+msgstr "http://www.wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_layout"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.cpp:48
 msgid "Objects on the layer to delete"
@@ -19219,7 +19207,7 @@ msgstr "Accéder à la page des extensions non officielles du wiki"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:176
 msgid "http://compilgames.net/wiki/doku.php/game_develop/extensions"
-msgstr "http://compilgames.net/wiki/doku.php/game_develop/extensions"
+msgstr "http://compilgames.net/wiki/doku.php/fr/gdevelop/extensions"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:194
 msgid "Close and reopen scene editors so as to take in account newly added extensions."
@@ -19235,7 +19223,7 @@ msgstr "Ne plus utiliser cette plateforme"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:396
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/extensions"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/extensions"
+msgstr "http://wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/extensions"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:416
 msgid "Unable to remove this platform: The project must use at least one plaform."
@@ -19392,7 +19380,7 @@ msgstr "Ces images ne semblent plus être utilisée dans le projet :\n"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:989
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"
-msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_image"
+msgstr "http://www.wiki.compilgames.net/doku.php/fr/gdevelop/documentation/manual/edit_image"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1022
 msgid "Choose the program for editing this kind of resource"

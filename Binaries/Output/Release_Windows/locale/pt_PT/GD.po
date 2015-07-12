@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-09 03:03-0400\n"
+"PO-Revision-Date: 2015-07-12 04:35-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -10076,7 +10076,7 @@ msgstr "Este ângulo será adicionado para o ângulo do objeto que deve tomar qu
 
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:228
 msgid "Â°"
-msgstr "Â°"
+msgstr "Âº"
 
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:234
 msgid "Movement and speed"
@@ -16829,7 +16829,7 @@ msgstr "Digite a posição Y do vértice"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1581
 msgid "Enter the displacement offset on X axis."
-msgstr "Digite o deslocamento  no eixo X."
+msgstr "Digite o deslocamento no eixo X."
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1582
 msgid "Enter the displacement offset on Y axis."
@@ -18927,7 +18927,7 @@ msgstr "Apagar a seleção\tDEL"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:232
 msgid "Add an automatism to the object"
-msgstr "Add an automatism to the object"
+msgstr "Adicionar um automatismo para o objeto"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:262

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-09 03:02-0400\n"
+"PO-Revision-Date: 2015-07-12 04:35-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -8534,15 +8534,15 @@ msgstr "Ändert die Reibung die auf die Partikel angewendet wird."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:240
 msgid "Do _PARAM1__PARAM2_ to the friction of particles of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to the friction of particles of _PARAM0_"
+msgstr "Verwende _PARAM1__PARAM2_ für die Reibung der Partikel von _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:253
 msgid "Test friction applied to particles."
-msgstr "Test friction applied to particles."
+msgstr "Testen der auf Partikel angewendeten Reibung."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:254
 msgid "Particles' friction of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Particles' friction of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Die Reibung der Partikel von _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:265
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:279
@@ -8579,7 +8579,7 @@ msgstr "Ändert die minimale Partikel-Lebenszeit. Die Partikel müssen neu gebil
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:295
 msgid "Do _PARAM1__PARAM2_ to minimum lifetime of particles of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to minimum lifetime of particles of _PARAM0_"
+msgstr "Verwende _PARAM1__PARAM2_ für die minimale Lebenszeit der Partikel von _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:307
 msgid "Test minimum lifetime of particles."
@@ -8587,7 +8587,7 @@ msgstr "Test der minimalen Lebensdauer der Partikel."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:308
 msgid "Minimum lifetime of particles of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Minimum lifetime of particles of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Die minimale Lebenszeit der Partikel von _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:319
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:333
@@ -8598,12 +8598,12 @@ msgstr "Maximale Lebensdauer"
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:320
 msgid "Modify particles maximum lifetime.\n"
 "Particles have to be recreated in order to take changes in account."
-msgstr "Modify particles maximum lifetime.\n"
-"Particles have to be recreated in order to take changes in account."
+msgstr "Ändert die maximale Partikel-Lebenszeit.\n"
+"Die Partikel müssen neu gebildet werden, um Änderungen zu berücksichtigen."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:321
 msgid "Do _PARAM1__PARAM2_ to maximum lifetime of particles of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to maximum lifetime of particles of _PARAM0_"
+msgstr "Verwenden von _PARAM1__PARAM2_ für die maximale Lebenszeit der Partikel von _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:334
 msgid "Test maximum lifetime of particles."
@@ -8611,7 +8611,7 @@ msgstr "Test der maximalen Lebensdauer von Partikeln."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:335
 msgid "Maximum lifetime of particles of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Maximum lifetime of particles of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Die maximale Lebenszeit der Partikel von _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:347
 msgid "X Gravity"
@@ -8897,7 +8897,7 @@ msgstr "Größe, Parameter 1"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:203
 msgid "Modifyt parameter 1 of the size of particles"
-msgstr "Modifyt parameter 1 of the size of particles"
+msgstr "Ändert Parameter 1 der Partikelgröße"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:204
 msgid "Do _PARAM1__PARAM2_ to the parameter 1 of size of _PARAM0_"
@@ -8918,7 +8918,7 @@ msgstr "Größe, Parameter 2"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:229
 msgid "Modify parameter 2 of the size of particles"
-msgstr "Modify parameter 2 of the size of particles"
+msgstr "Ändert Parameter 2 der Partikelgröße"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:230
 msgid "Do _PARAM1__PARAM2_ to the parameter 2 of size of _PARAM0_"
@@ -8939,7 +8939,7 @@ msgstr "Winkel, Parameter 1"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:255
 msgid "Modify parameter 1 of the angle of particles"
-msgstr "Modify parameter 1 of the angle of particles"
+msgstr "Ändert Parameter 1 des Partikelwinkels"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:256
 msgid "Do _PARAM1__PARAM2_ to the parameter 1 of angle of _PARAM0_"
@@ -8960,7 +8960,7 @@ msgstr "Winkel, Parameter 2"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:281
 msgid "Modify parameter 2 of the angle of particles"
-msgstr "Modify parameter 2 of the angle of particles"
+msgstr "Ändert Parameter 2 des Partikelwinkels"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:282
 msgid "Do _PARAM1__PARAM2_ to the parameter 2 of angle of _PARAM0_"
@@ -8981,7 +8981,7 @@ msgstr "Transparenz, Parameter 1"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:307
 msgid "Modify parameter 1 of the transparency of particles"
-msgstr "Modify parameter 1 of the transparency of particles"
+msgstr "Ändert Parameter 1 der Partikeltransparenz"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:308
 msgid "Do _PARAM1__PARAM2_ to parameter 1 of the transparency of _PARAM0_"
@@ -9002,7 +9002,7 @@ msgstr "Transparenz, Parameter 2"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:333
 msgid "Modify parameter 2 of the transparency of particles"
-msgstr "Modify parameter 2 of the transparency of particles"
+msgstr "Ändert Parameter 2 der Partikeltransparenz"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:334
 msgid "Do _PARAM1__PARAM2_ to parameter 2 of the transparency of _PARAM0_"
@@ -9022,7 +9022,7 @@ msgstr "Keine weiteren Partikel"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:361
 msgid "Return true if the object does not emit particles anylonger, so as to destroy it for example."
-msgstr "Return true if the object does not emit particles anylonger, so as to destroy it for example."
+msgstr "Rückgabe von \"wahr\" (true), wenn das Objekt nicht weiter Partikel emittiert, also es z.B. zerstört ist."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:362
 msgid "_PARAM0_ does not emit anylonger."
@@ -9034,11 +9034,11 @@ msgstr "Neu Partikel"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:21
 msgid "Destroy and recreate particles, so as to take changes made to setup of the emitter in account."
-msgstr "Destroy and recreate particles, so as to take changes made to setup of the emitter in account."
+msgstr "Partikel zerstören und neu bilden, um Änderungen der Emitter-Einstellungen zu berücksichtigen."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:22
 msgid "Recreate particles of _PARAM0_"
-msgstr "Recreate particles of _PARAM0_"
+msgstr "Partikel von _PARAM0_ neu bilden"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:31
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:172
@@ -9048,8 +9048,8 @@ msgstr "Rendering des ersten Parameters"
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:32
 msgid "Modify first parameter of rendering ( Size/Length ).\n"
 "Particles have to be recreated in order to take changes in account."
-msgstr "Modify first parameter of rendering ( Size/Length ).\n"
-"Particles have to be recreated in order to take changes in account."
+msgstr "Ändert den ersten Rendering-Parameter (Größe/Länge).\n"
+"Partikel müssen neu gebildet werden, um Änderungen zu berücksichtigen."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:33
 msgid "Do _PARAM1__PARAM2_ to rendering 1st parameter of _PARAM0_"
@@ -9072,8 +9072,8 @@ msgstr "Rendering des zweiten Parameters"
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:58
 msgid "Modify the second parameter of rendering ( Size/Length ).\n"
 "Particles have to be recreated in order to take changes in account."
-msgstr "Modify the second parameter of rendering ( Size/Length ).\n"
-"Particles have to be recreated in order to take changes in account."
+msgstr "Ändert den zweiten Rendering-Parameter (Größe/Länge).\n"
+"Partikel müssen neu gebildet werden, um Änderungen zu berücksichtigen."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:59
 msgid "Do _PARAM1__PARAM2_ to rendering 2nd parameter of _PARAM0_"
@@ -9133,7 +9133,7 @@ msgstr "The flow of _PARAM0_ is _PARAM2_ _PARAM1_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:140
 msgid "Change the image of particles ( if displayed )."
-msgstr "Change the image of particles ( if displayed )."
+msgstr "Ändert das Partikel-Bild (wenn angezeigt)."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:141
 msgid "Change the image of particles of _PARAM0_ to _PARAM1_"
@@ -9149,7 +9149,7 @@ msgstr "Prüft den Namen des angezeigten Bildes durch Partikel."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:153
 msgid "Image displayed by particles of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Image displayed by particles of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Das Bild, welches von Partikeln von _PARAM0_ angezeigt wird ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:159
 #: ../Extensions//TextEntryObject/Extension.cpp:52

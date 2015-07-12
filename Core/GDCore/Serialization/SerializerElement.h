@@ -35,7 +35,7 @@ public:
 	 */
     void SetValue(const SerializerValue & value) { valueUndefined = false; elementValue = value; }
     void SetValue(bool val) { valueUndefined = false; elementValue.SetBool(val); }
-	void SetValue(const gd::String &val) { valueUndefined = false; elementValue.SetString(val); }
+		void SetValue(const gd::String &val) { valueUndefined = false; elementValue.SetString(val); }
     void SetValue(int val) { valueUndefined = false; elementValue.SetInt(val); }
     void SetValue(unsigned int val) { valueUndefined = false; elementValue.SetInt((int)val); }
     void SetValue(double val) { valueUndefined = false; elementValue.SetDouble(val); }

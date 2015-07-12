@@ -166,7 +166,7 @@ String String::FromFloat(float value)
     return str;
 }
 
-int String::ToFloat() const
+float String::ToFloat() const
 {
     return gd::ToFloat(m_string);
 }
@@ -178,7 +178,7 @@ String String::FromDouble(double value)
     return str;
 }
 
-int String::ToDouble() const
+double String::ToDouble() const
 {
     return gd::ToDouble(m_string);
 }

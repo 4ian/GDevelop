@@ -264,7 +264,7 @@ public:
     /**
      * \return the string converted to float.
      */
-    int ToFloat() const;
+    float ToFloat() const;
 
     /**
      * \return a String created from a double.
@@ -274,7 +274,7 @@ public:
     /**
      * \return the string converted to double.
      */
-    int ToDouble() const;
+    double ToDouble() const;
 
 /**
  * \}

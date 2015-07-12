@@ -238,7 +238,7 @@ public:
             name = _("List of recipients");
             const std::vector< std::pair<sf::IpAddress, short unsigned int> > & list = NetworkManager::Get()->GetRecipientsList();
             for (unsigned int i = 0;i<list.size();++i)
-                value += list[i].first.toString()+ToString(_(" Port: "))+ToString(list[i].second)+"; ";
+                value += gd::String::FromLocale(list[i].first.toString())+_(" Port: ")+gd::String::FromUInt(list[i].second)+"; ";
         }
     }
 

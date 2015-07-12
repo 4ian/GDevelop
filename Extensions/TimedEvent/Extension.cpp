@@ -78,7 +78,7 @@ public:
                 for (unsigned int i = 0;i<event.GetConditions().size();++i)
                 {
                     if (i!=0) ifPredicat += " && ";
-                    ifPredicat += "condition"+ToString(i)+"IsTrue";
+                    ifPredicat += "condition"+gd::String::FromUInt(i)+"IsTrue";
                 }
 
                 if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";

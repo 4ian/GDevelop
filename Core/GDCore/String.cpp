@@ -61,9 +61,9 @@ String& String::operator=(const sf::String &string)
 {
     m_string.clear();
 
-    //In theory, an UTF8 character can be up to 6 bytes (even if the current Unicode standard,
-    //the last character is 4 bytes long).
-    //So, reverse the maximum possible size to avoid reallocations.
+    //In theory, an UTF8 character can be up to 6 bytes (even if in the current Unicode standard,
+    //the last character is 4 bytes long when encoded in UTF8).
+    //So, reserve the maximum possible size to avoid reallocations.
     m_string.reserve( string.getSize() * 6 );
 
     //Push_back all characters inside the string.
@@ -81,9 +81,9 @@ String& String::operator=(const std::u32string &string)
 {
     m_string.clear();
 
-    //In theory, an UTF8 character can be up to 6 bytes (even if the current Unicode standard,
-    //the last character is 4 bytes long).
-    //So, reverse the maximum possible size to avoid reallocations.
+    //In theory, an UTF8 character can be up to 6 bytes (even if in the current Unicode standard,
+    //the last character is 4 bytes long when encoded in UTF8).
+    //So, reserve the maximum possible size to avoid reallocations.
     m_string.reserve( string.size() * 6 );
 
     //Push_back all characters inside the string.

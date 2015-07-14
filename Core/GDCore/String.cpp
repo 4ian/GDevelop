@@ -403,9 +403,7 @@ String::iterator String::erase( String::iterator first, String::iterator last )
 
 String::iterator String::erase( String::iterator p )
 {
-    iterator next = p;
-    ++next;
-    return erase( p, next );
+    return iterator( m_string.erase( p.base() ) );
 }
 
 void String::erase( String::size_type pos, String::size_type len )

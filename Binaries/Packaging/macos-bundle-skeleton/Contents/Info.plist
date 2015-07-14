@@ -7,7 +7,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>GDevelop</string>
 	<key>CFBundleExecutable</key>
-	<string>GDIDELauncher.sh</string>
+	<string>GDIDE_launcher</string>
 	<key>CFBundleIconFile</key>
 	<string>icon.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -23,7 +23,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>3</string>
+	<string>10</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.6</string>
 	<key>LSApplicationCategoryType</key>

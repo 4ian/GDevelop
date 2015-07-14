@@ -403,7 +403,9 @@ String::iterator String::erase( String::iterator first, String::iterator last )
 
 String::iterator String::erase( String::iterator p )
 {
-    return erase( p, ++p );
+    iterator next = p;
+    ++next;
+    return erase( p, next );
 }
 
 void String::erase( String::size_type pos, String::size_type len )
@@ -588,7 +590,8 @@ namespace priv
     String::size_type find_last_of( const String &str, const String &match,
         String::size_type endPos, bool not_of )
     {
-        String::size_type strSize = str.size(); //Temporary store the size to avoid a double call to size()
+        //Temporary store the size to avoid a double call to size()
+        String::size_type strSize = str.size();
 
         String::const_iterator it = str.end();
         if( endPos < strSize )

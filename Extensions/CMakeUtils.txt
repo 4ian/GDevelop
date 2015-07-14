@@ -21,12 +21,10 @@ endmacro()
 function(gd_add_extension_definitions target_name)
 
 	#Define used in GD to check the build type
-	IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+	IF(CMAKE_BUILD_TYPE MATCHES "Debug")
 		add_definitions( -DDEBUG )
-	ELSEIF (CMAKE_BUILD_TYPE} MATCHES "Release")
-		add_definitions( -DRELEASE )
 	ELSE()
-		add_definitions( -DDEV )
+		add_definitions( -DRELEASE )
 	ENDIF()
 
 	set(${target_name}_extra_definitions "${${target_name}_extra_definitions} GD_IDE_ONLY=1;" PARENT_SCOPE)

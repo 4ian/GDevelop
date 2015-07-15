@@ -711,7 +711,7 @@ bool Project::LoadFromFile(const gd::String & filename)
 {
     //Load the XML document structure
     TiXmlDocument doc;
-    if ( !doc.LoadFile(filename.ToLocale().c_str(), TIXML_ENCODING_UTF8) )
+    if ( !doc.LoadFile(filename.ToLocale().c_str()) )
     {
         gd::String errorTinyXmlDesc = doc.ErrorDesc();
         gd::String error = _( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
@@ -728,47 +728,74 @@ bool Project::LoadFromFile(const gd::String & filename)
     TiXmlHandle hdl( &doc );
     gd::SerializerElement rootElement;
 
-    //COMPATIBILITY CODE WITH ANSI GDEVELOP ( <= 3.6.78 )
-    /*#if defined(GD_IDE_ONLY) //There should not be any problem with encoding in compiled games
+    //COMPATIBILITY CODE WITH ANSI GDEVELOP ( <= 3.6.83 )
+    #if defined(GD_IDE_ONLY) //There should not be any problem with encoding in compiled games
     //Get the declaration element
     TiXmlDeclaration * declXmlElement = hdl.FirstChild().ToNode()->ToDeclaration();
     if(strcmp(declXmlElement->Encoding(), "UTF-8") != 0)
     {
-        //The document is not encoded in UTF8, we need to convert the file first then reload it
-        std::string docStr;
-        FILE *docFile = fopen(filename.ToLocale().c_str(), "rb");
+        std::cout << "This is a legacy GDevelop project, checking if it is already encoded in UTF8..." << std::endl;
 
-        while(!feof(docFile))
+        //The document has not been converted for/saved by GDevelop UTF8, now, try to determine if the project
+        //was saved on Linux and is already in UTF8 or on Windows and still in the locale encoding.
+        bool isNotInUTF8 = false;
+        std::ifstream docStream;
+        docStream.open(filename.ToLocale(), ios::in);
+
+        while( !docStream.eof() )
         {
-            char buffer[20];
-            fgets(buffer, 20, docFile);
-            docStr += std::string(buffer);
+            std::string docLine;
+            std::getline(docStream, docLine);
+
+            if( !gd::String::FromUTF8(docLine).IsValid() )
+            {
+                //The file contains an invalid character,
+                //the file has been saved by the legacy ANSI Windows version of GDevelop
+                // -> stop reading the file and start converting from the locale to UTF8
+                isNotInUTF8 = true;
+                break;
+            }
         }
 
-        fclose(docFile);
+        docStream.close();
 
-        if(!::utf8::is_valid(docStr.begin(), docStr.end())) //Even if the declaration is not UTF8, the project might have been saved in UTF8 (on Linux with UTF8 locale)
+        //If the file is not encoded in UTF8, encode it
+        if(isNotInUTF8)
         {
-            std::cout << "Project file not encoded in UTF8, converting it !" << std::endl;
+            std::cout << "The project file is not encoded in UTF8, conversion started... ";
 
-            gd::String newFilename = filename + ".utf8";
-            docFile = fopen(newFilename.ToLocale().c_str(), "wb");
+            std::ofstream outStream;
+            docStream.open(filename.ToLocale(), ios::in);
 
-            std::string convertedStr;
+#if !defined(GD_NO_WX_GUI)
+            wxString tmpFileName = wxFileName::CreateTempFileName("");
+#else
+            std::string tmpFileName = filename.ToLocale() + ".utf8";
+#endif
+            outStream.open(tmpFileName, ios::out | ios::trunc);
 
-            //Convert the file from Latin1 (ISO-8859-1)
-            sf::Utf8::fromAnsi(docStr.begin(), docStr.end(), std::back_inserter(convertedStr));
-            convertedStr = gd::utf8::ReplaceInvalid(convertedStr);
+            while( !docStream.eof() )
+            {
+                std::string docLine;
+                std::string convLine;
 
-            fputs(convertedStr.c_str() + '\0', docFile);
-            fclose(docFile);
+                std::getline(docStream, docLine);
+                sf::Utf8::fromAnsi(docLine.begin(), docLine.end(), std::back_inserter(convLine));
 
-            doc.LoadFile(newFilename.ToLocale().c_str(), TIXML_ENCODING_UTF8);
+                outStream << convLine << '\n';
+            }
 
-            std::cout << " -> Conversion ended !" << std::endl;
+            outStream.close();
+            docStream.close();
+
+            doc.LoadFile(gd::String(tmpFileName).ToLocale().c_str());
+
+            std::cout << "Finished." << std::endl;
+
+            gd::LogMessage(_("Your project has been converted to the new encoding used by GDevelop 4 (UTF8).\nYou can save it to apply the change but it will be incompatible with old GDevelop version."));
         }
     }
-    #endif*/
+    #endif
     //END OF COMPATIBILITY CODE
 
     //Load the root element

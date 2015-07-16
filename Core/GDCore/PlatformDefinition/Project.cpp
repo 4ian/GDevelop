@@ -9,6 +9,7 @@
 #include "GDCore/String.h"
 #include <fstream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <SFML/System/Utf.hpp>
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ProjectUpdateDialog.h"
@@ -46,6 +47,8 @@
 #include <wx/propgrid/advprops.h>
 #include <wx/settings.h>
 #include <wx/filename.h>
+#include <wx/stdpaths.h>
+#include <wx/utils.h>
 #endif
 
 using namespace std;
@@ -764,14 +767,22 @@ bool Project::LoadFromFile(const gd::String & filename)
         {
             std::cout << "The project file is not encoded in UTF8, conversion started... ";
 
-            std::ofstream outStream;
-            docStream.open(filename.ToLocale(), ios::in);
-
+            //Create a temporary file
 #if !defined(GD_NO_WX_GUI)
+    #if defined(WINDOWS)
             wxString tmpFileName = wxFileName::CreateTempFileName("");
+    #else
+            wxString tmpFileName = wxStandardPaths::Get().GetUserConfigDir() + "/gdevelop_converted_project";
+    #endif
 #else
             std::string tmpFileName = filename.ToLocale() + ".utf8";
 #endif
+
+#if defined(WINDOWS)
+            //Convert using the current locale
+            std::ofstream outStream;
+            docStream.open(filename.ToLocale(), ios::in);
+
             outStream.open(tmpFileName, ios::out | ios::trunc);
 
             while( !docStream.eof() )
@@ -788,10 +799,21 @@ bool Project::LoadFromFile(const gd::String & filename)
             outStream.close();
             docStream.close();
 
-            doc.LoadFile(gd::String(tmpFileName).ToLocale().c_str());
+#else //ON LINUX OR MAC OS X
+            //Convert using iconv command tool
+            std::cout << "Executing " << "iconv -f LATIN1 -t UTF-8 \"" + filename.ToLocale() + "\" -o  \"" + tmpFileName + "\"" << std::endl;
+    #if !defined(GD_NO_WX_GUI)
+            wxExecute("iconv -f LATIN1 -t UTF-8 \"" + filename.ToLocale() + "\" -o  \"" + tmpFileName + "\"", wxEXEC_BLOCK);
+    #else
+            std::string command = "iconv -f LATIN1 -t UTF-8 \"" + filename.ToLocale() + "\" -o  \"" + std::string(tmpFileName) + "\"";
+            system(command.c_str());
+    #endif
+#endif
+
+            //Reload the converted file, forcing UTF8 encoding as the XML header is false (still written ISO-8859-1)
+            doc.LoadFile(std::string(tmpFileName).c_str(), TIXML_ENCODING_UTF8);
 
             std::cout << "Finished." << std::endl;
-
             gd::LogMessage(_("Your project has been converted to the new encoding used by GDevelop 4 (UTF8).\nYou can save it to apply the change but it will be incompatible with old GDevelop version."));
         }
     }

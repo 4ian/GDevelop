@@ -10,7 +10,6 @@
 #include <string>
 #include <set>
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Utf8Tools.h"
 #include "GDCpp/ExtensionBase.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/RuntimeGame.h"

@@ -496,7 +496,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             wxFileName fileName(file);
             if ( !wxCopyFile( file, outDir + "/" + fileName.GetFullName(), true ) )
-                diagnosticManager.AddError(_("Unable to copy file") + gd::utf8::FromWxString(file) + _(" from compilation directory to final directory.\n" ));
+                diagnosticManager.AddError(_("Unable to copy file") + gd::String(file) + _(" from compilation directory to final directory.\n" ));
 
             file = wxFindNextFile();
         }
@@ -614,13 +614,13 @@ void FullProjectCompiler::ClearDirectory(gd::String directory)
 {
 #if !defined(GD_NO_WX_GUI)
     if ( !wxDirExists( directory ) && !wxMkdir( directory ) )
-            diagnosticManager.AddError(_( "Unable to create directory:" ) + gd::utf8::FromWxString(directory) + "\n");
+            diagnosticManager.AddError(_( "Unable to create directory:" ) + directory + "\n");
 
     wxString file = wxFindFirstFile( directory + "/*" );
     while ( !file.empty() )
     {
         if ( !wxRemoveFile( file ) )
-            diagnosticManager.AddError(_("Unable to delete ") + gd::utf8::FromWxString(file) + _("in directory ")+gd::utf8::FromWxString(directory)+"\n" );
+            diagnosticManager.AddError(_("Unable to delete ") + gd::String(file) + _("in directory ")+ directory +"\n" );
 
         file = wxFindNextFile();
     }

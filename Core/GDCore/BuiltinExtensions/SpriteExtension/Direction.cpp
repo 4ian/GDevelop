@@ -10,7 +10,6 @@
 #include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 
 using namespace std;
 

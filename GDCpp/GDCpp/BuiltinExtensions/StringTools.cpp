@@ -6,7 +6,6 @@
 #include <string>
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/String.h"
-#include "GDCpp/Utf8Tools.h"
 
 using namespace std;
 

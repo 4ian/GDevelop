@@ -16,7 +16,6 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/ResourcesManager.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"

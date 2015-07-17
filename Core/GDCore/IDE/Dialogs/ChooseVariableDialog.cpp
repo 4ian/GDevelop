@@ -28,7 +28,6 @@
 #include "GDCore/PlatformDefinition/Variable.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 
 namespace gd
 {

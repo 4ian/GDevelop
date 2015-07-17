@@ -13,7 +13,6 @@
 #include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 namespace gd { class Project; }
 namespace gd { class Layout; }
 

@@ -17,7 +17,6 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include <wx/help.h>
 
 namespace gd

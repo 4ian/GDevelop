@@ -49,7 +49,6 @@
 #include "GDCore/IDE/wxTools/FileProperty.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/Dialogs/DndResourcesEditor.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"

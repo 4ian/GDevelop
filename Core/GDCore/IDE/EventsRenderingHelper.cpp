@@ -11,7 +11,6 @@
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/renderer.h>
-#include "GDCore/Utf8Tools.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/IDE/MetadataProvider.h"

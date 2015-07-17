@@ -17,7 +17,6 @@
 #include <wx/msgdlg.h>
 #include <wx/config.h>
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Layout.h"

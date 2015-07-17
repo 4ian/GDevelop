@@ -9,7 +9,6 @@
 #include "GDCore/String.h"
 #include <iostream>
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "ParameterControlsHelper.h"

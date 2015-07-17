@@ -17,7 +17,6 @@ This project is released under the MIT License.
 #include "GDCpp/Position.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Utf8Tools.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "TextObject.h"
 

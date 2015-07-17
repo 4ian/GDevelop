@@ -21,7 +21,6 @@
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/IDE/Dialogs/EditLink.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 
 using namespace std;
 

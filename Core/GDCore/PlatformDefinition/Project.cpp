@@ -32,7 +32,6 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "GDCore/Utf8/utf8.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/VersionWrapper.h"

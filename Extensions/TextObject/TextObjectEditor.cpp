@@ -21,7 +21,6 @@ This project is released under the MIT License.
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "TextObject.h"
 
 //(*IdInit(TextObjectEditor)

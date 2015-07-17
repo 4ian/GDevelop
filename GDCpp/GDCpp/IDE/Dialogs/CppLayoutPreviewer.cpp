@@ -21,7 +21,6 @@
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/ImageManager.h"
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
-#include "GDCore/Utf8Tools.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Project.h"

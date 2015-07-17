@@ -13,7 +13,6 @@
 #include <vector>
 #include "catch.hpp"
 #include "GDCore/String.h"
-#include "GDCore/Utf8Tools.h"
 #include <SFML/System/String.hpp>
 
 TEST_CASE( "Utf8 String", "[common][utf8]") {

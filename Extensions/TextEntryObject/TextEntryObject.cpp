@@ -17,7 +17,6 @@ This project is released under the MIT License.
 #include "GDCpp/Position.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Utf8Tools.h"
 #include "GDCore/Utf8/utf8.h"
 #include "TextEntryObject.h"
 #if defined(GD_IDE_ONLY)

@@ -39,7 +39,6 @@
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "EditExpressionDialog.h"
 
 using namespace std;

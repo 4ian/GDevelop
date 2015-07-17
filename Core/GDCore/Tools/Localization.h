@@ -8,7 +8,6 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     #include <wx/intl.h>
- 	  #include "GDCore/Utf8Tools.h"
     #include "GDCore/String.h"
     //Create a new macro to return UTF8 gd::String from a translation
  	  #if defined(_)

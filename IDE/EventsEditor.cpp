@@ -37,7 +37,6 @@
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "LogFileManager.h"
 #include "GDCpp/IDE/Dialogs/ProfileDlg.h"
 #include "SearchEvents.h"

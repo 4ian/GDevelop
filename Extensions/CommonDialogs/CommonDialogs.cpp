@@ -15,7 +15,6 @@ This project is released under the MIT License.
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/Variable.h"
-#include "GDCpp/Utf8Tools.h"
 
 //Windows build uses native windows-dialogs
 #if defined(WINDOWS)

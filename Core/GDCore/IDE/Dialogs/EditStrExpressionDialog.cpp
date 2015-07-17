@@ -33,7 +33,6 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "EditStrExpressionDialog.h"
 

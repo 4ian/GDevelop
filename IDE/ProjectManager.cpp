@@ -34,7 +34,6 @@
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Utf8Tools.h"
 #include "Dialogs/ExternalLayoutEditor.h"
 #include "Dialogs/ProjectPropertiesPnl.h"
 #include "gdTreeItemProjectData.h"

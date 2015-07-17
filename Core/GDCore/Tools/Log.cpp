@@ -5,7 +5,6 @@
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/log.h>
-#include "GDCore/Utf8Tools.h"
 #else
 #include <iostream>
 #endif

@@ -7,11 +7,11 @@
 	<key>CFBundleDisplayName</key>
 	<string>GDevelop</string>
 	<key>CFBundleExecutable</key>
-	<string>GDIDELauncher.sh</string>
+	<string>GDIDE_launcher</string>
 	<key>CFBundleIconFile</key>
 	<string>icon.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.gdevelop.gdide</string>
+	<string>com.gdevelop</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -23,9 +23,11 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>10</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.6</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.developer-tools</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

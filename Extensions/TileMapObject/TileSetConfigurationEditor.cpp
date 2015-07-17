@@ -69,8 +69,16 @@ void TileSetConfigurationEditor::UpdatePreviewTileSetPanel()
     previewTileSet.LoadResources(game);
     previewTileSet.Generate();
 
-    m_tileWidthSpin->SetRange(1, previewTileSet.GetSize().x);
-    m_tileHeightSpin->SetRange(1, previewTileSet.GetSize().y);
+    if(previewTileSet.GetSize().x >= 1 && previewTileSet.GetSize().y >= 1)
+    {
+        m_tileWidthSpin->SetRange(1, previewTileSet.GetSize().x);
+        m_tileHeightSpin->SetRange(1, previewTileSet.GetSize().y);
+    }
+    else
+    {
+        m_tileWidthSpin->SetRange(1, 1);
+        m_tileHeightSpin->SetRange(1, 1);
+    }
 
     m_tileSetPreviewPanel->Refresh();
 }

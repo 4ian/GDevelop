@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-07 06:38-0400\n"
+"PO-Revision-Date: 2015-07-09 03:03-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -18925,8 +18925,8 @@ msgid "Delete the selection\tDEL"
 msgstr "Delete the selection\tDEL"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:232
-msgid "Add an automatims to the object"
-msgstr "Add an automatims to the object"
+msgid "Add an automatism to the object"
+msgstr "Add an automatism to the object"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:262

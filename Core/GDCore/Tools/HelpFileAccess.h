@@ -34,7 +34,7 @@ public:
  *
  * Usage example:
  * \code
- * gd::HelpFileAccess::Get()->DisplayURL(_("www.mywebsite.com/wiki/help_about_my_topic");
+ * gd::HelpFileAccess::Get()->OpenURL(_("www.mywebsite.com/wiki/help_about_my_topic");
  * \endcode
  *
  * \ingroup Tools

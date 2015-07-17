@@ -441,19 +441,19 @@ gd::String GD_CORE_API GetTypeOfAutomatism(const gd::Project & project, const gd
 vector < gd::String > GD_CORE_API GetAutomatismsOfObject(const gd::Project & project, const gd::Layout & layout, gd::String name, bool searchInGroups)
 {
     bool automatismsAlreadyInserted = false;
-    vector < gd::String > automatims;
+    vector < gd::String > automatisms;
 
     //Search in objects
     if ( layout.HasObjectNamed(name) ) //We check first layout's objects' list.
     {
-        vector < gd::String > objectAutomatisms = layout.GetObject(name).GetAllAutomatismNames();
-        copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
+        std::vector < gd::String > objectAutomatisms = layout.GetObject(name).GetAllAutomatismNames();
+        std::copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatisms));
         automatismsAlreadyInserted = true;
     }
     else if ( project.HasObjectNamed(name) ) //Then the global object list
     {
         vector < gd::String > objectAutomatisms = project.GetObject(name).GetAllAutomatismNames();
-        copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
+        std::copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatisms));
         automatismsAlreadyInserted = true;
     }
 
@@ -475,15 +475,15 @@ vector < gd::String > GD_CORE_API GetAutomatismsOfObject(const gd::Project & pro
                 	if (!automatismsAlreadyInserted)
                 	{
                 	    automatismsAlreadyInserted = true;
-                	    automatims = objectAutomatisms;
+                	    automatisms = objectAutomatisms;
                 	}
                 	else
                 	{
-                        for (unsigned int a = 0 ;a<automatims.size();++a)
+                        for (unsigned int a = 0 ;a<automatisms.size();++a)
                         {
-                            if ( find(objectAutomatisms.begin(), objectAutomatisms.end(), automatims[a]) == objectAutomatisms.end() )
+                            if ( find(objectAutomatisms.begin(), objectAutomatisms.end(), automatisms[a]) == objectAutomatisms.end() )
                             {
-                                automatims.erase(automatims.begin() + a);
+                                automatisms.erase(automatisms.begin() + a);
                                 --a;
                             }
                         }
@@ -506,15 +506,15 @@ vector < gd::String > GD_CORE_API GetAutomatismsOfObject(const gd::Project & pro
                 	if (!automatismsAlreadyInserted)
                 	{
                 	    automatismsAlreadyInserted = true;
-                	    automatims = objectAutomatisms;
+                	    automatisms = objectAutomatisms;
                 	}
                 	else
                 	{
-                        for (unsigned int a = 0 ;a<automatims.size();++a)
+                        for (unsigned int a = 0 ;a<automatisms.size();++a)
                         {
-                            if ( find(objectAutomatisms.begin(), objectAutomatisms.end(), automatims[a]) == objectAutomatisms.end() )
+                            if ( find(objectAutomatisms.begin(), objectAutomatisms.end(), automatisms[a]) == objectAutomatisms.end() )
                             {
-                                automatims.erase(automatims.begin() + a);
+                                automatisms.erase(automatisms.begin() + a);
                                 --a;
                             }
                         }
@@ -524,7 +524,7 @@ vector < gd::String > GD_CORE_API GetAutomatismsOfObject(const gd::Project & pro
         }
     }
 
-    return automatims;
+    return automatisms;
 }
 #endif
 

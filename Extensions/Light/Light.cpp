@@ -86,8 +86,17 @@ sf::Vector2f Collision(sf::Vector2f p1, sf::Vector2f p2, sf::Vector2f q1, sf::Ve
         return sf::Vector2f (0,0);
 }
 
+bool Light::AreSamePt(sf::Vector2f pt1, sf::Vector2f pt2)
+{
+    //Work around floating point bad precision.
+    return fabs(pt1.x - pt2.x) < 0.001 && fabs(pt1.y - pt2.y) < 0.001; 
+}
+
 void Light::AddTriangle(sf::Vector2f pt1,sf::Vector2f pt2, int minimum_wall,std::vector <Wall*> &m_wall)
 {
+    sf::Vector2f originalPt1 = pt1;
+    sf::Vector2f originalPt2 = pt2;
+
     int w = minimum_wall;
     // On boucle sur tous les murs
     for(std::vector<Wall*>::iterator IterWall=m_wall.begin()+minimum_wall;IterWall!=m_wall.end();++IterWall,++w)
@@ -104,23 +113,33 @@ void Light::AddTriangle(sf::Vector2f pt1,sf::Vector2f pt2, int minimum_wall,std:
         {
             sf::Vector2f i = Intersect(pt1,pt2,sf::Vector2f (0,0),l1);
 
-            if (pt1 != i && pt2 != i)
+            if (!AreSamePt(pt1, i) && !AreSamePt(pt2, i))
             if((pt1.x >= i.x && pt2.x <= i.x) || (pt1.x <= i.x && pt2.x >= i.x))
             if((pt1.y >= i.y && pt2.y <= i.y) || (pt1.y <= i.y && pt2.y >= i.y))
                 if(l1.y > 0 && i.y > 0 || l1.y < 0 && i.y < 0)
-                if(l1.x > 0 && i.x > 0 || l1.x < 0 && i.x < 0)
-                AddTriangle(i, pt2, w, m_wall), pt2 = i;
+                if(l1.x > 0 && i.x > 0 || l1.x < 0 && i.x < 0) 
+            {
+                if (!AreSamePt(i, originalPt1) || !AreSamePt(pt2, originalPt2))
+                    AddTriangle(i, pt2, w, m_wall);
+
+                pt2 = i;
+            }
         }
         if(l2.x * l2.x + l2.y * l2.y < m_radius * m_radius)
         {
             sf::Vector2f i = Intersect(pt1,pt2,sf::Vector2f (0,0),l2);
 
-            if (pt1 != i && pt2 != i)
+            if (!AreSamePt(pt1, i) && !AreSamePt(pt2, i))
             if((pt1.x >= i.x && pt2.x <= i.x) || (pt1.x <= i.x && pt2.x >= i.x))
             if((pt1.y >= i.y && pt2.y <= i.y) || (pt1.y <= i.y && pt2.y >= i.y))
                 if(l2.y > 0 && i.y > 0 || l2.y < 0 && i.y < 0)
-                if(l2.x > 0 && i.x > 0 || l2.x < 0 && i.x < 0)
-                AddTriangle(pt1, i, w, m_wall), pt1 = i;
+                if(l2.x > 0 && i.x > 0 || l2.x < 0 && i.x < 0) 
+            {
+                if (!AreSamePt(pt1, originalPt1) || !AreSamePt(i, originalPt2))
+                    AddTriangle(pt1, i, w, m_wall);
+
+                pt1 = i;
+            }
         }
 
         sf::Vector2f m = Collision(l1, l2, sf::Vector2f(0,0), pt1);
@@ -132,10 +151,18 @@ void Light::AddTriangle(sf::Vector2f pt1,sf::Vector2f pt2, int minimum_wall,std:
         else
         {
             if((m.x != 0 || m.y != 0) && (o.x != 0 || o.y != 0))
-                AddTriangle(m ,o , w, m_wall), pt1 = o;
+            {
+                if (!AreSamePt(m, originalPt1) || !AreSamePt(o, originalPt2))
+                    AddTriangle(m ,o , w, m_wall);
+                pt1 = o;
+            }
 
-            if((n.x != 0 || n.y != 0) && (o.x != 0 || o.y != 0))
-                AddTriangle(o ,n , w, m_wall), pt2 = o;
+            if((n.x != 0 || n.y != 0) && (o.x != 0 || o.y != 0)) 
+            {
+                if (!AreSamePt(o, originalPt1) || !AreSamePt(n, originalPt2))
+                    AddTriangle(o ,n , w, m_wall);
+                pt2 = o;
+            }
         }
     }
 

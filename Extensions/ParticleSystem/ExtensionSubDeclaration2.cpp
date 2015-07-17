@@ -200,7 +200,7 @@ void Extension::ExtensionSubDeclaration2(gd::ObjectMetadata & obj)
 
     obj.AddAction("ParticleSize1",
                    _("SIze, parameter 1"),
-                   _("Modifyt parameter 1 of the size of particles"),
+                   _("Modify parameter 1 of the size of particles"),
                    _("Do _PARAM1__PARAM2_ to the parameter 1 of size of _PARAM0_"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",

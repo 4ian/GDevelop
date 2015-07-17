@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-07 06:38-0400\n"
+"PO-Revision-Date: 2015-07-12 04:35-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -1185,7 +1185,7 @@ msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/m
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:618
 msgid "Unable to rename the object : \n"
-msgstr "Unable to rename the object : \n"
+msgstr "Impossível renomear o objecto: \n"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:627
 msgid "Invalid name"
@@ -1193,7 +1193,7 @@ msgstr "Nome inválido"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:704
 msgid "Unable to rename the group : \n"
-msgstr "Unable to rename the group : \n"
+msgstr "Não é possível renomear o grupo: \n"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:784
 msgid "Unfold the group to see the objects inside it."
@@ -1234,11 +1234,11 @@ msgstr "Cópia do"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1343 ../IDE/Dialogs/ObjectsEditor.cpp:1387
 msgid "Can't set \""
-msgstr "Can't set \""
+msgstr "Não é possível definir\""
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1343 ../IDE/Dialogs/ObjectsEditor.cpp:1387
 msgid "\" global because :\n"
-msgstr "\" global because :\n"
+msgstr "\"global porque: \n"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1442
 msgid "Create a new group"
@@ -1251,15 +1251,15 @@ msgstr "Grupos"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1619
 msgid "an object"
-msgstr "an object"
+msgstr "um objeto"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1621
 msgid "a group"
-msgstr "a group"
+msgstr "um grupo"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1623
 msgid "with the same name exists in the current scene"
-msgstr "with the same name exists in the current scene"
+msgstr "existe com o mesmo nome na cena actual"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1633
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:237
@@ -1268,23 +1268,23 @@ msgstr "objetos"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1636
 msgid "/ groups"
-msgstr "/ groups"
+msgstr "/ grupos"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1637
 msgid "groups"
-msgstr "groups"
+msgstr "Grupos"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1639
 msgid "with the same name exist in these scenes : "
-msgstr "with the same name exist in these scenes : "
+msgstr "existe com o mesmo nome nas cenas : "
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1654
 msgid "a global object with the same name exists"
-msgstr "a global object with the same name exists"
+msgstr "Existe um objecto global com o mesmo nome"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1656
 msgid "a global group with the same name exists"
-msgstr "a global group with the same name exists"
+msgstr "existe um grupo global com o mesmo nome"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:140
 #: ../Extensions//TextObject/TextObjectEditor.cpp:193
@@ -3349,7 +3349,7 @@ msgstr "Idioma:"
 
 #: ../IDE/Preferences.cpp:271
 msgid "English"
-msgstr "English"
+msgstr "Inglês"
 
 #: ../IDE/Preferences.cpp:279
 msgid "New projects"
@@ -3659,7 +3659,7 @@ msgstr "Compilação de C++"
 
 #: ../IDE/Preferences.cpp:631
 msgid "Check for the news"
-msgstr "Check for the news"
+msgstr "Veja as notícias"
 
 #: ../IDE/Preferences.cpp:654
 msgid "Events editors"
@@ -4215,7 +4215,7 @@ msgstr "Música em pausa:"
 
 #: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:439
 msgid "C++ code (Experimental)"
-msgstr "C++ code (Experimental)"
+msgstr "Código C++ (Experimental)"
 
 #: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:440
 msgid "Execute C++ code"
@@ -5690,7 +5690,7 @@ msgstr "http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtousei
 
 #: ../GDJS/GDJS//Dialogs/ProjectExportDialog.cpp:95
 msgid "The export folder is not empty"
-msgstr "The export folder is not empty"
+msgstr "A pasta de exportação não está vazia"
 
 #: ../GDJS/GDJS//Dialogs/ProjectExportDialog.cpp:105
 msgid "Choose a folder, empty if possible, where the game should be exported."
@@ -10076,7 +10076,7 @@ msgstr "Este ângulo será adicionado para o ângulo do objeto que deve tomar qu
 
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:228
 msgid "Â°"
-msgstr "Â°"
+msgstr "Âº"
 
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:234
 msgid "Movement and speed"
@@ -12346,7 +12346,7 @@ msgstr "Salvar imagem _PARAM2_ para o arquivo _PARAM1_"
 
 #: ../Extensions//PrimitiveDrawing/ShapePainterObjectEditor.cpp:58
 msgid "Edit the Shape Painter object"
-msgstr "Edit the Shape Painter object"
+msgstr "Editar o objecto Pintor de Forma"
 
 #: ../Extensions//PrimitiveDrawing/ShapePainterObjectEditor.cpp:62
 msgid "Filling"
@@ -14109,7 +14109,7 @@ msgstr "Rodar"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:130
 msgid "Rotate an object, clockwise if the speed is positive, counterclockwise otherwise."
-msgstr "Rotate an object, clockwise if the speed is positive, counterclockwise otherwise."
+msgstr "Gire um objecto, no sentido horário, se a velocidade for positiva, no sentido anti-horário, caso contrário."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:131
 msgid "Rotate _PARAM0_ at speed _PARAM1_deg/second"
@@ -14877,24 +14877,24 @@ msgstr "Ângulo de tolerância"
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:739
 msgid "Test the distance between two objects.\n"
 "If condition is inverted, only objects that have a distance greater than specified to any other object will be picked."
-msgstr "Test the distance between two objects.\n"
-"If condition is inverted, only objects that have a distance greater than specified to any other object will be picked."
+msgstr "Teste a distância entre dois objectos. \n"
+"se a condição for invertida, serão escolhidos apenas os objectos que têm uma distância maior do que o especificado para qualquer outro objecto."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:740
 msgid "_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"
-msgstr "_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"
+msgstr "Distância de _PARAM0_ a _PARAM1_ está abaixo de _PARAM2_ pixels"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:773
 msgid "Pick nearest object"
-msgstr "Pick nearest object"
+msgstr "Escolhe o mais próximo do objecto"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:774
 msgid "Among the objects, pick the one that is nearest (or furthest if condition is inverted) from the specified position."
-msgstr "Among the objects, pick the one that is nearest (or furthest if condition is inverted) from the specified position."
+msgstr "Entre os objectos, escolhe o que é mais próximo (ou mais distante, se a condição for invertida) da posição especificada."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:775
 msgid "Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"
-msgstr "Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"
+msgstr "Escolher a mais próxima de _PARAM0_ para _PARAM1_; _PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:787
 msgid "Test the number of concerned objects."
@@ -15140,7 +15140,7 @@ msgstr "Esta ação modificar a zona de render de uma câmera da camada de dados
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:187
 msgid "Set the render zone of camera _PARAM2_ from layer _PARAM1_ to _PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"
-msgstr "Set the render zone of camera _PARAM2_ from layer _PARAM1_ to _PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"
+msgstr "Defina a zona de renderização da câmera _PARAM2_ da camada de _PARAM1_ para PARAM3_; _PARAM4_ _PARAM5_; _PARAM6_"
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:201
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:202
@@ -15760,7 +15760,7 @@ msgstr "Extensões internas que permitem usar o teclado"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:23
 msgid "Key pressed"
-msgstr "Key pressed"
+msgstr "Tecla pressionada"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:24
 msgid "Test if a key is pressed"
@@ -15782,20 +15782,20 @@ msgstr "Teclado"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:33
 msgid "Key released"
-msgstr "Key released"
+msgstr "Tecla libertada"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:34
 msgid "Test if a key was just released"
-msgstr "Test if a key was just released"
+msgstr "Testar se uma tecla foi solta"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:35
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:56
 msgid "_PARAM1_ key is released"
-msgstr "_PARAM1_ key is released"
+msgstr "Tecla  _PARAM1_ foi solta"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:43
 msgid "Key pressed (text expression)"
-msgstr "Key pressed (text expression)"
+msgstr "Tecla pressionada (expressão de texto)"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:44
 msgid "Test if a key, retrieved from the result of the expression, is pressed"
@@ -15808,15 +15808,15 @@ msgstr "Expressão gerando o botão para testar"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:54
 msgid "Key released (text expression)"
-msgstr "Key released (text expression)"
+msgstr "Tecla libertada (expressão de texto)"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:55
 msgid "Test if a key, retrieved from the result of the expression, was just released"
-msgstr "Test if a key, retrieved from the result of the expression, was just released"
+msgstr "Teste se a chave, obtida do resultado da expressão, só foi lançado"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:65
 msgid "Any key pressed"
-msgstr "Any key pressed"
+msgstr "Qualquer tecla pressionada"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:66
 msgid "Test if any key is pressed"
@@ -16260,15 +16260,15 @@ msgstr "Botão de teste"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:155
 msgid "Mouse button released"
-msgstr "Mouse button released"
+msgstr "Botão do mouse libertado"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:156
 msgid "Return true if the specified button of the mouse was released."
-msgstr "Return true if the specified button of the mouse was released."
+msgstr "Retornar verdadeiro se o botão especificado do rato foi solto."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:157
 msgid "_PARAM1_ mouse button was released"
-msgstr "_PARAM1_ mouse button was released"
+msgstr "Botão de _PARAM1_ do rato foi solto"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:166
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:239
@@ -16599,11 +16599,11 @@ msgstr "Expressão 2"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:167
 msgid "Edit the Sprite object"
-msgstr "Edit the Sprite object"
+msgstr "Editar o objeto Sprite"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:179
 msgid "Edit the collision masks (hitbox)"
-msgstr "Edit the collision masks (hitbox)"
+msgstr "Editar as máscaras de colisão (hitbox)"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:180
 msgid "Edit the image's point"
@@ -16775,11 +16775,11 @@ msgstr "Posição do ponto \"Centro\""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1315
 msgid "Enter the X position of the point (relative to the image)."
-msgstr "Enter the X position of the point (relative to the image)."
+msgstr "Digite a posição X do ponto (em relação à imagem)."
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1316
 msgid "Enter the Y position of the point (relative to the image)."
-msgstr "Enter the Y position of the point (relative to the image)."
+msgstr "Digite a posição Y do ponto (em relação à imagem)."
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1397
 msgid "Enter the width of the rectangle"
@@ -16829,7 +16829,7 @@ msgstr "Digite a posição Y do vértice"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1581
 msgid "Enter the displacement offset on X axis."
-msgstr "Digite o deslocamento  no eixo X."
+msgstr "Digite o deslocamento no eixo X."
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1582
 msgid "Enter the displacement offset on Y axis."
@@ -17796,7 +17796,7 @@ msgstr "Esta ação altera o tamanho da janela do jogo."
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:66
 msgid "Change window size: _PARAM1_x_PARAM2_"
-msgstr "Change window size: _PARAM1_x_PARAM2_"
+msgstr "Alterar o tamanho da janela: _PARAM1_x_PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:73
 msgid "Use this size as default size for new scene cameras?\n"
@@ -18206,12 +18206,12 @@ msgstr "Ajuda sobre variáveis"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:189
 msgid "scene variables"
-msgstr "scene variables"
+msgstr "Variáveis de cena"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:193
 #, c-format
 msgid "Edit the variables (%s)"
-msgstr "Edit the variables (%s)"
+msgstr "Editar as variáveis (%s)"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:299
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:303
@@ -18522,7 +18522,7 @@ msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/e
 
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:55
 msgid "Edit the \"For each object\" event"
-msgstr "Edit the \"For each object\" event"
+msgstr "Editar o evento \"para cada objeto\""
 
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:61
 msgid "Repeat event for each object:"
@@ -18631,7 +18631,7 @@ msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/m
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:54
 msgid "Edit the \"Repeat\" event"
-msgstr "Edit the \"Repeat\" event"
+msgstr "Editar o evento \"Repetir\""
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:60
 msgid "Number of repetitions of the event :"
@@ -18926,7 +18926,7 @@ msgid "Delete the selection\tDEL"
 msgstr "Apagar a seleção\tDEL"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:232
-msgid "Add an automatims to the object"
+msgid "Add an automatism to the object"
 msgstr "Adicionar um automatismo para o objeto"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234

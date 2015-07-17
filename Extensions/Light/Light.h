@@ -23,7 +23,7 @@ public:
 
 class GD_EXTENSION_API Light
 {
-    public :
+public:
 
     // Constructeur et destructeur
     Light();
@@ -71,7 +71,8 @@ class GD_EXTENSION_API Light
     sf::VertexArray shapes; ///< The vertices composing the light
     //std::vector <sf::Vertex> m_shape;
 
-    private :
+private:
+    bool AreSamePt(sf::Vector2f pt1, sf::Vector2f pt2);
 
     //Qualité de la lumière, c'est à dire le nombre de triangles par défaut qui la compose.
     int m_quality;

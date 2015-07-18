@@ -405,7 +405,8 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
     //Load all assets
     var assets = [];
     gdjs.iterateOverArray(gdjs.projectData.resources.resources, function(res) {
-        if ( res.file ) assets.push(res.file);
+        if ( res.file && assets.indexOf(res.file) === -1 )
+            assets.push(res.file);
     });
 
     var game = this;

@@ -25,13 +25,10 @@ class wxVariant;
 namespace gd
 {
 
-namespace utf8 { class String; }
+class String;
 
 //Forward decl
-bool CaseInsensitiveEquiv( const utf8::String &, const utf8::String &, bool );
-
-namespace utf8
-{
+bool CaseInsensitiveEquiv( const String &, const String &, bool );
 
 /**
  * \brief String represents an UTF8 encoded string.
@@ -551,8 +548,8 @@ public:
      * **Usage :**
      *
      * \code
-     * gd::utf8::String str = u8"10;20;30;40";
-     * std::vector<gd::utf8::String> splittedStr = str.Split(U';');
+     * gd::String str = u8"10;20;30;40";
+     * std::vector<gd::String> splittedStr = str.Split(U';');
      * //the U prefix is mandatory to get a char32_t from the literal
      * //Now the vector contains "10", "20", "30" and "40" as gd::String objects
      * \endcode
@@ -694,14 +691,14 @@ String GD_CORE_API operator+(String lhs, const String &rhs);
 /**
  * \relates String
  * \return a String containing the concatenation of lhs and rhs (rhs is
- * converted to gd::utf8::String assuming it's encoded in UTF8).
+ * converted to gd::String assuming it's encoded in UTF8).
  */
 String GD_CORE_API operator+(String lhs, const char *rhs);
 
 /**
  * \relates String
  * \return a String containing the concatenation of lhs and rhs (lhs is
- * converted to gd::utf8::String assuming it's encoded in UTF8).
+ * converted to gd::String assuming it's encoded in UTF8).
  */
 String GD_CORE_API operator+(const char *lhs, const String &rhs);
 
@@ -819,9 +816,6 @@ std::istream& GD_CORE_API operator>>(std::istream &is, String &str);
  * \}
  */
 
-}
-
-typedef utf8::String String;
 
 /**
  * \relates String
@@ -850,9 +844,7 @@ namespace std
 
 
 /**
- * \class gd::utf8::String
- *
- * \note Instead of gd::utf8::String, you can use gd::String which is just a typedef of gd::utf8::String.
+ * \class gd::String
  *
  * \section WhatIsUTF8 What is UTF8 and Unicode ?
  * (from https://en.wikipedia.org/wiki/Unicode and https://en.wikipedia.org/wiki/UTF-8)
@@ -872,8 +864,8 @@ namespace std
  * single octet with the same binary value as ASCII, making valid ASCII text valid UTF-8-encoded Unicode as well.
  *
  * \section Limitations Limitations
- * The String class stores internally the string as an UTF8 encoded std::string. This creates some limitations : it's
- * impossible to edit a single character with operator[]() nor at because the new character length might not be the same.
+ * The String class stores internally the string as an UTF8 encoded std::string. It results in some limitations : it's
+ * impossible to edit a single character with operator[]() nor at() because the new character length might not be the same.
  *
  * \section Performance Performance
  * The UTF8 encoding has the advantage to reduce the RAM consumption compared to UTF16 or UTF32 for strings using a lot
@@ -895,7 +887,7 @@ namespace std
  * \code
  * //Get a String from sf::String
  * sf::String sfmlStr("This is a test ! ");
- * gd::utf8::String str1(sfmlStr); //Now contains "This is a test ! " encoded in UTF8
+ * gd::String str1(sfmlStr); //Now contains "This is a test ! " encoded in UTF8
  *
  * //Get a String from wxString
  * wxString wxStr("Another test ! ");
@@ -912,25 +904,27 @@ namespace std
  * \code
  * //Get a String from a std::string encoded in the current locale
  * std::string ansiStr = "Some beautiful localized characters. "; //Encoded in ANSI on Windows, UTF8 on Linux
- * gd::utf8::String str = gd::utf8::String::FromLocale(ansiStr);
+ * gd::String str = gd::String::FromLocale(ansiStr);
  *
  * //Create a String using a string literal encoded in UTF8
- * gd::utf8::String anotherStr = u8"This is an UTF8 string";
- * //The same as gd::utf8::String anotherStr = gd::utf8::FromUTF8(u8"This is an UTF8 string");
+ * gd::String anotherStr = u8"This is an UTF8 string";
+ * //The same as gd::String anotherStr = gd::utf8::FromUTF8(u8"This is an UTF8 string");
  * //But it works only with string literals.
  *
- * gd::utf8::String finalStr = str + anotherStr; //Concatenates the two Strings
+ * gd::String finalStr = str + anotherStr; //Concatenates the two Strings
  * std::cout << finalStr.ToLocale() << std::endl //Shows "Some beautiful localized characters. This is an UTF8 string"
  * \endcode
  *
- * \section Normalization
+ * \section Normalization Normalization
  * This class stores Unicode strings normalized with NFC which means that all characters are combined. For example, the "à"
  * character can be written in two ways according to the Unicode norm : U+00E0 (the "à" in a single codepoint) or
  * U+0061 (the "a" letter codepoint) + U+0300 "the "`" combining accent. We say that they are canonically equivalent.
- * However, this can cause problem when comparing strings, that's why this class normalizes the string using the Normalization
- * Form Composition (all characters are combined, e.g. "à" is represented by a single codepoint).
+ * However, this can cause problem when comparing strings, that's why **this class normalizes the string when constructed** using
+ * the **Normalization Form Composition** (all characters are combined, e.g. "à" is represented by a single codepoint).
+ * If the string **is invalid when constructed, the string is not normalized** : it will be **normalized when the invalid characters
+ * will be removed using gd::String::ReplaceInvalid()**.
  *
- * \section Case-insensitive comparison
+ * \section CaseInsensitiveComparison Case-insensitive comparison
  * In Unicode, uppercasing/lowercasing strings to compare them in a case-insensitive way is not recommended.
- * That's why the function gd::CaseInsensitiveEquiv exists to compare two strings in a case-insensitive way. 
+ * That's why the function gd::CaseInsensitiveEquiv exists to compare two strings in a case-insensitive way.
  */

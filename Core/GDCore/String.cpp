@@ -18,9 +18,6 @@
 namespace gd
 {
 
-namespace utf8
-{
-
 const String::size_type GD_CORE_API String::npos;
 
 String::String() : m_string()
@@ -324,7 +321,7 @@ String& String::ReplaceInvalid( char32_t replacement )
 
     m_string = validStr;
 
-    Normalize();
+    Normalize(); //The string is now valid, normalize it
 
     return *this;
 }
@@ -834,8 +831,6 @@ std::istream& GD_CORE_API operator>>(std::istream &is, String &str)
     str = String::FromLocale(extractedString);
 
     return is;
-}
-
 }
 
 bool GD_CORE_API CaseInsensitiveEquiv( const String &lhs, const String &rhs, bool compat )

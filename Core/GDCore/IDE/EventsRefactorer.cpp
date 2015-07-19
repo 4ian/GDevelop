@@ -505,6 +505,7 @@ gd::String ReplaceAllOccurences(gd::String context, const gd::String& from, cons
 
 gd::String ReplaceAllOccurencesCaseUnsensitive(gd::String context, gd::String from, const gd::String& to)
 {
+    //Still use uppercase (instead of casefolding) to avoid to change the string size
     from = from.ToUpperCase();
 
     size_t lookHere = 0;

@@ -215,4 +215,20 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 		str.pop_back();
 		REQUIRE( str == u8"This is a sentence" );
 	}
+
+	SECTION("case-insensitive equivalence") {
+		gd::String str1 = u8"Ceci est une chaîne";
+		gd::String str2 = u8"CECI est UNE CHAÎNE";
+		gd::String str3 = u8"CECI est UNE CHAINE";
+		gd::String str4 = "\xEF\xAC\x83"; //ffi ligature
+		gd::String str5 = u8"ffi"; //ffi normal
+		gd::String str6 = u8"²";
+		gd::String str7 = u8"2";
+
+		REQUIRE( gd::CaseInsensitiveEquiv(str1, str2) == true );
+		REQUIRE( gd::CaseInsensitiveEquiv(str1, str3) == false );
+		REQUIRE( gd::CaseInsensitiveEquiv(str4, str5) == true );
+		REQUIRE( gd::CaseInsensitiveEquiv(str6, str7) == true );
+		REQUIRE( gd::CaseInsensitiveEquiv(str6, str7, false) == false );
+	}
 }

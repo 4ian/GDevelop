@@ -276,12 +276,8 @@ bool InstructionSelectorDialog::MatchSearchCriteria(gd::String search, const gd:
 {
     if (search.empty()) return true;
 
-    /** \todo Update this with UTF8
-    return gd::StrUppercase(instrMetadata.GetGroup()).find(search) != string::npos ||
-        gd::StrUppercase(instrMetadata.GetFullName()).find(search) != string::npos;*/
-
-    return instrMetadata.GetGroup().find(search) != string::npos ||
-        instrMetadata.GetFullName().find(search) != string::npos;
+    return instrMetadata.GetGroup().CaseFold().find(search) != string::npos ||
+        instrMetadata.GetFullName().CaseFold().find(search) != string::npos;
 }
 
 /**

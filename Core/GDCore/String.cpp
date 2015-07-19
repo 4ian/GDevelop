@@ -8,6 +8,7 @@
 
 #include <SFML/System/String.hpp>
 #include "GDCore/CommonTools.h"
+#include "GDCore/Utf8/utf8proc.h"
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/string.h>
@@ -27,9 +28,9 @@ String::String() : m_string()
 
 }
 
-String::String(const char *characters) : m_string(characters)
+String::String(const char *characters) : m_string()
 {
-
+    *this = characters;
 }
 
 String::String(const sf::String &string) : m_string()
@@ -54,6 +55,8 @@ String::String(const wxString &string) : m_string()
 String& String::operator=(const char *characters)
 {
     m_string = std::string(characters);
+    if(IsValid()) //Do not normalize if the string is invalid
+        Normalize();
     return *this;
 }
 
@@ -74,6 +77,8 @@ String& String::operator=(const sf::String &string)
 
     m_string.shrink_to_fit();
 
+    if(IsValid()) //Do not normalize if the string is invalid
+        Normalize();
     return *this;
 }
 
@@ -94,6 +99,8 @@ String& String::operator=(const std::u32string &string)
 
     m_string.shrink_to_fit();
 
+    if(IsValid()) //Do not normalize if the string is invalid
+        Normalize();
     return *this;
 }
 
@@ -102,6 +109,9 @@ String& String::operator=(const std::u32string &string)
 String& String::operator=(const wxString &string)
 {
     m_string =  std::string(string.ToUTF8().data());
+
+    if(IsValid()) //Do not normalize if the string is invalid
+        Normalize();
     return *this;
 }
 
@@ -210,7 +220,9 @@ String String::FromSfString( const sf::String &sfString )
 
 String String::FromUTF8( const std::string &utf8Str )
 {
-    return String(utf8Str.c_str());
+    String str(utf8Str.c_str());
+
+    return str;
 }
 
 String String::FromWide( const std::wstring &wstr )
@@ -311,6 +323,8 @@ String& String::ReplaceInvalid( char32_t replacement )
     ::utf8::replace_invalid(m_string.begin(), m_string.end(), std::back_inserter(validStr), replacement);
 
     m_string = validStr;
+
+    Normalize();
 
     return *this;
 }
@@ -443,6 +457,19 @@ std::vector<String> String::Split( String::value_type delimiter ) const
     }
 
     return splittedStrings;
+}
+
+String String::CaseFold() const
+{
+    unsigned char *newStr = nullptr;
+
+    utf8proc_map((unsigned char*)m_string.c_str(), 0, &newStr, static_cast<utf8proc_option_t>(UTF8PROC_CASEFOLD|UTF8PROC_NULLTERM));
+    String str((char*)newStr);
+    str.Normalize();
+
+    free(newStr);
+
+    return str;
 }
 
 String String::substr( String::size_type start, String::size_type length ) const
@@ -622,6 +649,26 @@ int String::compare( const String &other ) const
     return m_string.compare( other.m_string );
 }
 
+String& String::Normalize(String::NormForm form)
+{
+    unsigned char *newStr = nullptr;
+
+    if(form == NFD)
+        newStr = utf8proc_NFD((unsigned char*)m_string.c_str());
+    else if(form == NFC)
+        newStr = utf8proc_NFC((unsigned char*)m_string.c_str());
+    else if(form == NFKD)
+        newStr = utf8proc_NFKD((unsigned char*)m_string.c_str());
+    else if(form == NFKC)
+        newStr = utf8proc_NFKC((unsigned char*)m_string.c_str());
+
+    m_string = (char*)newStr;
+
+    free(newStr);
+
+    return *this;
+}
+
 String GD_CORE_API operator+(String lhs, const String &rhs)
 {
     lhs += rhs;
@@ -789,6 +836,14 @@ std::istream& GD_CORE_API operator>>(std::istream &is, String &str)
     return is;
 }
 
+}
+
+bool GD_CORE_API CaseInsensitiveEquiv( const String &lhs, const String &rhs, bool compat )
+{
+    if(compat)
+        return (lhs.CaseFold().Normalize(String::NFKC) == rhs.CaseFold().Normalize(String::NFKC));
+    else
+        return (lhs.CaseFold() == rhs.CaseFold());
 }
 
 }

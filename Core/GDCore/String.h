@@ -25,10 +25,13 @@ class wxVariant;
 namespace gd
 {
 
+namespace utf8 { class String; }
+
+//Forward decl
+bool CaseInsensitiveEquiv( const utf8::String &, const utf8::String &, bool );
+
 namespace utf8
 {
-
-class String;
 
 /**
  * \brief String represents an UTF8 encoded string.
@@ -39,6 +42,8 @@ class GD_CORE_API String
 {
 
 public:
+
+    friend bool GD_CORE_API ::gd::CaseInsensitiveEquiv( const String &, const String &, bool );
 
     typedef char32_t value_type;
     typedef char32_t& reference;
@@ -555,6 +560,17 @@ public:
     std::vector<String> Split( value_type delimiter ) const;
 
     /**
+     * \return the case-folded string.
+     * \note This string is not totally suitable for case-insensitive comparison because you have to make sure
+     * that it is normalized. So, to do a case-insensitive comparison, do :
+     * \code
+     * str1.CaseFold().Normalize() == str2.CaseFold().Normalize()
+     * \endcode
+     * You can also use gd::CaseInsensitiveEquiv();
+     */
+    String CaseFold() const;
+
+    /**
      * \return a String with uppercase letters only
      * TODO: Implement it
      */
@@ -644,6 +660,23 @@ public:
 
 private:
     std::string m_string; ///< Internal std::string container
+
+    /**
+     * Normalization form
+     */
+    enum NormForm
+    {
+        NFD, ///< Normalization Form Decomposition: characters are decomposed by canonical equivalence, and multiple combining characters are arranged in a specific order.
+        NFC, ///< Normalization Form Composition: characters are decomposed and then recomposed by canonical equivalence.
+        NFKD, ///< Normalization Form Compatibility Decomposition: characters are decomposed by compatibility, and multiple combining characters are arranged in a specific order.
+        NFKC, ///< Normalization Form Compatibitity Composition: characters are decomposed by compatibility, then recomposed by canonical equivalence.
+    };
+
+    /**
+     * Normalize the string using the normalization form **form**.
+     * \return *this
+     */
+    String& Normalize(NormForm form = NFC);
 
 };
 
@@ -790,6 +823,13 @@ std::istream& GD_CORE_API operator>>(std::istream &is, String &str);
 
 typedef utf8::String String;
 
+/**
+ * \relates String
+ * \param compat if true, the strings are normalized using a compatibility normalization form to remove characters special appearance.
+ * \return true if the two string are equivalent (in a case-insensitive way).
+ */
+bool GD_CORE_API CaseInsensitiveEquiv( const String &lhs, const String &rhs, bool compat = true );
+
 }
 
 namespace std
@@ -882,4 +922,15 @@ namespace std
  * gd::utf8::String finalStr = str + anotherStr; //Concatenates the two Strings
  * std::cout << finalStr.ToLocale() << std::endl //Shows "Some beautiful localized characters. This is an UTF8 string"
  * \endcode
+ *
+ * \section Normalization
+ * This class stores Unicode strings normalized with NFC which means that all characters are combined. For example, the "à"
+ * character can be written in two ways according to the Unicode norm : U+00E0 (the "à" in a single codepoint) or
+ * U+0061 (the "a" letter codepoint) + U+0300 "the "`" combining accent. We say that they are canonically equivalent.
+ * However, this can cause problem when comparing strings, that's why this class normalizes the string using the Normalization
+ * Form Composition (all characters are combined, e.g. "à" is represented by a single codepoint).
+ *
+ * \section Case-insensitive comparison
+ * In Unicode, uppercasing/lowercasing strings to compare them in a case-insensitive way is not recommended.
+ * That's why the function gd::CaseInsensitiveEquiv exists to compare two strings in a case-insensitive way. 
  */

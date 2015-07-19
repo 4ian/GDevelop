@@ -100,7 +100,7 @@ void EventStoreDialog::RefreshList()
 {
     templatesList->Clear();
     gd::String searchText = searchCtrl->GetValue();
-    searchText = searchText.ToUpperCase();
+    searchText = searchText.CaseFold();
     bool searching = searchText.empty() ? false : true;
 
     if (!templates) return;
@@ -110,8 +110,8 @@ void EventStoreDialog::RefreshList()
         gd::String name = eventTemplate.GetChild("name").GetValue().GetString();
         gd::String desc = eventTemplate.GetChild("description").GetValue().GetString();
 
-        if (!searching || name.ToUpperCase().find(searchText) != gd::String::npos
-            || desc.ToUpperCase().find(searchText) != gd::String::npos)
+        if (!searching || name.CaseFold().find(searchText) != gd::String::npos
+            || desc.CaseFold().find(searchText) != gd::String::npos)
         {
     		wxString id = eventTemplate.GetChild("_id").GetValue().GetString();
             if (desc.size() > 50) {

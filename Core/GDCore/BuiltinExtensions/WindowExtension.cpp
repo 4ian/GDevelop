@@ -22,7 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
     extension.AddAction("EcrireTexte",
                    _("Display a text"),
                    _("Display the specified text to screen"),
-                   _("Display _PARAM1_ at _PARAM2_;_PARAM3_ ( color  : _PARAM4_ , size : _PARAM5_, font : _PARAM6_ )"),
+                   _("Display _PARAM1_ at _PARAM2_;_PARAM3_ (color: _PARAM4_ , size: _PARAM5_, font: _PARAM6_)"),
                    _("Scene"),
                    "res/actions/texte24.png",
                    "res/actions/texte.png")
@@ -34,12 +34,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
         .AddParameter("color", _("Color"), "",false)
         .AddParameter("expression", _("Size"), "",false)
         .AddParameter("police", _("Font"), "",true)
-        .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
+        .AddParameter("layer", _("Layer (base layer if empty)"), "",true).SetDefaultValue("\"\"");
 
     extension.AddAction("SetFullScreen",
                    _("De/activate fullscreen"),
                    _("This action activate or desactivate fullscreen."),
-                   _("Activate fullscreen:  _PARAM1_ (Keep aspect ratio: _PARAM2_)"),
+                   _("Activate fullscreen:  _PARAM1_ (keep aspect ratio: _PARAM2_)"),
                    _("Game's window"),
                    "res/actions/fullscreen24.png",
                    "res/actions/fullscreen.png")

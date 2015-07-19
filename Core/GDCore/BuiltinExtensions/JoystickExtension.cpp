@@ -27,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
                    "res/conditions/joystick24.png",
                    "res/conditions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
+        .AddParameter("expression", _("Joystick number (first joystick: 0)"), "",false)
         .AddParameter("expression", _("Button"), "",false);
 
     extension.AddCondition("JoystickAxis",
@@ -38,7 +38,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
                    "res/conditions/joystick24.png",
                    "res/conditions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
+        .AddParameter("expression", _("Joystick number (first joystick: 0)"), "",false)
         .AddParameter("joyaxis", _("Axis"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
         .AddParameter("expression", _("Value to test"), "",false)
@@ -52,7 +52,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
                    "res/actions/joystick24.png",
                    "res/actions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
+        .AddParameter("expression", _("Joystick number (first joystick: 0)"), "",false)
         .AddParameter("joyaxis", _("Axis"), "",false)
         .AddParameter("scenevar", _("Save result to scene variable"), "",false)
         .SetManipulatedType("number");
@@ -64,7 +64,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
                    "res/conditions/joystick.png")
 
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
+        .AddParameter("expression", _("Joystick number (first joystick: 0)"), "",false)
         .AddParameter("joyaxis", _("Axis"), "",false);
     #endif
 }

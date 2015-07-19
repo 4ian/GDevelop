@@ -14760,7 +14760,7 @@ msgstr ""
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:176
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:191
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:37
-msgid "Layer ( Base layer if empty )"
+msgid "Layer (base layer if empty)"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:678
@@ -14947,7 +14947,7 @@ msgstr ""
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:140
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:177
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:192
-msgid "Camera number ( default : 0 )"
+msgid "Camera number (default : 0)"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:38

@@ -26,8 +26,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtens
 
 
     extension.AddExpression("mod", _("Modulo"), _("x mod y"), _("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", _("x ( as in x mod y )"))
-        .AddParameter("expression", _("y ( as in x mod y )"));
+        .AddParameter("expression", _("x (as in x mod y)"))
+        .AddParameter("expression", _("y (as in x mod y)"));
 
 
     extension.AddExpression("min", _("Minimum of two numbers"), _("Minimum of two numbers"), _("Mathematical tools"), "res/mathfunction.png")
@@ -64,7 +64,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtens
         .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("atan2", _("2 argument arctangent"), _("2 argument arctangent ( atan2 )"), _("Mathematical tools"), "res/mathfunction.png")
+    extension.AddExpression("atan2", _("2 argument arctangent"), _("2 argument arctangent (atan2)"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Y"))
         .AddParameter("expression", _("X"));
 
@@ -141,14 +141,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtens
 
     extension.AddExpression("pow", _("Power"), _("Raise a number to power n"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Number"))
-        .AddParameter("expression", _("The exponent ( n in x^n )"));
+        .AddParameter("expression", _("The exponent (n in x^n)"));
 
 
     extension.AddExpression("sec", _("Secant"), _("Secant"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("sign", _("Sign of a number"), _("Return the sign of a number ( 1,-1 or 0 )"), _("Mathematical tools"), "res/mathfunction.png")
+    extension.AddExpression("sign", _("Sign of a number"), _("Return the sign of a number (1,-1 or 0)"), _("Mathematical tools"), "res/mathfunction.png")
         .AddParameter("expression", _("Expression"));
 
 

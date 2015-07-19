@@ -32,7 +32,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"), "",false)
-        .AddParameter("expression", _("Start position of the portion ( The first letter is at position 0 )"), "",false)
+        .AddParameter("expression", _("Start position of the portion (the first letter is at position 0)"), "",false)
         .AddParameter("expression", _("Length of the portion"), "",false);
 
     extension.AddStrExpression("StrAt",
@@ -42,7 +42,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"), "",false)
-        .AddParameter("expression", _("Position of the character ( The first letter is at position 0 )"), "",false);
+        .AddParameter("expression", _("Position of the character (the first letter is at position 0)"), "",false);
 
     extension.AddExpression("StrLength",
                    _("Length of a text"),
@@ -56,7 +56,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
 
     extension.AddExpression("StrFind",
                    _("Search in a text"),
-                   _("Search in a text ( Return the position of the result or -1 if not found )"),
+                   _("Search in a text (return the position of the result or -1 if not found)"),
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
@@ -67,7 +67,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
 
     extension.AddExpression("StrRFind",
                    _("Search in a text from end"),
-                   _("Search in a text from the end ( Return the position of the result or -1 if not found )"),
+                   _("Search in a text from the end (return the position of the result or -1 if not found)"),
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
@@ -78,7 +78,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
 
     extension.AddExpression("StrFindFrom",
                    _("Search in a text, starting from a position"),
-                   _("Search in a text starting from a position ( Return the position of the result or -1 if not found )"),
+                   _("Search in a text starting from a position (return the position of the result or -1 if not found)"),
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
@@ -90,7 +90,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
 
     extension.AddExpression("StrRFindFrom",
                    _("Search in a text from the end, starting from a position"),
-                   _("Search in a text from the end, starting from a position ( Return the position of the result or -1 if not found )"),
+                   _("Search in a text from the end, starting from a position (return the position of the result or -1 if not found)"),
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 

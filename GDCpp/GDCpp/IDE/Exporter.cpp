@@ -9,8 +9,13 @@
 void Exporter::ShowProjectExportDialog(gd::Project & project)
 {
 #if !defined(GD_NO_WX_GUI)
+#if defined(MACOS)
+    wxString error = _("GDevelop for Mac OS X does not support creating native games :/\n\nInstead, please use the HTML5 platform for your game: you can activate it from the Extensions in the project manager.");
+    wxLogWarning(error);
+#else
     ProjectExportDialog dialog(NULL, project);
     dialog.ShowModal();
+#endif
 #else
     gd::LogError("BAD USE: Tried to call Exporter::ShowProjectExportDialog with support for wxWidgets disabled!");
 #endif

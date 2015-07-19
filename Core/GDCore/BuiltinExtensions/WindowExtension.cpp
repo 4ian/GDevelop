@@ -39,7 +39,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
     extension.AddAction("SetFullScreen",
                    _("De/activate fullscreen"),
                    _("This action activate or desactivate fullscreen."),
-                   _("Activate fullscreen:  _PARAM1_ (keep aspect ratio: _PARAM2_)"),
+                   _("Activate fullscreen: _PARAM1_ (keep aspect ratio: _PARAM2_)"),
                    _("Game's window"),
                    "res/actions/fullscreen24.png",
                    "res/actions/fullscreen.png")

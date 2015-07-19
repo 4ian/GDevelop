@@ -296,7 +296,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
+        .AddParameter("expression", _("Value to test (0: Alpha, 1: Add, 2: Multiply, 3: None)"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 

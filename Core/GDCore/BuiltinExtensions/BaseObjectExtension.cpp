@@ -783,8 +783,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .MarkAsSimple();
 
     extension.AddCondition("NbObjet",
-                   _("Number of objects"),
-                   _("Test the number of concerned objects."),
+                   _("Objects count"),
+                   _("Compare the number of picked objects"),
                    _("The number of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Objects"),
                    "res/conditions/nbObjet24.png",

@@ -46,7 +46,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
 
     extension.AddAction("GetJoystickAxis",
                    _("Get the value of the axis of a joystick"),
-                   _("Save in the variable the value of the axis of the joystick ( from -100 to 100 )."),
+                   _("Save in the variable the value of the axis of the joystick (from -100 to 100)."),
                    _("Save in _PARAM3_ the value of axis _PARAM2_ of joystick _PARAM1_"),
                    _("Joystick"),
                    "res/actions/joystick24.png",

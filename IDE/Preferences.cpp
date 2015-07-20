@@ -1087,7 +1087,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     }
 
     gd::InstructionSentenceFormatter::Get()->SaveTypesFormattingToConfig();
-	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(gd::ToString(conditionsColumnWidthEdit->GetValue())));
+	pConfig->Write("EventsEditor/ConditionColumnWidth", gd::String(conditionsColumnWidthEdit->GetValue()).ToInt());
 	pConfig->Write("EventsEditor/HideContextPanelsLabels", hideContextPanelsLabels->GetValue());
 	pConfig->Write("EventsEditor/Font", eventsEditorFontDialog->GetFontData().GetChosenFont());
 

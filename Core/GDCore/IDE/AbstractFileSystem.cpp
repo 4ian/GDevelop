@@ -114,7 +114,7 @@ bool NativeFileSystem::WriteToFile(const gd::String & filename, const gd::String
 {
     std::ofstream file( filename.c_str() );
     if ( file.is_open() ) {
-        file << content;
+        file << content.ToUTF8();
         file.close();
         return true;
     }

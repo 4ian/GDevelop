@@ -163,19 +163,12 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
 
 	Panel1->SetBackgroundColour(wxColour(layout.GetBackgroundColorRed(), layout.GetBackgroundColorGreen(), layout.GetBackgroundColorBlue()));
 
-    //TODO: GD C++ Platform specific code
-    try
-    {
-        gd::Layout & scene = dynamic_cast<Scene&>(layout);
-
-        if ( scene.StandardSortMethod() ) stableSortCheck->SetValue(true);
-        fovEdit->SetValue(ToString(scene.GetOpenGLFOV()));
-        zNearEdit->SetValue(ToString(scene.GetOpenGLZNear()));
-        zFarEdit->SetValue(ToString(scene.GetOpenGLZFar()));
-        stopSoundsCheck->SetValue(scene.StopSoundsOnStartup());
-        disableInputCheck->SetValue(scene.IsInputDisabledWhenFocusIsLost());
-    }
-    catch (...) { /*Not a GD C++ Platform scene*/ }
+    if ( layout.StandardSortMethod() ) stableSortCheck->SetValue(true);
+    fovEdit->SetValue(ToString(layout.GetOpenGLFOV()));
+    zNearEdit->SetValue(ToString(layout.GetOpenGLZNear()));
+    zFarEdit->SetValue(ToString(layout.GetOpenGLZFar()));
+    stopSoundsCheck->SetValue(layout.StopSoundsOnStartup());
+    disableInputCheck->SetValue(layout.IsInputDisabledWhenFocusIsLost());
 }
 
 EditPropScene::~EditPropScene()
@@ -187,25 +180,16 @@ EditPropScene::~EditPropScene()
 
 void EditPropScene::OnOkBtClick(wxCommandEvent& event)
 {
-    layout.SetWindowDefaultTitle(CaptionEdit->GetValue());
-
     wxColourData cData;
     cData.SetColour(Panel1->GetBackgroundColour());
     layout.SetBackgroundColor( cData.GetColour().Red(), cData.GetColour().Green(), cData.GetColour().Blue());
-
-    //TODO: GD C++ Platform specific code
-    try
-    {
-        gd::Layout & scene = dynamic_cast<Scene&>(layout);
-
-        scene.SetOpenGLFOV(ToFloat(ToString(fovEdit->GetValue())));
-        scene.SetOpenGLZNear(ToFloat(ToString(zNearEdit->GetValue())));
-        scene.SetOpenGLZFar(ToFloat(ToString(zFarEdit->GetValue())));
-        scene.SetStopSoundsOnStartup(stopSoundsCheck->GetValue());
-        scene.SetStandardSortMethod(fastSortCheck->GetValue());
-        scene.DisableInputWhenFocusIsLost(disableInputCheck->GetValue());
-    }
-    catch (...) { /*Not a GD C++ Platform scene*/ }
+    layout.SetWindowDefaultTitle(CaptionEdit->GetValue());
+    layout.SetOpenGLFOV(gd::String(fovEdit->GetValue()).ToFloat());
+    layout.SetOpenGLZNear(gd::String(zNearEdit->GetValue()).ToFloat());
+    layout.SetOpenGLZFar(gd::String(zFarEdit->GetValue()).ToFloat());
+    layout.SetStopSoundsOnStartup(stopSoundsCheck->GetValue());
+    layout.SetStandardSortMethod(fastSortCheck->GetValue());
+    layout.DisableInputWhenFocusIsLost(disableInputCheck->GetValue());
 
     EndModal(1);
 }

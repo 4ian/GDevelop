@@ -137,18 +137,6 @@ inline double Round( double d )
 }
 #endif
 
-/**
- * Make the whole string uppercase.
- * \ingroup CommonProgrammingTools
- */
-inline std::string StrUppercase( const std::string& in )
-{
-    std::string out;
-
-    std::transform( in.begin(), in.end(), std::back_inserter( out ), ::toupper );
-    return out;
-}
-
 }
 
 #endif // COMMONTOOLS_H

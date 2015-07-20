@@ -194,6 +194,8 @@ String String::FromLocale( const std::string &localizedString )
 {
 #if defined(WINDOWS)
     return FromSfString(sf::String(localizedString)); //Don't need to use the current locale, on Windows, std::locale is always the C locale
+#elif defined(MACOS)
+    return FromUTF8(localizedString); //Assume UTF8 is the current locale
 #else
     if(std::locale("").name().find("UTF-8") != std::string::npos)
         return FromUTF8(localizedString); //UTF8 is already the current locale
@@ -239,6 +241,8 @@ std::string String::ToLocale() const
 {
 #if defined(WINDOWS)
     return ToSfString().toAnsiString();
+#elif defined(MACOS)
+    return m_string;
 #else
     if(std::locale("").name().find("UTF-8") != std::string::npos)
         return m_string; //UTF8 is already the current locale on Linux

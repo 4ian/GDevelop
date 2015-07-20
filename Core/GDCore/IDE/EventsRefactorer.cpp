@@ -505,15 +505,14 @@ gd::String ReplaceAllOccurences(gd::String context, const gd::String& from, cons
 
 gd::String ReplaceAllOccurencesCaseUnsensitive(gd::String context, gd::String from, const gd::String& to)
 {
-    //Still use uppercase (instead of casefolding) to avoid to change the string size
-    from = from.ToUpperCase();
-
     size_t lookHere = 0;
     size_t foundHere;
-    while((foundHere = context.ToUpperCase().find(from, lookHere)) != string::npos)
+    size_t fromSize = from.size();
+    size_t toSize = to.size();
+    while((foundHere = context.FindCaseInsensitive(from, lookHere)) != gd::String::npos)
     {
-          context.replace(foundHere, from.size(), to);
-          lookHere = foundHere + to.size();
+          context.replace(foundHere, fromSize, to);
+          lookHere = foundHere + toSize;
     }
 
     return context;
@@ -621,14 +620,12 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
 
 bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, gd::String search, bool matchCase)
 {
-    if ( !matchCase ) search = search.ToUpperCase();
-
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
         for (unsigned int pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
         {
             size_t foundPosition = matchCase ? actions[aId].GetParameter(pNb).GetPlainString().find(search) :
-                                     actions[aId].GetParameter(pNb).GetPlainString().ToUpperCase().find(search);
+                                     actions[aId].GetParameter(pNb).GetPlainString().FindCaseInsensitive(search);
 
             if ( foundPosition != gd::String::npos ) return true;
         }
@@ -642,14 +639,12 @@ bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout &
 
 bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String search, bool matchCase)
 {
-    if ( !matchCase ) search = search.ToUpperCase();
-
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
         for (unsigned int pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
         {
             size_t foundPosition = matchCase ? conditions[cId].GetParameter(pNb).GetPlainString().find(search) :
-                                     conditions[cId].GetParameter(pNb).GetPlainString().ToUpperCase().find(search);
+                                     conditions[cId].GetParameter(pNb).GetPlainString().FindCaseInsensitive(search);
 
             if ( foundPosition != gd::String::npos ) return true;
         }

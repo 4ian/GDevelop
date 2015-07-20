@@ -646,6 +646,50 @@ int String::compare( const String &other ) const
     return m_string.compare( other.m_string );
 }
 
+namespace priv
+{
+    String::size_type GetPositionInCaseFolded( const String &str, String::size_type pos )
+    {
+        String::size_type posInCF = 0;
+        String::size_type totalDelta = 0;
+
+        for(String::size_type i = 0; i < pos; ++i)
+        {
+            String substrCF = str.substr(0, i).CaseFold();
+            String::size_type sizeCF = substrCF.size();
+
+            String::size_type sizeDelta = sizeCF - i;
+            posInCF += 1 /* One position further */
+                     + sizeDelta - totalDelta; /* The offset created by the casefolded, for example, if one character is casefolded into 2. */
+            totalDelta = sizeDelta;
+        }
+
+        return posInCF;
+    }
+
+    String::size_type GetPositionFromCaseFolded( const String &str, String::size_type pos )
+    {
+        String::size_type posInOrig = 0;
+        while(pos != GetPositionInCaseFolded(str, posInOrig))
+            posInOrig++;
+        return posInOrig;
+    }
+}
+
+String::size_type String::FindCaseInsensitive( const String &search, size_type pos ) const
+{
+    //Find where is pos in the casefolded string (it's important because some letters
+    //are casefolded into multiples letters, e.g. the german eszett ß is casefolded to ss).
+
+    //Do a traditionnal find with both strings casefolded
+    gd::String casefoldedStr = CaseFold();
+    size_type findPos = casefoldedStr.find( search.CaseFold(), priv::GetPositionInCaseFolded(*this, pos) );
+    if(findPos == npos)
+        return npos;
+    else
+        return priv::GetPositionFromCaseFolded(*this, findPos);
+}
+
 String& String::Normalize(String::NormForm form)
 {
     unsigned char *newStr = nullptr;

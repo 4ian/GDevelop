@@ -651,6 +651,15 @@ public:
      */
     int compare( const String &other ) const;
 
+    /**
+     * Do a case-insensitive search
+     * \return the position of the first occurence of **search** starting from **pos**.
+     *
+     * \note This method isn't very efficient as it is linear on the string size times the
+     * search string size
+     */
+    size_type FindCaseInsensitive( const String &search, size_type pos = 0 ) const;
+
 /**
  * \}
  */
@@ -855,7 +864,7 @@ namespace std
  * and the now-obsolete UCS-2.
  *
  * UTF-8 is a character encoding capable of encoding all possible characters, or code points, in Unicode.
- * The encoding is variable-length (not every character is 1 byte long) and uses 8-bit code units. It was designed
+ * The encoding is variable-length (not every codepoint is 1 byte long) and uses 8-bit code units. It was designed
  * for backward compatibility with ASCII.
  * UTF-8 encodes each of the 1,112,064 valid code points in the Unicode code space using one to four 8-bit bytes
  * (a group of 8 bits is known as an octet in the Unicode Standard). Code points with lower numerical values
@@ -866,6 +875,11 @@ namespace std
  * \section Limitations Limitations
  * The String class stores internally the string as an UTF8 encoded std::string. It results in some limitations : it's
  * impossible to edit a single character with operator[]() nor at() because the new character length might not be the same.
+ *
+ * **The gd::String class supports almost all Unicode characters, except the ones that can't be represented as a single
+ * codepoint (obviously, a codepoint can be represented by 1 to 4 bytes, as codepoints are encoded in UTF8).** For examples,
+ * some special letters are composed of multiple codepoints (a letter, and the accents). Most of them can be combined into a
+ * single codepoint but some can't. These are the not supported ones. See \ref Normalization.
  *
  * \section Performance Performance
  * The UTF8 encoding has the advantage to reduce the RAM consumption compared to UTF16 or UTF32 for strings using a lot
@@ -916,7 +930,7 @@ namespace std
  * \endcode
  *
  * \section Normalization Normalization
- * This class stores Unicode strings normalized with NFC which means that all characters are combined. For example, the "à"
+ * This class stores Unicode strings normalized with NFC which means that all characters are combined (if they can). For example, the "à"
  * character can be written in two ways according to the Unicode norm : U+00E0 (the "à" in a single codepoint) or
  * U+0061 (the "a" letter codepoint) + U+0300 "the "`" combining accent. We say that they are canonically equivalent.
  * However, this can cause problem when comparing strings, that's why **this class normalizes the string when constructed** using

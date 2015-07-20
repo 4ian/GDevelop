@@ -231,4 +231,23 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 		REQUIRE( gd::CaseInsensitiveEquiv(str6, str7) == true );
 		REQUIRE( gd::CaseInsensitiveEquiv(str6, str7, false) == false );
 	}
+
+	SECTION("case-insensitive find/rfind") {
+		gd::String str1 = u8"Ich heiße GDevelop";
+		gd::String search1 = u8"HEISSE";
+		gd::String search2 = u8"heiße";
+		gd::String search3 = u8"gdevelop";
+
+		REQUIRE( str1.FindCaseInsensitive(search1) == 4 );
+		REQUIRE( str1.FindCaseInsensitive(search1, 4) == 4 );
+		REQUIRE( str1.FindCaseInsensitive(search1, 5) == gd::String::npos );
+
+		REQUIRE( str1.FindCaseInsensitive(search2) == 4 );
+		REQUIRE( str1.FindCaseInsensitive(search2, 4) == 4 );
+		REQUIRE( str1.FindCaseInsensitive(search2, 5) == gd::String::npos );
+
+		REQUIRE( str1.FindCaseInsensitive(search3) == 10 );
+		REQUIRE( str1.FindCaseInsensitive(search3, 10) == 10 );
+		REQUIRE( str1.FindCaseInsensitive(search3, 11) == gd::String::npos );
+	}
 }

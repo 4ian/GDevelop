@@ -731,7 +731,7 @@ bool Project::LoadFromFile(const gd::String & filename)
     gd::SerializerElement rootElement;
 
     //COMPATIBILITY CODE WITH ANSI GDEVELOP ( <= 3.6.83 )
-    #if defined(GD_IDE_ONLY) //There should not be any problem with encoding in compiled games
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI) //There should not be any problem with encoding in compiled games
     //Get the declaration element
     TiXmlDeclaration * declXmlElement = hdl.FirstChild().ToNode()->ToDeclaration();
     if(strcmp(declXmlElement->Encoding(), "UTF-8") != 0)
@@ -767,18 +767,9 @@ bool Project::LoadFromFile(const gd::String & filename)
             std::cout << "The project file is not encoded in UTF8, conversion started... ";
 
             //Create a temporary file
-#if !defined(GD_NO_WX_GUI)
-    #if defined(WINDOWS)
-            wxString tmpFileName = wxFileName::CreateTempFileName("");
-    #else
-            wxString tmpFileName = wxStandardPaths::Get().GetUserConfigDir() + "/gdevelop_converted_project";
-    #endif
-#else
-            std::string tmpFileName = filename.ToLocale() + ".utf8";
-#endif
-
-#if defined(WINDOWS)
+            #if defined(WINDOWS)
             //Convert using the current locale
+            wxString tmpFileName = wxFileName::CreateTempFileName("");
             std::ofstream outStream;
             docStream.open(filename.ToLocale(), ios::in);
 
@@ -798,8 +789,9 @@ bool Project::LoadFromFile(const gd::String & filename)
             outStream.close();
             docStream.close();
 
-#else
+            #else
             //Convert using iconv command tool
+            wxString tmpFileName = wxStandardPaths::Get().GetUserConfigDir() + "/gdevelop_converted_project";
             gd::String iconvCall = gd::String("iconv -f LATIN1 -t UTF-8 \"") + filename.ToLocale() + "\" ";
             #if defined(MACOS)
             iconvCall += "> \"" + tmpFileName + "\"";
@@ -808,10 +800,8 @@ bool Project::LoadFromFile(const gd::String & filename)
             #endif
 
             std::cout << "Executing " << iconvCall  << std::endl;
-            #if !defined(GD_NO_WX_GUI)
             system(iconvCall.c_str());
             #endif
-#endif
 
             //Reload the converted file, forcing UTF8 encoding as the XML header is false (still written ISO-8859-1)
             doc.LoadFile(std::string(tmpFileName).c_str(), TIXML_ENCODING_UTF8);

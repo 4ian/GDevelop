@@ -798,15 +798,19 @@ bool Project::LoadFromFile(const gd::String & filename)
             outStream.close();
             docStream.close();
 
-#else //ON LINUX OR MAC OS X
+#else
             //Convert using iconv command tool
-            std::cout << "Executing " << "iconv -f LATIN1 -t UTF-8 \"" + filename.ToLocale() + "\" -o  \"" + tmpFileName + "\"" << std::endl;
-    #if !defined(GD_NO_WX_GUI)
-            wxExecute("iconv -f LATIN1 -t UTF-8 \"" + filename.ToLocale() + "\" -o  \"" + tmpFileName + "\"", wxEXEC_BLOCK);
-    #else
-            std::string command = "iconv -f LATIN1 -t UTF-8 \"" + filename.ToLocale() + "\" -o  \"" + std::string(tmpFileName) + "\"";
-            system(command.c_str());
-    #endif
+            gd::String iconvCall = gd::String("iconv -f LATIN1 -t UTF-8 \"") + filename.ToLocale() + "\" ";
+            #if defined(MACOS)
+            iconvCall += "> \"" + tmpFileName + "\"";
+            #else
+            iconvCall += "-o \"" + tmpFileName + "\"";
+            #endif
+
+            std::cout << "Executing " << iconvCall  << std::endl;
+            #if !defined(GD_NO_WX_GUI)
+            system(iconvCall.c_str());
+            #endif
 #endif
 
             //Reload the converted file, forcing UTF8 encoding as the XML header is false (still written ISO-8859-1)

@@ -249,5 +249,10 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 		REQUIRE( str1.FindCaseInsensitive(search3) == 10 );
 		REQUIRE( str1.FindCaseInsensitive(search3, 10) == 10 );
 		REQUIRE( str1.FindCaseInsensitive(search3, 11) == gd::String::npos );
+
+		gd::String str2 = u8"Ich heiße GDevelop ß";
+		REQUIRE( str2.FindCaseInsensitive(u8"SS") == 7 );
+		REQUIRE( str2.FindCaseInsensitive(u8"SS", 7) == 7 );
+		REQUIRE( str2.FindCaseInsensitive(u8"SS", 8) == 19 );
 	}
 }

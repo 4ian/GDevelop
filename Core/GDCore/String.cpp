@@ -652,27 +652,31 @@ int String::compare( const String &other ) const
 
 namespace priv
 {
+    /**
+     * As the the casefolded version of a string can have a different size, the positions
+     * in the two versions of the string are not the same.
+     * \return where the **pos** position in the original string **str** is in the
+     * casefolded version of **str**
+     */
     String::size_type GetPositionInCaseFolded( const String &str, String::size_type pos )
     {
-        String::size_type posInCF = 0;
-        String::size_type totalDelta = 0;
-
-        for(String::size_type i = 0; i < pos; ++i)
-        {
-            String substrCF = str.substr(0, i).CaseFold();
-            String::size_type sizeCF = substrCF.size();
-
-            String::size_type sizeDelta = sizeCF - i;
-            posInCF += 1 /* One position further */
-                     + sizeDelta - totalDelta; /* The offset created by the casefolded, for example, if one character is casefolded into 2. */
-            totalDelta = sizeDelta;
-        }
-
-        return posInCF;
+        //Use the substring to determine the differences between original and casefolded
+        //Get the substring from 0 to pos and then casefold it to see where the character
+        //is in the casefolded version
+        return str.substr(0, pos).CaseFold().size();
     }
 
+    /**
+     * As the the casefolded version of a string can have a different size, the positions
+     * in the two versions of the string are not the same.
+     * \return where the **pos** position in the casefolded string of **str** is in the
+     * original version **str**
+     * \note str must be the non-casefolded string.
+     */
     String::size_type GetPositionFromCaseFolded( const String &str, String::size_type pos )
     {
+        //Use the "opposite" operation (GetPositionInCaseFolded) to find where the position
+        //is in the original string.
         String::size_type posInOrig = 0;
         while(pos != GetPositionInCaseFolded(str, posInOrig))
             posInOrig++;

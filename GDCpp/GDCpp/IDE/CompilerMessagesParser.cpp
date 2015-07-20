@@ -21,34 +21,20 @@ void CompilerMessagesParser::ParseOutput(gd::String rawOutput)
     for (unsigned int i = 0;i<output.size();++i)
     {
         CompilerMessage newMessage;
+        std::vector<gd::String> columns = output[i].Split(U':');
 
-        //Parse file
-        size_t fileEndPos = output[i].find_first_of(gd::String(':'), 2);
-        if ( fileEndPos != gd::String::npos ) newMessage.file = output[i].substr(0, fileEndPos);
-
-        //Get line
-        size_t lineEndPos = gd::String::npos;
-        if ( output[i].length()>fileEndPos && isdigit(output[i][fileEndPos+1]) )
+        if (columns.size() >= 3)
         {
-            lineEndPos = output[i].find_first_of(gd::String(':'), fileEndPos+1);
-            if ( lineEndPos != gd::String::npos ) newMessage.line = output[i].substr(fileEndPos+1, lineEndPos).ToInt();
+            newMessage.file = columns[0];
+            newMessage.line = columns[1].ToInt();
+            newMessage.column = columns[2].ToInt();
         }
+        if (!columns.empty()) newMessage.message = columns.back();
 
-        //Get column
-        size_t colEndPos = gd::String::npos;
-        if ( output[i].length()>lineEndPos && isdigit(output[i][lineEndPos+1]) )
-        {
-            colEndPos = output[i].find_first_of(gd::String(':'), lineEndPos+1);
-            if ( colEndPos != gd::String::npos ) newMessage.column = output[i].substr(lineEndPos+1, colEndPos).ToInt();
-        }
-
-        if ( fileEndPos < output[i].length() )
-            newMessage.message = output[i].substr(colEndPos != gd::String::npos ? colEndPos+1 : fileEndPos, output[i].length());
+        if ( output[i].find("error") < output[i].length() )
+            newMessage.messageType = CompilerMessage::error;
         else
-            newMessage.message = output[i];
-
-        if ( output[i].find("error") < output[i].length() ) newMessage.messageType = CompilerMessage::error;
-        else newMessage.messageType = CompilerMessage::simple;
+            newMessage.messageType = CompilerMessage::simple;
 
         parsedMessages.push_back(newMessage);
     }

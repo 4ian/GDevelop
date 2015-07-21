@@ -94,24 +94,6 @@ float ToFloat( const T & value )
 template<>
 std::string GD_CORE_API ToString( const wxString & value ) GD_DEPRECATED;
 
-/**
- * Split a string into tokens stored in a vector, using the specified separator.
- * \param str String to split
- * \param separator Separator to use
- */
-template <typename T>
-std::vector <T> SplitString( const std::string & str, char separator )
-{
-    std::istringstream iss( str );
-    std::string token;
-    std::vector <T> array;
-
-    while ( std::getline( iss, token, separator ) )
-        array.push_back( T(token) );
-
-    return array;
-}
-
 inline double Pi()
 {
     return 3.141592653589793238;
@@ -136,18 +118,6 @@ inline double Round( double d )
     return ( d >= 0 ? floor(d+0.5) : ceil(d-0.5) );
 }
 #endif
-
-/**
- * Make the whole string uppercase.
- * \ingroup CommonProgrammingTools
- */
-inline std::string StrUppercase( const std::string& in )
-{
-    std::string out;
-
-    std::transform( in.begin(), in.end(), std::back_inserter( out ), ::toupper );
-    return out;
-}
 
 }
 

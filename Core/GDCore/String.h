@@ -248,7 +248,7 @@ public:
     {
         std::ostringstream oss;
         oss << value;
-        return gd::String::FromLocale(oss.str());
+        return gd::String(oss.str().c_str());
     }
 
     /**

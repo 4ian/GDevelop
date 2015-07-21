@@ -198,7 +198,7 @@ tempLayer(layer_)
 
     cameraChoice->Clear();
     for (unsigned int i = 0;i<layer.GetCameraCount();++i)
-    	cameraChoice->Append(ToString(i));
+    	cameraChoice->Append(gd::String::From(i));
 
     cameraChoice->SetSelection(0);
     RefreshCameraSettings();
@@ -227,7 +227,7 @@ void EditLayerDialog::OnokBtClick(wxCommandEvent& event)
 
     if( layer.GetName() != "")
     	tempLayer.SetName(nameEdit->GetValue());
-    
+
     tempLayer.SetVisibility(visibilityCheck->GetValue());
 
     layer = tempLayer;
@@ -267,8 +267,8 @@ void EditLayerDialog::RefreshCameraSettings()
         cameraWidthEdit->Enable(true);
         cameraHeightEdit->Enable(true);
 
-        cameraWidthEdit->ChangeValue(ToString(camera.GetWidth()));
-        cameraHeightEdit->ChangeValue(ToString(camera.GetHeight()));
+        cameraWidthEdit->ChangeValue(gd::String::From(camera.GetWidth()));
+        cameraHeightEdit->ChangeValue(gd::String::From(camera.GetHeight()));
     }
 
     viewportX1Edit->SetBackgroundColour(wxColour(255,255,255));
@@ -296,10 +296,10 @@ void EditLayerDialog::RefreshCameraSettings()
         viewportY1Edit->Enable(true);
         viewportY2Edit->Enable(true);
 
-        viewportX1Edit->ChangeValue(ToString(camera.GetViewportX1()));
-        viewportX2Edit->ChangeValue(ToString(camera.GetViewportX2()));
-        viewportY1Edit->ChangeValue(ToString(camera.GetViewportY1()));
-        viewportY2Edit->ChangeValue(ToString(camera.GetViewportY2()));
+        viewportX1Edit->ChangeValue(gd::String::From(camera.GetViewportX1()));
+        viewportX2Edit->ChangeValue(gd::String::From(camera.GetViewportX2()));
+        viewportY1Edit->ChangeValue(gd::String::From(camera.GetViewportY1()));
+        viewportY2Edit->ChangeValue(gd::String::From(camera.GetViewportY2()));
     }
 }
 
@@ -320,7 +320,7 @@ void EditLayerDialog::OncameraWidthEditText(wxCommandEvent& event)
     if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
-    camera.SetSize(ToFloat(ToString(cameraWidthEdit->GetValue())), camera.GetHeight());
+    camera.SetSize(gd::String(cameraWidthEdit->GetValue()).To<float>(), camera.GetHeight());
 }
 
 void EditLayerDialog::OncameraHeightEditText(wxCommandEvent& event)
@@ -329,7 +329,7 @@ void EditLayerDialog::OncameraHeightEditText(wxCommandEvent& event)
     if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
-    camera.SetSize(camera.GetWidth(), ToFloat(ToString(cameraHeightEdit->GetValue())));
+    camera.SetSize(camera.GetWidth(), gd::String(cameraHeightEdit->GetValue()).To<float>());
 }
 
 void EditLayerDialog::OnviewportCheckClick(wxCommandEvent& event)
@@ -358,7 +358,7 @@ void EditLayerDialog::OnviewportX1EditText(wxCommandEvent& event)
     float y2 = camera.GetViewportY2();
 
     {
-        float newValue = ToFloat(ToString(viewportX1Edit->GetValue()));
+        float newValue = gd::String(viewportX1Edit->GetValue()).To<float>();
         if ( newValue >= 0 && newValue <= 1)
         {
             x1 = newValue;
@@ -369,7 +369,7 @@ void EditLayerDialog::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue =  ToFloat(ToString(viewportY1Edit->GetValue()));
+        float newValue =  gd::String(viewportY1Edit->GetValue()).To<float>();
         if ( newValue >= 0 && newValue <= 1)
         {
             y1 = newValue;
@@ -380,7 +380,7 @@ void EditLayerDialog::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = ToFloat(ToString(viewportX2Edit->GetValue()));
+        float newValue = gd::String(viewportX2Edit->GetValue()).To<float>();
         if ( newValue >= 0 && newValue <= 1)
         {
             x2 = newValue;
@@ -391,7 +391,7 @@ void EditLayerDialog::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = ToFloat(ToString(viewportY2Edit->GetValue()));
+        float newValue = gd::String(viewportY2Edit->GetValue()).To<float>();
         if ( newValue >= 0 && newValue <= 1)
         {
             y2 = newValue;

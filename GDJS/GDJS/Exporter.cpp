@@ -186,7 +186,8 @@ bool Exporter::ExportIntelXDKIndexFile(gd::Project & project, gd::String exportD
         gd::String str = fs.ReadFile("./JsPlatform/Runtime/XDKProject.xdk");
 
         //Complete the project file
-        gd::String nowTimeStamp = wxDateTime::Now().GetTicks()+"000"; //Beware, timestamp is in ms.
+        gd::String nowTimeStamp = gd::String::From(wxDateTime::Now().GetTicks()) +
+            "000"; //Beware, timestamp is in ms.
         size_t pos = str.find("\"GDJS_LAST_MODIFIED\"");
         if ( pos < str.length() )
             str = str.replace(pos, 20, nowTimeStamp);

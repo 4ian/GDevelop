@@ -170,7 +170,9 @@ void EditLink::OnOkBtClick(wxCommandEvent& event)
     else
     {
         editedEvent.SetIncludeAllEvents(false);
-        editedEvent.SetIncludeStartAndEnd(ToInt(ToString(StartEdit->GetValue()))-1, ToInt(ToString(EndEdit->GetValue()))-1);
+        editedEvent.SetIncludeStartAndEnd(
+        	gd::String(StartEdit->GetValue()).To<int>() - 1,
+        	gd::String(EndEdit->GetValue()).To<int>() - 1);
     }
     EndModal(1);
 }

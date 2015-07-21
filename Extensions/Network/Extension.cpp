@@ -245,6 +245,7 @@ public:
     bool ChangeProperty(unsigned int propertyNb, gd::String newValue)
     {
         if ( propertyNb == 0 ) return false;
+        return false;
     }
 
     unsigned int GetNumberOfProperties() const

@@ -131,7 +131,7 @@ void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
     wxFileDialog dialog(this, _("Choose the MP3 file to encode in OGG Vorbis"), "", "", "Fichier audio MP3 ( *.mp3)|*.mp3");
     dialog.ShowModal();
 
-    string originalFile = gd::ToString( dialog.GetPath() );
+    wxString originalFile = dialog.GetPath();
     if ( originalFile == "" ) return;
 
     wxExecute("lame \""+originalFile+"\" \""+originalFile+".wav\" --decode", wxEXEC_SYNC);

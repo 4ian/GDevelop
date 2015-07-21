@@ -143,7 +143,7 @@ public:
                 functionCode += codeGenerator.GenerateObjectsDeclarationCode(context);
                 gd::String ifPredicat = "true";
                 for (unsigned int i = 0;i<event.GetConditions().size();++i)
-                    ifPredicat += " && condition"+gd::String::FromUInt(i)+"IsTrue";
+                    ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
                 functionCode += conditionsCode;
                 functionCode += "if (" +ifPredicat+ ")\n";

@@ -252,7 +252,7 @@ void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
     while ( alreadyExist )
     {
         ++nb;
-        name = _("New layer ") + gd::String::FromUInt(nb);
+        name = _("New layer ") + gd::String::From(nb);
 
         alreadyExist = false;
         for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)

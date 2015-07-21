@@ -82,9 +82,9 @@ gd::String SerializerValue::GetString() const
 	if (isBoolean)
 		return booleanValue ? gd::String("true") : gd::String("false");
 	else if (isInt)
-		return gd::String::FromInt(intValue);
+		return gd::String::From(intValue);
 	else if (isDouble)
-		return gd::String::FromDouble(doubleValue);
+		return gd::String::From(doubleValue);
 	else if (isUnknown)
 		return stringValue;
 
@@ -96,7 +96,7 @@ int SerializerValue::GetInt() const
 	if (isBoolean)
 		return booleanValue ? 1 : 0;
 	else if (isString || isUnknown)
-		return stringValue.ToInt();
+		return stringValue.To<int>();
 	else if (isDouble)
 		return doubleValue;
 
@@ -108,7 +108,7 @@ double SerializerValue::GetDouble() const
 	if (isBoolean)
 		return booleanValue ? 1 : 0;
 	else if (isString || isUnknown)
-		return stringValue.ToDouble();
+		return stringValue.To<double>();
 	else if (isInt)
 		return intValue;
 

@@ -188,12 +188,12 @@ std::map<gd::String, gd::PropertyDescriptor> TopDownMovementAutomatism::GetPrope
     std::map<gd::String, gd::PropertyDescriptor> properties;
 
     properties[_("Allows diagonals")].SetValue(allowDiagonals ? "true" : "false").SetType("Boolean");
-    properties[_("Acceleration")].SetValue(gd::String::FromFloat(acceleration));
-    properties[_("Deceleration")].SetValue(gd::String::FromFloat(deceleration));
-    properties[_("Max. speed")].SetValue(gd::String::FromFloat(maxSpeed));
-    properties[_("Rotate speed")].SetValue(gd::String::FromFloat(angularMaxSpeed));
+    properties[_("Acceleration")].SetValue(gd::String::From(acceleration));
+    properties[_("Deceleration")].SetValue(gd::String::From(deceleration));
+    properties[_("Max. speed")].SetValue(gd::String::From(maxSpeed));
+    properties[_("Rotate speed")].SetValue(gd::String::From(angularMaxSpeed));
     properties[_("Rotate object")].SetValue(rotateObject ? "true" : "false").SetType("Boolean");
-    properties[_("Angle offset")].SetValue(gd::String::FromFloat(angleOffset));
+    properties[_("Angle offset")].SetValue(gd::String::From(angleOffset));
     properties[_("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
 
     return properties;

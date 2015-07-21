@@ -337,7 +337,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
         gd::Layout & exportedLayout = project.GetLayout(i);
         gd::String eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(project, exportedLayout,
             exportedLayout.GetEvents(), eventsIncludes, false /*Export for edittime*/);
-        gd::String filename = outputDir+"code"+gd::String::FromUInt(i)+".js";
+        gd::String filename = outputDir+"code"+gd::String::From(i)+".js";
 
         //Export the code
         if (fs.WriteToFile(filename, eventsOutput))
@@ -368,7 +368,7 @@ bool Exporter::ExportExternalSourceFiles(gd::Project & project, gd::String outpu
 
         gd::String filename = file.GetFileName();
         fs.MakeAbsolute(filename, fs.DirNameFrom(project.GetProjectFile()));
-        gd::String outFilename = "ext-code"+gd::String::FromUInt(i)+".js";
+        gd::String outFilename = "ext-code"+gd::String::From(i)+".js";
         if (!fs.CopyFile(filename, outputDir+outFilename))
             gd::LogWarning(_("Could not copy external file") + filename);
 

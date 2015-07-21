@@ -24,7 +24,7 @@ gd::String SceneNameMangler::GetMangledSceneName(const gd::String & originalScen
               i == 0) ) //Also disallow some characters to be in first position
         {
             char32_t unallowedChar = partiallyMangledName[i];
-            partiallyMangledName.replace(i, 1, "_"+gd::String::FromInt(unallowedChar));
+            partiallyMangledName.replace(i, 1, "_"+gd::String::From(unallowedChar));
         }
     }
 

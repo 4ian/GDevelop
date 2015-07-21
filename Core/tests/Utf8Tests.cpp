@@ -180,15 +180,15 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 	}
 
 	SECTION("conversions from/to numbers") {
-		REQUIRE( gd::String::FromInt(-15) == "-15" );
-		REQUIRE( gd::String::FromUInt(15) == "15" );
-		REQUIRE( gd::String::FromFloat(15.6f) == "15.6" );
-		REQUIRE( gd::String::FromDouble(15.6) == "15.6" );
+		REQUIRE( gd::String::From(-15) == "-15" );
+		REQUIRE( gd::String::From<unsigned int>(15) == "15" );
+		REQUIRE( gd::String::From(15.6f) == "15.6" );
+		REQUIRE( gd::String::From(15.6) == "15.6" );
 
-		REQUIRE( gd::String("-15").ToInt() == -15 );
-		REQUIRE( gd::String("15").ToUInt() == 15 );
-		REQUIRE( gd::String("15.6").ToFloat() == 15.6f );
-		REQUIRE( gd::String("15.6").ToDouble() == 15.6 );
+		REQUIRE( gd::String("-15").To<int>() == -15 );
+		REQUIRE( gd::String("15").To<unsigned int>() == 15 );
+		REQUIRE( gd::String("15.6").To<float>() == 15.6f );
+		REQUIRE( gd::String("15.6").To<double>() == 15.6 );
 	}
 
 	SECTION("operator+=") {

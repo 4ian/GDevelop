@@ -707,9 +707,9 @@ gd::String PhysicsAutomatism::GetStringFromCoordsVector(const std::vector<sf::Ve
 
 	for (unsigned int a = 0; a < vec.size(); a++)
 	{
-	    coordsStr += gd::String::FromFloat(vec.at(a).x);
+	    coordsStr += gd::String::From(vec.at(a).x);
         coordsStr.push_back(composantSep);
-        coordsStr += gd::String::FromFloat(vec.at(a).y);
+        coordsStr += gd::String::From(vec.at(a).y);
 	    if(a != vec.size() - 1)
             coordsStr.push_back(coordsSep);
 	}

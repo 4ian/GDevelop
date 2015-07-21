@@ -63,7 +63,7 @@ void TileHitbox::SerializeTo(gd::SerializerElement &element) const
         if(vertexIt != hitbox.vertices.begin())
             polygonStr += "|";
 
-        polygonStr += gd::String::FromFloat(vertexIt->x) + ";" + gd::String::FromFloat(vertexIt->y);
+        polygonStr += gd::String::From(vertexIt->x) + ";" + gd::String::From(vertexIt->y);
     }
     element.SetAttribute("polygon", polygonStr);
 }
@@ -75,9 +75,9 @@ void TileHitbox::UnserializeFrom(const gd::SerializerElement &element, sf::Vecto
     hitbox.vertices.clear();
 
     gd::String defaultPolygonStr = "0;0|"
-                                    + gd::String::FromFloat(defaultTileSize.x) + ";0|"
-                                    + gd::String::FromFloat(defaultTileSize.x) + ";" + gd::String::FromFloat(defaultTileSize.y) + "|"
-                                    + "0;" + gd::String::FromFloat(defaultTileSize.y);
+                                    + gd::String::From(defaultTileSize.x) + ";0|"
+                                    + gd::String::From(defaultTileSize.x) + ";" + gd::String::From(defaultTileSize.y) + "|"
+                                    + "0;" + gd::String::From(defaultTileSize.y);
     gd::String polygonStr = element.GetStringAttribute("polygon", defaultPolygonStr);
 
     std::vector<gd::String> vertices = polygonStr.Split(U'|');

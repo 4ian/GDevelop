@@ -242,7 +242,7 @@ std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetInitialInstancePro
 {
     std::map<gd::String, gd::PropertyDescriptor> properties;
     properties[_("Animation")] = position.floatInfos.find("animation") != position.floatInfos.end() ?
-                                           gd::String::FromFloat(position.floatInfos.find("animation")->second) :
+                                           gd::String::From(position.floatInfos.find("animation")->second) :
                                            gd::String("0");
 
     return properties;
@@ -250,7 +250,7 @@ std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetInitialInstancePro
 
 bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & scene)
 {
-    if ( name == _("Animation") ) position.floatInfos["animation"] = value.ToInt();
+    if ( name == _("Animation") ) position.floatInfos["animation"] = value.To<int>();
 
     return true;
 }

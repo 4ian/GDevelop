@@ -361,15 +361,15 @@ std::map<gd::String, gd::PropertyDescriptor> Box3DObject::GetInitialInstanceProp
 {
     std::map<gd::String, gd::PropertyDescriptor> properties;
     properties[_("Z")] = position.floatInfos.find("z") != position.floatInfos.end() ?
-                                   gd::String::FromFloat(position.floatInfos.find("z")->second) :
+                                   gd::String::From(position.floatInfos.find("z")->second) :
                                    "0";
 
     properties[_("Pitch")] = position.floatInfos.find("pitch") != position.floatInfos.end() ?
-                                   gd::String::FromFloat(position.floatInfos.find("pitch")->second) :
+                                   gd::String::From(position.floatInfos.find("pitch")->second) :
                                    "0";
 
     properties[_("Roll")] = position.floatInfos.find("roll") != position.floatInfos.end() ?
-                                   gd::String::FromFloat(position.floatInfos.find("roll")->second) :
+                                   gd::String::From(position.floatInfos.find("roll")->second) :
                                    "0";
 
     return properties;
@@ -386,13 +386,13 @@ bool Box3DObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, 
 
 void RuntimeBox3DObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::FromFloat(width);}
-    else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::FromFloat(height);}
-    else if ( propertyNb == 2 ) {name = _("Depth");    value = gd::String::FromFloat(depth);}
-    else if ( propertyNb == 3 ) {name = _("Z Coordinate");  value = gd::String::FromFloat(zPosition);}
-    else if ( propertyNb == 4 ) {name = _("Yaw");           value = gd::String::FromFloat(yaw);}
-    else if ( propertyNb == 5 ) {name = _("Pitch");         value = gd::String::FromFloat(pitch);}
-    else if ( propertyNb == 6 ) {name = _("Roll");          value = gd::String::FromFloat(roll);}
+    if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::From(width);}
+    else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::From(height);}
+    else if ( propertyNb == 2 ) {name = _("Depth");    value = gd::String::From(depth);}
+    else if ( propertyNb == 3 ) {name = _("Z Coordinate");  value = gd::String::From(zPosition);}
+    else if ( propertyNb == 4 ) {name = _("Yaw");           value = gd::String::From(yaw);}
+    else if ( propertyNb == 5 ) {name = _("Pitch");         value = gd::String::From(pitch);}
+    else if ( propertyNb == 6 ) {name = _("Roll");          value = gd::String::From(roll);}
 }
 
 bool RuntimeBox3DObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)

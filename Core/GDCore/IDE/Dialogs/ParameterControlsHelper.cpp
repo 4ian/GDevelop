@@ -38,7 +38,7 @@ void ParameterControlsHelper::UpdateControls(unsigned int count)
     paramMetadata.resize(count);
     while ( paramEdits.size() < count )
     {
-        const gd::String num = gd::String::FromUInt( paramEdits.size() );
+        const gd::String num = gd::String::From( paramEdits.size() );
         long id = wxNewId(); //Bitmap buttons want an unique id so as to be displayed properly
 
         //Addings controls

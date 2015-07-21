@@ -282,7 +282,7 @@ void ChooseVariableDialog::OncancelBtClick(wxCommandEvent& event)
 {
     if ( modificationCount > 4 )
     {
-        wxMessageDialog msgDlg(this, _("You made ")+gd::String::FromUInt(modificationCount)+_(" changes. Are you sure you want to cancel all changes\?"), _("Lot's of changes made."), wxYES_NO | wxICON_QUESTION);
+        wxMessageDialog msgDlg(this, _("You made ")+gd::String::From(modificationCount)+_(" changes. Are you sure you want to cancel all changes\?"), _("Lot's of changes made."), wxYES_NO | wxICON_QUESTION);
         if ( msgDlg.ShowModal() == wxID_NO )
             return;
     }
@@ -300,7 +300,7 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
     unsigned int tries = 2;
     while ( temporaryContainer->Has(newName) )
     {
-        newName = _("NewVariable")+gd::String::FromUInt(tries);
+        newName = _("NewVariable")+gd::String::From(tries);
         tries++;
     }
 

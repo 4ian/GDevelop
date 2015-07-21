@@ -41,9 +41,9 @@ gd::String ProfileEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerat
     gd::String code;
 
     if ( previousProfileEvent )
-        code += "EndProfileTimer(*runtimeContext->scene, "+gd::String::FromUInt(previousProfileEvent->index)+");\n";
+        code += "EndProfileTimer(*runtimeContext->scene, "+gd::String::From(previousProfileEvent->index)+");\n";
 
-    code += "StartProfileTimer(*runtimeContext->scene, "+gd::String::FromUInt(index)+");\n";
+    code += "StartProfileTimer(*runtimeContext->scene, "+gd::String::From(index)+");\n";
 
     return code;
 }

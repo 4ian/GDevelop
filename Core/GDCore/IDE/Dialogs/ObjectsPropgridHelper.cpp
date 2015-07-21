@@ -45,13 +45,13 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
 
     if ( !displayedAfterInstanceProperties )
     {
-        grid->Append( new wxPropertyCategory(_("Object variables") + " (" + gd::String::FromInt(object->GetVariables().Count()) + ")", "OBJECT_VARIABLES_CATEGORY" ) );
+        grid->Append( new wxPropertyCategory(_("Object variables") + " (" + gd::String::From(object->GetVariables().Count()) + ")", "OBJECT_VARIABLES_CATEGORY" ) );
         grid->Append( new wxStringProperty(_("Variables"), wxPG_LABEL, _("Click to edit...")) );
         grid->SetPropertyCell(_("Variables"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
         grid->SetPropertyReadOnly(_("Variables"));
     }
 
-    grid->Append( new wxPropertyCategory(_("Automatisms") + " (" + gd::String::FromInt(object->GetAllAutomatisms().size()) + ")" , "AUTO") );
+    grid->Append( new wxPropertyCategory(_("Automatisms") + " (" + gd::String::From(object->GetAllAutomatisms().size()) + ")" , "AUTO") );
     grid->Append( new wxStringProperty(_("Add automatism"), "AUTO_ADD", _("Add...")) );
     grid->SetPropertyCell("AUTO_ADD", 1, _("Add..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
     grid->SetPropertyReadOnly("AUTO_ADD");
@@ -158,7 +158,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
                 //Update the grid:
                 if ( grid->GetProperty("OBJECT_VARIABLES_CATEGORY") != NULL)
                     grid->SetPropertyLabel("OBJECT_VARIABLES_CATEGORY",
-                        _("Object variables") + " (" + gd::String::FromUInt(object->GetVariables().Count()) + ")");
+                        _("Object variables") + " (" + gd::String::From(object->GetVariables().Count()) + ")");
             }
         }
         else if ( event.GetPropertyName() == "AUTO_ADD" )

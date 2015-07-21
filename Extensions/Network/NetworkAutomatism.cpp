@@ -51,11 +51,11 @@ void NetworkAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     if ( !sending )
     {
-        if ( xPosition ) object->SetX(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/X"]);
-        if ( yPosition ) object->SetY(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Y"]);
-        if ( angle ) object->SetAngle(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Angle"]);
-        if ( width ) object->SetWidth(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Width"]);
-        if ( height ) object->SetHeight(ReceivedDataManager::Get()->values[dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Height"]);
+        if ( xPosition ) object->SetX(ReceivedDataManager::Get()->values[dataPrefix+gd::String::From(objectNetworkId)+"/X"]);
+        if ( yPosition ) object->SetY(ReceivedDataManager::Get()->values[dataPrefix+gd::String::From(objectNetworkId)+"/Y"]);
+        if ( angle ) object->SetAngle(ReceivedDataManager::Get()->values[dataPrefix+gd::String::From(objectNetworkId)+"/Angle"]);
+        if ( width ) object->SetWidth(ReceivedDataManager::Get()->values[dataPrefix+gd::String::From(objectNetworkId)+"/Width"]);
+        if ( height ) object->SetHeight(ReceivedDataManager::Get()->values[dataPrefix+gd::String::From(objectNetworkId)+"/Height"]);
     }
 }
 
@@ -70,7 +70,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/X"
+                << dataPrefix+gd::String::From(objectNetworkId)+"/X"
                 << static_cast<double>(object->GetX());
 
         NetworkManager::Get()->Send(packet);
@@ -79,7 +79,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Y"
+                << dataPrefix+gd::String::From(objectNetworkId)+"/Y"
                 << static_cast<double>(object->GetY());
 
         NetworkManager::Get()->Send(packet);
@@ -88,7 +88,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Angle"
+                << dataPrefix+gd::String::From(objectNetworkId)+"/Angle"
                 << static_cast<double>(object->GetAngle());
 
         NetworkManager::Get()->Send(packet);
@@ -97,7 +97,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Width"
+                << dataPrefix+gd::String::From(objectNetworkId)+"/Width"
                 << static_cast<double>(object->GetWidth());
 
         NetworkManager::Get()->Send(packet);
@@ -106,7 +106,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Packet packet;
         packet  << sf::Int32(0)
-                << dataPrefix+gd::String::FromUInt(objectNetworkId)+"/Height"
+                << dataPrefix+gd::String::From(objectNetworkId)+"/Height"
                 << static_cast<double>(object->GetHeight());
 
         NetworkManager::Get()->Send(packet);

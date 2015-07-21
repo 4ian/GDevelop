@@ -154,13 +154,13 @@ void DebuggerGUI::UpdateGUI()
         return;
 
     //General tab
-    m_generalList->SetItem(0, 1, gd::String::FromDouble(1000000.0/static_cast<double>(scene.GetElapsedTime()))+_(" fps"));
-    m_generalList->SetItem(1, 1, gd::String::FromDouble(static_cast<double>(scene.GetElapsedTime())/1000.0)+"ms");
-    m_generalList->SetItem(2, 1, gd::String::FromDouble(scene.objectsInstances.GetAllObjects().size()));
+    m_generalList->SetItem(0, 1, gd::String::From(1000000.0/static_cast<double>(scene.GetElapsedTime()))+_(" fps"));
+    m_generalList->SetItem(1, 1, gd::String::From(static_cast<double>(scene.GetElapsedTime())/1000.0)+"ms");
+    m_generalList->SetItem(2, 1, gd::String::From(scene.objectsInstances.GetAllObjects().size()));
     //TODO //m_generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
-    m_generalList->SetItem(4, 1, gd::String::FromDouble(scene.game->GetMainWindowDefaultWidth())+"*"+gd::String::FromDouble(scene.game->GetMainWindowDefaultHeight()));
-    m_generalList->SetItem(5, 1, gd::String::FromDouble(scene.GetInputManager().GetMousePosition().x)+";"+gd::String::FromDouble(scene.GetInputManager().GetMousePosition().y));
-    m_generalList->SetItem(6, 1, gd::String::FromDouble(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
+    m_generalList->SetItem(4, 1, gd::String::From(scene.game->GetMainWindowDefaultWidth())+"*"+gd::String::From(scene.game->GetMainWindowDefaultHeight()));
+    m_generalList->SetItem(5, 1, gd::String::From(scene.GetInputManager().GetMousePosition().x)+";"+gd::String::From(scene.GetInputManager().GetMousePosition().y));
+    m_generalList->SetItem(6, 1, gd::String::From(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
 
     //Suppression des lignes en trop pour les variables
     while(static_cast<unsigned int>(m_generalList->GetItemCount()) > generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
@@ -633,8 +633,8 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
         return;
     }
 
-    int x = gd::String(wxGetTextFromUser(_("Enter the X position of the object"), _("Adding an object"))).ToInt();
-    int y = gd::String(wxGetTextFromUser(_("Enter the object's Y position"), _("Adding an object"))).ToInt();
+    int x = gd::String(wxGetTextFromUser(_("Enter the X position of the object"), _("Adding an object"))).To<int>();
+    int y = gd::String(wxGetTextFromUser(_("Enter the object's Y position"), _("Adding an object"))).To<int>();
     newObject->SetX( x );
     newObject->SetY( y );
 

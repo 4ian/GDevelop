@@ -354,9 +354,9 @@ void CustomPolygonDialog::OnpreviewPnlMouseMove(wxMouseEvent& event)
 
     wxSize panelSize = previewPnl->GetSize();
     cursorPosTxt->SetLabel(_("Cursor position:")+" "
-                           +gd::String::FromFloat(event.GetPosition().x+xOffset)
+                           +gd::String::From(event.GetPosition().x+xOffset)
                            +";"
-                           +gd::String::FromFloat(event.GetPosition().y+yOffset));
+                           +gd::String::From(event.GetPosition().y+yOffset));
 }
 
 

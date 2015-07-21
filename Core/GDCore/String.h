@@ -10,6 +10,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <SFML/System/String.hpp>
@@ -237,6 +238,23 @@ public:
  * \name Convert from/to numbers
  * \{
  */
+
+    template<typename T>
+    static String From(T value)
+    {
+        std::ostringstream oss;
+        oss << value;
+        return gd::String::FromLocale(oss.str());
+    }
+
+    template<typename T>
+    T To() const
+    {
+        T value;
+        std::istringstream oss(m_string);
+        oss >> value;
+        return value;
+    }
 
     /**
      * \return a String created from an integer.

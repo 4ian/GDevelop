@@ -23,7 +23,7 @@ void LogFileManager::WriteToLogFile(const gd::String & log)
             if ( !file.Create() ) return; //Failed to create log file
         }
         wxDateTime time = wxDateTime::Now();
-        file.AddLine("["+gd::String::FromUInt(time.GetMonth()+1)+"/"+gd::String::FromUInt(time.GetDay())+"/"+gd::String::FromUInt(time.GetYear())+", "+gd::String::FromUInt(time.GetHour())+":"+gd::String::FromUInt(time.GetMinute())+":"+gd::String::FromUInt(time.GetSecond())+"] "+log);
+        file.AddLine("["+gd::String::From(time.GetMonth()+1)+"/"+gd::String::From(time.GetDay())+"/"+gd::String::From(time.GetYear())+", "+gd::String::From(time.GetHour())+":"+gd::String::From(time.GetMinute())+":"+gd::String::From(time.GetSecond())+"] "+log);
         file.Write();
     }
 }

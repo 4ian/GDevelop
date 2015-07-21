@@ -101,7 +101,7 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingObstacleAutomatism::GetP
 {
     std::map<gd::String, gd::PropertyDescriptor> properties;
     properties[_("Impassable obstacle")].SetValue(impassable ? "true" : "false").SetType("Boolean");
-    properties[_("Cost (if not impassable)")].SetValue(gd::String::FromFloat(cost));
+    properties[_("Cost (if not impassable)")].SetValue(gd::String::From(cost));
 
     return properties;
 }

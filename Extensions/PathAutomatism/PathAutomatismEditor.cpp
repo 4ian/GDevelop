@@ -777,7 +777,7 @@ void PathAutomatismEditor::OnpreviewPnlRightUp(wxMouseEvent& event)
 
             if(menuSelection == coordsBtID)
             {
-                wxMessageBox(_("Point position:") + gd::String::FromDouble(path->at(selectedPoint).x) + ";" + gd::String::FromDouble(path->at(selectedPoint).y));
+                wxMessageBox(_("Point position:") + gd::String::From(path->at(selectedPoint).x) + ";" + gd::String::From(path->at(selectedPoint).y));
             }
             else if(menuSelection == positionBtID)
             {

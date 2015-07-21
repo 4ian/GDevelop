@@ -47,7 +47,7 @@ void GD_API HideLayer( RuntimeScene & scene, const gd::String & layer )
 void GD_API ChangeSceneBackground( RuntimeScene & scene, gd::String newColor )
 {
     std::vector < gd::String > colors = newColor.Split(U';');
-    if ( colors.size() > 2 ) scene.SetBackgroundColor( colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt() );
+    if ( colors.size() > 2 ) scene.SetBackgroundColor( colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>() );
 
     return;
 }
@@ -348,7 +348,7 @@ void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const gd::String & s
     texte.text.setPosition(x, y);
 
     std::vector < gd::String > colors = color.Split(U';');
-    if ( colors.size() > 2 ) texte.text.setColor(sf::Color(colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt() ));
+    if ( colors.size() > 2 ) texte.text.setColor(sf::Color(colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>() ));
 
     texte.text.setCharacterSize(characterSize);
     texte.fontName = fontName;

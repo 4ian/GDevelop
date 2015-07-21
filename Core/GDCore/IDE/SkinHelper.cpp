@@ -367,7 +367,7 @@ wxBitmap SkinHelper::GetIcon(wxString name, unsigned int size)
     wxLogNull noLogPlease;
     wxString skinName;
     gd::String iconName = name;
-    gd::String sizeStr = gd::String::FromUInt(size);
+    gd::String sizeStr = gd::String::From(size);
     wxConfigBase::Get()->Read( _T( "/Skin/Icons" ), &skinName, "default" );
     gd::String identifier = "res/icons_"+gd::ToString(skinName)+"/"+iconName+sizeStr+".png";
 
@@ -388,7 +388,7 @@ bool SkinHelper::IconExists(wxString name, unsigned int size)
     wxLogNull noLogPlease;
     wxString skinName;
     gd::String iconName = name;
-    gd::String sizeStr = gd::String::FromUInt(size);
+    gd::String sizeStr = gd::String::From(size);
     wxConfigBase::Get()->Read( _T( "/Skin/Icons" ), &skinName, "default" );
     gd::String identifier = "res/icons_"+skinName+"/"+iconName+sizeStr+".png";
 

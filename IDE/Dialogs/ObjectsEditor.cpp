@@ -122,7 +122,7 @@ namespace
                     std::find_if( objectsGroups.begin(), objectsGroups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
                         != objectsGroups.end();
                     ++i)
-                    name = text + "Group" + gd::String::FromUInt(i);
+                    name = text + "Group" + gd::String::From(i);
 
                 newGroup.SetName( name );
 
@@ -899,7 +899,7 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     //Find a new unique name for the object
     gd::String name = _("NewObject");
     for (unsigned int i = 2; nameChecker.HasObjectOrGroupNamed(name)!=gd::ObjectOrGroupFinder::No ;++i)
-        name = _("NewObject")+gd::String::FromUInt(i);
+        name = _("NewObject")+gd::String::From(i);
 
     //Add a new object of selected type to objects list
     gd::Object & object = layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(),
@@ -937,7 +937,7 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
     for (unsigned int i = 2;
         nameChecker.HasObjectOrGroupNamed(name) != gd::ObjectOrGroupFinder::No;
         ++i)
-        name = _("NewGroup")+gd::String::FromUInt(i);
+        name = _("NewGroup")+gd::String::From(i);
 
     newGroup.SetName( name );
 
@@ -1274,7 +1274,7 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
         {
             name =  _( "CopyOf" ) + object->GetName();
             for (unsigned int i = 2;nameChecker.HasObjectOrGroupNamed(name, globalObject /* Only search other layouts if it's a global object */)!=gd::ObjectOrGroupFinder::No;++i)
-                name = _("CopyOf")+ object->GetName()+gd::String::FromUInt(i);
+                name = _("CopyOf")+ object->GetName()+gd::String::From(i);
         }
 
         //Name the object
@@ -1300,7 +1300,7 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
         {
             name =  _( "CopyOf" ) + name;
             for (unsigned int i = 2;nameChecker.HasObjectOrGroupNamed(name, globalGroup /* Only search other layouts if it's a global object */)!=gd::ObjectOrGroupFinder::No;++i)
-                name = _("CopyOf")+ groupPasted.GetName()+gd::String::FromUInt(i);
+                name = _("CopyOf")+ groupPasted.GetName()+gd::String::From(i);
         }
         groupPasted.SetName(name);
         objectsGroups.push_back( groupPasted );

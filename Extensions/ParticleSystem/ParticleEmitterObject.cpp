@@ -597,7 +597,7 @@ void RuntimeParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyN
 {
     if ( !GetParticleSystem() || !GetParticleSystem()->particleSystem ) return;
 
-    if      ( propertyNb == 0 ) {name = _("Particles number");      value = gd::String::FromUInt(GetParticleSystem()->particleSystem->getNbParticles());}
+    if      ( propertyNb == 0 ) {name = _("Particles number");      value = gd::String::From(GetParticleSystem()->particleSystem->getNbParticles());}
 }
 
 bool RuntimeParticleEmitterObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)

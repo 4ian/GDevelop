@@ -345,9 +345,9 @@ void RuntimeTextObject::GetPropertyForDebugger(unsigned int propertyNb, gd::Stri
 {
     if      ( propertyNb == 0 ) {name = _("Text");                     value = GetString();}
     else if ( propertyNb == 1 ) {name = _("Font");                    value = GetFontFilename();}
-    else if ( propertyNb == 2 ) {name = _("Font Size");      value = gd::String::FromFloat(GetCharacterSize());}
-    else if ( propertyNb == 3 ) {name = _("Color");       value = gd::String::FromFloat(GetColorR())+";"+gd::String::FromFloat(GetColorG())+";"+gd::String::FromFloat(GetColorB());}
-    else if ( propertyNb == 4 ) {name = _("Opacity");       value = gd::String::FromFloat(GetOpacity());}
+    else if ( propertyNb == 2 ) {name = _("Font Size");      value = gd::String::From(GetCharacterSize());}
+    else if ( propertyNb == 3 ) {name = _("Color");       value = gd::String::From(GetColorR())+";"+gd::String::From(GetColorG())+";"+gd::String::From(GetColorB());}
+    else if ( propertyNb == 4 ) {name = _("Opacity");       value = gd::String::From(GetOpacity());}
     else if ( propertyNb == 5 ) {name = _("Smoothing");       value = smoothed ? _("Yes") : _("No");}
 }
 

@@ -360,7 +360,7 @@ public:
      * \warning value should be set to an UTF8 encoded string.
      * Implementation example:
      * \code
-     * if      ( propertyNb == 0 ) {name = _("MyObjectProperty");      value = gd::String::FromFloat(GetSomeProperty());}
+     * if      ( propertyNb == 0 ) {name = _("MyObjectProperty");      value = gd::String::From(GetSomeProperty());}
      * else if ( propertyNb == 1 ) {name = _("AnotherProperty");       value = GetAnotherPropety();}
      * \endcode
      */

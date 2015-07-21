@@ -39,28 +39,28 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     {
         if ( i == 0 )
         {
-            xProperty = gd::String::FromFloat(selectedInitialInstances[0]->GetX());
-            yProperty = gd::String::FromFloat(selectedInitialInstances[0]->GetY());
-            angleProperty = gd::String::FromFloat(selectedInitialInstances[0]->GetAngle());
-            zOrderProperty = gd::String::FromFloat(selectedInitialInstances[0]->GetZOrder());
+            xProperty = gd::String::From(selectedInitialInstances[0]->GetX());
+            yProperty = gd::String::From(selectedInitialInstances[0]->GetY());
+            angleProperty = gd::String::From(selectedInitialInstances[0]->GetAngle());
+            zOrderProperty = gd::String::From(selectedInitialInstances[0]->GetZOrder());
             layerProperty = selectedInitialInstances[0]->GetLayer();
             customSizeProperty = selectedInitialInstances[0]->HasCustomSize();
-            widthProperty = gd::String::FromFloat(selectedInitialInstances[0]->GetCustomWidth());
-            heightProperty = gd::String::FromFloat(selectedInitialInstances[0]->GetCustomHeight());
+            widthProperty = gd::String::From(selectedInitialInstances[0]->GetCustomWidth());
+            heightProperty = gd::String::From(selectedInitialInstances[0]->GetCustomHeight());
             lockedProperty = selectedInitialInstances[0]->IsLocked();
             customProperties = selectedInitialInstances[0]->GetCustomProperties(project, layout);
         }
         else
         {
-            if ( gd::String::FromFloat(selectedInitialInstances[i]->GetX()) != xProperty ) xProperty = _("(Multiples values)");
-            if ( gd::String::FromFloat(selectedInitialInstances[i]->GetY()) != yProperty ) yProperty = _("(Multiples values)");
-            if ( gd::String::FromFloat(selectedInitialInstances[i]->GetAngle()) != angleProperty ) angleProperty = _("(Multiples values)");
-            if ( gd::String::FromFloat(selectedInitialInstances[i]->GetZOrder()) != zOrderProperty ) zOrderProperty = _("(Multiples values)");
+            if ( gd::String::From(selectedInitialInstances[i]->GetX()) != xProperty ) xProperty = _("(Multiples values)");
+            if ( gd::String::From(selectedInitialInstances[i]->GetY()) != yProperty ) yProperty = _("(Multiples values)");
+            if ( gd::String::From(selectedInitialInstances[i]->GetAngle()) != angleProperty ) angleProperty = _("(Multiples values)");
+            if ( gd::String::From(selectedInitialInstances[i]->GetZOrder()) != zOrderProperty ) zOrderProperty = _("(Multiples values)");
             if ( selectedInitialInstances[i]->GetLayer() != layerProperty ) layerProperty = _("(Multiples values)");
             if ( !selectedInitialInstances[i]->HasCustomSize() ) customSizeProperty = false;
             if ( !selectedInitialInstances[i]->IsLocked() ) lockedProperty = false;
-            if ( gd::String::FromFloat(selectedInitialInstances[i]->GetCustomWidth()) != widthProperty ) widthProperty = _("(Multiples values)");
-            if ( gd::String::FromFloat(selectedInitialInstances[i]->GetCustomHeight()) != heightProperty ) heightProperty = _("(Multiples values)");
+            if ( gd::String::From(selectedInitialInstances[i]->GetCustomWidth()) != widthProperty ) widthProperty = _("(Multiples values)");
+            if ( gd::String::From(selectedInitialInstances[i]->GetCustomHeight()) != heightProperty ) heightProperty = _("(Multiples values)");
 
             //Merge custom properties
             std::map<gd::String, gd::PropertyDescriptor> instanceCustomProperties = selectedInitialInstances[i]->GetCustomProperties(project, layout);
@@ -100,7 +100,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
 
     if ( selectedInitialInstances.size() == 1)
     {
-        grid->Append( new wxStringProperty(_("Variables") + " (" + gd::String::FromUInt(selectedInitialInstances[0]->GetVariables().Count())
+        grid->Append( new wxStringProperty(_("Variables") + " (" + gd::String::From(selectedInitialInstances[0]->GetVariables().Count())
             + ")", "INSTANCE_VARIABLES", _("Click to edit...")) );
 
         grid->SetPropertyCell("INSTANCE_VARIABLES", 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT ));
@@ -124,7 +124,7 @@ void InitialInstancesPropgridHelper::OnPropertySelected(const std::vector<gd::In
             dialog.ShowModal();
 
             grid->SetPropertyLabel("INSTANCE_VARIABLES", _("Variables") + " ("
-                + gd::String::FromUInt(selectedInitialInstances[0]->GetVariables().Count()) + ")");
+                + gd::String::From(selectedInitialInstances[0]->GetVariables().Count()) + ")");
         }
     }
 }

@@ -42,7 +42,7 @@ void NetworkManager::ReceivePackets()
                 break;
             }
             default:
-                ErrorManager::Get()->SetLastError("Received unknown data ( Type "+gd::String::FromInt(type)+" )\n");
+                ErrorManager::Get()->SetLastError("Received unknown data ( Type "+gd::String::From(type)+" )\n");
                 break;
             }
         }

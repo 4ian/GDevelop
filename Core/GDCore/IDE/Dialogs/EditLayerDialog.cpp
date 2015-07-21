@@ -236,7 +236,7 @@ void EditLayerDialog::OnokBtClick(wxCommandEvent& event)
 
 void EditLayerDialog::OnaddCameraBtClick(wxCommandEvent& event)
 {
-    cameraChoice->Append(gd::String::FromUInt(tempLayer.GetCameraCount()));
+    cameraChoice->Append(gd::String::From(tempLayer.GetCameraCount()));
     tempLayer.SetCameraCount(tempLayer.GetCameraCount()+1);
 }
 

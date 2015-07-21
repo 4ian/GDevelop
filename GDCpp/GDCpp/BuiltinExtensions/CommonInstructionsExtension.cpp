@@ -58,7 +58,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 gd::EventsCodeGenerationContext context;
                 context.InheritsFrom(parentContext);
 
-                gd::String conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+gd::String::FromUInt(cId)+"IsTrue", context);
+                gd::String conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId)+"IsTrue", context);
 
                 conditionsCode += "{\n";
 
@@ -67,7 +67,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 if ( !conditions[cId].GetType().empty() ) conditionsCode += conditionCode;
 
                 //If the condition is true : merge all objects picked in the final object lists.
-                conditionsCode += "if( condition"+gd::String::FromUInt(cId)+"IsTrue ) {\n";
+                conditionsCode += "if( condition"+gd::String::From(cId)+"IsTrue ) {\n";
                 conditionsCode += "    conditionTrue = true;\n";
                 std::set<gd::String> objectsListsToBeDeclared = context.GetAllObjectsToBeDeclared();
                 for ( set<gd::String>::iterator it = objectsListsToBeDeclared.begin() ; it != objectsListsToBeDeclared.end(); ++it )
@@ -96,7 +96,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+"final;\n";
             }
             for (unsigned int i = 0;i<conditions.size();++i)
-                declarationsCode += "bool condition"+gd::String::FromUInt(i)+"IsTrue = false;\n";
+                declarationsCode += "bool condition"+gd::String::From(i)+"IsTrue = false;\n";
 
             //Generate code
             gd::String code;
@@ -120,7 +120,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 gd::String ifPredicat = "true";
                 for (unsigned int i = 0;i<instruction.GetSubInstructions().size();++i)
-                    ifPredicat += " && condition"+gd::String::FromUInt(i)+"IsTrue";
+                    ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
                 outputCode += "conditionTrue = (" +ifPredicat+ ");\n";
 
@@ -133,18 +133,18 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             gd::String outputCode;
 
             for (unsigned int i = 0;i<conditions.size();++i)
-                outputCode += "bool condition"+gd::String::FromUInt(i)+"IsTrue = false;\n";
+                outputCode += "bool condition"+gd::String::From(i)+"IsTrue = false;\n";
 
             for (unsigned int cId =0;cId < conditions.size();++cId)
             {
-                gd::String conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+gd::String::FromUInt(cId)+"IsTrue", parentContext);
+                gd::String conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId)+"IsTrue", parentContext);
 
                 if ( !conditions[cId].GetType().empty() )
                 {
                     for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is true. //TODO : Can be optimized
                     {
                         if (i == 0) outputCode += "if ( "; else outputCode += " && ";
-                        outputCode += "!condition"+gd::String::FromUInt(i)+"IsTrue";
+                        outputCode += "!condition"+gd::String::From(i)+"IsTrue";
                         if (i == cId-1) outputCode += ") ";
                     }
 
@@ -154,7 +154,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
             gd::String ifPredicat = "true";
             for (unsigned int i = 0;i<conditions.size();++i)
-                ifPredicat += " && !condition"+gd::String::FromUInt(i)+"IsTrue";
+                ifPredicat += " && !condition"+gd::String::From(i)+"IsTrue";
 
             outputCode += "conditionTrue = (" +ifPredicat+ ");\n";
 
@@ -164,7 +164,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     GetAllConditions()["BuiltinCommonInstructions::Once"].codeExtraInformation
         .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext) {
             size_t uniqueId = (size_t)&instruction;
-            return "conditionTrue = runtimeContext->TriggerOnce("+gd::String::FromUInt(uniqueId)+");\n";
+            return "conditionTrue = runtimeContext->TriggerOnce("+gd::String::From(uniqueId)+");\n";
         });
 
     GetAllEvents()["BuiltinCommonInstructions::Standard"]
@@ -178,7 +178,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             for (unsigned int i = 0;i<event.GetConditions().size();++i)
             {
                 if (i!=0) ifPredicat += " && ";
-                ifPredicat += "condition"+gd::String::FromUInt(i)+"IsTrue";
+                ifPredicat += "condition"+gd::String::From(i)+"IsTrue";
             }
 
             if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
@@ -248,10 +248,10 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
             //Prepare codes
             gd::String whileConditionsStr = codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(), context);
-            gd::String whileIfPredicat = "true"; for (unsigned int i = 0;i<event.GetWhileConditions().size();++i) whileIfPredicat += " && condition"+gd::String::FromUInt(i)+"IsTrue";
+            gd::String whileIfPredicat = "true"; for (unsigned int i = 0;i<event.GetWhileConditions().size();++i) whileIfPredicat += " && condition"+gd::String::From(i)+"IsTrue";
             gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
             gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-            gd::String ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::FromUInt(i)+"IsTrue";
+            gd::String ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
             //Write final code
             outputCode += "bool stopDoWhile = false;";
@@ -304,7 +304,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             //Prepare conditions/actions codes
             gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
             gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-            gd::String ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::FromUInt(i)+"IsTrue";
+            gd::String ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
             //Prepare object declaration and sub events
             gd::String subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
@@ -352,7 +352,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
             gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
             gd::String ifPredicat = "true";
-            for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::FromUInt(i)+"IsTrue";
+            for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
             //Prepare object declaration and sub events
             gd::String subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
@@ -365,7 +365,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 outputCode += "std::vector<RuntimeObject*> forEachObjects;";
                 for (unsigned int i = 0;i<realObjects.size();++i)
                 {
-                    outputCode += "unsigned int forEachCount"+gd::String::FromUInt(i)+" = "+ManObjListName(realObjects[i])+".size(); forEachTotalCount += forEachCount"+gd::String::FromUInt(i)+";";
+                    outputCode += "unsigned int forEachCount"+gd::String::From(i)+" = "+ManObjListName(realObjects[i])+".size(); forEachTotalCount += forEachCount"+gd::String::From(i)+";";
                     outputCode += "forEachObjects.insert("+ gd::String(i == 0 ? "forEachObjects.begin()" : "forEachObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
                 }
             }
@@ -398,7 +398,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     for (unsigned int j = 0;j<=i;++j)
                     {
                         if (j!=0) count+= "+";
-                        count += "forEachCount"+gd::String::FromUInt(j);
+                        count += "forEachCount"+gd::String::From(j);
                     }
 
                     if ( i != 0 ) outputCode += "else ";

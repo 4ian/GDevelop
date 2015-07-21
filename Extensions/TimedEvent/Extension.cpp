@@ -78,7 +78,7 @@ public:
                 for (unsigned int i = 0;i<event.GetConditions().size();++i)
                 {
                     if (i!=0) ifPredicat += " && ";
-                    ifPredicat += "condition"+gd::String::FromUInt(i)+"IsTrue";
+                    ifPredicat += "condition"+gd::String::From(i)+"IsTrue";
                 }
 
                 if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
@@ -185,7 +185,7 @@ public:
                 else
                     name = _("No name");
 
-                value = gd::String::FromDouble(static_cast<double>(iter->second.GetTime())/1000000.0)+"s";
+                value = gd::String::From(static_cast<double>(iter->second.GetTime())/1000000.0)+"s";
 
                 return;
             }

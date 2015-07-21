@@ -226,7 +226,7 @@ gd::String GD_API VariableStructureToJSON(const gd::Variable & variable)
 {
     if ( !variable.IsStructure() ) {
         if ( variable.IsNumber() )
-            return gd::String::FromDouble(variable.GetValue());
+            return gd::String::From(variable.GetValue());
         else
             return gd::String::FromUTF8(StringToQuotedJSONString(variable.GetString().c_str()));
     }
@@ -404,7 +404,7 @@ namespace
             {
                 pos++;
                 if (pos < jsonStr.length() && jsonStr[pos] == ']' ) break;
-                pos = ::ParseJSONObject(jsonStr, pos, variable.GetChild(gd::String::FromUInt(index)));
+                pos = ::ParseJSONObject(jsonStr, pos, variable.GetChild(gd::String::From(index)));
 
                 pos = SkipBlankChar(jsonStr, pos);
                 if ( pos >= jsonStr.length()) {

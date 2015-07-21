@@ -20,7 +20,7 @@ gd::String EventsCodeNameMangler::GetMangledObjectsListName(const gd::String & o
         if ( allowedCharacters.find_first_of(std::u32string(1, partiallyMangledName[i])) == gd::String::npos)
         {
             char32_t unallowedChar = partiallyMangledName[i];
-            partiallyMangledName.replace(i, 1, "_"+gd::String::FromInt(unallowedChar));
+            partiallyMangledName.replace(i, 1, "_"+gd::String::From(unallowedChar));
         }
     }
 
@@ -37,7 +37,7 @@ gd::String EventsCodeNameMangler::GetExternalEventsFunctionMangledName(const gd:
         if ( allowedCharacters.find_first_of(std::u32string(1, partiallyMangledName[i])) == gd::String::npos)
         {
             char32_t unallowedChar = partiallyMangledName[i];
-            partiallyMangledName.replace(i, 1, "_"+gd::String::FromInt(unallowedChar));
+            partiallyMangledName.replace(i, 1, "_"+gd::String::From(unallowedChar));
         }
     }
 

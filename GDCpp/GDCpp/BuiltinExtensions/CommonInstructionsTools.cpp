@@ -48,12 +48,12 @@ bool GD_API LogicalNegation(bool param)
 
 double GD_API ToDouble( const gd::String & str )
 {
-    return str.ToDouble();
+    return str.To<double>();
 }
 
 gd::String GD_API ToString( double number )
 {
-    return gd::String::FromDouble(number);
+    return gd::String::From(number);
 }
 
 gd::String GD_API LargeNumberToString( double number )

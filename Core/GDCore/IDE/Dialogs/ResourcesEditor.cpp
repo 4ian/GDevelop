@@ -1229,7 +1229,7 @@ void ResourcesEditor::OnAddFolderSelected(wxCommandEvent& event)
     unsigned int i = 1;
     while( project.GetResourcesManager().HasFolder(newName) )
     {
-        newName = _("New folder") + " " + gd::String::FromInt(i);
+        newName = _("New folder") + " " + gd::String::From(i);
         ++i;
     }
 

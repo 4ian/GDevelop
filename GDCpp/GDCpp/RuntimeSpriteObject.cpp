@@ -268,7 +268,7 @@ void RuntimeSpriteObject::MakeColorTransparent( const gd::String & colorStr )
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
     //Update texture and pixel perfect collision mask
-    dest->image.createMaskFromColor(  sf::Color( colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt()));
+    dest->image.createMaskFromColor(  sf::Color( colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>()));
     dest->texture.loadFromImage(dest->image);
 }
 
@@ -277,9 +277,9 @@ void RuntimeSpriteObject::SetColor(const gd::String & colorStr)
     std::vector < gd::String > colors = colorStr.Split(U';');
     if ( colors.size() < 3 ) return; //Color is not valid
 
-    SetColor(  colors[0].ToInt(),
-               colors[1].ToInt(),
-               colors[2].ToInt() );
+    SetColor(  colors[0].To<int>(),
+               colors[1].To<int>(),
+               colors[2].To<int>() );
 }
 
 /**
@@ -565,32 +565,32 @@ void RuntimeSpriteObject::TurnTowardObject(RuntimeObject * object, RuntimeScene 
 #if defined(GD_IDE_ONLY)
 void RuntimeSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Animation");     value = gd::String::FromUInt(GetCurrentAnimation());}
-    else if ( propertyNb == 1 ) {name = _("Direction");     value = gd::String::FromUInt(GetCurrentDirection());}
-    else if ( propertyNb == 2 ) {name = _("Image");         value = gd::String::FromUInt(GetSpriteNb());}
-    else if ( propertyNb == 3 ) {name = _("Opacity");       value = gd::String::FromFloat(GetOpacity());}
+    if      ( propertyNb == 0 ) {name = _("Animation");     value = gd::String::From(GetCurrentAnimation());}
+    else if ( propertyNb == 1 ) {name = _("Direction");     value = gd::String::From(GetCurrentDirection());}
+    else if ( propertyNb == 2 ) {name = _("Image");         value = gd::String::From(GetSpriteNb());}
+    else if ( propertyNb == 3 ) {name = _("Opacity");       value = gd::String::From(GetOpacity());}
     else if ( propertyNb == 4 ) {name = _("Blend mode");   if ( blendMode == 0) value = "0 (Alpha)";
                                                                     else if ( blendMode == 1) value = "1 (Add)";
                                                                     else if ( blendMode == 2) value = "2 (Multiply)";
                                                                     else if ( blendMode == 3) value = "3 (None)";}
-    else if ( propertyNb == 5 ) {name = _("X Scale");       value = gd::String::FromFloat(GetScaleX());}
-    else if ( propertyNb == 6 ) {name = _("Y Scale");       value = gd::String::FromFloat(GetScaleY());}
+    else if ( propertyNb == 5 ) {name = _("X Scale");       value = gd::String::From(GetScaleX());}
+    else if ( propertyNb == 6 ) {name = _("Y Scale");       value = gd::String::From(GetScaleY());}
 }
 
 bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
-    if ( propertyNb == 0 ) { return SetCurrentAnimation(newValue.ToInt()); }
+    if ( propertyNb == 0 ) { return SetCurrentAnimation(newValue.To<int>()); }
     else if ( propertyNb == 1 )
     {
         if ( currentAnimation >= GetAnimationsCount() ) return false;
 
-        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(newValue.ToUInt()) : SetAngle(newValue.ToFloat());
+        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(newValue.To<unsigned int>()) : SetAngle(newValue.To<float>());
     }
-    else if ( propertyNb == 2 ) { return SetSprite(newValue.ToInt()); }
-    else if ( propertyNb == 3 ) { SetOpacity(newValue.ToFloat()); }
-    else if ( propertyNb == 4 ) { SetBlendMode(newValue.ToInt()); }
-    else if ( propertyNb == 5 ) {SetScaleX(newValue.ToFloat());}
-    else if ( propertyNb == 6 ) {SetScaleY(newValue.ToFloat());}
+    else if ( propertyNb == 2 ) { return SetSprite(newValue.To<int>()); }
+    else if ( propertyNb == 3 ) { SetOpacity(newValue.To<float>()); }
+    else if ( propertyNb == 4 ) { SetBlendMode(newValue.To<int>()); }
+    else if ( propertyNb == 5 ) {SetScaleX(newValue.To<float>());}
+    else if ( propertyNb == 6 ) {SetScaleY(newValue.To<float>());}
 
     return true;
 }

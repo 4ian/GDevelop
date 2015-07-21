@@ -527,14 +527,14 @@ void SpriteObjectEditor::RefreshAnimationTree()
     {
         Animation & animation = object.GetAnimation(i);
         wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1,
-        	new gd::TreeItemStringData(gd::String::FromUInt(i), ""));
+        	new gd::TreeItemStringData(gd::String::From(i), ""));
 
         if ( animation.useMultipleDirections )
         {
             for (unsigned int j = 0;j<animation.GetDirectionsCount();++j)
             {
-                animationsTree->AppendItem(animationItem, _("Direction ")+gd::String::FromUInt(j), j+1, -1,
-                	new gd::TreeItemStringData(gd::String::FromUInt(i), gd::String::FromUInt(j)));
+                animationsTree->AppendItem(animationItem, _("Direction ")+gd::String::From(j), j+1, -1,
+                	new gd::TreeItemStringData(gd::String::From(i), gd::String::From(j)));
 
             }
         }
@@ -851,8 +851,8 @@ void SpriteObjectEditor::OnanimationsTreeSelectionChanged(wxTreeEvent& event)
 {
     if ( gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(animationsTree->GetItemData(event.GetItem())) )
     {
-        unsigned int newAnimation = itemData->GetString().ToInt();
-        unsigned int newDirection = itemData->GetSecondString().empty() ? 0 : itemData->GetSecondString().ToInt();
+        unsigned int newAnimation = itemData->GetString().To<int>();
+        unsigned int newDirection = itemData->GetSecondString().empty() ? 0 : itemData->GetSecondString().To<int>();
 
         if ( newAnimation != selectedAnimation || newDirection != selectedDirection )
         {
@@ -1317,8 +1317,8 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
     gd::String x_str = wxGetTextFromUser(_("Enter the X position of the point (relative to the image)."), "X position of the point",ToString(point.GetX()));
     gd::String y_str = wxGetTextFromUser(_("Enter the Y position of the point (relative to the image)."), "Y position of the point",ToString(point.GetY()));
 
-    point.SetX(x_str.ToInt());
-    point.SetY(y_str.ToInt());
+    point.SetX(x_str.To<int>());
+    point.SetY(y_str.To<int>());
 
     //Apply the change to others images if needed
     for (unsigned int i = 1;i<sprites.size();++i)
@@ -1670,7 +1670,7 @@ void SpriteObjectEditor::OnTimeBetweenFramesSelected(wxCommandEvent& event)
                                                          _("Time between each images"),
                                                          ToString(direction.GetTimeBetweenFrames()));
         if ( newTime.empty() ) return;
-        direction.SetTimeBetweenFrames(newTime.ToFloat());
+        direction.SetTimeBetweenFrames(newTime.To<float>());
     }
 }
 
@@ -1776,7 +1776,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
                     unsigned int uniqueID = 2;
                     while ( game.GetResourcesManager().HasResource(name) )
                     {
-                        name = file.GetFullName()+gd::String::FromUInt(uniqueID);
+                        name = file.GetFullName()+gd::String::From(uniqueID);
                         uniqueID++;
                     }
 

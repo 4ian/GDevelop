@@ -26,8 +26,8 @@ void CompilerMessagesParser::ParseOutput(gd::String rawOutput)
         if (columns.size() >= 3)
         {
             newMessage.file = columns[0];
-            newMessage.line = columns[1].ToInt();
-            newMessage.column = columns[2].ToInt();
+            newMessage.line = columns[1].To<int>();
+            newMessage.column = columns[2].To<int>();
         }
         if (!columns.empty()) newMessage.message = columns.back();
 

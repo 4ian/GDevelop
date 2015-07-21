@@ -246,7 +246,7 @@ void ExtensionsLoader::LoadExtension(const gd::String & fullpath, gd::Platform &
         error += "Not the same GDevelop Core version.\n(Extension is using "+extensionPtr->compilationInfo.gdCoreVersion+", GDevelop is using "+GDCore_RC_FILEVERSION_STRING+")\n";
 
     else if ( extensionPtr->compilationInfo.sizeOfpInt != sizeof(int*))
-        error += "Not the same architecture.\n(Extension sizeof(int*) is "+gd::String::FromUInt(extensionPtr->compilationInfo.sizeOfpInt)+", GDevelop sizeof(int*) is "+gd::String::FromUInt(sizeof(int*))+")\n";
+        error += "Not the same architecture.\n(Extension sizeof(int*) is "+gd::String::From(extensionPtr->compilationInfo.sizeOfpInt)+", GDevelop sizeof(int*) is "+gd::String::From(sizeof(int*))+")\n";
 
     if ( !error.empty() )
     {

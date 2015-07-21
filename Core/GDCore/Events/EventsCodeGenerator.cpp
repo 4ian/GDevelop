@@ -303,19 +303,19 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList 
     gd::String outputCode;
 
     for (unsigned int i = 0;i<conditions.size();++i)
-        outputCode += GenerateBooleanInitializationToFalse("condition"+gd::String::FromInt(i) +"IsTrue", context);
+        outputCode += GenerateBooleanInitializationToFalse("condition"+gd::String::From(i) +"IsTrue", context);
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
         gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
 
-        gd::String conditionCode = GenerateConditionCode(conditions[cId], "condition"+gd::String::FromInt(cId) +"IsTrue", context);
+        gd::String conditionCode = GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId) +"IsTrue", context);
         if ( !conditions[cId].GetType().empty() )
         {
             for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is false. //TODO : Can be optimized
             {
                 if (i == 0) outputCode += "if ( "; else outputCode += " && ";
-                outputCode += "condition"+gd::String::FromInt(i) +"IsTrue";
+                outputCode += "condition"+gd::String::From(i) +"IsTrue";
                 if (i == cId-1) outputCode += ") ";
             }
 

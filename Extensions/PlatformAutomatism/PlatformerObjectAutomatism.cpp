@@ -563,14 +563,14 @@ std::map<gd::String, gd::PropertyDescriptor> PlatformerObjectAutomatism::GetProp
 {
     std::map<gd::String, gd::PropertyDescriptor> properties;
 
-    properties[_("Gravity")].SetValue(gd::String::FromDouble(gravity));
-    properties[_("Jump speed")].SetValue(gd::String::FromDouble(jumpSpeed));
-    properties[_("Max. falling speed")].SetValue(gd::String::FromDouble(maxFallingSpeed));
-    properties[_("Acceleration")].SetValue(gd::String::FromDouble(acceleration));
-    properties[_("Deceleration")].SetValue(gd::String::FromDouble(deceleration));
-    properties[_("Max. speed")].SetValue(gd::String::FromDouble(maxSpeed));
+    properties[_("Gravity")].SetValue(gd::String::From(gravity));
+    properties[_("Jump speed")].SetValue(gd::String::From(jumpSpeed));
+    properties[_("Max. falling speed")].SetValue(gd::String::From(maxFallingSpeed));
+    properties[_("Acceleration")].SetValue(gd::String::From(acceleration));
+    properties[_("Deceleration")].SetValue(gd::String::From(deceleration));
+    properties[_("Max. speed")].SetValue(gd::String::From(maxSpeed));
     properties[_("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
-    properties[_("Slope max. angle")].SetValue(gd::String::FromDouble(slopeMaxAngle));
+    properties[_("Slope max. angle")].SetValue(gd::String::From(slopeMaxAngle));
 
     return properties;
 }

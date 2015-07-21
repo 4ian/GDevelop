@@ -38,7 +38,7 @@ gd::String InstructionSentenceFormatter::Translate(const gd::Instruction & instr
     //Replace _PARAMx_ placeholders by their values
     for (unsigned int i =0;i<metadata.parameters.size();++i)
     {
-        gd::String placeholder = "_PARAM"+gd::String::FromInt(i)+"_";
+        gd::String placeholder = "_PARAM"+gd::String::From(i)+"_";
         while ( out.find( placeholder ) != gd::String::npos )
         {
             gd::String parameter = instr.GetParameter(i).GetPlainString();
@@ -68,7 +68,7 @@ std::vector< std::pair<gd::String, gd::TextFormatting> > InstructionSentenceForm
         size_t firstParamIndex = gd::String::npos;
         for (unsigned int i =0;i<metadata.parameters.size();++i)
         {
-            size_t paramPosition = sentence.find( "_PARAM"+gd::String::FromInt(i)+"_" );
+            size_t paramPosition = sentence.find( "_PARAM"+gd::String::From(i)+"_" );
             if ( paramPosition < firstParamPosition )
             {
                 firstParamPosition = paramPosition;
@@ -94,7 +94,7 @@ std::vector< std::pair<gd::String, gd::TextFormatting> > InstructionSentenceForm
             std::replace( text.Raw().begin(), text.Raw().end(), '\n', ' '); //Using the raw std::string inside gd::String (no problems because it's only ANSI characters)
 
             formattedStr.push_back(std::make_pair(text, format));
-            gd::String placeholder = "_PARAM"+gd::String::FromInt(firstParamIndex)+"_";
+            gd::String placeholder = "_PARAM"+gd::String::From(firstParamIndex)+"_";
             sentence = sentence.substr(firstParamPosition+placeholder.length());
         }
         else if ( !sentence.empty() )//No more parameter found: Add the end of the sentence

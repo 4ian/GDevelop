@@ -632,14 +632,14 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingAutomatism::GetPropertie
     std::map<gd::String, gd::PropertyDescriptor> properties;
 
     properties[_("Allows diagonals")].SetValue(allowDiagonals ? "true" : "false").SetType("Boolean");
-    properties[_("Acceleration")].SetValue(gd::String::FromFloat(acceleration));
-    properties[_("Max. speed")].SetValue(gd::String::FromFloat(maxSpeed));
-    properties[_("Rotate speed")].SetValue(gd::String::FromFloat(angularMaxSpeed));
+    properties[_("Acceleration")].SetValue(gd::String::From(acceleration));
+    properties[_("Max. speed")].SetValue(gd::String::From(maxSpeed));
+    properties[_("Rotate speed")].SetValue(gd::String::From(angularMaxSpeed));
     properties[_("Rotate object")].SetValue(rotateObject ? "true" : "false").SetType("Boolean");
-    properties[_("Angle offset")].SetValue(gd::String::FromFloat(angleOffset));
-    properties[_("Virtual cell width")].SetValue(gd::String::FromFloat(cellWidth));
-    properties[_("Virtual cell height")].SetValue(gd::String::FromFloat(cellHeight));
-    properties[_("Extra border size")].SetValue(gd::String::FromFloat(extraBorder));
+    properties[_("Angle offset")].SetValue(gd::String::From(angleOffset));
+    properties[_("Virtual cell width")].SetValue(gd::String::From(cellWidth));
+    properties[_("Virtual cell height")].SetValue(gd::String::From(cellHeight));
+    properties[_("Extra border size")].SetValue(gd::String::From(extraBorder));
 
     return properties;
 }

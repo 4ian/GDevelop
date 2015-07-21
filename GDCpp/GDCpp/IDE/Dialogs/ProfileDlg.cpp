@@ -157,16 +157,16 @@ void ProfileDlg::UpdateGUI()
         return;
     }
 
-    eventsTimeTxt->SetLabel(_("Events:")+gd::String::FromDouble(static_cast<double>(lastEventsTime)/1000.0f)+_("ms")
+    eventsTimeTxt->SetLabel(_("Events:")+gd::String::From(static_cast<double>(lastEventsTime)/1000.0f)+_("ms")
                             +_("/ Percent of time used by events:")
-                                     +gd::String::FromDouble(static_cast<double>(lastEventsTime)/static_cast<double>((lastEventsTime+lastRenderingTime))*100.0f)
+                                     +gd::String::From(static_cast<double>(lastEventsTime)/static_cast<double>((lastEventsTime+lastRenderingTime))*100.0f)
                                      +"%");
 
     totalTimeTxt->SetLabel(_("Total rendering time ( Display + Events ):")+
-        gd::String::FromDouble(static_cast<double>((lastRenderingTime+lastEventsTime))/1000.0f)+_("ms"));
+        gd::String::From(static_cast<double>((lastRenderingTime+lastEventsTime))/1000.0f)+_("ms"));
 
     unsigned int currentObjectCount = sceneCanvas.GetRuntimeScene().objectsInstances.GetAllObjects().size();
-    objectsCountTxt->SetLabel(_("Number of objects:")+gd::String::FromDouble(currentObjectCount));
+    objectsCountTxt->SetLabel(_("Number of objects:")+gd::String::From(currentObjectCount));
 
     //Update events data
     eventsData.push_front(lastEventsTime/1000.0f);
@@ -203,16 +203,16 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
 
     if ( !profilingActivated || totalTimeData.empty() )
     {
-        scaleMaxTxt->SetLabel(gd::String::FromDouble(50)+_("ms\n(")+gd::String::FromDouble(1.0f/50*1000.0f)+" "+_("fps")+")");
-        scaleMidTxt->SetLabel(gd::String::FromDouble(50/2.0f)+_("ms\n(")+gd::String::FromDouble(1.0f/(50/2.0f)*1000.0f)+" "+_("fps")+")");
+        scaleMaxTxt->SetLabel(gd::String::From(50)+_("ms\n(")+gd::String::From(1.0f/50*1000.0f)+" "+_("fps")+")");
+        scaleMidTxt->SetLabel(gd::String::From(50/2.0f)+_("ms\n(")+gd::String::From(1.0f/(50/2.0f)*1000.0f)+" "+_("fps")+")");
 
         return;
     }
 
     unsigned int maximumTime = 50;
 
-    scaleMaxTxt->SetLabel(gd::String::FromDouble(maximumTime)+_("ms\n(")+gd::String::FromDouble(1.0f/maximumTime*1000.0f)+" "+_("fps")+")");
-    scaleMidTxt->SetLabel(gd::String::FromDouble(maximumTime/2.0f)+_("ms\n(")+gd::String::FromDouble(1.0f/(maximumTime/2.0f)*1000.0f)+" "+_("fps")+")");
+    scaleMaxTxt->SetLabel(gd::String::From(maximumTime)+_("ms\n(")+gd::String::From(1.0f/maximumTime*1000.0f)+" "+_("fps")+")");
+    scaleMidTxt->SetLabel(gd::String::From(maximumTime/2.0f)+_("ms\n(")+gd::String::From(1.0f/(maximumTime/2.0f)*1000.0f)+" "+_("fps")+")");
 
     //FPS curve
     if ( totalTimeCheck->IsChecked() )
@@ -301,14 +301,14 @@ void ProfileDlg::OnratioGraphicsRightUp(wxMouseEvent& event)
 
 void ProfileDlg::OnChangeDurationSelected(wxCommandEvent& event)
 {
-    gd::String newMaxData = wxGetTextFromUser(_("Enter the number of measure to memorize"), _("Number of measures"), gd::String::FromInt(maxData));
-    maxData = newMaxData.ToInt();
+    gd::String newMaxData = wxGetTextFromUser(_("Enter the number of measure to memorize"), _("Number of measures"), gd::String::From(maxData));
+    maxData = newMaxData.To<int>();
 }
 
 void ProfileDlg::OnStepTimeSelected(wxCommandEvent& event)
 {
-    gd::String newStepTime = wxGetTextFromUser(_("Enter time between each measure ( milliseconds )"), _("Time between each measure"), gd::String::FromDouble(static_cast<double>(stepTime)*1000.0f));
-    stepTime = newStepTime.ToFloat()/1000.0f;
+    gd::String newStepTime = wxGetTextFromUser(_("Enter time between each measure ( milliseconds )"), _("Time between each measure"), gd::String::From(static_cast<double>(stepTime)*1000.0f));
+    stepTime = newStepTime.To<float>()/1000.0f;
 }
 
 void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)

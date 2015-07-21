@@ -615,7 +615,7 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
         EditExtensionsOfGame(*game);
 
         unsigned int extensionsCount = game->GetUsedExtensions().size()-gd::PlatformExtension::GetBuiltinExtensionsNames().size();
-        projectsTree->SetItemText(selectedItem, _("Extensions") + (extensionsCount > 0 ? " (" + gd::String::FromUInt(extensionsCount) + ")" : ""));
+        projectsTree->SetItemText(selectedItem, _("Extensions") + (extensionsCount > 0 ? " (" + gd::String::From(extensionsCount) + ")" : ""));
         for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
         {
             std::cout << game->GetUsedExtensions()[i] << std::endl;

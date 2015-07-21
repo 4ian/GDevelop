@@ -117,7 +117,7 @@ gd::String TileMap::SerializeLayer(int layer) const
     {
         for(int row = 0; row < m_height; row++)
         {
-            tileString += gd::String::FromInt(GetTile(layer, col, row));
+            tileString += gd::String::From(GetTile(layer, col, row));
             if(row != (m_height - 1))
                 tileString.push_back(U',');
         }

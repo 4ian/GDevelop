@@ -154,7 +154,7 @@ std::map<gd::String, gd::PropertyDescriptor> SoundObject::GetInitialInstanceProp
 {
     std::map<gd::String, gd::PropertyDescriptor> properties;
     properties[_("Z")] = position.floatInfos.find("z") != position.floatInfos.end() ?
-                                   gd::String::FromFloat(position.floatInfos.find("z")->second) :
+                                   gd::String::From(position.floatInfos.find("z")->second) :
                                    "0";
 
     return properties;
@@ -191,11 +191,11 @@ void SoundObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 
 void RuntimeSoundObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Sound level");                    value = gd::String::FromFloat(GetVolume());}
-    else if ( propertyNb == 1 ) {name = _("Minimal distance");         value = gd::String::FromFloat(GetMinDistance());}
-    else if ( propertyNb == 2 ) {name = _("Attenuation");               value = gd::String::FromFloat(GetAttenuation());}
+    if      ( propertyNb == 0 ) {name = _("Sound level");                    value = gd::String::From(GetVolume());}
+    else if ( propertyNb == 1 ) {name = _("Minimal distance");         value = gd::String::From(GetMinDistance());}
+    else if ( propertyNb == 2 ) {name = _("Attenuation");               value = gd::String::From(GetAttenuation());}
     else if ( propertyNb == 3 ) {name = _("Loop");                 value = IsLooping() ? _("Yes") : _("No");}
-    else if ( propertyNb == 4 ) {name = _("Z Position");                          value = gd::String::FromFloat(GetZPos());}
+    else if ( propertyNb == 4 ) {name = _("Z Position");                          value = gd::String::From(GetZPos());}
 }
 
 bool RuntimeSoundObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)

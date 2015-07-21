@@ -295,12 +295,12 @@ void PanelSpriteObject::EditObject( wxWindow* parent, gd::Project & game, gd::Ma
 
 void RuntimePanelSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::FromFloat(width);}
-    else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::FromFloat(height);}
-    else if ( propertyNb == 2 ) {name = _("Left Margin");       value = gd::String::FromFloat(leftMargin);}
-    else if ( propertyNb == 3 ) {name = _("Top Margin");       value = gd::String::FromFloat(topMargin);}
-    else if ( propertyNb == 4 ) {name = _("Right Margin");       value = gd::String::FromFloat(rightMargin);}
-    else if ( propertyNb == 5 ) {name = _("Bottom Margin");       value = gd::String::FromFloat(bottomMargin);}
+    if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::From(width);}
+    else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::From(height);}
+    else if ( propertyNb == 2 ) {name = _("Left Margin");       value = gd::String::From(leftMargin);}
+    else if ( propertyNb == 3 ) {name = _("Top Margin");       value = gd::String::From(topMargin);}
+    else if ( propertyNb == 4 ) {name = _("Right Margin");       value = gd::String::From(rightMargin);}
+    else if ( propertyNb == 5 ) {name = _("Bottom Margin");       value = gd::String::From(bottomMargin);}
 }
 
 bool RuntimePanelSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)

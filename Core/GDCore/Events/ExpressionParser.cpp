@@ -463,7 +463,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                         firstErrorStr = _("Incorrect number of parameters");
                         firstErrorStr += " ";
                         firstErrorStr += _("Excepted ( maximum ) :");
-                        firstErrorStr += gd::String::FromUInt(GetMaximalParametersNumber(instructionInfos.parameters));
+                        firstErrorStr += gd::String::From(GetMaximalParametersNumber(instructionInfos.parameters));
 
                         return false;
                     }

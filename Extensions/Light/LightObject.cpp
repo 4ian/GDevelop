@@ -229,10 +229,10 @@ void LightObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 
 void RuntimeLightObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if ( propertyNb == 0 ) {name = _("Color");       value = gd::String::FromInt(GetColor().r)+";"+gd::String::FromInt(GetColor().g)+";"+gd::String::FromInt(GetColor().b);}
-    else if ( propertyNb == 1 ) {name = _("Intensity");       value = gd::String::FromInt(GetIntensity());}
-    else if ( propertyNb == 2 ) {name = _("Radius");       value = gd::String::FromInt(GetRadius());}
-    else if ( propertyNb == 2 ) {name = _("Quality");       value = gd::String::FromInt(GetQuality());}
+    if ( propertyNb == 0 ) {name = _("Color");       value = gd::String::From(GetColor().r)+";"+gd::String::From(GetColor().g)+";"+gd::String::From(GetColor().b);}
+    else if ( propertyNb == 1 ) {name = _("Intensity");       value = gd::String::From(GetIntensity());}
+    else if ( propertyNb == 2 ) {name = _("Radius");       value = gd::String::From(GetRadius());}
+    else if ( propertyNb == 2 ) {name = _("Quality");       value = gd::String::From(GetQuality());}
 }
 
 bool RuntimeLightObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)

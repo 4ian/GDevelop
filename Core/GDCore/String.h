@@ -40,7 +40,7 @@ class GD_CORE_API String
 
 public:
 
-    friend bool GD_CORE_API ::gd::CaseInsensitiveEquiv( const String &, const String &, bool );
+    friend bool GD_CORE_API CaseInsensitiveEquiv( const String &, const String &, bool );
 
     typedef char32_t value_type;
     typedef char32_t& reference;

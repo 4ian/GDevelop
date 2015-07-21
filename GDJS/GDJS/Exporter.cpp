@@ -337,16 +337,18 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
         gd::Layout & exportedLayout = project.GetLayout(i);
         gd::String eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(project, exportedLayout,
             exportedLayout.GetEvents(), eventsIncludes, false /*Export for edittime*/);
+        gd::String filename = outputDir+"code"+gd::String::FromUInt(i)+".js";
+
         //Export the code
-        if (fs.WriteToFile(outputDir+"code"+gd::ToString(i)+".js", eventsOutput))
+        if (fs.WriteToFile(filename, eventsOutput))
         {
             for ( std::set<gd::String>::iterator include = eventsIncludes.begin() ; include != eventsIncludes.end(); ++include )
                 InsertUnique(includesFiles, *include);
 
-            InsertUnique(includesFiles, gd::String(outputDir+"code"+gd::ToString(i)+".js"));
+            InsertUnique(includesFiles, filename);
         }
         else {
-            lastError = _("Unable to write ")+outputDir+"code"+gd::ToString(i)+".js";
+            lastError = _("Unable to write ") + filename;
             return false;
         }
     }

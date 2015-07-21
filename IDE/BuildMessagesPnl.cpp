@@ -100,7 +100,7 @@ void BuildMessagesPnl::OpenFileContainingFirstError()
     row_info.m_mask = wxLIST_MASK_TEXT;
 
     messagesList->GetItem( row_info );
-    size_t line = row_info.m_text.empty() ? gd::String::npos : ToInt(string(row_info.m_text.mb_str()));
+    size_t line = row_info.m_text.empty() ? gd::String::npos : gd::String(row_info.m_text).ToInt();
     gd::String file = messagesList->GetItemText(0);
 
     if ( projectManager && wxFileExists(file) ) projectManager->EditSourceFile(gameAssociatedWithErrors, file, line);
@@ -115,7 +115,7 @@ void BuildMessagesPnl::OnmessagesListItemActivated(wxListEvent& event)
     row_info.m_mask = wxLIST_MASK_TEXT;
 
     messagesList->GetItem( row_info );
-    size_t line = row_info.m_text.empty() ? gd::String::npos : ToInt(string(row_info.m_text.mb_str()));
+    size_t line = row_info.m_text.empty() ? gd::String::npos : gd::String(row_info.m_text).ToInt();
     gd::String file = messagesList->GetItemText(event.GetIndex());
 
     if ( projectManager && wxFileExists(file) ) projectManager->EditSourceFile(gameAssociatedWithErrors, file, line);

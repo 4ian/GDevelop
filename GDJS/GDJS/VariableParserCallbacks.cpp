@@ -88,7 +88,7 @@ void VariableCodeGenerationCallbacks::OnRootVariable(gd::String variableName)
 		unsigned int index = variables->GetPosition(variableName);
 		if ( index < variables->Count() )
 		{
-			output += ".getFromIndex("+gd::ToString(index)+")";
+			output += ".getFromIndex(" + gd::String::FromUInt(index) + ")";
 			return;
 		}
 	}

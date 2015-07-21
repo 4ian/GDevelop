@@ -72,9 +72,9 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
         for (unsigned int j = 1;j<=maxDepth;++j)
         {
             globalObjectLists += codeGenerator.GetCodeNamespace()
-                                 +ManObjListName(object.GetName())+gd::ToString(j) + "= [];\n";
+                + ManObjListName(object.GetName()) + gd::String::FromUInt(j) + "= [];\n";
             globalObjectListsReset += codeGenerator.GetCodeNamespace()
-                                      +ManObjListName(object.GetName())+gd::ToString(j) + ".length = 0;\n";
+                + ManObjListName(object.GetName()) + gd::String::FromUInt(j) + ".length = 0;\n";
         }
     };
 
@@ -93,7 +93,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
         globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"conditionTrue_"+gd::String::FromUInt(i)+" = {val:false};\n";
         for (unsigned int j = 0;j<=codeGenerator.GetMaxConditionsListsSize();++j)
         {
-            globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"condition"+gd::ToString(j)+"IsTrue_"+gd::String::FromUInt(i)+" = {val:false};\n";
+            globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"condition"+gd::String::FromUInt(j)+"IsTrue_"+gd::String::FromUInt(i)+" = {val:false};\n";
         }
     }
 
@@ -379,7 +379,8 @@ gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & obje
 
 gd::String EventsCodeGenerator::GetObjectListName(const gd::String & name, const gd::EventsCodeGenerationContext & context)
 {
-    return GetCodeNamespace()+ManObjListName(name)+gd::ToString(context.GetLastDepthObjectListWasNeeded(name));
+    return GetCodeNamespace() + ManObjListName(name)
+        + gd::String::FromUInt(context.GetLastDepthObjectListWasNeeded(name));
 }
 
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context)
@@ -573,7 +574,8 @@ gd::String EventsCodeGenerator::GenerateBooleanInitializationToFalse(const gd::S
 
 gd::String EventsCodeGenerator::GenerateBooleanFullName(const gd::String & boolName, const gd::EventsCodeGenerationContext & context )
 {
-    return GetCodeNamespace()+boolName+"_"+gd::ToString(context.GetCurrentConditionDepth());
+    return GetCodeNamespace() + boolName + "_"
+        + gd::String::FromUInt(context.GetCurrentConditionDepth());
 }
 
 gd::String EventsCodeGenerator::GetCodeNamespace()

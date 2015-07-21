@@ -113,10 +113,10 @@ bool PathfindingObstacleAutomatism::UpdateProperty(const gd::String & name, cons
         return true;
     }
 
-    if ( value.ToFloat() < 0 ) return false;
+    if ( value.To<float>() < 0 ) return false;
 
     if ( name == _("Cost (if not impassable)") )
-        cost = value.ToFloat();
+        cost = value.To<float>();
     else
         return false;
 

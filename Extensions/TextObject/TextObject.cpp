@@ -254,9 +254,9 @@ void RuntimeTextObject::SetColor(const gd::String & colorStr)
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
-    SetColor(  colors[0].ToInt(),
-               colors[1].ToInt(),
-               colors[2].ToInt() );
+    SetColor(  colors[0].To<int>(),
+               colors[1].To<int>(),
+               colors[2].To<int>() );
 }
 
 void RuntimeTextObject::SetOpacity(float val)
@@ -355,7 +355,7 @@ bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, gd::String newVa
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
     else if ( propertyNb == 1 ) { ChangeFont(newValue); }
-    else if ( propertyNb == 2 ) { SetCharacterSize(newValue.ToInt()); }
+    else if ( propertyNb == 2 ) { SetCharacterSize(newValue.To<int>()); }
     else if ( propertyNb == 3 )
     {
         gd::String r, gb, g, b;
@@ -379,9 +379,9 @@ bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, gd::String newVa
             b = gb.substr(separationPos+1, gb.length());
         }
 
-        SetColor(r.ToInt(), g.ToInt(), b.ToInt());
+        SetColor(r.To<int>(), g.To<int>(), b.To<int>());
     }
-    else if ( propertyNb == 4 ) { SetOpacity(newValue.ToFloat()); }
+    else if ( propertyNb == 4 ) { SetOpacity(newValue.To<float>()); }
     else if ( propertyNb == 5 ) { SetSmooth(!(newValue == _("No"))); }
 
     return true;

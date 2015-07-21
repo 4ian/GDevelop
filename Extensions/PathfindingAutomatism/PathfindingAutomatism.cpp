@@ -655,24 +655,24 @@ bool PathfindingAutomatism::UpdateProperty(const gd::String & name, const gd::St
         return true;
     }
     if ( name == _("Extra border size") ) {
-        extraBorder = value.ToFloat();
+        extraBorder = value.To<float>();
         return true;
     }
 
-    if ( value.ToFloat() < 0 ) return false;
+    if ( value.To<float>() < 0 ) return false;
 
     if ( name == _("Acceleration") )
-        acceleration = value.ToFloat();
+        acceleration = value.To<float>();
     else if ( name == _("Max. speed") )
-        maxSpeed = value.ToFloat();
+        maxSpeed = value.To<float>();
     else if ( name == _("Rotate speed") )
-        angularMaxSpeed = value.ToFloat();
+        angularMaxSpeed = value.To<float>();
     else if ( name == _("Angle offset") )
-        angleOffset = value.ToFloat();
+        angleOffset = value.To<float>();
     else if ( name == _("Virtual cell width") )
-        cellWidth = value.ToUInt();
+        cellWidth = value.To<unsigned int>();
     else if ( name == _("Virtual cell height") )
-        cellHeight = value.ToUInt();
+        cellHeight = value.To<unsigned int>();
     else
         return false;
 

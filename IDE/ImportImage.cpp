@@ -470,38 +470,38 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     wxFileName filename(fileSSEdit->GetValue());
     wxString path = filename.GetPath();
 
-    int lineNb = gd::String(linesSSEdit->GetValue()).ToInt();
+    int lineNb = gd::String(linesSSEdit->GetValue()).To<int>();
     if ( lineNb <= 0 )
     {
         gd::LogWarning(_("The number of lines is invalid: The minimum is one line."));
         return;
     }
 
-    int columnNb = gd::String(columnsSSEdit->GetValue()).ToInt();
+    int columnNb = gd::String(columnsSSEdit->GetValue()).To<int>();
     if ( columnNb <= 0 )
     {
         gd::LogWarning(_("The number of columns is invalid: The minimum is one column."));
         return;
     }
 
-    int origineX = gd::String(origineXEdit->GetValue()).ToInt();
-    int origineY = gd::String(origineYEdit->GetValue()).ToInt();
+    int origineX = gd::String(origineXEdit->GetValue()).To<int>();
+    int origineY = gd::String(origineYEdit->GetValue()).To<int>();
 
-    int width = gd::String(widthSSEdit->GetValue()).ToInt();
-    int height = gd::String(heightSSEdit->GetValue()).ToInt();
+    int width = gd::String(widthSSEdit->GetValue()).To<int>();
+    int height = gd::String(heightSSEdit->GetValue()).To<int>();
     if ( width <= 0 || height <= 0)
     {
         gd::LogWarning(_("The size of a sprite is invalid."));
         return;
     }
 
-    int spaceH = gd::String(spaceHSSEdit->GetValue()).ToInt();
+    int spaceH = gd::String(spaceHSSEdit->GetValue()).To<int>();
     if ( spaceH < 0 )
     {
         gd::LogWarning(_("The horizontal spacing is invalid (must be greater than or equal to 0)."));
         return;
     }
-    int spaceV = gd::String(spaceVSSEdit->GetValue()).ToInt();
+    int spaceV = gd::String(spaceVSSEdit->GetValue()).To<int>();
     if ( spaceV < 0 )
     {
         gd::LogWarning(_("The vertical spacing is invalid (must be greater than or equal to 0)."));

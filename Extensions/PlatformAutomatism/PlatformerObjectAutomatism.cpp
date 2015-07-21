@@ -582,22 +582,22 @@ bool PlatformerObjectAutomatism::UpdateProperty(const gd::String & name, const g
         return true;
     }
 
-    if ( value.ToDouble() < 0 ) return false;
+    if ( value.To<double>() < 0 ) return false;
 
     if ( name == _("Gravity") )
-        gravity = value.ToDouble();
+        gravity = value.To<double>();
     else if ( name == _("Max. falling speed") )
-        maxFallingSpeed = value.ToDouble();
+        maxFallingSpeed = value.To<double>();
     else if ( name == _("Acceleration") )
-        acceleration = value.ToDouble();
+        acceleration = value.To<double>();
     else if ( name == _("Deceleration") )
-        deceleration = value.ToDouble();
+        deceleration = value.To<double>();
     else if ( name == _("Max. speed") )
-        maxSpeed = value.ToDouble();
+        maxSpeed = value.To<double>();
     else if ( name == _("Jump speed") )
-        jumpSpeed = value.ToDouble();
+        jumpSpeed = value.To<double>();
     else if ( name == _("Slope max. angle") )
-        return SetSlopeMaxAngle(value.ToDouble());
+        return SetSlopeMaxAngle(value.To<double>());
     else
         return false;
 

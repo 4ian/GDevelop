@@ -139,57 +139,6 @@ String::const_iterator String::end() const
     return String::const_iterator(m_string.end());
 }
 
-String String::FromInt(int value)
-{
-    String str;
-    str.m_string = ToString<int>(value);
-    return str;
-}
-
-int String::ToInt() const
-{
-    return gd::ToInt(m_string);
-}
-
-String String::FromUInt(unsigned int value)
-{
-    String str;
-    str.m_string = ToString<unsigned int>(value);
-    return str;
-}
-
-unsigned int String::ToUInt() const
-{
-    unsigned int i;
-    std::istringstream oss(m_string);
-    oss >> i;
-    return i;
-}
-
-String String::FromFloat(float value)
-{
-    String str;
-    str.m_string = ToString<float>(value);
-    return str;
-}
-
-float String::ToFloat() const
-{
-    return gd::ToFloat(m_string);
-}
-
-String String::FromDouble(double value)
-{
-    String str;
-    str.m_string = ToString<double>(value);
-    return str;
-}
-
-double String::ToDouble() const
-{
-    return gd::ToDouble(m_string);
-}
-
 String String::FromLocale( const std::string &localizedString )
 {
 #if defined(WINDOWS)

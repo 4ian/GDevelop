@@ -239,6 +239,10 @@ public:
  * \{
  */
 
+    /**
+     * Method to create a gd::String from a number (float, double, int, ...)
+     * \return a gd::String created from **value**.
+     */
     template<typename T>
     static String From(T value)
     {
@@ -247,6 +251,10 @@ public:
         return gd::String::FromLocale(oss.str());
     }
 
+    /**
+     * Method to convert the string to a number
+     * \return the string converted to the type **T**
+     */
     template<typename T>
     T To() const
     {
@@ -255,46 +263,6 @@ public:
         oss >> value;
         return value;
     }
-
-    /**
-     * \return a String created from an integer.
-     */
-    static String FromInt(int value);
-
-    /**
-     * \return the string converted to int.
-     */
-    int ToInt() const;
-
-    /**
-     * \return a String created from an unsigned integer.
-     */
-    static String FromUInt(unsigned int value);
-
-    /**
-     * \return the string converted to unsigned int.
-     */
-    unsigned int ToUInt() const;
-
-    /**
-     * \return a String created from a float.
-     */
-    static String FromFloat(float value);
-
-    /**
-     * \return the string converted to float.
-     */
-    float ToFloat() const;
-
-    /**
-     * \return a String created from a double.
-     */
-    static String FromDouble(double value);
-
-    /**
-     * \return the string converted to double.
-     */
-    double ToDouble() const;
 
 /**
  * \}

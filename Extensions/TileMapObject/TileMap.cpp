@@ -143,7 +143,7 @@ void TileMap::UnserializeLayer(int layer, const gd::String &str)
 
         for(int row = 0; row < rowsVec.size(); row++)
         {
-            SetTile(layer, col, row, rowsVec[row].ToInt());
+            SetTile(layer, col, row, rowsVec[row].To<int>());
         }
     }
 }

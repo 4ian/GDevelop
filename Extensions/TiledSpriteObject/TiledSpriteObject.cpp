@@ -184,9 +184,9 @@ void RuntimeTiledSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, g
 
 bool RuntimeTiledSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
-    if      ( propertyNb == 0 ) {width = newValue.ToFloat();}
-    else if ( propertyNb == 1 ) {height = newValue.ToFloat();}
-    else if ( propertyNb == 2 ) {angle = newValue.ToFloat();}
+    if      ( propertyNb == 0 ) {width = newValue.To<float>();}
+    else if ( propertyNb == 1 ) {height = newValue.To<float>();}
+    else if ( propertyNb == 2 ) {angle = newValue.To<float>();}
 
     return true;
 }

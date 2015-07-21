@@ -67,7 +67,7 @@ void GD_EXTENSION_API CreateSFMLTexture( RuntimeScene & scene, const gd::String 
     if ( colors.size() == 3 )
     {
         colorIsOk = true;
-        color = sf::Color(colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt());
+        color = sf::Color(colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>());
     }
 
     //Create the SFML image and the SFML texture

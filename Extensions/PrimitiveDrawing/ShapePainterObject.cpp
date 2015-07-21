@@ -177,18 +177,18 @@ bool RuntimeShapePainterObject::ChangeProperty(unsigned int propertyNb, gd::Stri
         std::vector < gd::String > colors = newValue.Split(U';');
         if ( colors.size() < 3 ) return false; //Color is not valid
 
-        SetFillColor(colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt());
+        SetFillColor(colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>());
     }
-    else if ( propertyNb == 1 ) { SetFillOpacity(newValue.ToFloat()); }
-    else if ( propertyNb == 2 ) { SetOutlineSize(newValue.ToInt()); }
+    else if ( propertyNb == 1 ) { SetFillOpacity(newValue.To<float>()); }
+    else if ( propertyNb == 2 ) { SetOutlineSize(newValue.To<int>()); }
     else if ( propertyNb == 3 )
     {
         std::vector < gd::String > colors = newValue.Split(U';');
         if ( colors.size() < 3 ) return false; //Color is not valid
 
-        SetOutlineColor(colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt());
+        SetOutlineColor(colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>());
     }
-    else if ( propertyNb == 4 ) { SetOutlineOpacity(newValue.ToFloat()); }
+    else if ( propertyNb == 4 ) { SetOutlineOpacity(newValue.To<float>()); }
 
     return true;
 }
@@ -247,9 +247,9 @@ void ShapePainterObjectBase::SetFillColor( const gd::String & color )
     std::vector < gd::String > colors = color.Split(U';');
     if ( colors.size() < 3 ) return;
 
-    fillColorR = colors[0].ToInt();
-    fillColorG = colors[1].ToInt();
-    fillColorB = colors[2].ToInt();
+    fillColorR = colors[0].To<int>();
+    fillColorG = colors[1].To<int>();
+    fillColorB = colors[2].To<int>();
 }
 
 /**
@@ -260,9 +260,9 @@ void ShapePainterObjectBase::SetOutlineColor( const gd::String & color )
     std::vector < gd::String > colors = color.Split(U';');
     if ( colors.size() < 3 ) return;
 
-    outlineColorR = colors[0].ToInt();
-    outlineColorG = colors[1].ToInt();
-    outlineColorB = colors[2].ToInt();
+    outlineColorR = colors[0].To<int>();
+    outlineColorG = colors[1].To<int>();
+    outlineColorB = colors[2].To<int>();
 }
 
 void RuntimeShapePainterObject::DrawRectangle( float x, float y, float x2, float y2 )

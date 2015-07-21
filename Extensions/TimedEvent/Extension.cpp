@@ -202,7 +202,7 @@ public:
         {
             if ( propertyNb == i )
             {
-                iter->second.SetTime(newValue.ToDouble()*1000000.0);
+                iter->second.SetTime(newValue.To<double>()*1000000.0);
 
                 return true;
             }

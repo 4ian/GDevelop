@@ -184,9 +184,9 @@ void EditPropScene::OnOkBtClick(wxCommandEvent& event)
     cData.SetColour(Panel1->GetBackgroundColour());
     layout.SetBackgroundColor( cData.GetColour().Red(), cData.GetColour().Green(), cData.GetColour().Blue());
     layout.SetWindowDefaultTitle(CaptionEdit->GetValue());
-    layout.SetOpenGLFOV(gd::String(fovEdit->GetValue()).ToFloat());
-    layout.SetOpenGLZNear(gd::String(zNearEdit->GetValue()).ToFloat());
-    layout.SetOpenGLZFar(gd::String(zFarEdit->GetValue()).ToFloat());
+    layout.SetOpenGLFOV(gd::String(fovEdit->GetValue()).To<float>());
+    layout.SetOpenGLZNear(gd::String(zNearEdit->GetValue()).To<float>());
+    layout.SetOpenGLZFar(gd::String(zFarEdit->GetValue()).To<float>());
     layout.SetStopSoundsOnStartup(stopSoundsCheck->GetValue());
     layout.SetStandardSortMethod(fastSortCheck->GetValue());
     layout.DisableInputWhenFocusIsLost(disableInputCheck->GetValue());

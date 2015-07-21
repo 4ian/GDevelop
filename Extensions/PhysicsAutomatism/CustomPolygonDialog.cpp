@@ -481,8 +481,8 @@ void CustomPolygonDialog::OnButton3Click(wxCommandEvent& event)
         return;
 
     float angleRad = -ToFloat(ToString(angleStr)) * M_PI/180;
-    sf::Vector2f origin(gd::String::FromWxString(originStr).Split(U';').at(0).ToFloat(),
-                        gd::String::FromWxString(originStr).Split(U';').at(1).ToFloat());
+    sf::Vector2f origin(gd::String::FromWxString(originStr).Split(U';').at(0).To<float>(),
+                        gd::String::FromWxString(originStr).Split(U';').at(1).To<float>());
 
     std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(pointsEdit->GetValue());
     for(unsigned int a = 0; a < pointList.size(); a++)

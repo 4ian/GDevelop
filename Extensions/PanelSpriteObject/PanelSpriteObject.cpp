@@ -305,12 +305,12 @@ void RuntimePanelSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, g
 
 bool RuntimePanelSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
-    if      ( propertyNb == 0 ) {width = newValue.ToFloat();}
-    else if ( propertyNb == 1 ) {height = newValue.ToFloat();}
-    else if ( propertyNb == 2 ) {leftMargin = newValue.ToFloat();}
-    else if ( propertyNb == 3 ) {topMargin = newValue.ToFloat();}
-    else if ( propertyNb == 4 ) {rightMargin = newValue.ToFloat();}
-    else if ( propertyNb == 5 ) {bottomMargin = newValue.ToFloat();}
+    if      ( propertyNb == 0 ) {width = newValue.To<float>();}
+    else if ( propertyNb == 1 ) {height = newValue.To<float>();}
+    else if ( propertyNb == 2 ) {leftMargin = newValue.To<float>();}
+    else if ( propertyNb == 3 ) {topMargin = newValue.To<float>();}
+    else if ( propertyNb == 4 ) {rightMargin = newValue.To<float>();}
+    else if ( propertyNb == 5 ) {bottomMargin = newValue.To<float>();}
 
     return true;
 }

@@ -83,8 +83,8 @@ void TileHitbox::UnserializeFrom(const gd::SerializerElement &element, sf::Vecto
     std::vector<gd::String> vertices = polygonStr.Split(U'|');
     for(std::vector<gd::String>::iterator vertexIt = vertices.begin(); vertexIt != vertices.end(); vertexIt++)
     {
-        hitbox.vertices.push_back(sf::Vector2f(vertexIt->Split(U';')[0].ToFloat(),
-                                               vertexIt->Split(U';')[1].ToFloat()
+        hitbox.vertices.push_back(sf::Vector2f(vertexIt->Split(U';')[0].To<float>(),
+                                               vertexIt->Split(U';')[1].To<float>()
                                               ));
     }
 }

@@ -162,7 +162,7 @@ std::map<gd::String, gd::PropertyDescriptor> SoundObject::GetInitialInstanceProp
 
 bool SoundObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & game, gd::Layout & scene)
 {
-    if ( name == _("Z") ) position.floatInfos["z"] = value.ToFloat();
+    if ( name == _("Z") ) position.floatInfos["z"] = value.To<float>();
 
     return true;
 }
@@ -200,11 +200,11 @@ void RuntimeSoundObject::GetPropertyForDebugger(unsigned int propertyNb, gd::Str
 
 bool RuntimeSoundObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
-    if(propertyNb == 0) {SetVolume(newValue.ToFloat());}
-    else if (propertyNb == 1) {SetMinDistance(newValue.ToFloat());}
-    else if (propertyNb == 2) {SetAttenuation(newValue.ToFloat());}
+    if(propertyNb == 0) {SetVolume(newValue.To<float>());}
+    else if (propertyNb == 1) {SetMinDistance(newValue.To<float>());}
+    else if (propertyNb == 2) {SetAttenuation(newValue.To<float>());}
     else if (propertyNb == 3) {SetLooping(!(newValue == _("No")));}
-    else if (propertyNb == 4) {SetZPos(newValue.ToFloat());}
+    else if (propertyNb == 4) {SetZPos(newValue.To<float>());}
     return true;
 }
 

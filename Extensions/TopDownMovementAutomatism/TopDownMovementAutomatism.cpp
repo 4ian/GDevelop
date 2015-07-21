@@ -214,18 +214,18 @@ bool TopDownMovementAutomatism::UpdateProperty(const gd::String & name, const gd
         return true;
     }
 
-    if ( value.ToFloat() < 0 ) return false;
+    if ( value.To<float>() < 0 ) return false;
 
     if ( name == _("Acceleration") )
-        acceleration = value.ToFloat();
+        acceleration = value.To<float>();
     else if ( name == _("Deceleration") )
-        deceleration = value.ToFloat();
+        deceleration = value.To<float>();
     else if ( name == _("Max. speed") )
-        maxSpeed = value.ToFloat();
+        maxSpeed = value.To<float>();
     else if ( name == _("Rotate speed") )
-        angularMaxSpeed = value.ToFloat();
+        angularMaxSpeed = value.To<float>();
     else if ( name == _("Angle offset") )
-        angleOffset = value.ToFloat();
+        angleOffset = value.To<float>();
     else
         return false;
 

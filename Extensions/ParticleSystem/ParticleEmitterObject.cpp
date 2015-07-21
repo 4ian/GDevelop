@@ -736,9 +736,9 @@ void ParticleEmitterBase::SetParticleColor1( const gd::String & color )
 
     if ( colors.size() < 3 ) return; //Color is incorrect
 
-    SetParticleRed1(colors[0].ToInt());
-    SetParticleGreen1(colors[1].ToInt());
-    SetParticleBlue1(colors[2].ToInt());
+    SetParticleRed1(colors[0].To<int>());
+    SetParticleGreen1(colors[1].To<int>());
+    SetParticleBlue1(colors[2].To<int>());
 }
 void ParticleEmitterBase::SetParticleColor2( const gd::String & color )
 {
@@ -746,9 +746,9 @@ void ParticleEmitterBase::SetParticleColor2( const gd::String & color )
 
     if ( colors.size() < 3 ) return; //Color is incorrect
 
-    SetParticleRed2(colors[0].ToInt());
-    SetParticleGreen2(colors[1].ToInt());
-    SetParticleBlue2(colors[2].ToInt());
+    SetParticleRed2(colors[0].To<int>());
+    SetParticleGreen2(colors[1].To<int>());
+    SetParticleBlue2(colors[2].To<int>());
 }
 
 /**

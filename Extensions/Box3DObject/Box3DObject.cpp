@@ -377,9 +377,9 @@ std::map<gd::String, gd::PropertyDescriptor> Box3DObject::GetInitialInstanceProp
 
 bool Box3DObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & game, gd::Layout & scene)
 {
-    if ( name == _("Z") ) position.floatInfos["z"] = value.ToFloat();
-    if ( name == _("Pitch") ) position.floatInfos["pitch"] = value.ToFloat();
-    if ( name == _("Roll") ) position.floatInfos["roll"] = value.ToFloat();
+    if ( name == _("Z") ) position.floatInfos["z"] = value.To<float>();
+    if ( name == _("Pitch") ) position.floatInfos["pitch"] = value.To<float>();
+    if ( name == _("Roll") ) position.floatInfos["roll"] = value.To<float>();
 
     return true;
 }
@@ -397,13 +397,13 @@ void RuntimeBox3DObject::GetPropertyForDebugger(unsigned int propertyNb, gd::Str
 
 bool RuntimeBox3DObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
-    if      ( propertyNb == 0 ) {width = newValue.ToInt();}
-    else if ( propertyNb == 1 ) {height = newValue.ToInt();}
-    else if ( propertyNb == 2 ) {depth = newValue.ToInt();}
-    else if ( propertyNb == 3 ) {zPosition = newValue.ToInt();}
-    else if ( propertyNb == 4 ) {yaw = newValue.ToInt();}
-    else if ( propertyNb == 5 ) {pitch = newValue.ToInt();}
-    else if ( propertyNb == 6 ) {roll = newValue.ToInt();}
+    if      ( propertyNb == 0 ) {width = newValue.To<int>();}
+    else if ( propertyNb == 1 ) {height = newValue.To<int>();}
+    else if ( propertyNb == 2 ) {depth = newValue.To<int>();}
+    else if ( propertyNb == 3 ) {zPosition = newValue.To<int>();}
+    else if ( propertyNb == 4 ) {yaw = newValue.To<int>();}
+    else if ( propertyNb == 5 ) {pitch = newValue.To<int>();}
+    else if ( propertyNb == 6 ) {roll = newValue.To<int>();}
 
     return true;
 }

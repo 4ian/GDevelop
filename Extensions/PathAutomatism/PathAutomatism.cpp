@@ -392,7 +392,7 @@ std::vector<sf::Vector2f> PathAutomatism::GetCoordsVectorFromString(const gd::St
         if(coordXY.size() != 2)
             continue;
 
-        sf::Vector2f newCoord(coordXY.at(0).ToFloat(), coordXY.at(1).ToFloat());
+        sf::Vector2f newCoord(coordXY.at(0).To<float>(), coordXY.at(1).To<float>());
         coordsVec.push_back(newCoord);
     }
 

@@ -260,11 +260,11 @@ bool RuntimeLightObject::ChangeProperty(unsigned int propertyNb, gd::String newV
             b = gb.substr(separationPos+1, gb.length());
         }
 
-        SetColor(sf::Color(r.ToInt(), g.ToInt(), b.ToInt()));
+        SetColor(sf::Color(r.To<int>(), g.To<int>(), b.To<int>()));
     }
-    else if ( propertyNb == 1 ) { SetIntensity(newValue.ToFloat()); }
-    else if ( propertyNb == 2 ) { SetRadius(newValue.ToFloat()); }
-    else if ( propertyNb == 3 ) { SetQuality(newValue.ToInt()); }
+    else if ( propertyNb == 1 ) { SetIntensity(newValue.To<float>()); }
+    else if ( propertyNb == 2 ) { SetRadius(newValue.To<float>()); }
+    else if ( propertyNb == 3 ) { SetQuality(newValue.To<int>()); }
 
     return true;
 }
@@ -286,7 +286,7 @@ void RuntimeLightObject::SetColor(const gd::String & colorStr)
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
-    SetColor(sf::Color( colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt() ));
+    SetColor(sf::Color( colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>() ));
 }
 
 void RuntimeLightObject::SetGlobalColor(const gd::String & colorStr)
@@ -295,7 +295,7 @@ void RuntimeLightObject::SetGlobalColor(const gd::String & colorStr)
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
-    SetGlobalColor(sf::Color( colors[0].ToInt(),colors[1].ToInt(),colors[2].ToInt() ));
+    SetGlobalColor(sf::Color( colors[0].To<int>(),colors[1].To<int>(),colors[2].To<int>() ));
 }
 
 RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object & object)

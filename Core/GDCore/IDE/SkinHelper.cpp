@@ -369,7 +369,7 @@ wxBitmap SkinHelper::GetIcon(wxString name, unsigned int size)
     gd::String iconName = name;
     gd::String sizeStr = gd::String::From(size);
     wxConfigBase::Get()->Read( _T( "/Skin/Icons" ), &skinName, "default" );
-    gd::String identifier = "res/icons_"+gd::ToString(skinName)+"/"+iconName+sizeStr+".png";
+    gd::String identifier = "res/icons_" + gd::String(skinName) + "/" + iconName + sizeStr + ".png";
 
     if ( cachedIcons.find(identifier) != cachedIcons.end() && cachedIcons.find(identifier)->second != NULL )
         return *cachedIcons.find(identifier)->second;

@@ -86,14 +86,6 @@ float ToFloat( const T & value )
     return f;
 }
 
-/**
- * Specialization for converting wxString to a std::string
- * \deprecated Use ToLocaleString to convert a wxString to a locale std::string or gd::utf8::FromWxString to convert to an UTF8 std::string instead. If used, this function will produce a warning at runtime as it might cause problems with UTF8 strings.
- * \ingroup CommonProgrammingTools
- */
-template<>
-std::string GD_CORE_API ToString( const wxString & value ) GD_DEPRECATED;
-
 inline double Pi()
 {
     return 3.141592653589793238;

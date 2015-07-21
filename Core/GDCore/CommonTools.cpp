@@ -10,15 +10,3 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/string.h>
 #endif
-
-namespace gd
-{
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-template<>
-std::string GD_CORE_API ToString( const wxString & value )
-{
-    return std::string(value.mb_str());
-}
-#endif
-
-}

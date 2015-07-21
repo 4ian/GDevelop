@@ -204,7 +204,7 @@ void ReminderDialog::OnsendBtClick(wxCommandEvent& event)
     request.setMethod(sf::Http::Request::Post);
     request.setField("Content-Type", "application/x-www-form-urlencoded");
     request.setUri("/feedback/send.php");
-    request.setBody(gd::ToString(requestURI.GetQuery()));
+    request.setBody(gd::String(requestURI.GetQuery()).ToSfString());
 
     // Send the request
     sf::Http::Response response = Http.sendRequest(request, sf::seconds(5));

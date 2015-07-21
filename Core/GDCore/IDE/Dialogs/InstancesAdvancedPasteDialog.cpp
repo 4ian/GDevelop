@@ -178,19 +178,19 @@ void InstancesAdvancedPasteDialog::OncancelBtClick(wxCommandEvent& event)
 
 void InstancesAdvancedPasteDialog::SetStartX(float xStart)
 {
-    xStartEdit->SetValue(ToString(xStart));
+    xStartEdit->SetValue(gd::String::From(xStart));
 }
 void InstancesAdvancedPasteDialog::SetStartY(float yStart)
 {
-    yStartEdit->SetValue(ToString(yStart));
+    yStartEdit->SetValue(gd::String::From(yStart));
 }
 void InstancesAdvancedPasteDialog::SetXGap(float xGap)
 {
-    xGapEdit->SetValue(ToString(xGap));
+    xGapEdit->SetValue(gd::String::From(xGap));
 }
 void InstancesAdvancedPasteDialog::SetYGap(float yGap)
 {
-    yGapEdit->SetValue(ToString(yGap));
+    yGapEdit->SetValue(gd::String::From(yGap));
 }
 
 unsigned int InstancesAdvancedPasteDialog::GetXCount() const
@@ -205,23 +205,23 @@ unsigned int InstancesAdvancedPasteDialog::GetYCount() const
 
 float InstancesAdvancedPasteDialog::GetStartX() const
 {
-    return ToFloat(ToString(xStartEdit->GetValue()));
+    return gd::String(xStartEdit->GetValue()).To<float>();
 }
 float InstancesAdvancedPasteDialog::GetStartY() const
 {
-    return ToFloat(ToString(yStartEdit->GetValue()));
+    return gd::String(yStartEdit->GetValue()).To<float>();
 }
 float InstancesAdvancedPasteDialog::GetXGap() const
 {
-    return ToFloat(ToString(xGapEdit->GetValue()));
+    return gd::String(xGapEdit->GetValue()).To<float>();
 }
 float InstancesAdvancedPasteDialog::GetYGap() const
 {
-    return ToFloat(ToString(yGapEdit->GetValue()));
+    return gd::String(yGapEdit->GetValue()).To<float>();
 }
 float InstancesAdvancedPasteDialog::GetRotationIncrementation() const
 {
-    return ToFloat(ToString(rotationEdit->GetValue()));
+    return gd::String(rotationEdit->GetValue()).To<float>();
 }
 
 

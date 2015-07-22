@@ -218,7 +218,7 @@ void EventStoreDialog::OnSelectionChanged(wxCommandEvent& event)
     else
     {
         nameTxt->SetLabel("Unable to load the template");
-        descriptionEdit->SetValue("An error occured during the loading (Code: "+gd::ToString(status)+" )");
+        descriptionEdit->SetValue("An error occured during the loading (Code: "+gd::String::From(status)+" )");
     }
 
 }

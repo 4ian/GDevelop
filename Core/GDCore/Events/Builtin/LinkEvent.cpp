@@ -155,7 +155,7 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
     if ( !IncludeAllEvents() )
     {
         wxRect textRect = dc.GetTextExtent(_("Link to ")+GetTarget());
-        dc.DrawText( _("Include only events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+textRect.GetWidth()+32+10, y + 5 );
+        dc.DrawText( _("Include only events ")+gd::String::From(GetIncludeStart()+1)+_(" to ")+gd::String::From(GetIncludeEnd()+1), x+textRect.GetWidth()+32+10, y + 5 );
     }
 #endif
 }

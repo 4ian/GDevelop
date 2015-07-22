@@ -85,10 +85,10 @@ public:
         if ( i >= editor.initialPositionsList->GetItemCount() ) editor.initialPositionsList->InsertItem(i, "");
         editor.initialPositionsList->SetItem(i, 0, instance.GetObjectName());
         editor.initialPositionsList->SetItemColumnImage(i, 1, instance.IsLocked() ? 1 : 0 );
-        editor.initialPositionsList->SetItem(i, 2, ToString(instance.GetX()));
-        editor.initialPositionsList->SetItem(i, 3, ToString(instance.GetY()));
-        editor.initialPositionsList->SetItem(i, 4, ToString(instance.GetAngle())+"°");
-        editor.initialPositionsList->SetItem(i, 5, ToString(instance.GetZOrder()));
+        editor.initialPositionsList->SetItem(i, 2, gd::String::From(instance.GetX()));
+        editor.initialPositionsList->SetItem(i, 3, gd::String::From(instance.GetY()));
+        editor.initialPositionsList->SetItem(i, 4, gd::String::From(instance.GetAngle())+"ï¿½");
+        editor.initialPositionsList->SetItem(i, 5, gd::String::From(instance.GetZOrder()));
         editor.initialPositionsList->SetItemPtrData(i, wxPtrToUInt(&instance));
 
         if ( std::find(selectedInstance.begin(), selectedInstance.end(), &instance) != selectedInstance.end())

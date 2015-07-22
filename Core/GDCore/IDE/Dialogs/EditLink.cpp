@@ -128,8 +128,8 @@ game(game_)
 	if ( !editedEvent.IncludeAllEvents() )
 	{
 	    OnlyEventsCheck->SetValue(true);
-	    StartEdit->ChangeValue(ToString(editedEvent.GetIncludeStart()+1));
-	    EndEdit->ChangeValue(ToString(editedEvent.GetIncludeEnd()+1));
+	    StartEdit->ChangeValue(gd::String::From(editedEvent.GetIncludeStart()+1));
+	    EndEdit->ChangeValue(gd::String::From(editedEvent.GetIncludeEnd()+1));
 	}
 
 	for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)

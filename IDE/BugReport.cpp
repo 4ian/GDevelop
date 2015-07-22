@@ -189,7 +189,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<gd::String> & openedFi
     }
 
     CreateRapportBt->Disable();
-    bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::ToString(gd::VersionWrapper::Major())+gd::ToString(gd::VersionWrapper::Minor())+gd::ToString(gd::VersionWrapper::Build()));
+    bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::String::From(gd::VersionWrapper::Major())+gd::String::From(gd::VersionWrapper::Minor())+gd::String::From(gd::VersionWrapper::Build()));
 }
 
 BugReport::~BugReport()

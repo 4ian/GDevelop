@@ -371,7 +371,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
             else if ( !instrInfos.parameters[pNb].supplementaryInformation.empty()
                      && gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
-                cout << "Bad object type in parameter "+ToString(pNb)+" of an action " << action.GetType() << endl;
+                cout << "Bad object type in parameter "+gd::String::From(pNb)+" of an action " << action.GetType() << endl;
                 cout << "Action wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
                 cout << "Action has received " << objectInParameter << " of type " << gd::GetTypeOfObject(project, scene, objectInParameter) << endl;
 

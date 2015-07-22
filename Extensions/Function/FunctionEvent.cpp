@@ -193,7 +193,7 @@ gd::String FunctionEvent::MangleFunctionName(const gd::Layout & layout, const Fu
 
     return "GDFunction"+layout.GetMangledName()
         +gd::SceneNameMangler::GetMangledSceneName(functionEvent.GetName())
-        +gd::String::FromLocale(ToString(ptr));
+        +gd::String::From(ptr);
 };
 
 #endif

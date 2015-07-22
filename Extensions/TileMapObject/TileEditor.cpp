@@ -239,8 +239,8 @@ void TileEditor::OnEditPointToolClicked(wxCommandEvent& event)
     if(selectedPoint >= mask.vertices.size() || selectedPoint < 0)
         return;
 
-    gd::String x_str = wxGetTextFromUser(_("Enter the X position of the point ( regarding the tile )."), _("X position"),gd::ToString(mask.vertices[selectedPoint].x));
-    gd::String y_str = wxGetTextFromUser(_("Enter the Y position of the point ( regarding the tile )."), _("Y position"),gd::ToString(mask.vertices[selectedPoint].y));
+    gd::String x_str = wxGetTextFromUser(_("Enter the X position of the point ( regarding the tile )."), _("X position"),gd::String::From(mask.vertices[selectedPoint].x));
+    gd::String y_str = wxGetTextFromUser(_("Enter the Y position of the point ( regarding the tile )."), _("Y position"),gd::String::From(mask.vertices[selectedPoint].y));
 
     mask.vertices[selectedPoint].x = x_str.To<int>();
     mask.vertices[selectedPoint].y = y_str.To<int>();

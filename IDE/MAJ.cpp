@@ -154,7 +154,7 @@ void MAJ::CheckForUpdate()
     UpdateChecker * checker = UpdateChecker::Get();
     checker->DownloadInformation(/*excludeFromStatistics=*/true);
 
-    versionMAJTxt->SetLabel(gd::ToString(checker->newMajor)+"."+gd::ToString(checker->newMinor)+"."+gd::ToString(checker->newBuild)+"."+gd::ToString(checker->newRevision));
+    versionMAJTxt->SetLabel(gd::String::From(checker->newMajor)+"."+gd::String::From(checker->newMinor)+"."+gd::String::From(checker->newBuild)+"."+gd::String::From(checker->newRevision));
 
     wxString info = _("No informations about the new version.");
     if ( !checker->info.empty() ) info = checker->info;

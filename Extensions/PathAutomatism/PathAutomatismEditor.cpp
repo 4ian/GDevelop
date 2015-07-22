@@ -312,10 +312,10 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, gd::Project & game_
 	previewPnlState.selectedPoint = -1;
 	previewPnlState.backgroundBitmap = NULL;
 
-	speedEdit->SetValue(ToString(automatism.GetSpeed()));
-	xOffsetEdit->SetValue(ToString(automatism.GetOffsetX()));
-	yOffsetEdit->SetValue(ToString(automatism.GetOffsetY()));
-	angleOffsetEdit->SetValue(ToString(automatism.GetAngleOffset()));
+	speedEdit->SetValue(gd::String::From(automatism.GetSpeed()));
+	xOffsetEdit->SetValue(gd::String::From(automatism.GetOffsetX()));
+	yOffsetEdit->SetValue(gd::String::From(automatism.GetOffsetY()));
+	angleOffsetEdit->SetValue(gd::String::From(automatism.GetAngleOffset()));
 
 	reverseCheck->SetValue(automatism.ReverseAtEnd());
 	stopCheck->SetValue(automatism.StopAtEnd());
@@ -552,10 +552,10 @@ void PathAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     }
     automatism.ChangeCurrentPath(pathInfo->name);
 
-    automatism.SetSpeed(ToFloat(ToString(speedEdit->GetValue())));
-    automatism.SetOffsetX(ToFloat(ToString(xOffsetEdit->GetValue())));
-    automatism.SetOffsetY(ToFloat(ToString(yOffsetEdit->GetValue())));
-    automatism.SetAngleOffset(ToFloat(ToString(angleOffsetEdit->GetValue())));
+    automatism.SetSpeed(gd::String(speedEdit->GetValue()).To<float>());
+    automatism.SetOffsetX(gd::String(xOffsetEdit->GetValue()).To<float>());
+    automatism.SetOffsetY(gd::String(yOffsetEdit->GetValue()).To<float>());
+    automatism.SetAngleOffset(gd::String(angleOffsetEdit->GetValue()).To<float>());
 
     automatism.SetReverseAtEnd(reverseCheck->GetValue());
     automatism.SetStopAtEnd(stopCheck->GetValue());
@@ -617,8 +617,8 @@ void PathAutomatismEditor::OnPanel1Paint(wxPaintEvent& event)
         dc.SetPen(wxPen(wxColor(150, 150, 150)));
         dc.DrawLine(0, previewPnlState.mousePosition.y, panelSize.GetWidth(), previewPnlState.mousePosition.y);
         dc.DrawLine(previewPnlState.mousePosition.x, 0, previewPnlState.mousePosition.x, panelSize.GetHeight());
-        dc.DrawText(ToString(previewPnlState.mousePosition.x + previewPnlState.offset.x), previewPnlState.mousePosition.x + 2, 2);
-        dc.DrawText(ToString(previewPnlState.mousePosition.y + previewPnlState.offset.y), 2, previewPnlState.mousePosition.y + 2);
+        dc.DrawText(gd::String::From(previewPnlState.mousePosition.x + previewPnlState.offset.x), previewPnlState.mousePosition.x + 2, 2);
+        dc.DrawText(gd::String::From(previewPnlState.mousePosition.y + previewPnlState.offset.y), 2, previewPnlState.mousePosition.y + 2);
     }
 
     //Draw origin
@@ -738,7 +738,7 @@ void PathAutomatismEditor::OnpreviewPnlMouseMove(wxMouseEvent& event)
     previewPnl->Refresh();
     previewPnl->Update();
 
-    StaticText8->SetLabel(ToString(event.GetPosition().x + previewPnlState.offset.x) + ";" + ToString(event.GetPosition().y + previewPnlState.offset.y));
+    StaticText8->SetLabel(gd::String::From(event.GetPosition().x + previewPnlState.offset.x) + ";" + gd::String::From(event.GetPosition().y + previewPnlState.offset.y));
 
     UpdateContextMessage();
 }
@@ -781,8 +781,8 @@ void PathAutomatismEditor::OnpreviewPnlRightUp(wxMouseEvent& event)
             }
             else if(menuSelection == positionBtID)
             {
-                int posX = ToInt(ToString(wxGetTextFromUser(_("X position:"), _("Position precisely"), ToString(path->at(selectedPoint).x), this)));
-                int posY = ToInt(ToString(wxGetTextFromUser(_("Y position:"), _("Position precisely"), ToString(path->at(selectedPoint).y), this)));
+                int posX = gd::String(wxGetTextFromUser(_("X position:"), _("Position precisely"), gd::String::From(path->at(selectedPoint).x), this)).To<int>();
+                int posY = gd::String(wxGetTextFromUser(_("Y position:"), _("Position precisely"), gd::String::From(path->at(selectedPoint).y), this)).To<int>();
 
                 path->at(selectedPoint).x = posX;
                 path->at(selectedPoint).y = posY;

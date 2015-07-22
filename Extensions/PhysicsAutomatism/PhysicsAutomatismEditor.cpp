@@ -227,12 +227,12 @@ scene(scene_)
 
 	staticCheck->SetValue(!automatism.dynamic);
 	fixedRotationCheck->SetValue(automatism.fixedRotation);
-	massDensityEdit->SetValue(ToString(automatism.massDensity));
+	massDensityEdit->SetValue(gd::String::From(automatism.massDensity));
 	bulletCheck->SetValue(automatism.isBullet);
-	frictionEdit->SetValue(ToString(automatism.averageFriction));
-	restitutionEdit->SetValue(ToString(automatism.averageRestitution));
-	linearDampingEdit->SetValue(ToString(automatism.linearDamping));
-	angularDampingEdit->SetValue(ToString(automatism.angularDamping));
+	frictionEdit->SetValue(gd::String::From(automatism.averageFriction));
+	restitutionEdit->SetValue(gd::String::From(automatism.averageRestitution));
+	linearDampingEdit->SetValue(gd::String::From(automatism.linearDamping));
+	angularDampingEdit->SetValue(gd::String::From(automatism.angularDamping));
 
 	if ( game_.GetCurrentPlatform().GetName() == "GDevelop JS platform" )
     {
@@ -255,10 +255,10 @@ scene(scene_)
 	    return;
     }
 
-	gravityXEdit->SetValue(ToString(sharedDatas->gravityX));
-	gravityYEdit->SetValue(ToString(sharedDatas->gravityY));
-	scaleXEdit->SetValue(ToString(sharedDatas->scaleX));
-	scaleYEdit->SetValue(ToString(sharedDatas->scaleY));
+	gravityXEdit->SetValue(gd::String::From(sharedDatas->gravityX));
+	gravityYEdit->SetValue(gd::String::From(sharedDatas->gravityY));
+	scaleXEdit->SetValue(gd::String::From(sharedDatas->scaleX));
+	scaleYEdit->SetValue(gd::String::From(sharedDatas->scaleY));
 }
 
 PhysicsAutomatismEditor::~PhysicsAutomatismEditor()
@@ -287,11 +287,11 @@ void PhysicsAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     automatism.dynamic = !staticCheck->GetValue();
     automatism.fixedRotation = fixedRotationCheck->GetValue();
     automatism.isBullet = bulletCheck->GetValue();
-    automatism.massDensity = ToFloat(string(massDensityEdit->GetValue().mb_str()));
-    automatism.averageFriction = ToFloat(string(frictionEdit->GetValue().mb_str()));
-    automatism.averageRestitution = ToFloat(string(restitutionEdit->GetValue().mb_str()));
-    automatism.linearDamping = ToFloat(string(linearDampingEdit->GetValue().mb_str()));
-    automatism.angularDamping = ToFloat(string(angularDampingEdit->GetValue().mb_str()));
+    automatism.massDensity = gd::String(massDensityEdit->GetValue()).To<float>();
+    automatism.averageFriction = gd::String(frictionEdit->GetValue()).To<float>();
+    automatism.averageRestitution = gd::String(restitutionEdit->GetValue()).To<float>();
+    automatism.linearDamping = gd::String(linearDampingEdit->GetValue()).To<float>();
+    automatism.angularDamping = gd::String(angularDampingEdit->GetValue()).To<float>();
     automatism.polygonPositioning = static_cast<PhysicsAutomatism::Positioning>(positioning);
     automatism.polygonWidth = polygonWidth;
     automatism.polygonHeight = polygonHeight;
@@ -299,10 +299,10 @@ void PhysicsAutomatismEditor::OnokBtClick(wxCommandEvent& event)
 
     if ( sharedDatas != std::shared_ptr<ScenePhysicsDatas>() )
     {
-        sharedDatas->gravityX = ToFloat(string(gravityXEdit->GetValue().mb_str()));
-        sharedDatas->gravityY = ToFloat(string(gravityYEdit->GetValue().mb_str()));
-        sharedDatas->scaleX = ToFloat(string(scaleXEdit->GetValue().mb_str()));
-        sharedDatas->scaleY = ToFloat(string(scaleYEdit->GetValue().mb_str()));
+        sharedDatas->gravityX = gd::String(gravityXEdit->GetValue()).To<float>();
+        sharedDatas->gravityY = gd::String(gravityYEdit->GetValue()).To<float>();
+        sharedDatas->scaleX = gd::String(scaleXEdit->GetValue()).To<float>();
+        sharedDatas->scaleY = gd::String(scaleYEdit->GetValue()).To<float>();
     }
 
     EndModal(1);
@@ -335,4 +335,3 @@ void PhysicsAutomatismEditor::OnpolygonBtClick(wxCommandEvent& event)
 }
 
 #endif
-

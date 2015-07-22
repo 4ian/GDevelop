@@ -117,8 +117,8 @@ object(object_)
 	//*)
 
     intensityEdit->SetValue(object.GetIntensity());
-    radiusEdit->SetValue(ToString(object.GetRadius()));
-    qualityEdit->SetValue(ToString(object.GetQuality()));
+    radiusEdit->SetValue(gd::String::From(object.GetRadius()));
+    qualityEdit->SetValue(gd::String::From(object.GetQuality()));
     colorPicker->SetColour(wxColour(object.GetColor().r, object.GetColor().g, object.GetColor().b));
 
     globalCheck->SetValue(object.IsGlobalLight());
@@ -135,8 +135,8 @@ LightObjectEditor::~LightObjectEditor()
 void LightObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
     object.SetIntensity(intensityEdit->GetValue());
-    object.SetRadius( ToFloat(string(radiusEdit->GetValue().mb_str())));
-    object.SetQuality( ToFloat(string(qualityEdit->GetValue().mb_str())));
+    object.SetRadius( gd::String(radiusEdit->GetValue()).To<float>() );
+    object.SetQuality( gd::String(qualityEdit->GetValue()).To<float>() );
     object.SetColor(sf::Color(colorPicker->GetColour().Red(), colorPicker->GetColour().Green(), colorPicker->GetColour().Blue()));
 
     object.SetGlobalLight(globalCheck->GetValue());
@@ -151,4 +151,3 @@ void LightObjectEditor::OncancelBtClick(wxCommandEvent& event)
 }
 
 #endif
-

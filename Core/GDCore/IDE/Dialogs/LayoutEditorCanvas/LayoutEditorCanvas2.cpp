@@ -427,7 +427,7 @@ void LayoutEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
     //Find a new unique name for the object
     gd::String name = _("NewObject");
     for (unsigned int i = 2;layout.HasObjectNamed(name);++i)
-        name =  _("NewObject")+ToString(i);
+        name =  _("NewObject")+gd::String::From(i);
 
     //Add a new object of selected type to objects list
     layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), name, layout.GetObjectsCount());

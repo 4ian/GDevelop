@@ -590,7 +590,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, gd::String exportDir,
             wxArrayString files;
             wxDir::GetAllFiles(exportDir, &files);
 
-            wxString zipTempName = fs.GetTempDir()+"/GDTemporaries/zipped_"+ToString(&project)+".zip";
+            wxString zipTempName = fs.GetTempDir()+"/GDTemporaries/zipped_"+gd::String::From(&project)+".zip";
             wxFFileOutputStream out(zipTempName);
             wxZipOutputStream zip(out);
             for(unsigned int i = 0; i < files.size(); ++i)

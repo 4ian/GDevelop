@@ -517,7 +517,7 @@ void ChooseVariableDialog::OnAddChildSelected(wxCommandEvent& event)
 
     gd::String newChildName = _("NewChild");
     for(unsigned int i = 2;selectedVariable->HasChild(newChildName);++i )
-        newChildName = _("NewChild")+ToString(i);
+        newChildName = _("NewChild")+gd::String::From(i);
 
     selectedVariable->GetChild(newChildName);
     UpdateSelectedAndParentVariable();

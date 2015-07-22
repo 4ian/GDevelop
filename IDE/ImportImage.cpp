@@ -346,7 +346,7 @@ void ImportImage::OnFileGIFEditText(wxCommandEvent& event)
 {
     wxAnimation animation;
     if ( animation.LoadFile(FileGIFEdit->GetValue()) )
-        nbImageGIFBt->SetLabel(_("Number of images : ")+gd::ToString(animation.GetFrameCount()));
+        nbImageGIFBt->SetLabel(_("Number of images : ")+gd::String::From(animation.GetFrameCount()));
     else
         nbImageGIFBt->SetLabel(_("Number of images : \?"));
 }
@@ -369,7 +369,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     for (unsigned int i = 0;i<animation.GetFrameCount();++i)
     {
     	wxImage img = animation.GetFrame(i);
-    	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+gd::ToString(i)+".png", wxBITMAP_TYPE_PNG);
+    	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+gd::String::From(i)+".png", wxBITMAP_TYPE_PNG);
     }
 
     gd::LogMessage(_("Decomposition of the GIF completed!"));
@@ -442,7 +442,7 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
             if ( j == 1 ) direc = "L";
             if ( j == 2 ) direc = "R";
             if ( j == 3 ) direc = "U";
-            subImage.SaveFile(path+"/"+decomposeRPGEdit->GetValue()+direc+gd::ToString(i)+".png", wxBITMAP_TYPE_PNG);
+            subImage.SaveFile(path+"/"+decomposeRPGEdit->GetValue()+direc+gd::String::From(i)+".png", wxBITMAP_TYPE_PNG);
         }
     }
 
@@ -521,7 +521,7 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
             imageRect.SetWidth(width);
             imageRect.SetHeight(height);
 
-            image.GetSubImage(imageRect).SaveFile(path+"/"+decomposeSSEdit->GetValue()+"l"+gd::ToString(line)+"c"+gd::ToString(column)+".png", wxBITMAP_TYPE_PNG);
+            image.GetSubImage(imageRect).SaveFile(path+"/"+decomposeSSEdit->GetValue()+"l"+gd::String::From(line)+"c"+gd::String::From(column)+".png", wxBITMAP_TYPE_PNG);
 
             X += width + spaceH;
         }
@@ -550,4 +550,3 @@ void ImportImage::OnchooseColorMaskSSBtClick(wxCommandEvent& event)
         maskB = color.Blue();
     }
 }
-

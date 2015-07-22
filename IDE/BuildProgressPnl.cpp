@@ -92,8 +92,8 @@ void BuildProgressPnl::OnMustRefresh(wxCommandEvent&)
             wxString timeStr = wxString::Format(_("( %ld seconds )"), compilationTimer.Time()/1000);
             if (!currentTasks.empty())
             {
-                statusTxt->SetLabel(_("Compilation finished")+timeStr+_(", but ")+gd::ToString(currentTasks.size())+_(" task(s) are waiting."));
-                AppendText(_("Tasks finished ")+timeStr+_(", but ")+gd::ToString(currentTasks.size())+_(" task(s) are waiting.")+"\n");
+                statusTxt->SetLabel(_("Compilation finished")+timeStr+_(", but ")+gd::String::From(currentTasks.size())+_(" task(s) are waiting."));
+                AppendText(_("Tasks finished ")+timeStr+_(", but ")+gd::String::From(currentTasks.size())+_(" task(s) are waiting.")+"\n");
 
             }
             else
@@ -128,4 +128,3 @@ void BuildProgressPnl::AppendText(wxString text)
 void BuildProgressPnl::OntasksLogEditText(wxCommandEvent& event)
 {
 }
-

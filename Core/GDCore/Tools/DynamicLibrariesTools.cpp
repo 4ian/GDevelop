@@ -35,8 +35,8 @@ namespace gd
             (LPTSTR) &lpMsgBuf,
             0, NULL );
 
-        std::string errorMsg = "Error ("+ToString(dw)+"): "+std::string(lpMsgBuf);
-        return gd::String::FromLocale(errorMsg);
+        gd::String errorMsg = "Error ("+gd::String::From(dw)+"): "+gd::String::FromLocale(std::string(lpMsgBuf));
+        return errorMsg;
     }
 #elif defined(LINUX) || defined (MACOS)
     Handle OpenLibrary(const char* path) {return dlopen(path, RTLD_LAZY);}

@@ -135,7 +135,7 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
     while ( wxFileExists(newProjectFile) )
     {
         newProjectFile = newProjectBaseFolder+wxFileName::GetPathSeparator()+
-                              _("My project")+" "+gd::ToString(i)+wxFileName::GetPathSeparator()+
+                              _("My project")+" "+gd::String::From(i)+wxString(wxFileName::GetPathSeparator())+
                               _("Project.gdg");
         ++i;
     }

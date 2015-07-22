@@ -201,9 +201,9 @@ namespace
 		if (val.IsBoolean())
 			return val.GetBool() ? "true" : "false";
 		else if (val.IsInt())
-			return gd::ToString(val.GetInt());
+			return gd::String::From(val.GetInt()).ToUTF8();
 		else if (val.IsDouble())
-			return gd::ToString(val.GetDouble());
+			return gd::String::From(val.GetDouble()).ToUTF8();
 		else
 			return StringToQuotedJSONString(val.GetString().c_str());
 	}
@@ -487,7 +487,7 @@ namespace
             else if ( str == "false" )
             	element.SetValue(false);
             else
-            	element.SetValue(ToDouble(str));
+            	element.SetValue(gd::String::FromUTF8(str).To<double>());
             return endPos;
         }
     }

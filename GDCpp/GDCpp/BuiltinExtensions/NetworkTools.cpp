@@ -447,7 +447,7 @@ namespace
             else if ( str == "false" )
                 variable.SetValue(0);
             else
-                variable.SetValue(ToDouble(str));
+                variable.SetValue(gd::String::FromUTF8(str).To<double>());
             return endPos;
         }
     }

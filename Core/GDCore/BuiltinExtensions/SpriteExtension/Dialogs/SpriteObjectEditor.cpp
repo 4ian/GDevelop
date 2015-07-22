@@ -1397,9 +1397,9 @@ void SpriteObjectEditor::OnAddMaskClick(wxCommandEvent& event)
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
     if ( sprites[0]->IsCollisionMaskAutomatic() ) mask.clear();
 
-    float width = ToFloat(string(wxGetTextFromUser(_("Enter the width of the rectangle"), _("New rectangle"), "32").mb_str()));
-    float height = ToFloat(string(wxGetTextFromUser(_("Enter the height of the rectangle"), _("New rectangle"), "32").mb_str()));
-    float angle = ToFloat(string(wxGetTextFromUser(_("Enter the angle of the rotation of the rectangle ( in degrees )"), _("New rectangle"), "0").mb_str()));
+    float width = gd::String(wxGetTextFromUser(_("Enter the width of the rectangle"), _("New rectangle"), "32")).To<float>();
+    float height = gd::String(wxGetTextFromUser(_("Enter the height of the rectangle"), _("New rectangle"), "32")).To<float>();
+    float angle = gd::String(wxGetTextFromUser(_("Enter the angle of the rotation of the rectangle ( in degrees )"), _("New rectangle"), "0")).To<float>();
 
     Polygon2d newRectangle = Polygon2d::CreateRectangle(width, height);
     newRectangle.Rotate(angle*3.14159/180);

@@ -79,8 +79,8 @@ void BuildMessagesPnl::RefreshWith(gd::Project * game, std::vector < CompilerMes
     for (unsigned int i = 0; i<messages.size(); ++i)
     {
         messagesList->InsertItem(i, messages[i].file);
-        messagesList->SetItem(i, 1, messages[i].line != gd::String::npos ? ToString(messages[i].line) : "");
-        messagesList->SetItem(i, 2, messages[i].column != gd::String::npos ? ToString(messages[i].column) : "");
+        messagesList->SetItem(i, 1, messages[i].line != gd::String::npos ? gd::String::From(messages[i].line) : "");
+        messagesList->SetItem(i, 2, messages[i].column != gd::String::npos ? gd::String::From(messages[i].column) : "");
         messagesList->SetItem(i, 3, messages[i].message);
 
         if ( messages[i].messageType == CompilerMessage::error)

@@ -303,7 +303,7 @@ bool ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(wxWindow * paren
         //Add automatism to object
         gd::String autoName = metadata.GetDefaultName();
         for (unsigned int j = 2;object->HasAutomatismNamed(autoName);++j)
-            autoName = metadata.GetDefaultName()+gd::ToString(j);
+            autoName = metadata.GetDefaultName()+gd::String::From(j);
 
         object->AddNewAutomatism(project, dialog.GetSelectedAutomatismType(), autoName);
 

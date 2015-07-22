@@ -612,7 +612,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
 
             if (profilingActivated && events[i].IsExecutable())
             {
-                dc.DrawText(ToString(i+1), x-leftMargin+2-42, y);
+                dc.DrawText(gd::String::From(i+1), x-leftMargin+2-42, y);
                 dc.SetFont(gd::EventsRenderingHelper::Get()->GetNiceFont().Smaller());
 
                 //Draw profile results
@@ -630,7 +630,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
                 dc.SetFont(gd::EventsRenderingHelper::Get()->GetFont());
             }
             else
-                dc.DrawText(ToString(i+1), x-leftMargin+2, y+3);
+                dc.DrawText(gd::String::From(i+1), x-leftMargin+2, y+3);
 
 
             //Event rendering
@@ -816,9 +816,9 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
             {
                 EventItem eventItem = itemsAreas.GetEventAt(x, y);
                 if ( item.isCondition )
-                    LogFileManager::Get()->WriteToLogFile("Condition selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
+                    LogFileManager::Get()->WriteToLogFile("Condition selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+gd::String::From(eventItem.positionInList)+" )");
                 else
-                    LogFileManager::Get()->WriteToLogFile("Action selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
+                    LogFileManager::Get()->WriteToLogFile("Action selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+gd::String::From(eventItem.positionInList)+" )");
             }
         }
     }
@@ -842,7 +842,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
         selection.AddEvent(item);
 
         //Log file
-        LogFileManager::Get()->WriteToLogFile("Event selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(item.positionInList)+" )");
+        LogFileManager::Get()->WriteToLogFile("Event selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+gd::String::From(item.positionInList)+" )");
     }
 }
 

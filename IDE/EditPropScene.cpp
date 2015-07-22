@@ -164,9 +164,9 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
 	Panel1->SetBackgroundColour(wxColour(layout.GetBackgroundColorRed(), layout.GetBackgroundColorGreen(), layout.GetBackgroundColorBlue()));
 
     if ( layout.StandardSortMethod() ) stableSortCheck->SetValue(true);
-    fovEdit->SetValue(ToString(layout.GetOpenGLFOV()));
-    zNearEdit->SetValue(ToString(layout.GetOpenGLZNear()));
-    zFarEdit->SetValue(ToString(layout.GetOpenGLZFar()));
+    fovEdit->SetValue(gd::String::From(layout.GetOpenGLFOV()));
+    zNearEdit->SetValue(gd::String::From(layout.GetOpenGLZNear()));
+    zFarEdit->SetValue(gd::String::From(layout.GetOpenGLZFar()));
     stopSoundsCheck->SetValue(layout.StopSoundsOnStartup());
     disableInputCheck->SetValue(layout.IsInputDisabledWhenFocusIsLost());
 }

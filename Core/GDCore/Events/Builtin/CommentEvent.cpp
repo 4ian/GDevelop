@@ -71,8 +71,8 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
     renderingHelper->GetHTMLRenderer().SetStandardFonts(renderingHelper->GetNiceFont().GetPointSize());
 
     //Prepare HTML texts
-    gd::String str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
-    gd::String str2 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";
+    gd::String str1 = "<FONT color="+wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX)+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
+    gd::String str2 = "<FONT color="+wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX)+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";
 
     //Calculate space constraints
     const int sideSeparation = 3; //Spacing between text and borders
@@ -126,8 +126,8 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width, const gd::Platf
         renderingHelper->GetHTMLRenderer().SetDC(&dc);
         renderingHelper->GetHTMLRenderer().SetStandardFonts(renderingHelper->GetNiceFont().GetPointSize());
 
-        gd::String str1 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
-        gd::String str2 = "<FONT color="+ToString(wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX).mb_str())+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";
+        gd::String str1 = "<FONT color="+wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX)+">"+renderingHelper->GetHTMLText(com1)+"</FONT>";
+        gd::String str2 = "<FONT color="+wxColour(textR, textG, textB).GetAsString(wxC2S_HTML_SYNTAX)+">"+renderingHelper->GetHTMLText(com2)+"</FONT>";
 
         //Calculate space constraints
         const int sideSeparation = 3; //Spacing between text and borders

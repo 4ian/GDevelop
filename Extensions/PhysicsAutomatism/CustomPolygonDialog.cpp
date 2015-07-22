@@ -219,8 +219,8 @@ CustomPolygonDialog::CustomPolygonDialog(wxWindow* parent, std::vector<sf::Vecto
 	OnOriginRadioBt->SetValue(positioning == 0);
 	OnCenterRadioBt->SetValue(positioning == 2);
     autoResizingCheckBox->SetValue(automaticResizing);
-    polygonWidthTextCtrl->SetValue(ToString<float>(polygonWidth));
-    polygonHeightTextCtrl->SetValue(ToString<float>(polygonHeight));
+    polygonWidthTextCtrl->SetValue(gd::String::From(polygonWidth));
+    polygonHeightTextCtrl->SetValue(gd::String::From(polygonHeight));
 
     //Setup scrollbars
     wxSize panelSize = previewPnl->GetSize();
@@ -247,8 +247,8 @@ void CustomPolygonDialog::OnokBtClick(wxCommandEvent& event)
 
     positioning = OnOriginRadioBt->GetValue() ? 0 : 2;
 
-    polygonWidth = ToFloat(ToString(polygonWidthTextCtrl->GetValue()));
-    polygonHeight = ToFloat(ToString(polygonHeightTextCtrl->GetValue()));
+    polygonWidth = gd::String(polygonWidthTextCtrl->GetValue()).To<float>();
+    polygonHeight = gd::String(polygonHeightTextCtrl->GetValue()).To<float>();
 
     automaticResizing = autoResizingCheckBox->GetValue();
 
@@ -303,8 +303,8 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
 
         std::vector<wxPoint> polygonSizePoints;
 
-        float polygonWidth_ = ToFloat(ToString(polygonWidthTextCtrl->GetValue()));
-        float polygonHeight_ = ToFloat(ToString(polygonHeightTextCtrl->GetValue()));
+        float polygonWidth_ = gd::String(polygonWidthTextCtrl->GetValue()).To<float>();
+        float polygonHeight_ = gd::String(polygonHeightTextCtrl->GetValue()).To<float>();
 
         if(OnCenterRadioBt->GetValue())
         {
@@ -338,7 +338,7 @@ void CustomPolygonDialog::OnpreviewPnlLeftUp(wxMouseEvent& event)
     float xOffset = (previewPnlHorizontalScroll->GetThumbPosition() - previewPnlHorizontalScroll->GetRange()/2);
     float yOffset = (previewPnlVerticalScroll->GetThumbPosition() - previewPnlVerticalScroll->GetRange()/2);
 
-    pointsEdit->AppendText("\n"+ToString(event.GetX()+xOffset)+";"+ToString(event.GetY()+yOffset));
+    pointsEdit->AppendText("\n"+gd::String::From(event.GetX()+xOffset)+";"+gd::String::From(event.GetY()+yOffset));
 }
 
 void CustomPolygonDialog::OnpointsEditText(wxCommandEvent& event)
@@ -426,12 +426,12 @@ void CustomPolygonDialog::OnButton1Click(wxCommandEvent& event)
     if(xOffsetStr == "")
         xOffset = 0;
     else
-        xOffset = ToFloat(ToString(xOffsetStr));
+        xOffset = gd::String(xOffsetStr).To<float>();
 
     if(yOffsetStr == "")
         yOffset = 0;
     else
-        yOffset = ToFloat(ToString(yOffsetStr));
+        yOffset = gd::String(yOffsetStr).To<float>();
 
     std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(pointsEdit->GetValue());
     for(unsigned int a = 0; a < pointList.size(); a++)
@@ -454,12 +454,12 @@ void CustomPolygonDialog::OnButton2Click(wxCommandEvent& event)
     if(xScaleStr == "")
         xScale = 1;
     else
-        xScale = ToFloat(ToString(xScaleStr));
+        xScale = gd::String(xScaleStr).To<float>();
 
     if(yScaleStr == "")
         yScale = 1;
     else
-        yScale = ToFloat(ToString(yScaleStr));
+        yScale = gd::String(yScaleStr).To<float>();
 
     std::vector<sf::Vector2f> pointList = PhysicsAutomatism::GetCoordsVectorFromString(pointsEdit->GetValue());
     for(unsigned int a = 0; a < pointList.size(); a++)
@@ -480,7 +480,7 @@ void CustomPolygonDialog::OnButton3Click(wxCommandEvent& event)
     if(precision == -1)
         return;
 
-    float angleRad = -ToFloat(ToString(angleStr)) * M_PI/180;
+    float angleRad = -gd::String(angleStr).To<float>() * M_PI/180;
     sf::Vector2f origin(gd::String::FromWxString(originStr).Split(U';').at(0).To<float>(),
                         gd::String::FromWxString(originStr).Split(U';').at(1).To<float>());
 

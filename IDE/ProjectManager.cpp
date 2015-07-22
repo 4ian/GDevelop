@@ -517,7 +517,7 @@ void ProjectManager::Refresh()
         //Extensions
         gdTreeItemProjectData * extensionsItemData = new gdTreeItemProjectData("Extensions", "", mainEditor.games[i].get());
         int extensionsCount = game->GetUsedExtensions().size()-gd::PlatformExtension::GetBuiltinExtensionsNames().size();
-        projectsTree->AppendItem(projectItem, _("Extensions") + (extensionsCount > 0 ? " (" + ToString(extensionsCount) + ")" : ""),
+        projectsTree->AppendItem(projectItem, _("Extensions") + (extensionsCount > 0 ? " (" + gd::String::From(extensionsCount) + ")" : ""),
                                  3 ,3, extensionsItemData);
     }
 
@@ -1037,7 +1037,7 @@ void ProjectManager::AddLayoutToProject(gd::Project * project, unsigned int posi
     int i = 2;
     while(project->HasLayoutNamed(newSceneName))
     {
-        newSceneName = _("New scene") + " " + ToString(i);
+        newSceneName = _("New scene") + " " + gd::String::From(i);
         ++i;
     }
 
@@ -1227,7 +1227,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasLayoutNamed(newLayoutName))
     {
-        newLayoutName = _("Copy of") + " " + newLayout.GetName() + (i == 1 ? "" : " "+ToString(i));
+        newLayoutName = _("Copy of") + " " + newLayout.GetName() + (i == 1 ? "" : " "+gd::String::From(i));
         ++i;
     }
 
@@ -1532,7 +1532,7 @@ void ProjectManager::AddExternalEventsToGame(gd::Project * project)
     int i = 2;
     while(project->HasExternalEventsNamed(newName))
     {
-        newName = _("External events") + " " + ToString(i);
+        newName = _("External events") + " " + gd::String::From(i);
         ++i;
     }
 
@@ -1647,7 +1647,7 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasExternalEventsNamed(newName))
     {
-        newName = _("Copy of") + " " + newEvents.GetName() + " " + ( i==1 ? "" : ToString(i));
+        newName = _("Copy of") + " " + newEvents.GetName() + " " + ( i==1 ? "" : gd::String::From(i));
         ++i;
     }
 
@@ -1674,7 +1674,7 @@ void ProjectManager::AddExternalLayoutToGame(gd::Project * project)
     int i = 2;
     while(project->HasExternalLayoutNamed(newName))
     {
-        newName = _("External layout") + " " + ToString(i);
+        newName = _("External layout") + " " + gd::String::From(i);
         ++i;
     }
 
@@ -1853,7 +1853,7 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
     int i = 1;
     while(game->HasExternalLayoutNamed(newName))
     {
-        newName = _("Copy of") + " " + newExternalLayout.GetName() + " " + (i==1 ? "" : ToString(i));
+        newName = _("Copy of") + " " + newExternalLayout.GetName() + " " + (i==1 ? "" : gd::String::From(i));
         ++i;
     }
 

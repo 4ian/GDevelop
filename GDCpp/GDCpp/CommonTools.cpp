@@ -15,11 +15,3 @@
 #endif
 
 using namespace std;
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-template<>
-std::string GD_API ToString( const wxString & value )
-{
-    return string(value.mb_str());
-}
-#endif

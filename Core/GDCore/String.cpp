@@ -52,8 +52,6 @@ String::String(const wxString &string) : m_string()
 String& String::operator=(const char *characters)
 {
     m_string = std::string(characters);
-    if(IsValid()) //Do not normalize if the string is invalid
-        Normalize();
     return *this;
 }
 
@@ -74,8 +72,6 @@ String& String::operator=(const sf::String &string)
 
     m_string.shrink_to_fit();
 
-    if(IsValid()) //Do not normalize if the string is invalid
-        Normalize();
     return *this;
 }
 
@@ -96,8 +92,6 @@ String& String::operator=(const std::u32string &string)
 
     m_string.shrink_to_fit();
 
-    if(IsValid()) //Do not normalize if the string is invalid
-        Normalize();
     return *this;
 }
 
@@ -107,8 +101,6 @@ String& String::operator=(const wxString &string)
 {
     m_string =  std::string(string.ToUTF8().data());
 
-    if(IsValid()) //Do not normalize if the string is invalid
-        Normalize();
     return *this;
 }
 
@@ -277,8 +269,6 @@ String& String::ReplaceInvalid( char32_t replacement )
     ::utf8::replace_invalid(m_string.begin(), m_string.end(), std::back_inserter(validStr), replacement);
 
     m_string = validStr;
-
-    Normalize(); //The string is now valid, normalize it
 
     return *this;
 }

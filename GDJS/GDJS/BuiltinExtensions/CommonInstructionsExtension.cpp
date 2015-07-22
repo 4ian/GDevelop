@@ -458,7 +458,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             const gd::Layout & scene = codeGenerator.GetLayout();
 
             gd::String functionName = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code.userFunc"
-                + gd::String::FromLocale(gd::ToString(&event));
+                + gd::String::From(&event);
             gd::String callArguments = "runtimeScene";
             if (!event.GetParameterObjects().empty()) callArguments += ", objects";
 

@@ -157,7 +157,7 @@ void DebuggerGUI::UpdateGUI()
     m_generalList->SetItem(0, 1, gd::String::From(1000000.0/static_cast<double>(scene.GetElapsedTime()))+_(" fps"));
     m_generalList->SetItem(1, 1, gd::String::From(static_cast<double>(scene.GetElapsedTime())/1000.0)+"ms");
     m_generalList->SetItem(2, 1, gd::String::From(scene.objectsInstances.GetAllObjects().size()));
-    //TODO //m_generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
+    //TODO //m_generalList->SetItem(3, 1, gd::String::From(scene.game->resourcesManager.resources.size()));
     m_generalList->SetItem(4, 1, gd::String::From(scene.game->GetMainWindowDefaultWidth())+"*"+gd::String::From(scene.game->GetMainWindowDefaultHeight()));
     m_generalList->SetItem(5, 1, gd::String::From(scene.GetInputManager().GetMousePosition().x)+";"+gd::String::From(scene.GetInputManager().GetMousePosition().y));
     m_generalList->SetItem(6, 1, gd::String::From(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
@@ -276,7 +276,7 @@ void DebuggerGUI::UpdateGUI()
             if ( objectsInTree[weakPtrToObject].first != allObjects[i]->GetName() && initialObjects.find(allObjects[i]->GetName()) != initialObjects.end() )
             {
                 m_objectsTree->Delete(objectsInTree[weakPtrToObject].second);
-                wxTreeItemId objectItem = m_objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], ToString(i));
+                wxTreeItemId objectItem = m_objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], gd::String::From(i));
                 objectsInTree[weakPtrToObject] = std::pair<gd::String, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
             }
         }

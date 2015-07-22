@@ -91,8 +91,8 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const gd::String &
     //Add all the object files of the game
     for (unsigned int l= 0;l<game.GetLayoutsCount();++l)
     {
-        std::cout << "Added GD" << gd::ToString(&game.GetLayout(l)) << "RuntimeObjectFile.o (Layout object file) to the linking." << std::endl;
-        task.compilerCall.extraObjectFiles.push_back(gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&game.GetLayout(l)))+"RuntimeObjectFile.o"));
+        std::cout << "Added GD" << gd::String::From(&game.GetLayout(l)) << "RuntimeObjectFile.o (Layout object file) to the linking." << std::endl;
+        task.compilerCall.extraObjectFiles.push_back(gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&game.GetLayout(l)))+"RuntimeObjectFile.o");
 
         DependenciesAnalyzer analyzer(game, game.GetLayout(l));
         if ( !analyzer.Analyze() )
@@ -106,8 +106,8 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const gd::String &
             if (!game.HasSourceFile(*i, "C++")) continue;
             const gd::SourceFile & sourceFile = game.GetSourceFile(*i);
 
-            std::cout << "Added GD" << gd::ToString(&sourceFile) << "RuntimeObjectFile.o (Created from a Source file) to the linking." << std::endl;
-            task.compilerCall.extraObjectFiles.push_back(gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&sourceFile))+"RuntimeObjectFile.o"));
+            std::cout << "Added GD" << gd::String::From(&sourceFile) << "RuntimeObjectFile.o (Created from a Source file) to the linking." << std::endl;
+            task.compilerCall.extraObjectFiles.push_back(gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&sourceFile)+"RuntimeObjectFile.o"));
         }
     }
     for (unsigned int l= 0;l<game.GetExternalEventsCount();++l)
@@ -117,8 +117,8 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const gd::String &
         DependenciesAnalyzer analyzer(game, externalEvents);
         if ( !analyzer.ExternalEventsCanBeCompiledForAScene().empty() )
         {
-            std::cout << "Added GD" << gd::ToString(&externalEvents) << "RuntimeObjectFile.o (Created from external events) to the linking." << std::endl;
-            task.compilerCall.extraObjectFiles.push_back(gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&externalEvents))+"RuntimeObjectFile.o"));
+            std::cout << "Added GD" << gd::String::From(&externalEvents) << "RuntimeObjectFile.o (Created from external events) to the linking." << std::endl;
+            task.compilerCall.extraObjectFiles.push_back(gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&externalEvents)+"RuntimeObjectFile.o"));
         }
     }
 
@@ -229,8 +229,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.compilerCall.compilationForRuntime = true;
         task.compilerCall.optimize = optimize;
         task.compilerCall.eventsGeneratedCode = true;
-        task.compilerCall.inputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&game.GetLayout(i)))+"RuntimeEventsSource.cpp");
-        task.compilerCall.outputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&game.GetLayout(i)))+"RuntimeObjectFile.o");
+        task.compilerCall.inputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&game.GetLayout(i))+"RuntimeEventsSource.cpp");
+        task.compilerCall.outputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&game.GetLayout(i))+"RuntimeObjectFile.o");
         task.userFriendlyName = "Compilation of events of scene "+game.GetLayout(i).GetName();
         task.preWork = std::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, &game.GetLayout(i), resourcesMergingHelper));
         task.scene = &game.GetLayout(i);
@@ -649,7 +649,7 @@ void FullProjectCompilerConsoleDiagnosticManager::OnMessage(gd::String message, 
 
 void FullProjectCompilerConsoleDiagnosticManager::OnPercentUpdate(float percents)
 {
-    cout << _("Progress:") << gd::ToString(percents) << endl;
+    cout << _("Progress:") << gd::String::From(percents) << endl;
 }
 
 

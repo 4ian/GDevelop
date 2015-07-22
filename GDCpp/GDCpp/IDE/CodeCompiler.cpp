@@ -256,7 +256,7 @@ void CodeCompiler::StartTheNextTask()
                 if ( pendingTasks.empty() )
                     std::cout << "No more task to be processed." << std::endl;
                 else
-                    std::cout << "No more task to be processed ( But "+ToString(pendingTasks.size())+" disabled task(s) waiting for being enabled )." << std::endl;
+                    std::cout << "No more task to be processed ( But "+gd::String::From(pendingTasks.size())+" disabled task(s) waiting for being enabled )." << std::endl;
 
                 processLaunched = false;
                 NotifyControls();

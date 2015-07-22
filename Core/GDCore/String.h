@@ -246,6 +246,12 @@ public:
     template<typename T>
     static String From(T value)
     {
+        static_assert(!std::is_same<T, std::string>::value, "Can't use gd::String::From with std::string.");
+        static_assert(!std::is_same<T, sf::String>::value, "Can't use gd::String::From with sf::String.");
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+        static_assert(!std::is_same<T, wxString>::value, "Can't use gd::String::From with wxString.");
+#endif
+
         std::ostringstream oss;
         oss << value;
         return gd::String(oss.str().c_str());
@@ -258,6 +264,12 @@ public:
     template<typename T>
     T To() const
     {
+        static_assert(!std::is_same<T, std::string>::value, "Can't use gd::String::To with std::string.");
+        static_assert(!std::is_same<T, sf::String>::value, "Can't use gd::String::To with sf::String.");
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+        static_assert(!std::is_same<T, wxString>::value, "Can't use gd::String::To with wxString.");
+#endif
+
         T value;
         std::istringstream oss(m_string);
         oss >> value;

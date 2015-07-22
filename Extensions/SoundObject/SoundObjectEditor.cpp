@@ -198,10 +198,10 @@ void SoundObjectEditor::OnValidateButtonClick(wxCommandEvent& event)
     else
         object.SetSoundType("Music");
 
-    object.SetVolume(gd::String::From(VolumeSpinCtrl->GetValue()).To<float>());
-    object.SetAttenuation(gd::String::From(AttenuationSpinCtrl->GetValue()).To<float>());
-    object.SetPitch(gd::String::From(pitchTextCtrl->GetValue()).To<float>());
-    object.SetMinDistance(gd::String::From(MinDistanceSpinCtrl->GetValue()).To<float>());
+    object.SetVolume(VolumeSpinCtrl->GetValue());
+    object.SetAttenuation(gd::String(AttenuationSpinCtrl->GetValue()).To<float>());
+    object.SetPitch(gd::String(pitchTextCtrl->GetValue()).To<float>());
+    object.SetMinDistance(MinDistanceSpinCtrl->GetValue());
     object.SetLooping(LoopCheckBox->IsChecked());
     object.SetSoundFileName(FileNameTextCtrl->GetValue());
 

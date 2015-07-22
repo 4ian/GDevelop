@@ -19,11 +19,6 @@
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Serialization/Serializer.h"
 
-TEST_CASE( "Common tools", "[common]" ) {
-    REQUIRE( gd::ToInt("1") == 1 );
-    REQUIRE( gd::ToString(2) == "2" );
-}
-
 TEST_CASE( "Project", "[common]" ) {
     SECTION("Basics") {
         gd::Project project;

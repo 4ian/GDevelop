@@ -41,9 +41,8 @@ class BaseProfiler;
 /**
  * \brief Represents a scene being played.
  *
- * A RuntimeScene is used when a game is played.<br>
- * It contains everything a scene provide, but also specific
- * functions and members for runtime ( Render functions, objects instances, variables... )
+ * Contains game object instances and all runtime objects needed
+ * to play to a scene rendered in a SFML RenderWindow.
  *
  * \ingroup GameEngine
  */
@@ -107,7 +106,8 @@ public:
     const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const gd::String & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
 
     /**
-     * Set up the RuntimeScene using a Scene.
+     * \brief Set up the RuntimeScene using a gd::Layout.
+     *
      * Typically called automatically by the IDE or by the game executable.
      *
      * \note Similar to calling LoadFromSceneAndCustomInstances(scene, scene.GetInitialInstances());
@@ -116,8 +116,8 @@ public:
     bool LoadFromScene( const gd::Layout & scene );
 
     /**
-     * Set up the Runtime Scene using the \a instances and the \a scene.
-     * \param scene Scene used as context.
+     * \brief Set up the RuntimeScene using the specified \a instances and \a scene.
+     * \param scene gd::Layout that should be loaded
      * \param instances Initial instances to be put on the scene
      */
     bool LoadFromSceneAndCustomInstances( const gd::Layout & scene, const gd::InitialInstancesContainer & instances );
@@ -133,64 +133,65 @@ public:
     void CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0, std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap = NULL);
 
     /**
-     * Change the window used for rendering the scene
+     * \brief Change the window used for rendering the scene
      */
     void ChangeRenderWindow(sf::RenderWindow * window);
 
     /**
-     * Return true if scene is rendered full screen.
+     * \brief Check if scene is rendered full screen.
      */
     bool RenderWindowIsFullScreen() { return isFullScreen; }
 
     /**
-     * Change full screen state. The render window is itself not changed so as to be displayed fullscreen or not.
+     * \brief Change full screen state.
+     * The render window is itself not changed so as to be displayed fullscreen or not.
      */
     void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
 
     /**
-     * After calling this method, RenderAndStep() will return the number passed as parameter.
+     * \brief After calling this method, RenderAndStep() will return the number passed as parameter.
      * \see RenderAndStep
      */
     void GotoSceneWhenEventsAreFinished(int scene);
 
     /**
-     * Render and play the scene one frame.
+     * \brief Render and play the scene one frame.
      * \return -1 for doing nothing, -2 to quit the game, another number to change the scene
      */
     int RenderAndStep();
 
     /**
-     * Just render a frame.
+     * \brief Just render a frame, without applying logic or events on objects.
      */
     void RenderWithoutStep();
 
     /**
-     * Change scene time scale.
+     * \brief Change scene time scale.
      */
     inline void SetTimeScale(double timeScale_) { timeScale = timeScale_; };
 
     /**
-     * Return scene time scale.
+     * \brief Get the scene time scale.
      */
     inline double GetTimeScale() const { return timeScale; };
 
     /**
-     * Get elapsed time since last frame, in microseconds.
+     * \brief Get elapsed time since last frame, in microseconds.
      */
     inline signed long long GetElapsedTime() const { return elapsedTime; };
 
     /**
-     * Get time elapsed since beginning, in microseconds.
+     * \brief Get time elapsed since beginning, in microseconds.
      */
     inline signed long long GetTimeFromStart() const { return timeFromStart; };
 
     /**
-     * Return true if the scene was just rendered once.
+     * \brief Return true if the scene was just rendered once.
      */
     inline bool IsFirstLoop() const { return firstLoop; };
 
     /**
-     * Notify the scene that something (like a file dialog) stopped scene rendering for a certain amount of time.
+     * \brief Notify the scene that something (like a file dialog) stopped scene rendering for a certain amount of time.
      * \param pauseTime_ Pause duration, in microseconds.
      */
     void NotifyPauseWasMade(signed long long pauseTime_) { pauseTime += pauseTime_; }
@@ -200,13 +201,13 @@ public:
      */
     ///@{
     /**
-     * Give access to the execution engine of the scene.
+     * \brief Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
     std::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
 
     /**
-     * Give access to the execution engine of the scene.
+     * \brief Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
     void SetCodeExecutionEngine(std::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }

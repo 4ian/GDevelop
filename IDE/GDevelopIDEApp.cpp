@@ -365,7 +365,9 @@ bool GDevelopIDEApp::OnInit()
 
     cout << "* Initialization ended." << endl;
 
-    //gd::LogWarning(_("This is a beta version of GDevelop 3.\n\nSome features may be missing and bugs present: Report any feedback on www.forum.compilgames.net.\nThanks!"));
+    #if defined(MACOS)
+    gd::LogWarning(_("This is a beta version of GDevelop for Mac OS X.\n\nBugs may be present and only HTML5 games will work. Please report any feedback on www.forum.compilgames.net.\nThanks!"));
+    #endif
 
     //Checking for updates
     {

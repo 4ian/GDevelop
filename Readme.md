@@ -4,6 +4,8 @@ GDevelop is a full featured, open source game development software, allowing to 
 without needing any knowledge in a specific programming language. All the game logic is made thanks to an
 intuitive and powerful event based system.
 
+![GDevelop in action, used to add a trigger in a platformer game](https://raw.githubusercontent.com/4ian/GD/master/Core/docs/images/demo.gif "GDevelop in action, used to add a trigger in a platformer game")
+
 About directory structure
 -------------------------
 

@@ -154,6 +154,7 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
     RefreshTemplateList();
 
     UpdateListColumnsWidth();
+
 }
 
 void NewProjectDialog::RefreshPlatformList()
@@ -165,6 +166,10 @@ void NewProjectDialog::RefreshPlatformList()
     const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
     for (unsigned int i = 0;i<platforms.size();++i)
     {
+        #if defined(MACOS)
+        if (platforms[i]->GetName() == "GDevelop C++ platform") continue;
+        #endif
+
         platformList->InsertItem(0, platforms[i]->GetFullName(), 0);
         gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(platforms[i]->GetName());
         platformList->SetItemPtrData(0, wxPtrToUInt(associatedData));

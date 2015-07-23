@@ -87,6 +87,12 @@ bool CppLayoutPreviewer::LaunchPreview( )
 {
     std::cout << "Launching GD C++ Platform preview..." << std::endl;
 
+    #if defined(MACOS)
+    wxString error = _("GDevelop for Mac OS X does not support creating native games :/\n\nInstead, please use the HTML5 platform for your game: you can activate it from the Extensions in the project manager.");
+    wxLogWarning(error);
+    return false;
+    #else
+
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
 
@@ -104,6 +110,7 @@ bool CppLayoutPreviewer::LaunchPreview( )
 
     RefreshFromLayout();
     return true;
+    #endif
 }
 
 /**

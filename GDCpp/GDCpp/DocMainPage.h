@@ -77,8 +77,7 @@
  * \section utf8section UTF8 strings
  *
  * GDevelop uses UTF8 encoded gd::String as string parameters passed to actions/conditions and expressions and as return value for string expressions.
- * Your extension is free to take advantage of UTF8 or can use gd::String encoded with the current locale (the default C++ behavior). GDCpp provides tools to work
- * with UTF8 strings as some methods (like gd::String::size()) are not valid anymore with them.
+ * This class is a wrapper around std::string and is UTF8-aware.
  *
  * For more information, see [gd::String](../GDCore Documentation/classgd_1_1_string.html) reference in the [GDCore documentation](../GDCore Documentation/index.html).
  */
@@ -230,5 +229,3 @@
  * \brief Part of the tinyxml library
  * \ingroup TinyXml
  */
-
-

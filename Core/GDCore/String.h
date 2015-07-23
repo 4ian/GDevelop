@@ -33,6 +33,7 @@ bool CaseInsensitiveEquiv( const String &, const String &, bool );
 
 /**
  * \brief String represents an UTF8 encoded string.
+ *
  * This class represents an UTF8 encoded string. It provides almost the same features as the STL std::string class
  * but is UTF8 aware (size() returns the number of characters, not the number of bytes for example).
  */
@@ -106,9 +107,9 @@ public:
      * Constructs a string from an array of char **representing a string encoded
      * in UTF8**.
      *
-     * Usefull to implicitly create a String object from a string literal.
+     * Useful to implicitly create a String object from a string literal.
      *
-     * **Usage :**
+     * **Usage:**
      * \code
      * gd::String str(u8"A little sentence.");
      * \endcode
@@ -118,7 +119,7 @@ public:
     /**
      * Constructs a String from a std::u32string.
      *
-     * **Usage :**
+     * **Usage:**
      *
      * \code
      * gd::String str(U"A UTF32 encoded string.");
@@ -152,7 +153,7 @@ public:
      * Assign the String using a string literal (it assumes that the **string
      * literal is encoded in UTF8**).
      *
-     * Usage :
+     * Usage:
      * \code
      * gd::String str;
      * str = u8"This is a test string.";
@@ -180,22 +181,22 @@ public:
  */
 
     /**
-     * Returns true if the string is empty.
+     * \brief Returns true if the string is empty.
      */
     bool empty() const { return m_string.size() == 0; }
 
     /**
-     * Returns the string's length.
+     * \brief Returns the string's length.
      */
     size_type size() const;
 
     /**
-     * Returns the string's length.
+     * \brief Returns the string's length.
      */
     size_type length() const { return size(); };
 
     /**
-     * Clear the string.
+     * \brief Clear the string.
      *
      * **Iterators :** Obviously, all iterators are invalidated.
      */
@@ -211,22 +212,22 @@ public:
  */
 
     /**
-     * Get a beginning iterator.
+     * \brief Get a beginning iterator.
      */
     String::iterator begin();
 
     /**
-     * Get a constant beginning iterator.
+     * \brief Get a constant beginning iterator.
      */
     String::const_iterator begin() const;
 
     /**
-     * Get a ending iterator.
+     * \brief Get a ending iterator.
      */
     String::iterator end();
 
     /**
-     * Get a constant ending iterator.
+     * \brief Get a constant ending iterator.
      */
     String::const_iterator end() const;
 
@@ -240,7 +241,7 @@ public:
  */
 
     /**
-     * Method to create a gd::String from a number (float, double, int, ...)
+     * \brief Method to create a gd::String from a number (float, double, int, ...)
      * \return a gd::String created from **value**.
      */
     template<typename T>
@@ -258,7 +259,7 @@ public:
     }
 
     /**
-     * Method to convert the string to a number
+     * \brief Method to convert the string to a number
      * \return the string converted to the type **T**
      */
     template<typename T>
@@ -318,7 +319,7 @@ public:
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
     /**
-     * Returns a String created from a wxString.
+     * \return a String created from a wxString.
      *
      * See \ref Conversions1 for more information.
      */
@@ -405,7 +406,7 @@ public:
     bool IsValid() const;
 
     /**
-     * Searches the string for invalid characters and replaces them with **replacement**.
+     * \brief Searches the string for invalid characters and replaces them with **replacement**.
      * \return *this
      */
     String& ReplaceInvalid( char32_t replacement = 0xfffd );
@@ -420,7 +421,7 @@ public:
  */
 
     /**
-     * Returns the code point at the specified position
+     * \brief Returns the code point at the specified position
      * \warning This operator has a linear complexity on the character's
      * position. You should avoid to use it in a loop and use the iterators
      * provided by this class instead.
@@ -428,17 +429,17 @@ public:
     value_type operator[]( const size_type position ) const;
 
     /**
-     * Get the raw UTF8-encoded std::string
+     * \brief Get the raw UTF8-encoded std::string
      */
     std::string& Raw() { return m_string; }
 
     /**
-     * Get the raw UTF8-encoded std::string
+     * \brief Get the raw UTF8-encoded std::string
      */
     const std::string& Raw() const { return m_string; }
 
     /**
-     * Get the C-string.
+     * \brief Get the C-string.
      */
     const char* c_str() const { return m_string.c_str(); }
 
@@ -464,7 +465,7 @@ public:
 #endif
 
     /**
-     * Add a character (from its codepoint) at the end of the String.
+     * \brief Add a character (from its codepoint) at the end of the String.
      *
      * **Iterators : ** All iterators may be invalidated (in particular if the
      * string is reallocated).
@@ -472,7 +473,7 @@ public:
     void push_back( value_type character );
 
     /**
-     * Remove the last character of the String.
+     * \brief Remove the last character of the String.
      *
      * **Iterators : ** All iterators may be invalidated (in particular if the
      * string is reallocated).
@@ -480,7 +481,7 @@ public:
     void pop_back();
 
     /**
-     * Inserts characters right before the character at **pos**.
+     * \brief Inserts characters right before the character at **pos**.
      *
      * \return *this
      *
@@ -489,7 +490,7 @@ public:
     String& insert( size_type pos, const String &str );
 
     /**
-     * Replace the portion of the String between **i1** and **i2** (**i2** not
+     * \brief Replace the portion of the String between **i1** and **i2** (**i2** not
      * included) by the String **str**.
      * \return *this
      *
@@ -498,7 +499,7 @@ public:
     String& replace( iterator i1, iterator i2, const String &str );
 
     /**
-     * Replace the portion of the String between **pos** and **pos** + **len**
+     * \brief Replace the portion of the String between **pos** and **pos** + **len**
      * (the character at **pos** + **len** is not included)
      * \return *this
      *
@@ -507,7 +508,7 @@ public:
     String& replace( size_type pos, size_type len, const String &str );
 
     /**
-     * Erase the characters between **first** and **last** (**last** not included).
+     * \brief Erase the characters between **first** and **last** (**last** not included).
      * \param first an iterator to the first character to remove
      * \param last an iterator to the character next to the last one to remove
      * \return an iterator pointing at the old position of the first deleted character
@@ -515,14 +516,14 @@ public:
     iterator erase( iterator first, iterator last );
 
     /**
-     * Erase the character pointed by **p**.
+     * \brief Erase the character pointed by **p**.
      * \param p an iterator pointing to the character to be erased
      * \return an interator pointing at the old position of the deleted character
      */
     iterator erase( iterator p );
 
     /**
-     * Erase the characters between the positions **pos** and **pos** + **len**
+     * \brief Erase the characters between the positions **pos** and **pos** + **len**
      * (**pos** + **len** not included).
      * \param pos the position of the first character to remove
      * \param len the number of characters to remove from **pos**
@@ -539,11 +540,11 @@ public:
  */
 
     /**
-     * Split the string with a delimiter
+     * \brief Split the string with a delimiter
      * \param delimiter delimiter (an UTF32 codepoint)
      * \return a std::vector containing all the gd::String objects
      *
-     * **Usage :**
+     * **Usage:**
      *
      * \code
      * gd::String str = u8"10;20;30;40";
@@ -555,7 +556,7 @@ public:
     std::vector<String> Split( value_type delimiter ) const;
 
     /**
-     * \return the case-folded string.
+     * \brief Returns the case-folded string.
      * \note This string is not totally suitable for case-insensitive comparison because you have to make sure
      * that it is normalized. So, to do a case-insensitive comparison, do :
      * \code
@@ -607,7 +608,7 @@ public:
     size_type rfind( const value_type &search, size_type pos = npos ) const;
 
     /**
-     * Searches the string for the first character that matches any of the characters specified in
+     * \brief Searches the string for the first character that matches any of the characters specified in
      * its arguments.
      * \param match the characters that will be looked for in the String
      * \param startPos where to start the search
@@ -616,7 +617,7 @@ public:
     size_type find_first_of( const String &match, size_type startPos = 0 ) const;
 
     /**
-     * Searches the string for the first character that doesn't match any of the characters
+     * \brief Searches the string for the first character that doesn't match any of the characters
      * specified in its arguments.
      * \param not_match the characters that will be looked for in the String
      * \param startPos where to start the search
@@ -625,7 +626,7 @@ public:
     size_type find_first_not_of( const String &not_match, size_type startPos = 0 ) const;
 
     /**
-     * Searches the string for the last character that matches any of the characters specified in
+     * \brief Searches the string for the last character that matches any of the characters specified in
      * its arguments.
      * \param match the characters that will be looked for in the String
      * \param endPos where to end the search (this is the last character considered in the
@@ -635,7 +636,7 @@ public:
     size_type find_last_of( const String &match, size_type endPos = npos ) const;
 
     /**
-     * Searches the string for the last character that doesn't match any of the characters
+     * \brief Searches the string for the last character that doesn't match any of the characters
      * specified in its arguments.
      * \param not_match the characters that will be looked for in the String
      * \param endPos where to end the search (this is the last character considered in the
@@ -645,12 +646,12 @@ public:
     size_type find_last_not_of( const String &not_match, size_type endPos = npos ) const;
 
     /**
-     * Compares the current string with another.
+     * \brief Compares the current string with another.
      */
     int compare( const String &other ) const;
 
     /**
-     * Do a case-insensitive search
+     * \brief Do a case-insensitive search
      * \return the position of the first occurence of **search** starting from **pos**.
      *
      * \note This method isn't very efficient as it is linear on the string size times the

@@ -16,7 +16,6 @@
  * -# \subpage setupDevEnv
  * -# \ref overview
  * -# \ref writeANewExtension
- * -# \ref utf8support
  *
  * You can also read \subpage recommendedToolsAndConventions.
  *
@@ -377,15 +376,15 @@ make -j4
  *  - gd::PlatformExtension::AddObject and gd::PlatformExtension::AddAutomatism
  *
  *
- * Some platforms (like the C++ Platform) offers another base class which must be used instead of gd::PlatformExtension when declaring a platorm: As this base class
- * inherits from gd::PlatformExtension, standard methods still works, but you may be able to declares some others features (the C++ Platform offers
+ * Some platforms (like the C++ Platform) offer another base class which must be used instead of gd::PlatformExtension when declaring a platorm: as this base class
+ * inherits from gd::PlatformExtension, standard methods still work, but you may be able to declare some others features (the C++ Platform offers
  * the possibility of declaring debugger related functions).
  *
  * \subsection extensionloading Extensions loading
  *
  * A single dynamic library file can contains an extension for more than one platform:<br>
  * You just have to declare a class deriving from gd::PlatformExtension for each platform supported, and a creation function for each platform
- * (The C++ platform expects a function called *CreateGDExtension* while JS Platform search for a function called *CreateGDJSExtension*).
+ * (the C++ platform expects a function called *CreateGDExtension* while JS Platform search for a function called *CreateGDJSExtension*).
  *
  * \subsection extensionexample Edit or write a new extension
  *
@@ -395,10 +394,27 @@ make -j4
  *
  * \section utf8section UTF8 strings
  *
- * Parts of GDCore use UTF8 strings stored inside std::string. GDCore provides tools to work with these strings as some of the standard methods of std::string
- * are invalidated (std::string::size() don't return the size of an UTF8 encoded string).
- * 
- * For more information, see \ref utf8support
+ * Most parts of the codebase support UTF8 strings thanks to gd::String class. gd::String is a wrapper around std::string, exposing a similar
+ * interface as well as a few tool member functions and operators that are all UTF8 aware.
+ *
+ * Its usage is easy, especially if you're familiar with std::string. Some extra functions can be really useful, in particular
+ * the ones to convert the string from/to a number.
+ *
+ \code
+gd::String str = "Hello";
+str += " world";
+str += " " + gd::String::From(2);
+//str now contains "Hello world 2";
+
+gd::string twopointfiveStr = "2.5";
+double twopointfive = twopointfive.To<double>();
+//twopointfive == 2.5
+ \endcode
+ *
+ * gd::String can also be implicitly constructed from a wxString or a sf::String, so that it is easy to use when you're dealing
+ * with wxWidgets GUI dialogs/editors or SFML objects.
+ *
+ * For more information, see the complete reference of the class. Tests cases have also been made for most functions.
  */
 
 /**

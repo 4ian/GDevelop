@@ -32,9 +32,6 @@ gdjs.RuntimeGame = function(data, spec)
     this._imageManager = new gdjs.ImageManager(this);
     this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
-    //Game loop management (see startStandardGameLoop method)
-    this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
-
     //Rendering (see createStandardCanvas method)
     this._isFullscreen = true; //Used to track if the canvas is displayed as fullscreen (see setFullscreen method).
     this._forceFullscreen = spec.forceFullscreen || false; //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
@@ -56,6 +53,10 @@ gdjs.RuntimeGame = function(data, spec)
         this._forceFullscreen = true;
         console.log("Forcing fullscreen for Intel XDK.");
     }
+
+    //Game loop management (see startStandardGameLoop method)
+    this._sceneStack = new gdjs.SceneStack(this);
+    this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
 
     //Inputs :
     this._inputManager = new gdjs.InputManager();
@@ -81,7 +82,7 @@ gdjs.RuntimeGame.prototype.getImageManager = function() {
  */
 gdjs.RuntimeGame.prototype.getInputManager = function() {
     return this._inputManager;
-}
+};
 
 /**
  * Get the object containing the game data
@@ -332,6 +333,7 @@ gdjs.RuntimeGame.prototype.createStandardCanvas = function(canvasArea) {
     canvasArea.appendChild(this._renderer.view); // add the renderer view element to the DOM
     canvasArea.tabindex="1"; //Ensure that the canvas has the focus.
     canvasArea.style.overflow="hidden"; //No scrollbar in any case.
+    this._sceneStack.setPixiRenderer(this._renderer);
     this._resizeCanvas();
 
     //Handle resize
@@ -433,23 +435,18 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
 };
 
 /**
- * Launch the game, displayed in the renderer associated to the game (see createStandardCanvas).<br>
- * The method returns when the game is closed.
+ * Launch the game, displayed in the renderer associated to the game (see createStandardCanvas).
  * @method startStandardGameLoop
  */
 gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
-
     if ( !this.hasScene() ) {
         console.log("The game has no scene.");
         return;
     }
 
-    //Create the scene to be played
-    var currentScene = new gdjs.RuntimeScene(this, this._renderer);
+    //Load the first scene
     var firstSceneName = gdjs.projectData.firstLayout;
-    var firstsceneData = this.hasScene(firstSceneName) ? this.getSceneData(firstSceneName) : this.getSceneData();
-
-    currentScene.loadFromScene(firstsceneData);
+    this._sceneStack.push(this.hasScene(firstSceneName) ? firstSceneName : this.getSceneData().name);
 
     //Uncomment to profile the first x frames of the game.
     /*var x = 250;
@@ -463,31 +460,18 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
     requestAnimationFrame(gameLoop);
 
     //The standard game loop
-    var game = this;
+    var that = this;
     function gameLoop() {
-
         //Manage resize events.
-        if ( game._notifySceneForResize ) {
-            currentScene.onCanvasResized();
-            game._notifySceneForResize = false;
+        if (that._notifySceneForResize) {
+            that._sceneStack.onRendererResized();
+            that._notifySceneForResize = false;
         }
 
         //Render and step the scene.
-        if ( !currentScene.renderAndStep() ) {
-            //Something special was requested by the current scene.
-            if ( currentScene.gameStopRequested() )
-                postGameScreen();
-            else {
-                var nextSceneName = currentScene.getRequestedScene();
-                currentScene = new gdjs.RuntimeScene(game, game._renderer);
-                currentScene.loadFromScene(game.getSceneData(nextSceneName));
-                requestAnimationFrame(gameLoop);
-                game.getInputManager().onFrameEnded();
-            }
-        }
-        else {
+        if (that._sceneStack.step()) {
             requestAnimationFrame(gameLoop);
-            game.getInputManager().onFrameEnded();
+            that.getInputManager().onFrameEnded();
         }
     }
 };

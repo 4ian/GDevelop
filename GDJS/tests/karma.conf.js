@@ -15,6 +15,7 @@ module.exports = function(config) {
       '../Runtime/commontools.js',
       '../Runtime/runtimeobject.js',
       '../Runtime/runtimescene.js',
+      '../Runtime/scenestack.js',
       '../Runtime/polygon.js',
       '../Runtime/force.js',
       '../Runtime/layer.js',

@@ -73,6 +73,21 @@ gdjs.PhysicsSharedData = function(runtimeScene, sharedData)
 	this.world.SetContactListener(this.contactListener);
 };
 
+/**
+ * Get the shared data for a scene.
+ *
+ * @method getSharedData
+ * @static
+ */
+gdjs.PhysicsSharedData.getSharedData = function(runtimeScene, name) {
+    if (!runtimeScene.physicsSharedData) { //Create the shared data if necessary.
+        var initialData = runtimeScene.getInitialSharedDataForAutomatism(name);
+        runtimeScene.physicsSharedData = new gdjs.PhysicsSharedData(runtimeScene, initialData);
+    }
+
+    return runtimeScene.physicsSharedData;
+};
+
 gdjs.PhysicsSharedData.prototype.step = function(dt) {
 	this.totalTime += dt;
 
@@ -92,8 +107,7 @@ gdjs.PhysicsSharedData.prototype.step = function(dt) {
 };
 
 /**
- * PhysicsRuntimeAutomatism represents an automatism allowing objects to be
- * moved in a realistic way thanks to a physics engine.
+ * Allows objects to be moved in a realistic way thanks to a physics engine (Box2D).
  *
  * @class PhysicsRuntimeAutomatism
  * @constructor
@@ -122,13 +136,7 @@ gdjs.PhysicsRuntimeAutomatism = function(runtimeScene, automatismData, owner)
 	else
 		this.currentContacts = [];
 
-	//Create the shared data if necessary.
-	if ( !gdjs.PhysicsRuntimeAutomatism.scenesSharedData.containsKey(runtimeScene.getName()) ) {
-		var initialData = runtimeScene.getInitialSharedDataForAutomatism(automatismData.name);
-		var data = new gdjs.PhysicsSharedData(runtimeScene, initialData);
-		gdjs.PhysicsRuntimeAutomatism.scenesSharedData.put(runtimeScene.getName(), data);
-	}
-	this._sharedData = gdjs.PhysicsRuntimeAutomatism.scenesSharedData.get(runtimeScene.getName());
+	this._sharedData = gdjs.PhysicsSharedData.getSharedData(runtimeScene, automatismData.name);
 
 	//Do not create body now: the object is not fully created.
 
@@ -138,7 +146,6 @@ gdjs.PhysicsRuntimeAutomatism = function(runtimeScene, automatismData, owner)
 
 gdjs.PhysicsRuntimeAutomatism.prototype = Object.create( gdjs.RuntimeAutomatism.prototype );
 gdjs.PhysicsRuntimeAutomatism.thisIsARuntimeAutomatismConstructor = "PhysicsAutomatism::PhysicsAutomatism";
-gdjs.PhysicsRuntimeAutomatism.scenesSharedData = new Hashtable();
 
 gdjs.PhysicsRuntimeAutomatism.prototype.onDeActivate = function() {
 	if ( this._box2DBody !== null ) {

@@ -58,7 +58,7 @@ public:
     public:
         StringIterator() : strIt() {};
         StringIterator(const StringIterator<T> &other) : strIt(other.strIt) {}
-        StringIterator<T>& operator=(const StringIterator<T> &other) { strIt = other.strIt; }
+        StringIterator<T>& operator=(const StringIterator<T> &other) { strIt = other.strIt; return *this; }
 
         String::value_type operator*() {return ::utf8::unchecked::peek_next(strIt);}
 

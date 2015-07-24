@@ -276,8 +276,8 @@ bool InstructionSelectorDialog::MatchSearchCriteria(gd::String search, const gd:
 {
     if (search.empty()) return true;
 
-    return instrMetadata.GetGroup().CaseFold().find(search) != string::npos ||
-        instrMetadata.GetFullName().CaseFold().find(search) != string::npos;
+    return instrMetadata.GetGroup().FindCaseInsensitive(search) != string::npos ||
+        instrMetadata.GetFullName().FindCaseInsensitive(search) != string::npos;
 }
 
 /**

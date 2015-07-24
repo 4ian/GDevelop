@@ -54,10 +54,14 @@ public:
     class GD_CORE_API StringIterator : public std::iterator<std::bidirectional_iterator_tag, String::value_type, String::difference_type>
     {
         friend class String;
+        friend class StringIterator<const T>;
 
     public:
         StringIterator() : strIt() {};
+
         StringIterator(const StringIterator<T> &other) : strIt(other.strIt) {}
+        template<class U> StringIterator(const StringIterator<U> &other) : strIt(other.strIt) {} //Convert from const_iterator to iterator
+
         StringIterator<T>& operator=(const StringIterator<T> &other) { strIt = other.strIt; return *this; }
 
         String::value_type operator*() {return ::utf8::unchecked::peek_next(strIt);}

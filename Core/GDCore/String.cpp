@@ -416,6 +416,26 @@ String String::CaseFold() const
     return str;
 }
 
+String& String::Normalize(String::NormForm form)
+{
+    unsigned char *newStr = nullptr;
+
+    if(form == NFD)
+        newStr = utf8proc_NFD((unsigned char*)m_string.c_str());
+    else if(form == NFC)
+        newStr = utf8proc_NFC((unsigned char*)m_string.c_str());
+    else if(form == NFKD)
+        newStr = utf8proc_NFKD((unsigned char*)m_string.c_str());
+    else if(form == NFKC)
+        newStr = utf8proc_NFKC((unsigned char*)m_string.c_str());
+
+    m_string = (char*)newStr;
+
+    free(newStr);
+
+    return *this;
+}
+
 String String::substr( String::size_type start, String::size_type length ) const
 {
     String str;
@@ -641,26 +661,6 @@ String::size_type String::FindCaseInsensitive( const String &search, size_type p
         return priv::GetPositionFromCaseFolded(*this, findPos);
 }
 
-String& String::Normalize(String::NormForm form)
-{
-    unsigned char *newStr = nullptr;
-
-    if(form == NFD)
-        newStr = utf8proc_NFD((unsigned char*)m_string.c_str());
-    else if(form == NFC)
-        newStr = utf8proc_NFC((unsigned char*)m_string.c_str());
-    else if(form == NFKD)
-        newStr = utf8proc_NFKD((unsigned char*)m_string.c_str());
-    else if(form == NFKC)
-        newStr = utf8proc_NFKC((unsigned char*)m_string.c_str());
-
-    m_string = (char*)newStr;
-
-    free(newStr);
-
-    return *this;
-}
-
 String GD_CORE_API operator+(String lhs, const String &rhs)
 {
     lhs += rhs;
@@ -828,12 +828,20 @@ std::istream& GD_CORE_API operator>>(std::istream &is, String &str)
     return is;
 }
 
+bool GD_CORE_API CaseSensitiveEquiv( String lhs, String rhs, bool compat )
+{
+    if(compat)
+        return (lhs.Normalize(String::NFKD) == rhs.Normalize(String::NFKD));
+    else
+        return (lhs.Normalize(String::NFD) == rhs.Normalize(String::NFD));
+}
+
 bool GD_CORE_API CaseInsensitiveEquiv( const String &lhs, const String &rhs, bool compat )
 {
     if(compat)
-        return (lhs.CaseFold().Normalize(String::NFKC) == rhs.CaseFold().Normalize(String::NFKC));
+        return (lhs.CaseFold().Normalize(String::NFKD) == rhs.CaseFold().Normalize(String::NFKD));
     else
-        return (lhs.CaseFold() == rhs.CaseFold());
+        return (lhs.CaseFold().Normalize(String::NFD) == rhs.CaseFold().Normalize(String::NFD));
 }
 
 }

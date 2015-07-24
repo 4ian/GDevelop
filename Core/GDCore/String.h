@@ -28,9 +28,6 @@ namespace gd
 
 class String;
 
-//Forward decl
-bool CaseInsensitiveEquiv( const String &, const String &, bool );
-
 /**
  * \brief String represents an UTF8 encoded string.
  *
@@ -41,8 +38,6 @@ class GD_CORE_API String
 {
 
 public:
-
-    friend bool GD_CORE_API CaseInsensitiveEquiv( const String &, const String &, bool );
 
     typedef char32_t value_type;
     typedef char32_t& reference;
@@ -567,6 +562,23 @@ public:
     String CaseFold() const;
 
     /**
+     * Normalization form
+     */
+    enum NormForm
+    {
+        NFD, ///< Normalization Form Decomposition: characters are decomposed by canonical equivalence, and multiple combining characters are arranged in a specific order.
+        NFC, ///< Normalization Form Composition: characters are decomposed and then recomposed by canonical equivalence.
+        NFKD, ///< Normalization Form Compatibility Decomposition: characters are decomposed by compatibility, and multiple combining characters are arranged in a specific order.
+        NFKC, ///< Normalization Form Compatibitity Composition: characters are decomposed by compatibility, then recomposed by canonical equivalence.
+    };
+
+    /**
+     * Normalize the string using the normalization form **form**.
+     * \return *this
+     */
+    String& Normalize(NormForm form = NFC);
+
+    /**
      * \return a String with uppercase letters only
      * TODO: Implement it
      */
@@ -665,23 +677,6 @@ public:
 
 private:
     std::string m_string; ///< Internal std::string container
-
-    /**
-     * Normalization form
-     */
-    enum NormForm
-    {
-        NFD, ///< Normalization Form Decomposition: characters are decomposed by canonical equivalence, and multiple combining characters are arranged in a specific order.
-        NFC, ///< Normalization Form Composition: characters are decomposed and then recomposed by canonical equivalence.
-        NFKD, ///< Normalization Form Compatibility Decomposition: characters are decomposed by compatibility, and multiple combining characters are arranged in a specific order.
-        NFKC, ///< Normalization Form Compatibitity Composition: characters are decomposed by compatibility, then recomposed by canonical equivalence.
-    };
-
-    /**
-     * Normalize the string using the normalization form **form**.
-     * \return *this
-     */
-    String& Normalize(NormForm form = NFC);
 
 };
 
@@ -824,6 +819,13 @@ std::istream& GD_CORE_API operator>>(std::istream &is, String &str);
  * \}
  */
 
+
+/**
+ * \relates String
+ * \param compat if true, the strings are normalized using a compatibility normalization form to remove characters special appearance.
+ * \return true if the two string are equivalent (in a case-sensitive way).
+ */
+bool GD_CORE_API CaseSensitiveEquiv( String lhs, String rhs, bool compat = true );
 
 /**
  * \relates String

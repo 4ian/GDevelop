@@ -96,6 +96,10 @@ namespace
                     //Add the object in the group
                     std::cout << "Adding " << objectName << " to group" << std::endl;
                     group->AddObject(objectName);
+                    for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                        project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupEdited(
+                            project, data->GetString() == "GlobalGroup" ? NULL : &layout, group->GetName()
+                            );
                 }
                 else
                 {
@@ -868,6 +872,9 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
             for(unsigned int i = 0;i < dialog.GetChosenObjects().size();++i)
                 group->AddObject(dialog.GetChosenObjects()[i]);
         }
+
+        for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupEdited(project, globalGroup ? NULL : &layout, group->GetName());
 
         listsHelper.MakeGroupItem(objectsList, lastSelectedItem, *group, globalGroup);
     }

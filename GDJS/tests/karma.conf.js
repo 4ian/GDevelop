@@ -44,6 +44,7 @@ module.exports = function(config) {
       '../../Extensions/DraggableAutomatism/draggableruntimeautomatism.js',
       '../../Extensions/PlatformAutomatism/platformerobjectruntimeautomatism.js',
       '../../Extensions/PlatformAutomatism/platformruntimeautomatism.js',
+      '../../Extensions/LinkedObjects/linkedobjects.js',
 
       //All tests files:
       '../../Extensions/**/tests/**.spec.js',

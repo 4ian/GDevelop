@@ -5,8 +5,9 @@ Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
-#include "TextObjectEditor.h" //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include <wx/log.h>
+#include "Dialogs/TextObjectEditor.h" //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
 #include "GDCpp/Object.h"
@@ -136,6 +137,7 @@ bool TextObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumb
 void TextObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
 #if !defined(GD_NO_WX_GUI)
+    wxLogNull logNo;
     TextObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 #endif

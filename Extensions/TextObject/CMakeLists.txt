@@ -12,8 +12,9 @@ gd_add_extension_definitions(TextObject)
 ###
 include_directories(.)
 file(GLOB source_files *)
+file(GLOB ide_source_files Dialogs/*)
 
-gd_add_extension_target(TextObject "${source_files}")
+gd_add_extension_target(TextObject "${source_files};${ide_source_files}")
 gdcpp_add_runtime_extension_target(TextObject_Runtime "${source_files}")
 
 #Linker files for the IDE extension

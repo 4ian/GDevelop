@@ -184,14 +184,14 @@ void ChooseVariableDialog::UpdateTitle()
 {
     if ( editingOnly )
     {
-        gd::String context = "";
+        wxString context = "";
         if ( associatedProject != NULL && associatedLayout == NULL ) context = _("Global variables");
-        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject == NULL  ) context = associatedLayout->GetName() + " " + _("scene variables");
-        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject != NULL ) context = associatedObject->GetName();
+        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject == NULL  ) context = wxString::Format(_("\"%s\" scene variables").ToWxString(), associatedLayout->GetName().ToWxString());
+        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject != NULL ) context = wxString::Format(_("\"%s\" object variables").ToWxString(), associatedObject->GetName().ToWxString());
         else context = "Instance variables";
 
         SetTitle(wxString::Format(wxString(_("Edit the variables (%s)")),
-            context.ToWxString()));
+            context));
         okBt->SetLabel(_("Ok"));
     }
 }

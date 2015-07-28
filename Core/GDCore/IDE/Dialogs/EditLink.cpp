@@ -8,6 +8,7 @@
 #include "GDCore/Tools/Localization.h"
 #include <wx/image.h>
 #include <wx/string.h>
+#include <wx/settings.h>
 //*)
 #include <sstream>
 #include "GDCore/IDE/SkinHelper.h"
@@ -77,12 +78,12 @@ game(game_)
 	FlexGridSizer4 = new wxFlexGridSizer(0, 5, 0, 0);
 	OnlyEventsCheck = new wxRadioButton(this, ID_RADIOBUTTON2, _("Only the events"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
 	FlexGridSizer4->Add(OnlyEventsCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StartEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(35,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+	StartEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(45,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	StartEdit->SetToolTip(_("Number of the first event"));
 	FlexGridSizer4->Add(StartEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("to"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	EndEdit = new wxTextCtrl(this, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxSize(35,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+	EndEdit = new wxTextCtrl(this, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxSize(45,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
 	EndEdit->SetToolTip(_("Number of the last event"));
 	FlexGridSizer4->Add(EndEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("(included)"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -90,8 +91,10 @@ game(game_)
 	FlexGridSizer2->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Remember to update the numbers of the events if\nyou delete or add events in the scene linked."), wxDefaultPosition, wxSize(303,30), 0, _T("ID_STATICTEXT5"));
-	wxFont StaticText5Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Remember to update the numbers of the events if\nyou delete or add events in the scene linked."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	wxFont StaticText5Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+	if ( !StaticText5Font.Ok() ) StaticText5Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+	StaticText5Font.SetStyle(wxITALIC);
 	StaticText5->SetFont(StaticText5Font);
 	FlexGridSizer1->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));

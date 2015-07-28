@@ -60,9 +60,8 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="StartEdit" member="yes">
-											<size>35,21</size>
+											<size>45,-1</size>
 											<tooltip>Number of the first event</tooltip>
-											<handler function="OnStartEditText" entry="EVT_TEXT" />
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -77,9 +76,8 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="EndEdit" member="yes">
-											<size>35,21</size>
+											<size>45,-1</size>
 											<tooltip>Number of the last event</tooltip>
-											<handler function="OnEndEditText" entry="EVT_TEXT" />
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -109,7 +107,6 @@
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
 					<label>Remember to update the numbers of the events if&#x0A;you delete or add events in the scene linked.</label>
-					<size>303,30</size>
 					<font>
 						<style>italic</style>
 					</font>

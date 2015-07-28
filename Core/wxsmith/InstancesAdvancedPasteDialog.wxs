@@ -29,7 +29,7 @@
 											<cols>3</cols>
 											<object class="sizeritem">
 												<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="xStartEdit" member="yes">
-													<size>52,21</size>
+													<size>52,-1</size>
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 												<border>5</border>
@@ -45,7 +45,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="yStartEdit" member="yes">
-													<size>52,21</size>
+													<size>52,-1</size>
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 												<border>5</border>
@@ -71,7 +71,7 @@
 													<value>1</value>
 													<min>1</min>
 													<max>100000</max>
-													<size>56,21</size>
+													<size>56,-1</size>
 													<focused>1</focused>
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -103,7 +103,7 @@
 													<value>1</value>
 													<min>1</min>
 													<max>100000</max>
-													<size>56,21</size>
+													<size>56,-1</size>
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 												<border>5</border>
@@ -143,7 +143,7 @@
 							<cols>1</cols>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
-									<label>Spaces between each obejects</label>
+									<label>Spaces between each objects</label>
 								</object>
 								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
@@ -155,7 +155,7 @@
 									<object class="sizeritem">
 										<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="xGapEdit" member="yes">
 											<value>0</value>
-											<size>52,21</size>
+											<size>52,-1</size>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -172,7 +172,7 @@
 									<object class="sizeritem">
 										<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="yGapEdit" member="yes">
 											<value>0</value>
-											<size>52,21</size>
+											<size>52,-1</size>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -204,7 +204,7 @@
 									<object class="sizeritem">
 										<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="rotationEdit" member="yes">
 											<value>0</value>
-											<size>44,21</size>
+											<size>44,-1</size>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -212,7 +212,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-											<label>°</label>
+											<label></label>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>

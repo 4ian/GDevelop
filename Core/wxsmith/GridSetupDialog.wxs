@@ -64,7 +64,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="widthEdit" member="yes">
-							<size>55,21</size>
+							<size>55,-1</size>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -88,7 +88,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="heightEdit" member="yes">
-							<size>55,21</size>
+							<size>55,-1</size>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>

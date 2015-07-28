@@ -173,11 +173,11 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
         itemCount++;
     }
 
-    int bestHeight = 200+itemCount*10;
-    bestHeight = (bestHeight < 200) ? 350 : bestHeight;
+    int bestHeight = 300+itemCount*10;
+    bestHeight = (bestHeight < 300) ? 350 : bestHeight;
     bestHeight = (bestHeight > 500) ? 500 : bestHeight;
 
-    SetSize(GetSize().GetWidth(), bestHeight);
+    SetSize(500, bestHeight);
 }
 
 void ChooseVariableDialog::UpdateTitle()

@@ -40,7 +40,7 @@ TextObjectEditorBase::TextObjectEditorBase(wxWindow* parent, wxWindowID id, cons
     #endif
     m_toolbar->AddControl(m_fontTextCtrl);
     
-    m_toolbar->AddTool(CHANGE_FONT_BUTTON, wxT(""), wxXmlResource::Get()->LoadBitmap(wxT("texteicon")), wxNullBitmap, wxITEM_NORMAL, _("Change the font file"), wxT(""), NULL);
+    m_toolbar->AddTool(CHANGE_FONT_BUTTON, wxT(""), wxXmlResource::Get()->LoadBitmap(wxT("open16")), wxNullBitmap, wxITEM_NORMAL, _("Change the font file"), wxT(""), NULL);
     
     m_toolbar->AddSeparator();
     

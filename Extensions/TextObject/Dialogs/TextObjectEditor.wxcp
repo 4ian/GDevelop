@@ -351,7 +351,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "../../../Binaries/Output/Release_Windows/res/texteicon.png"
+           "m_path": "../../../Binaries/Output/Release_Windows/res/icons_default/open16.png"
           }, {
            "type": "filePicker",
            "m_label": "Disabled-Bitmap File",

@@ -7,6 +7,7 @@
 #include "../TextObject.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 
 TextObjectEditor::TextObjectEditor(wxWindow *parent, gd::Project &game, TextObject &object, gd::MainFrameWrapper &mainFrameWrapper)
@@ -37,6 +38,10 @@ TextObjectEditor::TextObjectEditor(wxWindow *parent, gd::Project &game, TextObje
     m_toolbar->ToggleTool(BOLD_TOOL_ID, object.IsBold());
     m_toolbar->ToggleTool(ITALIC_TOOL_ID, object.IsItalic());
     m_toolbar->ToggleTool(UNDER_TOOL_ID, object.IsUnderlined());
+
+    //Set the toolbar style
+    gd::SkinHelper::ApplyCurrentSkin(*m_auimgr);
+    gd::SkinHelper::ApplyCurrentSkin(*m_toolbar);
 
     UpdateColorBt();
     UpdatePreview();

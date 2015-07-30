@@ -26,6 +26,8 @@
 #include <wx/panel.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/statbmp.h>
+#include <wx/hyperlink.h>
 #include <wx/button.h>
 
 class TextObjectEditorBase : public wxDialog
@@ -46,6 +48,8 @@ protected:
     wxPanel* m_centerPanel;
     wxTextCtrl* m_textCtrl;
     wxStaticText* m_staticText62;
+    wxStaticBitmap* m_staticBitmap80;
+    wxHyperlinkCtrl* m_helpBt;
     wxStdDialogButtonSizer* m_stdBtnSizer40;
     wxButton* m_okButton;
     wxButton* m_cancelButton;
@@ -58,6 +62,7 @@ protected:
     virtual void OnBoldToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnItalicToolClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnUnderlineToolClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnHelpBtClicked(wxHyperlinkEvent& event) { event.Skip(); }
     virtual void OnOkBtClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:

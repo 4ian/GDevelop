@@ -20,6 +20,7 @@ private:
     wxColour textColor;
     wxBitmap colorBitmap;
 protected:
+    virtual void OnHelpBtClicked(wxHyperlinkEvent& event);
     virtual void OnChangeFontButton(wxCommandEvent& event);
     virtual void OnBoldToolClicked(wxCommandEvent& event);
     virtual void OnItalicToolClicked(wxCommandEvent& event);

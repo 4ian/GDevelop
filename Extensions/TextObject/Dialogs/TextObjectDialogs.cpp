@@ -99,9 +99,28 @@ TextObjectEditorBase::TextObjectEditorBase(wxWindow* parent, wxWindowID id, cons
     
     flexGridSizer36->Add(m_staticText62, 0, wxALL, 5);
     
+    wxFlexGridSizer* flexGridSizer76 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer76->SetFlexibleDirection( wxBOTH );
+    flexGridSizer76->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer76->AddGrowableCol(1);
+    flexGridSizer76->AddGrowableRow(0);
+    
+    flexGridSizer36->Add(flexGridSizer76, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticBitmap80 = new wxStaticBitmap(m_centerPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("help16")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    
+    flexGridSizer76->Add(m_staticBitmap80, 0, wxALL|wxALIGN_CENTER|wxALIGN_CENTER_VERTICAL, 5);
+    
+    m_helpBt = new wxHyperlinkCtrl(m_centerPanel, wxID_ANY, _("Help for this object"), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_helpBt->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_helpBt->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_helpBt->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer76->Add(m_helpBt, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    
     m_stdBtnSizer40 = new wxStdDialogButtonSizer();
     
-    flexGridSizer36->Add(m_stdBtnSizer40, 0, wxALL|wxALIGN_RIGHT, 5);
+    flexGridSizer76->Add(m_stdBtnSizer40, 0, wxALL|wxALIGN_RIGHT, 5);
     
     m_okButton = new wxButton(m_centerPanel, wxID_OK, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
     m_stdBtnSizer40->AddButton(m_okButton);
@@ -125,6 +144,7 @@ TextObjectEditorBase::TextObjectEditorBase(wxWindow* parent, wxWindowID id, cons
     this->Connect(BOLD_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TextObjectEditorBase::OnBoldToolClicked), NULL, this);
     this->Connect(ITALIC_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TextObjectEditorBase::OnItalicToolClicked), NULL, this);
     this->Connect(UNDER_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TextObjectEditorBase::OnUnderlineToolClicked), NULL, this);
+    m_helpBt->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TextObjectEditorBase::OnHelpBtClicked), NULL, this);
     m_okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TextObjectEditorBase::OnOkBtClicked), NULL, this);
     
 }
@@ -138,6 +158,7 @@ TextObjectEditorBase::~TextObjectEditorBase()
     this->Disconnect(BOLD_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TextObjectEditorBase::OnBoldToolClicked), NULL, this);
     this->Disconnect(ITALIC_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TextObjectEditorBase::OnItalicToolClicked), NULL, this);
     this->Disconnect(UNDER_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TextObjectEditorBase::OnUnderlineToolClicked), NULL, this);
+    m_helpBt->Disconnect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TextObjectEditorBase::OnHelpBtClicked), NULL, this);
     m_okButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TextObjectEditorBase::OnOkBtClicked), NULL, this);
     
     m_auimgr->UnInit();

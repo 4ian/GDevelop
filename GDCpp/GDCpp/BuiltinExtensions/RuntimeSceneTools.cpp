@@ -375,7 +375,7 @@ bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene )
                        "\n"
                        "Stop the preview?"), _("Infinite loop"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
     {
-        scene.running = false;
+        scene.RequestChange(RuntimeScene::SceneChange::STOP_GAME);
         return true;
     }
     #else

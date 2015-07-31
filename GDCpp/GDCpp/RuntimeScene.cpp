@@ -61,7 +61,6 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
     timeScale(1),
     timeFromStart(0),
     pauseTime(0),
-    specialAction(-1),
     codeExecutionEngine(new CodeExecutionEngine)
 {
     ChangeRenderWindow(renderWindow);
@@ -418,12 +417,6 @@ void RuntimeScene::ManageObjectsBeforeEvents()
         allObjects[id]->DoAutomatismsPreEvents(*this);
 }
 
-void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
-{
-    //Just store the next scene index:
-    specialAction = scene;
-}
-
 /**
  * \brief Internal Tool class used by RuntimeScene::CreateObjectsFrom
  */
@@ -519,7 +512,6 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     pauseTime = 0;
     timeScale = 1;
     timeFromStart = 0;
-    specialAction = -1;
 
     std::cout << ".";
     codeExecutionEngine->runtimeContext.scene = this;

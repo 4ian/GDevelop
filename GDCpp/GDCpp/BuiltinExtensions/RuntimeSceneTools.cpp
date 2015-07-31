@@ -53,22 +53,24 @@ void GD_API ChangeSceneBackground( RuntimeScene & scene, std::string newColor )
 
 void GD_API StopGame( RuntimeScene & scene )
 {
-    scene.GotoSceneWhenEventsAreFinished(-2);
-    return;
+    scene.RequestChange(RuntimeScene::SceneChange::STOP_GAME);
 }
 
-void GD_API ChangeScene( RuntimeScene & scene, std::string newSceneName )
+void GD_API ReplaceScene(RuntimeScene & scene, std::string newSceneName)
 {
-    for ( unsigned int i = 0;i < scene.game->GetLayoutsCount(); ++i )
-    {
-        if ( scene.game->GetLayout(i).GetName() == newSceneName )
-        {
-            scene.GotoSceneWhenEventsAreFinished(i);
-            return;
-        }
-    }
+    if (!scene.game->HasLayoutNamed(newSceneName)) return;
+    scene.RequestChange(RuntimeScene::SceneChange::REPLACE_SCENE, newSceneName);
+}
 
-   return;
+void GD_API PushScene(RuntimeScene & scene, std::string newSceneName)
+{
+    if (!scene.game->HasLayoutNamed(newSceneName)) return;
+    scene.RequestChange(RuntimeScene::SceneChange::PUSH_SCENE, newSceneName);
+}
+
+void GD_API PopScene(RuntimeScene & scene)
+{
+    scene.RequestChange(RuntimeScene::SceneChange::POP_SCENE);
 }
 
 bool GD_API SceneJustBegins(RuntimeScene & scene )

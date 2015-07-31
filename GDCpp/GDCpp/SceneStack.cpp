@@ -36,7 +36,7 @@ bool SceneStack::Step()
 
 std::shared_ptr<RuntimeScene> SceneStack::Pop()
 {
-	if (stack.empty()) return std::shared_ptr<RuntimeScene>();
+	if (stack.size() <= 1) return std::shared_ptr<RuntimeScene>();
 
 	auto scene = stack.back();
 	stack.pop_back();

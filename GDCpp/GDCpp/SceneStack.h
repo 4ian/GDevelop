@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <memory>
 class RuntimeGame;
 class RuntimeScene;
 namespace sf { class RenderWindow; }

@@ -147,12 +147,6 @@ public:
     void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
 
     /**
-     * After calling this method, RenderAndStep() will return the number passed as parameter.
-     * \see RenderAndStep
-     */
-    void GotoSceneWhenEventsAreFinished(int scene);
-
-    /**
      * Render and play one frame.
      * \return true if a scene change was request, false otherwise.
      */
@@ -270,7 +264,6 @@ protected:
     double                                  timeScale; ///< Time scale
     signed long long                        timeFromStart; ///< Time in microseconds elapsed from start.
     signed long long                        pauseTime; ///< Time to be subtracted to realElapsedTime for the current frame.
-    int                                     specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
     RuntimeVariablesContainer               variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;

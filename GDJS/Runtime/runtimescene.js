@@ -592,7 +592,7 @@ gdjs.RuntimeScene.REPLACE_SCENE = 3;
 gdjs.RuntimeScene.STOP_GAME = 4;
 
 /**
- * Return true if the scene requested the game to be stopped.
+ * Return the value of the scene change that is requested.
  * @method gameStopRequested
  */
 gdjs.RuntimeScene.prototype.changeRequested = function() {

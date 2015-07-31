@@ -41,6 +41,16 @@ void GD_API ChangeScene(RuntimeScene & scene, std::string newSceneName);
 /**
  * Only used internally by GD events generated code.
  */
+void GD_API PushScene(RuntimeScene & scene, std::string newSceneName);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+void GD_API PopScene(RuntimeScene & scene);
+
+/**
+ * Only used internally by GD events generated code.
+ */
 bool GD_API SceneJustBegins(RuntimeScene & scene);
 
 /**

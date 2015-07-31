@@ -58,15 +58,24 @@ TileSetConfigurationEditor::~TileSetConfigurationEditor()
 
 }
 
-void TileSetConfigurationEditor::UpdatePreviewTileSetPanel()
+void TileSetConfigurationEditor::UpdatePreviewTileSetPanel(bool newTexture)
 {
     previewTileSet.textureName = gd::ToString(m_textureNameTextCtrl->GetValue());
+    std::cout << "Reloading texture..." << std::endl;
+    previewTileSet.LoadResources(game);
+
+    if(newTexture)
+    {
+        //If the texture has changed, put default values for tile size/spacing
+        m_tileWidthSpin->SetValue(std::max(1.f, static_cast<float>(previewTileSet.GetSize().x)/10.f));
+        m_tileHeightSpin->SetValue(std::max(1.f, static_cast<float>(previewTileSet.GetSize().y)/10.f));
+    }
     previewTileSet.tileSize.x = m_tileWidthSpin->GetValue();
     previewTileSet.tileSize.y = m_tileHeightSpin->GetValue();
     previewTileSet.tileSpacing.x = m_spacingWidthSpin->GetValue();
     previewTileSet.tileSpacing.y = m_spacingHeightSpin->GetValue();
 
-    previewTileSet.LoadResources(game);
+    std::cout << "Generating texture coords and collision masks..." << std::endl;
     previewTileSet.Generate();
 
     if(previewTileSet.GetSize().x >= 1 && previewTileSet.GetSize().y >= 1)
@@ -113,7 +122,7 @@ void TileSetConfigurationEditor::OnOkButtonClicked(wxCommandEvent& event)
 
 void TileSetConfigurationEditor::OnTileSetTextureUpdated(wxCommandEvent& event)
 {
-    UpdatePreviewTileSetPanel();
+    UpdatePreviewTileSetPanel(true);
 }
 
 void TileSetConfigurationEditor::OnTileSetParameterUpdated(wxSpinEvent& event)

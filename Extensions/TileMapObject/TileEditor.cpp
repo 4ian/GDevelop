@@ -63,7 +63,7 @@ void TileEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
         return;
 
     m_currentTile = event.GetSelectedTile();
-    m_mainToolbar->ToggleTool(COLLIDABLE_TOOL_ID, m_tileset->GetTileHitbox(m_currentTile).collidable);
+    m_mainToolbar->ToggleTool(COLLIDABLE_TOOL_ID, m_tileset->IsTileCollidable(m_currentTile));
     UpdateScrollbars();
     m_tilePreviewPanel->Refresh();
 
@@ -150,7 +150,7 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
 
 void TileEditor::OnCollidableToolToggled(wxCommandEvent& event)
 {
-    m_tileset->GetTileHitbox(m_currentTile).collidable = event.IsChecked();
+    m_tileset->SetTileCollidable(m_currentTile, event.IsChecked());
 }
 
 void TileEditor::OnPredefinedShapeToolClicked(wxCommandEvent& event)

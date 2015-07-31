@@ -66,8 +66,8 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
     if(m_tileset && !m_tileset->IsDirty())
     {
         //Determine the first and last columns and rows to draw
-        int firstCol = std::max((int)(minPos.x / (m_tileset->tileSize.x + m_tileset->tileSpacing.x) - 1), 0);
-        int firstRow = std::max((int)(minPos.y / (m_tileset->tileSize.y + m_tileset->tileSpacing.y) - 1), 0);
+        int firstCol = std::max((int)(minPos.x / (m_tileset->tileSize.x + m_tileset->tileSpacing.x) - 1), 1);
+        int firstRow = std::max((int)(minPos.y / (m_tileset->tileSize.y + m_tileset->tileSpacing.y) - 1), 1);
         int lastCol = std::min((int)(maxPos.x / (m_tileset->tileSize.x + m_tileset->tileSpacing.x) + 1), m_tileset->GetColumnsCount());
         int lastRow = std::min((int)(maxPos.y / (m_tileset->tileSize.y + m_tileset->tileSpacing.y) + 1), m_tileset->GetRowsCount());
 

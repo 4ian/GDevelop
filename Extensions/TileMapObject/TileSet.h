@@ -12,6 +12,7 @@ This project is released under the MIT License.
 #include <wx/bitmap.h>
 #endif
 
+#include <map>
 #include <string>
 #include <vector>
 #include <SFML/System/Vector2.hpp>
@@ -47,8 +48,10 @@ struct TileHitbox
         BottomLeft ///< In the bottom-left hand corner
     };
 
-    bool collidable; ///< True to make the tile collidable
     Polygon2d hitbox; ///< The polygonal hitbox
+
+    bool operator==(const TileHitbox &other) const;
+    bool operator!=(const TileHitbox &other) const;
 
     /**
      * Generates a default hitbox (rectangle of the size of the tile).
@@ -167,6 +170,10 @@ public:
      */
     void ResetHitboxes();
 
+    bool IsTileCollidable(int id) const;
+
+    void SetTileCollidable(int id, bool collidable);
+
     /**
      * \return the hitbox of a tile.
      */
@@ -175,7 +182,7 @@ public:
     /**
      * \return the hitbox of a tile.
      */
-    const TileHitbox& GetTileHitbox(int id) const;
+    TileHitbox GetTileHitbox(int id) const;
     ///\}
 
     /**
@@ -185,12 +192,17 @@ public:
     /**
      * Return the tile ID according to its position.
      */
-    int GetTileIDFromPosition(sf::Vector2f position);
+    int GetTileIDFromPosition(sf::Vector2f position) const;
 
     /**
      * Return the tile ID according to its row and column.
      */
-    int GetTileIDFromCell(int col, int row);
+    int GetTileIDFromCell(int col, int row) const;
+
+    /**
+     * Return the tile cell (col, row) from its ID.
+     */
+    sf::Vector2u GetTileCellFromID(int id) const;
 
     /**
      * \return the number of tiles of the tileset.
@@ -230,9 +242,9 @@ public:
 private:
 
     std::shared_ptr<SFMLTextureWrapper> m_tilesetTexture; ///< The tileset texture (SFML)
-    std::vector<TileTextureCoords> m_coords; ///< The tileset coords
 
-    std::vector<TileHitbox> m_hitboxes;
+    std::vector<bool> m_collidable;
+    std::map<int, TileHitbox> m_hitboxes;
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     wxBitmap m_tilesetBitmap; ///< The tileset texture

@@ -4,10 +4,10 @@ Copyright (c) 2013-2015 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * PlatformObjectsManager manages the common objects shared by objects having a
- * platform automatism: In particular, the platforms automatisms are required to declare
- * themselves ( see gdjs.PlatformObjectsManager.addPlatform ) to the manager of their associated scene
- * ( see gdjs.PlatformRuntimeAutomatism.platformsObjectsManagers ).
+ * Manages the common objects shared by objects having a
+ * platform automatism: in particular, the platforms automatisms are required to declare
+ * themselves (see gdjs.PlatformObjectsManager.addPlatform) to the manager of their associated scene
+ * (see gdjs.PlatformRuntimeAutomatism.getManager).
  *
  * @class PlatformObjectsManager
  * @namespace gdjs
@@ -17,6 +17,20 @@ gdjs.PlatformObjectsManager = function(runtimeScene, sharedData)
 {
     this._platformsHSHG = new gdjs.HSHG.HSHG();
     //this._hshgNeedUpdate = true; Useless: The automatisms track by themselves changes in objects size or position.
+};
+
+/**
+ * Get the platforms manager of a scene.
+ *
+ * @method getManager
+ * @static
+ */
+gdjs.PlatformObjectsManager.getManager = function(runtimeScene) {
+    if (!runtimeScene.platformsObjectsManager) { //Create the shared manager if necessary.
+        runtimeScene.platformsObjectsManager = new gdjs.PlatformObjectsManager(runtimeScene);
+    }
+
+    return runtimeScene.platformsObjectsManager;
 };
 
 /**
@@ -110,20 +124,12 @@ gdjs.PlatformRuntimeAutomatism = function(runtimeScene, automatismData, owner)
     this._oldWidth = 0;
     this._oldHeight = 0;
 
-	//Create the shared manager if necessary.
-	if ( !gdjs.PlatformRuntimeAutomatism.platformsObjectsManagers.containsKey(runtimeScene.getName()) ) {
-		var manager = new gdjs.PlatformObjectsManager(runtimeScene);
-		gdjs.PlatformRuntimeAutomatism.platformsObjectsManagers.put(runtimeScene.getName(), manager);
-	}
-	this._manager = gdjs.PlatformRuntimeAutomatism.platformsObjectsManagers.get(runtimeScene.getName());
-
+	this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
 	this._registeredInManager = false;
-
 };
 
 gdjs.PlatformRuntimeAutomatism.prototype = Object.create( gdjs.RuntimeAutomatism.prototype );
 gdjs.PlatformRuntimeAutomatism.thisIsARuntimeAutomatismConstructor = "PlatformAutomatism::PlatformAutomatism";
-gdjs.PlatformRuntimeAutomatism.platformsObjectsManagers = new Hashtable();
 
 gdjs.PlatformRuntimeAutomatism.LADDER = 2;
 gdjs.PlatformRuntimeAutomatism.JUMPTHRU = 1;

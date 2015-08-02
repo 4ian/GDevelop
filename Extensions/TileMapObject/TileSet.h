@@ -167,9 +167,10 @@ public:
     void SetTileCollidable(int id, bool collidable);
 
     /**
-     * \return the hitbox of a tile.
+     * \return a reference to the hitbox of a tile.
+     * Allows the edition of the hitbox.
      */
-    TileHitbox& GetTileHitbox(int id);
+    TileHitbox& GetTileHitboxRef(int id);
 
     /**
      * \return the hitbox of a tile.

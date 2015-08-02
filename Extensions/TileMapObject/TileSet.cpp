@@ -252,7 +252,7 @@ void TileSet::StripUselessHitboxes()
 }
 #endif
 
-TileHitbox& TileSet::GetTileHitbox(int id)
+TileHitbox& TileSet::GetTileHitboxRef(int id)
 {
     if(m_hitboxes.count(id) == 0)
         m_hitboxes[id] = TileHitbox::Rectangle(tileSize);

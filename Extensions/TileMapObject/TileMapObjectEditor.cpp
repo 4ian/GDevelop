@@ -126,6 +126,8 @@ void TileMapObjectEditor::OnCancelButtonPressed(wxCommandEvent& event)
 
 void TileMapObjectEditor::OnOkButtonPressed(wxCommandEvent& event)
 {
+    tileSet.StripUselessHitboxes();
+
     object.tileSet = TileSetProxy(tileSet);
     object.tileMap = TileMapProxy(tileMap);
 
@@ -140,7 +142,6 @@ void TileMapObjectEditor::OnTileSetConfigureButtonClicked(wxCommandEvent& event)
     dialog.ShowModal();
 
     tileSet.LoadResources(game);
-    tileSet.Generate();
 
     if(oldTextureName != tileSet.textureName)
     {

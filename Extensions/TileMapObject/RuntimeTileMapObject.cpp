@@ -43,7 +43,6 @@ RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Objec
 
     //Load the tileset and generate the vertex array
     tileSet.Get().LoadResources(*(scene.game));
-    tileSet.Get().Generate(); //We don't need wxBitmaps
     vertexArray = TileMapExtension::GenerateVertexArray(tileSet.Get(), tileMap.Get());
     hitboxes = TileMapExtension::GenerateHitboxes(tileSet.Get(), tileMap.Get());
 }
@@ -162,7 +161,7 @@ float RuntimeTileMapObject::GetMapHeight() const
 
 void RuntimeTileMapObject::SetMapSize(int width, int height)
 {
-    if(width < 0 || height < 0 || (GetMapWidth() == width && GetMapHeight() == height)) //Avoid changing the size if the same 
+    if(width < 0 || height < 0 || (GetMapWidth() == width && GetMapHeight() == height)) //Avoid changing the size if the same
         return;
 
     tileMap.Get().SetSize(width, height);
@@ -214,7 +213,6 @@ void RuntimeTileMapObject::ChangeTexture(const std::string &textureName, Runtime
 {
     tileSet.Get().textureName = textureName;
     tileSet.Get().LoadResources(*(scene.game));
-    tileSet.Get().Generate();
     needGeneration = true;
 }
 

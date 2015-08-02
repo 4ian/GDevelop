@@ -101,11 +101,10 @@ public:
      */
     ///\{
     /**
-     * Returns true if the tileset hasn't been loaded and generated from a picture.
-     * \warning Can return true even if the loaded texture doesn't correspond to the TileSet::textureName or
-     * if the TileSet::tileSize or TileSet::tileSpacing have been modified as the object is not in a invalid state.
+     * Returns true if the tileset hasn't been loaded (texture not loaded) or have an invalid tile size.
+     * \warning Can return true even if the loaded texture doesn't correspond to the TileSet::textureName
      */
-    bool IsDirty() const {return m_dirty;};
+    bool IsDirty() const {return (!m_tilesetTexture || tileSize.x == 0.f || tileSize.y == 0.f);}
 
     /**
      * Load the image for the tilemap. Need to be called when using the TileSet for the first or after a texture change.
@@ -120,13 +119,6 @@ public:
      * in the scene preview or in a release game.
      */
     void LoadResources(RuntimeGame &game);
-
-    /**
-     * Generate the tile texture coords and temporary bitmaps for the IDE.
-     * Need to be called after a change in TileSet::textureName (in that case after TileSet::LoadResources) or after a change in the TileSet::tileSize or TileSet::tileSpacing.
-     * \sa TileSet::LoadResources
-     */
-    void Generate();
     ///\}
 
     /**
@@ -183,6 +175,15 @@ public:
      * \return the hitbox of a tile.
      */
     TileHitbox GetTileHitbox(int id) const;
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Strips useless hitboxes (the default rectangle hitbox) from the hitboxes data of the tileset.
+     * The tileset keeps only non-default hitboxes in memory (the default hitbox for tiles is a rectangle with the same size as tiles).
+     * This method checks if the tileset stores default hitbox and remove them as they are useless.
+     */
+    void StripUselessHitboxes();
+    #endif
     ///\}
 
     /**
@@ -250,8 +251,6 @@ private:
     wxBitmap m_tilesetBitmap; ///< The tileset texture
     static wxBitmap m_invalidBitmap;
     #endif
-
-    bool m_dirty;
 
 };
 

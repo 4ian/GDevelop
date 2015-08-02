@@ -24,7 +24,18 @@ wxBitmap TileSet::m_invalidBitmap = wxBitmap();
 
 bool TileHitbox::operator==(const TileHitbox &other) const
 {
-    return (hitbox.vertices == other.hitbox.vertices);
+    if(hitbox.vertices.size() == other.hitbox.vertices.size())
+    {
+        for(unsigned int i = 0; i < hitbox.vertices.size(); ++i)
+        {
+            if( fabs( hitbox.vertices[i].x - other.hitbox.vertices[i].x ) > 0.01f ||
+                fabs( hitbox.vertices[i].y - other.hitbox.vertices[i].y ) > 0.01f )
+                return false;
+        }
+        return true;
+    }
+    else
+        return false;
 }
 
 bool TileHitbox::operator!=(const TileHitbox &other) const
@@ -93,7 +104,7 @@ void TileHitbox::UnserializeFrom(const gd::SerializerElement &element, sf::Vecto
     }
 }
 
-TileSet::TileSet() : textureName(), tileSize(24, 24), tileSpacing(0, 0), m_tilesetTexture(), m_dirty(true)
+TileSet::TileSet() : textureName(), tileSize(24, 24), tileSpacing(0, 0), m_tilesetTexture()
 {
 
 }
@@ -105,14 +116,11 @@ TileSet::~TileSet()
 
 void TileSet::LoadResources(RuntimeGame &game)
 {
-    m_dirty = true;
     m_tilesetTexture = game.GetImageManager()->GetSFMLTexture(textureName);
 }
 
 void TileSet::LoadResources(gd::Project &game)
 {
-    m_dirty = true;
-
     if(game.GetResourcesManager().HasResource(textureName))
     {
         gd::ImageResource & image = dynamic_cast<gd::ImageResource&>(game.GetResourcesManager().GetResource(textureName));
@@ -141,26 +149,12 @@ void TileSet::LoadResources(gd::Project &game)
     }
 }
 
-void TileSet::Generate()
-{
-    m_dirty = true;
-
-    if (!m_tilesetTexture)
-        return;
-
-    if (tileSize.x == 0 || tileSize.y == 0)
-        return;
-
-    std::cout << "OK" << std::endl;
-    m_dirty = false;
-}
-
 void TileSet::ResetHitboxes()
 {
     m_collidable.clear();
     m_hitboxes.clear();
 
-    if (m_dirty)
+    if (IsDirty())
         return;
 
     m_collidable.assign(GetTilesCount(), true);
@@ -243,6 +237,20 @@ void TileSet::SetTileCollidable(int id, bool collidable)
 {
     m_collidable[id] = collidable;
 }
+
+#if defined(GD_IDE_ONLY)
+void TileSet::StripUselessHitboxes()
+{
+    auto it = m_hitboxes.begin();
+    while(it != m_hitboxes.end())
+    {
+        if( (it->second) == TileHitbox::Rectangle(tileSize) ) //This is an useless hitbox, remove it.
+            it = m_hitboxes.erase(it);
+        else
+            ++it;
+    }
+}
+#endif
 
 TileHitbox& TileSet::GetTileHitbox(int id)
 {
@@ -329,26 +337,18 @@ void TileSet::UnserializeFrom(const gd::SerializerElement &element)
     }
     else if(serializationVersion == 2)
     {
-        std::cout << "1" << std::endl;
         gd::SerializerElement &collidableElem = element.GetChild("collidable");
         collidableElem.ConsiderAsArrayOf("tile");
-        std::cout << "2" << std::endl;
         for(int i = 0; i < collidableElem.GetChildrenCount("tile"); i++)
         {
-            std::cout << "3." << i << std::endl;
             m_collidable.push_back(collidableElem.GetChild(i).GetBoolAttribute("collidable", true));
         }
-        std::cout << "4" << std::endl;
 
         gd::SerializerElement &hitboxesElem = element.GetChild("hitboxes");
         hitboxesElem.ConsiderAsArrayOf("tileHitbox");
-        std::cout << "5" << std::endl;
         for(int i = 0; i < hitboxesElem.GetChildrenCount("tileHitbox"); i++)
         {
-            std::cout << "6." << i << std::endl;
             m_hitboxes[hitboxesElem.GetChild(i).GetIntAttribute("tileId", -1)].UnserializeFrom(hitboxesElem.GetChild(i), tileSize);
         }
     }
-
-    m_dirty = true;
 }

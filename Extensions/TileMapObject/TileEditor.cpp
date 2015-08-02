@@ -62,6 +62,7 @@ void TileEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
     if(!m_tileset || m_tileset->IsDirty())
         return;
 
+    //Update the editor with the new tile
     m_currentTile = event.GetSelectedTile();
     m_mainToolbar->ToggleTool(COLLIDABLE_TOOL_ID, m_tileset->IsTileCollidable(m_currentTile));
     UpdateScrollbars();

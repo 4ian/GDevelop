@@ -63,6 +63,7 @@ void TileSetConfigurationEditor::UpdatePreviewTileSetPanel(bool newTexture)
     previewTileSet.textureName = gd::ToString(m_textureNameTextCtrl->GetValue());
     std::cout << "Reloading texture..." << std::endl;
     previewTileSet.LoadResources(game);
+    std::cout << "OK." << std::endl;
 
     if(newTexture)
     {
@@ -74,9 +75,6 @@ void TileSetConfigurationEditor::UpdatePreviewTileSetPanel(bool newTexture)
     previewTileSet.tileSize.y = m_tileHeightSpin->GetValue();
     previewTileSet.tileSpacing.x = m_spacingWidthSpin->GetValue();
     previewTileSet.tileSpacing.y = m_spacingHeightSpin->GetValue();
-
-    std::cout << "Generating texture coords and collision masks..." << std::endl;
-    previewTileSet.Generate();
 
     if(previewTileSet.GetSize().x >= 1 && previewTileSet.GetSize().y >= 1)
     {

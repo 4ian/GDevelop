@@ -15,6 +15,7 @@ module.exports = function(config) {
       '../Runtime/commontools.js',
       '../Runtime/runtimeobject.js',
       '../Runtime/runtimescene.js',
+      '../Runtime/scenestack.js',
       '../Runtime/polygon.js',
       '../Runtime/force.js',
       '../Runtime/layer.js',
@@ -43,6 +44,7 @@ module.exports = function(config) {
       '../../Extensions/DraggableAutomatism/draggableruntimeautomatism.js',
       '../../Extensions/PlatformAutomatism/platformerobjectruntimeautomatism.js',
       '../../Extensions/PlatformAutomatism/platformruntimeautomatism.js',
+      '../../Extensions/LinkedObjects/linkedobjects.js',
 
       //All tests files:
       '../../Extensions/**/tests/**.spec.js',

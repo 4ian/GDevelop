@@ -20,6 +20,20 @@ gdjs.PathfindingObstaclesManager = function(runtimeScene)
 };
 
 /**
+ * Get the obstacles manager of a scene.
+ *
+ * @method getManager
+ * @static
+ */
+gdjs.PathfindingObstaclesManager.getManager = function(runtimeScene) {
+    if (!runtimeScene.pathfindingObstaclesManager) { //Create the shared manager if necessary.
+        runtimeScene.pathfindingObstaclesManager = new gdjs.PathfindingObstaclesManager(runtimeScene);
+    }
+
+    return runtimeScene.pathfindingObstaclesManager;
+};
+
+/**
  * Add a obstacle to the list of existing obstacles.
  *
  * @method addObstacle
@@ -112,20 +126,12 @@ gdjs.PathfindingObstacleRuntimeAutomatism = function(runtimeScene, automatismDat
     this._oldY = 0; //The owner is not yet fully constructed.
     this._oldWidth = 0;
     this._oldHeight = 0;
-
-	//Create the shared manager if necessary.
-	if ( !gdjs.PathfindingObstacleRuntimeAutomatism.obstaclesManagers.containsKey(runtimeScene.getName()) ) {
-		var manager = new gdjs.PathfindingObstaclesManager(runtimeScene);
-		gdjs.PathfindingObstacleRuntimeAutomatism.obstaclesManagers.put(runtimeScene.getName(), manager);
-	}
-	this._manager = gdjs.PathfindingObstacleRuntimeAutomatism.obstaclesManagers.get(runtimeScene.getName());
-
+    this._manager = gdjs.PathfindingObstaclesManager.getManager(runtimeScene);
 	this._registeredInManager = false;
 };
 
 gdjs.PathfindingObstacleRuntimeAutomatism.prototype = Object.create( gdjs.RuntimeAutomatism.prototype );
 gdjs.PathfindingObstacleRuntimeAutomatism.thisIsARuntimeAutomatismConstructor = "PathfindingAutomatism::PathfindingObstacleAutomatism";
-gdjs.PathfindingObstacleRuntimeAutomatism.obstaclesManagers = new Hashtable();
 
 gdjs.PathfindingObstacleRuntimeAutomatism.prototype.ownerRemovedFromScene = function() {
 	if ( this._manager && this._registeredInManager ) this._manager.removeObstacle(this);

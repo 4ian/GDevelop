@@ -117,6 +117,7 @@ private:
     //State management
     bool isReloading; ///< Our previewer is a bit special: It sometimes need to wait for a compilation to finish before going into preview mode.
     bool playing;
+    bool running;
 };
 
 #endif // SCENEEDITORCANVAS_H

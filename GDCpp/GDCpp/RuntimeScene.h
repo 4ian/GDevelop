@@ -60,7 +60,6 @@ public:
     #endif
     ObjInstancesHolder                      objectsInstances; ///< Contains all of the objects on the scene
     std::vector < ManualTimer >             timers; ///<List of the timer currently used.
-    bool                                    running; ///< True if the scene is being played
 
     /**
      * \brief Provide access to the variables container
@@ -148,16 +147,10 @@ public:
     void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
 
     /**
-     * After calling this method, RenderAndStep() will return the number passed as parameter.
-     * \see RenderAndStep
+     * Render and play one frame.
+     * \return true if a scene change was request, false otherwise.
      */
-    void GotoSceneWhenEventsAreFinished(int scene);
-
-    /**
-     * Render and play the scene one frame.
-     * \return -1 for doing nothing, -2 to quit the game, another number to change the scene
-     */
-    int RenderAndStep();
+    bool RenderAndStep();
 
     /**
      * Just render a frame.
@@ -212,6 +205,19 @@ public:
     void SetCodeExecutionEngine(std::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
     ///@}
 
+    struct SceneChange {
+        enum Change {
+            CONTINUE = 0,
+            PUSH_SCENE,
+            POP_SCENE,
+            REPLACE_SCENE,
+            STOP_GAME
+        } change;
+        std::string requestedScene;
+    };
+
+    SceneChange GetRequestedChange() { return requestedChange; }
+    void RequestChange(SceneChange::Change change, std::string sceneName = "");
 
 protected:
 
@@ -258,7 +264,6 @@ protected:
     double                                  timeScale; ///< Time scale
     signed long long                        timeFromStart; ///< Time in microseconds elapsed from start.
     signed long long                        pauseTime; ///< Time to be subtracted to realElapsedTime for the current frame.
-    int                                     specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
     RuntimeVariablesContainer               variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
@@ -266,6 +271,7 @@ protected:
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
     std::shared_ptr<CodeExecutionEngine>    codeExecutionEngine;
     std::vector < Text >                    legacyTexts; ///<Deprecated way of displaying a text
+    SceneChange                             requestedChange; ///< What should be done at the end of the frame.
 
     static RuntimeLayer badRuntimeLayer; ///< Null object return by GetLayer when no appropriate layer could be found.
 };

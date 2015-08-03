@@ -306,6 +306,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     InsertUnique(includesFiles, "inputmanager.js");
     InsertUnique(includesFiles, "runtimeobject.js");
     InsertUnique(includesFiles, "runtimescene.js");
+    InsertUnique(includesFiles, "scenestack.js");
     InsertUnique(includesFiles, "polygon.js");
     InsertUnique(includesFiles, "force.js");
     InsertUnique(includesFiles, "layer.js");
@@ -315,9 +316,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, std::string outputDir, st
     InsertUnique(includesFiles, "variable.js");
     InsertUnique(includesFiles, "variablescontainer.js");
     InsertUnique(includesFiles, "eventscontext.js");
-    InsertUnique(includesFiles, "runtimescene.js");
     InsertUnique(includesFiles, "runtimeautomatism.js");
-    InsertUnique(includesFiles, "runtimeobject.js");
     InsertUnique(includesFiles, "spriteruntimeobject.js");
     InsertUnique(includesFiles, "soundmanager.js");
 

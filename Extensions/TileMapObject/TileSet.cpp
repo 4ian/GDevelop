@@ -137,11 +137,12 @@ void TileSet::LoadResources(gd::Project &game)
         wxSetWorkingDirectory(oldWorkingDir);
         if ( wxFileExists(image.GetAbsoluteFile(game)) )
         {
-            //wxBitmap bmp( image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
-            //m_tilesetBitmap = bmp;
             m_tilesetBitmap.LoadFile(image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
         }
 #endif
+
+        //Readjust the m_collidable std::vector according to the number of tiles
+        m_collidable.resize(GetTilesCount(), true);
     }
     else
     {

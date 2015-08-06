@@ -36,7 +36,17 @@ void GD_API StopGame(RuntimeScene & scene);
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API ChangeScene(RuntimeScene & scene, gd::String newSceneName);
+void GD_API ReplaceScene(RuntimeScene & scene, gd::String newSceneName, bool clearOthers);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+void GD_API PushScene(RuntimeScene & scene, gd::String newSceneName);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+void GD_API PopScene(RuntimeScene & scene);
 
 /**
  * Only used internally by GD events generated code.

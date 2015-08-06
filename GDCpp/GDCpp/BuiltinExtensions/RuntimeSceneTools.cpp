@@ -54,22 +54,26 @@ void GD_API ChangeSceneBackground( RuntimeScene & scene, gd::String newColor )
 
 void GD_API StopGame( RuntimeScene & scene )
 {
-    scene.GotoSceneWhenEventsAreFinished(-2);
-    return;
+    scene.RequestChange(RuntimeScene::SceneChange::STOP_GAME);
 }
 
-void GD_API ChangeScene( RuntimeScene & scene, gd::String newSceneName )
+void GD_API ReplaceScene(RuntimeScene & scene, gd::String newSceneName, bool clearOthers)
 {
-    for ( unsigned int i = 0;i < scene.game->GetLayoutsCount(); ++i )
-    {
-        if ( scene.game->GetLayout(i).GetName() == newSceneName )
-        {
-            scene.GotoSceneWhenEventsAreFinished(i);
-            return;
-        }
-    }
+    if (!scene.game->HasLayoutNamed(newSceneName)) return;
+    scene.RequestChange(clearOthers ?
+        RuntimeScene::SceneChange::CLEAR_SCENES :
+        RuntimeScene::SceneChange::REPLACE_SCENE, newSceneName);
+}
 
-   return;
+void GD_API PushScene(RuntimeScene & scene, gd::String newSceneName)
+{
+    if (!scene.game->HasLayoutNamed(newSceneName)) return;
+    scene.RequestChange(RuntimeScene::SceneChange::PUSH_SCENE, newSceneName);
+}
+
+void GD_API PopScene(RuntimeScene & scene)
+{
+    scene.RequestChange(RuntimeScene::SceneChange::POP_SCENE);
 }
 
 bool GD_API SceneJustBegins(RuntimeScene & scene )
@@ -376,7 +380,7 @@ bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene )
                        "\n"
                        "Stop the preview?"), _("Infinite loop"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
     {
-        scene.running = false;
+        scene.RequestChange(RuntimeScene::SceneChange::STOP_GAME);
         return true;
     }
     #else

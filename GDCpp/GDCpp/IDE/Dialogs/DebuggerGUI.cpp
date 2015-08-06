@@ -24,12 +24,13 @@
 
 const long DebuggerGUI::ID_EXTLIST = wxNewId();
 
-DebuggerGUI::DebuggerGUI(wxWindow* parent, RuntimeScene &scene_)
+DebuggerGUI::DebuggerGUI(wxWindow* parent, RuntimeScene &scene_, std::function<void(bool)> playCallback_)
     : DebuggerGUIBase(parent),
       BaseDebugger(),
       scene(scene_),
+      playCallback(playCallback_),
       mustRecreateTree(true),
-      doMAJ(false),
+      doUpdate(false),
       objectChanged(true)
 {
     //Connect events
@@ -108,33 +109,23 @@ DebuggerGUI::DebuggerGUI(wxWindow* parent, RuntimeScene &scene_)
     }
 }
 
-DebuggerGUI::~DebuggerGUI()
-{
-}
-
-////////////////////////////////////////////////////////////
-/// Contrôle du déroulement de la scène
-////////////////////////////////////////////////////////////
 void DebuggerGUI::OnPlayBtClick(wxCommandEvent& event)
 {
-    scene.running = true;
+    if (playCallback) playCallback(true);
 }
 void DebuggerGUI::OnPauseBtClick(wxCommandEvent& event)
 {
-    scene.running = false;
+    if (playCallback) playCallback(false);
 }
 void DebuggerGUI::OnStepBtClick(wxCommandEvent& event)
 {
     scene.RenderAndStep();
-    scene.running = false;
+    if (playCallback) playCallback(false);
 }
 
-////////////////////////////////////////////////////////////
-/// Activation/Desactivation du Debugger
-////////////////////////////////////////////////////////////
 void DebuggerGUI::Pause()
 {
-    doMAJ = false;
+    doUpdate = false;
     mustRecreateTree = true;
     m_toolbar->Enable(false);
     m_deleteBt->Enable(false);
@@ -142,7 +133,7 @@ void DebuggerGUI::Pause()
 
 void DebuggerGUI::Play()
 {
-    doMAJ = true;
+    doUpdate = true;
     mustRecreateTree = true;
     m_toolbar->Enable(true);
     m_deleteBt->Enable(true);
@@ -150,7 +141,7 @@ void DebuggerGUI::Play()
 
 void DebuggerGUI::UpdateGUI()
 {
-    if ( !doMAJ || !IsShown())
+    if ( !doUpdate || !IsShown())
         return;
 
     //General tab

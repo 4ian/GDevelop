@@ -1,5 +1,8 @@
 #Get the destination, or copy by default to release directory
 DESTINATION=../../Binaries/Output/Release_Linux/JsPlatform/Runtime/
+if [ "$(uname)" == "Darwin" ]; then
+	DESTINATION=../../Binaries/Output/Release_Darwin/JsPlatform/Runtime/
+fi
 if [ ! $# -eq 0 ]; then
 	DESTINATION=$1
 fi

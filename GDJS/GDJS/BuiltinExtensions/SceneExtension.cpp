@@ -30,7 +30,9 @@ SceneExtension::SceneExtension()
 
     GetAllConditions()["DepartScene"].SetFunctionName("gdjs.evtTools.runtimeScene.sceneJustBegins");
     GetAllActions()["SceneBackground"].SetFunctionName("gdjs.evtTools.runtimeScene.setBackgroundColor");
-    GetAllActions()["Scene"].SetFunctionName("gdjs.evtTools.runtimeScene.changeScene");
+    GetAllActions()["Scene"].SetFunctionName("gdjs.evtTools.runtimeScene.replaceScene");
+    GetAllActions()["PushScene"].SetFunctionName("gdjs.evtTools.runtimeScene.pushScene");
+    GetAllActions()["PopScene"].SetFunctionName("gdjs.evtTools.runtimeScene.popScene");
     GetAllActions()["Quit"].SetFunctionName("gdjs.evtTools.runtimeScene.stopGame");
 
     GetAllConditions()["Egal"].codeExtraInformation

@@ -40,13 +40,7 @@ gdjs.PlatformerObjectRuntimeAutomatism = function(runtimeScene, automatismData, 
     this._oldHeight = 0;//owner.getHeight(); //Be careful, object might not be initialized.
     this._hasReallyMoved = false;
     this.setSlopeMaxAngle(automatismData.slopeMaxAngle);
-
-	//Create the shared manager if necessary.
-	if ( !gdjs.PlatformRuntimeAutomatism.platformsObjectsManagers.containsKey(runtimeScene.getName()) ) {
-		var manager = new gdjs.PlatformObjectsManager(runtimeScene);
-		gdjs.PlatformRuntimeAutomatism.platformsObjectsManagers.put(runtimeScene.getName(), manager);
-	}
-	this._manager = gdjs.PlatformRuntimeAutomatism.platformsObjectsManagers.get(runtimeScene.getName());
+    this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
 };
 
 gdjs.PlatformerObjectRuntimeAutomatism.prototype = Object.create( gdjs.RuntimeAutomatism.prototype );

@@ -37,14 +37,36 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
         .MarkAsSimple();
 
     extension.AddAction("Scene",
-                   _("Go to a scene"),
-                   _("Change and start the specified scene."),
-                   _("Go to scene _PARAM1_"),
+                   _("Change the scene"),
+                   _("Stop this scene and start the specified one instead."),
+                   _("Change for scene _PARAM1_"),
                    _("Scene"),
-                   "res/actions/goscene24.png",
-                   "res/actions/goscene.png")
+                   "res/actions/replaceScene24.png",
+                   "res/actions/replaceScene.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the scene"), "",false)
+        .AddParameter("string", _("Name of the new scene"), "",false)
+        .AddParameter("yesorno", _("Stop any other paused scenes?"), "",false).SetDefaultValue("true")
+        .MarkAsAdvanced();
+
+    extension.AddAction("PushScene",
+                   _("Pause and start a new scene"),
+                   _("Pause this scene and start the specified one.\nLater, you can use \"Stop and go back to previous scene\" action to go back to this scene."),
+                   _("Pause the scene and start _PARAM1_"),
+                   _("Scene"),
+                   "res/actions/pushScene24.png",
+                   "res/actions/pushScene.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("string", _("Name of the new scene"), "",false)
+        .MarkAsAdvanced();
+
+    extension.AddAction("PopScene",
+                   _("Stop and go back to previous scene"),
+                   _("Stop this scene and go back to the previous paused one.\nTo pause a scene, use \"Pause and start a new scene\" action."),
+                   _("Stop the scene and go back to the previous paused one"),
+                   _("Scene"),
+                   "res/actions/popScene24.png",
+                   "res/actions/popScene.png")
+        .AddCodeOnlyParameter("currentScene", "")
         .MarkAsAdvanced();
 
     extension.AddAction("Quit",

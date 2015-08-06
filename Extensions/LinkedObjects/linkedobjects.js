@@ -15,6 +15,20 @@ gdjs.LinksManager = function()
 	this.links = {};
 };
 
+/**
+ * Get the links manager of a scene.
+ *
+ * @method getManager
+ * @static
+ */
+gdjs.LinksManager.getManager = function(runtimeScene) {
+    if (!runtimeScene.linkedObjectsManager) { //Create the shared manager if necessary.
+        runtimeScene.linkedObjectsManager = new gdjs.LinksManager();
+    }
+
+    return runtimeScene.linkedObjectsManager;
+};
+
 gdjs.LinksManager.prototype.getObjectsLinkedWith = function(objA) {
 	if ( !this.links.hasOwnProperty(objA.id) )
 		this.links[objA.id] = [];
@@ -68,38 +82,39 @@ gdjs.LinksManager.prototype.removeLinkBetween = function(objA, objB) {
  * @static
  * @private
  */
-gdjs.evtTools.linkedObjects = gdjs.evtTools.linkedObjects || {managers: new Hashtable()};
+gdjs.evtTools.linkedObjects = {};
 
 gdjs.evtTools.linkedObjects.gdjsCallbackRuntimeSceneLoaded = function(runtimeScene) {
-	gdjs.evtTools.linkedObjects.managers.put(runtimeScene.getName(), new gdjs.LinksManager());
+	//Manager is created on demand, no need to instanciate it now.
+	//gdjs.LinksManager.getManager(runtimeScene);
 };
 
 gdjs.evtTools.linkedObjects.gdjsCallbackObjectDeletedFromScene = function(runtimeScene, obj) {
-	gdjs.evtTools.linkedObjects.managers.get(runtimeScene.getName()).removeAllLinksOf(obj);
+	gdjs.LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
 };
 
 gdjs.evtTools.linkedObjects.linkObjects = function(runtimeScene, objA, objB) {
 	if (objA === null || objB === null) return;
 
-	gdjs.evtTools.linkedObjects.managers.get(runtimeScene.getName()).linkObjects(objA, objB);
+	gdjs.LinksManager.getManager(runtimeScene).linkObjects(objA, objB);
 };
 
 gdjs.evtTools.linkedObjects.removeLinkBetween = function(runtimeScene, objA, objB) {
 	if (objA === null || objB === null) return;
 
-	gdjs.evtTools.linkedObjects.managers.get(runtimeScene.getName()).removeLinkBetween(objA, objB);
+	gdjs.LinksManager.getManager(runtimeScene).removeLinkBetween(objA, objB);
 };
 
 gdjs.evtTools.linkedObjects.removeAllLinksOf = function(runtimeScene, objA) {
 	if (objA === null) return;
 
-	gdjs.evtTools.linkedObjects.managers.get(runtimeScene.getName()).removeAllLinksOf(objA);
+	gdjs.LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
 };
 
 gdjs.evtTools.linkedObjects.pickObjectsLinkedTo = function(runtimeScene, objectsLists, obj) {
 	if (obj === null) return false;
     var linkedObjects =
-		gdjs.evtTools.linkedObjects.managers.get(runtimeScene.getName()).getObjectsLinkedWith(obj);
+		gdjs.LinksManager.getManager(runtimeScene).getObjectsLinkedWith(obj);
 
 	return gdjs.evtTools.object.pickObjectsIf(function(obj) {
 		return linkedObjects.indexOf(obj) !== -1;

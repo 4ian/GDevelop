@@ -20,6 +20,7 @@
 #include "GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
+#include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/Clipboard.h"
@@ -677,10 +678,9 @@ void LayoutEditorCanvas::UpdateSize()
         unsigned int width = parentControl->GetSize().GetWidth()-(vScrollbar ? vScrollbar->GetSize().GetWidth() : 0);
         unsigned int height = parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0);
 
-        #if defined(MACOS) //&& defined(RETINA)
-        width *= 2;
-        height *= 2;
-        #endif
+        double scaleFactor = GUIContentScaleFactor::Get();
+        width *= scaleFactor;
+        height *= scaleFactor;
 
         //Scene takes all the space available in edition mode.
         Window::setSize(sf::Vector2u(width, height));

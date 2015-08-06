@@ -26,6 +26,7 @@
 #include "GDCpp/CppPlatform.h"
 #include "GDCpp/ExtensionsLoader.h"
 #include "GDCpp/Log.h"
+#include "GDCpp/SceneStack.h"
 #include "GDCpp/Tools/AES.h"
 #include "GDCpp/Serialization/Serializer.h"
 #include "GDCpp/Serialization/SerializerElement.h"
@@ -39,7 +40,7 @@
 using namespace std;
 
 gd::String GetCurrentWorkingDirectory();
-int AbortWithMessage(const gd::String & message);
+int DisplayMessage(const gd::String & message);
 
 int main( int argc, char *p_argv[] )
 {
@@ -83,7 +84,7 @@ int main( int argc, char *p_argv[] )
            && !resLoader->SetResourceFile( executablePath+"/gam.egd" )
            && !resLoader->SetResourceFile( "gam.egd" ) )
     {
-        return AbortWithMessage("Unable to load resources. Aborting.");
+        return DisplayMessage("Unable to load resources. Aborting.");
     }
 
     gd::Project game;
@@ -115,7 +116,7 @@ int main( int argc, char *p_argv[] )
         TiXmlDocument doc;
         if ( !doc.Parse(uncryptedSrc.c_str()) )
         {
-            return AbortWithMessage("Unable to parse game data. Aborting.");
+            return DisplayMessage("Unable to parse game data. Aborting.");
         }
 
         TiXmlHandle hdl(&doc);
@@ -125,7 +126,7 @@ int main( int argc, char *p_argv[] )
 	}
 
     if ( game.GetLayoutsCount() == 0 )
-        return AbortWithMessage("No scene to be loaded. Aborting.");
+        return DisplayMessage("No scene to be loaded. Aborting.");
 
     //Loading the code
     gd::String codeLibraryName = executablePath+"/"+executableNameOnly+"."+codeFileExtension;
@@ -136,7 +137,7 @@ int main( int argc, char *p_argv[] )
         Handle codeLibrary = gd::OpenLibrary(codeLibraryName.ToLocale().c_str());
         if ( codeLibrary == NULL )
         {
-            return AbortWithMessage("Unable to load the execution engine for game. Aborting.");
+            return DisplayMessage("Unable to load the execution engine for game. Aborting.");
         }
     }
 
@@ -159,46 +160,23 @@ int main( int argc, char *p_argv[] )
     RuntimeGame runtimeGame;
     runtimeGame.LoadFromProject(game);
 
-    RuntimeScene scenePlayed(&window, &runtimeGame);
-    if ( !scenePlayed.LoadFromScene( game.GetLayout(0) ) )
-        return AbortWithMessage("Unable to load the first scene \"" + game.GetLayout(0).GetName() + "\". Aborting.");
-
-    if (scenePlayed.GetCodeExecutionEngine() == std::shared_ptr<CodeExecutionEngine>() ||
-        !scenePlayed.GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
-                                                                                "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scenePlayed.GetName())) )
-    {
-        return AbortWithMessage("Unable to setup execution engine for scene \"" + game.GetLayout(0).GetName() + "\". Aborting.");
-    }
-
-    window.create( sf::VideoMode( game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32 ), scenePlayed.GetWindowDefaultTitle(), sf::Style::Close );
+    window.create(sf::VideoMode(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32),
+        "", sf::Style::Close);
     window.setActive(true);
-    window.setFramerateLimit( game.GetMaximumFPS() );
-    window.setVerticalSyncEnabled( game.IsVerticalSynchronizationEnabledByDefault() );
-    scenePlayed.ChangeRenderWindow(&window);
+    window.setFramerateLimit(game.GetMaximumFPS());
+    window.setVerticalSyncEnabled(game.IsVerticalSynchronizationEnabledByDefault());
 
     //Game main loop
-    while ( scenePlayed.running )
-    {
-        int returnCode = scenePlayed.RenderAndStep();
+    bool abort = false;
+    SceneStack sceneStack(runtimeGame, &window, codeLibraryName);
+    sceneStack.OnError([&abort](gd::String error) {
+        DisplayMessage(error);
+        abort = true;
+    });
 
-        if ( returnCode == -2 ) //Quit the game
-            scenePlayed.running = false;
-        else if ( returnCode != -1 && returnCode < game.GetLayoutsCount()) //Change the scene being played
-        {
-            RuntimeScene emptyScene(&window, &runtimeGame);
-            scenePlayed = emptyScene; //Clear the scene
-
-            if ( !scenePlayed.LoadFromScene( game.GetLayout(returnCode) ) )
-                return AbortWithMessage("Unable to load scene \"" + game.GetLayout(returnCode).GetName() + "\". Aborting.");
-
-            if (!scenePlayed.GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
-                "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scenePlayed.GetName())))
-            {
-                return AbortWithMessage("Unable to setup execution engine for scene \"" + scenePlayed.GetName() + "\". Aborting.");
-            }
-
-        }
-    }
+    sceneStack.Push(game.GetLayout(0).GetName());
+    while (sceneStack.Step() && !abort)
+        ;
 
     SoundManager::Get()->DestroySingleton();
     FontManager::Get()->DestroySingleton();
@@ -216,7 +194,6 @@ gd::String GetCurrentWorkingDirectory()
     char path[2048];
     getcwd(path, 2048);
 
-    if ( path == NULL ) return "";
     return path;
 }
 
@@ -224,11 +201,11 @@ gd::String GetCurrentWorkingDirectory()
 #include <windows.h>
 #include <Commdlg.h>
 #endif
-int AbortWithMessage(const gd::String & message)
+int DisplayMessage(const gd::String & message)
 {
     std::cout << message;
     #if defined(WINDOWS)
-    MessageBox(NULL, message.c_str(), "Fatal error", MB_ICONERROR);
+    MessageBoxW(NULL, message.ToWide().c_str(), L"Fatal error", MB_ICONERROR);
     #endif
     return EXIT_FAILURE;
 }

@@ -60,7 +60,8 @@ std::shared_ptr<RuntimeScene> SceneStack::Push(std::string newSceneName)
         return std::shared_ptr<RuntimeScene>();
     }
 
-    if (!newScene->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
+    if (!codeLibraryName.empty() && 
+        !newScene->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
         "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(newScene->GetName())))
     {
         if (errorCallback) errorCallback("Unable to setup execution engine for scene \"" + newScene->GetName() + "\".");

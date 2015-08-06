@@ -36,7 +36,7 @@ void GD_API StopGame(RuntimeScene & scene);
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API ReplaceScene(RuntimeScene & scene, std::string newSceneName);
+void GD_API ReplaceScene(RuntimeScene & scene, std::string newSceneName, bool clearOthers);
 
 /**
  * Only used internally by GD events generated code.

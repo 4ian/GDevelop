@@ -117,13 +117,13 @@
                                         <sprite hasCustomCollisionMask="false" image="Pea-Happy.png">
                                             <points />
                                             <originPoint name="origine" x="0.000000" y="0.000000" />
-                                            <centerPoint automatic="true" name="centre" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="18.500000" y="18.500000" />
                                             <customCollisionMask>
                                                 <polygon>
                                                     <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="37.000000" />
+                                                    <vertice x="0.000000" y="37.000000" />
                                                 </polygon>
                                             </customCollisionMask>
                                         </sprite>
@@ -138,13 +138,13 @@
                                         <sprite hasCustomCollisionMask="false" image="Pea-Hurt.png">
                                             <points />
                                             <originPoint name="origine" x="0.000000" y="0.000000" />
-                                            <centerPoint automatic="true" name="centre" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="19.000000" y="21.500000" />
                                             <customCollisionMask>
                                                 <polygon>
                                                     <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="38.000000" y="0.000000" />
+                                                    <vertice x="38.000000" y="43.000000" />
+                                                    <vertice x="0.000000" y="43.000000" />
                                                 </polygon>
                                             </customCollisionMask>
                                         </sprite>
@@ -165,13 +165,13 @@
                                         <sprite hasCustomCollisionMask="false" image="Pea-Happy.png">
                                             <points />
                                             <originPoint name="origine" x="0.000000" y="0.000000" />
-                                            <centerPoint automatic="true" name="centre" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="18.500000" y="18.500000" />
                                             <customCollisionMask>
                                                 <polygon>
                                                     <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="37.000000" />
+                                                    <vertice x="0.000000" y="37.000000" />
                                                 </polygon>
                                             </customCollisionMask>
                                         </sprite>
@@ -186,13 +186,13 @@
                                         <sprite hasCustomCollisionMask="false" image="Pea-Hurt.png">
                                             <points />
                                             <originPoint name="origine" x="0.000000" y="0.000000" />
-                                            <centerPoint automatic="true" name="centre" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="19.000000" y="21.500000" />
                                             <customCollisionMask>
                                                 <polygon>
                                                     <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="38.000000" y="0.000000" />
+                                                    <vertice x="38.000000" y="43.000000" />
+                                                    <vertice x="0.000000" y="43.000000" />
                                                 </polygon>
                                             </customCollisionMask>
                                         </sprite>
@@ -230,6 +230,14 @@
                                 <parameter>NewObject</parameter>
                                 <parameter>=</parameter>
                                 <parameter>2</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="SceneBackground" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>ToString(Random(255))+&quot;;255;&quot;+ToString(Random(255))</parameter>
                             </parameters>
                             <subActions />
                         </action>
@@ -437,6 +445,56 @@
                             <type inverted="false" value="PopScene" />
                             <parameters>
                                 <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyReleased" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>r</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Scene" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>&quot;New scene&quot;</parameter>
+                                <parameter>no</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyReleased" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>c</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Scene" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>&quot;New scene&quot;</parameter>
+                                <parameter>yes</parameter>
                             </parameters>
                             <subActions />
                         </action>

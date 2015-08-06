@@ -24,7 +24,9 @@ bool SceneStack::Step()
         } else if (request.change == RuntimeScene::SceneChange::PUSH_SCENE) {
         	Push(request.requestedScene);
         } else if (request.change == RuntimeScene::SceneChange::REPLACE_SCENE) {
-        	Replace(request.requestedScene);
+            Replace(request.requestedScene);
+        } else if (request.change == RuntimeScene::SceneChange::CLEAR_SCENES) {
+        	Replace(request.requestedScene, true);
         } else {
         	if (errorCallback) errorCallback("Unrecognized change in scene stack.");
         	return false;
@@ -64,8 +66,15 @@ std::shared_ptr<RuntimeScene> SceneStack::Push(std::string newSceneName)
 	return newScene;
 }
 
-std::shared_ptr<RuntimeScene> SceneStack::Replace(std::string newSceneName)
+std::shared_ptr<RuntimeScene> SceneStack::Replace(std::string newSceneName, bool clear)
 {
-	Pop();
-	Push(newSceneName);
+    if (clear) 
+    {
+        while (!stack.empty()) stack.pop_back();
+    } 
+    else 
+    {
+        if (!stack.empty()) stack.pop_back();
+    }
+	return Push(newSceneName);
 }

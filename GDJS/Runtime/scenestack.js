@@ -23,7 +23,7 @@ gdjs.SceneStack.prototype.step = function() {
 
 	var currentScene = this._stack[this._stack.length - 1];
     if (currentScene.renderAndStep()) {
-    	var request = currentScene.changeRequested();
+    	var request = currentScene.getRequestedChange();
         //Something special was requested by the current scene.
         if (request === gdjs.RuntimeScene.STOP_GAME) {
             //postGameScreen(); //TODO
@@ -33,7 +33,9 @@ gdjs.SceneStack.prototype.step = function() {
         } else if (request === gdjs.RuntimeScene.PUSH_SCENE) {
         	this.push(currentScene.getRequestedScene());
         } else if (request === gdjs.RuntimeScene.REPLACE_SCENE) {
-        	this.replace(currentScene.getRequestedScene());
+            this.replace(currentScene.getRequestedScene());
+        } else if (request === gdjs.RuntimeScene.CLEAR_SCENES) {
+        	this.replace(currentScene.getRequestedScene(), true);
         } else {
         	console.error("Unrecognized change in scene stack.");
         	return false;
@@ -56,7 +58,12 @@ gdjs.SceneStack.prototype.push = function(newSceneName) {
     return newScene;
 };
 
-gdjs.SceneStack.prototype.replace = function(newSceneName) {
-	this.pop();
+gdjs.SceneStack.prototype.replace = function(newSceneName, clear) {
+	if (!!clear) {
+        this._stack.length = 0;
+    } else {
+        if (this._stack.length !== 0) this._stack.pop();
+    }
+
 	return this.push(newSceneName);
 };

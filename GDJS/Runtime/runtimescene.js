@@ -196,7 +196,7 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * or a game stop was requested.
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function() {
-	this._changeRequested = gdjs.RuntimeScene.CONTINUE;
+	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
 	this._updateTime();
 	this._updateObjectsPreEvents();
 	this._eventsFunction(this, this._eventsContext);
@@ -205,7 +205,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
 
 	this._firstFrame = false;
 
-	return !!this.changeRequested();
+	return !!this.getRequestedChange();
 };
 
 /**
@@ -216,6 +216,7 @@ gdjs.RuntimeScene.prototype.render = function() {
 	if (!this._pixiRenderer) return;
 
 	// render the PIXI container of the scene
+	this._pixiRenderer.backgroundColor = this._backgroundColor;
 	this._pixiRenderer.render(this._pixiContainer);
 };
 
@@ -331,7 +332,7 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
 gdjs.RuntimeScene.prototype.setBackgroundColor = function(r,g,b) {
 	if (!this._pixiRenderer) return;
 
-	this._pixiRenderer.backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
+	this._backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
 };
 
 /**
@@ -589,19 +590,21 @@ gdjs.RuntimeScene.CONTINUE = 0;
 gdjs.RuntimeScene.PUSH_SCENE = 1;
 gdjs.RuntimeScene.POP_SCENE = 2;
 gdjs.RuntimeScene.REPLACE_SCENE = 3;
-gdjs.RuntimeScene.STOP_GAME = 4;
+gdjs.RuntimeScene.CLEAR_SCENES = 4;
+gdjs.RuntimeScene.STOP_GAME = 5;
 
 /**
  * Return the value of the scene change that is requested.
- * @method gameStopRequested
+ * @method getRequestedChange
  */
-gdjs.RuntimeScene.prototype.changeRequested = function() {
-	return this._changeRequested;
+gdjs.RuntimeScene.prototype.getRequestedChange = function() {
+	return this._requestedChange;
 };
 
 /**
  * Return the name of the new scene to be launched.
- * See requestSceneChange and requestScenePush.
+ *
+ * See requestChange.
  * @method getRequestedScene
  */
 gdjs.RuntimeScene.prototype.getRequestedScene = function() {
@@ -609,35 +612,13 @@ gdjs.RuntimeScene.prototype.getRequestedScene = function() {
 };
 
 /**
- * When called, the scene will be flagged as requesting the game to be stopped.
- * @method requestGameStop
+ * Request a scene change to be made. The change is handled externally (see gdjs.SceneStack)
+ * thanks to getRequestedChange and getRequestedScene methods.
+ * @param change One of gdjs.RuntimeScene.CONTINUE|PUSH_SCENE|POP_SCENE|REPLACE_SCENE|CLEAR_SCENES|STOP_GAME.
+ * @param sceneName The name of the new scene to launch, if applicable.
+ * @method requestChange
  */
-gdjs.RuntimeScene.prototype.requestGameStop = function() {
-	this._changeRequested = gdjs.RuntimeScene.STOP_GAME;
-};
-
-/**
- * When called, the scene will be flagged as requesting a new scene to be launched.
- * @method requestSceneReplace
- */
-gdjs.RuntimeScene.prototype.requestSceneReplace = function(sceneName) {
-	this._changeRequested = gdjs.RuntimeScene.REPLACE_SCENE;
+gdjs.RuntimeScene.prototype.requestChange = function(change, sceneName) {
+	this._requestedChange = change;
 	this._requestedScene = sceneName;
-};
-
-/**
- * When called, the scene will be flagged as requesting a new scene to be pushed on the stack.
- * @method requestScenePush
- */
-gdjs.RuntimeScene.prototype.requestScenePush = function(sceneName) {
-	this._changeRequested = gdjs.RuntimeScene.PUSH_SCENE;
-	this._requestedScene = sceneName;
-};
-
-/**
- * When called, the scene will be flagged as requesting to be popped from the stack.
- * @method requestScenePop
- */
-gdjs.RuntimeScene.prototype.requestScenePop = function() {
-	this._changeRequested = gdjs.RuntimeScene.POP_SCENE;
 };

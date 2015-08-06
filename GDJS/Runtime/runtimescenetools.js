@@ -118,24 +118,26 @@ gdjs.evtTools.runtimeScene.getTime = function(runtimeScene, what) {
     return 0;
 };
 
-gdjs.evtTools.runtimeScene.replaceScene = function(runtimeScene, newSceneName) {
+gdjs.evtTools.runtimeScene.replaceScene = function(runtimeScene, newSceneName, clearOthers) {
     if (!runtimeScene.getGame().getSceneData(newSceneName)) return;
 
-    runtimeScene.requestSceneReplace(newSceneName);
+    runtimeScene.requestChange(clearOthers ?
+        gdjs.RuntimeScene.CLEAR_SCENES :
+        gdjs.RuntimeScene.REPLACE_SCENE, newSceneName);
 };
 
 gdjs.evtTools.runtimeScene.pushScene = function(runtimeScene, newSceneName) {
     if (!runtimeScene.getGame().getSceneData(newSceneName)) return;
 
-    runtimeScene.requestScenePush(newSceneName);
+    runtimeScene.requestChange(gdjs.RuntimeScene.PUSH_SCENE, newSceneName);
 };
 
 gdjs.evtTools.runtimeScene.popScene = function(runtimeScene) {
-    runtimeScene.requestScenePop();
+    runtimeScene.requestChange(gdjs.RuntimeScene.POP_SCENE);
 };
 
 gdjs.evtTools.runtimeScene.stopGame = function(runtimeScene) {
-    runtimeScene.requestGameStop();
+    runtimeScene.requestChange(gdjs.RuntimeScene.STOP_GAME);
 };
 
 gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout = function(scene, externalLayout, xPos, yPos) {

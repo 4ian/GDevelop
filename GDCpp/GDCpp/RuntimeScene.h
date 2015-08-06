@@ -211,6 +211,7 @@ public:
             PUSH_SCENE,
             POP_SCENE,
             REPLACE_SCENE,
+            CLEAR_SCENES,
             STOP_GAME
         } change;
         std::string requestedScene;

@@ -56,10 +56,12 @@ void GD_API StopGame( RuntimeScene & scene )
     scene.RequestChange(RuntimeScene::SceneChange::STOP_GAME);
 }
 
-void GD_API ReplaceScene(RuntimeScene & scene, std::string newSceneName)
+void GD_API ReplaceScene(RuntimeScene & scene, std::string newSceneName, bool clearOthers)
 {
     if (!scene.game->HasLayoutNamed(newSceneName)) return;
-    scene.RequestChange(RuntimeScene::SceneChange::REPLACE_SCENE, newSceneName);
+    scene.RequestChange(clearOthers ? 
+        RuntimeScene::SceneChange::CLEAR_SCENES :
+        RuntimeScene::SceneChange::REPLACE_SCENE, newSceneName);
 }
 
 void GD_API PushScene(RuntimeScene & scene, std::string newSceneName)

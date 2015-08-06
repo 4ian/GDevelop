@@ -45,6 +45,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
                    "res/actions/replaceScene.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Name of the new scene"), "",false)
+        .AddParameter("yesorno", _("Stop any other paused scenes?"), "",false).SetDefaultValue("true")
         .MarkAsAdvanced();
 
     extension.AddAction("PushScene",

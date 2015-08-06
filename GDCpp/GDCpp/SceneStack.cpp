@@ -47,6 +47,12 @@ std::shared_ptr<RuntimeScene> SceneStack::Pop()
 
 std::shared_ptr<RuntimeScene> SceneStack::Push(std::string newSceneName)
 {
+    if (!game.HasLayoutNamed(newSceneName))
+    {
+        if (errorCallback) errorCallback("Scene \"" + newSceneName + "\" does not exist.");
+        return std::shared_ptr<RuntimeScene>();
+    }
+
 	auto newScene = std::make_shared<RuntimeScene>(window, &game);
     if (!newScene->LoadFromScene(game.GetLayout(newSceneName)))
     {

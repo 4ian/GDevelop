@@ -25,7 +25,9 @@ SceneExtension::SceneExtension()
     GetAllExpressions()["Random"].SetFunctionName("GDpriv::CommonInstructions::Random").SetIncludeFile("GDCpp/BuiltinExtensions/CommonInstructionsTools.h");
     GetAllStrExpressions()["CurrentSceneName"].SetFunctionName("GetSceneName").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllConditions()["DepartScene"].SetFunctionName("SceneJustBegins").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
-    GetAllActions()["Scene"].SetFunctionName("ChangeScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["Scene"].SetFunctionName("ReplaceScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["PushScene"].SetFunctionName("PushScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
+    GetAllActions()["PopScene"].SetFunctionName("PopScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllActions()["Quit"].SetFunctionName("StopGame").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllActions()["SceneBackground"].SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllActions()["DisableInputWhenFocusIsLost"].SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");

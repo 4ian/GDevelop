@@ -96,7 +96,6 @@ bool CppLayoutPreviewer::LaunchPreview( )
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
 
-    previewScene.running = false;
     playing = false;
 
     editor.setFramerateLimit(editor.GetProject().GetMaximumFPS());
@@ -121,7 +120,6 @@ void CppLayoutPreviewer::StopPreview()
     std::cout << "Stopping GD C++ preview..." << std::endl;
 
     CodeCompiler::Get()->EnableTaskRelatedTo(editor.GetLayout());
-    previewScene.running = false;
     playing = false;
 
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
@@ -134,7 +132,6 @@ void CppLayoutPreviewer::StopPreview()
     //Reset the scene.
     RuntimeScene newScene(&editor, &previewGame);
     previewScene = newScene;
-    previewScene.running = false;
     if ( debugger ) previewScene.debugger = debugger.get();
     if ( profiler ) previewScene.SetProfiler(profiler.get());
     if ( profiler ) editor.GetLayout().SetProfiler(profiler.get());
@@ -144,45 +141,45 @@ void CppLayoutPreviewer::StopPreview()
 
 void CppLayoutPreviewer::OnUpdate()
 {
-    if ( isReloading )
+    if (isReloading)
     {
         if ( CodeCompiler::Get()->CompilationInProcess()  ) //We're still waiting for compilation to finish
-        {
             RenderCompilationScreen(); //Display a message when compiling
-            return;
-        }
         else //Everything is finished, reloading is almost complete!
             RefreshFromLayoutSecondPart();
 
+        return;
     }
-    else //We're displaying the scene
-    {
-        if ( previewScene.running )
-        {
-            //Render the scene
-            int retourEvent = previewScene.RenderAndStep();
-            if ( externalPreviewWindow && externalPreviewWindow->IsShown() ) //Be sure that the editor is updated.
-            {
-                editor.clear(sf::Color(255,255,255));
-                editor.display();
-            }
 
-            if ( retourEvent == -2 )
-                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the game will quit." ));
-            else if ( retourEvent != -1 )
-            {
-                if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < editor.GetProject().GetLayoutsCount())
-                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + editor.GetProject().GetLayout(retourEvent).GetName() + "\"");
-            }
+    if (playing)
+    {
+        bool changeRequested = previewScene.RenderAndStep();
+        if (externalPreviewWindow && externalPreviewWindow->IsShown()) //Be sure that the editor is updated.
+        {
+            editor.clear(sf::Color(255,255,255));
+            editor.display();
         }
-        else if ( !previewScene.running ) //Paused
-            previewScene.RenderWithoutStep();
+
+        if (changeRequested)
+        {
+            auto request = previewScene.GetRequestedChange();
+            if (request.change == RuntimeScene::SceneChange::STOP_GAME)
+                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the game will be stopped." ));
+            else if (request.change == RuntimeScene::SceneChange::REPLACE_SCENE)
+                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will be stopped and replaced by " ) + "\"" + request.requestedScene + "\"");
+            else if (request.change == RuntimeScene::SceneChange::PUSH_SCENE)
+                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will be paused and replaced by " ) + "\"" + request.requestedScene + "\"");
+            else if (request.change == RuntimeScene::SceneChange::POP_SCENE)
+                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will be stopped and the game will go to the previous paused one"));
+        }
     }
+    else //Paused
+        previewScene.RenderWithoutStep();
 }
 
 void CppLayoutPreviewer::RefreshFromLayout()
 {
-    cout << "Scene Editor canvas reloading... ( Step 1/2 )" << endl;
+    cout << "Scene Editor canvas reloading... (step 1/2)" << endl;
     isReloading = true;
 
     SoundManager::Get()->ClearAllSoundsAndMusics();
@@ -197,13 +194,13 @@ void CppLayoutPreviewer::RefreshFromLayout()
     //Reset scene
     RuntimeScene newScene(&editor, &previewGame);
     previewScene = newScene;
-    previewScene.running = false;
     playing = false;
+
     if ( debugger ) previewScene.debugger = debugger.get();
     if ( profiler ) previewScene.SetProfiler(profiler.get());
     if ( profiler ) editor.GetLayout().SetProfiler(profiler.get());
 
-    //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
+    //Launch now events compilation if it has not been launched by another way (i.e: by the events editor).
     if ( editor.GetLayout().CompilationNeeded() && !CodeCompiler::Get()->HasTaskRelatedTo(editor.GetLayout()) )
     {
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(editor.GetProject(), editor.GetLayout());
@@ -215,7 +212,7 @@ void CppLayoutPreviewer::RefreshFromLayout()
 
 void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
 {
-    cout << "Scene canvas reloading... ( Step 2/2 )" << endl;
+    cout << "Scene canvas reloading... (step 2/2)" << endl;
     CodeCompiler::Get()->DisableTaskRelatedTo(editor.GetLayout());
 
     //Switch the working directory as we are making calls to the runtime scene
@@ -248,10 +245,10 @@ void CppLayoutPreviewer::RefreshFromLayoutSecondPart()
 void CppLayoutPreviewer::PlayPreview()
 {
     playing = true;
+
     if ( wxDirExists(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(editor.GetProject().GetProjectFile()).GetPath());
     std::cout << previewScene.GetProfiler() << "<-" << std::endl;
-    previewScene.running = true;
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
     previewScene.ChangeRenderWindow(&editor);
 
@@ -286,13 +283,12 @@ void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
 }
 void CppLayoutPreviewer::ExternalWindowClosed()
 {
-    if ( previewScene.running )
+    if (playing)
         PlayPreview(); //Go back to the internal preview
 }
 
 void CppLayoutPreviewer::PausePreview()
 {
-    previewScene.running = false;
     playing = false;
     wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 
@@ -359,7 +355,9 @@ void CppLayoutPreviewer::SetParentAuiManager(wxAuiManager * manager)
         if ( !debugger )
         {
             wxLogNull noLogPlease; //Avoid libpng warnings.
-            debugger = std::shared_ptr<DebuggerGUI>(new DebuggerGUI(editor.GetParentControl(), previewScene) );
+            debugger = std::shared_ptr<DebuggerGUI>(new DebuggerGUI(editor.GetParentControl(), previewScene, [this](bool newState) {
+                playing = newState;
+            }));
             if ( !parentAuiManager->GetPane("DBG").IsOk() )
                 parentAuiManager->AddPane( debugger.get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
             else

@@ -53,7 +53,6 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
     #if defined(GD_IDE_ONLY)
     debugger(NULL),
     #endif
-    running(true),
     firstLoop(true),
     isFullScreen(false),
     inputManager(renderWindow_),
@@ -62,7 +61,6 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
     timeScale(1),
     timeFromStart(0),
     pauseTime(0),
-    specialAction(-1),
     codeExecutionEngine(new CodeExecutionEngine)
 {
     ChangeRenderWindow(renderWindow);
@@ -112,6 +110,11 @@ void RuntimeScene::SetupOpenGLProjection()
     gluPerspective(GetOpenGLFOV(), windowRatio, GetOpenGLZNear(), GetOpenGLZFar());
 }
 
+void RuntimeScene::RequestChange(SceneChange::Change change, gd::String sceneName) {
+    requestedChange.change = change;
+    requestedChange.requestedScene = sceneName;
+}
+
 #ifndef RELEASE
 void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, int x, int & y)
 {
@@ -145,8 +148,9 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
 }
 #endif
 
-int RuntimeScene::RenderAndStep()
+bool RuntimeScene::RenderAndStep()
 {
+    requestedChange.change = SceneChange::CONTINUE;
     ManageRenderTargetEvents();
     UpdateTime();
     ManageObjectsBeforeEvents();
@@ -197,7 +201,7 @@ int RuntimeScene::RenderAndStep()
     #endif
 
     firstLoop = false; //The first frame was rendered
-    return specialAction;
+    return requestedChange.change != SceneChange::CONTINUE;
 }
 
 void RuntimeScene::ManageRenderTargetEvents()
@@ -211,7 +215,7 @@ void RuntimeScene::ManageRenderTargetEvents()
         if ( event.type == sf::Event::Closed )
         {
             //Handle window closing
-            running = false;
+            RequestChange(SceneChange::STOP_GAME);
             renderWindow->close();
         }
         else if (event.type == sf::Event::Resized)
@@ -413,12 +417,6 @@ void RuntimeScene::ManageObjectsBeforeEvents()
         allObjects[id]->DoAutomatismsPreEvents(*this);
 }
 
-void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
-{
-    //Just store the next scene index:
-    specialAction = scene;
-}
-
 /**
  * \brief Internal Tool class used by RuntimeScene::CreateObjectsFrom
  */
@@ -514,7 +512,6 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     pauseTime = 0;
     timeScale = 1;
     timeFromStart = 0;
-    specialAction = -1;
 
     std::cout << ".";
     codeExecutionEngine->runtimeContext.scene = this;

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-07 22:29+1200\n"
+"POT-Creation-Date: 2015-08-06 15:43+1200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,9 +87,8 @@ msgstr ""
 msgid "Close but don't open the autosave(s)"
 msgstr ""
 
-#: ../IDE/BugReport.cpp:156 ../IDE/BugReport.cpp:188
-#: ../IDE/ImportImage.cpp:290 ../IDE/MAJ.cpp:121 ../IDE/mp3ogg.cpp:91
-#: ../IDE/ProjectManager.cpp:381
+#: ../IDE/BugReport.cpp:156 ../IDE/BugReport.cpp:188 ../IDE/ImportImage.cpp:290
+#: ../IDE/MAJ.cpp:121 ../IDE/mp3ogg.cpp:91 ../IDE/ProjectManager.cpp:381
 #: ../GDCpp/GDCpp//IDE/Dialogs/CompilationErrorDialog.cpp:88
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:138
 #: ../GDJS/GDJS//Dialogs/GDJSDialogs.cpp:246
@@ -146,11 +145,11 @@ msgid "Line"
 msgstr ""
 
 #: ../IDE/BuildMessagesPnl.cpp:56
+#: ../Extensions//TileMapObject/Extension.cpp:114
 msgid "Column"
 msgstr ""
 
-#: ../IDE/BuildMessagesPnl.cpp:57
-#: ../Extensions//CommonDialogs/Extension.cpp:40
+#: ../IDE/BuildMessagesPnl.cpp:57 ../Extensions//CommonDialogs/Extension.cpp:40
 #: ../Extensions//CommonDialogs/Extension.cpp:70
 #: ../Extensions//CommonDialogs/Extension.cpp:85
 msgid "Message"
@@ -181,7 +180,7 @@ msgstr ""
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:213
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:214
 #: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:581
-#: ../GDJS/GDJS//Exporter.cpp:636
+#: ../GDJS/GDJS//Exporter.cpp:635
 msgid "Compilation finished"
 msgstr ""
 
@@ -235,8 +234,8 @@ msgstr ""
 
 #: ../IDE/ChoiceFile.cpp:81 ../IDE/ChoiceJoyAxis.cpp:76
 #: ../IDE/ChoixBouton.cpp:70 ../IDE/ChoixClavier.cpp:62
-#: ../IDE/CodeEditor.cpp:150 ../IDE/Dialogs/ObjectsEditor.cpp:409
-#: ../IDE/Dialogs/ObjectsEditor.cpp:411 ../IDE/EditObjectGroup.cpp:93
+#: ../IDE/CodeEditor.cpp:150 ../IDE/Dialogs/ObjectsEditor.cpp:413
+#: ../IDE/Dialogs/ObjectsEditor.cpp:415 ../IDE/EditObjectGroup.cpp:93
 #: ../IDE/EditPropScene.cpp:141 ../IDE/EventsEditor.cpp:469
 #: ../IDE/EventsEditor.cpp:471 ../IDE/GeneratePassword.cpp:75
 #: ../IDE/InstructionSelectorDialog.cpp:167 ../IDE/MainFrame.cpp:223
@@ -257,7 +256,7 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:148
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:80
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:160
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:105
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:108
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:79
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:103
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:55
@@ -289,7 +288,7 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:149
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:81
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:161
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:106
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:109
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:80
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:104
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:114
@@ -303,8 +302,7 @@ msgstr ""
 #: ../IDE/EditObjectGroup.cpp:97 ../IDE/EditPropScene.cpp:145
 #: ../IDE/GeneratePassword.cpp:79 ../IDE/InstructionSelectorDialog.cpp:173
 #: ../IDE/Preferences.cpp:575 ../IDE/SigneModification.cpp:50
-#: ../IDE/SigneTest.cpp:59
-#: ../GDCpp/GDCpp//IDE/Dialogs/EditCppCodeEvent.cpp:193
+#: ../IDE/SigneTest.cpp:59 ../GDCpp/GDCpp//IDE/Dialogs/EditCppCodeEvent.cpp:193
 #: ../GDJS/GDJS//Dialogs/GDJSDialogs.cpp:596
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:159
 #: ../Extensions//Function/FunctionEventEditorDlg.cpp:110
@@ -328,7 +326,7 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:135
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:84
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:164
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:109
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:112
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:83
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:94
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:174
@@ -372,7 +370,7 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/EditComment.cpp:80
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:86
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:166
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:111
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:114
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:85
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:178
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:315
@@ -539,22 +537,22 @@ msgid ""
 msgstr ""
 
 #: ../IDE/CodeEditor.cpp:63 ../IDE/CodeEditor.cpp:128
-#: ../IDE/Dialogs/ObjectsEditor.cpp:300 ../IDE/Dialogs/ObjectsEditor.cpp:404
+#: ../IDE/Dialogs/ObjectsEditor.cpp:304 ../IDE/Dialogs/ObjectsEditor.cpp:408
 #: ../IDE/EventsEditor.cpp:447
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:242
 msgid "Copy"
 msgstr ""
 
 #: ../IDE/CodeEditor.cpp:66 ../IDE/CodeEditor.cpp:129
-#: ../IDE/Dialogs/ObjectsEditor.cpp:303 ../IDE/Dialogs/ObjectsEditor.cpp:405
+#: ../IDE/Dialogs/ObjectsEditor.cpp:307 ../IDE/Dialogs/ObjectsEditor.cpp:409
 #: ../IDE/EventsEditor.cpp:448
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:245
 msgid "Cut"
 msgstr ""
 
 #: ../IDE/CodeEditor.cpp:69 ../IDE/CodeEditor.cpp:130
-#: ../IDE/Dialogs/ObjectsEditor.cpp:306 ../IDE/Dialogs/ObjectsEditor.cpp:315
-#: ../IDE/Dialogs/ObjectsEditor.cpp:406 ../IDE/EventsEditor.cpp:449
+#: ../IDE/Dialogs/ObjectsEditor.cpp:310 ../IDE/Dialogs/ObjectsEditor.cpp:319
+#: ../IDE/Dialogs/ObjectsEditor.cpp:410 ../IDE/EventsEditor.cpp:449
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:77
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:248
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:264
@@ -563,6 +561,7 @@ msgstr ""
 
 #: ../IDE/CodeEditor.cpp:76 ../IDE/CodeEditor.cpp:136
 #: ../IDE/EventsEditor.cpp:230 ../IDE/EventsEditor.cpp:442
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:95
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:561
 msgid "Redo"
 msgstr ""
@@ -571,7 +570,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: ../IDE/CodeEditor.cpp:126 ../IDE/Dialogs/ObjectsEditor.cpp:402
+#: ../IDE/CodeEditor.cpp:126 ../IDE/Dialogs/ObjectsEditor.cpp:406
 #: ../IDE/EventsEditor.cpp:445
 msgid "Clipboard"
 msgstr ""
@@ -988,7 +987,7 @@ msgstr ""
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:133
 #: ../IDE/Dialogs/NewProjectDialog.cpp:139
-#: ../IDE/Dialogs/NewProjectDialog.cpp:335
+#: ../IDE/Dialogs/NewProjectDialog.cpp:340
 msgid "Project.gdg"
 msgstr ""
 
@@ -1011,23 +1010,23 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:258
+#: ../IDE/Dialogs/NewProjectDialog.cpp:263
 msgid "Empty project"
 msgstr ""
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:259
+#: ../IDE/Dialogs/NewProjectDialog.cpp:264
 msgid "Create a new empty project"
 msgstr ""
 
-#: ../IDE/Dialogs/NewProjectDialog.cpp:335
+#: ../IDE/Dialogs/NewProjectDialog.cpp:340
 msgid "Choose a file for the project"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:143 ../IDE/Dialogs/ObjectsEditor.cpp:957
+#: ../IDE/Dialogs/ObjectsEditor.cpp:147 ../IDE/Dialogs/ObjectsEditor.cpp:964
 msgid "The group was correctly added."
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:245 ../IDE/Dialogs/ObjectsEditor.cpp:398
+#: ../IDE/Dialogs/ObjectsEditor.cpp:249 ../IDE/Dialogs/ObjectsEditor.cpp:402
 #: ../IDE/ProjectManager.cpp:202 ../IDE/ProjectManager.cpp:237
 #: ../IDE/ProjectManager.cpp:253
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:42
@@ -1038,26 +1037,26 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:247
+#: ../IDE/Dialogs/ObjectsEditor.cpp:251
 msgid "Add an automatism"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:249
+#: ../IDE/Dialogs/ObjectsEditor.cpp:253
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:693
 msgid "Other properties"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:253 ../IDE/Dialogs/ObjectsEditor.cpp:309
-#: ../IDE/Dialogs/ObjectsEditor.cpp:389 ../IDE/EditObjectGroup.cpp:104
+#: ../IDE/Dialogs/ObjectsEditor.cpp:257 ../IDE/Dialogs/ObjectsEditor.cpp:313
+#: ../IDE/Dialogs/ObjectsEditor.cpp:393 ../IDE/EditObjectGroup.cpp:104
 #: ../IDE/EditObjectGroup.cpp:126
 msgid "Add an object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:256
+#: ../IDE/Dialogs/ObjectsEditor.cpp:260
 msgid "Delete\tDel"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:259 ../IDE/ProjectManager.cpp:153
+#: ../IDE/Dialogs/ObjectsEditor.cpp:263 ../IDE/ProjectManager.cpp:153
 #: ../IDE/ProjectManager.cpp:189 ../IDE/ProjectManager.cpp:205
 #: ../IDE/ProjectManager.cpp:256
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:161
@@ -1065,66 +1064,66 @@ msgstr ""
 msgid "Rename\tF2"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:262
+#: ../IDE/Dialogs/ObjectsEditor.cpp:266
 msgid "Set as global object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:265 ../IDE/ProjectManager.cpp:164
+#: ../IDE/Dialogs/ObjectsEditor.cpp:269 ../IDE/ProjectManager.cpp:164
 #: ../IDE/ProjectManager.cpp:216 ../IDE/ProjectManager.cpp:267
 msgid "Move up\tCtrl-Up"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:268 ../IDE/ProjectManager.cpp:167
+#: ../IDE/Dialogs/ObjectsEditor.cpp:272 ../IDE/ProjectManager.cpp:167
 #: ../IDE/ProjectManager.cpp:219 ../IDE/ProjectManager.cpp:270
 msgid "Move down\tCtrl-Down"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:272 ../IDE/ProjectManager.cpp:171
+#: ../IDE/Dialogs/ObjectsEditor.cpp:276 ../IDE/ProjectManager.cpp:171
 #: ../IDE/ProjectManager.cpp:223 ../IDE/ProjectManager.cpp:274
 msgid "Copy\tCtrl-C"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:275 ../IDE/ProjectManager.cpp:174
+#: ../IDE/Dialogs/ObjectsEditor.cpp:279 ../IDE/ProjectManager.cpp:174
 #: ../IDE/ProjectManager.cpp:226 ../IDE/ProjectManager.cpp:277
 msgid "Cut\tCtrl-X"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:278 ../IDE/ProjectManager.cpp:177
+#: ../IDE/Dialogs/ObjectsEditor.cpp:282 ../IDE/ProjectManager.cpp:177
 #: ../IDE/ProjectManager.cpp:229 ../IDE/ProjectManager.cpp:280
 msgid "Paste\tCtrl-V"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:281 ../IDE/EventsEditor.cpp:202
+#: ../IDE/Dialogs/ObjectsEditor.cpp:285 ../IDE/EventsEditor.cpp:202
 #: ../IDE/ProjectManager.cpp:160 ../IDE/ProjectManager.cpp:212
 #: ../IDE/ProjectManager.cpp:241 ../IDE/ProjectManager.cpp:263
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:190
 msgid "Delete\tDEL"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:281
+#: ../IDE/Dialogs/ObjectsEditor.cpp:285
 msgid "Delete all selected items"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:284
+#: ../IDE/Dialogs/ObjectsEditor.cpp:288
 msgid "Add object(s) to group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:287 ../IDE/Dialogs/ObjectsEditor.cpp:399
+#: ../IDE/Dialogs/ObjectsEditor.cpp:291 ../IDE/Dialogs/ObjectsEditor.cpp:403
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:314
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:110
 msgid "Rename"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:290
+#: ../IDE/Dialogs/ObjectsEditor.cpp:294
 msgid "Set as global group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:293 ../IDE/Dialogs/ObjectsEditor.cpp:312
-#: ../IDE/Dialogs/ObjectsEditor.cpp:390
+#: ../IDE/Dialogs/ObjectsEditor.cpp:297 ../IDE/Dialogs/ObjectsEditor.cpp:316
+#: ../IDE/Dialogs/ObjectsEditor.cpp:394
 msgid "Add a group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:296 ../IDE/Dialogs/ObjectsEditor.cpp:391
+#: ../IDE/Dialogs/ObjectsEditor.cpp:300 ../IDE/Dialogs/ObjectsEditor.cpp:395
 #: ../IDE/EventsEditor.cpp:224 ../IDE/EventsEditor.cpp:434
 #: ../IDE/MainFrame.cpp:386
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:311
@@ -1132,152 +1131,152 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:387
+#: ../IDE/Dialogs/ObjectsEditor.cpp:391
 msgid "Objects and groups"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:389
+#: ../IDE/Dialogs/ObjectsEditor.cpp:393
 msgid "Add a new object to the list of the objects of the scene"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:390
+#: ../IDE/Dialogs/ObjectsEditor.cpp:394
 msgid "Add a new group to the scene"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:391
+#: ../IDE/Dialogs/ObjectsEditor.cpp:395
 msgid "Delete the selected object or group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:392 ../IDE/MainFrame.cpp:388
+#: ../IDE/Dialogs/ObjectsEditor.cpp:396 ../IDE/MainFrame.cpp:388
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:151
 msgid "Move up"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:393 ../IDE/MainFrame.cpp:389
+#: ../IDE/Dialogs/ObjectsEditor.cpp:397 ../IDE/MainFrame.cpp:389
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:152
 msgid "Move down"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:396
+#: ../IDE/Dialogs/ObjectsEditor.cpp:400
 msgid "Selection"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:398
+#: ../IDE/Dialogs/ObjectsEditor.cpp:402
 msgid "Edit the selected object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:399
+#: ../IDE/Dialogs/ObjectsEditor.cpp:403
 msgid "Rename the selected item"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:411
+#: ../IDE/Dialogs/ObjectsEditor.cpp:415
 msgid "Show the online help"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:418
+#: ../IDE/Dialogs/ObjectsEditor.cpp:422
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:618
+#: ../IDE/Dialogs/ObjectsEditor.cpp:622
 msgid "Unable to rename the object : \n"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:627
+#: ../IDE/Dialogs/ObjectsEditor.cpp:631
 msgid "Invalid name"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:704
+#: ../IDE/Dialogs/ObjectsEditor.cpp:708
 msgid "Unable to rename the group : \n"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:784
+#: ../IDE/Dialogs/ObjectsEditor.cpp:788
 msgid "Unfold the group to see the objects inside it."
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:900 ../IDE/Dialogs/ObjectsEditor.cpp:902
-#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:428
-#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:430
+#: ../IDE/Dialogs/ObjectsEditor.cpp:907 ../IDE/Dialogs/ObjectsEditor.cpp:909
+#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:429
+#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:431
 msgid "NewObject"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:924
+#: ../IDE/Dialogs/ObjectsEditor.cpp:931
 msgid "The object was correctly added"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:936 ../IDE/Dialogs/ObjectsEditor.cpp:940
+#: ../IDE/Dialogs/ObjectsEditor.cpp:943 ../IDE/Dialogs/ObjectsEditor.cpp:947
 msgid "NewGroup"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:988
+#: ../IDE/Dialogs/ObjectsEditor.cpp:995
 msgid "Delete also all references to this item in groups and events ( i.e. Actions and conditions using the object )?"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:989
+#: ../IDE/Dialogs/ObjectsEditor.cpp:996
 #, c-format
 msgid "Delete also all references to these %i items in groups and events ( i.e. Actions and conditions using the objects )?"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:990
+#: ../IDE/Dialogs/ObjectsEditor.cpp:997
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:490
 msgid "Confirm deletion"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1275 ../IDE/Dialogs/ObjectsEditor.cpp:1277
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1301 ../IDE/Dialogs/ObjectsEditor.cpp:1303
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1282 ../IDE/Dialogs/ObjectsEditor.cpp:1284
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1308 ../IDE/Dialogs/ObjectsEditor.cpp:1310
 msgid "CopyOf"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1343 ../IDE/Dialogs/ObjectsEditor.cpp:1387
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1350 ../IDE/Dialogs/ObjectsEditor.cpp:1394
 msgid "Can't set \""
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1343 ../IDE/Dialogs/ObjectsEditor.cpp:1387
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1350 ../IDE/Dialogs/ObjectsEditor.cpp:1394
 msgid "\" global because :\n"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1442
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1449
 msgid "Create a new group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1452
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1459
 #: ../Core/GDCore/IDE/Dialogs/ObjectListDialogsHelper.cpp:98
 msgid "Groups"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1619
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1626
 msgid "an object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1621
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1628
 msgid "a group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1623
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1630
 msgid "with the same name exists in the current scene"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1633
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:237
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1640
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:228
 msgid "objects"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1636
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1643
 msgid "/ groups"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1637
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1644
 msgid "groups"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1639
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1646
 msgid "with the same name exist in these scenes : "
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1654
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1661
 msgid "a global object with the same name exists"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1656
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1663
 msgid "a global group with the same name exists"
 msgstr ""
 
@@ -1495,8 +1494,10 @@ msgstr ""
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:33
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:43
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:54
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:64
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:65
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:75
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:85
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:96
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:26
 msgid "Scene"
 msgstr ""
@@ -1523,7 +1524,7 @@ msgid "Background color:"
 msgstr ""
 
 #: ../IDE/EditPropScene.cpp:94
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:79
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:100
 msgid "Deactivate input when focus is lost"
 msgstr ""
 
@@ -1561,7 +1562,6 @@ msgstr ""
 #: ../Extensions//TextEntryObject/TextEntryInitialPositionPanel.cpp:49
 #: ../Extensions//TextEntryObject/TextEntryInitialPositionPanel.cpp:57
 #: ../Extensions//TextEntryObject/TextEntryInitialPositionPanel.cpp:65
-#: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:130
 msgid "°"
 msgstr ""
 
@@ -1612,7 +1612,7 @@ msgstr ""
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:180
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:192
 #: ../Core/GDCore/BuiltinExtensions/AdvancedExtension.cpp:26
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:86
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:107
 msgid "Other"
 msgstr ""
 
@@ -1689,6 +1689,7 @@ msgid "Delete the selection"
 msgstr ""
 
 #: ../IDE/EventsEditor.cpp:441
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:93
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:560
 msgid "Undo"
 msgstr ""
@@ -1843,6 +1844,14 @@ msgstr ""
 msgid "Sorry! :/"
 msgstr ""
 
+#: ../IDE/GDevelopIDEApp.cpp:369
+msgid ""
+"This is a beta version of GDevelop for Mac OS X.\n"
+"\n"
+"Bugs may be present and only HTML5 games will work. Please report any feedback on www.forum.compilgames.net.\n"
+"Thanks!"
+msgstr ""
+
 #: ../IDE/GeneratePassword.cpp:49
 msgid "Automatic creation of a password"
 msgstr ""
@@ -1943,6 +1952,9 @@ msgid "32"
 msgstr ""
 
 #: ../IDE/ImportImage.cpp:204
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:315
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:348
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:478
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:111
 msgid "x"
 msgstr ""
@@ -2484,6 +2496,17 @@ msgstr ""
 #: ../Extensions//TiledSpriteObject/Extension.cpp:134
 #: ../Extensions//TiledSpriteObject/Extension.cpp:147
 #: ../Extensions//TiledSpriteObject/Extension.cpp:161
+#: ../Extensions//TileMapObject/Extension.cpp:43
+#: ../Extensions//TileMapObject/Extension.cpp:56
+#: ../Extensions//TileMapObject/Extension.cpp:86
+#: ../Extensions//TileMapObject/Extension.cpp:94
+#: ../Extensions//TileMapObject/Extension.cpp:98
+#: ../Extensions//TileMapObject/Extension.cpp:102
+#: ../Extensions//TileMapObject/Extension.cpp:106
+#: ../Extensions//TileMapObject/Extension.cpp:112
+#: ../Extensions//TileMapObject/Extension.cpp:136
+#: ../Extensions//TileMapObject/Extension.cpp:141
+#: ../Extensions//TileMapObject/Extension.cpp:148
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:43
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:55
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:67
@@ -2640,6 +2663,7 @@ msgid "Locked?"
 msgstr ""
 
 #: ../IDE/InitialPositionBrowserDlg.cpp:55
+#: ../Extensions//TileMapObject/Extension.cpp:137
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:69
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:412
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:423
@@ -2648,6 +2672,7 @@ msgid "X"
 msgstr ""
 
 #: ../IDE/InitialPositionBrowserDlg.cpp:56
+#: ../Extensions//TileMapObject/Extension.cpp:142
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:68
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:413
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:424
@@ -2655,8 +2680,7 @@ msgstr ""
 msgid "Y"
 msgstr ""
 
-#: ../IDE/InitialPositionBrowserDlg.cpp:57
-#: ../GDCpp/GDCpp//RuntimeObject.cpp:84
+#: ../IDE/InitialPositionBrowserDlg.cpp:57 ../GDCpp/GDCpp//RuntimeObject.cpp:84
 #: ../Extensions//Box3DObject/Extension.cpp:152
 #: ../Extensions//Box3DObject/Extension.cpp:165
 #: ../Extensions//Box3DObject/Extension.cpp:178
@@ -2692,8 +2716,7 @@ msgstr ""
 msgid "Angle"
 msgstr ""
 
-#: ../IDE/InitialPositionBrowserDlg.cpp:58
-#: ../GDCpp/GDCpp//RuntimeObject.cpp:88
+#: ../IDE/InitialPositionBrowserDlg.cpp:58 ../GDCpp/GDCpp//RuntimeObject.cpp:88
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:252
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:255
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:369
@@ -2955,7 +2978,7 @@ msgstr ""
 msgid "Open the online help"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:417 ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:79
+#: ../IDE/MainFrame.cpp:417 ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:80
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:78
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:243
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:597
@@ -3484,15 +3507,14 @@ msgid "File button"
 msgstr ""
 
 #: ../IDE/Preferences.cpp:412 ../Extensions//Light/Extension.cpp:46
-#: ../Extensions//Light/Extension.cpp:53
-#: ../Extensions//Light/Extension.cpp:143
+#: ../Extensions//Light/Extension.cpp:53 ../Extensions//Light/Extension.cpp:143
 #: ../Extensions//Light/LightObject.cpp:231
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:351
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:92
 #: ../Extensions//TextObject/Extension.cpp:95
 #: ../Extensions//TextObject/Extension.cpp:102
 #: ../Extensions//TextObject/TextObject.cpp:338
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:68
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:89
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:339
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:34
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:131
@@ -3572,6 +3594,8 @@ msgid "Default width of the condition column:"
 msgstr ""
 
 #: ../IDE/Preferences.cpp:513 ../Extensions//Light/LightObjectEditor.cpp:76
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:325
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:358
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:75
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:81
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:87
@@ -3612,7 +3636,7 @@ msgid "Maximum thread number for code compiler :"
 msgstr ""
 
 #: ../IDE/Preferences.cpp:563 ../IDE/Preferences.cpp:649
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:509
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:500
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:62
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:37
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:640
@@ -4211,7 +4235,7 @@ msgstr ""
 msgid "Opened file:"
 msgstr ""
 
-#: ../GDCpp/GDCpp//BuiltinExtensions/RuntimeSceneTools.cpp:370
+#: ../GDCpp/GDCpp//BuiltinExtensions/RuntimeSceneTools.cpp:372
 msgid ""
 "A \"While\" event was repeated 100000 times: You may have created an infinite loop, which is repeating itself indefinitely and which is going to freeze the software.\n"
 "\n"
@@ -4222,7 +4246,7 @@ msgid ""
 "Stop the preview?"
 msgstr ""
 
-#: ../GDCpp/GDCpp//BuiltinExtensions/RuntimeSceneTools.cpp:376
+#: ../GDCpp/GDCpp//BuiltinExtensions/RuntimeSceneTools.cpp:378
 msgid "Infinite loop"
 msgstr ""
 
@@ -4293,75 +4317,91 @@ msgstr ""
 msgid "Compiling..."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:164
-msgid "In the compiled game, the game will quit."
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:91
+#: ../GDCpp/GDCpp//IDE/Exporter.cpp:13
+msgid ""
+"GDevelop for Mac OS X does not support creating native games :/\n"
+"\n"
+"Instead, please use the HTML5 platform for your game: you can activate it from the Extensions in the project manager."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:168
-msgid "In the compiled game, the scene will change for "
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:167
+msgid "In the compiled game, the game will be stopped."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:203
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:169
+msgid "In the compiled game, the scene will be stopped and replaced by "
+msgstr ""
+
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:171
+msgid "In the compiled game, the scene will be paused and replaced by "
+msgstr ""
+
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:173
+msgid "In the compiled game, the scene will be stopped and the game will go to the previous paused one"
+msgstr ""
+
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:207
 msgid "Changes made to events will be taken into account when you switch to Edition mode"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:226
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:230
 msgid "Compilation of events failed, and scene cannot be previewed. Please report this problem to GDevelop's developer, joining this file:\n"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:357
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:382
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:362
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:387
 msgid "Debugger"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:366
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:383
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:371
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:388
 msgid "Profiling"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:379
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:384
 #: ../Extensions//SoundObject/Extension.cpp:128
 msgid "Play"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:379
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:384
 msgid "Start the preview"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:380
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:385
 msgid "Play in a window"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:380
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:385
 msgid "Start the preview in an external window"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:381
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:386
 #: ../Extensions//SoundObject/Extension.cpp:150
 msgid "Pause"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:381
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:386
 msgid "Pause the preview"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:382
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:387
 msgid "Show the debugger to view the state of the game"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:383
+#: ../GDCpp/GDCpp//IDE/Dialogs/CppLayoutPreviewer.cpp:388
 msgid "Show the profiler to monitor performances"
-msgstr ""
-
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:57
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:74
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:100
-msgid "Property"
 msgstr ""
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:58
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:75
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:101
+msgid "Property"
+msgstr ""
+
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:59
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:76
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:102
 #: ../Extensions//AdvancedXML/src/Extension.cpp:261
 #: ../Extensions//AdvancedXML/src/Extension.cpp:289
 #: ../Extensions//Box3DObject/Extension.cpp:54
@@ -4501,43 +4541,43 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:62
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:63
 msgid "Frame per seconds ( FPS )"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:63
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:64
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:111
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:114
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:118
 msgid "Time elapsed since the last image"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:64
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:65
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProfileDlg.cpp:155
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:786
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:823
 msgid "Number of objects"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:65
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:66
 msgid "Resources count"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:66
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:67
 msgid "Window's size"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:67
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:68
 msgid "Position of the mouse over the window"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:68
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:69
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:128
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:132
 msgid "Time elapsed since the beginning of the scene"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:70
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:71
 #: ../Core/GDCore/BuiltinExtensions/FileExtension.cpp:85
 #: ../Core/GDCore/BuiltinExtensions/FileExtension.cpp:97
 #: ../Core/GDCore/BuiltinExtensions/VariablesExtension.cpp:189
@@ -4545,17 +4585,17 @@ msgstr ""
 msgid "Scene variables"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:157
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:148
 msgid " fps"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:180
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:201
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:368
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:171
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:192
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:359
 msgid "(Structure)"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:189
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:180
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:991
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1001
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1002
@@ -4563,40 +4603,40 @@ msgstr ""
 msgid "Globals variables"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:407
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:422
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:433
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:448
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:455
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:484
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:398
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:413
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:424
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:439
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:446
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:475
 msgid "Enter the new value"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:407
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:422
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:448
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:455
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:484
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:398
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:413
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:439
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:446
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:475
 msgid "Editing a value"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:411
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:426
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:488
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:402
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:417
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:479
 msgid ""
 "Unable to modify the value.\n"
 "The value entered is either incorrect or the property is read-only."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:433
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:424
 msgid "Editing a variable"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:523
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:514
 msgid "Specific"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:537
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:528
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:280
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:294
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:455
@@ -4622,47 +4662,47 @@ msgstr ""
 msgid "Variables"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:575
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:594
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:566
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:585
 msgid "Type the name of the new variable"
 msgstr ""
 
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:566
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:575
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:584
 msgid "Adding a scene variable"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:580
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:599
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:571
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:590
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:312
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:501
 msgid "A variable with this name already exists!"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:584
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:603
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:575
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:594
 msgid "Enter the value of the variable"
 msgstr ""
 
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:585
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:594
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:603
 msgid "Adding a global variable"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:627
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:618
 msgid "Unable to create object."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:631
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:622
 msgid "Enter the X position of the object"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:631
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:632
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:622
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:623
 msgid "Adding an object"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:632
+#: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:623
 msgid "Enter the object's Y position"
 msgstr ""
 
@@ -4858,7 +4898,7 @@ msgid "Compiled project is now available in the export folder."
 msgstr ""
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:214
-#: ../GDJS/GDJS//Exporter.cpp:635
+#: ../GDJS/GDJS//Exporter.cpp:634
 msgid "Compilation achieved. Do you want to open the folder where the project has been compiled?"
 msgstr ""
 
@@ -4885,7 +4925,7 @@ msgstr ""
 msgid "Choose a folder, empty if possible, where create your game."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/Exporter.cpp:21
+#: ../GDCpp/GDCpp//IDE/Exporter.cpp:26
 msgid "Compile to a native executable"
 msgstr ""
 
@@ -5130,6 +5170,9 @@ msgstr ""
 #: ../Extensions//TextObject/Extension.cpp:71
 #: ../Extensions//TextObject/Extension.cpp:83
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:75
+#: ../Extensions//TileMapObject/Extension.cpp:40
+#: ../Extensions//TileMapObject/Extension.cpp:53
+#: ../Extensions//TileMapObject/Extension.cpp:66
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:626
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:629
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:633
@@ -5166,6 +5209,7 @@ msgid "Displayed"
 msgstr ""
 
 #: ../GDCpp/GDCpp//RuntimeObject.cpp:87
+#: ../Extensions//TileMapObject/Extension.cpp:113
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:265
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:383
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:388
@@ -5664,81 +5708,81 @@ msgstr ""
 msgid "Choose a folder, empty if possible, where the game should be exported."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:96 ../GDJS/GDJS//Exporter.cpp:543
+#: ../GDJS/GDJS//Exporter.cpp:96 ../GDJS/GDJS//Exporter.cpp:542
 msgid "Error during exporting! Unable to export source files:\n"
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:349
+#: ../GDJS/GDJS//Exporter.cpp:348
 msgid "Unable to write "
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:371
+#: ../GDJS/GDJS//Exporter.cpp:370
 msgid "Could not copy external file"
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:389
+#: ../GDJS/GDJS//Exporter.cpp:388
 msgid "The exported script could not be minified: Please check that you installed Node.js on your system."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:423
+#: ../GDJS/GDJS//Exporter.cpp:422
 msgid ""
 "The exported script could not be minified.\n"
 "\n"
 "May be an extension is triggering this error: Try to contact the developer if you think it is the case."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:503
+#: ../GDJS/GDJS//Exporter.cpp:502
 msgid "Export in progress ( 1/2 )"
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:503
+#: ../GDJS/GDJS//Exporter.cpp:502
 msgid "Exporting the project..."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:529
+#: ../GDJS/GDJS//Exporter.cpp:528
 msgid "Export in progress ( 2/2 )"
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:530
+#: ../GDJS/GDJS//Exporter.cpp:529
 msgid "Exporting events..."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:536
+#: ../GDJS/GDJS//Exporter.cpp:535
 msgid "Error during exporting! Unable to export events:\n"
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:548
+#: ../GDJS/GDJS//Exporter.cpp:547
 msgid "Preparing the project..."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:555 ../GDJS/GDJS//Exporter.cpp:564
+#: ../GDJS/GDJS//Exporter.cpp:554 ../GDJS/GDJS//Exporter.cpp:563
 msgid "Exporting files..."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:564
+#: ../GDJS/GDJS//Exporter.cpp:563
 msgid "Exporting files and minifying them..."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:576
+#: ../GDJS/GDJS//Exporter.cpp:575
 msgid "Error during export:\n"
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:584
+#: ../GDJS/GDJS//Exporter.cpp:583
 msgid "Creating the zip file..."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:606
+#: ../GDJS/GDJS//Exporter.cpp:605
 msgid ""
 "Unable to finalize the creation of the zip file!\n"
 "\n"
 "The exported project won't be put in a zip file."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:609
+#: ../GDJS/GDJS//Exporter.cpp:608
 msgid "Cleaning files..."
 msgstr ""
 
-#: ../GDJS/GDJS//Exporter.cpp:648
+#: ../GDJS/GDJS//Exporter.cpp:647
 msgid "Export to the web"
 msgstr ""
 
@@ -6290,6 +6334,7 @@ msgstr ""
 #: ../Extensions//TiledSpriteObject/Extension.cpp:33
 #: ../Extensions//TiledSpriteObject/Extension.cpp:45
 #: ../Extensions//TiledSpriteObject/TiledSpriteObject.cpp:180
+#: ../Extensions//TileMapObject/Extension.cpp:37
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:626
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:629
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:150
@@ -6313,6 +6358,7 @@ msgstr ""
 #: ../Extensions//TiledSpriteObject/Extension.cpp:59
 #: ../Extensions//TiledSpriteObject/Extension.cpp:72
 #: ../Extensions//TiledSpriteObject/TiledSpriteObject.cpp:181
+#: ../Extensions//TileMapObject/Extension.cpp:50
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:633
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:636
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:151
@@ -6419,6 +6465,7 @@ msgstr ""
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:252
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:1120
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:182
+#: ../Extensions//TileMapObject/TileSetConfigurationEditor.cpp:90
 msgid "Please display the image bank's editor and select an image before clicking on this button."
 msgstr ""
 
@@ -6587,8 +6634,7 @@ msgstr ""
 #: ../Extensions//Box3DObject/Extension.cpp:195
 #: ../Extensions//Box3DObject/Extension.cpp:221
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:43
-#: ../Extensions//Light/Extension.cpp:78
-#: ../Extensions//Light/Extension.cpp:104
+#: ../Extensions//Light/Extension.cpp:78 ../Extensions//Light/Extension.cpp:104
 #: ../Extensions//Light/Extension.cpp:130
 #: ../Extensions//PanelSpriteObject/Extension.cpp:54
 #: ../Extensions//PanelSpriteObject/Extension.cpp:80
@@ -6659,6 +6705,8 @@ msgstr ""
 #: ../Extensions//TiledSpriteObject/Extension.cpp:109
 #: ../Extensions//TiledSpriteObject/Extension.cpp:135
 #: ../Extensions//TiledSpriteObject/Extension.cpp:162
+#: ../Extensions//TileMapObject/Extension.cpp:44
+#: ../Extensions//TileMapObject/Extension.cpp:57
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:144
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:172
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:199
@@ -6690,7 +6738,7 @@ msgstr ""
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:137
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:174
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:189
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:90
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:111
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:193
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:207
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:220
@@ -6714,8 +6762,7 @@ msgstr ""
 #: ../Extensions//Box3DObject/Extension.cpp:196
 #: ../Extensions//Box3DObject/Extension.cpp:222
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:44
-#: ../Extensions//Light/Extension.cpp:79
-#: ../Extensions//Light/Extension.cpp:105
+#: ../Extensions//Light/Extension.cpp:79 ../Extensions//Light/Extension.cpp:105
 #: ../Extensions//Light/Extension.cpp:131
 #: ../Extensions//PanelSpriteObject/Extension.cpp:55
 #: ../Extensions//PanelSpriteObject/Extension.cpp:81
@@ -6786,6 +6833,8 @@ msgstr ""
 #: ../Extensions//TiledSpriteObject/Extension.cpp:110
 #: ../Extensions//TiledSpriteObject/Extension.cpp:136
 #: ../Extensions//TiledSpriteObject/Extension.cpp:163
+#: ../Extensions//TileMapObject/Extension.cpp:45
+#: ../Extensions//TileMapObject/Extension.cpp:58
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:462
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:794
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:31
@@ -7274,97 +7323,77 @@ msgid "_PARAM0_ is being dragged"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:38
-#: ../Extensions//Function/JsExtension.cpp:36
 msgid "Function events"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:39
-#: ../Extensions//Function/JsExtension.cpp:37
 msgid "Extension allowing to use events behaving as functions."
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:46
 #: ../Extensions//Function/Extension.cpp:47
-#: ../Extensions//Function/JsExtension.cpp:43
-#: ../Extensions//Function/JsExtension.cpp:44
 msgid "Launch a function"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:48
-#: ../Extensions//Function/JsExtension.cpp:45
 msgid "Launch _PARAM0_ (_PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:49
-#: ../Extensions//Function/JsExtension.cpp:46
 msgid "Functions"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:52
-#: ../Extensions//Function/JsExtension.cpp:50
 msgid "Name of the function"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:53
-#: ../Extensions//Function/JsExtension.cpp:51
 msgid "Parameter 1"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:54
-#: ../Extensions//Function/JsExtension.cpp:52
 msgid "Parameter 2"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:55
-#: ../Extensions//Function/JsExtension.cpp:53
 msgid "Parameter 3"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:56
-#: ../Extensions//Function/JsExtension.cpp:54
 msgid "Parameter 4"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:57
-#: ../Extensions//Function/JsExtension.cpp:55
 msgid "Parameter 5"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:58
-#: ../Extensions//Function/JsExtension.cpp:56
 msgid "Parameter 6"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:59
-#: ../Extensions//Function/JsExtension.cpp:57
 msgid "Parameter 7"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:106
 #: ../Extensions//Function/Extension.cpp:171
 #: ../Extensions//Function/FunctionEvent.cpp:102
-#: ../Extensions//Function/JsExtension.cpp:63
-#: ../Extensions//Function/JsExtension.cpp:106
 msgid "Function"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:107
-#: ../Extensions//Function/JsExtension.cpp:64
 msgid "Function event : An event which is launched only thanks to action \"Launch a function\""
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:169
-#: ../Extensions//Function/JsExtension.cpp:104
 msgid "Parameter of the current function"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:170
-#: ../Extensions//Function/JsExtension.cpp:105
 msgid "Return the text contained in a parameter of the currently launched function"
 msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:173
-#: ../Extensions//Function/JsExtension.cpp:108
 msgid "Index of the parameter (Parameters start at 0!)"
 msgstr ""
 
@@ -8070,6 +8099,7 @@ msgstr ""
 #: ../Extensions//SoundObject/Extension.cpp:310
 #: ../Extensions//SoundObject/Extension.cpp:395
 #: ../Extensions//SoundObject/Extension.cpp:474
+#: ../Extensions//TileMapObject/TileEditor.cpp:242
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:39
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:95
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:109
@@ -8096,6 +8126,7 @@ msgstr ""
 #: ../Extensions//SoundObject/Extension.cpp:324
 #: ../Extensions//SoundObject/Extension.cpp:407
 #: ../Extensions//SoundObject/Extension.cpp:478
+#: ../Extensions//TileMapObject/TileEditor.cpp:243
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:67
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:97
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:110
@@ -8166,6 +8197,7 @@ msgstr ""
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:49
 #: ../Extensions//TiledSpriteObject/Extension.cpp:47
+#: ../Extensions//TileMapObject/Extension.cpp:39
 msgid "The width of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr ""
 
@@ -8179,6 +8211,7 @@ msgstr ""
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:75
 #: ../Extensions//TiledSpriteObject/Extension.cpp:74
+#: ../Extensions//TileMapObject/Extension.cpp:52
 msgid "The height of _PARAM0_ is _PARAM1__PARAM2_"
 msgstr ""
 
@@ -8872,7 +8905,7 @@ msgid "SIze, parameter 1"
 msgstr ""
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:203
-msgid "Modifyt parameter 1 of the size of particles"
+msgid "Modify parameter 1 of the size of particles"
 msgstr ""
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:204
@@ -9372,7 +9405,7 @@ msgstr ""
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:412
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:436
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:132
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:83
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:84
 msgid "to"
 msgstr ""
 
@@ -9525,6 +9558,7 @@ msgid "Show the images bank"
 msgstr ""
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:916
+#: ../Extensions//TileMapObject/TileSetConfigurationEditor.cpp:31
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:431
 msgid "Images bank's editor"
 msgstr ""
@@ -10000,6 +10034,7 @@ msgid "Paths editor"
 msgstr ""
 
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:158
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:584
 msgid "Add a point"
 msgstr ""
 
@@ -13285,6 +13320,446 @@ msgstr ""
 msgid "Settings of the Tiled Sprite Object"
 msgstr ""
 
+#: ../Extensions//TileMapObject/Extension.cpp:22
+#: ../Extensions//TileMapObject/Extension.cpp:69
+#: ../Extensions//TileMapObject/Extension.cpp:82
+#: ../Extensions//TileMapObject/Extension.cpp:125
+#: ../Extensions//TileMapObject/Extension.cpp:158
+#: ../Extensions//TileMapObject/Extension.cpp:172
+msgid "Tile Map Object"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:23
+msgid "Extension allowing to use tile map objects."
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:28
+msgid "Tile Map"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:29
+msgid "Displays a tile map"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:38
+msgid "Test the width of a Tile Map Object."
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:51
+msgid "Test the height of a Tile Map Object."
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:63
+msgid "Resize the tilemap"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:64
+msgid "Change the size of the tilemap (number of tiles)."
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:65
+msgid "Resize the tilemap to _PARAM1_x_PARAM2_ tiles"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:70
+msgid "Width (tiles count)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:71
+msgid "Height (tiles count)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:76
+msgid "Collision with one tile"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:77
+msgid "Test if an object collides a specific tile."
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:78
+msgid "_PARAM4_ is in collision with the tile at _PARAM2_;_PARAM3_ (layer _PARAM1_) of _PARAM0_"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:79
+msgid "Collisions"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:83
+#: ../Extensions//TileMapObject/Extension.cpp:126
+msgid "Tile layer (0: Back, 1: Middle, 2: Top)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:84
+#: ../Extensions//TileMapObject/Extension.cpp:127
+msgid "Tile column"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:85
+#: ../Extensions//TileMapObject/Extension.cpp:128
+msgid "Tile row"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:93
+msgid "Tile width"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:93
+#: ../Extensions//TileMapObject/Extension.cpp:97
+#: ../Extensions//TileMapObject/Extension.cpp:122
+msgid "Tiles"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:97
+msgid "Tile height"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:101
+msgid "Map width (tiles)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:101
+msgid "Map width"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:101
+#: ../Extensions//TileMapObject/Extension.cpp:105
+#: ../Extensions//TileMapObject/Extension.cpp:111
+#: ../Extensions//TileMapObject/Extension.cpp:135
+#: ../Extensions//TileMapObject/Extension.cpp:140
+msgid "Map"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:105
+msgid "Map height (tiles)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:105
+msgid "Map height"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:111
+msgid "Get the Tile (id)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:115
+msgid "Row"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:119
+msgid "Change a tile"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:120
+msgid "Change a tile at a specific cell."
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:121
+msgid "Set tile #_PARAM4_ at the cell _PARAM2_;_PARAM3_ (layer: _PARAM1_) in _PARAM0_"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:129
+msgid "New tile Id (-1 to delete the tile)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:135
+msgid "Get tile column from X coordinates"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:140
+msgid "Get tile row from Y coordinates"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:147
+msgid "Save the tile map"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:147
+msgid "Save the tile map content in a string"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:147
+msgid "Saving"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:152
+msgid "Load the tiles from a string"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:153
+msgid "Load the tiles from a string."
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:154
+msgid "Load the tiles of _PARAM0_ from _PARAM1_"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:155
+msgid "Loading"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:159
+msgid "The string representing the tiles"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:166
+msgid "Change the tileset texture"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:167
+msgid "Change the tileset texture."
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:168
+msgid "Change the tileset texture of _PARAM0_ to _PARAM1_"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:169
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:34
+msgid "Tileset"
+msgstr ""
+
+#: ../Extensions//TileMapObject/Extension.cpp:173
+msgid "The new texture name"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:30
+msgid "Rectangle Shape"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:32
+msgid "Triangle Shape (top-left)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:33
+msgid "Triangle Shape (top-right)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:34
+msgid "Triangle Shape (bottom-right)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:35
+msgid "Triangle Shape (bottom-left)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:37
+msgid "Half-rectangle (top)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:38
+msgid "Half-rectangle (right)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:39
+msgid "Half-rectangle (bottom)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:40
+msgid "Half-rectangle (left)"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:70
+msgid "Tile ID: "
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:147
+msgid "This polygon must be convex, it's not the case."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:242
+msgid "Enter the X position of the point ( regarding the tile )."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileEditor.cpp:243
+msgid "Enter the Y position of the point ( regarding the tile )."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapConfigurationEditor.cpp:41
+msgid ""
+"The map will be smaller after that change. You can possibly lose data.\n"
+"Are you sure to continue ?"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapConfigurationEditor.cpp:42
+msgid "Map size"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapConfigurationEditor.cpp:56
+msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilemapconfig"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:48
+msgid "Configure the tileset"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:50
+msgid "Edit the selected tile"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:50
+msgid "Opens the tile editor to edit the tile collision mask."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:83
+msgid "Pencil mode"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:83
+msgid ""
+"Pencil mode\n"
+"Add tiles only where the mouse goes."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:85
+msgid "Rectangle mode"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:85
+msgid ""
+"Rectangle mode\n"
+"Add tile in a rectangle from the position where the mouse was pressed to the position the mouse was released."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:87
+msgid "Fill this space"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:87
+msgid "Fill the space with the selected tile"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:89
+msgid "Erase all the layer"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:89
+msgid "Delete all the tiles from the current layer."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:105
+msgid "Change map size"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:109
+msgid "Current layer:"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:126
+msgid "Hide upper layers"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:142
+msgid "Use left mouse click to add the current tile and right click to remove it."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:158
+msgid "Help about this object"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:251
+msgid "The tileset is the texture containing all the tiles which will be used in your tilemap object."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:258
+msgid "Note: the tilemap object needs to have all the tiles in a single texture."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:273
+msgid "Tileset texture:"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:296
+msgid "Tile size:"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:329
+msgid "Tile spacing:"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:362
+msgid "Preview:"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:383
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:504
+msgid "Help on this dialog"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:460
+msgid "Map size:"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:488
+msgid "tiles"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:572
+msgid "Collidable"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:572
+msgid "Activates the collision mask for collision detection"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:574
+msgid "Predefined shape"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:584
+msgid "Add a point to the collision mask"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:586
+msgid "Edit point position..."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:586
+msgid "Edit the selected point position..."
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:588
+msgid "Remove selected point"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.cpp:588
+msgid "Removes the selected point"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:60
+msgid "Tile editor"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:118
+msgid "Do you want to cancel all the changes made ?"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:118
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:201
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:207
+msgid "Confirm"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:174
+msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:201
+msgid "Are you sure you want to clear the whole layer ?"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:207
+msgid "Are you sure you want to fill the whole layer with that tile ?"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileSetConfigurationEditor.cpp:126
+msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilesetconfig"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileSetPanel.cpp:114
+msgid "You haven't selected a tileset yet."
+msgstr ""
+
 #: ../Extensions//TimedEvent/Extension.cpp:34
 #: ../Extensions//TimedEvent/Extension.cpp:111
 #: ../Extensions//TimedEvent/Extension.cpp:129
@@ -13476,6 +13951,18 @@ msgstr ""
 
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:347
 msgid "Rotation offset applied to the object"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.h:72
+msgid "TileMap Object Editor"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.h:114
+msgid "Tileset configuration"
+msgstr ""
+
+#: ../Extensions//TileMapObject/TileMapDialogs.h:139
+msgid "Tilemap size configuration"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/AdvancedExtension.cpp:23
@@ -16486,70 +16973,99 @@ msgid "Is true only when scene just begins."
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:40
-msgid "Go to a scene"
+msgid "Change the scene"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:41
-msgid "Change and start the specified scene."
+msgid "Stop this scene and start the specified one instead."
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:42
-msgid "Go to scene _PARAM1_"
+msgid "Change for scene _PARAM1_"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:47
-msgid "Name of the scene"
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:58
+msgid "Name of the new scene"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:51
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:52
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:53
-msgid "Quit the game"
+msgid "Pause and start a new scene"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:61
-msgid "Change background color"
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:52
+msgid ""
+"Pause this scene and start the specified one.\n"
+"Later, you can use \"Stop and go back to previous scene\" action to go back to this scene."
+msgstr ""
+
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:53
+msgid "Pause the scene and start _PARAM1_"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:62
-msgid "Change the background color of the scene."
+msgid "Stop and go back to previous scene"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:63
-msgid "Set background color to _PARAM1_"
+msgid ""
+"Stop this scene and go back to the previous paused one.\n"
+"To pause a scene, use \"Pause and start a new scene\" action."
+msgstr ""
+
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:64
+msgid "Stop the scene and go back to the previous paused one"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:72
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:73
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:74
+msgid "Quit the game"
+msgstr ""
+
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:82
+msgid "Change background color"
+msgstr ""
+
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:83
+msgid "Change the background color of the scene."
+msgstr ""
+
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:84
+msgid "Set background color to _PARAM1_"
+msgstr ""
+
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:93
 msgid "Disable input when focus is lost"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:73
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:94
 msgid ""
 "Set if the keyboard and mouse buttons must be taken into account even\n"
 "if the window is not active."
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:74
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:95
 msgid "Disable input when focus is lost: _PARAM1_"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:83
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:104
 msgid "Compare two expressions"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:84
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:105
 msgid "Test the two expression"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:85
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:106
 msgid "_PARAM0_ _PARAM1_ _PARAM2_"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:89
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:110
 msgid "Expression 1"
 msgstr ""
 
-#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:91
+#: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:112
 msgid "Expression 2"
 msgstr ""
 
@@ -17344,7 +17860,7 @@ msgid "Value of a timer"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:25
-msgid "Test the time elapsed of a timer."
+msgid "Test the elapsed time of a timer."
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:26
@@ -18536,45 +19052,45 @@ msgstr ""
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:61
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:62
 msgid "Create a link to another scene"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:66
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:67
 msgid "Link to scene/external events:"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:71
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:72
 msgid "Include"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:74
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:75
 msgid "All scene's events"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:78
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:79
 msgid "Only the events"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:81
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:82
 msgid "Number of the first event"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:86
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:87
 msgid "Number of the last event"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:88
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:89
 msgid "(included)"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:93
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:94
 msgid ""
 "Remember to update the numbers of the events if\n"
 "you delete or add events in the scene linked."
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:151
+#: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:154
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/link_events"
 msgstr ""
 
@@ -18779,6 +19295,10 @@ msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:125
 msgid "Apply progressively to each created object :"
+msgstr ""
+
+#: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:130
+msgid "ï¿½"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:49
@@ -19002,7 +19522,7 @@ msgid "Are you sure you want to clear the Undo History?"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:761
-msgid "http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"
+msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_layout"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.cpp:48

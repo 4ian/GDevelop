@@ -190,14 +190,13 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
 };
 
 /**
- * Step and render the scene.<br>
- * Should be called in a game loop.
- *
+ * Step and render the scene.
  * @method renderAndStep
- * @return true if the game loop should continue, false if a scene change or a game stop was
- * requested.
+ * @return true if the game loop should continue, false if a scene change/push/pop
+ * or a game stop was requested.
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function() {
+	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
 	this._updateTime();
 	this._updateObjectsPreEvents();
 	this._eventsFunction(this, this._eventsContext);
@@ -206,7 +205,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
 
 	this._firstFrame = false;
 
-	return this._requestedScene === "" && !this._gameStopRequested;
+	return !!this.getRequestedChange();
 };
 
 /**
@@ -217,6 +216,7 @@ gdjs.RuntimeScene.prototype.render = function() {
 	if (!this._pixiRenderer) return;
 
 	// render the PIXI container of the scene
+	this._pixiRenderer.backgroundColor = this._backgroundColor;
 	this._pixiRenderer.render(this._pixiContainer);
 };
 
@@ -332,7 +332,7 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
 gdjs.RuntimeScene.prototype.setBackgroundColor = function(r,g,b) {
 	if (!this._pixiRenderer) return;
 
-	this._pixiRenderer.backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
+	this._backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
 };
 
 /**
@@ -585,26 +585,26 @@ gdjs.RuntimeScene.prototype.getTimeScale = function() {
 	return this._timeScale;
 };
 
+//The flags to describe the change request by a scene:
+gdjs.RuntimeScene.CONTINUE = 0;
+gdjs.RuntimeScene.PUSH_SCENE = 1;
+gdjs.RuntimeScene.POP_SCENE = 2;
+gdjs.RuntimeScene.REPLACE_SCENE = 3;
+gdjs.RuntimeScene.CLEAR_SCENES = 4;
+gdjs.RuntimeScene.STOP_GAME = 5;
+
 /**
- * Return true if the scene requested the game to be stopped.
- * @method gameStopRequested
+ * Return the value of the scene change that is requested.
+ * @method getRequestedChange
  */
-gdjs.RuntimeScene.prototype.gameStopRequested = function() {
-	return this._gameStopRequested;
+gdjs.RuntimeScene.prototype.getRequestedChange = function() {
+	return this._requestedChange;
 };
 
 /**
- * When called, the scene will be flagged as requesting the game to be stopped.<br>
- * ( i.e: gameStopRequested will return true ).
+ * Return the name of the new scene to be launched.
  *
- * @method requestGameStop
- */
-gdjs.RuntimeScene.prototype.requestGameStop = function() {
-	this._gameStopRequested = true;
-};
-
-/**
- * Return the name of the new scene to be launched instead of this one.
+ * See requestChange.
  * @method getRequestedScene
  */
 gdjs.RuntimeScene.prototype.getRequestedScene = function() {
@@ -612,10 +612,13 @@ gdjs.RuntimeScene.prototype.getRequestedScene = function() {
 };
 
 /**
- * When called, the scene will be flagged as requesting a new scene to be launched.
- *
- * @method requestSceneChange
+ * Request a scene change to be made. The change is handled externally (see gdjs.SceneStack)
+ * thanks to getRequestedChange and getRequestedScene methods.
+ * @param change One of gdjs.RuntimeScene.CONTINUE|PUSH_SCENE|POP_SCENE|REPLACE_SCENE|CLEAR_SCENES|STOP_GAME.
+ * @param sceneName The name of the new scene to launch, if applicable.
+ * @method requestChange
  */
-gdjs.RuntimeScene.prototype.requestSceneChange = function(sceneName) {
+gdjs.RuntimeScene.prototype.requestChange = function(change, sceneName) {
+	this._requestedChange = change;
 	this._requestedScene = sceneName;
 };

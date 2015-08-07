@@ -8,7 +8,7 @@
 
 #include <map>
 #include <memory>
-
+#include <functional>
 #include <wx/toolbar.h>
 
 #include "GDCpp/RuntimeScene.h"
@@ -18,11 +18,18 @@
 class GD_API DebuggerGUI : public DebuggerGUIBase, public BaseDebugger
 {
 public:
-    DebuggerGUI(wxWindow* parent, RuntimeScene &scene_);
-    virtual ~DebuggerGUI();
+    DebuggerGUI(wxWindow* parent, RuntimeScene &scene_, std::function<void(bool)> playCallback);
+    virtual ~DebuggerGUI() {};
 
+    /**
+     * Deactivate the debugger.
+     */
     void Pause();
-    void Play(); 
+
+    /**
+     * Activate the debugger.
+     */
+    void Play();
 
 protected:
     static const long ID_EXTLIST;
@@ -50,8 +57,9 @@ private:
     void RecreateListForObject(const RuntimeObjSPtr & object);
 
     RuntimeScene & scene;
+    std::function<void(bool)> playCallback; //Function called to play/pause the scene.
 
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId>, std::owner_less<std::weak_ptr<RuntimeObject>>> objectsInTree; 
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId>, std::owner_less<std::weak_ptr<RuntimeObject>>> objectsInTree;
     //(Use std::owner_less to allow comparison between weak_ptr)
     std::map < gd::String, wxTreeItemId > initialObjects;
     bool mustRecreateTree;
@@ -61,7 +69,7 @@ private:
     unsigned int baseItemCount;
     unsigned int generalBaseItemCount;
     unsigned int generalBaseAndVariablesItemCount;
-    bool doMAJ;
+    bool doUpdate;
     bool objectChanged;
 
     wxFont font;

@@ -39,12 +39,7 @@ gdjs.PathfindingRuntimeAutomatism = function(runtimeScene, automatismData, owner
     this._currentSegment = 0;
     this._reachedEnd = false;
 
-	//Create the shared manager if necessary.
-	if ( !gdjs.PathfindingObstacleRuntimeAutomatism.obstaclesManagers.containsKey(runtimeScene.getName()) ) {
-		var manager = new gdjs.PathfindingObstaclesManager(runtimeScene);
-		gdjs.PathfindingObstacleRuntimeAutomatism.obstaclesManagers.put(runtimeScene.getName(), manager);
-	}
-	this._manager = gdjs.PathfindingObstacleRuntimeAutomatism.obstaclesManagers.get(runtimeScene.getName());
+    this._manager = gdjs.PathfindingObstaclesManager.getManager(runtimeScene);
 
     if ( this._searchContext === undefined )
         this._searchContext = new gdjs.PathfindingRuntimeAutomatism.SearchContext();

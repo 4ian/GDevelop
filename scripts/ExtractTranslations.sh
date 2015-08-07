@@ -8,8 +8,8 @@ find ../GDCpp/GDCpp/ -name '*.cpp' >> /tmp/listfile.txt
 find ../GDCpp/GDCpp/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.cpp' >> /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
-find ../Extensions/ -name '*.cpp' | grep -v '/TileMapObject/' >> /tmp/listfile.txt
-find ../Extensions/ -name '*.h' -o -name "*.hpp" | grep -v '/TileMapObject/' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.cpp' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.cpp' >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
 

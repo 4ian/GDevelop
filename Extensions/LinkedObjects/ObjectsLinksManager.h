@@ -24,7 +24,7 @@ namespace LinkedObjects
 /**
  * \brief Manage links between objects of a scene
  */
-class ObjectsLinksManager
+class GD_EXTENSION_API ObjectsLinksManager
 {
 public:
     /**

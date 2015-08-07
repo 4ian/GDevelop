@@ -25,7 +25,7 @@ public:
      * by "_"+UnicodeCodePointOfTheCharacter. The first character must be a letter, otherwise it is also
      * replaced in the same manner.
      */
-    static gd::String GetMangledSceneName(const gd::String & originalSceneName);
+    static gd::String GetMangledSceneName(gd::String sceneName);
 
 private:
     SceneNameMangler() {};

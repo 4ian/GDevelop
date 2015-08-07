@@ -11,24 +11,33 @@
 namespace gd
 {
 
-gd::String SceneNameMangler::GetMangledSceneName(const gd::String & originalSceneName)
+gd::String SceneNameMangler::GetMangledSceneName(gd::String sceneName)
 {
-    gd::String partiallyMangledName = originalSceneName;
     static const gd::String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     static const gd::String allowedExceptFirst = "0123456789";
 
-    for (size_t i = 0;i<partiallyMangledName.size();++i) //Replace all unallowed letters by an underscore and the Unicode code point of the letter
+    std::size_t i = 0;
+    for( auto it = sceneName.begin(); it != sceneName.end(); ++it )
     {
-        if ( allowedCharacters.find_first_of(std::u32string(1, partiallyMangledName[i])) == gd::String::npos &&
-             (allowedExceptFirst.find_first_of(std::u32string(1, partiallyMangledName[i])) == gd::String::npos ||
+        char32_t character = *it;
+        if ( allowedCharacters.find(character) == gd::String::npos &&
+             (allowedExceptFirst.find(character) == gd::String::npos ||
               i == 0) ) //Also disallow some characters to be in first position
         {
-            char32_t unallowedChar = partiallyMangledName[i];
-            partiallyMangledName.replace(i, 1, "_"+gd::String::From(unallowedChar));
+            //Replace the character by an underscore and its unicode codepoint (in base 10)
+            auto it2 = it; ++it2;
+            sceneName.replace(it, it2, "_"+gd::String::From(character));
+
+            //The iterator it may have been invalidated:
+            //re-assign it with a new iterator pointing to the same position.
+            it = sceneName.begin();
+            std::advance(it, i);
         }
+
+        ++i;
     }
 
-    return partiallyMangledName;
+    return sceneName;
 }
 
 }

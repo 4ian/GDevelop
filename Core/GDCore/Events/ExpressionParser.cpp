@@ -105,9 +105,10 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
     gd::String lastNumber;
     bool numberWasParsedLast = false;
 
-    for (unsigned int parsePos = 0;parsePos<str.length();++parsePos)
+    for( auto it = str.begin(); it != str.end(); ++it )
     {
-        if ( str[parsePos] == U' ' || str[parsePos] == U'\n' )
+        char32_t currentChar = *it;
+        if ( currentChar == U' ' || currentChar == U'\n' )
         {
             if ( requestNumber )
             {
@@ -126,11 +127,11 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
                 numberWasParsedLast = true;
             }
         }
-        else if ( numerics.find(str[parsePos]) != gd::String::npos )
+        else if ( numerics.find(currentChar) != gd::String::npos )
         {
             requestNumber = false;
 
-            if ( str[parsePos] == U'.' )
+            if ( currentChar == U'.' )
             {
                 if ( !parsingNumber )
                 {
@@ -149,7 +150,7 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
                 parsingDecimalNumber = true;
             }
 
-            if ( str[parsePos] == U'e' )
+            if ( currentChar == U'e' )
             {
                 if ( parsingScientificNotationNumber )
                 {
@@ -170,9 +171,9 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
             }
 
             parsingNumber = true;
-            lastNumber += str[parsePos];
+            lastNumber += currentChar;
         }
-        else if ( str[parsePos] == U')' )
+        else if ( currentChar == U')' )
         {
             if ( requestNumber )
             {
@@ -205,14 +206,15 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
                 return false;
             }
 
-            if ( str[parsePos-1] == U'(' )
+            auto previousIt = it; --previousIt;
+            if ( *previousIt == U'(' )
             {
                 firstErrorStr = _("Empty paranthesis");
 
                 return false;
             }
         }
-        else if ( str[parsePos] == U'(' )
+        else if ( currentChar == U'(' )
         {
             if ( requestNumber )
             {
@@ -240,11 +242,11 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
             parenthesisLevel++;
             numberWasParsedLast = false;
         }
-        else if ( operators.find(str[parsePos]) != gd::String::npos )
+        else if ( operators.find(currentChar) != gd::String::npos )
         {
-            if ( str[parsePos] == U'-' && parsingNumber && parsingScientificNotationNumber )
+            if ( currentChar == U'-' && parsingNumber && parsingScientificNotationNumber )
             {
-                lastNumber += str[parsePos];
+                lastNumber += currentChar;
                 requestNumber = true;
             }
             else
@@ -265,7 +267,7 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
                     numberWasParsedLast = true;
                 }
 
-                if ( str[parsePos] != U'-' && str[parsePos] != U'+' && !numberWasParsedLast )
+                if ( currentChar != U'-' && currentChar != U'+' && !numberWasParsedLast )
                 {
                     firstErrorStr = _("Operators without any number between them");
 

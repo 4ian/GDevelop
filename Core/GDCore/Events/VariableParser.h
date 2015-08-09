@@ -50,7 +50,7 @@ public:
      * \brief Default constructor
      * \param expressionPlainString The string representing the expression to be parsed.
      */
-    VariableParser(const gd::String & expressionPlainString_) : currentPosition(0), expression(expressionPlainString_) {};
+    VariableParser(const gd::String & expressionPlainString_) : currentPositionIt(), expression(expressionPlainString_) {};
     virtual ~VariableParser();
 
     /**
@@ -87,7 +87,7 @@ private:
 
     TokenType currentTokenType;
     gd::String currentToken;
-    size_t currentPosition;
+    gd::String::const_iterator currentPositionIt;
     gd::String expression;
 
     VariableParserCallbacks * callbacks;

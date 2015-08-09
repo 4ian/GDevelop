@@ -22,7 +22,7 @@
    "m_properties": [{
      "type": "string",
      "m_label": "Size:",
-     "m_value": "480, 350"
+     "m_value": "-1, -1"
     }, {
      "type": "string",
      "m_label": "Minimum Size:",
@@ -196,7 +196,7 @@
         "m_row": 0,
         "m_position": 0,
         "m_bestSize": "100,30",
-        "m_minSize": "100,0",
+        "m_minSize": "100,20",
         "m_maxSize": "-1,50",
         "m_resizable": false,
         "m_captionVisible": false,
@@ -747,8 +747,8 @@
         "m_layer": 0,
         "m_row": 0,
         "m_position": 0,
-        "m_bestSize": "200,100",
-        "m_minSize": "200,100",
+        "m_bestSize": "480,350",
+        "m_minSize": "480,250",
         "m_maxSize": "1000,800",
         "m_resizable": false,
         "m_captionVisible": false,

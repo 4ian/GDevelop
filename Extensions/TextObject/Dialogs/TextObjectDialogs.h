@@ -66,7 +66,7 @@ protected:
     virtual void OnOkBtClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    TextObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the Text object"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(480, 350), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
+    TextObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the Text object"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1, -1), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~TextObjectEditorBase();
 };
 

@@ -31,7 +31,7 @@ TextObjectEditorBase::TextObjectEditorBase(wxWindow* parent, wxWindowID id, cons
     m_toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxAUI_TB_DEFAULT_STYLE|wxAUI_TB_HORZ_TEXT|wxAUI_TB_HORZ_LAYOUT|wxAUI_TB_NO_AUTORESIZE);
     m_toolbar->SetToolBitmapSize(wxSize(16,16));
     
-    m_auimgr->AddPane(m_toolbar, wxAuiPaneInfo().Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).BestSize(100,30).MinSize(100,0).MaxSize(-1,50).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
+    m_auimgr->AddPane(m_toolbar, wxAuiPaneInfo().Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).BestSize(100,30).MinSize(100,20).MaxSize(-1,50).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     
     m_fontTextCtrl = new wxTextCtrl(m_toolbar, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(150,-1), 0);
     m_fontTextCtrl->SetToolTip(_("The font used by the text object.\nIf empty, uses the default font provided with GDevelop (Liberation)"));
@@ -78,7 +78,7 @@ TextObjectEditorBase::TextObjectEditorBase(wxWindow* parent, wxWindowID id, cons
     
     m_centerPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
     
-    m_auimgr->AddPane(m_centerPanel, wxAuiPaneInfo().Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(200,100).MinSize(200,100).MaxSize(1000,800).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
+    m_auimgr->AddPane(m_centerPanel, wxAuiPaneInfo().Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(480,350).MinSize(480,250).MaxSize(1000,800).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     m_auimgr->Update();
     
     wxFlexGridSizer* flexGridSizer36 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -131,7 +131,7 @@ TextObjectEditorBase::TextObjectEditorBase(wxWindow* parent, wxWindowID id, cons
     
     SetName(wxT("TextObjectEditorBase"));
     SetMinSize( wxSize(480,250) );
-    SetSizeHints(480,350);
+    SetSizeHints(-1,-1);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }

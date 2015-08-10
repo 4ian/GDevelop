@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwindows.org/wxxrc">
+  <object class="wxBitmap" name="bold16">..\..\..\Binaries\Output\Release_Windows\res\actions\bold16.png</object>
+  <object class="wxBitmap" name="error">..\..\..\Binaries\Output\Release_Windows\res\error.png</object>
+  <object class="wxBitmap" name="help16">..\..\..\Binaries\Output\Release_Windows\res\icons_default\help16.png</object>
+  <object class="wxBitmap" name="italic16">..\..\..\Binaries\Output\Release_Windows\res\actions\italic16.png</object>
+  <object class="wxBitmap" name="open16">..\..\..\Binaries\Output\Release_Windows\res\icons_default\open16.png</object>
+  <object class="wxBitmap" name="underline16">..\..\..\Binaries\Output\Release_Windows\res\actions\underline16.png</object>
+</resource>

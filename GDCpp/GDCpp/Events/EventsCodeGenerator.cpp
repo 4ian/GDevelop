@@ -424,7 +424,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
 
     //Generate default code around events:
     //Includes
-    output += "#include <vector>\n#include <map>\n#include <string>\n#include <algorithm>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDCpp/RuntimeContext.h\"\n#include \"GDCpp/Utf8Tools.h\"\n#include \"GDCpp/RuntimeObject.h\"\n";
+    output += "#include <vector>\n#include <map>\n#include <string>\n#include <algorithm>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDCpp/RuntimeContext.h\"\n#include \"GDCpp/RuntimeObject.h\"\n";
     for ( set<gd::String>::iterator include = codeGenerator.GetIncludeFiles().begin() ; include != codeGenerator.GetIncludeFiles().end(); ++include )
         output += "#include \""+*include+"\"\n";
 

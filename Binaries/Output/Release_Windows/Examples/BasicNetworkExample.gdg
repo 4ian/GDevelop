@@ -1,521 +1,655 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Project>
-    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Project" />
-        <Auteur value="" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="BuiltinExternalLayouts" />
-            <Extension name="Network" />
-            <Extension name="CommonDialogs" />
-        </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
-        </Platforms>
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable />
-        <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-    </Info>
-    <Resources>
-        <Resources>
-            <Resource kind="image" name="Pea-Ghost.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pea-Ghost.png" />
-            <Resource kind="image" name="Pea-Standard.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pea-Standard.png" />
-        </Resources>
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes firstScene="">
-        <Scene nom="New scene" mangledName="New_32scene" r="128.000000" v="255.000000" b="128.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Object1" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Pea-Standard.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="18.000000" Y="18.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Object2" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Pea-Ghost.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="45.000000" Y="19.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas />
-            <Positions>
-                <Objet nom="Object1" x="199.000000" y="169.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Object2" x="450.000000" y="167.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Demander quel joueur prendre et se connecter à l&apos;autre ordinateur&#x0A;Choose the player and connect to the second computer." />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="DepartScene" Contraire="false" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ShowYesNoMsgBox" />
-                            <Parametre value="" />
-                            <Parametre value="firstPlayer" />
-                            <Parametre value='&quot;Être le premier joueur ?&quot;' />
-                            <Parametre value='&quot;Choix du joueur&quot;' />
-                        </Action>
-                        <Action>
-                            <Type value="ShowTextInput" />
-                            <Parametre value="" />
-                            <Parametre value="OtherIP" />
-                            <Parametre value='&quot;Adresse IP de l&apos;autre ordinateur&quot;' />
-                            <Parametre value='&quot;Connexion&quot;' />
-                        </Action>
-                    </Actions>
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Comment" />
-                            <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                            <Com1 value="Les ports ont été personnalisés suivant que l&apos;ordinateur soit le premier ou le second joueur afin&#x0A;de permettre de pouvoir tester l&apos;exemple sur un même ordinateur ( En lançant deux fois le jeu et&#x0A;en entrant 127.0.0.1 en adresse IP )&#x0A;Ports numbers have been customized so as to allow testing the example on the same computer,&#x0A;by launching twice the game and by typing 127.0.0.1 in IP Adress." />
-                            <Com2 value="" />
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="VarSceneTxt" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="firstPlayer" />
-                                    <Parametre value="=" />
-                                    <Parametre value='&quot;yes&quot;' />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="Network::ListenToPort" />
-                                    <Parametre value="50001" />
-                                </Action>
-                                <Action>
-                                    <Type value="Network::AddRecipient" />
-                                    <Parametre value="VariableString(OtherIP)" />
-                                    <Parametre value="50002" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="VarSceneTxt" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="firstPlayer" />
-                                    <Parametre value="=" />
-                                    <Parametre value='&quot;no&quot;' />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="Network::ListenToPort" />
-                                    <Parametre value="50002" />
-                                </Action>
-                                <Action>
-                                    <Type value="Network::AddRecipient" />
-                                    <Parametre value="VariableString(OtherIP)" />
-                                    <Parametre value="50001" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                    </Events>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="1er joueur&#x0A;First player" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarSceneTxt" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="firstPlayer" />
-                            <Parametre value="=" />
-                            <Parametre value='&quot;yes&quot;' />
-                        </Condition>
-                    </Conditions>
-                    <Actions />
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Comment" />
-                            <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                            <Com1 value="Mise à jour de la position du joueur 2&#x0A;Update position of second player" />
-                            <Com2 value="" />
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="Network::ReceivePackets" />
-                                </Action>
-                                <Action>
-                                    <Type value="MettreXY" />
-                                    <Parametre value="Object2" />
-                                    <Parametre value="=" />
-                                    <Parametre value='Network::GetReceivedDataValue(&quot;Object2/X&quot;)' />
-                                    <Parametre value="=" />
-                                    <Parametre value='Network::GetReceivedDataValue(&quot;Object2/Y&quot;)' />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Comment" />
-                            <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                            <Com1 value="Déplacement du joueur 1&#x0A;Manage movement of first player" />
-                            <Com2 value="" />
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="KeyPressed" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="Right" />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="AddForceXY" />
-                                    <Parametre value="Object1" />
-                                    <Parametre value="150" />
-                                    <Parametre value="0" />
-                                    <Parametre value="0" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="KeyPressed" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="Down" />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="AddForceXY" />
-                                    <Parametre value="Object1" />
-                                    <Parametre value="0" />
-                                    <Parametre value="150" />
-                                    <Parametre value="0" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="KeyPressed" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="Up" />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="AddForceXY" />
-                                    <Parametre value="Object1" />
-                                    <Parametre value="0" />
-                                    <Parametre value="-150" />
-                                    <Parametre value="0" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="KeyPressed" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="Left" />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="AddForceXY" />
-                                    <Parametre value="Object1" />
-                                    <Parametre value="-150" />
-                                    <Parametre value="0" />
-                                    <Parametre value="0" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Comment" />
-                            <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                            <Com1 value="Envoi des données du joueur 1&#x0A;Send data concerning player 1" />
-                            <Com2 value="" />
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="Network::SendValue" />
-                                    <Parametre value='&quot;Object1/X&quot;' />
-                                    <Parametre value="Object1.X()" />
-                                </Action>
-                                <Action>
-                                    <Type value="Network::SendValue" />
-                                    <Parametre value='&quot;Object1/Y&quot;' />
-                                    <Parametre value="Object1.Y()" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                    </Events>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Second joueur&#x0A;Second player" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarSceneTxt" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="firstPlayer" />
-                            <Parametre value="=" />
-                            <Parametre value='&quot;no&quot;' />
-                        </Condition>
-                    </Conditions>
-                    <Actions />
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="Network::ReceivePackets" />
-                                </Action>
-                                <Action>
-                                    <Type value="MettreXY" />
-                                    <Parametre value="Object1" />
-                                    <Parametre value="=" />
-                                    <Parametre value='Network::GetReceivedDataValue(&quot;Object1/X&quot;)' />
-                                    <Parametre value="=" />
-                                    <Parametre value='Network::GetReceivedDataValue(&quot;Object1/Y&quot;)' />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="KeyPressed" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="Right" />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="AddForceXY" />
-                                    <Parametre value="Object2" />
-                                    <Parametre value="150" />
-                                    <Parametre value="0" />
-                                    <Parametre value="0" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="KeyPressed" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="Down" />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="AddForceXY" />
-                                    <Parametre value="Object2" />
-                                    <Parametre value="0" />
-                                    <Parametre value="150" />
-                                    <Parametre value="0" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="KeyPressed" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="Up" />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="AddForceXY" />
-                                    <Parametre value="Object2" />
-                                    <Parametre value="0" />
-                                    <Parametre value="-150" />
-                                    <Parametre value="0" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions>
-                                <Condition>
-                                    <Type value="KeyPressed" Contraire="false" />
-                                    <Parametre value="" />
-                                    <Parametre value="Left" />
-                                </Condition>
-                            </Conditions>
-                            <Actions>
-                                <Action>
-                                    <Type value="AddForceXY" />
-                                    <Parametre value="Object2" />
-                                    <Parametre value="-150" />
-                                    <Parametre value="0" />
-                                    <Parametre value="0" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="Network::SendValue" />
-                                    <Parametre value='&quot;Object2/X&quot;' />
-                                    <Parametre value="Object2.X()" />
-                                </Action>
-                                <Action>
-                                    <Type value="Network::SendValue" />
-                                    <Parametre value='&quot;Object2/Y&quot;' />
-                                    <Parametre value="Object2.Y()" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                    </Events>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalLayouts />
-    <ExternalSourceFiles />
-</Project>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Project</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="Network" />
+            <extension name="CommonDialogs" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+        </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources>
+            <resource alwaysLoaded="false" file="Pea-Ghost.png" kind="image" name="Pea-Ghost.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Pea-Standard.png" kind="image" name="Pea-Standard.png" smoothed="true" userAdded="true" />
+        </resources>
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="128" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="128" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="255">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Object1" width="0.000000" x="199.000000" y="169.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Object2" width="0.000000" x="450.000000" y="167.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Object1" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Pea-Standard.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="18.500000" y="18.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="37.000000" />
+                                                    <vertice x="0.000000" y="37.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Object2" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Pea-Ghost.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="45.000000" y="19.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="90.000000" y="0.000000" />
+                                                    <vertice x="90.000000" y="39.000000" />
+                                                    <vertice x="0.000000" y="39.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Demander quel joueur prendre et se connecter Ã  l&apos;autre ordinateur&#x0A;Choose the player and connect to the second computer.</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="DepartScene" />
+                            <parameters />
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ShowYesNoMsgBox" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>firstPlayer</parameter>
+                                <parameter>&quot;ÃŠtre le premier joueur ?&quot;</parameter>
+                                <parameter>&quot;Choix du joueur&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ShowTextInput" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>OtherIP</parameter>
+                                <parameter>&quot;Adresse IP de l&apos;autre ordinateur&quot;</parameter>
+                                <parameter>&quot;Connexion&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>Les ports ont Ã©tÃ© personnalisÃ©s suivant que l&apos;ordinateur soit le premier ou le second joueur afin&#x0A;de permettre de pouvoir tester l&apos;exemple sur un mÃªme ordinateur ( En lanÃ§ant deux fois le jeu et&#x0A;en entrant 127.0.0.1 en adresse IP )&#x0A;Ports numbers have been customized so as to allow testing the example on the same computer,&#x0A;by launching twice the game and by typing 127.0.0.1 in IP Adress.</comment>
+                            <comment2></comment2>
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="VarSceneTxt" />
+                                    <parameters>
+                                        <parameter>firstPlayer</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>&quot;yes&quot;</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="Network::ListenToPort" />
+                                    <parameters>
+                                        <parameter>50001</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="Network::AddRecipient" />
+                                    <parameters>
+                                        <parameter>VariableString(OtherIP)</parameter>
+                                        <parameter>50002</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="VarSceneTxt" />
+                                    <parameters>
+                                        <parameter>firstPlayer</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>&quot;no&quot;</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="Network::ListenToPort" />
+                                    <parameters>
+                                        <parameter>50002</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="Network::AddRecipient" />
+                                    <parameters>
+                                        <parameter>VariableString(OtherIP)</parameter>
+                                        <parameter>50001</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>1er joueur&#x0A;First player</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarSceneTxt" />
+                            <parameters>
+                                <parameter>firstPlayer</parameter>
+                                <parameter>=</parameter>
+                                <parameter>&quot;yes&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>Mise Ã  jour de la position du joueur 2&#x0A;Update position of second player</comment>
+                            <comment2></comment2>
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="Network::ReceivePackets" />
+                                    <parameters />
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="MettreXY" />
+                                    <parameters>
+                                        <parameter>Object2</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>Network::GetReceivedDataValue(&quot;Object2/X&quot;)</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>Network::GetReceivedDataValue(&quot;Object2/Y&quot;)</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>DÃ©placement du joueur 1&#x0A;Manage movement of first player</comment>
+                            <comment2></comment2>
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="KeyPressed" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Right</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AddForceXY" />
+                                    <parameters>
+                                        <parameter>Object1</parameter>
+                                        <parameter>150</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="KeyPressed" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Down</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AddForceXY" />
+                                    <parameters>
+                                        <parameter>Object1</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>150</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="KeyPressed" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Up</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AddForceXY" />
+                                    <parameters>
+                                        <parameter>Object1</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>-150</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="KeyPressed" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Left</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AddForceXY" />
+                                    <parameters>
+                                        <parameter>Object1</parameter>
+                                        <parameter>-150</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>Envoi des donnÃ©es du joueur 1&#x0A;Send data concerning player 1</comment>
+                            <comment2></comment2>
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="Network::SendValue" />
+                                    <parameters>
+                                        <parameter>&quot;Object1/X&quot;</parameter>
+                                        <parameter>Object1.X()</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="Network::SendValue" />
+                                    <parameters>
+                                        <parameter>&quot;Object1/Y&quot;</parameter>
+                                        <parameter>Object1.Y()</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Second joueur&#x0A;Second player</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarSceneTxt" />
+                            <parameters>
+                                <parameter>firstPlayer</parameter>
+                                <parameter>=</parameter>
+                                <parameter>&quot;no&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="Network::ReceivePackets" />
+                                    <parameters />
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="MettreXY" />
+                                    <parameters>
+                                        <parameter>Object1</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>Network::GetReceivedDataValue(&quot;Object1/X&quot;)</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>Network::GetReceivedDataValue(&quot;Object1/Y&quot;)</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="KeyPressed" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Right</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AddForceXY" />
+                                    <parameters>
+                                        <parameter>Object2</parameter>
+                                        <parameter>150</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="KeyPressed" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Down</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AddForceXY" />
+                                    <parameters>
+                                        <parameter>Object2</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>150</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="KeyPressed" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Up</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AddForceXY" />
+                                    <parameters>
+                                        <parameter>Object2</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>-150</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="KeyPressed" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Left</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AddForceXY" />
+                                    <parameters>
+                                        <parameter>Object2</parameter>
+                                        <parameter>-150</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="Network::SendValue" />
+                                    <parameters>
+                                        <parameter>&quot;Object2/X&quot;</parameter>
+                                        <parameter>Object2.X()</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="Network::SendValue" />
+                                    <parameters>
+                                        <parameter>&quot;Object2/Y&quot;</parameter>
+                                        <parameter>Object2.Y()</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="73" major="3" minor="4" revision="0" />
+    <gdVersion build="84" major="3" minor="6" revision="0" />
     <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Basic Level Editor with Tile Map Object</name>
         <author></author>
@@ -34,9 +34,9 @@
             <extension name="TextObject" />
         </extensions>
         <platforms>
-            <platform name="Game Develop C++ platform" />
+            <platform name="GDevelop C++ platform" />
         </platforms>
-        <currentPlatform>Game Develop C++ platform</currentPlatform>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
     </properties>
     <resources>
         <resources>
@@ -49,8 +49,8 @@
     <objectsGroups />
     <variables />
     <layouts>
-        <layout b="209" disableInputWhenNotFocused="true" mangledName="Nouvelle_32sc__4524ne" name="Nouvelle scène" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="209" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="209">
-            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+        <layout b="209" disableInputWhenNotFocused="true" mangledName="Nouvelle_32sc_232ne" name="Nouvelle scÃ¨ne" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="209" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="209">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
             <objectsGroups />
             <variables />
             <instances>
@@ -455,7 +455,7 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Comment</type>
                     <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
-                    <comment>Met à jour l&apos;indicateur de tuile (qui montre la tuile que l&apos;on souhaite insérer)</comment>
+                    <comment>Met Ã  jour l&apos;indicateur de tuile (qui montre la tuile que l&apos;on souhaite insÃ©rer)</comment>
                     <comment2>Update the tile indicator (which shows the tile that will be inserted)</comment2>
                 </event>
                 <event disabled="false" folded="false">
@@ -517,7 +517,7 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Comment</type>
                     <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
-                    <comment>Supprime la tuile&#x0A;Similaire à l&apos;événement précédent mais on met la tuile #-1 (cela permet de supprimer la tuile)</comment>
+                    <comment>Supprime la tuile&#x0A;Similaire Ã  l&apos;Ã©vÃ©nement prÃ©cÃ©dent mais on met la tuile #-1 (cela permet de supprimer la tuile)</comment>
                     <comment2>Remove the tile.&#x0A;Similar to the previous event but we set the tile #-1 to remove the tile.</comment2>
                 </event>
                 <event disabled="false" folded="false">
@@ -555,7 +555,7 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Comment</type>
                     <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
-                    <comment>Evénements pour changer la tuile à insérer</comment>
+                    <comment>EvÃ©nements pour changer la tuile Ã  insÃ©rer</comment>
                     <comment2>Events to change the tile to insert</comment2>
                 </event>
                 <event disabled="false" folded="false">
@@ -686,7 +686,7 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Comment</type>
                     <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
-                    <comment>Sauvegarder et charger un niveau (il est juste sauvegardé dans une variable, pas dans un fichier)</comment>
+                    <comment>Sauvegarder et charger un niveau (il est juste sauvegardÃ© dans une variable, pas dans un fichier)</comment>
                     <comment2>Save and load a level (just saved in a variable, not in a file)</comment2>
                 </event>
                 <event disabled="false" folded="false">

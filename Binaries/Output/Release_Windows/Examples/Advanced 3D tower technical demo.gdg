@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="81" major="3" minor="6" revision="0" />
+    <gdVersion build="84" major="3" minor="6" revision="0" />
     <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>The Tower HD - GDevelop - [TECH DEMO]</name>
         <author></author>
@@ -55,7 +55,7 @@
             <resource alwaysLoaded="false" file="mur 6.png" kind="image" name="mur 6.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="mur 7.png" kind="image" name="mur 7.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="mur 8.png" kind="image" name="mur 8.png" smoothed="true" userAdded="true" />
-            <resource alwaysLoaded="false" file="lumière.png" kind="image" name="lumière.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="lumiÃ¨re.png" kind="image" name="lumiÃ¨re.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="towerground.png" kind="image" name="towerground.png" smoothed="true" userAdded="true" />
         </resources>
         <resourceFolders />
@@ -282,16 +282,16 @@
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
-                                        <sprite hasCustomCollisionMask="false" image="lumière.png">
+                                        <sprite hasCustomCollisionMask="false" image="lumiÃ¨re.png">
                                             <points />
                                             <originPoint name="origine" x="0.000000" y="0.000000" />
-                                            <centerPoint automatic="true" name="centre" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="4.000000" y="4.000000" />
                                             <customCollisionMask>
                                                 <polygon>
                                                     <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
-                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="8.000000" y="0.000000" />
+                                                    <vertice x="8.000000" y="8.000000" />
+                                                    <vertice x="0.000000" y="8.000000" />
                                                 </polygon>
                                             </customCollisionMask>
                                         </sprite>

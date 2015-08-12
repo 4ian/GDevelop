@@ -1,243 +1,299 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Project>
-    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Project" />
-        <Auteur value="" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="BuiltinExternalLayouts" />
-            <Extension name="TextObject" />
-            <Extension name="CommonDialogs" />
-            <Extension name="AdvancedXML" />
-        </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
-        </Platforms>
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable />
-        <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-    </Info>
-    <Resources>
-        <Resources />
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes firstScene="">
-        <Scene nom="New scene" mangledName="New_32scene" r="209.000000" v="209.000000" b="209.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Explanation" type="TextObject::Text" smoothed="true" bold="false" italic="true" underlined="false">
-                    <Variables />
-                    <String value="Launch the scene, choose a file, and then open the file&#x0A;to see the result." />
-                    <Font value="" />
-                    <CharacterSize value="30" />
-                    <Color r="0" g="0" b="0" />
-                </Objet>
-                <Objet nom="Explanation_fr" type="TextObject::Text" smoothed="true" bold="false" italic="true" underlined="false">
-                    <Variables />
-                    <String value="Lancez la scène, choissisez un fichier et ouvrez le pour voir le résultat." />
-                    <Font value="" />
-                    <CharacterSize value="15" />
-                    <Color r="0" g="0" b="0" />
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas />
-            <Positions>
-                <Objet nom="Explanation" x="23.000000" y="200.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Explanation_fr" x="28.000000" y="282.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value='Let&apos;s create an XML file with this structure:&#x0A;&#x0A;&lt;Root&gt;&#x0A;    &lt;MyFirstElement myAttribute=&quot;valueOfMyAttribute&quot; /&gt;&#x0A;    &lt;!--Nice comment--&gt;&#x0A;    &lt;MySecondElement&gt;&#x0A;        &lt;MyRepeatedElement randomAttribute=&quot;4.000000&quot; /&gt;&#x0A;         ... repeated 10 times&#x0A;        &lt;MyRepeatedElement randomAttribute=&quot;4.000000&quot; /&gt;&#x0A;    &lt;/MySecondElement&gt;&#x0A;&lt;/Root&gt;&#x0A;' />
-                    <Com2 value="Créeons un fichier avec cette structure" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="DepartScene" Contraire="false" />
-                            <Parametre value="" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="AdvancedXML::NewFile" />
-                            <Parametre value='&quot;MyDocument&quot;' />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="AdvancedXML::CreateNewElement" />
-                            <Parametre value='&quot;Root&quot;' />
-                            <Parametre value="0" />
-                            <Parametre value='&quot;Root&quot;' />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="AdvancedXML::InsertElementIntoAnother" />
-                            <Parametre value='&quot;Root&quot;' />
-                            <Parametre value='&quot;MyDocument&quot;' />
-                            <Parametre value="" />
-                            <Parametre value="" />
-                        </Action>
-                    </Actions>
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="AdvancedXML::CreateNewElement" />
-                                    <Parametre value='&quot;MyFirstElement&quot;' />
-                                    <Parametre value="0" />
-                                    <Parametre value='&quot;MyFirstElement&quot;' />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="AdvancedXML::CreateNewElement" />
-                                    <Parametre value='&quot;MySecondElement&quot;' />
-                                    <Parametre value="0" />
-                                    <Parametre value='&quot;MySecondElement&quot;' />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="AdvancedXML::InsertElementIntoAnother" />
-                                    <Parametre value='&quot;MyFirstElement&quot;' />
-                                    <Parametre value='&quot;Root&quot;' />
-                                    <Parametre value="" />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="AdvancedXML::InsertElementIntoAnother" />
-                                    <Parametre value='&quot;MySecondElement&quot;' />
-                                    <Parametre value='&quot;Root&quot;' />
-                                    <Parametre value="" />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="AdvancedXML::SetAttributeString" />
-                                    <Parametre value='&quot;MyFirstElement&quot;' />
-                                    <Parametre value='&quot;myAttribute&quot;' />
-                                    <Parametre value="=" />
-                                    <Parametre value='&quot;valueOfMyAttribute&quot;' />
-                                    <Parametre value="" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Repeat" />
-                            <RepeatExpression value="10" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="AdvancedXML::CreateNewElement" />
-                                    <Parametre value='&quot;MyRepeatedElement&quot;' />
-                                    <Parametre value="0" />
-                                    <Parametre value='&quot;MyRepeatedElement&quot;' />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="AdvancedXML::InsertElementIntoAnother" />
-                                    <Parametre value='&quot;MyRepeatedElement&quot;' />
-                                    <Parametre value='&quot;MySecondElement&quot;' />
-                                    <Parametre value="" />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="AdvancedXML::SetAttributeNumber" />
-                                    <Parametre value='&quot;MyRepeatedElement&quot;' />
-                                    <Parametre value='&quot;randomAttribute&quot;' />
-                                    <Parametre value="=" />
-                                    <Parametre value="Random(10)" />
-                                    <Parametre value="" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="AdvancedXML::CreateNewElement" />
-                                    <Parametre value='&quot;MyComment&quot;' />
-                                    <Parametre value="2" />
-                                    <Parametre value='&quot;Nice comment&quot;' />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="AdvancedXML::InsertElementIntoAnother" />
-                                    <Parametre value='&quot;MyComment&quot;' />
-                                    <Parametre value='&quot;Root&quot;' />
-                                    <Parametre value='&quot;MySecondElement&quot;' />
-                                    <Parametre value="" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="ShowOpenFile" />
-                                    <Parametre value='&quot;C:\test.txt&quot;' />
-                                    <Parametre value="file" />
-                                    <Parametre value='&quot;Choose where to save the file&quot;' />
-                                    <Parametre value='&quot;XML file (*.xml)&quot;' />
-                                </Action>
-                                <Action>
-                                    <Type value="AdvancedXML::SaveFile" />
-                                    <Parametre value="VariableString(file)" />
-                                    <Parametre value='&quot;MyDocument&quot;' />
-                                    <Parametre value="=" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                    </Events>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalLayouts />
-    <ExternalSourceFiles />
-</Project>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Project</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="TextObject" />
+            <extension name="CommonDialogs" />
+            <extension name="AdvancedXML" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+        </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources />
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="209" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="209" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="209">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Explanation" width="0.000000" x="23.000000" y="200.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Explanation_fr" width="0.000000" x="28.000000" y="282.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object bold="false" italic="true" name="Explanation" smoothed="true" type="TextObject::Text" underlined="false">
+                    <variables />
+                    <automatisms />
+                    <string>Launch the scene, choose a file, and then open the file&#x0A;to see the result.</string>
+                    <font></font>
+                    <characterSize>30</characterSize>
+                    <color b="0" g="0" r="0" />
+                </object>
+                <object bold="false" italic="true" name="Explanation_fr" smoothed="true" type="TextObject::Text" underlined="false">
+                    <variables />
+                    <automatisms />
+                    <string>Lancez la scÃ¨ne, choisissez un fichier et ouvrez le pour voir le rÃ©sultat.</string>
+                    <font></font>
+                    <characterSize>15</characterSize>
+                    <color b="0" g="0" r="0" />
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Let&apos;s create an XML file with this structure:&#x0A;&#x0A;&lt;Root&gt;&#x0A;    &lt;MyFirstElement myAttribute=&quot;valueOfMyAttribute&quot; /&gt;&#x0A;    &lt;!--Nice comment--&gt;&#x0A;    &lt;MySecondElement&gt;&#x0A;        &lt;MyRepeatedElement randomAttribute=&quot;4.000000&quot; /&gt;&#x0A;         ... repeated 10 times&#x0A;        &lt;MyRepeatedElement randomAttribute=&quot;4.000000&quot; /&gt;&#x0A;    &lt;/MySecondElement&gt;&#x0A;&lt;/Root&gt;&#x0A;</comment>
+                    <comment2>CrÃ©eons un fichier avec cette structure</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="DepartScene" />
+                            <parameters>
+                                <parameter></parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="AdvancedXML::NewFile" />
+                            <parameters>
+                                <parameter>&quot;MyDocument&quot;</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="AdvancedXML::CreateNewElement" />
+                            <parameters>
+                                <parameter>&quot;Root&quot;</parameter>
+                                <parameter>0</parameter>
+                                <parameter>&quot;Root&quot;</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="AdvancedXML::InsertElementIntoAnother" />
+                            <parameters>
+                                <parameter>&quot;Root&quot;</parameter>
+                                <parameter>&quot;MyDocument&quot;</parameter>
+                                <parameter></parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::CreateNewElement" />
+                                    <parameters>
+                                        <parameter>&quot;MyFirstElement&quot;</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>&quot;MyFirstElement&quot;</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::CreateNewElement" />
+                                    <parameters>
+                                        <parameter>&quot;MySecondElement&quot;</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>&quot;MySecondElement&quot;</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::InsertElementIntoAnother" />
+                                    <parameters>
+                                        <parameter>&quot;MyFirstElement&quot;</parameter>
+                                        <parameter>&quot;Root&quot;</parameter>
+                                        <parameter></parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::InsertElementIntoAnother" />
+                                    <parameters>
+                                        <parameter>&quot;MySecondElement&quot;</parameter>
+                                        <parameter>&quot;Root&quot;</parameter>
+                                        <parameter></parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::SetAttributeString" />
+                                    <parameters>
+                                        <parameter>&quot;MyFirstElement&quot;</parameter>
+                                        <parameter>&quot;myAttribute&quot;</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>&quot;valueOfMyAttribute&quot;</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Repeat</type>
+                            <repeatExpression>10</repeatExpression>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::CreateNewElement" />
+                                    <parameters>
+                                        <parameter>&quot;MyRepeatedElement&quot;</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>&quot;MyRepeatedElement&quot;</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::InsertElementIntoAnother" />
+                                    <parameters>
+                                        <parameter>&quot;MyRepeatedElement&quot;</parameter>
+                                        <parameter>&quot;MySecondElement&quot;</parameter>
+                                        <parameter></parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::SetAttributeNumber" />
+                                    <parameters>
+                                        <parameter>&quot;MyRepeatedElement&quot;</parameter>
+                                        <parameter>&quot;randomAttribute&quot;</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>Random(10)</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::CreateNewElement" />
+                                    <parameters>
+                                        <parameter>&quot;MyComment&quot;</parameter>
+                                        <parameter>2</parameter>
+                                        <parameter>&quot;Nice comment&quot;</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::InsertElementIntoAnother" />
+                                    <parameters>
+                                        <parameter>&quot;MyComment&quot;</parameter>
+                                        <parameter>&quot;Root&quot;</parameter>
+                                        <parameter>&quot;MySecondElement&quot;</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="ShowOpenFile" />
+                                    <parameters>
+                                        <parameter>&quot;C:\test.txt&quot;</parameter>
+                                        <parameter>file</parameter>
+                                        <parameter>&quot;Choose where to save the file&quot;</parameter>
+                                        <parameter>&quot;XML file (*.xml)&quot;</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="AdvancedXML::SaveFile" />
+                                    <parameters>
+                                        <parameter>VariableString(file)</parameter>
+                                        <parameter>&quot;MyDocument&quot;</parameter>
+                                        <parameter>=</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

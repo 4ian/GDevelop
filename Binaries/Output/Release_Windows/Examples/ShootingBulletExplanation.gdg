@@ -1,383 +1,495 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Project>
-    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Basic explanation about shooting bullets" />
-        <Auteur value="" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="BuiltinExternalLayouts" />
-            <Extension name="CommonDialogs" />
-            <Extension name="DestroyOutsideAutomatism" />
-        </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
-            <Platform name="Game Develop JS platform" />
-        </Platforms>
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable />
-        <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-    </Info>
-    <Resources>
-        <Resources>
-            <Resource kind="image" name="Tir.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Bullet.png" />
-            <Resource kind="image" name="tank1fr1.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank1fr1.png" />
-            <Resource kind="image" name="Pointer-Standard.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pointer-Standard.png" />
-        </Resources>
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes firstScene="">
-        <Scene nom="One object" mangledName="One_32object" r="125.000000" v="125.000000" b="125.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="false" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Bullet" type="Sprite">
-                    <Variables />
-                    <Automatism Type="DestroyOutsideAutomatism::DestroyOutside" Name="DestroyOutside" extraBorder="0" />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Tir.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="5.000000" Y="5.000000" />
-                                        <PointCentre nom="centre" X="5.000000" Y="5.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Tank" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank1fr1.png">
-                                        <Points>
-                                            <Point nom="Canon" X="61.000000" Y="31.000000" />
-                                        </Points>
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="35.000000" Y="31.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Target" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Pointer-Standard.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="22.000000" Y="22.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas />
-            <Positions>
-                <Objet nom="Tank" x="337.000000" y="215.000000" plan="-1" layer="" angle="-65.480415" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Target" x="476.500000" y="213.500000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Shoot if left button is pressed and timer is ok :&#x0A;Create a bullet&#x0A;Make the bullet move&#x0A;and reset the timer to fire another bullet later." />
-                    <Com2 value="Tirer si le bouton gauche est pressé et le chronomètre supérieur à 0.25 secondes :&#x0A;On créer un tir&#x0A;On le met en mouvement&#x0A;On remet à zéro le chronomètre pour pouvoir tirer plus tard." />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="SourisBouton" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Left" />
-                        </Condition>
-                        <Condition>
-                            <Type value="Timer" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="0.25" />
-                            <Parametre value='&quot;FireRate&quot;' />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="Bullet" />
-                            <Parametre value="Tank.PointX(Canon)" />
-                            <Parametre value="Tank.PointY(Canon)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="AddForceVersPos" />
-                            <Parametre value="Bullet" />
-                            <Parametre value="MouseX()" />
-                            <Parametre value="MouseY()" />
-                            <Parametre value="300" />
-                            <Parametre value="1" />
-                        </Action>
-                        <Action>
-                            <Type value="ResetTimer" />
-                            <Parametre value="" />
-                            <Parametre value='&quot;FireRate&quot;' />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="MettreXY" />
-                            <Parametre value="Target" />
-                            <Parametre value="=" />
-                            <Parametre value="MouseX()" />
-                            <Parametre value="=" />
-                            <Parametre value="MouseY()" />
-                        </Action>
-                        <Action>
-                            <Type value="TourneVersPos" />
-                            <Parametre value="Tank" />
-                            <Parametre value="MouseX()" />
-                            <Parametre value="MouseY()" />
-                        </Action>
-                    </Actions>
-                </Event>
-            </Events>
-        </Scene>
-        <Scene nom="Multiple objects" mangledName="Multiple_32objects" r="125.000000" v="125.000000" b="125.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="false" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Bullet" type="Sprite">
-                    <Variables />
-                    <Automatism Type="DestroyOutsideAutomatism::DestroyOutside" Name="DestroyOutside" extraBorder="0" />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Tir.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="5.000000" Y="5.000000" />
-                                        <PointCentre nom="centre" X="5.000000" Y="5.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Tank" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank1fr1.png">
-                                        <Points>
-                                            <Point nom="Canon" X="61.000000" Y="31.000000" />
-                                        </Points>
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="35.000000" Y="31.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Target" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Pointer-Standard.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="22.000000" Y="22.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas />
-            <Positions>
-                <Objet nom="Tank" x="520.000000" y="216.000000" plan="-1" layer="" angle="-65.480415" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Tank" x="337.000000" y="215.000000" plan="-1" layer="" angle="-65.480415" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Tank" x="138.000000" y="201.000000" plan="-1" layer="" angle="-65.480415" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Target" x="608.500000" y="178.500000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value='When there is more than one object which&#x0A;must shoot a bullet, use &quot;For each object&quot; event&#x0A;so as to create a bullet for each of the objects.' />
-                    <Com2 value='Quand plus d&apos;un objet doit tirer, utilisez&#x0A;l&apos;évènement &quot;Pour chaque objet&quot; afin de créer&#x0A;un tir pour chacun des objets.' />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="SourisBouton" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Left" />
-                        </Condition>
-                        <Condition>
-                            <Type value="Timer" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="0.25" />
-                            <Parametre value='&quot;FireRate&quot;' />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ResetTimer" />
-                            <Parametre value="" />
-                            <Parametre value='&quot;FireRate&quot;' />
-                        </Action>
-                    </Actions>
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::ForEach" />
-                            <Object value="Tank" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="Create" />
-                                    <Parametre value="" />
-                                    <Parametre value="Bullet" />
-                                    <Parametre value="Tank.PointX(Canon)" />
-                                    <Parametre value="Tank.PointY(Canon)" />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="AddForceVersPos" />
-                                    <Parametre value="Bullet" />
-                                    <Parametre value='MouseX(&quot;&quot;,0)' />
-                                    <Parametre value='MouseY(&quot;&quot;,0)' />
-                                    <Parametre value="300" />
-                                    <Parametre value="1" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                    </Events>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="There is nothing more to change in our example." />
-                    <Com2 value="Il n&apos;y a rien de plus à modifier ici." />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="TourneVersPos" />
-                            <Parametre value="Tank" />
-                            <Parametre value='MouseX(&quot;&quot;,0)' />
-                            <Parametre value='MouseY(&quot;&quot;,0)' />
-                        </Action>
-                        <Action>
-                            <Type value="MettreXY" />
-                            <Parametre value="Target" />
-                            <Parametre value="=" />
-                            <Parametre value="MouseX()" />
-                            <Parametre value="=" />
-                            <Parametre value="MouseY()" />
-                        </Action>
-                    </Actions>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalLayouts />
-    <ExternalSourceFiles />
-</Project>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Basic explanation about shooting bullets</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="CommonDialogs" />
+            <extension name="DestroyOutsideAutomatism" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+            <platform name="GDevelop JS platform" />
+        </platforms>
+        <currentPlatform>GDevelop JS platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources>
+            <resource alwaysLoaded="false" file="Bullet.png" kind="image" name="Tir.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank1fr1.png" kind="image" name="tank1fr1.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Pointer-Standard.png" kind="image" name="Pointer-Standard.png" smoothed="true" userAdded="true" />
+        </resources>
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="125" disableInputWhenNotFocused="true" mangledName="One_32object" name="One object" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="125" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="125">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="false" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances>
+                <instance angle="-65.480415" customSize="false" height="0.000000" layer="" locked="false" name="Tank" width="0.000000" x="337.000000" y="215.000000" zOrder="-1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Target" width="0.000000" x="476.500000" y="213.500000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Bullet" type="Sprite">
+                    <variables />
+                    <automatisms>
+                        <automatism extraBorder="0.000000" name="DestroyOutside" type="DestroyOutsideAutomatism::DestroyOutside" />
+                    </automatisms>
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Tir.png">
+                                            <points />
+                                            <originPoint name="origine" x="5.000000" y="5.000000" />
+                                            <centerPoint automatic="true" name="centre" x="5.000000" y="5.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="10.000000" y="0.000000" />
+                                                    <vertice x="10.000000" y="10.000000" />
+                                                    <vertice x="0.000000" y="10.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Tank" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank1fr1.png">
+                                            <points>
+                                                <point name="Canon" x="61.000000" y="31.000000" />
+                                            </points>
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="35.000000" y="31.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="70.000000" y="0.000000" />
+                                                    <vertice x="70.000000" y="62.000000" />
+                                                    <vertice x="0.000000" y="62.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Target" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Pointer-Standard.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="22.000000" y="22.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="44.000000" y="0.000000" />
+                                                    <vertice x="44.000000" y="44.000000" />
+                                                    <vertice x="0.000000" y="44.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Shoot if left button is pressed and timer is ok :&#x0A;Create a bullet&#x0A;Make the bullet move&#x0A;and reset the timer to fire another bullet later.</comment>
+                    <comment2>Tirer si le bouton gauche est pressÃ© et le chronomÃ¨tre supÃ©rieur Ã  0.25 secondes :&#x0A;On crÃ©er un tir&#x0A;On le met en mouvement&#x0A;On remet Ã  zÃ©ro le chronomÃ¨tre pour pouvoir tirer plus tard.</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="SourisBouton" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Left</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="Timer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>0.25</parameter>
+                                <parameter>&quot;FireRate&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Bullet</parameter>
+                                <parameter>Tank.PointX(Canon)</parameter>
+                                <parameter>Tank.PointY(Canon)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="AddForceVersPos" />
+                            <parameters>
+                                <parameter>Bullet</parameter>
+                                <parameter>MouseX()</parameter>
+                                <parameter>MouseY()</parameter>
+                                <parameter>300</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ResetTimer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>&quot;FireRate&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="MettreXY" />
+                            <parameters>
+                                <parameter>Target</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseX()</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseY()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="TourneVersPos" />
+                            <parameters>
+                                <parameter>Tank</parameter>
+                                <parameter>MouseX()</parameter>
+                                <parameter>MouseY()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+        <layout b="125" disableInputWhenNotFocused="true" mangledName="Multiple_32objects" name="Multiple objects" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="125" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="125">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="false" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances>
+                <instance angle="-65.480415" customSize="false" height="0.000000" layer="" locked="false" name="Tank" width="0.000000" x="520.000000" y="216.000000" zOrder="-1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="-65.480415" customSize="false" height="0.000000" layer="" locked="false" name="Tank" width="0.000000" x="337.000000" y="215.000000" zOrder="-1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="-65.480415" customSize="false" height="0.000000" layer="" locked="false" name="Tank" width="0.000000" x="138.000000" y="201.000000" zOrder="-1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Target" width="0.000000" x="608.500000" y="178.500000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Bullet" type="Sprite">
+                    <variables />
+                    <automatisms>
+                        <automatism extraBorder="0.000000" name="DestroyOutside" type="DestroyOutsideAutomatism::DestroyOutside" />
+                    </automatisms>
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Tir.png">
+                                            <points />
+                                            <originPoint name="origine" x="5.000000" y="5.000000" />
+                                            <centerPoint automatic="true" name="centre" x="5.000000" y="5.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="10.000000" y="0.000000" />
+                                                    <vertice x="10.000000" y="10.000000" />
+                                                    <vertice x="0.000000" y="10.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Tank" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank1fr1.png">
+                                            <points>
+                                                <point name="Canon" x="61.000000" y="31.000000" />
+                                            </points>
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="35.000000" y="31.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="70.000000" y="0.000000" />
+                                                    <vertice x="70.000000" y="62.000000" />
+                                                    <vertice x="0.000000" y="62.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Target" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Pointer-Standard.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="22.000000" y="22.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="44.000000" y="0.000000" />
+                                                    <vertice x="44.000000" y="44.000000" />
+                                                    <vertice x="0.000000" y="44.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>When there is more than one object which&#x0A;must shoot a bullet, use &quot;For each object&quot; event&#x0A;so as to create a bullet for each of the objects.</comment>
+                    <comment2>Quand plus d&apos;un objet doit tirer, utilisez&#x0A;l&apos;Ã©vÃ¨nement &quot;Pour chaque objet&quot; afin de crÃ©er&#x0A;un tir pour chacun des objets.</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="SourisBouton" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Left</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="Timer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>0.25</parameter>
+                                <parameter>&quot;FireRate&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ResetTimer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>&quot;FireRate&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::ForEach</type>
+                            <object>Tank</object>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="Create" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Bullet</parameter>
+                                        <parameter>Tank.PointX(Canon)</parameter>
+                                        <parameter>Tank.PointY(Canon)</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="AddForceVersPos" />
+                                    <parameters>
+                                        <parameter>Bullet</parameter>
+                                        <parameter>MouseX(&quot;&quot;,0)</parameter>
+                                        <parameter>MouseY(&quot;&quot;,0)</parameter>
+                                        <parameter>300</parameter>
+                                        <parameter>1</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>There is nothing more to change in our example.</comment>
+                    <comment2>Il n&apos;y a rien de plus Ã  modifier ici.</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="TourneVersPos" />
+                            <parameters>
+                                <parameter>Tank</parameter>
+                                <parameter>MouseX(&quot;&quot;,0)</parameter>
+                                <parameter>MouseY(&quot;&quot;,0)</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="MettreXY" />
+                            <parameters>
+                                <parameter>Target</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseX()</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseY()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

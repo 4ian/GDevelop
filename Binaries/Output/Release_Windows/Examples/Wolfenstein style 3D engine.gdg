@@ -1,614 +1,717 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Game>
-    <GDVersion Major="2" Minor="1" Build="10682" Revision="53886" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="3D Engine" />
-        <Auteur value="" />
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable value="true" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="PhysicsAutomatism" />
-            <Extension name="LinkedObjects" />
-            <Extension name="CommonDialogs" />
-            <Extension name="Box3DObject" />
-        </Extensions>
-        <FPSmax value="300" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-        <Chargement>
-            <Afficher value="true" />
-            <Border value="true" />
-            <Smooth value="true" />
-            <Width value="170.000000" />
-            <Height value="50.000000" />
-            <TexteAfficher value="true" />
-            <TexteXPos value="0.000000" />
-            <TexteYPos value="5.000000" />
-            <Texte value="Chargement" />
-            <PourcentAfficher value="false" />
-            <PourcentXPos value="0.000000" />
-            <PourcentYPos value="0.000000" />
-            <ImageAfficher value="false" />
-            <Image value="" />
-        </Chargement>
-    </Info>
-    <Resources>
-        <Resources>
-            <Resource kind="image" name="Wall" alwaysLoaded="false" smoothed="true" userAdded="true" file="block.png" />
-            <Resource kind="image" name="Camera" alwaysLoaded="false" smoothed="true" userAdded="true" file="camera64.png" />
-            <Resource kind="image" name="Ground" alwaysLoaded="false" smoothed="true" userAdded="true" file="3DEngineBack.png" />
-            <Resource kind="image" name="Creature.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Creature.png" />
-        </Resources>
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes>
-        <Scene nom="Nouvelle scène 1" r="163.000000" v="199.000000" b="252.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" gridWidth="32.000000" grid="true" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" windowMask="false">
-            <GroupesObjets>
-                <Groupe nom="Invisible">
-                    <Objet nom="Wall2D" />
-                    <Objet nom="Camera" />
-                </Groupe>
-            </GroupesObjets>
-            <Objets>
-                <Objet nom="Wall2D" type="Sprite">
-                    <Variables />
-                    <Automatism Type="PhysicsAutomatism::PhysicsAutomatism" Name="Physics" dynamic="false" fixedRotation="false" isBullet="false" massDensity="1.000000" averageFriction="0.800000" linearDamping="0.100000" angularDamping="0.100000" shapeType="Box" positioning="OnOrigin" autoResizing="true" polygonWidth="200.000000" polygonHeight="200.000000" coordsList="" averageRestitution="0.000000" />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Wall">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="32.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="32.000000" Y="32.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Camera" type="Sprite">
-                    <Variables />
-                    <Automatism Type="PhysicsAutomatism::PhysicsAutomatism" Name="Physics" dynamic="true" fixedRotation="true" isBullet="false" massDensity="5.000000" averageFriction="0.000000" linearDamping="0.000000" angularDamping="0.000000" shapeType="Box" positioning="OnOrigin" autoResizing="true" polygonWidth="200.000000" polygonHeight="200.000000" coordsList="" averageRestitution="0.000000" />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Creature.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="8.000000" Y="8.000000" />
-                                        <PointCentre nom="centre" X="8.000000" Y="8.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Wall3D" type="Box3DObject::Box3D">
-                    <Variables />
-                    <frontTexture value="Wall" />
-                    <topTexture value="Wall" />
-                    <bottomTexture value="Wall" />
-                    <leftTexture value="Wall" />
-                    <rightTexture value="Wall" />
-                    <backTexture value="Wall" />
-                    <width value="64" />
-                    <height value="64" />
-                    <depth value="64" />
-                </Objet>
-                <Objet nom="Ground" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Ground">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="400.000000" Y="300.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="Ground" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-                <Layer Name="Map" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas>
-                <AutomatismSharedDatas Type="PhysicsAutomatism::PhysicsAutomatism" Name="Physics" gravityX="0.000000" gravityY="0.000000" scaleX="50.000000" scaleY="50.000000" />
-            </AutomatismsSharedDatas>
-            <Dependencies />
-            <Positions>
-                <Objet nom="Wall2D" x="128.000000" y="320.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Camera" x="693.000000" y="507.000000" plan="0" layer="" angle="31.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos>
-                        <Info name="animation" value="231803040.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="128.000000" y="256.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="192.000000" y="192.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="128.000000" y="384.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="256.000000" y="192.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos>
-                        <Info name="animation" value="1995553792.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="512.000000" y="192.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="344.000000" y="381.000000" plan="0" layer="" angle="-22.000000" personalizedSize="true" width="110.000000" height="64.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="448.000000" y="192.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Ground" x="0.000000" y="1.000000" plan="0" layer="Ground" angle="-159.120193" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos>
-                        <Info name="animation" value="57183676.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="-128.000000" y="512.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="320.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="384.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="768.000000" y="384.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="768.000000" y="320.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="704.000000" y="256.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="768.000000" y="448.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="320.000000" y="224.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="-128.000000" y="384.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="-128.000000" y="448.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="0.000000" y="512.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="448.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="512.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="576.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="768.000000" y="512.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="704.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="640.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="640.000000" y="256.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="576.000000" y="256.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="576.000000" y="320.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="576.000000" y="384.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="414.000000" y="532.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="446.000000" y="545.000000" plan="0" layer="" angle="2025.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos>
-                        <Info name="animation" value="1206198144.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="323.000000" y="545.000000" plan="0" layer="" angle="2025.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos>
-                        <Info name="animation" value="69447296.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="356.000000" y="532.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos>
-                        <Info name="animation" value="252530592.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="-64.000000" y="384.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="0.000000" y="384.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="64.000000" y="384.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="256.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="192.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Wall2D" x="128.000000" y="576.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Exemple de moteur 3D&#x0A;" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="DepartScene" loc="true" Contraire="false" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarScene" loc="true" />
-                            <Parametre value="" />
-                            <Parametre value="count" />
-                            <Parametre value="0" />
-                            <Parametre value="=" />
-                        </Action>
-                        <Action>
-                            <Type value="Cache" loc="true" />
-                            <Parametre value="Invisible" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Création des murs 3D qui correspondent à chaque mur 2D." />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="DepartScene" loc="true" Contraire="false" />
-                        </Condition>
-                    </Conditions>
-                    <Actions />
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::ForEach" />
-                            <Object value="Wall2D" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="Create" loc="true" />
-                                    <Parametre value="" />
-                                    <Parametre value="" />
-                                    <Parametre value="" />
-                                    <Parametre value="Wall3D" />
-                                    <Parametre value="0" />
-                                    <Parametre value="0" />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="LinkedObjects::LinkObjects" loc="true" />
-                                    <Parametre value="Wall3D" />
-                                    <Parametre value="ID" />
-                                    <Parametre value="Variable(count)" />
-                                    <Parametre value="Wall2D" />
-                                    <Parametre value="Wall3D" />
-                                </Action>
-                                <Action>
-                                    <Type value="Box3DObject::Width" loc="true" />
-                                    <Parametre value="Wall3D" />
-                                    <Parametre value="Wall2D.Width()" />
-                                    <Parametre value="=" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                    </Events>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Affichage des murs 3D" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::ForEach" />
-                    <Object value="Wall2D" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="LinkedObjects::PickObjectsLinkedTo" loc="true" Contraire="false" />
-                            <Parametre value="Wall3D" />
-                            <Parametre value="ID" />
-                            <Parametre value="Wall2D.Variable(ID)" />
-                            <Parametre value="Wall2D" />
-                            <Parametre value="" />
-                            <Parametre value="Wall3D" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarObjet" loc="true" />
-                            <Parametre value="Wall2D" />
-                            <Parametre value="distanceCamera" />
-                            <Parametre value="Wall2D.Distance(Camera)" />
-                            <Parametre value="=" />
-                        </Action>
-                        <Action>
-                            <Type value="ModVarObjet" loc="true" />
-                            <Parametre value="Wall2D" />
-                            <Parametre value="angleCamera" />
-                            <Parametre value="Camera.Variable(ViewAngle)*3.14/180-atan2(Wall2D.Y()-Camera.Y(), Wall2D.X()-Camera.X())" />
-                            <Parametre value="=" />
-                        </Action>
-                        <Action>
-                            <Type value="MettreY" loc="true" />
-                            <Parametre value="Wall3D" />
-                            <Parametre value="300-32" />
-                            <Parametre value="=" />
-                        </Action>
-                        <Action>
-                            <Type value="MettreX" loc="true" />
-                            <Parametre value="Wall3D" />
-                            <Parametre value="sin(Wall2D.Variable(angleCamera)) * Wall2D.Variable(distanceCamera)+400-32" />
-                            <Parametre value="=" />
-                        </Action>
-                        <Action>
-                            <Type value="Box3DObject::ZPosition" loc="true" />
-                            <Parametre value="Wall3D" />
-                            <Parametre value="cos(Wall2D.Variable(angleCamera)) * Wall2D.Variable(distanceCamera)+300-16" />
-                            <Parametre value="=" />
-                        </Action>
-                        <Action>
-                            <Type value="Box3DObject::Pitch" loc="true" />
-                            <Parametre value="Wall3D" />
-                            <Parametre value="Camera.Variable(ViewAngle)+Wall2D.Direction()" />
-                            <Parametre value="=" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Déplacement" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" loc="true" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Right" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarObjet" loc="true" />
-                            <Parametre value="Camera" />
-                            <Parametre value="ViewAngle" />
-                            <Parametre value="100*TimeDelta()" />
-                            <Parametre value="+" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" loc="true" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Up" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="PhysicsAutomatism::ApplyForce" loc="true" />
-                            <Parametre value="Camera" />
-                            <Parametre value="Physics" />
-                            <Parametre value="cos(Camera.Variable(ViewAngle)/180*3.14)*-4" />
-                            <Parametre value="sin(Camera.Variable(ViewAngle)/180*3.14)*-4" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" loc="true" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Left" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarObjet" loc="true" />
-                            <Parametre value="Camera" />
-                            <Parametre value="ViewAngle" />
-                            <Parametre value="100*TimeDelta()" />
-                            <Parametre value="-" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" loc="true" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Down" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="PhysicsAutomatism::ApplyForce" loc="true" />
-                            <Parametre value="Camera" />
-                            <Parametre value="Physics" />
-                            <Parametre value="cos(Camera.Variable(ViewAngle)/180*3.14)*3" />
-                            <Parametre value="sin(Camera.Variable(ViewAngle)/180*3.14)*3" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="PhysicsAutomatism::SetLinearVelocity" loc="true" />
-                            <Parametre value="Camera" />
-                            <Parametre value="Physics" />
-                            <Parametre value="Camera.Physics::LinearVelocityX() * pow( 0.9, ( TimeDelta()*60 ))" />
-                            <Parametre value="Camera.Physics::LinearVelocityY() * pow( 0.9, ( TimeDelta()*60 ))" />
-                            <Parametre value="" />
-                        </Action>
-                    </Actions>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalSourceFiles />
-</Game>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>3D Engine</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>300</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="PhysicsAutomatism" />
+            <extension name="LinkedObjects" />
+            <extension name="CommonDialogs" />
+            <extension name="Box3DObject" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+        </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources>
+            <resource alwaysLoaded="false" file="block.png" kind="image" name="Wall" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="camera64.png" kind="image" name="Camera" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="3DEngineBack.png" kind="image" name="Ground" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Creature.png" kind="image" name="Creature.png" smoothed="true" userAdded="true" />
+        </resources>
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="252" disableInputWhenNotFocused="false" mangledName="Nouvelle_32sc_232ne_321" name="Nouvelle scÃ¨ne 1" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="163" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="199">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="false" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups>
+                <group name="Invisible">
+                    <objects>
+                        <object name="Wall2D" />
+                        <object name="Camera" />
+                    </objects>
+                </group>
+            </objectsGroups>
+            <variables />
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="128.000000" y="320.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="31.000000" customSize="false" height="0.000000" layer="" locked="false" name="Camera" width="0.000000" x="693.000000" y="507.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="231803040.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="128.000000" y="256.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="192.000000" y="192.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="128.000000" y="384.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="256.000000" y="192.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="1995553792.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="512.000000" y="192.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="-22.000000" customSize="true" height="64.000000" layer="" locked="false" name="Wall2D" width="110.000000" x="321.000000" y="381.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="448.000000" y="192.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="-159.120193" customSize="false" height="0.000000" layer="Ground" locked="false" name="Ground" width="0.000000" x="0.000000" y="1.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="57183676.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="-128.000000" y="512.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="320.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="384.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="768.000000" y="384.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="768.000000" y="320.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="704.000000" y="256.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="768.000000" y="448.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="320.000000" y="224.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="-128.000000" y="384.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="-128.000000" y="448.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="0.000000" y="512.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="448.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="512.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="576.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="768.000000" y="512.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="704.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="640.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="640.000000" y="256.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="576.000000" y="256.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="576.000000" y="320.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="576.000000" y="384.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="414.000000" y="532.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="2025.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="446.000000" y="545.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="1206198144.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="2025.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="323.000000" y="545.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="69447296.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="356.000000" y="532.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="252530592.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="-64.000000" y="384.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="0.000000" y="384.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="64.000000" y="384.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="256.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="192.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Wall2D" width="0.000000" x="128.000000" y="576.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Wall2D" type="Sprite">
+                    <variables />
+                    <automatisms>
+                        <automatism angularDamping="0.100000" autoResizing="true" averageFriction="0.800000" averageRestitution="0.000000" coordsList="" dynamic="false" fixedRotation="false" isBullet="false" linearDamping="0.100000" massDensity="1.000000" name="Physics" polygonHeight="200.000000" polygonWidth="200.000000" positioning="OnOrigin" shapeType="Box" type="PhysicsAutomatism::PhysicsAutomatism" />
+                    </automatisms>
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Wall">
+                                            <points />
+                                            <originPoint name="origine" x="32.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="32.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="64.000000" y="0.000000" />
+                                                    <vertice x="64.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Camera" type="Sprite">
+                    <variables />
+                    <automatisms>
+                        <automatism angularDamping="0.000000" autoResizing="true" averageFriction="0.000000" averageRestitution="0.000000" coordsList="" dynamic="true" fixedRotation="true" isBullet="false" linearDamping="0.000000" massDensity="5.000000" name="Physics" polygonHeight="200.000000" polygonWidth="200.000000" positioning="OnOrigin" shapeType="Box" type="PhysicsAutomatism::PhysicsAutomatism" />
+                    </automatisms>
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Creature.png">
+                                            <points />
+                                            <originPoint name="origine" x="8.000000" y="8.000000" />
+                                            <centerPoint automatic="true" name="centre" x="8.000000" y="8.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="16.000000" y="0.000000" />
+                                                    <vertice x="16.000000" y="16.000000" />
+                                                    <vertice x="0.000000" y="16.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Wall3D" type="Box3DObject::Box3D">
+                    <variables />
+                    <automatisms />
+                    <frontTexture>Wall</frontTexture>
+                    <topTexture>Wall</topTexture>
+                    <bottomTexture>Wall</bottomTexture>
+                    <leftTexture>Wall</leftTexture>
+                    <rightTexture>Wall</rightTexture>
+                    <backTexture>Wall</backTexture>
+                    <width>64</width>
+                    <height>64</height>
+                    <depth>64</depth>
+                </object>
+                <object name="Ground" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Ground">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="0.000000" y="0.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Exemple de moteur 3D&#x0A;</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="DepartScene" />
+                            <parameters />
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarScene" />
+                            <parameters>
+                                <parameter>count</parameter>
+                                <parameter>=</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Cache" />
+                            <parameters>
+                                <parameter>Invisible</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>CrÃ©ation des murs 3D qui correspondent Ã  chaque mur 2D.</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="DepartScene" />
+                            <parameters />
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::ForEach</type>
+                            <object>Wall2D</object>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="Create" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Wall3D</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter>0</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="LinkedObjects::LinkObjects" />
+                                    <parameters>
+                                        <parameter>Wall3D</parameter>
+                                        <parameter>Wall2D</parameter>
+                                        <parameter>Wall3D</parameter>
+                                        <parameter>Wall2D</parameter>
+                                        <parameter>Wall3D</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="Box3DObject::Width" />
+                                    <parameters>
+                                        <parameter>Wall3D</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>Wall2D.Width()</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Affichage des murs 3D</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::ForEach</type>
+                    <object>Wall2D</object>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="LinkedObjects::PickObjectsLinkedTo" />
+                            <parameters>
+                                <parameter>Wall3D</parameter>
+                                <parameter>Wall3D</parameter>
+                                <parameter>Wall2D</parameter>
+                                <parameter>Wall2D</parameter>
+                                <parameter></parameter>
+                                <parameter>Wall3D</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Wall2D</parameter>
+                                <parameter>distanceCamera</parameter>
+                                <parameter>=</parameter>
+                                <parameter>Wall2D.Distance(Camera)</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Wall2D</parameter>
+                                <parameter>angleCamera</parameter>
+                                <parameter>=</parameter>
+                                <parameter>Camera.Variable(ViewAngle)*3.14/180-atan2(Wall2D.Y()-Camera.Y(), Wall2D.X()-Camera.X())</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="MettreY" />
+                            <parameters>
+                                <parameter>Wall3D</parameter>
+                                <parameter>=</parameter>
+                                <parameter>300-32</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="MettreX" />
+                            <parameters>
+                                <parameter>Wall3D</parameter>
+                                <parameter>=</parameter>
+                                <parameter>sin(Wall2D.Variable(angleCamera)) * Wall2D.Variable(distanceCamera)+400-32</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Box3DObject::ZPosition" />
+                            <parameters>
+                                <parameter>Wall3D</parameter>
+                                <parameter>=</parameter>
+                                <parameter>cos(Wall2D.Variable(angleCamera)) * Wall2D.Variable(distanceCamera)+300-16</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Box3DObject::Pitch" />
+                            <parameters>
+                                <parameter>Wall3D</parameter>
+                                <parameter>=</parameter>
+                                <parameter>Camera.Variable(ViewAngle)+Wall2D.Direction()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>DÃ©placement</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Right</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Camera</parameter>
+                                <parameter>ViewAngle</parameter>
+                                <parameter>+</parameter>
+                                <parameter>100*TimeDelta()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Up</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="PhysicsAutomatism::ApplyForce" />
+                            <parameters>
+                                <parameter>Camera</parameter>
+                                <parameter>Physics</parameter>
+                                <parameter>cos(Camera.Variable(ViewAngle)/180*3.14)*-4</parameter>
+                                <parameter>sin(Camera.Variable(ViewAngle)/180*3.14)*-4</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Left</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Camera</parameter>
+                                <parameter>ViewAngle</parameter>
+                                <parameter>-</parameter>
+                                <parameter>100*TimeDelta()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Down</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="PhysicsAutomatism::ApplyForce" />
+                            <parameters>
+                                <parameter>Camera</parameter>
+                                <parameter>Physics</parameter>
+                                <parameter>cos(Camera.Variable(ViewAngle)/180*3.14)*3</parameter>
+                                <parameter>sin(Camera.Variable(ViewAngle)/180*3.14)*3</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="PhysicsAutomatism::SetLinearVelocity" />
+                            <parameters>
+                                <parameter>Camera</parameter>
+                                <parameter>Physics</parameter>
+                                <parameter>Camera.Physics::LinearVelocityX() * pow( 0.9, ( TimeDelta()*60 ))</parameter>
+                                <parameter>Camera.Physics::LinearVelocityY() * pow( 0.9, ( TimeDelta()*60 ))</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+            </events>
+            <layers>
+                <layer name="Ground" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+                <layer name="Map" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData>
+                <automatismSharedData gravityX="0.000000" gravityY="0.000000" name="Physics" scaleX="50.000000" scaleY="50.000000" type="PhysicsAutomatism::PhysicsAutomatism" />
+            </automatismsSharedData>
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

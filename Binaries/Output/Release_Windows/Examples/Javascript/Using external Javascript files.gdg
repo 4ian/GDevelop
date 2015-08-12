@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="75" major="3" minor="5" revision="0" />
+    <gdVersion build="84" major="3" minor="6" revision="0" />
     <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="true" winExecutableFilename="" winExecutableIconFile="">
         <name>Project</name>
         <author></author>
@@ -189,7 +189,7 @@
     <externalEvents />
     <externalLayouts />
     <externalSourceFiles>
-        <sourceFile filename="animate-objects.js" gdManaged="false" language="Javascript" lastBuildTimeStamp="0" />
-        <sourceFile filename="alert-position.js" gdManaged="false" language="Javascript" lastBuildTimeStamp="0" />
+        <sourceFile filename="animate-objects.js" gdManaged="false" language="Javascript" />
+        <sourceFile filename="alert-position.js" gdManaged="false" language="Javascript" />
     </externalSourceFiles>
 </project>

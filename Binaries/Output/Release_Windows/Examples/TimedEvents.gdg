@@ -1,124 +1,127 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Game>
-    <GDVersion Major="2" Minor="1" Build="10682" Revision="53886" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Project" />
-        <Auteur value="" />
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable value="true" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="TimedEvent" />
-        </Extensions>
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-        <Chargement>
-            <Afficher value="true" />
-            <Border value="true" />
-            <Smooth value="true" />
-            <Width value="170.000000" />
-            <Height value="50.000000" />
-            <TexteAfficher value="true" />
-            <TexteXPos value="0.000000" />
-            <TexteYPos value="5.000000" />
-            <Texte value="Chargement" />
-            <PourcentAfficher value="false" />
-            <PourcentXPos value="0.000000" />
-            <PourcentYPos value="0.000000" />
-            <ImageAfficher value="false" />
-            <Image value="" />
-        </Chargement>
-    </Info>
-    <Resources>
-        <Resources />
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes>
-        <Scene nom="New scene" r="125.000000" v="125.000000" b="125.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" gridWidth="32.000000" grid="false" snap="false" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" windowMask="false">
-            <GroupesObjets />
-            <Objets />
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas />
-            <Dependencies />
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="1 second : Pause&#x0A;1 second : Blue flashs&#x0A;1 second : Red flashs" />
-                    <Com2 value="1 seconde de pause&#x0A;1 seconde de flash bleus&#x0A;1 seconde de flash rouges" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="TimedEvent::TimedEvent" />
-                    <Name value="Start" />
-                    <Timeout value="1" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="SceneBackground" loc="true" />
-                            <Parametre value="" />
-                            <Parametre value='&quot;255;0;0&quot;' />
-                        </Action>
-                    </Actions>
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="TimedEvent::TimedEvent" />
-                            <Name value="" />
-                            <Timeout value="1" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="SceneBackground" loc="true" />
-                                    <Parametre value="" />
-                                    <Parametre value='&quot;0;0;255&quot;' />
-                                </Action>
-                            </Actions>
-                            <Events>
-                                <Event disabled="false" folded="false">
-                                    <Type value="TimedEvent::TimedEvent" />
-                                    <Name value="" />
-                                    <Timeout value="1" />
-                                    <Conditions />
-                                    <Actions>
-                                        <Action>
-                                            <Type value="TimedEvent::ResetTimedEventAndSubs" loc="true" />
-                                            <Parametre value="Start" />
-                                        </Action>
-                                    </Actions>
-                                </Event>
-                            </Events>
-                        </Event>
-                    </Events>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalSourceFiles />
-</Game>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Project</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="TimedEvent" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+        </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources />
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="125" disableInputWhenNotFocused="false" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="125" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="125">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="false" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances />
+            <objects />
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>1 second : Pause&#x0A;1 second : Blue flashs&#x0A;1 second : Red flashs</comment>
+                    <comment2>1 seconde de pause&#x0A;1 seconde de flash bleus&#x0A;1 seconde de flash rouges</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>TimedEvent::TimedEvent</type>
+                    <name>Start</name>
+                    <timeout>1</timeout>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="SceneBackground" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>&quot;255;0;0&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>TimedEvent::TimedEvent</type>
+                            <name></name>
+                            <timeout>1</timeout>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="SceneBackground" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>&quot;0;0;255&quot;</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events>
+                                <event disabled="false" folded="false">
+                                    <type>TimedEvent::TimedEvent</type>
+                                    <name></name>
+                                    <timeout>1</timeout>
+                                    <conditions />
+                                    <actions>
+                                        <action>
+                                            <type inverted="false" value="TimedEvent::ResetTimedEventAndSubs" />
+                                            <parameters>
+                                                <parameter>Start</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                    </actions>
+                                    <events />
+                                </event>
+                            </events>
+                        </event>
+                    </events>
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

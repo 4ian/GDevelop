@@ -1,121 +1,142 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Project>
-    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Explosions" />
-        <Auteur value="" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="BuiltinExternalLayouts" />
-            <Extension name="ParticleSystem" />
-        </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
-        </Platforms>
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable />
-        <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-    </Info>
-    <Resources>
-        <Resources>
-            <Resource kind="image" name="ExplosionTexture.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="ExplosionTexture.png" />
-        </Resources>
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes firstScene="">
-        <Scene nom="New scene" mangledName="New_32scene" r="0.000000" v="0.000000" b="0.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Explosion" type="ParticleSystem::ParticleEmitter" particleEditionSimpleMode="false" emissionEditionSimpleMode="false" gravityEditionSimpleMode="false" tank="1000.000000" flow="-1.000000" emitterForceMin="5.000000" emitterForceMax="40.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" emitterAngleA="180.000000" emitterAngleB="160.000000" zoneRadius="2.000000" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="20.000000" friction="2.000000" particleLifeTimeMin="0.700000" particleLifeTimeMax="1.500000" particleRed1="255.000000" particleRed2="50.000000" particleGreen1="128.000000" particleGreen2="50.000000" particleBlue1="25.000000" particleBlue2="50.000000" particleAlpha1="204.000000" particleAlpha2="0.000000" particleSize1="100.000000" particleSize2="100.000000" particleAngle1="0.000000" particleAngle2="0.000000" rendererParam1="20.000000" rendererParam2="20.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" additive="true" destroyWhenNoParticles="true" textureParticleName="ExplosionTexture.png" maxParticleNb="5000" rendererType="Quad" redParam="Mutable" greenParam="Mutable" blueParam="Mutable" alphaParam="Mutable" sizeParam="Random" angleParam="Random">
-                    <Variables />
-                </Objet>
-                <Objet nom="Explosion2" type="ParticleSystem::ParticleEmitter" particleEditionSimpleMode="false" emissionEditionSimpleMode="false" gravityEditionSimpleMode="false" tank="350.000000" flow="-1.000000" emitterForceMin="50.000000" emitterForceMax="130.000000" emitterXDirection="1.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" emitterAngleA="0.000000" emitterAngleB="180.000000" zoneRadius="2.000000" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="30.000000" friction="2.000000" particleLifeTimeMin="0.700000" particleLifeTimeMax="1.500000" particleRed1="153.000000" particleRed2="1.000000" particleGreen1="76.000000" particleGreen2="180.000000" particleBlue1="25.000000" particleBlue2="75.000000" particleAlpha1="204.000000" particleAlpha2="0.000000" particleSize1="100.000000" particleSize2="100.000000" particleAngle1="0.000000" particleAngle2="0.000000" rendererParam1="0.050000" rendererParam2="1.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" additive="true" destroyWhenNoParticles="true" textureParticleName="" maxParticleNb="5000" rendererType="Line" redParam="Enabled" greenParam="Mutable" blueParam="Mutable" alphaParam="Mutable" sizeParam="Random" angleParam="Random">
-                    <Variables />
-                </Objet>
-                <Objet nom="ExplosionSmoke" type="ParticleSystem::ParticleEmitter" particleEditionSimpleMode="false" emissionEditionSimpleMode="false" gravityEditionSimpleMode="true" tank="500.000000" flow="400.000000" emitterForceMin="0.000000" emitterForceMax="10.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" emitterAngleA="45.000000" emitterAngleB="180.000000" zoneRadius="20.000000" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="30.000000" friction="2.000000" particleLifeTimeMin="0.700000" particleLifeTimeMax="1.200000" particleRed1="25.000000" particleRed2="0.100000" particleGreen1="25.000000" particleGreen2="0.800000" particleBlue1="25.000000" particleBlue2="0.000000" particleAlpha1="153.000000" particleAlpha2="0.000000" particleSize1="100.000000" particleSize2="100.000000" particleAngle1="0.000000" particleAngle2="0.000000" rendererParam1="20.000000" rendererParam2="20.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" additive="true" destroyWhenNoParticles="true" textureParticleName="ExplosionTexture.png" maxParticleNb="5000" rendererType="Quad" redParam="Enabled" greenParam="Enabled" blueParam="Enabled" alphaParam="Mutable" sizeParam="Random" angleParam="Random">
-                    <Variables />
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas />
-            <Positions />
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="Timer" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Random(0.3)+0.2" />
-                            <Parametre value='&quot;Creating&quot;' />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="Explosion" />
-                            <Parametre value="Random(800)" />
-                            <Parametre value="Random(600)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="Explosion2" />
-                            <Parametre value="Explosion.X()" />
-                            <Parametre value="Explosion.Y()" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="ExplosionSmoke" />
-                            <Parametre value="Explosion.X()" />
-                            <Parametre value="Explosion.Y()" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="ResetTimer" />
-                            <Parametre value="" />
-                            <Parametre value='&quot;Creating&quot;' />
-                        </Action>
-                    </Actions>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalLayouts />
-    <ExternalSourceFiles />
-</Project>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Explosions</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="ParticleSystem" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+        </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources>
+            <resource alwaysLoaded="false" file="ExplosionTexture.png" kind="image" name="ExplosionTexture.png" smoothed="true" userAdded="true" />
+        </resources>
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="0" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="0" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="0">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances />
+            <objects>
+                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Mutable" destroyWhenNoParticles="true" emissionEditionSimpleMode="false" emitterAngleA="180.000000" emitterAngleB="160.000000" emitterForceMax="40.000000" emitterForceMin="5.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="-1.000000" friction="2.000000" gravityEditionSimpleMode="false" greenParam="Mutable" maxParticleNb="5000" name="Explosion" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="25.000000" particleBlue2="50.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="20.000000" particleGreen1="128.000000" particleGreen2="50.000000" particleLifeTimeMax="1.500000" particleLifeTimeMin="0.700000" particleRed1="255.000000" particleRed2="50.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Mutable" rendererParam1="20.000000" rendererParam2="20.000000" rendererType="Quad" sizeParam="Random" tank="1000.000000" textureParticleName="ExplosionTexture.png" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
+                    <variables />
+                    <automatisms />
+                </object>
+                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Mutable" destroyWhenNoParticles="true" emissionEditionSimpleMode="false" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="130.000000" emitterForceMin="50.000000" emitterXDirection="1.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="-1.000000" friction="2.000000" gravityEditionSimpleMode="false" greenParam="Mutable" maxParticleNb="5000" name="Explosion2" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="25.000000" particleBlue2="75.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="30.000000" particleGreen1="76.000000" particleGreen2="180.000000" particleLifeTimeMax="1.500000" particleLifeTimeMin="0.700000" particleRed1="153.000000" particleRed2="1.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="0.050000" rendererParam2="1.000000" rendererType="Line" sizeParam="Random" tank="350.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
+                    <variables />
+                    <automatisms />
+                </object>
+                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Enabled" destroyWhenNoParticles="true" emissionEditionSimpleMode="false" emitterAngleA="45.000000" emitterAngleB="180.000000" emitterForceMax="10.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="400.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Enabled" maxParticleNb="5000" name="ExplosionSmoke" particleAlpha1="153.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="25.000000" particleBlue2="0.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="30.000000" particleGreen1="25.000000" particleGreen2="0.800000" particleLifeTimeMax="1.200000" particleLifeTimeMin="0.700000" particleRed1="25.000000" particleRed2="0.100000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="20.000000" rendererParam2="20.000000" rendererType="Quad" sizeParam="Random" tank="500.000000" textureParticleName="ExplosionTexture.png" type="ParticleSystem::ParticleEmitter" zoneRadius="20.000000">
+                    <variables />
+                    <automatisms />
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="Timer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Random(0.3)+0.2</parameter>
+                                <parameter>&quot;Creating&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Explosion</parameter>
+                                <parameter>Random(800)</parameter>
+                                <parameter>Random(600)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Explosion2</parameter>
+                                <parameter>Explosion.X()</parameter>
+                                <parameter>Explosion.Y()</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>ExplosionSmoke</parameter>
+                                <parameter>Explosion.X()</parameter>
+                                <parameter>Explosion.Y()</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ResetTimer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>&quot;Creating&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

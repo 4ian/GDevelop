@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="79" major="3" minor="6" revision="0" />
+    <gdVersion build="84" major="3" minor="6" revision="0" />
     <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>slot_machine_example</name>
         <author></author>

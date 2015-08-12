@@ -1,795 +1,1080 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Project>
-    <GDVersion Major="3" Minor="3" Build="70" Revision="0" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Project" />
-        <Auteur value="" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="BuiltinExternalLayouts" />
-            <Extension name="ParticleSystem" />
-            <Extension name="PathfindingAutomatism" />
-            <Extension name="TiledSpriteObject" />
-        </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
-            <Platform name="Game Develop JS platform" />
-        </Platforms>
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable />
-        <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-    </Info>
-    <Resources>
-        <Resources>
-            <Resource kind="image" name="Pointer-Standard.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pointer-Standard.png" />
-            <Resource kind="image" name="3DWall.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="3DWall.png" />
-            <Resource kind="image" name="Pea-Happy.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pea-Happy.png" />
-            <Resource kind="image" name="Flag-Pole.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Target.png" />
-            <Resource kind="image" name="Pea-Standard.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Pea-Standard.png" />
-            <Resource kind="image" name="tank_frame2-0001.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame2-0001.png" />
-            <Resource kind="image" name="tank_frame2-0002.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame2-0002.png" />
-            <Resource kind="image" name="tank_frame2-0003.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame2-0003.png" />
-            <Resource kind="image" name="tank_frame2-0004.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame2-0004.png" />
-            <Resource kind="image" name="tank_frame2-0005.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame2-0005.png" />
-            <Resource kind="image" name="tank_frame2-0006.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame2-0006.png" />
-            <Resource kind="image" name="tank_frame2-0007.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame2-0007.png" />
-            <Resource kind="image" name="tank_frame2-0008.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame2-0008.png" />
-            <Resource kind="image" name="tank_frame10001.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame10001.png" />
-            <Resource kind="image" name="tank_frame10002.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame10002.png" />
-            <Resource kind="image" name="tank_frame10003.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame10003.png" />
-            <Resource kind="image" name="tank_frame10004.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame10004.png" />
-            <Resource kind="image" name="tank_frame10005.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame10005.png" />
-            <Resource kind="image" name="tank_frame10006.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame10006.png" />
-            <Resource kind="image" name="tank_frame10007.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame10007.png" />
-            <Resource kind="image" name="tank_frame10008.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="tank_frame10008.png" />
-            <Resource kind="image" name="DestroyedTank.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="DestroyedTank.png" />
-            <Resource kind="image" name="Fire" alwaysLoaded="false" smoothed="true" userAdded="true" file="ExplosionTexture.png" />
-            <Resource kind="image" name="GrassDead.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="GrassDead.png" />
-            <Resource kind="image" name="NodeMarker.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="NodeMarker.png" />
-            <Resource kind="image" name="symbol.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="symbol.png" />
-        </Resources>
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes firstScene="">
-        <Scene nom="New scene" mangledName="New_32scene" r="0.000000" v="193.000000" b="0.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="45.000000" grid="false" snap="true" gridHeight="20.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="true" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Cursor" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Pointer-Standard.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Block" type="Sprite">
-                    <Variables />
-                    <Automatism Type="PathfindingAutomatism::PathfindingObstacleAutomatism" Name="PathfindingObstacle" impassable="true" cost="6.000000" />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="3DWall.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Flag" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Flag-Pole.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="25.000000" Y="13.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="DestroyedTank" type="Sprite">
-                    <Variables />
-                    <Automatism Type="PathfindingAutomatism::PathfindingObstacleAutomatism" Name="PathfindingObstacle" impassable="true" cost="2.000000" />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="DestroyedTank.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="DestroyedTank.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="DestroyedTank.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="DestroyedTank.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="DestroyedTank.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="DestroyedTank.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="DestroyedTank.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="DestroyedTank.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Smoke" type="ParticleSystem::ParticleEmitter" particleEditionSimpleMode="true" emissionEditionSimpleMode="true" gravityEditionSimpleMode="true" tank="-1.000000" flow="200.000000" emitterForceMin="0.000000" emitterForceMax="0.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" emitterAngleA="0.000000" emitterAngleB="180.000000" zoneRadius="3.000000" particleGravityX="0.000000" particleGravityY="-33.000000" particleGravityZ="0.000000" friction="2.000000" particleLifeTimeMin="0.500000" particleLifeTimeMax="2.500000" particleRed1="50.000000" particleRed2="1.000000" particleGreen1="50.000000" particleGreen2="0.800000" particleBlue1="50.000000" particleBlue2="0.000000" particleAlpha1="160.000000" particleAlpha2="0.000000" particleSize1="20.000000" particleSize2="100.000000" particleAngle1="0.000000" particleAngle2="360.000000" rendererParam1="15.000000" rendererParam2="15.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" additive="false" destroyWhenNoParticles="false" textureParticleName="Fire" maxParticleNb="5000" rendererType="Quad" redParam="Enabled" greenParam="Enabled" blueParam="Enabled" alphaParam="Mutable" sizeParam="Mutable" angleParam="Random">
-                    <Variables />
-                </Objet>
-                <Objet nom="Fire" type="ParticleSystem::ParticleEmitter" particleEditionSimpleMode="true" emissionEditionSimpleMode="true" gravityEditionSimpleMode="true" tank="-1.000000" flow="300.000000" emitterForceMin="0.000000" emitterForceMax="5.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" emitterAngleA="0.000000" emitterAngleB="180.000000" zoneRadius="2.000000" particleGravityX="0.000000" particleGravityY="-50.000000" particleGravityZ="0.000000" friction="2.000000" particleLifeTimeMin="0.250000" particleLifeTimeMax="1.500000" particleRed1="240.000000" particleRed2="1.000000" particleGreen1="50.000000" particleGreen2="204.000000" particleBlue1="50.000000" particleBlue2="0.000000" particleAlpha1="204.000000" particleAlpha2="0.000000" particleSize1="100.000000" particleSize2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" rendererParam1="5.000000" rendererParam2="10.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="30.000000" additive="true" destroyWhenNoParticles="false" textureParticleName="Fire" maxParticleNb="5000" rendererType="Quad" redParam="Enabled" greenParam="Random" blueParam="Random" alphaParam="Mutable" sizeParam="Mutable" angleParam="Mutable">
-                    <Variables />
-                </Objet>
-                <Objet nom="NodeMarker" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="NodeMarker.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Background" type="TiledSpriteObject::TiledSprite" texture="GrassDead.png" width="256" height="256">
-                    <Variables />
-                </Objet>
-                <Objet nom="Tank" type="Sprite">
-                    <Variables />
-                    <Automatism Type="PathfindingAutomatism::PathfindingAutomatism" Name="Pathfinding" allowDiagonals="true" acceleration="400.000000" maxSpeed="300.000000" angularMaxSpeed="180.000000" rotateObject="true" angleOffset="0.000000" cellWidth="20" cellHeight="20" extraBorder="-20.000000" />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="true" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank_frame2-0004.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                    <Sprite image="tank_frame10004.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="true" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank_frame2-0003.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                    <Sprite image="tank_frame10003.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="true" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank_frame2-0002.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                    <Sprite image="tank_frame10002.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="true" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank_frame2-0001.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                    <Sprite image="tank_frame10001.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="true" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank_frame2-0008.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                    <Sprite image="tank_frame10008.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="true" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank_frame2-0007.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                    <Sprite image="tank_frame10007.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="true" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank_frame2-0006.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                    <Sprite image="tank_frame10006.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="true" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="tank_frame2-0005.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                    <Sprite image="tank_frame10005.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="41.000000" Y="32.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Pea-Happy.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="18.000000" Y="18.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites />
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Symbol" type="Sprite">
-                    <Variables />
-                    <Automatism Type="PathfindingAutomatism::PathfindingObstacleAutomatism" Name="PathfindingObstacle" impassable="false" cost="2.000000" />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="symbol.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="0.000000" Y="0.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas>
-                <AutomatismSharedDatas Type="PathfindingAutomatism::PathfindingAutomatism" Name="Pathfinding" />
-                <AutomatismSharedDatas Type="PathfindingAutomatism::PathfindingObstacleAutomatism" Name="PathfindingObstacle" />
-            </AutomatismsSharedDatas>
-            <Positions>
-                <Objet nom="Block" x="225.000000" y="480.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="294.000000" y="120.000000" plan="0" layer="" angle="0.000000" personalizedSize="true" width="85.000000" height="44.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="229.000000" y="120.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="315.000000" y="480.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="576.000000" y="153.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="360.000000" y="121.000008" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="606.000000" y="292.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="639.000000" y="427.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="270.000000" y="480.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Flag" x="710.000000" y="366.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="2674909.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Cursor" x="639.000000" y="61.000000" plan="10" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="2679776.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="DestroyedTank" x="306.000000" y="28.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fire" x="342.000000" y="54.000000" plan="4" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Smoke" x="353.000000" y="40.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="DestroyedTank" x="575.000000" y="213.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fire" x="622.000000" y="238.000000" plan="4" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Smoke" x="618.000000" y="236.000000" plan="3" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="DestroyedTank" x="90.000000" y="460.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Smoke" x="135.000000" y="480.000000" plan="4" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Background" x="-213.115402" y="-107.875854" plan="-10" layer="" angle="0.000000" personalizedSize="true" width="1277.536987" height="777.002441" locked="true">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Tank" x="70.500000" y="162.500000" plan="2" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Symbol" x="272.000000" y="169.000000" plan="-2" layer="" angle="0.000000" personalizedSize="true" width="128.000000" height="95.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="405.000000" y="360.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="228.000000" y="268.000000" plan="0" layer="" angle="0.000000" personalizedSize="true" width="85.000000" height="44.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="279.000000" y="269.000000" plan="0" layer="" angle="0.000000" personalizedSize="true" width="85.000000" height="44.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Block" x="43.000000" y="309.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Click to put the flag." />
-                    <Com2 value="Cliquez pour placer le drapeau." />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="SourisBouton" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Left" />
-                        </Condition>
-                        <Condition>
-                            <Type value="BuiltinCommonInstructions::Once" Contraire="false" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="MettreXY" />
-                            <Parametre value="Flag" />
-                            <Parametre value="=" />
-                            <Parametre value='MouseX(&quot;&quot;,0)' />
-                            <Parametre value="=" />
-                            <Parametre value='MouseY(&quot;&quot;,0)' />
-                        </Action>
-                        <Action>
-                            <Type value="PathfindingAutomatism::SetDestination" />
-                            <Parametre value="Tank" />
-                            <Parametre value="Pathfinding" />
-                            <Parametre value="" />
-                            <Parametre value='MouseX(&quot;&quot;,0)' />
-                            <Parametre value='MouseY(&quot;&quot;,0)' />
-                        </Action>
-                    </Actions>
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="ModVarScene" />
-                                    <Parametre value="i" />
-                                    <Parametre value="=" />
-                                    <Parametre value="0" />
-                                </Action>
-                                <Action>
-                                    <Type value="Delete" />
-                                    <Parametre value="NodeMarker" />
-                                    <Parametre value="" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false" infiniteLoopWarning="true">
-                            <Type value="BuiltinCommonInstructions::While" />
-                            <WhileConditions>
-                                <Condition>
-                                    <Type value="VarScene" Contraire="false" />
-                                    <Parametre value="i" />
-                                    <Parametre value="&lt;" />
-                                    <Parametre value="Tank.Pathfinding::NodeCount()" />
-                                </Condition>
-                            </WhileConditions>
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="Create" />
-                                    <Parametre value="" />
-                                    <Parametre value="NodeMarker" />
-                                    <Parametre value="Tank.Pathfinding::GetNodeX(Variable(i))" />
-                                    <Parametre value="Tank.Pathfinding::GetNodeY(Variable(i))" />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="ModVarScene" />
-                                    <Parametre value="i" />
-                                    <Parametre value="+" />
-                                    <Parametre value="1" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                    </Events>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Moving is achivied using the automatism and by calling the action to move an object to a position" />
-                    <Com2 value="Le déplacement est créé en utilisant l&apos;automatisme de recherche de chemin et en appelant l&apos;action de déplacement." />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="MettreXY" />
-                            <Parametre value="Cursor" />
-                            <Parametre value="=" />
-                            <Parametre value='MouseX(&quot;&quot;,0)' />
-                            <Parametre value="=" />
-                            <Parametre value='MouseY(&quot;&quot;,0)' />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Restrict the speed when moving on some objects" />
-                    <Com2 value="Certains objets restreignent la vitesse." />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="PathfindingAutomatism::MaxSpeed" />
-                            <Parametre value="Tank" />
-                            <Parametre value="Pathfinding" />
-                            <Parametre value="=" />
-                            <Parametre value="400" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="CollisionNP" Contraire="false" />
-                            <Parametre value="Tank" />
-                            <Parametre value="Symbol" />
-                            <Parametre value="" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="PathfindingAutomatism::MaxSpeed" />
-                            <Parametre value="Tank" />
-                            <Parametre value="Pathfinding" />
-                            <Parametre value="=" />
-                            <Parametre value="200" />
-                        </Action>
-                    </Actions>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalLayouts />
-    <ExternalSourceFiles />
-</Project>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Project</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="ParticleSystem" />
+            <extension name="PathfindingAutomatism" />
+            <extension name="TiledSpriteObject" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+            <platform name="GDevelop JS platform" />
+        </platforms>
+        <currentPlatform>GDevelop JS platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources>
+            <resource alwaysLoaded="false" file="Pointer-Standard.png" kind="image" name="Pointer-Standard.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="3DWall.png" kind="image" name="3DWall.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Pea-Happy.png" kind="image" name="Pea-Happy.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Target.png" kind="image" name="Flag-Pole.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Pea-Standard.png" kind="image" name="Pea-Standard.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame2-0001.png" kind="image" name="tank_frame2-0001.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame2-0002.png" kind="image" name="tank_frame2-0002.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame2-0003.png" kind="image" name="tank_frame2-0003.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame2-0004.png" kind="image" name="tank_frame2-0004.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame2-0005.png" kind="image" name="tank_frame2-0005.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame2-0006.png" kind="image" name="tank_frame2-0006.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame2-0007.png" kind="image" name="tank_frame2-0007.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame2-0008.png" kind="image" name="tank_frame2-0008.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame10001.png" kind="image" name="tank_frame10001.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame10002.png" kind="image" name="tank_frame10002.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame10003.png" kind="image" name="tank_frame10003.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame10004.png" kind="image" name="tank_frame10004.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame10005.png" kind="image" name="tank_frame10005.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame10006.png" kind="image" name="tank_frame10006.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame10007.png" kind="image" name="tank_frame10007.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="tank_frame10008.png" kind="image" name="tank_frame10008.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="DestroyedTank.png" kind="image" name="DestroyedTank.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="ExplosionTexture.png" kind="image" name="Fire" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="GrassDead.png" kind="image" name="GrassDead.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="NodeMarker.png" kind="image" name="NodeMarker.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="symbol.png" kind="image" name="symbol.png" smoothed="true" userAdded="true" />
+        </resources>
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="0" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="0" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="193">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="20" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="45" snap="true" windowMask="true" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="225.000000" y="480.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="44.000000" layer="" locked="false" name="Block" width="85.000000" x="294.000000" y="120.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="229.000000" y="120.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="315.000000" y="480.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="576.000000" y="153.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="360.000000" y="121.000008" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="606.000000" y="292.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="639.000000" y="427.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="270.000000" y="480.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Flag" width="0.000000" x="710.000000" y="366.000000" zOrder="1">
+                    <numberProperties>
+                        <property name="animation" value="2674909.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Cursor" width="0.000000" x="639.000000" y="61.000000" zOrder="10">
+                    <numberProperties>
+                        <property name="animation" value="2679776.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="DestroyedTank" width="0.000000" x="306.000000" y="28.000000" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fire" width="0.000000" x="342.000000" y="54.000000" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Smoke" width="0.000000" x="353.000000" y="40.000000" zOrder="3">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="DestroyedTank" width="0.000000" x="575.000000" y="213.000000" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fire" width="0.000000" x="622.000000" y="238.000000" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Smoke" width="0.000000" x="618.000000" y="236.000000" zOrder="3">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="DestroyedTank" width="0.000000" x="90.000000" y="460.000000" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Smoke" width="0.000000" x="135.000000" y="480.000000" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="777.002441" layer="" locked="true" name="Background" width="1277.536987" x="-213.115402" y="-107.875854" zOrder="-10">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Tank" width="0.000000" x="70.500000" y="162.500000" zOrder="2">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="95.000000" layer="" locked="false" name="Symbol" width="128.000000" x="272.000000" y="169.000000" zOrder="-2">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="405.000000" y="360.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="44.000000" layer="" locked="false" name="Block" width="85.000000" x="228.000000" y="268.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="44.000000" layer="" locked="false" name="Block" width="85.000000" x="279.000000" y="269.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Block" width="0.000000" x="43.000000" y="309.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Cursor" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Pointer-Standard.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="22.000000" y="22.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="44.000000" y="0.000000" />
+                                                    <vertice x="44.000000" y="44.000000" />
+                                                    <vertice x="0.000000" y="44.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Block" type="Sprite">
+                    <variables />
+                    <automatisms>
+                        <automatism cost="6.000000" impassable="true" name="PathfindingObstacle" type="PathfindingAutomatism::PathfindingObstacleAutomatism" />
+                    </automatisms>
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="3DWall.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="44.500000" y="22.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="89.000000" y="0.000000" />
+                                                    <vertice x="89.000000" y="44.000000" />
+                                                    <vertice x="0.000000" y="44.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Flag" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Flag-Pole.png">
+                                            <points />
+                                            <originPoint name="origine" x="25.000000" y="13.000000" />
+                                            <centerPoint automatic="true" name="centre" x="25.000000" y="10.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="50.000000" y="0.000000" />
+                                                    <vertice x="50.000000" y="20.000000" />
+                                                    <vertice x="0.000000" y="20.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="DestroyedTank" type="Sprite">
+                    <variables />
+                    <automatisms>
+                        <automatism cost="2.000000" impassable="true" name="PathfindingObstacle" type="PathfindingAutomatism::PathfindingObstacleAutomatism" />
+                    </automatisms>
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="DestroyedTank.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="DestroyedTank.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="DestroyedTank.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="DestroyedTank.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="DestroyedTank.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="DestroyedTank.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="DestroyedTank.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="DestroyedTank.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object additive="false" alphaParam="Mutable" angleParam="Random" blueParam="Enabled" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="0.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="200.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Enabled" maxParticleNb="5000" name="Smoke" particleAlpha1="160.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="360.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="50.000000" particleBlue2="0.000000" particleEditionSimpleMode="true" particleGravityX="0.000000" particleGravityY="-33.000000" particleGravityZ="0.000000" particleGreen1="50.000000" particleGreen2="0.800000" particleLifeTimeMax="2.500000" particleLifeTimeMin="0.500000" particleRed1="50.000000" particleRed2="1.000000" particleSize1="20.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="15.000000" rendererParam2="15.000000" rendererType="Quad" sizeParam="Mutable" tank="-1.000000" textureParticleName="Fire" type="ParticleSystem::ParticleEmitter" zoneRadius="3.000000">
+                    <variables />
+                    <automatisms />
+                </object>
+                <object additive="true" alphaParam="Mutable" angleParam="Mutable" blueParam="Random" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="5.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="300.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Random" maxParticleNb="5000" name="Fire" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="30.000000" particleBlue1="50.000000" particleBlue2="0.000000" particleEditionSimpleMode="true" particleGravityX="0.000000" particleGravityY="-50.000000" particleGravityZ="0.000000" particleGreen1="50.000000" particleGreen2="204.000000" particleLifeTimeMax="1.500000" particleLifeTimeMin="0.250000" particleRed1="240.000000" particleRed2="1.000000" particleSize1="100.000000" particleSize2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="5.000000" rendererParam2="10.000000" rendererType="Quad" sizeParam="Mutable" tank="-1.000000" textureParticleName="Fire" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
+                    <variables />
+                    <automatisms />
+                </object>
+                <object name="NodeMarker" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="NodeMarker.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="0.000000" y="0.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object height="256.000000" name="Background" texture="GrassDead.png" type="TiledSpriteObject::TiledSprite" width="256.000000">
+                    <variables />
+                    <automatisms />
+                </object>
+                <object name="Tank" type="Sprite">
+                    <variables />
+                    <automatisms>
+                        <automatism acceleration="400.000000" allowDiagonals="true" angleOffset="0.000000" angularMaxSpeed="180.000000" cellHeight="20" cellWidth="20" extraBorder="-20.000000" maxSpeed="300.000000" name="Pathfinding" rotateObject="true" type="PathfindingAutomatism::PathfindingAutomatism" />
+                    </automatisms>
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="true" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame2-0004.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame10004.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="true" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame2-0003.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame10003.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="true" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame2-0002.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame10002.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="true" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame2-0001.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame10001.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="true" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame2-0008.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame10008.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="true" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame2-0007.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame10007.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="true" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame2-0006.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame10006.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="true" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame2-0005.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                        <sprite hasCustomCollisionMask="false" image="tank_frame10005.png">
+                                            <points />
+                                            <originPoint name="origine" x="41.000000" y="32.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.000000" y="32.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="0.000000" />
+                                                    <vertice x="82.000000" y="64.000000" />
+                                                    <vertice x="0.000000" y="64.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Pea-Happy.png">
+                                            <points />
+                                            <originPoint name="origine" x="18.000000" y="18.000000" />
+                                            <centerPoint automatic="true" name="centre" x="18.500000" y="18.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="37.000000" />
+                                                    <vertice x="0.000000" y="37.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites />
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Symbol" type="Sprite">
+                    <variables />
+                    <automatisms>
+                        <automatism cost="2.000000" impassable="false" name="PathfindingObstacle" type="PathfindingAutomatism::PathfindingObstacleAutomatism" />
+                    </automatisms>
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="symbol.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="64.000000" y="64.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="128.000000" y="0.000000" />
+                                                    <vertice x="128.000000" y="128.000000" />
+                                                    <vertice x="0.000000" y="128.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Click to put the flag.</comment>
+                    <comment2>Cliquez pour placer le drapeau.</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="SourisBouton" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Left</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="BuiltinCommonInstructions::Once" />
+                            <parameters />
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="MettreXY" />
+                            <parameters>
+                                <parameter>Flag</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseX(&quot;&quot;,0)</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseY(&quot;&quot;,0)</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="PathfindingAutomatism::SetDestination" />
+                            <parameters>
+                                <parameter>Tank</parameter>
+                                <parameter>Pathfinding</parameter>
+                                <parameter></parameter>
+                                <parameter>MouseX(&quot;&quot;,0)</parameter>
+                                <parameter>MouseY(&quot;&quot;,0)</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="ModVarScene" />
+                                    <parameters>
+                                        <parameter>i</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="Delete" />
+                                    <parameters>
+                                        <parameter>NodeMarker</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false" infiniteLoopWarning="true">
+                            <type>BuiltinCommonInstructions::While</type>
+                            <whileConditions>
+                                <condition>
+                                    <type inverted="false" value="VarScene" />
+                                    <parameters>
+                                        <parameter>i</parameter>
+                                        <parameter>&lt;</parameter>
+                                        <parameter>Tank.Pathfinding::NodeCount()</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </whileConditions>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="Create" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>NodeMarker</parameter>
+                                        <parameter>Tank.Pathfinding::GetNodeX(Variable(i))</parameter>
+                                        <parameter>Tank.Pathfinding::GetNodeY(Variable(i))</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="ModVarScene" />
+                                    <parameters>
+                                        <parameter>i</parameter>
+                                        <parameter>+</parameter>
+                                        <parameter>1</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Moving is achivied using the automatism and by calling the action to move an object to a position</comment>
+                    <comment2>Le dÃ©placement est crÃ©Ã© en utilisant l&apos;automatisme de recherche de chemin et en appelant l&apos;action de dÃ©placement.</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="MettreXY" />
+                            <parameters>
+                                <parameter>Cursor</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseX(&quot;&quot;,0)</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseY(&quot;&quot;,0)</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Restrict the speed when moving on some objects</comment>
+                    <comment2>Certains objets restreignent la vitesse.</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="PathfindingAutomatism::MaxSpeed" />
+                            <parameters>
+                                <parameter>Tank</parameter>
+                                <parameter>Pathfinding</parameter>
+                                <parameter>=</parameter>
+                                <parameter>400</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="CollisionNP" />
+                            <parameters>
+                                <parameter>Tank</parameter>
+                                <parameter>Symbol</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="PathfindingAutomatism::MaxSpeed" />
+                            <parameters>
+                                <parameter>Tank</parameter>
+                                <parameter>Pathfinding</parameter>
+                                <parameter>=</parameter>
+                                <parameter>200</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData>
+                <automatismSharedData name="Pathfinding" type="PathfindingAutomatism::PathfindingAutomatism" />
+                <automatismSharedData name="PathfindingObstacle" type="PathfindingAutomatism::PathfindingObstacleAutomatism" />
+            </automatismsSharedData>
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

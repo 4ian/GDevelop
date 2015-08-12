@@ -1,116 +1,127 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Project>
-    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Project" />
-        <Auteur value="" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="BuiltinExternalLayouts" />
-            <Extension name="TextObject" />
-            <Extension name="TextEntryObject" />
-        </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
-        </Platforms>
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable />
-        <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-    </Info>
-    <Resources>
-        <Resources />
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes firstScene="">
-        <Scene nom="New scene" mangledName="New_32scene" r="212.000000" v="212.000000" b="212.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Entry" type="TextEntryObject::TextEntry">
-                    <Variables />
-                </Objet>
-                <Objet nom="Text" type="TextObject::Text" smoothed="true" bold="false" italic="false" underlined="false">
-                    <Variables />
-                    <String value="(Text used to display user input)" />
-                    <Font value="" />
-                    <CharacterSize value="20" />
-                    <Color r="0" g="0" b="0" />
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas />
-            <Positions>
-                <Objet nom="Text" x="255.000000" y="266.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Entry" x="319.000000" y="268.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Simply type a text on keyboard." />
-                    <Com2 value="Tapez un texte au clavier." />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="TextObject::String" />
-                            <Parametre value="Text" />
-                            <Parametre value="=" />
-                            <Parametre value="Entry.String()" />
-                        </Action>
-                        <Action>
-                            <Type value="MettreXY" />
-                            <Parametre value="Text" />
-                            <Parametre value="=" />
-                            <Parametre value="400-Text.Width()/2" />
-                            <Parametre value="=" />
-                            <Parametre value="300" />
-                        </Action>
-                    </Actions>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalLayouts />
-    <ExternalSourceFiles />
-</Project>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Project</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="TextObject" />
+            <extension name="TextEntryObject" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+        </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources />
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="212" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="212" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="212">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Text" width="0.000000" x="255.000000" y="266.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Entry" width="0.000000" x="319.000000" y="268.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Entry" type="TextEntryObject::TextEntry">
+                    <variables />
+                    <automatisms />
+                </object>
+                <object bold="false" italic="false" name="Text" smoothed="true" type="TextObject::Text" underlined="false">
+                    <variables />
+                    <automatisms />
+                    <string>(Text used to display user input)</string>
+                    <font></font>
+                    <characterSize>20</characterSize>
+                    <color b="0" g="0" r="0" />
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Simply type a text on keyboard.</comment>
+                    <comment2>Tapez un texte au clavier.</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="TextObject::String" />
+                            <parameters>
+                                <parameter>Text</parameter>
+                                <parameter>=</parameter>
+                                <parameter>Entry.String()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="MettreXY" />
+                            <parameters>
+                                <parameter>Text</parameter>
+                                <parameter>=</parameter>
+                                <parameter>400-Text.Width()/2</parameter>
+                                <parameter>=</parameter>
+                                <parameter>300</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

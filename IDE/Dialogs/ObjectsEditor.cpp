@@ -443,6 +443,7 @@ void ObjectsEditor::Refresh()
     listsHelper.SetGroupExtraRendering([this](wxTreeItemId groupItem) {
         this->UpdateGroup(groupItem);
     });
+    listsHelper.SetSearchText(searchCtrl->GetValue());
     listsHelper.RefreshList(objectsList, &objectsRootItem, &groupsRootItem);
     objectsList->SetDropTarget(new ObjectsListDnd(objectsList, groupsRootItem, project, layout));
 }

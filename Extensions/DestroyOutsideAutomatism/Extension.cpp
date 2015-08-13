@@ -43,7 +43,8 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
-        .SetFunctionName("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
+        .SetFunctionName("GetExtraBorder").SetManipulatedType("number")
+        .SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
 
     aut.AddAction("ExtraBorder",
                    _("Additional border"),

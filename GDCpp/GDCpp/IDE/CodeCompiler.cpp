@@ -74,10 +74,11 @@ gd::String CodeCompilerCall::GetFullCall() const
         //Compiler default directories
         std::vector<gd::String> standardsIncludeDirs;
         #if defined(WINDOWS)
+        gd::String gccVersion = gd::String::From(__GNUC__) + "." + gd::String::From(__GNUC_MINOR__) + "." + gd::String::From(__GNUC_PATCHLEVEL__);
         standardsIncludeDirs.push_back("CppPlatform/MinGW32/include");
-        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.9.2/include");
-        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.9.2/include/c++");
-        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.9.2/include/c++/mingw32");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/" + gccVersion + "/include");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/" + gccVersion + "/include/c++");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/" + gccVersion + "/include/c++/mingw32");
         #elif defined(LINUX)
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/i686-linux-gnu/");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/lib/gcc/i686-linux-gnu/4.7/include");

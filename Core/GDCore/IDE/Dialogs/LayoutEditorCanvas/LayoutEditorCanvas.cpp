@@ -878,6 +878,7 @@ public:
     {
         gd::InitialInstance & instance = *instancePtr;
         if ( ignoreLockedInstances && instance.IsLocked() ) return;
+        if ( excludedLayers.find(instance.GetLayer()) != excludedLayers.end() ) return;
 
         sf::Vector2f size = editor.GetInitialInstanceSize(instance);
         sf::Vector2f origin = editor.GetInitialInstanceOrigin(instance);
@@ -890,13 +891,18 @@ public:
         }
     }
 
-    std::vector<InitialInstance*> & GetSelectedList() { return selectedList; };
-    InstancesInAreaPicker & IgnoreLockedInstances() { ignoreLockedInstances = true; return *this; };
+    std::vector<InitialInstance*> & GetSelectedList() { return selectedList; }
+    InstancesInAreaPicker & IgnoreLockedInstances() { ignoreLockedInstances = true; return *this; }
+    InstancesInAreaPicker & ExcludeLayer(const gd::String & layerName) { 
+        excludedLayers.insert(layerName);
+        return *this; 
+    }
 
 private:
     const LayoutEditorCanvas & editor;
     std::vector<InitialInstance*> selectedList; ///< This list will be filled with the instances that are into the selectionRectangle
     bool ignoreLockedInstances;
+    std::set<gd::String> excludedLayers;
 };
 
 void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
@@ -967,6 +973,8 @@ void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
 
         //Select the instances that are inside the selection rectangle
         InstancesInAreaPicker picker(*this);
+        for(auto hiddenLayer : gd::GetHiddenLayers(layout))
+            picker.ExcludeLayer(hiddenLayer);
         picker.IgnoreLockedInstances();
         instances.IterateOverInstances(picker);
 
@@ -1250,6 +1258,7 @@ public:
     {
         gd::InitialInstance & instance = *instancePtr;
         if ( pickLockedOnly != instance.IsLocked() ) return;
+        if ( excludedLayers.find(instance.GetLayer()) != excludedLayers.end() ) return;
 
         sf::Vector2f size = editor.GetInitialInstanceSize(instance);
         sf::Vector2f origin = editor.GetInitialInstanceOrigin(instance);
@@ -1269,6 +1278,7 @@ public:
     InitialInstance * GetSmallestInstanceUnderCursor() { return smallestInstance; };
 
     void PickLockedInstancesAndOnlyThem() { pickLockedOnly = true; }
+    void ExcludeLayer(const gd::String & layerName) { excludedLayers.insert(layerName); }
 
 private:
     const LayoutEditorCanvas & editor;
@@ -1277,11 +1287,15 @@ private:
     const double xPosition;
     const double yPosition;
     bool pickLockedOnly;
+    std::set<gd::String> excludedLayers;
 };
 
 InitialInstance * LayoutEditorCanvas::GetInitialInstanceAtPosition(double xPosition, double yPosition, bool pickOnlyLockedInstances)
 {
     SmallestInstanceUnderCursorPicker picker(*this, xPosition, yPosition);
+
+    for(auto hiddenLayer : gd::GetHiddenLayers(layout))
+        picker.ExcludeLayer(hiddenLayer);
     if ( pickOnlyLockedInstances ) picker.PickLockedInstancesAndOnlyThem();
     instances.IterateOverInstances(picker);
 

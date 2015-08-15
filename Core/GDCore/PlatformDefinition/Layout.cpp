@@ -348,6 +348,18 @@ void Layout::Init(const Layout & other)
     #endif
 }
 
+std::vector<gd::String> GetHiddenLayers(const Layout & layout) 
+{
+    std::vector<gd::String> hiddenLayers;
+    for (unsigned int i = 0;i < layout.GetLayersCount();++i) {
+        if (!layout.GetLayer(i).GetVisibility()) {
+            hiddenLayers.push_back(layout.GetLayer(i).GetName());
+        }
+    }
+
+    return hiddenLayers;
+}
+
 #if defined(GD_IDE_ONLY)
 gd::String GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::Layout & layout, gd::String name, bool searchInGroups)
 {

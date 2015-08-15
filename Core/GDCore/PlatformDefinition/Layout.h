@@ -462,6 +462,13 @@ struct LayoutHasName : public std::binary_function<std::shared_ptr<Layout>, gd::
 };
 
 /**
+ * \brief Get the names of all layers from the given layout
+ * that are invisible.
+ * \see gd::Layout
+ */
+std::vector<gd::String> GetHiddenLayers(const Layout & layout);
+
+/**
  * \brief Get a type from an object/group name.
  * \note If a group contains only objects of a same type, then the group has this type. Otherwise, it is considered as an object without any specific type.
  *

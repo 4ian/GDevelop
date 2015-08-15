@@ -192,9 +192,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number"), "",false)
         .AddParameter("expression", _("Render zone: Top left side: X Position ( Between 0 and 1 )"), "",false)
-        .AddParameter("expression", _("Render zone: Top left side: X Position ( Between 0 and 1 )"), "",false)
+        .AddParameter("expression", _("Render zone: Top left side: Y Position ( Between 0 and 1 )"), "",false)
         .AddParameter("expression", _("Render zone: Bottom right side: X Position ( Between 0 and 1 )"), "",false)
-        .AddParameter("expression", _("Render zone: Bottom right side: X Position ( Between 0 and 1 )"), "",false)
+        .AddParameter("expression", _("Render zone: Bottom right side: Y Position ( Between 0 and 1 )"), "",false)
         .MarkAsComplex();
 
     extension.AddAction("ZoomCamera",

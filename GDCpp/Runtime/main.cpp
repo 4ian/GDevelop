@@ -42,6 +42,17 @@ using namespace std;
 gd::String GetCurrentWorkingDirectory();
 int DisplayMessage(const gd::String & message);
 
+#if defined(WINDOWS)
+#include <windows.h>
+//On Windows computers, tells the Nvidia/AMD driver that GDevelop works better
+//with the more powerful discrete GPU (e.g. use the Nvidia card on an Optimus computer)
+extern "C"
+{
+    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+#endif
+
 int main( int argc, char *p_argv[] )
 {
     GDLogBanner();

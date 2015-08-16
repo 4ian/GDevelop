@@ -7,6 +7,14 @@
 typedef HINSTANCE Handle;
 typedef int (*EntryPointType)(int, char**);
 
+//On Windows computers, tells the Nvidia/AMD driver that GDevelop works better
+//with the more powerful discrete GPU (e.g. use the Nvidia card on an Optimus computer)
+extern "C"
+{
+    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 int AbortWithMessage(const std::string & message)
 {
     std::cout << message;

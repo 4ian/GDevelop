@@ -10,7 +10,6 @@ This project is released under the MIT License.
 #include "LightObject.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/XmlMacros.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cmath>

@@ -12,7 +12,6 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/XmlMacros.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/CommonTools.h"

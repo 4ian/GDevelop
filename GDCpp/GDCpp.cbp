@@ -860,7 +860,6 @@
 		<Unit filename="GDCpp/Version.h" />
 		<Unit filename="GDCpp/XmlFilesHelper.cpp" />
 		<Unit filename="GDCpp/XmlFilesHelper.h" />
-		<Unit filename="GDCpp/XmlMacros.h" />
 		<Unit filename="GDCpp/btAlignedAllocator.h" />
 		<Unit filename="GDCpp/btScalar.h" />
 		<Unit filename="GDCpp/profile.cpp" />

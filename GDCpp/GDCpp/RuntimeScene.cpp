@@ -29,7 +29,6 @@
 #include "GDCpp/AutomatismsRuntimeSharedData.h"
 #include "GDCpp/RuntimeContext.h"
 #include "GDCpp/Project.h"
-#include "GDCpp/Text.h"
 #include "GDCpp/ManualTimer.h"
 #include "GDCpp/CppPlatform.h"
 #include "GDCore/Tools/Localization.h"
@@ -188,7 +187,6 @@ bool RuntimeScene::RenderAndStep()
 
     //Rendering
     Render();
-    legacyTexts.clear();
 
     #if defined(GD_IDE_ONLY)
     if( GetProfiler() && GetProfiler()->profilingActivated )
@@ -292,9 +290,6 @@ void RuntimeScene::Render()
                     if (allObjects[id]->GetLayer() == layers[layerIndex].GetName())
                         allObjects[id]->Draw(*renderWindow);
                 }
-
-                //Texts
-                DisplayLegacyTexts(layers[layerIndex].GetName());
             }
         }
     }
@@ -350,24 +345,6 @@ bool RuntimeScene::OrderObjectsByZOrder(RuntimeObjList & objList)
         std::stable_sort( objList.begin(), objList.end(), [](const RuntimeObjSPtr & o1, const RuntimeObjSPtr & o2) {
             return o1->GetZOrder() < o2->GetZOrder();
         });
-
-    return true;
-}
-
-void RuntimeScene::DisplayText(Text & text)
-{
-    legacyTexts.push_back(text);
-}
-
-bool RuntimeScene::DisplayLegacyTexts(gd::String layer)
-{
-    if (!renderWindow) return false;
-
-    for ( unsigned int i = 0;i < legacyTexts.size();i++ )
-    {
-        if ( legacyTexts[i].layer == layer )
-            legacyTexts[i].Draw(*renderWindow);
-    }
 
     return true;
 }
@@ -504,7 +481,6 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     //Clear RuntimeScene datas
     objectsInstances.Clear();
-    legacyTexts.clear();
     timers.clear();
     firstLoop = true;
     elapsedTime = 0;

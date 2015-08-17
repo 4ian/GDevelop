@@ -21,7 +21,6 @@
 #include "GDCpp/profile.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/Variable.h"
-#include "GDCpp/Text.h"
 #include "GDCpp/CppPlatform.h"
 
 gd::String GD_API GetSceneName(RuntimeScene & scene)
@@ -343,24 +342,6 @@ unsigned int GD_API GetScreenColorDepth()
     sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
 
     return videoMode.bitsPerPixel;
-}
-
-void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const gd::String & str, float x, float y, const gd::String & color, float characterSize, const gd::String & fontName, const gd::String & layer)
-{
-    Text texte;
-    texte.text.setString(str);
-    texte.text.setPosition(x, y);
-
-    std::vector < gd::String > colors = color.Split(U';');
-    if ( colors.size() > 2 ) texte.text.setColor(sf::Color(colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>() ));
-
-    texte.text.setCharacterSize(characterSize);
-    texte.fontName = fontName;
-    texte.layer = layer;
-
-    scene.DisplayText(texte);
-
-    return;
 }
 
 void GD_API DisableInputWhenFocusIsLost( RuntimeScene & scene, bool disable )

@@ -848,8 +848,6 @@
 		<Unit filename="GDCpp/Sprite.cpp" />
 		<Unit filename="GDCpp/Sprite.h" />
 		<Unit filename="GDCpp/SpriteObject.cpp" />
-		<Unit filename="GDCpp/Text.cpp" />
-		<Unit filename="GDCpp/Text.h" />
 		<Unit filename="GDCpp/Tools/AES.cpp" />
 		<Unit filename="GDCpp/Tools/AES.h" />
 		<Unit filename="GDCpp/Tools/md5.cpp" />

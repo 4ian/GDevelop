@@ -20,7 +20,6 @@ WindowExtension::WindowExtension()
 
     #if defined(GD_IDE_ONLY)
 
-    GetAllActions()["EcrireTexte"].SetFunctionName("DisplayLegacyTextOnScene").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllActions()["SetFullScreen"].SetFunctionName("SetFullScreen").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllActions()["SetWindowSize"].SetFunctionName("SetWindowSize").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
     GetAllActions()["SetWindowIcon"].SetFunctionName("SetWindowIcon").SetIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
@@ -40,12 +39,6 @@ WindowExtension::WindowExtension()
 #if defined(GD_IDE_ONLY)
 void WindowExtension::ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker)
 {
-    if ( action.GetType() == "EcrireTexte" && !action.GetParameter( 6 ).GetPlainString().empty() )
-    {
-        gd::String parameter = action.GetParameter(6).GetPlainString();
-        worker.ExposeFile(parameter);
-        action.SetParameter(6, parameter);
-    }
     if ( action.GetType() == "SetWindowIcon" && !action.GetParameter( 1 ).GetPlainString().empty() )
     {
         gd::String parameter = action.GetParameter(1).GetPlainString();

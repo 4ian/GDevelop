@@ -15,7 +15,6 @@
 #include <memory>
 #include "GDCpp/ObjInstancesHolder.h"
 #include "GDCpp/RuntimeLayer.h"
-#include "GDCpp/Text.h"
 #include "GDCpp/InputManager.h"
 #include "GDCpp/ManualTimer.h"
 #include "GDCpp/AutomatismsRuntimeSharedDataHolder.h"
@@ -90,12 +89,6 @@ public:
      * Get the layer with specified name.
      */
     RuntimeLayer & GetRuntimeLayer(const gd::String & name);
-
-    /**
-     * Add a text to be displayed on the scene
-     * \deprecated
-     */
-    void DisplayText(Text & text);
 
     /**
      * \brief Return the shared data for an automatism.
@@ -272,7 +265,6 @@ protected:
     AutomatismsRuntimeSharedDataHolder      automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
     std::shared_ptr<CodeExecutionEngine>    codeExecutionEngine;
-    std::vector < Text >                    legacyTexts; ///<Deprecated way of displaying a text
     SceneChange                             requestedChange; ///< What should be done at the end of the frame.
 
     static RuntimeLayer badRuntimeLayer; ///< Null object return by GetLayer when no appropriate layer could be found.

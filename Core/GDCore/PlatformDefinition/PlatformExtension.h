@@ -90,6 +90,11 @@ public:
                                  const gd::String & license_);
 
     /**
+     * \brief Mark this extension as deprecated: the IDE will hide it from the user.
+     */
+    void MarkAsDeprecated() { deprecated = true; }
+
+    /**
      * \brief Declare a new condition as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
@@ -212,6 +217,11 @@ public:
      * \brief Return the name of extension license
      */
     const gd::String & GetLicense() const { return license; }
+
+    /**
+     * \brief Check if the extension is flagged as being deprecated.
+     */
+    bool IsDeprecated() const { return deprecated; }
 
     /**
      * \brief Return true if the extension is a standard extension that cannot be deactivated
@@ -387,6 +397,7 @@ private:
     gd::String informations; ///<Description displayed to users at edittime
     gd::String author; ///<Author displayed to users at edittime
     gd::String license;  ///<License name displayed to users at edittime
+    bool deprecated;
 
     std::map<gd::String, gd::ObjectMetadata > objectsInfos;
     std::map<gd::String, gd::AutomatismMetadata > automatismsInfo;

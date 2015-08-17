@@ -31,6 +31,8 @@ public:
                               "Florian Rival",
                               "Open source (MIT License)");
 
+        MarkAsDeprecated();
+
         #if defined(GD_IDE_ONLY)
 
         AddAction("AddRecipient",

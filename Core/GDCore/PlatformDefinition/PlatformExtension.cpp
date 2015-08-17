@@ -586,7 +586,8 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
 }
 #endif
 
-PlatformExtension::PlatformExtension()
+PlatformExtension::PlatformExtension() :
+    deprecated(false)
 {
 }
 

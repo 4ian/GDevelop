@@ -70,10 +70,10 @@ public:
 private:
 
     /**
-     * \brief A common task when a changes have been made is to update the shared data of automatisms,
+     * \brief A common task when a changes have been made is to update the shared data of behaviors,
      * which are stored in layouts.
      */
-    void UpdateAutomatismsSharedData(gd::Project & project, gd::Layout * layout) const;
+    void UpdateBehaviorsSharedData(gd::Project & project, gd::Layout * layout) const;
 
     wxPropertyGrid * grid; ///< The grid used for diplaying and editing properties.
     gd::Project & project;

@@ -8,7 +8,7 @@
 #include "GDCpp/BuiltinExtensions/MathematicalTools.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Object.h"
-#include "GDCpp/Automatism.h"
+#include "GDCpp/Behavior.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/PolygonCollision.h"
@@ -30,24 +30,24 @@ RuntimeObject::RuntimeObject(RuntimeScene & scene, const gd::Object & object) :
 {
     ClearForce();
 
-    //Do not forget to delete automatisms which are managed using raw pointers.
-    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    //Do not forget to delete behaviors which are managed using raw pointers.
+    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
     	delete it->second;
 
-    automatisms.clear();
+    behaviors.clear();
 
     //And insert the new ones.
-    for (std::map<gd::String, Automatism* >::const_iterator it = object.GetAllAutomatisms().begin() ; it != object.GetAllAutomatisms().end(); ++it )
+    for (std::map<gd::String, Behavior* >::const_iterator it = object.GetAllBehaviors().begin() ; it != object.GetAllBehaviors().end(); ++it )
     {
-    	automatisms[it->first] = it->second->Clone();
-    	automatisms[it->first]->SetOwner(this);
+    	behaviors[it->first] = it->second->Clone();
+    	behaviors[it->first]->SetOwner(this);
     }
 }
 
 RuntimeObject::~RuntimeObject()
 {
-    //Do not forget to delete automatisms and forces which are managed using raw pointers.
-    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    //Do not forget to delete behaviors and forces which are managed using raw pointers.
+    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
     	delete it->second;
 }
 
@@ -65,15 +65,15 @@ void RuntimeObject::Init(const RuntimeObject & object)
     force5 = object.force5;
     forces = object.forces;
 
-    //Do not forget to delete automatisms which are managed using raw pointers.
-    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    //Do not forget to delete behaviors which are managed using raw pointers.
+    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
     	delete it->second;
 
-    automatisms.clear();
-    for (std::map<gd::String, Automatism* >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
+    behaviors.clear();
+    for (std::map<gd::String, Behavior* >::const_iterator it = object.behaviors.begin() ; it != object.behaviors.end(); ++it )
     {
-    	automatisms[it->first] = it->second->Clone();
-    	automatisms[it->first]->SetOwner(this);
+    	behaviors[it->first] = it->second->Clone();
+    	behaviors[it->first]->SetOwner(this);
     }
 }
 
@@ -230,14 +230,14 @@ bool RuntimeObject::TestAngleOfDisplacement(float angle, float tolerance)
     return false;
 }
 
-void RuntimeObject::ActivateAutomatism( const gd::String & automatismName, bool activate )
+void RuntimeObject::ActivateBehavior( const gd::String & behaviorName, bool activate )
 {
-    GetAutomatismRawPointer(automatismName)->Activate(activate);
+    GetBehaviorRawPointer(behaviorName)->Activate(activate);
 }
 
-bool RuntimeObject::AutomatismActivated( const gd::String & automatismName )
+bool RuntimeObject::BehaviorActivated( const gd::String & behaviorName )
 {
-    return GetAutomatismRawPointer(automatismName)->Activated();
+    return GetBehaviorRawPointer(behaviorName)->Activated();
 }
 
 double RuntimeObject::GetSqDistanceTo(double pointX, double pointY)
@@ -553,14 +553,14 @@ bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)
     return false;
 }
 
-Automatism* RuntimeObject::GetAutomatismRawPointer(const gd::String & name)
+Behavior* RuntimeObject::GetBehaviorRawPointer(const gd::String & name)
 {
-    return automatisms.find(name)->second;
+    return behaviors.find(name)->second;
 }
 
-Automatism* RuntimeObject::GetAutomatismRawPointer(const gd::String & name) const
+Behavior* RuntimeObject::GetBehaviorRawPointer(const gd::String & name) const
 {
-    return automatisms.find(name)->second;
+    return behaviors.find(name)->second;
 }
 
 bool RuntimeObject::ClearForce()
@@ -629,15 +629,15 @@ float RuntimeObject::TotalForceLength() const
     return ForceMoyenne.GetLength();
 }
 
-void RuntimeObject::DoAutomatismsPreEvents(RuntimeScene & scene)
+void RuntimeObject::DoBehaviorsPreEvents(RuntimeScene & scene)
 {
-    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
         it->second->StepPreEvents(scene);
 }
 
-void RuntimeObject::DoAutomatismsPostEvents(RuntimeScene & scene)
+void RuntimeObject::DoBehaviorsPostEvents(RuntimeScene & scene)
 {
-    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
         it->second->StepPostEvents(scene);
 }
 

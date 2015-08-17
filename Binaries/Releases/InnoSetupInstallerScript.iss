@@ -99,7 +99,7 @@ Type: files; Name: "{app}\GDEditor.exe"
 ;Prevent crashes with incompatible extensions:
 Type: files; Name: "{app}\CppPlatform\Extensions\TextBoxObject.xgdwe"
 ;Old extensions:
-Type: files; Name: "{app}\CppPlatform\Extensions\AStarAutomatism.xgdwe"
+Type: files; Name: "{app}\CppPlatform\Extensions\AStarBehavior.xgdwe"
 
 Type: filesandordirs; Name: "{app}\Extensions"
 Type: filesandordirs; Name: "{app}\include"

@@ -24,7 +24,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
@@ -248,7 +248,7 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
     SetSizer(FlexGridSizer1);
     editMenuI = new wxMenuItem((&contextMenu), idMenuModObj, _("Edit"), wxEmptyString, wxITEM_NORMAL);
     contextMenu.Append(editMenuI);
-    MenuItem13 = new wxMenuItem((&contextMenu), idMenuAddAuto, _("Add an automatism"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem13 = new wxMenuItem((&contextMenu), idMenuAddAuto, _("Add an behavior"), wxEmptyString, wxITEM_NORMAL);
     contextMenu.Append(MenuItem13);
     editPropMenuItem = new wxMenuItem((&contextMenu), idMenuProp, _("Other properties"), wxEmptyString, wxITEM_NORMAL);
     editPropMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));
@@ -332,7 +332,7 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&ObjectsEditor::OnobjectsListItemMenu);
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ObjectsEditor::OnsearchCtrlText);
     Connect(idMenuModObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuEditObjectSelected);
-    Connect(idMenuAddAuto,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuAddAutomatismSelected);
+    Connect(idMenuAddAuto,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuAddBehaviorSelected);
     Connect(idMenuProp,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnMenuPropertiesSelected);
     Connect(idMenuAddObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnAddObjectSelected);
     Connect(idMenuDelObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ObjectsEditor::OnDeleteSelected);
@@ -1666,7 +1666,7 @@ gd::String ObjectsEditor::GetExistingObjectsErrorMessage(unsigned int nameCheckR
     return errorMessage;
 }
 
-void ObjectsEditor::OnMenuAddAutomatismSelected(wxCommandEvent& event)
+void ObjectsEditor::OnMenuAddBehaviorSelected(wxCommandEvent& event)
 {
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(objectsList->GetItemData(lastSelectedItem));
     if (!data) return;
@@ -1677,7 +1677,7 @@ void ObjectsEditor::OnMenuAddAutomatismSelected(wxCommandEvent& event)
         gd::Object * object = GetSelectedObject();
         if ( !object ) return;
 
-        if ( gd::ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(this, project,
+        if ( gd::ChooseBehaviorTypeDialog::ChooseAndAddBehaviorToObject(this, project,
             object, &layout, globalObject))
             UpdateAssociatedPropertiesPanel();
 

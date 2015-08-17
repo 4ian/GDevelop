@@ -11,7 +11,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/IDE/ChangesNotifier.h"
-namespace gd { class Automatism; }
+namespace gd { class Behavior; }
 namespace gd { class Object; }
 class RuntimeObject;
 class RuntimeScene;

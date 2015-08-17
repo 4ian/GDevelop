@@ -8,22 +8,22 @@ This project is released under the MIT License.
 #ifndef SCENENETWORKDATAS_H
 #define SCENENETWORKDATAS_H
 
-#include "GDCpp/AutomatismsSharedData.h"
+#include "GDCpp/BehaviorsSharedData.h"
 #include "RuntimeSceneNetworkDatas.h"
 
 /**
- * \brief Data shared by Network Automatism ( i.e. Nothing )
+ * \brief Data shared by Network Behavior ( i.e. Nothing )
  */
-class GD_EXTENSION_API SceneNetworkDatas : public gd::AutomatismsSharedData
+class GD_EXTENSION_API SceneNetworkDatas : public gd::BehaviorsSharedData
 {
 public:
     SceneNetworkDatas() {};
     virtual ~SceneNetworkDatas() {};
-    virtual std::shared_ptr<gd::AutomatismsSharedData> Clone() const { return std::shared_ptr<gd::AutomatismsSharedData>(new SceneNetworkDatas(*this));}
+    virtual std::shared_ptr<gd::BehaviorsSharedData> Clone() const { return std::shared_ptr<gd::BehaviorsSharedData>(new SceneNetworkDatas(*this));}
 
-    virtual std::shared_ptr<AutomatismsRuntimeSharedData> CreateRuntimeSharedDatas()
+    virtual std::shared_ptr<BehaviorsRuntimeSharedData> CreateRuntimeSharedDatas()
     {
-        return std::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneNetworkDatas(*this));
+        return std::shared_ptr<BehaviorsRuntimeSharedData>(new RuntimeSceneNetworkDatas(*this));
     }
 
     #if defined(GD_IDE_ONLY)

@@ -581,10 +581,10 @@
 		<Unit filename="ErrorManager.cpp" />
 		<Unit filename="ErrorManager.h" />
 		<Unit filename="Extension.cpp" />
-		<Unit filename="NetworkAutomatism.cpp" />
-		<Unit filename="NetworkAutomatism.h" />
-		<Unit filename="NetworkAutomatismEditor.cpp" />
-		<Unit filename="NetworkAutomatismEditor.h" />
+		<Unit filename="NetworkBehavior.cpp" />
+		<Unit filename="NetworkBehavior.h" />
+		<Unit filename="NetworkBehaviorEditor.cpp" />
+		<Unit filename="NetworkBehaviorEditor.h" />
 		<Unit filename="NetworkManager.cpp" />
 		<Unit filename="NetworkManager.h" />
 		<Unit filename="NetworkManagerFunctions.cpp" />
@@ -611,7 +611,7 @@
 			</DoxyBlocks>
 			<wxsmith version="1">
 				<resources>
-					<wxDialog wxs="wxsmith/NetworkAutomatismEditor.wxs" src="NetworkAutomatismEditor.cpp" hdr="NetworkAutomatismEditor.h" fwddecl="0" i18n="1" name="NetworkAutomatismEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/NetworkBehaviorEditor.wxs" src="NetworkBehaviorEditor.cpp" hdr="NetworkBehaviorEditor.h" fwddecl="0" i18n="1" name="NetworkBehaviorEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

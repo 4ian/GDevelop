@@ -367,7 +367,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
             bool functionFound = false;
             bool staticFunctionFound = false;
             bool objectFunctionFound = false;
-            bool automatismFunctionFound = false;
+            bool behaviorFunctionFound = false;
 
             //First try to bind to a static expression
             if ( nameIsFunction && MetadataProvider::HasExpression(platform, functionName) )
@@ -381,7 +381,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                 functionFound = true; objectFunctionFound = true;
                 instructionInfos = MetadataProvider::GetObjectExpressionMetadata(platform, gd::GetTypeOfObject(project, layout, objectName), functionName);
             }
-            //And in automatisms expressions
+            //And in behaviors expressions
             else if ( !nameIsFunction )
             {
                 size_t firstDoublePoints = functionName.find("::");
@@ -393,19 +393,19 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                     else
                         functionName = "";
 
-                    if ( MetadataProvider::HasAutomatismExpression(platform, gd::GetTypeOfAutomatism(project, layout, autoName), functionName) )
+                    if ( MetadataProvider::HasBehaviorExpression(platform, gd::GetTypeOfBehavior(project, layout, autoName), functionName) )
                     {
                         parameters.push_back(gd::Expression(autoName));
-                        functionFound = true; automatismFunctionFound = true;
+                        functionFound = true; behaviorFunctionFound = true;
 
-                        instructionInfos = MetadataProvider::GetAutomatismExpressionMetadata(platform,
-                                                                                             gd::GetTypeOfAutomatism(project, layout, autoName), functionName);
+                        instructionInfos = MetadataProvider::GetBehaviorExpressionMetadata(platform,
+                                                                                             gd::GetTypeOfBehavior(project, layout, autoName), functionName);
 
-                        //Verify that object has automatism.
-                        vector < gd::String > automatisms = gd::GetAutomatismsOfObject(project, layout, objectName);
-                        if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
+                        //Verify that object has behavior.
+                        vector < gd::String > behaviors = gd::GetBehaviorsOfObject(project, layout, objectName);
+                        if ( find(behaviors.begin(), behaviors.end(), autoName) == behaviors.end() )
                         {
-                            cout << "Bad automatism requested" << endl;
+                            cout << "Bad behavior requested" << endl;
                             functionFound = false;
                         }
                     }
@@ -492,10 +492,10 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                 nonFunctionTokenStartPos = gd::String::npos;
 
                 if      ( objectFunctionFound ) callbacks.OnObjectFunction(functionName, parameters, instructionInfos);
-                else if ( automatismFunctionFound ) callbacks.OnObjectAutomatismFunction(functionName, parameters, instructionInfos);
+                else if ( behaviorFunctionFound ) callbacks.OnObjectBehaviorFunction(functionName, parameters, instructionInfos);
                 else if ( staticFunctionFound ) callbacks.OnStaticFunction(functionName, parameters, instructionInfos);
 
-                if ( objectFunctionFound || automatismFunctionFound || staticFunctionFound ) expressionWithoutFunctions += "0";
+                if ( objectFunctionFound || behaviorFunctionFound || staticFunctionFound ) expressionWithoutFunctions += "0";
 
                 parsePosition = parametersEnd+1;
                 firstPointPos = expression.find(".", parametersEnd+1);
@@ -712,7 +712,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
                 callbacks.OnObjectFunction(functionName, parameters, expressionInfo);
             }
-            //And search automatisms expressions
+            //And search behaviors expressions
             else
             {
                 size_t firstDoublePoints = functionName.find("::");
@@ -724,19 +724,19 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
                     else
                         functionName = "";
 
-                    if ( MetadataProvider::HasAutomatismStrExpression(platform, gd::GetTypeOfAutomatism(project, layout, autoName), functionName) )
+                    if ( MetadataProvider::HasBehaviorStrExpression(platform, gd::GetTypeOfBehavior(project, layout, autoName), functionName) )
                     {
                         parameters.push_back(gd::Expression(autoName));
                         functionFound = true;
 
-                        const gd::ExpressionMetadata & expressionInfo = MetadataProvider::GetAutomatismStrExpressionMetadata(platform,
-                                                                                                                                gd::GetTypeOfAutomatism(project, layout, autoName), functionName);
+                        const gd::ExpressionMetadata & expressionInfo = MetadataProvider::GetBehaviorStrExpressionMetadata(platform,
+                                                                                                                                gd::GetTypeOfBehavior(project, layout, autoName), functionName);
 
-                        //Verify that object has automatism.
-                        vector < gd::String > automatisms = gd::GetAutomatismsOfObject(project, layout, objectName);
-                        if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
+                        //Verify that object has behavior.
+                        vector < gd::String > behaviors = gd::GetBehaviorsOfObject(project, layout, objectName);
+                        if ( find(behaviors.begin(), behaviors.end(), autoName) == behaviors.end() )
                         {
-                            cout << "Bad automatism requested" << endl;
+                            cout << "Bad behavior requested" << endl;
                             functionFound = false;
                         }
                         else
@@ -758,7 +758,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
                                     return false;
                             }
 
-                            callbacks.OnObjectAutomatismFunction(functionName, parameters, expressionInfo);
+                            callbacks.OnObjectBehaviorFunction(functionName, parameters, expressionInfo);
                         }
                     }
                 }

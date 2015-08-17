@@ -12,7 +12,7 @@
 #include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/PlatformDefinition/Automatism.h"
+#include "GDCore/PlatformDefinition/Behavior.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -60,11 +60,11 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
         codeGenerator.AddIncludeFiles(metadata.includeFiles);
 
         //Ensure needed files are included.
-        std::vector<gd::String> automatisms = object.GetAllAutomatismNames();
-        for (unsigned int j = 0;j<automatisms.size();++j)
+        std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
+        for (unsigned int j = 0;j<behaviors.size();++j)
         {
-            const gd::AutomatismMetadata & metadata = gd::MetadataProvider::GetAutomatismMetadata(JsPlatform::Get(),
-                                                                                                  object.GetAutomatism(automatisms[j]).GetTypeName());
+            const gd::BehaviorMetadata & metadata = gd::MetadataProvider::GetBehaviorMetadata(JsPlatform::Get(),
+                                                                                                  object.GetBehavior(behaviors[j]).GetTypeName());
             codeGenerator.AddIncludeFiles(metadata.includeFiles);
         }
 
@@ -132,9 +132,9 @@ gd::String EventsCodeGenerator::GenerateObjectFunctionCall(gd::String objectList
         return "(( "+GetObjectListName(objectListName, context)+".length === 0 ) ? "+defaultOutput+" :"+ GetObjectListName(objectListName, context)+"[0]."+codeInfo.functionCallName+"("+parametersStr+"))";
 }
 
-gd::String EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(gd::String objectListName,
-                                                      gd::String automatismName,
-                                                      const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(gd::String objectListName,
+                                                      gd::String behaviorName,
+                                                      const gd::BehaviorMetadata & autoInfo,
                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                       gd::String parametersStr,
                                                       gd::String defaultOutput,
@@ -143,9 +143,9 @@ gd::String EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(gd::String 
     if ( codeInfo.staticFunction )
         return "("+codeInfo.functionCallName+"("+parametersStr+"))";
     if ( context.GetCurrentObject() == objectListName && !context.GetCurrentObject().empty())
-        return "("+GetObjectListName(objectListName, context)+"[i].getAutomatism(\""+automatismName+"\")."+codeInfo.functionCallName+"("+parametersStr+"))";
+        return "("+GetObjectListName(objectListName, context)+"[i].getBehavior(\""+behaviorName+"\")."+codeInfo.functionCallName+"("+parametersStr+"))";
     else
-        return "(( "+GetObjectListName(objectListName, context)+".length === 0 ) ? "+defaultOutput+" :"+GetObjectListName(objectListName, context)+"[0].getAutomatism(\""+automatismName+"\")."+codeInfo.functionCallName+"("+parametersStr+"))";
+        return "(( "+GetObjectListName(objectListName, context)+".length === 0 ) ? "+defaultOutput+" :"+GetObjectListName(objectListName, context)+"[0].getBehavior(\""+behaviorName+"\")."+codeInfo.functionCallName+"("+parametersStr+"))";
 }
 
 gd::String EventsCodeGenerator::GenerateFreeCondition(const std::vector<gd::String> & arguments,
@@ -230,9 +230,9 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objec
     return conditionCode;
 }
 
-gd::String EventsCodeGenerator::GenerateAutomatismCondition(const gd::String & objectName,
-                                                             const gd::String & automatismName,
-                                                                   const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & objectName,
+                                                             const gd::String & behaviorName,
+                                                                   const gd::BehaviorMetadata & autoInfo,
                                                                    const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                                    const gd::String & returnBoolean,
@@ -242,7 +242,7 @@ gd::String EventsCodeGenerator::GenerateAutomatismCondition(const gd::String & o
     gd::String conditionCode;
 
     //Prepare call
-    gd::String objectFunctionCallNamePart = GetObjectListName(objectName, context)+"[i].getAutomatism(\""+automatismName+"\")."
+    gd::String objectFunctionCallNamePart = GetObjectListName(objectName, context)+"[i].getBehavior(\""+behaviorName+"\")."
                                         +instrInfos.codeExtraInformation.functionCallName;
 
     //Create call
@@ -264,11 +264,11 @@ gd::String EventsCodeGenerator::GenerateAutomatismCondition(const gd::String & o
     }
     if ( conditionInverted ) predicat = GenerateNegatedPredicat(predicat);
 
-    //Verify that object has automatism.
-    vector < gd::String > automatisms = gd::GetAutomatismsOfObject(project, scene, objectName);
-    if ( find(automatisms.begin(), automatisms.end(), automatismName) == automatisms.end() )
+    //Verify that object has behavior.
+    vector < gd::String > behaviors = gd::GetBehaviorsOfObject(project, scene, objectName);
+    if ( find(behaviors.begin(), behaviors.end(), behaviorName) == behaviors.end() )
     {
-        cout << "Bad automatism requested" << endl;
+        cout << "Bad behavior requested" << endl;
     }
     else
     {
@@ -326,9 +326,9 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
     return actionCode;
 }
 
-gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & objectName,
-                                                                    const gd::String & automatismName,
-                                                                   const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & objectName,
+                                                                    const gd::String & behaviorName,
+                                                                   const gd::BehaviorMetadata & autoInfo,
                                                                    const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                       gd::EventsCodeGenerationContext & context)
@@ -337,7 +337,7 @@ gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & obje
 
     //Prepare call
     //Add a static_cast if necessary
-    gd::String objectPart = GetObjectListName(objectName, context)+"[i].getAutomatism(\""+automatismName+"\").";
+    gd::String objectPart = GetObjectListName(objectName, context)+"[i].getBehavior(\""+behaviorName+"\").";
 
     //Create call
     gd::String call;
@@ -360,11 +360,11 @@ gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & obje
         call = objectPart+instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
     }
 
-    //Verify that object has automatism.
-    vector < gd::String > automatisms = gd::GetAutomatismsOfObject(project, scene, objectName);
-    if ( find(automatisms.begin(), automatisms.end(), automatismName) == automatisms.end() )
+    //Verify that object has behavior.
+    vector < gd::String > behaviors = gd::GetBehaviorsOfObject(project, scene, objectName);
+    if ( find(behaviors.begin(), behaviors.end(), behaviorName) == behaviors.end() )
     {
-        cout << "Bad automatism requested for an action" << endl;
+        cout << "Bad behavior requested for an action" << endl;
     }
     else
     {

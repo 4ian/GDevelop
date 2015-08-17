@@ -64,7 +64,7 @@
                 </Layer>
             </Layers>
             <Variables />
-            <AutomatismsSharedDatas />
+            <BehaviorsSharedDatas />
             <Positions>
                 <Objet nom="NouvelObjet" x="297.000000" y="245.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />

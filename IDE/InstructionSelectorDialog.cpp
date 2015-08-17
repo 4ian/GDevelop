@@ -302,10 +302,10 @@ void InstructionSelectorDialog::RefreshList()
             continue;
 
         std::vector<gd::String> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-        std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+        std::vector<gd::String> behaviorsTypes = extensions[i]->GetBehaviorsTypes();
 
         wxTreeItemId extensionItem = instructionsTree->GetRootItem();
-        if ( !objectsTypes.empty() || !automatismsTypes.empty() )//Display the extension name only if it contains objects/automatisms
+        if ( !objectsTypes.empty() || !behaviorsTypes.empty() )//Display the extension name only if it contains objects/behaviors
         {
             if ( extensions[i]->GetName() == "BuiltinObject" )
                 extensionItem = instructionsTree->AppendItem(instructionsTree->GetRootItem(), _("All objects"), 0);
@@ -341,12 +341,12 @@ void InstructionSelectorDialog::RefreshList()
             }
         }
 
-        for(unsigned int j = 0;j<automatismsTypes.size();++j)
+        for(unsigned int j = 0;j<behaviorsTypes.size();++j)
         {
-            //Add each automatism instructions
+            //Add each behavior instructions
             std::map<gd::String, gd::InstructionMetadata > allAutoActions = editingAction ?
-                extensions[i]->GetAllActionsForAutomatism(automatismsTypes[j]) :
-                extensions[i]->GetAllConditionsForAutomatism(automatismsTypes[j]);
+                extensions[i]->GetAllActionsForBehavior(behaviorsTypes[j]) :
+                extensions[i]->GetAllConditionsForBehavior(behaviorsTypes[j]);
 
             for(auto it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
             {

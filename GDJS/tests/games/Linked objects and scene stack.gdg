@@ -108,7 +108,7 @@
             <objects>
                 <object name="NewObject" type="Sprite">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -156,7 +156,7 @@
                 </object>
                 <object name="CopyOfNewObject" type="Sprite">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -509,7 +509,7 @@
                     </cameras>
                 </layer>
             </layers>
-            <automatismsSharedData />
+            <behaviorsSharedData />
         </layout>
     </layouts>
     <externalEvents />

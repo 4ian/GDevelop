@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="PhysicsAutomatismEditor">
-		<title>Edit the automatism</title>
+	<object class="wxDialog" name="PhysicsBehaviorEditor">
+		<title>Edit the behavior</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>

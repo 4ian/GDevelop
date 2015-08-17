@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="PhysicsBehavior" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../Runtime/bin/debug/PhysicsBehavior.xgdw" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
+					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lGDCpp" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="../../Runtime/bin/debug" />
+				</Linker>
+			</Target>
+			<Target title="Debug - Edittime">
+				<Option output="../../IDE/bin/debug/CppPlatform/Extensions/PhysicsBehavior.xgdwe" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug Edittime/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=1" />
+					<Add option="-D__WXDEBUG__" />
+					<Add option="-DWXUSINGDLL" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../../ExtLibs/wxwidgets/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lGDCore" />
+					<Add option="-lGDCpp" />
+					<Add option="-lwxmsw30ud_xrc" />
+					<Add option="-lwxmsw30ud_richtext" />
+					<Add option="-lwxmsw30ud_ribbon" />
+					<Add option="-lwxmsw30ud_aui" />
+					<Add option="-lwxmsw30ud_adv" />
+					<Add option="-lwxmsw30ud_html" />
+					<Add option="-lwxmsw30ud_core" />
+					<Add option="-lwxbase30ud_xml" />
+					<Add option="-lwxbase30ud_net" />
+					<Add option="-lwxexpatd" />
+					<Add option="-lwxbase30ud" />
+					<Add option="-lwxpngd" />
+					<Add option="-lwxjpegd" />
+					<Add option="-lwxzlibd" />
+					<Add option="-lwxtiffd" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="../../IDE/bin/debug" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="../../Runtime/bin/release/PhysicsBehavior.xgdw" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
+					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lGDCpp" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="../../Runtime/bin/release" />
+				</Linker>
+			</Target>
+			<Target title="Release - Edittime">
+				<Option output="../../IDE/bin/release/CppPlatform/Extensions/PhysicsBehavior.xgdwe" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release Edittime/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DPYSUPPORT" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=1" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../../ExtLibs/wxwidgets/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lGDCore" />
+					<Add option="-lGDCpp" />
+					<Add option="-lwxmsw30u_xrc" />
+					<Add option="-lwxmsw30u_richtext" />
+					<Add option="-lwxmsw30u_ribbon" />
+					<Add option="-lwxmsw30u_aui" />
+					<Add option="-lwxmsw30u_adv" />
+					<Add option="-lwxmsw30u_html" />
+					<Add option="-lwxmsw30u_core" />
+					<Add option="-lwxbase30u_xml" />
+					<Add option="-lwxbase30u_net" />
+					<Add option="-lwxexpat" />
+					<Add option="-lwxbase30u" />
+					<Add option="-lwxpng" />
+					<Add option="-lwxjpeg" />
+					<Add option="-lwxzlib" />
+					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="../../IDE/bin/release" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/" />
+				</Linker>
+			</Target>
+			<Target title="Development">
+				<Option output="../../Runtime/bin/dev/PhysicsBehavior.xgdw" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Dev/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
+					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
+					<Add option="-DDEV" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lGDCpp" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="../../Runtime/bin/dev" />
+				</Linker>
+			</Target>
+			<Target title="Development - Edittime">
+				<Option output="../../IDE/bin/dev/CppPlatform/Extensions/PhysicsBehavior.xgdwe" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Dev Edittime/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
+					<Add option="-DDEV" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DPYSUPPORT" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=1" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../../ExtLibs/wxwidgets/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lGDCore" />
+					<Add option="-lGDCpp" />
+					<Add option="-lwxmsw30u_xrc" />
+					<Add option="-lwxmsw30u_richtext" />
+					<Add option="-lwxmsw30u_ribbon" />
+					<Add option="-lwxmsw30u_aui" />
+					<Add option="-lwxmsw30u_adv" />
+					<Add option="-lwxmsw30u_html" />
+					<Add option="-lwxmsw30u_core" />
+					<Add option="-lwxbase30u_xml" />
+					<Add option="-lwxbase30u_net" />
+					<Add option="-lwxexpat" />
+					<Add option="-lwxbase30u" />
+					<Add option="-lwxpng" />
+					<Add option="-lwxjpeg" />
+					<Add option="-lwxzlib" />
+					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lkernel32" />
+					<Add option="-luser32" />
+					<Add option="-lopengl32" />
+					<Add option="-limm32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lglu32" />
+					<Add option="-lws2_32" />
+					<Add option="-lgdi32" />
+					<Add option="-lwinmm" />
+					<Add option="-luuid" />
+					<Add option="-lshell32" />
+					<Add option="-lole32" />
+					<Add option="-lwinspool" />
+					<Add option="-ladvapi32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-loleaut32" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add directory="../../IDE/bin/dev" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../../ExtLibs/wxwidgets/lib/gcc_dll/" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Release">
+				<Option output="../../Runtime/bin/release/PhysicsBehavior.xgdl" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lGDCpp" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="../../Runtime/bin/release" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Release - Edittime">
+				<Option output="../../IDE/bin/release/CppPlatform/Extensions/PhysicsBehavior.xgdle" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release Edittime/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="`wx-config --cppflags`" />
+					<Add option="`pkg-config gtk+-2.0 --cflags`" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lGDCore" />
+					<Add option="-lGDCpp" />
+					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="../../IDE/bin/release" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Debug - Edittime">
+				<Option output="../../IDE/bin/debug/CppPlatform/Extensions/PhysicsBehavior.xgdle" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug Edittime/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option="`wx-config --cppflags`" />
+					<Add option="`pkg-config gtk+-2.0 --cflags`" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-lGDCore" />
+					<Add option="-lGDCpp" />
+					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="../../IDE/bin/debug" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Debug">
+				<Option output="../../Runtime/bin/debug/PhysicsBehavior.xgdl" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lGDCpp" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add directory="../../Runtime/bin/debug" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+				</Linker>
+			</Target>
+			<Target title="Mac - Release">
+				<Option output="../../Runtime/bin/release/PhysicsBehavior.xgdm" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add directory="../../ExtLibs/boost" />
+					<Add directory="../../ExtLibs/SFML/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lGDCpp" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-framework OpenGL" />
+					<Add option="-dynamiclib" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="../../Runtime/bin/release" />
+					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../../Runtime/bin/release/PhysicsBehavior.xgdm" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/release/PhysicsBehavior.xgdm" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Mac - Debug">
+				<Option output="../../Runtime/bin/debug/PhysicsBehavior.xgdm" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add directory="../../ExtLibs/boost" />
+					<Add directory="../../ExtLibs/SFML/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-pg -g" />
+					<Add option="-lGDCpp" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
+					<Add option="-framework OpenGL" />
+					<Add option="-dynamiclib" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="../../Runtime/bin/debug" />
+					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libGDCpp.dylib libGDCpp.dylib ../../Runtime/bin/debug/PhysicsBehavior.xgdm" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../../Runtime/bin/debug/PhysicsBehavior.xgdm" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add directory="../../Core" />
+			<Add directory="../../GDCpp" />
+			<Add directory="../../ExtLibs/SFML/include" />
+			<Add directory="../../ExtLibs/boost" />
+			<Add directory="Box2D/Box2D" />
+		</Compiler>
+		<Linker>
+			<Add directory="../../ExtLibs/SFML/build-mingw-debug/lib" />
+			<Add directory="../../ExtLibs/SFML/build-mingw-release/lib" />
+		</Linker>
+		<Unit filename="Box2D/Box2D/Box2D/Box2D.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/Shapes/b2CircleShape.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/Shapes/b2CircleShape.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/Shapes/b2PolygonShape.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/Shapes/b2PolygonShape.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/Shapes/b2Shape.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2BroadPhase.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2BroadPhase.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2CollideCircle.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2CollidePolygon.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2Collision.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2Collision.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2Distance.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2Distance.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2DynamicTree.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2DynamicTree.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2TimeOfImpact.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Collision/b2TimeOfImpact.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Common/b2BlockAllocator.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Common/b2BlockAllocator.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Common/b2Math.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Common/b2Math.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Common/b2Settings.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Common/b2Settings.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Common/b2StackAllocator.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Common/b2StackAllocator.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2CircleContact.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2CircleContact.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2Contact.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2Contact.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2ContactSolver.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2ContactSolver.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2PolygonAndCircleContact.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2PolygonAndCircleContact.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2PolygonContact.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2PolygonContact.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2TOISolver.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Contacts/b2TOISolver.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2DistanceJoint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2DistanceJoint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2FrictionJoint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2FrictionJoint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2GearJoint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2GearJoint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2Joint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2Joint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2LineJoint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2LineJoint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2MouseJoint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2MouseJoint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2PrismaticJoint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2PrismaticJoint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2PulleyJoint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2PulleyJoint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2RevoluteJoint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2RevoluteJoint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2WeldJoint.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/Joints/b2WeldJoint.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2Body.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2Body.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2ContactManager.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2ContactManager.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2Fixture.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2Fixture.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2Island.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2Island.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2TimeStep.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2World.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2World.h" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2WorldCallbacks.cpp" />
+		<Unit filename="Box2D/Box2D/Box2D/Dynamics/b2WorldCallbacks.h" />
+		<Unit filename="ContactListener.cpp" />
+		<Unit filename="ContactListener.h" />
+		<Unit filename="CustomPolygonDialog.cpp" />
+		<Unit filename="CustomPolygonDialog.h" />
+		<Unit filename="Extension.cpp" />
+		<Unit filename="JsExtension.cpp" />
+		<Unit filename="PhysicsBehavior.cpp" />
+		<Unit filename="PhysicsBehavior.h" />
+		<Unit filename="PhysicsBehaviorEditor.cpp" />
+		<Unit filename="PhysicsBehaviorEditor.h" />
+		<Unit filename="RuntimeScenePhysicsDatas.cpp" />
+		<Unit filename="RuntimeScenePhysicsDatas.h" />
+		<Unit filename="ScenePhysicsDatas.cpp" />
+		<Unit filename="ScenePhysicsDatas.h" />
+		<Unit filename="Triangulation/triangulate.cpp" />
+		<Unit filename="Triangulation/triangulate.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="" main="" init_handlers="necessary" language="CPP" />
+				<resources>
+					<wxDialog wxs="wxsmith/PhysicsBehaviorEditor.wxs" src="PhysicsBehaviorEditor.cpp" hdr="PhysicsBehaviorEditor.h" fwddecl="0" i18n="1" name="PhysicsBehaviorEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/CustomPolygonDialog.wxs" src="CustomPolygonDialog.cpp" hdr="CustomPolygonDialog.h" fwddecl="0" i18n="1" name="CustomPolygonDialog" language="CPP" />
+				</resources>
+			</wxsmith>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

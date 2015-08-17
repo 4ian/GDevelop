@@ -14,14 +14,14 @@
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/Events/ObjectMetadata.h"
-#include "GDCore/Events/AutomatismMetadata.h"
+#include "GDCore/Events/BehaviorMetadata.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 namespace gd { class Instruction; }
 namespace gd { class Layout; }
 namespace gd { class Object; }
 namespace gd { class BaseEvent; }
-namespace gd { class AutomatismsSharedData; }
+namespace gd { class BehaviorsSharedData; }
 namespace gd {class ArbitraryResourceWorker;}
 class RuntimeScene;
 namespace gd { class Project; }

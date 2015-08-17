@@ -95,28 +95,28 @@ std::shared_ptr<gd::Object> Platform::CreateObject(gd::String type, const gd::St
     return std::shared_ptr<gd::Object> (object);
 }
 
-gd::Automatism* Platform::CreateAutomatism(const gd::String & automatismType) const
+gd::Behavior* Platform::CreateBehavior(const gd::String & behaviorType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        Automatism* automatism = extensionsLoaded[i]->CreateAutomatism(automatismType);
-        if ( automatism != NULL )
-            return automatism;
+        Behavior* behavior = extensionsLoaded[i]->CreateBehavior(behaviorType);
+        if ( behavior != NULL )
+            return behavior;
     }
 
     return NULL;
 }
 
-std::shared_ptr<gd::AutomatismsSharedData> Platform::CreateAutomatismSharedDatas(const gd::String & automatismType) const
+std::shared_ptr<gd::BehaviorsSharedData> Platform::CreateBehaviorSharedDatas(const gd::String & behaviorType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        std::shared_ptr<gd::AutomatismsSharedData> automatism = extensionsLoaded[i]->CreateAutomatismSharedDatas(automatismType);
-        if ( automatism != std::shared_ptr<gd::AutomatismsSharedData>() )
-            return automatism;
+        std::shared_ptr<gd::BehaviorsSharedData> behavior = extensionsLoaded[i]->CreateBehaviorSharedDatas(behaviorType);
+        if ( behavior != std::shared_ptr<gd::BehaviorsSharedData>() )
+            return behavior;
     }
 
-    return std::shared_ptr<gd::AutomatismsSharedData>();
+    return std::shared_ptr<gd::BehaviorsSharedData>();
 }
 
 #if defined(GD_IDE_ONLY)

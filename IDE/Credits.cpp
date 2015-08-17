@@ -223,7 +223,7 @@ Credits::Credits(wxWindow* parent)
                       +_("Fran�ois Dumortier : GDevelop logo design and website conception.")+"<br>"
                       +"( <a href=\"http://www.fdumortier.com\">http://www.fdumortier.com</a> )"+"<br>"
                       +"<br>"
-                      +_("Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path automatism and Sound object extension.")+"<br>"
+                      +_("Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension.")+"<br>"
                       +"( <a href=\"http://www.levasseursoftware.net/\">http://www.levasseursoftware.net</a> )"+"<br>"
                       +"<br>"
                       +_("Constantine Shvetsov: Awesome design of icons")+"<br>"

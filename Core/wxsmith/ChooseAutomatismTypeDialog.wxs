@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="ChooseAutomatismTypeDialog">
-		<title>Choose an automatism</title>
+	<object class="wxDialog" name="ChooseBehaviorTypeDialog">
+		<title>Choose an behavior</title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
 		<handler function="OnResize" entry="EVT_SIZE" />
@@ -11,18 +11,18 @@
 			<growablerows>1</growablerows>
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-					<label>Automatisms can be used to add a specific behaviour&#x0A;to an object. Choose the automatism to add:</label>
+					<label>Behaviors can be used to add a specific behaviour&#x0A;to an object. Choose the behavior to add:</label>
 				</object>
 				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
-				<object class="wxListCtrl" name="ID_LISTCTRL1" variable="automatismsList" member="yes">
+				<object class="wxListCtrl" name="ID_LISTCTRL1" variable="behaviorsList" member="yes">
 					<size>277,175</size>
 					<style>wxLC_REPORT|wxLC_NO_HEADER|wxLC_SINGLE_SEL</style>
-					<handler function="OnautomatismsListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
-					<handler function="OnautomatismsListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+					<handler function="OnbehaviorsListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
+					<handler function="OnbehaviorsListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
@@ -30,7 +30,7 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-					<label>You can also use the grayed automatisms:&#x0A;Their associated extension will be automatically enabled.</label>
+					<label>You can also use the grayed behaviors:&#x0A;Their associated extension will be automatically enabled.</label>
 				</object>
 				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>

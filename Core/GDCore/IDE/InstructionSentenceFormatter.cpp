@@ -120,7 +120,7 @@ gd::String InstructionSentenceFormatter::LabelFromType(const gd::String & type)
     if ( type.empty() ) return "";
     else if ( type == "expression" ) return _("Expression");
     else if ( gd::ParameterMetadata::IsObject(type) ) return _("Object");
-    else if ( type == "automatism" ) return _("Automatism");
+    else if ( type == "behavior" ) return _("Behavior");
     else if ( type == "operator" ) return _("Operator");
     else if ( type == "relationalOperator" ) return _( "Relational operator" );
     else if ( type == "file" ) return _("File");
@@ -149,7 +149,7 @@ void InstructionSentenceFormatter::LoadTypesFormattingFromConfig()
     typesFormatting.clear();
     typesFormatting["expression"].SetColor(99, 0, 0).SetBold();
     typesFormatting["object"].SetColor(19, 81, 0).SetBold();
-    typesFormatting["automatism"].SetColor(19, 81, 0).SetBold();
+    typesFormatting["behavior"].SetColor(19, 81, 0).SetBold();
     typesFormatting["operator"].SetColor(64, 81, 79).SetBold();
     typesFormatting["objectvar"].SetColor(44, 69, 99).SetBold();
     typesFormatting["scenevar"].SetColor(44, 69, 99).SetBold();
@@ -188,7 +188,7 @@ wxBitmap InstructionSentenceFormatter::BitmapFromType(const gd::String & type)
     if ( type == "" ) return CommonBitmapManager->unknownBt;
     else if ( type == "expression" ) return CommonBitmapManager->expressionBt;
     else if ( gd::ParameterMetadata::IsObject(type) ) return CommonBitmapManager->objectBt;
-    else if ( type == "automatism" ) return CommonBitmapManager->automatismBt;
+    else if ( type == "behavior" ) return CommonBitmapManager->behaviorBt;
     else if ( type == "operator" ) return CommonBitmapManager->signeBt;
     else if ( type == "relationalOperator" ) return CommonBitmapManager->signeBt;
     else if ( type == "file" ) return CommonBitmapManager->fileBt;

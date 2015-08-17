@@ -12,7 +12,7 @@
  * \brief Internal class used to trigger some custom works after changes have been made.
  *
  * It notably relaunch compilation when some changes have been made or take care of updating
- * automatisms shared data.
+ * behaviors shared data.
  *
  * \ingroup IDE
  */
@@ -36,10 +36,10 @@ public:
     virtual void OnObjectRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, const gd::String & oldName) const;
     virtual void OnObjectsDeleted(gd::Project & project, gd::Layout * layout, const std::vector<gd::String> & deletedObjects) const;
     virtual void OnObjectVariablesChanged(gd::Project & project, gd::Layout * layout, gd::Object & object) const;
-    virtual void OnAutomatismEdited(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const;
-    virtual void OnAutomatismAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const;
-    virtual void OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const gd::String & oldName) const;
-    virtual void OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const gd::String & automatismName) const;
+    virtual void OnBehaviorEdited(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior) const;
+    virtual void OnBehaviorAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior) const;
+    virtual void OnBehaviorRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior, const gd::String & oldName) const;
+    virtual void OnBehaviorDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const gd::String & behaviorName) const;
     virtual void OnObjectGroupAdded(gd::Project & project, gd::Layout * layout, const gd::String & groupName) const;
     virtual void OnObjectGroupEdited(gd::Project & project, gd::Layout * layout, const gd::String & groupName) const;
     virtual void OnObjectGroupRenamed(gd::Project & project, gd::Layout * layout, const gd::String & groupName, const gd::String & oldName) const;

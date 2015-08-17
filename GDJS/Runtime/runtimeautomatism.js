@@ -5,65 +5,65 @@
  */
 
 /**
- * RuntimeAutomatism represents an automatism being used by a RuntimeObject.
+ * RuntimeBehavior represents an behavior being used by a RuntimeObject.
  *
- * @class RuntimeAutomatism
+ * @class RuntimeBehavior
  * @constructor
- * @param runtimeScene The scene owning the object of the automatism
- * @param automatismData The object used to setup the automatism
- * @param owner The object owning the automatism
+ * @param runtimeScene The scene owning the object of the behavior
+ * @param behaviorData The object used to setup the behavior
+ * @param owner The object owning the behavior
  */
-gdjs.RuntimeAutomatism = function(runtimeScene, automatismData, owner)
+gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {
-    this.name = automatismData.name || "";
-    this.type = automatismData.type || "";
+    this.name = behaviorData.name || "";
+    this.type = behaviorData.type || "";
     this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
     this._activated = true;
     this.owner = owner;
 };
 /**
- * Get the name of the automatism.
+ * Get the name of the behavior.
  * @method getName
- * @return {String} The automatism's name.
+ * @return {String} The behavior's name.
  */
-gdjs.RuntimeAutomatism.prototype.getName = function() {
+gdjs.RuntimeBehavior.prototype.getName = function() {
 	return this.name;
 };
 
 /**
- * Get the name identifier of the automatism.
+ * Get the name identifier of the behavior.
  * @method getNameId
- * @return {Number} The automatism's name identifier.
+ * @return {Number} The behavior's name identifier.
  */
-gdjs.RuntimeAutomatism.prototype.getNameId = function() {
+gdjs.RuntimeBehavior.prototype.getNameId = function() {
 	return this._nameId;
 };
 
 /**
  * Called at each frame before events. Call doStepPreEvents.<br>
- * Automatisms writers: Please do not redefine this method. Redefine doStepPreEvents instead.
+ * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
  * @method stepPreEvents
  * @param runtimeScene The runtimeScene owning the object
  */
-gdjs.RuntimeAutomatism.prototype.stepPreEvents = function(runtimeScene) {
+gdjs.RuntimeBehavior.prototype.stepPreEvents = function(runtimeScene) {
 	if ( this._activated ) this.doStepPreEvents(runtimeScene);
 };
 
 /**
  * Called at each frame after events. Call doStepPostEvents.<br>
- * Automatisms writers: Please do not redefine this method. Redefine doStepPreEvents instead.
+ * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
  * @method stepPostEvents
  * @param runtimeScene The runtimeScene owning the object
  */
-gdjs.RuntimeAutomatism.prototype.stepPostEvents = function(runtimeScene) {
+gdjs.RuntimeBehavior.prototype.stepPostEvents = function(runtimeScene) {
 	if ( this._activated ) this.doStepPostEvents(runtimeScene);
 };
 
 /**
- * De/Activate the automatism
+ * De/Activate the behavior
  * @method activate
  */
-gdjs.RuntimeAutomatism.prototype.activate = function(enable) {
+gdjs.RuntimeBehavior.prototype.activate = function(enable) {
 	if ( enable === undefined ) enable = true;
 	if ( !this._activated && enable ) {
 		this._activated = true;
@@ -76,57 +76,57 @@ gdjs.RuntimeAutomatism.prototype.activate = function(enable) {
 };
 
 /**
- * Return true if the automatism is activated
+ * Return true if the behavior is activated
  * @method activated
  */
-gdjs.RuntimeAutomatism.prototype.activated = function() {
+gdjs.RuntimeBehavior.prototype.activated = function() {
 	return this._activated;
 };
 
 /**
- * Automatisms writers: Reimplement this method to do extra work
- * when the automatism is activated
+ * Behaviors writers: Reimplement this method to do extra work
+ * when the behavior is activated
  * @method onActivate
  */
-gdjs.RuntimeAutomatism.prototype.onActivate = function() {
+gdjs.RuntimeBehavior.prototype.onActivate = function() {
 
 };
 
 /**
- * Automatisms writers: Reimplement this method to do extra work
- * when the automatism is deactivated
+ * Behaviors writers: Reimplement this method to do extra work
+ * when the behavior is deactivated
  * @method onDeActivate
  */
-gdjs.RuntimeAutomatism.prototype.onDeActivate = function() {
+gdjs.RuntimeBehavior.prototype.onDeActivate = function() {
 
 };
 
 /**
- * Automatisms writers: This method is called each tick before events are done.
+ * Behaviors writers: This method is called each tick before events are done.
  * @method doStepPreEvents
  * @param runtimeScene The runtimeScene owning the object
  */
-gdjs.RuntimeAutomatism.prototype.doStepPreEvents = function(runtimeScene) {
+gdjs.RuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
 
 };
 
 /**
- * Automatisms writers: This method is called each tick after events are done.
+ * Behaviors writers: This method is called each tick after events are done.
  * @method doStepPostEvents
  * @param runtimeScene The runtimeScene owning the object
  */
-gdjs.RuntimeAutomatism.prototype.doStepPostEvents = function(runtimeScene) {
+gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 
 }
 
 /**
- * Automatisms writers: This method is called when the owner of the automatism
+ * Behaviors writers: This method is called when the owner of the behavior
  * is removed from its scene.
  * @method ownerRemovedFromScene
  */
-gdjs.RuntimeAutomatism.prototype.ownerRemovedFromScene = function() {
+gdjs.RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
 
 }
 
-//Notify gdjs this.the runtimeAutomatism exists.
-gdjs.RuntimeAutomatism.thisIsARuntimeAutomatismConstructor = "";
+//Notify gdjs this.the runtimeBehavior exists.
+gdjs.RuntimeBehavior.thisIsARuntimeBehaviorConstructor = "";

@@ -246,8 +246,8 @@
 		<Unit filename="GDCore/CommonTools.cpp" />
 		<Unit filename="GDCore/CommonTools.h" />
 		<Unit filename="GDCore/DocMainPage.h" />
-		<Unit filename="GDCore/Events/AutomatismMetadata.cpp" />
-		<Unit filename="GDCore/Events/AutomatismMetadata.h" />
+		<Unit filename="GDCore/Events/BehaviorMetadata.cpp" />
+		<Unit filename="GDCore/Events/BehaviorMetadata.h" />
 		<Unit filename="GDCore/Events/Builtin/CommentEvent.cpp" />
 		<Unit filename="GDCore/Events/Builtin/CommentEvent.h" />
 		<Unit filename="GDCore/Events/Builtin/ForEachEvent.cpp" />
@@ -297,10 +297,10 @@
 		<Unit filename="GDCore/IDE/ConditionSentenceFormatter.h" />
 		<Unit filename="GDCore/IDE/Dialogs/AdvancedEntryDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/AdvancedEntryDialog.h" />
-		<Unit filename="GDCore/IDE/Dialogs/ChooseAutomatismDialog.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/ChooseAutomatismDialog.h" />
-		<Unit filename="GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/ChooseBehaviorDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ChooseLayerDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/ChooseLayerDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ChooseObjectDialog.cpp" />
@@ -400,10 +400,10 @@
 		<Unit filename="GDCore/IDE/wxTools/SkinHelper.cpp" />
 		<Unit filename="GDCore/IDE/wxTools/SkinHelper.h" />
 		<Unit filename="GDCore/IDE/wxTools/TreeItemStringData.h" />
-		<Unit filename="GDCore/PlatformDefinition/Automatism.cpp" />
-		<Unit filename="GDCore/PlatformDefinition/Automatism.h" />
-		<Unit filename="GDCore/PlatformDefinition/AutomatismsSharedData.cpp" />
-		<Unit filename="GDCore/PlatformDefinition/AutomatismsSharedData.h" />
+		<Unit filename="GDCore/PlatformDefinition/Behavior.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/Behavior.h" />
+		<Unit filename="GDCore/PlatformDefinition/BehaviorsSharedData.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/BehaviorsSharedData.h" />
 		<Unit filename="GDCore/PlatformDefinition/ChangesNotifier.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/ChangesNotifier.h" />
 		<Unit filename="GDCore/PlatformDefinition/ClassWithObjects.cpp" />
@@ -460,8 +460,8 @@
 		<Unit filename="GDCore/Tools/VersionWrapper.cpp" />
 		<Unit filename="GDCore/Tools/VersionWrapper.h" />
 		<Unit filename="wxsmith/AdvancedEntryDialog.wxs" />
-		<Unit filename="wxsmith/ChooseAutomatismDialog.wxs" />
-		<Unit filename="wxsmith/ChooseAutomatismTypeDialog.wxs" />
+		<Unit filename="wxsmith/ChooseBehaviorDialog.wxs" />
+		<Unit filename="wxsmith/ChooseBehaviorTypeDialog.wxs" />
 		<Unit filename="wxsmith/ChooseLayerDialog.wxs" />
 		<Unit filename="wxsmith/ChooseObjectDialog.wxs" />
 		<Unit filename="wxsmith/ChooseObjectTypeDialog.wxs" />
@@ -493,7 +493,7 @@
 					<wxDialog wxs="wxsmith/ResourceLibraryDialog.wxs" src="GDCore\IDE\Dialogs\ResourceLibraryDialog.cpp" hdr="GDCore\IDE\Dialogs\ResourceLibraryDialog.h" fwddecl="0" i18n="1" name="ResourceLibraryDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ProjectExtensionsDialog.wxs" src="GDCore\IDE\Dialogs\ProjectExtensionsDialog.cpp" hdr="GDCore\IDE\Dialogs\ProjectExtensionsDialog.h" fwddecl="0" i18n="1" name="ProjectExtensionsDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseObjectDialog.wxs" src="GDCore\IDE\Dialogs\ChooseObjectDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseObjectDialog.h" fwddecl="0" i18n="1" name="ChooseObjectDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseAutomatismDialog.wxs" src="GDCore\IDE\Dialogs\ChooseAutomatismDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseAutomatismDialog.h" fwddecl="0" i18n="1" name="ChooseAutomatismDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseBehaviorDialog.wxs" src="GDCore\IDE\Dialogs\ChooseBehaviorDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseBehaviorDialog.h" fwddecl="0" i18n="1" name="ChooseBehaviorDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseLayerDialog.wxs" src="GDCore\IDE\Dialogs\ChooseLayerDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseLayerDialog.h" fwddecl="0" i18n="1" name="ChooseLayerDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/EditExpressionDialog.wxs" src="GDCore\IDE\Dialogs\EditExpressionDialog.cpp" hdr="GDCore\IDE\Dialogs\EditExpressionDialog.h" fwddecl="0" i18n="1" name="EditExpressionDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/EditStrExpressionDialog.wxs" src="GDCore\IDE\Dialogs\EditStrExpressionDialog.cpp" hdr="GDCore\IDE\Dialogs\EditStrExpressionDialog.h" fwddecl="0" i18n="1" name="EditStrExpressionDialog" language="CPP" />
@@ -503,7 +503,7 @@
 					<wxDialog wxs="wxsmith/GridSetupDialog.wxs" src="GDCore\IDE\Dialogs\GridSetupDialog.cpp" hdr="GDCore\IDE\Dialogs\GridSetupDialog.h" fwddecl="0" i18n="1" name="GridSetupDialog" language="CPP" />
 					<wxPanel wxs="wxsmith/LayersEditorPanel.wxs" src="GDCore\IDE\Dialogs\LayersEditorPanel.cpp" hdr="GDCore\IDE\Dialogs\LayersEditorPanel.h" fwddecl="0" i18n="1" name="LayersEditorPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/InstancesAdvancedPasteDialog.wxs" src="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.cpp" hdr="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.h" fwddecl="0" i18n="1" name="InstancesAdvancedPasteDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseAutomatismTypeDialog.wxs" src="GDCore\IDE\Dialogs\ChooseAutomatismTypeDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseAutomatismTypeDialog.h" fwddecl="0" i18n="1" name="ChooseAutomatismTypeDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseBehaviorTypeDialog.wxs" src="GDCore\IDE\Dialogs\ChooseBehaviorTypeDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseBehaviorTypeDialog.h" fwddecl="0" i18n="1" name="ChooseBehaviorTypeDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/EditLayerDialog.wxs" src="GDCore\IDE\Dialogs\EditLayerDialog.cpp" hdr="GDCore\IDE\Dialogs\EditLayerDialog.h" fwddecl="0" i18n="1" name="EditLayerDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDCore\IDE\Dialogs\EditLink.cpp" hdr="GDCore\IDE\Dialogs\EditLink.h" fwddecl="0" i18n="1" name="EditLink" language="CPP" />
 					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDCore\IDE\Dialogs\EditComment.cpp" hdr="GDCore\IDE\Dialogs\EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />

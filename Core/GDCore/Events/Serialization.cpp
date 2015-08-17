@@ -78,7 +78,7 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
             instr.SetParameter(1, instr.GetParameter(5));
             instr.SetParameter(2, instr.GetParameter(3));
         }
-        else if (instr.GetType() == "PhysicsAutomatism::AddRevoluteJointBetweenObjects")
+        else if (instr.GetType() == "PhysicsBehavior::AddRevoluteJointBetweenObjects")
         {
             instr.SetParameter(4, instr.GetParameter(5));
             instr.SetParameter(5, instr.GetParameter(6));

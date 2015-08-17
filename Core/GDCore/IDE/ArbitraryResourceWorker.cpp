@@ -73,10 +73,10 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
                             extensionHasAction = true;
                     }
 
-                    const vector < gd::String > & autos = allGameExtensions[e]->GetAutomatismsTypes();
+                    const vector < gd::String > & autos = allGameExtensions[e]->GetBehaviorsTypes();
                     for (unsigned int a = 0;a<autos.size();++a)
                     {
-                        const std::map<gd::String, gd::InstructionMetadata> & allAutosActions = allGameExtensions[e]->GetAllActionsForAutomatism(autos[a]);
+                        const std::map<gd::String, gd::InstructionMetadata> & allAutosActions = allGameExtensions[e]->GetAllActionsForBehavior(autos[a]);
                         if ( allAutosActions.find(type) != allAutosActions.end() )
                             extensionHasAction = true;
                     }
@@ -113,10 +113,10 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
                             extensionHasCondition = true;
                     }
 
-                    const vector < gd::String > & autos = allGameExtensions[e]->GetAutomatismsTypes();
+                    const vector < gd::String > & autos = allGameExtensions[e]->GetBehaviorsTypes();
                     for (unsigned int j = 0;j<autos.size();++j)
                     {
-                        const std::map<gd::String, gd::InstructionMetadata> & allAutosConditions = allGameExtensions[e]->GetAllConditionsForAutomatism(autos[j]);
+                        const std::map<gd::String, gd::InstructionMetadata> & allAutosConditions = allGameExtensions[e]->GetAllConditionsForBehavior(autos[j]);
                         if ( allAutosConditions.find(type) != allAutosConditions.end() )
                             extensionHasCondition = true;
                     }

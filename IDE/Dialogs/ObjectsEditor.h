@@ -176,7 +176,7 @@ private:
     void OnSetGlobalSelected(wxCommandEvent& event);
     void OnSetFocus(wxFocusEvent& event);
     void OnobjectsListBeginDrag(wxTreeEvent& event);
-    void OnMenuAddAutomatismSelected(wxCommandEvent& event);
+    void OnMenuAddBehaviorSelected(wxCommandEvent& event);
     //*)
     void OnHelpSelected(wxCommandEvent& event);
     wxTreeItemId AddObjectsToList(gd::ClassWithObjects & objects, bool globalObject);

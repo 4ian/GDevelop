@@ -13,7 +13,7 @@
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/ClassWithObjects.h"
-#include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
+#include "GDCore/PlatformDefinition/BehaviorsSharedData.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/Layer.h"
@@ -236,13 +236,13 @@ public:
 
     /**
      * Make sure that the scene had an instance of shared data for
-     * every automatism of every object that can be used on the scene
+     * every behavior of every object that can be used on the scene
      * ( i.e. the objects of the scene and the global objects )
      *
-     * Must be called when an automatism have been added/deleted
+     * Must be called when an behavior have been added/deleted
      * or when a scene have been added to a project.
      */
-    void UpdateAutomatismsSharedData(gd::Project & project);
+    void UpdateBehaviorsSharedData(gd::Project & project);
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     /**
@@ -340,7 +340,7 @@ public:
     ///@}
 
     //TODO: Send this to private part.
-    std::map < gd::String, std::shared_ptr<gd::AutomatismsSharedData> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
+    std::map < gd::String, std::shared_ptr<gd::BehaviorsSharedData> > behaviorsInitialSharedDatas; ///< Initial shared datas of behaviors
 
     //TODO: GD C++ Platform specific code below
     #if defined(GD_IDE_ONLY)
@@ -477,18 +477,18 @@ std::vector<gd::String> GetHiddenLayers(const Layout & layout);
 gd::String GD_CORE_API GetTypeOfObject(const Project & game, const Layout & layout, gd::String objectName, bool searchInGroups = true);
 
 /**
- * \brief Get a type from an automatism name
- * @return Type of the automatism.
+ * \brief Get a type from an behavior name
+ * @return Type of the behavior.
  */
-gd::String GD_CORE_API GetTypeOfAutomatism(const Project & game, const Layout & layout, gd::String automatismName, bool searchInGroups = true);
+gd::String GD_CORE_API GetTypeOfBehavior(const Project & game, const Layout & layout, gd::String behaviorName, bool searchInGroups = true);
 
 /**
- * \brief Get automatisms of an object/group
- * \note The automatisms of a group are the automatisms which are found in common when looking all the objects of the group.
+ * \brief Get behaviors of an object/group
+ * \note The behaviors of a group are the behaviors which are found in common when looking all the objects of the group.
  *
- * @return Vector containing names of automatisms
+ * @return Vector containing names of behaviors
  */
-std::vector < gd::String > GD_CORE_API GetAutomatismsOfObject(const Project & game, const Layout & layout, gd::String objectName, bool searchInGroups = true);
+std::vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const Project & game, const Layout & layout, gd::String objectName, bool searchInGroups = true);
 
 }
 

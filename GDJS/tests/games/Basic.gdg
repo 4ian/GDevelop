@@ -78,7 +78,7 @@
             <Variables>
                 <Variable Name="NouvelleVariable" Value="0" />
             </Variables>
-            <AutomatismsSharedDatas />
+            <BehaviorsSharedDatas />
             <Positions>
                 <Objet nom="NouvelObjet" x="466.000000" y="188.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
                     <floatInfos />

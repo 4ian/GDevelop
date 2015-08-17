@@ -31,7 +31,6 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
-#include "GDCpp/XmlMacros.h"
 #include "GDCpp/CommonTools.h"
 
 using namespace std;

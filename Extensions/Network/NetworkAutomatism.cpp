@@ -11,7 +11,6 @@ This project is released under the MIT License.
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/XmlMacros.h"
 #include "GDCpp/CommonTools.h"
 #include "ReceivedDataManager.h"
 #include "NetworkAutomatismEditor.h"

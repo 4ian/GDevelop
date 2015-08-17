@@ -146,7 +146,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
 
     extension.AddExpression("Time", _("Current time"), _("Current time"), _("Time"), "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("", _("Hour : hour\nMinutes : min\nSeconds : sec\nDay in the month : mday\nMonths since January : mon\nYear since 1900 : year\nDays since sunday :wday\nDays since January 1st : yday"), "",false);
+        .AddParameter("", _("Hour : hour\nMinutes : min\nSeconds : sec\nDay in the month : mday\nMonths since January : mon\nYear since 1900 : year\nDays since sunday :wday\nDays since January 1st : yday"));
 
     #endif
 }

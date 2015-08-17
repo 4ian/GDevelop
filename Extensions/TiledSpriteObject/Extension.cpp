@@ -37,7 +37,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/scaleWidth24.png",
                    "res/actions/scaleWidth.png")
 
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .SetFunctionName("SetWidth").SetManipulatedType("number").SetGetter("GetWidth").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
@@ -49,7 +49,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
@@ -64,7 +64,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/scaleHeight24.png",
                    "res/actions/scaleHeight.png")
 
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .SetFunctionName("SetHeight").SetManipulatedType("number").SetGetter("GetHeight").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
@@ -77,7 +77,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Size and angle"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
@@ -92,7 +92,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
 
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
@@ -107,7 +107,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
 
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .SetHidden() //Now available for all objects
@@ -120,7 +120,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
@@ -134,7 +134,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()
@@ -147,7 +147,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
@@ -161,7 +161,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
                    _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
-        .AddParameter("object", _("Object"), "TiledSprite", false)
+        .AddParameter("object", _("Object"), "TiledSprite")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .MarkAsAdvanced()

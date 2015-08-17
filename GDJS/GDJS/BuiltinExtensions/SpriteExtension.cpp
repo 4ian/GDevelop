@@ -85,12 +85,12 @@ SpriteExtension::SpriteExtension()
                        "res/copy24.png",
                        "res/copyicon.png")
 
-            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("object", _("Object"), "Sprite")
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("string", _("Name of the source image"), "",false)
-            .AddParameter("expression", _("X position"), "",false)
-            .AddParameter("expression", _("Y position"), "",false)
-            .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false)
+            .AddParameter("string", _("Name of the source image"))
+            .AddParameter("expression", _("X position"))
+            .AddParameter("expression", _("Y position"))
+            .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"))
             .SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 
 
@@ -103,8 +103,8 @@ SpriteExtension::SpriteExtension()
                        "res/actions/opacity24.png",
                        "res/actions/opacity.png")
 
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("color", _("Color to make transparent"), "",false)
+            .AddParameter("object", _("Object"), "Sprite")
+            .AddParameter("color", _("Color to make transparent"))
             .SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     }
 

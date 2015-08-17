@@ -183,11 +183,6 @@ unsigned int GD_API GetScreenHeight();
  */
 unsigned int GD_API GetScreenColorDepth();
 
-/**
- * Only used internally by GD events generated code.
- */
-void GD_API DisplayLegacyTextOnScene(RuntimeScene & scene, const gd::String & str, float x, float y, const gd::String & color, float characterSize, const gd::String & fontName, const gd::String & layer);
-
 #if defined(GD_IDE_ONLY)
 /**
  * \brief Called so as to warn the developer about a while event doing a large number of iterations.

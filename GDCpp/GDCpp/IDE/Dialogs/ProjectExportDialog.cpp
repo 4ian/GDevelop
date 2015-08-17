@@ -49,11 +49,8 @@ const long ProjectExportDialog::ID_GAUGE1 = wxNewId();
 const long ProjectExportDialog::ID_BUTTON1 = wxNewId();
 const long ProjectExportDialog::ID_STATICTEXT2 = wxNewId();
 const long ProjectExportDialog::ID_STATICTEXT1 = wxNewId();
-const long ProjectExportDialog::ID_STATICTEXT4 = wxNewId();
 const long ProjectExportDialog::ID_TEXTCTRL1 = wxNewId();
 const long ProjectExportDialog::ID_BUTTON5 = wxNewId();
-const long ProjectExportDialog::ID_CHECKBOX1 = wxNewId();
-const long ProjectExportDialog::ID_CHECKBOX4 = wxNewId();
 const long ProjectExportDialog::ID_STATICLINE2 = wxNewId();
 const long ProjectExportDialog::ID_STATICBITMAP2 = wxNewId();
 const long ProjectExportDialog::ID_HYPERLINKCTRL1 = wxNewId();
@@ -102,7 +99,7 @@ ProjectExportDialog::ProjectExportDialog( wxWindow* parent, gd::Project & gameTo
     StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Options"));
     FlexGridSizer5 = new wxFlexGridSizer(0, 2, 0, 0);
     FlexGridSizer5->AddGrowableCol(1);
-    StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Export folder:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    StaticText4 = new wxStaticText(this, wxID_ANY, _("Export folder:"), wxDefaultPosition, wxDefaultSize, 0, _T("wxID_ANY"));
     FlexGridSizer5->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer8->AddGrowableCol(0);
@@ -112,14 +109,6 @@ ProjectExportDialog::ProjectExportDialog( wxWindow* parent, gd::Project & gameTo
     browseBt = new wxButton(this, ID_BUTTON5, _("..."), wxDefaultPosition, wxSize(30,23), 0, wxDefaultValidator, _T("ID_BUTTON5"));
     FlexGridSizer8->Add(browseBt, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer5->Add(20,7,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    compressCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Compress in a single file"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
-    compressCheck->SetValue(false);
-    FlexGridSizer5->Add(compressCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer5->Add(20,10,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    optimizationCheck = new wxCheckBox(this, ID_CHECKBOX4, _("Activate optimizations ( slow down compilation )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
-    optimizationCheck->SetValue(false);
-    FlexGridSizer5->Add(optimizationCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer7->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -149,10 +138,6 @@ ProjectExportDialog::ProjectExportDialog( wxWindow* parent, gd::Project & gameTo
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ProjectExportDialog::OnFermerBtClick);
     //*)
 
-    #if defined(LINUX) || defined(MACOS)
-    compressCheck->Disable();
-    #endif
-
     dirEdit->AutoCompleteDirectories();
     if ( wxDirExists(gameToCompile.GetLastCompilationDirectory()) )
         dirEdit->SetValue(gameToCompile.GetLastCompilationDirectory());
@@ -164,7 +149,7 @@ ProjectExportDialog::ProjectExportDialog( wxWindow* parent, gd::Project & gameTo
     if ( gameToCompile.GetLayoutsCount() == 0 )
     {
         CompilBt->Enable(false);
-        statusTxt->SetLabel(_("The game is empty: Add a scene using the project manager."));
+        statusTxt->SetLabel(_("The game is empty: add a scene using the project manager."));
     }
 }
 
@@ -248,9 +233,6 @@ void ProjectExportDialog::OnCompilBtClick( wxCommandEvent& event )
     GDpriv::FullProjectCompiler compilationManager(gameToCompile, diagnosticManager, dirEdit->GetValue());
 
     compilationManager.SetForcedTempDir(tempDir);
-    compilationManager.CompressIfPossible(compressCheck->GetValue());
-    compilationManager.Optimize(optimizationCheck->GetValue());
-
     compilationManager.LaunchProjectCompilation();
 
     return;

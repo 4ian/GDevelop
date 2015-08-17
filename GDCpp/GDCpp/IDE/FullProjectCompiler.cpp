@@ -140,12 +140,10 @@ void FullProjectCompiler::LaunchProjectCompilation()
         windowsTarget = false;
         linuxTarget = true;
         macTarget = false;
-        compressIfPossible = false;
     #elif defined(MACOS)
         windowsTarget = false;
         linuxTarget = true;
         macTarget = false;
-        compressIfPossible = false;
     #else
         #warning Unknown OS
     #endif
@@ -227,7 +225,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         diagnosticManager.OnMessage(_("Compiling scene ")+game.GetLayout(i).GetName()+_("."));
         CodeCompilerTask task;
         task.compilerCall.compilationForRuntime = true;
-        task.compilerCall.optimize = optimize;
+        task.compilerCall.optimize = false;
         task.compilerCall.eventsGeneratedCode = true;
         task.compilerCall.inputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&game.GetLayout(i))+"RuntimeEventsSource.cpp");
         task.compilerCall.outputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&game.GetLayout(i))+"RuntimeObjectFile.o");
@@ -327,11 +325,10 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxRemoveFile( tempDir + "/compil.gdg" );
     diagnosticManager.OnPercentUpdate(85);
 
-    //Cr�ation du fichier gam.egd
     diagnosticManager.OnMessage(_( "Copying resources..." ), _( "Step 3 out of 3" ));
     gd::SafeYield::Do();
 
-    //On cr�� une liste avec tous les fichiers
+    //List all resources files
     std::vector < gd::String > files;
     {
         wxString file = wxFindFirstFile( tempDir + "/*" );
@@ -344,11 +341,11 @@ void FullProjectCompiler::LaunchProjectCompilation()
         }
     }
 
-    //On cr�� le fichier � partir des fichiers
+    //Create the file containing the resources
     DatFile gameDatFile;
     gameDatFile.Create(files, tempDir, tempDir + "/gam.egd");
 
-    //On supprime maintenant tout le superflu
+    //Remove resources that we just merged
     {
         wxString file = wxFindFirstFile( tempDir + "/*" );
         while ( !file.empty() )
@@ -456,123 +453,49 @@ void FullProjectCompiler::LaunchProjectCompilation()
             diagnosticManager.AddError(_( "Unable to copy C++ sources ( dynext.dxgd ) in compilation directory.\n" ));
     }
 
-    //Copie des derniers fichiers
-    if ( !compressIfPossible )
+
+    //Copy specific files
+    if ( windowsTarget )
     {
-        //Fichier pour windows
-        if ( windowsTarget )
-        {
-            if ( wxCopyFile( "CppPlatform/Runtime/PlayWin.exe", tempDir + "/" + winExecutableName, true ) == false )
-                diagnosticManager.AddError(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory.\n" ));
+        if ( wxCopyFile( "CppPlatform/Runtime/PlayWin.exe", tempDir + "/" + winExecutableName, true ) == false )
+            diagnosticManager.AddError(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory.\n" ));
 
-            if ( wxCopyFile( "CppPlatform/Runtime/GDCpp.dll", tempDir + "/GDCpp.dll", true ) == false )
-                diagnosticManager.AddError(_( "Unable to create ")+"GDCpp.dll"+_(" in compilation directory.\n" ));
+        if ( wxCopyFile( "CppPlatform/Runtime/GDCpp.dll", tempDir + "/GDCpp.dll", true ) == false )
+            diagnosticManager.AddError(_( "Unable to create ")+"GDCpp.dll"+_(" in compilation directory.\n" ));
 
-        }
-        //Fichiers pour linux
-        if ( linuxTarget )
-        {
-            if ( wxCopyFile( "CppPlatform/Runtime/ExeLinux", tempDir + "/ExeLinux", true ) == false )
-                diagnosticManager.AddError(_( "Unable to create ")+"l'executable Linux"+_(" in compilation directory.\n" ));
-
-            if ( wxCopyFile( "CppPlatform/Runtime/PlayLinux", tempDir + "/" + linuxExecutableName, true ) == false )
-                diagnosticManager.AddError(_( "Unable to create ")+"le script executable Linux"+_(" in compilation directory.\n" ));
-
-            if ( wxCopyFile( "CppPlatform/Runtime/libGDCpp.so", tempDir + "/libGDCpp.so", true ) == false )
-                diagnosticManager.AddError(_( "Unable to create ")+"libGDCpp.so"+_(" in compilation directory.\n" ));
-        }
-        if ( macTarget )
-        {
-            if ( wxCopyFile( "CppPlatform/MacRuntime/MacExe", tempDir + "/MacExe", true ) == false )
-                diagnosticManager.AddError(_( "Unable to create ")+"l'executable Mac OS"+_(" in compilation directory.\n" ));
-
-            if ( wxCopyFile( "CppPlatform/MacRuntime/libGDCpp.dylib", tempDir + "/libGDCpp.dylib", true ) == false )
-                diagnosticManager.AddError(_( "Unable to create ")+"libGDCpp.dylib"+_(" in compilation directory.\n" ));
-        }
-
-        //Copie du tout dans le r�pertoire final
-        wxString file = wxFindFirstFile( tempDir + "/*" );
-        while ( !file.empty() )
-        {
-            wxFileName fileName(file);
-            if ( !wxCopyFile( file, outDir + "/" + fileName.GetFullName(), true ) )
-                diagnosticManager.AddError(_("Unable to copy file") + gd::String(file) + _(" from compilation directory to final directory.\n" ));
-
-            file = wxFindNextFile();
-        }
     }
-    else
+    if ( linuxTarget )
     {
-        if ( windowsTarget )
-        {
-            if ( wxCopyFile( "CppPlatform/Runtime/PlayWin.exe", tempDir + "/internalstart.exe", true ) == false )
-                diagnosticManager.AddError(_( "Unable to create the Windows executable in compilation directory.\n" ));
+        if ( wxCopyFile( "CppPlatform/Runtime/ExeLinux", tempDir + "/ExeLinux", true ) == false )
+            diagnosticManager.AddError(_( "Unable to create ")+"l'executable Linux"+_(" in compilation directory.\n" ));
 
-            if ( wxCopyFile( "CppPlatform/Runtime/GDCpp.dll", tempDir + "/GDCpp.dll", true ) == false )
-                diagnosticManager.AddError(_( "Unable to create GDCpp.dll in compilation directory.\n" ));
+        if ( wxCopyFile( "CppPlatform/Runtime/PlayLinux", tempDir + "/" + linuxExecutableName, true ) == false )
+            diagnosticManager.AddError(_( "Unable to create ")+"le script executable Linux"+_(" in compilation directory.\n" ));
 
-            //Use 7zip to create a single archive
-            diagnosticManager.OnMessage( _("Exporting game... ( Compressing )") );
-            wxArrayString arrStdOut, arrStdErr;
-            wxExecute( _T( "7za.exe a  \""+ tempDir +"/archive.7z\" \"" + tempDir + "/*\"" ), arrStdOut, arrStdErr, wxEXEC_SYNC  );
+        if ( wxCopyFile( "CppPlatform/Runtime/libGDCpp.so", tempDir + "/libGDCpp.so", true ) == false )
+            diagnosticManager.AddError(_( "Unable to create ")+"libGDCpp.so"+_(" in compilation directory.\n" ));
+    }
+    if ( macTarget )
+    {
+        if ( wxCopyFile( "CppPlatform/MacRuntime/MacExe", tempDir + "/MacExe", true ) == false )
+            diagnosticManager.AddError(_( "Unable to create ")+"l'executable Mac OS"+_(" in compilation directory.\n" ));
 
-            //Make the archive autoextractible
-            std::ofstream outFile;
-            outFile.open (gd::String(outDir+"/"+winExecutableName).ToLocale().c_str(), std::ofstream::out | std::ofstream::binary);
-            {
-                std::ifstream file;
-                char buffer[1];
-
-                file.open ("7zS.sfx", std::ifstream::in | std::ifstream::binary);
-                if (file.is_open())
-                {
-                    file.seekg (0, std::ios::beg);
-                    while (file.read (buffer, 1))
-                        outFile.write (buffer, 1);
-
-                    file.close();
-                }
-                else
-                    diagnosticManager.AddError( _("Unable to open 7zS.sfx") );
-            }
-            {
-                std::ifstream file;
-                char buffer[1];
-
-                file.open ("config.txt", std::ifstream::in | std::ifstream::binary);
-                if (file.is_open())
-                {
-                    file.seekg (0, std::ios::beg);
-                    while (file.read (buffer, 1))
-                        outFile.write (buffer, 1);
-
-                    file.close();
-                }
-                else
-                    diagnosticManager.AddError( _("Unable to open config.txt") );
-            }
-            {
-                std::ifstream file;
-                char buffer[1];
-
-                file.open (gd::String(tempDir +"/archive.7z").ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
-                if (file.is_open())
-                {
-                    file.seekg (0, std::ios::beg);
-                    while (file.read (buffer, 1))
-                        outFile.write (buffer, 1);
-
-                    file.close();
-                }
-                else
-                    diagnosticManager.AddError( _("Unable to open ")+gd::String(tempDir +"/archive.7z") );
-            }
-
-            outFile.close();
-        }
+        if ( wxCopyFile( "CppPlatform/MacRuntime/libGDCpp.dylib", tempDir + "/libGDCpp.dylib", true ) == false )
+            diagnosticManager.AddError(_( "Unable to create ")+"libGDCpp.dylib"+_(" in compilation directory.\n" ));
     }
 
-    //Prepare executables
+    //Copy everything into the destination directory
+    wxString file = wxFindFirstFile( tempDir + "/*" );
+    while ( !file.empty() )
+    {
+        wxFileName fileName(file);
+        if ( !wxCopyFile( file, outDir + "/" + fileName.GetFullName(), true ) )
+            diagnosticManager.AddError(_("Unable to copy file") + gd::String(file) + _(" from compilation directory to final directory.\n" ));
+
+        file = wxFindNextFile();
+    }
+
+    //Update executable icon
     #if defined(WINDOWS)
     if ( windowsTarget )
         ExecutableIconChanger::ChangeWindowsExecutableIcon(outDir+"/"+winExecutableName, game.winExecutableIconFile);

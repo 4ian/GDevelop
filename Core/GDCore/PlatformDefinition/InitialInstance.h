@@ -189,7 +189,6 @@ public:
     ///@}
     #endif
 
-    //TODO : Refactor this:
     //In our implementation, more properties can be stored in floatInfos and stringInfos.
     //These properties are then managed by the Object class.
     std::map < gd::String, float > floatInfos; ///< More data which can be used by the object

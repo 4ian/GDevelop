@@ -285,18 +285,13 @@ bool GDevelopIDEApp::OnInit()
     errorDetectFile.Write(" ");
     errorDetectFile.Close();
 
-    //Les log
     cout << "* Displaying GDevelop version information :" << endl;
     cout << "GDevelop " << gd::VersionWrapper::FullString() << ", built "
          << gd::VersionWrapper::Date() << "/" << gd::VersionWrapper::Month() << "/" << gd::VersionWrapper::Year() << endl;
 
-    cout << "* Creating a useless SFML texture" << endl;
+    cout << "* Creating useless SFML objects" << endl;
     sf::RenderWindow window;
     sf::Window window2;
-
-    cout << "* Removing CppPlatform/Extensions/AStarAutomatism.xgdle" << endl;
-    if ( wxFileExists("CppPlatform/Extensions/AStarAutomatism.xgdle") )
-        wxRemoveFile("CppPlatform/Extensions/AStarAutomatism.xgdle");
 
     //Load platforms and extensions
     cout << "* Loading platforms and extensions:" << endl;
@@ -356,7 +351,6 @@ bool GDevelopIDEApp::OnInit()
     LogFileManager::Get()->InitalizeFromConfig();
     LogFileManager::Get()->WriteToLogFile("GDevelop initialization ended"),
 
-    //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
     mainEditor->Show();
     cout << "* Initializing platforms..." << endl;
@@ -402,15 +396,6 @@ bool GDevelopIDEApp::OnInit()
     {
         int result = 3;
         config->Read( "Startup/Reminder", &result );
-
-        //Force again the display when upgrading from a version older than 3.3.71
-        bool reminder3371Shown = false;
-        config->Read( "Startup/Reminder3371Shown", &reminder3371Shown );
-        if (!reminder3371Shown)
-        {
-            result = 3;
-            config->Write( "Startup/Reminder3371Shown", true);
-        }
 
         //Decrement the counter and show the reminder only after 3 launch in a row.
         if ( result > 0 )

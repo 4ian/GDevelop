@@ -31,9 +31,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("expression", _("Start position of the portion ( The first letter is at position 0 )"), "",false)
-        .AddParameter("expression", _("Length of the portion"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("expression", _("Start position of the portion (the first letter is at position 0)"))
+        .AddParameter("expression", _("Length of the portion"));
 
     extension.AddStrExpression("StrAt",
                    _("Get a character from a text"),
@@ -41,8 +41,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("expression", _("Position of the character ( The first letter is at position 0 )"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("expression", _("Position of the character (the first letter is at position 0)"));
 
     extension.AddExpression("StrLength",
                    _("Length of a text"),
@@ -50,53 +50,53 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false);
+        .AddParameter("string", _("Text"));
 
 
 
     extension.AddExpression("StrFind",
                    _("Search in a text"),
-                   _("Search in a text ( Return the position of the result or -1 if not found )"),
+                   _("Search in a text (return the position of the result or -1 if not found)"),
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("string", _("Text to search for"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("string", _("Text to search for"));
 
 
 
     extension.AddExpression("StrRFind",
                    _("Search in a text from end"),
-                   _("Search in a text from the end ( Return the position of the result or -1 if not found )"),
+                   _("Search in a text from the end (return the position of the result or -1 if not found)"),
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("string", _("Text to search for"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("string", _("Text to search for"));
 
 
 
     extension.AddExpression("StrFindFrom",
                    _("Search in a text, starting from a position"),
-                   _("Search in a text starting from a position ( Return the position of the result or -1 if not found )"),
+                   _("Search in a text starting from a position (return the position of the result or -1 if not found)"),
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("string", _("Text to search for"), "",false)
-        .AddParameter("expression", _("Position of the first character in the string to be considered in the search"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("string", _("Text to search for"))
+        .AddParameter("expression", _("Position of the first character in the string to be considered in the search"));
 
 
 
     extension.AddExpression("StrRFindFrom",
                    _("Search in a text from the end, starting from a position"),
-                   _("Search in a text from the end, starting from a position ( Return the position of the result or -1 if not found )"),
+                   _("Search in a text from the end, starting from a position (return the position of the result or -1 if not found)"),
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("string", _("Text to search for"), "",false)
-        .AddParameter("expression", _("Position of the last character in the string to be considered in the search"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("string", _("Text to search for"))
+        .AddParameter("expression", _("Position of the last character in the string to be considered in the search"));
 
 
     #endif

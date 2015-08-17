@@ -36,7 +36,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
-        .AddParameter("object", _("Object"), "TextEntry", false)
+        .AddParameter("object", _("Object"), "TextEntry")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("string", _("Text"))
         .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("TextEntryObject/TextEntryObject.h");
@@ -49,7 +49,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
-        .AddParameter("object", _("Object"), "TextEntry", false)
+        .AddParameter("object", _("Object"), "TextEntry")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("string", _("Text to test"))
         .SetFunctionName("GetString").SetManipulatedType("string").SetIncludeFile("TextEntryObject/TextEntryObject.h");
@@ -62,7 +62,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
-        .AddParameter("object", _("Object"), "TextEntry", false)
+        .AddParameter("object", _("Object"), "TextEntry")
         .AddParameter("yesorno", _("Activate"))
         .SetFunctionName("Activate").SetIncludeFile("TextObject/TextObject.h");
 
@@ -75,11 +75,11 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
-        .AddParameter("object", _("Object"), "TextEntry", false)
+        .AddParameter("object", _("Object"), "TextEntry")
         .SetFunctionName("IsActivated").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddStrExpression("String", _("Text entered with keyboard"), _("Text entered with keyboard"), _("Text entered with keyboard"), "res/texteicon.png")
-        .AddParameter("object", _("Object"), "TextEntry", false)
+        .AddParameter("object", _("Object"), "TextEntry")
         .SetFunctionName("GetString").SetIncludeFile("TextObject/TextObject.h");
     #endif
 }

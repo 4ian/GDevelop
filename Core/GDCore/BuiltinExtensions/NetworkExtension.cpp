@@ -26,9 +26,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
             _("Network"),
             "res/actions/net24.png",
             "res/actions/net.png")
-        .AddParameter("string", _(".php page URL ( Don't forget the protocol http:// ) "), "",false)
-        .AddParameter("password", _("Password"), "", false)
-        .AddParameter("string", _("Data 1"), "", false)
+        .AddParameter("string", _(".php page URL (don't forget the protocol http://)"))
+        .AddParameter("password", _("Password"))
+        .AddParameter("string", _("Data 1"))
         .AddParameter("string", _("Data 2"), "", true)
         .AddParameter("string", _("Data 3"), "", true)
         .AddParameter("string", _("Data 4"), "", true)
@@ -38,14 +38,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
 
     extension.AddAction("SendRequest",
             _("Send a request to a web page"),
-            _("Send a request to the specified web page.\n\nPlease note that for the web platform games, the game must be hosted on the same host as specified below, except if the server is configured to answer to all requests ( Cross-domain requests ). "),
+            _("Send a request to the specified web page.\n\nPlease note that for the web platform games, the game must be hosted on the same host as specified below, except if the server is configured to answer to all requests (cross-domain requests)."),
             _("Send _PARAM3_ request to _PARAM0__PARAM1_ with body: _PARAM2_"),
             _("Network"),
             "res/actions/net24.png",
             "res/actions/net.png")
-        .AddParameter("string", _("Host (Example: http://www.some-server.org/)"), "", false )
-        .AddParameter("string", _("Path to page (Example: /page.php)"), "", false )
-        .AddParameter("string", _("Request body content"), "", false )
+        .AddParameter("string", _("Host (example: http://www.some-server.org/)"))
+        .AddParameter("string", _("Path to page (Example: /page.php)"))
+        .AddParameter("string", _("Request body content"))
         .AddParameter("string", _("Method: \"POST\" or \"GET\" (if empty, GET will be used)"), "", true ).SetDefaultValue("\"GET\"")
         .AddParameter("string", _("Content type (application/x-www-form-urlencoded by default)"), "", true )
         .AddParameter("scenevar", _("Store the response in this variable"), "", true )
@@ -58,9 +58,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
             _("Network"),
             "res/actions/net24.png",
             "res/actions/net.png")
-        .AddParameter("string", _("Host ( For example : http://www.website.com )"), "",false)
-        .AddParameter("string", _("Path to file ( For example : /folder/file.txt )"), "",false)
-        .AddParameter("string", _("Save as"), "",false);
+        .AddParameter("string", _("Host (for example : http://www.website.com)"))
+        .AddParameter("string", _("Path to file (for example : /folder/file.txt)"))
+        .AddParameter("string", _("Save as"));
 
     extension.AddAction("JSONToVariableStructure",
             _("Convert JSON to variable"),
@@ -69,8 +69,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
             _("Network"),
             "res/actions/net24.png",
             "res/actions/net.png")
-        .AddParameter("string", _("JSON string"), "",false)
-        .AddParameter("scenevar", _("Variable where store the JSON object"), "",false)
+        .AddParameter("string", _("JSON string"))
+        .AddParameter("scenevar", _("Variable where store the JSON object"))
         .MarkAsAdvanced();
 
     extension.AddStrExpression("ToJSON",
@@ -78,7 +78,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
                        _("Convert a variable to JSON"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("scenevar", _("The variable to be stringify"), "",false);
+        .AddParameter("scenevar", _("The variable to be stringify"));
     #endif
 }
 

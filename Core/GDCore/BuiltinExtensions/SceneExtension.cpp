@@ -44,8 +44,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
                    "res/actions/replaceScene24.png",
                    "res/actions/replaceScene.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the new scene"), "",false)
-        .AddParameter("yesorno", _("Stop any other paused scenes?"), "",false).SetDefaultValue("true")
+        .AddParameter("string", _("Name of the new scene"))
+        .AddParameter("yesorno", _("Stop any other paused scenes?")).SetDefaultValue("true")
         .MarkAsAdvanced();
 
     extension.AddAction("PushScene",
@@ -56,7 +56,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
                    "res/actions/pushScene24.png",
                    "res/actions/pushScene.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the new scene"), "",false)
+        .AddParameter("string", _("Name of the new scene"))
         .MarkAsAdvanced();
 
     extension.AddAction("PopScene",
@@ -87,7 +87,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
                    "res/actions/background24.png",
                    "res/actions/background.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("color", _("Color"), "",false)
+        .AddParameter("color", _("Color"))
         .MarkAsAdvanced();
 
     extension.AddAction("DisableInputWhenFocusIsLost",
@@ -108,9 +108,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
                _("Other"),
                "res/conditions/egal24.png",
                "res/conditions/egal.png")
-        .AddParameter("expression", _("Expression 1"), "",false)
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Expression 2"), "",false)
+        .AddParameter("expression", _("Expression 1"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Expression 2"))
         .MarkAsAdvanced();
     #endif
 }

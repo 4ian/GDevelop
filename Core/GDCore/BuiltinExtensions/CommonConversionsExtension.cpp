@@ -25,28 +25,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonConversionsExtens
                        _("Convert the text to a number"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("string", _("Text to convert in a number"), "",false);
+        .AddParameter("string", _("Text to convert in a number"));
 
     extension.AddStrExpression("ToString",
                        _("Number > Text"),
                        _("Convert the result of the expression in a text"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Expression to be converted to a text"), "",false);
+        .AddParameter("expression", _("Expression to be converted to a text"));
 
     extension.AddStrExpression("LargeNumberToString",
                        _("Number > Text ( without scientific notation )"),
                        _("Convert the result of the expression in a text, without using the scientific notation"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Expression to be converted to a text"), "",false);
+        .AddParameter("expression", _("Expression to be converted to a text"));
 
     extension.AddExpression("ToRad",
                        _("Degrees > Radians"),
                        _("Converts the angle, expressed in degrees, into radians"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Angle, in degrees"), "",false);
+        .AddParameter("expression", _("Angle, in degrees"));
 
 
     extension.AddExpression("ToDeg",
@@ -54,7 +54,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonConversionsExtens
                        _("Converts the angle, expressed in radians, into degrees"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Angle, in radians"), "",false);
+        .AddParameter("expression", _("Angle, in radians"));
     #endif
 }
 

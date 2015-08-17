@@ -18,9 +18,10 @@ namespace gd
 {
 
 /**
- * \brief Represents a sprite to be included in a Direction and to display on the screen
+ * \brief Represents a sprite to be displayed on the screen.
  *
- * A sprite contains a SFML sprite to be displayed, some points, and can also have its own image ( rather than a image from ImageManager ).
+ * A sprite contains a SFML sprite to be displayed, some points,
+ * and can also have its own texture (rather than a texture from ImageManager).
  *
  * \see Direction
  * \see SpriteObject
@@ -33,22 +34,22 @@ public:
     virtual ~Sprite();
 
     /**
-     * Change the name of the Sprite's image
+     * \brief Change the name of the sprite image.
      */
     inline void SetImageName(const gd::String & image_) { image = image_; }
 
     /**
-     * Get the name of the Sprite's image
+     * \brief Get the name of the sprite image.
      */
     inline const gd::String & GetImageName() const { return image; }
 
     /**
-     * Get a reference to the name of the image
+     * \brief Get the name of the sprite image.
      */
     inline gd::String & GetImageName() { return image; }
 
     /**
-     * Get the collision mask ( custom or automatically generated owing to IsCollisionMaskAutomatic() )
+     * \brief Get the collision mask (custom or automatically generated owing to IsCollisionMaskAutomatic())
      *
      * \warning If the image has not been loaded ( using LoadImage ) and the collision mask is set as automatic,
      * the returned mask won't be correct.
@@ -56,89 +57,89 @@ public:
     std::vector<Polygon2d> GetCollisionMask() const;
 
     /**
-     * Set the custom collision mask.
-     * Call then SetCollisionMaskAutomatic() to use it.
+     * \brief Set the custom collision mask.
+     * Call then `SetCollisionMaskAutomatic(false)` to use it.
      */
     void SetCustomCollisionMask(const std::vector<Polygon2d> & collisionMask);
 
     /**
-     * Return true if the collision mask is a bounding box, false if a custom collision mask is used.
+     * \brief Return true if the collision mask is a bounding box, false if a custom collision mask is used.
      */
     inline bool IsCollisionMaskAutomatic() const { return automaticCollisionMask; }
 
     /**
-     * Un/Set use of the custom collision mask.
+     * \brief Un/set use of the custom collision mask.
      */
     inline void SetCollisionMaskAutomatic(bool enabled) { automaticCollisionMask = enabled; };
 
     /**
-     * Return all points without origin and center
+     * \brief Return all points, excluding origin and center.
      */
     inline std::vector < Point > & GetAllNonDefaultPoints() { return points; }
 
     /**
-     * Return all points without origin and center
+     * \brief Return all points, excluding origin and center.
      */
     inline const std::vector < Point > & GetAllNonDefaultPoints() const { return points; }
 
     /**
-     * Add a point
+     * \brief Add a point
      */
     void AddPoint( const Point & point );
 
     /**
-     * Delete point with the specified name
+     * \brief Delete a point
      */
     void DelPoint( const gd::String & name );
 
     /**
-     * Return point with name passed in argument
+     * \brief Get the specified point.
      */
     const Point & GetPoint( const gd::String & name) const;
 
     /**
-     * Return point with name passed in argument
+     * \brief Get the specified point.
      */
     Point & GetPoint(const gd::String & name);
 
     /**
-     * Return true if the point exists.
+     * \brief Return true if the point exists.
      */
     bool HasPoint( const gd::String & name ) const;
 
     /**
-     * Return Origin point.
+     * \brief Return Origin point.
      */
     inline const Point & GetOrigin() const { return origine; }
 
     /**
-     * Return Origin point.
+     * \brief Return Origin point.
      */
     inline Point & GetOrigin() { return origine; }
 
     /**
-     * Return Centre point.
+     * \brief Return Center point.
      *
-     * \warning If the image has not been loaded ( using LoadImage ) and the center point is set as automatic,
+     * \warning If the image has not been loaded (using LoadImage) and the center point is set as automatic,
      * the returned point won't be correct.
      */
     inline const Point & GetCenter() const { return centre; }
 
     /**
-     * Return Centre point.
+     * \brief Return Center point.
      *
-     * \warning If the image has not been loaded ( using LoadImage ) and the center point is set as automatic,
+     * \warning If the image has not been loaded (using LoadImage) and the center point is set as automatic,
      * the returned point won't be correct.
      */
     inline Point & GetCenter() { automaticCentre = false; return centre; }
 
     /**
-     * Return true if the center point is automatically computed
+     * \brief Return true if the center point is automatically computed.
      */
     inline bool IsDefaultCenterPoint() const { return automaticCentre; }
 
     /**
-     * Un/Set automatic centre
+     * \brief Un/set center as being automatically computed.
      */
     bool SetDefaultCenterPoint(bool enabled);
 
@@ -148,33 +149,33 @@ public:
      */
     ///@{
     /**
-     * Get the SFML Sprite associated with the Sprite
+     * \brief Get the SFML sprite associated with the sprite
      */
     inline const sf::Sprite & GetSFMLSprite() const { return sfmlSprite; }
 
     /**
-     * Get the SFML Sprite associated with the Sprite
+     * \brief Get the SFML sprite associated with the sprite
      */
     inline sf::Sprite & GetSFMLSprite() { return sfmlSprite; }
 
     /**
-     * Set a new image to the Sprite
+     * \brief Set the SFML texture of the sprite
      */
     void LoadImage(std::shared_ptr<SFMLTextureWrapper> image);
 
     /**
-     * Get SFML Image used by the sprite
+     * \brief Get SFML texture used by the sprite
      */
     std::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() { return sfmlImage; };
 
     /**
-     * Get SFML Image used by the sprite
+     * \brief Get SFML texture used by the sprite
      */
     const std::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() const { return sfmlImage; };
 
     /**
-     * Make the sprite, if it uses an image from ImageManager,
-     * copy this image and own it inside.
+     * \brief Make the sprite, if it uses a texture from ImageManager,
+     * copy this texture and take ownership of it.
      */
     void MakeSpriteOwnsItsImage();
     ///@}

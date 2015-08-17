@@ -163,6 +163,8 @@ void ChooseObjectTypeDialog::RefreshList()
     const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
+        if (extensions[i]->IsDeprecated()) continue;
+        
 	    //Verify if this extension is enabled
 	    bool extensionEnabled = find(project.GetUsedExtensions().begin(),
                                       project.GetUsedExtensions().end(),

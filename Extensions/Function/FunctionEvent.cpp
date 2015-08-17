@@ -16,7 +16,6 @@ This project is released under the MIT License.
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCpp/XmlMacros.h"
 #include "GDCpp/tinyxml/tinyxml.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"

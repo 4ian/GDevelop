@@ -27,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtensio
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the external layout"), "",false)
+        .AddParameter("string", _("Name of the external layout"))
         .AddParameter("expression", _("X position of the origin"), "",true).SetDefaultValue("0")
         .AddParameter("expression", _("Y position of the origin"), "",true).SetDefaultValue("0")
         .MarkAsAdvanced();

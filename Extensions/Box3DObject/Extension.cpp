@@ -50,7 +50,7 @@ public:
                            "res/actions/scaleWidth24.png",
                            "res/actions/scaleWidth.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
 
@@ -64,7 +64,7 @@ public:
                            "res/conditions/scaleWidth24.png",
                            "res/conditions/scaleWidth.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
 
@@ -79,7 +79,7 @@ public:
                            "res/actions/scaleHeight24.png",
                            "res/actions/scaleHeight.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
 
@@ -94,7 +94,7 @@ public:
                            "res/conditions/scaleHeight24.png",
                            "res/conditions/scaleHeight.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
 
@@ -109,7 +109,7 @@ public:
                            "res/actions/depth24.png",
                            "res/actions/depth.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
 
@@ -124,7 +124,7 @@ public:
                            "res/conditions/depth24.png",
                            "res/conditions/depth.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
 
@@ -139,7 +139,7 @@ public:
                            "res/actions/position24.png",
                            "res/actions/position.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
 
@@ -154,7 +154,7 @@ public:
                            "res/conditions/position24.png",
                            "res/conditions/position.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
 
@@ -169,7 +169,7 @@ public:
                            "res/actions/rotate24.png",
                            "res/actions/rotate.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
 
@@ -184,7 +184,7 @@ public:
                            "res/conditions/rotate24.png",
                            "res/conditions/rotate.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
 
@@ -199,7 +199,7 @@ public:
                            "res/actions/rotate24.png",
                            "res/actions/rotate.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
 
@@ -214,7 +214,7 @@ public:
                            "res/conditions/rotate24.png",
                            "res/conditions/rotate.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
 
@@ -228,7 +228,7 @@ public:
                            _("Angle"),
                            "res/actions/rotate24.png",
                            "res/actions/rotate.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
 
@@ -243,29 +243,29 @@ public:
                            "res/conditions/rotate24.png",
                            "res/conditions/rotate.png")
 
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
                 .SetFunctionName("GetRoll").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Depth", _("Depth of the 3D Box"), _("Depth of the 3D Box"), _("Size"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .codeExtraInformation.SetFunctionName("GetDepth").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Z", _("Z Position"), _("Z Position"), _("Position"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .SetFunctionName("GetZPosition").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Yaw", _("Yaw"), _("Yaw"), _("Angle"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .SetFunctionName("GetAngle").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Pitch", _("Pitch"), _("Pitch"), _("Angle"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .SetFunctionName("GetPitch").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             obj.AddExpression("Roll", _("Roll"), _("Roll"), _("Angle"), "res/actions/scaleHeight.png")
-                .AddParameter("object", _("Object"), "Box3D", false)
+                .AddParameter("object", _("Object"), "Box3D")
                 .SetFunctionName("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
 
             #endif

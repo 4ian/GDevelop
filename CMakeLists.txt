@@ -19,7 +19,7 @@ gd_set_option(BUILD_EXTENSIONS TRUE BOOL "TRUE to build the extensions")
 gd_set_option(BUILD_TESTS FALSE BOOL "TRUE to build the tests")
 gd_set_option(NO_GUI FALSE BOOL "TRUE to build without wxWidgets GUI")
 
-#Setting up installation directory, for Linux. (Has to be done before "project" command)
+#Setting up installation directory, for Linux (has to be done before "project" command).
 IF(NOT WIN32)
 	if (NOT APPLE)
 	gd_set_option(GD_INSTALL_PREFIX "/opt/gdevelop/" STRING "The directory where GDevelop should be installed")

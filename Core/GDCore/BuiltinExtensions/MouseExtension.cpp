@@ -122,8 +122,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("X position"))
-        .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
+        .AddParameter("layer", _("Layer (base layer if empty)"), "", true).SetDefaultValue("\"\"")
+        .AddParameter("expression", _("Camera number (default : 0)"), "", true).SetDefaultValue("0")
         .SetManipulatedType("number");
 
     extension.AddCondition("SourisY",
@@ -136,8 +136,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Y position"))
-        .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
+        .AddParameter("layer", _("Layer (base layer if empty)"), "", true).SetDefaultValue("\"\"")
+        .AddParameter("expression", _("Camera number (default : 0)"), "", true).SetDefaultValue("0")
         .SetManipulatedType("number");
 
     extension.AddCondition("SourisBouton",
@@ -173,8 +173,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddParameter("expression", _("Touch identifier"))
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("X position"))
-        .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
+        .AddParameter("layer", _("Layer (base layer if empty)"), "", true).SetDefaultValue("\"\"")
+        .AddParameter("expression", _("Camera number (default : 0)"), "", true).SetDefaultValue("0")
         .SetManipulatedType("number");
 
     extension.AddCondition("TouchY",
@@ -188,8 +188,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddParameter("expression", _("Touch identifier"))
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("X position"))
-        .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .AddParameter("expression", _("Camera number ( default : 0 )"), "", true).SetDefaultValue("0")
+        .AddParameter("layer", _("Layer (base layer if empty)"), "", true).SetDefaultValue("\"\"")
+        .AddParameter("expression", _("Camera number (default : 0)"), "", true).SetDefaultValue("0")
         .SetManipulatedType("number");
 
     extension.AddCondition("PopStartedTouch",
@@ -238,13 +238,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
 
     extension.AddExpression("TouchX", _("Touch X position"), _("Touch X position"), _("Multitouch"), "res/conditions/touch.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Touch identifier"), "", false)
+        .AddParameter("expression", _("Touch identifier"))
         .AddParameter("layer", _("Layer"), "", true).SetDefaultValue("\"\"")
         .AddParameter("camera", _("Camera"), "", true).SetDefaultValue("0");
 
     extension.AddExpression("TouchY", _("Touch Y position"), _("Touch Y position"), _("Multitouch"), "res/conditions/touch.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Touch identifier"), "", false)
+        .AddParameter("expression", _("Touch identifier"))
         .AddParameter("layer", _("Layer"), "", true).SetDefaultValue("\"\"")
         .AddParameter("camera", _("Camera"), "", true).SetDefaultValue("0");
 

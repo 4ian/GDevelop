@@ -1,4 +1,0 @@
-﻿;!@Install@!UTF-8!
-RunProgram="internalstart.exe -cwd=%%S"
-GUIMode="2"
-;!@InstallEnd@!

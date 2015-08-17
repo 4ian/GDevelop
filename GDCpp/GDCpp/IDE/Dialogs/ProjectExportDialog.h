@@ -9,7 +9,6 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
-#include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
@@ -44,8 +43,6 @@ public:
     wxStaticText* statusTxt;
     wxButton* FermerBt;
     wxStaticBitmap* StaticBitmap1;
-    wxCheckBox* optimizationCheck;
-    wxCheckBox* compressCheck;
     wxHyperlinkCtrl* HyperlinkCtrl1;
     wxStaticText* status2Txt;
     wxStaticLine* StaticLine2;
@@ -63,11 +60,8 @@ protected:
     static const long ID_BUTTON1;
     static const long ID_STATICTEXT2;
     static const long ID_STATICTEXT1;
-    static const long ID_STATICTEXT4;
     static const long ID_TEXTCTRL1;
     static const long ID_BUTTON5;
-    static const long ID_CHECKBOX1;
-    static const long ID_CHECKBOX4;
     static const long ID_STATICLINE2;
     static const long ID_STATICBITMAP2;
     static const long ID_HYPERLINKCTRL1;

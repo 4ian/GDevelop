@@ -38,15 +38,7 @@ public:
     gd::String GetTempDir();
     void SetForcedTempDir(const gd::String & dir) { forcedTempDir = dir; };
 
-    //Cross compilation is not available
-    /*void TargetWindows(bool enable = true) { windowsTarget = enable; };
-    void TargetLinux(bool enable = true) { linuxTarget = enable; };
-    void TargetMac(bool enable = true) { macTarget = enable; };*/
-    void CompressIfPossible(bool enable = true) { compressIfPossible = enable; };
-    void Optimize(bool enable = true) { optimize = enable; };
-
 private:
-
     gd::Project & gameToCompile;
     FullProjectCompilerDiagnosticManager & diagnosticManager;
     gd::String outDir;
@@ -55,8 +47,6 @@ private:
     bool windowsTarget;
     bool linuxTarget;
     bool macTarget;
-    bool compressIfPossible;
-    bool optimize;
 };
 
 /**

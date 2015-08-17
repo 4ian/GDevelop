@@ -63,7 +63,7 @@
 									<cols>2</cols>
 									<growablecols>1</growablecols>
 									<object class="sizeritem">
-										<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+										<object class="wxStaticText" name="wxID_ANY" variable="StaticText4" member="yes">
 											<label>Export folder:</label>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -93,34 +93,6 @@
 											</object>
 										</object>
 										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-										<option>1</option>
-									</object>
-									<object class="spacer">
-										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-										<border>5</border>
-										<option>1</option>
-										<size>20,7</size>
-									</object>
-									<object class="sizeritem">
-										<object class="wxCheckBox" name="ID_CHECKBOX1" variable="compressCheck" member="yes">
-											<label>Compress in a single file</label>
-										</object>
-										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-										<border>5</border>
-										<option>1</option>
-									</object>
-									<object class="spacer">
-										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-										<border>5</border>
-										<option>1</option>
-										<size>20,10</size>
-									</object>
-									<object class="sizeritem">
-										<object class="wxCheckBox" name="ID_CHECKBOX4" variable="optimizationCheck" member="yes">
-											<label>Activate optimizations ( slow down compilation )</label>
-										</object>
-										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-										<border>5</border>
 										<option>1</option>
 									</object>
 								</object>

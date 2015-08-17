@@ -21,7 +21,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("GroupExists",
                    _("Existence of a group"),
-                   _("Test if an element ( Example : PlayerState/CurrentLevel ) exists in the file.\nWarning! Spaces are forbidden in element's names."),
+                   _("Check if an element (example : PlayerState/CurrentLevel) exists in the file.\nSpaces are forbidden in element names."),
                    _("_PARAM1_ exists in file _PARAM0_"),
                    _("Storage"),
                    "res/conditions/fichier24.png",
@@ -52,7 +52,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
 
     extension.AddAction("EcrireFichierExp",
                    _("Write a value"),
-                   _("Write the result of the expression in the file, in the specified element.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
+                   _("Write the result of the expression in the file, in the specified element.\nSpecify the structure leading to the element using / (example : Root/Level/Current)\nSpaces are forbidden in element names."),
                    _("Write _PARAM2_ in _PARAM1_ of file _PARAM0_"),
                    _("Storage"),
                    "res/actions/fichier24.png",
@@ -63,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
 
     extension.AddAction("EcrireFichierTxt",
                    _("Write a text"),
-                   _("Write the text in the file, in the specified element.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
+                   _("Write the text in the file, in the specified element.\nSpecify the structure leading to the element using / (example : Root/Level/Current)\nSpaces are forbidden in element names."),
                    _("Write _PARAM2_ in _PARAM1_ of file _PARAM0_"),
                    _("Storage"),
                    "res/actions/fichier24.png",
@@ -74,7 +74,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
 
     extension.AddAction("LireFichierExp",
                    _("Read a value"),
-                   _("Read the value saved in the specified element and\nstore it in a variable.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
+                   _("Read the value saved in the specified element and store it in a variable.\nSpecify the structure leading to the element using / (example : Root/Level/Current)\nSpaces are forbidden in element names."),
                    _("Read _PARAM1_ from file _PARAM0_ and store value in _PARAM3_"),
                    _("Storage"),
                    "res/actions/fichier24.png",
@@ -86,7 +86,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
 
     extension.AddAction("LireFichierTxt",
                    _("Read a text"),
-                   _("Read the text saved in the specified element and\nstore it in a variable.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
+                   _("Read the text saved in the specified element and store it in a variable.\nSpecify the structure leading to the element using / (example : Root/Level/Current)\nSpaces are forbidden in element names."),
                    _("Read _PARAM1_ from file _PARAM0_ and store as text in _PARAM3_"),
                    _("Storage"),
                    "res/actions/fichier24.png",
@@ -98,7 +98,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
 
     extension.AddAction("DeleteGroupFichier",
                    _("Delete an element"),
-                   _("This action delete the specified element from the structured file.\nSpecify the structure leading to the element using / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in elements' names."),
+                   _("This action delete the specified element from the structured file.\nSpecify the structure leading to the element using / (example : Root/Level/Current)\nSpaces are forbidden in element names."),
                    _("Delete _PARAM1_ from the file _PARAM0_"),
                    _("Storage"),
                    "res/actions/delete24.png",

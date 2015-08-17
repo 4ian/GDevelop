@@ -259,9 +259,9 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
             bool stillInFloor = false;
             do
             {
-                if ( step >= floor(abs(requestedDeltaX*slopeClimbingFactor)) ) //Slope is too step ( > max angle )
+                if ( step >= floor(std::abs(requestedDeltaX*slopeClimbingFactor)) ) //Slope is too step ( > max angle )
                 {
-                    object->SetY(object->GetY()-(abs(requestedDeltaX*slopeClimbingFactor)-(double)step)); //Try to add the decimal part.
+                    object->SetY(object->GetY()-(std::abs(requestedDeltaX*slopeClimbingFactor)-(double)step)); //Try to add the decimal part.
                     if ( object->IsCollidingWith(floorPlatform->GetObject()) )
                         stillInFloor = true; //Too steep.
 
@@ -289,7 +289,7 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
             bool noMoreOnFloor = false;
             while ( !IsCollidingWith(potentialObjects) )
             {
-                if ( step > abs(requestedDeltaX*slopeClimbingFactor) ) //Slope is too step ( > 50% )
+                if ( step > std::abs(requestedDeltaX*slopeClimbingFactor) ) //Slope is too step ( > 50% )
                 {
                     noMoreOnFloor = true;
                     break;
@@ -379,7 +379,7 @@ void PlatformerObjectAutomatism::DoStepPreEvents(RuntimeScene & scene)
     jumpKey = false;
 
     //5) Track the movement
-    hasReallyMoved = abs(object->GetX()-oldX) >= 1;
+    hasReallyMoved = std::abs(object->GetX()-oldX) >= 1;
 }
 
 bool PlatformerObjectAutomatism::SeparateFromPlatforms(const std::set<PlatformAutomatism*> & candidates, bool excludeJumpThrus)

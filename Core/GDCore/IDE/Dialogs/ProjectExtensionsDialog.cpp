@@ -304,7 +304,10 @@ void ProjectExtensionsDialog::RefreshExtensionList()
         wxStringClientData * associatedData = new wxStringClientData(extensionsInstalled[i]->GetName());
 
         if ( !extensionsInstalled[i]->IsBuiltin() )
-            ExtensionsList->Insert(extensionsInstalled[i]->GetFullName(), 0, associatedData);
+            ExtensionsList->Insert(
+            	extensionsInstalled[i]->GetFullName() + (extensionsInstalled[i]->IsDeprecated() ? _(" (deprecated)") : ""), 
+            	extensionsInstalled[i]->IsDeprecated() ? ExtensionsList->GetCount() : 0, 
+            	associatedData);
     }
 
     //Check used extensions

@@ -133,8 +133,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", _("Object"), "", false)
-        .AddParameter("expression", _("Angular speed (in degrees per second)"), "",false)
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("Angular speed (in degrees per second)"))
         .AddCodeOnlyParameter("currentScene", "")
         .MarkAsSimple();
 
@@ -146,9 +146,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", _("Object"), "", false)
-        .AddParameter("expression", _("Angle to rotate towards (in degrees)"), "",false)
-        .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"), "",false)
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("Angle to rotate towards (in degrees)"))
+        .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"))
         .AddCodeOnlyParameter("currentScene", "");
 
     obj.AddAction("RotateTowardPosition",
@@ -159,10 +159,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", _("Object"), "", false)
-        .AddParameter("expression", _("X position"), "",false)
-        .AddParameter("expression", _("Y position"), "",false)
-        .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"), "",false)
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("X position"))
+        .AddParameter("expression", _("Y position"))
+        .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"))
         .AddCodeOnlyParameter("currentScene", "")
         .MarkAsAdvanced();
 
@@ -814,9 +814,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                       _("Angle"),
                       "res/conditions/estTourne24.png",
                       "res/conditions/estTourne.png")
-        .AddParameter("objectList", _("Name of the object"), "", false)
+        .AddParameter("objectList", _("Name of the object"))
         .AddParameter("objectList", _("Name of the second object"))
-        .AddParameter("expression", _("Angle of tolerance, in degrees (0: minimum tolerance)"), "",false)
+        .AddParameter("expression", _("Angle of tolerance, in degrees (0: minimum tolerance)"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsAdvanced();
 

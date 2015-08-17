@@ -49,7 +49,7 @@ public:
                        _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .AddParameter("color", _("Color"))
 
             .SetFunctionName("SetColor").SetIncludeFile("Light/LightObject.h");
@@ -62,7 +62,7 @@ public:
                        _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
 
@@ -76,7 +76,7 @@ public:
                        _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
 
@@ -90,7 +90,7 @@ public:
                        _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
 
@@ -104,7 +104,7 @@ public:
                        _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
 
@@ -118,7 +118,7 @@ public:
                        _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Value"))
 
@@ -132,7 +132,7 @@ public:
                        _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
 
@@ -146,7 +146,7 @@ public:
                        _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .AddParameter("color", _("Color"))
 
             .SetFunctionName("SetGlobalColor").SetIncludeFile("Light/LightObject.h");
@@ -159,7 +159,7 @@ public:
                        _("Light type"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .AddParameter("yesorno", _("Make light global"))
 
             .SetFunctionName("SetGlobalLight").SetIncludeFile("Light/LightObject.h");
@@ -172,20 +172,20 @@ public:
                        _("Light type"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             
             .SetFunctionName("IsGlobalLight").SetIncludeFile("Light/LightObject.h");
 
         obj.AddExpression("Intensity", _("Intensity"), _("Intensity"), _("Setup"), "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .SetFunctionName("GetIntensity").SetIncludeFile("Light/LightObject.h");
 
         obj.AddExpression("Radius", _("Radius"), _("Radius"), _("Setup"), "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .SetFunctionName("GetRadius").SetIncludeFile("Light/LightObject.h");
 
         obj.AddExpression("Quality", _("Quality"), _("Quality"), _("Setup"), "CppPlatform/Extensions/lightIcon16.png")
-            .AddParameter("object", _("Object"), "Light", false)
+            .AddParameter("object", _("Object"), "Light")
             .SetFunctionName("GetQuality").SetIncludeFile("Light/LightObject.h");
         #endif
 

@@ -31,9 +31,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("expression", _("Start position of the portion (the first letter is at position 0)"), "",false)
-        .AddParameter("expression", _("Length of the portion"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("expression", _("Start position of the portion (the first letter is at position 0)"))
+        .AddParameter("expression", _("Length of the portion"));
 
     extension.AddStrExpression("StrAt",
                    _("Get a character from a text"),
@@ -41,8 +41,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("expression", _("Position of the character (the first letter is at position 0)"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("expression", _("Position of the character (the first letter is at position 0)"));
 
     extension.AddExpression("StrLength",
                    _("Length of a text"),
@@ -50,7 +50,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false);
+        .AddParameter("string", _("Text"));
 
 
 
@@ -60,8 +60,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("string", _("Text to search for"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("string", _("Text to search for"));
 
 
 
@@ -71,8 +71,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("string", _("Text to search for"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("string", _("Text to search for"));
 
 
 
@@ -82,9 +82,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("string", _("Text to search for"), "",false)
-        .AddParameter("expression", _("Position of the first character in the string to be considered in the search"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("string", _("Text to search for"))
+        .AddParameter("expression", _("Position of the first character in the string to be considered in the search"));
 
 
 
@@ -94,9 +94,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png")
 
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("string", _("Text to search for"), "",false)
-        .AddParameter("expression", _("Position of the last character in the string to be considered in the search"), "",false);
+        .AddParameter("string", _("Text"))
+        .AddParameter("string", _("Text to search for"))
+        .AddParameter("expression", _("Position of the last character in the string to be considered in the search"));
 
 
     #endif

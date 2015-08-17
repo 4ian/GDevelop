@@ -40,7 +40,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/text24.png",
                    "res/actions/text.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("string", _("Text"))
         .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("TextObject/TextObject.h");
@@ -53,7 +53,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/conditions/text24.png",
                    "res/conditions/text.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("string", _("Text to test"))
         .SetFunctionName("GetString").SetManipulatedType("string").SetIncludeFile("TextObject/TextObject.h");
@@ -66,7 +66,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/font24.png",
                    "res/actions/font.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("police", _("Font"))
         .SetFunctionName("ChangeFont").SetIncludeFile("TextObject/TextObject.h");
 
@@ -78,7 +78,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/characterSize24.png",
                    "res/actions/characterSize.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .SetFunctionName("SetCharacterSize").SetManipulatedType("number").SetGetter("GetCharacterSize").SetIncludeFile("TextObject/TextObject.h");
@@ -91,7 +91,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/conditions/characterSize24.png",
                    "res/conditions/characterSize.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Size to test"))
         .SetFunctionName("GetCharacterSize").SetManipulatedType("number").SetIncludeFile("TextObject/TextObject.h");
@@ -104,7 +104,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/color24.png",
                    "res/actions/color.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("color", _("Color"))
         .SetFunctionName("SetColor").SetIncludeFile("TextObject/TextObject.h");
 
@@ -116,7 +116,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .SetFunctionName("SetOpacity").SetManipulatedType("number").SetGetter("GetOpacity").SetIncludeFile("TextObject/TextObject.h");
@@ -129,7 +129,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("TextObject/TextObject.h");
@@ -144,7 +144,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("yesorno", _("Smooth the text"))
         .SetFunctionName("SetSmooth").SetIncludeFile("TextObject/TextObject.h");
 
@@ -156,7 +156,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .SetFunctionName("IsSmoothed").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("SetBold",
@@ -167,7 +167,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/bold.png",
                    "res/actions/bold16.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("yesorno", _("Set bold style"))
         .SetFunctionName("SetBold").SetIncludeFile("TextObject/TextObject.h");
 
@@ -179,7 +179,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/conditions/bold.png",
                    "res/conditions/bold16.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .SetFunctionName("IsBold").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("SetItalic",
@@ -190,7 +190,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/italic.png",
                    "res/actions/italic16.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("yesorno", _("Set italic"))
         .SetFunctionName("SetItalic").SetIncludeFile("TextObject/TextObject.h");
 
@@ -202,7 +202,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/conditions/italic.png",
                    "res/conditions/italic16.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .SetFunctionName("IsItalic").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("SetUnderlined",
@@ -213,7 +213,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/underline.png",
                    "res/actions/underline16.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("yesorno", _("Underline"))
         .SetFunctionName("SetUnderlined").SetIncludeFile("TextObject/TextObject.h");
 
@@ -225,7 +225,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/conditions/underline.png",
                    "res/conditions/underline16.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .SetFunctionName("IsUnderlined").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("Angle",
@@ -236,7 +236,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .SetFunctionName("SetAngle").SetManipulatedType("number").SetGetter("GetAngle").SetIncludeFile("TextObject/TextObject.h");
@@ -249,21 +249,21 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
 
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddExpression("Opacity", _("Opacity"), _("Opacity"), _("Opacity"), "res/actions/opacity.png")
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .SetFunctionName("GetOpacity").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddExpression("Angle", _("Angle"), _("Angle"), _("Rotation"), "res/actions/rotate.png")
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .SetFunctionName("GetAngle").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddStrExpression("String", _("Text"), _("Text"), _("Text"), "res/texteicon.png")
-        .AddParameter("object", _("Object"), "Text", false)
+        .AddParameter("object", _("Object"), "Text")
         .SetFunctionName("GetString").SetIncludeFile("TextObject/TextObject.h");
     #endif
 }

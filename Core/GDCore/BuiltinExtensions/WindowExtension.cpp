@@ -27,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    "res/actions/fullscreen24.png",
                    "res/actions/fullscreen.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("yesorno", _("Activate fullscreen"), "",false)
+        .AddParameter("yesorno", _("Activate fullscreen"))
         .AddParameter("yesorno", _("Keep aspect ratio (HTML5 games only, yes by default)"), "",true).SetDefaultValue("yes");
 
     extension.AddAction("SetWindowMargins",
@@ -38,10 +38,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Top"), "",false)
-        .AddParameter("expression", _("Right"), "",false)
-        .AddParameter("expression", _("Bottom"), "",false)
-        .AddParameter("expression", _("Left"), "",false);
+        .AddParameter("expression", _("Top"))
+        .AddParameter("expression", _("Right"))
+        .AddParameter("expression", _("Bottom"))
+        .AddParameter("expression", _("Left"));
 
     extension.AddAction("SetWindowSize",
                    _("Change the size of the screen"),
@@ -51,9 +51,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Width"), "",false)
-        .AddParameter("expression", _("Height"), "",false)
-        .AddParameter("yesorno", _("Use this size as default size for new scene cameras\?\n(Yes to change extend the game area, No to stretch the game to the window's size)."), "",false);
+        .AddParameter("expression", _("Width"))
+        .AddParameter("expression", _("Height"))
+        .AddParameter("yesorno", _("Use this size as default size for new scene cameras\?\n(Yes to change extend the game area, No to stretch the game to the window's size)."));
 
     extension.AddAction("SetWindowIcon",
                    _("Change window's icon"),
@@ -63,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the image to be used as the icon"), "",false);
+        .AddParameter("string", _("Name of the image to be used as the icon"));
 
     extension.AddAction("SetWindowTitle",
                    _("Change window's title"),
@@ -73,7 +73,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("New title"), "",false);
+        .AddParameter("string", _("New title"));
 
     extension.AddExpression("SceneWindowWidth", _("Width of the scene window"), _("Width of the scene window (or scene canvas for HTML5 games)"), _("Screen"), "res/window.png")
         .AddCodeOnlyParameter("currentScene", "");

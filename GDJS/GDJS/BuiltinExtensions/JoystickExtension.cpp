@@ -36,8 +36,8 @@ JoystickExtension::JoystickExtension()
                    "res/conditions/joystick24.png",
                    "res/conditions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
-        .AddParameter("expression", _("Button"), "",false)
+        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"))
+        .AddParameter("expression", _("Button"))
         .SetFunctionName("JoystickButtonDown").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
 
@@ -50,10 +50,10 @@ JoystickExtension::JoystickExtension()
                    "res/conditions/joystick24.png",
                    "res/conditions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
-        .AddParameter("joyaxis", _("Axis"), "",false)
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Value to test"), "",false)
+        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"))
+        .AddParameter("joyaxis", _("Axis"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .SetFunctionName("GetJoystickAxisValue").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
 
@@ -66,9 +66,9 @@ JoystickExtension::JoystickExtension()
                    "res/actions/joystick24.png",
                    "res/actions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
-        .AddParameter("joyaxis", _("Axis"), "",false)
-        .AddParameter("scenevar", _("Save result to scene variable"), "",false)
+        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"))
+        .AddParameter("joyaxis", _("Axis"))
+        .AddParameter("scenevar", _("Save result to scene variable"))
         .SetFunctionName("JoystickAxisValueToVariable").SetManipulatedType("number").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
     AddExpression("GetJoystickAxis",
@@ -78,8 +78,8 @@ JoystickExtension::JoystickExtension()
                    "res/conditions/joystick.png")
 
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"), "",false)
-        .AddParameter("joyaxis", _("Axis"), "",false)
+        .AddParameter("expression", _("Joystick number ( First joystick: 0 )"))
+        .AddParameter("joyaxis", _("Axis"))
         .SetFunctionName("GetJoystickAxisValue").SetIncludeFile("GDCpp/BuiltinExtensions/JoystickTools.h");
 
     */

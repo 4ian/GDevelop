@@ -238,13 +238,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
 
     extension.AddExpression("TouchX", _("Touch X position"), _("Touch X position"), _("Multitouch"), "res/conditions/touch.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Touch identifier"), "", false)
+        .AddParameter("expression", _("Touch identifier"))
         .AddParameter("layer", _("Layer"), "", true).SetDefaultValue("\"\"")
         .AddParameter("camera", _("Camera"), "", true).SetDefaultValue("0");
 
     extension.AddExpression("TouchY", _("Touch Y position"), _("Touch Y position"), _("Multitouch"), "res/conditions/touch.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Touch identifier"), "", false)
+        .AddParameter("expression", _("Touch identifier"))
         .AddParameter("layer", _("Layer"), "", true).SetDefaultValue("\"\"")
         .AddParameter("camera", _("Camera"), "", true).SetDefaultValue("0");
 

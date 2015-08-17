@@ -36,7 +36,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/actions/rectangle24.png",
                    "res/actions/rectangle.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("expression", _("Top left side: X Position"))
         .AddParameter("expression", _("Top left side : Y Position"))
         .AddParameter("expression", _("Bottom right side : X Position"))
@@ -52,7 +52,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/actions/circle24.png",
                    "res/actions/circle.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("expression", _("X position of center"))
         .AddParameter("expression", _("Y position of center"))
         .AddParameter("expression", _("Radius ( in pixels )"))
@@ -67,7 +67,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/actions/line24.png",
                    "res/actions/line.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("expression", _("X Position of start point"))
         .AddParameter("expression", _("Y Position of start point"))
         .AddParameter("expression", _("X Position of end point"))
@@ -84,7 +84,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/actions/text24.png",
                    "res/actions/text.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("color", _("Fill color"))
         .SetFunctionName("SetFillColor").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -97,7 +97,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/actions/color24.png",
                    "res/actions/color.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("color", _("Color"))
         .SetFunctionName("SetOutlineColor").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -110,7 +110,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/actions/outlineSize24.png",
                    "res/actions/outlineSize.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Size in pixels"))
         .SetFunctionName("SetOutlineSize").SetManipulatedType("number").SetGetter("GetOutlineSize").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -124,7 +124,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/conditions/outlineSize24.png",
                    "res/conditions/outlineSize.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Size to test"))
         .SetFunctionName("GetOutlineSize").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -138,7 +138,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .SetFunctionName("SetFillOpacity").SetManipulatedType("number").SetGetter("GetFillOpacity").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -153,7 +153,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .SetFunctionName("GetFillOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -167,7 +167,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .SetFunctionName("SetOutlineOpacity").SetManipulatedType("number").SetGetter("GetOutlineOpacity").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -181,7 +181,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
-        .AddParameter("object", _("Shape Painter object"), "Drawer", false)
+        .AddParameter("object", _("Shape Painter object"), "Drawer")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
         .SetFunctionName("GetOutlineOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -218,7 +218,7 @@ public:
             .AddParameter("string", _("Name of the source image"))
             .AddParameter("expression", _("X position"))
             .AddParameter("expression", _("Y position"))
-            .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false)
+            .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"))
             .AddCodeOnlyParameter("currentScene", "")
 
             .SetFunctionName("GDpriv::PrimitiveDrawingTools::CopyImageOnAnother").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");

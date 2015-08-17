@@ -163,7 +163,7 @@ public:
                        "CppPlatform/Extensions/networkicon.png")
 
             .AddParameter("objectList", _("Object"))
-            .AddParameter("automatism", _("Automatism"), "NetworkAutomatism", false)
+            .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
             .SetFunctionName("NetworkAutomatism::GenerateObjectNetworkIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
 
         #endif
@@ -191,7 +191,7 @@ public:
                            "CppPlatform/Extensions/networkicon.png")
 
                 .AddParameter("object", _("Object"))
-                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism", false)
+                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
                 .SetFunctionName("SetAsSender").SetIncludeFile("Network/NetworkAutomatism.h");
 
             aut.AddAction("SetAsReceiver",
@@ -203,7 +203,7 @@ public:
                            "CppPlatform/Extensions/networkicon.png")
 
                 .AddParameter("object", _("Object"))
-                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism", false)
+                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
                 .SetFunctionName("SetAsReceiver").SetIncludeFile("Network/NetworkAutomatism.h");
 
             aut.AddAction("SetIdentifier",
@@ -215,13 +215,13 @@ public:
                            "CppPlatform/Extensions/networkicon.png")
 
                 .AddParameter("object", _("Object"))
-                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism", false)
+                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
                 .AddParameter("expression", _("Identifier"))
                 .SetFunctionName("SetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
 
             aut.AddExpression("GetIdentifier", _("Get the identifier of the object"), _("Get the identifier of the object"), _("Automatism Automatic Network Updater"), "res/texteicon.png")
                 .AddParameter("object", _("Object"))
-                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism", false)
+                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
                 .SetFunctionName("GetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
 
             #endif

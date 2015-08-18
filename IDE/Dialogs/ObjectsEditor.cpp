@@ -28,7 +28,6 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Clipboard.h"

@@ -22,7 +22,6 @@ This project is released under the MIT License.
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/CommonTools.h"

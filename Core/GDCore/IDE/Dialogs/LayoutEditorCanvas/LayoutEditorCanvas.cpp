@@ -28,7 +28,6 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"

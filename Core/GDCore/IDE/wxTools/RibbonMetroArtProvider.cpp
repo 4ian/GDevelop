@@ -10,7 +10,6 @@
 #include <wx/msw/private.h>
 #endif
 #include "GDCore/IDE/wxTools/RibbonMetroArtProvider.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/SkinHelper.h"
 
 namespace gd

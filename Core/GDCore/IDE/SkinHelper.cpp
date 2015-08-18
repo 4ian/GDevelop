@@ -9,7 +9,6 @@
 #include "GDCore/IDE/wxTools/AuiTabArt.h"
 #include "GDCore/IDE/wxTools/FlatAuiTabArt.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/wxTools/RibbonMetroArtProvider.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/art.h>

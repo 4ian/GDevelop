@@ -17,7 +17,8 @@ namespace gd
 {
 
 /**
- * \brief Deliver metadata for instructions ( i.e. Actions and conditions )
+ * \brief Allow to easily get metadata for instructions (i.e actions and conditions),
+ * objects and behaviors.
  *
  * \ingroup PlatformDefinition
  */

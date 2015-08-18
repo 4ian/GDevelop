@@ -22,7 +22,6 @@
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"

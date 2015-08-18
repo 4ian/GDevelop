@@ -236,7 +236,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::
 
     //Load values from the event
     codeEdit->SetText(editedEvent.GetInlineCode());
-    for (unsigned int i = 0;i<editedEvent.GetIncludeFiles().size();++i)
+    for (std::size_t i = 0;i<editedEvent.GetIncludeFiles().size();++i)
     {
         includeTextCtrl->AppendText(editedEvent.GetIncludeFiles()[i]+"\n");
     }
@@ -247,7 +247,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::
     displayCodeCheck->SetValue(editedEvent.IsCodeDisplayedInEditor());
 
 	const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
-    for (unsigned int i = 0;i<allFiles.size();++i)
+    for (std::size_t i = 0;i<allFiles.size();++i)
     {
         if ( allFiles[i]->IsGDManaged() ) continue;
         if ( allFiles[i]->GetLanguage() != "C++" ) continue;
@@ -279,9 +279,9 @@ void EditCppCodeEvent::OnokBtClick(wxCommandEvent& event)
     editedEvent.EnableCodeDisplayedInEditor(displayCodeCheck->GetValue());
 
     std::vector<gd::String> dependencies;
-    unsigned int listIndex = 0;
+    std::size_t listIndex = 0;
 	const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = game.GetAllSourceFiles();
-    for (unsigned int i = 0;i<allFiles.size();++i)
+    for (std::size_t i = 0;i<allFiles.size();++i)
     {
         if ( allFiles[i]->IsGDManaged() ) continue;
         if ( allFiles[i]->GetLanguage() != "C++" ) continue;

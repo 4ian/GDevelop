@@ -156,7 +156,7 @@ void MainFrame::SetLastUsedFile(wxString file)
     if ( file.EndsWith(".autosave") ) return;
 
     m_recentlist.SetLastUsed( file );
-    for ( unsigned int i = 0;i < 9;i++ )
+    for ( std::size_t i = 0;i < 9;i++ )
         wxConfigBase::Get()->Write( wxString::Format( _T( "/Recent/%d" ), i ), m_recentlist.GetEntry( i ) );
 }
 
@@ -188,15 +188,15 @@ void MainFrame::Open( gd::String file )
         UpdateOpenedProjectsLogFile();
 
         gd::String unknownExtensions = "";
-        for (unsigned int i = 0;i<newProject->GetUsedExtensions().size();++i)
+        for (std::size_t i = 0;i<newProject->GetUsedExtensions().size();++i)
         {
             bool extensionFound = false;
 
-            for(unsigned int p = 0;p<newProject->GetUsedPlatforms().size();++p)
+            for(std::size_t p = 0;p<newProject->GetUsedPlatforms().size();++p)
             {
                 gd::Platform & platform = *newProject->GetUsedPlatforms()[p];
                 std::vector < std::shared_ptr<gd::PlatformExtension> > allExtensions = platform.GetAllPlatformExtensions();
-                for (unsigned int e = 0;e<allExtensions.size();++e)
+                for (std::size_t e = 0;e<allExtensions.size();++e)
                 {
                     if ( allExtensions[e]->GetName() == newProject->GetUsedExtensions()[i])
                     {
@@ -260,7 +260,7 @@ void MainFrame::OnRibbonSaveDropDownClicked(wxRibbonButtonBarEvent& evt)
  */
 void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
 {
-    for (unsigned int i = 0;i<games.size();++i)
+    for (std::size_t i = 0;i<games.size();++i)
     {
         //TODO: Factor using SaveAs.
         if ( games[i]->GetProjectFile().empty() || wxString(games[i]->GetProjectFile()).EndsWith(".autosave") )

@@ -154,7 +154,7 @@ gd::BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, g
 
 const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const gd::String & functionName)
 {
-    for (unsigned int i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();++i)
     {
         const FunctionEvent * functionEvent = dynamic_cast<const FunctionEvent*>(&events[i]);
         const gd::LinkEvent * linkEvent = dynamic_cast<const gd::LinkEvent*>(&events[i]);

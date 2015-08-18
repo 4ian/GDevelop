@@ -135,10 +135,10 @@ game(game_)
 	    EndEdit->ChangeValue(gd::String::From(editedEvent.GetIncludeEnd()+1));
 	}
 
-	for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
+	for (std::size_t i = 0;i<game.GetExternalEventsCount();++i)
         linkedNameEdit->Append(game.GetExternalEvents(i).GetName());
 
-    for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
+    for (std::size_t i = 0;i<game.GetLayoutsCount();++i)
     	linkedNameEdit->Append(game.GetLayout(i).GetName());
 }
 

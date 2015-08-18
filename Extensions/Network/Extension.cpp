@@ -233,24 +233,24 @@ public:
     #if defined(GD_IDE_ONLY)
     bool HasDebuggingProperties() const { return true; };
 
-    void GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+    void GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
     {
         if ( propertyNb == 0 )
         {
             name = _("List of recipients");
             const std::vector< std::pair<sf::IpAddress, short unsigned int> > & list = NetworkManager::Get()->GetRecipientsList();
-            for (unsigned int i = 0;i<list.size();++i)
+            for (std::size_t i = 0;i<list.size();++i)
                 value += gd::String::FromLocale(list[i].first.toString())+_(" Port: ")+gd::String::From(list[i].second)+"; ";
         }
     }
 
-    bool ChangeProperty(unsigned int propertyNb, gd::String newValue)
+    bool ChangeProperty(std::size_t propertyNb, gd::String newValue)
     {
         if ( propertyNb == 0 ) return false;
         return false;
     }
 
-    unsigned int GetNumberOfProperties() const
+    std::size_t GetNumberOfProperties() const
     {
         return 1;
     }

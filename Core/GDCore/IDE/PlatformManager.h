@@ -68,7 +68,7 @@ public:
     {
         if ( NULL != _singleton )
         {
-            for (unsigned int i = 0;i<_singleton->platformsLoaded.size();++i)
+            for (std::size_t i = 0;i<_singleton->platformsLoaded.size();++i)
             {
                 if ( _singleton->platformsLoaded[i] != std::shared_ptr<gd::Platform>() )
                     _singleton->platformsLoaded[i]->OnIDEClosed();

@@ -252,9 +252,9 @@ private:
 
     gd::Project & game;
     SpriteObject & object;
-    unsigned int selectedAnimation;
-    unsigned int selectedDirection;
-    unsigned int selectedImage;
+    std::size_t selectedAnimation;
+    std::size_t selectedDirection;
+    std::size_t selectedImage;
     gd::String selectedPoint;
     float spritePosX; ///< Used to remember the position where the sprite have been drawn.
     float spritePosY; ///< Used to remember the position where the sprite have been drawn.

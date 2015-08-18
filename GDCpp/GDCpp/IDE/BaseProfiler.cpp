@@ -50,10 +50,9 @@ void BaseProfiler::Reset()
     totalSceneTime = 0;
     totalEventsTime = 0;
 
-    for (unsigned int i = 0;i<profileEventsInformation.size();++i)
+    for (std::size_t i = 0;i<profileEventsInformation.size();++i)
     {
         profileEventsInformation[i].time = 0;
     }
 }
 #endif
-

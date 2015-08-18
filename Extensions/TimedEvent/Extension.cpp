@@ -51,7 +51,7 @@ public:
                 codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
                 //Notify parent timed event that they have a child
-                for (unsigned int i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
+                for (std::size_t i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
                     TimedEvent::codeGenerationCurrentParents[i]->codeGenerationChildren.push_back(&event);
 
                 //And register this event as potential parent
@@ -75,7 +75,7 @@ public:
                 outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
 
                 gd::String ifPredicat;
-                for (unsigned int i = 0;i<event.GetConditions().size();++i)
+                for (std::size_t i = 0;i<event.GetConditions().size();++i)
                 {
                     if (i!=0) ifPredicat += " && ";
                     ifPredicat += "condition"+gd::String::From(i)+"IsTrue";
@@ -133,7 +133,7 @@ public:
             .codeExtraInformation.SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
                 codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
-                for (unsigned int i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
+                for (std::size_t i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
                 {
                     if ( TimedEvent::codeGenerationCurrentParents[i] == NULL )
                     {
@@ -150,7 +150,7 @@ public:
                             gd::String codeName = !timedEvent.GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.GetName()) : "GDTimedEvent_"+gd::String::From(&timedEvent);
                             code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
                         }
-                        for (unsigned int j = 0;j<timedEvent.codeGenerationChildren.size();++j)
+                        for (std::size_t j = 0;j<timedEvent.codeGenerationChildren.size();++j)
                         {
                             gd::String codeName = !timedEvent.codeGenerationChildren[j]->GetName().empty() ? "GDNamedTimedEvent_"+codeGenerator.ConvertToString(timedEvent.codeGenerationChildren[j]->GetName()) : "GDTimedEvent_"+gd::String::From(timedEvent.codeGenerationChildren[j]);
                             code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
@@ -170,9 +170,9 @@ public:
     #if defined(GD_IDE_ONLY)
     bool HasDebuggingProperties() const { return true; };
 
-    void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const
+    void GetPropertyForDebugger(RuntimeScene & scene, std::size_t propertyNb, gd::String & name, gd::String & value) const
     {
-        unsigned int i = 0;
+        std::size_t i = 0;
         std::map < gd::String, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
         for (std::map < gd::String, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
         {
@@ -194,9 +194,9 @@ public:
         }
     }
 
-    bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue)
+    bool ChangeProperty(RuntimeScene & scene, std::size_t propertyNb, gd::String newValue)
     {
-        unsigned int i = 0;
+        std::size_t i = 0;
         std::map < gd::String, ManualTimer >::const_iterator end = TimedEventsManager::managers[&scene].timedEvents.end();
         for (std::map < gd::String, ManualTimer >::iterator iter = TimedEventsManager::managers[&scene].timedEvents.begin();iter != end;++iter)
         {
@@ -213,7 +213,7 @@ public:
         return false;
     }
 
-    unsigned int GetNumberOfProperties(RuntimeScene & scene) const
+    std::size_t GetNumberOfProperties(RuntimeScene & scene) const
     {
         return TimedEventsManager::managers[&scene].timedEvents.size();
     }

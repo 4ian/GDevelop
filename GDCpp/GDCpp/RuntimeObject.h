@@ -364,7 +364,7 @@ public:
      * else if ( propertyNb == 1 ) {name = _("AnotherProperty");       value = GetAnotherPropety();}
      * \endcode
      */
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
 
     /**
      * \brief Called by the debugger so as to update a property
@@ -378,12 +378,12 @@ public:
      * else if ( propertyNb == 1 ) {return false;} //Changing property is not allowed: returning false.
      * \endcode
      */
-    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
 
     /**
      * \brief Must return the number of available properties for the debugger.
      */
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual std::size_t GetNumberOfProperties() const;
     ///@}
     #endif
 

@@ -131,7 +131,7 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
     wxString newProjectFile = newProjectBaseFolder+wxFileName::GetPathSeparator()+
                               _("My project")+wxFileName::GetPathSeparator()+
                               _("Project.gdg");
-    unsigned int i = 2;
+    std::size_t i = 2;
     while ( wxFileExists(newProjectFile) )
     {
         newProjectFile = newProjectBaseFolder+wxFileName::GetPathSeparator()+
@@ -164,7 +164,7 @@ void NewProjectDialog::RefreshPlatformList()
     platformList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
     const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (std::size_t i = 0;i<platforms.size();++i)
     {
         #if defined(MACOS)
         if (platforms[i]->GetName() == "GDevelop C++ platform") continue;
@@ -223,7 +223,7 @@ void NewProjectDialog::RefreshTemplateList()
                 if (descriptionFile.is_open())
                 {
                     std::string currentLine;
-                    for (unsigned int currentLineNb = 0; descriptionFile.good() ; ++currentLineNb )
+                    for (std::size_t currentLineNb = 0; descriptionFile.good() ; ++currentLineNb )
                     {
                         getline (descriptionFile,currentLine);
                         if(!currentLine.empty() && *currentLine.rbegin() == '\r')

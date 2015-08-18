@@ -1,6 +1,6 @@
 /*
  * GDevelop Core
- * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com) 
+ * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com)
  				   and Victor Levasseur (victorlevasseur52@gmail.com).
  * This project is released under the MIT License.
  */
@@ -20,7 +20,7 @@ void SPtrList<T>::Insert(const SPtrList<T> & otherElements, size_t begin, size_t
 	if (end < begin) return;
 	if (end >= otherElements.size()) end = otherElements.size()-1;
 
-    for (unsigned int insertPos = 0;insertPos <= (end-begin);insertPos++)
+    for (std::size_t insertPos = 0;insertPos <= (end-begin);insertPos++)
     {
 	    if (position != (size_t)-1 && position+insertPos < elements.size())
 	        elements.insert(elements.begin()+position+insertPos, CloneRememberingOriginalElement(otherElements.elements[begin+insertPos]));
@@ -72,7 +72,7 @@ void SPtrList<T>::Remove(const T & element)
 template<typename T>
 bool SPtrList<T>::Contains(const T & elementToSearch) const
 {
-    for (unsigned int i = 0;i<GetCount();++i)
+    for (std::size_t i = 0;i<GetCount();++i)
     {
         if ( &Get(i) == &elementToSearch) return true;
     }

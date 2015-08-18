@@ -179,7 +179,7 @@ public:
      * \brief Declare a list of include files to be added
      * \see gd::EventsCodeGenerator::AddIncludeFile
      */
-    void AddIncludeFiles(std::vector<gd::String> files) { for(unsigned int i = 0;i<files.size();++i) AddIncludeFile(files[i]); };
+    void AddIncludeFiles(std::vector<gd::String> files) { for(std::size_t i = 0;i<files.size();++i) AddIncludeFile(files[i]); };
 
     /**
      * \brief Add a declaration which will be inserted after includes
@@ -440,9 +440,9 @@ protected:
                                                             gd::EventsCodeGenerationContext & context);
 
 
-    gd::String GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, unsigned int startFromArgument = 0);
-    gd::String GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, const gd::String & getterStartString, unsigned int startFromArgument = 0);
-    gd::String GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, unsigned int startFromArgument = 0);
+    gd::String GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, std::size_t startFromArgument = 0);
+    gd::String GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, const gd::String & getterStartString, std::size_t startFromArgument = 0);
+    gd::String GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, std::size_t startFromArgument = 0);
 
     /**
      * \brief Must return an expression whose value is true.

@@ -51,7 +51,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
             //"OR" condition must declare objects list, but without picking the objects from the scene. Lists are either empty or come from a parent event.
             set<gd::String> emptyListsNeeded;
-            for (unsigned int cId =0;cId < conditions.size();++cId)
+            for (std::size_t cId =0;cId < conditions.size();++cId)
             {
                 //Each condition inherits the context from the "Or" condition:
                 //For example, two sub conditions using an object called "MyObject" will both have to declare a "MyObject" object list.
@@ -73,7 +73,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 for ( set<gd::String>::iterator it = objectsListsToBeDeclared.begin() ; it != objectsListsToBeDeclared.end(); ++it )
                 {
                     emptyListsNeeded.insert(*it);
-                    conditionsCode += "    for(unsigned int i = 0;i<"+ManObjListName(*it)+".size();++i)\n";
+                    conditionsCode += "    for(std::size_t i = 0;i<"+ManObjListName(*it)+".size();++i)\n";
                     conditionsCode += "    {\n";
                     conditionsCode += "        if ( find("+ManObjListName(*it)+"final.begin(), "+ManObjListName(*it)+"final.end(), "+ManObjListName(*it)+"[i]) == "+ManObjListName(*it)+"final.end())\n";
                     conditionsCode += "            "+ManObjListName(*it)+"final.push_back("+ManObjListName(*it)+"[i]);\n";
@@ -95,7 +95,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 //but they will have no incidence on further conditions, as conditions use "normal" ones.
                 declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+"final;\n";
             }
-            for (unsigned int i = 0;i<conditions.size();++i)
+            for (std::size_t i = 0;i<conditions.size();++i)
                 declarationsCode += "bool condition"+gd::String::From(i)+"IsTrue = false;\n";
 
             //Generate code
@@ -119,7 +119,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 outputCode += codeGenerator.GenerateConditionsListCode(instruction.GetSubInstructions(), parentContext);
 
                 gd::String ifPredicat = "true";
-                for (unsigned int i = 0;i<instruction.GetSubInstructions().size();++i)
+                for (std::size_t i = 0;i<instruction.GetSubInstructions().size();++i)
                     ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
                 outputCode += "conditionTrue = (" +ifPredicat+ ");\n";
@@ -132,16 +132,16 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             gd::InstructionsList & conditions = instruction.GetSubInstructions();
             gd::String outputCode;
 
-            for (unsigned int i = 0;i<conditions.size();++i)
+            for (std::size_t i = 0;i<conditions.size();++i)
                 outputCode += "bool condition"+gd::String::From(i)+"IsTrue = false;\n";
 
-            for (unsigned int cId =0;cId < conditions.size();++cId)
+            for (std::size_t cId =0;cId < conditions.size();++cId)
             {
                 gd::String conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId)+"IsTrue", parentContext);
 
                 if ( !conditions[cId].GetType().empty() )
                 {
-                    for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is true. //TODO : Can be optimized
+                    for (std::size_t i = 0;i<cId;++i) //Skip conditions if one condition is true. //TODO : Can be optimized
                     {
                         if (i == 0) outputCode += "if ( "; else outputCode += " && ";
                         outputCode += "!condition"+gd::String::From(i)+"IsTrue";
@@ -153,7 +153,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             }
 
             gd::String ifPredicat = "true";
-            for (unsigned int i = 0;i<conditions.size();++i)
+            for (std::size_t i = 0;i<conditions.size();++i)
                 ifPredicat += " && !condition"+gd::String::From(i)+"IsTrue";
 
             outputCode += "conditionTrue = (" +ifPredicat+ ");\n";
@@ -175,7 +175,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
 
             gd::String ifPredicat;
-            for (unsigned int i = 0;i<event.GetConditions().size();++i)
+            for (std::size_t i = 0;i<event.GetConditions().size();++i)
             {
                 if (i!=0) ifPredicat += " && ";
                 ifPredicat += "condition"+gd::String::From(i)+"IsTrue";
@@ -212,7 +212,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             return outputCode;
         })
         .SetPreprocessing([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator,
-                                gd::EventsList & eventList, unsigned int indexOfTheEventInThisList) {
+                                gd::EventsList & eventList, std::size_t indexOfTheEventInThisList) {
             gd::LinkEvent & event = dynamic_cast<gd::LinkEvent&>(event_);
             gd::Project & project = codeGenerator.GetProject();
             const gd::Layout & scene = codeGenerator.GetLayout();
@@ -248,14 +248,14 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
             //Prepare codes
             gd::String whileConditionsStr = codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(), context);
-            gd::String whileIfPredicat = "true"; for (unsigned int i = 0;i<event.GetWhileConditions().size();++i) whileIfPredicat += " && condition"+gd::String::From(i)+"IsTrue";
+            gd::String whileIfPredicat = "true"; for (std::size_t i = 0;i<event.GetWhileConditions().size();++i) whileIfPredicat += " && condition"+gd::String::From(i)+"IsTrue";
             gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
             gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-            gd::String ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
+            gd::String ifPredicat = "true"; for (std::size_t i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
             //Write final code
             outputCode += "bool stopDoWhile = false;";
-            if ( event.HasInfiniteLoopWarning() && !codeGenerator.GenerateCodeForRuntime() ) outputCode += "unsigned int loopCount = 0;";
+            if ( event.HasInfiniteLoopWarning() && !codeGenerator.GenerateCodeForRuntime() ) outputCode += "std::size_t loopCount = 0;";
             outputCode += "do";
             outputCode += "{\n";
             outputCode += codeGenerator.GenerateObjectsDeclarationCode(context);
@@ -304,7 +304,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             //Prepare conditions/actions codes
             gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
             gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-            gd::String ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
+            gd::String ifPredicat = "true"; for (std::size_t i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
             //Prepare object declaration and sub events
             gd::String subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
@@ -312,7 +312,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
             //Write final code
             outputCode += "int repeatCount = "+repeatCountCode+";\n";
-            outputCode += "for(unsigned int repeatIndex = 0;repeatIndex < repeatCount;++repeatIndex)\n";
+            outputCode += "for(std::size_t repeatIndex = 0;repeatIndex < repeatCount;++repeatIndex)\n";
             outputCode += "{\n";
             outputCode += objectDeclaration;
             outputCode += conditionsCode;
@@ -341,7 +341,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 event.GetObjectToPick(), parentContext);
 
             if ( realObjects.empty() ) return gd::String("");
-            for (unsigned int i = 0;i<realObjects.size();++i)
+            for (std::size_t i = 0;i<realObjects.size();++i)
                 parentContext.ObjectsListNeeded(realObjects[i]);
 
             //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
@@ -352,7 +352,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
             gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
             gd::String ifPredicat = "true";
-            for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
+            for (std::size_t i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
             //Prepare object declaration and sub events
             gd::String subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
@@ -361,11 +361,11 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
             if ( realObjects.size() != 1) //(We write a slighty more simple ( and optimized ) output code when only one object list is used.)
             {
-                outputCode += "unsigned int forEachTotalCount = 0;";
+                outputCode += "std::size_t forEachTotalCount = 0;";
                 outputCode += "std::vector<RuntimeObject*> forEachObjects;";
-                for (unsigned int i = 0;i<realObjects.size();++i)
+                for (std::size_t i = 0;i<realObjects.size();++i)
                 {
-                    outputCode += "unsigned int forEachCount"+gd::String::From(i)+" = "+ManObjListName(realObjects[i])+".size(); forEachTotalCount += forEachCount"+gd::String::From(i)+";";
+                    outputCode += "std::size_t forEachCount"+gd::String::From(i)+" = "+ManObjListName(realObjects[i])+".size(); forEachTotalCount += forEachCount"+gd::String::From(i)+";";
                     outputCode += "forEachObjects.insert("+ gd::String(i == 0 ? "forEachObjects.begin()" : "forEachObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
                 }
             }
@@ -374,9 +374,9 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
             //For loop declaration
             if ( realObjects.size() == 1 ) //We write a slighty more simple ( and optimized ) output code when only one object list is used.
-                outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+ManObjListName(realObjects[0])+".size();++forEachIndex)\n";
+                outputCode += "for(std::size_t forEachIndex = 0;forEachIndex < "+ManObjListName(realObjects[0])+".size();++forEachIndex)\n";
             else
-                outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < forEachTotalCount;++forEachIndex)\n";
+                outputCode += "for(std::size_t forEachIndex = 0;forEachIndex < forEachTotalCount;++forEachIndex)\n";
 
             outputCode += "{\n";
 
@@ -389,13 +389,13 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             else
             {
                 //Declare all lists of concerned objects empty
-                for (unsigned int j = 0;j<realObjects.size();++j)
+                for (std::size_t j = 0;j<realObjects.size();++j)
                     outputCode += "std::vector<RuntimeObject*> "+ManObjListName(realObjects[j])+";\n";
 
-                for (unsigned int i = 0;i<realObjects.size();++i) //Pick then only one object
+                for (std::size_t i = 0;i<realObjects.size();++i) //Pick then only one object
                 {
                     gd::String count;
-                    for (unsigned int j = 0;j<=i;++j)
+                    for (std::size_t j = 0;j<=i;++j)
                     {
                         if (j!=0) count+= "+";
                         count += "forEachCount"+gd::String::From(j);
@@ -463,7 +463,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     event.GetObjectToPassAsParameter(), parentContext);
 
                 outputCode += "std::vector<RuntimeObject*> functionObjects;";
-                for (unsigned int i = 0;i<realObjects.size();++i)
+                for (std::size_t i = 0;i<realObjects.size();++i)
                 {
                     parentContext.ObjectsListNeeded(realObjects[i]);
                     outputCode += "functionObjects.insert("+ gd::String(i == 0 ? "functionObjects.begin()" : "functionObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";

@@ -10,7 +10,7 @@
 void gd::MainFrameWrapper::DisableControlsForScenePreviewing()
 {
     unsigned int notebookCurrentPage =  editorsNotebook ? editorsNotebook->GetSelection() : 0;
-    for (unsigned int i = 0;i<disableOnPreview.size();++i) disableOnPreview[i]->Disable();
+    for (std::size_t i = 0;i<disableOnPreview.size();++i) disableOnPreview[i]->Disable();
     if ( editorsNotebook ) editorsNotebook->SetSelection(notebookCurrentPage);
 };
 
@@ -19,7 +19,7 @@ void gd::MainFrameWrapper::DisableControlsForScenePreviewing()
  */
 void gd::MainFrameWrapper::RemoveControlToBeDisabledOnPreview(wxWindow * control)
 {
-    for (unsigned int i = 0;i<disableOnPreview.size();++i)
+    for (std::size_t i = 0;i<disableOnPreview.size();++i)
     {
         if ( disableOnPreview[i] == control )
         {

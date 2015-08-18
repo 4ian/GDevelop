@@ -165,7 +165,7 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
     RefreshAll();
 
     //Give a convenient size
-    unsigned int itemCount = 0;
+    std::size_t itemCount = 0;
     for ( wxTreeListItem item = variablesList->GetFirstItem();
         item.IsOk();
         item = variablesList->GetNextItem(item) )
@@ -252,7 +252,7 @@ void ChooseVariableDialog::RefreshAll()
 {
     variablesList->DeleteAllItems();
 
-    for (unsigned int i = 0;i<temporaryContainer->Count();++i)
+    for (std::size_t i = 0;i<temporaryContainer->Count();++i)
     {
         const std::pair<gd::String, gd::Variable> & variable = temporaryContainer->Get(i);
 
@@ -329,7 +329,7 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
 void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 {
     UpdateSelectedAndParentVariable();
-    for (unsigned int i = 1;i<temporaryContainer->Count();++i)
+    for (std::size_t i = 1;i<temporaryContainer->Count();++i)
     {
         const std::pair<gd::String, gd::Variable> & currentVar = temporaryContainer->Get(i);
         if ( currentVar.first == selectedVariableName)
@@ -351,7 +351,7 @@ void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 void ChooseVariableDialog::OnMoveDownVarSelected(wxCommandEvent& event)
 {
     UpdateSelectedAndParentVariable();
-    for (unsigned int i = 0;i<temporaryContainer->Count()-1;++i)
+    for (std::size_t i = 0;i<temporaryContainer->Count()-1;++i)
     {
         const std::pair<gd::String, gd::Variable> & currentVar = temporaryContainer->Get(i);
         if ( currentVar.first == selectedVariableName)
@@ -432,7 +432,7 @@ void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
 
     //Add selection
     wxArrayInt selection = dialog.GetSelections();
-    for (unsigned int i = 0;i<selection.size();++i)
+    for (std::size_t i = 0;i<selection.size();++i)
     {
         temporaryContainer->InsertNew(variablesNotDeclared[selection[i]],temporaryContainer->Count());
         modificationCount++;
@@ -581,7 +581,7 @@ void ChooseVariableDialog::UpdateSelectedAndParentVariable()
             parent = variablesList->GetItemParent(parent);
         }
 
-        for(unsigned int i = 0;i<parents.size();++i)
+        for(std::size_t i = 0;i<parents.size();++i)
         {
             //Generate the full name
             selectedVariableFullName += parents[i]+".";

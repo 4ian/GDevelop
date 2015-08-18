@@ -141,7 +141,7 @@ void ChooseAutomatismDialog::RefreshList()
 	std::vector <gd::String> automatisms = gd::GetAutomatismsOfObject(project, layout, parentObject);
 
 	automatismsList->Clear();
-	for (unsigned int i = 0;i<automatisms.size();++i)
+	for (std::size_t i = 0;i<automatisms.size();++i)
 	{
 	    gd::String automatismName = automatisms[i];
 

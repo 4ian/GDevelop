@@ -193,12 +193,12 @@ void InstancesAdvancedPasteDialog::SetYGap(float yGap)
     yGapEdit->SetValue(gd::String::From(yGap));
 }
 
-unsigned int InstancesAdvancedPasteDialog::GetXCount() const
+std::size_t InstancesAdvancedPasteDialog::GetXCount() const
 {
     return xCountEdit->GetValue();
 }
 
-unsigned int InstancesAdvancedPasteDialog::GetYCount() const
+std::size_t InstancesAdvancedPasteDialog::GetYCount() const
 {
     return yCountEdit->GetValue();
 }

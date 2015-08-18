@@ -32,7 +32,7 @@ std::vector<gd::String> ObjectListDialogsHelper::GetMatchingObjects() const
     bool searching = searchText.empty() ? false : true;
     std::vector<gd::String> results;
 
-    for ( unsigned int i = 0;i < project.GetObjectsCount();i++ )
+    for ( std::size_t i = 0;i < project.GetObjectsCount();i++ )
     {
         gd::String name = project.GetObject(i).GetName();
 
@@ -43,7 +43,7 @@ std::vector<gd::String> ObjectListDialogsHelper::GetMatchingObjects() const
             results.push_back(name);
         }
     }
-    for ( unsigned int i = 0;i < project.GetObjectGroups().size();i++ )
+    for ( std::size_t i = 0;i < project.GetObjectGroups().size();i++ )
     {
         gd::String name = project.GetObjectGroups()[i].GetName();
 
@@ -54,7 +54,7 @@ std::vector<gd::String> ObjectListDialogsHelper::GetMatchingObjects() const
             results.push_back(name);
         }
     }
-    for ( unsigned int i = 0;i < layout.GetObjectsCount();i++ )
+    for ( std::size_t i = 0;i < layout.GetObjectsCount();i++ )
     {
         gd::String name = layout.GetObject(i).GetName();
 
@@ -66,7 +66,7 @@ std::vector<gd::String> ObjectListDialogsHelper::GetMatchingObjects() const
         }
     }
 
-    for ( unsigned int i = 0;i < layout.GetObjectGroups().size();i++ )
+    for ( std::size_t i = 0;i < layout.GetObjectGroups().size();i++ )
     {
         gd::String name = layout.GetObjectGroups()[i].GetName();
 
@@ -115,7 +115,7 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
     bool searching = searchText.empty() ? false : true;
 
     wxTreeItemId lastAddedItem;
-    for ( unsigned int i = 0;i < objects.GetObjectsCount();i++ )
+    for ( std::size_t i = 0;i < objects.GetObjectsCount();i++ )
     {
         gd::String name = objects.GetObject(i).GetName();
 
@@ -138,7 +138,7 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
     bool searching = searchText.empty() ? false : true;
 
     wxTreeItemId lastAddedItem;
-    for (unsigned int i = 0;i<groups.size();++i)
+    for (std::size_t i = 0;i<groups.size();++i)
     {
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, groups[i].GetName()) == objectTypeAllowed ) &&
             ( !searching || (searching && groups[i].GetName().CaseFold().find(searchText.CaseFold()) != gd::String::npos)) )

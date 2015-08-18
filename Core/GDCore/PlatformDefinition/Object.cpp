@@ -156,7 +156,7 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
     //Compatibility with GD <= 3.3
     if (element.HasChild("Automatism"))
     {
-        for (unsigned int i = 0; i < element.GetChildrenCount("Automatism"); ++i)
+        for (std::size_t i = 0; i < element.GetChildrenCount("Automatism"); ++i)
         {
             SerializerElement & automatismElement = element.GetChild("Automatism", i);
 
@@ -179,7 +179,7 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
     {
         SerializerElement & automatismsElement = element.GetChild("automatisms");
         automatismsElement.ConsiderAsArrayOf("automatism");
-        for (unsigned int i = 0; i < automatismsElement.GetChildrenCount(); ++i)
+        for (std::size_t i = 0; i < automatismsElement.GetChildrenCount(); ++i)
         {
             SerializerElement & automatismElement = automatismsElement.GetChild(i);
 
@@ -211,7 +211,7 @@ void Object::SerializeTo(SerializerElement & element) const
     SerializerElement & automatismsElement = element.AddChild("automatisms");
     automatismsElement.ConsiderAsArrayOf("automatism");
     std::vector < gd::String > allAutomatisms = GetAllAutomatismNames();
-    for (unsigned int i = 0;i<allAutomatisms.size();++i)
+    for (std::size_t i = 0;i<allAutomatisms.size();++i)
     {
         SerializerElement & automatismElement = automatismsElement.AddChild("automatism");
 

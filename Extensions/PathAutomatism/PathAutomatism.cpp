@@ -77,7 +77,7 @@ void PathAutomatism::Reset()
     EnterSegment(0);
 }
 
-void PathAutomatism::EnterSegment(unsigned int segmentNumber)
+void PathAutomatism::EnterSegment(std::size_t segmentNumber)
 {
     currentSegment = segmentNumber;
     if (!path.empty() && currentSegment < path.size()-1)
@@ -217,7 +217,7 @@ void PathAutomatism::UnserializePathsFrom(const gd::SerializerElement & element)
     localePaths.clear();
 
     element.ConsiderAsArrayOf("path", "Path");
-    for(unsigned int i = 0;i<element.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<element.GetChildrenCount();++i)
     {
         const gd::SerializerElement & pathElement = element.GetChild(i);
         localePaths[pathElement.GetStringAttribute("name")] = GetCoordsVectorFromString(pathElement.GetStringAttribute("coords"), '/', ';');
@@ -341,7 +341,7 @@ void PathAutomatism::DeleteAllPaths()
     localePaths.clear();
 }
 
-void PathAutomatism::SetCurrentSegment(unsigned int seg)
+void PathAutomatism::SetCurrentSegment(std::size_t seg)
 {
     futureSegment = seg;
 }
@@ -366,7 +366,7 @@ gd::String PathAutomatism::GetStringFromCoordsVector(const std::vector<sf::Vecto
 {
     gd::String coordsStr;
 
-	for (unsigned int a = 0; a < vec.size(); a++)
+	for (std::size_t a = 0; a < vec.size(); a++)
 	{
 	    coordsStr += gd::String::From(vec.at(a).x);
         coordsStr.push_back(composantSep);
@@ -384,7 +384,7 @@ std::vector<sf::Vector2f> PathAutomatism::GetCoordsVectorFromString(const gd::St
 
     std::vector<gd::String> coordsDecomposed = str.Split(coordsSep);
 
-    for(unsigned int a = 0; a < coordsDecomposed.size(); a++)
+    for(std::size_t a = 0; a < coordsDecomposed.size(); a++)
     {
         std::vector<gd::String> coordXY = coordsDecomposed.at(a).Split(composantSep);
 

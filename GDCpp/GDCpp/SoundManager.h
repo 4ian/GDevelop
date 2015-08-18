@@ -105,8 +105,8 @@ public:
 
 private:
 
-    std::map<unsigned int, std::shared_ptr<Sound> >  soundsChannel;
-    std::map<unsigned int, std::shared_ptr<Music> >  musicsChannel;
+    std::map<std::size_t, std::shared_ptr<Sound> >  soundsChannel;
+    std::map<std::size_t, std::shared_ptr<Music> >  musicsChannel;
 
     float globalVolume;
 

@@ -21,11 +21,11 @@ namespace StringTools
 gd::String GD_API SubStr(const gd::String & str, size_t start, size_t length );
 gd::String GD_API StrAt(const gd::String & str, size_t pos );
 gd::String GD_API NewLine();
-unsigned int GD_API StrLen(const gd::String & str);
+std::size_t GD_API StrLen(const gd::String & str);
 int GD_API StrFind(const gd::String & str, const gd::String & findwhat);
 int GD_API StrRFind(const gd::String & str, const gd::String & findwhat);
-int GD_API StrFindFrom(const gd::String & str, const gd::String & findwhat, unsigned int start);
-int GD_API StrRFindFrom(const gd::String & str, const gd::String & findwhat, unsigned int start);
+int GD_API StrFindFrom(const gd::String & str, const gd::String & findwhat, std::size_t start);
+int GD_API StrRFindFrom(const gd::String & str, const gd::String & findwhat, std::size_t start);
 
 }
 

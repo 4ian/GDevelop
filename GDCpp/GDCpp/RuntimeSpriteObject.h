@@ -59,9 +59,9 @@ public:
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+    virtual std::size_t GetNumberOfProperties() const;
     #endif
 
     virtual void UpdateTime(float timeElapsed);
@@ -133,19 +133,19 @@ public:
     /**
      * \brief Get the number of animations inside this object.
      */
-    unsigned int GetAnimationsCount() const { return animations.size(); };
+    std::size_t GetAnimationsCount() const { return animations.size(); };
 
     /**
      * \brief Get the index of the animation being played.
      */
-    inline unsigned int GetCurrentAnimation() const { return currentAnimation; }
+    inline std::size_t GetCurrentAnimation() const { return currentAnimation; }
 
     /**
      * \brief Change the animation to play.
      * \param index The index of the new animation
      * \return true if the animation was successfully changed, false otherwise (index out of bound).
      */
-    bool SetCurrentAnimation(unsigned int nb);
+    bool SetCurrentAnimation(std::size_t nb);
 
     /**
      * \brief Check if the current animation has reached its end.
@@ -161,16 +161,16 @@ public:
      * \param index Index of the new frame
      * \return true if the frame was changed, false otherwise (out of bound index).
      */
-    bool SetSprite(unsigned int nb);
+    bool SetSprite(std::size_t nb);
 
     /**
      * \brief Return the index of the frame of the animation being displayed.
      */
-    inline unsigned int GetSpriteNb() const { return currentSprite; }
+    inline std::size_t GetSpriteNb() const { return currentSprite; }
     ///@}
 
     bool SetDirection(float nb);
-    inline unsigned int GetCurrentDirection() const { return currentDirection; }
+    inline std::size_t GetCurrentDirection() const { return currentDirection; }
 
     /**
      * \brief Return the angle or direction, according to the current direction type.
@@ -283,10 +283,10 @@ public:
 private:
 
     //Animations, direction and current frame:
-    unsigned int currentAnimation;
-    unsigned int currentDirection;
+    std::size_t currentAnimation;
+    std::size_t currentDirection;
     float currentAngle;
-    unsigned int currentSprite;
+    std::size_t currentSprite;
     bool animationStopped;
 
     float timeElapsedOnCurrentSprite;

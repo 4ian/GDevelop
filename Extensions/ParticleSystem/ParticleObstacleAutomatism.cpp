@@ -26,7 +26,7 @@ void ParticleObstacleAutomatism::DoStepPreEvents(RuntimeScene & scene)
         modifier = new SPK::Obstacle(zone);
 
         std::vector < std::shared_ptr<RuntimeObject> > allObjects = scene.objectsInstances.GetAllObjects();
-        for (unsigned int i = 0;i<allObjects.size();++i)
+        for (std::size_t i = 0;i<allObjects.size();++i)
         {
             std::shared_ptr<RuntimeParticleEmitterObject> object = std::dynamic_pointer_cast<RuntimeParticleEmitterObject>(allObjects[i]);
             if ( object != std::shared_ptr<RuntimeParticleEmitterObject>() )
@@ -42,4 +42,3 @@ void ParticleObstacleAutomatism::DoStepPostEvents(RuntimeScene & scene)
 {
 
 }
-

@@ -26,7 +26,7 @@ void ObjInstancesHolder::ObjectNameHasChanged(RuntimeObject * object)
     for (std::unordered_map<gd::String, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
     {
         RuntimeObjList & list = it->second;
-        for (unsigned int i = 0;i<list.size();++i)
+        for (std::size_t i = 0;i<list.size();++i)
         {
             if ( list[i].get() == object )
             {
@@ -53,7 +53,7 @@ void ObjInstancesHolder::Init(const ObjInstancesHolder & other)
     for (std::unordered_map<gd::String, RuntimeObjList>::const_iterator it = other.objectsInstances.begin() ;
         it != other.objectsInstances.end(); ++it )
     {
-        for (unsigned int i = 0;i<it->second.size();++i) //We need to really copy the objects
+        for (std::size_t i = 0;i<it->second.size();++i) //We need to really copy the objects
             AddObject( std::shared_ptr<RuntimeObject>(it->second[i]->Clone()) );
     }
 }

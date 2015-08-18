@@ -26,11 +26,11 @@ FileExtension::FileExtension()
 }
 
 #if defined(GD_IDE_ONLY)
-void FileExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const
+void FileExtension::GetPropertyForDebugger(RuntimeScene & scene, std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     const std::map < gd::String, std::shared_ptr<XmlFile> > & openedFiles = XmlFilesManager::GetOpenedFilesList();
 
-    unsigned int i = 0;
+    std::size_t i = 0;
     std::map < gd::String, std::shared_ptr<XmlFile> >::const_iterator end = openedFiles.end();
     for (std::map < gd::String, std::shared_ptr<XmlFile> >::const_iterator iter = openedFiles.begin();iter != end;++iter)
     {
@@ -46,14 +46,13 @@ void FileExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int pr
     }
 }
 
-bool FileExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue)
+bool FileExtension::ChangeProperty(RuntimeScene & scene, std::size_t propertyNb, gd::String newValue)
 {
     return false;
 }
 
-unsigned int FileExtension::GetNumberOfProperties(RuntimeScene & scene) const
+std::size_t FileExtension::GetNumberOfProperties(RuntimeScene & scene) const
 {
     return XmlFilesManager::GetOpenedFilesList().size();
 }
 #endif
-

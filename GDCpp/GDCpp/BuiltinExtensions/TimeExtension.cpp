@@ -41,7 +41,7 @@ TimeExtension::TimeExtension()
 }
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-void TimeExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const
+void TimeExtension::GetPropertyForDebugger(RuntimeScene & scene, std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if ( propertyNb < scene.timers.size() )
     {
@@ -52,7 +52,7 @@ void TimeExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int pr
     }
 }
 
-bool TimeExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue)
+bool TimeExtension::ChangeProperty(RuntimeScene & scene, std::size_t propertyNb, gd::String newValue)
 {
     if ( propertyNb < scene.timers.size() )
     {
@@ -64,7 +64,7 @@ bool TimeExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb
     return false;
 }
 
-unsigned int TimeExtension::GetNumberOfProperties(RuntimeScene & scene) const
+std::size_t TimeExtension::GetNumberOfProperties(RuntimeScene & scene) const
 {
     return scene.timers.size();
 }

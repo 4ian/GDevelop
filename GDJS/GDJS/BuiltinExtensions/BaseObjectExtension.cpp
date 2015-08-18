@@ -121,7 +121,7 @@ BaseObjectExtension::BaseObjectExtension()
             gd::String outputCode;
 
             std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(instruction.GetParameter(0).GetPlainString(), context);
-            for (unsigned int i = 0;i<realObjects.size();++i)
+            for (std::size_t i = 0;i<realObjects.size();++i)
             {
                 context.SetCurrentObject(realObjects[i]);
                 context.ObjectsListNeeded(realObjects[i]);

@@ -240,7 +240,7 @@ private:
 	void OnRibbonHelpSelected(wxRibbonButtonBarEvent& event);
 	void EditExtensionsOfGame(gd::Project & project);
 	void OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event);
-	void AddLayoutToProject(gd::Project * project, unsigned int position);
+	void AddLayoutToProject(gd::Project * project, std::size_t position);
 	void OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event);
 	void EditResourcesOfProject(gd::Project * project);
 	void OnRibbonAddExternalEventsSelected(wxRibbonButtonBarEvent& event);
@@ -257,7 +257,7 @@ private:
     static wxRibbonButtonBar * projectRibbonBar;
     static wxRibbonButtonBar * operationsRibbonBar;
 
-    static const unsigned int gameMaxCharDisplayedInEditor = 15;
+    static const std::size_t gameMaxCharDisplayedInEditor = 15;
 
 	DECLARE_EVENT_TABLE()
 };

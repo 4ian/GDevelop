@@ -48,27 +48,27 @@ public:
     /**
      * \brief Change the number of cameras inside the layer.
      */
-    void SetCameraCount(unsigned int n);
+    void SetCameraCount(std::size_t n);
 
     /**
      * \brief Get cameras count.
      */
-    inline unsigned int GetCameraCount() const { return cameras.size(); };
+    inline std::size_t GetCameraCount() const { return cameras.size(); };
 
     /**
      * \brief Return a reference to a camera
      */
-    inline const Camera & GetCamera(unsigned int n) const { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
+    inline const Camera & GetCamera(std::size_t n) const { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
 
     /**
      * \brief Return a reference to a camera
      */
-    inline Camera & GetCamera(unsigned int n) { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
+    inline Camera & GetCamera(std::size_t n) { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
 
     /**
      * \brief Delete a specific camera.
      */
-    inline void DeleteCamera(unsigned int n) { if ( n >= GetCameraCount() ) return; cameras.erase(cameras.begin()+n); }
+    inline void DeleteCamera(std::size_t n) { if ( n >= GetCameraCount() ) return; cameras.erase(cameras.begin()+n); }
 
     /**
      * \brief Add an already existing camera.

@@ -116,14 +116,14 @@ bool CppPlatform::AddExtension(std::shared_ptr<gd::PlatformExtension> platformEx
 
     //Then Load all runtime objects provided by the extension
     std::vector < gd::String > objectsTypes = extension->GetExtensionObjectsTypes();
-    for ( unsigned int i = 0; i < objectsTypes.size();++i)
+    for ( std::size_t i = 0; i < objectsTypes.size();++i)
     {
         runtimeObjCreationFunctionTable[objectsTypes[i]] = extension->GetRuntimeObjectCreationFunctionPtr(objectsTypes[i]);
     }
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     //And Add include directories
-    for (unsigned int i = 0;i<extension->GetSupplementaryIncludeDirectories().size();++i)
+    for (std::size_t i = 0;i<extension->GetSupplementaryIncludeDirectories().size();++i)
         CodeCompiler::Get()->AddHeaderDirectory(extension->GetSupplementaryIncludeDirectories()[i]);
     #endif
     return true;

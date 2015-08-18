@@ -302,17 +302,17 @@ public:
     /**
      * \brief Return a reference to the layout at position "index" in the layout list
      */
-    Layout & GetLayout(unsigned int index);
+    Layout & GetLayout(std::size_t index);
 
     /**
      * \brief Return a reference to the layout at position "index" in the layout list
      */
-    const Layout & GetLayout (unsigned int index) const;
+    const Layout & GetLayout (std::size_t index) const;
 
     /**
      * \brief Return the position of the layout called "name" in the layout list
      */
-    unsigned int GetLayoutPosition(const gd::String & name) const;
+    std::size_t GetLayoutPosition(const gd::String & name) const;
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -320,18 +320,18 @@ public:
      *
      * Do nothing if indexes are not correct.
      */
-    void SwapLayouts(unsigned int first, unsigned int second);
+    void SwapLayouts(std::size_t first, std::size_t second);
     #endif
 
     /**
      * \brief Return the number of layouts.
      */
-    unsigned int GetLayoutsCount() const;
+    std::size_t GetLayoutsCount() const;
 
     /**
      * \brief Must add a new empty layout called "name" at the specified position in the layout list.
      */
-    gd::Layout & InsertNewLayout(const gd::String & name, unsigned int position);
+    gd::Layout & InsertNewLayout(const gd::String & name, std::size_t position);
 
     /**
      * \brief Must add a new layout constructed from the layout passed as parameter.
@@ -339,7 +339,7 @@ public:
      * \param layout The layout that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the layout must be inserted at the end of the layout list.
      */
-    gd::Layout & InsertLayout(const Layout & layout, unsigned int position);
+    gd::Layout & InsertLayout(const Layout & layout, std::size_t position);
 
     /**
      * Must delete layout named "name".
@@ -442,34 +442,34 @@ public:
     /**
      * Return a reference to the external events at position "index" in the external events list
      */
-    ExternalEvents & GetExternalEvents(unsigned int index);
+    ExternalEvents & GetExternalEvents(std::size_t index);
 
     /**
      * Return a reference to the external events at position "index" in the external events list
      */
-    const ExternalEvents & GetExternalEvents (unsigned int index) const;
+    const ExternalEvents & GetExternalEvents (std::size_t index) const;
 
     /**
      * Return the position of the external events called "name" in the external events list
      */
-    unsigned int GetExternalEventsPosition(const gd::String & name) const;
+    std::size_t GetExternalEventsPosition(const gd::String & name) const;
 
     /**
      * \brief Swap the specified external events.
      *
      * Do nothing if indexes are not correct.
      */
-    void SwapExternalEvents(unsigned int first, unsigned int second);
+    void SwapExternalEvents(std::size_t first, std::size_t second);
 
     /**
      * Return the number of external events.
      */
-    unsigned int GetExternalEventsCount() const;
+    std::size_t GetExternalEventsCount() const;
 
     /**
      * Must add a new empty external events sheet called "name" at the specified position in the layout list.
      */
-    ExternalEvents & InsertNewExternalEvents(const gd::String & name, unsigned int position);
+    ExternalEvents & InsertNewExternalEvents(const gd::String & name, std::size_t position);
 
     /**
      * Must add a new external events sheet constructed from the layout passed as parameter.
@@ -477,7 +477,7 @@ public:
      * \param externalEvents The external events that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the external events must be inserted at the end of the external events list.
      */
-    void InsertExternalEvents(const ExternalEvents & externalEvents, unsigned int position);
+    void InsertExternalEvents(const ExternalEvents & externalEvents, std::size_t position);
 
     /**
      * Must delete external events named "name".
@@ -509,17 +509,17 @@ public:
     /**
      * Return a reference to the external layout at position "index" in the external layout list
      */
-    ExternalLayout & GetExternalLayout(unsigned int index);
+    ExternalLayout & GetExternalLayout(std::size_t index);
 
     /**
      * Return a reference to the external layout at position "index" in the external layout list
      */
-    const ExternalLayout & GetExternalLayout (unsigned int index) const;
+    const ExternalLayout & GetExternalLayout (std::size_t index) const;
 
     /**
      * Return the position of the external layout called "name" in the external layout list
      */
-    unsigned int GetExternalLayoutPosition(const gd::String & name) const;
+    std::size_t GetExternalLayoutPosition(const gd::String & name) const;
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -527,18 +527,18 @@ public:
      *
      * Do nothing if indexes are not correct.
      */
-    void SwapExternalLayouts(unsigned int first, unsigned int second);
+    void SwapExternalLayouts(std::size_t first, std::size_t second);
     #endif
 
     /**
      * Return the number of external layout.
      */
-    unsigned int GetExternalLayoutsCount() const;
+    std::size_t GetExternalLayoutsCount() const;
 
     /**
      * Must add a new empty external layout called "name" at the specified position in the layout list.
      */
-    gd::ExternalLayout & InsertNewExternalLayout(const gd::String & name, unsigned int position);
+    gd::ExternalLayout & InsertNewExternalLayout(const gd::String & name, std::size_t position);
 
     /**
      * Must add a new external layout constructed from the layout passed as parameter.
@@ -546,7 +546,7 @@ public:
      * \param externalLayout The external layout that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the external layout must be inserted at the end of the external layout list.
      */
-    void InsertExternalLayout(const ExternalLayout & externalLayout, unsigned int position);
+    void InsertExternalLayout(const ExternalLayout & externalLayout, std::size_t position);
 
     /**
      * Must delete external layout named "name".
@@ -703,7 +703,7 @@ public:
     /**
      * Add a new source file the specified position in the external source files list.
      */
-    gd::SourceFile & InsertNewSourceFile(const gd::String & name, const gd::String & language, unsigned int position = -1);
+    gd::SourceFile & InsertNewSourceFile(const gd::String & name, const gd::String & language, std::size_t position = -1);
     #endif
     ///@}
 

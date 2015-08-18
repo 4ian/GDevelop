@@ -156,7 +156,7 @@ ProjectExportDialog::ProjectExportDialog( wxWindow* parent, gd::Project & gameTo
 wxString ProjectExportDialog::DeleteInvalidCharacters(const wxString & directoryName) const
 {
     wxString result = directoryName;
-    for (unsigned int i =0;i<result.size();)
+    for (std::size_t i =0;i<result.size();)
     {
         wxChar character = result[i];
         if ( character == '/' || character == '\\' || character == '"' || character == '*' || character == ':' || character == '|' || character == '<' || character == '>' || character == '?' )

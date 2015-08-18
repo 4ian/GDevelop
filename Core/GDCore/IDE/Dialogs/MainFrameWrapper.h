@@ -105,7 +105,7 @@ public:
     /**
      * Call this method when a scene preview has ended.
      */
-    void EnableControlsAfterScenePreviewing() { for (unsigned int i = 0;i<disableOnPreview.size();++i) disableOnPreview[i]->Enable(); };
+    void EnableControlsAfterScenePreviewing() { for (std::size_t i = 0;i<disableOnPreview.size();++i) disableOnPreview[i]->Enable(); };
 
     /**
      * Used by the IDE to setup controls to be disabled when a scene is previewed.

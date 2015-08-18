@@ -273,7 +273,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     }
 
     //Initialize previewers
-    for (unsigned int i = 0;i<project.GetUsedPlatforms().size();++i)
+    for (std::size_t i = 0;i<project.GetUsedPlatforms().size();++i)
     {
         std::shared_ptr<gd::LayoutEditorPreviewer> previewer = project.GetUsedPlatforms()[i]->GetLayoutPreviewer(*this);
         previewers[project.GetUsedPlatforms()[i]->GetName()] = previewer;
@@ -571,7 +571,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
     if ( selectedInstances.empty() ) return;
 
     //Can we send the objects on a higher layer ?
-    unsigned int lowestLayer = layout.GetLayersCount()-1;
+    std::size_t lowestLayer = layout.GetLayersCount()-1;
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if (it->first == NULL) continue;
@@ -588,7 +588,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
     }
 
     //Can we send the objects on a lower layer ?
-    unsigned int highestLayer = 0;
+    std::size_t highestLayer = 0;
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if (it->first == NULL) continue;
@@ -608,7 +608,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
 
 void LayoutEditorCanvas::OnLayerUpSelected(wxCommandEvent & event)
 {
-    unsigned int lowestLayer = layout.GetLayersCount()-1;
+    std::size_t lowestLayer = layout.GetLayersCount()-1;
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if (it->first == NULL) continue;
@@ -620,7 +620,7 @@ void LayoutEditorCanvas::OnLayerUpSelected(wxCommandEvent & event)
 
 void LayoutEditorCanvas::OnLayerDownSelected(wxCommandEvent & event)
 {
-    unsigned int highestLayer = 0;
+    std::size_t highestLayer = 0;
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if (it->first == NULL) continue;
@@ -657,7 +657,7 @@ void LayoutEditorCanvas::OnAddAutoObjSelected(wxCommandEvent & event)
 
     gd::Object * object = GetObjectLinkedToInitialInstance(*selection[0]);
     bool globalObject = false;
-    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<project.GetObjectsCount();++i)
     {
         if ( &project.GetObject(i) == object )
         {
@@ -734,7 +734,7 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
     double mouseY = GetMouseYOnLayout();
 
     //Check if there is a click on a gui element inside the layout
-    for (unsigned int i = 0;i<guiElements.size();++i)
+    for (std::size_t i = 0;i<guiElements.size();++i)
     {
         if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
         {
@@ -769,7 +769,7 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
             if (!isMovingInstance && ctrlPressed) //Clone objects
             {
                 std::vector < InitialInstance* > selection = GetSelection();
-                for (unsigned int i = 0;i<selection.size();++i)
+                for (std::size_t i = 0;i<selection.size();++i)
                     instances.InsertInitialInstance(*selection[i]);
 
                 for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
@@ -853,7 +853,7 @@ void LayoutEditorCanvas::UnselectInstance(InitialInstance * instance)
 
 void LayoutEditorCanvas::DeleteInstances(std::vector<InitialInstance *> instancesToDelete)
 {
-    for (unsigned int i = 0;i<instancesToDelete.size();++i)
+    for (std::size_t i = 0;i<instancesToDelete.size();++i)
     {
         if (instancesToDelete[i] == NULL ) continue;
 
@@ -893,9 +893,9 @@ public:
 
     std::vector<InitialInstance*> & GetSelectedList() { return selectedList; }
     InstancesInAreaPicker & IgnoreLockedInstances() { ignoreLockedInstances = true; return *this; }
-    InstancesInAreaPicker & ExcludeLayer(const gd::String & layerName) { 
+    InstancesInAreaPicker & ExcludeLayer(const gd::String & layerName) {
         excludedLayers.insert(layerName);
-        return *this; 
+        return *this;
     }
 
 private:
@@ -924,7 +924,7 @@ void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
     }
 
     //Check if there is a click released on a gui element inside the layout
-    for (unsigned int i = 0;i<guiElements.size();++i)
+    for (std::size_t i = 0;i<guiElements.size();++i)
     {
         if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
         {
@@ -978,7 +978,7 @@ void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
         picker.IgnoreLockedInstances();
         instances.IterateOverInstances(picker);
 
-        for ( unsigned int i = 0; i<picker.GetSelectedList().size();++i)
+        for ( std::size_t i = 0; i<picker.GetSelectedList().size();++i)
             SelectInstance(picker.GetSelectedList()[i]);
 
         isSelecting = false;
@@ -1077,7 +1077,7 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
 
         //Check if there is a gui element hovered inside the layout
         bool hoveringSomething = false;
-        for (unsigned int i = 0;i<guiElements.size();++i)
+        for (std::size_t i = 0;i<guiElements.size();++i)
         {
             if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) ) {
                 OnGuiElementHovered(guiElements[i]);
@@ -1355,9 +1355,9 @@ void LayoutEditorCanvas::OnUndoBtClick( wxCommandEvent & event )
     Undo();
 }
 
-void LayoutEditorCanvas::Undo(unsigned int times)
+void LayoutEditorCanvas::Undo(std::size_t times)
 {
-    for (unsigned int i = 0;i<times;++i)
+    for (std::size_t i = 0;i<times;++i)
     {
         if ( history.empty() ) return;
 
@@ -1378,9 +1378,9 @@ void LayoutEditorCanvas::OnClearHistorySelected(wxCommandEvent& event)
     redoHistory.clear();
 }
 
-void LayoutEditorCanvas::Redo( unsigned int times )
+void LayoutEditorCanvas::Redo( std::size_t times )
 {
-    for (unsigned int i = 0;i<times;++i)
+    for (std::size_t i = 0;i<times;++i)
     {
         if ( redoHistory.empty() ) return;
 
@@ -1488,9 +1488,9 @@ void LayoutEditorCanvas::ReloadResources()
     if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
 
-    for (unsigned int i = 0;i<layout.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<layout.GetObjectsCount();++i)
         layout.GetObject(i).LoadResources(project, layout);
-    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<project.GetObjectsCount();++i)
         project.GetObject(i).LoadResources(project, layout);
 
     wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());

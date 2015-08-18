@@ -48,7 +48,7 @@ void GroupEvent::SerializeTo(SerializerElement & element) const
 
     gd::SerializerElement & parametersElement = element.AddChild("parameters");
     parametersElement.ConsiderAsArrayOf("parameter");
-    for ( unsigned int i = 0;i < parameters.size();++i)
+    for ( std::size_t i = 0;i < parameters.size();++i)
         parametersElement.AddChild("parameter").SetValue(parameters[i]);
 }
 
@@ -65,7 +65,7 @@ void GroupEvent::UnserializeFrom(gd::Project & project, const SerializerElement 
     parameters.clear();
     gd::SerializerElement & parametersElement = element.GetChild("parameters");
     parametersElement.ConsiderAsArrayOf("parameters");
-    for ( unsigned int i = 0;i < parametersElement.GetChildrenCount();++i)
+    for ( std::size_t i = 0;i < parametersElement.GetChildrenCount();++i)
         parameters.push_back(parametersElement.GetChild(i).GetValue().GetString());
 }
 

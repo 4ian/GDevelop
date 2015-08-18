@@ -95,9 +95,9 @@ public :
     void ChangeAndReloadImage(const gd::String &texture, const RuntimeScene &scene);
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+    virtual std::size_t GetNumberOfProperties() const;
     #endif
 
     gd::String textureName;

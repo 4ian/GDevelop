@@ -57,7 +57,7 @@ public:
     #endif
 
     void Reset();
-    void EnterSegment(unsigned int segmentNumber);
+    void EnterSegment(std::size_t segmentNumber);
 
     float GetOffsetX() const;
     void SetOffsetX(float off);
@@ -110,7 +110,7 @@ public:
     */
     std::vector<gd::String> GetListOfPathsNames() const;
 
-    void SetCurrentSegment(unsigned int seg);
+    void SetCurrentSegment(std::size_t seg);
     int GetCurrentSegment();
     float GetPositionOnSegment(); ///< position belongs to 0 to 1 (percentage of the current segment)
     void SetPositionOnSegment(float pos);
@@ -133,7 +133,7 @@ private:
     float speed;
     float timeOnSegment;
     float totalSegmentTime;
-    unsigned int currentSegment;
+    std::size_t currentSegment;
 
     bool stopAtEnd;
     bool reverseAtEnd;

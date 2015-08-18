@@ -141,7 +141,7 @@ public:
      * \see gd::EventMetadata
      * \see gd::BaseEvent::MustBePreprocessed
      */
-    virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, unsigned int indexOfTheEventInThisList);
+    virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, std::size_t indexOfTheEventInThisList);
 
     /**
      * \brief If MustBePreprocessed is redefined to return true, the gd::EventMetadata::preprocessing associated to the event will be called

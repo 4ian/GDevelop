@@ -1,4 +1,4 @@
-/*
+/*std::size_t
  * GDevelop C++ Platform
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
@@ -11,12 +11,12 @@
 #include "GDCpp/IDE/BaseProfiler.h"
 #include <iostream>
 
-void GD_API StartProfileTimer(RuntimeScene & scene, unsigned int id)
+void GD_API StartProfileTimer(RuntimeScene & scene, std::size_t id)
 {
     scene.GetProfiler()->profileEventsInformation[id].Reset();
 }
 
-void GD_API EndProfileTimer(RuntimeScene & scene, unsigned int id)
+void GD_API EndProfileTimer(RuntimeScene & scene, std::size_t id)
 {
     scene.GetProfiler()->profileEventsInformation[id].Stop();
 }

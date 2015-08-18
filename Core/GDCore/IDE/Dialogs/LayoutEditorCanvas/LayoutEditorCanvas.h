@@ -439,12 +439,12 @@ protected:
     /**
      * Undo last changes.
      */
-    void Undo(unsigned int times = 1);
+    void Undo(std::size_t times = 1);
 
     /**
      * Redo last changes.
      */
-    void Redo(unsigned int times = 1);
+    void Redo(std::size_t times = 1);
 
     /**
      * Update the mouse according to the selected button

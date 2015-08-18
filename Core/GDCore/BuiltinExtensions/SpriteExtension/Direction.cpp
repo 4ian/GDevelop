@@ -40,23 +40,23 @@ void Direction::AddSprite( const Sprite & sprite )
     sprites.push_back(sprite);
 }
 
-const Sprite & Direction::GetSprite(unsigned int nb) const
+const Sprite & Direction::GetSprite(std::size_t nb) const
 {
     return sprites[nb];
 }
 
-Sprite & Direction::GetSprite(unsigned int nb)
+Sprite & Direction::GetSprite(std::size_t nb)
 {
     return sprites[nb];
 }
 
-void Direction::RemoveSprite(unsigned int index)
+void Direction::RemoveSprite(std::size_t index)
 {
     if ( index < sprites.size() )
         sprites.erase(sprites.begin()+index);
 }
 
-void Direction::SwapSprites(unsigned int firstSpriteIndex, unsigned int secondSpriteIndex)
+void Direction::SwapSprites(std::size_t firstSpriteIndex, std::size_t secondSpriteIndex)
 {
     if ( firstSpriteIndex < sprites.size() && secondSpriteIndex < sprites.size() && firstSpriteIndex != secondSpriteIndex)
         swap(sprites[firstSpriteIndex], sprites[secondSpriteIndex]);
@@ -67,7 +67,7 @@ bool Direction::HasNoSprites() const
     return sprites.empty();
 }
 
-unsigned int Direction::GetSpritesCount() const
+std::size_t Direction::GetSpritesCount() const
 {
     return sprites.size();
 }
@@ -87,7 +87,7 @@ void OpenPoint(Point & point, const gd::SerializerElement & element)
 void OpenPointsSprites(vector < Point > & points, const gd::SerializerElement & element)
 {
     element.ConsiderAsArrayOf("point", "Point");
-    for (unsigned int i = 0; i < element.GetChildrenCount(); ++i)
+    for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
     {
         Point point("");
         OpenPoint(point, element.GetChild(i));
@@ -103,7 +103,7 @@ void Direction::UnserializeFrom(const gd::SerializerElement & element)
 
     const gd::SerializerElement & spritesElement = element.GetChild("sprites", 0, "Sprites");
     spritesElement.ConsiderAsArrayOf("sprite", "Sprite");
-    for (unsigned int i = 0; i < spritesElement.GetChildrenCount(); ++i)
+    for (std::size_t i = 0; i < spritesElement.GetChildrenCount(); ++i)
     {
         const gd::SerializerElement & spriteElement = spritesElement.GetChild(i);
         Sprite sprite;
@@ -123,13 +123,13 @@ void Direction::UnserializeFrom(const gd::SerializerElement & element)
         std::vector<Polygon2d> mask;
         const gd::SerializerElement & collisionMaskElement = spriteElement.GetChild("customCollisionMask", 0, "CustomCollisionMask");
         collisionMaskElement.ConsiderAsArrayOf("polygon", "Polygon");
-        for (unsigned int j = 0; j < collisionMaskElement.GetChildrenCount(); ++j)
+        for (std::size_t j = 0; j < collisionMaskElement.GetChildrenCount(); ++j)
         {
             Polygon2d polygon;
 
             const gd::SerializerElement & polygonElement = collisionMaskElement.GetChild(j);
             polygonElement.ConsiderAsArrayOf("vertice", "Point");
-            for (unsigned int k = 0; k < polygonElement.GetChildrenCount(); ++k)
+            for (std::size_t k = 0; k < polygonElement.GetChildrenCount(); ++k)
             {
                 const gd::SerializerElement & verticeElement = polygonElement.GetChild(k);
 
@@ -156,14 +156,14 @@ void SavePoint(const Point & point, gd::SerializerElement & element)
 void SavePointsSprites(const vector < Point > & points, gd::SerializerElement & element)
 {
     element.ConsiderAsArrayOf("point");
-    for (unsigned int i = 0;i<points.size();++i)
+    for (std::size_t i = 0;i<points.size();++i)
         SavePoint(points[i], element.AddChild("point"));
 }
 
 void SaveSpritesDirection(const vector < Sprite > & sprites, gd::SerializerElement & element)
 {
     element.ConsiderAsArrayOf("sprite");
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         gd::SerializerElement & spriteElement = element.AddChild("sprite");
 
@@ -179,11 +179,11 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, gd::SerializerEleme
         gd::SerializerElement & collisionMaskElement = spriteElement.AddChild("customCollisionMask");
         collisionMaskElement.ConsiderAsArrayOf("polygon");
         std::vector<Polygon2d> polygons = sprites[i].GetCollisionMask();
-        for (unsigned int j = 0;j<polygons.size();++j)
+        for (std::size_t j = 0;j<polygons.size();++j)
         {
             gd::SerializerElement & polygonElement = collisionMaskElement.AddChild("polygon");
             polygonElement.ConsiderAsArrayOf("vertice");
-            for (unsigned int k = 0;k<polygons[j].vertices.size();++k)
+            for (std::size_t k = 0;k<polygons[j].vertices.size();++k)
             {
                 polygonElement.AddChild("vertice")
                     .SetAttribute("x", polygons[j].vertices[k].x)

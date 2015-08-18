@@ -193,27 +193,27 @@ public:
     /**
      * Must return a reference to the layer at position "index" in the layers list
      */
-    Layer & GetLayer(unsigned int index);
+    Layer & GetLayer(std::size_t index);
 
     /**
      * Must return a reference to the layer at position "index" in the layers list
      */
-    const Layer & GetLayer (unsigned int index) const;
+    const Layer & GetLayer (std::size_t index) const;
 
     /**
      * Must return the position of the layer called "name" in the layers list
      */
-    unsigned int GetLayerPosition(const gd::String & name) const;
+    std::size_t GetLayerPosition(const gd::String & name) const;
 
     /**
      * Must return the number of layers.
      */
-    unsigned int GetLayersCount() const;
+    std::size_t GetLayersCount() const;
 
     /**
      * Must add a new empty the layer sheet called "name" at the specified position in the layout list.
      */
-    void InsertNewLayer(const gd::String & name, unsigned int position);
+    void InsertNewLayer(const gd::String & name, std::size_t position);
 
     /**
      * Must add a new the layer constructed from the layout passed as parameter.
@@ -221,7 +221,7 @@ public:
      * \param theLayer The the layer that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the layer must be inserted at the end of the layers list.
      */
-    void InsertLayer(const Layer & theLayer, unsigned int position);
+    void InsertLayer(const Layer & theLayer, std::size_t position);
 
     /**
      * Must delete the layer named "name".
@@ -231,7 +231,7 @@ public:
     /**
      * Must swap the position of the specified layers.
      */
-    void SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex);
+    void SwapLayers(std::size_t firstLayerIndex, std::size_t secondLayerIndex);
     ///@}
 
     /**

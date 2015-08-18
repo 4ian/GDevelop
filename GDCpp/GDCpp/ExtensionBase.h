@@ -101,18 +101,18 @@ public :
      * \brief Called by the debugger so as to get a property value and name.
      * \see RuntimeObject::GetPropertyForDebugger
      */
-    virtual void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const {};
+    virtual void GetPropertyForDebugger(RuntimeScene & scene, std::size_t propertyNb, gd::String & name, gd::String & value) const {};
 
     /**
      * \brief Called by the debugger so as to update a property
      * \see RuntimeObject::ChangeProperty
      */
-    virtual bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue) { return false; };
+    virtual bool ChangeProperty(RuntimeScene & scene, std::size_t propertyNb, gd::String newValue) { return false; };
 
     /**
      * \brief Must return the number of available properties for the debugger
      */
-    virtual unsigned int GetNumberOfProperties(RuntimeScene & scene) const { return 0; };
+    virtual std::size_t GetNumberOfProperties(RuntimeScene & scene) const { return 0; };
 
     const std::vector < std::pair<gd::String, gd::String> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
     const std::vector < gd::String > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
@@ -132,4 +132,3 @@ private:
 };
 
 #endif // EXTENSIONBASE_H
-

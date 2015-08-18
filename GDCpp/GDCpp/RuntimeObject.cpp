@@ -78,7 +78,7 @@ void RuntimeObject::Init(const RuntimeObject & object)
 }
 
 #if defined(GD_IDE_ONLY)
-void RuntimeObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Position");      value = gd::String::From(GetX())+";"+gd::String::From(GetY());}
     else if ( propertyNb == 1 ) {name = _("Angle");         value = gd::String::From(GetAngle())+u8"°";}
@@ -92,7 +92,7 @@ void RuntimeObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String &
     else if ( propertyNb == 9 ) {name = _("Y coordinate of moving"); value = gd::String::From(TotalForceY());}
 }
 
-bool RuntimeObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if ( propertyNb == 0 )
     {
@@ -128,7 +128,7 @@ bool RuntimeObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
     return true;
 }
 
-unsigned int RuntimeObject::GetNumberOfProperties() const
+std::size_t RuntimeObject::GetNumberOfProperties() const
 {
     //Be careful, properties start at 0.
     return 10;
@@ -282,14 +282,14 @@ bool RuntimeObject::SeparateFromObjects(const std::vector<RuntimeObject*> & obje
     bool moved = false;
     sf::Vector2f moveVector;
     vector<Polygon2d> hitBoxes = GetHitBoxes();
-    for (unsigned int j = 0;j<objects.size(); ++j)
+    for (std::size_t j = 0;j<objects.size(); ++j)
     {
         if ( objects[j] != this )
         {
             vector<Polygon2d> otherHitBoxes = objects[j]->GetHitBoxes();
-            for (unsigned int k = 0;k<hitBoxes.size();++k)
+            for (std::size_t k = 0;k<hitBoxes.size();++k)
             {
-                for (unsigned int l = 0;l<otherHitBoxes.size();++l)
+                for (std::size_t l = 0;l<otherHitBoxes.size();++l)
                 {
                     CollisionResult result = PolygonCollisionTest(hitBoxes[k], otherHitBoxes[l]);
                     if ( result.collision )
@@ -364,9 +364,9 @@ bool RuntimeObject::IsCollidingWith(RuntimeObject * obj2)
     //Do a real check if necessary.
     vector<Polygon2d> objHitboxes = obj1->GetHitBoxes();
     vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes();
-    for (unsigned int k = 0;k<objHitboxes.size();++k)
+    for (std::size_t k = 0;k<objHitboxes.size();++k)
     {
-        for (unsigned int l = 0;l<obj2Hitboxes.size();++l)
+        for (std::size_t l = 0;l<obj2Hitboxes.size();++l)
         {
             if ( PolygonCollisionTest(objHitboxes[k], obj2Hitboxes[l]).collision )
                 return true;
@@ -388,7 +388,7 @@ void RuntimeObject::SeparateObjectsWithoutForces( std::map <gd::String, std::vec
         }
     }
 
-    for (unsigned int j = 0;j<objects2.size(); ++j)
+    for (std::size_t j = 0;j<objects2.size(); ++j)
     {
         if ( objects2[j] != this )
         {
@@ -434,7 +434,7 @@ void RuntimeObject::SeparateObjectsWithForces( std::map <gd::String, std::vector
         }
     }
 
-    for (unsigned int j = 0;j<objects2.size(); ++j)
+    for (std::size_t j = 0;j<objects2.size(); ++j)
     {
         if ( objects2[j] != this )
         {
@@ -536,7 +536,7 @@ bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)
 {
     RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
 
-    for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
+    for (std::size_t cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
     {
         sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
             scene.GetInputManager().GetMousePosition(), theLayer.GetCamera(cameraIndex).GetSFMLView());
@@ -578,7 +578,7 @@ bool RuntimeObject::UpdateForce( float elapsedTime )
     force5.SetLength( force5.GetLength() - force5.GetLength() * ( 1 - force5.GetClearing() ) * elapsedTime );
     if ( force5.GetClearing() == 0 ) force5.SetLength(0);
 
-    for ( unsigned int i = 0; i < forces.size();)
+    for ( std::size_t i = 0; i < forces.size();)
     {
         if ( forces[i].GetClearing() == 0 || forces[i].GetLength() <= 0.001 )
             forces.erase(forces.begin()+i);
@@ -596,7 +596,7 @@ bool RuntimeObject::UpdateForce( float elapsedTime )
 float RuntimeObject::TotalForceX() const
 {
     float ForceXsimple = 0;
-    for ( unsigned int i = 0; i < forces.size();i++ )
+    for ( std::size_t i = 0; i < forces.size();i++ )
         ForceXsimple += forces[i].GetX();
 
     return ForceXsimple + force5.GetX();
@@ -605,7 +605,7 @@ float RuntimeObject::TotalForceX() const
 float RuntimeObject::TotalForceY() const
 {
     float ForceYsimple = 0;
-    for ( unsigned int i = 0; i < forces.size();i++ )
+    for ( std::size_t i = 0; i < forces.size();i++ )
         ForceYsimple += forces[i].GetY();
 
     return ForceYsimple + force5.GetY();

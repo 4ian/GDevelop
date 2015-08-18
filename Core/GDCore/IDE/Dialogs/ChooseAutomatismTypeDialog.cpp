@@ -111,7 +111,7 @@ project(project_)
     if(theme) theme->SetWindowTheme((HWND) automatismsList->GetHWND(), L"EXPLORER", NULL);
     #endif
 
-    for (unsigned int i = 0;i<project.GetUsedPlatforms().size();++i)
+    for (std::size_t i = 0;i<project.GetUsedPlatforms().size();++i)
     {
         platformChoice->Append( project.GetUsedPlatforms()[i]->GetFullName() );
         if ( project.GetUsedPlatforms()[i] == &project.GetCurrentPlatform() ) platformChoice->SetSelection(i);
@@ -160,7 +160,7 @@ void ChooseAutomatismTypeDialog::RefreshList()
 
     //Insert extension objects
     const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (std::size_t i = 0;i<extensions.size();++i)
 	{
         if (extensions[i]->IsDeprecated()) continue;
 
@@ -170,7 +170,7 @@ void ChooseAutomatismTypeDialog::RefreshList()
                                       extensions[i]->GetName()) != project.GetUsedExtensions().end();
 
 	    std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
-	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
+	    for(std::size_t j = 0;j<automatismsTypes.size();++j)
 	    {
 	        if ( !automatismsTypes[j].empty() )
 	        {
@@ -221,7 +221,7 @@ void ChooseAutomatismTypeDialog::OnokBtClick(wxCommandEvent& event)
     const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
     std::shared_ptr<PlatformExtension> extension = std::shared_ptr<PlatformExtension>();
 
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (std::size_t i = 0;i<extensions.size();++i)
 	{
 	    std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
 	    if ( find(automatismsTypes.begin(), automatismsTypes.end(), selectedAutomatismType) != automatismsTypes.end() )
@@ -294,7 +294,7 @@ bool ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(wxWindow * paren
         //Find automatism metadata
         std::shared_ptr<gd::PlatformExtension> extension = std::shared_ptr<gd::PlatformExtension> ();
         std::vector < std::shared_ptr<gd::PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
-        for (unsigned int i = 0;i<extensions.size();++i)
+        for (std::size_t i = 0;i<extensions.size();++i)
         {
             std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
             if ( find(automatismsTypes.begin(), automatismsTypes.end(), dialog.GetSelectedAutomatismType()) != automatismsTypes.end() )
@@ -304,7 +304,7 @@ bool ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(wxWindow * paren
 
         //Add automatism to object
         gd::String autoName = metadata.GetDefaultName();
-        for (unsigned int j = 2;object->HasAutomatismNamed(autoName);++j)
+        for (std::size_t j = 2;object->HasAutomatismNamed(autoName);++j)
             autoName = metadata.GetDefaultName()+gd::String::From(j);
 
         object->AddNewAutomatism(project, dialog.GetSelectedAutomatismType(), autoName);
@@ -314,11 +314,11 @@ bool ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(wxWindow * paren
             layout->UpdateAutomatismsSharedData(project);
         else //Scene pointer is NULL: Update shared data of all layouts
         {
-            for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
+            for (std::size_t i = 0;i<project.GetLayoutsCount();++i)
                 project.GetLayout(i).UpdateAutomatismsSharedData(project);
         }
 
-        for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+        for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismAdded(project, isGlobalObject ? NULL : layout, *object, object->GetAutomatism(autoName));
 
         return true;

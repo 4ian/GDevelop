@@ -7,7 +7,7 @@
 #include "GDCore/IDE/ObjectOrGroupFinder.h"
 
 #include <algorithm>
-#include <assert.h> 
+#include <assert.h>
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -17,9 +17,9 @@
 namespace gd
 {
 
-ObjectOrGroupFinder::ObjectOrGroupFinder(const Project &project, const Layout *layout) : 
-    project(project), 
-    layout(layout), 
+ObjectOrGroupFinder::ObjectOrGroupFinder(const Project &project, const Layout *layout) :
+    project(project),
+    layout(layout),
     layoutsWithSameObjectName()
 {
 
@@ -49,7 +49,7 @@ unsigned int ObjectOrGroupFinder::HasObjectOrGroupNamed(const gd::String &name, 
     //Tests other scenes' objects
     if(allLayouts)
     {
-        for(unsigned int i = 0; i < project.GetLayoutsCount(); i++)
+        for(std::size_t i = 0; i < project.GetLayoutsCount(); i++)
         {
             const gd::Layout &aLayout = project.GetLayout(i);
 

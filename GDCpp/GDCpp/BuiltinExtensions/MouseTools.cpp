@@ -34,7 +34,7 @@ void GD_API ShowCursor( RuntimeScene & scene )
     scene.renderWindow->setMouseCursorVisible(true);
 }
 
-double GD_API GetCursorXPosition( RuntimeScene & scene, const gd::String & layer, unsigned int camera )
+double GD_API GetCursorXPosition( RuntimeScene & scene, const gd::String & layer, std::size_t camera )
 {
     if (scene.GetRuntimeLayer(layer).GetCameraCount() == 0) return 0;
     if (camera >= scene.GetRuntimeLayer(layer).GetCameraCount()) camera = 0;
@@ -44,7 +44,7 @@ double GD_API GetCursorXPosition( RuntimeScene & scene, const gd::String & layer
     return scene.renderWindow->mapPixelToCoords(scene.GetInputManager().GetMousePosition(), view).x;
 }
 
-double GD_API GetCursorYPosition( RuntimeScene & scene, const gd::String & layer, unsigned int camera )
+double GD_API GetCursorYPosition( RuntimeScene & scene, const gd::String & layer, std::size_t camera )
 {
     if (scene.GetRuntimeLayer(layer).GetCameraCount() == 0) return 0;
     if (camera >= scene.GetRuntimeLayer(layer).GetCameraCount()) camera = 0;

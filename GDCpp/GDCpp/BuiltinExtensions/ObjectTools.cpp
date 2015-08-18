@@ -16,7 +16,7 @@ using namespace std;
 
 double GD_API PickedObjectsCount( std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists )
 {
-    unsigned int size = 0;
+    std::size_t size = 0;
     std::map <gd::String, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists.begin();
     for (;it!=objectsLists.end();++it)
     {

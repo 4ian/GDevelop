@@ -51,7 +51,7 @@ static void InsertUnique(std::vector<gd::String> & container, gd::String str)
 static void GenerateFontsDeclaration(gd::AbstractFileSystem & fs, const gd::String & outputDir, gd::String & css, gd::String & html)
 {
     std::vector<gd::String> ttfFiles = fs.ReadDir(outputDir, ".TTF");
-    for(unsigned int i = 0; i<ttfFiles.size();++i) {
+    for(std::size_t i = 0; i<ttfFiles.size();++i) {
         gd::String relativeFile = ttfFiles[i];
         fs.MakeRelative(relativeFile, outputDir);
         css += "@font-face{ font-family : \"gdjs_font_";
@@ -331,7 +331,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "stringtools.js");
     InsertUnique(includesFiles, "windowtools.js");
 
-    for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
+    for (std::size_t i = 0;i<project.GetLayoutsCount();++i)
     {
         std::set<gd::String> eventsIncludes;
         gd::Layout & exportedLayout = project.GetLayout(i);
@@ -359,7 +359,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
 bool Exporter::ExportExternalSourceFiles(gd::Project & project, gd::String outputDir, std::vector<gd::String> & includesFiles)
 {
     const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = project.GetAllSourceFiles();
-    for (unsigned int i = 0;i<allFiles.size();++i)
+    for (std::size_t i = 0;i<allFiles.size();++i)
     {
         if (allFiles[i] == std::shared_ptr<gd::SourceFile>() ) continue;
         if (allFiles[i]->GetLanguage() != "Javascript" ) continue;
@@ -592,7 +592,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, gd::String exportDir,
             wxString zipTempName = fs.GetTempDir()+"/GDTemporaries/zipped_"+gd::String::From(&project)+".zip";
             wxFFileOutputStream out(zipTempName);
             wxZipOutputStream zip(out);
-            for(unsigned int i = 0; i < files.size(); ++i)
+            for(std::size_t i = 0; i < files.size(); ++i)
             {
                 wxFileName filename(files[i]);
                 filename.MakeRelativeTo(exportDir);

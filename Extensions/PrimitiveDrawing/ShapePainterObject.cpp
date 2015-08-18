@@ -117,7 +117,7 @@ bool RuntimeShapePainterObject::Draw( sf::RenderTarget& renderTarget )
         return true;
     }
 
-    for (unsigned int i = 0;i<shapesToDraw.size();++i)
+    for (std::size_t i = 0;i<shapesToDraw.size();++i)
     {
     	renderTarget.draw(shapesToDraw[i].rectangleShape);
     	renderTarget.draw(shapesToDraw[i].circleShape);
@@ -161,7 +161,7 @@ void ShapePainterObject::EditObject( wxWindow* parent, gd::Project & game, gd::M
 #endif
 }
 
-void RuntimeShapePainterObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeShapePainterObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Fill color");    value = gd::String::From(GetFillColorR())+";"+gd::String::From(GetFillColorG())+";"+gd::String::From(GetFillColorB());}
     else if ( propertyNb == 1 ) {name = _("Fill opacity");    value = gd::String::From(GetFillOpacity());}
@@ -170,7 +170,7 @@ void RuntimeShapePainterObject::GetPropertyForDebugger(unsigned int propertyNb, 
     else if ( propertyNb == 4 ) {name = _("Outline opacity");        value = gd::String::From(GetOutlineOpacity());}
 }
 
-bool RuntimeShapePainterObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeShapePainterObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if ( propertyNb == 0 )
     {
@@ -193,7 +193,7 @@ bool RuntimeShapePainterObject::ChangeProperty(unsigned int propertyNb, gd::Stri
     return true;
 }
 
-unsigned int RuntimeShapePainterObject::GetNumberOfProperties() const
+std::size_t RuntimeShapePainterObject::GetNumberOfProperties() const
 {
     return 5;
 }

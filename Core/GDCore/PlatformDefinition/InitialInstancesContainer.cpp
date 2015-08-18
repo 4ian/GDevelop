@@ -22,7 +22,7 @@ InitialInstancesContainer::~InitialInstancesContainer()
 {
 }
 
-unsigned int InitialInstancesContainer::GetInstancesCount() const
+std::size_t InitialInstancesContainer::GetInstancesCount() const
 {
     return initialInstances.size();
 }
@@ -30,7 +30,7 @@ unsigned int InitialInstancesContainer::GetInstancesCount() const
 void InitialInstancesContainer::UnserializeFrom(const SerializerElement & element)
 {
     element.ConsiderAsArrayOf("instance", "Objet");
-    for (unsigned int i = 0; i < element.GetChildrenCount(); ++i)
+    for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
     {
         const SerializerElement & instanceElement = element.GetChild(i);
         gd::InitialInstance newPosition;
@@ -50,7 +50,7 @@ void InitialInstancesContainer::UnserializeFrom(const SerializerElement & elemen
 
         const SerializerElement & floatPropElement = instanceElement.GetChild("numberProperties" , 0 ,"floatInfos");
         floatPropElement.ConsiderAsArrayOf("property", "Info");
-        for (unsigned int j = 0; j < floatPropElement.GetChildrenCount(); ++j)
+        for (std::size_t j = 0; j < floatPropElement.GetChildrenCount(); ++j)
         {
             gd::String name = floatPropElement.GetChild(j).GetStringAttribute("name");
             float value = floatPropElement.GetChild(j).GetDoubleAttribute("value");
@@ -59,7 +59,7 @@ void InitialInstancesContainer::UnserializeFrom(const SerializerElement & elemen
 
         const SerializerElement & stringPropElement = instanceElement.GetChild("stringProperties" , 0 ,"stringInfos");
         stringPropElement.ConsiderAsArrayOf("property", "Info");
-        for (unsigned int j = 0; j < stringPropElement.GetChildrenCount(); ++j)
+        for (std::size_t j = 0; j < stringPropElement.GetChildrenCount(); ++j)
         {
             gd::String name = stringPropElement.GetChild(j).GetStringAttribute("name");
             gd::String value = stringPropElement.GetChild(j).GetStringAttribute("value");
@@ -102,7 +102,7 @@ void InitialInstancesContainer::IterateOverInstancesWithZOrdering(gd::InitialIns
     }
 
     std::sort(sortedInstances.begin(), sortedInstances.end(), gd::InstancesZOrderSort());
-    for (unsigned int i = 0;i<sortedInstances.size();++i)
+    for (std::size_t i = 0;i<sortedInstances.size();++i)
         func(sortedInstances[i]);
 }
 

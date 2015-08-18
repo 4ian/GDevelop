@@ -14,7 +14,7 @@ void Polygon2d::Rotate(float angle)
           cosa = cos(-angle),
           sina = sin(-angle); //We want a clockwise rotation
 
-    for (unsigned int i = 0;i<vertices.size();++i)
+    for (std::size_t i = 0;i<vertices.size();++i)
     {
         t = vertices[i].x;
         vertices[i].x = t*cosa + vertices[i].y*sina;
@@ -24,7 +24,7 @@ void Polygon2d::Rotate(float angle)
 
 void Polygon2d::Move(float x, float y)
 {
-    for (unsigned int i = 0; i < vertices.size(); i++)
+    for (std::size_t i = 0; i < vertices.size(); i++)
     {
         vertices[i].x += x;
         vertices[i].y += y;
@@ -37,7 +37,7 @@ void Polygon2d::ComputeEdges() const
     sf::Vector2f v1, v2;
     edges.clear();
 
-    for (unsigned int i = 0; i < vertices.size(); i++)
+    for (std::size_t i = 0; i < vertices.size(); i++)
     {
         v1 = vertices[i];
         if ((i + 1) >= vertices.size()) v2 = vertices[0];
@@ -54,7 +54,7 @@ bool Polygon2d::IsConvex() const
 
     bool zProductIsPositive = (edges[0].x*edges[0+1].y - edges[0].y*edges[0+1].x) > 0;
 
-    for (unsigned int i = 1;i<edges.size()-1;++i)
+    for (std::size_t i = 1;i<edges.size()-1;++i)
     {
         float zCrossProduct = edges[i].x*edges[i+1].y - edges[i].y*edges[i+1].x;
         if ( (zCrossProduct > 0) != zProductIsPositive ) return false;
@@ -70,7 +70,7 @@ sf::Vector2f Polygon2d::ComputeCenter() const
 {
     sf::Vector2f center;
 
-    for (unsigned int i = 0; i < vertices.size(); i++)
+    for (std::size_t i = 0; i < vertices.size(); i++)
     {
         center.x += vertices[i].x;
         center.y += vertices[i].y;
@@ -91,4 +91,3 @@ Polygon2d Polygon2d::CreateRectangle(float width, float height)
 
     return rect;
 }
-

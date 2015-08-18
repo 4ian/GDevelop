@@ -55,7 +55,7 @@ void LayoutEditorCanvas::OnUpdate()
             if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
                 wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
 
-            for (unsigned int i = 0;i<project.imagesChanged.size();++i)
+            for (std::size_t i = 0;i<project.imagesChanged.size();++i)
                 project.GetImageManager()->ReloadImage(project.imagesChanged[i]);
 
             project.GetImageManager()->LoadPermanentImages();
@@ -255,7 +255,7 @@ void LayoutEditorCanvas::RenderEdittime()
     InstancesRenderer renderer(*this, GetInitialInstanceUnderCursor(), guiElementsShapes);
 
     //Render objects of each layer
-    for (unsigned int layerIndex =0;layerIndex<layout.GetLayersCount();++layerIndex)
+    for (std::size_t layerIndex =0;layerIndex<layout.GetLayersCount();++layerIndex)
     {
         if ( layout.GetLayer(layerIndex).GetVisibility() )
         {
@@ -310,7 +310,7 @@ void LayoutEditorCanvas::RenderEdittime()
         DrawSelectionRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin));
     }
 
-    for (unsigned int i = 0;i<guiElementsShapes.size();++i)
+    for (std::size_t i = 0;i<guiElementsShapes.size();++i)
     	draw(*guiElementsShapes[i]);
 
     if ( options.windowMask ) RenderWindowMask();
@@ -524,7 +524,7 @@ void LayoutEditorCanvas::OnPasteSelected(wxCommandEvent & event)
 
     vector < std::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::Get()->Gets();
 
-    for (unsigned int i =0;i<pastedInstances.size();++i)
+    for (std::size_t i =0;i<pastedInstances.size();++i)
     {
         gd::InitialInstance & instance = instances.InsertInitialInstance(*pastedInstances[i]->Clone());
         instance.SetX(instance.GetX()+oldMouseX);
@@ -557,9 +557,9 @@ void LayoutEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
     if ( dialog.ShowModal() != 1 ) return;
 
     float angle = dialog.GetRotationIncrementation();
-    for (unsigned int i = 0;i<dialog.GetYCount();++i)
+    for (std::size_t i = 0;i<dialog.GetYCount();++i)
     {
-        for (unsigned int j = 0;j<dialog.GetXCount();++j)
+        for (std::size_t j = 0;j<dialog.GetXCount();++j)
         {
             gd::InitialInstance & insertedInstance = instances.InsertInitialInstance(*instance);
             insertedInstance.SetX(dialog.GetStartX()+dialog.GetXGap()*j);

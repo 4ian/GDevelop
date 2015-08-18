@@ -187,8 +187,8 @@ public:
         openNodes.insert(&startNode);
 
         //A* algorithm main loop
-        unsigned int iterationCount = 0;
-        unsigned int maxIterationCount = startNode.estimateCost*maxComplexityFactor;
+        std::size_t iterationCount = 0;
+        std::size_t maxIterationCount = startNode.estimateCost*maxComplexityFactor;
         while (!openNodes.empty())
         {
             if (iterationCount++ > maxIterationCount) return false; //Make sure we do not search forever.
@@ -371,7 +371,7 @@ private:
     int startY; ///< The start Y position, in "world" coordinates (not in "node" coordinates!).
     DistanceFunPtr distanceFunction;
     bool allowsDiagonal; ///< True to allow diagonals when planning the path.
-    unsigned int maxComplexityFactor;
+    std::size_t maxComplexityFactor;
     float cellWidth;
     float cellHeight;
     float leftBorder;
@@ -459,7 +459,7 @@ void PathfindingAutomatism::MoveTo(RuntimeScene & scene, float x, float y)
     pathFound = false;
 }
 
-void PathfindingAutomatism::EnterSegment(unsigned int segmentNumber)
+void PathfindingAutomatism::EnterSegment(std::size_t segmentNumber)
 {
     if ( path.empty() ) return;
 
@@ -528,17 +528,17 @@ void PathfindingAutomatism::DoStepPostEvents(RuntimeScene & scene)
     }
 }
 
-float PathfindingAutomatism::GetNodeX(unsigned int index) const
+float PathfindingAutomatism::GetNodeX(std::size_t index) const
 {
     if (index<path.size()) return path[index].x;
     return 0;
 }
-float PathfindingAutomatism::GetNodeY(unsigned int index) const
+float PathfindingAutomatism::GetNodeY(std::size_t index) const
 {
     if (index<path.size()) return path[index].y;
     return 0;
 }
-unsigned int PathfindingAutomatism::GetNextNodeIndex() const
+std::size_t PathfindingAutomatism::GetNextNodeIndex() const
 {
     if (currentSegment+1 < path.size())
         return currentSegment+1;

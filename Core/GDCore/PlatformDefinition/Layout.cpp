@@ -290,12 +290,30 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
         initialLayers.push_back(layer);
     }
 
-    SerializerElement & behaviorsDataElement = element.GetChild("behaviorsSharedData", 0, "BehaviorsSharedDatas");
-    behaviorsDataElement.ConsiderAsArrayOf("behaviorSharedData", "BehaviorSharedDatas");
+    //Compatibility with GD <= 4
+    gd::String deprecatedTag1 = "automatismsSharedData";
+    gd::String deprecatedTag2 = "automatismSharedData";
+    if (!element.HasChild(deprecatedTag1)) 
+    {
+        deprecatedTag1 = "AutomatismsSharedDatas";
+        deprecatedTag2 = "AutomatismSharedDatas";
+    }
+
+    auto renameOldType = [](gd::String name) {
+        gd::String oldWord = "Automatism";
+        while (name.find(oldWord) != gd::String::npos)
+            name = name.replace(name.find(oldWord), oldWord.size(), "Behavior");
+
+        return name;
+    };
+    //end of compatibility code
+
+    SerializerElement & behaviorsDataElement = element.GetChild("behaviorsSharedData", 0, deprecatedTag1);
+    behaviorsDataElement.ConsiderAsArrayOf("behaviorSharedData", deprecatedTag2);
     for (unsigned int i = 0; i < behaviorsDataElement.GetChildrenCount(); ++i)
     {
         SerializerElement & behaviorDataElement = behaviorsDataElement.GetChild(i);
-        gd::String type = behaviorDataElement.GetStringAttribute("type", "", "Type");
+        gd::String type = renameOldType(behaviorDataElement.GetStringAttribute("type", "", "Type"));
 
         std::shared_ptr<gd::BehaviorsSharedData> sharedData = project.CreateBehaviorSharedDatas(type);
         if ( sharedData != std::shared_ptr<gd::BehaviorsSharedData>() )

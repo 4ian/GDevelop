@@ -641,8 +641,6 @@ void Project::UnserializeFrom(const SerializerElement & element)
             size_t pos = extensionsUsed[i].find(oldWord);
             if (pos != gd::String::npos)
                 extensionsUsed[i] = extensionsUsed[i].replace(pos, oldWord.size(), "Behavior");
-
-            std::cout << extensionsUsed[i] << std::endl;
         }
     }
     #endif

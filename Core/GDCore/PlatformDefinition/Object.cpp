@@ -153,14 +153,24 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
     //Name and type are already loaded.
     objectVariables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
-    //Compatibility with GD <= 3.3
-    if (element.HasChild("Behavior"))
-    {
-        for (unsigned int i = 0; i < element.GetChildrenCount("Behavior"); ++i)
-        {
-            SerializerElement & behaviorElement = element.GetChild("Behavior", i);
+    //Compatibility with GD <= 4
+    auto renameOldType = [](gd::String name) {
+        gd::String oldWord = "Automatism";
+        while (name.find(oldWord) != gd::String::npos)
+            name = name.replace(name.find(oldWord), oldWord.size(), "Behavior");
 
-            gd::String autoType = behaviorElement.GetStringAttribute("type", "", "Type");
+        return name;
+    };
+    //End of compatibility code
+
+    //Compatibility with GD <= 3.3
+    if (element.HasChild("Automatism"))
+    {
+        for (unsigned int i = 0; i < element.GetChildrenCount("Automatism"); ++i)
+        {
+            SerializerElement & behaviorElement = element.GetChild("Automatism", i);
+
+            gd::String autoType = renameOldType(behaviorElement.GetStringAttribute("type", "", "Type"));
             gd::String autoName = behaviorElement.GetStringAttribute("name", "", "Name");
 
             Behavior* behavior = project.CreateBehavior(autoType);
@@ -177,13 +187,13 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
     //End of compatibility code
     else
     {
-        SerializerElement & behaviorsElement = element.GetChild("behaviors");
-        behaviorsElement.ConsiderAsArrayOf("behavior");
+        SerializerElement & behaviorsElement = element.GetChild("behaviors", 0, "automatisms");
+        behaviorsElement.ConsiderAsArrayOf("behavior", "automatism");
         for (unsigned int i = 0; i < behaviorsElement.GetChildrenCount(); ++i)
         {
             SerializerElement & behaviorElement = behaviorsElement.GetChild(i);
 
-            gd::String autoType = behaviorElement.GetStringAttribute("type");
+            gd::String autoType = renameOldType(behaviorElement.GetStringAttribute("type"));
             gd::String autoName = behaviorElement.GetStringAttribute("name");
 
             Behavior* behavior = project.CreateBehavior(autoType);

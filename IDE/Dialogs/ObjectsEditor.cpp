@@ -248,7 +248,7 @@ ObjectsEditor::ObjectsEditor(wxWindow* parent, gd::Project & project_, gd::Layou
     SetSizer(FlexGridSizer1);
     editMenuI = new wxMenuItem((&contextMenu), idMenuModObj, _("Edit"), wxEmptyString, wxITEM_NORMAL);
     contextMenu.Append(editMenuI);
-    MenuItem13 = new wxMenuItem((&contextMenu), idMenuAddAuto, _("Add an behavior"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem13 = new wxMenuItem((&contextMenu), idMenuAddAuto, _("Add a behavior"), wxEmptyString, wxITEM_NORMAL);
     contextMenu.Append(MenuItem13);
     editPropMenuItem = new wxMenuItem((&contextMenu), idMenuProp, _("Other properties"), wxEmptyString, wxITEM_NORMAL);
     editPropMenuItem->SetBitmap(gd::SkinHelper::GetIcon("properties", 16));

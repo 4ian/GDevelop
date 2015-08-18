@@ -98,7 +98,7 @@ gdjs.PlatformObjectsManager.prototype.getAllPlatformsAround = function(object, m
 };
 
 /**
- * PlatformRuntimeBehavior represents an behavior allowing objects to be
+ * PlatformRuntimeBehavior represents a behavior allowing objects to be
  * considered as a platform by objects having PlatformerObject Behavior.
  *
  * @class PlatformRuntimeBehavior

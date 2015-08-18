@@ -121,12 +121,12 @@ public:
     std::shared_ptr<gd::Object> CreateObject(gd::String type, const gd::String & name) const;
 
     /**
-     * \brief Create an behavior
+     * \brief Create a behavior
      */
     gd::Behavior* CreateBehavior(const gd::String & type) const;
 
     /**
-     * \brief Create an behavior shared data object.
+     * \brief Create a behavior shared data object.
      */
     std::shared_ptr<gd::BehaviorsSharedData> CreateBehaviorSharedDatas(const gd::String & type) const;
 

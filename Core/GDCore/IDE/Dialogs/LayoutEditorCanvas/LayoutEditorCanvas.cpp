@@ -229,7 +229,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
         deleteItem->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 
         contextMenu.Append(ID_PROPMENU, _("Properties"));
-        contextMenu.Append(ID_AUTOMENU, _("Add an behavior to the object"));
+        contextMenu.Append(ID_AUTOMENU, _("Add a behavior to the object"));
         contextMenu.AppendSeparator();
         contextMenu.Append(ID_CREATEOBJECTMENU, _("Insert a new object"));
         contextMenu.AppendSeparator();

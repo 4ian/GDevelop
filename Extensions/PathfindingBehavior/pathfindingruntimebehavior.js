@@ -4,7 +4,7 @@ Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * PathfindingRuntimeBehavior represents an behavior allowing objects to
+ * PathfindingRuntimeBehavior represents a behavior allowing objects to
  * follow a path computed to avoid obstacles.
  *
  * @class PathfindingRuntimeBehavior

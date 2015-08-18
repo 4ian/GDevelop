@@ -26,7 +26,7 @@ class GD_CORE_API MetadataProvider
 public:
 
     /**
-     * Get the metadata about an behavior in a project using a platform
+     * Get the metadata about a behavior in a project using a platform
      */
     static const BehaviorMetadata & GetBehaviorMetadata(const gd::Platform & platform, gd::String behaviorType);
 

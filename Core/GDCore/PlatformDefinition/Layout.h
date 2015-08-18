@@ -239,7 +239,7 @@ public:
      * every behavior of every object that can be used on the scene
      * ( i.e. the objects of the scene and the global objects )
      *
-     * Must be called when an behavior have been added/deleted
+     * Must be called when a behavior have been added/deleted
      * or when a scene have been added to a project.
      */
     void UpdateBehaviorsSharedData(gd::Project & project);
@@ -477,7 +477,7 @@ std::vector<gd::String> GetHiddenLayers(const Layout & layout);
 gd::String GD_CORE_API GetTypeOfObject(const Project & game, const Layout & layout, gd::String objectName, bool searchInGroups = true);
 
 /**
- * \brief Get a type from an behavior name
+ * \brief Get a type from a behavior name
  * @return Type of the behavior.
  */
 gd::String GD_CORE_API GetTypeOfBehavior(const Project & game, const Layout & layout, gd::String behaviorName, bool searchInGroups = true);

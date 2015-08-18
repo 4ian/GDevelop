@@ -203,7 +203,7 @@ void Layout::UpdateBehaviorsSharedData(gd::Project & project)
         allSharedData.push_back(it->first);
     }
 
-    //Then delete shared data not linked to an behavior
+    //Then delete shared data not linked to a behavior
     for (unsigned int i = 0;i<allSharedData.size();++i)
     {
         if ( std::find(allBehaviorsNames.begin(), allBehaviorsNames.end(), allSharedData[i]) == allBehaviorsNames.end() )

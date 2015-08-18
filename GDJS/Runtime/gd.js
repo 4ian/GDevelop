@@ -205,7 +205,7 @@ gdjs.getObjectConstructor = function(name) {
 };
 
 /**
- * Get the constructor of an behavior.
+ * Get the constructor of a behavior.
  *
  * @method getBehaviorConstructor
  * @static

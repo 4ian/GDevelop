@@ -1038,7 +1038,7 @@ msgid "Edit"
 msgstr ""
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:251
-msgid "Add an behavior"
+msgid "Add a behavior"
 msgstr ""
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:253
@@ -15030,7 +15030,7 @@ msgid "Behaviors"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:504
-msgid "De/activate an behavior"
+msgid "De/activate a behavior"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:505
@@ -18513,11 +18513,11 @@ msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp:58
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.cpp:66
-msgid "Choose an behavior"
+msgid "Choose a behavior"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp:69
-msgid "Choose an behavior of the object."
+msgid "Choose a behavior of the object."
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp:122
@@ -19395,7 +19395,7 @@ msgid "Delete the selection\tDEL"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:232
-msgid "Add an behavior to the object"
+msgid "Add a behavior to the object"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234
@@ -19582,7 +19582,7 @@ msgid "Enter a new name for the behavior"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:198
-msgid "Rename an behavior"
+msgid "Rename a behavior"
 msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ParameterControlsHelper.cpp:46

@@ -28,7 +28,7 @@ namespace gd
 {
 
 /**
- * \brief Dialog used to choose an behavior of an object.
+ * \brief Dialog used to choose a behavior of an object.
  *
  * \ingroup IDEDialogs
  */
@@ -42,7 +42,7 @@ public:
      * \param parent The wxWidgets parent window
      * \param project Project
      * \param layout Layout
-     * \param parentObject The object from which an behavior must be chosen
+     * \param parentObject The object from which a behavior must be chosen
      * \param behaviorTypeAllowed If not empty, only behaviors of this type will be shown
      */
     ChooseBehaviorDialog(wxWindow* parent, Project & project, gd::Layout & layout, gd::String parentObject_, gd::String behaviorTypeAllowed_);
@@ -51,7 +51,7 @@ public:
     /**
      * \brief Automatically choose the behavior if there is only
      * a single behavior to be chosen.
-     * \return true if an behavior (or none) was chosen. false if there are two behaviors or more.
+     * \return true if a behavior (or none) was chosen. false if there are two behaviors or more.
      */
     bool DeduceBehavior();
 

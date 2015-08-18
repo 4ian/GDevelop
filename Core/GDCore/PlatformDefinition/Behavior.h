@@ -22,7 +22,7 @@ namespace gd
 {
 
 /**
- * \brief Base class used to represents an behavior that can be applied to an object
+ * \brief Base class used to represents a behavior that can be applied to an object
  *
  * \ingroup PlatformDefinition
  */

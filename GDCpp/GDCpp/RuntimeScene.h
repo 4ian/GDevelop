@@ -91,7 +91,7 @@ public:
     RuntimeLayer & GetRuntimeLayer(const gd::String & name);
 
     /**
-     * \brief Return the shared data for an behavior.
+     * \brief Return the shared data for a behavior.
      * \warning Be careful, no check is made to ensure that the shared data exist.
      * \param name The name of the behavior for which shared data must be fetched.
      */

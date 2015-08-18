@@ -68,7 +68,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
         this._behaviors = []; //Contains the behaviors of the object
 
     if (this._behaviorsTable === undefined)
-        this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when an behavior is accessed by its name ( see getBehavior ).
+        this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
     else
         this._behaviorsTable.clear();
 
@@ -760,7 +760,7 @@ gdjs.RuntimeObject.prototype.stepBehaviorsPostEvents = function(runtimeScene) {
 };
 
 /**
- * Get an behavior from its name.<br>
+ * Get a behavior from its name.<br>
  * Be careful, the behavior must exists, no check is made on the name.
  * @method getBehavior
  * @param name {String} The behavior name.
@@ -770,7 +770,7 @@ gdjs.RuntimeObject.prototype.getBehavior = function(name) {
 };
 
 /**
- * Check if an behavior is used by the object.
+ * Check if a behavior is used by the object.
  *
  * @method hasBehavior
  * @param name {String} The behavior name.
@@ -780,7 +780,7 @@ gdjs.RuntimeObject.prototype.hasBehavior = function(name) {
 };
 
 /**
- * De/activate an behavior of the object.
+ * De/activate a behavior of the object.
  *
  * @method activateBehavior
  * @param name {String} The behavior name.
@@ -793,7 +793,7 @@ gdjs.RuntimeObject.prototype.activateBehavior = function(name, enable) {
 };
 
 /**
- * Check if an behavior is activated
+ * Check if a behavior is activated
  *
  * @method behaviorActivated
  * @param name {String} The behavior name.

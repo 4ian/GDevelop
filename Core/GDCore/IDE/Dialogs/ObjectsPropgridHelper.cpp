@@ -52,7 +52,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
     }
 
     grid->Append( new wxPropertyCategory(_("Behaviors") + " (" + gd::String::From(object->GetAllBehaviors().size()) + ")" , "AUTO") );
-    grid->Append( new wxStringProperty(_("Add behavior"), "AUTO_ADD", _("Add...")) );
+    grid->Append( new wxStringProperty(_("Add a behavior"), "AUTO_ADD", _("Add...")) );
     grid->SetPropertyCell("AUTO_ADD", 1, _("Add..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
     grid->SetPropertyReadOnly("AUTO_ADD");
 
@@ -195,7 +195,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
 
             gd::Behavior & behavior = object->GetBehavior(oldName);
 
-            gd::String newName = wxGetTextFromUser(_("Enter a new name for the behavior"), _("Rename an behavior"), behavior.GetName());
+            gd::String newName = wxGetTextFromUser(_("Enter a new name for the behavior"), _("Rename a behavior"), behavior.GetName());
             if ( newName == behavior.GetName() || object->HasBehaviorNamed(newName) || newName.empty() ) return false;
 
             object->RenameBehavior(oldName, newName);

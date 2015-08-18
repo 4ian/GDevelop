@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="ChooseBehaviorTypeDialog">
-		<title>Choose an behavior</title>
+		<title>Choose a behavior</title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
 		<handler function="OnResize" entry="EVT_SIZE" />
@@ -11,7 +11,7 @@
 			<growablerows>1</growablerows>
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-					<label>Behaviors can be used to add a specific behaviour&#x0A;to an object. Choose the behavior to add:</label>
+					<label>Choose the behavior to add to the object:</label>
 				</object>
 				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
@@ -30,7 +30,7 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-					<label>You can also use the grayed behaviors:&#x0A;Their associated extension will be automatically enabled.</label>
+					<label>You can also use the grayed behaviors:&#x0A;their associated extension will be automatically enabled.</label>
 				</object>
 				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>

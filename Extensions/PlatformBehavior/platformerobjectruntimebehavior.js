@@ -4,7 +4,7 @@ Copyright (c) 2013-2015 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * PlatformerObjectRuntimeBehavior represents an behavior allowing objects to be
+ * PlatformerObjectRuntimeBehavior represents a behavior allowing objects to be
  * considered as a platform by objects having PlatformerObject Behavior.
  *
  * @class PlatformerObjectRuntimeBehavior

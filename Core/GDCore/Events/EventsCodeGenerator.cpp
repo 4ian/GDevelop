@@ -410,7 +410,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
         }
     }
 
-    //Affection to an behavior member function if found
+    //Assign to a behavior member function if found
     gd::String behaviorType = gd::GetTypeOfBehavior(project, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
     if (MetadataProvider::HasBehaviorAction(platform, behaviorType, action.GetType()) && instrInfos.parameters.size() >= 2)
     {

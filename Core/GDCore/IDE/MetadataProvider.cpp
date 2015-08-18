@@ -25,7 +25,7 @@ gd::ExpressionMetadata MetadataProvider::badStrExpressionMetadata;
 
 
 /**
- * Get the metadata about an behavior in a platform
+ * Get the metadata about a behavior in a platform
  */
 const BehaviorMetadata & MetadataProvider::GetBehaviorMetadata(const gd::Platform & platform, gd::String behaviorType)
 {

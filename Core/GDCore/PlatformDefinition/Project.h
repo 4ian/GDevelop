@@ -211,7 +211,7 @@ public:
     std::shared_ptr<gd::Object> CreateObject(const gd::String & type, const gd::String & name, const gd::String & platformName = "");
 
     /**
-     * Create an behavior of the given type.
+     * Create a behavior of the given type.
      *
      * \note A project can use more than one platform. In this case, the first platform supporting the behavior is used,
      * unless \a platformName argument is not empty.<br>

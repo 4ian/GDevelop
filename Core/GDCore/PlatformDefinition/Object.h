@@ -198,7 +198,7 @@ public:
     const Behavior & GetBehavior(const gd::String & name) const;
 
     /**
-     * \brief Return true if object has an behavior called \a name.
+     * \brief Return true if object has a behavior called \a name.
      */
     bool HasBehaviorNamed(const gd::String & name) const;
 

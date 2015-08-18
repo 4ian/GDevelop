@@ -108,7 +108,7 @@ gdjs.PathfindingObstaclesManager.prototype.getAllObstaclesAround = function(x, y
 };
 
 /**
- * PathfindingObstacleRuntimeBehavior represents an behavior allowing objects to be
+ * PathfindingObstacleRuntimeBehavior represents a behavior allowing objects to be
  * considered as a obstacle by objects having Pathfinding Behavior.
  *
  * @class PathfindingObstacleRuntimeBehavior

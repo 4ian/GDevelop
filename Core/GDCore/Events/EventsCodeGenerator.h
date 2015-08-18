@@ -351,7 +351,7 @@ protected:
                                                           gd::EventsCodeGenerationContext & context);
 
     /**
-     * \brief Call a function of an behavior of the current object.
+     * \brief Call a function of a behavior of the current object.
      * \note The current object is the object being manipulated by a condition or an action.
      *
      * \param objectListName The full name of the object list being used

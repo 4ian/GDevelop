@@ -4,7 +4,7 @@ Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * TopDownMovementRuntimeBehavior represents an behavior allowing objects to
+ * TopDownMovementRuntimeBehavior represents a behavior allowing objects to
  * follow a path computed to avoid obstacles.
  *
  * @class TopDownMovementRuntimeBehavior

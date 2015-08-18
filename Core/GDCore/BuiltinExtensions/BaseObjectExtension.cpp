@@ -501,7 +501,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .MarkAsAdvanced();
 
     obj.AddAction("ActivateBehavior",
-                   _("De/activate an behavior"),
+                   _("De/activate a behavior"),
                    _("De/activate the behavior for the object."),
                    _("Activate behavior _PARAM1_ of _PARAM0_: _PARAM2_"),
                    _("Behaviors"),

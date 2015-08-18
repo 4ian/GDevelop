@@ -22,7 +22,7 @@ namespace gd
 {
 
 /**
- * \brief Contains user-friendly information about an behavior type
+ * \brief Contains user-friendly information about a behavior type
  *
  * Implementations may derive from this class so as to provide more complete metadata if needed.
  * ( For example, GDevelop C++ Platform is shared pointers to objects that will be cloned so as to create the behaviors... )

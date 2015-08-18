@@ -5,7 +5,7 @@
  */
 
 /**
- * RuntimeBehavior represents an behavior being used by a RuntimeObject.
+ * RuntimeBehavior represents a behavior being used by a RuntimeObject.
  *
  * @class RuntimeBehavior
  * @constructor

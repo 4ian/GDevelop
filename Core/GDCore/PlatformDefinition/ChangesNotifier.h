@@ -196,7 +196,7 @@ public:
     virtual void OnObjectVariablesChanged(gd::Project & project, gd::Layout * layout, gd::Object & object) const {};
 
     /**
-     * \brief Called when an behavior have been edited
+     * \brief Called when a behavior have been edited
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
@@ -205,7 +205,7 @@ public:
     virtual void OnBehaviorEdited(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior) const {};
 
     /**
-     * \brief Called when an behavior have been added
+     * \brief Called when a behavior have been added
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
@@ -214,7 +214,7 @@ public:
     virtual void OnBehaviorAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior) const {};
 
     /**
-     * \brief Called when an behavior have been renamed
+     * \brief Called when a behavior have been renamed
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
@@ -224,7 +224,7 @@ public:
     virtual void OnBehaviorRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior, const gd::String & oldName) const {};
 
     /**
-     * \brief Called when an behavior have been deleted
+     * \brief Called when a behavior have been deleted
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object

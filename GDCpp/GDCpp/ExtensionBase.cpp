@@ -8,8 +8,8 @@
 #include <string>
 #include <iostream>
 #include "GDCpp/ExtensionBase.h"
-#include "GDCpp/Automatism.h"
-#include "GDCpp/AutomatismsSharedData.h"
+#include "GDCpp/Behavior.h"
+#include "GDCpp/BehaviorsSharedData.h"
 #include "GDCpp/CommonTools.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Event.h"
@@ -42,5 +42,5 @@ void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, gd::String cla
 //when compiling for runtime:
 #include "GDCore/PlatformDefinition/PlatformExtension.cpp"
 #include "GDCore/Events/ObjectMetadata.cpp"
-#include "GDCore/Events/AutomatismMetadata.cpp"
+#include "GDCore/Events/BehaviorMetadata.cpp"
 #endif

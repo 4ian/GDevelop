@@ -628,8 +628,6 @@
 		<Unit filename="ParticleEmitterObject.h" />
 		<Unit filename="ParticleEmitterObjectEditor.cpp" />
 		<Unit filename="ParticleEmitterObjectEditor.h" />
-		<Unit filename="ParticleObstacleAutomatism.cpp" />
-		<Unit filename="ParticleObstacleAutomatism.h" />
 		<Unit filename="ParticleSystemWrapper.cpp" />
 		<Unit filename="ParticleSystemWrapper.h" />
 		<Extensions>

@@ -1,16 +1,16 @@
 *.depend
 /AES/obj
 /AES/AES.depend
-/AStarAutomatism/obj
-/AStarAutomatism/AStarAutomatism.depend
+/AStarBehavior/obj
+/AStarBehavior/AStarBehavior.depend
 /Box3DObject/obj
 /Box3DObject/Box3DObject.depend
 /Common Dialogs/obj
 /Common Dialogs/CommonDialogs.depend
-/DestroyOutsideAutomatism/obj
-/DestroyOutsideAutomatism/DestroyOutsideAutomatism.depend
-/DraggableAutomatism/obj
-/DraggableAutomatism/DraggableAutomatism.depend
+/DestroyOutsideBehavior/obj
+/DestroyOutsideBehavior/DestroyOutsideBehavior.depend
+/DraggableBehavior/obj
+/DraggableBehavior/DraggableBehavior.depend
 /Function/obj
 /Function/Function.depend
 /Light/obj
@@ -23,10 +23,10 @@
 /PanelSpriteObject/PanelSpriteObject.depend
 /ParticleSystem/obj
 /ParticleSystem/ParticleSystem.depend
-/PathAutomatism/obj
-/PathAutomatism/PathAutomatism.depend
-/PhysicsAutomatism/obj
-/PhysicsAutomatism/PhysicsAutomatism.depend
+/PathBehavior/obj
+/PathBehavior/PathBehavior.depend
+/PhysicsBehavior/obj
+/PhysicsBehavior/PhysicsBehavior.depend
 /PrimitiveDrawing/obj
 /PrimitiveDrawing/PrimitiveDrawing.depend
 /TextEntryObject/obj

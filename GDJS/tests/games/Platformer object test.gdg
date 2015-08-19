@@ -30,7 +30,7 @@
             <extension name="BuiltinStringInstructions" />
             <extension name="BuiltinMathematicalTools" />
             <extension name="BuiltinExternalLayouts" />
-            <extension name="PlatformAutomatism" />
+            <extension name="PlatformBehavior" />
         </extensions>
         <platforms>
             <platform name="GDevelop C++ platform" />
@@ -110,9 +110,9 @@
             <objects>
                 <object name="NewObject" type="Sprite">
                     <variables />
-                    <automatisms>
-                        <automatism acceleration="1500.000000" deceleration="1500.000000" gravity="1000.000000" ignoreDefaultControls="false" jumpSpeed="600.000000" maxFallingSpeed="700.000000" maxSpeed="250.000000" name="PlatformerObject" slopeMaxAngle="60.000000" type="PlatformAutomatism::PlatformerObjectAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior acceleration="1500.000000" deceleration="1500.000000" gravity="1000.000000" ignoreDefaultControls="false" jumpSpeed="600.000000" maxFallingSpeed="700.000000" maxSpeed="250.000000" name="PlatformerObject" slopeMaxAngle="60.000000" type="PlatformBehavior::PlatformerObjectBehavior" />
+                    </behaviors>
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -167,9 +167,9 @@
                 </object>
                 <object name="NewObject2" type="Sprite">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="NormalPlatform" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior name="Platform" platformType="NormalPlatform" type="PlatformBehavior::PlatformBehavior" />
+                    </behaviors>
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -196,9 +196,9 @@
                 </object>
                 <object name="Moving" type="Sprite">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="NormalPlatform" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior name="Platform" platformType="NormalPlatform" type="PlatformBehavior::PlatformBehavior" />
+                    </behaviors>
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -225,9 +225,9 @@
                 </object>
                 <object name="Jumpthru" type="Sprite">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="Jumpthru" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior name="Platform" platformType="Jumpthru" type="PlatformBehavior::PlatformBehavior" />
+                    </behaviors>
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -254,9 +254,9 @@
                 </object>
                 <object name="Ladder" type="Sprite">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="Ladder" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior name="Platform" platformType="Ladder" type="PlatformBehavior::PlatformBehavior" />
+                    </behaviors>
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -333,7 +333,7 @@
                     </conditions>
                     <actions>
                         <action>
-                            <type inverted="false" value="PlatformAutomatism::ChangePlatformType" />
+                            <type inverted="false" value="PlatformBehavior::ChangePlatformType" />
                             <parameters>
                                 <parameter>Ladder</parameter>
                                 <parameter>Platform</parameter>
@@ -348,7 +348,7 @@
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
                         <condition>
-                            <type inverted="false" value="PlatformAutomatism::IsJumping" />
+                            <type inverted="false" value="PlatformBehavior::IsJumping" />
                             <parameters>
                                 <parameter>NewObject</parameter>
                                 <parameter>PlatformerObject</parameter>
@@ -373,7 +373,7 @@
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
                         <condition>
-                            <type inverted="false" value="PlatformAutomatism::IsOnFloor" />
+                            <type inverted="false" value="PlatformBehavior::IsOnFloor" />
                             <parameters>
                                 <parameter>NewObject</parameter>
                                 <parameter>PlatformerObject</parameter>
@@ -408,10 +408,10 @@
                     </cameras>
                 </layer>
             </layers>
-            <automatismsSharedData>
-                <automatismSharedData name="Platform" type="PlatformAutomatism::PlatformAutomatism" />
-                <automatismSharedData name="PlatformerObject" type="PlatformAutomatism::PlatformerObjectAutomatism" />
-            </automatismsSharedData>
+            <behaviorsSharedData>
+                <behaviorSharedData name="Platform" type="PlatformBehavior::PlatformBehavior" />
+                <behaviorSharedData name="PlatformerObject" type="PlatformBehavior::PlatformerObjectBehavior" />
+            </behaviorsSharedData>
         </layout>
     </layouts>
     <externalEvents />

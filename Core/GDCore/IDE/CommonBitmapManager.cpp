@@ -23,7 +23,7 @@ CommonBitmapManager::CommonBitmapManager()
 {
     expressionBt.LoadFile("res/expressionicon.png", wxBITMAP_TYPE_ANY);
     objectBt = gd::SkinHelper::GetIcon("object", 16);
-    automatismBt.LoadFile("res/automatism16.png", wxBITMAP_TYPE_ANY);
+    behaviorBt.LoadFile("res/behavior16.png", wxBITMAP_TYPE_ANY);
     signeBt.LoadFile("res/signeicon.png", wxBITMAP_TYPE_ANY);
     fileBt.LoadFile("res/fileicon.png", wxBITMAP_TYPE_ANY);
     yesnoBt.LoadFile("res/yesnoicon.png", wxBITMAP_TYPE_ANY);

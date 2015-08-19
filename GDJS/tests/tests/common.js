@@ -14,12 +14,12 @@ describe('gdjs.evtTools.object.twoListsTest', function() {
 		var map2 = new Hashtable();
 
 		var runtimeScene = new gdjs.RuntimeScene(null, null);
-		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-		var obj2A = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", automatisms: []});
-		var obj2B = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", automatisms: []});
-		var obj2C = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", automatisms: []});
+		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+		var obj2A = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", behaviors: []});
+		var obj2B = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", behaviors: []});
+		var obj2C = new gdjs.RuntimeObject(runtimeScene, {name: "obj2", type: "", behaviors: []});
 
 		var list1 = [obj1A, obj1B, obj1C];
 		var list2 = [obj2A, obj2B, obj2C];
@@ -48,9 +48,9 @@ describe('gdjs.evtTools.object.pickObjectsIf', function() {
 		var map1 = new Hashtable();
 
 		var runtimeScene = new gdjs.RuntimeScene(null, null);
-		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 
 		var list1 = [obj1A, obj1B, obj1C];
 		map1.put("obj1", list1);
@@ -73,9 +73,9 @@ describe('gdjs.evtTools.object.pickRandomObject', function() {
 		var map1 = new Hashtable();
 
 		var runtimeScene = new gdjs.RuntimeScene(null, null);
-		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 
 		var list1 = [obj1A, obj1B, obj1C];
 		map1.put("obj1", list1);
@@ -94,9 +94,9 @@ describe('gdjs.evtTools.object.pickNearestObject', function() {
 	var map1 = new Hashtable();
 
 	var runtimeScene = new gdjs.RuntimeScene(null, null);
-	var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-	var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
-	var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+	var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+	var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+	var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 	obj1A.setPosition(50, 50);
 	obj1B.setPosition(160, 160);
 	obj1C.setPosition(100, 300);

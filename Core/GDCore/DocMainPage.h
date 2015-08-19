@@ -369,11 +369,11 @@ make -j4
  *
  * **Extensions** are seen by GDevelop Core as classes inheriting from gd::PlatformExtension.<br>
  * They are stored inside the platform they belong to, and they are also loaded from a dynamic library file thanks to gd::ExtensionsLoader. The main
- * job of an extension is to <b>declare</b> everything it provides: objects, actions and conditions, automatisms, expressions.<br>
+ * job of an extension is to <b>declare</b> everything it provides: objects, actions and conditions, behaviors, expressions.<br>
  * This is done directly using the standard method provided by gd::PlatformExtension, notably:
  *  - gd::PlatformExtension::AddCondition and gd::PlatformExtension::AddAction,
  *  - gd::PlatformExtension::AddExpression (and gd::PlatformExtension::AddStrExpression),
- *  - gd::PlatformExtension::AddObject and gd::PlatformExtension::AddAutomatism
+ *  - gd::PlatformExtension::AddObject and gd::PlatformExtension::AddBehavior
  *
  *
  * Some platforms (like the C++ Platform) offer another base class which must be used instead of gd::PlatformExtension when declaring a platorm: as this base class
@@ -554,30 +554,30 @@ AddEvent("Standard",
 	.SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
  * \endcode
 
- * \section automatismsDeclaration Declaring the automatisms
+ * \section behaviorsDeclaration Declaring the behaviors
 
-Automatisms are declared like objects:
+Behaviors are declared like objects:
 
 
  * \code
-gd::AutomatismMetadata & aut = AddAutomatism("Name",
+gd::BehaviorMetadata & aut = AddBehavior("Name",
 	_("Name displayed to users"),
 	_("DefaultNameUsedInEditor"),
 	_("Description."),
 	"Group",
 	"path-to-a-32-by-32-icon.png",
-	"AutomatismClassName",
-	std::shared_ptr<gd::Automatism>(new AutomatismClassName),
-	std::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
+	"BehaviorClassName",
+	std::shared_ptr<gd::Behavior>(new BehaviorClassName),
+	std::shared_ptr<gd::BehaviorsSharedData>(new BehaviorSharedDataClassName));
  * \endcode
- * The last line can be replaced by <code>std::shared_ptr<gd::AutomatismsSharedData>()</code> if no shared data are being used.
+ * The last line can be replaced by <code>std::shared_ptr<gd::BehaviorsSharedData>()</code> if no shared data are being used.
  *
- * You can then declare the actions, conditions, and expressions related to the automatism like objects:<br>
+ * You can then declare the actions, conditions, and expressions related to the behavior like objects:<br>
  * Call AddAction/AddCondition/AddExpression on the <i>aut</i> object.
 
  * \section excludingNonRuntimeDeclaration (C++ platform) Excluding elements declaration from runtime
  * When your extension is compiled for the C++ platform Runtime, GDevelop does not known anything about action/condition or even events classes.<br>
- * You have then to exclude all actions/conditions/expressions/events declaration from extension at runtime (only Extension/Object/Automatisms declarations have to be kept).
+ * You have then to exclude all actions/conditions/expressions/events declaration from extension at runtime (only Extension/Object/Behaviors declarations have to be kept).
 
  * Use the *<code>GD_IDE_ONLY</code> define* to achieve this goal, as demonstrated in this skeleton of a complete extension declaration:
  * \code
@@ -619,18 +619,18 @@ public:
         }
 
         {
-            gd::AutomatismMetadata & aut = AddAutomatism("AutomatismName",
-                       _("Automatism name"),
+            gd::BehaviorMetadata & aut = AddBehavior("BehaviorName",
+                       _("Behavior name"),
                        "defaultGDname",
                        _("Description"),
                        "",
                        "CppPlatform/Extensions/myicon.png",
-                       "PhysicsAutomatism",
-                       std::shared_ptr<gd::Automatism>(new AutomatismClassName),
-                       std::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
+                       "PhysicsBehavior",
+                       std::shared_ptr<gd::Behavior>(new BehaviorClassName),
+                       std::shared_ptr<gd::BehaviorsSharedData>(new BehaviorSharedDataClassName));
 
             #if defined(GD_IDE_ONLY)
-            automatismInfo.SetIncludeFile("MyExtension/MyIncludeFile.h");
+            behaviorInfo.SetIncludeFile("MyExtension/MyIncludeFile.h");
 
             aut.AddAction(...);
             aut.AddCondition(...);

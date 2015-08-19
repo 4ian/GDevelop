@@ -19,6 +19,18 @@
 
 using namespace std;
 
+namespace {
+//Compatibility with GD <= 4
+gd::String RenameOldTypeFromGD3x(gd::String name) {
+    gd::String oldWord = "Automatism";
+    while (name.find(oldWord) != gd::String::npos)
+        name = name.replace(name.find(oldWord), oldWord.size(), "Behavior");
+
+    return name;
+};
+//End of compatibility code
+}
+
 namespace gd
 {
 
@@ -78,7 +90,7 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
             instr.SetParameter(1, instr.GetParameter(5));
             instr.SetParameter(2, instr.GetParameter(3));
         }
-        else if (instr.GetType() == "PhysicsAutomatism::AddRevoluteJointBetweenObjects")
+        else if (instr.GetType() == "PhysicsBehavior::AddRevoluteJointBetweenObjects")
         {
             instr.SetParameter(4, instr.GetParameter(5));
             instr.SetParameter(5, instr.GetParameter(6));
@@ -209,7 +221,7 @@ void gd::EventsListSerialization::OpenConditions(gd::Project & project, gd::Inst
         gd::Instruction instruction;
         const SerializerElement & conditionElem = elem.GetChild(i);
 
-        instruction.SetType( conditionElem.GetChild("type", 0, "Type").GetStringAttribute("value") );
+        instruction.SetType( ::RenameOldTypeFromGD3x(conditionElem.GetChild("type", 0, "Type").GetStringAttribute("value")) );
         instruction.SetInverted( conditionElem.GetChild("type", 0, "Type").GetBoolAttribute("inverted", false, "Contraire") );
 
         //Read parameters
@@ -256,7 +268,7 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, gd::Instruc
         gd::Instruction instruction;
         const SerializerElement & actionElem = elem.GetChild(i);
 
-        instruction.SetType( actionElem.GetChild("type", 0, "Type").GetStringAttribute("value") );
+        instruction.SetType( ::RenameOldTypeFromGD3x(actionElem.GetChild("type", 0, "Type").GetStringAttribute("value")) );
 
         //Read parameters
         vector < gd::Expression > parameters;

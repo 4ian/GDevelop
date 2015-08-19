@@ -7,7 +7,7 @@
 #define METADATAPROVIDER_H
 #include "GDCore/String.h"
 #include "GDCore/Events/InstructionMetadata.h"
-namespace gd { class AutomatismMetadata; }
+namespace gd { class BehaviorMetadata; }
 namespace gd { class ObjectMetadata; }
 namespace gd { class ExpressionMetadata; }
 namespace gd { class ExpressionMetadata; }
@@ -17,7 +17,8 @@ namespace gd
 {
 
 /**
- * \brief Deliver metadata for instructions ( i.e. Actions and conditions )
+ * \brief Allow to easily get metadata for instructions (i.e actions and conditions),
+ * objects and behaviors.
  *
  * \ingroup PlatformDefinition
  */
@@ -26,9 +27,9 @@ class GD_CORE_API MetadataProvider
 public:
 
     /**
-     * Get the metadata about an automatism in a project using a platform
+     * Get the metadata about a behavior in a project using a platform
      */
-    static const AutomatismMetadata & GetAutomatismMetadata(const gd::Platform & platform, gd::String automatismType);
+    static const BehaviorMetadata & GetBehaviorMetadata(const gd::Platform & platform, gd::String behaviorType);
 
     /**
      * Get the metadata about an object in a project using a platform
@@ -37,13 +38,13 @@ public:
 
     /**
      * Get the metadata of an action.
-     * Must work for object, automatisms and static actions.
+     * Must work for object, behaviors and static actions.
      */
     static const gd::InstructionMetadata & GetActionMetadata(const gd::Platform & platform, gd::String actionType);
 
     /**
      * Get the metadata of a condition.
-     * Must Work for object, automatisms and static conditions.
+     * Must Work for object, behaviors and static conditions.
      */
     static const gd::InstructionMetadata & GetConditionMetadata(const gd::Platform & platform, gd::String conditionType);
 
@@ -61,9 +62,9 @@ public:
 
     /**
      * Get information about an expression from its type
-     * Works for automatism expressions.
+     * Works for behavior expressions.
      */
-    static const gd::ExpressionMetadata & GetAutomatismExpressionMetadata(const gd::Platform & platform, gd::String autoType, gd::String exprType);
+    static const gd::ExpressionMetadata & GetBehaviorExpressionMetadata(const gd::Platform & platform, gd::String autoType, gd::String exprType);
 
     /**
      * Get information about a gd::String expression from its type
@@ -79,9 +80,9 @@ public:
 
     /**
      * Get information about a gd::String expression from its type
-     * Works for automatism expressions.
+     * Works for behavior expressions.
      */
-    static const gd::ExpressionMetadata & GetAutomatismStrExpressionMetadata(const gd::Platform & platform, gd::String autoType, gd::String exprType);
+    static const gd::ExpressionMetadata & GetBehaviorStrExpressionMetadata(const gd::Platform & platform, gd::String autoType, gd::String exprType);
 
     /**
      * Verifying if a ( static ) condition exists
@@ -108,16 +109,16 @@ public:
     static bool HasObjectCondition(const gd::Platform & platform, gd::String objectType, gd::String name);
 
     /**
-     * Verifying if a ( Automatism ) action exists
-     * @return true if the ( Automatism ) action exists
+     * Verifying if a ( Behavior ) action exists
+     * @return true if the ( Behavior ) action exists
      */
-    static bool HasAutomatismAction(const gd::Platform & platform, gd::String automatismType, gd::String name);
+    static bool HasBehaviorAction(const gd::Platform & platform, gd::String behaviorType, gd::String name);
 
     /**
-     * Verifying if a ( Automatism ) condition exists
-     * @return true if the ( Automatism ) condition exists
+     * Verifying if a ( Behavior ) condition exists
+     * @return true if the ( Behavior ) condition exists
      */
-    static bool HasAutomatismCondition(const gd::Platform & platform, gd::String automatismType, gd::String name);
+    static bool HasBehaviorCondition(const gd::Platform & platform, gd::String behaviorType, gd::String name);
 
     /**
      * Verifying if a ( static ) expression exists
@@ -132,10 +133,10 @@ public:
     static bool HasObjectExpression(const gd::Platform & platform, gd::String objectType, gd::String name);
 
     /**
-     * Verifying if a ( automatism ) expression exists
-     * @return true if the ( automatism ) expression exists
+     * Verifying if a ( behavior ) expression exists
+     * @return true if the ( behavior ) expression exists
      */
-    static bool HasAutomatismExpression(const gd::Platform & platform, gd::String automatismType, gd::String name);
+    static bool HasBehaviorExpression(const gd::Platform & platform, gd::String behaviorType, gd::String name);
 
     /**
      * Verifying if a ( static ) gd::String expression exists
@@ -153,13 +154,13 @@ public:
      * Verifying if a ( object ) gd::String expression exists
      * @return true if the ( object ) gd::String expression exists
      */
-    static bool HasAutomatismStrExpression(const gd::Platform & platform, gd::String automatismType, gd::String name);
+    static bool HasBehaviorStrExpression(const gd::Platform & platform, gd::String behaviorType, gd::String name);
 
     virtual ~MetadataProvider();
 private:
     MetadataProvider();
 
-    static AutomatismMetadata badAutomatismInfo;
+    static BehaviorMetadata badBehaviorInfo;
     static ObjectMetadata badObjectInfo;
     static gd::InstructionMetadata badInstructionMetadata;
     static gd::ExpressionMetadata badExpressionMetadata;

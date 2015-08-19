@@ -121,30 +121,30 @@ std::shared_ptr<gd::Object> Project::CreateObject(const gd::String & type, const
     return std::shared_ptr<gd::Object>();
 }
 
-gd::Automatism* Project::CreateAutomatism(const gd::String & type, const gd::String & platformName)
+gd::Behavior* Project::CreateBehavior(const gd::String & type, const gd::String & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
-        gd::Automatism* automatism = platforms[i]->CreateAutomatism(type);
-        if ( automatism ) return automatism;
+        gd::Behavior* behavior = platforms[i]->CreateBehavior(type);
+        if ( behavior ) return behavior;
     }
 
     return NULL;
 }
 
-std::shared_ptr<gd::AutomatismsSharedData> Project::CreateAutomatismSharedDatas(const gd::String & type, const gd::String & platformName)
+std::shared_ptr<gd::BehaviorsSharedData> Project::CreateBehaviorSharedDatas(const gd::String & type, const gd::String & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
-        std::shared_ptr<gd::AutomatismsSharedData> automatism = platforms[i]->CreateAutomatismSharedDatas(type);
-        if ( automatism ) return automatism;
+        std::shared_ptr<gd::BehaviorsSharedData> behavior = platforms[i]->CreateBehaviorSharedDatas(type);
+        if ( behavior ) return behavior;
     }
 
-    return std::shared_ptr<gd::AutomatismsSharedData>();
+    return std::shared_ptr<gd::BehaviorsSharedData>();
 }
 
 #if defined(GD_IDE_ONLY)
@@ -271,7 +271,7 @@ gd::Layout & Project::InsertNewLayout(const gd::String & name, unsigned int posi
 
     newScene->SetName(name);
     #if defined(GD_IDE_ONLY)
-    newScene->UpdateAutomatismsSharedData(*this);
+    newScene->UpdateBehaviorsSharedData(*this);
     #endif
 
     return *newScene;
@@ -286,7 +286,7 @@ gd::Layout & Project::InsertLayout(const gd::Layout & layout, unsigned int posit
         scenes.push_back(newScene);
 
     #if defined(GD_IDE_ONLY)
-    newScene->UpdateAutomatismsSharedData(*this);
+    newScene->UpdateBehaviorsSharedData(*this);
     #endif
 
     return *newScene;
@@ -610,7 +610,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
-    if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMajorVersion, GDMinorVersion, build, 2,2,1,10822) )
+    if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMinorVersion, revision, build, 2,2,1,10822) )
     {
         if ( std::find(GetUsedExtensions().begin(), GetUsedExtensions().end(), "BuiltinExternalLayouts") == GetUsedExtensions().end() )
             GetUsedExtensions().push_back("BuiltinExternalLayouts");
@@ -619,14 +619,28 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
-    if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMajorVersion, GDMinorVersion, build, 3,3,3,0) )
+    if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMinorVersion, revision, build, 3,3,3,0) )
     {
-        if ( std::find(GetUsedExtensions().begin(), GetUsedExtensions().end(), "AStarAutomatism") != GetUsedExtensions().end() )
+        if ( std::find(GetUsedExtensions().begin(), GetUsedExtensions().end(), "AStarBehavior") != GetUsedExtensions().end() )
         {
-            GetUsedExtensions().erase( std::remove( GetUsedExtensions().begin(), GetUsedExtensions().end(), "AStarAutomatism" ), GetUsedExtensions().end() );
-            GetUsedExtensions().push_back("PathfindingAutomatism");
-            updateText += _("The project is using the pathfinding automatism. This automatism has been replaced by a new one:\n");
-            updateText += _("You must add the new 'Pathfinding' automatism to the objects that need to be moved, and add the 'Pathfinding Obstacle' to the objects that must act as obstacles.");
+            GetUsedExtensions().erase( std::remove( GetUsedExtensions().begin(), GetUsedExtensions().end(), "AStarBehavior" ), GetUsedExtensions().end() );
+            GetUsedExtensions().push_back("PathfindingBehavior");
+            updateText += _("The project is using the pathfinding behavior. This behavior has been replaced by a new one:\n");
+            updateText += _("You must add the new 'Pathfinding' behavior to the objects that need to be moved, and add the 'Pathfinding Obstacle' to the objects that must act as obstacles.");
+        }
+    }
+    #endif
+
+    //Compatibility code
+    #if defined(GD_IDE_ONLY)
+    if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMinorVersion, revision, build, 4,0,85,0) )
+    {
+        for(unsigned int i = 0;i < extensionsUsed.size();++i) 
+        {
+            gd::String oldWord = "Automatism";
+            size_t pos = extensionsUsed[i].find(oldWord);
+            if (pos != gd::String::npos)
+                extensionsUsed[i] = extensionsUsed[i].replace(pos, oldWord.size(), "Behavior");
         }
     }
     #endif

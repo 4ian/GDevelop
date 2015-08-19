@@ -1,1 +1,0 @@
-#include "AutomatismsRuntimeSharedData.h"

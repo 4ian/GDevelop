@@ -7,13 +7,13 @@
 #include "ObjectsPropgridHelper.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/PlatformDefinition/Automatism.h"
+#include "GDCore/PlatformDefinition/Behavior.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/CommonTools.h"
 #include <wx/propgrid/propgrid.h>
@@ -51,36 +51,36 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
         grid->SetPropertyReadOnly(_("Variables"));
     }
 
-    grid->Append( new wxPropertyCategory(_("Automatisms") + " (" + gd::String::From(object->GetAllAutomatisms().size()) + ")" , "AUTO") );
-    grid->Append( new wxStringProperty(_("Add automatism"), "AUTO_ADD", _("Add...")) );
+    grid->Append( new wxPropertyCategory(_("Behaviors") + " (" + gd::String::From(object->GetAllBehaviors().size()) + ")" , "AUTO") );
+    grid->Append( new wxStringProperty(_("Add a behavior"), "AUTO_ADD", _("Add...")) );
     grid->SetPropertyCell("AUTO_ADD", 1, _("Add..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
     grid->SetPropertyReadOnly("AUTO_ADD");
 
-    std::vector<gd::String> automatisms = object->GetAllAutomatismNames();
-    if ( !automatisms.empty() ) {
+    std::vector<gd::String> behaviors = object->GetAllBehaviorNames();
+    if ( !behaviors.empty() ) {
         grid->AppendIn("AUTO", new wxStringProperty("", "AUTO_REMOVE", _("Remove...")) );
         grid->SetPropertyCell("AUTO_REMOVE", 1, _("Remove..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
         grid->SetPropertyReadOnly("AUTO_REMOVE");
     }
 
-    for (unsigned int i = 0;i<automatisms.size();++i)
+    for (unsigned int i = 0;i<behaviors.size();++i)
     {
-        const gd::Automatism & automatism = object->GetAutomatism(automatisms[i]);
-        std::map<gd::String, gd::PropertyDescriptor> properties = automatism.GetProperties(project);
+        const gd::Behavior & behavior = object->GetBehavior(behaviors[i]);
+        std::map<gd::String, gd::PropertyDescriptor> properties = behavior.GetProperties(project);
 
-        grid->AppendIn( "AUTO", new wxPropertyCategory(automatism.GetName()) );
+        grid->AppendIn( "AUTO", new wxPropertyCategory(behavior.GetName()) );
         if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() )
         {
             //"Click to edit" is not shown if properties are not empty, except if the magic property is set.
-            grid->Append( new wxStringProperty(_("Edit"), wxString("AUTO:"+automatisms[i]), _("Click to edit...")) );
-            grid->SetPropertyCell(wxString("AUTO:"+automatisms[i]), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
-            grid->SetPropertyReadOnly(wxString("AUTO:"+automatisms[i]));
+            grid->Append( new wxStringProperty(_("Edit"), wxString("AUTO:"+behaviors[i]), _("Click to edit...")) );
+            grid->SetPropertyCell(wxString("AUTO:"+behaviors[i]), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+            grid->SetPropertyReadOnly(wxString("AUTO:"+behaviors[i]));
         }
-        grid->Append( new wxStringProperty("", "AUTO_RENAME:"+automatisms[i], _("Rename...")) );
-        grid->SetPropertyCell(wxString("AUTO_RENAME:"+automatisms[i]), 1, _("Rename..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
-        grid->SetPropertyReadOnly(wxString("AUTO_RENAME:"+automatisms[i]));
+        grid->Append( new wxStringProperty("", "AUTO_RENAME:"+behaviors[i], _("Rename...")) );
+        grid->SetPropertyCell(wxString("AUTO_RENAME:"+behaviors[i]), 1, _("Rename..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+        grid->SetPropertyReadOnly(wxString("AUTO_RENAME:"+behaviors[i]));
 
-        //Add automatism custom properties
+        //Add behavior custom properties
         for (std::map<gd::String, gd::PropertyDescriptor>::iterator it = properties.begin();
             it != properties.end();++it)
         {
@@ -96,16 +96,16 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
                 for (unsigned int j = 0; j < choices.size(); ++j)
                     choicesArray.push_back(choices[j]);
 
-                wxEnumProperty * prop = new wxEnumProperty(name, "AUTO_PROP:"+automatisms[i], choicesArray);
+                wxEnumProperty * prop = new wxEnumProperty(name, "AUTO_PROP:"+behaviors[i], choicesArray);
                 prop->SetChoiceSelection(choicesArray.Index(value));
                 grid->Append(prop);
             }
             else if ( type == "Boolean" )
             {
-                grid->Append(new wxBoolProperty(name, "AUTO_PROP:"+automatisms[i], value == "true"));
+                grid->Append(new wxBoolProperty(name, "AUTO_PROP:"+behaviors[i], value == "true"));
             }
             else
-                grid->Append(new wxStringProperty(name, "AUTO_PROP:"+automatisms[i], value));
+                grid->Append(new wxStringProperty(name, "AUTO_PROP:"+behaviors[i], value));
         }
 
     }
@@ -163,27 +163,27 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         }
         else if ( event.GetPropertyName() == "AUTO_ADD" )
         {
-            return gd::ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(grid, project,
+            return gd::ChooseBehaviorTypeDialog::ChooseAndAddBehaviorToObject(grid, project,
                 object, layout, globalObject);
         }
         else if ( event.GetPropertyName() == "AUTO_REMOVE" )
         {
-            //Create automatism array
-            wxArrayString automatismsStr;
+            //Create behavior array
+            wxArrayString behaviorsStr;
 
             //Fill array
-            std::vector <gd::String> automatisms = object->GetAllAutomatismNames();
-            for (unsigned int i = 0;i<automatisms.size();++i)
-                automatismsStr.Add(object->GetAutomatism(automatisms[i]).GetName());
+            std::vector <gd::String> behaviors = object->GetAllBehaviorNames();
+            for (unsigned int i = 0;i<behaviors.size();++i)
+                behaviorsStr.Add(object->GetBehavior(behaviors[i]).GetName());
 
-            int selection = wxGetSingleChoiceIndex(_("Choose the automatism to delete"), _("Choose the automatism to delete"), automatismsStr);
+            int selection = wxGetSingleChoiceIndex(_("Choose the behavior to delete"), _("Choose the behavior to delete"), behaviorsStr);
             if ( selection == -1 ) return false;
 
-            object->RemoveAutomatism(automatisms[selection]);
-            UpdateAutomatismsSharedData(project, globalObject ? NULL : layout);
+            object->RemoveBehavior(behaviors[selection]);
+            UpdateBehaviorsSharedData(project, globalObject ? NULL : layout);
 
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismDeleted(project, globalObject ? NULL : layout, *object, automatisms[selection]);
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnBehaviorDeleted(project, globalObject ? NULL : layout, *object, behaviors[selection]);
 
             return true;
         }
@@ -191,18 +191,18 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         {
             event.Veto();
             gd::String oldName = event.GetPropertyName().substr(12);
-            if ( !object->HasAutomatismNamed(oldName)) return true;
+            if ( !object->HasBehaviorNamed(oldName)) return true;
 
-            gd::Automatism & automatism = object->GetAutomatism(oldName);
+            gd::Behavior & behavior = object->GetBehavior(oldName);
 
-            gd::String newName = wxGetTextFromUser(_("Enter a new name for the automatism"), _("Rename an automatism"), automatism.GetName());
-            if ( newName == automatism.GetName() || object->HasAutomatismNamed(newName) || newName.empty() ) return false;
+            gd::String newName = wxGetTextFromUser(_("Enter a new name for the behavior"), _("Rename a behavior"), behavior.GetName());
+            if ( newName == behavior.GetName() || object->HasBehaviorNamed(newName) || newName.empty() ) return false;
 
-            object->RenameAutomatism(oldName, newName);
-            UpdateAutomatismsSharedData(project, globalObject ? NULL : layout);
+            object->RenameBehavior(oldName, newName);
+            UpdateBehaviorsSharedData(project, globalObject ? NULL : layout);
 
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismRenamed(project, globalObject ? NULL : layout, *object, automatism, oldName);
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnBehaviorRenamed(project, globalObject ? NULL : layout, *object, behavior, oldName);
 
             return true;
         }
@@ -210,13 +210,13 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         {
             event.Veto();
             gd::String autoName = event.GetPropertyName().substr(5);
-            if ( !object->HasAutomatismNamed(autoName)) return true;
+            if ( !object->HasBehaviorNamed(autoName)) return true;
 
-            gd::Automatism & automatism = object->GetAutomatism(autoName);
+            gd::Behavior & behavior = object->GetBehavior(autoName);
 
-            automatism.EditAutomatism(grid, project, layout, mainFrameWrapper); //EditAutomatism always need a valid layout!
+            behavior.EditBehavior(grid, project, layout, mainFrameWrapper); //EditBehavior always need a valid layout!
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnAutomatismEdited(project, globalObject ? NULL : layout, *object, automatism);
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnBehaviorEdited(project, globalObject ? NULL : layout, *object, behavior);
         }
     }
 
@@ -310,18 +310,18 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
     else if ( event.GetPropertyName().substr(0,10) == "AUTO_PROP:" )
     {
         gd::String autoName = event.GetPropertyName().substr(10);
-        if ( !object->HasAutomatismNamed(autoName))
+        if ( !object->HasBehaviorNamed(autoName))
         {
             event.Veto();
             return false;
         }
 
-        gd::Automatism & automatism = object->GetAutomatism(autoName);
+        gd::Behavior & behavior = object->GetBehavior(autoName);
         gd::String value = event.GetPropertyValue().GetString();
 
         //Special case for enums.
         if ( wxEnumProperty * enumProperty = dynamic_cast<wxEnumProperty*>(event.GetProperty()) ) {
-            std::map<gd::String, gd::PropertyDescriptor> properties = automatism.GetProperties(project);
+            std::map<gd::String, gd::PropertyDescriptor> properties = behavior.GetProperties(project);
             const std::vector<gd::String> & choices = properties[event.GetProperty()->GetLabel()].GetExtraInfo();
 
             unsigned int id = event.GetPropertyValue().GetLong();
@@ -334,7 +334,7 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
         std::cout << "VALUE" << value;
 
 
-        if ( !automatism.UpdateProperty(event.GetProperty()->GetLabel(), value, project) )
+        if ( !behavior.UpdateProperty(event.GetProperty()->GetLabel(), value, project) )
         {
             event.Veto();
             return false;
@@ -344,14 +344,14 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
     return false;
 }
 
-void ObjectsPropgridHelper::UpdateAutomatismsSharedData(gd::Project & project, gd::Layout * scene) const
+void ObjectsPropgridHelper::UpdateBehaviorsSharedData(gd::Project & project, gd::Layout * scene) const
 {
     if ( scene )
-        scene->UpdateAutomatismsSharedData(project);
+        scene->UpdateBehaviorsSharedData(project);
     else //Scene pointer is NULL: Update shared data of all scenes
     {
         for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
-            project.GetLayout(i).UpdateAutomatismsSharedData(project);
+            project.GetLayout(i).UpdateBehaviorsSharedData(project);
     }
 }
 

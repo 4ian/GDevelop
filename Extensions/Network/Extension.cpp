@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "GDCpp/CommonTools.h"
-#include "NetworkAutomatism.h"
+#include "NetworkBehavior.h"
 #include "NetworkManager.h"
 
 #include <SFML/Network.hpp>
@@ -158,71 +158,71 @@ public:
                        _("Generate objects' identifiers"),
                        _("Generate automatically identifiers for these objects.\nNote that this action must be preferably used at the start of the scene for example, so as to be sure objects\nhave the same unique identifiers on the different computers."),
                        _("Generate unique network identifiers for _PARAM0_"),
-                       _("Automatism Automatic Network Updater"),
+                       _("Behavior Automatic Network Updater"),
                        "CppPlatform/Extensions/networkicon24.png",
                        "CppPlatform/Extensions/networkicon.png")
 
             .AddParameter("objectList", _("Object"))
-            .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
-            .SetFunctionName("NetworkAutomatism::GenerateObjectNetworkIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
+            .AddParameter("behavior", _("Behavior"), "NetworkBehavior")
+            .SetFunctionName("NetworkBehavior::GenerateObjectNetworkIdentifier").SetIncludeFile("Network/NetworkBehavior.h");
 
         #endif
 
         {
-            gd::AutomatismMetadata & aut = AddAutomatism("NetworkAutomatism",
+            gd::BehaviorMetadata & aut = AddBehavior("NetworkBehavior",
                   _("Automatic network update"),
                   _("NetworkUpdater"),
                   _("Allows to automatically synchronize the objects of a game on the network."),
                   "",
                   "CppPlatform/Extensions/networkicon32.png",
-                  "NetworkAutomatism",
-                  std::shared_ptr<gd::Automatism>(new NetworkAutomatism),
-                  std::shared_ptr<gd::AutomatismsSharedData>(new SceneNetworkDatas));
+                  "NetworkBehavior",
+                  std::shared_ptr<gd::Behavior>(new NetworkBehavior),
+                  std::shared_ptr<gd::BehaviorsSharedData>(new SceneNetworkDatas));
 
             #if defined(GD_IDE_ONLY)
-            aut.SetIncludeFile("Network/NetworkAutomatism.h");
+            aut.SetIncludeFile("Network/NetworkBehavior.h");
 
             aut.AddAction("SetAsSender",
                            _("Set to send data"),
-                           _("The automatism will send the data of the objects.\nBe sure to have generated identifiers for these objects before."),
+                           _("The behavior will send the data of the objects.\nBe sure to have generated identifiers for these objects before."),
                            _("Set _PARAM0_ to send data"),
-                           _("Automatism Automatic Network Updater"),
+                           _("Behavior Automatic Network Updater"),
                            "CppPlatform/Extensions/networkicon24.png",
                            "CppPlatform/Extensions/networkicon.png")
 
                 .AddParameter("object", _("Object"))
-                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
-                .SetFunctionName("SetAsSender").SetIncludeFile("Network/NetworkAutomatism.h");
+                .AddParameter("behavior", _("Behavior"), "NetworkBehavior")
+                .SetFunctionName("SetAsSender").SetIncludeFile("Network/NetworkBehavior.h");
 
             aut.AddAction("SetAsReceiver",
                            _("Set to receive data"),
-                           _("The automatism will receive the data and will update the objects.\nBe sure to have generated identifiers for these objects before."),
+                           _("The behavior will receive the data and will update the objects.\nBe sure to have generated identifiers for these objects before."),
                            _("Set _PARAM0_ to receive data"),
-                           _("Automatism Automatic Network Updater"),
+                           _("Behavior Automatic Network Updater"),
                            "CppPlatform/Extensions/networkicon24.png",
                            "CppPlatform/Extensions/networkicon.png")
 
                 .AddParameter("object", _("Object"))
-                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
-                .SetFunctionName("SetAsReceiver").SetIncludeFile("Network/NetworkAutomatism.h");
+                .AddParameter("behavior", _("Behavior"), "NetworkBehavior")
+                .SetFunctionName("SetAsReceiver").SetIncludeFile("Network/NetworkBehavior.h");
 
             aut.AddAction("SetIdentifier",
                            _("Change object's identifier"),
                            _("Each object need a unique identifier, the same on all computers, so as to be identified and updated"),
                            _("Set identifier of _PARAM0_ to _PARAM2_"),
-                           _("Automatism Automatic Network Updater"),
+                           _("Behavior Automatic Network Updater"),
                            "CppPlatform/Extensions/networkicon24.png",
                            "CppPlatform/Extensions/networkicon.png")
 
                 .AddParameter("object", _("Object"))
-                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
+                .AddParameter("behavior", _("Behavior"), "NetworkBehavior")
                 .AddParameter("expression", _("Identifier"))
-                .SetFunctionName("SetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
+                .SetFunctionName("SetIdentifier").SetIncludeFile("Network/NetworkBehavior.h");
 
-            aut.AddExpression("GetIdentifier", _("Get the identifier of the object"), _("Get the identifier of the object"), _("Automatism Automatic Network Updater"), "res/texteicon.png")
+            aut.AddExpression("GetIdentifier", _("Get the identifier of the object"), _("Get the identifier of the object"), _("Behavior Automatic Network Updater"), "res/texteicon.png")
                 .AddParameter("object", _("Object"))
-                .AddParameter("automatism", _("Automatism"), "NetworkAutomatism")
-                .SetFunctionName("GetIdentifier").SetIncludeFile("Network/NetworkAutomatism.h");
+                .AddParameter("behavior", _("Behavior"), "NetworkBehavior")
+                .SetFunctionName("GetIdentifier").SetIncludeFile("Network/NetworkBehavior.h");
 
             #endif
         }

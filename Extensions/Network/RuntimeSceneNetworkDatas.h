@@ -9,18 +9,18 @@ This project is released under the MIT License.
 #define RUNTIMESCENENETWORKDATAS_H
 
 #include <iostream>
-#include "GDCpp/AutomatismsRuntimeSharedData.h"
+#include "GDCpp/BehaviorsRuntimeSharedData.h"
 class SceneNetworkDatas;
 
 /**
- * Datas shared by Network Automatism at runtime ( i.e. Nothing )
+ * Datas shared by Network Behavior at runtime ( i.e. Nothing )
  */
-class GD_EXTENSION_API RuntimeSceneNetworkDatas : public AutomatismsRuntimeSharedData
+class GD_EXTENSION_API RuntimeSceneNetworkDatas : public BehaviorsRuntimeSharedData
 {
     public:
-        RuntimeSceneNetworkDatas(const SceneNetworkDatas & automatismSharedDatas);
+        RuntimeSceneNetworkDatas(const SceneNetworkDatas & behaviorSharedDatas);
         virtual ~RuntimeSceneNetworkDatas();
-        virtual std::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return std::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneNetworkDatas(*this));}
+        virtual std::shared_ptr<BehaviorsRuntimeSharedData> Clone() const { return std::shared_ptr<BehaviorsRuntimeSharedData>(new RuntimeSceneNetworkDatas(*this));}
 
     private:
 };

@@ -15,11 +15,11 @@
 namespace gd { class InstructionsMetadataHolder; }
 namespace gd { class Project; }
 namespace gd { class Object; }
-namespace gd { class Automatism; }
-namespace gd { class AutomatismMetadata; }
+namespace gd { class Behavior; }
+namespace gd { class BehaviorMetadata; }
 namespace gd { class ObjectMetadata; }
 namespace gd { class BaseEvent; }
-namespace gd { class AutomatismsSharedData; }
+namespace gd { class BehaviorsSharedData; }
 namespace gd { class PlatformExtension; }
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class ProjectExporter; }
@@ -121,14 +121,14 @@ public:
     std::shared_ptr<gd::Object> CreateObject(gd::String type, const gd::String & name) const;
 
     /**
-     * \brief Create an automatism
+     * \brief Create a behavior
      */
-    gd::Automatism* CreateAutomatism(const gd::String & type) const;
+    gd::Behavior* CreateBehavior(const gd::String & type) const;
 
     /**
-     * \brief Create an automatism shared data object.
+     * \brief Create a behavior shared data object.
      */
-    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const gd::String & type) const;
+    std::shared_ptr<gd::BehaviorsSharedData> CreateBehaviorSharedDatas(const gd::String & type) const;
 
     #if defined(GD_IDE_ONLY)
     /**

@@ -13,7 +13,7 @@
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ObjectMetadata.h"
-#include "GDCore/Events/AutomatismMetadata.h"
+#include "GDCore/Events/BehaviorMetadata.h"
 
 using namespace std;
 
@@ -269,22 +269,22 @@ gd::String EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditio
         }
     }
 
-    //Generate automatism condition if available
-    gd::String automatismType = gd::GetTypeOfAutomatism(project, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
-    if (MetadataProvider::HasAutomatismCondition(platform, automatismType, condition.GetType()) && instrInfos.parameters.size() >= 2)
+    //Generate behavior condition if available
+    gd::String behaviorType = gd::GetTypeOfBehavior(project, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
+    if (MetadataProvider::HasBehaviorCondition(platform, behaviorType, condition.GetType()) && instrInfos.parameters.size() >= 2)
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
         for (unsigned int i = 0;i<realObjects.size();++i)
         {
             //Setup context
-            const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(platform, automatismType);
+            const BehaviorMetadata & autoInfo = MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
             AddIncludeFiles(autoInfo.includeFiles);
             context.SetCurrentObject(realObjects[i]);
             context.ObjectsListNeeded(realObjects[i]);
 
             //Prepare arguments and generate the whole condition code
             vector<gd::String>  arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context);
-            conditionCode += GenerateAutomatismCondition(realObjects[i], condition.GetParameter(1).GetPlainString(), autoInfo, arguments,
+            conditionCode += GenerateBehaviorCondition(realObjects[i], condition.GetParameter(1).GetPlainString(), autoInfo, arguments,
                                                                instrInfos, returnBoolean, condition.IsInverted(), context);
 
             context.SetNoCurrentObject();
@@ -410,22 +410,22 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
         }
     }
 
-    //Affection to an automatism member function if found
-    gd::String automatismType = gd::GetTypeOfAutomatism(project, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
-    if (MetadataProvider::HasAutomatismAction(platform, automatismType, action.GetType()) && instrInfos.parameters.size() >= 2)
+    //Assign to a behavior member function if found
+    gd::String behaviorType = gd::GetTypeOfBehavior(project, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
+    if (MetadataProvider::HasBehaviorAction(platform, behaviorType, action.GetType()) && instrInfos.parameters.size() >= 2)
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
         for (unsigned int i = 0;i<realObjects.size();++i)
         {
             //Setup context
-            const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(platform, automatismType);
+            const BehaviorMetadata & autoInfo = MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
             AddIncludeFiles(autoInfo.includeFiles);
             context.SetCurrentObject(realObjects[i]);
             context.ObjectsListNeeded(realObjects[i]);
 
             //Prepare arguments and generate the whole action code
             vector<gd::String>  arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
-            actionCode += GenerateAutomatismAction(realObjects[i], action.GetParameter(1).GetPlainString(), autoInfo, arguments, instrInfos, context);
+            actionCode += GenerateBehaviorAction(realObjects[i], action.GetParameter(1).GetPlainString(), autoInfo, arguments, instrInfos, context);
 
             context.SetNoCurrentObject();
         }
@@ -511,7 +511,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
 
         argOutput = "\""+argOutput+"\"";
     }
-    else if ( metadata.type == "object" || metadata.type == "automatism" )
+    else if ( metadata.type == "object" || metadata.type == "behavior" )
     {
         argOutput = "\""+ConvertToString(parameter)+"\"";
     }
@@ -759,15 +759,15 @@ gd::String EventsCodeGenerator::GenerateObjectFunctionCall(gd::String objectList
     return "TODO (GenerateObjectFunctionCall)";
 }
 
-gd::String EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(gd::String objectListName,
-                                                      gd::String automatismName,
-                                                      const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(gd::String objectListName,
+                                                      gd::String behaviorName,
+                                                      const gd::BehaviorMetadata & autoInfo,
                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                       gd::String parametersStr,
                                                       gd::String defaultOutput,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    return "TODO (GenerateObjectAutomatismFunctionCall)";
+    return "TODO (GenerateObjectBehaviorFunctionCall)";
 }
 
 
@@ -845,9 +845,9 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objec
     return "For each picked object \""+objectName+"\", check "+predicat+".\n";
 }
 
-gd::String EventsCodeGenerator::GenerateAutomatismCondition(const gd::String & objectName,
-                                                                       const gd::String & automatismName,
-                                                                   const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & objectName,
+                                                                       const gd::String & behaviorName,
+                                                                   const gd::BehaviorMetadata & autoInfo,
                                                                    const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                                    const gd::String & returnBoolean,
@@ -873,7 +873,7 @@ gd::String EventsCodeGenerator::GenerateAutomatismCondition(const gd::String & o
     }
     if ( conditionInverted ) predicat = GenerateNegatedPredicat(predicat);
 
-    return "For each picked object \""+objectName+"\", check "+predicat+" for automatism \""+automatismName+"\".\n";
+    return "For each picked object \""+objectName+"\", check "+predicat+" for behavior \""+behaviorName+"\".\n";
 }
 
 gd::String EventsCodeGenerator::GenerateFreeAction(const std::vector<gd::String> & arguments, const gd::InstructionMetadata & instrInfos,
@@ -934,9 +934,9 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
 
 }
 
-gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & objectName,
-                                                                   const gd::String & automatismName,
-                                                                   const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & objectName,
+                                                                   const gd::String & behaviorName,
+                                                                   const gd::BehaviorMetadata & autoInfo,
                                                                    const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                                    gd::EventsCodeGenerationContext & context)
@@ -950,7 +950,7 @@ gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & obje
         else
             call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName,2);
         return "For each picked object \""+objectName+"\", call "+call
-                +" for automatism \""+automatismName+"\".\n";
+                +" for behavior \""+behaviorName+"\".\n";
     }
     else
     {
@@ -963,7 +963,7 @@ gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & obje
 
         call = instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
         return "For each picked object \""+objectName+"\", call "+call+"("+argumentsStr+")"
-                +" for automatism \""+automatismName+"\".\n";
+                +" for behavior \""+behaviorName+"\".\n";
     }
 
 }

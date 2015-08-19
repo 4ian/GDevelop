@@ -115,11 +115,11 @@ std::shared_ptr<gd::ProjectExporter> JsPlatform::GetProjectExporter() const
  //When compiling with emscripten, extensions exposes specific functions to create them.
 #if defined(EMSCRIPTEN)
 extern "C" {
-gd::PlatformExtension * CreateGDJSPlatformAutomatismExtension();
-gd::PlatformExtension * CreateGDJSDestroyOutsideAutomatismExtension();
+gd::PlatformExtension * CreateGDJSPlatformBehaviorExtension();
+gd::PlatformExtension * CreateGDJSDestroyOutsideBehaviorExtension();
 gd::PlatformExtension * CreateGDJSTiledSpriteObjectExtension();
-gd::PlatformExtension * CreateGDJSDraggableAutomatismExtension();
-gd::PlatformExtension * CreateGDJSTopDownMovementAutomatismExtension();
+gd::PlatformExtension * CreateGDJSDraggableBehaviorExtension();
+gd::PlatformExtension * CreateGDJSTopDownMovementBehaviorExtension();
 gd::PlatformExtension * CreateGDJSTextObjectExtension();
 }
 #endif
@@ -152,11 +152,11 @@ JsPlatform::JsPlatform() :
 
     #if defined(EMSCRIPTEN) //When compiling with emscripten, hardcode extensions to load.
     std::cout << "* Loading other extensions... "; std::cout.flush();
-    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSPlatformAutomatismExtension())); std::cout.flush();
-    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDestroyOutsideAutomatismExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSPlatformBehaviorExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDestroyOutsideBehaviorExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTiledSpriteObjectExtension())); std::cout.flush();
-    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDraggableAutomatismExtension())); std::cout.flush();
-    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementAutomatismExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDraggableBehaviorExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementBehaviorExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTextObjectExtension())); std::cout.flush();
     #endif
     std::cout << "done." << std::endl;

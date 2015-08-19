@@ -75,7 +75,7 @@
                 </Layer>
             </Layers>
             <Variables />
-            <AutomatismsSharedDatas />
+            <BehaviorsSharedDatas />
             <Dependencies />
             <Events>
                 <Event disabled="false" folded="false">

@@ -68,8 +68,8 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("separateObjectsWithoutForces").SetIncludeFile("runtimeobject.js");
     objectActions["Rebondir"].codeExtraInformation //Deprecated
         .SetFunctionName("separateObjectsWithForces").SetIncludeFile("runtimeobject.js");
-    objectConditions["AutomatismActivated"].SetFunctionName("automatismActivated").SetIncludeFile("runtimeobject.js");
-    objectActions["ActivateAutomatism"].SetFunctionName("activateAutomatism").SetIncludeFile("runtimeobject.js");
+    objectConditions["BehaviorActivated"].SetFunctionName("behaviorActivated").SetIncludeFile("runtimeobject.js");
+    objectActions["ActivateBehavior"].SetFunctionName("activateBehavior").SetIncludeFile("runtimeobject.js");
     objectConditions["ObjectVariableChildExists"].SetFunctionName("variableChildExists").SetIncludeFile("runtimeobject.js");
     objectActions["ObjectVariableRemoveChild"].SetFunctionName("variableRemoveChild").SetIncludeFile("runtimeobject.js");
 

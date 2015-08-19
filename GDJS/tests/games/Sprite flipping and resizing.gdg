@@ -95,7 +95,7 @@
                 </Layer>
             </Layers>
             <Variables />
-            <AutomatismsSharedDatas />
+            <BehaviorsSharedDatas />
             <Positions>
                 <Objet nom="Obj" x="609.026123" y="357.702576" plan="-1" layer="" angle="2.606821" personalizedSize="true" width="100.749054" height="224.566879" locked="false">
                     <floatInfos />

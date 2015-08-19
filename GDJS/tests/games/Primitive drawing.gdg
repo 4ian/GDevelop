@@ -90,7 +90,7 @@
             <objects>
                 <object name="NewObject" type="PrimitiveDrawing::Drawer">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <fillOpacity>255</fillOpacity>
                     <outlineSize>1</outlineSize>
                     <outlineOpacity>255</outlineOpacity>
@@ -100,7 +100,7 @@
                 </object>
                 <object name="NewObject2" type="PrimitiveDrawing::Drawer">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <fillOpacity>255</fillOpacity>
                     <outlineSize>5</outlineSize>
                     <outlineOpacity>255</outlineOpacity>
@@ -110,7 +110,7 @@
                 </object>
                 <object name="NewObject3" type="PrimitiveDrawing::Drawer">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <fillOpacity>255</fillOpacity>
                     <outlineSize>1</outlineSize>
                     <outlineOpacity>255</outlineOpacity>
@@ -120,7 +120,7 @@
                 </object>
                 <object name="NewObject4" type="PrimitiveDrawing::Drawer">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <fillOpacity>128</fillOpacity>
                     <outlineSize>2</outlineSize>
                     <outlineOpacity>255</outlineOpacity>
@@ -283,7 +283,7 @@
                     </cameras>
                 </layer>
             </layers>
-            <automatismsSharedData />
+            <behaviorsSharedData />
         </layout>
     </layouts>
     <externalEvents />

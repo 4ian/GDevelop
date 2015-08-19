@@ -9,7 +9,7 @@
 			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="Custom" name="ID_PROPGRID" subclass="wxPropertyGrid" variable="grid" member="yes">
-					<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),0,$(NAME));</creating_code>
+					<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),wxPG_HIDE_MARGIN,$(NAME));</creating_code>
 					<include_file>wx/propgrid/propgrid.h</include_file>
 					<style></style>
 					<size>359,438</size>

@@ -76,11 +76,11 @@
             <objects>
                 <object name="Entry" type="TextEntryObject::TextEntry">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
                 <object bold="false" italic="false" name="Text" smoothed="true" type="TextObject::Text" underlined="false">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <string>(Text used to display user input)</string>
                     <font></font>
                     <characterSize>20</characterSize>
@@ -231,7 +231,7 @@
                     </cameras>
                 </layer>
             </layers>
-            <automatismsSharedData />
+            <behaviorsSharedData />
         </layout>
     </layouts>
     <externalEvents />

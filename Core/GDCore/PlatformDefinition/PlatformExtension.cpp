@@ -7,12 +7,12 @@
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/IDE/PlatformManager.h"
-#include "GDCore/PlatformDefinition/Automatism.h"
-#include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
+#include "GDCore/PlatformDefinition/Behavior.h"
+#include "GDCore/PlatformDefinition/BehaviorsSharedData.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/Events/ObjectMetadata.h"
-#include "GDCore/Events/AutomatismMetadata.h"
+#include "GDCore/Events/BehaviorMetadata.h"
 #include "GDCore/Events/EventMetadata.h"
 #include "GDCore/Events/Event.h"
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -96,19 +96,19 @@ gd::ObjectMetadata & PlatformExtension::AddObject(const gd::String & name,
     return objectsInfos[nameWithNamespace];
 }
 
-gd::AutomatismMetadata & PlatformExtension::AddAutomatism(const gd::String & name,
+gd::BehaviorMetadata & PlatformExtension::AddBehavior(const gd::String & name,
                                                       const gd::String & fullname,
                                                       const gd::String & defaultName,
                                                       const gd::String & description,
                                                       const gd::String & group,
                                                       const gd::String & icon24x24,
                                                       const gd::String & className,
-                                                      std::shared_ptr<gd::Automatism> instance,
-                                                      std::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance)
+                                                      std::shared_ptr<gd::Behavior> instance,
+                                                      std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance)
 {
     gd::String nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
-    automatismsInfo[nameWithNamespace] = AutomatismMetadata(GetNameSpace(), nameWithNamespace, fullname, defaultName, description, group, icon24x24, className, instance, sharedDatasInstance);
-    return automatismsInfo[nameWithNamespace];
+    behaviorsInfo[nameWithNamespace] = BehaviorMetadata(GetNameSpace(), nameWithNamespace, fullname, defaultName, description, group, icon24x24, className, instance, sharedDatasInstance);
+    return behaviorsInfo[nameWithNamespace];
 }
 
 gd::EventMetadata & PlatformExtension::AddEvent(const gd::String & name_,
@@ -159,25 +159,25 @@ gd::ObjectMetadata & PlatformExtension::GetObjectMetadata(const gd::String & obj
     return badObjectMetadata;
 }
 
-gd::AutomatismMetadata & PlatformExtension::GetAutomatismMetadata(const gd::String & automatismType)
+gd::BehaviorMetadata & PlatformExtension::GetBehaviorMetadata(const gd::String & behaviorType)
 {
-    if ( automatismsInfo.find(automatismType) != automatismsInfo.end())
-        return automatismsInfo.find(automatismType)->second;
+    if ( behaviorsInfo.find(behaviorType) != behaviorsInfo.end())
+        return behaviorsInfo.find(behaviorType)->second;
 
-    std::cout << "Warning: Automatism type \"" << automatismType << "\" not found in an extension!" << std::endl;
-    return badAutomatismMetadata;
+    std::cout << "Warning: Behavior type \"" << behaviorType << "\" not found in an extension!" << std::endl;
+    return badBehaviorMetadata;
 }
 
 #if defined(GD_IDE_ONLY)
-std::vector < gd::String > PlatformExtension::GetAutomatismsTypes() const
+std::vector < gd::String > PlatformExtension::GetBehaviorsTypes() const
 {
-    std::vector < gd::String > automatisms;
+    std::vector < gd::String > behaviors;
 
-    std::map<gd::String, gd::AutomatismMetadata>::const_iterator it;
-    for(it = automatismsInfo.begin(); it != automatismsInfo.end(); ++it)
-        automatisms.push_back(it->first);
+    std::map<gd::String, gd::BehaviorMetadata>::const_iterator it;
+    for(it = behaviorsInfo.begin(); it != behaviorsInfo.end(); ++it)
+        behaviors.push_back(it->first);
 
-    return automatisms;
+    return behaviors;
 }
 
 std::map<gd::String, gd::InstructionMetadata > & PlatformExtension::GetAllActions()
@@ -236,34 +236,34 @@ std::map<gd::String, gd::ExpressionMetadata > & PlatformExtension::GetAllStrExpr
     return badStrExpressionsMetadata;
 }
 
-std::map<gd::String, gd::InstructionMetadata > & PlatformExtension::GetAllActionsForAutomatism(gd::String autoType)
+std::map<gd::String, gd::InstructionMetadata > & PlatformExtension::GetAllActionsForBehavior(gd::String autoType)
 {
-    if ( automatismsInfo.find(autoType) != automatismsInfo.end())
-        return automatismsInfo.find(autoType)->second.actionsInfos;
+    if ( behaviorsInfo.find(autoType) != behaviorsInfo.end())
+        return behaviorsInfo.find(autoType)->second.actionsInfos;
 
     return badActionsMetadata;
 }
 
-std::map<gd::String, gd::InstructionMetadata > & PlatformExtension::GetAllConditionsForAutomatism(gd::String autoType)
+std::map<gd::String, gd::InstructionMetadata > & PlatformExtension::GetAllConditionsForBehavior(gd::String autoType)
 {
-    if ( automatismsInfo.find(autoType) != automatismsInfo.end())
-        return automatismsInfo.find(autoType)->second.conditionsInfos;
+    if ( behaviorsInfo.find(autoType) != behaviorsInfo.end())
+        return behaviorsInfo.find(autoType)->second.conditionsInfos;
 
     return badConditionsMetadata;
 }
 
-std::map<gd::String, gd::ExpressionMetadata > & PlatformExtension::GetAllExpressionsForAutomatism(gd::String autoType)
+std::map<gd::String, gd::ExpressionMetadata > & PlatformExtension::GetAllExpressionsForBehavior(gd::String autoType)
 {
-    if ( automatismsInfo.find(autoType) != automatismsInfo.end())
-        return automatismsInfo.find(autoType)->second.expressionsInfos;
+    if ( behaviorsInfo.find(autoType) != behaviorsInfo.end())
+        return behaviorsInfo.find(autoType)->second.expressionsInfos;
 
     return badExpressionsMetadata;
 }
 
-std::map<gd::String, gd::ExpressionMetadata > & PlatformExtension::GetAllStrExpressionsForAutomatism(gd::String autoType)
+std::map<gd::String, gd::ExpressionMetadata > & PlatformExtension::GetAllStrExpressionsForBehavior(gd::String autoType)
 {
-    if ( automatismsInfo.find(autoType) != automatismsInfo.end())
-        return automatismsInfo.find(autoType)->second.strExpressionsInfos;
+    if ( behaviorsInfo.find(autoType) != behaviorsInfo.end())
+        return behaviorsInfo.find(autoType)->second.strExpressionsInfos;
 
     return badStrExpressionsMetadata;
 }
@@ -294,21 +294,21 @@ CreateFunPtr PlatformExtension::GetObjectCreationFunctionPtr(gd::String objectTy
     return NULL;
 }
 
-Automatism* PlatformExtension::CreateAutomatism(gd::String type) const
+Behavior* PlatformExtension::CreateBehavior(gd::String type) const
 {
-    if ( automatismsInfo.find(type) != automatismsInfo.end())
-        return automatismsInfo.find(type)->second.Get()->Clone();
+    if ( behaviorsInfo.find(type) != behaviorsInfo.end())
+        return behaviorsInfo.find(type)->second.Get()->Clone();
 
     return NULL;
 }
 
 
-std::shared_ptr<gd::AutomatismsSharedData> PlatformExtension::CreateAutomatismSharedDatas(gd::String type) const
+std::shared_ptr<gd::BehaviorsSharedData> PlatformExtension::CreateBehaviorSharedDatas(gd::String type) const
 {
-    if ( automatismsInfo.find(type) != automatismsInfo.end() && automatismsInfo.find(type)->second.GetSharedDataInstance())
-        return automatismsInfo.find(type)->second.GetSharedDataInstance()->Clone();
+    if ( behaviorsInfo.find(type) != behaviorsInfo.end() && behaviorsInfo.find(type)->second.GetSharedDataInstance())
+        return behaviorsInfo.find(type)->second.GetSharedDataInstance()->Clone();
 
-    return std::shared_ptr<gd::AutomatismsSharedData>();
+    return std::shared_ptr<gd::BehaviorsSharedData>();
 }
 
 
@@ -423,9 +423,9 @@ void PlatformExtension::CloneExtension(const gd::String & platformName, const gd
                 it->second.SetFunctionName("").RemoveCustomCodeGenerator();
         }
 
-        for(std::map<gd::String, gd::AutomatismMetadata >::iterator objIt = automatismsInfo.begin();objIt!=automatismsInfo.end();++objIt)
+        for(std::map<gd::String, gd::BehaviorMetadata >::iterator objIt = behaviorsInfo.begin();objIt!=behaviorsInfo.end();++objIt)
         {
-            gd::AutomatismMetadata & obj = objIt->second;
+            gd::BehaviorMetadata & obj = objIt->second;
 
             for (std::map<gd::String, gd::InstructionMetadata >::iterator it = obj.actionsInfos.begin();it != obj.actionsInfos.end();++it)
                 it->second.SetFunctionName("").SetGetter("").RemoveCustomCodeGenerator();
@@ -532,9 +532,9 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions()
         }
     }
 
-    for(std::map<gd::String, gd::AutomatismMetadata >::iterator objIt = automatismsInfo.begin();objIt!=automatismsInfo.end();++objIt)
+    for(std::map<gd::String, gd::BehaviorMetadata >::iterator objIt = behaviorsInfo.begin();objIt!=behaviorsInfo.end();++objIt)
     {
-        gd::AutomatismMetadata & obj = objIt->second;
+        gd::BehaviorMetadata & obj = objIt->second;
 
         for (std::map<gd::String, gd::InstructionMetadata >::iterator it = obj.actionsInfos.begin();it != obj.actionsInfos.end();)
         {

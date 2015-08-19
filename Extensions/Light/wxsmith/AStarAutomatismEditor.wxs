@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="AStarAutomatismEditor">
-		<title>Automatism setup</title>
+	<object class="wxDialog" name="AStarBehaviorEditor">
+		<title>Behavior setup</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -140,7 +140,7 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
-					<label>Automatism global parameters</label>
+					<label>Behavior global parameters</label>
 					<object class="sizeritem">
 						<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 							<cols>1</cols>

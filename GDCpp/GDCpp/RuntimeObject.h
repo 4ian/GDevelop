@@ -12,7 +12,7 @@
 #include "GDCpp/RuntimeVariablesContainer.h"
 #include "GDCpp/Force.h"
 #include "GDCpp/String.h"
-namespace gd { class Automatism; }
+namespace gd { class Behavior; }
 namespace gd { class InitialInstance; }
 namespace gd { class Object; }
 namespace sf { class RenderTarget; }
@@ -43,7 +43,7 @@ public:
      * \brief Construct a RuntimeObject from an object.
      *
      * The default implementation already takes care of setting common properties
-     * ( name, type, automatisms... ). Be sure to call the original constructor if you redefine it:
+     * ( name, type, behaviors... ). Be sure to call the original constructor if you redefine it:
      * \code
      * MyRuntimeObject(RuntimeScene & scene, const gd::Object & object) :
      *     RuntimeObject(scene, object)
@@ -110,34 +110,34 @@ public:
     ///@}
 
 
-    /** \name Automatism related functions
-     * Functions related to automatisms management.
+    /** \name Behavior related functions
+     * Functions related to behaviors management.
      */
     ///@{
     /**
-     * \brief Call each automatism so that they do their work before events
+     * \brief Call each behavior so that they do their work before events
      */
-    void DoAutomatismsPreEvents(RuntimeScene & scene);
+    void DoBehaviorsPreEvents(RuntimeScene & scene);
 
     /**
-     * \brief Call each automatism so that they do their work after the events were runn.
+     * \brief Call each behavior so that they do their work after the events were runn.
      */
-    void DoAutomatismsPostEvents(RuntimeScene & scene);
-
-    /**
-     * Only used by GD events generated code
-     */
-    gd::Automatism* GetAutomatismRawPointer(const gd::String & name);
+    void DoBehaviorsPostEvents(RuntimeScene & scene);
 
     /**
      * Only used by GD events generated code
      */
-    gd::Automatism* GetAutomatismRawPointer(const gd::String & name) const;
+    gd::Behavior* GetBehaviorRawPointer(const gd::String & name);
 
     /**
-     * \brief Return true if the object has the automatism with the specified name.
+     * Only used by GD events generated code
      */
-    virtual bool HasAutomatismNamed(const gd::String & name) const { return automatisms.find(name) != automatisms.end(); };
+    gd::Behavior* GetBehaviorRawPointer(const gd::String & name) const;
+
+    /**
+     * \brief Return true if the object has the behavior with the specified name.
+     */
+    virtual bool HasBehaviorNamed(const gd::String & name) const { return behaviors.find(name) != behaviors.end(); };
     ///@}
 
     /**
@@ -414,8 +414,8 @@ public:
     void SetXY( const char* xOperator, float xValue, const char* yOperator, float yValue );
 
     void Duplicate( RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists );
-    void ActivateAutomatism( const gd::String & automatismName, bool activate = true );
-    bool AutomatismActivated( const gd::String & automatismName );
+    void ActivateBehavior( const gd::String & behaviorName, bool activate = true );
+    bool BehaviorActivated( const gd::String & behaviorName );
 
     bool IsStopped();
     bool TestAngleOfDisplacement( float angle, float tolerance );
@@ -443,7 +443,7 @@ protected:
     int                                                     zOrder; ///<Z order on the scene, to choose if an object is displayed before another object.
     bool                                                    hidden; ///<True to prevent the object from being rendered.
     gd::String                                             layer; ///<Name of the layer on which the object is.
-    std::map<gd::String, gd::Automatism* >                 automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
+    std::map<gd::String, gd::Behavior* >                 behaviors; ///<Contains all behaviors of the object. Behaviors are the ownership of the object
     RuntimeVariablesContainer                               objectVariables; ///<List of the variables of the object
     std::vector < Force >                                   forces; ///< Forces applied to the object
 

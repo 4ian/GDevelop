@@ -19,7 +19,7 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._objectsCtor = new Hashtable();
     this._layers = new Hashtable();
     this._timers = new Hashtable();
-	this._initialAutomatismSharedData = new Hashtable();
+	this._initialBehaviorSharedData = new Hashtable();
     this._pixiRenderer = pixiRenderer;
     this._pixiContainer = new PIXI.Container(); //The Container meant to contains all pixi objects of the scene.
     this._latestFrameDate = new Date();
@@ -86,10 +86,10 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     //Load variables
     this._variables = new gdjs.VariablesContainer(sceneData.variables);
 
-	//Cache the initial shared data of the automatisms
-    gdjs.iterateOverArray(sceneData.automatismsSharedData, function(data) {
+	//Cache the initial shared data of the behaviors
+    gdjs.iterateOverArray(sceneData.behaviorsSharedData, function(data) {
 		//console.log("Initializing shared data for "+data.name);
-		that._initialAutomatismSharedData.put(data.name, data);
+		that._initialBehaviorSharedData.put(data.name, data);
 	});
 
     //Load objects: Global objects first...
@@ -244,7 +244,7 @@ gdjs.RuntimeScene.prototype._updateTime = function() {
  * Empty the list of the removed objects:<br>
  * When an object is removed from the scene, it is still kept in the _instancesRemoved member
  * of the RuntimeScene.<br>
- * This method should be called regularly (after events or automatisms steps) so as to clear this list
+ * This method should be called regularly (after events or behaviors steps) so as to clear this list
  * and allows the removed objects to be cached (or destroyed if the cache is full).<br>
  * The removed objects could not be sent directly to the cache, as events may still be using them after
  * removing them from the scene for example.
@@ -294,14 +294,14 @@ gdjs.RuntimeScene.prototype._constructListOfAllInstances= function() {
  */
 gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
 
-	//It is *mandatory* to create and iterate on a external list of all objects, as the automatisms
+	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
 	//may delete the objects.
 	this._constructListOfAllInstances();
 	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-		this._allInstancesList[i].stepAutomatismsPreEvents(this);
+		this._allInstancesList[i].stepBehaviorsPreEvents(this);
 	}
 
-	this._cacheOrClearRemovedInstances(); //Some automatisms may have request objects to be deleted.
+	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
 };
 
 /**
@@ -314,15 +314,15 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
 
 	this.updateObjectsForces();
 
-	//It is *mandatory* to create and iterate on a external list of all objects, as the automatisms
+	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
 	//may delete the objects.
 	this._constructListOfAllInstances();
 	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 		this._allInstancesList[i].updateTime(this._elapsedTime/1000);
-		this._allInstancesList[i].stepAutomatismsPostEvents(this);
+		this._allInstancesList[i].stepBehaviorsPostEvents(this);
 	}
 
-	this._cacheOrClearRemovedInstances(); //Some automatisms may have request objects to be deleted.
+	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
 };
 
 /**
@@ -446,8 +446,8 @@ gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
 
 	//Notify the object it was removed from the scene
 	obj.onDeletedFromScene(this);
-	for(var j = 0, lenj = obj._automatisms.length;j<lenj;++j) {
-		obj._automatisms[j].ownerRemovedFromScene();
+	for(var j = 0, lenj = obj._behaviors.length;j<lenj;++j) {
+		obj._behaviors[j].ownerRemovedFromScene();
 	}
 
 	//Call global callback
@@ -509,13 +509,13 @@ gdjs.RuntimeScene.prototype.getVariables = function() {
 };
 
 /**
- * Get the data representing the initial shared data of the scene for the specified automatism.
- * @method getInitialSharedDataForAutomatism
- * @param name {String} The name of the automatism
+ * Get the data representing the initial shared data of the scene for the specified behavior.
+ * @method getInitialSharedDataForBehavior
+ * @param name {String} The name of the behavior
  */
-gdjs.RuntimeScene.prototype.getInitialSharedDataForAutomatism = function(name) {
-	if ( this._initialAutomatismSharedData.containsKey(name) ) {
-		return this._initialAutomatismSharedData.get(name);
+gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
+	if ( this._initialBehaviorSharedData.containsKey(name) ) {
+		return this._initialBehaviorSharedData.get(name);
 	}
 
 	return null;

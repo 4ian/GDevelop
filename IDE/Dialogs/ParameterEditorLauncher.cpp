@@ -27,7 +27,7 @@
 #include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseBehaviorDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "../ChoixClavier.h"
 #include "../SigneModification.h"
@@ -56,12 +56,12 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
         }
         return;
     }
-    else if ( metadata.GetType() == "automatism" )
+    else if ( metadata.GetType() == "behavior" )
     {
         gd::String object = paramEdits.empty() ? "" : paramEdits[0]->GetValue();
-        gd::ChooseAutomatismDialog dialog(parent, project, layout, object, metadata.GetExtraInfo());
-        if (dialog.DeduceAutomatism() || dialog.ShowModal() == 1 )
-            editCtrl->ChangeValue(dialog.GetChosenAutomatism());
+        gd::ChooseBehaviorDialog dialog(parent, project, layout, object, metadata.GetExtraInfo());
+        if (dialog.DeduceBehavior() || dialog.ShowModal() == 1 )
+            editCtrl->ChangeValue(dialog.GetChosenBehavior());
 
         return;
     }

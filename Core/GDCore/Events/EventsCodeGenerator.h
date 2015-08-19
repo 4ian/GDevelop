@@ -14,7 +14,7 @@ namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
 namespace gd { class ParameterMetadata; }
 namespace gd { class ObjectMetadata; }
-namespace gd { class AutomatismMetadata; }
+namespace gd { class BehaviorMetadata; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class EventsCodeGenerationContext; }
 namespace gd { class ExpressionCodeGenerationInformation; }
@@ -107,7 +107,7 @@ public:
     /**
      * \brief Generate code for a single condition.
      *
-     * The generation is really done in GenerateFreeCondition/GenerateObjectCondition or GenerateAutomatismCondition.
+     * The generation is really done in GenerateFreeCondition/GenerateObjectCondition or GenerateBehaviorCondition.
      *
      * \param condition instruction to be done.
      * \param returnBoolean The name of the boolean that must contains the condition result.
@@ -119,7 +119,7 @@ public:
     /**
      * \brief Generate code for a single action
      *
-     * The generation is really done in GenerateFreeAction/GenerateObjectAction or GenerateAutomatismAction.
+     * The generation is really done in GenerateFreeAction/GenerateObjectAction or GenerateBehaviorAction.
      *
      * \param condition instruction to be done.
      * \param context Context used for generation
@@ -351,19 +351,19 @@ protected:
                                                           gd::EventsCodeGenerationContext & context);
 
     /**
-     * \brief Call a function of an automatism of the current object.
+     * \brief Call a function of a behavior of the current object.
      * \note The current object is the object being manipulated by a condition or an action.
      *
      * \param objectListName The full name of the object list being used
-     * \param automatismName The full name of the automatism to be used
-     * \param objMetadata Metadata about the automatism being used.
+     * \param behaviorName The full name of the behavior to be used
+     * \param objMetadata Metadata about the behavior being used.
      * \param functionCallName The function to be called on this object.
      * \param parametersStr The parameters of the function
      * \param context The context : May be used to get information about the current scope.
      */
-    virtual gd::String GenerateObjectAutomatismFunctionCall(gd::String objectListName,
-                                                                      gd::String automatismName,
-                                                                      const gd::AutomatismMetadata & autoInfo,
+    virtual gd::String GenerateObjectBehaviorFunctionCall(gd::String objectListName,
+                                                                      gd::String behaviorName,
+                                                                      const gd::BehaviorMetadata & autoInfo,
                                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                                       gd::String parametersStr,
                                                                       gd::String defaultOutput,
@@ -413,9 +413,9 @@ protected:
                                                             bool conditionInverted,
                                                             gd::EventsCodeGenerationContext & context);
 
-    virtual gd::String GenerateAutomatismCondition(const gd::String & objectName,
-                                                                const gd::String & automatismName,
-                                                                const gd::AutomatismMetadata & autoInfo,
+    virtual gd::String GenerateBehaviorCondition(const gd::String & objectName,
+                                                                const gd::String & behaviorName,
+                                                                const gd::BehaviorMetadata & autoInfo,
                                                                 const std::vector<gd::String> & arguments,
                                                                 const gd::InstructionMetadata & instrInfos,
                                                                 const gd::String & returnBoolean,
@@ -432,9 +432,9 @@ protected:
                                                         const gd::InstructionMetadata & instrInfos,
                                                         gd::EventsCodeGenerationContext & context);
 
-    virtual gd::String GenerateAutomatismAction(const gd::String & objectName,
-                                                            const gd::String & automatismName,
-                                                            const gd::AutomatismMetadata & autoInfo,
+    virtual gd::String GenerateBehaviorAction(const gd::String & objectName,
+                                                            const gd::String & behaviorName,
+                                                            const gd::BehaviorMetadata & autoInfo,
                                                             const std::vector<gd::String> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             gd::EventsCodeGenerationContext & context);

@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/PlatformDefinition/Automatism.h"
+#include "GDCore/PlatformDefinition/Behavior.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -21,8 +21,8 @@ namespace gd
 
 Object::~Object()
 {
-    //Do not forget to delete automatisms which are managed using raw pointers.
-    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    //Do not forget to delete behaviors which are managed using raw pointers.
+    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
     	delete it->second;
 }
 
@@ -37,66 +37,66 @@ void Object::Init(const gd::Object & object)
     type = object.type;
     objectVariables = object.objectVariables;
 
-    //Do not forget to delete automatisms which are managed using raw pointers.
-    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    //Do not forget to delete behaviors which are managed using raw pointers.
+    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
     	delete it->second;
 
-    automatisms.clear();
-    for (std::map<gd::String, Automatism* >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
-    	automatisms[it->first] = it->second->Clone();
+    behaviors.clear();
+    for (std::map<gd::String, Behavior* >::const_iterator it = object.behaviors.begin() ; it != object.behaviors.end(); ++it )
+    	behaviors[it->first] = it->second->Clone();
 }
 
 
-std::vector < gd::String > Object::GetAllAutomatismNames() const
+std::vector < gd::String > Object::GetAllBehaviorNames() const
 {
     std::vector < gd::String > allNameIdentifiers;
 
-    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
     	allNameIdentifiers.push_back(it->first);
 
     return allNameIdentifiers;
 }
 
-void Object::RemoveAutomatism(const gd::String & name)
+void Object::RemoveBehavior(const gd::String & name)
 {
-    //Do not forget to delete automatisms which are managed using raw pointers.
-    delete(automatisms[name]);
+    //Do not forget to delete behaviors which are managed using raw pointers.
+    delete(behaviors[name]);
 
-    automatisms.erase(name);
+    behaviors.erase(name);
 }
 
-bool Object::RenameAutomatism(const gd::String & name, const gd::String & newName)
+bool Object::RenameBehavior(const gd::String & name, const gd::String & newName)
 {
-    if ( automatisms.find(name) == automatisms.end()
-      || automatisms.find(newName) != automatisms.end() ) return false;
+    if ( behaviors.find(name) == behaviors.end()
+      || behaviors.find(newName) != behaviors.end() ) return false;
 
-    Automatism * aut = automatisms.find(name)->second;
-    automatisms.erase(name);
-    automatisms[newName] = aut;
+    Behavior * aut = behaviors.find(name)->second;
+    behaviors.erase(name);
+    behaviors[newName] = aut;
     aut->SetName(newName);
 
     return true;
 }
 
-gd::Automatism & Object::GetAutomatism(const gd::String & name)
+gd::Behavior & Object::GetBehavior(const gd::String & name)
 {
-    return *automatisms.find(name)->second;
+    return *behaviors.find(name)->second;
 }
 
-const gd::Automatism & Object::GetAutomatism(const gd::String & name) const
+const gd::Behavior & Object::GetBehavior(const gd::String & name) const
 {
-    return *automatisms.find(name)->second;
+    return *behaviors.find(name)->second;
 }
 
-bool Object::HasAutomatismNamed(const gd::String & name) const
+bool Object::HasBehaviorNamed(const gd::String & name) const
 {
-    return automatisms.find(name) != automatisms.end();
+    return behaviors.find(name) != behaviors.end();
 }
 
-bool Object::AddAutomatism(Automatism * automatism)
+bool Object::AddBehavior(Behavior * behavior)
 {
-    if (automatism && !HasAutomatismNamed(automatism->GetName())) {
-        automatisms[automatism->GetName()] = automatism;
+    if (behavior && !HasBehaviorNamed(behavior->GetName())) {
+        behaviors[behavior->GetName()] = behavior;
         return true;
     }
 
@@ -104,16 +104,16 @@ bool Object::AddAutomatism(Automatism * automatism)
 }
 
 #if defined(GD_IDE_ONLY)
-gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const gd::String & type, const gd::String & name)
+gd::Behavior * Object::AddNewBehavior(gd::Project & project, const gd::String & type, const gd::String & name)
 {
-    Automatism * automatism = project.GetCurrentPlatform().CreateAutomatism(type);
+    Behavior * behavior = project.GetCurrentPlatform().CreateBehavior(type);
 
-    if ( automatism != NULL ) {
-        automatism->SetName(name);
-        automatisms[automatism->GetName()] = automatism;
+    if ( behavior != NULL ) {
+        behavior->SetName(name);
+        behaviors[behavior->GetName()] = behavior;
     }
 
-    return automatism;
+    return behavior;
 }
 
 sf::Vector2f Object::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
@@ -153,48 +153,58 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
     //Name and type are already loaded.
     objectVariables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
+    //Compatibility with GD <= 4
+    auto renameOldType = [](gd::String name) {
+        gd::String oldWord = "Automatism";
+        while (name.find(oldWord) != gd::String::npos)
+            name = name.replace(name.find(oldWord), oldWord.size(), "Behavior");
+
+        return name;
+    };
+    //End of compatibility code
+
     //Compatibility with GD <= 3.3
     if (element.HasChild("Automatism"))
     {
         for (unsigned int i = 0; i < element.GetChildrenCount("Automatism"); ++i)
         {
-            SerializerElement & automatismElement = element.GetChild("Automatism", i);
+            SerializerElement & behaviorElement = element.GetChild("Automatism", i);
 
-            gd::String autoType = automatismElement.GetStringAttribute("type", "", "Type");
-            gd::String autoName = automatismElement.GetStringAttribute("name", "", "Name");
+            gd::String autoType = renameOldType(behaviorElement.GetStringAttribute("type", "", "Type"));
+            gd::String autoName = behaviorElement.GetStringAttribute("name", "", "Name");
 
-            Automatism* automatism = project.CreateAutomatism(autoType);
-            if ( automatism != NULL )
+            Behavior* behavior = project.CreateBehavior(autoType);
+            if ( behavior != NULL )
             {
-                automatism->SetName(autoName);
-                automatism->UnserializeFrom(automatismElement);
-                automatisms[automatism->GetName()] = automatism;
+                behavior->SetName(autoName);
+                behavior->UnserializeFrom(behaviorElement);
+                behaviors[behavior->GetName()] = behavior;
             }
             else
-                std::cout << "WARNING: Unknown automatism " << automatismElement.GetStringAttribute("type") << std::endl;
+                std::cout << "WARNING: Unknown behavior " << behaviorElement.GetStringAttribute("type") << std::endl;
         }
     }
     //End of compatibility code
     else
     {
-        SerializerElement & automatismsElement = element.GetChild("automatisms");
-        automatismsElement.ConsiderAsArrayOf("automatism");
-        for (unsigned int i = 0; i < automatismsElement.GetChildrenCount(); ++i)
+        SerializerElement & behaviorsElement = element.GetChild("behaviors", 0, "automatisms");
+        behaviorsElement.ConsiderAsArrayOf("behavior", "automatism");
+        for (unsigned int i = 0; i < behaviorsElement.GetChildrenCount(); ++i)
         {
-            SerializerElement & automatismElement = automatismsElement.GetChild(i);
+            SerializerElement & behaviorElement = behaviorsElement.GetChild(i);
 
-            gd::String autoType = automatismElement.GetStringAttribute("type");
-            gd::String autoName = automatismElement.GetStringAttribute("name");
+            gd::String autoType = renameOldType(behaviorElement.GetStringAttribute("type"));
+            gd::String autoName = behaviorElement.GetStringAttribute("name");
 
-            Automatism* automatism = project.CreateAutomatism(autoType);
-            if ( automatism != NULL )
+            Behavior* behavior = project.CreateBehavior(autoType);
+            if ( behavior != NULL )
             {
-                automatism->SetName(autoName);
-                automatism->UnserializeFrom(automatismElement);
-                automatisms[automatism->GetName()] = automatism;
+                behavior->SetName(autoName);
+                behavior->UnserializeFrom(behaviorElement);
+                behaviors[behavior->GetName()] = behavior;
             }
             else
-                std::cout << "WARNING: Unknown automatism " << automatismElement.GetStringAttribute("type") << std::endl;
+                std::cout << "WARNING: Unknown behavior " << behaviorElement.GetStringAttribute("type") << std::endl;
         }
     }
 
@@ -208,16 +218,16 @@ void Object::SerializeTo(SerializerElement & element) const
     element.SetAttribute( "type", GetType() );
     objectVariables.SerializeTo(element.AddChild("variables"));
 
-    SerializerElement & automatismsElement = element.AddChild("automatisms");
-    automatismsElement.ConsiderAsArrayOf("automatism");
-    std::vector < gd::String > allAutomatisms = GetAllAutomatismNames();
-    for (unsigned int i = 0;i<allAutomatisms.size();++i)
+    SerializerElement & behaviorsElement = element.AddChild("behaviors");
+    behaviorsElement.ConsiderAsArrayOf("behavior");
+    std::vector < gd::String > allBehaviors = GetAllBehaviorNames();
+    for (unsigned int i = 0;i<allBehaviors.size();++i)
     {
-        SerializerElement & automatismElement = automatismsElement.AddChild("automatism");
+        SerializerElement & behaviorElement = behaviorsElement.AddChild("behavior");
 
-        automatismElement.SetAttribute( "type", GetAutomatism(allAutomatisms[i]).GetTypeName() );
-        automatismElement.SetAttribute( "name", GetAutomatism(allAutomatisms[i]).GetName() );
-        GetAutomatism(allAutomatisms[i]).SerializeTo(automatismElement);
+        behaviorElement.SetAttribute( "type", GetBehavior(allBehaviors[i]).GetTypeName() );
+        behaviorElement.SetAttribute( "name", GetBehavior(allBehaviors[i]).GetName() );
+        GetBehavior(allBehaviors[i]).SerializeTo(behaviorElement);
     }
 
     DoSerializeTo(element);

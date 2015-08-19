@@ -21,14 +21,13 @@
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasTextDnd.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"
@@ -229,7 +228,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
         deleteItem->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 
         contextMenu.Append(ID_PROPMENU, _("Properties"));
-        contextMenu.Append(ID_AUTOMENU, _("Add an automatism to the object"));
+        contextMenu.Append(ID_AUTOMENU, _("Add a behavior to the object"));
         contextMenu.AppendSeparator();
         contextMenu.Append(ID_CREATEOBJECTMENU, _("Insert a new object"));
         contextMenu.AppendSeparator();
@@ -666,7 +665,7 @@ void LayoutEditorCanvas::OnAddAutoObjSelected(wxCommandEvent & event)
         }
     }
 
-    gd::ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(this, project,
+    gd::ChooseBehaviorTypeDialog::ChooseAndAddBehaviorToObject(this, project,
         object, &layout, globalObject);
 
     //Show the properties panel and ensure other editors are refreshed:

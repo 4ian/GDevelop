@@ -23,7 +23,7 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseBehaviorDialog.h"
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/Dialogs/AdvancedEntryDialog.h"
@@ -177,7 +177,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, gd::String ex
             continue;
 
 	    std::vector<gd::String>  objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-	    std::vector<gd::String>  automatismsTypes = extensions[i]->GetAutomatismsTypes();
+	    std::vector<gd::String>  behaviorsTypes = extensions[i]->GetBehaviorsTypes();
 
         wxTreeItemId extensionItem = ObjList->GetRootItem();
 
@@ -216,26 +216,26 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, gd::String ex
             }
 	    }
 
-	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
+	    for(unsigned int j = 0;j<behaviorsTypes.size();++j)
 	    {
-            wxTreeItemId automatismTypeItem =   automatismsTypes[j] == "" ?
+            wxTreeItemId behaviorTypeItem =   behaviorsTypes[j] == "" ?
                                             ObjList->AppendItem(extensionItem, _("All objects"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(), 0) ;
+                                            ObjList->AppendItem(extensionItem, _("Behavior") + wxString(" ") + extensions[i]->GetBehaviorMetadata(behaviorsTypes[j]).GetFullName(), 0) ;
 
-            //Add each automatism expression
-            std::map<gd::String, gd::ExpressionMetadata > allAutoExpr = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            //Add each behavior expression
+            std::map<gd::String, gd::ExpressionMetadata > allAutoExpr = extensions[i]->GetAllStrExpressionsForBehavior(behaviorsTypes[j]);
             for(std::map<gd::String, gd::ExpressionMetadata>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
             {
                 if ( it->second.IsShown() )
                 {
                     //Search and/or add group item
                     wxTreeItemIdValue cookie;
-                    wxTreeItemId groupItem = ObjList->GetFirstChild(automatismTypeItem, cookie);
+                    wxTreeItemId groupItem = ObjList->GetFirstChild(behaviorTypeItem, cookie);
                     while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.GetGroup())
                     {
                         groupItem = ObjList->GetNextSibling(groupItem);
                     }
-                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
+                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(behaviorTypeItem, it->second.GetGroup(), 0);
 
                     //Add expression item
                     int IDimage = 0;
@@ -328,15 +328,15 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, gd::String ex
                 keywords += " "+it->first;
         }
 
-        //Add keywords of automatisms expressions
-	    std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
-        for (unsigned int j = 0;j<automatismsTypes.size();++j)
+        //Add keywords of behaviors expressions
+	    std::vector<gd::String> behaviorsTypes = extensions[i]->GetBehaviorsTypes();
+        for (unsigned int j = 0;j<behaviorsTypes.size();++j)
         {
-            const std::map<gd::String, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
+            const std::map<gd::String, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForBehavior(behaviorsTypes[j]);
             for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<gd::String, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            const std::map<gd::String, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForBehavior(behaviorsTypes[j]);
             for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
@@ -542,14 +542,14 @@ void EditStrExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
         gd::String object = ShowParameterDialog(infos->GetExpressionMetadata().parameters[0], cancelled);
         if ( cancelled ) return;
 
-        gd::String parametersStr, automatismStr;
+        gd::String parametersStr, behaviorStr;
         for (unsigned int i = 1;i<infos->GetExpressionMetadata().parameters.size();++i)
         {
-            if ( i == 1 && infos->GetExpressionMetadata().parameters[i].type == "automatism")
+            if ( i == 1 && infos->GetExpressionMetadata().parameters[i].type == "behavior")
             {
-                gd::ChooseAutomatismDialog dialog(this, project, layout, object, infos->GetExpressionMetadata().parameters[i].supplementaryInformation);
-                if ( dialog.DeduceAutomatism() || dialog.ShowModal() == 1 )
-                    automatismStr = dialog.GetChosenAutomatism()+"::";
+                gd::ChooseBehaviorDialog dialog(this, project, layout, object, infos->GetExpressionMetadata().parameters[i].supplementaryInformation);
+                if ( dialog.DeduceBehavior() || dialog.ShowModal() == 1 )
+                    behaviorStr = dialog.GetChosenBehavior()+"::";
             }
             else
             {
@@ -560,7 +560,7 @@ void EditStrExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
         }
 
         if ( TexteEdit->GetText() == "\"\"" ) TexteEdit->SetText("");
-        TexteEdit->AddText(object+"."+automatismStr+infos->GetName()+"("+parametersStr+")");
+        TexteEdit->AddText(object+"."+behaviorStr+infos->GetName()+"("+parametersStr+")");
         return;
     }
 }

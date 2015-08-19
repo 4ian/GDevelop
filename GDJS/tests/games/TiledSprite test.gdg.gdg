@@ -111,15 +111,15 @@
             <objects>
                 <object height="64.000000" name="NewObject" texture="gem2z.png" type="TiledSpriteObject::TiledSprite" width="64.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
                 <object height="64.000000" name="NewObject2" texture="use42338.png" type="TiledSpriteObject::TiledSprite" width="64.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
                 <object bold="false" italic="false" name="NewObject3" smoothed="true" type="TextObject::Text" underlined="false">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <string>Text</string>
                     <font></font>
                     <characterSize>20</characterSize>
@@ -172,7 +172,7 @@
                     </cameras>
                 </layer>
             </layers>
-            <automatismsSharedData />
+            <behaviorsSharedData />
         </layout>
     </layouts>
     <externalEvents />

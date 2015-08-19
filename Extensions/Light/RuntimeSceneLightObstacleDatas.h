@@ -8,19 +8,19 @@ This project is released under the MIT License.
 #ifndef RUNTIMESCENELIGHTOBSTACLEDATAS_H
 #define RUNTIMESCENELIGHTOBSTACLEDATAS_H
 #include <vector>
-#include "GDCpp/AutomatismsRuntimeSharedData.h"
+#include "GDCpp/BehaviorsRuntimeSharedData.h"
 class SceneLightObstacleDatas;
-class LightObstacleAutomatism;
+class LightObstacleBehavior;
 
 /**
- * Datas shared by A Star Automatism at runtime
+ * Datas shared by A Star Behavior at runtime
  */
-class GD_EXTENSION_API RuntimeSceneLightObstacleDatas : public AutomatismsRuntimeSharedData
+class GD_EXTENSION_API RuntimeSceneLightObstacleDatas : public BehaviorsRuntimeSharedData
 {
 public:
-    RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & automatismSharedDatas);
+    RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & behaviorSharedDatas);
     virtual ~RuntimeSceneLightObstacleDatas();
-    virtual std::shared_ptr<AutomatismsRuntimeSharedData> Clone() const { return std::shared_ptr<AutomatismsRuntimeSharedData>(new RuntimeSceneLightObstacleDatas(*this));}
+    virtual std::shared_ptr<BehaviorsRuntimeSharedData> Clone() const { return std::shared_ptr<BehaviorsRuntimeSharedData>(new RuntimeSceneLightObstacleDatas(*this));}
 
     float gridWidth;
     float gridHeight;

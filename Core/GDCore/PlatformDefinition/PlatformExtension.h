@@ -11,20 +11,20 @@
 #include <vector>
 #include <memory>
 #include "GDCore/Events/ObjectMetadata.h"
-#include "GDCore/Events/AutomatismMetadata.h"
+#include "GDCore/Events/BehaviorMetadata.h"
 #include "GDCore/Events/EventMetadata.h"
 #include "GDCore/String.h"
 namespace gd { class Instruction; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
 namespace gd { class ObjectMetadata; }
-namespace gd { class AutomatismMetadata; }
+namespace gd { class BehaviorMetadata; }
 namespace gd { class BaseEvent; }
 namespace gd { class EventMetadata; }
 namespace gd { class EventCodeGenerator; }
 namespace gd { class ArbitraryResourceWorker; }
-namespace gd { class AutomatismsSharedData; }
-namespace gd { class Automatism; }
+namespace gd { class BehaviorsSharedData; }
+namespace gd { class Behavior; }
 namespace gd { class Object; }
 
 typedef void (*DestroyFunPtr)(gd::Object*);
@@ -161,26 +161,26 @@ public:
                                    CreateFunPtr createFunPtrP);
 
     /**
-     * \brief Declare a new automatism as being part of the extension.
+     * \brief Declare a new behavior as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      *
-     * \param name The name of the automatism
-     * \param fullname The user friendly name of the automatism
-     * \param description The user friendly description of the automatism
-     * \param icon The 24x24 icon of the automatism: res/icons_[SkinName]/[iconName]24.png will be first tried,
+     * \param name The name of the behavior
+     * \param fullname The user friendly name of the behavior
+     * \param description The user friendly description of the behavior
+     * \param icon The 24x24 icon of the behavior: res/icons_[SkinName]/[iconName]24.png will be first tried,
      * and then if it does not exists, it is assumed that the icon name is the filename that must be used to open the icon.
-     * \param instance An instance of the automatism that will be used to create the automatism
-     * \param sharedDatasInstance Optional instance of the data shared by the automatisms having the same name.
+     * \param instance An instance of the behavior that will be used to create the behavior
+     * \param sharedDatasInstance Optional instance of the data shared by the behaviors having the same name.
      */
-    gd::AutomatismMetadata & AddAutomatism(const gd::String & name_,
+    gd::BehaviorMetadata & AddBehavior(const gd::String & name_,
                                           const gd::String & fullname_,
                                           const gd::String & defaultName_,
                                           const gd::String & description_,
                                           const gd::String & group_,
                                           const gd::String & icon24x24_,
                                           const gd::String & className_,
-                                          std::shared_ptr<gd::Automatism> instance,
-                                          std::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance);
+                                          std::shared_ptr<gd::Behavior> instance,
+                                          std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance);
 
     /**
      * \brief Declare a new event as being part of the extension.
@@ -240,9 +240,9 @@ public:
     std::vector < gd::String > GetExtensionObjectsTypes() const;
 
     /**
-     * \brief Return a vector containing all the automatism types provided by the extension
+     * \brief Return a vector containing all the behavior types provided by the extension
      */
-    std::vector < gd::String > GetAutomatismsTypes() const;
+    std::vector < gd::String > GetBehaviorsTypes() const;
 
     /**
      * \brief Return a function to create the object if the type is handled by the extension
@@ -256,18 +256,18 @@ public:
      */
     std::shared_ptr<gd::BaseEvent> CreateEvent(gd::String eventType) const;
     /**
-     * \brief Create an automatism
+     * \brief Create a behavior
      *
-     * Return NULL if \a automatismType is not provided by the extension.
+     * Return NULL if \a behaviorType is not provided by the extension.
      */
-    gd::Automatism* CreateAutomatism(gd::String automatismType) const;
+    gd::Behavior* CreateBehavior(gd::String behaviorType) const;
 
     /**
-     * \brief Create shared data for an automatism
+     * \brief Create shared data for a behavior
      *
-     * Return NULL if \a automatismType is not provided by the extension.
+     * Return NULL if \a behaviorType is not provided by the extension.
      */
-    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(gd::String automatismType) const;
+    std::shared_ptr<gd::BehaviorsSharedData> CreateBehaviorSharedDatas(gd::String behaviorType) const;
 
     /**
      * \brief Return a reference to the ObjectMetadata object associated to \a objectType
@@ -275,9 +275,9 @@ public:
     ObjectMetadata & GetObjectMetadata(const gd::String & objectType);
 
     /**
-     * \brief Return a reference to the AutomatismMetadata object associated to \a automatismType
+     * \brief Return a reference to the BehaviorMetadata object associated to \a behaviorType
      */
-    AutomatismMetadata & GetAutomatismMetadata(const gd::String & automatismType);
+    BehaviorMetadata & GetBehaviorMetadata(const gd::String & behaviorType);
 
     /**
      * \brief Return a map containing all the events provided by the extension
@@ -328,22 +328,22 @@ public:
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<gd::String, gd::InstructionMetadata > & GetAllActionsForAutomatism(gd::String autoType);
+    std::map<gd::String, gd::InstructionMetadata > & GetAllActionsForBehavior(gd::String autoType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<gd::String, gd::InstructionMetadata > & GetAllConditionsForAutomatism(gd::String autoType);
+    std::map<gd::String, gd::InstructionMetadata > & GetAllConditionsForBehavior(gd::String autoType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<gd::String, gd::ExpressionMetadata > & GetAllExpressionsForAutomatism(gd::String autoType);
+    std::map<gd::String, gd::ExpressionMetadata > & GetAllExpressionsForBehavior(gd::String autoType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<gd::String, gd::ExpressionMetadata > & GetAllStrExpressionsForAutomatism(gd::String autoType);
+    std::map<gd::String, gd::ExpressionMetadata > & GetAllStrExpressionsForBehavior(gd::String autoType);
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by conditions and update their filename
@@ -392,7 +392,7 @@ private:
     void SetNameSpace(gd::String nameSpace_);
 
     gd::String name; ///<Name identifying the extension
-    gd::String nameSpace; ///<Automatically set from the name of the extension, and added to every actions/conditions/expressions/objects/automatism/event.
+    gd::String nameSpace; ///<Automatically set from the name of the extension, and added to every actions/conditions/expressions/objects/behavior/event.
     gd::String fullname; ///<Name displayed to users at edittime
     gd::String informations; ///<Description displayed to users at edittime
     gd::String author; ///<Author displayed to users at edittime
@@ -400,7 +400,7 @@ private:
     bool deprecated;
 
     std::map<gd::String, gd::ObjectMetadata > objectsInfos;
-    std::map<gd::String, gd::AutomatismMetadata > automatismsInfo;
+    std::map<gd::String, gd::BehaviorMetadata > behaviorsInfo;
     #if defined(GD_IDE_ONLY)
     std::map<gd::String, gd::InstructionMetadata > conditionsInfos;
     std::map<gd::String, gd::InstructionMetadata > actionsInfos;
@@ -410,7 +410,7 @@ private:
     #endif
 
     ObjectMetadata badObjectMetadata;
-    AutomatismMetadata badAutomatismMetadata;
+    BehaviorMetadata badBehaviorMetadata;
     #if defined(GD_IDE_ONLY)
     static std::map<gd::String, gd::InstructionMetadata > badConditionsMetadata; ///< Used when a condition is not found in the extension
     static std::map<gd::String, gd::InstructionMetadata > badActionsMetadata;  ///< Used when an action is not found in the extension

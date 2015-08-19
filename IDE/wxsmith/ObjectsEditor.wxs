@@ -46,8 +46,8 @@
 				<handler function="OnMenuEditObjectSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuAddAuto" variable="MenuItem13" member="yes">
-				<label>Add an automatism</label>
-				<handler function="OnMenuAddAutomatismSelected" entry="EVT_MENU" />
+				<label>Add a behavior</label>
+				<handler function="OnMenuAddBehaviorSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuProp" variable="editPropMenuItem" member="no">
 				<label>Other properties</label>

@@ -8,7 +8,7 @@ describe('gdjs.SpriteRuntimeObject', function() {
 	var runtimeScene = new gdjs.RuntimeScene(runtimeGame, null);
 
 	it('should handle scaling properly', function(){
-		var object = new gdjs.SpriteRuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+		var object = new gdjs.SpriteRuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 
 		expect(object.getScaleX()).to.be(1);
 		object.flipX(true);

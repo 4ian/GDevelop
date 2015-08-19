@@ -10,7 +10,7 @@ fi
 echo "Copying versioned files from Release_Windows to '$DESTINATION'..."
 
 cd ../Binaries/Output/Release_Windows
-git archive --format tar.gz --output ../allRuntimeFiles.tar master
+git archive --format tar.gz --output ../allRuntimeFiles.tar HEAD
 if [ $? -eq 0 ]; then
 	cd ..
 	tar -xzf allRuntimeFiles.tar -C "$DESTINATION"

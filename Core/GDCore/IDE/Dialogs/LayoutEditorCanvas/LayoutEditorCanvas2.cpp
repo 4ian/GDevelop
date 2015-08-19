@@ -615,7 +615,10 @@ void LayoutEditorCanvas::OnMouseWheel( wxMouseEvent &event )
     }
     else
     {
-        editionView.move(0, -event.GetWheelRotation());
+        if(event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL)
+            editionView.move(0, -event.GetWheelRotation());
+        else
+            editionView.move(event.GetWheelRotation(), 0);
         UpdateScrollbars();
     }
 }

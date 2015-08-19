@@ -63,34 +63,34 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
     //A force returned by getAverageForce method:
     if (this._averageForce === undefined) this._averageForce = new gdjs.Force(0,0,false);
 
-    //Automatisms:
-    if (this._automatisms === undefined)
-        this._automatisms = []; //Contains the automatisms of the object
+    //Behaviors:
+    if (this._behaviors === undefined)
+        this._behaviors = []; //Contains the behaviors of the object
 
-    if (this._automatismsTable === undefined)
-        this._automatismsTable = new Hashtable(); //Also contains the automatisms: Used when an automatism is accessed by its name ( see getAutomatism ).
+    if (this._behaviorsTable === undefined)
+        this._behaviorsTable = new Hashtable(); //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
     else
-        this._automatismsTable.clear();
+        this._behaviorsTable.clear();
 
     var that = this;
     var i = 0;
-    gdjs.iterateOverArray(objectData.automatisms, function(autoData) {
-        var Ctor = gdjs.getAutomatismConstructor(autoData.type);
+    gdjs.iterateOverArray(objectData.behaviors, function(autoData) {
+        var Ctor = gdjs.getBehaviorConstructor(autoData.type);
 
-        //Try to reuse already existing automatisms.
-        if ( i < that._automatisms.length ) {
-            if ( that._automatisms[i] instanceof Ctor )
-                Ctor.call(that._automatisms[i], runtimeScene, autoData, that);
+        //Try to reuse already existing behaviors.
+        if ( i < that._behaviors.length ) {
+            if ( that._behaviors[i] instanceof Ctor )
+                Ctor.call(that._behaviors[i], runtimeScene, autoData, that);
             else
-                that._automatisms[i] = new Ctor(runtimeScene, autoData, that);
+                that._behaviors[i] = new Ctor(runtimeScene, autoData, that);
         }
-        else that._automatisms.push(new Ctor(runtimeScene, autoData, that));
+        else that._behaviors.push(new Ctor(runtimeScene, autoData, that));
 
-        that._automatismsTable.put(autoData.name, that._automatisms[i]);
+        that._behaviorsTable.put(autoData.name, that._behaviors[i]);
 
         i++;
     });
-    this._automatisms.length = i;//Make sure to delete already existing automatisms which are not used anymore.
+    this._behaviors.length = i;//Make sure to delete already existing behaviors which are not used anymore.
 };
 
 gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avoiding recreating forces each tick.
@@ -737,71 +737,71 @@ gdjs.RuntimeObject.prototype.updateAABB = function() {
     this.aabb.max[1] = this.getDrawableY()+this.getHeight();
 };
 
-//Automatisms:
+//Behaviors:
 
 /**
- * Call each automatism stepPreEvents method.
- * @method stepAutomatismsPreEvents
+ * Call each behavior stepPreEvents method.
+ * @method stepBehaviorsPreEvents
  */
-gdjs.RuntimeObject.prototype.stepAutomatismsPreEvents = function(runtimeScene) {
-    for(var i = 0, len = this._automatisms.length;i<len;++i) {
-        this._automatisms[i].stepPreEvents(runtimeScene);
+gdjs.RuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeScene) {
+    for(var i = 0, len = this._behaviors.length;i<len;++i) {
+        this._behaviors[i].stepPreEvents(runtimeScene);
     }
 };
 
 /**
- * Call each automatism stepPostEvents method.
- * @method stepAutomatismsPostEvents
+ * Call each behavior stepPostEvents method.
+ * @method stepBehaviorsPostEvents
  */
-gdjs.RuntimeObject.prototype.stepAutomatismsPostEvents = function(runtimeScene) {
-    for(var i = 0, len = this._automatisms.length;i<len;++i) {
-        this._automatisms[i].stepPostEvents(runtimeScene);
+gdjs.RuntimeObject.prototype.stepBehaviorsPostEvents = function(runtimeScene) {
+    for(var i = 0, len = this._behaviors.length;i<len;++i) {
+        this._behaviors[i].stepPostEvents(runtimeScene);
     }
 };
 
 /**
- * Get an automatism from its name.<br>
- * Be careful, the automatism must exists, no check is made on the name.
- * @method getAutomatism
- * @param name {String} The automatism name.
+ * Get a behavior from its name.<br>
+ * Be careful, the behavior must exists, no check is made on the name.
+ * @method getBehavior
+ * @param name {String} The behavior name.
  */
-gdjs.RuntimeObject.prototype.getAutomatism = function(name) {
-    return this._automatismsTable.get(name);
+gdjs.RuntimeObject.prototype.getBehavior = function(name) {
+    return this._behaviorsTable.get(name);
 };
 
 /**
- * Check if an automatism is used by the object.
+ * Check if a behavior is used by the object.
  *
- * @method hasAutomatism
- * @param name {String} The automatism name.
+ * @method hasBehavior
+ * @param name {String} The behavior name.
  */
-gdjs.RuntimeObject.prototype.hasAutomatism = function(name) {
-    return this._automatismsTable.containsKey(name);
+gdjs.RuntimeObject.prototype.hasBehavior = function(name) {
+    return this._behaviorsTable.containsKey(name);
 };
 
 /**
- * De/activate an automatism of the object.
+ * De/activate a behavior of the object.
  *
- * @method activateAutomatism
- * @param name {String} The automatism name.
- * @param enable {Boolean} true to activate the automatism
+ * @method activateBehavior
+ * @param name {String} The behavior name.
+ * @param enable {Boolean} true to activate the behavior
  */
-gdjs.RuntimeObject.prototype.activateAutomatism = function(name, enable) {
-    if ( this._automatismsTable.containsKey(name) ) {
-        this._automatismsTable.get(name).activate(enable);
+gdjs.RuntimeObject.prototype.activateBehavior = function(name, enable) {
+    if ( this._behaviorsTable.containsKey(name) ) {
+        this._behaviorsTable.get(name).activate(enable);
     }
 };
 
 /**
- * Check if an automatism is activated
+ * Check if a behavior is activated
  *
- * @method automatismActivated
- * @param name {String} The automatism name.
- * @return true if the automatism is activated.
+ * @method behaviorActivated
+ * @param name {String} The behavior name.
+ * @return true if the behavior is activated.
  */
-gdjs.RuntimeObject.prototype.automatismActivated = function(name) {
-    if ( this._automatismsTable.containsKey(name) ) {
-        this._automatismsTable.get(name).activated();
+gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
+    if ( this._behaviorsTable.containsKey(name) ) {
+        this._behaviorsTable.get(name).activated();
     }
 
     return false;

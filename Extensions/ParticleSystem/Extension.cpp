@@ -7,9 +7,8 @@ This project is released under the MIT License.
 
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
-#include "GDCpp/AutomatismsSharedData.h"
+#include "GDCpp/BehaviorsSharedData.h"
 #include "ParticleEmitterObject.h"
-#include "ParticleObstacleAutomatism.h"
 #include "ExtensionSubDeclaration1.h"
 #include "ExtensionSubDeclaration2.h"
 #include "ExtensionSubDeclaration3.h"

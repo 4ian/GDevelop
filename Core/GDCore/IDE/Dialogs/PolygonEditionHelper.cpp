@@ -6,10 +6,7 @@
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
 #include "GDCore/IDE/Dialogs/PolygonEditionHelper.h"
-
-#include "GDCore/IDE/CommonBitmapManager.h"
 
 namespace gd
 {

@@ -104,12 +104,12 @@ describe('gdjs.RuntimeObject.cursorOnObject', function() {
 	runtimeScene.loadFromScene({
 		layers:[{name:"", visibility: true}],
 		variables: [],
-		automatismsSharedData: [],
+		behaviorsSharedData: [],
 		objects: [],
 		instances: []
 	});
 
-	var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", automatisms: []});
+	var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 	object.setPosition(450, 500);
 
 	it('should handle mouse', function() {

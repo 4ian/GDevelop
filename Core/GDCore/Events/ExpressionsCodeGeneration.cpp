@@ -15,7 +15,7 @@
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/Events/ObjectMetadata.h"
-#include "GDCore/Events/AutomatismMetadata.h"
+#include "GDCore/Events/BehaviorMetadata.h"
 #include "GDCore/CommonTools.h"
 
 using namespace std;
@@ -114,7 +114,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(gd::String functionN
     plainExpression += output;
 };
 
-void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
 {
     const gd::Project & project = codeGenerator.GetProject();
     const gd::Layout & scene = codeGenerator.GetLayout();
@@ -147,12 +147,12 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(gd::String
         context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
-        gd::String automatismType = gd::GetTypeOfAutomatism(project, scene, parameters[1].GetPlainString());
-        const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(codeGenerator.GetPlatform(), automatismType);
+        gd::String behaviorType = gd::GetTypeOfBehavior(project, scene, parameters[1].GetPlainString());
+        const BehaviorMetadata & autoInfo = MetadataProvider::GetBehaviorMetadata(codeGenerator.GetPlatform(), behaviorType);
 
-        //Build gd::String to access the automatism
+        //Build gd::String to access the behavior
         codeGenerator.AddIncludeFiles(autoInfo.includeFiles);
-        output = codeGenerator.GenerateObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
+        output = codeGenerator.GenerateObjectBehaviorFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
     }
 
 

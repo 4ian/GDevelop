@@ -488,28 +488,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("string", _("Variable"))
         .SetHidden();
 
-    obj.AddCondition("AutomatismActivated",
-                   _("Automatism activated"),
-                   _("Return true if the automatism is activated for the object."),
-                   _("Automatism _PARAM1_ of _PARAM0_ is activated"),
-                   _("Automatisms"),
-                   "res/automatism24.png",
-                   "res/automatism16.png")
+    obj.AddCondition("BehaviorActivated",
+                   _("Behavior activated"),
+                   _("Return true if the behavior is activated for the object."),
+                   _("Behavior _PARAM1_ of _PARAM0_ is activated"),
+                   _("Behaviors"),
+                   "res/behavior24.png",
+                   "res/behavior16.png")
 
         .AddParameter("object", _("Object"))
-        .AddParameter("automatism", _("Automatism"))
+        .AddParameter("behavior", _("Behavior"))
         .MarkAsAdvanced();
 
-    obj.AddAction("ActivateAutomatism",
-                   _("De/activate an automatism"),
-                   _("De/activate the automatism for the object."),
-                   _("Activate automatism _PARAM1_ of _PARAM0_: _PARAM2_"),
-                   _("Automatisms"),
-                   "res/automatism24.png",
-                   "res/automatism16.png")
+    obj.AddAction("ActivateBehavior",
+                   _("De/activate a behavior"),
+                   _("De/activate the behavior for the object."),
+                   _("Activate behavior _PARAM1_ of _PARAM0_: _PARAM2_"),
+                   _("Behaviors"),
+                   "res/behavior24.png",
+                   "res/behavior16.png")
 
         .AddParameter("object", _("Object"))
-        .AddParameter("automatism", _("Automatism"))
+        .AddParameter("behavior", _("Behavior"))
         .AddParameter("yesorno", _("Activate?"))
         .MarkAsAdvanced();
 

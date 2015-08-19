@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "GDCpp/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
-#include "LightObstacleAutomatism.h"
+#include "LightObstacleBehavior.h"
 #include "LightObject.h"
 #include "SceneLightObstacleDatas.h"
 
@@ -189,15 +189,15 @@ public:
             .SetFunctionName("GetQuality").SetIncludeFile("Light/LightObject.h");
         #endif
 
-        AddAutomatism("LightObstacleAutomatism",
+        AddBehavior("LightObstacleBehavior",
               _("Light obstacle"),
               _("LightObstacle"),
               _("Mark the objects as obstacles for Light objects."),
               "",
               "CppPlatform/Extensions/lightObstacleIcon32.png",
-              "LightObstacleAutomatism",
-              std::shared_ptr<gd::Automatism>(new LightObstacleAutomatism),
-              std::shared_ptr<gd::AutomatismsSharedData>(new SceneLightObstacleDatas));
+              "LightObstacleBehavior",
+              std::shared_ptr<gd::Behavior>(new LightObstacleBehavior),
+              std::shared_ptr<gd::BehaviorsSharedData>(new SceneLightObstacleDatas));
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

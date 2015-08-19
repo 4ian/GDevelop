@@ -26,8 +26,8 @@ namespace gd { class VariablesContainer; }
 namespace gd { class ArbitraryResourceWorker; }
 namespace gd { class SourceFile; }
 namespace gd { class ImageManager; }
-namespace gd { class Automatism; }
-namespace gd { class AutomatismsSharedData; }
+namespace gd { class Behavior; }
+namespace gd { class BehaviorsSharedData; }
 namespace gd { class BaseEvent; }
 namespace gd { class SerializerElement; }
 #undef GetObject //Disable an annoying macro
@@ -211,30 +211,30 @@ public:
     std::shared_ptr<gd::Object> CreateObject(const gd::String & type, const gd::String & name, const gd::String & platformName = "");
 
     /**
-     * Create an automatism of the given type.
+     * Create a behavior of the given type.
      *
-     * \note A project can use more than one platform. In this case, the first platform supporting the automatism is used,
+     * \note A project can use more than one platform. In this case, the first platform supporting the behavior is used,
      * unless \a platformName argument is not empty.<br>
-     * It is assumed that each platform provides an equivalent automatism.
+     * It is assumed that each platform provides an equivalent behavior.
      *
      * \param project The project for which the object must be created.
-     * \param type The type of the automatism
+     * \param type The type of the behavior
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    gd::Automatism* CreateAutomatism(const gd::String & type, const gd::String & platformName = "");
+    gd::Behavior* CreateBehavior(const gd::String & type, const gd::String & platformName = "");
 
     /**
-     * Create automatism shared data of the given type.
+     * Create behavior shared data of the given type.
      *
-     * \note A project can use more than one platform. In this case, the first platform supporting the automatism shared data is used,
+     * \note A project can use more than one platform. In this case, the first platform supporting the behavior shared data is used,
      * unless \a platformName argument is not empty.<br>
-     * It is assumed that each platform provides equivalent automatism shared data.
+     * It is assumed that each platform provides equivalent behavior shared data.
      *
-     * \param project The project for which the automatism shared data must be created.
-     * \param type The type of automatism shared data
+     * \param project The project for which the behavior shared data must be created.
+     * \param type The type of behavior shared data
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const gd::String & type, const gd::String & platformName = "");
+    std::shared_ptr<gd::BehaviorsSharedData> CreateBehaviorSharedDatas(const gd::String & type, const gd::String & platformName = "");
 
 #if defined(GD_IDE_ONLY)
     /**

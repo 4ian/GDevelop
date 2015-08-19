@@ -66,7 +66,7 @@ void ChangesNotifier::OnObjectsDeleted(gd::Project & project, gd::Layout * layou
     RequestFullRecompilation(project, layout);
 }
 
-void ChangesNotifier::OnAutomatismEdited(gd::Project & game, gd::Layout * scene, gd::Object & object, gd::Automatism & automatism) const
+void ChangesNotifier::OnBehaviorEdited(gd::Project & game, gd::Layout * scene, gd::Object & object, gd::Behavior & behavior) const
 {
     if ( scene )
         scene->SetRefreshNeeded();
@@ -77,17 +77,17 @@ void ChangesNotifier::OnAutomatismEdited(gd::Project & game, gd::Layout * scene,
     }
 }
 
-void ChangesNotifier::OnAutomatismAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const
+void ChangesNotifier::OnBehaviorAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior) const
 {
     RequestFullRecompilation(project, layout);
 }
 
-void ChangesNotifier::OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const gd::String & oldName) const
+void ChangesNotifier::OnBehaviorRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior, const gd::String & oldName) const
 {
     RequestFullRecompilation(project, layout);
 }
 
-void ChangesNotifier::OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const gd::String & automatismName) const
+void ChangesNotifier::OnBehaviorDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const gd::String & behaviorName) const
 {
     RequestFullRecompilation(project, layout);
 }

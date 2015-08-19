@@ -18,7 +18,6 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 
 namespace gd

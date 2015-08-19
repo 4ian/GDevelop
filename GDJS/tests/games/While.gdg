@@ -97,7 +97,7 @@
                 </Layer>
             </Layers>
             <Variables />
-            <AutomatismsSharedDatas />
+            <BehaviorsSharedDatas />
             <Positions />
             <Events>
                 <Event disabled="false" folded="false" infiniteLoopWarning="true">

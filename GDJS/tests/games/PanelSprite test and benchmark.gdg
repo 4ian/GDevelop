@@ -93,11 +93,11 @@
             <objects>
                 <object bottomMargin="10.000000" height="64.000000" leftMargin="50.000000" name="NewObject" rightMargin="7.000000" texture="gem2z.png" topMargin="30.000000" type="PanelSpriteObject::PanelSprite" width="64.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
                 <object bottomMargin="10.000000" height="64.000000" leftMargin="10.000000" name="NewObject2" rightMargin="10.000000" texture="gem2z.png" topMargin="10.000000" type="PanelSpriteObject::PanelSprite" width="64.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
             </objects>
             <events>
@@ -253,7 +253,7 @@
                     </cameras>
                 </layer>
             </layers>
-            <automatismsSharedData />
+            <behaviorsSharedData />
         </layout>
     </layouts>
     <externalEvents />

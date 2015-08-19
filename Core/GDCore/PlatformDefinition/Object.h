@@ -12,7 +12,7 @@
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include <SFML/System/Vector2.hpp>
 namespace gd { class PropertyDescriptor; }
-namespace gd { class Automatism; }
+namespace gd { class Behavior; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class MainFrameWrapper; }
@@ -177,64 +177,64 @@ public:
     ///@}
     #endif
 
-    /** \name Automatisms management
-     * Members functions related to automatisms management.
+    /** \name Behaviors management
+     * Members functions related to behaviors management.
      */
     ///@{
 
     /**
-     * \brief Return a vector containing the names of all the automatisms used by the object
+     * \brief Return a vector containing the names of all the behaviors used by the object
      */
-    std::vector < gd::String > GetAllAutomatismNames() const;
+    std::vector < gd::String > GetAllBehaviorNames() const;
 
     /**
-     * \brief Return a reference to the automatism called \a name.
+     * \brief Return a reference to the behavior called \a name.
      */
-    Automatism & GetAutomatism(const gd::String & name);
+    Behavior & GetBehavior(const gd::String & name);
 
     /**
-     * \brief Return a reference to the automatism called \a name.
+     * \brief Return a reference to the behavior called \a name.
      */
-    const Automatism & GetAutomatism(const gd::String & name) const;
+    const Behavior & GetBehavior(const gd::String & name) const;
 
     /**
-     * \brief Return true if object has an automatism called \a name.
+     * \brief Return true if object has a behavior called \a name.
      */
-    bool HasAutomatismNamed(const gd::String & name) const;
+    bool HasBehaviorNamed(const gd::String & name) const;
 
     /**
-     * \brief Remove automatism called \a name
+     * \brief Remove behavior called \a name
      */
-    void RemoveAutomatism(const gd::String & name);
+    void RemoveBehavior(const gd::String & name);
 
     /**
-     * \brief Change the name of automatism called name to newName.
+     * \brief Change the name of behavior called name to newName.
      * \return true if name was successfully changed
      */
-    bool RenameAutomatism(const gd::String & name, const gd::String & newName);
+    bool RenameBehavior(const gd::String & name, const gd::String & newName);
 
     #if defined(GD_IDE_ONLY)
     /**
-     * \brief Add the automatism of the specified \a type with the specified \a name.
+     * \brief Add the behavior of the specified \a type with the specified \a name.
      *
-     * The project's current platform is used to create the automatism.
+     * The project's current platform is used to create the behavior.
      *
-     * \return A pointer to the newly added automatism. NULL if the creation failed.
+     * \return A pointer to the newly added behavior. NULL if the creation failed.
      */
-    gd::Automatism * AddNewAutomatism(gd::Project & project, const gd::String & type, const gd::String & name);
+    gd::Behavior * AddNewBehavior(gd::Project & project, const gd::String & type, const gd::String & name);
     #endif
 
     /**
-     * \brief Add the specified automatism to the object
-     * \note The object takes ownership of the automatism.
-     * \return true if the automatism was added, false otherwise (automatism with the same name already in the object)
+     * \brief Add the specified behavior to the object
+     * \note The object takes ownership of the behavior.
+     * \return true if the behavior was added, false otherwise (behavior with the same name already in the object)
      */
-    bool AddAutomatism(gd::Automatism * automatism);
+    bool AddBehavior(gd::Behavior * behavior);
 
     /**
-     * \brief Get a read-only access to the map containing the automatisms.
+     * \brief Get a read-only access to the map containing the behaviors.
      */
-    const std::map<gd::String, gd::Automatism* > & GetAllAutomatisms() const {return automatisms;};
+    const std::map<gd::String, gd::Behavior* > & GetAllBehaviors() const {return behaviors;};
     ///@}
 
     /** \name Variable management
@@ -274,7 +274,7 @@ public:
 protected:
     gd::String                             name; ///< The full name of the object
     gd::String                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
-    std::map<gd::String, gd::Automatism* > automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
+    std::map<gd::String, gd::Behavior* > behaviors; ///<Contains all behaviors of the object. Behaviors are the ownership of the object
     gd::VariablesContainer                  objectVariables; ///<List of the variables of the object
 
     /**

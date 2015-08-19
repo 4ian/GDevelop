@@ -57,9 +57,9 @@ gd::String EventsCodeGenerator::GenerateObjectFunctionCall(gd::String objectList
     }
 }
 
-gd::String EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(gd::String objectListName,
-                                                                             gd::String automatismName,
-                                                      const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(gd::String objectListName,
+                                                                             gd::String behaviorName,
+                                                      const gd::BehaviorMetadata & autoInfo,
                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                       gd::String parametersStr,
                                                       gd::String defaultOutput,
@@ -70,23 +70,23 @@ gd::String EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(gd::String 
     if ( codeInfo.staticFunction )
     {
         if ( !castNeeded )
-            return "(gd::Automatism::"+codeInfo.functionCallName+"("+parametersStr+"))";
+            return "(gd::Behavior::"+codeInfo.functionCallName+"("+parametersStr+"))";
         else
             return "("+autoInfo.className+"::"+codeInfo.functionCallName+"("+parametersStr+"))";
     }
     else if ( context.GetCurrentObject() == objectListName && !context.GetCurrentObject().empty())
     {
         if ( !castNeeded )
-            return "("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\")->"+codeInfo.functionCallName+"("+parametersStr+"))";
+            return "("+ManObjListName(objectListName)+"[i]->GetBehaviorRawPointer(\""+behaviorName+"\")->"+codeInfo.functionCallName+"("+parametersStr+"))";
         else
-            return "(static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+codeInfo.functionCallName+"("+parametersStr+"))";
+            return "(static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[i]->GetBehaviorRawPointer(\""+behaviorName+"\"))->"+codeInfo.functionCallName+"("+parametersStr+"))";
     }
     else
     {
         if ( !castNeeded )
-            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" :"+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\")->"+codeInfo.functionCallName+"("+parametersStr+"))";
+            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" :"+ManObjListName(objectListName)+"[0]->GetBehaviorRawPointer(\""+behaviorName+"\")->"+codeInfo.functionCallName+"("+parametersStr+"))";
         else
-            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[0]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+codeInfo.functionCallName+"("+parametersStr+"))";
+            return "(( "+ManObjListName(objectListName)+".empty() ) ? "+defaultOutput+" : "+"static_cast<"+autoInfo.className+"*>("+ManObjListName(objectListName)+"[0]->GetBehaviorRawPointer(\""+behaviorName+"\"))->"+codeInfo.functionCallName+"("+parametersStr+"))";
     }
 }
 
@@ -143,9 +143,9 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objec
     return conditionCode;
 }
 
-gd::String EventsCodeGenerator::GenerateAutomatismCondition(const gd::String & objectName,
-                                                                       const gd::String & automatismName,
-                                                                   const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & objectName,
+                                                                       const gd::String & behaviorName,
+                                                                   const gd::BehaviorMetadata & autoInfo,
                                                                    const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                                    const gd::String & returnBoolean,
@@ -158,8 +158,8 @@ gd::String EventsCodeGenerator::GenerateAutomatismCondition(const gd::String & o
     //Add a static_cast if necessary
     gd::String objectFunctionCallNamePart =
     ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
-        "static_cast<"+autoInfo.className+"*>("+ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"+instrInfos.codeExtraInformation.functionCallName
-    :   ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\")->"+instrInfos.codeExtraInformation.functionCallName;
+        "static_cast<"+autoInfo.className+"*>("+ManObjListName(objectName)+"[i]->GetBehaviorRawPointer(\""+behaviorName+"\"))->"+instrInfos.codeExtraInformation.functionCallName
+    :   ManObjListName(objectName)+"[i]->GetBehaviorRawPointer(\""+behaviorName+"\")->"+instrInfos.codeExtraInformation.functionCallName;
 
     //Create call
     gd::String predicat;
@@ -180,11 +180,11 @@ gd::String EventsCodeGenerator::GenerateAutomatismCondition(const gd::String & o
     }
     if ( conditionInverted ) predicat = GenerateNegatedPredicat(predicat);
 
-    //Verify that object has automatism.
-    vector < gd::String > automatisms = gd::GetAutomatismsOfObject(project, scene, objectName);
-    if ( find(automatisms.begin(), automatisms.end(), automatismName) == automatisms.end() )
+    //Verify that object has behavior.
+    vector < gd::String > behaviors = gd::GetBehaviorsOfObject(project, scene, objectName);
+    if ( find(behaviors.begin(), behaviors.end(), behaviorName) == behaviors.end() )
     {
-        cout << "Bad automatism requested" << endl;
+        cout << "Bad behavior requested" << endl;
     }
     else
     {
@@ -248,9 +248,9 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
     return actionCode;
 }
 
-gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & objectName,
-                                                            const gd::String & automatismName,
-                                                            const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & objectName,
+                                                            const gd::String & behaviorName,
+                                                            const gd::BehaviorMetadata & autoInfo,
                                                             const std::vector<gd::String> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             gd::EventsCodeGenerationContext & context)
@@ -261,8 +261,8 @@ gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & obje
     //Add a static_cast if necessary
     gd::String objectPart =
     ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
-        "static_cast<"+autoInfo.className+"*>("+ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\"))->"
-    :   ManObjListName(objectName)+"[i]->GetAutomatismRawPointer(\""+automatismName+"\")->";
+        "static_cast<"+autoInfo.className+"*>("+ManObjListName(objectName)+"[i]->GetBehaviorRawPointer(\""+behaviorName+"\"))->"
+    :   ManObjListName(objectName)+"[i]->GetBehaviorRawPointer(\""+behaviorName+"\")->";
 
     //Create call
     gd::String call;
@@ -285,11 +285,11 @@ gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & obje
         call = objectPart+instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
     }
 
-    //Verify that object has automatism.
-    vector < gd::String > automatisms = gd::GetAutomatismsOfObject(project, scene, objectName);
-    if ( find(automatisms.begin(), automatisms.end(), automatismName) == automatisms.end() )
+    //Verify that object has behavior.
+    vector < gd::String > behaviors = gd::GetBehaviorsOfObject(project, scene, objectName);
+    if ( find(behaviors.begin(), behaviors.end(), behaviorName) == behaviors.end() )
     {
-        cout << "Bad automatism requested for an action" << endl;
+        cout << "Bad behavior requested for an action" << endl;
     }
     else
     {

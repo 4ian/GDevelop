@@ -53,10 +53,10 @@
  * Objects are represented by the gd::Object class. Again, this class is used only for the storage or by the IDE: When a game is played, RuntimeObject
  * is used.<br>
  *
- * \subsection automatism gd::Automatism
+ * \subsection behavior gd::Behavior
 
- * Each automatism is an instance of a class that derive from gd::Automatism.  Automatisms are linked to an object (thus, automatisms can access to their object by using their member `object`) and they are also managed by this object.<br>
- * gd::Automatism is the only exception to the rule explained below: Whereas the classes described in this section are used only for storage, this class
+ * Each behavior is an instance of a class that derive from gd::Behavior.  Behaviors are linked to an object (thus, behaviors can access to their object by using their member `object`) and they are also managed by this object.<br>
+ * gd::Behavior is the only exception to the rule explained below: Whereas the classes described in this section are used only for storage, this class
  * is used both for storage and by the game engine.
  *
  * \subsection event gd::BaseEvent

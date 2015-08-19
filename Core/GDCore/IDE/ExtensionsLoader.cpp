@@ -60,7 +60,10 @@ void ExtensionsLoader::LoadAllExtensions(const gd::String & directory, gd::Platf
     while ( (lecture = readdir( rep )) )
     {
         gd::String lec = lecture->d_name;
-        if ( lec != "." && lec != ".." && lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos)
+        //Load all extensions, except the legacy ones finishing by *Automatism.xgd* from GD3.x
+        if ( lec != "." && lec != ".." && 
+            lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos &&
+            lec.find("Automatism.xgd"+suffix) == string::npos)
         {
             //Use a log file, in IDE only
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)

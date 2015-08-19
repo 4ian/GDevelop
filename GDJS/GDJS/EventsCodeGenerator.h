@@ -12,7 +12,7 @@
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
 namespace gd { class ObjectMetadata; }
-namespace gd { class AutomatismMetadata; }
+namespace gd { class BehaviorMetadata; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionCodeGenerationInformation; }
 namespace gd { class EventsCodeGenerationContext; }
@@ -86,9 +86,9 @@ protected:
                                                           gd::String defaultOutput,
                                                           gd::EventsCodeGenerationContext & context);
 
-    virtual gd::String GenerateObjectAutomatismFunctionCall(gd::String objectListName,
-                                                                      gd::String automatismName,
-                                                                      const gd::AutomatismMetadata & autoInfo,
+    virtual gd::String GenerateObjectBehaviorFunctionCall(gd::String objectListName,
+                                                                      gd::String behaviorName,
+                                                                      const gd::BehaviorMetadata & autoInfo,
                                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
                                                                       gd::String parametersStr,
                                                                       gd::String defaultOutput,
@@ -108,9 +108,9 @@ protected:
                                                             bool conditionInverted,
                                                             gd::EventsCodeGenerationContext & context);
 
-    virtual gd::String GenerateAutomatismCondition(const gd::String & objectName,
-                                                                const gd::String & automatismName,
-                                                                const gd::AutomatismMetadata & autoInfo,
+    virtual gd::String GenerateBehaviorCondition(const gd::String & objectName,
+                                                                const gd::String & behaviorName,
+                                                                const gd::BehaviorMetadata & autoInfo,
                                                                 const std::vector<gd::String> & arguments,
                                                                 const gd::InstructionMetadata & instrInfos,
                                                                 const gd::String & returnBoolean,
@@ -123,9 +123,9 @@ protected:
                                                         const gd::InstructionMetadata & instrInfos,
                                                         gd::EventsCodeGenerationContext & context);
 
-    virtual gd::String GenerateAutomatismAction(const gd::String & objectName,
-                                                            const gd::String & automatismName,
-                                                            const gd::AutomatismMetadata & autoInfo,
+    virtual gd::String GenerateBehaviorAction(const gd::String & objectName,
+                                                            const gd::String & behaviorName,
+                                                            const gd::BehaviorMetadata & autoInfo,
                                                             const std::vector<gd::String> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             gd::EventsCodeGenerationContext & context);

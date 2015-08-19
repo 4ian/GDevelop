@@ -103,7 +103,7 @@
             <objects>
                 <object name="Object1" type="Sprite">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -130,7 +130,7 @@
                 </object>
                 <object name="Object2" type="Sprite">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -159,7 +159,7 @@
                     <variables>
                         <variable name="TouchId" value="0" />
                     </variables>
-                    <automatisms />
+                    <behaviors />
                     <animations>
                         <animation useMultipleDirections="false">
                             <directions>
@@ -338,7 +338,7 @@
                     </cameras>
                 </layer>
             </layers>
-            <automatismsSharedData />
+            <behaviorsSharedData />
         </layout>
     </layouts>
     <externalEvents />

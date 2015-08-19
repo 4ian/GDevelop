@@ -53,10 +53,10 @@ cd ../../..
 
 #TODO:
 rm -rf GDevelop.app/Contents/Resources/CppPlatform/Extensions/include/CommonDialogs/dlib-18.16/
-rm -rf GDevelop.app/Contents/Resources/CppPlatform/Extensions/include/PhysicsAutomatism/Box2D/Contributions
+rm -rf GDevelop.app/Contents/Resources/CppPlatform/Extensions/include/PhysicsBehavior/Box2D/Contributions
 rm -rf GDevelop.app/Contents/Resources/CppPlatform/Extensions/Runtime/.xgd
 rm -rf GDevelop.app/Contents/Resources/JsPlatform/Runtime/Extensions/CommonDialogs/dlib-18.16/
-rm -rf GDevelop.app/Contents/Resources/JsPlatform/Runtime/Extensions/PhysicsAutomatism/Box2D/Contributions
+rm -rf GDevelop.app/Contents/Resources/JsPlatform/Runtime/Extensions/PhysicsBehavior/Box2D/Contributions
 rm GDevelop.app/Contents/Resources/7zS.sfx
 
 #Now sign the package:

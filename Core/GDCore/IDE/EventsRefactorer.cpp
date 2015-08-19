@@ -76,7 +76,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
                                +"."+functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectAutomatismFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+    virtual void OnObjectBehaviorFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.size() < 2 ) return;
 
@@ -153,7 +153,7 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
         if ( parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual void OnObjectAutomatismFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+    virtual void OnObjectBehaviorFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 

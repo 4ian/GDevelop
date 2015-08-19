@@ -14,7 +14,7 @@
 #include "GDCpp/Project.h"
 #include "GDCpp/ExtensionBase.h"
 #include "GDCpp/SoundManager.h"
-#include "GDCpp/Automatism.h"
+#include "GDCpp/Behavior.h"
 #include "GDCpp/FontManager.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCpp/IDE/ChangesNotifier.h"

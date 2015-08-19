@@ -60,8 +60,8 @@ BaseObjectExtension::BaseObjectExtension()
     objectConditions["VarObjet"].SetFunctionName("ReturnVariable").SetManipulatedType("number");
     objectConditions["VarObjetTxt"].SetFunctionName("ReturnVariable").SetManipulatedType("string");
     objectConditions["VarObjetDef"].SetFunctionName("VariableExists");
-    objectConditions["AutomatismActivated"].SetFunctionName("AutomatismActivated");
-    objectActions["ActivateAutomatism"].SetFunctionName("ActivateAutomatism");
+    objectConditions["BehaviorActivated"].SetFunctionName("BehaviorActivated");
+    objectActions["ActivateBehavior"].SetFunctionName("ActivateBehavior");
     objectActions["AddForceVers"].SetFunctionName("AddForceTowardObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
     objectActions["AddForceTourne"].SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
     objectActions["MettreAutour"].SetFunctionName("PutAroundObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");

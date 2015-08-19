@@ -160,7 +160,7 @@ The user interface allows you to preview your game and test it inside the editor
 All the game logic is created using events, allowing to launch actions if some conditions are filled. An entire game can be created without using a single line of code as events are both easy to use and flexible, thanks to sub-events and custom events types like loop events or functions-like events.
 Moreover, events are compiled by GDevelop to machine code, just like ordinary programming language used in commercial games: GDevelop is the only game development software which combine the simplicity of creation with the power of professional programming languages.
 
-GDevelop provides you with many features for your project : Dynamic lights and particle systems are available trought dedicated objects, actions and conditions to create multiplayer games are available, 3D objects can be used to render buildings, realistic physics behaviour can be added to objects thanks to the Physics automatism.
+GDevelop provides you with many features for your project : Dynamic lights and particle systems are available trought dedicated objects, actions and conditions to create multiplayer games are available, 3D objects can be used to render buildings, realistic physics behaviour can be added to objects thanks to the Physics behavior.
 Many of these features are provided thanks to official open source extensions, and external developers can also develop extensions to enhance GDevelop capabilities.</Char_Desc_2000>
     </English>
   </Program_Descriptions>

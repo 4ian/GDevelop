@@ -15,7 +15,7 @@ class Project;
 class Layout;
 
 /**
-\brief Class used to check if other objects or groups have a specific name.
+ * \brief Class used to check if other objects or groups have a specific name.
  */
 class GD_CORE_API ObjectOrGroupFinder
 {
@@ -50,7 +50,7 @@ public:
 
     /**
      * Return a flag (ObjectOrGroupFinder::HasSameName) to tell if an object/group has the search name
-     * Note : with allLayouts set to true, it also test the local objects and groups of other layouts.
+     * Note: with allLayouts set to true, it also test the local objects and groups of other layouts.
      */
     unsigned int HasObjectOrGroupNamed(const gd::String &name, bool allLayouts = false);
 

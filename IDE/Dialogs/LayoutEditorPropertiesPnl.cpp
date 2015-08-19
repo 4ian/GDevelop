@@ -49,7 +49,7 @@ LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Proje
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	grid = new wxPropertyGrid(this,ID_PROPGRID,wxDefaultPosition,wxSize(359,438),0,_T("ID_PROPGRID"));
+	grid = new wxPropertyGrid(this,ID_PROPGRID,wxDefaultPosition,wxSize(359,438), wxPG_HIDE_MARGIN|wxPG_SPLITTER_AUTO_CENTER,_T("ID_PROPGRID"));
 	FlexGridSizer1->Add(grid, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);

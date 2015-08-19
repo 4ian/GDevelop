@@ -25,8 +25,8 @@
 #include "GDCpp/profile.h"
 #include "GDCpp/Position.h"
 #include "GDCpp/FontManager.h"
-#include "GDCpp/AutomatismsSharedData.h"
-#include "GDCpp/AutomatismsRuntimeSharedData.h"
+#include "GDCpp/BehaviorsSharedData.h"
+#include "GDCpp/BehaviorsRuntimeSharedData.h"
 #include "GDCpp/RuntimeContext.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/ManualTimer.h"
@@ -324,7 +324,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
         }
     }
 
-    //Update objects positions, forces and automatisms
+    //Update objects positions, forces and behaviors
     allObjects = objectsInstances.GetAllObjects();
     for (std::size_t id = 0;id<allObjects.size();++id)
     {
@@ -332,7 +332,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
         allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * static_cast<double>(GetElapsedTime())/1000000.0 ));
         allObjects[id]->UpdateTime( static_cast<double>(GetElapsedTime())/1000000.0 );
         allObjects[id]->UpdateForce( static_cast<double>(GetElapsedTime())/1000000.0 );
-        allObjects[id]->DoAutomatismsPostEvents(*this);
+        allObjects[id]->DoBehaviorsPostEvents(*this);
     }
 }
 
@@ -340,7 +340,7 @@ void RuntimeScene::ManageObjectsBeforeEvents()
 {
     RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     for (std::size_t id = 0;id<allObjects.size();++id)
-        allObjects[id]->DoAutomatismsPreEvents(*this);
+        allObjects[id]->DoBehaviorsPreEvents(*this);
 }
 
 /**
@@ -453,9 +453,9 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     std::cout << ".";
     CreateObjectsFrom(instances);
 
-    //Automatisms shared data
+    //Behaviors shared data
     std::cout << ".";
-    automatismsSharedDatas.LoadFrom(scene.automatismsInitialSharedDatas);
+    behaviorsSharedDatas.LoadFrom(scene.behaviorsInitialSharedDatas);
 
     std::cout << ".";
     //Extensions specific initialization

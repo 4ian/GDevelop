@@ -317,7 +317,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "variable.js");
     InsertUnique(includesFiles, "variablescontainer.js");
     InsertUnique(includesFiles, "eventscontext.js");
-    InsertUnique(includesFiles, "runtimeautomatism.js");
+    InsertUnique(includesFiles, "runtimebehavior.js");
     InsertUnique(includesFiles, "spriteruntimeobject.js");
     InsertUnique(includesFiles, "soundmanager.js");
 

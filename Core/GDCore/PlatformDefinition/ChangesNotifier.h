@@ -12,7 +12,7 @@ namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class ExternalLayout; }
 namespace gd { class Object; }
-namespace gd { class Automatism; }
+namespace gd { class Behavior; }
 namespace gd { class ExternalEvents; }
 
 namespace gd
@@ -149,7 +149,7 @@ public:
     virtual void OnEventsModified(gd::Project & project, gd::ExternalEvents & events, bool indirectChange = false, gd::String sourceOfTheIndirectChange = "") const {};
     ///@}
 
-    /** \name Objects and automatisms notifications
+    /** \name Objects and behaviors notifications
      * Members functions called by the IDE so as to notify changes have been made
      */
     ///@{
@@ -196,41 +196,41 @@ public:
     virtual void OnObjectVariablesChanged(gd::Project & project, gd::Layout * layout, gd::Object & object) const {};
 
     /**
-     * \brief Called when an automatism have been edited
+     * \brief Called when a behavior have been edited
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
-     * \param automatism Automatism
+     * \param behavior Behavior
      */
-    virtual void OnAutomatismEdited(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const {};
+    virtual void OnBehaviorEdited(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior) const {};
 
     /**
-     * \brief Called when an automatism have been added
+     * \brief Called when a behavior have been added
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
-     * \param automatism Automatism
+     * \param behavior Behavior
      */
-    virtual void OnAutomatismAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const {};
+    virtual void OnBehaviorAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior) const {};
 
     /**
-     * \brief Called when an automatism have been renamed
+     * \brief Called when a behavior have been renamed
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
-     * \param automatism Automatism
-     * \param oldName Automatism old name
+     * \param behavior Behavior
+     * \param oldName Behavior old name
      */
-    virtual void OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const gd::String & oldName) const {};
+    virtual void OnBehaviorRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Behavior & behavior, const gd::String & oldName) const {};
 
     /**
-     * \brief Called when an automatism have been deleted
+     * \brief Called when a behavior have been deleted
      * \param project Related project
      * \param layout Related layout ( can be NULL )
      * \param object Related object
-     * \param automatismName The name of the automatism removed
+     * \param behaviorName The name of the behavior removed
      */
-    virtual void OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const gd::String & automatismName) const {};
+    virtual void OnBehaviorDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const gd::String & behaviorName) const {};
 
     /**
      * \brief Called when a group have been added
@@ -268,7 +268,7 @@ public:
     /**
      * \brief Called when a resource have been added/removed/modified
      * \param project Related project
-     * \param automatismName The name of the resource which have been modified
+     * \param behaviorName The name of the resource which have been modified
      */
     virtual void OnResourceModified(gd::Project & project, const gd::String & resourceName) const {};
 

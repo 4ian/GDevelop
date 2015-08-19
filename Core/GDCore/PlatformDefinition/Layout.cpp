@@ -293,7 +293,7 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
     //Compatibility with GD <= 4
     gd::String deprecatedTag1 = "automatismsSharedData";
     gd::String deprecatedTag2 = "automatismSharedData";
-    if (!element.HasChild(deprecatedTag1)) 
+    if (!element.HasChild(deprecatedTag1))
     {
         deprecatedTag1 = "AutomatismsSharedDatas";
         deprecatedTag2 = "AutomatismSharedDatas";
@@ -447,13 +447,8 @@ gd::String GD_CORE_API GetTypeOfBehavior(const gd::Project & project, const gd::
 {
     for (std::size_t i = 0;i<layout.GetObjectsCount();++i)
     {
-<<<<<<< HEAD
-        vector < gd::String > automatisms = layout.GetObject(i).GetAllAutomatismNames();
-        for (std::size_t j = 0;j<automatisms.size();++j)
-=======
         vector < gd::String > behaviors = layout.GetObject(i).GetAllBehaviorNames();
-        for (unsigned int j = 0;j<behaviors.size();++j)
->>>>>>> upstream/feature/behavior-renaming
+        for (std::size_t j = 0;j<behaviors.size();++j)
         {
             if ( layout.GetObject(i).GetBehavior(behaviors[j]).GetName() == name )
                 return layout.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
@@ -462,13 +457,8 @@ gd::String GD_CORE_API GetTypeOfBehavior(const gd::Project & project, const gd::
 
     for (std::size_t i = 0;i<project.GetObjectsCount();++i)
     {
-<<<<<<< HEAD
-        vector < gd::String > automatisms = project.GetObject(i).GetAllAutomatismNames();
-        for (std::size_t j = 0;j<automatisms.size();++j)
-=======
         vector < gd::String > behaviors = project.GetObject(i).GetAllBehaviorNames();
-        for (unsigned int j = 0;j<behaviors.size();++j)
->>>>>>> upstream/feature/behavior-renaming
+        for (std::size_t j = 0;j<behaviors.size();++j)
         {
             if ( project.GetObject(i).GetBehavior(behaviors[j]).GetName() == name )
                 return project.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
@@ -519,11 +509,7 @@ vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const gd::Project & proje
                 	}
                 	else
                 	{
-<<<<<<< HEAD
-                        for (std::size_t a = 0 ;a<automatisms.size();++a)
-=======
-                        for (unsigned int a = 0 ;a<behaviors.size();++a)
->>>>>>> upstream/feature/behavior-renaming
+                        for (std::size_t a = 0 ;a<behaviors.size();++a)
                         {
                             if ( find(objectBehaviors.begin(), objectBehaviors.end(), behaviors[a]) == objectBehaviors.end() )
                             {
@@ -554,11 +540,7 @@ vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const gd::Project & proje
                 	}
                 	else
                 	{
-<<<<<<< HEAD
-                        for (std::size_t a = 0 ;a<automatisms.size();++a)
-=======
-                        for (unsigned int a = 0 ;a<behaviors.size();++a)
->>>>>>> upstream/feature/behavior-renaming
+                        for (std::size_t a = 0 ;a<behaviors.size();++a)
                         {
                             if ( find(objectBehaviors.begin(), objectBehaviors.end(), behaviors[a]) == objectBehaviors.end() )
                             {

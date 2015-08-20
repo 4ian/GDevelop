@@ -904,7 +904,7 @@ void ResourcesEditor::Refresh()
 
     //Setup search
     gd::String search = searchCtrl->GetValue();
-    search = search.ToUpperCase();
+    search = search.CaseFold().Normalize();
     bool searching = search.empty() ? false : true;
 
     //Folders
@@ -919,7 +919,7 @@ void ResourcesEditor::Refresh()
         {
             gd::Resource & resource = folder.GetResource(resources[j]);
 
-            if ( searching && resource.GetName().ToUpperCase().find(search) == gd::String::npos)
+            if ( searching && resource.GetName().CaseFold().Normalize().find(search) == gd::String::npos)
                 continue;
 
             resourcesTree->AppendItem( folderItem, resource.GetName(), -1,-1, new gd::TreeItemStringData("Image", resource.GetName() ));
@@ -933,7 +933,7 @@ void ResourcesEditor::Refresh()
     {
         gd::Resource & resource = project.GetResourcesManager().GetResource(resources[i]);
 
-        if ( searching && resource.GetName().ToUpperCase().find(search) == gd::String::npos)
+        if ( searching && resource.GetName().CaseFold().Normalize().find(search) == gd::String::npos)
             continue;
 
         resourcesTree->AppendItem( allImagesItem, resource.GetName(), -1, -1, new gd::TreeItemStringData("Image", resource.GetName() ));

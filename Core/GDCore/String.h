@@ -555,7 +555,7 @@ public:
 
     /**
      * \brief Returns the case-folded string.
-     * \note This string is not totally suitable for case-insensitive comparison because you have to make sure
+     * \note This string is almost but not totally suitable for case-insensitive comparison because you have to make sure
      * that it is normalized. So, to do a case-insensitive comparison, do :
      * \code
      * str1.CaseFold().Normalize() == str2.CaseFold().Normalize()
@@ -563,6 +563,18 @@ public:
      * You can also use gd::CaseInsensitiveEquiv();
      */
     String CaseFold() const;
+
+    /**
+     * \brief Returns the string in uppercase.
+     * \note Some characters that maps to multiple characters when uppercased may not be processed, e.g. the german etzett.
+     */
+    String UpperCase() const;
+
+    /**
+     * \brief Returns the string in lowercase.
+     * \note Some characters that maps to multiple characters when lowercased may not be processed, e.g. double SS to etzett in german.
+     */
+    String LowerCase() const;
 
     /**
      * Normalization form
@@ -580,12 +592,6 @@ public:
      * \return *this
      */
     String& Normalize(NormForm form = NFC);
-
-    /**
-     * \return a String with uppercase letters only
-     * TODO: Implement it
-     */
-    String ToUpperCase() const { return *this; }
 
     /**
      * Returns a sub-string starting from **start** and with length **length**.

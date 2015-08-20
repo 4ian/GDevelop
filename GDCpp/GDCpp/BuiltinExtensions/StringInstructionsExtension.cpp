@@ -18,6 +18,8 @@ StringInstructionsExtension::StringInstructionsExtension()
     #if defined(GD_IDE_ONLY)
     GetAllStrExpressions()["NewLine"].SetFunctionName("GDpriv::StringTools::NewLine").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
     GetAllStrExpressions()["FromCodePoint"].SetFunctionName("GDpriv::StringTools::FromCodePoint").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllStrExpressions()["ToUpperCase"].SetFunctionName("GDpriv::StringTools::ToUpperCase").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllStrExpressions()["ToLowerCase"].SetFunctionName("GDpriv::StringTools::ToLowerCase").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
     GetAllStrExpressions()["SubStr"].SetFunctionName("GDpriv::StringTools::SubStr").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
     GetAllStrExpressions()["StrAt"].SetFunctionName("GDpriv::StringTools::StrAt").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
     GetAllExpressions()["StrLength"].SetFunctionName("GDpriv::StringTools::StrLen").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");

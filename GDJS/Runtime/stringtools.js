@@ -24,12 +24,30 @@ gdjs.evtTools.string.newLine = function() {
 };
 
 /**
- * Return a character from its codepoint
+ * Return a character from its codepoint.
  * @method fromCodePoint
  * @private
  */
 gdjs.evtTools.string.fromCodePoint = function(codePoint) {
     return String.fromCodePoint(codePoint);
+};
+
+/**
+ * Return the uppercased version of the string.
+ * @method toUpperCase
+ * @private
+ */
+gdjs.evtTools.string.toUpperCase = function(str) {
+    return str.toUpperCase();
+};
+
+/**
+ * Return the lowercased version of the string.
+ * @method toLowerCase
+ * @private
+ */
+gdjs.evtTools.string.toLowerCase = function(str) {
+    return str.toLowerCase()
 };
 
 /**

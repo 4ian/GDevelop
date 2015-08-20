@@ -416,6 +416,22 @@ String String::CaseFold() const
     return str;
 }
 
+String String::UpperCase() const
+{
+    gd::String upperCasedStr;
+    std::for_each( begin(), end(), [&](char32_t codepoint){ upperCasedStr.push_back( utf8proc_toupper(codepoint) ); } );
+
+    return upperCasedStr;
+}
+
+String String::LowerCase() const
+{
+    gd::String lowerCasedStr;
+    std::for_each( begin(), end(), [&](char32_t codepoint){ lowerCasedStr.push_back( utf8proc_tolower(codepoint) ); } );
+
+    return lowerCasedStr;
+}
+
 String& String::Normalize(String::NormForm form)
 {
     unsigned char *newStr = nullptr;

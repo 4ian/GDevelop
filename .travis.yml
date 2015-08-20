@@ -3,6 +3,17 @@ compiler:
   - gcc
   - clang
 
+env:
+  global:
+    - GCC_VERSION="5"
+
+#Use GCC/G++ 5
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+
+
 #Activate X Virtual Framebuffer to allow tests to
 #use SFML.
 before_install:
@@ -15,10 +26,13 @@ install:
   - sudo apt-get install p7zip-full
     #SFML dependencies:
   - sudo apt-get install libopenal-dev libjpeg-dev libglew-dev libudev-dev libxrandr-dev libsndfile1-dev libglu1-mesa-dev libfreetype6-dev
+#Get the correct version of gcc/g++
+  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq "g++-${GCC_VERSION}"; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
 #Compile the tests only
   - mkdir .build-tests
   - cd .build-tests
-  - cmake -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE ..
+  - cmake -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
   - make -j 4
   - cd ..
 #Install GDJS tests dependencies

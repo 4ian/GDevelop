@@ -39,16 +39,16 @@ class GD_CORE_API String
 
 public:
 
-    typedef char32_t value_type;
-    typedef char32_t& reference;
-    typedef const char32_t& const_reference;
-    typedef char32_t* pointer;
-    typedef const char32_t* const_pointer;
+    using value_type = char32_t;
+    using reference = char32_t&;
+    using const_reference = const char32_t&;
+    using pointer = char32_t*;
+    using const_pointer = const char32_t*;
 
-    typedef std::string::size_type size_type;
-    typedef std::string::difference_type difference_type;
+    using size_type = std::string::size_type;
+    using difference_type = std::string::difference_type;
 
-    static const size_type npos = -1;
+    static constexpr size_type npos = -1;
 
     template<class T>
     class GD_CORE_API StringIterator : public std::iterator<std::bidirectional_iterator_tag, String::value_type, String::difference_type>
@@ -86,11 +86,10 @@ public:
         T strIt;
     };
 
-
-    typedef StringIterator<std::string::iterator> iterator;
-    typedef StringIterator<std::string::const_iterator> const_iterator;
-    typedef std::reverse_iterator<iterator> reverse_iterator;
-    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+    using iterator = StringIterator<std::string::iterator>;
+    using const_iterator = StringIterator<std::string::const_iterator>;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 /**
  * \name Constructors
@@ -408,7 +407,7 @@ public:
      * \brief Searches the string for invalid characters and replaces them with **replacement**.
      * \return *this
      */
-    String& ReplaceInvalid( char32_t replacement = 0xfffd );
+    String& ReplaceInvalid( value_type replacement = 0xfffd );
 
 /**
  * \}
@@ -455,7 +454,7 @@ public:
 
     String& operator+=( const char *other );
 
-    String& operator+=( char32_t character );
+    String& operator+=( value_type character );
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 

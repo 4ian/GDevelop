@@ -263,7 +263,7 @@ bool String::IsValid() const
     return ::utf8::is_valid(m_string.begin(), m_string.end());
 }
 
-String& String::ReplaceInvalid( char32_t replacement )
+String& String::ReplaceInvalid( value_type replacement )
 {
     std::string validStr;
     ::utf8::replace_invalid(m_string.begin(), m_string.end(), std::back_inserter(validStr), replacement);
@@ -292,7 +292,7 @@ String& String::operator+=( const char *other )
     return *this;
 }
 
-String& String::operator+=( char32_t character )
+String& String::operator+=( value_type character )
 {
     push_back(character);
     return *this;

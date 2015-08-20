@@ -37,6 +37,14 @@ gd::String GD_API StrAt(const gd::String & str, size_t pos )
 }
 
 /**
+ * Expression function for getting a character from its codepoint
+ */
+gd::String GD_API FromCodePoint(int32_t codepoint)
+{
+    return gd::String::FromUTF32( std::u32string( 1, static_cast<char32_t>(codepoint) ) );
+}
+
+/**
  * Expression function for getting a substring from a string
  */
 unsigned int GD_API StrLen(const gd::String & str)

@@ -17,6 +17,7 @@ StringInstructionsExtension::StringInstructionsExtension()
 
     #if defined(GD_IDE_ONLY)
     GetAllStrExpressions()["NewLine"].SetFunctionName("GDpriv::StringTools::NewLine").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
+    GetAllStrExpressions()["FromCodePoint"].SetFunctionName("GDpriv::StringTools::FromCodePoint").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
     GetAllStrExpressions()["SubStr"].SetFunctionName("GDpriv::StringTools::SubStr").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
     GetAllStrExpressions()["StrAt"].SetFunctionName("GDpriv::StringTools::StrAt").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
     GetAllExpressions()["StrLength"].SetFunctionName("GDpriv::StringTools::StrLen").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
@@ -26,4 +27,3 @@ StringInstructionsExtension::StringInstructionsExtension()
     GetAllExpressions()["StrRFindFrom"].SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDCpp/BuiltinExtensions/StringTools.h");
     #endif
 }
-

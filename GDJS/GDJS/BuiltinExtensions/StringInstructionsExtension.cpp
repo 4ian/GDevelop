@@ -25,6 +25,8 @@ StringInstructionsExtension::StringInstructionsExtension()
 
     GetAllStrExpressions()["NewLine"]
         .SetFunctionName("gdjs.evtTools.string.newLine");
+    GetAllStrExpressions()["FromCodePoint"]
+        .SetFunctionName("gdjs.evtTools.string.fromCodePoint");
     GetAllStrExpressions()["SubStr"]
         .SetFunctionName("gdjs.evtTools.string.subStr");
     GetAllStrExpressions()["StrAt"]

@@ -21,6 +21,7 @@ namespace StringTools
 gd::String GD_API SubStr(const gd::String & str, size_t start, size_t length );
 gd::String GD_API StrAt(const gd::String & str, size_t pos );
 gd::String GD_API NewLine();
+gd::String GD_API FromCodePoint(int32_t codepoint);
 unsigned int GD_API StrLen(const gd::String & str);
 int GD_API StrFind(const gd::String & str, const gd::String & findwhat);
 int GD_API StrRFind(const gd::String & str, const gd::String & findwhat);

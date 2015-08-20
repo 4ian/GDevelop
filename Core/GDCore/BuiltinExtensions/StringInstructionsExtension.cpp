@@ -25,6 +25,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    _("Manipulation on text"),
                    "res/conditions/toujours24.png");
 
+    extension.AddStrExpression("FromCodePoint",
+                   _("Get character from code point"),
+                   _("Get character from code point"),
+                   _("Manipulation on text"),
+                   "res/conditions/toujours24.png")
+        .AddParameter("expression", _("Code point"));
+
     extension.AddStrExpression("SubStr",
                    _("Get a portion of a text"),
                    _("Get a portion of a text"),

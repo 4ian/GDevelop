@@ -24,6 +24,15 @@ gdjs.evtTools.string.newLine = function() {
 };
 
 /**
+ * Return a character from its codepoint
+ * @method fromCodePoint
+ * @private
+ */
+gdjs.evtTools.string.fromCodePoint = function(codePoint) {
+    return String.fromCodePoint(codePoint);
+};
+
+/**
  * Return a new string containing the substring of the original string.
  * @method subStr
  * @private

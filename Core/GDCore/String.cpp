@@ -18,7 +18,7 @@
 namespace gd
 {
 
-const String::size_type GD_CORE_API String::npos;
+constexpr String::size_type String::npos;
 
 String::String() : m_string()
 {

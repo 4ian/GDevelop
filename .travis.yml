@@ -5,9 +5,9 @@ compiler:
 
 env:
   global:
-    - GCC_VERSION="5"
+    - GCC_VERSION="4.8"
 
-#Use GCC/G++ 5
+#Use custom GCC version
 addons:
   apt:
     sources:

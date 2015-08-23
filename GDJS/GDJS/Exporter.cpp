@@ -80,15 +80,12 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
 
     gd::Project exportedProject = project;
 
-    std::cout << "a" << std::endl;
 
     //Export resources (*before* generating events as some resources filenames may be updated)
     ExportResources(fs, exportedProject, exportDir);
-    std::cout << "a2" << std::endl;
     //Generate events code
     if ( !ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
         return false;
-    std::cout << "b" << std::endl;
 
     //Export source files
     if ( !ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
@@ -96,7 +93,6 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
         gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
         return false;
     }
-    std::cout << "c" << std::endl;
 
     //Strip the project (*after* generating events as the events may use stripped things (objects groups...))
     gd::ProjectStripper::StripProject(exportedProject);

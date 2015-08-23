@@ -1,4 +1,5 @@
 language: cpp
+sudo: false
 compiler:
   - gcc
   - clang
@@ -7,12 +8,24 @@ env:
   global:
     - GCC_VERSION="4.8"
 
-#Use custom GCC version
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-
+    packages:
+    #Build dependencies:
+    - cmake
+    - p7zip-full
+    - g++-4.8
+    #SFML dependencies:
+    - libopenal-dev
+    - libjpeg-dev
+    - libglew-dev
+    - libudev-dev
+    - libxrandr-dev
+    - libsndfile1-dev
+    - libglu1-mesa-dev
+    - libfreetype6-dev
 
 #Activate X Virtual Framebuffer to allow tests to
 #use SFML.
@@ -21,13 +34,7 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
 
 install:
-  - sudo apt-get update
-#Download and compile dependencies
-  - sudo apt-get install p7zip-full
-    #SFML dependencies:
-  - sudo apt-get install libopenal-dev libjpeg-dev libglew-dev libudev-dev libxrandr-dev libsndfile1-dev libglu1-mesa-dev libfreetype6-dev
 #Get the correct version of gcc/g++
-  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq "g++-${GCC_VERSION}"; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
 #Compile the tests only
   - mkdir .build-tests

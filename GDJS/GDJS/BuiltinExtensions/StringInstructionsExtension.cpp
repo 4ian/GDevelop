@@ -25,6 +25,12 @@ StringInstructionsExtension::StringInstructionsExtension()
 
     GetAllStrExpressions()["NewLine"]
         .SetFunctionName("gdjs.evtTools.string.newLine");
+    GetAllStrExpressions()["FromCodePoint"]
+        .SetFunctionName("gdjs.evtTools.string.fromCodePoint");
+    GetAllStrExpressions()["ToUpperCase"]
+        .SetFunctionName("gdjs.evtTools.string.toUpperCase");
+    GetAllStrExpressions()["ToLowerCase"]
+        .SetFunctionName("gdjs.evtTools.string.toLowerCase");
     GetAllStrExpressions()["SubStr"]
         .SetFunctionName("gdjs.evtTools.string.subStr");
     GetAllStrExpressions()["StrAt"]

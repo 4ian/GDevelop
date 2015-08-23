@@ -37,6 +37,30 @@ gd::String GD_API StrAt(const gd::String & str, size_t pos )
 }
 
 /**
+ * Expression function for getting a character from its codepoint
+ */
+gd::String GD_API FromCodePoint(int32_t codepoint)
+{
+    return gd::String::FromUTF32( std::u32string( 1, static_cast<char32_t>(codepoint) ) );
+}
+
+/**
+ * Expression function for getting the uppercased version of a string
+ */
+gd::String GD_API ToUpperCase(const gd::String & str)
+{
+    return str.UpperCase();
+}
+
+/**
+ * Expression function for getting the uppercased version of a string
+ */
+gd::String GD_API ToLowerCase(const gd::String & str)
+{
+    return str.LowerCase();
+}
+
+/**
  * Expression function for getting a substring from a string
  */
 std::size_t GD_API StrLen(const gd::String & str)

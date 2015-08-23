@@ -18,7 +18,7 @@
 namespace gd
 {
 
-const String::size_type GD_CORE_API String::npos;
+constexpr String::size_type String::npos;
 
 String::String() : m_string()
 {
@@ -263,7 +263,7 @@ bool String::IsValid() const
     return ::utf8::is_valid(m_string.begin(), m_string.end());
 }
 
-String& String::ReplaceInvalid( char32_t replacement )
+String& String::ReplaceInvalid( value_type replacement )
 {
     std::string validStr;
     ::utf8::replace_invalid(m_string.begin(), m_string.end(), std::back_inserter(validStr), replacement);
@@ -292,7 +292,7 @@ String& String::operator+=( const char *other )
     return *this;
 }
 
-String& String::operator+=( char32_t character )
+String& String::operator+=( value_type character )
 {
     push_back(character);
     return *this;
@@ -414,6 +414,22 @@ String String::CaseFold() const
     free(newStr);
 
     return str;
+}
+
+String String::UpperCase() const
+{
+    gd::String upperCasedStr;
+    std::for_each( begin(), end(), [&](char32_t codepoint){ upperCasedStr.push_back( utf8proc_toupper(codepoint) ); } );
+
+    return upperCasedStr;
+}
+
+String String::LowerCase() const
+{
+    gd::String lowerCasedStr;
+    std::for_each( begin(), end(), [&](char32_t codepoint){ lowerCasedStr.push_back( utf8proc_tolower(codepoint) ); } );
+
+    return lowerCasedStr;
 }
 
 String& String::Normalize(String::NormForm form)

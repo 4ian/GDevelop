@@ -84,7 +84,7 @@ void LayoutEditorPropertiesPnl::Refresh()
         std::vector<gd::InitialInstance*> selection = layoutEditorCanvas->GetSelection();
         instancesHelper.RefreshFrom(selection);
         gd::String objectName;
-        for (unsigned int i = 0;i<selection.size();++i)
+        for (std::size_t i = 0;i<selection.size();++i)
         {
             if ( !selection[i] ) continue;
             if ( i == 0 ) objectName = selection[i]->GetObjectName();
@@ -163,7 +163,7 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
         //of instances at their original width/height
         if ( event.GetPropertyName() == _("Custom size?") && grid->GetProperty(_("Custom size?"))->GetValue().GetBool() )
         {
-            for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+            for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             {
                 sf::Vector2f size = layoutEditorCanvas->GetInitialInstanceSize(*selectedInitialInstances[i]);
                 selectedInitialInstances[i]->SetCustomWidth(size.x);

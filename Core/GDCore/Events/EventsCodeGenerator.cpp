@@ -30,10 +30,10 @@ namespace gd
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Get
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String>  & arguments, const gd::String & callStartString, unsigned int startFromArgument)
+gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String>  & arguments, const gd::String & callStartString, std::size_t startFromArgument)
 {
-    unsigned int relationalOperatorIndex = instrInfos.parameters.size();
-    for (unsigned int i = startFromArgument;i<instrInfos.parameters.size();++i)
+    std::size_t relationalOperatorIndex = instrInfos.parameters.size();
+    for (std::size_t i = startFromArgument;i<instrInfos.parameters.size();++i)
     {
         if ( instrInfos.parameters[i].type == "relationalOperator" )
             relationalOperatorIndex = i;
@@ -50,7 +50,7 @@ gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::Instruc
 
     gd::String rhs = arguments[relationalOperatorIndex+1];
     gd::String argumentsStr;
-    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    for (std::size_t i = startFromArgument;i<arguments.size();++i)
     {
         if ( i != relationalOperatorIndex && i != relationalOperatorIndex+1)
         {
@@ -73,10 +73,10 @@ gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::Instruc
  * \param String to be placed at the start of the call of the getter ( the "getter" function to be called typically ). Example : MyObject->Get
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-gd::String EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String>  & arguments, const gd::String & callStartString, const gd::String & getterStartString, unsigned int startFromArgument)
+gd::String EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String>  & arguments, const gd::String & callStartString, const gd::String & getterStartString, std::size_t startFromArgument)
 {
-    unsigned int operatorIndex = instrInfos.parameters.size();
-    for (unsigned int i = startFromArgument;i<instrInfos.parameters.size();++i)
+    std::size_t operatorIndex = instrInfos.parameters.size();
+    for (std::size_t i = startFromArgument;i<instrInfos.parameters.size();++i)
     {
         if ( instrInfos.parameters[i].type == "operator" )
             operatorIndex = i;
@@ -96,7 +96,7 @@ gd::String EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetada
 
     //Generate arguments for calling the "getter" function
     gd::String getterArgumentsStr;
-    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    for (std::size_t i = startFromArgument;i<arguments.size();++i)
     {
         if ( i != operatorIndex && i != operatorIndex+1)
         {
@@ -107,7 +107,7 @@ gd::String EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetada
 
     //Generate arguments for calling the function ("setter")
     gd::String argumentsStr;
-    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    for (std::size_t i = startFromArgument;i<arguments.size();++i)
     {
         if ( i != operatorIndex && i != operatorIndex+1) //Generate classic arguments
         {
@@ -138,10 +138,10 @@ gd::String EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetada
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Set
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-gd::String EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String>  & arguments, const gd::String & callStartString, unsigned int startFromArgument)
+gd::String EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String>  & arguments, const gd::String & callStartString, std::size_t startFromArgument)
 {
-    unsigned int operatorIndex = instrInfos.parameters.size();
-    for (unsigned int i = startFromArgument;i<instrInfos.parameters.size();++i)
+    std::size_t operatorIndex = instrInfos.parameters.size();
+    for (std::size_t i = startFromArgument;i<instrInfos.parameters.size();++i)
     {
         if ( instrInfos.parameters[i].type == "operator" )
             operatorIndex = i;
@@ -167,7 +167,7 @@ gd::String EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::Instructi
 
     //Generate arguments for calling the function ("setter")
     gd::String argumentsStr;
-    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    for (std::size_t i = startFromArgument;i<arguments.size();++i)
     {
         if ( i != operatorIndex && i != operatorIndex+1) //Generate classic arguments
         {
@@ -208,7 +208,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditio
     }
 
     //Verify that there are not mismatch between object type in parameters
-    for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+    for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
     {
         if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) )
         {
@@ -253,7 +253,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditio
     if ( !objectName.empty() && MetadataProvider::HasObjectCondition(platform, objectType, condition.GetType()) && !instrInfos.parameters.empty())
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             //Set up the context
             const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(platform, objectType);
@@ -274,7 +274,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditio
     if (MetadataProvider::HasBehaviorCondition(platform, behaviorType, condition.GetType()) && instrInfos.parameters.size() >= 2)
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             //Setup context
             const BehaviorMetadata & autoInfo = MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
@@ -302,17 +302,17 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList 
 {
     gd::String outputCode;
 
-    for (unsigned int i = 0;i<conditions.size();++i)
+    for (std::size_t i = 0;i<conditions.size();++i)
         outputCode += GenerateBooleanInitializationToFalse("condition"+gd::String::From(i) +"IsTrue", context);
 
-    for (unsigned int cId =0;cId < conditions.size();++cId)
+    for (std::size_t cId =0;cId < conditions.size();++cId)
     {
         gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
 
         gd::String conditionCode = GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId) +"IsTrue", context);
         if ( !conditions[cId].GetType().empty() )
         {
-            for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is false. //TODO : Can be optimized
+            for (std::size_t i = 0;i<cId;++i) //Skip conditions if one condition is false. //TODO : Can be optimized
             {
                 if (i == 0) outputCode += "if ( "; else outputCode += " && ";
                 outputCode += "condition"+gd::String::From(i) +"IsTrue";
@@ -355,7 +355,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
     }
 
     //Verify that there are not mismatch between object type in parameters
-    for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+    for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
     {
         if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) )
         {
@@ -394,7 +394,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
     if (MetadataProvider::HasObjectAction(platform, objectType, action.GetType()) && !instrInfos.parameters.empty())
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             //Setup context
             const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(platform, objectType);
@@ -415,7 +415,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
     if (MetadataProvider::HasBehaviorAction(platform, behaviorType, action.GetType()) && instrInfos.parameters.size() >= 2)
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             //Setup context
             const BehaviorMetadata & autoInfo = MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
@@ -440,7 +440,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
 gd::String EventsCodeGenerator::GenerateActionsListCode(gd::InstructionsList & actions, EventsCodeGenerationContext & context)
 {
     gd::String outputCode;
-    for (unsigned int aId =0;aId < actions.size();++aId)
+    for (std::size_t aId =0;aId < actions.size();++aId)
     {
         gd::InstructionMetadata instrInfos = MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
 
@@ -547,7 +547,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         //Try supplementary types if provided
         if ( supplementaryParametersTypes )
         {
-            for (unsigned int i = 0;i<supplementaryParametersTypes->size();++i)
+            for (std::size_t i = 0;i<supplementaryParametersTypes->size();++i)
             {
                 if ( (*supplementaryParametersTypes)[i].first == metadata.type )
                     argOutput += (*supplementaryParametersTypes)[i].second;
@@ -572,7 +572,7 @@ vector<gd::String>  EventsCodeGenerator::GenerateParametersCodes(vector < gd::Ex
     while(parameters.size() < parametersInfo.size())
         parameters.push_back(gd::Expression(""));
 
-    for (unsigned int pNb = 0;pNb < parametersInfo.size() && pNb < parameters.size();++pNb)
+    for (std::size_t pNb = 0;pNb < parametersInfo.size() && pNb < parameters.size();++pNb)
     {
         if ( parameters[pNb].GetPlainString().empty() && parametersInfo[pNb].optional  )
             parameters[pNb] = gd::Expression(parametersInfo[pNb].defaultValue);
@@ -629,7 +629,7 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(gd::EventsList & events, 
 {
     gd::String output;
 
-    for ( unsigned int eId = 0; eId < events.size();++eId )
+    for ( std::size_t eId = 0; eId < events.size();++eId )
     {
         //Each event has its own context : Objects picked in an event are totally different than the one picked in another.
         gd::EventsCodeGenerationContext context;
@@ -706,7 +706,7 @@ std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(const gd::String 
     }
 
     //Ensure that all returned objects actually exists.
-    for (unsigned int i = 0; i < realObjects.size();)
+    for (std::size_t i = 0; i < realObjects.size();)
     {
         if ( !scene.HasObjectNamed(realObjects[i]) && !project.HasObjectNamed(realObjects[i]) )
             realObjects.erase(realObjects.begin()+i);
@@ -719,7 +719,7 @@ std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(const gd::String 
 
 void EventsCodeGenerator::DeleteUselessEvents(gd::EventsList & events)
 {
-    for ( unsigned int eId = events.size()-1; eId < events.size();--eId )
+    for ( std::size_t eId = events.size()-1; eId < events.size();--eId )
     {
         if ( events[eId].CanHaveSubEvents() ) //Process sub events, if any
             DeleteUselessEvents(events[eId].GetSubEvents());
@@ -734,7 +734,7 @@ void EventsCodeGenerator::DeleteUselessEvents(gd::EventsList & events)
  */
 void EventsCodeGenerator::PreprocessEventList(gd::EventsList & listEvent)
 {
-    for ( unsigned int i = 0;i < listEvent.GetEventsCount();++i )
+    for ( std::size_t i = 0;i < listEvent.GetEventsCount();++i )
     {
         listEvent[i].Preprocess(*this, listEvent, i);
         if ( i < listEvent.GetEventsCount() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )
@@ -786,7 +786,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(const std::vector<gd::Stri
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 0;i<arguments.size();++i)
+        for (std::size_t i = 0;i<arguments.size();++i)
         {
             if ( i != 0 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -797,7 +797,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(const std::vector<gd::Stri
 
     //Add logical not if needed
     bool conditionAlreadyTakeCareOfInversion = false;
-    for (unsigned int i = 0;i<instrInfos.parameters.size();++i) //Some conditions already have a "conditionInverted" parameter
+    for (std::size_t i = 0;i<instrInfos.parameters.size();++i) //Some conditions already have a "conditionInverted" parameter
     {
         if( instrInfos.parameters[i].type == "conditionInverted" )
             conditionAlreadyTakeCareOfInversion = true;
@@ -832,7 +832,7 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objec
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 1;i<arguments.size();++i)
+        for (std::size_t i = 1;i<arguments.size();++i)
         {
             if ( i != 1 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -863,7 +863,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & obj
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -891,7 +891,7 @@ gd::String EventsCodeGenerator::GenerateFreeAction(const std::vector<gd::String>
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 0;i<arguments.size();++i)
+        for (std::size_t i = 0;i<arguments.size();++i)
         {
             if ( i != 0 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -922,7 +922,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -955,7 +955,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & object
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];

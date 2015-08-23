@@ -360,7 +360,7 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
         //Add each image to images list and to folder if any
         std::vector < gd::String > filenames;
-        for ( unsigned int i = 0; i < files.GetCount();++i )
+        for ( std::size_t i = 0; i < files.GetCount();++i )
             filenames.push_back(files[i]);
 
         AddResources(filenames);
@@ -379,7 +379,7 @@ std::vector<gd::String> ResourcesEditor::CopyAndAddResources(std::vector<gd::Str
 
         wxFileName destinationDir = wxFileName::FileName(projectDirectory+"/"+destinationDirStr+"/");
         destinationDir.MakeAbsolute(projectDirectory);
-        for (unsigned int i = 0;i<filenames.size();++i)
+        for (std::size_t i = 0;i<filenames.size();++i)
         {
             wxString name = wxFileName::FileName(filenames[i]).GetFullName();
             wxFileName destinationFile = wxFileName::FileName(destinationDir.GetPath()+"/"+name);
@@ -413,7 +413,7 @@ std::vector<gd::String> ResourcesEditor::AddResources(const std::vector<gd::Stri
     wxString projectDirectory = wxFileName::FileName(project.GetProjectFile()).GetPath();
 
     //Add each resource to the list and to the folder if any
-    for ( unsigned int i = 0; i < filenames.size();++i )
+    for ( std::size_t i = 0; i < filenames.size();++i )
     {
         wxFileName file = wxFileName::FileName(filenames[i]);
         if (!projectDirectory.empty())  //If game is not saved, we keep absolute filenames
@@ -425,7 +425,7 @@ std::vector<gd::String> ResourcesEditor::AddResources(const std::vector<gd::Stri
         //Add to all images
         if ( project.GetResourcesManager().AddResource(name, file.GetFullPath()) )
         {
-            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, name);
 
             resourcesTree->AppendItem( allImagesItem, name, -1, -1, new gd::TreeItemStringData("Image", name));
@@ -514,7 +514,7 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
 {
     wxArrayTreeItemIds selection;
     resourcesTree->GetSelections(selection);
-    for (unsigned int i = 0;i<selection.size();++i)
+    for (std::size_t i = 0;i<selection.size();++i)
     {
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
         if ( data && data->GetString() == "Image")
@@ -522,7 +522,7 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
             gd::String imageName = data->GetSecondString();
 
             project.GetResourcesManager().RemoveResource(imageName);
-            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, imageName);
             RemoveImageFromTree( resourcesTree->GetRootItem(), imageName );
         }
@@ -610,7 +610,7 @@ void ResourcesEditor::UpdatePropertyGrid()
     //First construct the list of common properties
     wxArrayTreeItemIds selection;
     resourcesTree->GetSelections(selection);
-    for (unsigned int i = 0;i<selection.size();++i)
+    for (std::size_t i = 0;i<selection.size();++i)
     {
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
         if ( data && data->GetString() == "Image")
@@ -621,7 +621,7 @@ void ResourcesEditor::UpdatePropertyGrid()
             else
             {
                 //Keep only properties that are common to all the selected resources
-                for (unsigned int j = 0;j<commonProperties.size();)
+                for (std::size_t j = 0;j<commonProperties.size();)
                 {
                     if ( find(properties.begin(), properties.end(), commonProperties[j]) == properties.end() )
                         commonProperties.erase(commonProperties.begin()+j);
@@ -660,7 +660,7 @@ void ResourcesEditor::UpdatePropertyGrid()
         fileProperty->SetAttribute(wxPG_FILE_INITIAL_PATH, wxFileName::FileName(project.GetProjectFile()).GetPath());
         fileProperty->SetAttribute(wxPG_FILE_SHOW_RELATIVE_PATH, wxFileName::FileName(project.GetProjectFile()).GetPath());
         propertyGrid->SetPropertyHelpString(fileProperty, _("File of the resource.\nThe filename is relative to the project directory."));
-        for (unsigned int i = 0;i<selection.size();++i)
+        for (std::size_t i = 0;i<selection.size();++i)
         {
             gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
             if ( data && data->GetString() == "Image")
@@ -690,12 +690,12 @@ void ResourcesEditor::UpdatePropertyGrid()
 
         //Other properties
         if ( !commonProperties.empty() ) propertyGrid->Append( new wxPropertyCategory(_("Other properties")) );
-        for (unsigned int j = 0;j<commonProperties.size();++j)
+        for (std::size_t j = 0;j<commonProperties.size();++j)
         {
             wxPGProperty * property = propertyGrid->Append( new wxStringProperty("", commonProperties[j], "") );
             wxString commonValue;
 
-            for (unsigned int i = 0;i<selection.size();++i)
+            for (std::size_t i = 0;i<selection.size();++i)
             {
                 gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
                 if ( data && data->GetString() == "Image")
@@ -727,7 +727,7 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
 
     wxArrayTreeItemIds selection;
     resourcesTree->GetSelections(selection);
-    for (unsigned int i = 0;i<selection.size();++i)
+    for (std::size_t i = 0;i<selection.size();++i)
     {
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
         if ( data && data->GetString() == "Image")
@@ -742,7 +742,7 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
             {
                 project.GetResourcesManager().RenameResource(renamedItemOldName, propertyNewValue);
 
-                for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+                for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
                 {
                     project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
                     project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, propertyNewValue);
@@ -753,7 +753,7 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
             else
                 project.GetResourcesManager().GetResource(data->GetSecondString()).ChangeProperty(project, propertyName, propertyNewValue);
 
-            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, data->GetSecondString());
         }
         else if ( data && data->GetString() == "Folder")
@@ -773,7 +773,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
 
     wxArrayTreeItemIds selection;
     resourcesTree->GetSelections(selection);
-    for (unsigned int i = 0;i<selection.size();++i)
+    for (std::size_t i = 0;i<selection.size();++i)
     {
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
         if ( data && data->GetString() == "Image")
@@ -865,7 +865,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
 
             project.GetResourcesManager().RenameResource(renamedItemOldName, newName);
 
-            for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
+            for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
             {
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, newName);
@@ -909,13 +909,13 @@ void ResourcesEditor::Refresh()
 
     //Folders
     std::vector<gd::String> folders = project.GetResourcesManager().GetAllFolderList();
-    for (unsigned int i = 0;i< folders.size() ;++i)
+    for (std::size_t i = 0;i< folders.size() ;++i)
     {
         gd::ResourceFolder & folder = project.GetResourcesManager().GetFolder(folders[i]);
         wxTreeItemId folderItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), folders[i], -1, -1, new gd::TreeItemStringData("Folder", folders[i] ));
 
         std::vector<gd::String> resources = folder.GetAllResourcesList();
-        for (unsigned int j=0;j<resources.size();++j)
+        for (std::size_t j=0;j<resources.size();++j)
         {
             gd::Resource & resource = folder.GetResource(resources[j]);
 
@@ -929,7 +929,7 @@ void ResourcesEditor::Refresh()
     //All images
     allImagesItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), _("All images"), -1,-1, new gd::TreeItemStringData("BaseFolder", "" ));
     std::vector<gd::String> resources = project.GetResourcesManager().GetAllResourcesList();
-    for ( unsigned int i = 0;i <resources.size();i++ )
+    for ( std::size_t i = 0;i <resources.size();i++ )
     {
         gd::Resource & resource = project.GetResourcesManager().GetResource(resources[i]);
 
@@ -950,7 +950,7 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
     //Construct corresponding wxArrayString with unused images
     wxArrayString imagesNotUsed;
     wxArrayInt initialSelection;
-    for ( unsigned int i = 0;i < unusedImages.size() ;i++ )
+    for ( std::size_t i = 0;i < unusedImages.size() ;i++ )
     {
         imagesNotUsed.push_back(unusedImages[i]);
         initialSelection.push_back(imagesNotUsed.size()-1);
@@ -963,7 +963,7 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 
     //Remove selection
     wxArrayInt selection = dialog.GetSelections();
-    for (unsigned int i = 0;i<selection.size();++i)
+    for (std::size_t i = 0;i<selection.size();++i)
     {
         gd::String imageName = imagesNotUsed[selection[i]];
 
@@ -1251,7 +1251,7 @@ void ResourcesEditor::OnresourcesTreeBeginDrag(wxTreeEvent& event)
     resourcesTree->GetSelections(selection);
 
     wxString draggedImagesPartialCommand;
-    for (unsigned int i = 0;i<selection.size();++i)
+    for (std::size_t i = 0;i<selection.size();++i)
     {
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
         if ( !data ) continue;

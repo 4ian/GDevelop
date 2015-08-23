@@ -61,7 +61,7 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(gd::String functionN
     //Prepare parameters
     std::vector<gd::String> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
     gd::String parametersStr;
-    for (unsigned int i = 0;i<parametersCode.size();++i)
+    for (std::size_t i = 0;i<parametersCode.size();++i)
     {
         if ( i != 0 ) parametersStr += ", ";
         parametersStr += parametersCode[i];
@@ -89,7 +89,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(gd::String functionN
     //Prepare parameters
     std::vector<gd::String> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
     gd::String parametersStr;
-    for (unsigned int i = 1;i<parametersCode.size();++i)
+    for (std::size_t i = 1;i<parametersCode.size();++i)
     {
         if ( i != 1 ) parametersStr += ", ";
         parametersStr += parametersCode[i];
@@ -99,7 +99,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(gd::String functionN
 
     //Get object(s) concerned by function call
     std::vector<gd::String> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
-    for (unsigned int i = 0;i<realObjects.size();++i)
+    for (std::size_t i = 0;i<realObjects.size();++i)
     {
         context.ObjectsListNeeded(realObjects[i]);
 
@@ -132,7 +132,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(gd::String f
     //Prepare parameters
     std::vector<gd::String> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
     gd::String parametersStr;
-    for (unsigned int i = 2;i<parametersCode.size();++i)
+    for (std::size_t i = 2;i<parametersCode.size();++i)
     {
         if ( i != 2 ) parametersStr += ", ";
         parametersStr += parametersCode[i];
@@ -142,7 +142,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(gd::String f
     std::vector<gd::String> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
 
     gd::String output = GetReturnType() == "string" ? "\"\"" : "0";
-    for (unsigned int i = 0;i<realObjects.size();++i)
+    for (std::size_t i = 0;i<realObjects.size();++i)
     {
         context.ObjectsListNeeded(realObjects[i]);
 

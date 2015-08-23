@@ -64,16 +64,16 @@ RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object 
     const gd::SpriteObject & spriteObject = static_cast<const gd::SpriteObject&>(object);
 
     animations.clear();
-    for (unsigned int i = 0; i < spriteObject.GetAllAnimations().size(); ++i)
+    for (std::size_t i = 0; i < spriteObject.GetAllAnimations().size(); ++i)
         animations.push_back(AnimationProxy(spriteObject.GetAllAnimations()[i]));
 
     //Load resources
-    for ( unsigned int j = 0; j < animations.size();j++ )
+    for ( std::size_t j = 0; j < animations.size();j++ )
     {
         gd::Animation & anim = animations[j].GetNonConst();
-        for ( unsigned int k = 0;k < anim.GetDirectionsCount();k++ )
+        for ( std::size_t k = 0;k < anim.GetDirectionsCount();k++ )
         {
-            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpritesCount();l++ )
+            for ( std::size_t l = 0;l < anim.GetDirection(k).GetSpritesCount();l++ )
             {
                 gd::Sprite & sprite = anim.GetDirection(k).GetSprite(l);
 
@@ -295,7 +295,7 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
         gd::Animation & animation = animations[currentAnimation].GetNonConst();
         multipleDirections = animation.useMultipleDirections;
 
-        unsigned int directionIndex = multipleDirections ? currentDirection : 0;
+        std::size_t directionIndex = multipleDirections ? currentDirection : 0;
         if ( directionIndex >= animation.GetDirectionsCount() )
             ptrToCurrentSprite = badSpriteDatas;
         else
@@ -334,7 +334,7 @@ void RuntimeSpriteObject::UpdateTime(float elapsedTime)
     {
         if ( delay != 0 )
         {
-            unsigned int frameCount = static_cast<unsigned int>( timeElapsedOnCurrentSprite / delay );
+            std::size_t frameCount = static_cast<std::size_t>( timeElapsedOnCurrentSprite / delay );
             currentSprite += frameCount;
         }
         else currentSprite++;
@@ -374,9 +374,9 @@ std::vector<Polygon2d> RuntimeSpriteObject::GetHitBoxes() const
     const sf::Sprite & currentSFMLSprite = GetCurrentSFMLSprite();
 
     std::vector<Polygon2d> polygons = GetCurrentSprite().GetCollisionMask();
-    for (unsigned int i = 0;i<polygons.size();++i)
+    for (std::size_t i = 0;i<polygons.size();++i)
     {
-        for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
+        for (std::size_t j = 0;j<polygons[i].vertices.size();++j)
         {
             sf::Vector2f newVertice = currentSFMLSprite.getTransform().transformPoint(
                             !isFlippedX ? polygons[i].vertices[j].x : GetCurrentSprite().GetSFMLSprite().getLocalBounds().width-polygons[i].vertices[j].x,
@@ -388,7 +388,7 @@ std::vector<Polygon2d> RuntimeSpriteObject::GetHitBoxes() const
     return polygons;
 }
 
-bool RuntimeSpriteObject::SetSprite( unsigned int nb )
+bool RuntimeSpriteObject::SetSprite( std::size_t nb )
 {
     if ( currentAnimation >= GetAnimationsCount() ||
         currentDirection >= animations[currentAnimation].Get().GetDirectionsCount() ||
@@ -401,7 +401,7 @@ bool RuntimeSpriteObject::SetSprite( unsigned int nb )
     return true;
 }
 
-bool RuntimeSpriteObject::SetCurrentAnimation( unsigned int nb )
+bool RuntimeSpriteObject::SetCurrentAnimation( std::size_t nb )
 {
     if ( nb >= GetAnimationsCount() ) return false;
 
@@ -534,7 +534,7 @@ bool RuntimeSpriteObject::CursorOnObject(RuntimeScene & scene, bool accurate)
 {
     RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
 
-    for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
+    for (std::size_t cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
     {
         sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
             scene.GetInputManager().GetMousePosition(), theLayer.GetCamera(cameraIndex).GetSFMLView());
@@ -563,7 +563,7 @@ void RuntimeSpriteObject::TurnTowardObject(RuntimeObject * object, RuntimeScene 
 }
 
 #if defined(GD_IDE_ONLY)
-void RuntimeSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeSpriteObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Animation");     value = gd::String::From(GetCurrentAnimation());}
     else if ( propertyNb == 1 ) {name = _("Direction");     value = gd::String::From(GetCurrentDirection());}
@@ -577,14 +577,14 @@ void RuntimeSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, gd::St
     else if ( propertyNb == 6 ) {name = _("Y Scale");       value = gd::String::From(GetScaleY());}
 }
 
-bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeSpriteObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if ( propertyNb == 0 ) { return SetCurrentAnimation(newValue.To<int>()); }
     else if ( propertyNb == 1 )
     {
         if ( currentAnimation >= GetAnimationsCount() ) return false;
 
-        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(newValue.To<unsigned int>()) : SetAngle(newValue.To<float>());
+        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(newValue.To<std::size_t>()) : SetAngle(newValue.To<float>());
     }
     else if ( propertyNb == 2 ) { return SetSprite(newValue.To<int>()); }
     else if ( propertyNb == 3 ) { SetOpacity(newValue.To<float>()); }
@@ -595,7 +595,7 @@ bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String new
     return true;
 }
 
-unsigned int RuntimeSpriteObject::GetNumberOfProperties() const
+std::size_t RuntimeSpriteObject::GetNumberOfProperties() const
 {
     return 7;
 }

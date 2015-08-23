@@ -25,13 +25,13 @@ SoundManager::~SoundManager()
 
 void SoundManager::ManageGarbage()
 {
-    for ( unsigned int i = 0;i < sounds.size();i++ )
+    for ( std::size_t i = 0;i < sounds.size();i++ )
     {
         if ( sounds[i]->sound.getStatus() == sf::Sound::Stopped )
             sounds.erase( sounds.begin() + i );
     }
 
-    for ( unsigned int i = 0;i < musics.size();i++ )
+    for ( std::size_t i = 0;i < musics.size();i++ )
     {
         if ( musics[i]->GetStatus() == sf::Music::Stopped )
             musics.erase( musics.begin() + i );
@@ -69,20 +69,20 @@ void SoundManager::SetGlobalVolume(float volume)
     if ( globalVolume > 100.0 )
         globalVolume = 100.0;
 
-    //Mise à jour des volumes des sons
-    for (std::map<unsigned int, std::shared_ptr<Sound> >::iterator it = soundsChannel.begin();it != soundsChannel.end();++it)
+    //Mise ï¿½ jour des volumes des sons
+    for (std::map<std::size_t, std::shared_ptr<Sound> >::iterator it = soundsChannel.begin();it != soundsChannel.end();++it)
     {
         if ( it->second != std::shared_ptr<Sound>() ) (it->second)->UpdateVolume();
     }
-    for (std::map<unsigned int, std::shared_ptr<Music> >::iterator it = musicsChannel.begin();it != musicsChannel.end();++it)
+    for (std::map<std::size_t, std::shared_ptr<Music> >::iterator it = musicsChannel.begin();it != musicsChannel.end();++it)
     {
         if ( it->second != std::shared_ptr<Music>() ) it->second->UpdateVolume();
     }
-    for (unsigned int i =0;i<sounds.size();++i)
+    for (std::size_t i =0;i<sounds.size();++i)
     {
         if ( sounds[i] != std::shared_ptr<Sound>() ) sounds[i]->UpdateVolume();
     }
-    for (unsigned int i =0;i<musics.size();++i)
+    for (std::size_t i =0;i<musics.size();++i)
     {
         if ( musics[i] != std::shared_ptr<Music>() ) musics[i]->UpdateVolume();
     }

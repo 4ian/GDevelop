@@ -42,14 +42,14 @@ const EventsList * LinkEvent::GetLinkedEvents(const gd::Project & project) const
     return events;
 }
 
-void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, unsigned int indexOfTheEventInThisList)
+void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, std::size_t indexOfTheEventInThisList)
 {
     //Finding what to link to.
     const EventsList * eventsToInclude = GetLinkedEvents(project);
     if ( eventsToInclude != NULL )
     {
-        unsigned int firstEvent = IncludeAllEvents() ? 0 : GetIncludeStart();
-        unsigned int lastEvent = IncludeAllEvents() ? eventsToInclude->size() - 1 : GetIncludeEnd();
+        std::size_t firstEvent = IncludeAllEvents() ? 0 : GetIncludeStart();
+        std::size_t lastEvent = IncludeAllEvents() ? eventsToInclude->size() - 1 : GetIncludeEnd();
 
         //Check bounds
         if ( firstEvent >= eventsToInclude->size() )

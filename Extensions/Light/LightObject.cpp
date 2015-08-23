@@ -182,7 +182,7 @@ bool RuntimeLightObject::Draw( sf::RenderTarget& window )
     }
 
     //Debug draw
-    /*for (unsigned int i = 0;i<manager->walls.size();++i)
+    /*for (std::size_t i = 0;i<manager->walls.size();++i)
     {
         sf::Shape shape = sf::Shape::Line(manager->walls[i]->pt1, manager->walls[i]->pt2, 1, sf::Color(255,0,0));
         window.draw(shape);
@@ -227,7 +227,7 @@ void LightObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 #endif
 }
 
-void RuntimeLightObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeLightObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if ( propertyNb == 0 ) {name = _("Color");       value = gd::String::From(GetColor().r)+";"+gd::String::From(GetColor().g)+";"+gd::String::From(GetColor().b);}
     else if ( propertyNb == 1 ) {name = _("Intensity");       value = gd::String::From(GetIntensity());}
@@ -235,7 +235,7 @@ void RuntimeLightObject::GetPropertyForDebugger(unsigned int propertyNb, gd::Str
     else if ( propertyNb == 2 ) {name = _("Quality");       value = gd::String::From(GetQuality());}
 }
 
-bool RuntimeLightObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeLightObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if ( propertyNb == 0 )
     {
@@ -269,7 +269,7 @@ bool RuntimeLightObject::ChangeProperty(unsigned int propertyNb, gd::String newV
     return true;
 }
 
-unsigned int RuntimeLightObject::GetNumberOfProperties() const
+std::size_t RuntimeLightObject::GetNumberOfProperties() const
 {
     return 2;
 }

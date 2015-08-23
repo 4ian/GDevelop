@@ -84,7 +84,7 @@ void GD_API MoveObjects( RuntimeScene & scene )
 {
     RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
 
-    for (unsigned int id = 0;id < allObjects.size();++id)
+    for (std::size_t id = 0;id < allObjects.size();++id)
     {
         allObjects[id]->SetX( allObjects[id]->GetX() + allObjects[id]->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
         allObjects[id]->SetY( allObjects[id]->GetY() + allObjects[id]->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
@@ -150,7 +150,7 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <gd::String, std::vect
         {
             std::vector<RuntimeObject*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(it->first);
 
-            for (unsigned int j = 0;j<objectsOnScene.size();++j)
+            for (std::size_t j = 0;j<objectsOnScene.size();++j)
             {
                 if ( find(it->second->begin(), it->second->end(), objectsOnScene[j]) == it->second->end() )
                     it->second->push_back(objectsOnScene[j]);
@@ -174,7 +174,7 @@ bool GD_API PickRandomObject(RuntimeScene &, std::map <gd::String, std::vector<R
     if ( allObjects.empty() )
         return false;
 
-    unsigned int id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
+    std::size_t id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
     PickOnly(pickedObjectLists, allObjects[id]);
     return true;
 }
@@ -189,7 +189,7 @@ bool GD_API PickNearestObject(std::map <gd::String, std::vector<RuntimeObject*> 
         if ( it->second == NULL ) continue;
         auto list = *it->second;
 
-        for (unsigned int i = 0;i<list.size();++i)
+        for (std::size_t i = 0;i<list.size();++i)
         {
             double value = list[i]->GetSqDistanceTo(x, y);
             if (first || ((value < best) ^ inverted)) {

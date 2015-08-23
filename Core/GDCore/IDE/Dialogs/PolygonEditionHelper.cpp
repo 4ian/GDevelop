@@ -28,10 +28,10 @@ PolygonEditionHelper::~PolygonEditionHelper()
 
 void PolygonEditionHelper::OnPaint(std::vector<Polygon2d> &mask, wxDC &dc, wxPoint offset)
 {
-    for (unsigned int i = 0; i<mask.size();++i)
+    for (std::size_t i = 0; i<mask.size();++i)
     {
         wxPointList list;
-        for (unsigned int j = 0;j<mask[i].vertices.size();++j)
+        for (std::size_t j = 0;j<mask[i].vertices.size();++j)
             list.push_back(new wxPoint(mask[i].vertices[j].x, mask[i].vertices[j].y));
 
         dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
@@ -40,7 +40,7 @@ void PolygonEditionHelper::OnPaint(std::vector<Polygon2d> &mask, wxDC &dc, wxPoi
             dc.SetBrush(wxBrush(wxColour(255,255,255), wxBRUSHSTYLE_FDIAGONAL_HATCH));
 
         dc.DrawPolygon(&list, offset.x, offset.y);
-        for (unsigned int j = 0; j<mask[i].vertices.size();++j)
+        for (std::size_t j = 0; j<mask[i].vertices.size();++j)
         {
             dc.SetBrush(wxBrush(wxColour(128,128,228), wxBRUSHSTYLE_SOLID));
             dc.SetPen(wxPen(wxColour(j == selectedPolygonPoint ? 180 : 100,100,100)));
@@ -51,9 +51,9 @@ void PolygonEditionHelper::OnPaint(std::vector<Polygon2d> &mask, wxDC &dc, wxPoi
 
 void PolygonEditionHelper::OnMouseLeftDown(std::vector<Polygon2d> &mask, wxMouseEvent &event, wxPoint offset)
 {
-    for (unsigned int i = 0;i<mask.size();++i)
+    for (std::size_t i = 0;i<mask.size();++i)
     {
-        for (unsigned int j = 0;j<mask[i].vertices.size();++j)
+        for (std::size_t j = 0;j<mask[i].vertices.size();++j)
         {
             if ( offset.x+mask[i].vertices[j].x-3 <= event.GetX() &&
                              offset.y+mask[i].vertices[j].y-3 <=  event.GetY() &&

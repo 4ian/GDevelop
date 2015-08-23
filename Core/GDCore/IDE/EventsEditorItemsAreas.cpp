@@ -15,7 +15,7 @@ namespace gd {
 
 bool EventsEditorItemsAreas::IsOnEvent(int x, int y)
 {
-    for (unsigned int i = 0;i<eventsAreas.size();++i)
+    for (std::size_t i = 0;i<eventsAreas.size();++i)
     {
         if ( eventsAreas[i].first.Contains(x,y) )
             return true;
@@ -26,7 +26,7 @@ bool EventsEditorItemsAreas::IsOnEvent(int x, int y)
 
 EventItem EventsEditorItemsAreas::GetEventAt(int x, int y)
 {
-    for (unsigned int i = 0;i<eventsAreas.size();++i)
+    for (std::size_t i = 0;i<eventsAreas.size();++i)
     {
         if ( eventsAreas[i].first.Contains(x,y) )
             return eventsAreas[i].second;
@@ -39,7 +39,7 @@ EventItem EventsEditorItemsAreas::GetEventAt(int x, int y)
 }
 wxRect EventsEditorItemsAreas::GetAreaOfEventAt(int x, int y)
 {
-    for (unsigned int i = 0;i<eventsAreas.size();++i)
+    for (std::size_t i = 0;i<eventsAreas.size();++i)
     {
         if ( eventsAreas[i].first.Contains(x,y) )
             return eventsAreas[i].first;
@@ -53,7 +53,7 @@ wxRect EventsEditorItemsAreas::GetAreaOfEventAt(int x, int y)
 
 bool EventsEditorItemsAreas::IsOnInstruction(int x, int y)
 {
-    for (unsigned int i = 0;i<instructionsAreas.size();++i)
+    for (std::size_t i = 0;i<instructionsAreas.size();++i)
     {
         if ( instructionsAreas[i].first.Contains(x,y) )
             return true;
@@ -64,7 +64,7 @@ bool EventsEditorItemsAreas::IsOnInstruction(int x, int y)
 
 InstructionItem EventsEditorItemsAreas::GetInstructionAt(int x, int y)
 {
-    for (unsigned int i = 0;i<instructionsAreas.size();++i)
+    for (std::size_t i = 0;i<instructionsAreas.size();++i)
     {
         if ( instructionsAreas[i].first.Contains(x,y) )
             return instructionsAreas[i].second;
@@ -78,7 +78,7 @@ InstructionItem EventsEditorItemsAreas::GetInstructionAt(int x, int y)
 
 wxRect EventsEditorItemsAreas::GetAreaOfInstructionAt(int x, int y)
 {
-    for (unsigned int i = 0;i<instructionsAreas.size();++i)
+    for (std::size_t i = 0;i<instructionsAreas.size();++i)
     {
         if ( instructionsAreas[i].first.Contains(x,y) )
             return instructionsAreas[i].first;
@@ -92,7 +92,7 @@ wxRect EventsEditorItemsAreas::GetAreaOfInstructionAt(int x, int y)
 
 bool EventsEditorItemsAreas::IsOnInstructionList(int x, int y)
 {
-    for (unsigned int i = 0;i<instructionListsAreas.size();++i)
+    for (std::size_t i = 0;i<instructionListsAreas.size();++i)
     {
         if ( instructionListsAreas[i].first.Contains(x,y) )
             return true;
@@ -105,7 +105,7 @@ InstructionListItem EventsEditorItemsAreas::GetInstructionListAt(int x, int y)
 {
     wxRect rect;
     InstructionListItem instructionList;
-    for (unsigned int i = 0;i<instructionListsAreas.size();++i)
+    for (std::size_t i = 0;i<instructionListsAreas.size();++i)
     {
         if ( instructionListsAreas[i].first.Contains(x,y) )
         {
@@ -126,7 +126,7 @@ InstructionListItem EventsEditorItemsAreas::GetInstructionListAt(int x, int y)
 wxRect EventsEditorItemsAreas::GetAreaOfInstructionListAt(int x, int y)
 {
     wxRect rect;
-    for (unsigned int i = 0;i<instructionListsAreas.size();++i)
+    for (std::size_t i = 0;i<instructionListsAreas.size();++i)
     {
         if ( instructionListsAreas[i].first.Contains(x,y) )
         {
@@ -143,7 +143,7 @@ wxRect EventsEditorItemsAreas::GetAreaOfInstructionListAt(int x, int y)
 
 bool EventsEditorItemsAreas::IsOnParameter(int x, int y)
 {
-    for (unsigned int i = 0;i<parametersAreas.size();++i)
+    for (std::size_t i = 0;i<parametersAreas.size();++i)
     {
         if ( parametersAreas[i].first.Contains(x,y) )
             return true;
@@ -154,7 +154,7 @@ bool EventsEditorItemsAreas::IsOnParameter(int x, int y)
 
 ParameterItem EventsEditorItemsAreas::GetParameterAt(int x, int y)
 {
-    for (unsigned int i = 0;i<parametersAreas.size();++i)
+    for (std::size_t i = 0;i<parametersAreas.size();++i)
     {
         if ( parametersAreas[i].first.Contains(x,y) )
             return parametersAreas[i].second;
@@ -168,7 +168,7 @@ ParameterItem EventsEditorItemsAreas::GetParameterAt(int x, int y)
 
 wxRect EventsEditorItemsAreas::GetAreaOfParameterAt(int x, int y)
 {
-    for (unsigned int i = 0;i<parametersAreas.size();++i)
+    for (std::size_t i = 0;i<parametersAreas.size();++i)
     {
         if ( parametersAreas[i].first.Contains(x,y) )
             return parametersAreas[i].first;
@@ -182,7 +182,7 @@ wxRect EventsEditorItemsAreas::GetAreaOfParameterAt(int x, int y)
 
 bool EventsEditorItemsAreas::IsOnFoldingItem(int x, int y)
 {
-    for (unsigned int i = 0;i<foldingAreas.size();++i)
+    for (std::size_t i = 0;i<foldingAreas.size();++i)
     {
         if ( foldingAreas[i].first.Contains(x,y) )
             return true;
@@ -193,7 +193,7 @@ bool EventsEditorItemsAreas::IsOnFoldingItem(int x, int y)
 
 FoldingItem EventsEditorItemsAreas::GetFoldingItemAt(int x, int y)
 {
-    for (unsigned int i = 0;i<foldingAreas.size();++i)
+    for (std::size_t i = 0;i<foldingAreas.size();++i)
     {
         if ( foldingAreas[i].first.Contains(x,y) )
             return foldingAreas[i].second;
@@ -245,7 +245,7 @@ bool EventItem::operator==(const gd::EventItem & other) const
     return (event == other.event && eventsList == other.eventsList && positionInList == other.positionInList);
 }
 
-EventItem::EventItem(std::shared_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ ) :
+EventItem::EventItem(std::shared_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, std::size_t positionInList_ ) :
     event(event_),
     eventsList(eventsList_),
     positionInList(positionInList_)
@@ -266,7 +266,7 @@ bool gd::InstructionItem::operator==(const gd::InstructionItem & other) const
     return (instruction == other.instruction && isCondition == other.isCondition && instructionList == other.instructionList && positionInList == other.positionInList && event == other.event);
 }
 
-InstructionItem::InstructionItem(gd::Instruction * instruction_, bool isCondition_, gd::InstructionsList* instructionList_, unsigned int positionInList_, gd::BaseEvent * event_ ) :
+InstructionItem::InstructionItem(gd::Instruction * instruction_, bool isCondition_, gd::InstructionsList* instructionList_, std::size_t positionInList_, gd::BaseEvent * event_ ) :
     instruction(instruction_),
     isCondition(isCondition_),
     instructionList(instructionList_),

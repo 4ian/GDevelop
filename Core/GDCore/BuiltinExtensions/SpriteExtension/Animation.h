@@ -28,27 +28,27 @@ public:
     /**
      * \brief Return the n-th direction
      */
-    const Direction & GetDirection(unsigned int n) const;
+    const Direction & GetDirection(std::size_t n) const;
 
     /**
      * \brief Return the n-th direction
      */
-    Direction & GetDirection(unsigned int n);
+    Direction & GetDirection(std::size_t n);
 
     /**
      * \brief Change a direction
      */
-    void SetDirection(const Direction & direction, unsigned int nb);
+    void SetDirection(const Direction & direction, std::size_t nb);
 
     /**
      * \brief Change direction count
      */
-    void SetDirectionsCount(unsigned int nb);
+    void SetDirectionsCount(std::size_t nb);
 
     /**
      * \brief Get direction count
      */
-    unsigned int GetDirectionsCount() const;
+    std::size_t GetDirectionsCount() const;
 
     /**
      * \brief Return true if there isn't any direction in the animation

@@ -927,7 +927,7 @@ ParticleEmitterObjectEditor::~ParticleEmitterObjectEditor()
 }
 void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-    unsigned int particleNb = gd::String(maxParticleNbEdit->GetValue()).To<int>() > 0 ? gd::String(maxParticleNbEdit->GetValue()).To<unsigned int>() : 0;
+    std::size_t particleNb = gd::String(maxParticleNbEdit->GetValue()).To<int>() > 0 ? gd::String(maxParticleNbEdit->GetValue()).To<std::size_t>() : 0;
     if ( particleNb > 30000 )
     {
         if ( wxMessageBox(_("The number of particles is huge. A number too important could crash the game.\nAre you sure you wan to continue\?"), _("Maximum Particles number"), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )

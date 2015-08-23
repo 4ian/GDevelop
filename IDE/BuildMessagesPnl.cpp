@@ -76,7 +76,7 @@ void BuildMessagesPnl::RefreshWith(gd::Project * game, std::vector < CompilerMes
     gameAssociatedWithErrors = game;
 
     messagesList->DeleteAllItems();
-    for (unsigned int i = 0; i<messages.size(); ++i)
+    for (std::size_t i = 0; i<messages.size(); ++i)
     {
         messagesList->InsertItem(i, messages[i].file);
         messagesList->SetItem(i, 1, messages[i].line != gd::String::npos ? gd::String::From(messages[i].line) : "");

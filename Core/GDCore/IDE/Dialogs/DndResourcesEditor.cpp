@@ -18,7 +18,7 @@ bool DndTextResourcesEditor::OnDropText(wxCoord x, wxCoord y, const wxString& te
     if (command.size() >= 2 && command[0] == "NORMAL")
     {
         std::vector<gd::String > resources;
-        for (unsigned int i = 1;i<command.size();++i)
+        for (std::size_t i = 1;i<command.size();++i)
             resources.push_back(command[i]);
 
         editor.TriggerDrop(x, y, resources);
@@ -27,7 +27,7 @@ bool DndTextResourcesEditor::OnDropText(wxCoord x, wxCoord y, const wxString& te
     else if (command.size() >= 3 && command[0] == "COPYANDADDRESOURCES")
     {
         std::vector<gd::String > files;
-        for (unsigned int i = 2;i<command.size();++i)
+        for (std::size_t i = 2;i<command.size();++i)
             files.push_back(command[i]);
 
         editor.CopyAndAddResources(files, command[1]);

@@ -39,7 +39,7 @@ bool GD_API GroupExists( const gd::String & filename, const gd::String & group )
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     //On avance petit � petit dans le fichier
-    for (unsigned int i =0;i<groups.size();i++)
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
             return false;
@@ -135,7 +135,7 @@ void GD_API DeleteGroupFromFile( const gd::String & filename, const gd::String &
     groups.push_back("");
 
     //A chaque fois, on v�rifie si le groupe voulu existe
-    for (unsigned int i =0;i<groups.size();i++)
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
             return;
@@ -192,7 +192,7 @@ void GD_API WriteValueInFile( const gd::String & filename, const gd::String & gr
 
     //A chaque fois, on v�rifie si le groupe voulu existe, si non on le cr��,
     //et on se d�place dedans.
-    for (unsigned int i =0;i<groups.size();i++)
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
         {
@@ -248,7 +248,7 @@ void GD_API WriteStringInFile( const gd::String & filename, const gd::String & g
 
     //A chaque fois, on v�rifie si le groupe voulu existe, si non on le cr��,
     //et on se d�place dedans.
-    for (unsigned int i =0;i<groups.size();i++)
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
         {
@@ -281,7 +281,7 @@ void GD_API ReadValueFromFile( const gd::String & filename, const gd::String & g
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     //On avance petit � petit dans le fichier
-    for (unsigned int i =0;i<groups.size();i++)
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {
@@ -317,7 +317,7 @@ void GD_API ReadStringFromFile( const gd::String & filename, const gd::String & 
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     //On avance petit � petit dans le fichier
-    for (unsigned int i =0;i<groups.size();i++)
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {

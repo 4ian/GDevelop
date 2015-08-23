@@ -85,10 +85,10 @@ private:
     void ParseProfileEvents(const std::vector < gd::BaseEventSPtr > & events);
     void UpdateGUI();
 
-    unsigned int maxData;
+    std::size_t maxData;
     std::deque <unsigned long int> eventsData;
     std::deque <unsigned long int> totalTimeData;
-    std::deque <unsigned int> objectsCountData;
+    std::deque <std::size_t> objectsCountData;
 
     CppLayoutPreviewer & sceneCanvas;
 };

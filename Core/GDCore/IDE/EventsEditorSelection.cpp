@@ -269,7 +269,7 @@ gd::InstructionsList * EventsEditorSelection::EndDragInstruction(bool deleteDrag
     }
 
     //Insert dragged instructions into their new list.
-    for (unsigned int i = 0;i<draggedInstructions.size();++i)
+    for (std::size_t i = 0;i<draggedInstructions.size();++i)
     {
         if ( positionInList < list->size() )
             list->Insert(draggedInstructions[i], positionInList);
@@ -316,7 +316,7 @@ void EventsEditorSelection::EventHighlightedOnBottomPart(bool isOnbottomHandSide
 void EventsEditorSelection::DeleteAllInstructionSelected()
 {
     //1) Construct a map with their list and their index in the list
-    std::map< gd::InstructionsList*, std::list<unsigned int> > mapOfDeletionsRequest;
+    std::map< gd::InstructionsList*, std::list<std::size_t> > mapOfDeletionsRequest;
     for (std::unordered_set< gd::InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
         if ( (*it).event != NULL ) (*it).event->eventHeightNeedUpdate = true;
@@ -324,13 +324,13 @@ void EventsEditorSelection::DeleteAllInstructionSelected()
             mapOfDeletionsRequest[(*it).instructionList].push_back((*it).positionInList);
     }
     //2) For each list, erase each index
-    for (std::map<gd::InstructionsList*,std::list<unsigned int> >::iterator it = mapOfDeletionsRequest.begin();it!=mapOfDeletionsRequest.end();++it)
+    for (auto it = mapOfDeletionsRequest.begin();it!=mapOfDeletionsRequest.end();++it)
     {
-        std::list<unsigned int> & listOfIndexesToDelete = it->second;
+        std::list<std::size_t> & listOfIndexesToDelete = it->second;
         listOfIndexesToDelete.sort();
         listOfIndexesToDelete.reverse(); //We have erase from end to start to prevent index changing
 
-        for (std::list<unsigned int>::iterator index = listOfIndexesToDelete.begin();index!=listOfIndexesToDelete.end();++index)
+        for (std::list<std::size_t>::iterator index = listOfIndexesToDelete.begin();index!=listOfIndexesToDelete.end();++index)
             it->first->Remove(*index);
     }
 }
@@ -345,7 +345,7 @@ EventsEditorSelection::EventsEditorSelection(gd::EventsEditorRefreshCallbacks & 
 
 bool EventsEditorSelection::FindInInstructionsAndSubInstructions(gd::InstructionsList & list, const gd::Instruction * instrToSearch)
 {
-    for (unsigned int i = 0;i<list.size();++i)
+    for (std::size_t i = 0;i<list.size();++i)
     {
         if ( &list[i] == instrToSearch) return true;
         if ( FindInInstructionsAndSubInstructions(list[i].GetSubInstructions(), instrToSearch) )

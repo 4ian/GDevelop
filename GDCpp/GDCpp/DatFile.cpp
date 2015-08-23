@@ -35,7 +35,7 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
     m_header.nb_files = files.size();
 
     //Next, we open each file in orderto create the File Entries Table
-    for (unsigned int i = 0; i<files.size(); i++)
+    for (std::size_t i = 0; i<files.size(); i++)
     {
         gd::String fileToOpen = directory + "/" + files[i];
         file.open (fileToOpen.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
@@ -68,7 +68,7 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
     long actual_offset = 0;
     actual_offset += sizeof(sDATHeader);
     actual_offset += m_header.nb_files * sizeof(sFileEntry);
-    for (unsigned int i=0;i<m_entries.size();i++)
+    for (std::size_t i=0;i<m_entries.size();i++)
     {
         m_entries[i].offset = actual_offset;
         actual_offset += m_entries[i].size;
@@ -81,13 +81,13 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
     datfile.write ((char*)&m_header, sizeof(sDATHeader) );
 
     //Then, the File Entries Table
-    for (unsigned int i=0;i<m_entries.size();i++)
+    for (std::size_t i=0;i<m_entries.size();i++)
     {
         datfile.write ((char*)&m_entries[i], sizeof(sFileEntry) );
     }
 
     //Finally, we write each file
-    for (unsigned int i = 0; i<m_entries.size(); i++)
+    for (std::size_t i = 0; i<m_entries.size(); i++)
     {
         gd::String fileToOpen = directory + "/" + files[i];
         file.open (fileToOpen.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
@@ -130,7 +130,7 @@ bool DatFile::Read (gd::String source)
         //Reading the DAT Header
         datfile.read ((char*)&m_header, sizeof(sDATHeader));
         //Next we are reading each file entry
-        for (unsigned int i=0;i<m_header.nb_files;i++)
+        for (std::size_t i=0;i<m_header.nb_files;i++)
         {
             //Reading a File Entry
             datfile.read ((char*)&entry, sizeof(sFileEntry));
@@ -154,7 +154,7 @@ bool DatFile::ContainsFile(const gd::String & filename)
     if ( m_header.nb_files != m_entries.size() )
         return false;
 
-    for (unsigned int i=0; i<m_header.nb_files;i++)
+    for (std::size_t i=0; i<m_header.nb_files;i++)
     {
         if (gd::String(m_entries[i].name) == filename)
             return true;
@@ -176,7 +176,7 @@ char* DatFile::GetFile (gd::String filename)
     }
 
     //First, we have to find the file needed
-    for (unsigned int i=0; i<m_header.nb_files;i++)
+    for (std::size_t i=0; i<m_header.nb_files;i++)
     {
         //If we found it
         if(gd::String(m_entries[i].name) == filename)
@@ -214,7 +214,7 @@ char* DatFile::GetFile (gd::String filename)
 long int DatFile::GetFileSize (gd::String filename)
 {
     //First, we have to find the file needed
-    for (unsigned int i=0; i<m_header.nb_files;i++)
+    for (std::size_t i=0; i<m_header.nb_files;i++)
     {
         //If we found it
         if (gd::String(m_entries[i].name) == filename)

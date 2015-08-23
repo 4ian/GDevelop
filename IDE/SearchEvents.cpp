@@ -255,7 +255,7 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
     if ( onlySelectedEventCheck->GetValue() )
     {
         std::vector < gd::EventItem > selectedEventsInfo = parent->GetSelection().GetAllSelectedEvents();
-        for (unsigned int i = 0;i<selectedEventsInfo.size();++i)
+        for (std::size_t i = 0;i<selectedEventsInfo.size();++i)
         {
             if ( selectedEventsInfo[i].event != std::shared_ptr<gd::BaseEvent>() )
                 eventsToInspect.InsertEvent(selectedEventsInfo[i].event);

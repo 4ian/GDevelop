@@ -77,7 +77,7 @@ public:
                 {
                     objectsAsArgumentCode += "runtimeContext->ClearObjectListsMap()";
                     std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(functionEvent->GetObjectsPassedAsArgument(), context);
-                    for (unsigned int i = 0;i<realObjects.size();++i)
+                    for (std::size_t i = 0;i<realObjects.size();++i)
                     {
                         context.EmptyObjectsListNeeded(realObjects[i]);
                         objectsAsArgumentCode += ".AddObjectListToMap(\""+codeGenerator.ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
@@ -87,7 +87,7 @@ public:
 
                 //Generate code for evaluating parameters
                 code += "std::vector<gd::String> functionParameters;\n";
-                for (unsigned int i = 1;i<8;++i)
+                for (std::size_t i = 1;i<8;++i)
                 {
                     gd::String parameterCode;
                     gd::CallbacksForGeneratingExpressionCode callbacks(parameterCode, codeGenerator, context);
@@ -123,7 +123,7 @@ public:
                 gd::EventsCodeGenerationContext callerContext;
                 {
                     std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(event.GetObjectsPassedAsArgument(), callerContext);
-                    for (unsigned int i = 0;i<realObjects.size();++i)
+                    for (std::size_t i = 0;i<realObjects.size();++i)
                     {
                         callerContext.EmptyObjectsListNeeded(realObjects[i]);
                         functionCode += "std::vector<RuntimeObject*> "+ManObjListName(realObjects[i]) + ";\n";
@@ -142,7 +142,7 @@ public:
 
                 functionCode += codeGenerator.GenerateObjectsDeclarationCode(context);
                 gd::String ifPredicat = "true";
-                for (unsigned int i = 0;i<event.GetConditions().size();++i)
+                for (std::size_t i = 0;i<event.GetConditions().size();++i)
                     ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
                 functionCode += conditionsCode;

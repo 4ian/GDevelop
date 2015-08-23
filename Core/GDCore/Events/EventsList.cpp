@@ -24,7 +24,7 @@ void EventsList::InsertEvents(const EventsList & otherEvents, size_t begin, size
 	if (end < begin) return;
 	if (end >= otherEvents.size()) end = otherEvents.size()-1;
 
-    for (unsigned int insertPos = 0;insertPos <= (end-begin);insertPos++)
+    for (std::size_t insertPos = 0;insertPos <= (end-begin);insertPos++)
     {
 	    if (position != (size_t)-1 && position+insertPos < events.size())
 	        events.insert(events.begin()+position+insertPos, CloneRememberingOriginalEvent(otherEvents.events[begin+insertPos]));
@@ -94,7 +94,7 @@ void EventsList::UnserializeFrom(gd::Project & project, const SerializerElement 
 
 bool EventsList::Contains(const gd::BaseEvent & eventToSearch, bool recursive) const
 {
-    for (unsigned int i = 0;i<GetEventsCount();++i)
+    for (std::size_t i = 0;i<GetEventsCount();++i)
     {
         if ( &GetEvent(i) == &eventToSearch) return true;
         if ( recursive && GetEvent(i).CanHaveSubEvents() && GetEvent(i).GetSubEvents().Contains(eventToSearch) )

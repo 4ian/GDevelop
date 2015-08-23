@@ -252,11 +252,11 @@ void ProjectExtensionsDialog::RefreshPlatformList()
 
     const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
     const std::vector< Platform * > & usedPlatforms = project.GetUsedPlatforms();
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (std::size_t i = 0;i<platforms.size();++i)
     {
         //Check if the platform is used by the game
         bool used = false;
-        for (unsigned int j = 0;j<usedPlatforms.size();++j)
+        for (std::size_t j = 0;j<usedPlatforms.size();++j)
         {
             if (usedPlatforms[j]==platforms[i].get())
             {
@@ -299,19 +299,19 @@ void ProjectExtensionsDialog::RefreshExtensionList()
     const vector < std::shared_ptr<PlatformExtension> > & extensionsInstalled = currentPlatform->GetAllPlatformExtensions();
 
     //Create the list of available extensions
-    for (unsigned int i = 0;i<extensionsInstalled.size();++i)
+    for (std::size_t i = 0;i<extensionsInstalled.size();++i)
     {
         wxStringClientData * associatedData = new wxStringClientData(extensionsInstalled[i]->GetName());
 
         if ( !extensionsInstalled[i]->IsBuiltin() )
             ExtensionsList->Insert(
-            	extensionsInstalled[i]->GetFullName() + (extensionsInstalled[i]->IsDeprecated() ? _(" (deprecated)") : ""), 
-            	extensionsInstalled[i]->IsDeprecated() ? ExtensionsList->GetCount() : 0, 
+            	extensionsInstalled[i]->GetFullName() + (extensionsInstalled[i]->IsDeprecated() ? _(" (deprecated)") : ""),
+            	extensionsInstalled[i]->IsDeprecated() ? ExtensionsList->GetCount() : 0,
             	associatedData);
     }
 
     //Check used extensions
-    for (unsigned int i =0;i<ExtensionsList->GetCount();++i)
+    for (std::size_t i =0;i<ExtensionsList->GetCount();++i)
     {
         wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(i));
         if (associatedData)
@@ -345,7 +345,7 @@ void ProjectExtensionsDialog::OnExtensionsListSelect(wxCommandEvent& event)
 
     const vector < std::shared_ptr<PlatformExtension> > & extensionsInstalled = currentPlatform->GetAllPlatformExtensions();
 
-    for (unsigned int i = 0;i<extensionsInstalled.size();++i)
+    for (std::size_t i = 0;i<extensionsInstalled.size();++i)
     {
         if ( extensionsInstalled[i]->GetName() == gd::String(associatedData->GetData()) )
         {
@@ -382,7 +382,7 @@ void ProjectExtensionsDialog::OnFermerBtClick(wxCommandEvent& event)
 {
     //For sanity sake, make sure that built-in extensions are used by the project
     std::vector<gd::String> builtinExtensions = gd::PlatformExtension::GetBuiltinExtensionsNames();
-    for(unsigned int i = 0;i<builtinExtensions.size();++i)
+    for(std::size_t i = 0;i<builtinExtensions.size();++i)
     {
         if ( std::find(project.GetUsedExtensions().begin(), project.GetUsedExtensions().end(), builtinExtensions[i])
              == project.GetUsedExtensions().end())
@@ -430,7 +430,7 @@ void ProjectExtensionsDialog::OnplatformListItemSelect(wxListEvent& event)
         gd::String chosenPlatform = associatedData->GetString();
 
         const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
-        for (unsigned int i = 0;i<platforms.size();++i)
+        for (std::size_t i = 0;i<platforms.size();++i)
         {
             if ( platforms[i]->GetName() == chosenPlatform )
             {
@@ -449,7 +449,7 @@ void ProjectExtensionsDialog::OnplatformListItemRClick(wxListEvent& event)
         gd::String chosenPlatform = associatedData->GetString();
 
         const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
-        for (unsigned int i = 0;i<platforms.size();++i)
+        for (std::size_t i = 0;i<platforms.size();++i)
         {
             if ( platforms[i]->GetName() == chosenPlatform )
             {
@@ -458,7 +458,7 @@ void ProjectExtensionsDialog::OnplatformListItemRClick(wxListEvent& event)
         }
 
         const std::vector< Platform * > & usedPlatforms = project.GetUsedPlatforms();
-        for (unsigned int j = 0;j<usedPlatforms.size();++j)
+        for (std::size_t j = 0;j<usedPlatforms.size();++j)
         {
             if ( usedPlatforms[j]->GetName() == chosenPlatform)
             {

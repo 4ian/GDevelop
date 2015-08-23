@@ -36,7 +36,7 @@ void RuntimeVariablesContainer::Clear()
 
 void RuntimeVariablesContainer::Merge(const gd::VariablesContainer & container)
 {
-    for ( unsigned int i = 0; i<container.Count();++i)
+    for ( std::size_t i = 0; i<container.Count();++i)
     {
         const std::pair<gd::String, gd::Variable> & variable = container.Get(i);
 

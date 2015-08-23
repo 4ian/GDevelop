@@ -40,13 +40,13 @@ std::vector<gd::String> ProjectResourcesAdder::GetAllUselessResources(gd::Projec
 
     //Search for used images
     gd::ImagesUsedInventorizer inventorizer;
-    
+
     project.ExposeResources(inventorizer);
     std::set<gd::String> & usedImages = inventorizer.GetAllUsedImages();
 
     //Search all images resources not used
     std::vector<gd::String> resources = project.GetResourcesManager().GetAllResourcesList();
-    for (unsigned int i = 0;i < resources.size();i++)
+    for (std::size_t i = 0;i < resources.size();i++)
     {
         if (project.GetResourcesManager().GetResource(resources[i]).GetKind() != "image")
             continue;
@@ -62,7 +62,7 @@ void ProjectResourcesAdder::RemoveAllUselessResources(gd::Project & project)
 {
     std::vector<gd::String> unusedResources = GetAllUselessResources(project);
 
-    for(unsigned int i = 0;i < unusedResources.size();++i) {
+    for(std::size_t i = 0;i < unusedResources.size();++i) {
         project.GetResourcesManager().RemoveResource(unusedResources[i]);
     }
 }

@@ -29,7 +29,7 @@ void EventMetadata::ClearCodeGenerationAndPreprocessing()
 	codeGeneration = [](gd::BaseEvent &, gd::EventsCodeGenerator &, gd::EventsCodeGenerationContext &) {
 	    return "";
 	};
-	preprocessing = [](gd::BaseEvent &, gd::EventsCodeGenerator &, gd::EventsList &, unsigned int) {
+	preprocessing = [](gd::BaseEvent &, gd::EventsCodeGenerator &, gd::EventsList &, std::size_t) {
 		//Do nothing
 	};
 }

@@ -84,7 +84,7 @@ ObjectsOnBadLayerDialog::ObjectsOnBadLayerDialog(wxWindow* parent, const std::ve
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ObjectsOnBadLayerDialog::OnCancelClick);
 	//*)
 
-	for (unsigned int i =0;i<availableLayers.size();++i)
+	for (std::size_t i =0;i<availableLayers.size();++i)
 	{
 	    gd::String name = availableLayers[i];
 	    if ( name == "" ) name = _("Base layer");

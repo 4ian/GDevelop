@@ -27,7 +27,7 @@ void DestroyOutsideBehavior::DoStepPostEvents(RuntimeScene & scene)
     const RuntimeLayer & theLayer = scene.GetRuntimeLayer(object->GetLayer());
     float objCenterX = object->GetDrawableX()+object->GetCenterX();
     float objCenterY = object->GetDrawableY()+object->GetCenterY();
-    for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
+    for (std::size_t cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
     {
         const RuntimeCamera & theCamera = theLayer.GetCamera(cameraIndex);
 

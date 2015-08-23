@@ -456,7 +456,7 @@ void ProjectManager::Refresh()
 {
     projectsTree->DeleteAllItems();
     projectsTree->AddRoot(_("Projects"));
-    for (unsigned int i = 0;i<mainEditor.games.size();++i)
+    for (std::size_t i = 0;i<mainEditor.games.size();++i)
     {
         wxString name = mainEditor.games[i]->GetName() == gd::String() ?
                         _("(No name)") :
@@ -474,7 +474,7 @@ void ProjectManager::Refresh()
         //Scenes
         gdTreeItemProjectData * scenesItemData = new gdTreeItemProjectData("Scenes", "", mainEditor.games[i].get());
         wxTreeItemId scenesItem = projectsTree->AppendItem(projectItem, _("Scenes"), 1 ,1, scenesItemData);
-        for (unsigned int j = 0;j<mainEditor.games[i]->GetLayoutsCount();++j)
+        for (std::size_t j = 0;j<mainEditor.games[i]->GetLayoutsCount();++j)
         {
             gdTreeItemProjectData * sceneItemData = new gdTreeItemProjectData("Scene", mainEditor.games[i]->GetLayout(j).GetName(), mainEditor.games[i].get());
             projectsTree->AppendItem(scenesItem, mainEditor.games[i]->GetLayout(j).GetName(), 1 ,1, sceneItemData);
@@ -483,7 +483,7 @@ void ProjectManager::Refresh()
         //External events
         gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalEventsRoot", "", mainEditor.games[i].get());
         wxTreeItemId eventsItem = projectsTree->AppendItem(projectItem, _("External events"), 4 ,4, eventsItemData);
-        for (unsigned int j = 0;j<mainEditor.games[i]->GetExternalEventsCount();++j)
+        for (std::size_t j = 0;j<mainEditor.games[i]->GetExternalEventsCount();++j)
         {
             gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalEvents", mainEditor.games[i]->GetExternalEvents(j).GetName(), mainEditor.games[i].get());
             projectsTree->AppendItem(eventsItem, mainEditor.games[i]->GetExternalEvents(j).GetName(), 4 ,4, eventsItemData);
@@ -492,7 +492,7 @@ void ProjectManager::Refresh()
         //External layouts
         gdTreeItemProjectData * externalLayoutsItemData = new gdTreeItemProjectData("ExternalLayoutsRoot", "", mainEditor.games[i].get());
         wxTreeItemId externalayoutsItem = projectsTree->AppendItem(projectItem, _("External layouts"), 6 , 6, externalLayoutsItemData);
-        for (unsigned int j = 0;j<mainEditor.games[i]->GetExternalLayoutsCount();++j)
+        for (std::size_t j = 0;j<mainEditor.games[i]->GetExternalLayoutsCount();++j)
         {
             gdTreeItemProjectData * externalLayoutsItemData = new gdTreeItemProjectData("ExternalLayout", mainEditor.games[i]->GetExternalLayout(j).GetName(), mainEditor.games[i].get());
             projectsTree->AppendItem(externalayoutsItem, mainEditor.games[i]->GetExternalLayout(j).GetName(), 6 , 6, externalLayoutsItemData);
@@ -504,7 +504,7 @@ void ProjectManager::Refresh()
             gdTreeItemProjectData * sourceFilesItemData = new gdTreeItemProjectData("SourceFiles", "", mainEditor.games[i].get());
             wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("Source files"), 5 ,5, sourceFilesItemData);
             const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = game->GetAllSourceFiles();
-            for (unsigned int j = 0;j<allFiles.size();++j)
+            for (std::size_t j = 0;j<allFiles.size();++j)
             {
                 if ( allFiles[j]->IsGDManaged() )
                     continue;
@@ -582,7 +582,7 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
         }
 
         //Activate the project double clicked
-        for(unsigned int i = 0;i<mainEditor.games.size();++i)
+        for(std::size_t i = 0;i<mainEditor.games.size();++i)
         {
             if (mainEditor.games[i].get() == game)
             {
@@ -614,9 +614,9 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
     {
         EditExtensionsOfGame(*game);
 
-        unsigned int extensionsCount = game->GetUsedExtensions().size()-gd::PlatformExtension::GetBuiltinExtensionsNames().size();
+        std::size_t extensionsCount = game->GetUsedExtensions().size()-gd::PlatformExtension::GetBuiltinExtensionsNames().size();
         projectsTree->SetItemText(selectedItem, _("Extensions") + (extensionsCount > 0 ? " (" + gd::String::From(extensionsCount) + ")" : ""));
-        for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
+        for (std::size_t i = 0;i<game->GetUsedExtensions().size();++i)
         {
             std::cout << game->GetUsedExtensions()[i] << std::endl;
         }
@@ -718,7 +718,7 @@ void ProjectManager::EditSourceFile(gd::Project * game, gd::String filename, siz
 
 
     //Verify if the editor is not already opened
-    for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
+    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
     {
         CodeEditor * editorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
@@ -764,7 +764,7 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
 void ProjectManager::EditLayout(gd::Project & project, gd::Layout & layout)
 {
     //Verify if the scene editor is not already opened
-    for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
+    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
@@ -844,7 +844,7 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
     dialog.SetAssociatedLayout(game, &layout);
     if ( dialog.ShowModal() == 1 )
     {
-        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
             game->GetUsedPlatforms()[j]->GetChangesNotifier().OnVariablesModified(*game, &layout);
     }
 }
@@ -922,7 +922,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
         layout.SetName(newName);
 
         //Updating editors
-        for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+        for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
         {
             EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
@@ -930,7 +930,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
 
-        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
             game->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutRenamed(*game, layout, data->GetSecondString());
     }
     //Renaming external events
@@ -955,14 +955,14 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
         events.SetName(newName);
 
         //Updating editors
-        for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+        for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
         {
             ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
             if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
-        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
             game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsRenamed(*game, events, data->GetSecondString());
     }
     //Renaming external layout
@@ -987,14 +987,14 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
         layout.SetName(newName);
 
         //Updating editors
-        for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+        for (std::size_t k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
         {
             ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
             if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
-        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
             game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutRenamed(*game, layout, data->GetSecondString());
     }
 }
@@ -1028,7 +1028,7 @@ void ProjectManager::OnaddSceneMenuItemSelected(wxCommandEvent& event)
 /**
  * Add a scene to a game
  */
-void ProjectManager::AddLayoutToProject(gd::Project * project, unsigned int position)
+void ProjectManager::AddLayoutToProject(gd::Project * project, std::size_t position)
 {
     if ( !project ) return;
 
@@ -1045,7 +1045,7 @@ void ProjectManager::AddLayoutToProject(gd::Project * project, unsigned int posi
 
     if ( project->HasLayoutNamed(newSceneName) )
     {
-        for ( unsigned int j = 0; j < project->GetUsedPlatforms().size();++j)
+        for ( std::size_t j = 0; j < project->GetUsedPlatforms().size();++j)
             project->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutAdded(*project, project->GetLayout(newSceneName));
     }
     else
@@ -1068,7 +1068,7 @@ void ProjectManager::OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event)
 void ProjectManager::EditResourcesOfProject(gd::Project * project)
 {
     //Verify if the image editor is not already opened
-    for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
+    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
     {
         ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
@@ -1112,7 +1112,7 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     gd::Layout & layout = game->GetLayout(sceneName);
 
     //Updating editors
-    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
         ExternalLayoutEditor * externalLayoutEditPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
@@ -1139,7 +1139,7 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     if ( waitDialog ) delete waitDialog;
 
     game->RemoveLayout(sceneName);
-    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
         game->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutDeleted(*game, sceneName);
 }
 
@@ -1182,7 +1182,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     gd::Clipboard::Get()->SetLayout(&layout);
 
     //Updating editors
-    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
@@ -1207,7 +1207,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     if ( waitDialog ) delete waitDialog;
 
     game->RemoveLayout(layoutName);
-    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
     game->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutDeleted(*game, layoutName);
 }
 
@@ -1233,7 +1233,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
 
     newLayout.SetName(newLayoutName);
     game->InsertLayout(newLayout, game->GetLayoutPosition(data->GetSecondString()));
-    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
     game->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutAdded(*game, game->GetLayout(newLayoutName));
 
     //Insert in tree
@@ -1265,7 +1265,7 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
     dialog.SetAssociatedProject(game);
     if ( dialog.ShowModal() == 1 )
     {
-        for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+        for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
             game->GetUsedPlatforms()[j]->GetChangesNotifier().OnVariablesModified(*game);
     }
 }
@@ -1319,7 +1319,7 @@ void ProjectManager::OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event)
 void ProjectManager::CloseGame(gd::Project * project)
 {
     //Closing all editors related to game
-    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
         ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
@@ -1331,7 +1331,7 @@ void ProjectManager::CloseGame(gd::Project * project)
         if ( sceneEditorPtr != NULL )
         {
             bool sceneBelongToGame = false;
-            for (unsigned int i = 0;i<project->GetLayoutsCount();++i)
+            for (std::size_t i = 0;i<project->GetLayoutsCount();++i)
             {
             	if ( &project->GetLayout(i) == &sceneEditorPtr->GetLayout() )
                     sceneBelongToGame = true;
@@ -1391,7 +1391,7 @@ void ProjectManager::CloseGame(gd::Project * project)
     }
     if ( waitDialog ) delete waitDialog;
 
-    for (unsigned int i = 0;i<mainEditor.games.size();++i)
+    for (std::size_t i = 0;i<mainEditor.games.size();++i)
     {
     	if ( mainEditor.games[i].get() == project)
             mainEditor.games.erase(mainEditor.games.begin()+i);
@@ -1467,7 +1467,7 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
     }
 
     //Verify if the scene editor is not already opened
-    for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
+    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
     {
         ExternalEventsEditor * eventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
@@ -1537,7 +1537,7 @@ void ProjectManager::AddExternalEventsToGame(gd::Project * project)
     }
 
     project->InsertNewExternalEvents(newName, project->GetExternalEventsCount());
-    for ( unsigned int j = 0; j < project->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < project->GetUsedPlatforms().size();++j)
         project->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsAdded(*project, project->GetExternalEvents(newName));
 }
 
@@ -1560,7 +1560,7 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     }
 
     //Updating editors
-    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
@@ -1577,7 +1577,7 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalEvents(externalEventsName);
-    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
         game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsDeleted(*game, externalEventsName);
 }
 
@@ -1612,7 +1612,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
     gd::Clipboard::Get()->SetExternalEvents(game->GetExternalEvents(data->GetSecondString()));
 
     //Updating editors
-    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
@@ -1629,7 +1629,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalEvents(externalEventsName);
-    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
         game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsDeleted(*game, externalEventsName);
 }
 
@@ -1653,7 +1653,7 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
 
     newEvents.SetName(newName);
     game->InsertExternalEvents(newEvents, game->GetExternalEventsPosition(data->GetSecondString()));
-    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
         game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsAdded(*game, game->GetExternalEvents(newName));
 
     //Insert in tree
@@ -1679,7 +1679,7 @@ void ProjectManager::AddExternalLayoutToGame(gd::Project * project)
     }
 
     project->InsertNewExternalLayout(newName, project->GetExternalLayoutsCount());
-    for ( unsigned int j = 0; j < project->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < project->GetUsedPlatforms().size();++j)
         project->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutAdded(*project, project->GetExternalLayout(newName));
 }
 
@@ -1719,7 +1719,7 @@ void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
     }
 
     //Verify if the scene editor is not already opened
-    for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
+    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
     {
         ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
@@ -1766,7 +1766,7 @@ void ProjectManager::OnDeleteExternalLayoutSelected(wxCommandEvent& event)
     }
 
     //Updating editors
-    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
@@ -1783,7 +1783,7 @@ void ProjectManager::OnDeleteExternalLayoutSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalLayout(externalLayoutName);
-    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
         game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutDeleted(*game, externalLayoutName);
 }
 
@@ -1818,7 +1818,7 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
     gd::Clipboard::Get()->SetExternalLayout(game->GetExternalLayout(data->GetSecondString()));
 
     //Updating editors
-    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
@@ -1835,7 +1835,7 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalLayout(externalLayoutName);
-    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
         game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutDeleted(*game, externalLayoutName);
 }
 
@@ -1859,7 +1859,7 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
 
     newExternalLayout.SetName(newName);
     game->InsertExternalLayout(newExternalLayout, game->GetExternalLayoutPosition(data->GetSecondString()));
-    for ( unsigned int j = 0; j < game->GetUsedPlatforms().size();++j)
+    for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
         game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutAdded(*game, game->GetExternalLayout(newName));
 
     //Insert in tree
@@ -1884,7 +1884,7 @@ void ProjectManager::OnAddCppSourceFileSelected(wxCommandEvent& event)
     fileDialog.GetFilenames( names );
     fileDialog.GetPaths( files );
 
-    for ( unsigned int i = 0; i < files.GetCount();i++ )
+    for ( std::size_t i = 0; i < files.GetCount();i++ )
     {
     	gd::String language = AutodetectFileLanguage(files[i]);
 
@@ -1911,7 +1911,7 @@ void ProjectManager::OnDeleteSourceFileSelected(wxCommandEvent& event)
 
     //Updating editors
     gd::SourceFile & sourceFile = game->GetSourceFile(name);
-    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         CodeEditor * editorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
@@ -2007,7 +2007,7 @@ void ProjectManager::OnSceneMoveUpSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    unsigned int index = game->GetLayoutPosition(data->GetSecondString());
+    std::size_t index = game->GetLayoutPosition(data->GetSecondString());
     if ( index >= game->GetLayoutsCount() || index == 0 )
         return;
 
@@ -2034,7 +2034,7 @@ void ProjectManager::OnSceneMoveDownSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    unsigned int index = game->GetLayoutPosition(data->GetSecondString());
+    std::size_t index = game->GetLayoutPosition(data->GetSecondString());
     if ( index >= game->GetLayoutsCount()-1 )
         return;
 
@@ -2061,7 +2061,7 @@ void ProjectManager::OnExternalLayoutMoveUpSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    unsigned int index = game->GetExternalLayoutPosition(data->GetSecondString());
+    std::size_t index = game->GetExternalLayoutPosition(data->GetSecondString());
     if ( index >= game->GetExternalLayoutsCount() || index == 0 )
         return;
 
@@ -2088,7 +2088,7 @@ void ProjectManager::OnExternalLayoutMoveDownSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    unsigned int index = game->GetExternalLayoutPosition(data->GetSecondString());
+    std::size_t index = game->GetExternalLayoutPosition(data->GetSecondString());
     if ( index >= game->GetExternalLayoutsCount()-1 )
         return;
 
@@ -2115,7 +2115,7 @@ void ProjectManager::OnExternalEventsMoveUpSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    unsigned int index = game->GetExternalEventsPosition(data->GetSecondString());
+    std::size_t index = game->GetExternalEventsPosition(data->GetSecondString());
     if ( index >= game->GetExternalEventsCount() || index == 0 )
         return;
 
@@ -2142,7 +2142,7 @@ void ProjectManager::OnExternalEventsMoveDownSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    unsigned int index = game->GetExternalEventsPosition(data->GetSecondString());
+    std::size_t index = game->GetExternalEventsPosition(data->GetSecondString());
     if ( index >= game->GetExternalEventsCount()-1 )
         return;
 

@@ -66,9 +66,9 @@ private:
 
     std::vector<wxListCtrl*> extensionsListCtrls; ///< Contains wxListCtrl used to display properties of each extensions.
 
-    unsigned int baseItemCount;
-    unsigned int generalBaseItemCount;
-    unsigned int generalBaseAndVariablesItemCount;
+    std::size_t baseItemCount;
+    std::size_t generalBaseItemCount;
+    std::size_t generalBaseAndVariablesItemCount;
     bool doUpdate;
     bool objectChanged;
 

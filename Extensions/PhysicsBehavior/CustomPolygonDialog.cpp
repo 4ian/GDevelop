@@ -283,7 +283,7 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
 
     //Constructing the wxWidgets polygon.
     std::vector<wxPoint> points;
-    for (unsigned int i = 0;i<coordsVec.size();++i)
+    for (std::size_t i = 0;i<coordsVec.size();++i)
     {
         points.push_back(wxPoint(coordsVec[i].x-xOffset,
                                  coordsVec[i].y-yOffset));
@@ -434,7 +434,7 @@ void CustomPolygonDialog::OnButton1Click(wxCommandEvent& event)
         yOffset = gd::String(yOffsetStr).To<float>();
 
     std::vector<sf::Vector2f> pointList = PhysicsBehavior::GetCoordsVectorFromString(pointsEdit->GetValue());
-    for(unsigned int a = 0; a < pointList.size(); a++)
+    for(std::size_t a = 0; a < pointList.size(); a++)
     {
         pointList.at(a).x += xOffset;
         pointList.at(a).y += yOffset;
@@ -462,7 +462,7 @@ void CustomPolygonDialog::OnButton2Click(wxCommandEvent& event)
         yScale = gd::String(yScaleStr).To<float>();
 
     std::vector<sf::Vector2f> pointList = PhysicsBehavior::GetCoordsVectorFromString(pointsEdit->GetValue());
-    for(unsigned int a = 0; a < pointList.size(); a++)
+    for(std::size_t a = 0; a < pointList.size(); a++)
     {
         pointList.at(a).x *= xScale;
         pointList.at(a).y *= yScale;
@@ -485,7 +485,7 @@ void CustomPolygonDialog::OnButton3Click(wxCommandEvent& event)
                         gd::String::FromWxString(originStr).Split(U';').at(1).To<float>());
 
     std::vector<sf::Vector2f> pointList = PhysicsBehavior::GetCoordsVectorFromString(pointsEdit->GetValue());
-    for(unsigned int a = 0; a < pointList.size(); a++)
+    for(std::size_t a = 0; a < pointList.size(); a++)
     {
         sf::Vector2f pointProjOnOrigin(pointList.at(a).x - origin.x,
                                        pointList.at(a).y - origin.y);
@@ -506,7 +506,7 @@ void CustomPolygonDialog::OnButton4Click(wxCommandEvent& event)
         return;
 
     std::vector<sf::Vector2f> pointList = PhysicsBehavior::GetCoordsVectorFromString(pointsEdit->GetValue());
-    for(unsigned int a = 0; a < pointList.size(); a++)
+    for(std::size_t a = 0; a < pointList.size(); a++)
     {
         pointList.at(a).x = round(pointList.at(a).x * pow(10, precision)) / pow(10, precision);
         pointList.at(a).y = round(pointList.at(a).y * pow(10, precision)) / pow(10, precision);

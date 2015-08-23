@@ -313,7 +313,7 @@ void EventsEditor::Init(wxWindow* parent)
         gd::EventsRenderingHelper::Get()->SetFont(eventsEditorFont);
 
     //Create platform list
-    for (unsigned int i = 0;i<game.GetUsedPlatforms().size();++i)
+    for (std::size_t i = 0;i<game.GetUsedPlatforms().size();++i)
     {
         long id = wxNewId();
         idForPlatformsMenu[id] = game.GetUsedPlatforms()[i]->GetName();
@@ -366,7 +366,7 @@ void EventsEditor::RecreateCustomEventsMenu()
     idForEventTypesMenu.clear();
 
     //Insert extension specific events types
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (std::size_t i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
 	    if ( find(game.GetUsedExtensions().begin(),
@@ -567,7 +567,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
 {
     int originalYPosition = y;
 
-    for (unsigned int i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();++i)
     {
         if ( scrollTo == &events[i] )
         	scrollBar->SetThumbPosition(y);
@@ -1105,7 +1105,7 @@ void EventsEditor::DeleteSelection()
 
     //..and events
     std::vector<EventItem> eventsSelection = selection.GetAllSelectedEvents();
-    for (unsigned int i = 0; i<eventsSelection.size();++i)
+    for (std::size_t i = 0; i<eventsSelection.size();++i)
     {
         if ( eventsSelection[i].event != std::shared_ptr<gd::BaseEvent>() && eventsSelection[i].eventsList != NULL)
             eventsSelection[i].eventsList->RemoveEvent(*eventsSelection[i].event);
@@ -1202,7 +1202,7 @@ void EventsEditor::EnsureTriggerOnceIsLastCondition(gd::InstructionsList & condi
 
 	bool endWithTriggerOnce = conditions.Get(conditions.GetCount()-1).GetType() == "BuiltinCommonInstructions::Once";
 	bool multipleOnce = false;
-	for (unsigned int i = 0;i<conditions.size()-1;)
+	for (std::size_t i = 0;i<conditions.size()-1;)
 	{
 		if (conditions[i].GetType() == "BuiltinCommonInstructions::Once")
 		{
@@ -1358,7 +1358,7 @@ void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & p
 {
     //Retrieve event type
     gd::String eventType;
-    for (unsigned int i = 0;i<idForEventTypesMenu.size();++i)
+    for (std::size_t i = 0;i<idForEventTypesMenu.size();++i)
     {
     	if ( idForEventTypesMenu[i].first == menuID )
             eventType = idForEventTypesMenu[i].second;
@@ -1435,7 +1435,7 @@ void EventsEditor::OnRibbonUnFoldAll(wxRibbonButtonBarEvent& evt)
 
 void EventsEditor::FoldEventsListAndSubEvents(gd::EventsList & list, bool fold)
 {
-    for (unsigned int i = 0;i<list.size();++i)
+    for (std::size_t i = 0;i<list.size();++i)
     {
         list[i].SetFolded(fold);
         if ( list[i].CanHaveSubEvents() )  FoldEventsListAndSubEvents(list[i].GetSubEvents(), fold);
@@ -1448,7 +1448,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     {
         std::vector < gd::InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
         gd::InstructionsList instructionsToCopy;
-        for (unsigned int i = 0;i<itemsSelected.size();++i)
+        for (std::size_t i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].instruction != NULL)
                 instructionsToCopy.Insert(*itemsSelected[i].instruction);
@@ -1460,7 +1460,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     {
         std::vector < gd::InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
         gd::InstructionsList instructionsToCopy;
-        for (unsigned int i = 0;i<itemsSelected.size();++i)
+        for (std::size_t i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].instruction != NULL)
                 instructionsToCopy.Insert(*itemsSelected[i].instruction);
@@ -1472,7 +1472,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     {
         std::vector < EventItem > itemsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
         gd::EventsList eventsToCopy;
-        for (unsigned int i = 0;i<itemsSelected.size();++i)
+        for (std::size_t i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].event != std::shared_ptr<gd::BaseEvent>())
                 eventsToCopy.InsertEvent(*itemsSelected[i].event);
@@ -1510,7 +1510,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 
         //Paste all conditions
         const gd::InstructionsList & instructions = gd::Clipboard::Get()->GetInstructions();
-        for (unsigned int i = 0;i<instructions.size();++i)
+        for (std::size_t i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
                 instructionList->Insert(instructions[i], positionInThisList);
@@ -1535,7 +1535,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 
         //Paste all actions
         const gd::InstructionsList & instructions = gd::Clipboard::Get()->GetInstructions();
-        for (unsigned int i = 0;i<instructions.size();++i)
+        for (std::size_t i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
                 instructionList->Insert(instructions[i], positionInThisList);
@@ -1550,7 +1550,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
     else
     {
         gd::EventsList * eventsList; //The list where events should be inserted.
-        unsigned int position = gd::String::npos; //The position where events should be inserted in the list.
+        std::size_t position = gd::String::npos; //The position where events should be inserted in the list.
 
         //Find where events should be inserted
         if (selection.HasSelectedEvents())
@@ -1692,7 +1692,7 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
 void EventsEditor::OntoggleActivationSelected(wxCommandEvent& event)
 {
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEvents();
-    for (unsigned int i = 0;i<eventsSelected.size();++i)
+    for (std::size_t i = 0;i<eventsSelected.size();++i)
     {
         if ( eventsSelected[i].event != std::shared_ptr<gd::BaseEvent>())
             eventsSelected[i].event->SetDisabled(!eventsSelected[i].event->IsDisabled());

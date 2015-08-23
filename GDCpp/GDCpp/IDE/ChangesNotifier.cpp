@@ -27,7 +27,7 @@ void ChangesNotifier::OnObjectEdited(gd::Project & game, gd::Layout * scene, gd:
         scene->SetRefreshNeeded();
     else //Scene pointer is not NULL: Update shared data of all scenes
     {
-        for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
+        for (std::size_t i = 0;i<game.GetLayoutsCount();++i)
             game.GetLayout(i).SetRefreshNeeded();
     }
 }
@@ -72,7 +72,7 @@ void ChangesNotifier::OnBehaviorEdited(gd::Project & game, gd::Layout * scene, g
         scene->SetRefreshNeeded();
     else //Scene pointer is not NULL: Update shared data of all scenes
     {
-        for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
+        for (std::size_t i = 0;i<game.GetLayoutsCount();++i)
             game.GetLayout(i).SetRefreshNeeded();
     }
 }
@@ -99,12 +99,12 @@ void ChangesNotifier::OnObjectVariablesChanged(gd::Project & game, gd::Layout * 
         scene->SetRefreshNeeded();
     else //Scene pointer is NULL: Update shared data of all scenes
     {
-        for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
+        for (std::size_t i = 0;i<game.GetLayoutsCount();++i)
         {
             game.GetLayout(i).SetRefreshNeeded();
             game.GetLayout(i).SetCompilationNeeded();
         }
-        for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
+        for (std::size_t i = 0;i<game.GetExternalEventsCount();++i)
         {
             game.GetExternalEvents(i).SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
         }
@@ -248,12 +248,12 @@ void ChangesNotifier::RequestFullRecompilation(gd::Project & game, gd::Layout * 
     }
     else //Scene pointer is NULL: Mark all scenes as modified
     {
-        for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
+        for (std::size_t i = 0;i<game.GetLayoutsCount();++i)
         {
             game.GetLayout(i).SetRefreshNeeded();
             game.GetLayout(i).SetCompilationNeeded();
         }
-        for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
+        for (std::size_t i = 0;i<game.GetExternalEventsCount();++i)
         {
             game.GetExternalEvents(i).SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
         }
@@ -267,4 +267,3 @@ void ChangesNotifier::OnResourceModified(gd::Project & project, const gd::String
 }
 
 #endif
-

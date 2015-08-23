@@ -4,12 +4,12 @@
 #include "GDCpp/profile.h"
 #include <vector>
 
-bool RuntimeContext::TriggerOnce(unsigned int conditionId)
+bool RuntimeContext::TriggerOnce(std::size_t conditionId)
 {
 	onceConditionsTriggered[conditionId] = true; //Remember that we triggered this condition.
 
 	//Return true only if the condition was not triggered the last frame.
-	std::map <unsigned int, bool>::iterator lastFrame = onceConditionsTriggeredLastFrame.find(conditionId);
+	std::map <std::size_t, bool>::iterator lastFrame = onceConditionsTriggeredLastFrame.find(conditionId);
 	return lastFrame == onceConditionsTriggeredLastFrame.end() || lastFrame->second == false;
 }
 

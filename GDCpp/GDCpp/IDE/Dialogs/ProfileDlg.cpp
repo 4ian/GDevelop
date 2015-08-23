@@ -165,7 +165,7 @@ void ProfileDlg::UpdateGUI()
     totalTimeTxt->SetLabel(_("Total rendering time ( Display + Events ):")+
         gd::String::From(static_cast<double>((lastRenderingTime+lastEventsTime))/1000.0f)+_("ms"));
 
-    unsigned int currentObjectCount = sceneCanvas.GetRuntimeScene().objectsInstances.GetAllObjects().size();
+    std::size_t currentObjectCount = sceneCanvas.GetRuntimeScene().objectsInstances.GetAllObjects().size();
     objectsCountTxt->SetLabel(_("Number of objects:")+gd::String::From(currentObjectCount));
 
     //Update events data
@@ -209,7 +209,7 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
         return;
     }
 
-    unsigned int maximumTime = 50;
+    std::size_t maximumTime = 50;
 
     scaleMaxTxt->SetLabel(gd::String::From(maximumTime)+_("ms\n(")+gd::String::From(1.0f/maximumTime*1000.0f)+" "+_("fps")+")");
     scaleMidTxt->SetLabel(gd::String::From(maximumTime/2.0f)+_("ms\n(")+gd::String::From(1.0f/(maximumTime/2.0f)*1000.0f)+" "+_("fps")+")");
@@ -218,10 +218,10 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
     if ( totalTimeCheck->IsChecked() )
     {
         vector <wxPoint> points;
-        unsigned int numberDisplay = infiniteDataCheck->IsChecked() ? totalTimeData.size() : maxData-1;
+        std::size_t numberDisplay = infiniteDataCheck->IsChecked() ? totalTimeData.size() : maxData-1;
 
         points.push_back(wxPoint(ratioGraphics->GetSize().x, ratioGraphics->GetSize().y));
-        for (unsigned int i = 0;i<totalTimeData.size();++i)
+        for (std::size_t i = 0;i<totalTimeData.size();++i)
             points.push_back(wxPoint(static_cast<double>(ratioGraphics->GetSize().x)-(i)/static_cast<double>(numberDisplay)*static_cast<double>(ratioGraphics->GetSize().x),
                                      static_cast<double>(ratioGraphics->GetSize().y)-static_cast<double>(totalTimeData[i])/static_cast<double>(maximumTime)*static_cast<double>(ratioGraphics->GetSize().y)));
         points.push_back(wxPoint(points.back().x, ratioGraphics->GetSize().y));
@@ -235,10 +235,10 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
     if ( eventsTimeCheck->IsChecked() )
     {
         vector <wxPoint> points;
-        unsigned int numberDisplay = infiniteDataCheck->IsChecked() ? eventsData.size() : maxData-1;
+        std::size_t numberDisplay = infiniteDataCheck->IsChecked() ? eventsData.size() : maxData-1;
 
         points.push_back(wxPoint(ratioGraphics->GetSize().x, ratioGraphics->GetSize().y));
-        for (unsigned int i = 0;i<eventsData.size();++i)
+        for (std::size_t i = 0;i<eventsData.size();++i)
             points.push_back(wxPoint(static_cast<double>(ratioGraphics->GetSize().x)-(i)/static_cast<double>(numberDisplay)*static_cast<double>(ratioGraphics->GetSize().x),
                                      static_cast<double>(ratioGraphics->GetSize().y)-static_cast<double>(eventsData[i])/static_cast<double>(maximumTime)*static_cast<double>(ratioGraphics->GetSize().y)));
         points.push_back(wxPoint(points.back().x, ratioGraphics->GetSize().y));
@@ -251,14 +251,14 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
     //Objects curve
     if ( objectsCountCheck->IsChecked() )
     {
-        std::deque<unsigned int>::iterator maximumElementIterator = std::max_element(objectsCountData.begin(), objectsCountData.end());
-        unsigned int maximumElement = *maximumElementIterator;
+        std::deque<std::size_t>::iterator maximumElementIterator = std::max_element(objectsCountData.begin(), objectsCountData.end());
+        std::size_t maximumElement = *maximumElementIterator;
 
         vector <wxPoint> points;
-        unsigned int numberDisplay = infiniteDataCheck->IsChecked() ? objectsCountData.size() : maxData-1;
+        std::size_t numberDisplay = infiniteDataCheck->IsChecked() ? objectsCountData.size() : maxData-1;
 
         points.push_back(wxPoint(ratioGraphics->GetSize().x, ratioGraphics->GetSize().y));
-        for (unsigned int i = 0;i<objectsCountData.size();++i)
+        for (std::size_t i = 0;i<objectsCountData.size();++i)
             points.push_back(wxPoint(static_cast<double>(ratioGraphics->GetSize().x)-(i)/static_cast<double>(numberDisplay)*static_cast<double>(ratioGraphics->GetSize().x),
                                      static_cast<double>(ratioGraphics->GetSize().y)-static_cast<double>(objectsCountData[i])/static_cast<double>(maximumElement)*static_cast<double>(ratioGraphics->GetSize().y)));
         points.push_back(wxPoint(points.back().x, ratioGraphics->GetSize().y));
@@ -273,7 +273,7 @@ void ProfileDlg::ParseProfileEvents()
 {
     if (!sceneCanvas.GetRuntimeScene().GetProfiler()) return;
 
-    for (unsigned int i = 0;i<sceneCanvas.GetRuntimeScene().GetProfiler()->profileEventsInformation.size();++i)
+    for (std::size_t i = 0;i<sceneCanvas.GetRuntimeScene().GetProfiler()->profileEventsInformation.size();++i)
     {
         std::shared_ptr<gd::BaseEvent> event = sceneCanvas.GetRuntimeScene().GetProfiler()->profileEventsInformation[i].originalEvent.lock();
         if ( event != std::shared_ptr<gd::BaseEvent>())

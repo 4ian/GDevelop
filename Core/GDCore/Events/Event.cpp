@@ -51,7 +51,7 @@ gd::String BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator,
 
 
         //Else make a search in all the extensions
-        for (unsigned int i = 0;i<platform.GetAllPlatformExtensions().size();++i)
+        for (std::size_t i = 0; i < platform.GetAllPlatformExtensions().size(); ++i)
         {
             std::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
             if ( !extension ) continue;
@@ -69,7 +69,7 @@ gd::String BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator,
     return "";
 }
 
-void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)
+void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, std::size_t indexOfTheEventInThisList)
 {
     if ( IsDisabled() || !MustBePreprocessed() ) return;
 
@@ -90,7 +90,7 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsLi
         }
 
         //Else make a search in all the extensions
-        for (unsigned int i = 0;i<platform.GetAllPlatformExtensions().size();++i)
+        for (std::size_t i = 0;i<platform.GetAllPlatformExtensions().size();++i)
         {
             std::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
             if ( !extension ) continue;

@@ -61,7 +61,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
 
         //Ensure needed files are included.
         std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
-        for (unsigned int j = 0;j<behaviors.size();++j)
+        for (std::size_t j = 0;j<behaviors.size();++j)
         {
             const gd::BehaviorMetadata & metadata = gd::MetadataProvider::GetBehaviorMetadata(JsPlatform::Get(),
                                                                                                   object.GetBehavior(behaviors[j]).GetTypeName());
@@ -80,10 +80,10 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
 
     gd::String globalObjectLists;
     gd::String globalObjectListsReset;
-    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<project.GetObjectsCount();++i)
         generateDeclarations(project.GetObject(i), maxDepthLevelReached, globalObjectLists, globalObjectListsReset);
 
-    for (unsigned int i = 0;i<scene.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<scene.GetObjectsCount();++i)
         generateDeclarations(scene.GetObject(i), maxDepthLevelReached, globalObjectLists, globalObjectListsReset);
 
     //Condition global booleans
@@ -91,7 +91,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
     for (unsigned int i = 0;i<=codeGenerator.GetMaxCustomConditionsDepth();++i)
     {
         globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"conditionTrue_"+gd::String::From(i)+" = {val:false};\n";
-        for (unsigned int j = 0;j<=codeGenerator.GetMaxConditionsListsSize();++j)
+        for (std::size_t j = 0;j<=codeGenerator.GetMaxConditionsListsSize();++j)
         {
             globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"condition"+gd::String::From(j)+"IsTrue_"+gd::String::From(i)+" = {val:false};\n";
         }
@@ -163,7 +163,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(const std::vector<gd::Stri
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 0;i<arguments.size();++i)
+        for (std::size_t i = 0;i<arguments.size();++i)
         {
             if ( i != 0 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -174,7 +174,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(const std::vector<gd::Stri
 
     //Add logical not if needed
     bool conditionAlreadyTakeCareOfInversion = false;
-    for (unsigned int i = 0;i<instrInfos.parameters.size();++i) //Some conditions already have a "conditionInverted" parameter
+    for (std::size_t i = 0;i<instrInfos.parameters.size();++i) //Some conditions already have a "conditionInverted" parameter
     {
         if( instrInfos.parameters[i].type == "conditionInverted" )
             conditionAlreadyTakeCareOfInversion = true;
@@ -207,7 +207,7 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objec
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 1;i<arguments.size();++i)
+        for (std::size_t i = 1;i<arguments.size();++i)
         {
             if ( i != 1 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -254,7 +254,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & obj
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -309,7 +309,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 1;i<arguments.size();++i)
+        for (std::size_t i = 1;i<arguments.size();++i)
         {
             if ( i != 1 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -351,7 +351,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & object
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -426,10 +426,10 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList 
 {
     gd::String outputCode;
 
-    for (unsigned int i = 0;i<conditions.size();++i)
+    for (std::size_t i = 0;i<conditions.size();++i)
         outputCode += GenerateBooleanInitializationToFalse("condition"+gd::String::From(i)+"IsTrue", context);
 
-    for (unsigned int cId =0;cId < conditions.size();++cId)
+    for (std::size_t cId =0;cId < conditions.size();++cId)
     {
         if (cId != 0) outputCode += "if ( "+GenerateBooleanFullName("condition"+gd::String::From(cId-1)+"IsTrue", context)+".val ) {\n";
 
@@ -444,7 +444,7 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList 
         }
     }
 
-    for (unsigned int cId =0;cId < conditions.size();++cId)
+    for (std::size_t cId =0;cId < conditions.size();++cId)
     {
         if (cId != 0) outputCode += "}\n";
     }
@@ -472,7 +472,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
 
         argOutput += "context.clearEventsObjectsMap()";
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             context.ObjectsListNeeded(realObjects[i]);
             argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+GetObjectListName(realObjects[i], context)+")";
@@ -485,7 +485,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
 
         argOutput += "context.clearEventsObjectsMap()";
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             context.EmptyObjectsListNeeded(realObjects[i]);
             argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+GetObjectListName(realObjects[i], context)+")";
@@ -504,13 +504,13 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         }
         else
         {
-            for (unsigned int i = 0;i<realObjects.size();++i)
+            for (std::size_t i = 0;i<realObjects.size();++i)
             {
                 context.ObjectsListNeeded(realObjects[i]);
                 argOutput += "("+GetObjectListName(realObjects[i], context)+".length !== 0 ? "+GetObjectListName(realObjects[i], context)+"[0] : ";
             }
             argOutput += "null";
-            for (unsigned int i = 0;i<realObjects.size();++i)
+            for (std::size_t i = 0;i<realObjects.size();++i)
                 argOutput += ")";
         }
     }

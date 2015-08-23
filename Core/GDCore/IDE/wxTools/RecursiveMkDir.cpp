@@ -19,7 +19,7 @@ bool RecursiveMkDir::MkDir(wxString directory)
     wxArrayString dirs = destinationDir.GetDirs();
 
     wxString currentDir = destinationDir.GetVolume()+destinationDir.GetVolumeSeparator();
-    for (unsigned int i = 0;i<dirs.size();++i)
+    for (std::size_t i = 0;i<dirs.size();++i)
     {
         currentDir += destinationDir.GetPathSeparator()+dirs[i];
 

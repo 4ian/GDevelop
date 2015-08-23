@@ -593,21 +593,21 @@ void ParticleEmitterObject::EditObject( wxWindow* parent, gd::Project & game, gd
 #endif
 }
 
-void RuntimeParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeParticleEmitterObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if ( !GetParticleSystem() || !GetParticleSystem()->particleSystem ) return;
 
     if      ( propertyNb == 0 ) {name = _("Particles number");      value = gd::String::From(GetParticleSystem()->particleSystem->getNbParticles());}
 }
 
-bool RuntimeParticleEmitterObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeParticleEmitterObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) { return false; }
 
     return true;
 }
 
-unsigned int RuntimeParticleEmitterObject::GetNumberOfProperties() const
+std::size_t RuntimeParticleEmitterObject::GetNumberOfProperties() const
 {
     return 1;
 }

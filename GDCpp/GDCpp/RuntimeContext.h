@@ -46,7 +46,7 @@ public:
      * \brief Used by "Trigger once" conditions: Return true only if
      * this method was not called with the same identifier during the last frame.
      */
-    bool TriggerOnce(unsigned int conditionId);
+    bool TriggerOnce(std::size_t conditionId);
 
     /**
      * \brief To be called when events begin so that "Trigger once" conditions
@@ -62,8 +62,8 @@ public:
 
 private:
     std::map <gd::String, std::vector<RuntimeObject*> *> temporaryMap;
-    std::map <unsigned int, bool> onceConditionsTriggered;
-    std::map <unsigned int, bool> onceConditionsTriggeredLastFrame;
+    std::map <std::size_t, bool> onceConditionsTriggered;
+    std::map <std::size_t, bool> onceConditionsTriggeredLastFrame;
 };
 
 #endif // RUNTIMECONTEXT_H

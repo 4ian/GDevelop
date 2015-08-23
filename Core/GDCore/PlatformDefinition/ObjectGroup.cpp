@@ -34,7 +34,7 @@ void ObjectGroup::RemoveObject(const gd::String & name)
 void ObjectGroup::SerializeTo(const std::vector < gd::ObjectGroup > & list, SerializerElement & element)
 {
     element.ConsiderAsArrayOf("group");
-    for ( unsigned int j = 0;j < list.size();j++ )
+    for ( std::size_t j = 0;j < list.size();j++ )
     {
         SerializerElement & groupElement = element.AddChild("group");
 
@@ -43,7 +43,7 @@ void ObjectGroup::SerializeTo(const std::vector < gd::ObjectGroup > & list, Seri
         SerializerElement & objectsElement = groupElement.AddChild("objects");
         objectsElement.ConsiderAsArrayOf("object");
         vector < gd::String > allObjects = list[j].GetAllObjectsNames();
-        for ( unsigned int k = 0;k < allObjects.size();k++ )
+        for ( std::size_t k = 0;k < allObjects.size();k++ )
             objectsElement.AddChild("object").SetAttribute( "name", allObjects[k] );
     }
 }
@@ -51,7 +51,7 @@ void ObjectGroup::SerializeTo(const std::vector < gd::ObjectGroup > & list, Seri
 void ObjectGroup::UnserializeFrom(std::vector < gd::ObjectGroup > & list, const SerializerElement & element)
 {
     element.ConsiderAsArrayOf("group", "Groupe");
-    for (unsigned int i = 0; i < element.GetChildrenCount(); ++i)
+    for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
     {
         SerializerElement & groupElement = element.GetChild(i);
         gd::ObjectGroup objectGroup;
@@ -61,7 +61,7 @@ void ObjectGroup::UnserializeFrom(std::vector < gd::ObjectGroup > & list, const 
         //Compatibility with GD <= 3.3
         if ( groupElement.HasChild("Objet") )
         {
-            for (unsigned int j = 0; j < groupElement.GetChildrenCount("Objet"); ++j)
+            for (std::size_t j = 0; j < groupElement.GetChildrenCount("Objet"); ++j)
                 objectGroup.AddObject(groupElement.GetChild("Objet", j).GetStringAttribute("nom"));
         }
         //End of compatibility code
@@ -69,7 +69,7 @@ void ObjectGroup::UnserializeFrom(std::vector < gd::ObjectGroup > & list, const 
         {
             SerializerElement & objectsElement = groupElement.GetChild("objects");
             objectsElement.ConsiderAsArrayOf("object");
-            for (unsigned int j = 0; j < objectsElement.GetChildrenCount(); ++j)
+            for (std::size_t j = 0; j < objectsElement.GetChildrenCount(); ++j)
                 objectGroup.AddObject(objectsElement.GetChild(j).GetStringAttribute("name"));
         }
 

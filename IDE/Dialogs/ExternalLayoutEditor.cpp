@@ -290,7 +290,7 @@ void ExternalLayoutEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
     parentSceneComboBox->Clear();
     parentSceneComboBox->Append(_("No layout"));
 
-    for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
+    for (std::size_t i = 0;i<project.GetLayoutsCount();++i)
     	parentSceneComboBox->Append(project.GetLayout(i).GetName());
 }
 

@@ -45,17 +45,17 @@ public:
     /**
      * Set the number of the first and last event to be included ( Meaningful only if includeAll was set to false, see SetIncludeAllEvents )
      */
-    void SetIncludeStartAndEnd(unsigned int includeStart_, unsigned int includeEnd_) { includeStart = includeStart_; includeEnd = includeEnd_;  };
+    void SetIncludeStartAndEnd(std::size_t includeStart_, std::size_t includeEnd_) { includeStart = includeStart_; includeEnd = includeEnd_;  };
 
     /**
      * Get the number of the first event to be included. (Meaningful only if includeAll was set to false, see SetIncludeAllEvents)
      */
-    unsigned int GetIncludeStart() const { return includeStart; };
+    std::size_t GetIncludeStart() const { return includeStart; };
 
     /**
      * Get the number of the last event to be included. (Meaningful only if includeAll was set to false, see SetIncludeAllEvents)
      */
-    unsigned int GetIncludeEnd() const { return includeEnd; };
+    std::size_t GetIncludeEnd() const { return includeEnd; };
 
     /**
      * The link event must always be preprocessed.
@@ -75,7 +75,7 @@ public:
      * When implementing a platform with a link event, you should call this function when preprocessing the events
      * (See gd::EventMetadata::codeGeneration).
      */
-    void ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, unsigned int indexOfTheEventInThisList);
+    void ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, std::size_t indexOfTheEventInThisList);
 
     virtual bool IsExecutable() const { return true; };
 
@@ -97,8 +97,8 @@ public:
 private:
     gd::String target; ///< The name of the external events (or scene) to be included
     bool includeAll; ///< If set to true, all the events of the target should be included
-    unsigned int includeStart; ///< If includeAll is set to false, represents the number of the first event of the target to included.
-    unsigned int includeEnd; ///< If includeAll is set to false, represents the number of the last event of the target to included.
+    std::size_t includeStart; ///< If includeAll is set to false, represents the number of the first event of the target to included.
+    std::size_t includeEnd; ///< If includeAll is set to false, represents the number of the last event of the target to included.
     bool linkWasInvalid; ///< Set to true by Preprocess if the links was invalid the last time is was processed. Used to display a warning in the events editor.
 };
 

@@ -166,9 +166,9 @@ public:
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
 #endif
-    const gd::ParameterMetadata & GetParameter(unsigned int id) const { return parameters[id]; };
-    gd::ParameterMetadata & GetParameter(unsigned int id) { return parameters[id]; };
-    unsigned int GetParametersCount() const { return parameters.size(); };
+    const gd::ParameterMetadata & GetParameter(std::size_t id) const { return parameters[id]; };
+    gd::ParameterMetadata & GetParameter(std::size_t id) { return parameters[id]; };
+    std::size_t GetParametersCount() const { return parameters.size(); };
 
     std::vector < gd::ParameterMetadata > parameters;
 private:

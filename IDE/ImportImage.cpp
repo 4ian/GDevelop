@@ -366,7 +366,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     wxFileName filename(FileGIFEdit->GetValue());
     wxString path = filename.GetPath();
 
-    for (unsigned int i = 0;i<animation.GetFrameCount();++i)
+    for (std::size_t i = 0;i<animation.GetFrameCount();++i)
     {
     	wxImage img = animation.GetFrame(i);
     	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+gd::String::From(i)+".png", wxBITMAP_TYPE_PNG);
@@ -426,9 +426,9 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
     wxFileName filename(fileRPGEdit->GetValue());
     wxString path = filename.GetPath();
 
-    for (unsigned int j = 0;j<4;++j)
+    for (std::size_t j = 0;j<4;++j)
     {
-        for (unsigned int i = 0;i<4;++i)
+        for (std::size_t i = 0;i<4;++i)
         {
             //On r�cup�re la sous image
             wxImage subImage = image.GetSubImage(wxRect(image.GetWidth()/4*i,
@@ -510,10 +510,10 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
 
     //D�composition ligne par ligne
     int Y = origineY;
-    for (unsigned int line = 0;line<static_cast<unsigned>(lineNb);++line)
+    for (std::size_t line = 0;line<static_cast<std::size_t>(lineNb);++line)
     {
         int X = origineX;
-        for (unsigned int column = 0;column<static_cast<unsigned>(columnNb);++column)
+        for (std::size_t column = 0;column<static_cast<std::size_t>(columnNb);++column)
         {
             wxRect imageRect;
             imageRect.SetX(X);

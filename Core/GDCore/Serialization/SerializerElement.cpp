@@ -141,7 +141,7 @@ SerializerElement & SerializerElement::AddChild(gd::String name)
 	return *newElement;
 }
 
-SerializerElement & SerializerElement::GetChild(unsigned int index) const
+SerializerElement & SerializerElement::GetChild(std::size_t index) const
 {
 	if ( arrayOf.empty() )
 	{
@@ -149,7 +149,7 @@ SerializerElement & SerializerElement::GetChild(unsigned int index) const
 		return nullElement;
 	}
 
-	unsigned int currentIndex = 0;
+	std::size_t currentIndex = 0;
 	for (size_t i = 0; i < children.size(); ++i)
 	{
 		if (children[i].second == std::shared_ptr<SerializerElement>())
@@ -168,7 +168,7 @@ SerializerElement & SerializerElement::GetChild(unsigned int index) const
 	return nullElement;
 }
 
-SerializerElement & SerializerElement::GetChild(gd::String name, unsigned int index, gd::String deprecatedName) const
+SerializerElement & SerializerElement::GetChild(gd::String name, std::size_t index, gd::String deprecatedName) const
 {
 	if ( !arrayOf.empty() )
 	{
@@ -180,7 +180,7 @@ SerializerElement & SerializerElement::GetChild(gd::String name, unsigned int in
 		}
 	}
 
-	unsigned int currentIndex = 0;
+	std::size_t currentIndex = 0;
 	for (size_t i = 0; i < children.size(); ++i)
 	{
 		if (children[i].second == std::shared_ptr<SerializerElement>())
@@ -199,7 +199,7 @@ SerializerElement & SerializerElement::GetChild(gd::String name, unsigned int in
 	return nullElement;
 }
 
-unsigned int SerializerElement::GetChildrenCount(gd::String name, gd::String deprecatedName) const
+std::size_t SerializerElement::GetChildrenCount(gd::String name, gd::String deprecatedName) const
 {
 	if (name.empty())
 	{
@@ -213,7 +213,7 @@ unsigned int SerializerElement::GetChildrenCount(gd::String name, gd::String dep
 		deprecatedName = deprecatedArrayOf;
 	}
 
-	unsigned int currentIndex = 0;
+	std::size_t currentIndex = 0;
 	for (size_t i = 0; i < children.size(); ++i)
 	{
 		if (children[i].second == std::shared_ptr<SerializerElement>())

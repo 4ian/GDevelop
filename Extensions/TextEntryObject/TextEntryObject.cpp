@@ -54,7 +54,7 @@ void RuntimeTextEntryObject::UpdateTime(float)
 
     //Retrieve text entered
     const auto & characters = scene->GetInputManager().GetCharactersEntered();
-    for (unsigned int i = 0;i<characters.size();++i)
+    for (std::size_t i = 0;i<characters.size();++i)
     {
         //Skip some non displayable characters
         if (characters[i] > 30 && (characters[i] < 127 || characters[i] > 159))
@@ -96,13 +96,13 @@ bool TextEntryObject::GenerateThumbnail(const gd::Project & project, wxBitmap & 
     return true;
 }
 
-void RuntimeTextEntryObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeTextEntryObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Text in memory");    value = GetString();}
     else if ( propertyNb == 1 ) {name = _("Activated \?");      value = activated ? _("Yes") : _("No");}
 }
 
-bool RuntimeTextEntryObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeTextEntryObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
     else if ( propertyNb == 1 ) { activated = (newValue != _("No")); return true; }
@@ -110,7 +110,7 @@ bool RuntimeTextEntryObject::ChangeProperty(unsigned int propertyNb, gd::String 
     return true;
 }
 
-unsigned int RuntimeTextEntryObject::GetNumberOfProperties() const
+std::size_t RuntimeTextEntryObject::GetNumberOfProperties() const
 {
     return 2;
 }

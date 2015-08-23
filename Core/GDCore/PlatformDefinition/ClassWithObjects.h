@@ -60,12 +60,12 @@ public:
     /**
      * \brief Return a reference to the object at position \a index in the objects list
      */
-    Object & GetObject(unsigned int index);
+    Object & GetObject(std::size_t index);
 
     /**
      * \brief Return a reference to the object at position \a index in the objects list.
      */
-    const gd::Object & GetObject (unsigned int index) const;
+    const gd::Object & GetObject (std::size_t index) const;
 
     /**
      * \brief Return the position of the object called \a name in the objects list.
@@ -73,12 +73,12 @@ public:
      * \warning This has nothing to do with an object position on a layout. Objects put on layouts
      * are represented thanks to the gd::InitialInstance class.
      */
-    unsigned int GetObjectPosition(const gd::String & name) const;
+    std::size_t GetObjectPosition(const gd::String & name) const;
 
     /**
      * \brief Return the number of object.
      */
-    unsigned int GetObjectsCount() const;
+    std::size_t GetObjectsCount() const;
 
 #if defined(GD_IDE_ONLY)
     /**
@@ -87,7 +87,7 @@ public:
      * \note The object is created using the project's current platform.
      * \return A reference to the object in the list.
      */
-    gd::Object & InsertNewObject(gd::Project & project, const gd::String & objectType, const gd::String & name, unsigned int position);
+    gd::Object & InsertNewObject(gd::Project & project, const gd::String & objectType, const gd::String & name, std::size_t position);
 #endif
 
     /**
@@ -97,7 +97,7 @@ public:
      * \param position Insertion position. If the position is invalid, the object is inserted at the end of the objects list.
      * \return A reference to the object in the list.
      */
-    gd::Object & InsertObject(const gd::Object & object, unsigned int position);
+    gd::Object & InsertObject(const gd::Object & object, std::size_t position);
 
     /**
      * \brief Delete an object.
@@ -108,7 +108,7 @@ public:
     /**
      * \brief Swap the position of the specified objects.
      */
-    void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex);
+    void SwapObjects(std::size_t firstObjectIndex, std::size_t secondObjectIndex);
 
     /**
      * Provide a raw access to the vector containing the objects

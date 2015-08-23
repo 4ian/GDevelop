@@ -41,7 +41,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
     //Get all extensions used
     std::vector< std::shared_ptr<gd::PlatformExtension> > allGameExtensions;
     std::vector<gd::String> usedExtensions = project.GetUsedExtensions();
-    for (unsigned int i = 0;i<usedExtensions.size();++i)
+    for (std::size_t i = 0;i<usedExtensions.size();++i)
     {
         std::shared_ptr<gd::PlatformExtension> extension = project.GetCurrentPlatform().GetExtension(usedExtensions[i]);
 
@@ -49,15 +49,15 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
             allGameExtensions.push_back(extension);
     }
 
-    for ( unsigned int j = 0;j < events.size() ;j++ )
+    for ( std::size_t j = 0;j < events.size() ;j++ )
     {
         vector < gd::InstructionsList* > allActionsVectors = events[j].GetAllActionsVectors();
-        for (unsigned int i = 0;i<allActionsVectors.size();++i)
+        for (std::size_t i = 0;i<allActionsVectors.size();++i)
         {
-            for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
+            for ( std::size_t k = 0;k < allActionsVectors[i]->size() ;k++ )
             {
                 gd::String type = allActionsVectors[i]->Get( k ).GetType();
-                for (unsigned int e = 0;e<allGameExtensions.size();++e)
+                for (std::size_t e = 0;e<allGameExtensions.size();++e)
                 {
                     bool extensionHasAction = false;
 
@@ -66,7 +66,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
                         extensionHasAction = true;
 
                     const vector < gd::String > & objects = allGameExtensions[e]->GetExtensionObjectsTypes();
-                    for (unsigned int o = 0;o<objects.size();++o)
+                    for (std::size_t o = 0;o<objects.size();++o)
                     {
                         const std::map<gd::String, gd::InstructionMetadata> & allObjectsActions = allGameExtensions[e]->GetAllActionsForObject(objects[o]);
                         if ( allObjectsActions.find(type) != allObjectsActions.end() )
@@ -74,7 +74,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
                     }
 
                     const vector < gd::String > & autos = allGameExtensions[e]->GetBehaviorsTypes();
-                    for (unsigned int a = 0;a<autos.size();++a)
+                    for (std::size_t a = 0;a<autos.size();++a)
                     {
                         const std::map<gd::String, gd::InstructionMetadata> & allAutosActions = allGameExtensions[e]->GetAllActionsForBehavior(autos[a]);
                         if ( allAutosActions.find(type) != allAutosActions.end() )
@@ -92,12 +92,12 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
         }
 
         vector < gd::InstructionsList* > allConditionsVector = events[j].GetAllConditionsVectors();
-        for (unsigned int i = 0;i<allConditionsVector.size();++i)
+        for (std::size_t i = 0;i<allConditionsVector.size();++i)
         {
-            for ( unsigned int k = 0;k < allConditionsVector[i]->size() ;k++ )
+            for ( std::size_t k = 0;k < allConditionsVector[i]->size() ;k++ )
             {
                 gd::String type = allConditionsVector[i]->Get( k ).GetType();
-                for (unsigned int e = 0;e<allGameExtensions.size();++e)
+                for (std::size_t e = 0;e<allGameExtensions.size();++e)
                 {
                     bool extensionHasCondition = false;
 
@@ -106,7 +106,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
                         extensionHasCondition = true;
 
                     const vector < gd::String > & objects = allGameExtensions[e]->GetExtensionObjectsTypes();
-                    for (unsigned int j = 0;j<objects.size();++j)
+                    for (std::size_t j = 0;j<objects.size();++j)
                     {
                         const std::map<gd::String, gd::InstructionMetadata> & allObjectsConditions = allGameExtensions[e]->GetAllConditionsForObject(objects[j]);
                         if ( allObjectsConditions.find(type) != allObjectsConditions.end() )
@@ -114,7 +114,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
                     }
 
                     const vector < gd::String > & autos = allGameExtensions[e]->GetBehaviorsTypes();
-                    for (unsigned int j = 0;j<autos.size();++j)
+                    for (std::size_t j = 0;j<autos.size();++j)
                     {
                         const std::map<gd::String, gd::InstructionMetadata> & allAutosConditions = allGameExtensions[e]->GetAllConditionsForBehavior(autos[j]);
                         if ( allAutosConditions.find(type) != allAutosConditions.end() )

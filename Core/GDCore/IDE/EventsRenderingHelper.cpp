@@ -180,7 +180,7 @@ int EventsRenderingHelper::DrawConditionsList(gd::InstructionsList & conditions,
     }
 
     //Draw each conditions
-    for ( unsigned int j = 0;j < conditions.size();j++ )
+    for ( std::size_t j = 0;j < conditions.size();j++ )
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
@@ -281,7 +281,7 @@ int EventsRenderingHelper::DrawActionsList(gd::InstructionsList & actions, wxDC 
     }
 
     //Draw each actions
-    for ( unsigned int j = 0;j < actions.size();j++ )
+    for ( std::size_t j = 0;j < actions.size();j++ )
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
@@ -348,7 +348,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const gd::In
     if ( conditions.empty() )
         return fontCharacterHeight;
 
-    for ( unsigned int j = 0;j < conditions.size();j++ )
+    for ( std::size_t j = 0;j < conditions.size();j++ )
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
@@ -381,7 +381,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const gd::Instr
         return fontCharacterHeight;
 
     //Draw each actions
-    for ( unsigned int j = 0;j < actions.size();j++ )
+    for ( std::size_t j = 0;j < actions.size();j++ )
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
@@ -410,7 +410,7 @@ int EventsRenderingHelper::DrawInstruction(gd::Instruction & instruction, const 
 
     wxPoint lastPos = point;
     //size_t alreadyWrittenCharCount = 0;
-    for (unsigned int i = 0;i<formattedStr.size();++i)
+    for (std::size_t i = 0;i<formattedStr.size();++i)
     {
         //Update font and properties
         dc.SetTextForeground(!event->IsDisabled() ? formattedStr[i].second.GetWxColor() : wxColour(160,160,160));

@@ -62,7 +62,7 @@ void VariableCodeGenerationCallbacks::OnRootVariable(gd::String variableName)
 	    std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(object, context);
 
 	    output = "RuntimeVariablesContainer::GetBadVariablesContainer()";
-	    for (unsigned int i = 0;i<realObjects.size();++i)
+	    for (std::size_t i = 0;i<realObjects.size();++i)
 	    {
         	context.ObjectsListNeeded(realObjects[i]);
 
@@ -84,7 +84,7 @@ void VariableCodeGenerationCallbacks::OnRootVariable(gd::String variableName)
 	//(In this case, it is stored in an array at runtime and we know its position.)
 	if ( variables && variables->Has(variableName) )
 	{
-		unsigned int index = variables->GetPosition(variableName);
+		std::size_t index = variables->GetPosition(variableName);
 		if ( index < variables->Count() )
 		{
 			output += ".Get("+gd::String::From(index)+")";

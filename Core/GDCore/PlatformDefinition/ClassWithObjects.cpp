@@ -21,7 +21,7 @@ ClassWithObjects::ClassWithObjects()
 void ClassWithObjects::SerializeObjectsTo(SerializerElement & element) const
 {
     element.ConsiderAsArrayOf("object");
-    for ( unsigned int j = 0;j < initialObjects.size();j++ )
+    for ( std::size_t j = 0;j < initialObjects.size();j++ )
     {
         initialObjects[j]->SerializeTo(element.AddChild("object"));
     }
@@ -33,7 +33,7 @@ void ClassWithObjects::UnserializeObjectsFrom(gd::Project & project, const Seria
 {
     initialObjects.clear();
     element.ConsiderAsArrayOf("object", "Objet");
-    for (unsigned int i = 0; i < element.GetChildrenCount(); ++i)
+    for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
     {
         const SerializerElement & objectElement = element.GetChild(i);
 
@@ -63,28 +63,28 @@ const gd::Object & ClassWithObjects::GetObject(const gd::String & name) const
 {
     return *(*find_if(initialObjects.begin(), initialObjects.end(), bind2nd(gd::ObjectHasName(), name)));
 }
-gd::Object & ClassWithObjects::GetObject(unsigned int index)
+gd::Object & ClassWithObjects::GetObject(std::size_t index)
 {
     return *initialObjects[index];
 }
-const gd::Object & ClassWithObjects::GetObject (unsigned int index) const
+const gd::Object & ClassWithObjects::GetObject (std::size_t index) const
 {
     return *initialObjects[index];
 }
-unsigned int ClassWithObjects::GetObjectPosition(const gd::String & name) const
+std::size_t ClassWithObjects::GetObjectPosition(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<initialObjects.size();++i)
+    for (std::size_t i = 0;i<initialObjects.size();++i)
     {
         if ( initialObjects[i]->GetName() == name ) return i;
     }
     return gd::String::npos;
 }
-unsigned int ClassWithObjects::GetObjectsCount() const
+std::size_t ClassWithObjects::GetObjectsCount() const
 {
     return initialObjects.size();
 }
 #if defined(GD_IDE_ONLY)
-gd::Object & ClassWithObjects::InsertNewObject(gd::Project & project, const gd::String & objectType, const gd::String & name, unsigned int position)
+gd::Object & ClassWithObjects::InsertNewObject(gd::Project & project, const gd::String & objectType, const gd::String & name, std::size_t position)
 {
     std::shared_ptr<gd::Object> newObject = project.GetCurrentPlatform().CreateObject(objectType, name);
     if (position<initialObjects.size())
@@ -96,7 +96,7 @@ gd::Object & ClassWithObjects::InsertNewObject(gd::Project & project, const gd::
 }
 #endif
 
-gd::Object & ClassWithObjects::InsertObject(const gd::Object & object, unsigned int position)
+gd::Object & ClassWithObjects::InsertObject(const gd::Object & object, std::size_t position)
 {
     std::shared_ptr<gd::Object> newObject = std::shared_ptr<gd::Object>(object.Clone());
     if (position<initialObjects.size())
@@ -107,7 +107,7 @@ gd::Object & ClassWithObjects::InsertObject(const gd::Object & object, unsigned 
     return *newObject;
 }
 
-void ClassWithObjects::SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex)
+void ClassWithObjects::SwapObjects(std::size_t firstObjectIndex, std::size_t secondObjectIndex)
 {
     if ( firstObjectIndex >= initialObjects.size() || secondObjectIndex >= initialObjects.size() )
         return;

@@ -215,7 +215,7 @@ namespace
         }
 
         //Construct the list of the external shared libraries files to be used
-        for (unsigned int i = 0;i<game.GetUsedExtensions().size();++i)
+        for (std::size_t i = 0;i<game.GetUsedExtensions().size();++i)
         {
             std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedExtensions()[i]);
             std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
@@ -226,7 +226,7 @@ namespace
                  wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetName()+".dylib") )
                 task.compilerCall.extraLibFiles.push_back(extension->GetName());
 
-            for (unsigned int j =0;j<extension->GetSupplementaryLibFiles().size();++j)
+            for (std::size_t j =0;j<extension->GetSupplementaryLibFiles().size();++j)
             {
                 if ( wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".a") ||
                      wxFileExists(CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".dll.a") ||

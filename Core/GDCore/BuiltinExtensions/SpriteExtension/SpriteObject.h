@@ -71,18 +71,18 @@ public :
      * \brief Return the animation at the specified index.
      * If the index is out of bound, a "bad animation" object is returned.
      */
-    const Animation & GetAnimation(unsigned int nb) const;
+    const Animation & GetAnimation(std::size_t nb) const;
 
     /**
      * \brief Return the animation at the specified index.
      * If the index is out of bound, a "bad animation" object is returned.
      */
-    Animation & GetAnimation(unsigned int nb);
+    Animation & GetAnimation(std::size_t nb);
 
     /**
      * \brief Return the number of animations this object has.
      */
-    unsigned int GetAnimationsCount() const { return animations.size(); };
+    std::size_t GetAnimationsCount() const { return animations.size(); };
 
     /**
      * \brief Add an animation at the end of the existing ones.
@@ -92,7 +92,7 @@ public :
     /**
      * \brief Remove an animation.
      */
-    bool RemoveAnimation(unsigned int nb);
+    bool RemoveAnimation(std::size_t nb);
 
     /**
      * \brief Remove all animations.
@@ -107,7 +107,7 @@ public :
     /**
      * \brief Swap the position of two sprites
      */
-    void SwapAnimations(unsigned int firstIndex, unsigned int secondIndex);
+    void SwapAnimations(std::size_t firstIndex, std::size_t secondIndex);
 
     /**
      * \brief Return a read-only reference to the vector containing all the animation of the object.

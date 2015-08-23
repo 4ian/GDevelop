@@ -848,7 +848,7 @@ changesNeedRestart(false)
         langChoice->Clear();
 
         //Add languages to list and retrieve selected language
-        for (unsigned int i = 0;i<languagesAvailables.size();++i)
+        for (std::size_t i = 0;i<languagesAvailables.size();++i)
         {
             const wxLanguageInfo * language = wxLocale::FindLanguageInfo(languagesAvailables[i]);
             langChoice->Append(language->Description);

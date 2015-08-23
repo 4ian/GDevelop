@@ -21,7 +21,7 @@ std::vector<T*> GetSpecificObjects( const std::vector<RuntimeObject*> & objectsL
     std::vector<T*> specializedObjects;
     specializedObjects.reserve(objectsList.size());
 
-    for (unsigned int i = 0;i<objectsList.size();++i)
+    for (std::size_t i = 0;i<objectsList.size();++i)
     {
         T * specializedObject = dynamic_cast<T*>(objectsList[i]);
         if ( specializedObject != NULL ) specializedObjects.push_back(specializedObject);

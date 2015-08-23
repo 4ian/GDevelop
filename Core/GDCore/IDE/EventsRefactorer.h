@@ -29,13 +29,13 @@ namespace gd
 class GD_CORE_API EventsSearchResult
 {
 public:
-    EventsSearchResult(std::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ );
+    EventsSearchResult(std::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, std::size_t positionInList_ );
     EventsSearchResult();
     ~EventsSearchResult() {};
 
     std::weak_ptr<gd::BaseEvent> event;
     gd::EventsList * eventsList;
-    unsigned int positionInList;
+    std::size_t positionInList;
 };
 
 /**

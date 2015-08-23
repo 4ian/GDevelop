@@ -35,7 +35,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     bool lockedProperty = false;
     std::map<gd::String, gd::PropertyDescriptor> customProperties;
 
-    for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+    for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
     {
         if ( i == 0 )
         {
@@ -141,52 +141,52 @@ void InitialInstancesPropgridHelper::OnPropertyChanged(const std::vector<gd::Ini
         grid->EnableProperty("INSTANCE_CUSTOM_SIZE.INSTANCE_SIZE_WIDTH", hasCustomSize);
         grid->EnableProperty("INSTANCE_CUSTOM_SIZE.INSTANCE_SIZE_HEIGHT", hasCustomSize);
 
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetHasCustomSize(hasCustomSize);
     }
     else if ( event.GetPropertyName() == "INSTANCE_CUSTOM_SIZE.INSTANCE_SIZE_WIDTH" )
     {
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetCustomWidth(event.GetValue().GetReal());
     }
     else if ( event.GetPropertyName() == "INSTANCE_CUSTOM_SIZE.INSTANCE_SIZE_HEIGHT" )
     {
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetCustomHeight(event.GetValue().GetReal());
     }
     else if ( event.GetPropertyName() == "INSTANCE_X" )
     {
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetX(event.GetValue().GetReal());
     }
     else if ( event.GetPropertyName() == "INSTANCE_Y" )
     {
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetY(event.GetValue().GetReal());
     }
     else if ( event.GetPropertyName() == "INSTANCE_ANGLE" )
     {
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetAngle(event.GetValue().GetReal());
     }
     else if ( event.GetPropertyName() == "INSTANCE_Z" )
     {
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetZOrder(event.GetValue().GetInteger());
     }
     else if ( event.GetPropertyName() == "INSTANCE_LAYER" )
     {
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetLayer(event.GetValue().GetString());
     }
     else if ( event.GetPropertyName() == "INSTANCE_LOCKED" )
     {
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetLocked(event.GetValue().GetBool());
     }
     else
     {
-        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+        for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
         {
             selectedInitialInstances[i]->UpdateCustomProperty(event.GetPropertyName(),
                                                               event.GetValue().GetString(),

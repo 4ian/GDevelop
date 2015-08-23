@@ -22,11 +22,10 @@ public:
 
     #if defined(GD_IDE_ONLY)
     bool HasDebuggingProperties() const { return true; };
-    void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const;
-    bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue);
-    unsigned int GetNumberOfProperties(RuntimeScene & scene) const;
+    void GetPropertyForDebugger(RuntimeScene & scene, std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    bool ChangeProperty(RuntimeScene & scene, std::size_t propertyNb, gd::String newValue);
+    std::size_t GetNumberOfProperties(RuntimeScene & scene) const;
     #endif
 };
 
 #endif // FILEEXTENSION_H
-

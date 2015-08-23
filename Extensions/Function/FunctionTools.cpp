@@ -12,7 +12,7 @@ namespace GDpriv
 namespace FunctionTools
 {
 
-gd::String GD_EXTENSION_API GetSafelyStringFromVector(std::vector<gd::String> & list, unsigned int index )
+gd::String GD_EXTENSION_API GetSafelyStringFromVector(std::vector<gd::String> & list, std::size_t index )
 {
     if (index < list.size()) return list[index];
     return "";
@@ -20,4 +20,3 @@ gd::String GD_EXTENSION_API GetSafelyStringFromVector(std::vector<gd::String> & 
 
 }
 }
-

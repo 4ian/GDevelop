@@ -110,7 +110,7 @@ Project::~Project()
 
 std::shared_ptr<gd::Object> Project::CreateObject(const gd::String & type, const gd::String & name, const gd::String & platformName)
 {
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (std::size_t i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
@@ -123,7 +123,7 @@ std::shared_ptr<gd::Object> Project::CreateObject(const gd::String & type, const
 
 gd::Behavior* Project::CreateBehavior(const gd::String & type, const gd::String & platformName)
 {
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (std::size_t i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
@@ -136,7 +136,7 @@ gd::Behavior* Project::CreateBehavior(const gd::String & type, const gd::String 
 
 std::shared_ptr<gd::BehaviorsSharedData> Project::CreateBehaviorSharedDatas(const gd::String & type, const gd::String & platformName)
 {
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (std::size_t i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
@@ -150,7 +150,7 @@ std::shared_ptr<gd::BehaviorsSharedData> Project::CreateBehaviorSharedDatas(cons
 #if defined(GD_IDE_ONLY)
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(const gd::String & type, const gd::String & platformName)
 {
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (std::size_t i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
@@ -171,7 +171,7 @@ Platform & Project::GetCurrentPlatform() const
 
 void Project::AddPlatform(Platform & platform)
 {
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (std::size_t i = 0;i<platforms.size();++i)
     {
         if (platforms[i] == &platform)
             return;
@@ -184,7 +184,7 @@ void Project::AddPlatform(Platform & platform)
 
 void Project::SetCurrentPlatform(const gd::String & platformName)
 {
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (std::size_t i = 0;i<platforms.size();++i)
     {
         if (platforms[i]->GetName() == platformName)
         {
@@ -198,7 +198,7 @@ bool Project::RemovePlatform(const gd::String & platformName)
 {
     if ( platforms.size() <= 1 ) return false;
 
-    for (unsigned int i = 0;i<platforms.size();++i)
+    for (std::size_t i = 0;i<platforms.size();++i)
     {
         if (platforms[i]->GetName() == platformName)
         {
@@ -227,29 +227,29 @@ const gd::Layout & Project::GetLayout(const gd::String & name) const
 {
     return *(*find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name)));
 }
-gd::Layout & Project::GetLayout(unsigned int index)
+gd::Layout & Project::GetLayout(std::size_t index)
 {
     return *scenes[index];
 }
-const gd::Layout & Project::GetLayout (unsigned int index) const
+const gd::Layout & Project::GetLayout (std::size_t index) const
 {
     return *scenes[index];
 }
-unsigned int Project::GetLayoutPosition(const gd::String & name) const
+std::size_t Project::GetLayoutPosition(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<scenes.size();++i)
+    for (std::size_t i = 0;i<scenes.size();++i)
     {
         if ( scenes[i]->GetName() == name ) return i;
     }
     return gd::String::npos;
 }
-unsigned int Project::GetLayoutsCount() const
+std::size_t Project::GetLayoutsCount() const
 {
     return scenes.size();
 }
 
 #if defined(GD_IDE_ONLY)
-void Project::SwapLayouts(unsigned int first, unsigned int second)
+void Project::SwapLayouts(std::size_t first, std::size_t second)
 {
     if ( first >= scenes.size() || second >= scenes.size() )
         return;
@@ -261,7 +261,7 @@ void Project::SwapLayouts(unsigned int first, unsigned int second)
 }
 #endif
 
-gd::Layout & Project::InsertNewLayout(const gd::String & name, unsigned int position)
+gd::Layout & Project::InsertNewLayout(const gd::String & name, std::size_t position)
 {
     std::shared_ptr<gd::Layout> newScene = std::shared_ptr<gd::Layout>(new Layout);
     if (position<scenes.size())
@@ -277,7 +277,7 @@ gd::Layout & Project::InsertNewLayout(const gd::String & name, unsigned int posi
     return *newScene;
 }
 
-gd::Layout & Project::InsertLayout(const gd::Layout & layout, unsigned int position)
+gd::Layout & Project::InsertLayout(const gd::Layout & layout, std::size_t position)
 {
     std::shared_ptr<gd::Layout> newScene = std::shared_ptr<gd::Layout>(new Layout(layout));
     if (position<scenes.size())
@@ -313,28 +313,28 @@ const gd::ExternalEvents & Project::GetExternalEvents(const gd::String & name) c
 {
     return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name)));
 }
-gd::ExternalEvents & Project::GetExternalEvents(unsigned int index)
+gd::ExternalEvents & Project::GetExternalEvents(std::size_t index)
 {
     return *externalEvents[index];
 }
-const gd::ExternalEvents & Project::GetExternalEvents (unsigned int index) const
+const gd::ExternalEvents & Project::GetExternalEvents (std::size_t index) const
 {
     return *externalEvents[index];
 }
-unsigned int Project::GetExternalEventsPosition(const gd::String & name) const
+std::size_t Project::GetExternalEventsPosition(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<externalEvents.size();++i)
+    for (std::size_t i = 0;i<externalEvents.size();++i)
     {
         if ( externalEvents[i]->GetName() == name ) return i;
     }
     return gd::String::npos;
 }
-unsigned int Project::GetExternalEventsCount() const
+std::size_t Project::GetExternalEventsCount() const
 {
     return externalEvents.size();
 }
 
-gd::ExternalEvents & Project::InsertNewExternalEvents(const gd::String & name, unsigned int position)
+gd::ExternalEvents & Project::InsertNewExternalEvents(const gd::String & name, std::size_t position)
 {
     std::shared_ptr<gd::ExternalEvents> newExternalEvents(new gd::ExternalEvents);
     if (position<externalEvents.size())
@@ -346,7 +346,7 @@ gd::ExternalEvents & Project::InsertNewExternalEvents(const gd::String & name, u
     return *newExternalEvents;
 }
 
-void Project::InsertExternalEvents(const gd::ExternalEvents & events, unsigned int position)
+void Project::InsertExternalEvents(const gd::ExternalEvents & events, std::size_t position)
 {
     if (position<externalEvents.size())
         externalEvents.insert(externalEvents.begin()+position, std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
@@ -362,7 +362,7 @@ void Project::RemoveExternalEvents(const gd::String & name)
     externalEvents.erase(events);
 }
 
-void Project::SwapExternalEvents(unsigned int first, unsigned int second)
+void Project::SwapExternalEvents(std::size_t first, std::size_t second)
 {
     if ( first >= externalEvents.size() || second >= externalEvents.size() )
         return;
@@ -373,7 +373,7 @@ void Project::SwapExternalEvents(unsigned int first, unsigned int second)
     externalEvents[second] = firstItem;
 }
 
-void Project::SwapExternalLayouts(unsigned int first, unsigned int second)
+void Project::SwapExternalLayouts(std::size_t first, std::size_t second)
 {
     if ( first >= externalLayouts.size() || second >= externalLayouts.size() )
         return;
@@ -396,29 +396,29 @@ const gd::ExternalLayout & Project::GetExternalLayout(const gd::String & name) c
 {
     return *(*find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name)));
 }
-gd::ExternalLayout & Project::GetExternalLayout(unsigned int index)
+gd::ExternalLayout & Project::GetExternalLayout(std::size_t index)
 {
     return *externalLayouts[index];
 }
-const gd::ExternalLayout & Project::GetExternalLayout (unsigned int index) const
+const gd::ExternalLayout & Project::GetExternalLayout (std::size_t index) const
 {
     return *externalLayouts[index];
 }
-unsigned int Project::GetExternalLayoutPosition(const gd::String & name) const
+std::size_t Project::GetExternalLayoutPosition(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<externalLayouts.size();++i)
+    for (std::size_t i = 0;i<externalLayouts.size();++i)
     {
         if ( externalLayouts[i]->GetName() == name ) return i;
     }
     return gd::String::npos;
 }
 
-unsigned int Project::GetExternalLayoutsCount() const
+std::size_t Project::GetExternalLayoutsCount() const
 {
     return externalLayouts.size();
 }
 
-gd::ExternalLayout & Project::InsertNewExternalLayout(const gd::String & name, unsigned int position)
+gd::ExternalLayout & Project::InsertNewExternalLayout(const gd::String & name, std::size_t position)
 {
     std::shared_ptr<gd::ExternalLayout> newExternalLayout = std::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout);
     if (position<externalLayouts.size())
@@ -430,7 +430,7 @@ gd::ExternalLayout & Project::InsertNewExternalLayout(const gd::String & name, u
     return *newExternalLayout;
 }
 
-void Project::InsertExternalLayout(const gd::ExternalLayout & layout, unsigned int position)
+void Project::InsertExternalLayout(const gd::ExternalLayout & layout, std::size_t position)
 {
     std::shared_ptr<gd::ExternalLayout> newLayout(new gd::ExternalLayout(layout));
 
@@ -540,7 +540,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     const SerializerElement & extensionsElement = propElement.GetChild("extensions", 0, "Extensions");
     extensionsElement.ConsiderAsArrayOf("extension", "Extension");
-    for(unsigned int i = 0;i<extensionsElement.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<extensionsElement.GetChildrenCount();++i)
     {
         gd::String extensionName = extensionsElement.GetChild(i).GetStringAttribute("name");
         if ( find(GetUsedExtensions().begin(), GetUsedExtensions().end(), extensionName ) == GetUsedExtensions().end() )
@@ -560,7 +560,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     const SerializerElement & platformsElement = propElement.GetChild("platforms", 0, "Platforms");
     platformsElement.ConsiderAsArrayOf("platform", "Platform");
-    for(unsigned int i = 0;i<platformsElement.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<platformsElement.GetChildrenCount();++i)
     {
         gd::String name = platformsElement.GetChild(i).GetStringAttribute("name");
         //Compatibility code
@@ -654,7 +654,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     const SerializerElement & layoutsElement = element.GetChild("layouts", 0, "Scenes");
     layoutsElement.ConsiderAsArrayOf("layout", "Scene");
-    for(unsigned int i = 0;i<layoutsElement.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<layoutsElement.GetChildrenCount();++i)
     {
         const SerializerElement & layoutElement = layoutsElement.GetChild(i);
 
@@ -676,7 +676,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #if defined(GD_IDE_ONLY)
     const SerializerElement & externalEventsElement = element.GetChild("externalEvents", 0, "ExternalEvents");
     externalEventsElement.ConsiderAsArrayOf("externalEvents", "ExternalEvents");
-    for(unsigned int i = 0;i<externalEventsElement.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<externalEventsElement.GetChildrenCount();++i)
     {
         const SerializerElement & externalEventElement = externalEventsElement.GetChild(i);
 
@@ -688,7 +688,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 
     const SerializerElement & externalLayoutsElement = element.GetChild("externalLayouts", 0, "ExternalLayouts");
     externalLayoutsElement.ConsiderAsArrayOf("externalLayout", "ExternalLayout");
-    for(unsigned int i = 0;i<externalLayoutsElement.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<externalLayoutsElement.GetChildrenCount();++i)
     {
         const SerializerElement & externalLayoutElement = externalLayoutsElement.GetChild(i);
 
@@ -700,7 +700,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #if defined(GD_IDE_ONLY)
     const SerializerElement & externalSourceFilesElement = element.GetChild("externalSourceFiles", 0, "ExternalSourceFiles");
     externalSourceFilesElement.ConsiderAsArrayOf("sourceFile", "SourceFile");
-    for(unsigned int i = 0;i<externalSourceFilesElement.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<externalSourceFilesElement.GetChildrenCount();++i)
     {
         const SerializerElement & sourceFileElement = externalSourceFilesElement.GetChild(i);
 
@@ -890,12 +890,12 @@ void Project::SerializeTo(SerializerElement & element) const
 
     SerializerElement & extensionsElement = propElement.AddChild("extensions");
     extensionsElement.ConsiderAsArrayOf("extension");
-    for (unsigned int i =0;i<GetUsedExtensions().size();++i)
+    for (std::size_t i =0;i<GetUsedExtensions().size();++i)
         extensionsElement.AddChild("extension").SetAttribute("name", GetUsedExtensions()[i]);
 
     SerializerElement & platformsElement = propElement.AddChild("platforms");
     platformsElement.ConsiderAsArrayOf("platform");
-    for (unsigned int i =0;i<platforms.size();++i) {
+    for (std::size_t i =0;i<platforms.size();++i) {
         if (platforms[i] == NULL) {
             std::cout << "ERROR: The project has a platform which is NULL.";
             continue;
@@ -916,22 +916,22 @@ void Project::SerializeTo(SerializerElement & element) const
     element.SetAttribute("firstLayout", firstLayout);
     gd::SerializerElement & layoutsElement = element.AddChild("layouts");
     layoutsElement.ConsiderAsArrayOf("layout");
-    for ( unsigned int i = 0;i < GetLayoutsCount();i++ )
+    for ( std::size_t i = 0;i < GetLayoutsCount();i++ )
         GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
 
     SerializerElement & externalEventsElement = element.AddChild("externalEvents");
     externalEventsElement.ConsiderAsArrayOf("externalEvents");
-    for (unsigned int i =0;i<GetExternalEventsCount();++i)
+    for (std::size_t i =0;i<GetExternalEventsCount();++i)
         GetExternalEvents(i).SerializeTo(externalEventsElement.AddChild("externalEvents"));
 
     SerializerElement & externalLayoutsElement = element.AddChild("externalLayouts");
     externalLayoutsElement.ConsiderAsArrayOf("externalLayout");
-    for (unsigned int i =0;i<externalLayouts.size();++i)
+    for (std::size_t i =0;i<externalLayouts.size();++i)
         externalLayouts[i]->SerializeTo(externalLayoutsElement.AddChild("externalLayout"));
 
     SerializerElement & externalSourceFilesElement = element.AddChild("externalSourceFiles");
     externalSourceFilesElement.ConsiderAsArrayOf("sourceFile");
-    for (unsigned int i =0;i<externalSourceFiles.size();++i)
+    for (std::size_t i =0;i<externalSourceFiles.size();++i)
         externalSourceFiles[i]->SerializeTo(externalSourceFilesElement.AddChild("sourceFile"));
 
     #if defined(GD_IDE_ONLY)
@@ -1001,7 +1001,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     //Add project resources
     std::vector<gd::String> resources = GetResourcesManager().GetAllResourcesList();
-    for ( unsigned int i = 0;i < resources.size() ;i++ )
+    for ( std::size_t i = 0;i < resources.size() ;i++ )
     {
         if ( GetResourcesManager().GetResource(resources[i]).UseFile() )
             worker.ExposeResource(GetResourcesManager().GetResource(resources[i]));
@@ -1011,15 +1011,15 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     #endif
 
     //Add layouts resources
-    for ( unsigned int s = 0;s < GetLayoutsCount();s++ )
+    for ( std::size_t s = 0;s < GetLayoutsCount();s++ )
     {
-        for (unsigned int j = 0;j<GetLayout(s).GetObjectsCount();++j) //Add objects resources
+        for (std::size_t j = 0;j<GetLayout(s).GetObjectsCount();++j) //Add objects resources
         	GetLayout(s).GetObject(j).ExposeResources(worker);
 
         LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
     }
     //Add external events resources
-    for ( unsigned int s = 0;s < GetExternalEventsCount();s++ )
+    for ( std::size_t s = 0;s < GetExternalEventsCount();s++ )
     {
         LaunchResourceWorkerOnEvents(*this, GetExternalEvents(s).GetEvents(), worker);
     }
@@ -1028,7 +1028,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     #endif
 
     //Add global objects resources
-    for (unsigned int j = 0;j<GetObjectsCount();++j) {
+    for (std::size_t j = 0;j<GetObjectsCount();++j) {
         GetObject(j).ExposeResources(worker);
     }
 
@@ -1068,7 +1068,7 @@ void Project::RemoveSourceFile(const gd::String & name)
     externalSourceFiles.erase(sourceFile);
 }
 
-gd::SourceFile & Project::InsertNewSourceFile(const gd::String & name, const gd::String & language, unsigned int position)
+gd::SourceFile & Project::InsertNewSourceFile(const gd::String & name, const gd::String & language, std::size_t position)
 {
     if (HasSourceFile(name, language))
         return GetSourceFile(name);
@@ -1225,28 +1225,28 @@ void Project::Init(const gd::Project & game)
     imageManager->SetGame(this);
 
     GetObjects().clear();
-    for (unsigned int i =0;i<game.GetObjects().size();++i)
+    for (std::size_t i =0;i<game.GetObjects().size();++i)
     	GetObjects().push_back( std::shared_ptr<gd::Object>(game.GetObjects()[i]->Clone()) );
 
     scenes.clear();
-    for (unsigned int i =0;i<game.scenes.size();++i)
+    for (std::size_t i =0;i<game.scenes.size();++i)
     	scenes.push_back( std::shared_ptr<gd::Layout>(new gd::Layout(*game.scenes[i])) );
 
     #if defined(GD_IDE_ONLY)
     externalEvents.clear();
-    for (unsigned int i =0;i<game.externalEvents.size();++i)
+    for (std::size_t i =0;i<game.externalEvents.size();++i)
     	externalEvents.push_back( std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(*game.externalEvents[i])) );
     #endif
 
     externalLayouts.clear();
-    for (unsigned int i =0;i<game.externalLayouts.size();++i)
+    for (std::size_t i =0;i<game.externalLayouts.size();++i)
     	externalLayouts.push_back( std::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout(*game.externalLayouts[i])) );
 
     #if defined(GD_IDE_ONLY)
     useExternalSourceFiles = game.useExternalSourceFiles;
 
     externalSourceFiles.clear();
-    for (unsigned int i =0;i<game.externalSourceFiles.size();++i)
+    for (std::size_t i =0;i<game.externalSourceFiles.size();++i)
     	externalSourceFiles.push_back( std::shared_ptr<gd::SourceFile>(new gd::SourceFile(*game.externalSourceFiles[i])) );
     #endif
 

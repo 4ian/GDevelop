@@ -142,7 +142,7 @@ void ImageManager::LoadPermanentImages()
     std::map < gd::String, std::shared_ptr<SFMLTextureWrapper> > newPermanentlyLoadedImages;
 
     std::vector<gd::String> resources = game->GetResourcesManager().GetAllResourcesList();
-    for ( unsigned int i = 0;i <resources.size();i++ )
+    for ( std::size_t i = 0;i <resources.size();i++ )
     {
         try
         {

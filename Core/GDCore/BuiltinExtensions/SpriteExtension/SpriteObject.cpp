@@ -47,7 +47,7 @@ void SpriteObject::DoUnserializeFrom(gd::Project & project, const gd::Serializer
 {
     const gd::SerializerElement & animationsElement = element.GetChild("animations", 0, "Animations");
     animationsElement.ConsiderAsArrayOf("animation", "Animation");
-    for (unsigned int i = 0; i < animationsElement.GetChildrenCount(); ++i)
+    for (std::size_t i = 0; i < animationsElement.GetChildrenCount(); ++i)
     {
         const gd::SerializerElement & animationElement = animationsElement.GetChild(i);
         Animation newAnimation;
@@ -57,7 +57,7 @@ void SpriteObject::DoUnserializeFrom(gd::Project & project, const gd::Serializer
         //Compatibility with GD <= 3.3
         if (animationElement.HasChild("Direction"))
         {
-            for (unsigned int j = 0; j < animationElement.GetChildrenCount("Direction"); ++j)
+            for (std::size_t j = 0; j < animationElement.GetChildrenCount("Direction"); ++j)
             {
                 Direction direction;
                 direction.UnserializeFrom(animationElement.GetChild("Direction", j));
@@ -71,7 +71,7 @@ void SpriteObject::DoUnserializeFrom(gd::Project & project, const gd::Serializer
         {
             const gd::SerializerElement & directionsElement = animationElement.GetChild("directions");
             directionsElement.ConsiderAsArrayOf("direction");
-            for (unsigned int j = 0; j < directionsElement.GetChildrenCount(); ++j)
+            for (std::size_t j = 0; j < directionsElement.GetChildrenCount(); ++j)
             {
                 Direction direction;
                 direction.UnserializeFrom(directionsElement.GetChild(j));
@@ -91,7 +91,7 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement & element) const
     //Animations
     gd::SerializerElement & animationsElement = element.AddChild("animations");
     animationsElement.ConsiderAsArrayOf("animation");
-    for ( unsigned int k = 0;k < GetAnimationsCount();k++ )
+    for ( std::size_t k = 0;k < GetAnimationsCount();k++ )
     {
         gd::SerializerElement & animationElement = animationsElement.AddChild("animation");
 
@@ -99,7 +99,7 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement & element) const
 
         gd::SerializerElement & directionsElement = animationElement.AddChild("directions");
         directionsElement.ConsiderAsArrayOf("direction");
-        for ( unsigned int l = 0;l < GetAnimation(k).GetDirectionsCount();l++ )
+        for ( std::size_t l = 0;l < GetAnimation(k).GetDirectionsCount();l++ )
         {
             GetAnimation(k).GetDirection(l).SerializeTo(directionsElement.AddChild("direction"));
         }
@@ -108,12 +108,12 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement & element) const
 #if !defined(EMSCRIPTEN)
 void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
-    for ( unsigned int j = 0; j < animations.size();j++ )
+    for ( std::size_t j = 0; j < animations.size();j++ )
     {
         Animation & anim = animations[j];
-        for ( unsigned int k = 0;k < anim.GetDirectionsCount();k++ )
+        for ( std::size_t k = 0;k < anim.GetDirectionsCount();k++ )
         {
-            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpritesCount();l++ )
+            for ( std::size_t l = 0;l < anim.GetDirection(k).GetSpritesCount();l++ )
             {
                 Sprite & sprite = anim.GetDirection(k).GetSprite(l);
 
@@ -128,13 +128,13 @@ const Sprite * SpriteObject::GetInitialInstanceSprite(gd::InitialInstance & inst
     if ( HasNoAnimations() ) return NULL;
 
     //Search the first sprite of the current animation/direction.
-    unsigned int animationId = instance.floatInfos.find("animation") != instance.floatInfos.end() ? instance.floatInfos.find("animation")->second : 0;
+    std::size_t animationId = instance.floatInfos.find("animation") != instance.floatInfos.end() ? instance.floatInfos.find("animation")->second : 0;
     if ( animationId >= GetAnimationsCount() ) animationId = 0;
 
     const Animation & animation = GetAnimation(animationId);
     if ( animation.HasNoDirections() ) return NULL;
 
-    unsigned int directionId = 0;
+    std::size_t directionId = 0;
     if ( animation.useMultipleDirections ) {
 
         float normalizedAngle = static_cast<int>(instance.GetAngle())%360;
@@ -218,11 +218,11 @@ bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thu
 
 void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    for ( unsigned int j = 0; j < GetAnimationsCount();j++ )
+    for ( std::size_t j = 0; j < GetAnimationsCount();j++ )
     {
-        for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsCount();k++ )
+        for ( std::size_t k = 0;k < GetAnimation( j ).GetDirectionsCount();k++ )
         {
-            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesCount();l++ ) {
+            for ( std::size_t l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesCount();l++ ) {
                 worker.ExposeImage(GetAnimation( j ).GetDirection(k).GetSprite(l).GetImageName());
             }
         }
@@ -256,7 +256,7 @@ bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position,
 }
 #endif
 
-const Animation & SpriteObject::GetAnimation(unsigned int nb) const
+const Animation & SpriteObject::GetAnimation(std::size_t nb) const
 {
     if ( nb >= animations.size())
         return badAnimation;
@@ -264,7 +264,7 @@ const Animation & SpriteObject::GetAnimation(unsigned int nb) const
     return animations[nb];
 }
 
-Animation & SpriteObject::GetAnimation(unsigned int nb)
+Animation & SpriteObject::GetAnimation(std::size_t nb)
 {
     if ( nb >= animations.size())
         return badAnimation;
@@ -277,7 +277,7 @@ void SpriteObject::AddAnimation(const Animation & animation)
     animations.push_back(animation);
 }
 
-bool SpriteObject::RemoveAnimation(unsigned int nb)
+bool SpriteObject::RemoveAnimation(std::size_t nb)
 {
     if ( nb >= GetAnimationsCount() )
         return false;
@@ -286,7 +286,7 @@ bool SpriteObject::RemoveAnimation(unsigned int nb)
     return true;
 }
 
-void SpriteObject::SwapAnimations(unsigned int firstIndex, unsigned int secondIndex)
+void SpriteObject::SwapAnimations(std::size_t firstIndex, std::size_t secondIndex)
 {
     if ( firstIndex < animations.size() && secondIndex < animations.size() && firstIndex != secondIndex)
         std::swap(animations[firstIndex], animations[secondIndex]);

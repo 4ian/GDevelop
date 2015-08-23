@@ -83,7 +83,7 @@ gd::String CppCodeEvent::GenerateAssociatedFileCode() const
     gd::String output;
     if (passSceneAsParameter ) output += "#include \"GDCpp/RuntimeScene.h\"\n";
     if (passObjectListAsParameter ) output += "#include \"GDCpp/Object.h\"\n";
-    for (unsigned int i = 0;i<includeFiles.size();++i) output += "#include "+includeFiles[i]+"\n";
+    for (std::size_t i = 0;i<includeFiles.size();++i) output += "#include "+includeFiles[i]+"\n";
 
     output += functionPrototype+"\n";
     output += "{\n";
@@ -195,12 +195,12 @@ void CppCodeEvent::SerializeTo(gd::SerializerElement & element) const
 
     gd::SerializerElement & includesElement = element.AddChild("includes");
     includesElement.ConsiderAsArrayOf("include");
-    for ( unsigned int i = 0;i < includeFiles.size();++i)
+    for ( std::size_t i = 0;i < includeFiles.size();++i)
         includesElement.AddChild("include").SetValue(includeFiles[i]);
 
     gd::SerializerElement & dependenciesElement = element.AddChild("dependencies");
     dependenciesElement.ConsiderAsArrayOf("dependency");
-    for ( unsigned int i = 0;i < dependencies.size();++i)
+    for ( std::size_t i = 0;i < dependencies.size();++i)
         dependenciesElement.AddChild("dependency").SetAttribute("sourceFile", dependencies[i]);
 
 }
@@ -223,13 +223,13 @@ void CppCodeEvent::UnserializeFrom(gd::Project & project, const gd::SerializerEl
     includeFiles.clear();
     gd::SerializerElement & includesElement = element.GetChild("includes", 0, "Includes");
     includesElement.ConsiderAsArrayOf("include", "Include");
-    for ( unsigned int i = 0;i < includesElement.GetChildrenCount();++i)
+    for ( std::size_t i = 0;i < includesElement.GetChildrenCount();++i)
         includeFiles.push_back(includesElement.GetChild(i).GetValue().GetString());
 
     dependencies.clear();
     gd::SerializerElement & dependenciesElement = element.GetChild("dependencies", 0, "Dependencies");
     dependenciesElement.ConsiderAsArrayOf("dependency", "Dependency");
-    for ( unsigned int i = 0;i < dependenciesElement.GetChildrenCount();++i)
+    for ( std::size_t i = 0;i < dependenciesElement.GetChildrenCount();++i)
         dependencies.push_back(dependenciesElement.GetChild(i).GetStringAttribute("sourceFile"));
 }
 

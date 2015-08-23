@@ -6,6 +6,7 @@ This project is released under the MIT License.
 */
 
 #include <memory>
+#include <cmath>
 #include "PathBehavior.h"
 #include "PathBehaviorEditor.h"
 #include "GDCpp/Scene.h"
@@ -402,7 +403,7 @@ std::vector<sf::Vector2f> PathBehavior::GetCoordsVectorFromString(const gd::Stri
 
 float PathBehavior::GetAngleOfSegment(sf::Vector2f &seg)
 {
-    float norm = abs(sqrtf(pow(seg.x, 2) + pow(seg.y,2)));
+    float norm = std::abs(sqrtf(pow(seg.x, 2) + pow(seg.y,2)));
 
     if(seg.y >= 0)
     {

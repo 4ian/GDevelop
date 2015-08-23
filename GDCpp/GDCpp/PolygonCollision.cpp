@@ -111,7 +111,7 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
         }
 
         float dist = distance(minA, maxA, minB, maxB);
-        dist = abs(dist);
+        dist = std::abs(dist);
 
         if (dist < min_dist)
         {

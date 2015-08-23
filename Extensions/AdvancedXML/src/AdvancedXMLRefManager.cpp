@@ -132,7 +132,7 @@ namespace AdvancedXML
         std::vector<gd::String> pathArgs = path.Split('/');
         TiXmlNode *currentNode = baseNode;
 
-        for(unsigned int a = 0;
+        for(std::size_t a = 0;
             a < pathArgs.size() && currentNode;
             a++)
         {

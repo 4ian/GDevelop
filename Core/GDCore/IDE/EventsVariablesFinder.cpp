@@ -61,7 +61,7 @@ public:
     void SearchInParameters(const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         gd::String lastObjectParameter = "";
-        for (unsigned int i = 0;i<parameters.size();++i)
+        for (std::size_t i = 0;i<parameters.size();++i)
         {
             if (i >= expressionInfo.parameters.size()) break;
 
@@ -88,7 +88,7 @@ std::set < gd::String > EventsVariablesFinder::FindAllGlobalVariables(const gd::
 {
     std::set < gd::String > results;
 
-    for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
+    for (std::size_t i = 0;i<project.GetLayoutsCount();++i)
     {
         std::set < gd::String > results2 = FindArgumentsInEvents(platform, project, project.GetLayout(i), project.GetLayout(i).GetEvents(), "globalvar");
         results.insert(results2.begin(), results2.end());
@@ -123,12 +123,12 @@ std::set < gd::String > EventsVariablesFinder::FindArgumentsInInstructions(const
 {
     std::set < gd::String > results;
 
-    for (unsigned int aId = 0;aId < instructions.size();++aId)
+    for (std::size_t aId = 0;aId < instructions.size();++aId)
     {
         gd::String lastObjectParameter = "";
         gd::InstructionMetadata instrInfos = instructionsAreConditions ? MetadataProvider::GetConditionMetadata(platform, instructions[aId].GetType()) :
                                                                          MetadataProvider::GetActionMetadata(platform, instructions[aId].GetType());
-        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+        for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //The parameter has the searched type...
             if ( instrInfos.parameters[pNb].type == parameterType )
@@ -173,17 +173,17 @@ std::set < gd::String > EventsVariablesFinder::FindArgumentsInEvents(const gd::P
     const gd::String & parameterType, const gd::String & objectName)
 {
     std::set < gd::String > results;
-    for (unsigned int i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();++i)
     {
         vector < const gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
-        for (unsigned int j = 0;j < conditionsVectors.size();++j)
+        for (std::size_t j = 0;j < conditionsVectors.size();++j)
         {
             std::set < gd::String > results2 = FindArgumentsInInstructions(platform, project, layout, *conditionsVectors[j], /*conditions=*/true, parameterType, objectName);
             results.insert(results2.begin(), results2.end());
         }
 
         vector < const gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
-        for (unsigned int j = 0;j < actionsVectors.size();++j)
+        for (std::size_t j = 0;j < actionsVectors.size();++j)
         {
             std::set < gd::String > results2 = FindArgumentsInInstructions(platform, project, layout, *actionsVectors[j], /*conditions=*/false, parameterType, objectName);
             results.insert(results2.begin(), results2.end());

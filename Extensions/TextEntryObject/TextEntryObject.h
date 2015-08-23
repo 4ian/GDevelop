@@ -57,9 +57,9 @@ public :
     virtual RuntimeObject * Clone() const { return new RuntimeTextEntryObject(*this);}
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+    virtual std::size_t GetNumberOfProperties() const;
     #endif
 
     virtual void UpdateTime(float);

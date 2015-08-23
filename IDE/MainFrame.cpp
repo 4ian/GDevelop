@@ -291,7 +291,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     #endif
 
     //Update the file menu with exporting items
-    for (unsigned int i = 0;i<gd::PlatformManager::Get()->GetAllPlatforms().size();++i)
+    for (std::size_t i = 0;i<gd::PlatformManager::Get()->GetAllPlatforms().size();++i)
     {
         std::shared_ptr<gd::ProjectExporter> exporter = gd::PlatformManager::Get()->GetAllPlatforms()[i]->GetProjectExporter();
         if ( exporter != std::shared_ptr<gd::ProjectExporter>()
@@ -487,7 +487,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     //Construct the lightweight wrapper used by editors to access to the main frame.
     mainFrameWrapper = gd::MainFrameWrapper(ribbon, ribbonSceneEditorButtonBar, this, &m_mgr, editorsNotebook, infoBar, &scenesLockingShortcuts, wxGetCwd());
     mainFrameWrapper.AddControlToBeDisabledOnPreview(projectManager);
-    for (unsigned int i = 0;i<controlsToBeDisabledOnPreview.size();++i) mainFrameWrapper.AddControlToBeDisabledOnPreview(controlsToBeDisabledOnPreview[i]);
+    for (std::size_t i = 0;i<controlsToBeDisabledOnPreview.size();++i) mainFrameWrapper.AddControlToBeDisabledOnPreview(controlsToBeDisabledOnPreview[i]);
 
     SetSize(900,740);
     Center();
@@ -513,7 +513,7 @@ MainFrame::~MainFrame()
 
 /** Change current project
   */
-void MainFrame::SetCurrentGame(unsigned int i, bool refreshProjectManager)
+void MainFrame::SetCurrentGame(std::size_t i, bool refreshProjectManager)
 {
     projectCurrentlyEdited = i;
     if ( i >= games.size())
@@ -574,7 +574,7 @@ void MainFrame::OnRibbonCppToolsClicked(wxRibbonButtonBarEvent& evt)
  */
 void MainFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt)
 {
-    for (unsigned int i = 0;i<editorsNotebook->GetPageCount();++i)
+    for (std::size_t i = 0;i<editorsNotebook->GetPageCount();++i)
     {
     	if ( dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(i)) != NULL )
     	{
@@ -596,7 +596,7 @@ void MainFrame::UpdateOpenedProjectsLogFile()
     if ( !projectsLogFile.IsOpened() ) return;
     projectsLogFile.Clear();
 
-    for(unsigned int i = 0;i<games.size();++i)
+    for(std::size_t i = 0;i<games.size();++i)
         projectsLogFile.AddLine(games[i]->GetProjectFile());
 
     projectsLogFile.Write();
@@ -608,7 +608,7 @@ void MainFrame::UpdateOpenedProjectsLogFile()
  */
 void MainFrame::OnClose( wxCloseEvent& event )
 {
-    for(unsigned int i = 0;i<games.size();++i) {
+    for(std::size_t i = 0;i<games.size();++i) {
         if ( games[i]->IsDirty() ) {
             wxString fullMessage = wxString::Format(wxString(_("Project \"%s\" has been changed.\n\n")), games[i]->GetName().ToWxString());
             fullMessage += wxString::Format(wxString(_("Do you want to save it in %s?")), games[i]->GetProjectFile().ToWxString());
@@ -803,7 +803,7 @@ void MainFrame::PrepareAutosave()
  */
 void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
 {
-    for (unsigned int i = 0;i<games.size();++i)
+    for (std::size_t i = 0;i<games.size();++i)
     {
         wxFileName filename(games[i]->GetProjectFile());
         if (games[i]->GetProjectFile().empty()) continue;

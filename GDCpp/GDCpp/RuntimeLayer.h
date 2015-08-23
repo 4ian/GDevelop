@@ -138,22 +138,22 @@ public:
     /**
      * Get cameras count.
      */
-    inline unsigned int GetCameraCount() const { return cameras.size(); };
+    inline std::size_t GetCameraCount() const { return cameras.size(); };
 
     /**
      * Return a reference to a camera
      */
-    inline const RuntimeCamera & GetCamera(unsigned int n) const { return cameras[n]; }
+    inline const RuntimeCamera & GetCamera(std::size_t n) const { return cameras[n]; }
 
     /**
      * Return a reference to a camera
      */
-    inline RuntimeCamera & GetCamera(unsigned int n) { return cameras[n]; }
+    inline RuntimeCamera & GetCamera(std::size_t n) { return cameras[n]; }
 
     /**
      * Delete a specific camera.
      */
-    inline void DeleteCamera(unsigned int n) { if ( n < cameras.size() ) cameras.erase(cameras.begin()+n); }
+    inline void DeleteCamera(std::size_t n) { if ( n < cameras.size() ) cameras.erase(cameras.begin()+n); }
 
     /**
      * Add an already existing camera.

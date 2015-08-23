@@ -132,6 +132,6 @@ void ExternalEventsEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
     parentSceneComboBox->Clear();
     parentSceneComboBox->Append(_("No scene"));
 
-    for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
+    for (std::size_t i = 0;i<game.GetLayoutsCount();++i)
     	parentSceneComboBox->Append(game.GetLayout(i).GetName());
 }

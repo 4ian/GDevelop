@@ -56,14 +56,14 @@ public:
      *
      * \note If index is invalid, an empty variable is returned.
      */
-    std::pair<gd::String, gd::Variable> & Get(unsigned int index);
+    std::pair<gd::String, gd::Variable> & Get(std::size_t index);
 
     /**
      * \brief Return a pair containing the name and the variable at position \index in the container.
      *
      * \note If index is invalid, an empty variable is returned.
      */
-    const std::pair<gd::String, gd::Variable> & Get(unsigned int index) const;
+    const std::pair<gd::String, gd::Variable> & Get(std::size_t index) const;
 
     /**
      * Must add a new variable constructed from the variable passed as parameter.
@@ -72,18 +72,18 @@ public:
      * \param position Insertion position. If the position is invalid, the variable is inserted at the end of the variable list.
      * \return Reference to the newly added variable
      */
-    Variable & Insert(const gd::String & name, const Variable & variable, unsigned int position);
+    Variable & Insert(const gd::String & name, const Variable & variable, std::size_t position);
 
     /**
      * \brief Return the number of variables.
      */
-    unsigned int Count() const { return variables.size(); };
+    std::size_t Count() const { return variables.size(); };
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief return the position of the variable called "name" in the variable list
      */
-    unsigned int GetPosition(const gd::String & name) const;
+    std::size_t GetPosition(const gd::String & name) const;
 
     /**
      * \brief Add a new empty variable at the specified position in the container.
@@ -91,7 +91,7 @@ public:
      * \param position Insertion position. If the position is invalid, the variable is inserted at the end of the variable list.
      * \return Reference to the newly added variable
      */
-    Variable & InsertNew(const gd::String & name, unsigned int position = -1);
+    Variable & InsertNew(const gd::String & name, std::size_t position = -1);
 
     /**
      * \brief Remove the specified variable from the container.
@@ -106,7 +106,7 @@ public:
     /**
      * \brief Swap the position of the specified variables.
      */
-    void Swap(unsigned int firstVariableIndex, unsigned int secondVariableIndex);
+    void Swap(std::size_t firstVariableIndex, std::size_t secondVariableIndex);
     #endif
 
     /**

@@ -85,9 +85,9 @@ bool GDevelopIDEApp::OnInit()
 #endif
 #ifdef WINDOWS
     wxString exeDirectory = argv[0]; //Make sure current working directory is executable directory.
-    unsigned int backslashpos = exeDirectory.find_last_of( "\\" );
+    std::size_t backslashpos = exeDirectory.find_last_of( "\\" );
     if ( backslashpos > exeDirectory.length() ) backslashpos = 0;
-    unsigned int slashpos = exeDirectory.find_last_of( "/" );
+    std::size_t slashpos = exeDirectory.find_last_of( "/" );
     if ( slashpos > exeDirectory.length() ) slashpos = 0;
 
     exeDirectory = exeDirectory.substr( 0, slashpos > backslashpos ? slashpos : backslashpos );
@@ -125,7 +125,7 @@ bool GDevelopIDEApp::OnInit()
     SetAppDisplayName("GDevelop IDE");
 
     std::vector<gd::String> filesToOpen;
-    for (unsigned int i = 0;i<parser.GetParamCount();++i)
+    for (std::size_t i = 0;i<parser.GetParamCount();++i)
     {
         filesToOpen.push_back(parser.GetParam(i));
     }
@@ -177,7 +177,7 @@ bool GDevelopIDEApp::OnInit()
 
         //Retrieve selected language
         int languageId = wxLANGUAGE_DEFAULT;
-        for (unsigned int i = 0;i<languagesAvailables.size();++i)
+        for (std::size_t i = 0;i<languagesAvailables.size();++i)
         {
             if ( wxLocale::FindLanguageInfo(languagesAvailables[i])->CanonicalName == wantedLanguage )
                 languageId = wxLocale::FindLanguageInfo(languagesAvailables[i])->Language;
@@ -203,7 +203,7 @@ bool GDevelopIDEApp::OnInit()
 
             if ( connection )
             {
-                for (unsigned int i = 0; i < filesToOpen.size(); ++i)
+                for (std::size_t i = 0; i < filesToOpen.size(); ++i)
                     connection->Execute(filesToOpen[i]);
 
                 connection->Disconnect();
@@ -263,7 +263,7 @@ bool GDevelopIDEApp::OnInit()
         BugReport dialog(NULL, openedFiles);
         if ( dialog.ShowModal() == 1 )
         {
-            for (unsigned int i = 0; i < openedFiles.size(); ++i)
+            for (std::size_t i = 0; i < openedFiles.size(); ++i)
             {
                 if ( wxFileExists(openedFiles[i]+".autosave") )
                     filesToOpen.push_back(openedFiles[i]+".autosave");
@@ -330,7 +330,7 @@ bool GDevelopIDEApp::OnInit()
     SetTopWindow( mainEditor );
 
     //Open files
-    for (unsigned int i = 0;i<filesToOpen.size();++i)
+    for (std::size_t i = 0;i<filesToOpen.size();++i)
         mainEditor->Open(filesToOpen[i]);
 
     cout << "* Connecting shortcuts" << endl;
@@ -460,7 +460,7 @@ void GDevelopIDEApp::OnUnhandledException()
 
     try
     {
-        for (unsigned int i = 0;i<mainEditor->games.size();++i)
+        for (std::size_t i = 0;i<mainEditor->games.size();++i)
             mainEditor->games[i]->SaveToFile("gameDump"+gd::String::From(i)+".gdg");
     }
     catch(...)
@@ -483,7 +483,7 @@ bool GDevelopIDEApp::OnExceptionInMainLoop()
 
     try
     {
-        for (unsigned int i = 0;i<mainEditor->games.size();++i)
+        for (std::size_t i = 0;i<mainEditor->games.size();++i)
             mainEditor->games[i]->SaveToFile("gameDump"+gd::String::From(i)+".gdg");
     }
     catch(...)

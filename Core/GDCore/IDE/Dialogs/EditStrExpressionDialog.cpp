@@ -168,7 +168,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, gd::String ex
 
     //Insert extension objects expressions
     const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (std::size_t i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
 	    if ( find(project.GetUsedExtensions().begin(),
@@ -181,7 +181,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, gd::String ex
 
         wxTreeItemId extensionItem = ObjList->GetRootItem();
 
-	    for(unsigned int j = 0;j<objectsTypes.size();++j)
+	    for(std::size_t j = 0;j<objectsTypes.size();++j)
 	    {
             wxTreeItemId objectTypeItem =   objectsTypes[j] == "" ?
                                             ObjList->AppendItem(extensionItem, _("All objects"), 0) :
@@ -216,7 +216,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, gd::String ex
             }
 	    }
 
-	    for(unsigned int j = 0;j<behaviorsTypes.size();++j)
+	    for(std::size_t j = 0;j<behaviorsTypes.size();++j)
 	    {
             wxTreeItemId behaviorTypeItem =   behaviorsTypes[j] == "" ?
                                             ObjList->AppendItem(extensionItem, _("All objects"), 0) :
@@ -298,7 +298,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, gd::String ex
 
     //Prepare keyword highlighting
     gd::String keywords;
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (std::size_t i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
 	    if ( find(project.GetUsedExtensions().begin(),
@@ -317,7 +317,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, gd::String ex
 
         //Add keywords of objects expressions
 	    std::vector<gd::String> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-        for (unsigned int j = 0;j<objectsTypes.size();++j)
+        for (std::size_t j = 0;j<objectsTypes.size();++j)
         {
             const std::map<gd::String, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
             for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
@@ -330,7 +330,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, gd::String ex
 
         //Add keywords of behaviors expressions
 	    std::vector<gd::String> behaviorsTypes = extensions[i]->GetBehaviorsTypes();
-        for (unsigned int j = 0;j<behaviorsTypes.size();++j)
+        for (std::size_t j = 0;j<behaviorsTypes.size();++j)
         {
             const std::map<gd::String, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForBehavior(behaviorsTypes[j]);
             for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
@@ -543,7 +543,7 @@ void EditStrExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
         if ( cancelled ) return;
 
         gd::String parametersStr, behaviorStr;
-        for (unsigned int i = 1;i<infos->GetExpressionMetadata().parameters.size();++i)
+        for (std::size_t i = 1;i<infos->GetExpressionMetadata().parameters.size();++i)
         {
             if ( i == 1 && infos->GetExpressionMetadata().parameters[i].type == "behavior")
             {
@@ -587,7 +587,7 @@ void EditStrExpressionDialog::OnAddFunctionBtClick(wxCommandEvent& event)
         bool cancelled = false;
 
         gd::String parametersStr;
-        for (unsigned int i = 0;i<infos->GetExpressionMetadata().parameters.size();++i)
+        for (std::size_t i = 0;i<infos->GetExpressionMetadata().parameters.size();++i)
         {
             if ( !parametersStr.empty() ) parametersStr += ",";
             parametersStr += ShowParameterDialog(infos->GetExpressionMetadata().parameters[i], cancelled);

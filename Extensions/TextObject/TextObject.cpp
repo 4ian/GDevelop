@@ -343,7 +343,7 @@ void RuntimeTextObject::SetSmooth(bool smooth)
 }
 
 #if defined(GD_IDE_ONLY)
-void RuntimeTextObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeTextObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Text");                     value = GetString();}
     else if ( propertyNb == 1 ) {name = _("Font");                    value = GetFontFilename();}
@@ -353,7 +353,7 @@ void RuntimeTextObject::GetPropertyForDebugger(unsigned int propertyNb, gd::Stri
     else if ( propertyNb == 5 ) {name = _("Smoothing");       value = smoothed ? _("Yes") : _("No");}
 }
 
-bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeTextObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
     else if ( propertyNb == 1 ) { ChangeFont(newValue); }
@@ -389,7 +389,7 @@ bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, gd::String newVa
     return true;
 }
 
-unsigned int RuntimeTextObject::GetNumberOfProperties() const
+std::size_t RuntimeTextObject::GetNumberOfProperties() const
 {
     return 6;
 }

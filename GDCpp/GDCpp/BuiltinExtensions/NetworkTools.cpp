@@ -399,7 +399,7 @@ namespace
         }
         else if ( jsonStr[pos] == '[' ) //Array are translated into child named 0,1,2...
         {
-            unsigned int index = 0;
+            std::size_t index = 0;
             while ( index == 0 || jsonStr[pos] == ',' )
             {
                 pos++;

@@ -67,7 +67,7 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
 
 RuntimeScene::~RuntimeScene()
 {
-	for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
+	for (std::size_t i = 0;i<game->GetUsedExtensions().size();++i)
     {
         std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
         std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
@@ -220,11 +220,11 @@ void RuntimeScene::Render()
     renderWindow->setActive();
 
     //Draw layer by layer
-    for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
+    for (std::size_t layerIndex =0;layerIndex<layers.size();++layerIndex)
     {
         if ( layers[layerIndex].GetVisibility() )
         {
-            for (unsigned int cameraIndex = 0;cameraIndex < layers[layerIndex].GetCameraCount();++cameraIndex)
+            for (std::size_t cameraIndex = 0;cameraIndex < layers[layerIndex].GetCameraCount();++cameraIndex)
             {
                 RuntimeCamera & camera = layers[layerIndex].GetCamera(cameraIndex);
 
@@ -247,7 +247,7 @@ void RuntimeScene::Render()
                 renderWindow->setView(camera.GetSFMLView());
 
                 //Rendering all objects
-                for (unsigned int id = 0;id < allObjects.size();++id)
+                for (std::size_t id = 0;id < allObjects.size();++id)
                 {
                     if (allObjects[id]->GetLayer() == layers[layerIndex].GetName())
                         allObjects[id]->Draw(*renderWindow);
@@ -278,7 +278,7 @@ bool RuntimeScene::UpdateTime()
     timeFromStart += elapsedTime;
     pauseTime = 0;
 
-    for (unsigned int i =0;i<timers.size();++i)
+    for (std::size_t i =0;i<timers.size();++i)
         timers[i].UpdateTime(elapsedTime);
 
     return true;
@@ -300,7 +300,7 @@ bool RuntimeScene::OrderObjectsByZOrder(RuntimeObjList & objList)
 
 RuntimeLayer & RuntimeScene::GetRuntimeLayer(const gd::String & name)
 {
-    for (unsigned int i = 0;i<layers.size();++i)
+    for (std::size_t i = 0;i<layers.size();++i)
     {
         if ( layers[i].GetName() == name )
             return layers[i];
@@ -313,11 +313,11 @@ void RuntimeScene::ManageObjectsAfterEvents()
 {
     //Delete objects that were removed.
     RuntimeObjList allObjects = objectsInstances.GetAllObjects();
-    for (unsigned int id = 0;id<allObjects.size();++id)
+    for (std::size_t id = 0;id<allObjects.size();++id)
     {
     	if ( allObjects[id]->GetName().empty() )
         {
-            for (unsigned int i = 0;i<extensionsToBeNotifiedOnObjectDeletion.size();++i)
+            for (std::size_t i = 0;i<extensionsToBeNotifiedOnObjectDeletion.size();++i)
                 extensionsToBeNotifiedOnObjectDeletion[i]->ObjectDeletedFromScene(*this, allObjects[id].get());
 
             objectsInstances.RemoveObject(allObjects[id]); //Remove from objects instances, not from the temporary list!
@@ -326,7 +326,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
 
     //Update objects positions, forces and behaviors
     allObjects = objectsInstances.GetAllObjects();
-    for (unsigned int id = 0;id<allObjects.size();++id)
+    for (std::size_t id = 0;id<allObjects.size();++id)
     {
         allObjects[id]->SetX( allObjects[id]->GetX() + ( allObjects[id]->TotalForceX() * static_cast<double>(GetElapsedTime())/1000000.0 ));
         allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * static_cast<double>(GetElapsedTime())/1000000.0 ));
@@ -339,7 +339,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
 void RuntimeScene::ManageObjectsBeforeEvents()
 {
     RuntimeObjList allObjects = objectsInstances.GetAllObjects();
-    for (unsigned int id = 0;id<allObjects.size();++id)
+    for (std::size_t id = 0;id<allObjects.size();++id)
         allObjects[id]->DoBehaviorsPreEvents(*this);
 }
 
@@ -445,7 +445,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     std::cout << ".";
     layers.clear();
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
-    for (unsigned int i = 0;i<GetLayersCount();++i) {
+    for (std::size_t i = 0;i<GetLayersCount();++i) {
         layers.push_back(RuntimeLayer(GetLayer(i), defaultView));
     }
 
@@ -459,7 +459,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     std::cout << ".";
     //Extensions specific initialization
-	for (unsigned int i = 0;i<game->GetUsedExtensions().size();++i)
+	for (std::size_t i = 0;i<game->GetUsedExtensions().size();++i)
     {
         std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
         std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);

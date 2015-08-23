@@ -351,7 +351,7 @@ PathBehaviorEditor::PathBehaviorEditor(wxWindow* parent, gd::Project & game_, gd
 
     //Loading paths from the object
     std::vector<gd::String> listOfPathsNames = behavior.GetListOfPathsNames();
-    for(unsigned int a = 0; a < listOfPathsNames.size(); a++)
+    for(std::size_t a = 0; a < listOfPathsNames.size(); a++)
     {
         PathInfo newPathInfo;
 
@@ -586,7 +586,7 @@ void PathBehaviorEditor::OnPanel1Paint(wxPaintEvent& event)
 
     //Draw lines between points
     std::vector<wxPoint> points;
-    for(unsigned int a = 0; a < path->size(); a++)
+    for(std::size_t a = 0; a < path->size(); a++)
     {
         points.push_back(wxPoint(path->at(a).x - previewPnlState.offset.x,
                                  path->at(a).y - previewPnlState.offset.y));
@@ -598,7 +598,7 @@ void PathBehaviorEditor::OnPanel1Paint(wxPaintEvent& event)
     wxBitmap point(gd::CommonBitmapManager::Get()->point);
 
     //Draw points
-    for(unsigned int a = 0; a < path->size(); a++)
+    for(std::size_t a = 0; a < path->size(); a++)
     {
         dc.DrawBitmap(point,
                     path->at(a).x-point.GetWidth()/2  - previewPnlState.offset.x,
@@ -851,7 +851,7 @@ int PathBehaviorEditor::GetPointOnMouse(wxMouseEvent& event)
     sf::Vector2f posOfMouse = sf::Vector2f(event.GetPosition().x + previewPnlState.offset.x,
                                            event.GetPosition().y + previewPnlState.offset.y);
 
-    for(unsigned int a = 0; a < path->size(); a++)
+    for(std::size_t a = 0; a < path->size(); a++)
     {
         int pointPosX = path->at(a).x;
         int pointPosY = path->at(a).y;
@@ -874,7 +874,7 @@ int PathBehaviorEditor::GetSegmentOnMouse(wxMouseEvent& event)
     sf::Vector2f posOfMouse = sf::Vector2f(event.GetPosition().x + previewPnlState.offset.x,
                                            event.GetPosition().y + previewPnlState.offset.y);
 
-    for(unsigned int a = 0; a < path->size() - 1; a++)
+    for(std::size_t a = 0; a < path->size() - 1; a++)
     {
         int pointPosX1 = path->at(a).x;
         int pointPosY1 = path->at(a).y;

@@ -136,8 +136,8 @@ void ChooseObjectDialog::Refresh()
 void ChooseObjectDialog::OnChoisirBtClick(wxCommandEvent& event)
 {
     wxArrayTreeItemIds selectionIds;
-    unsigned int count = objectsList->GetSelections(selectionIds);
-    for (unsigned int i = 0;i<count;++i)
+    std::size_t count = objectsList->GetSelections(selectionIds);
+    for (std::size_t i = 0;i<count;++i)
         objectsChosen.push_back(objectsList->GetItemText( selectionIds.Item(i) ));
 
     objectChosen = !objectsChosen.empty() ? objectsChosen[0] : "";

@@ -66,7 +66,7 @@ public:
     virtual ~MainFrame();
 
     vector < std::shared_ptr<gd::Project> > games; ///< All games opened
-    unsigned int projectCurrentlyEdited; ///< Index of the current game ( "Current" means chosen in the project manager )
+    std::size_t projectCurrentlyEdited; ///< Index of the current game ( "Current" means chosen in the project manager )
 
     /**
      * Get a shared pointer to the current game ( "Current" means choosen in the project manager )
@@ -91,7 +91,7 @@ public:
     /**
      *  \briefChange the current game
      */
-    void SetCurrentGame(unsigned int i, bool refreshProjectManager = true);
+    void SetCurrentGame(std::size_t i, bool refreshProjectManager = true);
 
     /**
      *  \brief Open a game from its filename

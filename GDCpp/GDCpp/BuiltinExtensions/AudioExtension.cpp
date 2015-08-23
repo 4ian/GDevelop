@@ -75,7 +75,7 @@ void AudioExtension::ExposeActionsResources(gd::Instruction & action, gd::Arbitr
     }
 }
 
-void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const
+void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if ( propertyNb == 0 )
     {
@@ -84,7 +84,7 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
     }
     else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3 )
     {
-        unsigned int soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
+        std::size_t soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
         if (soundNb >= SoundManager::Get()->sounds.size()) return;
 
         if ( propertyNb % 3 == 1)
@@ -115,7 +115,7 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
     }
     else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3+SoundManager::Get()->musics.size()*3 )
     {
-        unsigned int musicNb = ((propertyNb-1-SoundManager::Get()->sounds.size()*3)-(propertyNb-1-SoundManager::Get()->sounds.size()*3)%3)/3;
+        std::size_t musicNb = ((propertyNb-1-SoundManager::Get()->sounds.size()*3)-(propertyNb-1-SoundManager::Get()->sounds.size()*3)%3)/3;
         if (musicNb >= SoundManager::Get()->musics.size()) return;
 
         if ( propertyNb % 3 == 1)
@@ -145,7 +145,7 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
     }
 }
 
-bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue)
+bool AudioExtension::ChangeProperty(RuntimeScene & scene, std::size_t propertyNb, gd::String newValue)
 {
     if ( propertyNb == 0 )
     {
@@ -154,7 +154,7 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyN
     }
     else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3 )
     {
-        unsigned int soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
+        std::size_t soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
         if (soundNb >= SoundManager::Get()->sounds.size()) return false;
 
         if ( propertyNb % 3 == 1)
@@ -179,7 +179,7 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyN
     }
     else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3+SoundManager::Get()->musics.size()*3 )
     {
-        unsigned int musicNb = ((propertyNb-1-SoundManager::Get()->sounds.size()*3)-(propertyNb-1-SoundManager::Get()->sounds.size()*3)%3)/3;
+        std::size_t musicNb = ((propertyNb-1-SoundManager::Get()->sounds.size()*3)-(propertyNb-1-SoundManager::Get()->sounds.size()*3)%3)/3;
         if (musicNb >= SoundManager::Get()->musics.size()) return false;
 
         if ( propertyNb % 3 == 1)
@@ -206,7 +206,7 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyN
     return false;
 }
 
-unsigned int AudioExtension::GetNumberOfProperties(RuntimeScene & scene) const
+std::size_t AudioExtension::GetNumberOfProperties(RuntimeScene & scene) const
 {
     return 1+SoundManager::Get()->musics.size()*3+SoundManager::Get()->sounds.size()*3;
 }

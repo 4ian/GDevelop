@@ -176,7 +176,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<gd::String> & openedFi
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&BugReport::OnCloseBtClick);
     //*)
 
-    for (unsigned int i = 0; i < openedFiles.size(); ++i)
+    for (std::size_t i = 0; i < openedFiles.size(); ++i)
     {
         gd::String file = openedFiles[i];
         if (!wxFileExists(file+".autosave"))

@@ -46,7 +46,7 @@ public:
      * \brief Set the code to preprocess the event.
      */
     EventMetadata & SetPreprocessing(std::function<void(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
-        gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)> function) {
+        gd::EventsList & eventList, std::size_t indexOfTheEventInThisList)> function) {
         preprocessing = function;
         return *this;
     }
@@ -91,7 +91,7 @@ public:
     std::function<gd::String(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
         gd::EventsCodeGenerationContext & context)> codeGeneration;
     std::function<void(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
-        gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)> preprocessing;
+        gd::EventsList & eventList, std::size_t indexOfTheEventInThisList)> preprocessing;
 };
 
 }

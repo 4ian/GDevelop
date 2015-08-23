@@ -73,7 +73,7 @@ public:
     /**
      * \brief Return the number of instances
      */
-    unsigned int GetInstancesCount() const;
+    std::size_t GetInstancesCount() const;
 
     /**
      * \brief Apply \a func to each instance of the container.

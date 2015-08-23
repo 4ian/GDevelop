@@ -189,7 +189,7 @@ void SoundObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFram
 #endif
 }
 
-void RuntimeSoundObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeSoundObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Sound level");                    value = gd::String::From(GetVolume());}
     else if ( propertyNb == 1 ) {name = _("Minimal distance");         value = gd::String::From(GetMinDistance());}
@@ -198,7 +198,7 @@ void RuntimeSoundObject::GetPropertyForDebugger(unsigned int propertyNb, gd::Str
     else if ( propertyNb == 4 ) {name = _("Z Position");                          value = gd::String::From(GetZPos());}
 }
 
-bool RuntimeSoundObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeSoundObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if(propertyNb == 0) {SetVolume(newValue.To<float>());}
     else if (propertyNb == 1) {SetMinDistance(newValue.To<float>());}
@@ -208,7 +208,7 @@ bool RuntimeSoundObject::ChangeProperty(unsigned int propertyNb, gd::String newV
     return true;
 }
 
-unsigned int RuntimeSoundObject::GetNumberOfProperties() const
+std::size_t RuntimeSoundObject::GetNumberOfProperties() const
 {
     return 5;
 }

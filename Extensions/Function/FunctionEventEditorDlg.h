@@ -18,61 +18,61 @@
 
 class FunctionEventEditorDlg: public wxDialog
 {
-	public:
+public:
 
-		FunctionEventEditorDlg(wxWindow* parent, FunctionEvent & event_, gd::Project & game_, gd::Layout & scene_);
-		virtual ~FunctionEventEditorDlg();
+	FunctionEventEditorDlg(wxWindow* parent, FunctionEvent & event_, gd::Project & game_, gd::Layout & scene_);
+	virtual ~FunctionEventEditorDlg();
 
-		//(*Declarations(FunctionEventEditorDlg)
-		wxStaticText* StaticText2;
-		wxPanel* Panel1;
-		wxStaticText* StaticText1;
-		wxStaticText* StaticText3;
-		wxButton* cancelBt;
-		wxStaticLine* StaticLine2;
-		wxBitmapButton* objectBt;
-		wxTextCtrl* nameEdit;
-		wxStaticText* StaticText5;
-		wxStaticLine* StaticLine1;
-		wxTextCtrl* objectEdit;
-		wxStaticText* StaticText4;
-		wxButton* okBt;
-		wxStaticBitmap* StaticBitmap3;
-		//*)
+	//(*Declarations(FunctionEventEditorDlg)
+	wxStaticText* StaticText2;
+	wxPanel* Panel1;
+	wxStaticText* StaticText1;
+	wxStaticText* StaticText3;
+	wxButton* cancelBt;
+	wxStaticLine* StaticLine2;
+	wxBitmapButton* objectBt;
+	wxTextCtrl* nameEdit;
+	wxStaticText* StaticText5;
+	wxStaticLine* StaticLine1;
+	wxTextCtrl* objectEdit;
+	wxStaticText* StaticText4;
+	wxButton* okBt;
+	wxStaticBitmap* StaticBitmap3;
+	//*)
 
-		FunctionEvent & eventEdited;
+	FunctionEvent & eventEdited;
 
-	protected:
+protected:
 
-		//(*Identifiers(FunctionEventEditorDlg)
-		static const long ID_STATICBITMAP3;
-		static const long ID_STATICTEXT3;
-		static const long ID_PANEL1;
-		static const long ID_STATICLINE2;
-		static const long ID_STATICTEXT2;
-		static const long ID_TEXTCTRL2;
-		static const long ID_STATICTEXT1;
-		static const long ID_TEXTCTRL1;
-		static const long ID_BITMAPBUTTON1;
-		static const long ID_STATICTEXT5;
-		static const long ID_STATICTEXT4;
-		static const long ID_STATICLINE1;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
-		//*)
+	//(*Identifiers(FunctionEventEditorDlg)
+	static const long ID_STATICBITMAP3;
+	static const long ID_STATICTEXT3;
+	static const long ID_PANEL1;
+	static const long ID_STATICLINE2;
+	static const long ID_STATICTEXT2;
+	static const long ID_TEXTCTRL2;
+	static const long ID_STATICTEXT1;
+	static const long ID_TEXTCTRL1;
+	static const long ID_BITMAPBUTTON1;
+	static const long ID_STATICTEXT5;
+	static const long ID_STATICTEXT4;
+	static const long ID_STATICLINE1;
+	static const long ID_BUTTON1;
+	static const long ID_BUTTON2;
+	//*)
 
-	private:
+private:
 
-		//(*Handlers(FunctionEventEditorDlg)
-		void OncancelBtClick(wxCommandEvent& event);
-		void OnokBtClick(wxCommandEvent& event);
-		void OnobjectBtClick(wxCommandEvent& event);
-		//*)
+	//(*Handlers(FunctionEventEditorDlg)
+	void OncancelBtClick(wxCommandEvent& event);
+	void OnokBtClick(wxCommandEvent& event);
+	void OnobjectBtClick(wxCommandEvent& event);
+	//*)
 
-		gd::Project & game;
-		gd::Layout & scene;
+	gd::Project & game;
+	gd::Layout & scene;
 
-		DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
 #endif

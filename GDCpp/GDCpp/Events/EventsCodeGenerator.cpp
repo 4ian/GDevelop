@@ -116,7 +116,7 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objec
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 1;i<arguments.size();++i)
+        for (std::size_t i = 1;i<arguments.size();++i)
         {
             if ( i != 1 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -127,7 +127,7 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objec
     if ( conditionInverted ) predicat = GenerateNegatedPredicat(predicat);
 
     //Generate whole condition code
-    conditionCode += "for(unsigned int i = 0;i < "+ManObjListName(objectName)+".size();)\n";
+    conditionCode += "for(std::size_t i = 0;i < "+ManObjListName(objectName)+".size();)\n";
     conditionCode += "{\n";
     conditionCode += "    if ( "+predicat+" )\n";
     conditionCode += "    {\n";
@@ -170,7 +170,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & obj
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -188,7 +188,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & obj
     }
     else
     {
-        conditionCode += "for(unsigned int i = 0;i < "+ManObjListName(objectName)+".size();)\n";
+        conditionCode += "for(std::size_t i = 0;i < "+ManObjListName(objectName)+".size();)\n";
         conditionCode += "{\n";
         conditionCode += "    if ( "+predicat+" )\n";
         conditionCode += "    {\n";
@@ -230,7 +230,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 1;i<arguments.size();++i)
+        for (std::size_t i = 1;i<arguments.size();++i)
         {
             if ( i != 1 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -239,7 +239,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
         call = objectPart+instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
     }
 
-    actionCode += "for(unsigned int i = 0;i < "+ManObjListName(objectName)+".size();++i)\n";
+    actionCode += "for(std::size_t i = 0;i < "+ManObjListName(objectName)+".size();++i)\n";
     actionCode += "{\n";
     actionCode += "    "+call+";\n";
     actionCode += "}\n";
@@ -276,7 +276,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & object
     else
     {
         gd::String argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -293,7 +293,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & object
     }
     else
     {
-        actionCode += "for(unsigned int i = 0;i < "+ManObjListName(objectName)+".size();++i)\n";
+        actionCode += "for(std::size_t i = 0;i < "+ManObjListName(objectName)+".size();++i)\n";
         actionCode += "{\n";
         actionCode += "    "+call+";\n";
         actionCode += "}\n";
@@ -321,7 +321,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
 
         argOutput += "runtimeContext->ClearObjectListsMap()";
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             context.ObjectsListNeeded(realObjects[i]);
             argOutput += ".AddObjectListToMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
@@ -334,7 +334,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
 
         argOutput += "runtimeContext->ClearObjectListsMap()";
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             context.EmptyObjectsListNeeded(realObjects[i]);
             argOutput += ".AddObjectListToMap(\""+ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
@@ -353,13 +353,13 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         }
         else
         {
-            for (unsigned int i = 0;i<realObjects.size();++i)
+            for (std::size_t i = 0;i<realObjects.size();++i)
             {
                 context.ObjectsListNeeded(realObjects[i]);
                 argOutput += "(!"+ManObjListName(realObjects[i])+".empty() ? "+ManObjListName(realObjects[i])+"[0] : ";
             }
             argOutput += "NULL";
-            for (unsigned int i = 0;i<realObjects.size();++i)
+            for (std::size_t i = 0;i<realObjects.size();++i)
                 argOutput += ")";
         }
     }
@@ -506,7 +506,7 @@ void EventsCodeGenerator::PreprocessEventList( gd::EventsList & eventsList )
     std::shared_ptr<ProfileEvent> previousProfileEvent;
     #endif
 
-    for ( unsigned int i = 0;i < eventsList.size();++i )
+    for ( std::size_t i = 0;i < eventsList.size();++i )
     {
         eventsList[i].Preprocess(*this, eventsList, i);
         if ( i < eventsList.size() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )

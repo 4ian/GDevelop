@@ -135,10 +135,10 @@ game(game_)
 	    EndEdit->ChangeValue(gd::String::From(editedEvent.GetIncludeEnd()+1));
 	}
 
-	for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
+	for (std::size_t i = 0;i<game.GetExternalEventsCount();++i)
         linkedNameEdit->Append(game.GetExternalEvents(i).GetName());
 
-    for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
+    for (std::size_t i = 0;i<game.GetLayoutsCount();++i)
     	linkedNameEdit->Append(game.GetLayout(i).GetName());
 }
 
@@ -174,8 +174,8 @@ void EditLink::OnOkBtClick(wxCommandEvent& event)
     {
         editedEvent.SetIncludeAllEvents(false);
         editedEvent.SetIncludeStartAndEnd(
-        	gd::String(StartEdit->GetValue()).To<int>() - 1,
-        	gd::String(EndEdit->GetValue()).To<int>() - 1);
+        	gd::String(StartEdit->GetValue()).To<std::size_t>() - 1,
+        	gd::String(EndEdit->GetValue()).To<std::size_t>() - 1);
     }
     EndModal(1);
 }

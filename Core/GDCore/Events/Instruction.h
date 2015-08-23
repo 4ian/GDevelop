@@ -77,14 +77,14 @@ public:
     /**
      * \brief Return the number of parameters of the instruction.
      */
-    unsigned int GetParametersCount() const { return parameters.size(); }
+    std::size_t GetParametersCount() const { return parameters.size(); }
 
     /**
      * \brief Change the number of parameter of the instruction.
      *
      * If the new size if larger than the previous, new blank parameters are added.
      */
-    void SetParametersCount(unsigned int size);
+    void SetParametersCount(std::size_t size);
 
     /**
      * \brief Get the value of a parameter.
@@ -92,7 +92,7 @@ public:
      * Return an empty expression if the parameter requested does not exists.
      * \return The current value of the parameter.
      */
-    const gd::Expression & GetParameter(unsigned int index) const;
+    const gd::Expression & GetParameter(std::size_t index) const;
 
     /**
      * \brief Get the value of a parameter.
@@ -100,13 +100,13 @@ public:
      * Return an empty expression if the parameter requested does not exists.
      * \return The current value of the parameter.
      */
-    gd::Expression & GetParameter(unsigned int index);
+    gd::Expression & GetParameter(std::size_t index);
 
     /** Change the specified parameter
      * \param nb The parameter number
      * \param val The new value of the parameter
      */
-    void SetParameter(unsigned int nb, const gd::Expression & val);
+    void SetParameter(std::size_t nb, const gd::Expression & val);
 
     /** \brief Get a reference to the std::vector containing the parameters.
      * \return A std::vector containing the parameters

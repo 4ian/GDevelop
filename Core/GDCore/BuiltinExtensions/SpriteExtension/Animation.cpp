@@ -23,7 +23,7 @@ Animation::~Animation()
 {
 }
 
-unsigned int Animation::GetDirectionsCount() const
+std::size_t Animation::GetDirectionsCount() const
 {
     return directions.size();
 };
@@ -33,7 +33,7 @@ bool Animation::HasNoDirections() const
     return directions.empty();
 };
 
-void Animation::SetDirectionsCount(unsigned int nb)
+void Animation::SetDirectionsCount(std::size_t nb)
 {
     while ( directions.size() < nb ) {
         Direction direction;
@@ -43,7 +43,7 @@ void Animation::SetDirectionsCount(unsigned int nb)
         directions.erase(directions.begin()+directions.size()-1);
 }
 
-const Direction & Animation::GetDirection(unsigned int nb) const
+const Direction & Animation::GetDirection(std::size_t nb) const
 {
     if (!useMultipleDirections) nb = 0;
 
@@ -53,7 +53,7 @@ const Direction & Animation::GetDirection(unsigned int nb) const
     return badDirection;
 }
 
-Direction & Animation::GetDirection(unsigned int nb)
+Direction & Animation::GetDirection(std::size_t nb)
 {
     if (!useMultipleDirections) nb = 0;
 
@@ -64,7 +64,7 @@ Direction & Animation::GetDirection(unsigned int nb)
 }
 
 
-void Animation::SetDirection(const Direction & direction, unsigned int nb)
+void Animation::SetDirection(const Direction & direction, std::size_t nb)
 {
     if (nb < directions.size() ) directions[nb] = direction;
 

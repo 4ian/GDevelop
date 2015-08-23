@@ -93,7 +93,7 @@ private:
     gd::Project & project;
     gd::Layout & layout;
 
-    unsigned int modificationCount; ///< Track the number of modification. If the user made lots of modifications and wants to cancel, he will be warned.
+    std::size_t modificationCount; ///< Track the number of modification. If the user made lots of modifications and wants to cancel, he will be warned.
 
     DECLARE_EVENT_TABLE()
 };

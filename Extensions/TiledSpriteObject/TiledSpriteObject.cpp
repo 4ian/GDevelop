@@ -175,14 +175,14 @@ void TiledSpriteObject::EditObject( wxWindow* parent, gd::Project & game, gd::Ma
 #endif
 }
 
-void RuntimeTiledSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeTiledSpriteObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::From(width);}
     else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::From(height);}
     else if ( propertyNb == 2 ) {name = _("Angle");       value = gd::String::From(angle);}
 }
 
-bool RuntimeTiledSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeTiledSpriteObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) {width = newValue.To<float>();}
     else if ( propertyNb == 1 ) {height = newValue.To<float>();}
@@ -191,7 +191,7 @@ bool RuntimeTiledSpriteObject::ChangeProperty(unsigned int propertyNb, gd::Strin
     return true;
 }
 
-unsigned int RuntimeTiledSpriteObject::GetNumberOfProperties() const
+std::size_t RuntimeTiledSpriteObject::GetNumberOfProperties() const
 {
     return 3;
 }

@@ -293,7 +293,7 @@ void PanelSpriteObject::EditObject( wxWindow* parent, gd::Project & game, gd::Ma
 #endif
 }
 
-void RuntimePanelSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimePanelSpriteObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::From(width);}
     else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::From(height);}
@@ -303,7 +303,7 @@ void RuntimePanelSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, g
     else if ( propertyNb == 5 ) {name = _("Bottom Margin");       value = gd::String::From(bottomMargin);}
 }
 
-bool RuntimePanelSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimePanelSpriteObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) {width = newValue.To<float>();}
     else if ( propertyNb == 1 ) {height = newValue.To<float>();}
@@ -315,7 +315,7 @@ bool RuntimePanelSpriteObject::ChangeProperty(unsigned int propertyNb, gd::Strin
     return true;
 }
 
-unsigned int RuntimePanelSpriteObject::GetNumberOfProperties() const
+std::size_t RuntimePanelSpriteObject::GetNumberOfProperties() const
 {
     return 6;
 }

@@ -48,7 +48,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
         }
 
         gd::String parametersStr;
-        for (unsigned int i = 0;i<parameters.size();++i)
+        for (std::size_t i = 0;i<parameters.size();++i)
         {
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
                 continue; //Skip code only parameter which are not included in function calls.
@@ -64,7 +64,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
         if ( parameters.empty() ) return;
 
         gd::String parametersStr;
-        for (unsigned int i = 1;i<parameters.size();++i)
+        for (std::size_t i = 1;i<parameters.size();++i)
         {
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
                 continue; //Skip code only parameter which are not included in function calls.
@@ -81,7 +81,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
         if ( parameters.size() < 2 ) return;
 
         gd::String parametersStr;
-        for (unsigned int i = 2;i<parameters.size();++i)
+        for (std::size_t i = 2;i<parameters.size();++i)
         {
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
                 continue; //Skip code only parameter which are not included in function calls.
@@ -193,10 +193,10 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::
 {
     bool somethingModified = false;
 
-    for (unsigned int aId = 0;aId < actions.size();++aId)
+    for (std::size_t aId = 0;aId < actions.size();++aId)
     {
         gd::InstructionMetadata instrInfos = MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
-        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+        for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
             if ( gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && actions[aId].GetParameter(pNb).GetPlainString() == oldName )
@@ -244,10 +244,10 @@ bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, g
 {
     bool somethingModified = false;
 
-    for (unsigned int cId = 0;cId < conditions.size();++cId)
+    for (std::size_t cId = 0;cId < conditions.size();++cId)
     {
         gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
-        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+        for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
             if ( gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && conditions[cId].GetParameter(pNb).GetPlainString() == oldName )
@@ -293,10 +293,10 @@ bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, g
 
 void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, gd::String oldName, gd::String newName)
 {
-    for (unsigned int i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();++i)
     {
         vector < gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
-        for (unsigned int j = 0;j < conditionsVectors.size();++j)
+        for (std::size_t j = 0;j < conditionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInConditions(platform, project, layout, *conditionsVectors[j], oldName, newName);
             #if defined(GD_IDE_ONLY)
@@ -305,7 +305,7 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::P
         }
 
         vector < gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
-        for (unsigned int j = 0;j < actionsVectors.size();++j)
+        for (std::size_t j = 0;j < actionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInActions(platform, project, layout, *actionsVectors[j], oldName, newName);
             #if defined(GD_IDE_ONLY)
@@ -321,12 +321,12 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::
 {
     bool somethingModified = false;
 
-    for (unsigned int aId = 0;aId < actions.size();++aId)
+    for (std::size_t aId = 0;aId < actions.size();++aId)
     {
         bool deleteMe = false;
 
         gd::InstructionMetadata instrInfos = MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
-        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+        for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
             if ( gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && actions[aId].GetParameter(pNb).GetPlainString() == name )
@@ -377,12 +377,12 @@ bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, g
 {
     bool somethingModified = false;
 
-    for (unsigned int cId = 0;cId < conditions.size();++cId)
+    for (std::size_t cId = 0;cId < conditions.size();++cId)
     {
         bool deleteMe = false;
 
         gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
-        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+        for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
             if ( gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) && conditions[cId].GetParameter(pNb).GetPlainString() == name )
@@ -429,10 +429,10 @@ bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, g
 
 void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, gd::String name)
 {
-    for (unsigned int i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();++i)
     {
         vector < gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
-        for (unsigned int j = 0;j < conditionsVectors.size();++j)
+        for (std::size_t j = 0;j < conditionsVectors.size();++j)
         {
             bool conditionsModified = RemoveObjectInConditions(platform, project, layout, *conditionsVectors[j], name);
             #if defined(GD_IDE_ONLY)
@@ -441,7 +441,7 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::P
         }
 
         vector < gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
-        for (unsigned int j = 0;j < actionsVectors.size();++j)
+        for (std::size_t j = 0;j < actionsVectors.size();++j)
         {
             bool actionsModified = RemoveObjectInActions(platform, project, layout, *actionsVectors[j], name);
             #if defined(GD_IDE_ONLY)
@@ -460,12 +460,12 @@ void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout &
                                               bool inConditions,
                                               bool inActions)
 {
-    for (unsigned int i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();++i)
     {
         if ( inConditions )
         {
             vector < gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
-            for (unsigned int j = 0;j < conditionsVectors.size();++j)
+            for (std::size_t j = 0;j < conditionsVectors.size();++j)
             {
                 bool conditionsModified = ReplaceStringInConditions(project, layout, *conditionsVectors[j], toReplace, newString, matchCase);
                 #if defined(GD_IDE_ONLY)
@@ -477,7 +477,7 @@ void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout &
         if ( inActions )
         {
             vector < gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
-            for (unsigned int j = 0;j < actionsVectors.size();++j)
+            for (std::size_t j = 0;j < actionsVectors.size();++j)
             {
                 bool actionsModified = ReplaceStringInActions(project, layout, *actionsVectors[j], toReplace, newString, matchCase);
                 #if defined(GD_IDE_ONLY)
@@ -522,9 +522,9 @@ bool EventsRefactorer::ReplaceStringInActions(gd::Project & project, gd::Layout 
 {
     bool somethingModified = false;
 
-    for (unsigned int aId = 0;aId < actions.size();++aId)
+    for (std::size_t aId = 0;aId < actions.size();++aId)
     {
-        for (unsigned int pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
+        for (std::size_t pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
         {
             gd::String newParameter = matchCase ? ReplaceAllOccurences(actions[aId].GetParameter(pNb).GetPlainString(), toReplace, newString)
                                                  : ReplaceAllOccurencesCaseUnsensitive(actions[aId].GetParameter(pNb).GetPlainString(), toReplace, newString);
@@ -549,9 +549,9 @@ bool EventsRefactorer::ReplaceStringInConditions(gd::Project & project, gd::Layo
 {
     bool somethingModified = false;
 
-    for (unsigned int cId = 0;cId < conditions.size();++cId)
+    for (std::size_t cId = 0;cId < conditions.size();++cId)
     {
-        for (unsigned int pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
+        for (std::size_t pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
         {
             gd::String newParameter = matchCase ? ReplaceAllOccurences(conditions[cId].GetParameter(pNb).GetPlainString(), toReplace, newString)
                                                  : ReplaceAllOccurencesCaseUnsensitive(conditions[cId].GetParameter(pNb).GetPlainString(), toReplace, newString);
@@ -580,14 +580,14 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
 {
     vector < EventsSearchResult > results;
 
-    for (unsigned int i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();++i)
     {
         bool eventAddedInResults = false;
 
         if ( inConditions )
         {
             vector < gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
-            for (unsigned int j = 0;j < conditionsVectors.size();++j)
+            for (std::size_t j = 0;j < conditionsVectors.size();++j)
             {
                 if (!eventAddedInResults && SearchStringInConditions(project, layout, *conditionsVectors[j], search, matchCase))
                 {
@@ -599,7 +599,7 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
         if ( inActions )
         {
             vector < gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
-            for (unsigned int j = 0;j < actionsVectors.size();++j)
+            for (std::size_t j = 0;j < actionsVectors.size();++j)
             {
                 if (!eventAddedInResults && SearchStringInActions(project, layout, *actionsVectors[j], search, matchCase))
                 {
@@ -620,9 +620,9 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
 
 bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, gd::String search, bool matchCase)
 {
-    for (unsigned int aId = 0;aId < actions.size();++aId)
+    for (std::size_t aId = 0;aId < actions.size();++aId)
     {
-        for (unsigned int pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
+        for (std::size_t pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
         {
             size_t foundPosition = matchCase ? actions[aId].GetParameter(pNb).GetPlainString().find(search) :
                                      actions[aId].GetParameter(pNb).GetPlainString().FindCaseInsensitive(search);
@@ -639,9 +639,9 @@ bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout &
 
 bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String search, bool matchCase)
 {
-    for (unsigned int cId = 0;cId < conditions.size();++cId)
+    for (std::size_t cId = 0;cId < conditions.size();++cId)
     {
-        for (unsigned int pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
+        for (std::size_t pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
         {
             size_t foundPosition = matchCase ? conditions[cId].GetParameter(pNb).GetPlainString().find(search) :
                                      conditions[cId].GetParameter(pNb).GetPlainString().FindCaseInsensitive(search);
@@ -656,7 +656,7 @@ bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layou
     return false;
 }
 
-EventsSearchResult::EventsSearchResult(std::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ ) :
+EventsSearchResult::EventsSearchResult(std::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, std::size_t positionInList_ ) :
     event(event_),
     eventsList(eventsList_),
     positionInList(positionInList_)

@@ -41,8 +41,8 @@ public:
 
     float GetStartX() const;
     float GetStartY() const;
-    unsigned int GetXCount() const;
-    unsigned int GetYCount() const;
+    std::size_t GetXCount() const;
+    std::size_t GetYCount() const;
     float GetXGap() const;
     float GetYGap() const;
     float GetRotationIncrementation() const;

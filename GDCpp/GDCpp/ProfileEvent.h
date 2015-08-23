@@ -29,7 +29,7 @@ public:
     virtual bool IsExecutable() const {return true;}
     virtual gd::String GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
-    unsigned int index;
+    std::size_t index;
 
 private:
     void Init(const ProfileEvent & event);
@@ -40,4 +40,3 @@ private:
 #endif // PROFILEEVENT_H
 
 #endif
-

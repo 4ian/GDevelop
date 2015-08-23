@@ -141,7 +141,7 @@ void ChooseBehaviorDialog::RefreshList()
 	std::vector <gd::String> behaviors = gd::GetBehaviorsOfObject(project, layout, parentObject);
 
 	behaviorsList->Clear();
-	for (unsigned int i = 0;i<behaviors.size();++i)
+	for (std::size_t i = 0;i<behaviors.size();++i)
 	{
 	    gd::String behaviorName = behaviors[i];
 

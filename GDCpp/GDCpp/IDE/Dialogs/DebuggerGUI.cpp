@@ -80,7 +80,7 @@ DebuggerGUI::DebuggerGUI(wxWindow* parent, RuntimeScene &scene_, std::function<v
     m_objectsTree->AddRoot(_("Objects"));
 
     std::set<gd::String> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
-    for (unsigned int i = 0;i<scene.game->GetUsedExtensions().size();++i)
+    for (std::size_t i = 0;i<scene.game->GetUsedExtensions().size();++i)
     {
         std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedExtensions()[i]);
         std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
@@ -154,15 +154,15 @@ void DebuggerGUI::UpdateGUI()
     m_generalList->SetItem(6, 1, gd::String::From(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
 
     //Suppression des lignes en trop pour les variables
-    while(static_cast<unsigned int>(m_generalList->GetItemCount()) > generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
+    while(static_cast<std::size_t>(m_generalList->GetItemCount()) > generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
         m_generalList->DeleteItem(generalBaseItemCount);
 
     //Rajout si au contraire il n'y en a pas assez
-    while(static_cast<unsigned int>(m_generalList->GetItemCount()) < generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
+    while(static_cast<std::size_t>(m_generalList->GetItemCount()) < generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
         m_generalList->InsertItem(generalBaseItemCount, "");
 
     //Update scene variables
-    unsigned int i = 0;
+    std::size_t i = 0;
     const std::map < gd::String, gd::Variable* > & sceneVariables = scene.GetVariables().DumpAllVariables();
     for (std::map < gd::String, gd::Variable* >::const_iterator it = sceneVariables.begin();
         it!=sceneVariables.end();++it, ++i)
@@ -194,8 +194,8 @@ void DebuggerGUI::UpdateGUI()
     }
 
     //Extensions tab
-    unsigned int extListCtrlId = 0;
-    for (unsigned int i = 0;i<scene.game->GetUsedExtensions().size();++i)
+    std::size_t extListCtrlId = 0;
+    for (std::size_t i = 0;i<scene.game->GetUsedExtensions().size();++i)
     {
         std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedExtensions()[i]);
         std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
@@ -203,13 +203,13 @@ void DebuggerGUI::UpdateGUI()
         if ( extension != std::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && extListCtrlId < extensionsListCtrls.size() )
         {
             //Update items count
-            while(static_cast<unsigned int>(extensionsListCtrls[extListCtrlId]->GetItemCount()) > extension->GetNumberOfProperties(scene))
+            while(static_cast<std::size_t>(extensionsListCtrls[extListCtrlId]->GetItemCount()) > extension->GetNumberOfProperties(scene))
                 extensionsListCtrls[extListCtrlId]->DeleteItem(0);
-            while(static_cast<unsigned int>(extensionsListCtrls[extListCtrlId]->GetItemCount()) < extension->GetNumberOfProperties(scene))
+            while(static_cast<std::size_t>(extensionsListCtrls[extListCtrlId]->GetItemCount()) < extension->GetNumberOfProperties(scene))
                 extensionsListCtrls[extListCtrlId]->InsertItem(0, "");
 
             //Update properties
-            for (unsigned int propertyNb = 0;propertyNb<extension->GetNumberOfProperties(scene);++propertyNb)
+            for (std::size_t propertyNb = 0;propertyNb<extension->GetNumberOfProperties(scene);++propertyNb)
             {
                 gd::String name, value;
                 extension->GetPropertyForDebugger(scene, propertyNb, name, value);
@@ -231,13 +231,13 @@ void DebuggerGUI::UpdateGUI()
         mustRecreateTree = false;
 
         //Scene's objects
-        for(unsigned int i = 0;i<scene.GetObjects().size();++i)
+        for(std::size_t i = 0;i<scene.GetObjects().size();++i)
         {
             wxTreeItemId objectItem = m_objectsTree->AppendItem(m_objectsTree->GetRootItem(), scene.GetObjects()[i]->GetName());
             initialObjects[scene.GetObjects()[i]->GetName()] = objectItem;
         }
         //Globals objects
-        for(unsigned int i = 0;i<scene.game->GetObjects().size();++i)
+        for(std::size_t i = 0;i<scene.game->GetObjects().size();++i)
         {
             wxTreeItemId objectItem = m_objectsTree->AppendItem(m_objectsTree->GetRootItem(), scene.game->GetObjects()[i]->GetName());
             initialObjects[scene.game->GetObjects()[i]->GetName()] = objectItem;
@@ -248,7 +248,7 @@ void DebuggerGUI::UpdateGUI()
 
     //Ajout des objets
     RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
-    for(unsigned int i = 0;i<allObjects.size();++i)
+    for(std::size_t i = 0;i<allObjects.size();++i)
     {
         std::weak_ptr<RuntimeObject> weakPtrToObject = allObjects[i];
 
@@ -314,10 +314,10 @@ void DebuggerGUI::UpdateGUI()
         RecreateListForObject(object);
 
     gd::String value, uselessName;
-    unsigned int currentLine = 1; //We start a the second line, after "General"
+    std::size_t currentLine = 1; //We start a the second line, after "General"
 
     //Properties of base object
-    for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
+    for (std::size_t i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
     {
         object->RuntimeObject::GetPropertyForDebugger(i, uselessName, value);
         m_objectList->SetItem(currentLine, 1, value);
@@ -328,7 +328,7 @@ void DebuggerGUI::UpdateGUI()
     currentLine += 2; //We have two lines to jump for "Specific"
 
     //Specific properties of object
-    for (unsigned int i = 0;i<object->GetNumberOfProperties();++i)
+    for (std::size_t i = 0;i<object->GetNumberOfProperties();++i)
     {
         object->GetPropertyForDebugger(i, uselessName, value);
         m_objectList->SetItem(currentLine, 1, value);
@@ -489,7 +489,7 @@ void DebuggerGUI::UpdateListCtrlColumnsWidth()
 {
     m_generalList->SetColumnWidth(1, m_generalList->GetSize().GetWidth()-m_generalList->GetColumnWidth(0)-15);
     m_objectList->SetColumnWidth(1, m_objectList->GetSize().GetWidth()-m_objectList->GetColumnWidth(0)-15);
-    for (unsigned int i = 0;i<extensionsListCtrls.size();++i)
+    for (std::size_t i = 0;i<extensionsListCtrls.size();++i)
         extensionsListCtrls[i]->SetColumnWidth(1, extensionsListCtrls[i]->GetSize().GetWidth()-extensionsListCtrls[i]->GetColumnWidth(0)-15);
 }
 
@@ -499,7 +499,7 @@ void DebuggerGUI::UpdateListCtrlColumnsWidth()
 void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
 {
     m_objectList->DeleteAllItems();
-    unsigned int currentLine = 0;
+    std::size_t currentLine = 0;
     gd::String name, uselessValue;
 
     m_objectList->InsertItem(0, _("General"));
@@ -507,7 +507,7 @@ void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
     currentLine++;
 
     //Create base properties.
-    for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
+    for (std::size_t i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
     {
         object->RuntimeObject::GetPropertyForDebugger(i, name, uselessValue);
         m_objectList->InsertItem(currentLine, name);
@@ -521,7 +521,7 @@ void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
     currentLine += 2;
 
     //Create object specific properties.
-    for (unsigned int i = 0;i<object->GetNumberOfProperties();++i)
+    for (std::size_t i = 0;i<object->GetNumberOfProperties();++i)
     {
         object->GetPropertyForDebugger(i, name, uselessValue);
         m_objectList->InsertItem(currentLine, name);

@@ -7,7 +7,7 @@ bool GD_API TimerElapsedTime( RuntimeScene & scene, double time, const gd::Strin
     if ( timerName.empty() ) return false;
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene.timers.size();i++ )
+    for ( std::size_t i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
         if ( scene.timers[i].GetName() == timerName )
@@ -24,7 +24,7 @@ double GD_API GetTimerElapsedTimeInSeconds( RuntimeScene & scene, const gd::Stri
 {
     if ( timerName.empty() ) return 0;
 
-    for ( unsigned int i = 0;i < scene.timers.size();i++ )
+    for ( std::size_t i = 0;i < scene.timers.size();i++ )
     {
         if ( scene.timers[i].GetName() == timerName )
         {
@@ -40,7 +40,7 @@ bool GD_API TimerPaused( RuntimeScene & scene, const gd::String & timerName )
     if ( timerName.empty() ) return false;
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene.timers.size();i++ )
+    for ( std::size_t i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
         if ( scene.timers[i].GetName() == timerName )
@@ -63,7 +63,7 @@ void GD_API ResetTimer( RuntimeScene & scene, const gd::String & timerName )
     if ( timerName.empty() ) return;
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene.timers.size();i++ )
+    for ( std::size_t i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
         if ( scene.timers[i].GetName() == timerName )
@@ -85,7 +85,7 @@ void GD_API PauseTimer( RuntimeScene & scene, const gd::String & timerName )
     if ( timerName.empty() ) return;
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene.timers.size();i++ )
+    for ( std::size_t i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
         if ( scene.timers[i].GetName() == timerName )
@@ -108,7 +108,7 @@ void GD_API UnPauseTimer( RuntimeScene & scene, const gd::String & timerName )
     if ( timerName.empty() ) return;
 
     //Le timer existe il ? on parcourt la liste.
-    for ( unsigned int i = 0;i < scene.timers.size();i++ )
+    for ( std::size_t i = 0;i < scene.timers.size();i++ )
     {
         //On cherche le nom du timer
         if ( scene.timers[i].GetName() == timerName )
@@ -133,7 +133,7 @@ void GD_API RemoveTimer( RuntimeScene & scene, const gd::String & timerName )
 {
     if ( timerName.empty() ) return;
 
-    for ( unsigned int i = 0;i < scene.timers.size();i++ )
+    for ( std::size_t i = 0;i < scene.timers.size();i++ )
     {
         if ( scene.timers[i].GetName() == timerName )
         {

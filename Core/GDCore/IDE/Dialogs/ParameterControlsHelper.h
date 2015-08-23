@@ -75,14 +75,14 @@ public:
      * \warning The sizer must have been set.
      * \see gd::ParameterControlsHelper::SetWindowAndSizer
      */
-    void UpdateControls(unsigned int count);
+    void UpdateControls(std::size_t count);
 
     /**
      * \brief Update the controls of a parameter using the specified content
      * and the metadata provided.
      * \note A copy of the metadata is stored.
      */
-    void UpdateParameterContent(unsigned int i, const ParameterMetadata & metadata, gd::String content);
+    void UpdateParameterContent(std::size_t i, const ParameterMetadata & metadata, gd::String content);
 
     /**
      * \brief The prototype of the function that can be called
@@ -91,7 +91,7 @@ public:
      */
     typedef void (* EditParameterFunction)(wxWindow * parent,
         gd::Project &, gd::Layout &, const ParameterMetadata & paramMetadata,
-        std::vector<wxTextCtrl * > & paramEdits, unsigned int paramIndex);
+        std::vector<wxTextCtrl * > & paramEdits, std::size_t paramIndex);
 
     /**
      * \brief Set the function that will be called when a parameter should be edited.

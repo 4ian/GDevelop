@@ -36,7 +36,7 @@ gd::String InstructionSentenceFormatter::Translate(const gd::Instruction & instr
     if ( out.empty() ) out = "   "; //Prevent empty sentences that could trigger graphical glitches.
 
     //Replace _PARAMx_ placeholders by their values
-    for (unsigned int i =0;i<metadata.parameters.size();++i)
+    for (std::size_t i =0;i<metadata.parameters.size();++i)
     {
         gd::String placeholder = "_PARAM"+gd::String::From(i)+"_";
         while ( out.find( placeholder ) != gd::String::npos )
@@ -66,7 +66,7 @@ std::vector< std::pair<gd::String, gd::TextFormatting> > InstructionSentenceForm
         parse = false;
         size_t firstParamPosition = gd::String::npos;
         size_t firstParamIndex = gd::String::npos;
-        for (unsigned int i =0;i<metadata.parameters.size();++i)
+        for (std::size_t i =0;i<metadata.parameters.size();++i)
         {
             size_t paramPosition = sentence.find( "_PARAM"+gd::String::From(i)+"_" );
             if ( paramPosition < firstParamPosition )

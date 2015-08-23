@@ -44,10 +44,10 @@ public:
      */
     bool DestinationReached() { return reachedEnd; }
 
-    float GetNodeX(unsigned int index) const;
-    float GetNodeY(unsigned int index) const;
-    unsigned int GetNextNodeIndex() const;
-    unsigned int GetNodeCount() const { return path.size(); };
+    float GetNodeX(std::size_t index) const;
+    float GetNodeY(std::size_t index) const;
+    std::size_t GetNextNodeIndex() const;
+    std::size_t GetNodeCount() const { return path.size(); };
     float GetNextNodeX() const;
     float GetNextNodeY() const;
     float GetLastNodeX() const;
@@ -97,7 +97,7 @@ public:
 private:
     virtual void DoStepPreEvents(RuntimeScene & scene);
     virtual void DoStepPostEvents(RuntimeScene & scene);
-    void EnterSegment(unsigned int segmentNumber);
+    void EnterSegment(std::size_t segmentNumber);
 
     RuntimeScene * parentScene; ///< The scene the object belongs to.
     ScenePathfindingObstaclesManager * sceneManager; ///< The platform objects manager associated to the scene.
@@ -120,7 +120,7 @@ private:
     float angularSpeed;
     float timeOnSegment;
     float totalSegmentTime;
-    unsigned int currentSegment;
+    std::size_t currentSegment;
     bool reachedEnd;
 
 };

@@ -41,7 +41,7 @@
 using namespace std;
 
 void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & project, gd::Layout & layout,
-	const gd::ParameterMetadata & metadata, std::vector<wxTextCtrl * > & paramEdits, unsigned int paramIndex)
+	const gd::ParameterMetadata & metadata, std::vector<wxTextCtrl * > & paramEdits, std::size_t paramIndex)
 {
 	if (paramIndex >= paramEdits.size()) return;
 	wxTextCtrl * editCtrl = paramEdits.at(paramIndex);

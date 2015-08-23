@@ -47,7 +47,7 @@ void EventStoreDialog::RefreshWith(gd::String templateId, const std::vector<gd::
 {
     FetchTemplate(templateId);
     RefreshTemplate();
-    for(unsigned int i = 0;i<parameters.size() && i<paramEdits.size();++i) {
+    for(std::size_t i = 0;i<parameters.size() && i<paramEdits.size();++i) {
         paramEdits[i]->SetValue(parameters[i]);
     }
 }
@@ -105,7 +105,7 @@ void EventStoreDialog::RefreshList()
 
     if (!templates) return;
 	templates->ConsiderAsArrayOf("Template");
-	for (unsigned int i = 0;i<templates->GetChildrenCount();++i) {
+	for (std::size_t i = 0;i<templates->GetChildrenCount();++i) {
 		const SerializerElement & eventTemplate = templates->GetChild(i);
         gd::String name = eventTemplate.GetChild("name").GetValue().GetString();
         gd::String desc = eventTemplate.GetChild("description").GetValue().GetString();
@@ -144,7 +144,7 @@ void EventStoreDialog::RefreshParameters()
     parameters.ConsiderAsArrayOf("Parameter");
     parametersHelper.UpdateControls(parameters.GetChildrenCount());
 
-    for (unsigned int i = 0;i<parameters.GetChildrenCount();++i)
+    for (std::size_t i = 0;i<parameters.GetChildrenCount();++i)
     {
         const SerializerElement & parameter = parameters.GetChild(i);
 
@@ -176,7 +176,7 @@ void EventStoreDialog::InstantiateTemplate()
     parameters.ConsiderAsArrayOf("Parameter");
     parametersHelper.UpdateControls(parameters.GetChildrenCount());
 
-    for (unsigned int i = 0;i<parameters.GetChildrenCount() && i < paramEdits.size();++i)
+    for (std::size_t i = 0;i<parameters.GetChildrenCount() && i < paramEdits.size();++i)
     {
         const SerializerElement & parameter = parameters.GetChild(i);
         gd::String newValue = paramEdits[i]->GetValue();

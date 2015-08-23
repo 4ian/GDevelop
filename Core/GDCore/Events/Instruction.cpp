@@ -38,21 +38,21 @@ parameters(parameters_)
     parameters.reserve(8);
 }
 
-const gd::Expression & Instruction::GetParameter(unsigned int index) const
+const gd::Expression & Instruction::GetParameter(std::size_t index) const
 {
     if ( index >= parameters.size() ) return badExpression;
 
     return parameters[index];
 }
 
-gd::Expression & Instruction::GetParameter(unsigned int index)
+gd::Expression & Instruction::GetParameter(std::size_t index)
 {
     if ( index >= parameters.size() )  return badExpression;
 
     return parameters[index];
 }
 
-void Instruction::SetParametersCount(unsigned int size)
+void Instruction::SetParametersCount(std::size_t size)
 {
     while(size < parameters.size())
         parameters.erase(parameters.begin()+parameters.size()-1);
@@ -65,7 +65,7 @@ Instruction::~Instruction()
     //dtor
 }
 
-void Instruction::SetParameter(unsigned int nb, const gd::Expression & val)
+void Instruction::SetParameter(std::size_t nb, const gd::Expression & val)
 {
     if ( nb >= parameters.size() )
     {

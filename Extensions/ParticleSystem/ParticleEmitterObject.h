@@ -116,7 +116,7 @@ public:
     void SetParticleAngleRandomness2(float newValue) { particleAngleRandomness2= newValue; UpdateAngleParameters();};
     void SetParticleLifeTimeMin(float newValue) { particleLifeTimeMin= newValue; UpdateLifeTime();};
     void SetParticleLifeTimeMax(float newValue) { particleLifeTimeMax= newValue; UpdateLifeTime();};
-    void SetMaxParticleNb(unsigned int newValue) { maxParticleNb = newValue; };
+    void SetMaxParticleNb(std::size_t newValue) { maxParticleNb = newValue; };
     void SetDestroyWhenNoParticles(bool enable = true) { destroyWhenNoParticles = enable; };
 
     float GetRendererParam1() const { return rendererParam1; };
@@ -140,7 +140,7 @@ public:
     float GetFriction() const { return friction; };
     float GetParticleLifeTimeMin() const { return particleLifeTimeMin; };
     float GetParticleLifeTimeMax() const { return particleLifeTimeMax; };
-    unsigned int GetMaxParticleNb() const { return maxParticleNb; };
+    std::size_t GetMaxParticleNb() const { return maxParticleNb; };
     bool GetDestroyWhenNoParticles() const { return destroyWhenNoParticles; };
 
     ParticleParameterType GetRedParameterType() const { return redParam; };
@@ -203,7 +203,7 @@ private:
     float particleSize1, particleSize2, particleAngle1, particleAngle2;
     float particleAlphaRandomness1, particleAlphaRandomness2;
     float particleSizeRandomness1, particleSizeRandomness2, particleAngleRandomness1, particleAngleRandomness2;
-    unsigned int maxParticleNb;
+    std::size_t maxParticleNb;
     bool destroyWhenNoParticles; ///< If set to true, the object will removed itself from the scene when it has no more particles.
 
     ParticleSystemWrapper * particleSystem; ///< Pointer to the class wrapping all the real particle engine related stuff. This pointer is managed by the object.
@@ -270,9 +270,9 @@ public :
     virtual float GetAngle() const;
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+    virtual std::size_t GetNumberOfProperties() const;
     #endif
 
     const ParticleSystemWrapper & GetAssociatedParticleSystemWrapper() const { return *GetParticleSystem(); };

@@ -23,7 +23,7 @@ LightObstacleBehavior::~LightObstacleBehavior()
 {
     if ( manager )
     {
-        for (unsigned int i = 0;i<wallsOfObject.size();++i)
+        for (std::size_t i = 0;i<wallsOfObject.size();++i)
         {
             manager->walls.erase(std::remove(manager->walls.begin(), manager->walls.end(), (wallsOfObject[i])), manager->walls.end());
             delete wallsOfObject[i];
@@ -110,7 +110,7 @@ void LightObstacleBehavior::OnDeActivate()
 {
     if ( manager )
     {
-        for (unsigned int i = 0;i<wallsOfObject.size();++i)
+        for (std::size_t i = 0;i<wallsOfObject.size();++i)
         {
             manager->walls.erase(std::remove(manager->walls.begin(), manager->walls.end(), (wallsOfObject[i])), manager->walls.end());
             delete wallsOfObject[i];

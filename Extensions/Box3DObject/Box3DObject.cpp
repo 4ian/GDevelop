@@ -384,7 +384,7 @@ bool Box3DObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, 
     return true;
 }
 
-void RuntimeBox3DObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
+void RuntimeBox3DObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::From(width);}
     else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::From(height);}
@@ -395,7 +395,7 @@ void RuntimeBox3DObject::GetPropertyForDebugger(unsigned int propertyNb, gd::Str
     else if ( propertyNb == 6 ) {name = _("Roll");          value = gd::String::From(roll);}
 }
 
-bool RuntimeBox3DObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
+bool RuntimeBox3DObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) {width = newValue.To<int>();}
     else if ( propertyNb == 1 ) {height = newValue.To<int>();}
@@ -408,7 +408,7 @@ bool RuntimeBox3DObject::ChangeProperty(unsigned int propertyNb, gd::String newV
     return true;
 }
 
-unsigned int RuntimeBox3DObject::GetNumberOfProperties() const
+std::size_t RuntimeBox3DObject::GetNumberOfProperties() const
 {
     return 7;
 }

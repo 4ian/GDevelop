@@ -13,8 +13,8 @@ class ProfileEvent;
 namespace gd { class Layout; }
 class RuntimeScene;
 
-void GD_API StartProfileTimer(RuntimeScene & scene, unsigned int id);
-void GD_API EndProfileTimer(RuntimeScene & scene, unsigned int id);
+void GD_API StartProfileTimer(RuntimeScene & scene, std::size_t id);
+void GD_API EndProfileTimer(RuntimeScene & scene, std::size_t id);
 
 #endif // PROFILETOOLS_H
 

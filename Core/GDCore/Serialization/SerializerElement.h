@@ -168,13 +168,13 @@ public:
      * \param name The name of the new child.
      * \param name The index of the child
      */
-	SerializerElement & GetChild(gd::String name, unsigned int index = 0, gd::String deprecatedName = "") const;
+	SerializerElement & GetChild(gd::String name, std::size_t index = 0, gd::String deprecatedName = "") const;
 
     /**
      * \brief Get a child of the element using its index (when the element is considered as an array).
      * \param name The index of the child
      */
-	SerializerElement & GetChild(unsigned int index) const;
+	SerializerElement & GetChild(std::size_t index) const;
 
     /**
      * \brief Get the number of children having a specific name.
@@ -187,7 +187,7 @@ public:
      *
      * \see SerializerElement::ConsiderAsArrayOf
      */
-	unsigned int GetChildrenCount(gd::String name = "", gd::String deprecatedName = "") const;
+	std::size_t GetChildrenCount(gd::String name = "", gd::String deprecatedName = "") const;
 
     /**
      * \brief Return true if the specified child exists.

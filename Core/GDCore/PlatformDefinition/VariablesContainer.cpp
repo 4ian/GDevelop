@@ -45,7 +45,7 @@ bool VariablesContainer::Has(const gd::String & name) const
     return (i != variables.end());
 }
 
-std::pair<gd::String, gd::Variable> & VariablesContainer::Get(unsigned int index)
+std::pair<gd::String, gd::Variable> & VariablesContainer::Get(std::size_t index)
 {
     if ( index < variables.size() )
         return variables[index];
@@ -53,7 +53,7 @@ std::pair<gd::String, gd::Variable> & VariablesContainer::Get(unsigned int index
     return badVariable;
 }
 
-const std::pair<gd::String, gd::Variable> & VariablesContainer::Get(unsigned int index) const
+const std::pair<gd::String, gd::Variable> & VariablesContainer::Get(std::size_t index) const
 {
     if ( index < variables.size() )
         return variables[index];
@@ -81,7 +81,7 @@ const Variable & VariablesContainer::Get(const gd::String & name) const
     return badVariable.second;
 }
 
-Variable & VariablesContainer::Insert(const gd::String & name, const gd::Variable & variable, unsigned int position)
+Variable & VariablesContainer::Insert(const gd::String & name, const gd::Variable & variable, std::size_t position)
 {
     if (position<variables.size())
     {
@@ -102,9 +102,9 @@ void VariablesContainer::Remove(const gd::String & varName)
         VariableHasName(varName)), variables.end() );
 }
 
-unsigned int VariablesContainer::GetPosition(const gd::String & name) const
+std::size_t VariablesContainer::GetPosition(const gd::String & name) const
 {
-    for(unsigned int i = 0;i<variables.size();++i)
+    for(std::size_t i = 0;i<variables.size();++i)
     {
         if ( variables[i].first == name )
             return i;
@@ -113,7 +113,7 @@ unsigned int VariablesContainer::GetPosition(const gd::String & name) const
     return gd::String::npos;
 }
 
-Variable & VariablesContainer::InsertNew(const gd::String & name, unsigned int position)
+Variable & VariablesContainer::InsertNew(const gd::String & name, std::size_t position)
 {
     Variable newVariable;
     return Insert(name, newVariable, position);
@@ -126,7 +126,7 @@ void VariablesContainer::Rename(const gd::String & oldName, const gd::String & n
     if (i != variables.end()) i->first = newName;
 }
 
-void VariablesContainer::Swap(unsigned int firstVariableIndex, unsigned int secondVariableIndex)
+void VariablesContainer::Swap(std::size_t firstVariableIndex, std::size_t secondVariableIndex)
 {
     if ( firstVariableIndex >= variables.size() || secondVariableIndex >= variables.size() )
         return;
@@ -139,7 +139,7 @@ void VariablesContainer::Swap(unsigned int firstVariableIndex, unsigned int seco
 void VariablesContainer::SerializeTo(SerializerElement & element) const
 {
     element.ConsiderAsArrayOf("variable");
-    for ( unsigned int j = 0;j < variables.size();j++ )
+    for ( std::size_t j = 0;j < variables.size();j++ )
     {
         SerializerElement & variableElement = element.AddChild("variable");
         variableElement.SetAttribute("name", variables[j].first);
@@ -152,7 +152,7 @@ void VariablesContainer::UnserializeFrom(const SerializerElement & element)
 {
     Clear();
     element.ConsiderAsArrayOf("variable", "Variable");
-    for ( unsigned int j = 0;j < element.GetChildrenCount();j++ )
+    for ( std::size_t j = 0;j < element.GetChildrenCount();j++ )
     {
         const SerializerElement & variableElement = element.GetChild(j);
 

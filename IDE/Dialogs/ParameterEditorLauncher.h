@@ -30,7 +30,7 @@ public:
 	 */
     static void LaunchEditor(wxWindow * parent, gd::Project &, gd::Layout &,
     	const gd::ParameterMetadata & paramMetadata,
-        std::vector<wxTextCtrl * > & paramEdits, unsigned int paramIndex);
+        std::vector<wxTextCtrl * > & paramEdits, std::size_t paramIndex);
 
 private:
 	ParameterEditorLauncher() {};

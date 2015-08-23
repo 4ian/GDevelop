@@ -60,7 +60,7 @@ gd::String CodeCompilerCall::GetFullCall() const
         args.push_back("-fPIC"); //Necessary, on 64 bits platforms to avoid "relocation R_X86_64_32 against `.rodata' can not be used when making a shared object" error.
         //Rely on the default includes directories of the compiler
     #endif
-    for (unsigned int i = 0;i<extraOptions.size();++i)
+    for (std::size_t i = 0;i<extraOptions.size();++i)
         args.push_back(extraOptions[i]);
 
     args.push_back("-o \""+outputFile+"\"");
@@ -96,7 +96,7 @@ gd::String CodeCompilerCall::GetFullCall() const
         standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/lib/gcc_dll/msw");
         standardsIncludeDirs.push_back("CppPlatform/Extensions/include");
 
-        for (unsigned int i =0;i<standardsIncludeDirs.size();++i)
+        for (std::size_t i =0;i<standardsIncludeDirs.size();++i)
             args.push_back("-I\""+baseDir+standardsIncludeDirs[i]+"\"");
 
         //CodeCompiler extra headers directories
@@ -105,7 +105,7 @@ gd::String CodeCompilerCall::GetFullCall() const
             args.push_back("-I\""+*header+"\"");
 
         //Additional headers for the task
-        for (unsigned int i = 0;i<extraHeaderDirectories.size();++i)
+        for (std::size_t i = 0;i<extraHeaderDirectories.size();++i)
             args.push_back("-I\""+extraHeaderDirectories[i]+"\"");
 
         if ( !compilationForRuntime ) args.push_back("-DGD_IDE_ONLY");
@@ -142,7 +142,7 @@ gd::String CodeCompilerCall::GetFullCall() const
     {
         args.push_back("-shared");
         if ( !inputFile.empty() ) args.push_back("\""+inputFile+"\"");
-        for (unsigned int i = 0;i<extraObjectFiles.size();++i)
+        for (std::size_t i = 0;i<extraObjectFiles.size();++i)
         {
             if (!extraObjectFiles[i].empty()) args.push_back("\""+extraObjectFiles[i]+"\"");
         }
@@ -214,7 +214,7 @@ gd::String CodeCompilerCall::GetFullCall() const
         args.push_back("\""+baseDir+"libsfml-system-d.so.2\"");
         #endif
         #endif
-        for (unsigned int i = 0;i<extraLibFiles.size();++i)
+        for (std::size_t i = 0;i<extraLibFiles.size();++i)
         {
             if ( !extraLibFiles[i].empty())
                 args.push_back("-l\""+extraLibFiles[i]+"\"");
@@ -222,7 +222,7 @@ gd::String CodeCompilerCall::GetFullCall() const
     }
 
     gd::String argsStr;
-    for (unsigned int i = 0;i<args.size();++i) argsStr += args[i]+" ";
+    for (std::size_t i = 0;i<args.size();++i) argsStr += args[i]+" ";
 
     return compilerExecutable+" "+argsStr;
 }
@@ -240,7 +240,7 @@ void CodeCompiler::StartTheNextTask()
         else
         {
             bool newTaskFound = false;
-            for (unsigned int i = 0;i<pendingTasks.size();++i)
+            for (std::size_t i = 0;i<pendingTasks.size();++i)
             {
                 //Be sure that the task is not disabled
                 if ( find(compilationDisallowed.begin(), compilationDisallowed.end(), pendingTasks[i].scene) == compilationDisallowed.end() )
@@ -374,10 +374,10 @@ void CodeCompiler::ProcessEndedWork(wxCommandEvent & event)
     //Compilation ended, saving diagnostics
     {
         lastTaskMessages.clear();
-        for (unsigned int i = 0;i<currentTaskProcess->output.size();++i)
+        for (std::size_t i = 0;i<currentTaskProcess->output.size();++i)
             lastTaskMessages += currentTaskProcess->output[i]+"\n";
 
-        for (unsigned int i = 0;i<currentTaskProcess->outputErrors.size();++i)
+        for (std::size_t i = 0;i<currentTaskProcess->outputErrors.size();++i)
             lastTaskMessages += currentTaskProcess->outputErrors[i]+"\n";
 
         ofstream outputFile;
@@ -445,7 +445,7 @@ void CodeCompiler::AddTask(CodeCompilerTask task)
         sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
         //Check if an equivalent task is not waiting in the pending list
-        for (unsigned int i = 0;i<pendingTasks.size();++i)
+        for (std::size_t i = 0;i<pendingTasks.size();++i)
         {
             if ( task.IsSameTaskAs(pendingTasks[i]) ) return;
         }
@@ -496,7 +496,7 @@ bool CodeCompiler::HasTaskRelatedTo(gd::Layout & scene) const
 
     if ( processLaunched && currentTask.scene == &scene ) return true;
 
-    for (unsigned int i = 0;i<pendingTasks.size();++i)
+    for (std::size_t i = 0;i<pendingTasks.size();++i)
     {
         if ( pendingTasks[i].scene == &scene ) return true;
     }
@@ -532,7 +532,7 @@ void CodeCompiler::RemovePendingTasksRelatedTo(gd::Layout & scene)
 {
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
-    for (unsigned int i = 0;i<pendingTasks.size();)
+    for (std::size_t i = 0;i<pendingTasks.size();)
     {
         if ( pendingTasks[i].scene == &scene )
             pendingTasks.erase(pendingTasks.begin()+i);

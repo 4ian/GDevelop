@@ -221,7 +221,7 @@ wxTreeItemId InstructionSelectorDialog::GetGroupItem(wxTreeCtrl * treeCtrl, wxTr
 {
     std::vector<gd::String> groups = groupStr.Split(U'/');
 
-    for(unsigned int i = 0;i<groups.size();++i)
+    for(std::size_t i = 0;i<groups.size();++i)
     {
         if ( groups[i].empty() ) continue;
 
@@ -293,7 +293,7 @@ void InstructionSelectorDialog::RefreshList()
 
     //Insert extension instructions
     const vector < std::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
-    for (unsigned int i = 0;i<extensions.size();++i)
+    for (std::size_t i = 0;i<extensions.size();++i)
     {
         //Verify if that extension is enabled
         if ( find(game.GetUsedExtensions().begin(),
@@ -313,7 +313,7 @@ void InstructionSelectorDialog::RefreshList()
                 extensionItem = instructionsTree->AppendItem(instructionsTree->GetRootItem(), extensions[i]->GetFullName(), 0);
         }
 
-        for(unsigned int j = 0;j<objectsTypes.size();++j)
+        for(std::size_t j = 0;j<objectsTypes.size();++j)
         {
             //Add each object instructions
             std::map<gd::String, gd::InstructionMetadata > allObjActions = editingAction ?
@@ -341,7 +341,7 @@ void InstructionSelectorDialog::RefreshList()
             }
         }
 
-        for(unsigned int j = 0;j<behaviorsTypes.size();++j)
+        for(std::size_t j = 0;j<behaviorsTypes.size();++j)
         {
             //Add each behavior instructions
             std::map<gd::String, gd::InstructionMetadata > allAutoActions = editingAction ?
@@ -430,7 +430,7 @@ void InstructionSelectorDialog::RefreshFromInstruction()
 
     //Update parameters controls
     parametersHelper.UpdateControls(instructionMetadata.parameters.size());
-    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ ) {
+    for ( std::size_t i = 0;i < instructionMetadata.parameters.size();i++ ) {
         parametersHelper.UpdateParameterContent(i, instructionMetadata.parameters[i],
             i < Param.size() ? Param[i].GetPlainString() : "");
     }
@@ -460,7 +460,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
     bool parametersHaveErrors = false;
     gd::String message;
     size_t parameterDisplayIndex = 0;
-    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
+    for ( std::size_t i = 0;i < instructionMetadata.parameters.size();i++ )
     {
         if (!instructionMetadata.parameters[i].codeOnly ) parameterDisplayIndex++;
 
@@ -499,7 +499,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
 
     //On ajoute les param�tres
     Param.clear();
-    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
+    for ( std::size_t i = 0;i < instructionMetadata.parameters.size();i++ )
     {
         if ( ParaFac.at(i)->IsShown() && !ParaFac.at(i)->GetValue())
             Param.push_back(gd::Expression("")); //Optional parameter not filled stay empty.

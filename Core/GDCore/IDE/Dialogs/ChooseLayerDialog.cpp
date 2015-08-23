@@ -62,7 +62,7 @@ addQuotes(addQuotes_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseLayerDialog::OncancelBtClick);
 	//*)
 
-	for (unsigned int i =0;i<layout.GetLayersCount();++i)
+	for (std::size_t i =0;i<layout.GetLayersCount();++i)
 	{
 	    gd::String name = layout.GetLayer(i).GetName();
 	    if ( name == "" ) name = _("Base layer");

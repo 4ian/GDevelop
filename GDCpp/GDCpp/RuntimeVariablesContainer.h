@@ -64,7 +64,7 @@ public:
     /**
      * \brief Return the number of variables in the container.
      */
-    unsigned int Count() { return variables.size(); }
+    std::size_t Count() { return variables.size(); }
     #endif
 
     /**
@@ -82,14 +82,14 @@ public:
      * \warning No bound check is made. Please use other overload of gd::VariablesContainer::Get when you do not have any efficiency request.
      * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
-    virtual gd::Variable & Get(unsigned int index) { return *variablesArray[index]; }
+    virtual gd::Variable & Get(std::size_t index) { return *variablesArray[index]; }
 
     /**
      * \brief Return a reference to the variable at the @ index position in the list.
      * \warning No bound check is made. Please use other overload of gd::VariablesContainer::GetVariable when you do not have any efficiency request.
      * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
-    virtual const gd::Variable & Get(unsigned int index) const { return *variablesArray[index]; }
+    virtual const gd::Variable & Get(std::size_t index) const { return *variablesArray[index]; }
 
     /**
      * \brief Return a "bad" variable that can be used when no other valid variable can be used.
@@ -164,8 +164,8 @@ public:
 
     virtual gd::Variable & Get(const gd::String & name) { return RuntimeVariablesContainer::GetBadVariable(); }
     virtual const gd::Variable & Get(const gd::String & name) const { return RuntimeVariablesContainer::GetBadVariable(); }
-    virtual gd::Variable & Get(unsigned int index) { return RuntimeVariablesContainer::GetBadVariable(); }
-    virtual const gd::Variable & Get(unsigned int index) const { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual gd::Variable & Get(std::size_t index) { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual const gd::Variable & Get(std::size_t index) const { return RuntimeVariablesContainer::GetBadVariable(); }
     virtual void Merge(const gd::VariablesContainer & container) {}
 };
 

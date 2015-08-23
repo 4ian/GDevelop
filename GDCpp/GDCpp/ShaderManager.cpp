@@ -23,7 +23,7 @@ std::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<gd::S
 
     std::shared_ptr<sf::Shader> shader(new sf::Shader);
 
-    for (unsigned int i = 0;i<shaders.size();++i)
+    for (std::size_t i = 0;i<shaders.size();++i)
     {
         gd::String file = gd::ResourcesLoader::Get()->LoadPlainText(shaders[i]);
 
@@ -52,7 +52,7 @@ std::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<gd::S
     }
 
     gd::String shaderSource;
-    for (unsigned int i = 0;i<declarations.size();++i) shaderSource += declarations[i];
+    for (std::size_t i = 0;i<declarations.size();++i) shaderSource += declarations[i];
     shaderSource += "\nvoid main()\n{"+mainFunctions+"}";
     std::cout << "ShaderSource:" << shaderSource << std::endl;
     shader->loadFromMemory(shaderSource.c_str(), sf::Shader::Fragment);

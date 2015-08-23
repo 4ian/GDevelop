@@ -50,14 +50,14 @@ bool PickObjectsIf(const RuntimeObjectsLists & pickedObjectsLists, bool negatePr
     }
 
     //Pick objects which are fulfulling the predicate.
-    unsigned int i = 0;
+    std::size_t i = 0;
     for(RuntimeObjectsLists::const_iterator it = pickedObjectsLists.begin();
         it != pickedObjectsLists.end();++it, ++i)
     {
         if ( !it->second ) continue;
         const std::vector<RuntimeObject*> & arr1 = *it->second;
 
-        for(unsigned int k = 0;k<arr1.size();++k)
+        for(std::size_t k = 0;k<arr1.size();++k)
         {
             if (negatePredicate ^ predicate(arr1[k])) {
                 pickedList[i][k] = true;
@@ -75,7 +75,7 @@ bool PickObjectsIf(const RuntimeObjectsLists & pickedObjectsLists, bool negatePr
         if ( !it->second ) continue;
         std::vector<RuntimeObject*> & arr = *it->second;
 
-        for(unsigned int k = 0;k<arr.size();++k)
+        for(std::size_t k = 0;k<arr.size();++k)
         {
             RuntimeObject * obj = arr[k];
             if ( pickedList[i][k] )
@@ -146,24 +146,24 @@ bool TwoObjectListsTest(RuntimeObjectsLists objectsLists1,
 
     //Launch the function each object of the first list with each object
     //of the second list.
-    unsigned int i = 0;
+    std::size_t i = 0;
     for(RuntimeObjectsLists::const_iterator it = objectsLists1.begin();
         it != objectsLists1.end();++it, ++i)
     {
         if ( !it->second ) continue;
         const std::vector<RuntimeObject*> & arr1 = *it->second;
 
-        for(unsigned int k = 0;k<arr1.size();++k) {
+        for(std::size_t k = 0;k<arr1.size();++k) {
             bool atLeastOneObject = false;
 
-            unsigned int j = 0;
+            std::size_t j = 0;
             for(RuntimeObjectsLists::const_iterator it2 = objectsLists2.begin();
                 it2 != objectsLists2.end();++it2, ++j)
             {
                 if ( !it2->second ) continue;
                 const std::vector<RuntimeObject*> & arr2 = *it2->second;
 
-                for(unsigned int l = 0;l<arr2.size();++l) {
+                for(std::size_t l = 0;l<arr2.size();++l) {
                     if ( pickedList1[i][k] && pickedList2[j][l]) continue; //Avoid unnecessary costly call to functor.
 
                     if ( arr1[k] != arr2[l] && predicate(arr1[k], arr2[l]) ) {
@@ -196,7 +196,7 @@ bool TwoObjectListsTest(RuntimeObjectsLists objectsLists1,
         if ( !it->second ) continue;
         std::vector<RuntimeObject*> & arr = *it->second;
 
-        for(unsigned int k = 0;k<arr.size();++k)
+        for(std::size_t k = 0;k<arr.size();++k)
         {
             RuntimeObject * obj = arr[k];
             if ( pickedList1[i][k] )
@@ -209,7 +209,7 @@ bool TwoObjectListsTest(RuntimeObjectsLists objectsLists1,
     }
 
     if ( !negatePredicate ) {
-        unsigned int i = 0;
+        std::size_t i = 0;
         for(RuntimeObjectsLists::const_iterator it = objectsLists2.begin();
             it != objectsLists2.end();++it, ++i)
         {
@@ -221,7 +221,7 @@ bool TwoObjectListsTest(RuntimeObjectsLists objectsLists1,
             if ( arr.size() != pickedList2[i].size() ) //If the size of the objects list != size of the boolean "picked" list...
                 continue; //... then the object list was already trimmed, skip it.
 
-            for(unsigned int k = 0;k<arr.size();++k)
+            for(std::size_t k = 0;k<arr.size();++k)
             {
                 RuntimeObject * obj = arr[k];
                 if ( pickedList2[i][k] )

@@ -169,7 +169,7 @@ void PhysicsBehavior::CreateBody(const RuntimeScene & scene)
         Triangulate::Process(polygonCoords, resultOfTriangulation);
 
         //Iterate over all triangles
-        for(unsigned int i = 0; i < resultOfTriangulation.size() / 3; i++)
+        for(std::size_t i = 0; i < resultOfTriangulation.size() / 3; i++)
         {
             b2FixtureDef fixtureDef;
             b2PolygonShape dynamicBox;
@@ -177,7 +177,7 @@ void PhysicsBehavior::CreateBody(const RuntimeScene & scene)
             //Create vertices
             b2Vec2 vertices[3];
 
-            unsigned int b = 0;
+            std::size_t b = 0;
             for(int a = 2; a >= 0; a--) //Box2D use another direction for vertices
             {
                 if(polygonPositioning == OnOrigin)
@@ -704,7 +704,7 @@ gd::String PhysicsBehavior::GetStringFromCoordsVector(const std::vector<sf::Vect
 {
     gd::String coordsStr;
 
-	for (unsigned int a = 0; a < vec.size(); a++)
+	for (std::size_t a = 0; a < vec.size(); a++)
 	{
 	    coordsStr += gd::String::From(vec.at(a).x);
         coordsStr.push_back(composantSep);
@@ -722,7 +722,7 @@ std::vector<sf::Vector2f> PhysicsBehavior::GetCoordsVectorFromString(const gd::S
 
     std::vector<gd::String> coordsDecomposed = str.Split(coordsSep);
 
-    for(unsigned int a = 0; a < coordsDecomposed.size(); a++)
+    for(std::size_t a = 0; a < coordsDecomposed.size(); a++)
     {
         std::vector<gd::String> coordXY = coordsDecomposed.at(a).Split(composantSep);
 

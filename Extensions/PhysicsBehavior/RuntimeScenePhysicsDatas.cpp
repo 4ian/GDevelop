@@ -37,12 +37,12 @@ void RuntimeScenePhysicsDatas::StepWorld(float dt, int v, int p)
 
 	if(totalTime > fixedTimeStep)
 	{
-	    unsigned int numberOfSteps(std::floor(totalTime / fixedTimeStep));
+	    std::size_t numberOfSteps(std::floor(totalTime / fixedTimeStep));
 	    totalTime -= numberOfSteps * fixedTimeStep;
 
-	    unsigned int numberOfStepToProcess = std::min(numberOfSteps, maxSteps);
+	    std::size_t numberOfStepToProcess = std::min(numberOfSteps, maxSteps);
 
-	    for(unsigned int a = 0; a < numberOfStepToProcess; a++)
+	    for(std::size_t a = 0; a < numberOfStepToProcess; a++)
 	    {
             world->Step(fixedTimeStep, v, p);
             world->ClearForces();
@@ -59,4 +59,3 @@ RuntimeScenePhysicsDatas::~RuntimeScenePhysicsDatas()
     delete world;
     delete contactListener;
 }
-

@@ -31,7 +31,7 @@ void DraggableBehavior::DoStepPreEvents(RuntimeScene & scene)
         !leftPressedLastFrame && !somethingDragged )
     {
         RuntimeLayer & theLayer = scene.GetRuntimeLayer(object->GetLayer());
-        for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
+        for (std::size_t cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
         {
             sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
                 scene.GetInputManager().GetMousePosition(), theLayer.GetCamera(cameraIndex).GetSFMLView());

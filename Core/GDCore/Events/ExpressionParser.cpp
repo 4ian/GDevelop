@@ -26,7 +26,7 @@ gd::String ExpressionParser::parserSeparators = " ,+-*/%.<>=&|;()#^![]{}";
 size_t ExpressionParser::GetMinimalParametersNumber(const std::vector < gd::ParameterMetadata > & parametersInfos)
 {
     size_t nb = 0;
-    for (unsigned int i = 0;i<parametersInfos.size();++i)
+    for (std::size_t i = 0;i<parametersInfos.size();++i)
     {
     	if ( !parametersInfos[i].optional && !parametersInfos[i].codeOnly ) nb++;
     }
@@ -37,7 +37,7 @@ size_t ExpressionParser::GetMinimalParametersNumber(const std::vector < gd::Para
 size_t ExpressionParser::GetMaximalParametersNumber(const std::vector < gd::ParameterMetadata > & parametersInfos)
 {
     size_t nb = 0;
-    for (unsigned int i = 0;i<parametersInfos.size();++i)
+    for (std::size_t i = 0;i<parametersInfos.size();++i)
     {
     	if ( !parametersInfos[i].codeOnly ) nb++;
     }
@@ -65,7 +65,7 @@ gd::String ReplaceTildesBySpaces(gd::String text)
 std::vector<gd::Expression> CompleteParameters(const std::vector < gd::ParameterMetadata > & parametersInfo, const std::vector < gd::Expression > & parameters)
 {
     std::vector<gd::Expression> completeParameters = parameters;
-    for (unsigned int i = 0;i<parametersInfo.size();++i) //Code only parameters are not included in expressions parameters.
+    for (std::size_t i = 0;i<parametersInfo.size();++i) //Code only parameters are not included in expressions parameters.
     {
         if ( parametersInfo[i].codeOnly)
         {
@@ -472,7 +472,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
 
                     //Preparing parameters
                     parameters = CompleteParameters(instructionInfos.parameters, parameters);
-                    for (unsigned int i = 0;i<instructionInfos.parameters.size();++i)
+                    for (std::size_t i = 0;i<instructionInfos.parameters.size();++i)
                     {
                         if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], instructionInfos.parameters[i], functionNameEnd) )
                             return false; //TODO : Boarf, param�tres optionels sont rajout�s et �valu�s : Probl�me avec les calques par exemple ( Au minimum, il faut "" )
@@ -676,7 +676,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
                 //Preparing parameters
                 parameters = CompleteParameters(expressionInfo.parameters, parameters);
-                for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
+                for (std::size_t i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                 {
                     if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
                         return false;
@@ -696,7 +696,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
                     firstErrorPos = functionNameEnd;
                     firstErrorStr = _("Incorrect number of parameters");
 
-                    for (unsigned int i = 0;i<parameters.size();++i)
+                    for (std::size_t i = 0;i<parameters.size();++i)
                         cout << "Param:" << parameters[i].GetPlainString() << endl;
 
                     return false;
@@ -704,7 +704,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
                 //Preparing parameters
                 parameters = CompleteParameters(expressionInfo.parameters, parameters);
-                for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
+                for (std::size_t i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                 {
                     if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
                         return false;
@@ -752,7 +752,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
                             //Preparing parameters
                             parameters = CompleteParameters(expressionInfo.parameters, parameters);
-                            for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
+                            for (std::size_t i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                             {
                                 if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
                                     return false;

@@ -197,7 +197,7 @@ tempLayer(layer_)
 	}
 
     cameraChoice->Clear();
-    for (unsigned int i = 0;i<layer.GetCameraCount();++i)
+    for (std::size_t i = 0;i<layer.GetCameraCount();++i)
     	cameraChoice->Append(gd::String::From(i));
 
     cameraChoice->SetSelection(0);
@@ -247,7 +247,7 @@ void EditLayerDialog::OncameraChoiceSelect(wxCommandEvent& event)
 
 void EditLayerDialog::RefreshCameraSettings()
 {
-    unsigned int selection = cameraChoice->GetSelection();
+    std::size_t selection = cameraChoice->GetSelection();
     if (selection >= tempLayer.GetCameraCount()) return;
 
     const Camera & camera = tempLayer.GetCamera(selection);
@@ -305,7 +305,7 @@ void EditLayerDialog::RefreshCameraSettings()
 
 void EditLayerDialog::OnsizeCheckClick(wxCommandEvent& event)
 {
-    unsigned int selection = cameraChoice->GetSelection();
+    std::size_t selection = cameraChoice->GetSelection();
     if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
@@ -316,7 +316,7 @@ void EditLayerDialog::OnsizeCheckClick(wxCommandEvent& event)
 
 void EditLayerDialog::OncameraWidthEditText(wxCommandEvent& event)
 {
-    unsigned int selection = cameraChoice->GetSelection();
+    std::size_t selection = cameraChoice->GetSelection();
     if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
@@ -325,7 +325,7 @@ void EditLayerDialog::OncameraWidthEditText(wxCommandEvent& event)
 
 void EditLayerDialog::OncameraHeightEditText(wxCommandEvent& event)
 {
-    unsigned int selection = cameraChoice->GetSelection();
+    std::size_t selection = cameraChoice->GetSelection();
     if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
@@ -334,7 +334,7 @@ void EditLayerDialog::OncameraHeightEditText(wxCommandEvent& event)
 
 void EditLayerDialog::OnviewportCheckClick(wxCommandEvent& event)
 {
-    unsigned int selection = cameraChoice->GetSelection();
+    std::size_t selection = cameraChoice->GetSelection();
     if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
@@ -348,7 +348,7 @@ void EditLayerDialog::OnviewportCheckClick(wxCommandEvent& event)
  */
 void EditLayerDialog::OnviewportX1EditText(wxCommandEvent& event)
 {
-    unsigned int selection = cameraChoice->GetSelection();
+    std::size_t selection = cameraChoice->GetSelection();
     if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
@@ -406,7 +406,7 @@ void EditLayerDialog::OnviewportX1EditText(wxCommandEvent& event)
 
 void EditLayerDialog::OndeleteCameraBtClick(wxCommandEvent& event)
 {
-    unsigned int selection = cameraChoice->GetSelection();
+    std::size_t selection = cameraChoice->GetSelection();
     if (selection >= tempLayer.GetCameraCount()) return;
 
     if ( tempLayer.GetCameraCount() == 1 )

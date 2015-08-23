@@ -90,15 +90,15 @@ const gd::Layer & Layout::GetLayer(const gd::String & name) const
 
     return badLayer;
 }
-gd::Layer & Layout::GetLayer(unsigned int index)
+gd::Layer & Layout::GetLayer(std::size_t index)
 {
     return initialLayers[index];
 }
-const gd::Layer & Layout::GetLayer (unsigned int index) const
+const gd::Layer & Layout::GetLayer (std::size_t index) const
 {
     return initialLayers[index];
 }
-unsigned int Layout::GetLayersCount() const
+std::size_t Layout::GetLayersCount() const
 {
     return initialLayers.size();
 }
@@ -108,16 +108,16 @@ bool Layout::HasLayerNamed(const gd::String & name) const
 {
     return ( find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name)) != initialLayers.end() );
 }
-unsigned int Layout::GetLayerPosition(const gd::String & name) const
+std::size_t Layout::GetLayerPosition(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<initialLayers.size();++i)
+    for (std::size_t i = 0;i<initialLayers.size();++i)
     {
         if ( initialLayers[i].GetName() == name ) return i;
     }
     return gd::String::npos;
 }
 
-void Layout::InsertNewLayer(const gd::String & name, unsigned int position)
+void Layout::InsertNewLayer(const gd::String & name, std::size_t position)
 {
     gd::Layer newLayer;
     newLayer.SetName(name);
@@ -127,7 +127,7 @@ void Layout::InsertNewLayer(const gd::String & name, unsigned int position)
         initialLayers.push_back(newLayer);
 }
 
-void Layout::InsertLayer(const gd::Layer & layer, unsigned int position)
+void Layout::InsertLayer(const gd::Layer & layer, std::size_t position)
 {
     if (position<initialLayers.size())
         initialLayers.insert(initialLayers.begin()+position, layer);
@@ -143,7 +143,7 @@ void Layout::RemoveLayer(const gd::String & name)
     initialLayers.erase(layer);
 }
 
-void Layout::SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex)
+void Layout::SwapLayers(std::size_t firstLayerIndex, std::size_t secondLayerIndex)
 {
     if ( firstLayerIndex >= initialLayers.size() || secondLayerIndex >= initialLayers.size() )
         return;
@@ -159,7 +159,7 @@ void Layout::UpdateBehaviorsSharedData(gd::Project & project)
     std::vector < gd::String > allBehaviorsNames;
 
     //Search in objects for the type and the name of every behaviors.
-    for (unsigned int i = 0;i<initialObjects.size();++i)
+    for (std::size_t i = 0;i<initialObjects.size();++i)
     {
         std::vector < gd::String > objectBehaviors = initialObjects[i]->GetAllBehaviorNames();
         for (unsigned int j = 0;j<objectBehaviors.size();++j)
@@ -169,10 +169,10 @@ void Layout::UpdateBehaviorsSharedData(gd::Project & project)
             allBehaviorsNames.push_back(behavior.GetName());
         }
     }
-    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<project.GetObjectsCount();++i)
     {
         std::vector < gd::String > objectBehaviors = project.GetObject(i).GetAllBehaviorNames();
-        for (unsigned int j = 0;j<objectBehaviors.size();++j)
+        for (std::size_t j = 0;j<objectBehaviors.size();++j)
         {
             gd::Behavior & behavior = project.GetObject(i).GetBehavior(objectBehaviors[j]);
             allBehaviorsTypes.push_back(behavior.GetTypeName());
@@ -181,7 +181,7 @@ void Layout::UpdateBehaviorsSharedData(gd::Project & project)
     }
 
     //Create non existing shared data
-    for (unsigned int i = 0;i<allBehaviorsTypes.size() && i < allBehaviorsNames.size();++i)
+    for (std::size_t i = 0;i<allBehaviorsTypes.size() && i < allBehaviorsNames.size();++i)
     {
         if ( behaviorsInitialSharedDatas.find(allBehaviorsNames[i]) == behaviorsInitialSharedDatas.end() )
         {
@@ -204,7 +204,7 @@ void Layout::UpdateBehaviorsSharedData(gd::Project & project)
     }
 
     //Then delete shared data not linked to a behavior
-    for (unsigned int i = 0;i<allSharedData.size();++i)
+    for (std::size_t i = 0;i<allSharedData.size();++i)
     {
         if ( std::find(allBehaviorsNames.begin(), allBehaviorsNames.end(), allSharedData[i]) == allBehaviorsNames.end() )
             behaviorsInitialSharedDatas.erase(allSharedData[i]);
@@ -238,7 +238,7 @@ void Layout::SerializeTo(SerializerElement & element) const
 
     SerializerElement & layersElement = element.AddChild("layers");
     layersElement.ConsiderAsArrayOf("layer");
-    for ( unsigned int j = 0;j < GetLayersCount();++j )
+    for ( std::size_t j = 0;j < GetLayersCount();++j )
         GetLayer(j).SerializeTo(layersElement.AddChild("layer"));
 
     SerializerElement & behaviorDatasElement = element.AddChild("behaviorsSharedData");
@@ -282,7 +282,7 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
     initialLayers.clear();
     SerializerElement & layersElement = element.GetChild("layers", 0, "Layers");
     layersElement.ConsiderAsArrayOf("layer", "Layer");
-    for (unsigned int i = 0; i < layersElement.GetChildrenCount(); ++i)
+    for (std::size_t i = 0; i < layersElement.GetChildrenCount(); ++i)
     {
         gd::Layer layer;
 
@@ -293,7 +293,7 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
     //Compatibility with GD <= 4
     gd::String deprecatedTag1 = "automatismsSharedData";
     gd::String deprecatedTag2 = "automatismSharedData";
-    if (!element.HasChild(deprecatedTag1)) 
+    if (!element.HasChild(deprecatedTag1))
     {
         deprecatedTag1 = "AutomatismsSharedDatas";
         deprecatedTag2 = "AutomatismSharedDatas";
@@ -345,7 +345,7 @@ void Layout::Init(const Layout & other)
     variables = other.GetVariables();
 
     initialObjects.clear();
-    for (unsigned int i =0;i<other.initialObjects.size();++i)
+    for (std::size_t i =0;i<other.initialObjects.size();++i)
     	initialObjects.push_back( std::shared_ptr<gd::Object>(other.initialObjects[i]->Clone()) );
 
     behaviorsInitialSharedDatas.clear();
@@ -366,10 +366,10 @@ void Layout::Init(const Layout & other)
     #endif
 }
 
-std::vector<gd::String> GetHiddenLayers(const Layout & layout) 
+std::vector<gd::String> GetHiddenLayers(const Layout & layout)
 {
     std::vector<gd::String> hiddenLayers;
-    for (unsigned int i = 0;i < layout.GetLayersCount();++i) {
+    for (std::size_t i = 0;i < layout.GetLayersCount();++i) {
         if (!layout.GetLayer(i).GetVisibility()) {
             hiddenLayers.push_back(layout.GetLayer(i).GetName());
         }
@@ -392,7 +392,7 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::La
     //Search in groups
     if ( searchInGroups )
     {
-        for (unsigned int i = 0;i<layout.GetObjectGroups().size();++i)
+        for (std::size_t i = 0;i<layout.GetObjectGroups().size();++i)
         {
             if ( layout.GetObjectGroups()[i].GetName() == name )
             {
@@ -402,7 +402,7 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::La
                 vector < gd::String > groupsObjects = layout.GetObjectGroups()[i].GetAllObjectsNames();
                 gd::String previousType = groupsObjects.empty() ? "" : GetTypeOfObject(project, layout, groupsObjects[0], false);
 
-                for (unsigned int j = 0;j<groupsObjects.size();++j)
+                for (std::size_t j = 0;j<groupsObjects.size();++j)
                 {
                     if ( GetTypeOfObject(project, layout, groupsObjects[j], false) != previousType )
                         return ""; //The group has more than one type.
@@ -415,7 +415,7 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::La
                 type = previousType;
             }
         }
-        for (unsigned int i = 0;i<project.GetObjectGroups().size();++i)
+        for (std::size_t i = 0;i<project.GetObjectGroups().size();++i)
         {
             if ( project.GetObjectGroups()[i].GetName() == name )
             {
@@ -425,7 +425,7 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::La
                 vector < gd::String > groupsObjects = project.GetObjectGroups()[i].GetAllObjectsNames();
                 gd::String previousType = groupsObjects.empty() ? "" : GetTypeOfObject(project, layout, groupsObjects[0], false);
 
-                for (unsigned int j = 0;j<groupsObjects.size();++j)
+                for (std::size_t j = 0;j<groupsObjects.size();++j)
                 {
                     if ( GetTypeOfObject(project, layout, groupsObjects[j], false) != previousType )
                         return ""; //The group has more than one type.
@@ -445,20 +445,20 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::La
 
 gd::String GD_CORE_API GetTypeOfBehavior(const gd::Project & project, const gd::Layout & layout, gd::String name, bool searchInGroups)
 {
-    for (unsigned int i = 0;i<layout.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<layout.GetObjectsCount();++i)
     {
         vector < gd::String > behaviors = layout.GetObject(i).GetAllBehaviorNames();
-        for (unsigned int j = 0;j<behaviors.size();++j)
+        for (std::size_t j = 0;j<behaviors.size();++j)
         {
             if ( layout.GetObject(i).GetBehavior(behaviors[j]).GetName() == name )
                 return layout.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
         }
     }
 
-    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<project.GetObjectsCount();++i)
     {
         vector < gd::String > behaviors = project.GetObject(i).GetAllBehaviorNames();
-        for (unsigned int j = 0;j<behaviors.size();++j)
+        for (std::size_t j = 0;j<behaviors.size();++j)
         {
             if ( project.GetObject(i).GetBehavior(behaviors[j]).GetName() == name )
                 return project.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
@@ -490,7 +490,7 @@ vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const gd::Project & proje
     //Search in groups
     if ( searchInGroups )
     {
-        for (unsigned int i = 0;i<layout.GetObjectGroups().size();++i)
+        for (std::size_t i = 0;i<layout.GetObjectGroups().size();++i)
         {
             if ( layout.GetObjectGroups()[i].GetName() == name )
             {
@@ -498,7 +498,7 @@ vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const gd::Project & proje
                 //Verifying now that all objects have common behaviors.
 
                 vector < gd::String > groupsObjects = layout.GetObjectGroups()[i].GetAllObjectsNames();
-                for (unsigned int j = 0;j<groupsObjects.size();++j)
+                for (std::size_t j = 0;j<groupsObjects.size();++j)
                 {
                     //Get behaviors of the object of the group and delete behavior which are not in commons.
                 	vector < gd::String > objectBehaviors = GetBehaviorsOfObject(project, layout, groupsObjects[j], false);
@@ -509,7 +509,7 @@ vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const gd::Project & proje
                 	}
                 	else
                 	{
-                        for (unsigned int a = 0 ;a<behaviors.size();++a)
+                        for (std::size_t a = 0 ;a<behaviors.size();++a)
                         {
                             if ( find(objectBehaviors.begin(), objectBehaviors.end(), behaviors[a]) == objectBehaviors.end() )
                             {
@@ -521,7 +521,7 @@ vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const gd::Project & proje
                 }
             }
         }
-        for (unsigned int i = 0;i<project.GetObjectGroups().size();++i)
+        for (std::size_t i = 0;i<project.GetObjectGroups().size();++i)
         {
             if ( project.GetObjectGroups()[i].GetName() == name )
             {
@@ -529,7 +529,7 @@ vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const gd::Project & proje
                 //Verifying now that all objects have common behaviors.
 
                 vector < gd::String > groupsObjects = project.GetObjectGroups()[i].GetAllObjectsNames();
-                for (unsigned int j = 0;j<groupsObjects.size();++j)
+                for (std::size_t j = 0;j<groupsObjects.size();++j)
                 {
                     //Get behaviors of the object of the group and delete behavior which are not in commons.
                 	vector < gd::String > objectBehaviors = GetBehaviorsOfObject(project, layout, groupsObjects[j], false);
@@ -540,7 +540,7 @@ vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const gd::Project & proje
                 	}
                 	else
                 	{
-                        for (unsigned int a = 0 ;a<behaviors.size();++a)
+                        for (std::size_t a = 0 ;a<behaviors.size();++a)
                         {
                             if ( find(objectBehaviors.begin(), objectBehaviors.end(), behaviors[a]) == objectBehaviors.end() )
                             {

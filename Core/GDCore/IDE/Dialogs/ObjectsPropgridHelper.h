@@ -8,10 +8,13 @@
 #define OBJECTSPROPGRIDHELPER_H
 
 #include <wx/propgrid/propgrid.h>
+#include <map>
 #include <vector>
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Object; }
 namespace gd { class Project; }
+namespace gd { class PropertyDescriptor; }
+namespace gd { class String; }
 namespace gd { class Layout; }
 
 namespace gd
@@ -43,6 +46,13 @@ public:
      * \param displayedAfterInstanceProperties If set to true, it is assumed that the grid already contains properties of an instance of the object.
      */
     void RefreshFrom(const gd::Object * object, bool displayedAfterInstanceProperties = false);
+
+    /**
+     * \brief Add to the grid a list of properties
+     * \param properties The properties to display
+     * \param propertiesName The name associated to the properties
+     */
+    void RefreshFrom(const std::map<gd::String, gd::PropertyDescriptor> & properties, gd::String propertiesNames);
 
     /**
      * \brief Call this when the event wxEVT_PG_SELECTED of wxPropertyGrid is triggered.

@@ -20,7 +20,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
     extension.SetExtensionInformation("TextObject",
                           _("Text object"),
                           _("Extension allowing to use an object displaying a text."),
-                          "Florian Rival",
+                          "Florian Rival and Victor Levasseur",
                           "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject("Text",

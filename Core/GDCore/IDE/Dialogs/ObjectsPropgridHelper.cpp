@@ -81,37 +81,38 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
         grid->SetPropertyReadOnly(wxString("AUTO_RENAME:"+behaviors[i]));
 
         //Add behavior custom properties
-        for (std::map<gd::String, gd::PropertyDescriptor>::iterator it = properties.begin();
-            it != properties.end();++it)
-        {
-            if ( (*it).first == "PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS" ) continue; //Skip the magic property.
-
-            gd::String type = (*it).second.GetType();
-            gd::String value = (*it).second.GetValue();
-            gd::String name = (*it).first;
-            if ( type == "Choice" )
-            {
-                const std::vector<gd::String> & choices = (*it).second.GetExtraInfo();
-                wxArrayString choicesArray;
-                for (std::size_t j = 0; j < choices.size(); ++j)
-                    choicesArray.push_back(choices[j]);
-
-                wxEnumProperty * prop = new wxEnumProperty(name, "AUTO_PROP:"+behaviors[i], choicesArray);
-                prop->SetChoiceSelection(choicesArray.Index(value));
-                grid->Append(prop);
-            }
-            else if ( type == "Boolean" )
-            {
-                grid->Append(new wxBoolProperty(name, "AUTO_PROP:"+behaviors[i], value == "true"));
-            }
-            else
-                grid->Append(new wxStringProperty(name, "AUTO_PROP:"+behaviors[i], value));
-        }
-
+        RefreshFrom(properties, "AUTO_PROP:"+behaviors[i]);
     }
 
 
     grid->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
+}
+
+void ObjectsPropgridHelper::RefreshFrom(const std::map<gd::String, gd::PropertyDescriptor> & properties, gd::String propertiesNames)
+{
+    for (auto it = properties.begin();it != properties.end();++it)
+    {
+        if ( (*it).first == "PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS" ) continue; //Skip the magic property.
+
+        gd::String type = (*it).second.GetType();
+        gd::String value = (*it).second.GetValue();
+        gd::String name = (*it).first;
+        if ( type == "Choice" )
+        {
+            auto & choices = (*it).second.GetExtraInfo();
+            wxArrayString choicesArray;
+            for (std::size_t j = 0; j < choices.size(); ++j)
+                choicesArray.push_back(choices[j]);
+
+            wxEnumProperty * prop = new wxEnumProperty(name, propertiesNames, choicesArray);
+            prop->SetChoiceSelection(choicesArray.Index(value));
+            grid->Append(prop);
+        }
+        else if ( type == "Boolean" )
+            grid->Append(new wxBoolProperty(name, propertiesNames, value == "true"));
+        else
+            grid->Append(new wxStringProperty(name, propertiesNames, value));
+    }
 }
 
 bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout * layout, wxPropertyGridEvent& event)
@@ -227,87 +228,7 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
 {
     if ( !grid || !object ) return false;
 
-    //Check if the object is global
-    bool globalObject = false;
-    for (std::size_t i = 0;i<project.GetObjectsCount();++i)
-    {
-        if ( &project.GetObject(i) == object )
-        {
-            globalObject = true;
-            break;
-        }
-    }
-
-    if ( event.GetPropertyName() == _("Object name") )
-    {
-        /*gd::String oldName = object->GetName();
-        gd::String newName = event.GetPropertyValue().GetString();
-
-        //Be sure the name is valid
-        if ( !project.ValidateObjectName(newName) )
-        {
-            wxRichToolTip tip(_("Invalid name"), project.GetBadObjectNameWarning());
-            tip.SetIcon(wxICON_INFORMATION);
-            tip.ShowFor(grid);
-
-            event.Veto();
-            return false;
-        }
-
-        if ( (!globalObject && layout && layout->HasObjectNamed(newName)) ||
-             (globalObject && project.HasObjectNamed(newName)) ) return false;
-
-        object->SetName( newName );
-
-        if ( !globalObject && layout ) //Change the object name in the layout.
-        {
-            gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, *layout, layout->GetEvents(), oldName, newName);
-            layout->GetInitialInstances().RenameInstancesOfObject(oldName, newName);
-            for (std::size_t g = 0;g<layout->GetObjectGroups().size();++g)
-            {
-                if ( layout->GetObjectGroups()[g].Find(oldName))
-                {
-                    layout->GetObjectGroups()[g].RemoveObject(oldName);
-                    layout->GetObjectGroups()[g].AddObject(newName);
-                }
-            }
-        }
-        else if ( globalObject ) //Change the object name in all layouts
-        {
-            for (std::size_t g = 0;g<project.GetObjectGroups().size();++g)
-            {
-                if ( project.GetObjectGroups()[g].Find(oldName))
-                {
-                    project.GetObjectGroups()[g].RemoveObject(oldName);
-                    project.GetObjectGroups()[g].AddObject(newName);
-                }
-            }
-
-            for (std::size_t i = 0;i<project.GetLayoutsCount();++i)
-            {
-                gd::Layout & layout = project.GetLayout(i);
-                if ( layout.HasObjectNamed(oldName) ) continue;
-
-                gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), oldName, newName);
-                layout.GetInitialInstances().RenameInstancesOfObject(oldName, newName);
-                for (std::size_t g = 0;g<layout.GetObjectGroups().size();++g)
-                {
-                    if ( layout.GetObjectGroups()[g].Find(oldName))
-                    {
-                        layout.GetObjectGroups()[g].RemoveObject(oldName);
-                        layout.GetObjectGroups()[g].AddObject(newName);
-                    }
-                }
-
-            }
-        }
-
-        for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
-            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectRenamed(project, globalObject ? NULL : layout, *object, oldName);
-
-        return true;*/
-    }
-    else if ( event.GetPropertyName().substr(0,10) == "AUTO_PROP:" )
+    if ( event.GetPropertyName().substr(0,10) == "AUTO_PROP:" )
     {
         gd::String autoName = event.GetPropertyName().substr(10);
         if ( !object->HasBehaviorNamed(autoName))
@@ -327,12 +248,8 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
             unsigned int id = event.GetPropertyValue().GetLong();
             if (id < choices.size()) {
                 value = choices[id];
-                std::cout << "deduced" << value;
-
             }
         }
-        std::cout << "VALUE" << value;
-
 
         if ( !behavior.UpdateProperty(event.GetProperty()->GetLabel(), value, project) )
         {

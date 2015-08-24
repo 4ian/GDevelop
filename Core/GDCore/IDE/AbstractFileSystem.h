@@ -93,10 +93,28 @@ public:
      */
     virtual bool MakeRelative(gd::String & filename, const gd::String & baseDirectory) = 0;
 
+    /**
+     * \brief Copy a file
+     * \return true if the operation succeeded.
+     */
     virtual bool CopyFile(const gd::String & file, const gd::String & destination) = 0;
+    
+    /**
+     * \brief Copy a whole directory
+     * \return true if the operation succeeded.
+     */
+    virtual bool CopyDir(const gd::String & source, const gd::String & destination) = 0;
 
+    /**
+     * \brief Write the content of a string to a file.
+     * \return true if the operation succeeded.
+     */
     virtual bool WriteToFile(const gd::String & file, const gd::String & content) = 0;
 
+    /**
+     * \brief Read the content of a file.
+     * \return The content of the file.
+     */
     virtual gd::String ReadFile(const gd::String & file) = 0;
 
     /**
@@ -136,6 +154,7 @@ public:
     virtual bool MakeRelative(gd::String & filename, const gd::String & baseDirectory);
     virtual bool IsAbsolute(const gd::String & filename);
     virtual bool CopyFile(const gd::String & file, const gd::String & destination);
+    virtual bool CopyDir(const gd::String & source, const gd::String & destination);
     virtual bool ClearDir(const gd::String & directory);
     virtual bool WriteToFile(const gd::String & file, const gd::String & content);
     virtual gd::String ReadFile(const gd::String & file);

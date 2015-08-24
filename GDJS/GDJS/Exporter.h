@@ -53,7 +53,7 @@ public:
      * Called by ShowProjectExportDialog if the user clicked on Ok.
      */
     bool ExportWholeProject(gd::Project & project, gd::String exportDir,
-        bool minify, bool exportForCocoonJS, bool exportForIntelXDK);
+        bool minify, bool exportForCocoonJS, bool exportForCordova);
 
     /**
      * \brief Return the error that occurred during the last export.
@@ -122,11 +122,11 @@ private:
      * \brief Copy the external source files used by the game into the export directory, and add them into files
      * to be included.
      *
-     * Files are named "ext-codeX.js", X being the number of the layout in the project.
+     * Files are named "ext-codeX.js", X being the index of the external source file in the project.
      * \param project The project with resources to be exported.
      * \param outputDir The directory where the events code must be generated.
      * \param includesFiles A reference to a vector that will be filled with JS files to be exported along with the project.
-     * ( including "ext-codeX.js" files ).
+     * (including "ext-codeX.js" files).
      */
     bool ExportExternalSourceFiles(gd::Project & project, gd::String outputDir, std::vector<gd::String> & includesFiles);
 
@@ -136,23 +136,12 @@ private:
      * The includes files must be relative to the export directory.
      *
      * \param project The project with layouts to be exported.
+     * \param source The file to be used as a template for the final file.
      * \param exportDir The directory where the preview must be created.
      * \param includesFiles The JS files to be included in the HTML file. Order is important.
      * \param additionalSpec JSON string that will be passed to the gdjs.RuntimeGame object.
      */
-    bool ExportStandardIndexFile(gd::Project & project, gd::String exportDir, const std::vector<gd::String> & includesFiles, gd::String additionalSpec = "");
-
-    /**
-     * \brief Generate the standard index file for use with Intel XDK and save it to the export directory.
-     *
-     * The includes files must be relative to the export directory.
-     *
-     * \param project The project with layouts to be exported.
-     * \param exportDir The directory where the project must be generated.
-     * \param includesFiles The JS files to be included in the HTML file. Order is important.
-     * \param additionalSpec JSON string that will be passed to the gdjs.RuntimeGame object.
-     */
-    bool ExportIntelXDKIndexFile(gd::Project & project, gd::String exportDir, const std::vector<gd::String> & includesFiles, gd::String additionalSpec = "");
+    bool ExportIndexFile(gd::String source, gd::String exportDir, const std::vector<gd::String> & includesFiles, gd::String additionalSpec = "");
 
     /**
      * \brief Replace the annotations in a index.html file by the specified content.
@@ -165,6 +154,14 @@ private:
      * \param additionalSpec The string "GDJS_ADDITIONAL_SPEC" surrounded by comments marks will be replaced by the content of the string.
      */
     bool CompleteIndexFile(gd::String & indexFileContent, gd::String customCss, gd::String customHtml, gd::String exportDir, const std::vector<gd::String> & includesFiles, gd::String additionalSpec);
+
+    /**
+     * \brief Generate the Cordova configuration file and save it to the export directory.
+     *
+     * \param project The project to be used to generate the configuration file.
+     * \param exportDir The directory where the config.xml must be created.
+     */
+    bool ExportCordovaConfigFile(const gd::Project & project, gd::String exportDir);
 
     gd::AbstractFileSystem & fs; ///< The abstract file system to be used for exportation.
     gd::String lastError; ///< The last error that occurred.

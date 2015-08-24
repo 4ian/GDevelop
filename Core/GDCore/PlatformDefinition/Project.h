@@ -54,25 +54,35 @@ public:
     ///@{
 
     /**
-     * Change project name
+     * \brief Change project name
      */
     void SetName(const gd::String & name_) { name = name_; };
 
     /**
-     * Get project name
+     * \brief Get project name
      */
-    const gd::String & GetName() const {return name;}
+    const gd::String & GetName() const { return name; }
 
 #if defined(GD_IDE_ONLY)
     /**
-     * Must change the name of the project with the name passed as parameter.
+     * \brief Change the author of the project.
      */
     void SetAuthor(const gd::String & author_) { author = author_; };
 
     /**
-     * Return the name of the project.
+     * \brief Get project author name.
      */
-    const gd::String & GetAuthor() const {return author;}
+    const gd::String & GetAuthor() const { return author; }
+    
+    /**
+     * \brief Change project package name.
+     */
+    void SetPackageName(const gd::String & packageName_) { packageName = packageName_; };
+
+    /**
+     * \brief Get project package name.
+     */
+    const gd::String & GetPackageName() const { return packageName; }
 
     /**
      * Called when project file has changed.
@@ -748,6 +758,7 @@ private:
     std::vector < std::shared_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
     std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
     gd::String                                         author; ///< Game author name
+    gd::String                                         packageName; ///< Game package name
     gd::String                                         gameFile; ///< File of the game
     gd::String                                         latestCompilationDirectory; ///< File of the game
     gd::Platform*                                       currentPlatform; ///< The platform being used to edit the project.

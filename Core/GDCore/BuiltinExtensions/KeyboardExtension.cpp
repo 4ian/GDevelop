@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
 {
     extension.SetExtensionInformation("BuiltinKeyboard",
                           _("Keyboard features"),
-                          _("Built-in extensions allowing to use keyboard"),
+                          _("Built-in extension allowing to use keyboard"),
                           "Florian Rival",
                           "Open source (MIT License)");
 

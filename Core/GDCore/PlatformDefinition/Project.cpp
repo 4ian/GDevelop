@@ -60,6 +60,7 @@ namespace gd
 Project::Project() :
     #if defined(GD_IDE_ONLY)
     name(_("Project")),
+    packageName("com.example.gamename"),
     #endif
     windowWidth(800),
     windowHeight(600),
@@ -530,6 +531,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     SetVerticalSyncActivatedByDefault(propElement.GetChild("verticalSync").GetValue().GetInt());
     #if defined(GD_IDE_ONLY)
     SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
+    SetPackageName(propElement.GetStringAttribute("packageName"));
     SetLastCompilationDirectory(propElement.GetChild("latestCompilationDirectory", 0, "LatestCompilationDirectory").GetValue().GetString());
     winExecutableFilename = propElement.GetStringAttribute("winExecutableFilename");
     winExecutableIconFile = propElement.GetStringAttribute("winExecutableIconFile");
@@ -882,6 +884,7 @@ void Project::SerializeTo(SerializerElement & element) const
     propElement.AddChild("maxFPS").SetValue(GetMaximumFPS());
     propElement.AddChild("minFPS").SetValue(GetMinimumFPS());
     propElement.AddChild("verticalSync").SetValue(IsVerticalSynchronizationEnabledByDefault());
+    propElement.SetAttribute("packageName", packageName);
     propElement.SetAttribute("winExecutableFilename", winExecutableFilename);
     propElement.SetAttribute("winExecutableIconFile", winExecutableIconFile);
     propElement.SetAttribute("linuxExecutableFilename", linuxExecutableFilename);
@@ -1090,6 +1093,7 @@ void Project::PopulatePropertyGrid(wxPropertyGrid * grid)
 {
     grid->Append( new wxPropertyCategory(_("Properties")) );
     grid->Append( new wxStringProperty(_("Name of the project"), wxPG_LABEL, GetName()) );
+    grid->Append( new wxStringProperty(_("Package name"), wxPG_LABEL, GetPackageName()) );
     grid->Append( new wxStringProperty(_("Author"), wxPG_LABEL, GetAuthor()) );
     grid->Append( new wxStringProperty(_("Globals variables"), wxPG_LABEL, _("Click to edit...")) );
     grid->Append( new wxStringProperty(_("Extensions"), wxPG_LABEL, _("Click to edit...")) );
@@ -1130,6 +1134,8 @@ void Project::UpdateFromPropertyGrid(wxPropertyGrid * grid)
         SetName(grid->GetProperty(_("Name of the project"))->GetValueAsString());
     if ( grid->GetProperty(_("Author")) != NULL)
         SetAuthor(grid->GetProperty(_("Author"))->GetValueAsString());
+    if ( grid->GetProperty(_("Package name")) != NULL)
+        SetPackageName(grid->GetProperty(_("Package name"))->GetValueAsString());
     if ( grid->GetProperty(_("Width")) != NULL)
         SetDefaultWidth(grid->GetProperty(_("Width"))->GetValue().GetInteger());
     if ( grid->GetProperty(_("Height")) != NULL)
@@ -1208,6 +1214,7 @@ void Project::Init(const gd::Project & game)
 
     #if defined(GD_IDE_ONLY)
     author = game.author;
+    packageName = game.packageName;
     latestCompilationDirectory = game.latestCompilationDirectory;
     objectGroups = game.objectGroups;
 

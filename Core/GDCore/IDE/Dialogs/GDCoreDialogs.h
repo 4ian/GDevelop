@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef GDCOREDIALOGS_BASE_CLASSES_H
-#define GDCOREDIALOGS_BASE_CLASSES_H
+#ifndef IDE_DIALOGS_GDCOREDIALOGS_BASE_CLASSES_H
+#define IDE_DIALOGS_GDCOREDIALOGS_BASE_CLASSES_H
 
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
@@ -33,6 +33,12 @@
 #include <wx/htmllbox.h>
 #include "wx/srchctrl.h"
 #include <wx/scrolwin.h>
+#if wxVERSION_NUMBER >= 2900
+#include <wx/persist.h>
+#include <wx/persist/toplevel.h>
+#include <wx/persist/bookctrl.h>
+#include <wx/persist/treebook.h>
+#endif
 
 class LayersEditorPanelBase : public wxPanel
 {
@@ -63,6 +69,10 @@ protected:
     virtual void OnHelpClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxAuiToolBar* GetToolbar() { return m_toolbar; }
+    wxListCtrl* GetLayersList() { return m_layersList; }
+    wxPanel* GetPanel7() { return m_panel7; }
+    wxAuiManager* GetAuimgr() { return m_auimgr; }
     LayersEditorPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~LayersEditorPanelBase();
 };
@@ -87,6 +97,15 @@ protected:
     virtual void onCancelBtClick(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticText* GetStaticText49() { return m_staticText49; }
+    wxTextCtrl* GetGroupNameEdit() { return groupNameEdit; }
+    wxButton* GetBackColorBt() { return backColorBt; }
+    wxCheckBox* GetHideCheck() { return hideCheck; }
+    wxStaticLine* GetStaticLine47() { return m_staticLine47; }
+    wxStaticBitmap* GetStaticBitmap63() { return m_staticBitmap63; }
+    wxHyperlinkCtrl* GetHyperLink65() { return m_hyperLink65; }
+    wxButton* GetOkBt() { return okBt; }
+    wxButton* GetCancelBt() { return cancelBt; }
     BaseGroupEventDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the events group properties"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,200), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     virtual ~BaseGroupEventDialog();
 };
@@ -116,6 +135,20 @@ protected:
     virtual void OnCancelBtClick(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxSimpleHtmlListBox* GetTemplatesList() { return templatesList; }
+    wxSearchCtrl* GetSearchCtrl() { return searchCtrl; }
+    wxStaticText* GetNameTxt() { return nameTxt; }
+    wxStaticText* GetAuthorTxt() { return authorTxt; }
+    wxTextCtrl* GetDescriptionEdit() { return descriptionEdit; }
+    wxStaticLine* GetStaticLine979() { return m_staticLine979; }
+    wxFlexGridSizer* GetParametersSizer() { return parametersSizer; }
+    wxScrolledWindow* GetParametersScrolledWindow() { return parametersScrolledWindow; }
+    wxStaticLine* GetStaticLine7911() { return m_staticLine7911; }
+    wxStaticBitmap* GetStaticBitmap631() { return m_staticBitmap631; }
+    wxHyperlinkCtrl* GetHyperLink652() { return m_hyperLink652; }
+    wxHyperlinkCtrl* GetHyperLink154() { return m_hyperLink154; }
+    wxButton* GetOkBt() { return okBt; }
+    wxButton* GetCancelBt() { return cancelBt; }
     BaseEventStoreDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add a template from the event store"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(750,450), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~BaseEventStoreDialog();
 };

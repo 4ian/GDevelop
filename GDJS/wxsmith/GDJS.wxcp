@@ -72,6 +72,10 @@
 					"m_label":	"Style:",
 					"m_value":	""
 				}, {
+					"type":	"bool",
+					"m_label":	"Enable Window Persistency:",
+					"m_value":	true
+				}, {
 					"type":	"string",
 					"m_label":	"Title:",
 					"m_value":	"Export the project"
@@ -127,6 +131,10 @@
 					"m_styles":	[],
 					"m_sizerFlags":	[],
 					"m_properties":	[{
+							"type":	"string",
+							"m_label":	"Minimum Size:",
+							"m_value":	"-1,-1"
+						}, {
 							"type":	"string",
 							"m_label":	"Name:",
 							"m_value":	"flexGridSizer33"
@@ -227,7 +235,7 @@
 								}, {
 									"type":	"multi-string",
 									"m_label":	"Label:",
-									"m_value":	"Choose where do you want to export the game:"
+									"m_value":	"Choose how to export the game:"
 								}, {
 									"type":	"string",
 									"m_label":	"Wrap:",
@@ -389,6 +397,10 @@
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
 											"m_properties":	[{
 													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
+													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer34"
 												}, {
@@ -431,6 +443,10 @@
 													"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
 													"m_properties":	[{
 															"type":	"string",
+															"m_label":	"Minimum Size:",
+															"m_value":	"-1,-1"
+														}, {
+															"type":	"string",
 															"m_label":	"Name:",
 															"m_value":	"flexGridSizer35"
 														}, {
@@ -472,6 +488,10 @@
 															"m_styles":	[],
 															"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
 															"m_properties":	[{
+																	"type":	"string",
+																	"m_label":	"Minimum Size:",
+																	"m_value":	"-1,-1"
+																}, {
 																	"type":	"string",
 																	"m_label":	"Name:",
 																	"m_value":	"flexGridSizer36"
@@ -590,6 +610,10 @@
 																	"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
 																	"m_properties":	[{
 																			"type":	"string",
+																			"m_label":	"Minimum Size:",
+																			"m_value":	"-1,-1"
+																		}, {
+																			"type":	"string",
 																			"m_label":	"Name:",
 																			"m_value":	"flexGridSizer38"
 																		}, {
@@ -692,6 +716,10 @@
 																					"m_value":	""
 																				}, {
 																					"type":	"string",
+																					"m_label":	"Text Hint",
+																					"m_value":	""
+																				}, {
+																					"type":	"string",
 																					"m_label":	"Max Length:",
 																					"m_value":	"0"
 																				}, {
@@ -782,6 +810,11 @@
 																					"m_label":	"Bitmap File:",
 																					"m_path":	""
 																				}, {
+																					"type":	"choice",
+																					"m_label":	"Direction",
+																					"m_selection":	0,
+																					"m_options":	["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
+																				}, {
 																					"type":	"string",
 																					"m_label":	"Margins:",
 																					"m_value":	"2,2"
@@ -824,6 +857,10 @@
 																	"m_styles":	[],
 																	"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 																	"m_properties":	[{
+																			"type":	"string",
+																			"m_label":	"Minimum Size:",
+																			"m_value":	"-1,-1"
+																		}, {
 																			"type":	"string",
 																			"m_label":	"Name:",
 																			"m_value":	"flexGridSizer152"
@@ -1182,6 +1219,10 @@
 													"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
 													"m_properties":	[{
 															"type":	"string",
+															"m_label":	"Minimum Size:",
+															"m_value":	"-1,-1"
+														}, {
+															"type":	"string",
 															"m_label":	"Name:",
 															"m_value":	"staticBoxSizer45"
 														}, {
@@ -1208,6 +1249,10 @@
 															"m_styles":	[],
 															"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
 															"m_properties":	[{
+																	"type":	"string",
+																	"m_label":	"Minimum Size:",
+																	"m_value":	"-1,-1"
+																}, {
 																	"type":	"string",
 																	"m_label":	"Name:",
 																	"m_value":	"flexGridSizer46"
@@ -1308,11 +1353,11 @@
 																		}, {
 																			"type":	"multi-string",
 																			"m_label":	"Label:",
-																			"m_value":	"When the exportation is done, send the files to your website\\n(you need a web hosting) and just go to the website to start\\nthe game."
+																			"m_value":	"When the exportation is done, send the files to your website (you need a web hosting) and just go to the website to start the game."
 																		}, {
 																			"type":	"string",
 																			"m_label":	"Wrap:",
-																			"m_value":	"-1"
+																			"m_value":	"450"
 																		}],
 																	"m_events":	[],
 																	"m_children":	[]
@@ -1474,7 +1519,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Export to iOS or Android (with Intel XDK)"
+											"m_value":	"Export to iOS or Android with Cordova (Intel XDK)"
 										}, {
 											"type":	"bool",
 											"m_label":	"Selected",
@@ -1494,6 +1539,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer5511"
@@ -1602,6 +1651,10 @@
 															"m_styles":	[],
 															"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 															"m_properties":	[{
+																	"type":	"string",
+																	"m_label":	"Minimum Size:",
+																	"m_value":	"-1,-1"
+																}, {
 																	"type":	"string",
 																	"m_label":	"Name:",
 																	"m_value":	"flexGridSizer6333"
@@ -1775,7 +1828,7 @@
 														}, {
 															"type":	"multi-string",
 															"m_label":	"Label:",
-															"m_value":	"Intel XDK is a technology that helps HTML5 developers\\npublish their web-based games and apps for iOS,\\nAndroid and other devices and web stores."
+															"m_value":	"Cordova is a technology that enables HTML5 games to\\nbe packaged for iOS, Android and more. Third-party tools\\nlike Intel XDK allow game developers to bundle their games\\nusing Cordova."
 														}, {
 															"type":	"string",
 															"m_label":	"Wrap:",
@@ -1792,6 +1845,10 @@
 													"m_styles":	[],
 													"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 													"m_properties":	[{
+															"type":	"string",
+															"m_label":	"Minimum Size:",
+															"m_value":	"-1,-1"
+														}, {
 															"type":	"string",
 															"m_label":	"Name:",
 															"m_value":	"staticBoxSizer1126"
@@ -1819,6 +1876,10 @@
 															"m_styles":	[],
 															"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 															"m_properties":	[{
+																	"type":	"string",
+																	"m_label":	"Minimum Size:",
+																	"m_value":	"-1,-1"
+																}, {
 																	"type":	"string",
 																	"m_label":	"Name:",
 																	"m_value":	"flexGridSizer1147"
@@ -1919,11 +1980,11 @@
 																		}, {
 																			"type":	"multi-string",
 																			"m_label":	"Label:",
-																			"m_value":	"Just click on the \"Export\" button and GDevelop will\\npackage your game.\\nYou'll then be able to import the project into Intel XDK,\\nwhich will allows you to compile the game into an\\niOS and Android application."
+																			"m_value":	"Just click on the \"Export\" button and GDevelop will package your game.\\nYou'll then be able to import the project into Intel XDK (or any other Cordova compatible tool), which will allow you to compile the game into an iOS and Android application."
 																		}, {
 																			"type":	"string",
 																			"m_label":	"Wrap:",
-																			"m_value":	"-1"
+																			"m_value":	"450"
 																		}],
 																	"m_events":	[],
 																	"m_children":	[]
@@ -2018,6 +2079,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer551"
@@ -2126,6 +2191,10 @@
 															"m_styles":	[],
 															"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 															"m_properties":	[{
+																	"type":	"string",
+																	"m_label":	"Minimum Size:",
+																	"m_value":	"-1,-1"
+																}, {
 																	"type":	"string",
 																	"m_label":	"Name:",
 																	"m_value":	"flexGridSizer633"
@@ -2317,6 +2386,10 @@
 													"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 													"m_properties":	[{
 															"type":	"string",
+															"m_label":	"Minimum Size:",
+															"m_value":	"-1,-1"
+														}, {
+															"type":	"string",
 															"m_label":	"Name:",
 															"m_value":	"staticBoxSizer112"
 														}, {
@@ -2343,6 +2416,10 @@
 															"m_styles":	[],
 															"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 															"m_properties":	[{
+																	"type":	"string",
+																	"m_label":	"Minimum Size:",
+																	"m_value":	"-1,-1"
+																}, {
 																	"type":	"string",
 																	"m_label":	"Name:",
 																	"m_value":	"flexGridSizer114"
@@ -2466,6 +2543,10 @@
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
 							"m_properties":	[{
 									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
 									"m_label":	"Name:",
 									"m_value":	"flexGridSizer50"
 								}, {
@@ -2507,6 +2588,10 @@
 									"m_styles":	[],
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_LEFT", "wxALIGN_CENTER_VERTICAL"],
 									"m_properties":	[{
+											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
 											"type":	"string",
 											"m_label":	"Name:",
 											"m_value":	"flexGridSizer51"
@@ -2776,6 +2861,11 @@
 											"m_label":	"Bitmap File:",
 											"m_path":	""
 										}, {
+											"type":	"choice",
+											"m_label":	"Direction",
+											"m_selection":	0,
+											"m_options":	["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
+										}, {
 											"type":	"string",
 											"m_label":	"Margins:",
 											"m_value":	"2,2"
@@ -2866,6 +2956,11 @@
 											"m_label":	"Bitmap File:",
 											"m_path":	""
 										}, {
+											"type":	"choice",
+											"m_label":	"Direction",
+											"m_selection":	0,
+											"m_options":	["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
+										}, {
 											"type":	"string",
 											"m_label":	"Margins:",
 											"m_value":	"2,2"
@@ -2943,6 +3038,10 @@
 					"m_label":	"Style:",
 					"m_value":	""
 				}, {
+					"type":	"bool",
+					"m_label":	"Enable Window Persistency:",
+					"m_value":	true
+				}, {
 					"type":	"string",
 					"m_label":	"Title:",
 					"m_value":	"Upload the packaged game to CocoonJS cloud compiler"
@@ -2998,6 +3097,10 @@
 					"m_styles":	[],
 					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 					"m_properties":	[{
+							"type":	"string",
+							"m_label":	"Minimum Size:",
+							"m_value":	"-1,-1"
+						}, {
 							"type":	"string",
 							"m_label":	"Name:",
 							"m_value":	"flexGridSizer87"
@@ -3106,6 +3209,10 @@
 									"m_styles":	[],
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 									"m_properties":	[{
+											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
 											"type":	"string",
 											"m_label":	"Name:",
 											"m_value":	"flexGridSizer6338"
@@ -3384,6 +3491,10 @@
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 							"m_properties":	[{
 									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
 									"m_label":	"Name:",
 									"m_value":	"flexGridSizer1910"
 								}, {
@@ -3561,6 +3672,10 @@
 											"m_value":	""
 										}, {
 											"type":	"string",
+											"m_label":	"Text Hint",
+											"m_value":	""
+										}, {
+											"type":	"string",
 											"m_label":	"Max Length:",
 											"m_value":	"0"
 										}, {
@@ -3727,6 +3842,11 @@
 									"m_label":	"Bitmap File:",
 									"m_path":	""
 								}, {
+									"type":	"choice",
+									"m_label":	"Direction",
+									"m_selection":	0,
+									"m_options":	["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
+								}, {
 									"type":	"string",
 									"m_label":	"Margins:",
 									"m_value":	"2,2"
@@ -3761,7 +3881,7 @@
 				}, {
 					"type":	"string",
 					"m_label":	"Name:",
-					"m_value":	"BaseIntelXDKPackageDialog"
+					"m_value":	"BaseCordovaPackageDialog"
 				}, {
 					"type":	"multi-string",
 					"m_label":	"Tooltip:",
@@ -3803,9 +3923,13 @@
 					"m_label":	"Style:",
 					"m_value":	""
 				}, {
+					"type":	"bool",
+					"m_label":	"Enable Window Persistency:",
+					"m_value":	true
+				}, {
 					"type":	"string",
 					"m_label":	"Title:",
-					"m_value":	"Package the game with Intel XDK"
+					"m_value":	"Package the game for Cordova (Intel XDK)"
 				}, {
 					"type":	"virtualFolderPicker",
 					"m_label":	"Virtual Folder:",
@@ -3818,11 +3942,11 @@
 				}, {
 					"type":	"string",
 					"m_label":	"Inherited Class",
-					"m_value":	"IntelXDKPackageDialog"
+					"m_value":	"CordovaPackageDialog"
 				}, {
 					"type":	"string",
 					"m_label":	"File:",
-					"m_value":	"IntelXDKPackageDialog"
+					"m_value":	"CordovaPackageDialog"
 				}, {
 					"type":	"string",
 					"m_label":	"Class Decorator",
@@ -3858,6 +3982,10 @@
 					"m_styles":	[],
 					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 					"m_properties":	[{
+							"type":	"string",
+							"m_label":	"Minimum Size:",
+							"m_value":	"-1,-1"
+						}, {
 							"type":	"string",
 							"m_label":	"Name:",
 							"m_value":	"flexGridSizer873"
@@ -3966,6 +4094,10 @@
 									"m_styles":	[],
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 									"m_properties":	[{
+											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
 											"type":	"string",
 											"m_label":	"Name:",
 											"m_value":	"flexGridSizer63385"
@@ -4244,6 +4376,10 @@
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 							"m_properties":	[{
 									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
 									"m_label":	"Name:",
 									"m_value":	"flexGridSizer19109"
 								}, {
@@ -4343,7 +4479,7 @@
 										}, {
 											"type":	"multi-string",
 											"m_label":	"Label:",
-											"m_value":	"Then, open the project which was saved at this location on your computer:"
+											"m_value":	"Then, import the project which was saved at this location on your computer:"
 										}, {
 											"type":	"string",
 											"m_label":	"Wrap:",
@@ -4418,6 +4554,10 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Value:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"Text Hint",
 											"m_value":	""
 										}, {
 											"type":	"string",
@@ -4502,7 +4642,7 @@
 								}, {
 									"type":	"multi-string",
 									"m_label":	"Label:",
-									"m_value":	"In the \"Build\" tab, select \"Android\" or \"Crosswalk for Android\".\\nFill in all the fields and XDK will be able to package your game into a native Android or iOS application."
+									"m_value":	"Activate any Cordova plugin that may be required by the objects\\nyou use in the project.\\nIn the \"Build\" tab, select \"Crosswalk for Android\" or \"iOS\".\\nXDK will be able to package your game into a native Android or iOS application."
 								}, {
 									"type":	"string",
 									"m_label":	"Wrap:",
@@ -4519,6 +4659,10 @@
 							"m_styles":	[],
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
 							"m_properties":	[{
+									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
 									"type":	"string",
 									"m_label":	"Name:",
 									"m_value":	"flexGridSizer5014"
@@ -4561,6 +4705,10 @@
 									"m_styles":	[],
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_LEFT", "wxALIGN_CENTER_VERTICAL"],
 									"m_properties":	[{
+											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
 											"type":	"string",
 											"m_label":	"Name:",
 											"m_value":	"flexGridSizer5115"
@@ -4830,6 +4978,11 @@
 											"m_label":	"Bitmap File:",
 											"m_path":	""
 										}, {
+											"type":	"choice",
+											"m_label":	"Direction",
+											"m_selection":	0,
+											"m_options":	["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
+										}, {
 											"type":	"string",
 											"m_label":	"Margins:",
 											"m_value":	"2,2"
@@ -4907,6 +5060,10 @@
 					"m_label":	"Style:",
 					"m_value":	""
 				}, {
+					"type":	"bool",
+					"m_label":	"Enable Window Persistency:",
+					"m_value":	true
+				}, {
 					"type":	"string",
 					"m_label":	"Title:",
 					"m_value":	"Edit the Javascript code"
@@ -4963,6 +5120,10 @@
 					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 					"m_properties":	[{
 							"type":	"string",
+							"m_label":	"Minimum Size:",
+							"m_value":	"-1,-1"
+						}, {
+							"type":	"string",
 							"m_label":	"Name:",
 							"m_value":	"flexGridSizer160"
 						}, {
@@ -5004,6 +5165,10 @@
 							"m_styles":	[],
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 							"m_properties":	[{
+									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
 									"type":	"string",
 									"m_label":	"Name:",
 									"m_value":	"flexGridSizer162"
@@ -5166,6 +5331,10 @@
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 									"m_properties":	[{
 											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
+											"type":	"string",
 											"m_label":	"Name:",
 											"m_value":	"flexGridSizer178"
 										}, {
@@ -5282,6 +5451,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer182"
@@ -5460,6 +5633,10 @@
 															"m_value":	""
 														}, {
 															"type":	"string",
+															"m_label":	"Text Hint",
+															"m_value":	""
+														}, {
+															"type":	"string",
 															"m_label":	"Max Length:",
 															"m_value":	"0"
 														}, {
@@ -5567,6 +5744,10 @@
 							"m_styles":	[],
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 							"m_properties":	[{
+									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
 									"type":	"string",
 									"m_label":	"Name:",
 									"m_value":	"flexGridSizer164"
@@ -5842,6 +6023,11 @@
 											"m_label":	"Bitmap File:",
 											"m_path":	""
 										}, {
+											"type":	"choice",
+											"m_label":	"Direction",
+											"m_selection":	0,
+											"m_options":	["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
+										}, {
 											"type":	"string",
 											"m_label":	"Margins:",
 											"m_value":	"2,2"
@@ -5931,6 +6117,11 @@
 											"type":	"bitmapPicker",
 											"m_label":	"Bitmap File:",
 											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Direction",
+											"m_selection":	0,
+											"m_options":	["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
 										}, {
 											"type":	"string",
 											"m_label":	"Margins:",

@@ -287,11 +287,12 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     bottomSizer->Add(m_hyperLink572, 0, wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 5);
     
     SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetName(wxT("BaseStartHerePage"));
     SetSizeHints(700,500);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    Centre(wxBOTH);
+    CentreOnParent(wxBOTH);
     // Connect events
     lastProject1Bt->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(BaseStartHerePage::OnLastProject1Click), NULL, this);
     lastProject2Bt->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(BaseStartHerePage::OnLastProject2Click), NULL, this);

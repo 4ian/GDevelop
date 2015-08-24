@@ -29,7 +29,7 @@ public:
     enum ExportType
     {
         Normal,
-        IntelXDK,
+        Cordova,
         CocoonJS
     };
 

@@ -57,7 +57,7 @@ ProjectExportDialog::ExportType ProjectExportDialog::GetExportType()
     switch(exportChoice->GetSelection())
     {
         case 1:
-            return IntelXDK;
+            return Cordova;
         case 2:
             return CocoonJS;
         default:

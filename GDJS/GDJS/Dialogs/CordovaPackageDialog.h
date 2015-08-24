@@ -4,17 +4,17 @@
  * This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#ifndef INTELXDKPACKAGEDIALOG_H
-#define INTELXDKPACKAGEDIALOG_H
+#ifndef CORDOVAPACKAGEDIALOG_H
+#define CORDOVAPACKAGEDIALOG_H
 #include "GDJSDialogs.h"
 
-class IntelXDKPackageDialog : public BaseIntelXDKPackageDialog
+class CordovaPackageDialog : public BaseCordovaPackageDialog
 {
 public:
-    IntelXDKPackageDialog(wxWindow* parent, wxString packageLocation);
-    virtual ~IntelXDKPackageDialog();
+    CordovaPackageDialog(wxWindow* parent, wxString packageLocation);
+    virtual ~CordovaPackageDialog();
 protected:
     virtual void OnCloseClicked(wxCommandEvent& event);
 };
-#endif // INTELXDKPACKAGEDIALOG_H
+#endif // CORDOVAPACKAGEDIALOG_H
 #endif

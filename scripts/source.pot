@@ -5489,7 +5489,7 @@ msgstr ""
 
 #: ../GDJS/GDJS//BuiltinExtensions/MouseExtension.cpp:24
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:17
-msgid "Built-in extensions allowing to use the mouse"
+msgid "Built-in extension allowing to use the mouse"
 msgstr ""
 
 #: ../GDJS/GDJS//BuiltinExtensions/NetworkExtension.cpp:21
@@ -16199,7 +16199,7 @@ msgid "Keyboard features"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:17
-msgid "Built-in extensions allowing to use keyboard"
+msgid "Built-in extension allowing to use keyboard"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:23

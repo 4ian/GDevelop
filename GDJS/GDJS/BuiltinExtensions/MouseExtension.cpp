@@ -21,7 +21,7 @@ MouseExtension::MouseExtension()
 
     SetExtensionInformation("BuiltinMouse",
                           _("Mouse features"),
-                          _("Built-in extensions allowing to use the mouse"),
+                          _("Built-in extension allowing to use the mouse"),
                           "Florian Rival",
                           "Open source (MIT License)");
 

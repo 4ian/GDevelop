@@ -15,6 +15,7 @@
 #include <iostream>
 #include <wx/log.h>
 #include <wx/filefn.h>
+#include <wx/dir.h>
 #endif
 
 #undef CopyFile //Remove a Windows macro
@@ -152,6 +153,45 @@ bool NativeFileSystem::CopyFile(const gd::String & file, const gd::String & dest
 {
     wxLogNull noLogPlease;
     return wxCopyFile( file, destination, true );
+}
+
+bool NativeFileSystem::CopyDir(const gd::String & source, const gd::String & destination)
+{
+    wxString sFrom = source.ToWxString();
+    wxString sTo = destination.ToWxString();
+
+    //As seen on https://forums.wxwidgets.org/viewtopic.php?t=2080
+    if (sFrom[sFrom.Len() - 1] != '\\' && sFrom[sFrom.Len() - 1] != '/') sFrom += wxFILE_SEP_PATH;
+    if (sTo[sTo.Len() - 1] != '\\' && sTo[sTo.Len() - 1] != '/') sTo += wxFILE_SEP_PATH;
+
+    if (!::wxDirExists(sFrom)) {
+        return false;
+    }
+    if (!wxDirExists(sTo)) {
+        if (!wxFileName::Mkdir(sTo, 0777, wxPATH_MKDIR_FULL)) {
+            return false;
+        }
+    }
+
+    wxDir fDir(sFrom);
+    wxString sNext = wxEmptyString;
+    bool bIsFile = fDir.GetFirst(&sNext);
+    while (bIsFile) {
+        const wxString sFileFrom = sFrom + sNext;
+        const wxString sFileTo = sTo + sNext;
+        if (::wxDirExists(sFileFrom)) {
+            CopyDir(sFileFrom, sFileTo);
+        }
+        else {
+            if (!::wxFileExists(sFileTo)) {
+                if (!::wxCopyFile(sFileFrom, sFileTo)) {
+                    return false;
+                }
+            }
+        }
+        bIsFile = fDir.GetNext(&sNext);
+    }
+    return true;
 }
 
 NativeFileSystem & NativeFileSystem::Get()

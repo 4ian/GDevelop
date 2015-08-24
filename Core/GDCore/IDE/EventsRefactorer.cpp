@@ -490,19 +490,6 @@ void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout &
     }
 }
 
-gd::String ReplaceAllOccurences(gd::String context, const gd::String& from, const gd::String& to)
-{
-    size_t lookHere = 0;
-    size_t foundHere;
-    while((foundHere = context.find(from, lookHere)) != string::npos)
-    {
-          context.replace(foundHere, from.size(), to);
-          lookHere = foundHere + to.size();
-    }
-
-    return context;
-}
-
 gd::String ReplaceAllOccurencesCaseUnsensitive(gd::String context, gd::String from, const gd::String& to)
 {
     size_t lookHere = 0;
@@ -526,7 +513,7 @@ bool EventsRefactorer::ReplaceStringInActions(gd::Project & project, gd::Layout 
     {
         for (std::size_t pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
         {
-            gd::String newParameter = matchCase ? ReplaceAllOccurences(actions[aId].GetParameter(pNb).GetPlainString(), toReplace, newString)
+            gd::String newParameter = matchCase ? actions[aId].GetParameter(pNb).GetPlainString().FindAndReplace(toReplace, newString, true)
                                                  : ReplaceAllOccurencesCaseUnsensitive(actions[aId].GetParameter(pNb).GetPlainString(), toReplace, newString);
 
             if ( newParameter != actions[aId].GetParameter(pNb).GetPlainString())
@@ -553,7 +540,7 @@ bool EventsRefactorer::ReplaceStringInConditions(gd::Project & project, gd::Layo
     {
         for (std::size_t pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
         {
-            gd::String newParameter = matchCase ? ReplaceAllOccurences(conditions[cId].GetParameter(pNb).GetPlainString(), toReplace, newString)
+            gd::String newParameter = matchCase ? conditions[cId].GetParameter(pNb).GetPlainString().FindAndReplace(toReplace, newString, true)
                                                  : ReplaceAllOccurencesCaseUnsensitive(conditions[cId].GetParameter(pNb).GetPlainString(), toReplace, newString);
 
             if ( newParameter != conditions[cId].GetParameter(pNb).GetPlainString())

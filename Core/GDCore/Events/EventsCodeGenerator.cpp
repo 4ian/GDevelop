@@ -669,9 +669,7 @@ gd::String EventsCodeGenerator::ConvertToString(gd::String plainString)
         }
     }
 
-    while ( plainString.find('\n') != gd::String::npos)
-        plainString.replace(plainString.find('\n'), 1, "\\n");
-
+    plainString = plainString.FindAndReplace("\n", "\\n");
 
     return plainString;
 }

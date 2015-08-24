@@ -39,15 +39,11 @@ gd::String InstructionSentenceFormatter::Translate(const gd::Instruction & instr
     for (std::size_t i =0;i<metadata.parameters.size();++i)
     {
         gd::String placeholder = "_PARAM"+gd::String::From(i)+"_";
-        while ( out.find( placeholder ) != gd::String::npos )
-        {
-            gd::String parameter = instr.GetParameter(i).GetPlainString();
-            out.replace(out.find(placeholder), placeholder.length(), parameter);
-        }
+        gd::String parameter = instr.GetParameter(i).GetPlainString();
+        out = out.FindAndReplace(placeholder, parameter);
     }
 
-    std::replace( out.Raw().begin(), out.Raw().end(), '\n', ' ');
-
+    out = out.FindAndReplace("\n", " ");
     return out;
 }
 

@@ -155,30 +155,10 @@ bool Exporter::ExportIndexFile(gd::String source, gd::String exportDir, const st
 
 bool Exporter::ExportCordovaConfigFile(const gd::Project & project, gd::String exportDir)
 {
-    //Open the index.html template
-    gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cordova/config.xml");
-
-    size_t pos = str.find("GDJS_PROJECTNAME");
-    if ( pos < str.length() )
-        str = str.replace(pos, 16, project.GetName());
-    else
-    {
-        std::cout << "Unable to find GDJS_PROJECTNAME in config.xml file." << std::endl;
-        lastError = "Unable to find GDJS_PROJECTNAME in config.xml file.";
-        return false;
-    }
-
-    pos = str.find("GDJS_PACKAGENAME");
-    if ( pos < str.length() )
-        str = str.replace(pos, 16, project.GetPackageName());
-    else
-    {
-        std::cout << "Unable to find GDJS_PACKAGENAME in config.xml file." << std::endl;
-        lastError = "Unable to find GDJS_PACKAGENAME in config.xml file.";
-        return false;
-    }
-
-    //Write the index.html file
+    gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cordova/config.xml")
+        .FindAndReplace("GDJS_PROJECTNAME", project.GetName())
+        .FindAndReplace("GDJS_PACKAGENAME", project.GetPackageName());
+    
     if (!fs.WriteToFile(exportDir + "/config.xml", str))
     {
         lastError = "Unable to write configuration file.";
@@ -190,65 +170,26 @@ bool Exporter::ExportCordovaConfigFile(const gd::Project & project, gd::String e
 
 bool Exporter::CompleteIndexFile(gd::String & str, gd::String customCss, gd::String customHtml, gd::String exportDir, const std::vector<gd::String> & includesFiles, gd::String additionalSpec)
 {
-    size_t pos = str.find("/* GDJS_CUSTOM_STYLE */");
-    if ( pos < str.length() )
-        str = str.replace(pos, 23, customCss);
-    else
-    {
-        std::cout << "Unable to find /* GDJS_CUSTOM_STYLE */ in index file." << std::endl;
-        lastError = "Unable to find /* GDJS_CUSTOM_STYLE */ in index file.";
-        return false;
-    }
+    if (additionalSpec.empty()) additionalSpec = "{}";
 
-    pos = str.find("<!-- GDJS_CUSTOM_HTML -->");
-    if ( pos < str.length() )
-        str = str.replace(pos, 25, customHtml);
-    else
+    gd::String codeFilesIncludes;
+    for (std::vector<gd::String>::const_iterator it = includesFiles.begin(); it != includesFiles.end(); ++it)
     {
-        std::cout << "Unable to find <!-- GDJS_CUSTOM_HTML --> in index file." << std::endl;
-        lastError = "Unable to find <!-- GDJS_CUSTOM_HTML --> in index file.";
-        return false;
-    }
-
-    pos = str.find("<!-- GDJS_CODE_FILES -->");
-    if ( pos < str.length() )
-    {
-        gd::String codeFilesIncludes;
-        for (std::vector<gd::String>::const_iterator it = includesFiles.begin(); it != includesFiles.end(); ++it)
+        if ( !fs.FileExists(exportDir + "/" + *it) )
         {
-            if ( !fs.FileExists(exportDir+"/"+*it) )
-            {
-                std::cout << "Warning: Unable to found " << exportDir+"/"+*it << "." << std::endl;
-                continue;
-            }
-
-            gd::String relativeFile = exportDir+"/"+*it;
-            fs.MakeRelative(relativeFile, exportDir);
-            codeFilesIncludes += "\t<script src=\""+relativeFile+"\"></script>\n";
+            std::cout << "Warning: Unable to found " << exportDir+"/"+*it << "." << std::endl;
+            continue;
         }
 
-        str = str.replace(pos, 24, codeFilesIncludes);
-    }
-    else
-    {
-        std::cout << "Unable to find <!-- GDJS_CODE_FILES --> in index file." << std::endl;
-        lastError = "Unable to find <!-- GDJS_CODE_FILES --> in index file.";
-        return false;
+        gd::String relativeFile = exportDir+"/"+*it;
+        fs.MakeRelative(relativeFile, exportDir);
+        codeFilesIncludes += "\t<script src=\""+relativeFile+"\"></script>\n";
     }
 
-    pos = str.find("{}/*GDJS_ADDITIONAL_SPEC*/");
-    if ( pos < str.length() )
-    {
-        if (additionalSpec.empty()) additionalSpec = "{}";
-
-        str = str.replace(pos, 26, additionalSpec);
-    }
-    else
-    {
-        std::cout << "Unable to find {}/*GDJS_ADDITIONAL_SPEC*/ in index file." << std::endl;
-        lastError = "Unable to find {}/*GDJS_ADDITIONAL_SPEC*/ in index file.";
-        return false;
-    }
+    str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", customCss)
+        .FindAndReplace("<!-- GDJS_CUSTOM_HTML -->", customHtml)
+        .FindAndReplace("<!-- GDJS_CODE_FILES -->", codeFilesIncludes)
+        .FindAndReplace("{}/*GDJS_ADDITIONAL_SPEC*/", additionalSpec);
 
     return true;
 }

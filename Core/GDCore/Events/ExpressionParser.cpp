@@ -45,18 +45,6 @@ size_t ExpressionParser::GetMaximalParametersNumber(const std::vector < gd::Para
     return nb;
 }
 
-gd::String ReplaceTildesBySpaces(gd::String text)
-{
-    size_t foundPos=text.find("~");
-    while(foundPos != string::npos)
-    {
-        if(foundPos != string::npos) text.replace(foundPos,1," ");
-        foundPos=text.find("~", foundPos+1);
-    }
-
-    return text;
-}
-
 /**
  * Add blank parameters when code-only parameters are excepted.
  * \param Parameters information
@@ -339,7 +327,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
         nameStart++;
 
         gd::String nameBefore = expression.substr(nameStart, nameEnd-nameStart);
-        gd::String objectName = ReplaceTildesBySpaces(nameBefore);
+        gd::String objectName = nameBefore.FindAndReplace("~", " ");
 
         //Identify function name
         gd::String functionName = nameBefore;
@@ -599,7 +587,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
             callbacks.OnConstantToken(expression.substr(parsePosition, nameStart-parsePosition));
 
             gd::String nameBefore = expression.substr(nameStart, nameEnd-nameStart);
-            gd::String objectName = ReplaceTildesBySpaces(nameBefore);
+            gd::String objectName = nameBefore.FindAndReplace("~", " ");
 
             //Identify function name
             gd::String functionName = nameBefore;

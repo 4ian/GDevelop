@@ -638,12 +638,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMinorVersion, revision, build, 4,0,85,0) )
     {
         for(unsigned int i = 0;i < extensionsUsed.size();++i) 
-        {
-            gd::String oldWord = "Automatism";
-            size_t pos = extensionsUsed[i].find(oldWord);
-            if (pos != gd::String::npos)
-                extensionsUsed[i] = extensionsUsed[i].replace(pos, oldWord.size(), "Behavior");
-        }
+            extensionsUsed[i] = extensionsUsed[i].FindAndReplace("Automatism", "Behavior");
     }
     #endif
 

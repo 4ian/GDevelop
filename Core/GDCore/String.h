@@ -577,12 +577,12 @@ public:
     String LowerCase() const;
 
     /**
-     * \brief Searches a string for a specified substring and returns a new string where this substring is replaced.
+     * \brief Searches a string for a specified substring and returns a new string where all occurrences of this substring is replaced.
      * \param search The string that will be replaced by the new string.
      * \param replacement The value to replace the old substring with.
-     * \param all If set to true, all matching substring will be replaced.
+     * \param all If set to false, only the first matching substring will be replaced.
      */
-    String FindAndReplace(String search, String replacement, bool all = false) const;
+    String FindAndReplace(String search, String replacement, bool all = true) const;
 
     /**
      * Normalization form
@@ -592,7 +592,7 @@ public:
         NFD, ///< Normalization Form Decomposition: characters are decomposed by canonical equivalence, and multiple combining characters are arranged in a specific order.
         NFC, ///< Normalization Form Composition: characters are decomposed and then recomposed by canonical equivalence.
         NFKD, ///< Normalization Form Compatibility Decomposition: characters are decomposed by compatibility, and multiple combining characters are arranged in a specific order.
-        NFKC, ///< Normalization Form Compatibitity Composition: characters are decomposed by compatibility, then recomposed by canonical equivalence.
+        NFKC, ///< Normalization Form Compatibility Composition: characters are decomposed by compatibility, then recomposed by canonical equivalence.
     };
 
     /**

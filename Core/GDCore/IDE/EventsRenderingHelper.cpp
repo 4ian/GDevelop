@@ -478,23 +478,10 @@ void EventsRenderingHelper::DrawNiceRectangle(wxDC & dc, const wxRect & rect) co
 
 gd::String EventsRenderingHelper::GetHTMLText(gd::String str)
 {
-    size_t pos = 0;
-    while ( str.find("&", pos) != string::npos)
-    {
-        str.replace( str.find( "&", pos), 1, "&amp;" );
-        pos = str.find( "&", pos)+1;
-    }
-
-    while ( str.find("<") != string::npos)
-        str.replace( str.find( "<" ), 1, "&lt;" );
-
-    while ( str.find(">") != string::npos)
-        str.replace( str.find( ">" ), 1, "&gt;" );
-
-    while ( str.find("\n") != string::npos)
-        str.replace( str.find( "\n" ), 1, "<br>" );
-
-    return str;
+    return str.FindAndReplace("&", "&amp;")
+        .FindAndReplace("<", "&lt;")
+        .FindAndReplace(">", "&gt;")
+        .FindAndReplace("\n", "<br>");
 }
 
 EventsRenderingHelper * EventsRenderingHelper::Get()

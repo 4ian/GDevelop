@@ -153,16 +153,6 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
     //Name and type are already loaded.
     objectVariables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
-    //Compatibility with GD <= 4
-    auto renameOldType = [](gd::String name) {
-        gd::String oldWord = "Automatism";
-        while (name.find(oldWord) != gd::String::npos)
-            name = name.replace(name.find(oldWord), oldWord.size(), "Behavior");
-
-        return name;
-    };
-    //End of compatibility code
-
     //Compatibility with GD <= 3.3
     if (element.HasChild("Automatism"))
     {
@@ -170,7 +160,8 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
         {
             SerializerElement & behaviorElement = element.GetChild("Automatism", i);
 
-            gd::String autoType = renameOldType(behaviorElement.GetStringAttribute("type", "", "Type"));
+            gd::String autoType = behaviorElement.GetStringAttribute("type", "", "Type")
+                .FindAndReplace("Automatism", "Behavior");
             gd::String autoName = behaviorElement.GetStringAttribute("name", "", "Name");
 
             Behavior* behavior = project.CreateBehavior(autoType);
@@ -181,7 +172,7 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
                 behaviors[behavior->GetName()] = behavior;
             }
             else
-                std::cout << "WARNING: Unknown behavior " << behaviorElement.GetStringAttribute("type") << std::endl;
+                std::cout << "WARNING: Unknown behavior " << autoType << std::endl;
         }
     }
     //End of compatibility code
@@ -193,7 +184,8 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
         {
             SerializerElement & behaviorElement = behaviorsElement.GetChild(i);
 
-            gd::String autoType = renameOldType(behaviorElement.GetStringAttribute("type"));
+            gd::String autoType = behaviorElement.GetStringAttribute("type")
+                .FindAndReplace("Automatism", "Behavior"); //Compatibility with GD <= 4
             gd::String autoName = behaviorElement.GetStringAttribute("name");
 
             Behavior* behavior = project.CreateBehavior(autoType);
@@ -204,7 +196,7 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
                 behaviors[behavior->GetName()] = behavior;
             }
             else
-                std::cout << "WARNING: Unknown behavior " << behaviorElement.GetStringAttribute("type") << std::endl;
+                std::cout << "WARNING: Unknown behavior " << autoType << std::endl;
         }
     }
 

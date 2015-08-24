@@ -29,13 +29,8 @@ AbstractFileSystem::~AbstractFileSystem()
 
 gd::String gd::AbstractFileSystem::NormalizeSeparator(gd::String filename)
 {
-    gd::String file = filename;
-
     //Convert all backslash to slashs.
-    while (file.find("\\") != gd::String::npos)
-        file.replace(file.find("\\"), 1, "/");
-
-    return file;
+    return filename.FindAndReplace("\\", "/");
 }
 
 #if !defined(GD_NO_WX_GUI)

@@ -432,6 +432,25 @@ String String::LowerCase() const
     return lowerCasedStr;
 }
 
+String String::FindAndReplace(String search, String replacement, bool all) const
+{
+    gd::String result(*this);
+
+    size_type pos, lastPos = 0;
+    do {
+        pos = result.find(search, lastPos);
+        lastPos = pos;
+        if (pos != npos) 
+        {
+            result.replace(pos, search.size(), replacement);
+            lastPos += replacement.size();
+        }
+
+    } while(lastPos != npos && all);
+
+    return result;
+}
+
 String& String::Normalize(String::NormForm form)
 {
     unsigned char *newStr = nullptr;

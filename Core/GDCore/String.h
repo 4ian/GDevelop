@@ -577,6 +577,14 @@ public:
     String LowerCase() const;
 
     /**
+     * \brief Searches a string for a specified substring and returns a new string where this substring is replaced.
+     * \param search The string that will be replaced by the new string.
+     * \param replacement The value to replace the old substring with.
+     * \param all If set to true, all matching substring will be replaced.
+     */
+    String FindAndReplace(String search, String replacement, bool all = false) const;
+
+    /**
      * Normalization form
      */
     enum NormForm

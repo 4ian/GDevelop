@@ -109,6 +109,34 @@ public:
     virtual bool SupportShaders() { return false; }
     ///@}
 
+    /** \name Object properties
+     * Reading and updating object properties
+     */
+    ///@{
+    /**
+     * \brief Called when the IDE wants to know about the custom properties of the object.
+     *
+     * Usage example:
+     \code
+        std::map<gd::String, gd::PropertyDescriptor> properties;
+        properties[ToString(_("Text"))].SetValue("Hello world!");
+
+        return properties;
+     \endcode
+     *
+     * \return a std::map with properties names as key.
+     * \see gd::PropertyDescriptor
+     */
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
+
+    /**
+     * \brief Called when the IDE wants to update a custom property of the object
+     *
+     * \return false if the new value cannot be set
+     */
+    virtual bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project) {return false;};
+    ///@}
+
     /** \name Drawing and editing initial instances
      * Members functions related to drawing and editing initial instances of this object
      */

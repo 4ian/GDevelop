@@ -26,6 +26,7 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
@@ -841,22 +842,31 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
         gd::Object * object = GetSelectedObject();
         if ( !object ) return;
 
-        object->EditObject(this, project, mainFrameWrapper);
-        for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
-            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObject ? NULL : &layout, *object);
+        auto properties = object->GetProperties(project);
+        if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() ) {
 
-        project.SetDirty();
+            //Open object editor
+            object->EditObject(this, project, mainFrameWrapper);
+            for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
+                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObject ? NULL : &layout, *object);
 
-        listsHelper.MakeObjectItem(objectsList, lastSelectedItem, *object, globalObject);
+            project.SetDirty();
 
-        //Reload resources : Do not forget to switch the working directory.
-        wxString oldWorkingDir = wxGetCwd();
-        if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
-            wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
+            listsHelper.MakeObjectItem(objectsList, lastSelectedItem, *object, globalObject);
 
-        object->LoadResources(project, layout);
+            //Reload resources : Do not forget to switch the working directory.
+            wxString oldWorkingDir = wxGetCwd();
+            if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
+                wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
 
-        wxSetWorkingDirectory(oldWorkingDir);
+            object->LoadResources(project, layout);
+
+            wxSetWorkingDirectory(oldWorkingDir);
+        } else {
+            //No object editor: open properties panel
+            wxCommandEvent useless;
+            OnMenuPropertiesSelected(useless);
+        }
     }
     //Group clicked?
     else if ( data && (data->GetString() == "GlobalGroup" || data->GetString() == "LayoutGroup") )

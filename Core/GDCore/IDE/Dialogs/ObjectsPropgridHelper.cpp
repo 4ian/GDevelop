@@ -39,9 +39,16 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
         grid->Append( new wxPropertyCategory(_("General object properties")) );
 
     grid->EnableProperty(grid->Append( new wxStringProperty(_("Object name"), wxPG_LABEL, object->GetName())), false);
-    grid->Append( new wxStringProperty(_("Edit"), wxPG_LABEL, _("Click to edit...")) );
-    grid->SetPropertyCell(_("Edit"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
-    grid->SetPropertyReadOnly(_("Edit"));
+
+    auto properties = object->GetProperties(project);
+    if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() )
+    {
+        //"Click to edit" is not shown if properties are not empty, except if the magic property is set.
+        grid->Append( new wxStringProperty(_("Edit"), wxPG_LABEL, _("Click to edit...")) );
+        grid->SetPropertyCell(_("Edit"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+        grid->SetPropertyReadOnly(_("Edit"));
+    }
+    RefreshFrom(properties, "OBJ_PROP");
 
     if ( !displayedAfterInstanceProperties )
     {
@@ -66,7 +73,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
     for (std::size_t i = 0;i<behaviors.size();++i)
     {
         const gd::Behavior & behavior = object->GetBehavior(behaviors[i]);
-        std::map<gd::String, gd::PropertyDescriptor> properties = behavior.GetProperties(project);
+        auto properties = behavior.GetProperties(project);
 
         grid->AppendIn( "AUTO", new wxPropertyCategory(behavior.GetName()) );
         if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() )
@@ -228,6 +235,17 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
 {
     if ( !grid || !object ) return false;
 
+    auto readEnumPropertyString = [&event](std::map<gd::String, gd::PropertyDescriptor> properties) {
+        const std::vector<gd::String> & choices = properties[event.GetProperty()->GetLabel()].GetExtraInfo();
+
+        unsigned int id = event.GetPropertyValue().GetLong();
+        if (id < choices.size()) {
+            return gd::String(choices[id]);
+        }
+
+        return gd::String("");
+    };
+
     if ( event.GetPropertyName().substr(0,10) == "AUTO_PROP:" )
     {
         gd::String autoName = event.GetPropertyName().substr(10);
@@ -241,17 +259,24 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
         gd::String value = event.GetPropertyValue().GetString();
 
         //Special case for enums.
-        if ( wxEnumProperty * enumProperty = dynamic_cast<wxEnumProperty*>(event.GetProperty()) ) {
-            std::map<gd::String, gd::PropertyDescriptor> properties = behavior.GetProperties(project);
-            const std::vector<gd::String> & choices = properties[event.GetProperty()->GetLabel()].GetExtraInfo();
+        if (wxEnumProperty * enumProperty = dynamic_cast<wxEnumProperty*>(event.GetProperty()))
+            value = readEnumPropertyString(behavior.GetProperties(project));
 
-            unsigned int id = event.GetPropertyValue().GetLong();
-            if (id < choices.size()) {
-                value = choices[id];
-            }
+        if (!behavior.UpdateProperty(event.GetProperty()->GetLabel(), value, project)) 
+        {
+            event.Veto();
+            return false;
         }
+    }
+    else if ( event.GetPropertyName().substr(0,8) == "OBJ_PROP" )
+    {
+        gd::String value = event.GetPropertyValue().GetString();
 
-        if ( !behavior.UpdateProperty(event.GetProperty()->GetLabel(), value, project) )
+        //Special case for enums.
+        if (wxEnumProperty * enumProperty = dynamic_cast<wxEnumProperty*>(event.GetProperty()))
+            value = readEnumPropertyString(object->GetProperties(project));
+
+        if (!object->UpdateProperty(event.GetProperty()->GetLabel(), value, project))
         {
             event.Veto();
             return false;

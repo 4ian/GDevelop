@@ -163,13 +163,13 @@ public:
     /** \name Others properties management
      * Members functions related to exposing others properties of the instance.
      *
-     * \note Extensions writers: Even if we can define new types of object by inheriting from gd::Object class,
+     * \note Extensions writers: even if we can define new types of object by inheriting from gd::Object class,
      * we cannot define new gd::InitialInstance classes. However, objects can store custom
-     * properties for their associated initial instances : These properties can be stored
+     * properties for their associated initial instances: these properties can be stored
      * into floatInfos and stringInfos members. When the IDE want to get the custom properties, it
      * will call GetProperties and UpdateProperty methods. These
      * methods are here defined to forward the call to the gd::Object associated to the gd::InitialInstance.
-     * ( By looking at the value returned by GetObjectName() ).
+     * (by looking at the value returned by GetObjectName()).
      *
      * \see gd::Object
      */

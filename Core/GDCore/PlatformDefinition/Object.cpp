@@ -104,6 +104,12 @@ bool Object::AddBehavior(Behavior * behavior)
 }
 
 #if defined(GD_IDE_ONLY)
+std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties(gd::Project & project) const
+{
+    std::map<gd::String, gd::PropertyDescriptor> nothing;
+    return nothing;
+}
+
 gd::Behavior * Object::AddNewBehavior(gd::Project & project, const gd::String & type, const gd::String & name)
 {
     Behavior * behavior = project.GetCurrentPlatform().CreateBehavior(type);

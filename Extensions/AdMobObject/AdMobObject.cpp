@@ -17,6 +17,9 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#endif
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
 

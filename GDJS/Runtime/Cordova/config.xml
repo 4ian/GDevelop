@@ -17,4 +17,5 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
+    <preference name="orientation" value="GDJS_ORIENTATION" />
 </widget>

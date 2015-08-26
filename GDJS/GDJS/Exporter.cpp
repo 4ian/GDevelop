@@ -157,7 +157,8 @@ bool Exporter::ExportCordovaConfigFile(const gd::Project & project, gd::String e
 {
     gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cordova/config.xml")
         .FindAndReplace("GDJS_PROJECTNAME", project.GetName())
-        .FindAndReplace("GDJS_PACKAGENAME", project.GetPackageName());
+        .FindAndReplace("GDJS_PACKAGENAME", project.GetPackageName())
+        .FindAndReplace("GDJS_ORIENTATION", "default");
     
     if (!fs.WriteToFile(exportDir + "/config.xml", str))
     {

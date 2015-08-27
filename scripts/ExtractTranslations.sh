@@ -17,7 +17,7 @@ echo "Generating .POT file..."
 if type xgettext 2>/dev/null; then
     GETTEXT=xgettext
 else
-	GETTEXT=$(find /**/* -name "xgettext" -print -quit 2>/dev/null)
+	GETTEXT=$(find /usr -name "xgettext" -print -quit 2>/dev/null)
 fi
 
 if type $GETTEXT 2>/dev/null; then

@@ -60,7 +60,7 @@ TileSetConfigurationEditor::~TileSetConfigurationEditor()
 
 void TileSetConfigurationEditor::UpdatePreviewTileSetPanel(bool newTexture)
 {
-    previewTileSet.textureName = gd::ToString(m_textureNameTextCtrl->GetValue());
+    previewTileSet.textureName = m_textureNameTextCtrl->GetValue();
     std::cout << "Reloading texture..." << std::endl;
     previewTileSet.LoadResources(game);
     std::cout << "OK." << std::endl;

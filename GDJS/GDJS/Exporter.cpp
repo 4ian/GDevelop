@@ -529,7 +529,6 @@ bool Exporter::ExportWholeProject(gd::Project & project, gd::String exportDir,
     {
         //Prepare the export directory
         fs.MkDir(exportDir);
-        fs.ClearDir(exportDir);
         if (!ExportCordovaConfigFile(project, exportDir))
             return false;
 

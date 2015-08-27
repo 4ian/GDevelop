@@ -19,10 +19,10 @@ bool ProjectResourcesAdder::AddAllMissingImages(gd::Project & project)
 {
     gd::ImagesUsedInventorizer inventorizer;
     project.ExposeResources(inventorizer);
-    std::set<std::string> & allImages = inventorizer.GetAllUsedImages();
+    std::set<gd::String> & allImages = inventorizer.GetAllUsedImages();
 
     ResourcesManager & resourcesManager = project.GetResourcesManager();
-    for (std::set<std::string>::const_iterator it = allImages.begin(); it != allImages.end(); ++it)
+    for (std::set<gd::String>::const_iterator it = allImages.begin(); it != allImages.end(); ++it)
     {
         if (!resourcesManager.HasResource(*it))
         {
@@ -34,19 +34,19 @@ bool ProjectResourcesAdder::AddAllMissingImages(gd::Project & project)
     return true;
 }
 
-std::vector<std::string> ProjectResourcesAdder::GetAllUselessResources(gd::Project & project)
+std::vector<gd::String> ProjectResourcesAdder::GetAllUselessResources(gd::Project & project)
 {
-    std::vector<std::string> unusedResources;
+    std::vector<gd::String> unusedResources;
 
     //Search for used images
     gd::ImagesUsedInventorizer inventorizer;
-    
+
     project.ExposeResources(inventorizer);
-    std::set<std::string> & usedImages = inventorizer.GetAllUsedImages();
+    std::set<gd::String> & usedImages = inventorizer.GetAllUsedImages();
 
     //Search all images resources not used
-    std::vector<std::string> resources = project.GetResourcesManager().GetAllResourcesList();
-    for (unsigned int i = 0;i < resources.size();i++)
+    std::vector<gd::String> resources = project.GetResourcesManager().GetAllResourcesList();
+    for (std::size_t i = 0;i < resources.size();i++)
     {
         if (project.GetResourcesManager().GetResource(resources[i]).GetKind() != "image")
             continue;
@@ -60,9 +60,9 @@ std::vector<std::string> ProjectResourcesAdder::GetAllUselessResources(gd::Proje
 
 void ProjectResourcesAdder::RemoveAllUselessResources(gd::Project & project)
 {
-    std::vector<std::string> unusedResources = GetAllUselessResources(project);
+    std::vector<gd::String> unusedResources = GetAllUselessResources(project);
 
-    for(unsigned int i = 0;i < unusedResources.size();++i) {
+    for(std::size_t i = 0;i < unusedResources.size();++i) {
         project.GetResourcesManager().RemoveResource(unusedResources[i]);
     }
 }

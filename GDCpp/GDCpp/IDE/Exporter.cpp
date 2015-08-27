@@ -21,9 +21,9 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
 #endif
 }
 
-std::string Exporter::GetProjectExportButtonLabel()
+gd::String Exporter::GetProjectExportButtonLabel()
 {
-    return gd::ToString(_("Compile to a native executable"));
+    return _("Compile to a native executable");
 }
 
 Exporter::~Exporter()

@@ -8,14 +8,18 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     #include <wx/intl.h>
-    //Ensure the wxWidgets macro "_" returns a std::string
-    #if defined(_)
+    #include "GDCore/String.h"
+    //Create a new macro to return UTF8 gd::String from a translation
+ 	  #if defined(_)
         #undef _
     #endif
-    #define _(s) std::string(wxGetTranslation((s)).mb_str())
+    #define _(s) gd::String(wxGetTranslation(u8##s))
 #else
-    //Ensure the internationalization macro is still defined as code rely on it:
-    #define _(x) x
+    //Create a new macro to return UTF8 gd::String from a translation
+ 	  #if defined(_)
+        #undef _
+    #endif
+    #define _(s) gd::String(u8##s)
 #endif
 
 #endif // GDCORE_LOCALIZATION_H

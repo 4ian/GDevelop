@@ -13,7 +13,7 @@
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
 namespace gd { class ObjectMetadata; }
-namespace gd { class AutomatismMetadata; }
+namespace gd { class BehaviorMetadata; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionCodeGenerationInformation; }
 
@@ -31,7 +31,7 @@ public:
      * \param compilationForRuntime Set this to true if the code is generated for runtime.
      * \return C++ code
      */
-    static std::string GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, gd::EventsList & events, bool compilationForRuntime = false);
+    static gd::String GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, gd::EventsList & events, bool compilationForRuntime = false);
 
     /**
      * Generate complete C++ file for compiling external events.
@@ -42,7 +42,7 @@ public:
      * \param compilationForRuntime Set this to true if the code is generated for runtime.
      * \return C++ code
      */
-    static std::string GenerateExternalEventsCompleteCode(gd::Project & project, gd::ExternalEvents & events, bool compilationForRuntime = false);
+    static gd::String GenerateExternalEventsCompleteCode(gd::Project & project, gd::ExternalEvents & events, bool compilationForRuntime = false);
 
     /**
      * \brief GD C++ Platform has a specific processing function so as to handle profiling.
@@ -50,53 +50,53 @@ public:
     void PreprocessEventList( gd::EventsList & listEvent );
 
 protected:
-    virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+    virtual gd::String GenerateParameterCodes(const gd::String & parameter, const gd::ParameterMetadata & metadata,
                                                gd::EventsCodeGenerationContext & context,
-                                               const std::string & previousParameter,
-                                               std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes);
+                                               const gd::String & previousParameter,
+                                               std::vector < std::pair<gd::String, gd::String> > * supplementaryParametersTypes);
 
-    virtual std::string GenerateObjectFunctionCall(std::string objectListName,
+    virtual gd::String GenerateObjectFunctionCall(gd::String objectListName,
                                                           const gd::ObjectMetadata & objMetadata,
                                                           const gd::ExpressionCodeGenerationInformation & codeInfo,
-                                                          std::string parametersStr,
-                                                          std::string defaultOutput,
+                                                          gd::String parametersStr,
+                                                          gd::String defaultOutput,
                                                           gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateObjectAutomatismFunctionCall(std::string objectListName,
-                                                                      std::string automatismName,
-                                                                      const gd::AutomatismMetadata & autoInfo,
+    virtual gd::String GenerateObjectBehaviorFunctionCall(gd::String objectListName,
+                                                                      gd::String behaviorName,
+                                                                      const gd::BehaviorMetadata & autoInfo,
                                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
-                                                                      std::string parametersStr,
-                                                                      std::string defaultOutput,
+                                                                      gd::String parametersStr,
+                                                                      gd::String defaultOutput,
                                                                       gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateObjectCondition(const std::string & objectName,
+    virtual gd::String GenerateObjectCondition(const gd::String & objectName,
                                                             const gd::ObjectMetadata & objInfo,
-                                                            const std::vector<std::string> & arguments,
+                                                            const std::vector<gd::String> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
-                                                            const std::string & returnBoolean,
+                                                            const gd::String & returnBoolean,
                                                             bool conditionInverted,
                                                             gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateAutomatismCondition(const std::string & objectName,
-                                                                const std::string & automatismName,
-                                                                const gd::AutomatismMetadata & autoInfo,
-                                                                const std::vector<std::string> & arguments,
+    virtual gd::String GenerateBehaviorCondition(const gd::String & objectName,
+                                                                const gd::String & behaviorName,
+                                                                const gd::BehaviorMetadata & autoInfo,
+                                                                const std::vector<gd::String> & arguments,
                                                                 const gd::InstructionMetadata & instrInfos,
-                                                                const std::string & returnBoolean,
+                                                                const gd::String & returnBoolean,
                                                                 bool conditionInverted,
                                                                 gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateObjectAction(const std::string & objectName,
+    virtual gd::String GenerateObjectAction(const gd::String & objectName,
                                                         const gd::ObjectMetadata & objInfo,
-                                                        const std::vector<std::string> & arguments,
+                                                        const std::vector<gd::String> & arguments,
                                                         const gd::InstructionMetadata & instrInfos,
                                                         gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateAutomatismAction(const std::string & objectName,
-                                                            const std::string & automatismName,
-                                                            const gd::AutomatismMetadata & autoInfo,
-                                                            const std::vector<std::string> & arguments,
+    virtual gd::String GenerateBehaviorAction(const gd::String & objectName,
+                                                            const gd::String & behaviorName,
+                                                            const gd::BehaviorMetadata & autoInfo,
+                                                            const std::vector<gd::String> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             gd::EventsCodeGenerationContext & context);
 

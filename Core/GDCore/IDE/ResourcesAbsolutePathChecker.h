@@ -8,7 +8,7 @@
 
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
-#include <string>
+#include "GDCore/String.h"
 
 namespace gd
 {
@@ -34,10 +34,10 @@ public:
     /**
      * Check if there is a resource with an absolute path
      */
-    virtual void ExposeFile(std::string & resource);
+    virtual void ExposeFile(gd::String & resource);
 
-    virtual void ExposeImage(std::string & imageName) {};
-    virtual void ExposeShader(std::string & shaderName) {};
+    virtual void ExposeImage(gd::String & imageName) {};
+    virtual void ExposeShader(gd::String & shaderName) {};
 
 private:
     bool hasAbsoluteFilenames;

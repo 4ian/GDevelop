@@ -35,7 +35,7 @@ BEGIN_EVENT_TABLE(CompilationErrorDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-CompilationErrorDialog::CompilationErrorDialog(wxWindow* parent, string report)
+CompilationErrorDialog::CompilationErrorDialog(wxWindow* parent, gd::String report)
 {
 	//(*Initialize(CompilationErrorDialog)
 	wxFlexGridSizer* FlexGridSizer4;

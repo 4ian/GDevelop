@@ -5,7 +5,7 @@ describe('gdjs.LinksManager', function() {
 	runtimeScene.loadFromScene({
 		layers:[{name:"", visibility: true}],
 		variables: [],
-		automatismsSharedData: [],
+		behaviorsSharedData: [],
 		objects: [],
 		instances: []
 	});

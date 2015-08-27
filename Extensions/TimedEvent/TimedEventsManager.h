@@ -18,7 +18,7 @@ public:
     TimedEventsManager() {};
     virtual ~TimedEventsManager() {};
 
-    std::map < std::string, ManualTimer > timedEvents;
+    std::map < gd::String, ManualTimer > timedEvents;
 
     static std::map < RuntimeScene* , TimedEventsManager > managers; //List of managers associated with scenes.
 };

@@ -6,7 +6,7 @@
 
 #if defined(GD_IDE_ONLY)
 #include <algorithm>
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 #include <utility>
 #include <iostream>
@@ -30,45 +30,41 @@ namespace gd
 
 InstructionSentenceFormatter *InstructionSentenceFormatter::_singleton = NULL;
 
-string InstructionSentenceFormatter::Translate(const gd::Instruction & instr, const gd::InstructionMetadata & metadata)
+gd::String InstructionSentenceFormatter::Translate(const gd::Instruction & instr, const gd::InstructionMetadata & metadata)
 {
-    std::string out = metadata.GetSentence();
+    gd::String out = metadata.GetSentence();
     if ( out.empty() ) out = "   "; //Prevent empty sentences that could trigger graphical glitches.
 
     //Replace _PARAMx_ placeholders by their values
-    for (unsigned int i =0;i<metadata.parameters.size();++i)
+    for (std::size_t i =0;i<metadata.parameters.size();++i)
     {
-        std::string placeholder = "_PARAM"+ToString(i)+"_";
-        while ( out.find( placeholder ) != std::string::npos )
-        {
-            std::string parameter = instr.GetParameter(i).GetPlainString();
-            out.replace(out.find(placeholder), placeholder.length(), parameter);
-        }
+        gd::String placeholder = "_PARAM"+gd::String::From(i)+"_";
+        gd::String parameter = instr.GetParameter(i).GetPlainString();
+        out = out.FindAndReplace(placeholder, parameter);
     }
 
-    std::replace( out.begin(), out.end(), '\n', ' ');
-
+    out = out.FindAndReplace("\n", " ");
     return out;
 }
 
-std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFormatter::GetAsFormattedText(
+std::vector< std::pair<gd::String, gd::TextFormatting> > InstructionSentenceFormatter::GetAsFormattedText(
     const Instruction & instr, const gd::InstructionMetadata & metadata)
 {
-    std::vector< std::pair<std::string, gd::TextFormatting> > formattedStr;
+    std::vector< std::pair<gd::String, gd::TextFormatting> > formattedStr;
 
-    std::string sentence = metadata.GetSentence();
-    std::replace( sentence.begin(), sentence.end(), '\n', ' ');
+    gd::String sentence = metadata.GetSentence();
+    std::replace( sentence.Raw().begin(), sentence.Raw().end(), '\n', ' ');
     bool parse = true;
 
     while ( parse )
     {
         //Search first parameter
         parse = false;
-        size_t firstParamPosition = std::string::npos;
-        size_t firstParamIndex = std::string::npos;
-        for (unsigned int i =0;i<metadata.parameters.size();++i)
+        size_t firstParamPosition = gd::String::npos;
+        size_t firstParamIndex = gd::String::npos;
+        for (std::size_t i =0;i<metadata.parameters.size();++i)
         {
-            size_t paramPosition = sentence.find( "_PARAM"+ToString(i)+"_" );
+            size_t paramPosition = sentence.find( "_PARAM"+gd::String::From(i)+"_" );
             if ( paramPosition < firstParamPosition )
             {
                 firstParamPosition = paramPosition;
@@ -77,7 +73,7 @@ std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFor
             }
         }
 
-        //When a parameter is found, complete formatted std::string.
+        //When a parameter is found, complete formatted gd::String.
         if ( parse )
         {
             if ( firstParamPosition != 0 ) //Add constant text before the parameter if any
@@ -90,12 +86,12 @@ std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFor
             TextFormatting format = GetFormattingFromType(metadata.parameters[firstParamIndex].type);
             format.userData = firstParamIndex;
 
-            std::string text = instr.GetParameter( firstParamIndex ).GetPlainString();
-            std::replace( text.begin(), text.end(), '\n', ' ');
+            gd::String text = instr.GetParameter( firstParamIndex ).GetPlainString();
+            std::replace( text.Raw().begin(), text.Raw().end(), '\n', ' '); //Using the raw std::string inside gd::String (no problems because it's only ANSI characters)
 
             formattedStr.push_back(std::make_pair(text, format));
-
-            sentence = sentence.substr(firstParamPosition+ToString("_PARAM"+ToString(firstParamIndex)+"_").length());
+            gd::String placeholder = "_PARAM"+gd::String::From(firstParamIndex)+"_";
+            sentence = sentence.substr(firstParamPosition+placeholder.length());
         }
         else if ( !sentence.empty() )//No more parameter found: Add the end of the sentence
         {
@@ -107,7 +103,7 @@ std::vector< std::pair<std::string, gd::TextFormatting> > InstructionSentenceFor
     return formattedStr;
 }
 
-TextFormatting InstructionSentenceFormatter::GetFormattingFromType(const std::string & type)
+TextFormatting InstructionSentenceFormatter::GetFormattingFromType(const gd::String & type)
 {
     if (gd::ParameterMetadata::IsObject(type))
         return typesFormatting["object"];
@@ -115,12 +111,12 @@ TextFormatting InstructionSentenceFormatter::GetFormattingFromType(const std::st
     return typesFormatting[type];
 }
 
-std::string InstructionSentenceFormatter::LabelFromType(const std::string & type)
+gd::String InstructionSentenceFormatter::LabelFromType(const gd::String & type)
 {
     if ( type.empty() ) return "";
     else if ( type == "expression" ) return _("Expression");
     else if ( gd::ParameterMetadata::IsObject(type) ) return _("Object");
-    else if ( type == "automatism" ) return _("Automatism");
+    else if ( type == "behavior" ) return _("Behavior");
     else if ( type == "operator" ) return _("Operator");
     else if ( type == "relationalOperator" ) return _( "Relational operator" );
     else if ( type == "file" ) return _("File");
@@ -149,7 +145,7 @@ void InstructionSentenceFormatter::LoadTypesFormattingFromConfig()
     typesFormatting.clear();
     typesFormatting["expression"].SetColor(99, 0, 0).SetBold();
     typesFormatting["object"].SetColor(19, 81, 0).SetBold();
-    typesFormatting["automatism"].SetColor(19, 81, 0).SetBold();
+    typesFormatting["behavior"].SetColor(19, 81, 0).SetBold();
     typesFormatting["operator"].SetColor(64, 81, 79).SetBold();
     typesFormatting["objectvar"].SetColor(44, 69, 99).SetBold();
     typesFormatting["scenevar"].SetColor(44, 69, 99).SetBold();
@@ -159,7 +155,7 @@ void InstructionSentenceFormatter::LoadTypesFormattingFromConfig()
     #if !defined(GD_NO_WX_GUI)
     wxConfigBase * config = wxConfigBase::Get();
 
-    for(std::map<std::string, gd::TextFormatting>::iterator it = typesFormatting.begin(); it != typesFormatting.end();++it)
+    for(std::map<gd::String, gd::TextFormatting>::iterator it = typesFormatting.begin(); it != typesFormatting.end();++it)
     {
         it->second.SetColor(config->ReadObject("EventsEditor/"+it->first+"Color", it->second.GetWxColor()));
         it->second.bold = config->ReadBool("EventsEditor/"+it->first+"Bold", it->second.IsBold());
@@ -173,7 +169,7 @@ void InstructionSentenceFormatter::SaveTypesFormattingToConfig()
 {
     wxConfigBase * config = wxConfigBase::Get();
 
-    for (std::map<std::string, TextFormatting>::iterator it = typesFormatting.begin();it!=typesFormatting.end();++it)
+    for (std::map<gd::String, TextFormatting>::iterator it = typesFormatting.begin();it!=typesFormatting.end();++it)
     {
         config->Write("EventsEditor/"+it->first+"Color", it->second.GetWxColor());
         config->Write("EventsEditor/"+it->first+"Bold", it->second.bold);
@@ -181,14 +177,14 @@ void InstructionSentenceFormatter::SaveTypesFormattingToConfig()
     }
 }
 
-wxBitmap InstructionSentenceFormatter::BitmapFromType(const std::string & type)
+wxBitmap InstructionSentenceFormatter::BitmapFromType(const gd::String & type)
 {
     gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::Get();
 
     if ( type == "" ) return CommonBitmapManager->unknownBt;
     else if ( type == "expression" ) return CommonBitmapManager->expressionBt;
     else if ( gd::ParameterMetadata::IsObject(type) ) return CommonBitmapManager->objectBt;
-    else if ( type == "automatism" ) return CommonBitmapManager->automatismBt;
+    else if ( type == "behavior" ) return CommonBitmapManager->behaviorBt;
     else if ( type == "operator" ) return CommonBitmapManager->signeBt;
     else if ( type == "relationalOperator" ) return CommonBitmapManager->signeBt;
     else if ( type == "file" ) return CommonBitmapManager->fileBt;

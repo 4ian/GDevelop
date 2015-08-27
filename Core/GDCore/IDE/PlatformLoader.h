@@ -6,7 +6,7 @@
 
 #ifndef PLATFORMLOADER_H
 #define PLATFORMLOADER_H
-#include <string>
+#include "GDCore/String.h"
 #include <memory>
 namespace gd { class Platform; }
 
@@ -37,7 +37,7 @@ public:
      *
      * \todo For now, only GDCpp.dll and GDJS.dll are loaded.
      */
-    static void LoadAllPlatformsInManager(std::string dir);
+    static void LoadAllPlatformsInManager(gd::String dir);
 
     /**
      * Load a specific platform.
@@ -45,7 +45,7 @@ public:
      * \param fullpath The path to the platform file.
      * \return Smart pointer to the loaded platform. Can be NULL ( if loading failed ).
      */
-    static std::shared_ptr<gd::Platform> LoadPlatformInManager(std::string fullpath);
+    static std::shared_ptr<gd::Platform> LoadPlatformInManager(gd::String fullpath);
 
 private:
     PlatformLoader();

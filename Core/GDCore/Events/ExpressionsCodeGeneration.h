@@ -7,7 +7,7 @@
 #define EXPRESSIONSCODEGENERATION_H
 
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include "GDCore/Events/ExpressionParser.h"
 namespace gd { class ExpressionMetadata; }
 namespace gd { class Expression; }
@@ -25,7 +25,7 @@ namespace gd
  *
  * Usage example :
  * \code
- *   std::string expressionOutputCppCode;
+ *   gd::String expressionOutputCppCode;
  *
  *   CallbacksForGeneratingExpressionCode callbacks(expressionOutputCppCode, codeGenerator, context);
  *   gd::ExpressionParser parser(theOriginalGameDevelopExpression);
@@ -38,18 +38,18 @@ namespace gd
 class GD_CORE_API CallbacksForGeneratingExpressionCode : public gd::ParserCallbacks
 {
 public:
-    CallbacksForGeneratingExpressionCode(std::string & output, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_);
+    CallbacksForGeneratingExpressionCode(gd::String & output, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_);
     virtual ~CallbacksForGeneratingExpressionCode() {};
 
-    void OnConstantToken(std::string text);
-    void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);
-    void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);
-    void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);
+    void OnConstantToken(gd::String text);
+    void OnStaticFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);
+    void OnObjectFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);
+    void OnObjectBehaviorFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);
     bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
     bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
 
 private:
-    std::string & plainExpression;
+    gd::String & plainExpression;
     EventsCodeGenerator & codeGenerator;
     EventsCodeGenerationContext & context;
 };

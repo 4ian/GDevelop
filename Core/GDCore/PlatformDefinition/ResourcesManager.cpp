@@ -24,7 +24,7 @@
 namespace gd
 {
 
-std::string Resource::badStr;
+gd::String Resource::badStr;
 
 Resource ResourcesManager::badResource;
 #if defined(GD_IDE_ONLY)
@@ -38,7 +38,7 @@ void ResourceFolder::Init(const ResourceFolder & other)
     name = other.name;
 
     resources.clear();
-    for (unsigned int i = 0;i<other.resources.size();++i)
+    for (std::size_t i = 0;i<other.resources.size();++i)
     {
         resources.push_back(std::shared_ptr<Resource>(other.resources[i]->Clone()));
     }
@@ -48,22 +48,22 @@ void ResourceFolder::Init(const ResourceFolder & other)
 void ResourcesManager::Init(const ResourcesManager & other)
 {
     resources.clear();
-    for (unsigned int i = 0;i<other.resources.size();++i)
+    for (std::size_t i = 0;i<other.resources.size();++i)
     {
         resources.push_back(std::shared_ptr<Resource>(other.resources[i]->Clone()));
     }
 #if defined(GD_IDE_ONLY)
     folders.clear();
-    for (unsigned int i = 0;i<other.folders.size();++i)
+    for (std::size_t i = 0;i<other.folders.size();++i)
     {
         folders.push_back(other.folders[i]);
     }
 #endif
 }
 
-Resource & ResourcesManager::GetResource(const std::string & name)
+Resource & ResourcesManager::GetResource(const gd::String & name)
 {
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == name )
             return *resources[i];
@@ -72,9 +72,9 @@ Resource & ResourcesManager::GetResource(const std::string & name)
     return badResource;
 }
 
-const Resource & ResourcesManager::GetResource(const std::string & name) const
+const Resource & ResourcesManager::GetResource(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == name )
             return *resources[i];
@@ -83,7 +83,7 @@ const Resource & ResourcesManager::GetResource(const std::string & name) const
     return badResource;
 }
 
-std::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string & kind)
+std::shared_ptr<Resource> ResourcesManager::CreateResource(const gd::String & kind)
 {
     if (kind == "image")
     {
@@ -94,9 +94,9 @@ std::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string & k
     return std::shared_ptr<Resource>(new Resource);
 }
 
-bool ResourcesManager::HasResource(const std::string & name) const
+bool ResourcesManager::HasResource(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == name )
             return true;
@@ -105,10 +105,10 @@ bool ResourcesManager::HasResource(const std::string & name) const
     return false;
 }
 
-std::vector<std::string> ResourcesManager::GetAllResourcesList()
+std::vector<gd::String> ResourcesManager::GetAllResourcesList()
 {
-    std::vector<std::string> allResources;
-    for (unsigned int i = 0;i<resources.size();++i)
+    std::vector<gd::String> allResources;
+    for (std::size_t i = 0;i<resources.size();++i)
         allResources.push_back(resources[i]->GetName());
 
     return allResources;
@@ -133,7 +133,7 @@ bool ResourcesManager::AddResource(const gd::Resource & resource)
     return true;
 }
 
-bool ResourcesManager::AddResource(const std::string & name, const std::string & filename)
+bool ResourcesManager::AddResource(const gd::String & name, const gd::String & filename)
 {
     if ( HasResource(name) ) return false;
 
@@ -146,21 +146,21 @@ bool ResourcesManager::AddResource(const std::string & name, const std::string &
     return true;
 }
 
-std::vector<std::string> ResourceFolder::GetAllResourcesList()
+std::vector<gd::String> ResourceFolder::GetAllResourcesList()
 {
-    std::vector<std::string> allResources;
-    for (unsigned int i = 0;i<resources.size();++i)
+    std::vector<gd::String> allResources;
+    for (std::size_t i = 0;i<resources.size();++i)
         allResources.push_back(resources[i]->GetName());
 
     return allResources;
 }
 
-bool ImageResource::EditProperty(gd::Project & project, const std::string & property)
+bool ImageResource::EditProperty(gd::Project & project, const gd::String & property)
 {
     return false;
 }
 
-bool ImageResource::ChangeProperty(gd::Project & project, const std::string & property, const std::string & newValue)
+bool ImageResource::ChangeProperty(gd::Project & project, const gd::String & property, const gd::String & newValue)
 {
     if ( property == "smooth" )
         smooth = (newValue == _("Yes"));
@@ -170,7 +170,7 @@ bool ImageResource::ChangeProperty(gd::Project & project, const std::string & pr
     return true;
 }
 
-void ImageResource::GetPropertyInformation(gd::Project & project, const std::string & property, std::string & userFriendlyName, std::string & description) const
+void ImageResource::GetPropertyInformation(gd::Project & project, const gd::String & property, gd::String & userFriendlyName, gd::String & description) const
 {
     if ( property == "smooth" )
     {
@@ -184,15 +184,15 @@ void ImageResource::GetPropertyInformation(gd::Project & project, const std::str
     }
 }
 
-std::string ImageResource::GetProperty(gd::Project & project, const std::string & property)
+gd::String ImageResource::GetProperty(gd::Project & project, const gd::String & property)
 {
     if ( property == "smooth" )
     {
-        return ToString(smooth ? _("Yes") : _("No"));
+        return smooth ? _("Yes") : _("No");
     }
     else if ( property == "alwaysLoaded" )
     {
-        return ToString(alwaysLoaded ? _("Yes") : _("No"));
+        return alwaysLoaded ? _("Yes") : _("No");
     }
 
     return "";
@@ -201,9 +201,9 @@ std::string ImageResource::GetProperty(gd::Project & project, const std::string 
 /**
  * Return a vector containing the name of all the properties of the resource
  */
-std::vector<std::string> ImageResource::GetAllProperties(gd::Project & project) const
+std::vector<gd::String> ImageResource::GetAllProperties(gd::Project & project) const
 {
-    std::vector<std::string> allProperties;
+    std::vector<gd::String> allProperties;
     allProperties.push_back("smooth");
     allProperties.push_back("alwaysLoaded");
 
@@ -249,9 +249,9 @@ void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Pr
 
 #endif
 
-Resource & ResourceFolder::GetResource(const std::string & name)
+Resource & ResourceFolder::GetResource(const gd::String & name)
 {
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == name )
             return *resources[i];
@@ -260,9 +260,9 @@ Resource & ResourceFolder::GetResource(const std::string & name)
     return badResource;
 }
 
-const Resource & ResourceFolder::GetResource(const std::string & name) const
+const Resource & ResourceFolder::GetResource(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == name )
             return *resources[i];
@@ -273,10 +273,10 @@ const Resource & ResourceFolder::GetResource(const std::string & name) const
 
 namespace
 {
-bool MoveResourceUpInList(std::vector< std::shared_ptr<Resource> > & resources, const std::string & name)
+bool MoveResourceUpInList(std::vector< std::shared_ptr<Resource> > & resources, const gd::String & name)
 {
-    unsigned int index = std::string::npos;
-    for (unsigned int i = 0;i<resources.size();++i)
+    std::size_t index = gd::String::npos;
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == name)
         {
@@ -294,10 +294,10 @@ bool MoveResourceUpInList(std::vector< std::shared_ptr<Resource> > & resources, 
     return false;
 }
 
-bool MoveResourceDownInList(std::vector< std::shared_ptr<Resource> > & resources, const std::string & name)
+bool MoveResourceDownInList(std::vector< std::shared_ptr<Resource> > & resources, const gd::String & name)
 {
-    unsigned int index = std::string::npos;
-    for (unsigned int i = 0;i<resources.size();++i)
+    std::size_t index = gd::String::npos;
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == name)
         {
@@ -318,42 +318,42 @@ bool MoveResourceDownInList(std::vector< std::shared_ptr<Resource> > & resources
 
 }
 
-std::string Resource::GetAbsoluteFile(const gd::Project & project) const
+gd::String Resource::GetAbsoluteFile(const gd::Project & project) const
 {
 #if !defined(GD_NO_WX_GUI)
     wxString projectDir = wxFileName::FileName(project.GetProjectFile()).GetPath();
     wxFileName filename = wxFileName::FileName(GetFile());
     filename.MakeAbsolute(projectDir);
-    return ToString(filename.GetFullPath());
+    return filename.GetFullPath();
 #else
     gd::LogWarning("BAD USE: Resource::GetAbsoluteFile called when compiled with no support for wxWidgets");
     return GetFile();
 #endif
 }
 
-bool ResourceFolder::MoveResourceUpInList(const std::string & name)
+bool ResourceFolder::MoveResourceUpInList(const gd::String & name)
 {
     return gd::MoveResourceUpInList(resources, name);
 }
 
-bool ResourceFolder::MoveResourceDownInList(const std::string & name)
+bool ResourceFolder::MoveResourceDownInList(const gd::String & name)
 {
     return gd::MoveResourceDownInList(resources, name);
 }
 
-bool ResourcesManager::MoveResourceUpInList(const std::string & name)
+bool ResourcesManager::MoveResourceUpInList(const gd::String & name)
 {
     return gd::MoveResourceUpInList(resources, name);
 }
 
-bool ResourcesManager::MoveResourceDownInList(const std::string & name)
+bool ResourcesManager::MoveResourceDownInList(const gd::String & name)
 {
     return gd::MoveResourceDownInList(resources, name);
 }
 
-bool ResourcesManager::MoveFolderUpInList(const std::string & name)
+bool ResourcesManager::MoveFolderUpInList(const gd::String & name)
 {
-    for (unsigned int i =1;i<folders.size();++i)
+    for (std::size_t i =1;i<folders.size();++i)
     {
         if ( folders[i].GetName() == name )
         {
@@ -365,9 +365,9 @@ bool ResourcesManager::MoveFolderUpInList(const std::string & name)
     return false;
 }
 
-bool ResourcesManager::MoveFolderDownInList(const std::string & name)
+bool ResourcesManager::MoveFolderDownInList(const gd::String & name)
 {
-    for (unsigned int i =0;i<folders.size()-1;++i)
+    for (std::size_t i =0;i<folders.size()-1;++i)
     {
         if ( folders[i].GetName() == name )
         {
@@ -379,9 +379,9 @@ bool ResourcesManager::MoveFolderDownInList(const std::string & name)
     return false;
 }
 
-std::shared_ptr<gd::Resource> ResourcesManager::GetResourceSPtr(const std::string & name)
+std::shared_ptr<gd::Resource> ResourcesManager::GetResourceSPtr(const gd::String & name)
 {
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == name )
             return resources[i];
@@ -390,9 +390,9 @@ std::shared_ptr<gd::Resource> ResourcesManager::GetResourceSPtr(const std::strin
     return std::shared_ptr<gd::Resource>();
 }
 
-bool ResourcesManager::HasFolder(const std::string & name) const
+bool ResourcesManager::HasFolder(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<folders.size();++i)
+    for (std::size_t i = 0;i<folders.size();++i)
     {
         if ( folders[i].GetName() == name )
             return true;
@@ -401,9 +401,9 @@ bool ResourcesManager::HasFolder(const std::string & name) const
     return false;
 }
 
-const ResourceFolder & ResourcesManager::GetFolder(const std::string & name) const
+const ResourceFolder & ResourcesManager::GetFolder(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<folders.size();++i)
+    for (std::size_t i = 0;i<folders.size();++i)
     {
         if ( folders[i].GetName() == name )
             return folders[i];
@@ -412,9 +412,9 @@ const ResourceFolder & ResourcesManager::GetFolder(const std::string & name) con
     return badFolder;
 }
 
-ResourceFolder & ResourcesManager::GetFolder(const std::string & name)
+ResourceFolder & ResourcesManager::GetFolder(const gd::String & name)
 {
-    for (unsigned int i = 0;i<folders.size();++i)
+    for (std::size_t i = 0;i<folders.size();++i)
     {
         if ( folders[i].GetName() == name )
             return folders[i];
@@ -423,9 +423,9 @@ ResourceFolder & ResourcesManager::GetFolder(const std::string & name)
     return badFolder;
 }
 
-void ResourcesManager::RemoveFolder(const std::string & name)
+void ResourcesManager::RemoveFolder(const gd::String & name)
 {
-    for (unsigned int i = 0;i<folders.size();)
+    for (std::size_t i = 0;i<folders.size();)
     {
         if ( folders[i].GetName() == name )
         {
@@ -436,7 +436,7 @@ void ResourcesManager::RemoveFolder(const std::string & name)
     }
 }
 
-void ResourcesManager::CreateFolder(const std::string & name)
+void ResourcesManager::CreateFolder(const gd::String & name)
 {
     ResourceFolder newFolder;
     newFolder.SetName(name);
@@ -444,18 +444,18 @@ void ResourcesManager::CreateFolder(const std::string & name)
     folders.push_back(newFolder);
 }
 
-std::vector<std::string> ResourcesManager::GetAllFolderList()
+std::vector<gd::String> ResourcesManager::GetAllFolderList()
 {
-    std::vector<std::string> allFolders;
-    for (unsigned int i =0;i<folders.size();++i)
+    std::vector<gd::String> allFolders;
+    for (std::size_t i =0;i<folders.size();++i)
         allFolders.push_back(folders[i].GetName());
 
     return allFolders;
 }
 
-bool ResourceFolder::HasResource(const std::string & name) const
+bool ResourceFolder::HasResource(const gd::String & name) const
 {
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == name )
             return true;
@@ -464,7 +464,7 @@ bool ResourceFolder::HasResource(const std::string & name) const
     return false;
 }
 
-void ResourceFolder::AddResource(const std::string & name, gd::ResourcesManager & parentManager)
+void ResourceFolder::AddResource(const gd::String & name, gd::ResourcesManager & parentManager)
 {
     try
     {
@@ -479,18 +479,18 @@ void ResourceFolder::AddResource(const std::string & name, gd::ResourcesManager 
     }
 }
 
-void ResourcesManager::RenameResource(const std::string & oldName, const std::string & newName)
+void ResourcesManager::RenameResource(const gd::String & oldName, const gd::String & newName)
 {
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i]->GetName() == oldName )
             resources[i]->SetName(newName);
     }
 }
 
-void ResourceFolder::RemoveResource(const std::string & name)
+void ResourceFolder::RemoveResource(const gd::String & name)
 {
-    for (unsigned int i = 0;i<resources.size();)
+    for (std::size_t i = 0;i<resources.size();)
     {
         if (resources[i] != std::shared_ptr<Resource>() && resources[i]->GetName() == name)
             resources.erase(resources.begin()+i);
@@ -499,9 +499,9 @@ void ResourceFolder::RemoveResource(const std::string & name)
     }
 }
 
-void ResourcesManager::RemoveResource(const std::string & name)
+void ResourcesManager::RemoveResource(const gd::String & name)
 {
-    for (unsigned int i = 0;i<resources.size();)
+    for (std::size_t i = 0;i<resources.size();)
     {
         if (resources[i] != std::shared_ptr<Resource>() && resources[i]->GetName() == name)
             resources.erase(resources.begin()+i);
@@ -509,7 +509,7 @@ void ResourcesManager::RemoveResource(const std::string & name)
             ++i;
     }
 
-    for (unsigned int i = 0;i<folders.size();++i)
+    for (std::size_t i = 0;i<folders.size();++i)
         folders[i].RemoveResource(name);
 }
 #endif
@@ -522,7 +522,7 @@ void ResourceFolder::UnserializeFrom(const SerializerElement & element, gd::Reso
 
     SerializerElement & resourcesElement = element.GetChild("resources", 0, "Resources");
     resourcesElement.ConsiderAsArrayOf("resource", "Resource");
-    for(unsigned int i = 0;i<resourcesElement.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<resourcesElement.GetChildrenCount();++i)
         AddResource(resourcesElement.GetChild(i).GetStringAttribute("name"), parentManager);
 }
 
@@ -532,7 +532,7 @@ void ResourceFolder::SerializeTo(SerializerElement & element) const
 
     SerializerElement & resourcesElement = element.AddChild("resources");
     resourcesElement.ConsiderAsArrayOf("resource");
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i] == std::shared_ptr<Resource>() ) continue;
         resourcesElement.AddChild("resource").SetAttribute("name", resources[i]->GetName());
@@ -544,11 +544,11 @@ void ResourcesManager::UnserializeFrom(const SerializerElement & element)
 {
     const SerializerElement & resourcesElement = element.GetChild("resources", 0, "Resources");
     resourcesElement.ConsiderAsArrayOf("resource", "Resource");
-    for(unsigned int i = 0;i<resourcesElement.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<resourcesElement.GetChildrenCount();++i)
     {
         const SerializerElement & resourceElement = resourcesElement.GetChild(i);
-        std::string kind = resourceElement.GetStringAttribute("kind");
-        std::string name = resourceElement.GetStringAttribute("name");
+        gd::String kind = resourceElement.GetStringAttribute("kind");
+        gd::String name = resourceElement.GetStringAttribute("name");
 
         std::shared_ptr<Resource> resource = CreateResource(kind);
         resource->SetName(name);
@@ -560,7 +560,7 @@ void ResourcesManager::UnserializeFrom(const SerializerElement & element)
     #if defined(GD_IDE_ONLY)
     const SerializerElement & resourcesFoldersElement = element.GetChild("resourceFolders", 0, "ResourceFolders");
     resourcesFoldersElement.ConsiderAsArrayOf("folder", "Folder");
-    for(unsigned int i = 0;i<resourcesFoldersElement.GetChildrenCount();++i)
+    for(std::size_t i = 0;i<resourcesFoldersElement.GetChildrenCount();++i)
     {
         ResourceFolder folder;
         folder.UnserializeFrom(resourcesFoldersElement.GetChild(i), *this);
@@ -575,7 +575,7 @@ void ResourcesManager::SerializeTo(SerializerElement & element) const
 {
     SerializerElement & resourcesElement = element.AddChild("resources");
     resourcesElement.ConsiderAsArrayOf("resource");
-    for (unsigned int i = 0;i<resources.size();++i)
+    for (std::size_t i = 0;i<resources.size();++i)
     {
         if ( resources[i] == std::shared_ptr<Resource>() ) break;
 
@@ -588,17 +588,17 @@ void ResourcesManager::SerializeTo(SerializerElement & element) const
 
     SerializerElement & resourcesFoldersElement = element.AddChild("resourceFolders");
     resourcesFoldersElement.ConsiderAsArrayOf("folder");
-    for (unsigned int i = 0;i<folders.size();++i)
+    for (std::size_t i = 0;i<folders.size();++i)
         folders[i].SerializeTo(resourcesFoldersElement.AddChild("folder"));
 }
 #endif
 
-void ImageResource::SetFile(const std::string & newFile)
+void ImageResource::SetFile(const gd::String & newFile)
 {
     file = newFile;
 
     //Convert all backslash to slashs.
-    while (file.find('\\') != std::string::npos)
+    while (file.find('\\') != gd::String::npos)
         file.replace(file.find('\\'), 1, "/");
 }
 
@@ -616,7 +616,7 @@ void ImageResource::SerializeTo(SerializerElement & element) const
     element.SetAttribute("alwaysLoaded", alwaysLoaded);
     element.SetAttribute("smoothed", smooth);
     element.SetAttribute("userAdded", IsUserAdded());
-    element.SetAttribute("file", GetFile());
+    element.SetAttribute("file", GetFile()); //Keep the resource path in the current locale (but save it in UTF8 for compatibility on other OSes)
 }
 
 

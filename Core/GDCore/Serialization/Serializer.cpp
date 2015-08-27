@@ -26,8 +26,8 @@ void Serializer::ToXML(SerializerElement & element, TiXmlElement * xmlElement)
 
 	if (element.IsValueUndefined())
 	{
-		const std::map<std::string, SerializerValue> & attributes = element.GetAllAttributes();
-		for (std::map<std::string, SerializerValue>::const_iterator it = attributes.begin(); it != attributes.end();++it)
+		const std::map<gd::String, SerializerValue> & attributes = element.GetAllAttributes();
+		for (std::map<gd::String, SerializerValue>::const_iterator it = attributes.begin(); it != attributes.end();++it)
 		{
 			const SerializerValue & attr = it->second;
 
@@ -43,7 +43,7 @@ void Serializer::ToXML(SerializerElement & element, TiXmlElement * xmlElement)
 				xmlElement->SetAttribute(it->first.c_str(), attr.GetString().c_str());
 		}
 
-		const std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
+		const std::vector< std::pair<gd::String, std::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
 		for (size_t i = 0; i < children.size(); ++i)
 		{
 			if (children[i].second == std::shared_ptr<SerializerElement>())
@@ -71,9 +71,9 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 	{
 		if ( attr->Name() != NULL )
 		{
-			std::string name = attr->Name();
+			gd::String name = gd::String::FromUTF8(attr->Name()).ReplaceInvalid();
 			if (attr->Value())
-				element.SetAttribute(name, std::string(attr->Value()));
+				element.SetAttribute(name, gd::String::FromUTF8(attr->Value()).ReplaceInvalid());
 		}
 
 		attr = attr->Next();
@@ -84,7 +84,7 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 	{
 		if (child->Value())
 		{
-			std::string name = child->Value();
+			gd::String name = gd::String::FromUTF8(child->Value()).ReplaceInvalid();
 			SerializerElement & childElement = element.AddChild(name);
 			FromXML(childElement, child);
 		}
@@ -95,7 +95,7 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 	if (xmlElement->GetText())
 	{
 		SerializerValue value;
-		value.Set(xmlElement->GetText());
+		value.Set(gd::String::FromUTF8(xmlElement->GetText()).ReplaceInvalid());
 		element.SetValue(value);
 	}
 
@@ -201,9 +201,9 @@ namespace
 		if (val.IsBoolean())
 			return val.GetBool() ? "true" : "false";
 		else if (val.IsInt())
-			return gd::ToString(val.GetInt());
+			return gd::String::From(val.GetInt()).ToUTF8();
 		else if (val.IsDouble())
-			return gd::ToString(val.GetDouble());
+			return gd::String::From(val.GetDouble()).ToUTF8();
 		else
 			return StringToQuotedJSONString(val.GetString().c_str());
 	}
@@ -225,7 +225,7 @@ std::string Serializer::ToJSON(const SerializerElement & element)
 					<< " but has attributes. These attributes won't be saved!" << std::endl;
 		    }
 
-			const std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
+			const std::vector< std::pair<gd::String, std::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
 			for (size_t i = 0; i < children.size(); ++i)
 			{
 				if (children[i].second == std::shared_ptr<SerializerElement>())
@@ -251,8 +251,8 @@ std::string Serializer::ToJSON(const SerializerElement & element)
 		    std::string str = "{";
 		    bool firstChild = true;
 
-			const std::map<std::string, SerializerValue> & attributes = element.GetAllAttributes();
-			for (std::map<std::string, SerializerValue>::const_iterator it = attributes.begin();
+			const std::map<gd::String, SerializerValue> & attributes = element.GetAllAttributes();
+			for (std::map<gd::String, SerializerValue>::const_iterator it = attributes.begin();
 				it != attributes.end();++it)
 		    {
 		        if ( !firstChild ) str += ",";
@@ -261,7 +261,7 @@ std::string Serializer::ToJSON(const SerializerElement & element)
 		        firstChild = false;
 		    }
 
-			const std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
+			const std::vector< std::pair<gd::String, std::shared_ptr<SerializerElement> > > & children = element.GetAllChildren();
 			for (size_t i = 0; i < children.size(); ++i)
 			{
 				if (children[i].second == std::shared_ptr<SerializerElement>())
@@ -424,7 +424,7 @@ namespace
                 if ( pos >= jsonStr.length() || jsonStr[pos] != ':' ) return std::string::npos;
 
                 pos++;
-                pos = ParseJSONObject(jsonStr, pos, element.AddChild(childName));
+                pos = ParseJSONObject(jsonStr, pos, element.AddChild(gd::String::FromUTF8(childName).ReplaceInvalid()));
 
                 pos = SkipBlankChar(jsonStr, pos);
                 if ( pos >= jsonStr.length()) return std::string::npos;
@@ -469,7 +469,7 @@ namespace
                 return std::string::npos;
             }
 
-            element.SetValue(str);
+            element.SetValue(gd::String::FromUTF8(str).ReplaceInvalid());
             return pos+1;
         }
         else //Number or boolean
@@ -487,7 +487,7 @@ namespace
             else if ( str == "false" )
             	element.SetValue(false);
             else
-            	element.SetValue(ToDouble(str));
+            	element.SetValue(gd::String::FromUTF8(str).To<double>());
             return endPos;
         }
     }

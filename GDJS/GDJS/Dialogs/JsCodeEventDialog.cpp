@@ -69,8 +69,8 @@ void JsCodeEventDialog::onObjectsButtonClick(wxCommandEvent& event)
 
 void JsCodeEventDialog::onOkBtClick(wxCommandEvent&)
 {
-	event.SetInlineCode(gd::ToString(codeEdit->GetText()));
-	event.SetParameterObjects(gd::ToString(objectsEdit->GetValue()));
+	event.SetInlineCode(codeEdit->GetText());
+	event.SetParameterObjects(objectsEdit->GetValue());
 	EndModal(1);
 }
 

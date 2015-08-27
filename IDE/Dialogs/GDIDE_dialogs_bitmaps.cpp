@@ -21,14 +21,13 @@
         wxMemoryFSHandler::AddFile(name, data, size)
 #endif
 
-static size_t xml_res_size_0 = 108;
+static size_t xml_res_size_0 = 90;
 static unsigned char xml_res_file_0[] = {
 60,63,120,109,108,32,118,101,114,115,105,111,110,61,34,49,46,48,34,32,101,
 110,99,111,100,105,110,103,61,34,85,84,70,45,56,34,63,62,10,60,114,101,
 115,111,117,114,99,101,32,120,109,108,110,115,61,34,104,116,116,112,58,
-47,47,119,119,119,46,119,120,119,105,110,100,111,119,115,46,111,114,103,
-47,119,120,120,114,99,34,32,118,101,114,115,105,111,110,61,34,50,46,51,
-46,48,46,49,34,47,62,10};
+47,47,119,119,119,46,119,120,119,105,100,103,101,116,115,46,111,114,103,
+47,119,120,120,114,99,34,47,62,10};
 
 void wxCraftergfm8VaInitBitmapResources()
 {
@@ -43,6 +42,6 @@ void wxCraftergfm8VaInitBitmapResources()
         else wxFileSystem::AddHandler(new wxMemoryFSHandlerBase);
     }
 
-    XRC_ADD_FILE(wxT("XRC_resource/GDIDE_dialogs_bitmaps.cpp$D__Florian_Programmation_GameDevelop3_IDE_Dialogs_GDIDE_dialogs_bitmaps.xrc"), xml_res_file_0, xml_res_size_0, wxT("text/xml"));
-    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDIDE_dialogs_bitmaps.cpp$D__Florian_Programmation_GameDevelop3_IDE_Dialogs_GDIDE_dialogs_bitmaps.xrc"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDIDE_dialogs_bitmaps.cpp$_Users_florian_Projects_F_GD_IDE_Dialogs_GDIDE_dialogs_bitmaps.xrc"), xml_res_file_0, xml_res_size_0, wxT("text/xml"));
+    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDIDE_dialogs_bitmaps.cpp$_Users_florian_Projects_F_GD_IDE_Dialogs_GDIDE_dialogs_bitmaps.xrc"));
 }

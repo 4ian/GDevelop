@@ -18,18 +18,18 @@
 namespace gd
 {
 
-ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
-                   const std::string & name_,
-                   const std::string & fullname_,
-                   const std::string & informations_,
-                   const std::string & icon24x24,
+ObjectMetadata::ObjectMetadata(const gd::String & extensionNamespace_,
+                   const gd::String & name_,
+                   const gd::String & fullname_,
+                   const gd::String & informations_,
+                   const gd::String & icon24x24,
                    CreateFunPtr createFunPtrP) :
     extensionNamespace(extensionNamespace_)
 {
     name = name_;
 #if defined(GD_IDE_ONLY)
-    SetFullName(std::string(fullname_));
-    SetDescription(std::string(informations_));
+    SetFullName(gd::String(fullname_));
+    SetDescription(gd::String(informations_));
     iconFilename = icon24x24;
 #if !defined(GD_NO_WX_GUI)
     if ( gd::SkinHelper::IconExists(icon24x24, 24) )
@@ -47,41 +47,41 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
     createFunPtr = createFunPtrP;
 }
 
-gd::InstructionMetadata & ObjectMetadata::AddCondition(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
-                                       const std::string & sentence,
-                                       const std::string & group,
-                                       const std::string & icon,
-                                       const std::string & smallicon)
+gd::InstructionMetadata & ObjectMetadata::AddCondition(const gd::String & name,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
+                                       const gd::String & sentence,
+                                       const gd::String & group,
+                                       const gd::String & icon,
+                                       const gd::String & smallicon)
 {
 #if defined(GD_IDE_ONLY)
-    std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
+    gd::String nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace, nameWithNamespace, fullname, description, sentence, group, icon, smallicon);
     return conditionsInfos[nameWithNamespace];
 #endif
 }
 
-gd::InstructionMetadata & ObjectMetadata::AddAction(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
-                                       const std::string & sentence,
-                                       const std::string & group,
-                                       const std::string & icon,
-                                       const std::string & smallicon)
+gd::InstructionMetadata & ObjectMetadata::AddAction(const gd::String & name,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
+                                       const gd::String & sentence,
+                                       const gd::String & group,
+                                       const gd::String & icon,
+                                       const gd::String & smallicon)
 {
 #if defined(GD_IDE_ONLY)
-    std::string nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
+    gd::String nameWithNamespace = extensionNamespace.empty() ? name : extensionNamespace+name;
     actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace, nameWithNamespace, fullname, description, sentence, group, icon, smallicon);
     return actionsInfos[nameWithNamespace];
 #endif
 }
 
-gd::ExpressionMetadata & ObjectMetadata::AddExpression(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
-                                       const std::string & group,
-                                       const std::string & smallicon)
+gd::ExpressionMetadata & ObjectMetadata::AddExpression(const gd::String & name,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
+                                       const gd::String & group,
+                                       const gd::String & smallicon)
 {
 #if defined(GD_IDE_ONLY)
     //Be careful, objects expression do not have namespace ( not necessary as objects inherits from only one derived object )
@@ -90,11 +90,11 @@ gd::ExpressionMetadata & ObjectMetadata::AddExpression(const std::string & name,
 #endif
 }
 
-gd::ExpressionMetadata & ObjectMetadata::AddStrExpression(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
-                                       const std::string & group,
-                                       const std::string & smallicon)
+gd::ExpressionMetadata & ObjectMetadata::AddStrExpression(const gd::String & name,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
+                                       const gd::String & group,
+                                       const gd::String & smallicon)
 {
 #if defined(GD_IDE_ONLY)
     //Be careful, objects expression do not have namespace ( not necessary as objects inherits from only one derived object )
@@ -103,7 +103,7 @@ gd::ExpressionMetadata & ObjectMetadata::AddStrExpression(const std::string & na
 #endif
 }
 
-ObjectMetadata & ObjectMetadata::SetFullName(const std::string & fullname_)
+ObjectMetadata & ObjectMetadata::SetFullName(const gd::String & fullname_)
 {
 #if defined(GD_IDE_ONLY)
     fullname = fullname_;
@@ -111,7 +111,7 @@ ObjectMetadata & ObjectMetadata::SetFullName(const std::string & fullname_)
     return *this;
 }
 
-ObjectMetadata & ObjectMetadata::SetDescription(const std::string & description_)
+ObjectMetadata & ObjectMetadata::SetDescription(const gd::String & description_)
 {
 #if defined(GD_IDE_ONLY)
     description = description_;
@@ -127,7 +127,7 @@ ObjectMetadata & ObjectMetadata::SetBitmapIcon(const wxBitmap & bitmap_)
     return *this;
 }
 
-ObjectMetadata & ObjectMetadata::SetIncludeFile(const std::string & includeFile)
+ObjectMetadata & ObjectMetadata::SetIncludeFile(const gd::String & includeFile)
 {
 #if defined(GD_IDE_ONLY)
     includeFiles.clear();
@@ -135,7 +135,7 @@ ObjectMetadata & ObjectMetadata::SetIncludeFile(const std::string & includeFile)
 #endif
     return *this;
 }
-ObjectMetadata & ObjectMetadata::AddIncludeFile(const std::string & includeFile)
+ObjectMetadata & ObjectMetadata::AddIncludeFile(const gd::String & includeFile)
 {
 #if defined(GD_IDE_ONLY)
     if ( std::find(includeFiles.begin(), includeFiles.end(), includeFile) == includeFiles.end())

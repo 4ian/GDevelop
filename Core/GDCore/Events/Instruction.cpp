@@ -6,19 +6,17 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/Expression.h"
-#include <string>
+#include "GDCore/String.h"
 #include <iostream>
 #include <vector>
 #include <assert.h>
-
-using namespace std;
 
 namespace gd
 {
 
 gd::Expression Instruction::badExpression("");
 
-Instruction::Instruction(string type_) :
+Instruction::Instruction(gd::String type_) :
 renderedHeightNeedUpdate(true),
 renderedHeight(0),
 selected(false),
@@ -29,7 +27,7 @@ inverted(false)
     parameters.reserve(8);
 }
 
-Instruction::Instruction(string type_, const vector <gd::Expression> & parameters_, bool inverted_) :
+Instruction::Instruction(gd::String type_, const std::vector<gd::Expression> & parameters_, bool inverted_) :
 renderedHeightNeedUpdate(true),
 renderedHeight(0),
 selected(false),
@@ -40,21 +38,21 @@ parameters(parameters_)
     parameters.reserve(8);
 }
 
-const gd::Expression & Instruction::GetParameter(unsigned int index) const
+const gd::Expression & Instruction::GetParameter(std::size_t index) const
 {
     if ( index >= parameters.size() ) return badExpression;
 
     return parameters[index];
 }
 
-gd::Expression & Instruction::GetParameter(unsigned int index)
+gd::Expression & Instruction::GetParameter(std::size_t index)
 {
     if ( index >= parameters.size() )  return badExpression;
 
     return parameters[index];
 }
 
-void Instruction::SetParametersCount(unsigned int size)
+void Instruction::SetParametersCount(std::size_t size)
 {
     while(size < parameters.size())
         parameters.erase(parameters.begin()+parameters.size()-1);
@@ -67,11 +65,11 @@ Instruction::~Instruction()
     //dtor
 }
 
-void Instruction::SetParameter(unsigned int nb, const gd::Expression & val)
+void Instruction::SetParameter(std::size_t nb, const gd::Expression & val)
 {
     if ( nb >= parameters.size() )
     {
-        cout << "Trying to write an out of bound parameter.\n\n" << std::endl;
+        std::cout << "Trying to write an out of bound parameter.\n\n" << std::endl;
         return;
     }
     parameters[nb] = val;

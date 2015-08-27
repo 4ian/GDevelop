@@ -22,7 +22,7 @@ namespace gd
 
 ResourcesLoader * ResourcesLoader::_singleton = NULL;
 
-bool ResourcesLoader::SetResourceFile(const string & filename)
+bool ResourcesLoader::SetResourceFile(const gd::String & filename)
 {
     if ( resFile.Read(filename) )
     {
@@ -33,7 +33,7 @@ bool ResourcesLoader::SetResourceFile(const string & filename)
     return false;
 }
 
-sf::Texture ResourcesLoader::LoadSFMLTexture(const string & filename)
+sf::Texture ResourcesLoader::LoadSFMLTexture(const gd::String & filename)
 {
     sf::Texture texture;
 
@@ -46,13 +46,13 @@ sf::Texture ResourcesLoader::LoadSFMLTexture(const string & filename)
         if (!texture.loadFromMemory(buffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a SFML texture from resource file: " << filename << endl;
     }
-    else if (!texture.loadFromFile(filename))
+    else if (!texture.loadFromFile(filename.ToLocale()))
         cout << "Failed to load a SFML texture: " << filename << endl;
 
     return texture;
 }
 
-std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const string & filename)
+std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filename)
 {
     if (resFile.ContainsFile(filename))
     {
@@ -80,7 +80,7 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const string & filename)
     else
     {
         sf::Font * font = new sf::Font();
-        if (!font->loadFromFile(filename))
+        if (!font->loadFromFile(filename.ToLocale()))
         {
             cout << "Failed to load a font from a file: " << filename << endl;
             delete font;
@@ -91,7 +91,7 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const string & filename)
     }
 }
 
-sf::SoundBuffer ResourcesLoader::LoadSoundBuffer( const string & filename )
+sf::SoundBuffer ResourcesLoader::LoadSoundBuffer( const gd::String & filename )
 {
     sf::SoundBuffer sbuffer;
 
@@ -104,15 +104,15 @@ sf::SoundBuffer ResourcesLoader::LoadSoundBuffer( const string & filename )
         if (!sbuffer.loadFromMemory(buffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a sound buffer from resource file: " << filename << endl;
     }
-    else if (!sbuffer.loadFromFile(filename))
+    else if (!sbuffer.loadFromFile(filename.ToLocale()))
         cout << "Failed to load a sound buffer: " << filename << endl;
 
     return sbuffer;
 }
 
-std::string ResourcesLoader::LoadPlainText( const string & filename )
+gd::String ResourcesLoader::LoadPlainText( const gd::String & filename )
 {
-    std::string text;
+    gd::String text;
 
     if (resFile.ContainsFile(filename))
     {
@@ -120,18 +120,18 @@ std::string ResourcesLoader::LoadPlainText( const string & filename )
         if (!buffer) {
             cout << "Failed to read a file from resource file: " << filename << endl;
         } else {
-            text = buffer;
+            text = gd::String::FromUTF8(std::string(buffer));
         }
     }
     else
     {
-        ifstream file(filename.c_str(), ios::in);
+        ifstream file(filename.ToLocale().c_str(), ios::in);
 
         if(!file.fail())
         {
             string ligne;
             while(getline(file, ligne))
-                text += ligne+"\n";
+                text += gd::String::FromUTF8(ligne)+"\n";
 
             file.close();
         }
@@ -146,7 +146,7 @@ std::string ResourcesLoader::LoadPlainText( const string & filename )
 /**
  * Load a binary text file
  */
-char* ResourcesLoader::LoadBinaryFile( const string & filename )
+char* ResourcesLoader::LoadBinaryFile( const gd::String & filename )
 {
     if (resFile.ContainsFile(filename))
     {
@@ -158,7 +158,7 @@ char* ResourcesLoader::LoadBinaryFile( const string & filename )
     }
     else
     {
-        ifstream file (filename.c_str(), ios::in|ios::binary|ios::ate);
+        ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
         if (file.is_open()) {
             ifstream::pos_type size = file.tellg();
             char * memblock = new char [size];
@@ -174,13 +174,13 @@ char* ResourcesLoader::LoadBinaryFile( const string & filename )
     return NULL;
 }
 
-long int ResourcesLoader::GetBinaryFileSize( const string & filename)
+long int ResourcesLoader::GetBinaryFileSize( const gd::String & filename)
 {
     if (resFile.ContainsFile(filename))
         return resFile.GetFileSize(filename);
     else
     {
-        ifstream file (filename.c_str(), ios::in|ios::binary|ios::ate);
+        ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
         if (file.is_open()) {
             return file.tellg();
         }
@@ -190,7 +190,7 @@ long int ResourcesLoader::GetBinaryFileSize( const string & filename)
     return 0;
 }
 
-bool ResourcesLoader::HasFile(const std::string & filename)
+bool ResourcesLoader::HasFile(const gd::String & filename)
 {
     return resFile.ContainsFile(filename);
 }

@@ -33,7 +33,7 @@ BEGIN_EVENT_TABLE(AdvancedTextEntryDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-AdvancedTextEntryDialog::AdvancedTextEntryDialog(wxWindow* parent, std::string caption, std::string description, std::string defaultText, MoreButtonType moreButtonType_, gd::Project * project_, gd::Layout * layout_ ):
+AdvancedTextEntryDialog::AdvancedTextEntryDialog(wxWindow* parent, gd::String caption, gd::String description, gd::String defaultText, MoreButtonType moreButtonType_, gd::Project * project_, gd::Layout * layout_ ):
     moreButtonType(moreButtonType_),
     project(project_),
     layout(layout_)
@@ -93,19 +93,19 @@ void AdvancedTextEntryDialog::OnmoreBtClick(wxCommandEvent& event)
 {
     if ( moreButtonType == MathExpression && project && layout)
     {
-        EditExpressionDialog dialog(this, ToString( textEdit->GetValue() ), *project, *layout);
+        EditExpressionDialog dialog(this, textEdit->GetValue(), *project, *layout);
         if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(dialog.GetExpression());
     }
     else if ( moreButtonType == TextExpression && project && layout)
     {
-        EditStrExpressionDialog dialog(this, ToString( textEdit->GetValue() ), *project, *layout);
+        EditStrExpressionDialog dialog(this, textEdit->GetValue(), *project, *layout);
         if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(dialog.GetExpression());
     }
 }
 
 void AdvancedTextEntryDialog::OnokBtClick(wxCommandEvent& event)
 {
-    text = ToString( textEdit->GetValue() );
+    text = textEdit->GetValue();
 
     EndModal(wxOK);
 }

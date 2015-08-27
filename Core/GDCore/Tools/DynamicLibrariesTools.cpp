@@ -20,7 +20,7 @@ namespace gd
     Handle OpenLibrary(const char* path) {return LoadLibrary(path);}
     void* GetSymbol(Handle library, const char* name) { return (void*)GetProcAddress(library, name);}
     void CloseLibrary(Handle library) {FreeLibrary(library);}
-    std::string DynamicLibraryLastError()
+    gd::String DynamicLibraryLastError()
     {
         LPSTR lpMsgBuf;
         DWORD dw = GetLastError();
@@ -35,14 +35,14 @@ namespace gd
             (LPTSTR) &lpMsgBuf,
             0, NULL );
 
-        std::string errorMsg = "Error ("+ToString(dw)+"): "+std::string(lpMsgBuf);
+        gd::String errorMsg = "Error ("+gd::String::From(dw)+"): "+gd::String::FromLocale(std::string(lpMsgBuf));
         return errorMsg;
     }
 #elif defined(LINUX) || defined (MACOS)
     Handle OpenLibrary(const char* path) {return dlopen(path, RTLD_LAZY);}
     void* GetSymbol(Handle library, const char* name) { return dlsym(library, name);}
     void CloseLibrary(Handle library) {dlclose(library);}
-    std::string DynamicLibraryLastError() {return std::string(dlerror());}
+    gd::String DynamicLibraryLastError() {return gd::String::FromLocale(std::string(dlerror()));}
     Handle SetLibraryGlobal(const char* path) {
         //RTLD_NOLOAD has the library is already opened.
         //RTLD_NOW to be sure that all symbols are existing (Otherwise, could get strange "symbol lookup error"!)

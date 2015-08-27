@@ -58,7 +58,7 @@ public:
             .AddParameter("string", _("Parameter 6"), "", true)
             .AddParameter("string", _("Parameter 7"), "", true)
             .codeExtraInformation.SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
-                std::string functionName = instruction.GetParameter(0).GetPlainString();
+                gd::String functionName = instruction.GetParameter(0).GetPlainString();
                 const gd::Project & project = codeGenerator.GetProject();
                 const gd::Layout & layout = codeGenerator.GetLayout();
 
@@ -69,15 +69,15 @@ public:
                     return "//Function \""+functionName+"\" not found.\n";
                 }
 
-                codeGenerator.AddGlobalDeclaration("void "+FunctionEvent::MangleFunctionName(layout, *functionEvent)+"(RuntimeContext *, std::map <std::string, std::vector<RuntimeObject*> *>, std::vector<std::string> &);\n");
-                std::string code;
+                codeGenerator.AddGlobalDeclaration("void "+FunctionEvent::MangleFunctionName(layout, *functionEvent)+"(RuntimeContext *, std::map <gd::String, std::vector<RuntimeObject*> *>, std::vector<gd::String> &);\n");
+                gd::String code;
 
                 //Generate code for objects passed as arguments
-                std::string objectsAsArgumentCode;
+                gd::String objectsAsArgumentCode;
                 {
                     objectsAsArgumentCode += "runtimeContext->ClearObjectListsMap()";
-                    std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(functionEvent->GetObjectsPassedAsArgument(), context);
-                    for (unsigned int i = 0;i<realObjects.size();++i)
+                    std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(functionEvent->GetObjectsPassedAsArgument(), context);
+                    for (std::size_t i = 0;i<realObjects.size();++i)
                     {
                         context.EmptyObjectsListNeeded(realObjects[i]);
                         objectsAsArgumentCode += ".AddObjectListToMap(\""+codeGenerator.ConvertToString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
@@ -86,10 +86,10 @@ public:
                 }
 
                 //Generate code for evaluating parameters
-                code += "std::vector<std::string> functionParameters;\n";
-                for (unsigned int i = 1;i<8;++i)
+                code += "std::vector<gd::String> functionParameters;\n";
+                for (std::size_t i = 1;i<8;++i)
                 {
-                    std::string parameterCode;
+                    gd::String parameterCode;
                     gd::CallbacksForGeneratingExpressionCode callbacks(parameterCode, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameter(i).GetPlainString());
                     parser.ParseStringExpression(CppPlatform::Get(), project, layout, callbacks);
@@ -114,16 +114,16 @@ public:
                 const gd::Layout & layout = codeGenerator.GetLayout();
 
                 //Declaring function prototype.
-                codeGenerator.AddGlobalDeclaration("void "+FunctionEvent::MangleFunctionName(layout, event)+"(RuntimeContext *, std::map <std::string, std::vector<RuntimeObject*> *>, std::vector<std::string> &);\n");
+                codeGenerator.AddGlobalDeclaration("void "+FunctionEvent::MangleFunctionName(layout, event)+"(RuntimeContext *, std::map <gd::String, std::vector<RuntimeObject*> *>, std::vector<gd::String> &);\n");
 
                 //Generating function code:
-                std::string functionCode;
-                functionCode += "\nvoid "+FunctionEvent::MangleFunctionName(layout, event)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<RuntimeObject*> *> objectsListsMap, std::vector<std::string> & currentFunctionParameters)\n{\n";
+                gd::String functionCode;
+                functionCode += "\nvoid "+FunctionEvent::MangleFunctionName(layout, event)+"(RuntimeContext * runtimeContext, std::map <gd::String, std::vector<RuntimeObject*> *> objectsListsMap, std::vector<gd::String> & currentFunctionParameters)\n{\n";
 
                 gd::EventsCodeGenerationContext callerContext;
                 {
-                    std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(event.GetObjectsPassedAsArgument(), callerContext);
-                    for (unsigned int i = 0;i<realObjects.size();++i)
+                    std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(event.GetObjectsPassedAsArgument(), callerContext);
+                    for (std::size_t i = 0;i<realObjects.size();++i)
                     {
                         callerContext.EmptyObjectsListNeeded(realObjects[i]);
                         functionCode += "std::vector<RuntimeObject*> "+ManObjListName(realObjects[i]) + ";\n";
@@ -136,14 +136,14 @@ public:
                 context.InheritsFrom(callerContext);
 
                 //Generating function body code
-                std::string conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
-                std::string actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-                std::string subeventsCode = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+                gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+                gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+                gd::String subeventsCode = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
 
                 functionCode += codeGenerator.GenerateObjectsDeclarationCode(context);
-                std::string ifPredicat = "true";
-                for (unsigned int i = 0;i<event.GetConditions().size();++i)
-                    ifPredicat += " && condition"+ToString(i)+"IsTrue";
+                gd::String ifPredicat = "true";
+                for (std::size_t i = 0;i<event.GetConditions().size();++i)
+                    ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
                 functionCode += conditionsCode;
                 functionCode += "if (" +ifPredicat+ ")\n";
@@ -164,7 +164,6 @@ public:
                 return "";
             });
 
-
         AddStrExpression("Parameter",
             _("Parameter of the current function"),
             _("Return the text contained in a parameter of the currently launched function"),
@@ -177,17 +176,17 @@ public:
                 const gd::Layout & scene = codeGenerator.GetLayout();
 
                 //Ensure currentFunctionParameters vector is always existing.
-                std::string mainFakeParameters = "std::vector<std::string> currentFunctionParameters;\n";
-                if (codeGenerator.GetCustomCodeInMain().find(mainFakeParameters) == std::string::npos)
+                gd::String mainFakeParameters = "std::vector<gd::String> currentFunctionParameters;\n";
+                if (codeGenerator.GetCustomCodeInMain().find(mainFakeParameters) == gd::String::npos)
                     codeGenerator.AddCustomCodeInMain(mainFakeParameters);
 
                 //Generate code for evaluating index
-                std::string expression;
+                gd::String expression;
                 gd::CallbacksForGeneratingExpressionCode callbacks(expression, codeGenerator, context);
                 gd::ExpressionParser parser(parameters[0].GetPlainString());
                 if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), game, scene, callbacks) || expression.empty()) expression = "0";
 
-                std::string code;
+                gd::String code;
 
                 code += "GDpriv::FunctionTools::GetSafelyStringFromVector(currentFunctionParameters, "+expression+")";
 

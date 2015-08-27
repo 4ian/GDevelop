@@ -19,7 +19,7 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._objectsCtor = new Hashtable();
     this._layers = new Hashtable();
     this._timers = new Hashtable();
-	this._initialAutomatismSharedData = new Hashtable();
+	this._initialBehaviorSharedData = new Hashtable();
     this._pixiRenderer = pixiRenderer;
     this._pixiContainer = new PIXI.Container(); //The Container meant to contains all pixi objects of the scene.
     this._latestFrameDate = new Date();
@@ -86,10 +86,10 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     //Load variables
     this._variables = new gdjs.VariablesContainer(sceneData.variables);
 
-	//Cache the initial shared data of the automatisms
-    gdjs.iterateOverArray(sceneData.automatismsSharedData, function(data) {
+	//Cache the initial shared data of the behaviors
+    gdjs.iterateOverArray(sceneData.behaviorsSharedData, function(data) {
 		//console.log("Initializing shared data for "+data.name);
-		that._initialAutomatismSharedData.put(data.name, data);
+		that._initialBehaviorSharedData.put(data.name, data);
 	});
 
     //Load objects: Global objects first...
@@ -196,7 +196,7 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * or a game stop was requested.
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function() {
-	this._changeRequested = gdjs.RuntimeScene.CONTINUE;
+	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
 	this._updateTime();
 	this._updateObjectsPreEvents();
 	this._eventsFunction(this, this._eventsContext);
@@ -205,7 +205,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
 
 	this._firstFrame = false;
 
-	return !!this.changeRequested();
+	return !!this.getRequestedChange();
 };
 
 /**
@@ -216,6 +216,7 @@ gdjs.RuntimeScene.prototype.render = function() {
 	if (!this._pixiRenderer) return;
 
 	// render the PIXI container of the scene
+	this._pixiRenderer.backgroundColor = this._backgroundColor;
 	this._pixiRenderer.render(this._pixiContainer);
 };
 
@@ -243,7 +244,7 @@ gdjs.RuntimeScene.prototype._updateTime = function() {
  * Empty the list of the removed objects:<br>
  * When an object is removed from the scene, it is still kept in the _instancesRemoved member
  * of the RuntimeScene.<br>
- * This method should be called regularly (after events or automatisms steps) so as to clear this list
+ * This method should be called regularly (after events or behaviors steps) so as to clear this list
  * and allows the removed objects to be cached (or destroyed if the cache is full).<br>
  * The removed objects could not be sent directly to the cache, as events may still be using them after
  * removing them from the scene for example.
@@ -293,14 +294,14 @@ gdjs.RuntimeScene.prototype._constructListOfAllInstances= function() {
  */
 gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
 
-	//It is *mandatory* to create and iterate on a external list of all objects, as the automatisms
+	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
 	//may delete the objects.
 	this._constructListOfAllInstances();
 	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-		this._allInstancesList[i].stepAutomatismsPreEvents(this);
+		this._allInstancesList[i].stepBehaviorsPreEvents(this);
 	}
 
-	this._cacheOrClearRemovedInstances(); //Some automatisms may have request objects to be deleted.
+	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
 };
 
 /**
@@ -313,15 +314,15 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
 
 	this.updateObjectsForces();
 
-	//It is *mandatory* to create and iterate on a external list of all objects, as the automatisms
+	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
 	//may delete the objects.
 	this._constructListOfAllInstances();
 	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 		this._allInstancesList[i].updateTime(this._elapsedTime/1000);
-		this._allInstancesList[i].stepAutomatismsPostEvents(this);
+		this._allInstancesList[i].stepBehaviorsPostEvents(this);
 	}
 
-	this._cacheOrClearRemovedInstances(); //Some automatisms may have request objects to be deleted.
+	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
 };
 
 /**
@@ -331,7 +332,7 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
 gdjs.RuntimeScene.prototype.setBackgroundColor = function(r,g,b) {
 	if (!this._pixiRenderer) return;
 
-	this._pixiRenderer.backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
+	this._backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
 };
 
 /**
@@ -445,8 +446,8 @@ gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
 
 	//Notify the object it was removed from the scene
 	obj.onDeletedFromScene(this);
-	for(var j = 0, lenj = obj._automatisms.length;j<lenj;++j) {
-		obj._automatisms[j].ownerRemovedFromScene();
+	for(var j = 0, lenj = obj._behaviors.length;j<lenj;++j) {
+		obj._behaviors[j].ownerRemovedFromScene();
 	}
 
 	//Call global callback
@@ -508,13 +509,13 @@ gdjs.RuntimeScene.prototype.getVariables = function() {
 };
 
 /**
- * Get the data representing the initial shared data of the scene for the specified automatism.
- * @method getInitialSharedDataForAutomatism
- * @param name {String} The name of the automatism
+ * Get the data representing the initial shared data of the scene for the specified behavior.
+ * @method getInitialSharedDataForBehavior
+ * @param name {String} The name of the behavior
  */
-gdjs.RuntimeScene.prototype.getInitialSharedDataForAutomatism = function(name) {
-	if ( this._initialAutomatismSharedData.containsKey(name) ) {
-		return this._initialAutomatismSharedData.get(name);
+gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
+	if ( this._initialBehaviorSharedData.containsKey(name) ) {
+		return this._initialBehaviorSharedData.get(name);
 	}
 
 	return null;
@@ -589,19 +590,21 @@ gdjs.RuntimeScene.CONTINUE = 0;
 gdjs.RuntimeScene.PUSH_SCENE = 1;
 gdjs.RuntimeScene.POP_SCENE = 2;
 gdjs.RuntimeScene.REPLACE_SCENE = 3;
-gdjs.RuntimeScene.STOP_GAME = 4;
+gdjs.RuntimeScene.CLEAR_SCENES = 4;
+gdjs.RuntimeScene.STOP_GAME = 5;
 
 /**
  * Return the value of the scene change that is requested.
- * @method gameStopRequested
+ * @method getRequestedChange
  */
-gdjs.RuntimeScene.prototype.changeRequested = function() {
-	return this._changeRequested;
+gdjs.RuntimeScene.prototype.getRequestedChange = function() {
+	return this._requestedChange;
 };
 
 /**
  * Return the name of the new scene to be launched.
- * See requestSceneChange and requestScenePush.
+ *
+ * See requestChange.
  * @method getRequestedScene
  */
 gdjs.RuntimeScene.prototype.getRequestedScene = function() {
@@ -609,35 +612,13 @@ gdjs.RuntimeScene.prototype.getRequestedScene = function() {
 };
 
 /**
- * When called, the scene will be flagged as requesting the game to be stopped.
- * @method requestGameStop
+ * Request a scene change to be made. The change is handled externally (see gdjs.SceneStack)
+ * thanks to getRequestedChange and getRequestedScene methods.
+ * @param change One of gdjs.RuntimeScene.CONTINUE|PUSH_SCENE|POP_SCENE|REPLACE_SCENE|CLEAR_SCENES|STOP_GAME.
+ * @param sceneName The name of the new scene to launch, if applicable.
+ * @method requestChange
  */
-gdjs.RuntimeScene.prototype.requestGameStop = function() {
-	this._changeRequested = gdjs.RuntimeScene.STOP_GAME;
-};
-
-/**
- * When called, the scene will be flagged as requesting a new scene to be launched.
- * @method requestSceneReplace
- */
-gdjs.RuntimeScene.prototype.requestSceneReplace = function(sceneName) {
-	this._changeRequested = gdjs.RuntimeScene.REPLACE_SCENE;
+gdjs.RuntimeScene.prototype.requestChange = function(change, sceneName) {
+	this._requestedChange = change;
 	this._requestedScene = sceneName;
-};
-
-/**
- * When called, the scene will be flagged as requesting a new scene to be pushed on the stack.
- * @method requestScenePush
- */
-gdjs.RuntimeScene.prototype.requestScenePush = function(sceneName) {
-	this._changeRequested = gdjs.RuntimeScene.PUSH_SCENE;
-	this._requestedScene = sceneName;
-};
-
-/**
- * When called, the scene will be flagged as requesting to be popped from the stack.
- * @method requestScenePop
- */
-gdjs.RuntimeScene.prototype.requestScenePop = function() {
-	this._changeRequested = gdjs.RuntimeScene.POP_SCENE;
 };

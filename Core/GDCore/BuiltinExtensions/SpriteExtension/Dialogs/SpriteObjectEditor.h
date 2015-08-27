@@ -252,10 +252,10 @@ private:
 
     gd::Project & game;
     SpriteObject & object;
-    unsigned int selectedAnimation;
-    unsigned int selectedDirection;
-    unsigned int selectedImage;
-    std::string selectedPoint;
+    std::size_t selectedAnimation;
+    std::size_t selectedDirection;
+    std::size_t selectedImage;
+    gd::String selectedPoint;
     float spritePosX; ///< Used to remember the position where the sprite have been drawn.
     float spritePosY; ///< Used to remember the position where the sprite have been drawn.
     float spriteWidth; ///< Used to remember the width of the current sprite.
@@ -265,7 +265,7 @@ private:
     bool editingPoint;
     bool deletingMaskTreeItems; //Used to workaround an event being called when using maskTree->DeleteAllItems().
 
-    std::string renamedPointOldName;
+    gd::String renamedPointOldName;
 
     gd::PolygonEditionHelper polygonEditionHelper;
 

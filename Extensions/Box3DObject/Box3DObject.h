@@ -31,7 +31,7 @@ class GD_EXTENSION_API Box3DObject : public gd::Object
 {
 public :
 
-    Box3DObject(std::string name_);
+    Box3DObject(gd::String name_);
     virtual ~Box3DObject();
     virtual gd::Object * Clone() const { return new Box3DObject(*this);}
 
@@ -42,8 +42,8 @@ public :
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
     virtual void EditObject( wxWindow* parent, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual std::map<std::string, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene);
-    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & game, gd::Layout & scene);
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & game, gd::Layout & scene);
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & game, gd::Layout & scene);
     #endif
 
     virtual float GetWidth() const { return width; };
@@ -55,12 +55,12 @@ public :
     float GetDepth() const { return depth; }
     void SetDepth(float depth_) { depth = depth_; }
 
-    std::string frontTextureName;
-    std::string topTextureName;
-    std::string bottomTextureName;
-    std::string leftTextureName;
-    std::string rightTextureName;
-    std::string backTextureName;
+    gd::String frontTextureName;
+    gd::String topTextureName;
+    gd::String bottomTextureName;
+    gd::String leftTextureName;
+    gd::String rightTextureName;
+    gd::String backTextureName;
 
 private:
 
@@ -111,17 +111,17 @@ public :
     float GetDepth() const { return depth; }
     void SetDepth(float depth_) { depth = depth_; }
 
-    std::string frontTextureName;
-    std::string topTextureName;
-    std::string bottomTextureName;
-    std::string leftTextureName;
-    std::string rightTextureName;
-    std::string backTextureName;
+    gd::String frontTextureName;
+    gd::String topTextureName;
+    gd::String bottomTextureName;
+    gd::String leftTextureName;
+    gd::String rightTextureName;
+    gd::String backTextureName;
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+    virtual std::size_t GetNumberOfProperties() const;
     #endif
 
 private:
@@ -143,7 +143,7 @@ private:
 };
 
 RuntimeObject * CreateRuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object);
-gd::Object * CreateBox3DObject(std::string name);
+gd::Object * CreateBox3DObject(gd::String name);
 
 #endif // BOX3DOBJECT_H
 

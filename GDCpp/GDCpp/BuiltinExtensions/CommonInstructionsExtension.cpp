@@ -46,19 +46,19 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     GetAllConditions()["BuiltinCommonInstructions::Or"].codeExtraInformation
         .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext) {
             //Conditions code
-            std::string conditionsCode;
+            gd::String conditionsCode;
             gd::InstructionsList & conditions = instruction.GetSubInstructions();
 
             //"OR" condition must declare objects list, but without picking the objects from the scene. Lists are either empty or come from a parent event.
-            set<string> emptyListsNeeded;
-            for (unsigned int cId =0;cId < conditions.size();++cId)
+            set<gd::String> emptyListsNeeded;
+            for (std::size_t cId =0;cId < conditions.size();++cId)
             {
                 //Each condition inherits the context from the "Or" condition:
                 //For example, two sub conditions using an object called "MyObject" will both have to declare a "MyObject" object list.
                 gd::EventsCodeGenerationContext context;
                 context.InheritsFrom(parentContext);
 
-                string conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
+                gd::String conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId)+"IsTrue", context);
 
                 conditionsCode += "{\n";
 
@@ -67,13 +67,13 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 if ( !conditions[cId].GetType().empty() ) conditionsCode += conditionCode;
 
                 //If the condition is true : merge all objects picked in the final object lists.
-                conditionsCode += "if( condition"+ToString(cId)+"IsTrue ) {\n";
+                conditionsCode += "if( condition"+gd::String::From(cId)+"IsTrue ) {\n";
                 conditionsCode += "    conditionTrue = true;\n";
-                std::set<std::string> objectsListsToBeDeclared = context.GetAllObjectsToBeDeclared();
-                for ( set<string>::iterator it = objectsListsToBeDeclared.begin() ; it != objectsListsToBeDeclared.end(); ++it )
+                std::set<gd::String> objectsListsToBeDeclared = context.GetAllObjectsToBeDeclared();
+                for ( set<gd::String>::iterator it = objectsListsToBeDeclared.begin() ; it != objectsListsToBeDeclared.end(); ++it )
                 {
                     emptyListsNeeded.insert(*it);
-                    conditionsCode += "    for(unsigned int i = 0;i<"+ManObjListName(*it)+".size();++i)\n";
+                    conditionsCode += "    for(std::size_t i = 0;i<"+ManObjListName(*it)+".size();++i)\n";
                     conditionsCode += "    {\n";
                     conditionsCode += "        if ( find("+ManObjListName(*it)+"final.begin(), "+ManObjListName(*it)+"final.end(), "+ManObjListName(*it)+"[i]) == "+ManObjListName(*it)+"final.end())\n";
                     conditionsCode += "            "+ManObjListName(*it)+"final.push_back("+ManObjListName(*it)+"[i]);\n";
@@ -84,10 +84,10 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 conditionsCode += "}\n";
             }
 
-            std::string declarationsCode;
+            gd::String declarationsCode;
 
             //Declarations code
-            for ( set<string>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
+            for ( set<gd::String>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
             {
                 //"OR" condition must declare objects list, but without getting the objects from the scene. Lists are either empty or come from a parent event.
                 parentContext.EmptyObjectsListNeeded(*it);
@@ -95,17 +95,17 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 //but they will have no incidence on further conditions, as conditions use "normal" ones.
                 declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+"final;\n";
             }
-            for (unsigned int i = 0;i<conditions.size();++i)
-                declarationsCode += "bool condition"+ToString(i)+"IsTrue = false;\n";
+            for (std::size_t i = 0;i<conditions.size();++i)
+                declarationsCode += "bool condition"+gd::String::From(i)+"IsTrue = false;\n";
 
             //Generate code
-            string code;
+            gd::String code;
             code += declarationsCode;
             code += conditionsCode;
 
             //When condition is finished, "final" objects lists become the "normal" ones.
             code += "{\n";
-            for ( set<string>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
+            for ( set<gd::String>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
                 code += ManObjListName(*it)+" = "+ManObjListName(*it)+"final;\n";
             code += "}\n";
 
@@ -114,13 +114,13 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     GetAllConditions()["BuiltinCommonInstructions::And"].codeExtraInformation
         .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext) {
-                string outputCode;
+                gd::String outputCode;
 
                 outputCode += codeGenerator.GenerateConditionsListCode(instruction.GetSubInstructions(), parentContext);
 
-                std::string ifPredicat = "true";
-                for (unsigned int i = 0;i<instruction.GetSubInstructions().size();++i)
-                    ifPredicat += " && condition"+ToString(i)+"IsTrue";
+                gd::String ifPredicat = "true";
+                for (std::size_t i = 0;i<instruction.GetSubInstructions().size();++i)
+                    ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
                 outputCode += "conditionTrue = (" +ifPredicat+ ");\n";
 
@@ -130,21 +130,21 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     GetAllConditions()["BuiltinCommonInstructions::Not"].codeExtraInformation
         .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext) {
             gd::InstructionsList & conditions = instruction.GetSubInstructions();
-            string outputCode;
+            gd::String outputCode;
 
-            for (unsigned int i = 0;i<conditions.size();++i)
-                outputCode += "bool condition"+ToString(i)+"IsTrue = false;\n";
+            for (std::size_t i = 0;i<conditions.size();++i)
+                outputCode += "bool condition"+gd::String::From(i)+"IsTrue = false;\n";
 
-            for (unsigned int cId =0;cId < conditions.size();++cId)
+            for (std::size_t cId =0;cId < conditions.size();++cId)
             {
-                string conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
+                gd::String conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId)+"IsTrue", parentContext);
 
                 if ( !conditions[cId].GetType().empty() )
                 {
-                    for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is true. //TODO : Can be optimized
+                    for (std::size_t i = 0;i<cId;++i) //Skip conditions if one condition is true. //TODO : Can be optimized
                     {
                         if (i == 0) outputCode += "if ( "; else outputCode += " && ";
-                        outputCode += "!condition"+ToString(i)+"IsTrue";
+                        outputCode += "!condition"+gd::String::From(i)+"IsTrue";
                         if (i == cId-1) outputCode += ") ";
                     }
 
@@ -152,9 +152,9 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 }
             }
 
-            std::string ifPredicat = "true";
-            for (unsigned int i = 0;i<conditions.size();++i)
-                ifPredicat += " && !condition"+ToString(i)+"IsTrue";
+            gd::String ifPredicat = "true";
+            for (std::size_t i = 0;i<conditions.size();++i)
+                ifPredicat += " && !condition"+gd::String::From(i)+"IsTrue";
 
             outputCode += "conditionTrue = (" +ifPredicat+ ");\n";
 
@@ -164,21 +164,21 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     GetAllConditions()["BuiltinCommonInstructions::Once"].codeExtraInformation
         .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext) {
             size_t uniqueId = (size_t)&instruction;
-            return "conditionTrue = runtimeContext->TriggerOnce("+ToString(uniqueId)+");\n";
+            return "conditionTrue = runtimeContext->TriggerOnce("+gd::String::From(uniqueId)+");\n";
         });
 
     GetAllEvents()["BuiltinCommonInstructions::Standard"]
         .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
-            std::string outputCode;
+            gd::String outputCode;
             gd::StandardEvent & event = dynamic_cast<gd::StandardEvent&>(event_);
 
             outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
 
-            std::string ifPredicat;
-            for (unsigned int i = 0;i<event.GetConditions().size();++i)
+            gd::String ifPredicat;
+            for (std::size_t i = 0;i<event.GetConditions().size();++i)
             {
                 if (i!=0) ifPredicat += " && ";
-                ifPredicat += "condition"+ToString(i)+"IsTrue";
+                ifPredicat += "condition"+gd::String::From(i)+"IsTrue";
             }
 
             if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
@@ -202,17 +202,17 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
             //This function is called only when the link refers to external events compiled separately. ( See LinkEvent::Preprocess )
             //We must generate code to call these external events.
-            std::string outputCode;
+            gd::String outputCode;
 
-            std::string functionCall = EventsCodeNameMangler::Get()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(runtimeContext);";
-            std::string functionDeclaration = "void "+EventsCodeNameMangler::Get()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(RuntimeContext * context);";
+            gd::String functionCall = EventsCodeNameMangler::Get()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(runtimeContext);";
+            gd::String functionDeclaration = "void "+EventsCodeNameMangler::Get()->GetExternalEventsFunctionMangledName(event.GetTarget())+"(RuntimeContext * context);";
             outputCode += functionCall+"\n";
             codeGenerator.AddGlobalDeclaration(functionDeclaration);
 
             return outputCode;
         })
         .SetPreprocessing([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator,
-                                gd::EventsList & eventList, unsigned int indexOfTheEventInThisList) {
+                                gd::EventsList & eventList, std::size_t indexOfTheEventInThisList) {
             gd::LinkEvent & event = dynamic_cast<gd::LinkEvent&>(event_);
             gd::Project & project = codeGenerator.GetProject();
             const gd::Layout & scene = codeGenerator.GetLayout();
@@ -238,7 +238,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     GetAllEvents()["BuiltinCommonInstructions::While"]
         .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext) {
-            std::string outputCode;
+            gd::String outputCode;
             gd::WhileEvent & event = dynamic_cast<gd::WhileEvent&>(event_);
 
             //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
@@ -247,15 +247,15 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             if ( event.HasInfiniteLoopWarning() && !codeGenerator.GenerateCodeForRuntime() ) codeGenerator.AddIncludeFile("GDCpp/BuiltinExtensions/RuntimeSceneTools.h");
 
             //Prepare codes
-            std::string whileConditionsStr = codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(), context);
-            std::string whileIfPredicat = "true"; for (unsigned int i = 0;i<event.GetWhileConditions().size();++i) whileIfPredicat += " && condition"+ToString(i)+"IsTrue";
-            std::string conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
-            std::string actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-            std::string ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
+            gd::String whileConditionsStr = codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(), context);
+            gd::String whileIfPredicat = "true"; for (std::size_t i = 0;i<event.GetWhileConditions().size();++i) whileIfPredicat += " && condition"+gd::String::From(i)+"IsTrue";
+            gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+            gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+            gd::String ifPredicat = "true"; for (std::size_t i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
             //Write final code
             outputCode += "bool stopDoWhile = false;";
-            if ( event.HasInfiniteLoopWarning() && !codeGenerator.GenerateCodeForRuntime() ) outputCode += "unsigned int loopCount = 0;";
+            if ( event.HasInfiniteLoopWarning() && !codeGenerator.GenerateCodeForRuntime() ) outputCode += "std::size_t loopCount = 0;";
             outputCode += "do";
             outputCode += "{\n";
             outputCode += codeGenerator.GenerateObjectsDeclarationCode(context);
@@ -284,15 +284,15 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     GetAllEvents()["BuiltinCommonInstructions::Repeat"]
         .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext){
-            std::string outputCode;
+            gd::String outputCode;
             gd::RepeatEvent & event = dynamic_cast<gd::RepeatEvent&>(event_);
 
             const gd::Layout & scene = codeGenerator.GetLayout();
 
-            std::string repeatNumberExpression = event.GetRepeatExpression();
+            gd::String repeatNumberExpression = event.GetRepeatExpression();
 
             //Prepare expression containing how many times event must be repeated
-            std::string repeatCountCode;
+            gd::String repeatCountCode;
             gd::CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, codeGenerator, parentContext);
             gd::ExpressionParser parser(repeatNumberExpression);
             if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), scene, callbacks) || repeatCountCode.empty()) repeatCountCode = "0";
@@ -302,17 +302,17 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             context.InheritsFrom(parentContext);
 
             //Prepare conditions/actions codes
-            std::string conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
-            std::string actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-            std::string ifPredicat = "true"; for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
+            gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+            gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+            gd::String ifPredicat = "true"; for (std::size_t i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
             //Prepare object declaration and sub events
-            std::string subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
-            std::string objectDeclaration = codeGenerator.GenerateObjectsDeclarationCode(context)+"\n";
+            gd::String subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+            gd::String objectDeclaration = codeGenerator.GenerateObjectsDeclarationCode(context)+"\n";
 
             //Write final code
             outputCode += "int repeatCount = "+repeatCountCode+";\n";
-            outputCode += "for(unsigned int repeatIndex = 0;repeatIndex < repeatCount;++repeatIndex)\n";
+            outputCode += "for(std::size_t repeatIndex = 0;repeatIndex < repeatCount;++repeatIndex)\n";
             outputCode += "{\n";
             outputCode += objectDeclaration;
             outputCode += conditionsCode;
@@ -334,14 +334,14 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     GetAllEvents()["BuiltinCommonInstructions::ForEach"]
         .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext) {
-            std::string outputCode;
+            gd::String outputCode;
             gd::ForEachEvent & event = dynamic_cast<gd::ForEachEvent&>(event_);
 
-            std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(
+            std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(
                 event.GetObjectToPick(), parentContext);
 
-            if ( realObjects.empty() ) return std::string("");
-            for (unsigned int i = 0;i<realObjects.size();++i)
+            if ( realObjects.empty() ) return gd::String("");
+            for (std::size_t i = 0;i<realObjects.size();++i)
                 parentContext.ObjectsListNeeded(realObjects[i]);
 
             //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
@@ -349,24 +349,24 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             context.InheritsFrom(parentContext);
 
             //Prepare conditions/actions codes
-            std::string conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
-            std::string actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-            std::string ifPredicat = "true";
-            for (unsigned int i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
+            gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
+            gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+            gd::String ifPredicat = "true";
+            for (std::size_t i = 0;i<event.GetConditions().size();++i) ifPredicat += " && condition"+gd::String::From(i)+"IsTrue";
 
             //Prepare object declaration and sub events
-            std::string subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+            gd::String subevents = codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
 
-            std::string objectDeclaration = codeGenerator.GenerateObjectsDeclarationCode(context)+"\n";
+            gd::String objectDeclaration = codeGenerator.GenerateObjectsDeclarationCode(context)+"\n";
 
             if ( realObjects.size() != 1) //(We write a slighty more simple ( and optimized ) output code when only one object list is used.)
             {
-                outputCode += "unsigned int forEachTotalCount = 0;";
+                outputCode += "std::size_t forEachTotalCount = 0;";
                 outputCode += "std::vector<RuntimeObject*> forEachObjects;";
-                for (unsigned int i = 0;i<realObjects.size();++i)
+                for (std::size_t i = 0;i<realObjects.size();++i)
                 {
-                    outputCode += "unsigned int forEachCount"+ToString(i)+" = "+ManObjListName(realObjects[i])+".size(); forEachTotalCount += forEachCount"+ToString(i)+";";
-                    outputCode += "forEachObjects.insert("+ string(i == 0 ? "forEachObjects.begin()" : "forEachObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
+                    outputCode += "std::size_t forEachCount"+gd::String::From(i)+" = "+ManObjListName(realObjects[i])+".size(); forEachTotalCount += forEachCount"+gd::String::From(i)+";";
+                    outputCode += "forEachObjects.insert("+ gd::String(i == 0 ? "forEachObjects.begin()" : "forEachObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
                 }
             }
 
@@ -374,9 +374,9 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
             //For loop declaration
             if ( realObjects.size() == 1 ) //We write a slighty more simple ( and optimized ) output code when only one object list is used.
-                outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < "+ManObjListName(realObjects[0])+".size();++forEachIndex)\n";
+                outputCode += "for(std::size_t forEachIndex = 0;forEachIndex < "+ManObjListName(realObjects[0])+".size();++forEachIndex)\n";
             else
-                outputCode += "for(unsigned int forEachIndex = 0;forEachIndex < forEachTotalCount;++forEachIndex)\n";
+                outputCode += "for(std::size_t forEachIndex = 0;forEachIndex < forEachTotalCount;++forEachIndex)\n";
 
             outputCode += "{\n";
 
@@ -389,16 +389,16 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             else
             {
                 //Declare all lists of concerned objects empty
-                for (unsigned int j = 0;j<realObjects.size();++j)
+                for (std::size_t j = 0;j<realObjects.size();++j)
                     outputCode += "std::vector<RuntimeObject*> "+ManObjListName(realObjects[j])+";\n";
 
-                for (unsigned int i = 0;i<realObjects.size();++i) //Pick then only one object
+                for (std::size_t i = 0;i<realObjects.size();++i) //Pick then only one object
                 {
-                    std::string count;
-                    for (unsigned int j = 0;j<=i;++j)
+                    gd::String count;
+                    for (std::size_t j = 0;j<=i;++j)
                     {
                         if (j!=0) count+= "+";
-                        count += "forEachCount"+ToString(j);
+                        count += "forEachCount"+gd::String::From(j);
                     }
 
                     if ( i != 0 ) outputCode += "else ";
@@ -448,29 +448,29 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             //DependenciesAnalyzer and compiled by CodeCompilationHelpers);
 
             //Generate the code to call the associated source file
-            std::string functionPrototype = "void "+event.GetFunctionToCall()+"("+ (event.GetPassSceneAsParameter() ? "RuntimeScene & scene" :"")
+            gd::String functionPrototype = "void "+event.GetFunctionToCall()+"("+ (event.GetPassSceneAsParameter() ? "RuntimeScene & scene" :"")
                                             + ((event.GetPassSceneAsParameter() && event.GetPassObjectListAsParameter()) ? ", ":"")
                                             + (event.GetPassObjectListAsParameter() ? "std::vector<RuntimeObject*> objectsList" :"") + ");";
             codeGenerator.AddGlobalDeclaration(functionPrototype+"\n");
 
-            std::string outputCode;
+            gd::String outputCode;
             outputCode += "{";
 
             //Prepare objects list if needed
             if ( event.GetPassObjectListAsParameter() )
             {
-                std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(
+                std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(
                     event.GetObjectToPassAsParameter(), parentContext);
 
                 outputCode += "std::vector<RuntimeObject*> functionObjects;";
-                for (unsigned int i = 0;i<realObjects.size();++i)
+                for (std::size_t i = 0;i<realObjects.size();++i)
                 {
                     parentContext.ObjectsListNeeded(realObjects[i]);
-                    outputCode += "functionObjects.insert("+ string(i == 0 ? "functionObjects.begin()" : "functionObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
+                    outputCode += "functionObjects.insert("+ gd::String(i == 0 ? "functionObjects.begin()" : "functionObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
                 }
             }
 
-            std::string functionCall = event.GetFunctionToCall()+"("+ (event.GetPassSceneAsParameter() ? "*runtimeContext->scene" :"")
+            gd::String functionCall = event.GetFunctionToCall()+"("+ (event.GetPassSceneAsParameter() ? "*runtimeContext->scene" :"")
                                        +((event.GetPassSceneAsParameter() && event.GetPassObjectListAsParameter()) ? ", ":"")
                                        +(event.GetPassObjectListAsParameter() ? "functionObjects" :"") + ");";
             outputCode += ""+functionCall+"\n";
@@ -479,37 +479,36 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             return outputCode;
         });
 
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-audio-2.dll"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-graphics-2.dll"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-network-2.dll"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-window-2.dll"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-system-2.dll"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libsndfile-1.dll"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "openal32.dll"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "mingwm10.dll"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libgcc_s_sjlj-1.dll"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libstdc++-6.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "sfml-audio-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "sfml-graphics-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "sfml-network-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "sfml-window-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "sfml-system-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "libsndfile-1.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "openal32.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "mingwm10.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "libgcc_s_sjlj-1.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Windows", "libstdc++-6.dll"));
 
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libFLAC.so.8"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libfreetype.so.6"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libGLEW.so.1.5"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libGLEW.so.1.8"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libGLEW.so.1.10"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libopenal.so.0"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libopenal.so.1"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-audio.so.2"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-graphics.so.2"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-network.so.2"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-system.so.2"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-window.so.2"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsndfile.so.1"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libFLAC.so.8"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libfreetype.so.6"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libGLEW.so.1.5"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libGLEW.so.1.8"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libGLEW.so.1.10"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libopenal.so.0"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libopenal.so.1"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libsfml-audio.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libsfml-graphics.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libsfml-network.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libsfml-system.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libsfml-window.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Linux", "libsndfile.so.1"));
 
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-audio.2.0.dylib"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-graphics.2.0.dylib"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-network.2.0.dylib"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-system.2.0.dylib"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-window.2.0.dylib"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "sndfile"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Mac", "libsfml-audio.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Mac", "libsfml-graphics.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Mac", "libsfml-network.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Mac", "libsfml-system.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Mac", "libsfml-window.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<gd::String, gd::String>("Mac", "sndfile"));
     #endif
 }
-

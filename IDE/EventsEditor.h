@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #ifndef EVENTSEDITOR_H
@@ -205,7 +205,7 @@ private:
     static wxRibbonButtonBar * clipboardRibbonBar;
     static wxRibbonButtonBar * templateRibbonBar;
     static wxRibbonButtonBar * undoRibbonBar;
-    std::vector < std::pair<long, std::string> > idForEventTypesMenu;
+    std::vector < std::pair<long, gd::String> > idForEventTypesMenu;
 
     //(*Handlers(EventsEditor)
     void OneventsPanelPaint(wxPaintEvent& event);
@@ -315,7 +315,7 @@ private:
     gd::MainFrameWrapper & mainFrameWrapper;
     gd::LayoutEditorCanvas * layoutCanvas;
 
-    std::map<long, std::string> idForPlatformsMenu;
+    std::map<long, gd::String> idForPlatformsMenu;
     wxMenu platformsMenu; ///< Used to display and allow the user to choose the plaform being used to edit the events.
 
     gd::EventsEditorItemsAreas itemsAreas; ///< Areas management

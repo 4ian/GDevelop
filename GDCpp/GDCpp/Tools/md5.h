@@ -35,7 +35,7 @@ documentation and/or software.
 
 #include <string>
 #include <iostream>
-
+#include "GDCpp/String.h"
 
 // a small class for calculating MD5 hashes of strings or byte arrays
 // it is not meant to be fast or secure
@@ -44,7 +44,7 @@ documentation and/or software.
 //      2) finalize()
 //      3) get hexdigest() string
 //      or
-//      MD5(std::string).hexdigest()
+//      MD5(gd::String).hexdigest()
 //
 // assumes that char is 8 bit and int is 32 bit
 class MD5
@@ -53,11 +53,11 @@ public:
   typedef unsigned int size_type; // must be 32bit
 
   MD5();
-  MD5(const std::string& text);
+  MD5(const gd::String& text);
   void update(const unsigned char *buf, size_type length);
   void update(const char *buf, size_type length);
   MD5& finalize();
-  std::string hexdigest() const;
+  gd::String hexdigest() const;
   friend std::ostream& operator<<(std::ostream&, MD5 md5);
 
 private:
@@ -88,6 +88,6 @@ private:
   static inline void II(uint4 &a, uint4 b, uint4 c, uint4 d, uint4 x, uint4 s, uint4 ac);
 };
 
-std::string md5(const std::string str);
+gd::String md5(const gd::String str);
 
 #endif

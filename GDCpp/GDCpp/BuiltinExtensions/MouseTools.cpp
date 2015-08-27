@@ -34,7 +34,7 @@ void GD_API ShowCursor( RuntimeScene & scene )
     scene.renderWindow->setMouseCursorVisible(true);
 }
 
-double GD_API GetCursorXPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
+double GD_API GetCursorXPosition( RuntimeScene & scene, const gd::String & layer, std::size_t camera )
 {
     if (scene.GetRuntimeLayer(layer).GetCameraCount() == 0) return 0;
     if (camera >= scene.GetRuntimeLayer(layer).GetCameraCount()) camera = 0;
@@ -44,7 +44,7 @@ double GD_API GetCursorXPosition( RuntimeScene & scene, const std::string & laye
     return scene.renderWindow->mapPixelToCoords(scene.GetInputManager().GetMousePosition(), view).x;
 }
 
-double GD_API GetCursorYPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
+double GD_API GetCursorYPosition( RuntimeScene & scene, const gd::String & layer, std::size_t camera )
 {
     if (scene.GetRuntimeLayer(layer).GetCameraCount() == 0) return 0;
     if (camera >= scene.GetRuntimeLayer(layer).GetCameraCount()) camera = 0;
@@ -54,12 +54,12 @@ double GD_API GetCursorYPosition( RuntimeScene & scene, const std::string & laye
     return scene.renderWindow->mapPixelToCoords(scene.GetInputManager().GetMousePosition(), view).y;
 }
 
-bool GD_API MouseButtonPressed(RuntimeScene & scene, const std::string & button)
+bool GD_API MouseButtonPressed(RuntimeScene & scene, const gd::String & button)
 {
     return scene.GetInputManager().IsMouseButtonPressed(button);
 }
 
-bool GD_API MouseButtonReleased(RuntimeScene & scene, const std::string & button)
+bool GD_API MouseButtonReleased(RuntimeScene & scene, const gd::String & button)
 {
     return scene.GetInputManager().IsMouseButtonReleased(button);
 }
@@ -69,7 +69,7 @@ int GD_API GetMouseWheelDelta(RuntimeScene & scene)
     return scene.GetInputManager().GetMouseWheelDelta();
 }
 
-bool GD_API CursorOnObject(std::map <std::string, std::vector<RuntimeObject*> *> objectsLists, RuntimeScene & scene, bool precise, bool conditionInverted)
+bool GD_API CursorOnObject(std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists, RuntimeScene & scene, bool precise, bool conditionInverted)
 {
     return PickObjectsIf(objectsLists, conditionInverted, [&scene, precise](RuntimeObject * obj) {
         return obj->CursorOnObject(scene, precise);

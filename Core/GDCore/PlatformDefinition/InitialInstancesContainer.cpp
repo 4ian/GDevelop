@@ -22,7 +22,7 @@ InitialInstancesContainer::~InitialInstancesContainer()
 {
 }
 
-unsigned int InitialInstancesContainer::GetInstancesCount() const
+std::size_t InitialInstancesContainer::GetInstancesCount() const
 {
     return initialInstances.size();
 }
@@ -30,7 +30,7 @@ unsigned int InitialInstancesContainer::GetInstancesCount() const
 void InitialInstancesContainer::UnserializeFrom(const SerializerElement & element)
 {
     element.ConsiderAsArrayOf("instance", "Objet");
-    for (unsigned int i = 0; i < element.GetChildrenCount(); ++i)
+    for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
     {
         const SerializerElement & instanceElement = element.GetChild(i);
         gd::InitialInstance newPosition;
@@ -50,19 +50,19 @@ void InitialInstancesContainer::UnserializeFrom(const SerializerElement & elemen
 
         const SerializerElement & floatPropElement = instanceElement.GetChild("numberProperties" , 0 ,"floatInfos");
         floatPropElement.ConsiderAsArrayOf("property", "Info");
-        for (unsigned int j = 0; j < floatPropElement.GetChildrenCount(); ++j)
+        for (std::size_t j = 0; j < floatPropElement.GetChildrenCount(); ++j)
         {
-            std::string name = floatPropElement.GetChild(j).GetStringAttribute("name");
+            gd::String name = floatPropElement.GetChild(j).GetStringAttribute("name");
             float value = floatPropElement.GetChild(j).GetDoubleAttribute("value");
             newPosition.floatInfos[name] = value;
         }
 
         const SerializerElement & stringPropElement = instanceElement.GetChild("stringProperties" , 0 ,"stringInfos");
         stringPropElement.ConsiderAsArrayOf("property", "Info");
-        for (unsigned int j = 0; j < stringPropElement.GetChildrenCount(); ++j)
+        for (std::size_t j = 0; j < stringPropElement.GetChildrenCount(); ++j)
         {
-            std::string name = stringPropElement.GetChild(j).GetStringAttribute("name");
-            std::string value = stringPropElement.GetChild(j).GetStringAttribute("value");
+            gd::String name = stringPropElement.GetChild(j).GetStringAttribute("name");
+            gd::String value = stringPropElement.GetChild(j).GetStringAttribute("value");
             newPosition.stringInfos[name] = value;
         }
 
@@ -91,7 +91,7 @@ struct InstancesZOrderSort
 
 }
 
-void InitialInstancesContainer::IterateOverInstancesWithZOrdering(gd::InitialInstanceFunctor & func, const std::string & layerName)
+void InitialInstancesContainer::IterateOverInstancesWithZOrdering(gd::InitialInstanceFunctor & func, const gd::String & layerName)
 {
     std::vector<gd::InitialInstance*> sortedInstances;
     sortedInstances.reserve(initialInstances.size());
@@ -102,7 +102,7 @@ void InitialInstancesContainer::IterateOverInstancesWithZOrdering(gd::InitialIns
     }
 
     std::sort(sortedInstances.begin(), sortedInstances.end(), gd::InstancesZOrderSort());
-    for (unsigned int i = 0;i<sortedInstances.size();++i)
+    for (std::size_t i = 0;i<sortedInstances.size();++i)
         func(sortedInstances[i]);
 }
 
@@ -140,7 +140,7 @@ gd::InitialInstance & InitialInstancesContainer::InsertInitialInstance(const gd:
     return badPosition;
 }
 
-void InitialInstancesContainer::RenameInstancesOfObject(const std::string & oldName, const std::string & newName)
+void InitialInstancesContainer::RenameInstancesOfObject(const gd::String & oldName, const gd::String & newName)
 {
     for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
     {
@@ -149,7 +149,7 @@ void InitialInstancesContainer::RenameInstancesOfObject(const std::string & oldN
     }
 }
 
-void InitialInstancesContainer::RemoveInitialInstancesOfObject(const std::string & objectName)
+void InitialInstancesContainer::RemoveInitialInstancesOfObject(const gd::String & objectName)
 {
     for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end;)
     {
@@ -160,7 +160,7 @@ void InitialInstancesContainer::RemoveInitialInstancesOfObject(const std::string
     }
 }
 
-void InitialInstancesContainer::RemoveAllInstancesOnLayer(const std::string & layerName)
+void InitialInstancesContainer::RemoveAllInstancesOnLayer(const gd::String & layerName)
 {
     for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end;)
     {
@@ -171,7 +171,7 @@ void InitialInstancesContainer::RemoveAllInstancesOnLayer(const std::string & la
     }
 }
 
-void InitialInstancesContainer::MoveInstancesToLayer(const std::string & fromLayer, const std::string & toLayer)
+void InitialInstancesContainer::MoveInstancesToLayer(const gd::String & fromLayer, const gd::String & toLayer)
 {
     for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
     {
@@ -180,7 +180,7 @@ void InitialInstancesContainer::MoveInstancesToLayer(const std::string & fromLay
     }
 }
 
-bool InitialInstancesContainer::SomeInstancesAreOnLayer(const std::string & layerName)
+bool InitialInstancesContainer::SomeInstancesAreOnLayer(const gd::String & layerName)
 {
     for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
     {
@@ -219,7 +219,7 @@ void InitialInstancesContainer::SerializeTo(SerializerElement & element) const
 
         SerializerElement & floatPropElement = instanceElement.AddChild("numberProperties");
         floatPropElement.ConsiderAsArrayOf("property");
-        for(std::map<std::string, float>::const_iterator floatInfo = (*it).floatInfos.begin(); floatInfo != (*it).floatInfos.end(); ++floatInfo)
+        for(std::map<gd::String, float>::const_iterator floatInfo = (*it).floatInfos.begin(); floatInfo != (*it).floatInfos.end(); ++floatInfo)
         {
             floatPropElement.AddChild("property")
                 .SetAttribute("name", floatInfo->first)
@@ -228,7 +228,7 @@ void InitialInstancesContainer::SerializeTo(SerializerElement & element) const
 
         SerializerElement & stringPropElement = instanceElement.AddChild("stringProperties");
         stringPropElement.ConsiderAsArrayOf("property");
-        for(std::map<std::string, std::string>::const_iterator stringInfo = (*it).stringInfos.begin(); stringInfo != (*it).stringInfos.end(); ++stringInfo)
+        for(std::map<gd::String, gd::String>::const_iterator stringInfo = (*it).stringInfos.begin(); stringInfo != (*it).stringInfos.end(); ++stringInfo)
         {
             stringPropElement.AddChild("property")
                 .SetAttribute("name", stringInfo->first)

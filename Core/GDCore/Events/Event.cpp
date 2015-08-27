@@ -29,7 +29,7 @@ bool BaseEvent::HasSubEvents() const
     return !GetSubEvents().IsEmpty();
 }
 
-std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+gd::String BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
 {
     if ( IsDisabled() ) return "";
 
@@ -40,23 +40,23 @@ std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator
         const gd::Platform & platform = codeGenerator.GetPlatform();
 
         //First try to guess the extension used
-        std::string eventNamespace = type.substr(0, type.find("::"));
+        gd::String eventNamespace = type.substr(0, type.find("::"));
         std::shared_ptr<gd::PlatformExtension> guessedExtension = platform.GetExtension(eventNamespace);
         if ( guessedExtension )
         {
-            std::map<std::string, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
+            std::map<gd::String, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
             if ( allEvents.find(type) != allEvents.end() )
                 return allEvents[type].codeGeneration(*this, codeGenerator, context);
         }
 
 
         //Else make a search in all the extensions
-        for (unsigned int i = 0;i<platform.GetAllPlatformExtensions().size();++i)
+        for (std::size_t i = 0; i < platform.GetAllPlatformExtensions().size(); ++i)
         {
             std::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
             if ( !extension ) continue;
 
-            std::map<std::string, gd::EventMetadata > & allEvents = extension->GetAllEvents();
+            std::map<gd::String, gd::EventMetadata > & allEvents = extension->GetAllEvents();
             if ( allEvents.find(type) != allEvents.end() )
                 return allEvents[type].codeGeneration(*this, codeGenerator, context);
         }
@@ -69,7 +69,7 @@ std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator
     return "";
 }
 
-void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)
+void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, std::size_t indexOfTheEventInThisList)
 {
     if ( IsDisabled() || !MustBePreprocessed() ) return;
 
@@ -80,22 +80,22 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsLi
         const gd::Platform & platform = codeGenerator.GetPlatform();
 
         //First try to guess the extension used
-        std::string eventNamespace = type.substr(0, type.find("::"));
+        gd::String eventNamespace = type.substr(0, type.find("::"));
         std::shared_ptr<gd::PlatformExtension> guessedExtension = platform.GetExtension(eventNamespace);
         if ( guessedExtension )
         {
-            std::map<std::string, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
+            std::map<gd::String, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
             if ( allEvents.find(type) != allEvents.end() )
                 return allEvents[type].preprocessing(*this, codeGenerator, eventList, indexOfTheEventInThisList);
         }
 
         //Else make a search in all the extensions
-        for (unsigned int i = 0;i<platform.GetAllPlatformExtensions().size();++i)
+        for (std::size_t i = 0;i<platform.GetAllPlatformExtensions().size();++i)
         {
             std::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
             if ( !extension ) continue;
 
-            std::map<std::string, gd::EventMetadata > & allEvents = extension->GetAllEvents();
+            std::map<gd::String, gd::EventMetadata > & allEvents = extension->GetAllEvents();
             if ( allEvents.find(type) != allEvents.end() )
                 return allEvents[type].preprocessing(*this, codeGenerator, eventList, indexOfTheEventInThisList);
         }

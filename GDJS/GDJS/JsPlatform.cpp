@@ -66,7 +66,7 @@ public:
 
     virtual bool LaunchPreview()
     {
-        std::string exportDir = gd::ToString(wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/");
+        gd::String exportDir = wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/";
 
         Exporter exporter(gd::NativeFileSystem::Get());
         if ( !exporter.ExportLayoutForPreview(project, layout, exportDir) )
@@ -77,7 +77,7 @@ public:
 
         //Without "http://", the function fails ( on Windows at least ).
         //The timestamp is here to prevent browsers caching contents.
-        if ( !wxLaunchDefaultBrowser("http://localhost:2828?"+gd::ToString(wxGetLocalTime())) )
+        if ( !wxLaunchDefaultBrowser("http://localhost:2828?"+gd::String::From(wxGetLocalTime())) )
         {
             gd::LogError(_("Unable to launch your browser :(\nOpen manually your browser and type \"localhost:2828\" in\nthe address bar ( without the quotes ) to launch the preview!"));
         }
@@ -95,7 +95,7 @@ void JsPlatform::OnIDEInitialized()
     //Initializing the tiny web server used to preview the games
     #if !defined(GD_NO_WX_GUI)
     std::cout << " * Starting web server..." << std::endl;
-    std::string exportDir = gd::ToString(wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/");
+    gd::String exportDir = wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/";
     httpServer.Run(exportDir);
     #endif
 }
@@ -115,11 +115,11 @@ std::shared_ptr<gd::ProjectExporter> JsPlatform::GetProjectExporter() const
  //When compiling with emscripten, extensions exposes specific functions to create them.
 #if defined(EMSCRIPTEN)
 extern "C" {
-gd::PlatformExtension * CreateGDJSPlatformAutomatismExtension();
-gd::PlatformExtension * CreateGDJSDestroyOutsideAutomatismExtension();
+gd::PlatformExtension * CreateGDJSPlatformBehaviorExtension();
+gd::PlatformExtension * CreateGDJSDestroyOutsideBehaviorExtension();
 gd::PlatformExtension * CreateGDJSTiledSpriteObjectExtension();
-gd::PlatformExtension * CreateGDJSDraggableAutomatismExtension();
-gd::PlatformExtension * CreateGDJSTopDownMovementAutomatismExtension();
+gd::PlatformExtension * CreateGDJSDraggableBehaviorExtension();
+gd::PlatformExtension * CreateGDJSTopDownMovementBehaviorExtension();
 gd::PlatformExtension * CreateGDJSTextObjectExtension();
 }
 #endif
@@ -152,11 +152,11 @@ JsPlatform::JsPlatform() :
 
     #if defined(EMSCRIPTEN) //When compiling with emscripten, hardcode extensions to load.
     std::cout << "* Loading other extensions... "; std::cout.flush();
-    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSPlatformAutomatismExtension())); std::cout.flush();
-    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDestroyOutsideAutomatismExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSPlatformBehaviorExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDestroyOutsideBehaviorExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTiledSpriteObjectExtension())); std::cout.flush();
-    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDraggableAutomatismExtension())); std::cout.flush();
-    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementAutomatismExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSDraggableBehaviorExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementBehaviorExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTextObjectExtension())); std::cout.flush();
     #endif
     std::cout << "done." << std::endl;

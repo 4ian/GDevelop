@@ -5,7 +5,7 @@
  */
 #ifndef PROJECTRESOURCESCOPIER_H
 #define PROJECTRESOURCESCOPIER_H
-#include <string>
+#include "GDCore/String.h"
 namespace gd { class Project; }
 namespace gd { class AbstractFileSystem; }
 class wxProgressDialog;
@@ -37,7 +37,7 @@ public:
      * \return true if no error happened
      */
     static bool CopyAllResourcesTo(gd::Project & project, gd::AbstractFileSystem & fs,
-        std::string destinationDirectory, bool updateOriginalProject, wxProgressDialog * optionalProgressDialog = NULL,
+        gd::String destinationDirectory, bool updateOriginalProject, wxProgressDialog * optionalProgressDialog = NULL,
         bool askAboutAbsoluteFilenames = true, bool preserveDirectoryStructure = true);
 };
 

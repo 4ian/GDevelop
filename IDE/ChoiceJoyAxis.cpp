@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include "ChoiceJoyAxis.h"
@@ -38,7 +38,7 @@ BEGIN_EVENT_TABLE(ChoiceJoyAxis,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, string joyaxis_, gd::Project & game_, gd::Layout & scene_) :
+ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, gd::String joyaxis_, gd::Project & game_, gd::Layout & scene_) :
 joyaxis(joyaxis_),
 game(game_),
 scene(scene_)

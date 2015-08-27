@@ -15,7 +15,7 @@
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/Events/ObjectMetadata.h"
-#include "GDCore/Events/AutomatismMetadata.h"
+#include "GDCore/Events/BehaviorMetadata.h"
 #include "GDCore/CommonTools.h"
 
 using namespace std;
@@ -23,7 +23,7 @@ using namespace std;
 namespace gd
 {
 
-CallbacksForGeneratingExpressionCode::CallbacksForGeneratingExpressionCode(string & plainExpression_,
+CallbacksForGeneratingExpressionCode::CallbacksForGeneratingExpressionCode(gd::String & plainExpression_,
                                                                            EventsCodeGenerator & codeGenerator_,
                                                                            EventsCodeGenerationContext & context_) :
     plainExpression(plainExpression_),
@@ -33,12 +33,12 @@ CallbacksForGeneratingExpressionCode::CallbacksForGeneratingExpressionCode(strin
 
 }
 
-void CallbacksForGeneratingExpressionCode::OnConstantToken(string text)
+void CallbacksForGeneratingExpressionCode::OnConstantToken(gd::String text)
 {
     plainExpression += text;
 };
 
-void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnStaticFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
 {
     codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
 
@@ -59,18 +59,19 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     }
 
     //Prepare parameters
-    vector<string> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
-    string parametersStr;
-    for (unsigned int i = 0;i<parametersCode.size();++i)
+    std::vector<gd::String> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
+    gd::String parametersStr;
+    for (std::size_t i = 0;i<parametersCode.size();++i)
     {
         if ( i != 0 ) parametersStr += ", ";
         parametersStr += parametersCode[i];
     }
 
+
     plainExpression += expressionInfo.codeExtraInformation.functionCallName+"("+parametersStr+")";
 };
 
-void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnObjectFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
 {
     const gd::Project & project = codeGenerator.GetProject();
     const gd::Layout & scene = codeGenerator.GetLayout();
@@ -86,26 +87,26 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     }
 
     //Prepare parameters
-    vector<string> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
-    string parametersStr;
-    for (unsigned int i = 1;i<parametersCode.size();++i)
+    std::vector<gd::String> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
+    gd::String parametersStr;
+    for (std::size_t i = 1;i<parametersCode.size();++i)
     {
         if ( i != 1 ) parametersStr += ", ";
         parametersStr += parametersCode[i];
     }
 
-    std::string output = GetReturnType() == "string" ? "\"\"" : "0";
+    gd::String output = GetReturnType() == "string" ? "\"\"" : "0";
 
     //Get object(s) concerned by function call
-    std::vector<std::string> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
-    for (unsigned int i = 0;i<realObjects.size();++i)
+    std::vector<gd::String> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
+    for (std::size_t i = 0;i<realObjects.size();++i)
     {
         context.ObjectsListNeeded(realObjects[i]);
 
-        string objectType = gd::GetTypeOfObject(project, scene, realObjects[i]);
+        gd::String objectType = gd::GetTypeOfObject(project, scene, realObjects[i]);
         const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(codeGenerator.GetPlatform(), objectType);
 
-        //Build string to access the object
+        //Build gd::String to access the object
         codeGenerator.AddIncludeFiles(objInfo.includeFiles);
         output = codeGenerator.GenerateObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
     }
@@ -113,7 +114,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     plainExpression += output;
 };
 
-void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
 {
     const gd::Project & project = codeGenerator.GetProject();
     const gd::Layout & scene = codeGenerator.GetLayout();
@@ -129,37 +130,38 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     }
 
     //Prepare parameters
-    vector<string> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
-    string parametersStr;
-    for (unsigned int i = 2;i<parametersCode.size();++i)
+    std::vector<gd::String> parametersCode = codeGenerator.GenerateParametersCodes(parameters, expressionInfo.parameters, context);
+    gd::String parametersStr;
+    for (std::size_t i = 2;i<parametersCode.size();++i)
     {
         if ( i != 2 ) parametersStr += ", ";
         parametersStr += parametersCode[i];
     }
 
     //Get object(s) concerned by function call
-    std::vector<std::string> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
+    std::vector<gd::String> realObjects = codeGenerator. ExpandObjectsName(parameters[0].GetPlainString(), context);
 
-    std::string output = GetReturnType() == "string" ? "\"\"" : "0";
-    for (unsigned int i = 0;i<realObjects.size();++i)
+    gd::String output = GetReturnType() == "string" ? "\"\"" : "0";
+    for (std::size_t i = 0;i<realObjects.size();++i)
     {
         context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
-        string automatismType = gd::GetTypeOfAutomatism(project, scene, parameters[1].GetPlainString());
-        const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(codeGenerator.GetPlatform(), automatismType);
+        gd::String behaviorType = gd::GetTypeOfBehavior(project, scene, parameters[1].GetPlainString());
+        const BehaviorMetadata & autoInfo = MetadataProvider::GetBehaviorMetadata(codeGenerator.GetPlatform(), behaviorType);
 
-        //Build string to access the automatism
+        //Build gd::String to access the behavior
         codeGenerator.AddIncludeFiles(autoInfo.includeFiles);
-        output = codeGenerator.GenerateObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
+        output = codeGenerator.GenerateObjectBehaviorFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
     }
+
 
     plainExpression += output;
 };
 
 bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
 {
-    string newExpression;
+    gd::String newExpression;
 
     CallbacksForGeneratingExpressionCode callbacks(newExpression, codeGenerator, context);
 
@@ -178,7 +180,7 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const gd::Platfor
 
 bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
 {
-    string newExpression;
+    gd::String newExpression;
 
     CallbacksForGeneratingExpressionCode callbacks(newExpression, codeGenerator, context);
 

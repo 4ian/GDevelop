@@ -19,32 +19,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                           "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
-    extension.AddAction("EcrireTexte",
-                   _("Display a text"),
-                   _("Display the specified text to screen"),
-                   _("Display _PARAM1_ at _PARAM2_;_PARAM3_ ( color  : _PARAM4_ , size : _PARAM5_, font : _PARAM6_ )"),
-                   _("Scene"),
-                   "res/actions/texte24.png",
-                   "res/actions/texte.png")
-        .SetHidden() //Deprecated
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Text"), "",false)
-        .AddParameter("expression", _("X position"), "",false)
-        .AddParameter("expression", _("Y position"), "",false)
-        .AddParameter("color", _("Color"), "",false)
-        .AddParameter("expression", _("Size"), "",false)
-        .AddParameter("police", _("Font"), "",true)
-        .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
-
     extension.AddAction("SetFullScreen",
                    _("De/activate fullscreen"),
                    _("This action activate or desactivate fullscreen."),
-                   _("Activate fullscreen:  _PARAM1_ (Keep aspect ratio: _PARAM2_)"),
+                   _("Activate fullscreen: _PARAM1_ (keep aspect ratio: _PARAM2_)"),
                    _("Game's window"),
                    "res/actions/fullscreen24.png",
                    "res/actions/fullscreen.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("yesorno", _("Activate fullscreen"), "",false)
+        .AddParameter("yesorno", _("Activate fullscreen"))
         .AddParameter("yesorno", _("Keep aspect ratio (HTML5 games only, yes by default)"), "",true).SetDefaultValue("yes");
 
     extension.AddAction("SetWindowMargins",
@@ -55,10 +38,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Top"), "",false)
-        .AddParameter("expression", _("Right"), "",false)
-        .AddParameter("expression", _("Bottom"), "",false)
-        .AddParameter("expression", _("Left"), "",false);
+        .AddParameter("expression", _("Top"))
+        .AddParameter("expression", _("Right"))
+        .AddParameter("expression", _("Bottom"))
+        .AddParameter("expression", _("Left"));
 
     extension.AddAction("SetWindowSize",
                    _("Change the size of the screen"),
@@ -68,9 +51,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Width"), "",false)
-        .AddParameter("expression", _("Height"), "",false)
-        .AddParameter("yesorno", _("Use this size as default size for new scene cameras\?\n(Yes to change extend the game area, No to stretch the game to the window's size)."), "",false);
+        .AddParameter("expression", _("Width"))
+        .AddParameter("expression", _("Height"))
+        .AddParameter("yesorno", _("Use this size as default size for new scene cameras\?\n(Yes to change extend the game area, No to stretch the game to the window's size)."));
 
     extension.AddAction("SetWindowIcon",
                    _("Change window's icon"),
@@ -80,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the image to be used as the icon"), "",false);
+        .AddParameter("string", _("Name of the image to be used as the icon"));
 
     extension.AddAction("SetWindowTitle",
                    _("Change window's title"),
@@ -90,7 +73,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("New title"), "",false);
+        .AddParameter("string", _("New title"));
 
     extension.AddExpression("SceneWindowWidth", _("Width of the scene window"), _("Width of the scene window (or scene canvas for HTML5 games)"), _("Screen"), "res/window.png")
         .AddCodeOnlyParameter("currentScene", "");

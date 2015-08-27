@@ -7,7 +7,7 @@
 #if defined(GD_IDE_ONLY)
 #ifndef EVENTMETADATA_H
 #define EVENTMETADATA_H
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 #include <memory>
 #include <functional>
@@ -35,7 +35,7 @@ public:
     /**
      * \brief Set the code generator used when generating code from events.
      */
-    EventMetadata & SetCodeGenerator(std::function<std::string(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
+    EventMetadata & SetCodeGenerator(std::function<gd::String(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
         gd::EventsCodeGenerationContext & context)> function) {
         hasCustomCodeGenerator = true;
         codeGeneration = function;
@@ -46,7 +46,7 @@ public:
      * \brief Set the code to preprocess the event.
      */
     EventMetadata & SetPreprocessing(std::function<void(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
-        gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)> function) {
+        gd::EventsList & eventList, std::size_t indexOfTheEventInThisList)> function) {
         preprocessing = function;
         return *this;
     }
@@ -62,36 +62,36 @@ public:
      */
     bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
-    EventMetadata(const std::string & name_,
-                 const std::string & fullname_,
-                 const std::string & description_,
-                 const std::string & group_,
-                 const std::string & smallicon_,
+    EventMetadata(const gd::String & name_,
+                 const gd::String & fullname_,
+                 const gd::String & description_,
+                 const gd::String & group_,
+                 const gd::String & smallicon_,
                  std::shared_ptr<gd::BaseEvent> instance);
 
     EventMetadata() {};
     virtual ~EventMetadata() {};
 
-    const std::string & GetFullName() const { return fullname; }
-    const std::string & GetDescription() const { return description; }
-    const std::string & GetGroup() const { return group; }
+    const gd::String & GetFullName() const { return fullname; }
+    const gd::String & GetDescription() const { return description; }
+    const gd::String & GetGroup() const { return group; }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
 #endif
 
-    std::string fullname;
-    std::string description;
-    std::string group;
+    gd::String fullname;
+    gd::String description;
+    gd::String group;
 #if !defined(GD_NO_WX_GUI)
     wxBitmap smallicon;
 #endif
 
     std::shared_ptr<gd::BaseEvent> instance;
     bool hasCustomCodeGenerator;
-    std::function<std::string(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
+    std::function<gd::String(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
         gd::EventsCodeGenerationContext & context)> codeGeneration;
     std::function<void(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator,
-        gd::EventsList & eventList, unsigned int indexOfTheEventInThisList)> preprocessing;
+        gd::EventsList & eventList, std::size_t indexOfTheEventInThisList)> preprocessing;
 };
 
 }

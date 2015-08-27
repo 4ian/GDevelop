@@ -8,6 +8,7 @@
 #define PROJECTEXPORTDIALOG_H
 #include "GDJSDialogs.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/String.h"
 namespace gd { class Project; }
 
 namespace gdjs
@@ -28,7 +29,7 @@ public:
     enum ExportType
     {
         Normal,
-        IntelXDK,
+        Cordova,
         CocoonJS
     };
 
@@ -40,7 +41,7 @@ public:
     /**
      * \brief Get the directory where project must be exported.
      */
-    std::string GetExportDir();
+    gd::String GetExportDir();
 
     /**
      * \brief Check if the user wants to minify the JS files.

@@ -1,1002 +1,1315 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Project>
-    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Basic racing game" />
-        <Auteur value="" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="BuiltinExternalLayouts" />
-            <Extension name="TextObject" />
-            <Extension name="CommonDialogs" />
-        </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
-        </Platforms>
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable />
-        <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-    </Info>
-    <Resources>
-        <Resources>
-            <Resource kind="image" name="police.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="police.png" />
-            <Resource kind="image" name="voiture.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="voiture.png" />
-            <Resource kind="image" name="Skycraper.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Skycraper.png" />
-            <Resource kind="image" name="Barn.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Barn.png" />
-            <Resource kind="image" name="Batiment.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Batiment.png" />
-            <Resource kind="image" name="Mur3D.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Mur3D.png" />
-            <Resource kind="image" name="Shop.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Shop.png" />
-            <Resource kind="image" name="Herbe.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Herbe.png" />
-            <Resource kind="image" name="RouteHorizontale.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="RouteHorizontale.png" />
-            <Resource kind="image" name="RouteVerticale.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="RouteVerticale.png" />
-            <Resource kind="image" name="etincelle.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="etincelle.png" />
-            <Resource kind="image" name="smoke1.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="smoke1.png" />
-            <Resource kind="image" name="smoke2.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="smoke2.png" />
-            <Resource kind="image" name="smoke3.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="smoke3.png" />
-            <Resource kind="image" name="frein.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="frein.png" />
-        </Resources>
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes firstScene="">
-        <Scene nom="Nouvelle scène 1" mangledName="Nouvelle_32sc__4524ne_321" r="95.000000" v="118.000000" b="48.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Voiture" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="voiture.png">
-                                        <Points>
-                                            <Point nom="Roue1" X="11.000000" Y="45.000000" />
-                                            <Point nom="Roue2" X="11.000000" Y="29.000000" />
-                                        </Points>
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="37.000000" Y="37.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Batiment" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Batiment.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="114.000000" Y="41.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Skycraper.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="101.000000" Y="201.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Barn.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="117.000000" Y="37.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Mur3D.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="95.000000" Y="22.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Fond" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Herbe.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="300.000000" Y="225.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Route" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="RouteHorizontale.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="112.000000" Y="45.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="50.000000" Y="50.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="RouteVerticale.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="45.000000" Y="112.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="etincelle" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="etincelle.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="2.000000" Y="2.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="fumée" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="smoke1.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="10.000000" Y="10.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="smoke2.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="10.000000" Y="10.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="smoke3.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="10.000000" Y="10.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="frein" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="0.000000">
-                                <Sprites>
-                                    <Sprite image="frein.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="15.000000" Y="3.000000" />
-                                        <PointCentre nom="centre" X="10.000000" Y="4.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Speed" type="TextObject::Text" smoothed="true" bold="false" italic="false" underlined="false">
-                    <Variables />
-                    <String value="Text" />
-                    <Font value="" />
-                    <CharacterSize value="30" />
-                    <Color r="255" g="255" b="255" />
-                </Objet>
-                <Objet nom="Explanation" type="TextObject::Text" smoothed="true" bold="false" italic="false" underlined="false">
-                    <Variables />
-                    <String value="Use arrows to move the car.&#x0A;See other examples for&#x0A;enhanced racing games." />
-                    <Font value="" />
-                    <CharacterSize value="20" />
-                    <Color r="255" g="255" b="255" />
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-                <Layer Name="Interface" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas />
-            <Positions>
-                <Objet nom="Voiture" x="281.000000" y="135.000000" plan="5" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Batiment" x="400.000000" y="21.000000" plan="-1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Batiment" x="199.000000" y="-300.000000" plan="-1" layer="" angle="45.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fond" x="2.000000" y="-190.000000" plan="-10" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fond" x="599.000000" y="-190.000000" plan="-10" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fond" x="0.000000" y="260.000000" plan="-10" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fond" x="594.000000" y="258.000000" plan="-10" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Route" x="125.000000" y="100.000000" plan="-5" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Route" x="344.000000" y="100.000000" plan="-5" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Route" x="567.000000" y="100.000000" plan="-5" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fond" x="-2.000000" y="-617.000000" plan="-5" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fond" x="599.000000" y="-617.000000" plan="-5" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fond" x="-600.000000" y="-620.000000" plan="-5" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fond" x="-598.000000" y="-170.000000" plan="-5" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Fond" x="-600.000000" y="280.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Route" x="792.000000" y="100.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Route" x="1016.000000" y="100.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Route" x="794.000000" y="187.000000" plan="0" layer="" angle="90.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Route" x="794.000000" y="412.000000" plan="0" layer="" angle="90.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Route" x="792.000000" y="636.000000" plan="0" layer="" angle="90.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Batiment" x="437.000000" y="402.000000" plan="0" layer="" angle="90.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Batiment" x="350.000000" y="288.000000" plan="0" layer="" angle="135.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Batiment" x="530.000000" y="288.000000" plan="0" layer="" angle="135.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Batiment" x="145.000000" y="263.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Speed" x="0.000000" y="0.000000" plan="0" layer="Interface" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Explanation" x="2.000000" y="441.000000" plan="0" layer="Interface" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Direction" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Right" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ChangeDirection" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="+" />
-                            <Parametre value="200*TimeDelta()" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Left" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ChangeDirection" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="-" />
-                            <Parametre value="200*TimeDelta()" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Acceleration" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Up" />
-                        </Condition>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="&lt;" />
-                            <Parametre value="400" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarObjet" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="+" />
-                            <Parametre value="500*TimeDelta()" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Braking" />
-                    <Com2 value="Freinage progressif" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Down" />
-                        </Condition>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="&gt;" />
-                            <Parametre value="-75" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarObjet" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="-" />
-                            <Parametre value="600*TimeDelta()" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Braking at high speed" />
-                    <Com2 value="Freinage à haute vitesse" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="&gt;" />
-                            <Parametre value="150" />
-                        </Condition>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Down" />
-                        </Condition>
-                        <Condition>
-                            <Type value="Timer" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="0.5" />
-                            <Parametre value='&quot;TraceFrein&quot;' />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="frein" />
-                            <Parametre value="Voiture.X(Roue1)" />
-                            <Parametre value="Voiture.Y(Roue1)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="frein" />
-                            <Parametre value="Voiture.X(Roue2)" />
-                            <Parametre value="Voiture.Y(Roue2)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="ChangeDirection" />
-                            <Parametre value="frein" />
-                            <Parametre value="=" />
-                            <Parametre value="Voiture.Direc()" />
-                        </Action>
-                        <Action>
-                            <Type value="ChangePlan" />
-                            <Parametre value="frein" />
-                            <Parametre value="=" />
-                            <Parametre value="1" />
-                        </Action>
-                        <Action>
-                            <Type value="ResetTimer" />
-                            <Parametre value="" />
-                            <Parametre value='&quot;TraceFrein&quot;' />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="&lt;" />
-                            <Parametre value="20" />
-                        </Condition>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Down" />
-                        </Condition>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Up" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarObjet" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="Demarrage rapide" />
-                            <Parametre value="=" />
-                            <Parametre value="1" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="&gt;" />
-                            <Parametre value="20" />
-                        </Condition>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="Demarrage rapide" />
-                            <Parametre value="=" />
-                            <Parametre value="1" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="fumée" />
-                            <Parametre value="Voiture.X(Roue1)" />
-                            <Parametre value="Voiture.Y(Roue1)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="fumée" />
-                            <Parametre value="Voiture.X(Roue2)" />
-                            <Parametre value="Voiture.Y(Roue2)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="ModVarObjet" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="=" />
-                            <Parametre value="130" />
-                        </Action>
-                        <Action>
-                            <Type value="ModVarObjet" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="Demarrage rapide" />
-                            <Parametre value="=" />
-                            <Parametre value="0" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Move the car according to its acceleration" />
-                    <Com2 value="Faire bouger la voiture" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="AddForceAL" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="Voiture.Direc()" />
-                            <Parametre value="Voiture.Variable(acceleration)" />
-                            <Parametre value="0" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Slowing down car" />
-                    <Com2 value="Ralentir progressivement la voiture" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="&gt;" />
-                            <Parametre value="0" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarObjet" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="-" />
-                            <Parametre value="50*TimeDelta()" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Collision management" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="Collision" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="Batiment" />
-                            <Parametre value="" />
-                            <Parametre value="" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Rebondir" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="Batiment" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Collision with effects" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="&gt;" />
-                            <Parametre value="100" />
-                        </Condition>
-                        <Condition>
-                            <Type value="Collision" Contraire="false" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="Batiment" />
-                            <Parametre value="" />
-                            <Parametre value="" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarObjet" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="acceleration" />
-                            <Parametre value="=" />
-                            <Parametre value="100" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="etincelle" />
-                            <Parametre value="Voiture.PointX(Centre)" />
-                            <Parametre value="Voiture.PointY(Centre)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="etincelle" />
-                            <Parametre value="Voiture.PointX(Centre)" />
-                            <Parametre value="Voiture.PointY(Centre)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="etincelle" />
-                            <Parametre value="Voiture.PointX(Centre)" />
-                            <Parametre value="Voiture.PointY(Centre)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="AddForceAL" />
-                            <Parametre value="etincelle" />
-                            <Parametre value="Random(360)" />
-                            <Parametre value="Random(60)+70" />
-                            <Parametre value="0.5" />
-                        </Action>
-                        <Action>
-                            <Type value="ChangePlan" />
-                            <Parametre value="etincelle" />
-                            <Parametre value="=" />
-                            <Parametre value="6" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="fumée" />
-                            <Parametre value="Voiture.X()+Random(60)" />
-                            <Parametre value="Voiture.Y()+Random(60)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="fumée" />
-                            <Parametre value="Voiture.X()+Random(60)" />
-                            <Parametre value="Voiture.Y()+Random(60)" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="ChangePlan" />
-                            <Parametre value="fumée" />
-                            <Parametre value="=" />
-                            <Parametre value="6" />
-                        </Action>
-                        <Action>
-                            <Type value="ChangeAnimation" />
-                            <Parametre value="fumée" />
-                            <Parametre value="=" />
-                            <Parametre value="Random(2)" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Smoke and effects management" />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="AddForceAL" />
-                            <Parametre value="fumée" />
-                            <Parametre value="200+Random(90)" />
-                            <Parametre value="Random(50)" />
-                            <Parametre value="0" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="Vitesse" Contraire="false" />
-                            <Parametre value="etincelle" />
-                            <Parametre value="&lt;" />
-                            <Parametre value="60" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Delete" />
-                            <Parametre value="etincelle" />
-                            <Parametre value="" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="Timer" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="1" />
-                            <Parametre value='&quot;SmokeDestroy&quot;' />
-                        </Condition>
-                        <Condition>
-                            <Type value="AjoutHasard" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="fumée" />
-                            <Parametre value="" />
-                            <Parametre value="fumée" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Delete" />
-                            <Parametre value="fumée" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="ResetTimer" />
-                            <Parametre value="" />
-                            <Parametre value='&quot;SmokeDestroy&quot;' />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Camera and user interface" />
-                    <Com2 value="Caméra et interface utilisateur" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="CentreCamera" />
-                            <Parametre value="" />
-                            <Parametre value="Voiture" />
-                            <Parametre value="" />
-                            <Parametre value="" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="TextObject::String" />
-                            <Parametre value="Speed" />
-                            <Parametre value="=" />
-                            <Parametre value='ToString(int(Voiture.Longueur()/2)) + &quot; km/h&quot;' />
-                        </Action>
-                    </Actions>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalLayouts />
-    <ExternalSourceFiles />
-</Project>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Basic racing game</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="TextObject" />
+            <extension name="CommonDialogs" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+        </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources>
+            <resource alwaysLoaded="false" file="police.png" kind="image" name="police.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="voiture.png" kind="image" name="voiture.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Skycraper.png" kind="image" name="Skycraper.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Barn.png" kind="image" name="Barn.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Batiment.png" kind="image" name="Batiment.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Mur3D.png" kind="image" name="Mur3D.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Shop.png" kind="image" name="Shop.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Herbe.png" kind="image" name="Herbe.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="RouteHorizontale.png" kind="image" name="RouteHorizontale.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="RouteVerticale.png" kind="image" name="RouteVerticale.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="etincelle.png" kind="image" name="etincelle.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="smoke1.png" kind="image" name="smoke1.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="smoke2.png" kind="image" name="smoke2.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="smoke3.png" kind="image" name="smoke3.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="frein.png" kind="image" name="frein.png" smoothed="true" userAdded="true" />
+        </resources>
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="48" disableInputWhenNotFocused="true" mangledName="Nouvelle_32sc_232ne_321" name="Nouvelle scÃ¨ne 1" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="95" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="118">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Voiture" width="0.000000" x="281.000000" y="135.000000" zOrder="5">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Batiment" width="0.000000" x="400.000000" y="21.000000" zOrder="-1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="45.000000" customSize="false" height="0.000000" layer="" locked="false" name="Batiment" width="0.000000" x="199.000000" y="-300.000000" zOrder="-1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fond" width="0.000000" x="2.000000" y="-190.000000" zOrder="-10">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fond" width="0.000000" x="599.000000" y="-190.000000" zOrder="-10">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fond" width="0.000000" x="0.000000" y="260.000000" zOrder="-10">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fond" width="0.000000" x="594.000000" y="258.000000" zOrder="-10">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Route" width="0.000000" x="125.000000" y="100.000000" zOrder="-5">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Route" width="0.000000" x="344.000000" y="100.000000" zOrder="-5">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Route" width="0.000000" x="567.000000" y="100.000000" zOrder="-5">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fond" width="0.000000" x="-2.000000" y="-617.000000" zOrder="-5">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fond" width="0.000000" x="599.000000" y="-617.000000" zOrder="-5">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fond" width="0.000000" x="-600.000000" y="-620.000000" zOrder="-5">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fond" width="0.000000" x="-598.000000" y="-170.000000" zOrder="-5">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Fond" width="0.000000" x="-600.000000" y="280.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Route" width="0.000000" x="792.000000" y="100.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Route" width="0.000000" x="1016.000000" y="100.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="90.000000" customSize="false" height="0.000000" layer="" locked="false" name="Route" width="0.000000" x="794.000000" y="187.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="90.000000" customSize="false" height="0.000000" layer="" locked="false" name="Route" width="0.000000" x="794.000000" y="412.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="90.000000" customSize="false" height="0.000000" layer="" locked="false" name="Route" width="0.000000" x="792.000000" y="636.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="90.000000" customSize="false" height="0.000000" layer="" locked="false" name="Batiment" width="0.000000" x="437.000000" y="402.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="135.000000" customSize="false" height="0.000000" layer="" locked="false" name="Batiment" width="0.000000" x="350.000000" y="288.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="135.000000" customSize="false" height="0.000000" layer="" locked="false" name="Batiment" width="0.000000" x="530.000000" y="288.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Batiment" width="0.000000" x="145.000000" y="263.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="Interface" locked="false" name="Speed" width="0.000000" x="0.000000" y="0.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="Interface" locked="false" name="Explanation" width="0.000000" x="2.000000" y="441.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Voiture" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="voiture.png">
+                                            <points>
+                                                <point name="Roue1" x="11.000000" y="45.000000" />
+                                                <point name="Roue2" x="11.000000" y="29.000000" />
+                                            </points>
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="37.500000" y="37.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="75.000000" y="0.000000" />
+                                                    <vertice x="75.000000" y="75.000000" />
+                                                    <vertice x="0.000000" y="75.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Batiment" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Batiment.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="114.500000" y="41.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="229.000000" y="0.000000" />
+                                                    <vertice x="229.000000" y="82.000000" />
+                                                    <vertice x="0.000000" y="82.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Skycraper.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="101.000000" y="201.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="202.000000" y="0.000000" />
+                                                    <vertice x="202.000000" y="402.000000" />
+                                                    <vertice x="0.000000" y="402.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Barn.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="117.500000" y="37.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="235.000000" y="0.000000" />
+                                                    <vertice x="235.000000" y="74.000000" />
+                                                    <vertice x="0.000000" y="74.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Mur3D.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="95.000000" y="22.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="190.000000" y="0.000000" />
+                                                    <vertice x="190.000000" y="44.000000" />
+                                                    <vertice x="0.000000" y="44.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="50.000000" y="50.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="100.000000" y="0.000000" />
+                                                    <vertice x="100.000000" y="100.000000" />
+                                                    <vertice x="0.000000" y="100.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Fond" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Herbe.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="300.000000" y="225.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="600.000000" y="0.000000" />
+                                                    <vertice x="600.000000" y="450.000000" />
+                                                    <vertice x="0.000000" y="450.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Route" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="RouteHorizontale.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="112.500000" y="45.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="225.000000" y="0.000000" />
+                                                    <vertice x="225.000000" y="90.000000" />
+                                                    <vertice x="0.000000" y="90.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="50.000000" y="50.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="100.000000" y="0.000000" />
+                                                    <vertice x="100.000000" y="100.000000" />
+                                                    <vertice x="0.000000" y="100.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="RouteVerticale.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="45.000000" y="112.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="90.000000" y="0.000000" />
+                                                    <vertice x="90.000000" y="225.000000" />
+                                                    <vertice x="0.000000" y="225.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="etincelle" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="etincelle.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="0.000000" y="0.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="fumÃ©e" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="smoke1.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="10.000000" y="10.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="20.000000" y="0.000000" />
+                                                    <vertice x="20.000000" y="20.000000" />
+                                                    <vertice x="0.000000" y="20.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="smoke2.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="10.000000" y="10.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="20.000000" y="0.000000" />
+                                                    <vertice x="20.000000" y="20.000000" />
+                                                    <vertice x="0.000000" y="20.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="smoke3.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="10.000000" y="10.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="20.000000" y="0.000000" />
+                                                    <vertice x="20.000000" y="20.000000" />
+                                                    <vertice x="0.000000" y="20.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="frein" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="0.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="frein.png">
+                                            <points />
+                                            <originPoint name="origine" x="15.000000" y="3.000000" />
+                                            <centerPoint automatic="true" name="centre" x="10.000000" y="4.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="20.000000" y="0.000000" />
+                                                    <vertice x="20.000000" y="8.000000" />
+                                                    <vertice x="0.000000" y="8.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object bold="false" italic="false" name="Speed" smoothed="true" type="TextObject::Text" underlined="false">
+                    <variables />
+                    <automatisms />
+                    <string>Text</string>
+                    <font></font>
+                    <characterSize>30</characterSize>
+                    <color b="255" g="255" r="255" />
+                </object>
+                <object bold="false" italic="false" name="Explanation" smoothed="true" type="TextObject::Text" underlined="false">
+                    <variables />
+                    <automatisms />
+                    <string>Use arrows to move the car.&#x0A;See other examples for&#x0A;enhanced racing games.</string>
+                    <font></font>
+                    <characterSize>20</characterSize>
+                    <color b="255" g="255" r="255" />
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Direction</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Right</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ChangeDirection" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>+</parameter>
+                                <parameter>200*TimeDelta()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Left</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ChangeDirection" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>-</parameter>
+                                <parameter>200*TimeDelta()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Acceleration</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Up</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>&lt;</parameter>
+                                <parameter>400</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>+</parameter>
+                                <parameter>500*TimeDelta()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Braking</comment>
+                    <comment2>Freinage progressif</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Down</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>&gt;</parameter>
+                                <parameter>-75</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>-</parameter>
+                                <parameter>600*TimeDelta()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Braking at high speed</comment>
+                    <comment2>Freinage Ã  haute vitesse</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>&gt;</parameter>
+                                <parameter>150</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Down</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="Timer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>0.5</parameter>
+                                <parameter>&quot;TraceFrein&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>frein</parameter>
+                                <parameter>Voiture.X(Roue1)</parameter>
+                                <parameter>Voiture.Y(Roue1)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>frein</parameter>
+                                <parameter>Voiture.X(Roue2)</parameter>
+                                <parameter>Voiture.Y(Roue2)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ChangeDirection" />
+                            <parameters>
+                                <parameter>frein</parameter>
+                                <parameter>=</parameter>
+                                <parameter>Voiture.Direc()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ChangePlan" />
+                            <parameters>
+                                <parameter>frein</parameter>
+                                <parameter>=</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ResetTimer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>&quot;TraceFrein&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>&lt;</parameter>
+                                <parameter>20</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Down</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Up</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>Demarrage rapide</parameter>
+                                <parameter>=</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>&gt;</parameter>
+                                <parameter>20</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>Demarrage rapide</parameter>
+                                <parameter>=</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>fumÃ©e</parameter>
+                                <parameter>Voiture.X(Roue1)</parameter>
+                                <parameter>Voiture.Y(Roue1)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>fumÃ©e</parameter>
+                                <parameter>Voiture.X(Roue2)</parameter>
+                                <parameter>Voiture.Y(Roue2)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>=</parameter>
+                                <parameter>130</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>Demarrage rapide</parameter>
+                                <parameter>=</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Move the car according to its acceleration</comment>
+                    <comment2>Faire bouger la voiture</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="AddForceAL" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>Voiture.Direc()</parameter>
+                                <parameter>Voiture.Variable(acceleration)</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Slowing down car</comment>
+                    <comment2>Ralentir progressivement la voiture</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>&gt;</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>-</parameter>
+                                <parameter>50*TimeDelta()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Collision management</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="Collision" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>Batiment</parameter>
+                                <parameter></parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Rebondir" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>Batiment</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Collision with effects</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>&gt;</parameter>
+                                <parameter>100</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="Collision" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>Batiment</parameter>
+                                <parameter></parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Voiture</parameter>
+                                <parameter>acceleration</parameter>
+                                <parameter>=</parameter>
+                                <parameter>100</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>etincelle</parameter>
+                                <parameter>Voiture.PointX(Centre)</parameter>
+                                <parameter>Voiture.PointY(Centre)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>etincelle</parameter>
+                                <parameter>Voiture.PointX(Centre)</parameter>
+                                <parameter>Voiture.PointY(Centre)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>etincelle</parameter>
+                                <parameter>Voiture.PointX(Centre)</parameter>
+                                <parameter>Voiture.PointY(Centre)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="AddForceAL" />
+                            <parameters>
+                                <parameter>etincelle</parameter>
+                                <parameter>Random(360)</parameter>
+                                <parameter>Random(60)+70</parameter>
+                                <parameter>0.5</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ChangePlan" />
+                            <parameters>
+                                <parameter>etincelle</parameter>
+                                <parameter>=</parameter>
+                                <parameter>6</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>fumÃ©e</parameter>
+                                <parameter>Voiture.X()+Random(60)</parameter>
+                                <parameter>Voiture.Y()+Random(60)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>fumÃ©e</parameter>
+                                <parameter>Voiture.X()+Random(60)</parameter>
+                                <parameter>Voiture.Y()+Random(60)</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ChangePlan" />
+                            <parameters>
+                                <parameter>fumÃ©e</parameter>
+                                <parameter>=</parameter>
+                                <parameter>6</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ChangeAnimation" />
+                            <parameters>
+                                <parameter>fumÃ©e</parameter>
+                                <parameter>=</parameter>
+                                <parameter>Random(2)</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Smoke and effects management</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="AddForceAL" />
+                            <parameters>
+                                <parameter>fumÃ©e</parameter>
+                                <parameter>200+Random(90)</parameter>
+                                <parameter>Random(50)</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="Vitesse" />
+                            <parameters>
+                                <parameter>etincelle</parameter>
+                                <parameter>&lt;</parameter>
+                                <parameter>60</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Delete" />
+                            <parameters>
+                                <parameter>etincelle</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="Timer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>1</parameter>
+                                <parameter>&quot;SmokeDestroy&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="AjoutHasard" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>fumÃ©e</parameter>
+                                <parameter></parameter>
+                                <parameter>fumÃ©e</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Delete" />
+                            <parameters>
+                                <parameter>fumÃ©e</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ResetTimer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>&quot;SmokeDestroy&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Camera and user interface</comment>
+                    <comment2>CamÃ©ra et interface utilisateur</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="CentreCamera" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Voiture</parameter>
+                                <parameter></parameter>
+                                <parameter></parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="TextObject::String" />
+                            <parameters>
+                                <parameter>Speed</parameter>
+                                <parameter>=</parameter>
+                                <parameter>ToString(int(Voiture.Longueur()/2)) + &quot; km/h&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+                <layer name="Interface" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

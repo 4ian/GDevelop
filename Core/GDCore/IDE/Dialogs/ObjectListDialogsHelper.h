@@ -7,7 +7,7 @@
 #ifndef GDCORE_OBJECTLISTDIALOGSHELPER_H
 #define GDCORE_OBJECTLISTDIALOGSHELPER_H
 
-#include <string>
+#include "GDCore/String.h"
 #include <functional>
 #include <vector>
 namespace gd { class Project; }
@@ -55,14 +55,14 @@ public:
      * containing this text will be shown when calling RefreshList.
      * \param searchText The filter text
      */
-    void SetSearchText(std::string searchText_);
+    void SetSearchText(gd::String searchText_);
 
     /**
      * \brief Specify a type of object to display. Only objects of this type will
      * be shown when calling RefreshList.
      * \param allowedObjectType The type of objects. For example, "Sprite" or "TextObject::Text".
      */
-    void SetAllowedObjectType(std::string allowedObjectType_) { objectTypeAllowed = allowedObjectType_; }
+    void SetAllowedObjectType(gd::String allowedObjectType_) { objectTypeAllowed = allowedObjectType_; }
 
     /**
      * \brief Set if groups of objects are displayed when calling RefreshList (true by default).
@@ -73,7 +73,7 @@ public:
     /**
      * \brief Return a list of objects (and groups if allowed) that matches the criteria.
      */
-    std::vector<std::string> GetMatchingObjects() const;
+    std::vector<gd::String> GetMatchingObjects() const;
 
     #if !defined(GD_NO_WX_GUI)
     /**
@@ -122,8 +122,8 @@ private:
 
     const Project & project;
     const Layout & layout;
-    std::string objectTypeAllowed;
-    std::string searchText;
+    gd::String objectTypeAllowed;
+    gd::String searchText;
     bool groupsAllowed;
 
     bool hasGroupExtraRendering;

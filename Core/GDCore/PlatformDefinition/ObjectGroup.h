@@ -7,7 +7,7 @@
 #ifndef GDCORE_OBJECTGROUP_H
 #define GDCORE_OBJECTGROUP_H
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include <utility>
 namespace gd { class SerializerElement; }
 
@@ -32,30 +32,30 @@ public:
     /**
      * \brief Return true if an object is found inside the ObjectGroup.
      */
-    bool Find(const std::string & name) const;
+    bool Find(const gd::String & name) const;
 
     /**
      * \brief Add an object name to the group.
      */
-    void AddObject(const std::string & name);
+    void AddObject(const gd::String & name);
 
     /**
      * \brief Remove an object name from the group
      */
-    void RemoveObject(const std::string & name);
+    void RemoveObject(const gd::String & name);
 
     /** \brief Get group name
      */
-    inline const std::string & GetName() const { return name; };
+    inline const gd::String & GetName() const { return name; };
 
     /** \brief Change group name
      */
-    inline void SetName(const std::string & name_) {name = name_;};
+    inline void SetName(const gd::String & name_) {name = name_;};
 
     /**
      * \brief Get a vector with objects names.
      */
-    inline const std::vector < std::string > & GetAllObjectsNames() const
+    inline const std::vector < gd::String > & GetAllObjectsNames() const
     {
         return memberObjects;
     }
@@ -71,8 +71,8 @@ public:
     static void UnserializeFrom(std::vector < gd::ObjectGroup > & list, const SerializerElement & element);
 
 private:
-    std::vector < std::string > memberObjects;
-    std::string name; ///< Group name
+    std::vector < gd::String > memberObjects;
+    gd::String name; ///< Group name
 };
 
 /**
@@ -89,9 +89,9 @@ private:
  *
  * \see gd::ObjectGroup
  */
-struct GroupHasTheSameName : public std::binary_function<ObjectGroup, std::string, bool>
+struct GroupHasTheSameName : public std::binary_function<ObjectGroup, gd::String, bool>
 {
-    bool operator ()( const ObjectGroup & group, const std::string & name ) const
+    bool operator ()( const ObjectGroup & group, const gd::String & name ) const
     {
         return group.GetName() == name;
     }

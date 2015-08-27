@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="71" major="3" minor="3" revision="0" />
+    <gdVersion build="84" major="3" minor="6" revision="0" />
     <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Project</name>
         <author></author>
@@ -34,8 +34,9 @@
             <extension name="PathAutomatism" />
         </extensions>
         <platforms>
-            <platform name="Game Develop C++ platform" />
+            <platform name="GDevelop C++ platform" />
         </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
     </properties>
     <resources>
         <resources>
@@ -66,7 +67,7 @@
     <variables />
     <layouts>
         <layout b="41" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="41" standardSortMethod="true" stopSoundsOnStartup="true" title="(No title)" v="41">
-            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridR="158" gridWidth="32" snap="false" windowMask="false" zoomFactor="1.000000" />
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="false" windowMask="false" zoomFactor="1.000000" />
             <objectsGroups />
             <variables>
                 <variable name="TempY" value="0" />
@@ -2782,7 +2783,7 @@
                     <type>BuiltinCommonInstructions::Comment</type>
                     <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
                     <comment>Camera management</comment>
-                    <comment2>Gestion de la caméra</comment2>
+                    <comment2>Gestion de la camÃ©ra</comment2>
                 </event>
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>

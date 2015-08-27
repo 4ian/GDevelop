@@ -108,6 +108,10 @@
 					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 					"m_properties":	[{
 							"type":	"string",
+							"m_label":	"Minimum Size:",
+							"m_value":	"-1,-1"
+						}, {
+							"type":	"string",
 							"m_label":	"Name:",
 							"m_value":	"flexGridSizer3"
 						}, {
@@ -149,6 +153,10 @@
 							"m_styles":	[],
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 							"m_properties":	[{
+									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
 									"type":	"string",
 									"m_label":	"Name:",
 									"m_value":	"logoSizer"
@@ -339,6 +347,10 @@
 							"m_sizerFlags":	["wxLEFT", "wxRIGHT", "wxTOP", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_CENTER_VERTICAL"],
 							"m_properties":	[{
 									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
 									"m_label":	"Name:",
 									"m_value":	"centerSizer"
 								}, {
@@ -381,6 +393,10 @@
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 									"m_properties":	[{
 											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
+											"type":	"string",
 											"m_label":	"Name:",
 											"m_value":	"gettingstartedSizer"
 										}, {
@@ -422,6 +438,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer82"
@@ -611,6 +631,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer21"
@@ -917,6 +941,10 @@
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 									"m_properties":	[{
 											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
+											"type":	"string",
 											"m_label":	"Name:",
 											"m_value":	"latestProjectsSizer"
 										}, {
@@ -958,6 +986,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer85"
@@ -1147,6 +1179,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer21410"
@@ -1474,6 +1510,10 @@
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 									"m_properties":	[{
 											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
+											"type":	"string",
 											"m_label":	"Name:",
 											"m_value":	"communitySizer"
 										}, {
@@ -1515,6 +1555,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer91"
@@ -1704,6 +1748,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer214"
@@ -2010,6 +2058,10 @@
 									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 									"m_properties":	[{
 											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
+											"type":	"string",
 											"m_label":	"Name:",
 											"m_value":	"newsSizer"
 										}, {
@@ -2051,6 +2103,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer88"
@@ -2301,6 +2357,10 @@
 													"m_value":	""
 												}, {
 													"type":	"string",
+													"m_label":	"Text Hint",
+													"m_value":	""
+												}, {
+													"type":	"string",
 													"m_label":	"Max Length:",
 													"m_value":	"0"
 												}, {
@@ -2323,6 +2383,10 @@
 											"m_styles":	[],
 											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 											"m_properties":	[{
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
 													"type":	"string",
 													"m_label":	"Name:",
 													"m_value":	"flexGridSizer77"
@@ -2542,6 +2606,10 @@
 							"m_styles":	[],
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_BOTTOM"],
 							"m_properties":	[{
+									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
 									"type":	"string",
 									"m_label":	"Name:",
 									"m_value":	"bottomSizer"

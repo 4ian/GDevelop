@@ -6,14 +6,14 @@
 
 #ifndef GDCORE_EXPRESSION_H
 #define GDCORE_EXPRESSION_H
-#include <string>
+#include "GDCore/String.h"
 
 namespace gd
 {
 
 /**
  * \brief Class representing an expression used as a parameter of a gd::Instruction.
- * This class is nothing more than a wrapper around a std::string.
+ * This class is nothing more than a wrapper around a gd::String.
  *
  * \see gd::Instruction
  *
@@ -31,7 +31,7 @@ public:
     /**
      * \brief Construct an expression from a string
      */
-    Expression(std::string plainString_) : plainString(plainString_) {};
+    Expression(gd::String plainString_) : plainString(plainString_) {};
 
     /**
      * \brief Construct an expression from a const char *
@@ -41,7 +41,7 @@ public:
     /**
      * \brief Get the plain string representing the expression
      */
-    inline const std::string & GetPlainString() const { return plainString; };
+    inline const gd::String & GetPlainString() const { return plainString; };
 
     /**
      * \brief Mimics std::string::c_str
@@ -52,7 +52,7 @@ public:
 
 private:
 
-    std::string plainString; ///<The expression string
+    gd::String plainString; ///<The expression string
 };
 
 }

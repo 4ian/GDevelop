@@ -17,7 +17,6 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/PlatformDefinition/ImageManager.h"
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
@@ -381,11 +380,11 @@ void CppLayoutPreviewer::CreatePreviewRibbonTools(wxRibbonButtonBar & buttonBar)
     bool hideLabels = false;
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
-    buttonBar.AddButton(idRibbonPlay, !hideLabels ? _("Play") : "", gd::SkinHelper::GetRibbonIcon("start"), _("Start the preview"));
-    buttonBar.AddButton(idRibbonPlayWin, !hideLabels ? _("Play in a window") : "", gd::SkinHelper::GetRibbonIcon("startwindow"), _("Start the preview in an external window"));
-    buttonBar.AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", gd::SkinHelper::GetRibbonIcon("pause"), _("Pause the preview"));
-    buttonBar.AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", gd::SkinHelper::GetRibbonIcon("bug"), _("Show the debugger to view the state of the game"));
-    buttonBar.AddButton(idRibbonProfiler, !hideLabels ? _("Profiling") : "", gd::SkinHelper::GetRibbonIcon("profiler"), _("Show the profiler to monitor performances"));
+    buttonBar.AddButton(idRibbonPlay, !hideLabels ? _("Play") : gd::String(), gd::SkinHelper::GetRibbonIcon("start"), _("Start the preview"));
+    buttonBar.AddButton(idRibbonPlayWin, !hideLabels ? _("Play in a window") : gd::String(), gd::SkinHelper::GetRibbonIcon("startwindow"), _("Start the preview in an external window"));
+    buttonBar.AddButton(idRibbonPause, !hideLabels ? _("Pause") : gd::String(), gd::SkinHelper::GetRibbonIcon("pause"), _("Pause the preview"));
+    buttonBar.AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : gd::String(), gd::SkinHelper::GetRibbonIcon("bug"), _("Show the debugger to view the state of the game"));
+    buttonBar.AddButton(idRibbonProfiler, !hideLabels ? _("Profiling") : gd::String(), gd::SkinHelper::GetRibbonIcon("profiler"), _("Show the profiler to monitor performances"));
 }
 
 void CppLayoutPreviewer::ConnectPreviewRibbonToolsEvents()

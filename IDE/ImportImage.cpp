@@ -331,7 +331,7 @@ void ImportImage::OnFermerBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void ImportImage::OnBrowseGIFBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choose the animated GIF to decompose"), "", "", "GIF animé (*.gif)|*.gif");
+    wxFileDialog dialog(this, _("Choose the animated GIF to decompose"), "", "", "GIF animï¿½ (*.gif)|*.gif");
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
@@ -340,19 +340,19 @@ void ImportImage::OnBrowseGIFBtClick(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-///Mise à jour en temps réel du nombre d'image d'un fichier gif
+///Mise ï¿½ jour en temps rï¿½el du nombre d'image d'un fichier gif
 ////////////////////////////////////////////////////////////
 void ImportImage::OnFileGIFEditText(wxCommandEvent& event)
 {
     wxAnimation animation;
     if ( animation.LoadFile(FileGIFEdit->GetValue()) )
-        nbImageGIFBt->SetLabel(_("Number of images : ")+gd::ToString(animation.GetFrameCount()));
+        nbImageGIFBt->SetLabel(_("Number of images : ")+gd::String::From(animation.GetFrameCount()));
     else
         nbImageGIFBt->SetLabel(_("Number of images : \?"));
 }
 
 ////////////////////////////////////////////////////////////
-///Décomposition du fichier GIF
+///Dï¿½composition du fichier GIF
 ////////////////////////////////////////////////////////////
 void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
 {
@@ -366,10 +366,10 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     wxFileName filename(FileGIFEdit->GetValue());
     wxString path = filename.GetPath();
 
-    for (unsigned int i = 0;i<animation.GetFrameCount();++i)
+    for (std::size_t i = 0;i<animation.GetFrameCount();++i)
     {
     	wxImage img = animation.GetFrame(i);
-    	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+gd::ToString(i)+".png", wxBITMAP_TYPE_PNG);
+    	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+gd::String::From(i)+".png", wxBITMAP_TYPE_PNG);
     }
 
     gd::LogMessage(_("Decomposition of the GIF completed!"));
@@ -400,19 +400,19 @@ void ImportImage::OnBrowseSSBtClick(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-///Mise à jour en temps réel de la taille d'une image après décomposition
+///Mise ï¿½ jour en temps rï¿½el de la taille d'une image aprï¿½s dï¿½composition
 ////////////////////////////////////////////////////////////
 void ImportImage::OnfileRPGEditText(wxCommandEvent& event)
 {
     wxImage image;
     if ( image.LoadFile(fileRPGEdit->GetValue()) )
-        tailleImageRPGEdit->SetLabel(_("Size of an image : ")+gd::ToString(image.GetWidth()/4)+"x"+gd::ToString(image.GetHeight()/4));
+        tailleImageRPGEdit->SetLabel(_("Size of an image : ")+gd::String::From(image.GetWidth()/4)+"x"+gd::String::From(image.GetHeight()/4));
     else
         tailleImageRPGEdit->SetLabel(_("Size of an image : \?x\?"));
 }
 
 ////////////////////////////////////////////////////////////
-///Décomposition de la feuille de sprite RPG Maker
+///Dï¿½composition de la feuille de sprite RPG Maker
 ////////////////////////////////////////////////////////////
 void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
 {
@@ -426,23 +426,23 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
     wxFileName filename(fileRPGEdit->GetValue());
     wxString path = filename.GetPath();
 
-    for (unsigned int j = 0;j<4;++j)
+    for (std::size_t j = 0;j<4;++j)
     {
-        for (unsigned int i = 0;i<4;++i)
+        for (std::size_t i = 0;i<4;++i)
         {
-            //On récupère la sous image
+            //On rï¿½cupï¿½re la sous image
             wxImage subImage = image.GetSubImage(wxRect(image.GetWidth()/4*i,
                                                         image.GetHeight()/4*j,
                                                         image.GetWidth()/4,
                                                         image.GetHeight()/4));
 
-            //La direction est noté sous forme Down, Left, Right, Up
+            //La direction est notï¿½ sous forme Down, Left, Right, Up
             string direc = "";
             if ( j == 0 ) direc = "D";
             if ( j == 1 ) direc = "L";
             if ( j == 2 ) direc = "R";
             if ( j == 3 ) direc = "U";
-            subImage.SaveFile(path+"/"+decomposeRPGEdit->GetValue()+direc+gd::ToString(i)+".png", wxBITMAP_TYPE_PNG);
+            subImage.SaveFile(path+"/"+decomposeRPGEdit->GetValue()+direc+gd::String::From(i)+".png", wxBITMAP_TYPE_PNG);
         }
     }
 
@@ -450,7 +450,7 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-///Décomposition d'une feuille de sprite générique
+///Dï¿½composition d'une feuille de sprite gï¿½nï¿½rique
 ////////////////////////////////////////////////////////////
 void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
 {
@@ -470,50 +470,50 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     wxFileName filename(fileSSEdit->GetValue());
     wxString path = filename.GetPath();
 
-    int lineNb = ToInt(static_cast<string>(linesSSEdit->GetValue()));
+    int lineNb = gd::String(linesSSEdit->GetValue()).To<int>();
     if ( lineNb <= 0 )
     {
         gd::LogWarning(_("The number of lines is invalid: The minimum is one line."));
         return;
     }
 
-    int columnNb = ToInt(static_cast<string>(columnsSSEdit->GetValue()));
+    int columnNb = gd::String(columnsSSEdit->GetValue()).To<int>();
     if ( columnNb <= 0 )
     {
         gd::LogWarning(_("The number of columns is invalid: The minimum is one column."));
         return;
     }
 
-    int origineX = ToInt(static_cast<string>(origineXEdit->GetValue()));
-    int origineY = ToInt(static_cast<string>(origineYEdit->GetValue()));
+    int origineX = gd::String(origineXEdit->GetValue()).To<int>();
+    int origineY = gd::String(origineYEdit->GetValue()).To<int>();
 
-    int width = ToInt(static_cast<string>(widthSSEdit->GetValue()));
-    int height = ToInt(static_cast<string>(heightSSEdit->GetValue()));
+    int width = gd::String(widthSSEdit->GetValue()).To<int>();
+    int height = gd::String(heightSSEdit->GetValue()).To<int>();
     if ( width <= 0 || height <= 0)
     {
         gd::LogWarning(_("The size of a sprite is invalid."));
         return;
     }
 
-    int spaceH = ToInt(static_cast<string>(spaceHSSEdit->GetValue()));
+    int spaceH = gd::String(spaceHSSEdit->GetValue()).To<int>();
     if ( spaceH < 0 )
     {
         gd::LogWarning(_("The horizontal spacing is invalid (must be greater than or equal to 0)."));
         return;
     }
-    int spaceV = ToInt(static_cast<string>(spaceVSSEdit->GetValue()));
+    int spaceV = gd::String(spaceVSSEdit->GetValue()).To<int>();
     if ( spaceV < 0 )
     {
         gd::LogWarning(_("The vertical spacing is invalid (must be greater than or equal to 0)."));
         return;
     }
 
-    //Décomposition ligne par ligne
+    //Dï¿½composition ligne par ligne
     int Y = origineY;
-    for (unsigned int line = 0;line<static_cast<unsigned>(lineNb);++line)
+    for (std::size_t line = 0;line<static_cast<std::size_t>(lineNb);++line)
     {
         int X = origineX;
-        for (unsigned int column = 0;column<static_cast<unsigned>(columnNb);++column)
+        for (std::size_t column = 0;column<static_cast<std::size_t>(columnNb);++column)
         {
             wxRect imageRect;
             imageRect.SetX(X);
@@ -521,7 +521,7 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
             imageRect.SetWidth(width);
             imageRect.SetHeight(height);
 
-            image.GetSubImage(imageRect).SaveFile(path+"/"+decomposeSSEdit->GetValue()+"l"+gd::ToString(line)+"c"+gd::ToString(column)+".png", wxBITMAP_TYPE_PNG);
+            image.GetSubImage(imageRect).SaveFile(path+"/"+decomposeSSEdit->GetValue()+"l"+gd::String::From(line)+"c"+gd::String::From(column)+".png", wxBITMAP_TYPE_PNG);
 
             X += width + spaceH;
         }
@@ -550,4 +550,3 @@ void ImportImage::OnchooseColorMaskSSBtClick(wxCommandEvent& event)
         maskB = color.Blue();
     }
 }
-

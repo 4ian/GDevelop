@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef GDJS_BASE_CLASSES_H
-#define GDJS_BASE_CLASSES_H
+#ifndef GDJS_WXSMITH_GDJS_BASE_CLASSES_H
+#define GDJS_WXSMITH_GDJS_BASE_CLASSES_H
 
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
@@ -26,6 +26,12 @@
 #include <wx/statbmp.h>
 #include <wx/stc/stc.h>
 #include <wx/bmpbuttn.h>
+#if wxVERSION_NUMBER >= 2900
+#include <wx/persist.h>
+#include <wx/persist/toplevel.h>
+#include <wx/persist/bookctrl.h>
+#include <wx/persist/treebook.h>
+#endif
 
 class BaseProjectExportDialog : public wxDialog
 {
@@ -63,6 +69,32 @@ protected:
     virtual void OnExportBtClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticText* GetStaticText59() { return m_staticText59; }
+    wxStaticText* GetID_STATICTEXT4() { return ID_STATICTEXT4; }
+    wxTextCtrl* GetExportFolderEdit() { return exportFolderEdit; }
+    wxButton* GetBrowseBt() { return browseBt; }
+    wxCheckBox* GetMinifyCheck() { return minifyCheck; }
+    wxHyperlinkCtrl* GetNodejsLink() { return nodejsLink; }
+    wxStaticText* GetID_STATICTEXT2() { return ID_STATICTEXT2; }
+    wxStaticText* GetID_STATICTEXT1() { return ID_STATICTEXT1; }
+    wxStaticText* GetID_STATICTEXT3() { return ID_STATICTEXT3; }
+    wxHyperlinkCtrl* GetID_HYPERLINKCTRL2() { return ID_HYPERLINKCTRL2; }
+    wxPanel* GetPanel61() { return m_panel61; }
+    wxStaticBitmap* GetStaticBitmap5744() { return m_staticBitmap5744; }
+    wxPanel* GetCocoonjslogoPanel22() { return cocoonjslogoPanel22; }
+    wxStaticText* GetStaticText6555() { return m_staticText6555; }
+    wxStaticText* GetStaticText6768() { return m_staticText6768; }
+    wxPanel* GetPanel118() { return m_panel118; }
+    wxStaticBitmap* GetStaticBitmap574() { return m_staticBitmap574; }
+    wxPanel* GetCocoonjslogoPanel2() { return cocoonjslogoPanel2; }
+    wxStaticText* GetStaticText655() { return m_staticText655; }
+    wxStaticText* GetStaticText676() { return m_staticText676; }
+    wxPanel* GetPanel71() { return m_panel71; }
+    wxChoicebook* GetExportChoice() { return exportChoice; }
+    wxStaticBitmap* GetID_STATICBITMAP2() { return ID_STATICBITMAP2; }
+    wxHyperlinkCtrl* GetID_HYPERLINKCTRL1() { return ID_HYPERLINKCTRL1; }
+    wxButton* GetCloseBt() { return closeBt; }
+    wxButton* GetExportBt() { return exportBt; }
     BaseProjectExportDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Export the project"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~BaseProjectExportDialog();
 };
@@ -84,12 +116,20 @@ protected:
     virtual void OnCloseBtClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticBitmap* GetStaticBitmap5749() { return m_staticBitmap5749; }
+    wxPanel* GetCocoonjslogoPanel27() { return cocoonjslogoPanel27; }
+    wxStaticText* GetStaticText101() { return m_staticText101; }
+    wxHyperlinkCtrl* GetHyperLink104() { return m_hyperLink104; }
+    wxStaticText* GetStaticText15111() { return m_staticText15111; }
+    wxTextCtrl* GetPackageLocationEdit() { return packageLocationEdit; }
+    wxStaticText* GetStaticText106() { return m_staticText106; }
+    wxButton* GetButton108() { return m_button108; }
     BaseCocoonJSUploadDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Upload the packaged game to CocoonJS cloud compiler"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~BaseCocoonJSUploadDialog();
 };
 
 
-class BaseIntelXDKPackageDialog : public wxDialog
+class BaseCordovaPackageDialog : public wxDialog
 {
 protected:
     wxPanel* cocoonjslogoPanel274;
@@ -107,8 +147,18 @@ protected:
     virtual void OnCloseClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    BaseIntelXDKPackageDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Package the game with Intel XDK"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
-    virtual ~BaseIntelXDKPackageDialog();
+    wxStaticBitmap* GetStaticBitmap57496() { return m_staticBitmap57496; }
+    wxPanel* GetCocoonjslogoPanel274() { return cocoonjslogoPanel274; }
+    wxStaticText* GetStaticText1017() { return m_staticText1017; }
+    wxHyperlinkCtrl* GetHyperLink1048() { return m_hyperLink1048; }
+    wxStaticText* GetStaticText1511110() { return m_staticText1511110; }
+    wxTextCtrl* GetPackageLocationEdit() { return packageLocationEdit; }
+    wxStaticText* GetStaticText10611() { return m_staticText10611; }
+    wxStaticBitmap* GetID_STATICBITMAP216() { return ID_STATICBITMAP216; }
+    wxHyperlinkCtrl* GetID_HYPERLINKCTRL117() { return ID_HYPERLINKCTRL117; }
+    wxButton* GetButton10812() { return m_button10812; }
+    BaseCordovaPackageDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Package the game for Cordova (Intel XDK)"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~BaseCordovaPackageDialog();
 };
 
 
@@ -132,6 +182,15 @@ protected:
     virtual void onOkBtClick(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStyledTextCtrl* GetCodeEdit() { return codeEdit; }
+    wxStaticText* GetStaticText180() { return m_staticText180; }
+    wxStaticText* GetStaticText184() { return m_staticText184; }
+    wxTextCtrl* GetObjectsEdit() { return objectsEdit; }
+    wxBitmapButton* GetBmpButton188() { return m_bmpButton188; }
+    wxStaticBitmap* GetStaticBitmap190() { return m_staticBitmap190; }
+    wxHyperlinkCtrl* GetHyperLink170() { return m_hyperLink170; }
+    wxButton* GetCancelBt() { return cancelBt; }
+    wxButton* GetOkBt() { return okBt; }
     BaseJsCodeEventDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the Javascript code"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~BaseJsCodeEventDialog();
 };

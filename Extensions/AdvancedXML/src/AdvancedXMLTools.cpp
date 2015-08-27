@@ -18,22 +18,22 @@ using namespace std;
 
 namespace AdvancedXML
 {
-    void GD_EXTENSION_API CreateNewDocument(const std::string &refname, RuntimeScene &scene)
+    void GD_EXTENSION_API CreateNewDocument(const gd::String &refname, RuntimeScene &scene)
     {
         RefManager::Get(&scene)->CreateNewDocument(refname);
     }
 
-    void GD_EXTENSION_API LoadXmlFile(const std::string &filename, const std::string &refname, RuntimeScene &scene)
+    void GD_EXTENSION_API LoadXmlFile(const gd::String &filename, const gd::String &refname, RuntimeScene &scene)
     {
         RefManager::Get(&scene)->LoadDocument(filename, refname);
     }
 
-    void GD_EXTENSION_API SaveXmlFile(const std::string &filename, const std::string &refname, RuntimeScene &scene)
+    void GD_EXTENSION_API SaveXmlFile(const gd::String &filename, const gd::String &refname, RuntimeScene &scene)
     {
         RefManager::Get(&scene)->SaveDocument(filename, refname);
     }
 
-    void GD_EXTENSION_API CreateNewElement(const std::string &refname, const int type, const std::string &content, RuntimeScene &scene)
+    void GD_EXTENSION_API CreateNewElement(const gd::String &refname, const int type, const gd::String &content, RuntimeScene &scene)
     {
         if(type == 0)
             RefManager::Get(&scene)->CreateElement<TiXmlElement>(refname, content);
@@ -43,7 +43,7 @@ namespace AdvancedXML
             RefManager::Get(&scene)->CreateElement<TiXmlComment>(refname, content);
     }
 
-    void GD_EXTENSION_API DeleteAnElement(const std::string &refname, RuntimeScene &scene)
+    void GD_EXTENSION_API DeleteAnElement(const gd::String &refname, RuntimeScene &scene)
     {
         TiXmlNode *nodeToRemove = RefManager::Get(&scene)->GetRef(refname);
 
@@ -58,7 +58,7 @@ namespace AdvancedXML
         }
     }
 
-    void GD_EXTENSION_API InsertElementIntoAnother(const std::string &refNameOfElementToAdd, const std::string &refNameOfParentElement, const std::string &refNameOfNextElement, RuntimeScene &scene)
+    void GD_EXTENSION_API InsertElementIntoAnother(const gd::String &refNameOfElementToAdd, const gd::String &refNameOfParentElement, const gd::String &refNameOfNextElement, RuntimeScene &scene)
     {
         TiXmlNode *parentEle = RefManager::Get(&scene)->GetRef(refNameOfParentElement);
         TiXmlNode *nextEle = RefManager::Get(&scene)->GetRef(refNameOfNextElement);
@@ -82,12 +82,12 @@ namespace AdvancedXML
         }
     }
 
-    void GD_EXTENSION_API BrowseTo(const std::string baseRefName, const std::string &futureRefName, const std::string &pathToFutureRefName, RuntimeScene &scene)
+    void GD_EXTENSION_API BrowseTo(const gd::String baseRefName, const gd::String &futureRefName, const gd::String &pathToFutureRefName, RuntimeScene &scene)
     {
         RefManager::Get(&scene)->CreateRef(baseRefName, futureRefName, pathToFutureRefName);
     }
 
-    void GD_EXTENSION_API NextSibling(const std::string &futureRefName, const std::string &baseRefName, const std::string &tagName, RuntimeScene &scene)
+    void GD_EXTENSION_API NextSibling(const gd::String &futureRefName, const gd::String &baseRefName, const gd::String &tagName, RuntimeScene &scene)
     {
         if(!RefManager::Get(&scene)->GetRef(baseRefName))
             return;
@@ -97,12 +97,12 @@ namespace AdvancedXML
                                                                 RefManager::Get(&scene)->GetRef(baseRefName)->NextSibling(tagName.c_str()));
     }
 
-    bool GD_EXTENSION_API IsRefValid(const std::string &refName, RuntimeScene &scene)
+    bool GD_EXTENSION_API IsRefValid(const gd::String &refName, RuntimeScene &scene)
     {
         return RefManager::Get(&scene)->GetRef(refName) ? true : false;
     }
 
-    int GD_EXTENSION_API GetRefType(const std::string &refName, RuntimeScene &scene)
+    int GD_EXTENSION_API GetRefType(const gd::String &refName, RuntimeScene &scene)
     {
         if(!RefManager::Get(&scene)->GetRef(refName))
             return -1;
@@ -123,19 +123,19 @@ namespace AdvancedXML
         return -1;
     }
 
-    std::string GD_EXTENSION_API GetText(const std::string &refName, RuntimeScene &scene)
+    gd::String GD_EXTENSION_API GetText(const gd::String &refName, RuntimeScene &scene)
     {
         TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refName);
 
         if(refNode)
         {
-            return std::string(refNode->Value());
+            return gd::String(refNode->Value());
         }
 
         return "";
     }
 
-    void GD_EXTENSION_API SetText(const std::string &refName, const std::string &text, RuntimeScene &scene)
+    void GD_EXTENSION_API SetText(const gd::String &refName, const gd::String &text, RuntimeScene &scene)
     {
         TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refName);
 
@@ -145,7 +145,7 @@ namespace AdvancedXML
         }
     }
 
-    std::string GD_EXTENSION_API GetAttributeString(const std::string &refname, const std::string &property, RuntimeScene &scene)
+    gd::String GD_EXTENSION_API GetAttributeString(const gd::String &refname, const gd::String &property, RuntimeScene &scene)
     {
         TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 
@@ -154,7 +154,7 @@ namespace AdvancedXML
             TiXmlElement *refEle = refNode->ToElement();
             if(refEle)
             {
-                std::string attributeStr = refEle->Attribute(property.c_str());
+                gd::String attributeStr = refEle->Attribute(property.c_str());
                 return attributeStr;
             }
             else
@@ -168,7 +168,7 @@ namespace AdvancedXML
         }
     }
 
-    double GD_EXTENSION_API GetAttributeNumber(const std::string &refname, const std::string &property, RuntimeScene &scene)
+    double GD_EXTENSION_API GetAttributeNumber(const gd::String &refname, const gd::String &property, RuntimeScene &scene)
     {
         TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 
@@ -193,7 +193,7 @@ namespace AdvancedXML
         }
     }
 
-    void GD_EXTENSION_API SetAttributeString(const std::string &refname, const std::string &property, const std::string &value, RuntimeScene &scene)
+    void GD_EXTENSION_API SetAttributeString(const gd::String &refname, const gd::String &property, const gd::String &value, RuntimeScene &scene)
     {
         TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 
@@ -207,7 +207,7 @@ namespace AdvancedXML
         }
     }
 
-    void GD_EXTENSION_API SetAttributeNumber(const std::string &refname, const std::string &property, const double &value, RuntimeScene &scene)
+    void GD_EXTENSION_API SetAttributeNumber(const gd::String &refname, const gd::String &property, const double &value, RuntimeScene &scene)
     {
         TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 
@@ -221,7 +221,7 @@ namespace AdvancedXML
         }
     }
 
-    void GD_EXTENSION_API RemoveAttribute(const std::string &refname, const std::string &property, RuntimeScene &scene)
+    void GD_EXTENSION_API RemoveAttribute(const gd::String &refname, const gd::String &property, RuntimeScene &scene)
     {
         TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 

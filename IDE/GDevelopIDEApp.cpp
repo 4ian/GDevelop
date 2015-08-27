@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 //This file was created 2008-03-01
@@ -85,9 +85,9 @@ bool GDevelopIDEApp::OnInit()
 #endif
 #ifdef WINDOWS
     wxString exeDirectory = argv[0]; //Make sure current working directory is executable directory.
-    unsigned int backslashpos = exeDirectory.find_last_of( "\\" );
+    std::size_t backslashpos = exeDirectory.find_last_of( "\\" );
     if ( backslashpos > exeDirectory.length() ) backslashpos = 0;
-    unsigned int slashpos = exeDirectory.find_last_of( "/" );
+    std::size_t slashpos = exeDirectory.find_last_of( "/" );
     if ( slashpos > exeDirectory.length() ) slashpos = 0;
 
     exeDirectory = exeDirectory.substr( 0, slashpos > backslashpos ? slashpos : backslashpos );
@@ -124,10 +124,10 @@ bool GDevelopIDEApp::OnInit()
     SetAppName("GDIDE");
     SetAppDisplayName("GDevelop IDE");
 
-    std::vector<std::string> filesToOpen;
-    for (unsigned int i = 0;i<parser.GetParamCount();++i)
+    std::vector<gd::String> filesToOpen;
+    for (std::size_t i = 0;i<parser.GetParamCount();++i)
     {
-        filesToOpen.push_back(string(parser.GetParam(i).mb_str()));
+        filesToOpen.push_back(parser.GetParam(i));
     }
 
     //Load configuration
@@ -164,20 +164,20 @@ bool GDevelopIDEApp::OnInit()
         }
 
         //Retrieve languages files
-        std::vector <std::string> languagesAvailables;
+        std::vector <gd::String> languagesAvailables;
         wxDir dir(wxGetCwd()+"/locale/");
         wxString filename;
 
         bool cont = dir.GetFirst(&filename, "", wxDIR_DIRS);
         while ( cont )
         {
-            languagesAvailables.push_back(string(filename.mb_str()));
+            languagesAvailables.push_back(filename);
             cont = dir.GetNext(&filename);
         }
 
         //Retrieve selected language
         int languageId = wxLANGUAGE_DEFAULT;
-        for (unsigned int i = 0;i<languagesAvailables.size();++i)
+        for (std::size_t i = 0;i<languagesAvailables.size();++i)
         {
             if ( wxLocale::FindLanguageInfo(languagesAvailables[i])->CanonicalName == wantedLanguage )
                 languageId = wxLocale::FindLanguageInfo(languagesAvailables[i])->Language;
@@ -203,7 +203,7 @@ bool GDevelopIDEApp::OnInit()
 
             if ( connection )
             {
-                for (unsigned int i = 0; i < filesToOpen.size(); ++i)
+                for (std::size_t i = 0; i < filesToOpen.size(); ++i)
                     connection->Execute(filesToOpen[i]);
 
                 connection->Disconnect();
@@ -249,12 +249,12 @@ bool GDevelopIDEApp::OnInit()
         recoveringFromBug = true;
 
         //Get the files opened during the last crash
-        std::vector<string> openedFiles;
+        std::vector<gd::String> openedFiles;
         wxTextFile projectsLogFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log");
         if (projectsLogFile.Open())
         {
             for (wxString str = projectsLogFile.GetFirstLine(); !projectsLogFile.Eof(); str = projectsLogFile.GetNextLine())
-                openedFiles.push_back(gd::ToString(str));
+                openedFiles.push_back(str);
         }
 
         projectsLogFile.Close();
@@ -263,7 +263,7 @@ bool GDevelopIDEApp::OnInit()
         BugReport dialog(NULL, openedFiles);
         if ( dialog.ShowModal() == 1 )
         {
-            for (unsigned int i = 0; i < openedFiles.size(); ++i)
+            for (std::size_t i = 0; i < openedFiles.size(); ++i)
             {
                 if ( wxFileExists(openedFiles[i]+".autosave") )
                     filesToOpen.push_back(openedFiles[i]+".autosave");
@@ -285,18 +285,13 @@ bool GDevelopIDEApp::OnInit()
     errorDetectFile.Write(" ");
     errorDetectFile.Close();
 
-    //Les log
     cout << "* Displaying GDevelop version information :" << endl;
     cout << "GDevelop " << gd::VersionWrapper::FullString() << ", built "
          << gd::VersionWrapper::Date() << "/" << gd::VersionWrapper::Month() << "/" << gd::VersionWrapper::Year() << endl;
 
-    cout << "* Creating a useless SFML texture" << endl;
+    cout << "* Creating useless SFML objects" << endl;
     sf::RenderWindow window;
     sf::Window window2;
-
-    cout << "* Removing CppPlatform/Extensions/AStarAutomatism.xgdle" << endl;
-    if ( wxFileExists("CppPlatform/Extensions/AStarAutomatism.xgdle") )
-        wxRemoveFile("CppPlatform/Extensions/AStarAutomatism.xgdle");
 
     //Load platforms and extensions
     cout << "* Loading platforms and extensions:" << endl;
@@ -335,7 +330,7 @@ bool GDevelopIDEApp::OnInit()
     SetTopWindow( mainEditor );
 
     //Open files
-    for (unsigned int i = 0;i<filesToOpen.size();++i)
+    for (std::size_t i = 0;i<filesToOpen.size();++i)
         mainEditor->Open(filesToOpen[i]);
 
     cout << "* Connecting shortcuts" << endl;
@@ -356,7 +351,6 @@ bool GDevelopIDEApp::OnInit()
     LogFileManager::Get()->InitalizeFromConfig();
     LogFileManager::Get()->WriteToLogFile("GDevelop initialization ended"),
 
-    //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
     mainEditor->Show();
     cout << "* Initializing platforms..." << endl;
@@ -402,15 +396,6 @@ bool GDevelopIDEApp::OnInit()
     {
         int result = 3;
         config->Read( "Startup/Reminder", &result );
-
-        //Force again the display when upgrading from a version older than 3.3.71
-        bool reminder3371Shown = false;
-        config->Read( "Startup/Reminder3371Shown", &reminder3371Shown );
-        if (!reminder3371Shown)
-        {
-            result = 3;
-            config->Write( "Startup/Reminder3371Shown", true);
-        }
 
         //Decrement the counter and show the reminder only after 3 launch in a row.
         if ( result > 0 )
@@ -475,8 +460,8 @@ void GDevelopIDEApp::OnUnhandledException()
 
     try
     {
-        for (unsigned int i = 0;i<mainEditor->games.size();++i)
-            mainEditor->games[i]->SaveToFile("gameDump"+ToString(i)+".gdg");
+        for (std::size_t i = 0;i<mainEditor->games.size();++i)
+            mainEditor->games[i]->SaveToFile("gameDump"+gd::String::From(i)+".gdg");
     }
     catch(...)
     {
@@ -498,8 +483,8 @@ bool GDevelopIDEApp::OnExceptionInMainLoop()
 
     try
     {
-        for (unsigned int i = 0;i<mainEditor->games.size();++i)
-            mainEditor->games[i]->SaveToFile("gameDump"+ToString(i)+".gdg");
+        for (std::size_t i = 0;i<mainEditor->games.size();++i)
+            mainEditor->games[i]->SaveToFile("gameDump"+gd::String::From(i)+".gdg");
     }
     catch(...)
     {
@@ -522,7 +507,7 @@ bool STConnection::OnExec(const wxString & topic, const wxString &filename)
     if ( filename.empty() )
         frame->Raise();
     else
-        frame->Open(gd::ToString(filename));
+        frame->Open(filename);
 
     return true;
 }

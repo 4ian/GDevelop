@@ -8,7 +8,7 @@
 #define GDCORE_EXPRESSIONSCORRECTNESSTESTING_H
 
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include "GDCore/Events/ExpressionParser.h"
 namespace gd { class ExpressionMetadata; }
 namespace gd { class Expression; }
@@ -43,10 +43,10 @@ public:
     CallbacksForExpressionCorrectnessTesting(const gd::Project & project, const gd::Layout & layout);
     virtual ~CallbacksForExpressionCorrectnessTesting() {};
 
-    void OnConstantToken(std::string text) {};
-    void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) {};
-    void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) {};
-    void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) {};
+    void OnConstantToken(gd::String text) {};
+    void OnStaticFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) {};
+    void OnObjectFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) {};
+    void OnObjectBehaviorFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) {};
     bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
     bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
 

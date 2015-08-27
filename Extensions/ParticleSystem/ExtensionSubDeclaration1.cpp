@@ -255,9 +255,11 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
+
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
+        
         .SetFunctionName("GetFriction").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
 

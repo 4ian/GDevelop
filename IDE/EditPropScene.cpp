@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include "EditPropScene.h"
@@ -117,7 +117,7 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
 	FlexGridSizer7->AddGrowableCol(0);
 	fovEdit = new wxTextCtrl(this, ID_TEXTCTRL2, _("90"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	FlexGridSizer7->Add(fovEdit, 1, wxTOP|wxBOTTOM|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("Â°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer7->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT6, _("First clipping plane distance :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
@@ -163,19 +163,12 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
 
 	Panel1->SetBackgroundColour(wxColour(layout.GetBackgroundColorRed(), layout.GetBackgroundColorGreen(), layout.GetBackgroundColorBlue()));
 
-    //TODO: GD C++ Platform specific code
-    try
-    {
-        gd::Layout & scene = dynamic_cast<Scene&>(layout);
-
-        if ( scene.StandardSortMethod() ) stableSortCheck->SetValue(true);
-        fovEdit->SetValue(ToString(scene.GetOpenGLFOV()));
-        zNearEdit->SetValue(ToString(scene.GetOpenGLZNear()));
-        zFarEdit->SetValue(ToString(scene.GetOpenGLZFar()));
-        stopSoundsCheck->SetValue(scene.StopSoundsOnStartup());
-        disableInputCheck->SetValue(scene.IsInputDisabledWhenFocusIsLost());
-    }
-    catch (...) { /*Not a GD C++ Platform scene*/ }
+    if ( layout.StandardSortMethod() ) stableSortCheck->SetValue(true);
+    fovEdit->SetValue(gd::String::From(layout.GetOpenGLFOV()));
+    zNearEdit->SetValue(gd::String::From(layout.GetOpenGLZNear()));
+    zFarEdit->SetValue(gd::String::From(layout.GetOpenGLZFar()));
+    stopSoundsCheck->SetValue(layout.StopSoundsOnStartup());
+    disableInputCheck->SetValue(layout.IsInputDisabledWhenFocusIsLost());
 }
 
 EditPropScene::~EditPropScene()
@@ -187,25 +180,16 @@ EditPropScene::~EditPropScene()
 
 void EditPropScene::OnOkBtClick(wxCommandEvent& event)
 {
-    layout.SetWindowDefaultTitle(ToString(CaptionEdit->GetValue()));
-
     wxColourData cData;
     cData.SetColour(Panel1->GetBackgroundColour());
     layout.SetBackgroundColor( cData.GetColour().Red(), cData.GetColour().Green(), cData.GetColour().Blue());
-
-    //TODO: GD C++ Platform specific code
-    try
-    {
-        gd::Layout & scene = dynamic_cast<Scene&>(layout);
-
-        scene.SetOpenGLFOV(ToFloat(ToString(fovEdit->GetValue())));
-        scene.SetOpenGLZNear(ToFloat(ToString(zNearEdit->GetValue())));
-        scene.SetOpenGLZFar(ToFloat(ToString(zFarEdit->GetValue())));
-        scene.SetStopSoundsOnStartup(stopSoundsCheck->GetValue());
-        scene.SetStandardSortMethod(fastSortCheck->GetValue());
-        scene.DisableInputWhenFocusIsLost(disableInputCheck->GetValue());
-    }
-    catch (...) { /*Not a GD C++ Platform scene*/ }
+    layout.SetWindowDefaultTitle(CaptionEdit->GetValue());
+    layout.SetOpenGLFOV(gd::String(fovEdit->GetValue()).To<float>());
+    layout.SetOpenGLZNear(gd::String(zNearEdit->GetValue()).To<float>());
+    layout.SetOpenGLZFar(gd::String(zFarEdit->GetValue()).To<float>());
+    layout.SetStopSoundsOnStartup(stopSoundsCheck->GetValue());
+    layout.SetStandardSortMethod(fastSortCheck->GetValue());
+    layout.DisableInputWhenFocusIsLost(disableInputCheck->GetValue());
 
     EndModal(1);
 }
@@ -232,5 +216,3 @@ void EditPropScene::OnAideBtClick(wxCommandEvent& event)
 {
     gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_projman"));
 }
-
-

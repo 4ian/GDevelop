@@ -8,10 +8,13 @@
 #define OBJECTSPROPGRIDHELPER_H
 
 #include <wx/propgrid/propgrid.h>
+#include <map>
 #include <vector>
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Object; }
 namespace gd { class Project; }
+namespace gd { class PropertyDescriptor; }
+namespace gd { class String; }
 namespace gd { class Layout; }
 
 namespace gd
@@ -45,6 +48,13 @@ public:
     void RefreshFrom(const gd::Object * object, bool displayedAfterInstanceProperties = false);
 
     /**
+     * \brief Add to the grid a list of properties
+     * \param properties The properties to display
+     * \param propertiesName The name associated to the properties
+     */
+    void RefreshFrom(const std::map<gd::String, gd::PropertyDescriptor> & properties, gd::String propertiesNames);
+
+    /**
      * \brief Call this when the event wxEVT_PG_SELECTED of wxPropertyGrid is triggered.
      * \param object The object displayed
      * \param layout The layout the object belongs to ( or the layout being edited for global objects )
@@ -70,10 +80,10 @@ public:
 private:
 
     /**
-     * \brief A common task when a changes have been made is to update the shared data of automatisms,
+     * \brief A common task when a changes have been made is to update the shared data of behaviors,
      * which are stored in layouts.
      */
-    void UpdateAutomatismsSharedData(gd::Project & project, gd::Layout * layout) const;
+    void UpdateBehaviorsSharedData(gd::Project & project, gd::Layout * layout) const;
 
     wxPropertyGrid * grid; ///< The grid used for diplaying and editing properties.
     gd::Project & project;

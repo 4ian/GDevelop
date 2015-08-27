@@ -92,7 +92,7 @@ public:
     TileSet();
     ~TileSet();
 
-    std::string textureName; ///< The texture name.
+    gd::String textureName; ///< The texture name.
     sf::Vector2f tileSize; ///< Tile size
     sf::Vector2f tileSpacing; ///< Space between tile on the tileset texture.
 

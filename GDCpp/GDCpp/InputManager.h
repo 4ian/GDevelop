@@ -10,6 +10,7 @@
 #include <string>
 #include <set>
 #include <SFML/Window.hpp>
+#include "GDCpp/String.h"
 
 /**
  * \brief Manage the events and mouse, keyboard
@@ -73,17 +74,17 @@ public:
     /**
      * \brief Return the key name of the latest pressed key.
      */
-    std::string GetLastPressedKey() const;
+    gd::String GetLastPressedKey() const;
 
     /**
      * \brief Return true if the specified key name is pressed.
      */
-    bool IsKeyPressed(std::string key) const;
+    bool IsKeyPressed(gd::String key) const;
 
     /**
      * \brief Return true if the specified key name was just released.
      */
-    bool WasKeyReleased(std::string key) const;
+    bool WasKeyReleased(gd::String key) const;
 
     /**
      * \brief Return true if any key was pressed since the last call
@@ -96,8 +97,8 @@ public:
      */
     std::vector<sf::Uint32> GetCharactersEntered() const { return charactersEntered; };
 
-    static const std::map<std::string, int> & GetKeyNameToSfKeyMap();
-    static const std::map<int, std::string> & GetSfKeyToKeyNameMap();
+    static const std::map<gd::String, int> & GetKeyNameToSfKeyMap();
+    static const std::map<int, gd::String> & GetSfKeyToKeyNameMap();
     ///@}
 
     /** \name Mouse
@@ -111,20 +112,20 @@ public:
     /**
      * @brief Return true if the specified mouse button is pressed.
      */
-    bool IsMouseButtonPressed(const std::string & button) const;
+    bool IsMouseButtonPressed(const gd::String & button) const;
 
     /**
      * @brief Return true if the specified mouse button was released in this frame.
      */
-    bool IsMouseButtonReleased(const std::string & button) const;
+    bool IsMouseButtonReleased(const gd::String & button) const;
 
     /**
      * @brief Get the number of ticks the wheel moved during last frame.
      */
     int GetMouseWheelDelta() const;
 
-    static const std::map<std::string, int> & GetButtonNameToSfButtonMap();
-    static const std::map<int, std::string> & GetSfButtonToButtonNameMap();
+    static const std::map<gd::String, int> & GetButtonNameToSfButtonMap();
+    static const std::map<int, gd::String> & GetSfButtonToButtonNameMap();
     ///@}
 
 private:
@@ -132,13 +133,13 @@ private:
 
     int lastPressedKey; ///< SFML key code of the last pressed key.
     bool keyWasPressed; ///< True if a key was pressed during the last step.
-    std::map<std::string, bool> keysPressed; ///< The keys pressed for this frame.
-    std::map<std::string, bool> oldKeysPressed; ///< The keys pressed during the last frame.
+    std::map<gd::String, bool> keysPressed; ///< The keys pressed for this frame.
+    std::map<gd::String, bool> oldKeysPressed; ///< The keys pressed during the last frame.
     std::vector<sf::Uint32> charactersEntered; ///< The characters entered for this frame.
 
     int mouseWheelDelta;
-    std::map<std::string, bool> buttonsPressed; ///< The buttons pressed for this frame.
-    std::map<std::string, bool> oldButtonsPressed; ///< The buttons pressed during the last frame.
+    std::map<gd::String, bool> buttonsPressed; ///< The buttons pressed for this frame.
+    std::map<gd::String, bool> oldButtonsPressed; ///< The buttons pressed during the last frame.
 
     bool windowHasFocus; ///< True if the render target has the focus.
     bool disableInputWhenNotFocused; ///< True if input should be ignored when focus is lost.

@@ -369,28 +369,52 @@ make -j4
  *
  * **Extensions** are seen by GDevelop Core as classes inheriting from gd::PlatformExtension.<br>
  * They are stored inside the platform they belong to, and they are also loaded from a dynamic library file thanks to gd::ExtensionsLoader. The main
- * job of an extension is to <b>declare</b> everything it provides: objects, actions and conditions, automatisms, expressions.<br>
+ * job of an extension is to <b>declare</b> everything it provides: objects, actions and conditions, behaviors, expressions.<br>
  * This is done directly using the standard method provided by gd::PlatformExtension, notably:
  *  - gd::PlatformExtension::AddCondition and gd::PlatformExtension::AddAction,
  *  - gd::PlatformExtension::AddExpression (and gd::PlatformExtension::AddStrExpression),
- *  - gd::PlatformExtension::AddObject and gd::PlatformExtension::AddAutomatism
+ *  - gd::PlatformExtension::AddObject and gd::PlatformExtension::AddBehavior
  *
  *
- * Some platforms (like the C++ Platform) offers another base class which must be used instead of gd::PlatformExtension when declaring a platorm: As this base class
- * inherits from gd::PlatformExtension, standard methods still works, but you may be able to declares some others features (the C++ Platform offers
+ * Some platforms (like the C++ Platform) offer another base class which must be used instead of gd::PlatformExtension when declaring a platorm: as this base class
+ * inherits from gd::PlatformExtension, standard methods still work, but you may be able to declare some others features (the C++ Platform offers
  * the possibility of declaring debugger related functions).
  *
  * \subsection extensionloading Extensions loading
  *
  * A single dynamic library file can contains an extension for more than one platform:<br>
  * You just have to declare a class deriving from gd::PlatformExtension for each platform supported, and a creation function for each platform
- * (The C++ platform expects a function called *CreateGDExtension* while JS Platform search for a function called *CreateGDJSExtension*).
+ * (the C++ platform expects a function called *CreateGDExtension* while JS Platform search for a function called *CreateGDJSExtension*).
  *
  * \subsection extensionexample Edit or write a new extension
  *
  * Refer to these pages for more information about extensions:
  *  - \subpage AboutExtensionCpp
  *  - \subpage writeANewExtension
+ *
+ * \section utf8section UTF8 strings
+ *
+ * Most parts of the codebase support UTF8 strings thanks to gd::String class. gd::String is a wrapper around std::string, exposing a similar
+ * interface as well as a few tool member functions and operators that are all UTF8 aware.
+ *
+ * Its usage is easy, especially if you're familiar with std::string. Some extra functions can be really useful, in particular
+ * the ones to convert the string from/to a number.
+ *
+ \code
+gd::String str = "Hello";
+str += " world";
+str += " " + gd::String::From(2);
+//str now contains "Hello world 2";
+
+gd::string twopointfiveStr = "2.5";
+double twopointfive = twopointfive.To<double>();
+//twopointfive == 2.5
+ \endcode
+ *
+ * gd::String can also be implicitly constructed from a wxString or a sf::String, so that it is easy to use when you're dealing
+ * with wxWidgets GUI dialogs/editors or SFML objects.
+ *
+ * For more information, see the complete reference of the class. Tests cases have also been made for most functions.
  */
 
 /**
@@ -530,30 +554,30 @@ AddEvent("Standard",
 	.SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
  * \endcode
 
- * \section automatismsDeclaration Declaring the automatisms
+ * \section behaviorsDeclaration Declaring the behaviors
 
-Automatisms are declared like objects:
+Behaviors are declared like objects:
 
 
  * \code
-gd::AutomatismMetadata & aut = AddAutomatism("Name",
+gd::BehaviorMetadata & aut = AddBehavior("Name",
 	_("Name displayed to users"),
 	_("DefaultNameUsedInEditor"),
 	_("Description."),
 	"Group",
 	"path-to-a-32-by-32-icon.png",
-	"AutomatismClassName",
-	std::shared_ptr<gd::Automatism>(new AutomatismClassName),
-	std::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
+	"BehaviorClassName",
+	std::shared_ptr<gd::Behavior>(new BehaviorClassName),
+	std::shared_ptr<gd::BehaviorsSharedData>(new BehaviorSharedDataClassName));
  * \endcode
- * The last line can be replaced by <code>std::shared_ptr<gd::AutomatismsSharedData>()</code> if no shared data are being used.
+ * The last line can be replaced by <code>std::shared_ptr<gd::BehaviorsSharedData>()</code> if no shared data are being used.
  *
- * You can then declare the actions, conditions, and expressions related to the automatism like objects:<br>
+ * You can then declare the actions, conditions, and expressions related to the behavior like objects:<br>
  * Call AddAction/AddCondition/AddExpression on the <i>aut</i> object.
 
  * \section excludingNonRuntimeDeclaration (C++ platform) Excluding elements declaration from runtime
  * When your extension is compiled for the C++ platform Runtime, GDevelop does not known anything about action/condition or even events classes.<br>
- * You have then to exclude all actions/conditions/expressions/events declaration from extension at runtime (only Extension/Object/Automatisms declarations have to be kept).
+ * You have then to exclude all actions/conditions/expressions/events declaration from extension at runtime (only Extension/Object/Behaviors declarations have to be kept).
 
  * Use the *<code>GD_IDE_ONLY</code> define* to achieve this goal, as demonstrated in this skeleton of a complete extension declaration:
  * \code
@@ -595,18 +619,18 @@ public:
         }
 
         {
-            gd::AutomatismMetadata & aut = AddAutomatism("AutomatismName",
-                       _("Automatism name"),
+            gd::BehaviorMetadata & aut = AddBehavior("BehaviorName",
+                       _("Behavior name"),
                        "defaultGDname",
                        _("Description"),
                        "",
                        "CppPlatform/Extensions/myicon.png",
-                       "PhysicsAutomatism",
-                       std::shared_ptr<gd::Automatism>(new AutomatismClassName),
-                       std::shared_ptr<gd::AutomatismsSharedData>(new AutomatismSharedDataClassName));
+                       "PhysicsBehavior",
+                       std::shared_ptr<gd::Behavior>(new BehaviorClassName),
+                       std::shared_ptr<gd::BehaviorsSharedData>(new BehaviorSharedDataClassName));
 
             #if defined(GD_IDE_ONLY)
-            automatismInfo.SetIncludeFile("MyExtension/MyIncludeFile.h");
+            behaviorInfo.SetIncludeFile("MyExtension/MyIncludeFile.h");
 
             aut.AddAction(...);
             aut.AddCondition(...);

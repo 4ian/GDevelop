@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #include "SceneNetworkDatas.h"
 #include <iostream>
 
-RuntimeSceneNetworkDatas::RuntimeSceneNetworkDatas(const SceneNetworkDatas & automatismSharedDatas)
+RuntimeSceneNetworkDatas::RuntimeSceneNetworkDatas(const SceneNetworkDatas & behaviorSharedDatas)
 {
 }
 

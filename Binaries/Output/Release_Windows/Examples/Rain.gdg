@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="71" major="3" minor="3" revision="0" />
+    <gdVersion build="84" major="3" minor="6" revision="0" />
     <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>inRain</name>
         <author>CROSS</author>
@@ -33,8 +33,9 @@
             <extension name="CommonDialogs" />
         </extensions>
         <platforms>
-            <platform name="Game Develop C++ platform" />
+            <platform name="GDevelop C++ platform" />
         </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
     </properties>
     <resources>
         <resources>
@@ -52,7 +53,7 @@
     <variables />
     <layouts>
         <layout b="0" disableInputWhenNotFocused="true" mangledName="inrain" name="inrain" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="0" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="0">
-            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
             <objectsGroups />
             <variables />
             <instances>

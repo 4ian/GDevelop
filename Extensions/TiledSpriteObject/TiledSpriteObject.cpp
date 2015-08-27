@@ -32,7 +32,7 @@ This project is released under the MIT License.
 
 using namespace std;
 
-TiledSpriteObject::TiledSpriteObject(std::string name_) :
+TiledSpriteObject::TiledSpriteObject(gd::String name_) :
     Object(name_),
     textureName(""),
     width(32),
@@ -94,7 +94,7 @@ RuntimeTiledSpriteObject::RuntimeTiledSpriteObject(RuntimeScene & scene, const g
     ChangeAndReloadImage(textureName, scene);
 }
 
-void RuntimeTiledSpriteObject::ChangeAndReloadImage(const std::string &txtName, const RuntimeScene &scene)
+void RuntimeTiledSpriteObject::ChangeAndReloadImage(const gd::String &txtName, const RuntimeScene &scene)
 {
     textureName = txtName;
     texture = scene.GetImageManager()->GetSFMLTexture(textureName);
@@ -175,23 +175,23 @@ void TiledSpriteObject::EditObject( wxWindow* parent, gd::Project & game, gd::Ma
 #endif
 }
 
-void RuntimeTiledSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeTiledSpriteObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Width");       value = ToString(width);}
-    else if ( propertyNb == 1 ) {name = _("Height");       value = ToString(height);}
-    else if ( propertyNb == 2 ) {name = _("Angle");       value = ToString(angle);}
+    if      ( propertyNb == 0 ) {name = _("Width");       value = gd::String::From(width);}
+    else if ( propertyNb == 1 ) {name = _("Height");       value = gd::String::From(height);}
+    else if ( propertyNb == 2 ) {name = _("Angle");       value = gd::String::From(angle);}
 }
 
-bool RuntimeTiledSpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeTiledSpriteObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
-    if      ( propertyNb == 0 ) {width = ToFloat(newValue);}
-    else if ( propertyNb == 1 ) {height = ToFloat(newValue);}
-    else if ( propertyNb == 2 ) {angle = ToFloat(newValue);}
+    if      ( propertyNb == 0 ) {width = newValue.To<float>();}
+    else if ( propertyNb == 1 ) {height = newValue.To<float>();}
+    else if ( propertyNb == 2 ) {angle = newValue.To<float>();}
 
     return true;
 }
 
-unsigned int RuntimeTiledSpriteObject::GetNumberOfProperties() const
+std::size_t RuntimeTiledSpriteObject::GetNumberOfProperties() const
 {
     return 3;
 }
@@ -202,8 +202,7 @@ RuntimeObject * CreateRuntimeTiledSpriteObject(RuntimeScene & scene, const gd::O
     return new RuntimeTiledSpriteObject(scene, object);
 }
 
-gd::Object * CreateTiledSpriteObject(std::string name)
+gd::Object * CreateTiledSpriteObject(gd::String name)
 {
     return new TiledSpriteObject(name);
 }
-

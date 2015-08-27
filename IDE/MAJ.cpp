@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #ifndef GD_NO_UPDATE_CHECKER
@@ -154,7 +154,7 @@ void MAJ::CheckForUpdate()
     UpdateChecker * checker = UpdateChecker::Get();
     checker->DownloadInformation(/*excludeFromStatistics=*/true);
 
-    versionMAJTxt->SetLabel(gd::ToString(checker->newMajor)+"."+gd::ToString(checker->newMinor)+"."+gd::ToString(checker->newBuild)+"."+gd::ToString(checker->newRevision));
+    versionMAJTxt->SetLabel(gd::String::From(checker->newMajor)+"."+gd::String::From(checker->newMinor)+"."+gd::String::From(checker->newBuild)+"."+gd::String::From(checker->newRevision));
 
     wxString info = _("No informations about the new version.");
     if ( !checker->info.empty() ) info = checker->info;

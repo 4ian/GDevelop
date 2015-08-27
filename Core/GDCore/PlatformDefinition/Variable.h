@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_VARIABLE_H
 #define GDCORE_VARIABLE_H
-#include <string>
+#include "GDCore/String.h"
 #include <map>
 namespace gd { class SerializerElement; }
 class TiXmlElement;
@@ -39,12 +39,12 @@ public:
     /**
      * \brief Return the content of the variable, considered as a string.
      */
-    const std::string & GetString() const;
+    const gd::String & GetString() const;
 
     /**
      * \brief Change the content of the variable, considered as a string.
      */
-    void SetString(const std::string & newStr)
+    void SetString(const gd::String & newStr)
     {
         str = newStr;
         isNumber = false;
@@ -81,11 +81,11 @@ public:
     bool operator!=(double val) const { return GetValue() != val;};
 
     //Operators are overloaded to allow accessing to variable using a simple string-like semantic.
-    void operator=(const std::string & val)  {SetString(val);};
-    void operator+=(const std::string & val) {SetString(GetString()+val);}
+    void operator=(const gd::String & val)  {SetString(val);};
+    void operator+=(const gd::String & val) {SetString(GetString()+val);}
 
-    bool operator==(const std::string & val) const { return GetString() == val;};
-    bool operator!=(const std::string & val) const { return GetString() != val;};
+    bool operator==(const gd::String & val) const { return GetString() == val;};
+    bool operator!=(const gd::String & val) const { return GetString() != val;};
 
     /**
      * \brief Return true if the variable is a number
@@ -106,7 +106,7 @@ public:
     /**
      * \brief Return true if the variable is a structure and has the specified child.
      */
-    bool HasChild(const std::string & name) const;
+    bool HasChild(const gd::String & name) const;
 
     /**
      * \brief Return the child with the specified name.
@@ -114,7 +114,7 @@ public:
      * If the variable has not the specified child, an empty variable with the specified name
      * is added as child.
      */
-    Variable & GetChild(const std::string & name);
+    Variable & GetChild(const gd::String & name);
 
     /**
      * \brief Return the child with the specified name.
@@ -122,7 +122,7 @@ public:
      * If the variable has not the specified child, an empty variable with the specified name
      * is added as child.
      */
-    const Variable & GetChild(const std::string & name) const;
+    const Variable & GetChild(const gd::String & name) const;
 
     /**
      * \brief Remove the child with the specified name.
@@ -130,12 +130,12 @@ public:
      * If the variable is not a structure or has not
      * the specified child, nothing is done.
      */
-    void RemoveChild(const std::string & name);
+    void RemoveChild(const gd::String & name);
 
     /**
      * \brief Get the map containing all the children.
      */
-    const std::map<std::string, Variable> & GetAllChildren() const { return children; }
+    const std::map<gd::String, Variable> & GetAllChildren() const { return children; }
 
     ///@}
 
@@ -167,10 +167,10 @@ public:
 
 private:
     mutable double value;
-    mutable std::string str;
+    mutable gd::String str;
     mutable bool isNumber; ///< True if the type of the variable is a number.
-    mutable bool isStructure; ///< False when the variable is a primitive ( i.e: Number or string ), true when it is a structure and has may have children.
-    mutable std::map<std::string, Variable> children; ///<Children, when the variable is considered as a structure.
+    mutable bool isStructure; ///< False when the variable is a primitive ( i.e: Number or String ), true when it is a structure and has may have children.
+    mutable std::map<gd::String, Variable> children; ///<Children, when the variable is considered as a structure.
 };
 
 }

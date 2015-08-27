@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 #include "ExternalEventsEditor.h"
 
@@ -98,7 +98,7 @@ void ExternalEventsEditor::ForceRefreshRibbonAndConnect()
  */
 void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 {
-    std::string name = gd::ToString(parentSceneComboBox->GetValue()) ;
+    gd::String name = parentSceneComboBox->GetValue() ;
 
     gd::Layout * scene = game.HasLayoutNamed(name) ? &game.GetLayout(name) : NULL;
 
@@ -132,7 +132,6 @@ void ExternalEventsEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
     parentSceneComboBox->Clear();
     parentSceneComboBox->Append(_("No scene"));
 
-    for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
+    for (std::size_t i = 0;i<game.GetLayoutsCount();++i)
     	parentSceneComboBox->Append(game.GetLayout(i).GetName());
 }
-

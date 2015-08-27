@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef GDIDE_BASE_CLASSES_H
-#define GDIDE_BASE_CLASSES_H
+#ifndef IDE_DIALOGS_GDIDE_BASE_CLASSES_H
+#define IDE_DIALOGS_GDIDE_BASE_CLASSES_H
 
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
@@ -17,6 +17,12 @@
 #include <wx/stattext.h>
 #include <wx/hyperlink.h>
 #include <wx/textctrl.h>
+#if wxVERSION_NUMBER >= 2900
+#include <wx/persist.h>
+#include <wx/persist/toplevel.h>
+#include <wx/persist/bookctrl.h>
+#include <wx/persist/treebook.h>
+#endif
 
 class BaseStartHerePage : public wxPanel
 {
@@ -57,6 +63,35 @@ protected:
     virtual void OnLastProject3Click(wxHyperlinkEvent& event) { event.Skip(); }
 
 public:
+    wxStaticBitmap* GetLogoBmp() { return logoBmp; }
+    wxStaticText* GetStaticText9() { return m_staticText9; }
+    wxStaticBitmap* GetGettingStartedBmp() { return gettingStartedBmp; }
+    wxStaticText* GetGettingStartedTxt() { return gettingStartedTxt; }
+    wxHyperlinkCtrl* GetHyperLink17() { return m_hyperLink17; }
+    wxHyperlinkCtrl* GetHyperLink231() { return m_hyperLink231; }
+    wxHyperlinkCtrl* GetHyperLink23() { return m_hyperLink23; }
+    wxStaticBitmap* GetLatestProjectsBmp() { return latestProjectsBmp; }
+    wxStaticText* GetLatestProjectsTxt() { return latestProjectsTxt; }
+    wxHyperlinkCtrl* GetLastProject1Bt() { return lastProject1Bt; }
+    wxHyperlinkCtrl* GetLastProject2Bt() { return lastProject2Bt; }
+    wxHyperlinkCtrl* GetLastProject3Bt() { return lastProject3Bt; }
+    wxStaticBitmap* GetCommunityBmp() { return communityBmp; }
+    wxStaticText* GetCommunityTxt() { return communityTxt; }
+    wxHyperlinkCtrl* GetHyperLink175() { return m_hyperLink175; }
+    wxHyperlinkCtrl* GetHyperLink2316() { return m_hyperLink2316; }
+    wxHyperlinkCtrl* GetHyperLink237() { return m_hyperLink237; }
+    wxStaticBitmap* GetNewsBmp() { return newsBmp; }
+    wxStaticText* GetNewsTxt() { return newsTxt; }
+    wxTextCtrl* GetNewsEdit() { return newsEdit; }
+    wxHyperlinkCtrl* GetNewsLink1() { return newsLink1; }
+    wxHyperlinkCtrl* GetNewsLink2() { return newsLink2; }
+    wxStaticText* GetStaticText53() { return m_staticText53; }
+    wxStaticBitmap* GetDonateBmp() { return donateBmp; }
+    wxHyperlinkCtrl* GetDonateLinkBt() { return donateLinkBt; }
+    wxStaticBitmap* GetGithubBmp() { return githubBmp; }
+    wxHyperlinkCtrl* GetHyperLink57() { return m_hyperLink57; }
+    wxStaticBitmap* GetLocaleBmp() { return localeBmp; }
+    wxHyperlinkCtrl* GetHyperLink572() { return m_hyperLink572; }
     BaseStartHerePage(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(700,500), long style = wxTAB_TRAVERSAL);
     virtual ~BaseStartHerePage();
 };

@@ -7,6 +7,7 @@
 #ifndef GDCORE_SERIALIZERVALUE_H
 #define GDCORE_SERIALIZERVALUE_H
 #include <string>
+#include "GDCore/String.h"
 
 namespace gd {
 
@@ -21,7 +22,7 @@ class GD_CORE_API SerializerValue
 public:
 	SerializerValue();
 	SerializerValue(bool val);
-	SerializerValue(std::string val);
+	SerializerValue(const gd::String &val);
 	SerializerValue(int val);
 	SerializerValue(double val);
 	virtual ~SerializerValue() {};
@@ -32,9 +33,9 @@ public:
 	void SetBool(bool val);
 
 	/**
-	 * Set the value, its type being a std::string.
+	 * Set the value, its type being a gd::String.
 	 */
-	void SetString(const std::string & val);
+	void SetString(const gd::String & val);
 
 	/**
 	 * Set the value, its type being an integer.
@@ -49,7 +50,7 @@ public:
 	/**
 	 * Set the value, its type being unknown, but representable as a string.
 	 */
-	void Set(const std::string & val);
+	void Set(const gd::String & val);
 
 	/**
 	 * Get the value, its type being a boolean.
@@ -57,9 +58,9 @@ public:
 	bool GetBool() const;
 
 	/**
-	 * Get the value, its type being a string.
+	 * Get the value, its type being a gd::String.
 	 */
-	std::string GetString() const;
+	gd::String GetString() const;
 
 	/**
 	 * Get the value, its type being an int.
@@ -74,19 +75,19 @@ public:
 	/**
 	 * \brief Return true if the value is a boolean.
 	 */
-	bool IsBoolean() const { return isBoolean; };
+	bool IsBoolean() const { return isBoolean; }
 	/**
 	 * \brief Return true if the value is a string.
 	 */
-	bool IsString() const { return isString; };
+	bool IsString() const { return isString; }
 	/**
 	 * \brief Return true if the value is an int.
 	 */
-	bool IsInt() const { return isInt; };
+	bool IsInt() const { return isInt; }
 	/**
 	 * \brief Return true if the value is a double.
 	 */
-	bool IsDouble() const { return isDouble; };
+	bool IsDouble() const { return isDouble; }
 
 private:
 	bool isUnknown; ///< If true, the type is unknown but the value is stored as a string in stringValue member.
@@ -96,7 +97,7 @@ private:
 	bool isDouble;
 
 	bool booleanValue;
-	std::string stringValue;
+	gd::String stringValue;
 	int intValue;
 	double doubleValue;
 };

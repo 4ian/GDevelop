@@ -22,7 +22,6 @@ This project is released under the MIT License.
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/CommonTools.h"
@@ -136,7 +135,7 @@ void TileMapObjectEditor::OnOkButtonPressed(wxCommandEvent& event)
 
 void TileMapObjectEditor::OnTileSetConfigureButtonClicked(wxCommandEvent& event)
 {
-    std::string oldTextureName = tileSet.textureName;
+    gd::String oldTextureName = tileSet.textureName;
 
     TileSetConfigurationEditor dialog(this, tileSet, game, mainFrameWrapper);
     dialog.ShowModal();

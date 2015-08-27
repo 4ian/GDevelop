@@ -16,11 +16,11 @@ This project is released under the MIT License.
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCpp/XmlMacros.h"
 #include "GDCpp/tinyxml/tinyxml.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/Tools/Localization.h"
 #include "FunctionEventEditorDlg.h"
 namespace gd { class Project; }
 
@@ -152,9 +152,9 @@ gd::BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, g
     return ChangesMade;
 }
 
-const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const std::string & functionName)
+const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const gd::String & functionName)
 {
-    for (unsigned int i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();++i)
     {
         const FunctionEvent * functionEvent = dynamic_cast<const FunctionEvent*>(&events[i]);
         const gd::LinkEvent * linkEvent = dynamic_cast<const gd::LinkEvent*>(&events[i]);
@@ -180,7 +180,7 @@ const FunctionEvent* FunctionEvent::SearchForFunctionInEvents(const gd::Project 
     return NULL;
 }
 
-std::string FunctionEvent::MangleFunctionName(const gd::Layout & layout, const FunctionEvent & functionEvent)
+gd::String FunctionEvent::MangleFunctionName(const gd::Layout & layout, const FunctionEvent & functionEvent)
 {
     //To generate a "unique" name for the function, the name is mangled and suffixed with the
     //pointer to the (original) event of the function.
@@ -192,8 +192,7 @@ std::string FunctionEvent::MangleFunctionName(const gd::Layout & layout, const F
 
     return "GDFunction"+layout.GetMangledName()
         +gd::SceneNameMangler::GetMangledSceneName(functionEvent.GetName())
-        +ToString(ptr);
+        +gd::String::From(ptr);
 };
 
 #endif
-

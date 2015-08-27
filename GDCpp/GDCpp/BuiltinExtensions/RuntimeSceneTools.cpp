@@ -6,6 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/msgdlg.h> //Must be placed first
 #endif
+#include <vector>
 #include "GDCore/Tools/Log.h"
 #include "GDCpp/BuiltinExtensions/RuntimeSceneTools.h"
 #include "GDCpp/RuntimeScene.h"
@@ -20,33 +21,32 @@
 #include "GDCpp/profile.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/Variable.h"
-#include "GDCpp/Text.h"
 #include "GDCpp/CppPlatform.h"
 
-std::string GD_API GetSceneName(RuntimeScene & scene)
+gd::String GD_API GetSceneName(RuntimeScene & scene)
 {
     return scene.GetName();
 }
 
-bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
+bool GD_API LayerVisible( RuntimeScene & scene, const gd::String & layer )
 {
     return scene.GetRuntimeLayer(layer).GetVisibility();
 }
 
-void GD_API ShowLayer( RuntimeScene & scene, const std::string & layer )
+void GD_API ShowLayer( RuntimeScene & scene, const gd::String & layer )
 {
     scene.GetRuntimeLayer(layer).SetVisibility(true);
 }
 
-void GD_API HideLayer( RuntimeScene & scene, const std::string & layer )
+void GD_API HideLayer( RuntimeScene & scene, const gd::String & layer )
 {
     scene.GetRuntimeLayer(layer).SetVisibility(false);
 }
 
-void GD_API ChangeSceneBackground( RuntimeScene & scene, std::string newColor )
+void GD_API ChangeSceneBackground( RuntimeScene & scene, gd::String newColor )
 {
-    vector < string > colors = SplitString <string> (newColor, ';');
-    if ( colors.size() > 2 ) scene.SetBackgroundColor( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]) );
+    std::vector < gd::String > colors = newColor.Split(U';');
+    if ( colors.size() > 2 ) scene.SetBackgroundColor( colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>() );
 
     return;
 }
@@ -56,13 +56,15 @@ void GD_API StopGame( RuntimeScene & scene )
     scene.RequestChange(RuntimeScene::SceneChange::STOP_GAME);
 }
 
-void GD_API ReplaceScene(RuntimeScene & scene, std::string newSceneName)
+void GD_API ReplaceScene(RuntimeScene & scene, gd::String newSceneName, bool clearOthers)
 {
     if (!scene.game->HasLayoutNamed(newSceneName)) return;
-    scene.RequestChange(RuntimeScene::SceneChange::REPLACE_SCENE, newSceneName);
+    scene.RequestChange(clearOthers ?
+        RuntimeScene::SceneChange::CLEAR_SCENES :
+        RuntimeScene::SceneChange::REPLACE_SCENE, newSceneName);
 }
 
-void GD_API PushScene(RuntimeScene & scene, std::string newSceneName)
+void GD_API PushScene(RuntimeScene & scene, gd::String newSceneName)
 {
     if (!scene.game->HasLayoutNamed(newSceneName)) return;
     scene.RequestChange(RuntimeScene::SceneChange::PUSH_SCENE, newSceneName);
@@ -82,7 +84,7 @@ void GD_API MoveObjects( RuntimeScene & scene )
 {
     RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
 
-    for (unsigned int id = 0;id < allObjects.size();++id)
+    for (std::size_t id = 0;id < allObjects.size();++id)
     {
         allObjects[id]->SetX( allObjects[id]->GetX() + allObjects[id]->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
         allObjects[id]->SetY( allObjects[id]->GetY() + allObjects[id]->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
@@ -95,7 +97,7 @@ void GD_API MoveObjects( RuntimeScene & scene )
 
 namespace {
 
-void DoCreateObjectOnScene(RuntimeScene & scene, std::string objectName, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, float positionX, float positionY, const std::string & layer)
+void DoCreateObjectOnScene(RuntimeScene & scene, gd::String objectName, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, float positionX, float positionY, const gd::String & layer)
 {
     if ( pickedObjectLists.empty() ) return;
 
@@ -126,21 +128,21 @@ void DoCreateObjectOnScene(RuntimeScene & scene, std::string objectName, std::ma
 
 }
 
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, float positionX, float positionY, const std::string & layer)
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, float positionX, float positionY, const gd::String & layer)
 {
     if ( pickedObjectLists.empty() ) return;
 
     ::DoCreateObjectOnScene(scene, pickedObjectLists.begin()->first, pickedObjectLists, positionX, positionY, layer);
 }
 
-void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
+void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, const gd::String & objectWanted, float positionX, float positionY, const gd::String & layer)
 {
     if ( pickedObjectLists[objectWanted] == NULL ) return; //Bail out if the object is not present in the specified group
 
     ::DoCreateObjectOnScene(scene, objectWanted, pickedObjectLists, positionX, positionY, layer);
 }
 
-bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
@@ -148,7 +150,7 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
         {
             std::vector<RuntimeObject*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(it->first);
 
-            for (unsigned int j = 0;j<objectsOnScene.size();++j)
+            for (std::size_t j = 0;j<objectsOnScene.size();++j)
             {
                 if ( find(it->second->begin(), it->second->end(), objectsOnScene[j]) == it->second->end() )
                     it->second->push_back(objectsOnScene[j]);
@@ -159,7 +161,7 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
     return true;
 }
 
-bool GD_API PickRandomObject(RuntimeScene &, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+bool GD_API PickRandomObject(RuntimeScene &, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     //Create a list with all objects
     std::vector<RuntimeObject*> allObjects;
@@ -172,12 +174,12 @@ bool GD_API PickRandomObject(RuntimeScene &, std::map <std::string, std::vector<
     if ( allObjects.empty() )
         return false;
 
-    unsigned int id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
+    std::size_t id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
     PickOnly(pickedObjectLists, allObjects[id]);
     return true;
 }
 
-bool GD_API PickNearestObject(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, bool inverted)
+bool GD_API PickNearestObject(std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, bool inverted)
 {
     double best = 0;
     bool first = true;
@@ -187,7 +189,7 @@ bool GD_API PickNearestObject(std::map <std::string, std::vector<RuntimeObject*>
         if ( it->second == NULL ) continue;
         auto list = *it->second;
 
-        for (unsigned int i = 0;i<list.size();++i)
+        for (std::size_t i = 0;i<list.size();++i)
         {
             double value = list[i]->GetSqDistanceTo(x, y);
             if (first || ((value < best) ^ inverted)) {
@@ -206,12 +208,12 @@ bool GD_API PickNearestObject(std::map <std::string, std::vector<RuntimeObject*>
     return true;
 }
 
-bool GD_API SceneVariableExists(RuntimeScene & scene, const std::string & variable)
+bool GD_API SceneVariableExists(RuntimeScene & scene, const gd::String & variable)
 {
     return scene.GetVariables().Has(variable);
 }
 
-bool GD_API GlobalVariableExists(RuntimeScene & scene, const std::string & variable)
+bool GD_API GlobalVariableExists(RuntimeScene & scene, const gd::String & variable)
 {
     return scene.game->GetVariables().Has(variable);
 }
@@ -221,12 +223,12 @@ gd::Variable & GD_API ReturnVariable(gd::Variable & variable)
     return variable;
 };
 
-bool GD_API VariableChildExists(const gd::Variable & variable, const std::string & childName)
+bool GD_API VariableChildExists(const gd::Variable & variable, const gd::String & childName)
 {
     return variable.HasChild(childName);
 }
 
-void GD_API VariableRemoveChild(gd::Variable & variable, const std::string & childName)
+void GD_API VariableRemoveChild(gd::Variable & variable, const gd::String & childName)
 {
     variable.RemoveChild(childName);
 }
@@ -236,12 +238,12 @@ double GD_API GetVariableValue(const gd::Variable & variable)
     return variable.GetValue();
 };
 
-const std::string& GD_API GetVariableString(const gd::Variable & variable)
+const gd::String& GD_API GetVariableString(const gd::Variable & variable)
 {
     return variable.GetString();
 };
 
-void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
+void GD_API SetWindowIcon(RuntimeScene & scene, const gd::String & imageName)
 {
     //Retrieve the image
     std::shared_ptr<SFMLTextureWrapper> image = scene.GetImageManager()->GetSFMLTexture(imageName);
@@ -251,13 +253,13 @@ void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
     scene.renderWindow->setIcon(image->image.getSize().x, image->image.getSize().y, image->image.getPixelsPtr());
 }
 
-void GD_API SetWindowTitle(RuntimeScene & scene, const std::string & newName)
+void GD_API SetWindowTitle(RuntimeScene & scene, const gd::String & newName)
 {
     scene.SetWindowDefaultTitle( newName );
     if (scene.renderWindow != NULL) scene.renderWindow->setTitle(scene.GetWindowDefaultTitle());
 }
 
-const std::string & GD_API GetWindowTitle(RuntimeScene & scene)
+const gd::String & GD_API GetWindowTitle(RuntimeScene & scene)
 {
     return scene.GetWindowDefaultTitle();
 }
@@ -340,24 +342,6 @@ unsigned int GD_API GetScreenColorDepth()
     sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
 
     return videoMode.bitsPerPixel;
-}
-
-void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const std::string & str, float x, float y, const std::string & color, float characterSize, const std::string & fontName, const std::string & layer)
-{
-    Text texte;
-    texte.text.setString(str);
-    texte.text.setPosition(x, y);
-
-    vector < string > colors = SplitString <string> (color, ';');
-    if ( colors.size() > 2 ) texte.text.setColor(sf::Color(ToInt(colors[0]), ToInt(colors[1]),ToInt(colors[2]) ));
-
-    texte.text.setCharacterSize(characterSize);
-    texte.fontName = fontName;
-    texte.layer = layer;
-
-    scene.DisplayText(texte);
-
-    return;
 }
 
 void GD_API DisableInputWhenFocusIsLost( RuntimeScene & scene, bool disable )

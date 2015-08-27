@@ -18,6 +18,7 @@ This project is released under the MIT License.
 
 //Windows build uses native windows-dialogs
 #if defined(WINDOWS)
+#define UNICODE
 #include <windows.h>
 #include <Commdlg.h>
 #include <unistd.h>
@@ -41,16 +42,16 @@ namespace CommonDialogs
 /**
  * Display a simple message box.
  */
-void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & message, const std::string & title )
+void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const gd::String & message, const gd::String & title )
 {
     sf::Clock timeSpent;
 
     //Display the box
     #if defined(WINDOWS)
-    MessageBox(NULL, message.c_str(), title.c_str(), MB_ICONINFORMATION);
+    MessageBoxW(NULL, message.ToWide().c_str(), title.ToWide().c_str(), MB_ICONINFORMATION);
     #endif
     #if defined(LINUX) || defined(MACOS)
-    nw::MsgBox msgBox(title, message);
+    nw::MsgBox msgBox(title.ToLocale(), message.ToLocale());
     msgBox.wait_until_closed();
     #endif
 
@@ -60,37 +61,39 @@ void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & 
 /**
  * Display an "open file" dialog
  */
-void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variable, const std::string & title, std::string filters )
+void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variable, const gd::String & title, gd::String filters )
 {
     sf::Clock timeSpent;
 
-    string result;
+    gd::String result;
 
     //Display the dialog
     #if defined(WINDOWS)
     //Process filters to match windows dialogs filters style.
-    filters = filters+'\0';
-    std::replace(filters.begin(), filters.end(), '|', '\0');
+    filters.Raw() = filters.Raw()+'\0';
+    std::replace(filters.Raw().begin(), filters.Raw().end(), '|', '\0');
 
-    OPENFILENAME toGetFileName; //Struct for the dialog
-    char filePath[MAX_PATH];
-    getcwd(filePath, MAX_PATH);
+    OPENFILENAMEW toGetFileName; //Struct for the dialog
+    wchar_t filePath[MAX_PATH];
+    _wgetcwd(filePath, MAX_PATH);
 
-    ZeroMemory(&toGetFileName, sizeof(OPENFILENAME));
-    toGetFileName.lStructSize = sizeof(OPENFILENAME);
+    ZeroMemory(&toGetFileName, sizeof(OPENFILENAMEW));
+    toGetFileName.lStructSize = sizeof(OPENFILENAMEW);
     toGetFileName.hwndOwner = NULL;
     toGetFileName.lpstrFile = filePath;
     toGetFileName.nMaxFile = MAX_PATH;
-    toGetFileName.lpstrFilter = filters == "\0" ? NULL : filters.c_str();
+    toGetFileName.lpstrFilter = filters == "\0" ? NULL : filters.ToWide().c_str();
     toGetFileName.nFilterIndex = 1;
     toGetFileName.Flags = OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;;
 
-    if(GetOpenFileName(&toGetFileName) == TRUE)
-        result = filePath;
+    if(GetOpenFileNameW(&toGetFileName) == TRUE)
+        result = gd::String::FromWide(filePath);
     #endif
     #if defined(LINUX) || defined(MACOS)
-    nw::OpenFile * dialog = new nw::OpenFile(title, true, result);
+    std::string strResult;
+    nw::OpenFile * dialog = new nw::OpenFile(title.ToLocale(), true, strResult);
     dialog->wait_until_closed();
+    result = gd::String::FromLocale(strResult);
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
@@ -102,28 +105,28 @@ void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, gd::Variable & variabl
 /**
  * Show a message box with Yes/No buttons
  */
-void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, gd::Variable & variable, const std::string & message, const std::string & title )
+void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, gd::Variable & variable, const gd::String & message, const gd::String & title )
 {
     sf::Clock timeSpent;
 
-    string result;
+    gd::String result;
 
     //Display the box
     #if defined(WINDOWS)
-    if( MessageBox(NULL, message.c_str(), title.c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
+    if( MessageBoxW(NULL, message.ToWide().c_str(), title.ToWide().c_str(), MB_ICONQUESTION | MB_YESNO) == IDYES)
         result = "yes";
     else
         result = "no";
     #endif
     #if defined(LINUX) || defined(MACOS)
-    nw::YesNoMsgBox dialog(title, message, result);
+    nw::YesNoMsgBox dialog(title.ToLocale(), message.ToLocale(), result.Raw());
     dialog.wait_until_closed();
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
 
     //Update the variable
-    variable.SetString(result);
+    variable.SetString(result); //Can only be "yes" or "no", no need to encode in UTF8
 }
 
 //Declaration and definition of a simple input box for windows
@@ -153,8 +156,8 @@ class CInputBox
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 public:
     // text from InputBox
-	LPTSTR Text;
-    BOOL DoModal(LPCTSTR szCaption, LPCTSTR szPrompt);
+	LPWSTR Text;
+    BOOL DoModal(LPCWSTR szCaption, LPCWSTR szPrompt);
 
 	CInputBox(HWND hWndParent);
 	virtual ~CInputBox();
@@ -190,11 +193,11 @@ CInputBox::CInputBox(HWND hWndParent)
 {
 	HINSTANCE hInst = GetModuleHandle(NULL);
 
-	WNDCLASSEX wcex;
+	WNDCLASSEXW wcex;
 
-	if (!GetClassInfoEx(hInst, "InputBox", &wcex))
+	if (!GetClassInfoExW(hInst, L"InputBox", &wcex))
 	{
-		wcex.cbSize = sizeof(WNDCLASSEX);
+		wcex.cbSize = sizeof(WNDCLASSEXW);
 
 		wcex.style			= CS_HREDRAW | CS_VREDRAW;
 		wcex.lpfnWndProc	= (WNDPROC)WndProc;
@@ -205,11 +208,11 @@ CInputBox::CInputBox(HWND hWndParent)
 		wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 		wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW);
 		wcex.lpszMenuName	= NULL;
-		wcex.lpszClassName	= "InputBox";
+		wcex.lpszClassName	= L"InputBox";
 		wcex.hIconSm		= NULL;
 
-		if (RegisterClassEx(&wcex) == 0)
-			MessageBox(NULL, "Can't create CInputBox!", "Error", MB_OK);
+		if (RegisterClassExW(&wcex) == 0)
+			MessageBoxW(NULL, L"Can't create CInputBox!", L"Error", MB_OK);
 	}
 
     m_hWndParent = hWndParent;
@@ -230,14 +233,14 @@ Description : Window procedure
 */
 LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    LOGFONT lfont;
+    LOGFONTW lfont;
 
 	switch (message)
 	{
 		case WM_CREATE:
             // font
             memset(&lfont, 0, sizeof(lfont));
-            lstrcpy(lfont.lfFaceName, ("Arial"));
+            lstrcpy(lfont.lfFaceName, L"Arial");
             lfont.lfHeight = 16;
             lfont.lfWeight = FW_NORMAL;//FW_BOLD;
             lfont.lfItalic = FALSE;
@@ -246,13 +249,13 @@ LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
             lfont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
             lfont.lfQuality = DEFAULT_QUALITY;
             lfont.lfPitchAndFamily = DEFAULT_PITCH;
-	        m_hFont = CreateFontIndirect(&lfont);
+	        m_hFont = CreateFontIndirectW(&lfont);
 
 	        m_hInst = GetModuleHandle(NULL);
 
 			// creating Edit
-			m_hWndEdit = CreateWindowEx(WS_EX_STATICEDGE,
-				"edit","",
+			m_hWndEdit = CreateWindowExW(WS_EX_STATICEDGE,
+				L"edit",L"",
 				WS_VISIBLE | WS_CHILD  | WS_TABSTOP | ES_AUTOHSCROLL,
 				5, INPUTBOX_HEIGHT - 50, INPUTBOX_WIDTH - 16, 20,
 				hWnd,
@@ -264,8 +267,8 @@ LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 			SendMessage(m_hWndEdit, WM_SETFONT, (WPARAM)m_hFont, 0);
 
             // button OK
-			m_hWndOK = CreateWindowEx(WS_EX_STATICEDGE,
-				"button","OK",
+			m_hWndOK = CreateWindowExW(WS_EX_STATICEDGE,
+				L"button",L"OK",
 				WS_VISIBLE | WS_CHILD | WS_TABSTOP,
 				INPUTBOX_WIDTH - 100, 10, 90, 25,
 				hWnd,
@@ -277,8 +280,8 @@ LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
             SendMessage(m_hWndOK, WM_SETFONT, (WPARAM)m_hFont, 0);
 
             // button Cancel
-			m_hWndCancel = CreateWindowEx(WS_EX_STATICEDGE,
-				"button","Cancel",
+			m_hWndCancel = CreateWindowExW(WS_EX_STATICEDGE,
+				L"button",L"Cancel",
 				WS_VISIBLE | WS_CHILD | WS_TABSTOP,
 				INPUTBOX_WIDTH - 100, 40, 90, 25,
 				hWnd,
@@ -290,8 +293,8 @@ LRESULT CALLBACK CInputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
             SendMessage(m_hWndCancel, WM_SETFONT, (WPARAM)m_hFont, 0);
 
             // static Propmpt
-			m_hWndPrompt = CreateWindowEx(WS_EX_STATICEDGE,
-				"static","",
+			m_hWndPrompt = CreateWindowExW(WS_EX_STATICEDGE,
+				L"static",L"",
 				WS_VISIBLE | WS_CHILD,
 				5, 10, INPUTBOX_WIDTH - 110, INPUTBOX_HEIGHT - 70,
 				hWnd,
@@ -339,13 +342,13 @@ Date        : 13.06.2002
 Description :
         Constructs InputBox window
 */
-BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
+BOOL CInputBox::DoModal(LPCWSTR szCaption, LPCWSTR szPrompt)
 {
 	RECT r;
 	GetWindowRect(GetDesktopWindow(), &r);
 
-	m_hWndInputBox = CreateWindowEx(WS_EX_TOOLWINDOW,
-                "InputBox",
+	m_hWndInputBox = CreateWindowExW(WS_EX_TOOLWINDOW,
+                L"InputBox",
                 szCaption,
                 WS_POPUPWINDOW | WS_CAPTION | WS_TABSTOP,
                 (r.right - INPUTBOX_WIDTH) / 2, (r.bottom - INPUTBOX_HEIGHT) / 2,
@@ -358,7 +361,7 @@ BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
         return FALSE;
 
 
-    SetWindowText(m_hWndPrompt, szPrompt);
+    SetWindowTextW(m_hWndPrompt, szPrompt);
 
     SetForegroundWindow(m_hWndInputBox);
     BringWindowToTop(m_hWndInputBox);
@@ -385,15 +388,15 @@ BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
             }
 			if (msg.wParam == VK_RETURN)
             {
-                int nCount = GetWindowTextLength(m_hWndEdit);
+                int nCount = GetWindowTextLengthW(m_hWndEdit);
                 nCount++;
                 if (Text)
                 {
                     delete[] Text;
                     Text = NULL;
                 }
-                Text = new TCHAR[nCount];
-                GetWindowText(m_hWndEdit, Text, nCount);
+                Text = new WCHAR[nCount];
+                GetWindowTextW(m_hWndEdit, Text, nCount);
 			    SendMessage(m_hWndInputBox, WM_DESTROY, 0, 0);
                 ret = 1;
             }
@@ -420,20 +423,22 @@ BOOL CInputBox::DoModal(LPCTSTR szCaption, LPCTSTR szPrompt)
 /**
  * Show a dialog so as to get a text from user
  */
-bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, gd::Variable & variable, const std::string & message, const std::string & title )
+bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, gd::Variable & variable, const gd::String & message, const gd::String & title )
 {
     sf::Clock timeSpent;
-    string result;
+    gd::String result;
 
     //Display the box
     #if defined(WINDOWS)
     CInputBox ibox(NULL);
-    if (ibox.DoModal(title.c_str(), message.c_str()))
-        result = ibox.Text;
+    if (ibox.DoModal(title.ToWide().c_str(), message.ToWide().c_str()))
+        result = gd::String::FromWide(ibox.Text);
     #endif
     #if defined(LINUX) || defined(MACOS)
-    nw::TextInput dialog(title, message, result);
+    std::string strResult;
+    nw::TextInput dialog(title.ToLocale(), message.ToLocale(), strResult);
     dialog.wait_until_closed();
+    result = gd::String::FromLocale(strResult); //Convert from locale
     #endif
 
     scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
@@ -446,4 +451,3 @@ bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, gd::Variable & variab
 
 }
 } //namespace GDpriv
-

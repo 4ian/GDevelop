@@ -22,6 +22,7 @@
 #include <vector>
 #include <algorithm>
 #include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/SkinHelper.h"
@@ -522,18 +523,18 @@ void SpriteObjectEditor::RefreshAnimationTree()
 
     animationsTree->DeleteAllItems();
     wxTreeItemId root = animationsTree->AddRoot(_("All animations"));
-    for (unsigned int i = 0;i<object.GetAnimationsCount();++i)
+    for (std::size_t i = 0;i<object.GetAnimationsCount();++i)
     {
         Animation & animation = object.GetAnimation(i);
-        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1,
-        	new gd::TreeItemStringData(ToString(i), ""));
+        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ") + gd::String::From(i), 0, -1,
+        	new gd::TreeItemStringData(gd::String::From(i), ""));
 
         if ( animation.useMultipleDirections )
         {
-            for (unsigned int j = 0;j<animation.GetDirectionsCount();++j)
+            for (std::size_t j = 0;j<animation.GetDirectionsCount();++j)
             {
-                animationsTree->AppendItem(animationItem, _("Direction ")+ToString(j), j+1, -1,
-                	new gd::TreeItemStringData(ToString(i), ToString(j)));
+                animationsTree->AppendItem(animationItem, _("Direction ")+gd::String::From(j), j+1, -1,
+                	new gd::TreeItemStringData(gd::String::From(i), gd::String::From(j)));
 
             }
         }
@@ -553,7 +554,7 @@ void SpriteObjectEditor::RefreshImagesList()
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         const Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        for (unsigned int i = 0;i<direction.GetSpritesCount();++i)
+        for (std::size_t i = 0;i<direction.GetSpritesCount();++i)
         {
             const Sprite & sprite = direction.GetSprite(i);
             wxBitmap spriteBitmap;
@@ -567,7 +568,7 @@ void SpriteObjectEditor::RefreshImagesList()
                 thumbnailList->Add(spriteBitmap);
             else
                 thumbnailList->Add(gd::CommonBitmapManager::Get()->error48);
-            imagesList->InsertItem(imagesList->GetItemCount(), ToString(i), i);
+            imagesList->InsertItem(imagesList->GetItemCount(), gd::String::From(i), i);
         }
     }
 }
@@ -682,8 +683,8 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
             { pointX = sprite.GetCenter().GetX(); pointY = sprite.GetCenter().GetY(); }
             else if ( pointIndex != -1 )
             {
-                pointX = sprite.GetPoint(ToString(pointsList->GetItemText(pointIndex))).GetX();
-                pointY = sprite.GetPoint(ToString(pointsList->GetItemText(pointIndex))).GetY();
+                pointX = sprite.GetPoint(pointsList->GetItemText(pointIndex)).GetX();
+                pointY = sprite.GetPoint(pointsList->GetItemText(pointIndex)).GetY();
             }
 
             dc.DrawBitmap(gd::CommonBitmapManager::Get()->point,
@@ -750,27 +751,27 @@ void SpriteObjectEditor::RefreshPoints()
         wxBitmap bmp = GetwxBitmapFromImageResource(game.GetResourcesManager().GetResource(sprite.GetImageName()));
 
         pointsList->InsertItem(pointsList->GetItemCount(), "Origin", 0);
-        pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(sprite.GetOrigin().GetX()));
-        pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(sprite.GetOrigin().GetY()));
+        pointsList->SetItem(pointsList->GetItemCount()-1, 1, gd::String::From(sprite.GetOrigin().GetX()));
+        pointsList->SetItem(pointsList->GetItemCount()-1, 2, gd::String::From(sprite.GetOrigin().GetY()));
 
         pointsList->InsertItem(pointsList->GetItemCount(), "Centre", 0);
         if ( sprite.IsDefaultCenterPoint() ) //Center point is a special case as most of the time it is automatically computed at runtime
         {
-            pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(bmp.GetWidth()/2));
-            pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(bmp.GetHeight()/2));
+            pointsList->SetItem(pointsList->GetItemCount()-1, 1, gd::String::From(bmp.GetWidth()/2));
+            pointsList->SetItem(pointsList->GetItemCount()-1, 2, gd::String::From(bmp.GetHeight()/2));
         }
         else
         {
-            pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(sprite.GetCenter().GetX()));
-            pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(sprite.GetCenter().GetY()));
+            pointsList->SetItem(pointsList->GetItemCount()-1, 1, gd::String::From(sprite.GetCenter().GetX()));
+            pointsList->SetItem(pointsList->GetItemCount()-1, 2, gd::String::From(sprite.GetCenter().GetY()));
         }
 
         const std::vector<Point> & points = sprite.GetAllNonDefaultPoints();
-        for (unsigned int i = 0;i<points.size();++i)
+        for (std::size_t i = 0;i<points.size();++i)
         {
             pointsList->InsertItem(pointsList->GetItemCount(), points[i].GetName(), 0);
-            pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(points[i].GetX()));
-            pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(points[i].GetY()));
+            pointsList->SetItem(pointsList->GetItemCount()-1, 1, gd::String::From(points[i].GetX()));
+            pointsList->SetItem(pointsList->GetItemCount()-1, 2, gd::String::From(points[i].GetY()));
         }
 
     }
@@ -794,7 +795,7 @@ void SpriteObjectEditor::RefreshCollisionMasks()
         if ( !sprite.IsCollisionMaskAutomatic() )
         {
             std::vector<Polygon2d> mask = sprite.GetCollisionMask();
-            for (unsigned int i = 0;i<mask.size();++i)
+            for (std::size_t i = 0;i<mask.size();++i)
             {
                 wxTreeListItem polygonItem;
                 if ( mask[i].vertices.size() == 3)
@@ -805,7 +806,7 @@ void SpriteObjectEditor::RefreshCollisionMasks()
                     polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Polygon"), 2, 2);
 
                 //Associate with the item the polygon #
-                maskTree->SetItemData(polygonItem, new wxStringClientData(ToString(i)));
+                maskTree->SetItemData(polygonItem, new wxStringClientData(gd::String::From(i)));
 
                 if ( !mask[i].IsConvex() )
                 {
@@ -813,14 +814,14 @@ void SpriteObjectEditor::RefreshCollisionMasks()
                     maskTree->SetItemText(polygonItem, maskTree->GetItemText(polygonItem)+" "+_("( INVALID : The polygon is not convex )"));
                 }
 
-                for (unsigned int j = 0;j<mask[i].vertices.size();++j)
+                for (std::size_t j = 0;j<mask[i].vertices.size();++j)
                 {
                     wxTreeListItem pointItem = maskTree->AppendItem(polygonItem, _("Vertice"), 3,3);
-                    maskTree->SetItemText(pointItem, 1, ToString(mask[i].vertices[j].x));
-                    maskTree->SetItemText(pointItem, 2, ToString(mask[i].vertices[j].y));
+                    maskTree->SetItemText(pointItem, 1, gd::String::From(mask[i].vertices[j].x));
+                    maskTree->SetItemText(pointItem, 2, gd::String::From(mask[i].vertices[j].y));
 
                     //Associate with the item the point #
-                    maskTree->SetItemData(pointItem, new wxStringClientData(ToString(j)));
+                    maskTree->SetItemData(pointItem, new wxStringClientData(gd::String::From(j)));
                 }
 
                 maskTree->Expand(polygonItem);
@@ -836,7 +837,7 @@ void SpriteObjectEditor::RefreshCollisionMasks()
 
 void SpriteObjectEditor::OnimagesListItemSelect(wxListEvent& event)
 {
-    unsigned int newImage = event.GetIndex();
+    std::size_t newImage = event.GetIndex();
 
     if ( newImage != selectedImage )
     {
@@ -850,8 +851,8 @@ void SpriteObjectEditor::OnanimationsTreeSelectionChanged(wxTreeEvent& event)
 {
     if ( gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(animationsTree->GetItemData(event.GetItem())) )
     {
-        unsigned int newAnimation = ToInt(itemData->GetString());
-        unsigned int newDirection = itemData->GetSecondString().empty() ? 0 : ToInt(itemData->GetSecondString());
+        std::size_t newAnimation = itemData->GetString().To<int>();
+        std::size_t newDirection = itemData->GetSecondString().empty() ? 0 : itemData->GetSecondString().To<int>();
 
         if ( newAnimation != selectedAnimation || newDirection != selectedDirection )
         {
@@ -932,7 +933,8 @@ void SpriteObjectEditor::OnanimationsTreeItemRightClick(wxTreeEvent& event)
                 animationsMenu.Enable(ID_MENULOOP, true);
                 animationsMenu.Enable(ID_MENUTIMEBETWEENFRAMES, true);
                 animationsMenu.Check(ID_MENULOOP, direction.IsLooping());
-                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images: ")+ToString(direction.GetTimeBetweenFrames())+_("s"));
+                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images: ") +
+                	gd::String::From(direction.GetTimeBetweenFrames()) + _("s"));
             }
         }
     }
@@ -998,7 +1000,7 @@ void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image, bool refresh
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
         Sprite newSprite;
-        newSprite.SetImageName(ToString(image));
+        newSprite.SetImageName(image);
 
         direction.AddSprite(newSprite);
         if ( refresh )
@@ -1011,11 +1013,12 @@ void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image, bool refresh
 
 bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text)
 {
-    std::vector<std::string > command = gd::SplitString<std::string>(ToString(text), ';');
+    gd::String fullCommand = text;
+    std::vector<gd::String> command = fullCommand.Split(U';');
 
 	//"Normal" drop of one or more images.
     if (command.size() >= 2 && command[0] == "NORMAL") {
-    	for (unsigned int i = 1;i<command.size();++i)
+    	for (std::size_t i = 1;i<command.size();++i)
     		editor.AddImageToCurrentAnimation(command[i], /*refresh=*/i == command.size()-1);
     }
 	//This is a "special" drop coming from the resource library dialog
@@ -1024,12 +1027,12 @@ bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString&
     	if (!editor.resourcesEditorPnl) return true;
 
     	//Add ressources dragged from the library dialog to the project.
-        std::vector<std::string > files;
-        for (unsigned int i = 2;i<command.size();++i) files.push_back(command[i]);
-        std::vector<std::string > names = editor.resourcesEditorPnl->CopyAndAddResources(files, command[1]);
+        std::vector<gd::String> files;
+        for (std::size_t i = 2;i<command.size();++i) files.push_back(command[i]);
+        std::vector<gd::String> names = editor.resourcesEditorPnl->CopyAndAddResources(files, command[1]);
 
     	//And add them as usual to the animation.
-        for (unsigned int i = 0;i<names.size();++i)
+        for (std::size_t i = 0;i<names.size();++i)
     		editor.AddImageToCurrentAnimation(names[i], /*refresh=*/i == names.size()-1);
     }
 	else
@@ -1119,7 +1122,7 @@ void SpriteObjectEditor::OnmgrPaneClose(wxAuiManagerEvent& event)
             if ( !sprite.IsCollisionMaskAutomatic() )
             {
                 std::vector<Polygon2d> mask = sprite.GetCollisionMask();
-                for (unsigned int i = 0;i<mask.size();++i)
+                for (std::size_t i = 0;i<mask.size();++i)
                 {
                     if ( !mask[i].IsConvex() ) aPolygonIsNotConvex = true;
                 }
@@ -1149,19 +1152,19 @@ void SpriteObjectEditor::OnpointsListBeginLabelEdit(wxListEvent& event)
         return;
     }
 
-    renamedPointOldName = ToString(pointsList->GetItemText(event.GetIndex()));
+    renamedPointOldName = pointsList->GetItemText(event.GetIndex());
 }
 
 void SpriteObjectEditor::OnpointsListEndLabelEdit(wxListEvent& event)
 {
     std::vector < Sprite * > sprites = GetSpritesToModify();
-    if ( sprites.empty() || sprites[0]->HasPoint(ToString(event.GetLabel())) )
+    if ( sprites.empty() || sprites[0]->HasPoint(event.GetLabel()) )
         event.Veto();
 
-    for(unsigned int i = 0;i<sprites.size();++i)
+    for(std::size_t i = 0;i<sprites.size();++i)
     {
-        if ( !sprites[i]->HasPoint(ToString(event.GetLabel())) )
-            sprites[i]->GetPoint(renamedPointOldName).SetName(ToString(event.GetLabel()));
+        if ( !sprites[i]->HasPoint(event.GetLabel()) )
+            sprites[i]->GetPoint(renamedPointOldName).SetName(event.GetLabel());
     }
 }
 
@@ -1169,7 +1172,7 @@ void SpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
 {
     std::vector < Sprite * > sprites = GetSpritesToModify();
 
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         Sprite & sprite = *sprites[i];
         if ( editingPoint )
@@ -1191,7 +1194,7 @@ void SpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
             }
             else if ( pointIndex != -1 )
             {
-                std::string pointName = ToString(pointsList->GetItemText(pointIndex));
+                gd::String pointName = pointsList->GetItemText(pointIndex);
 
                 if ( !sprite.HasPoint(pointName) )
                 {
@@ -1238,7 +1241,7 @@ std::vector < Sprite * > SpriteObjectEditor::GetSpritesToModify()
              selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
         {
             Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-            for (unsigned int i = 0;i<direction.GetSpritesCount();++i)
+            for (std::size_t i = 0;i<direction.GetSpritesCount();++i)
             {
                 if ( i != selectedImage ) //Sprite at index "selectedImage" is already in the vector
                     result.push_back(&direction.GetSprite(i));
@@ -1254,10 +1257,10 @@ void SpriteObjectEditor::OnDeletePointClick(wxCommandEvent& event)
     if ( !editingPoint ) return;
 
     long pointIndex = pointsList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    std::string pointName = ToString(pointsList->GetItemText(pointIndex));
+    gd::String pointName = pointsList->GetItemText(pointIndex);
 
     std::vector < Sprite * > sprites = GetSpritesToModify();
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
         sprites[i]->DelPoint(pointName);
 
     pointsList->DeleteItem(pointIndex);
@@ -1269,16 +1272,16 @@ void SpriteObjectEditor::OnAddPointClick(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     //Find a new name for the point
-    Point point(ToString(_("NewPoint")));
+    Point point(_("NewPoint"));
     unsigned int i = 2;
     while ( sprites[0]->HasPoint(point.GetName()) )
     {
-        point.SetName(ToString(_("NewPoint"))+ToString(i));
+        point.SetName(_("NewPoint") + gd::String::From(i));
         ++i;
     }
 
     //Add the point to the sprite(s)
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         if ( !sprites[i]->HasPoint(point.GetName()) ) sprites[i]->AddPoint(point);
     }
@@ -1293,33 +1296,33 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
     if ( sprites.empty() ) return;
 
     long pointIndex = pointsList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    std::string pointName = ToString(pointsList->GetItemText(pointIndex));
+    gd::String pointName = pointsList->GetItemText(pointIndex);
 
     if ( pointName == "Centre" ) //Center point can be automatically positioned.
     {
         if (wxMessageBox(_("The point \"Centre\" can be automatically placed by GDevelop at the center.\nDo you really want to modify the point\?\nClick on yes to modify it, click on no so as let GDevelop place it."),
                        _("Position of the point \"Centre\""), wxYES_NO ) == wxNO)
         {
-            for (unsigned int i = 0;i<sprites.size();++i) sprites[i]->SetDefaultCenterPoint(true);
+            for (std::size_t i = 0;i<sprites.size();++i) sprites[i]->SetDefaultCenterPoint(true);
             RefreshPoints();
             imagePanel->Refresh();
             imagePanel->Update();
             return;
         } else {
-        	for (unsigned int i = 0;i<sprites.size();++i) sprites[i]->SetDefaultCenterPoint(false);
+        	for (std::size_t i = 0;i<sprites.size();++i) sprites[i]->SetDefaultCenterPoint(false);
         }
     }
 
     Point & point = sprites[0]->GetPoint(pointName);
 
-    std::string x_str = ToString(wxGetTextFromUser(_("Enter the X position of the point (relative to the image)."), "X position of the point", ToString(point.GetX())));
-    std::string y_str = ToString(wxGetTextFromUser(_("Enter the Y position of the point (relative to the image)."), "Y position of the point", ToString(point.GetY())));
+    gd::String x_str = wxGetTextFromUser(_("Enter the X position of the point (relative to the image)."), "X position of the point", gd::String::From(point.GetX()));
+    gd::String y_str = wxGetTextFromUser(_("Enter the Y position of the point (relative to the image)."), "Y position of the point", gd::String::From(point.GetY()));
 
-    point.SetX(ToInt(x_str));
-    point.SetY(ToInt(y_str));
+    point.SetX(x_str.To<int>());
+    point.SetY(y_str.To<int>());
 
     //Apply the change to others images if needed
-    for (unsigned int i = 1;i<sprites.size();++i)
+    for (std::size_t i = 1;i<sprites.size();++i)
     {
         if ( sprites[i]->HasPoint(pointName) ) sprites[i]->GetPoint(pointName) = point;
     }
@@ -1339,7 +1342,7 @@ void SpriteObjectEditor::OnimagePanelLeftDown(wxMouseEvent& event)
 
         //Select the item in the treeview
         wxTreeListItem polygonItem = maskTree->GetFirstChild(maskTree->GetRootItem());
-        unsigned int polyId = 0;
+        std::size_t polyId = 0;
         while ( polygonItem.IsOk() && polyId != polygonEditionHelper.GetSelectedPolygon() )
         {
             polygonItem = maskTree->GetNextSibling(polygonItem);
@@ -1348,7 +1351,7 @@ void SpriteObjectEditor::OnimagePanelLeftDown(wxMouseEvent& event)
         if ( polygonItem.IsOk() )
         {
             wxTreeListItem verticeItem = maskTree->GetFirstChild(polygonItem);
-            unsigned int verticeId = 0;
+            std::size_t verticeId = 0;
             while ( verticeItem.IsOk() && verticeId != polygonEditionHelper.GetSelectedPoint() )
             {
                 verticeItem = maskTree->GetNextSibling(verticeItem);
@@ -1374,7 +1377,7 @@ void SpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
         sprites[0]->SetCustomCollisionMask(mask);
 
         //Apply changes to other sprites if necessary
-        for (unsigned int i = 0;i<sprites.size();++i)
+        for (std::size_t i = 0;i<sprites.size();++i)
         {
             sprites[i]->SetCollisionMaskAutomatic(false);
             sprites[i]->SetCustomCollisionMask(mask);
@@ -1394,16 +1397,16 @@ void SpriteObjectEditor::OnAddMaskClick(wxCommandEvent& event)
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
     if ( sprites[0]->IsCollisionMaskAutomatic() ) mask.clear();
 
-    float width = ToFloat(string(wxGetTextFromUser(_("Enter the width of the rectangle"), _("New rectangle"), "32").mb_str()));
-    float height = ToFloat(string(wxGetTextFromUser(_("Enter the height of the rectangle"), _("New rectangle"), "32").mb_str()));
-    float angle = ToFloat(string(wxGetTextFromUser(_("Enter the angle of the rotation of the rectangle ( in degrees )"), _("New rectangle"), "0").mb_str()));
+    float width = gd::String(wxGetTextFromUser(_("Enter the width of the rectangle"), _("New rectangle"), "32")).To<float>();
+    float height = gd::String(wxGetTextFromUser(_("Enter the height of the rectangle"), _("New rectangle"), "32")).To<float>();
+    float angle = gd::String(wxGetTextFromUser(_("Enter the angle of the rotation of the rectangle ( in degrees )"), _("New rectangle"), "0")).To<float>();
 
     Polygon2d newRectangle = Polygon2d::CreateRectangle(width, height);
     newRectangle.Rotate(angle*3.14159/180);
     newRectangle.Move(spriteWidth/2.0, spriteHeight/2.0);
     mask.push_back(newRectangle);
 
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
         sprites[i]->SetCustomCollisionMask(mask);
@@ -1450,7 +1453,7 @@ void SpriteObjectEditor::OnAddVerticeClick(wxCommandEvent& event)
         }
     }
 
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
         sprites[i]->SetCustomCollisionMask(mask);
@@ -1476,16 +1479,16 @@ void SpriteObjectEditor::OnmaskTreeSelectionChanged(wxTreeListEvent& event)
     {
         //A polygon is selected
         wxStringClientData * data = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(selectedItem));
-        polygonEditionHelper.SetSelectedPolygon(data ? ToInt(ToString(data->GetData())) : std::string::npos);
-        polygonEditionHelper.SetSelectedPoint(std::string::npos);
+        polygonEditionHelper.SetSelectedPolygon(data ? gd::String(data->GetData()).To<int>() : gd::String::npos);
+        polygonEditionHelper.SetSelectedPoint(gd::String::npos);
     }
     else
     {
         //A point is selected
         wxStringClientData * data = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(selectedItem));
-        polygonEditionHelper.SetSelectedPoint(data ? ToInt(ToString(data->GetData())) : std::string::npos);
+        polygonEditionHelper.SetSelectedPoint(data ? gd::String(data->GetData()).To<int>() : gd::String::npos);
         wxStringClientData * parentData = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(maskTree->GetItemParent(selectedItem)));
-        polygonEditionHelper.SetSelectedPolygon(parentData ? ToInt(ToString(parentData->GetData())) : std::string::npos);
+        polygonEditionHelper.SetSelectedPolygon(parentData ? gd::String(parentData->GetData()).To<int>() : gd::String::npos);
     }
 
     imagePanel->Refresh();
@@ -1519,7 +1522,7 @@ void SpriteObjectEditor::OnDeleteMaskClick(wxCommandEvent& event)
             mask.erase(mask.begin()+polygonEditionHelper.GetSelectedPolygon());
     }
 
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
         sprites[i]->SetCustomCollisionMask(mask);
@@ -1537,7 +1540,7 @@ void SpriteObjectEditor::OnDefaultMaskClick(wxCommandEvent& event)
     }
 
     std::vector < Sprite * > sprites = GetSpritesToModify();
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(true);
     }
@@ -1551,15 +1554,17 @@ void SpriteObjectEditor::OnPositionMaskSelected(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
-    unsigned int selectedPolygon = polygonEditionHelper.GetSelectedPolygon();
-    unsigned int selectedPolygonPoint = polygonEditionHelper.GetSelectedPoint();
+    std::size_t selectedPolygon = polygonEditionHelper.GetSelectedPolygon();
+    std::size_t selectedPolygonPoint = polygonEditionHelper.GetSelectedPoint();
     if ( selectedPolygon < mask.size() && selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
     {
-        mask[selectedPolygon].vertices[selectedPolygonPoint].x = ToFloat(ToString(wxGetTextFromUser(_("Enter the X position of the vertice"), _("Positioning"), ToString(mask[selectedPolygon].vertices[selectedPolygonPoint].x))));
-        mask[selectedPolygon].vertices[selectedPolygonPoint].y = ToFloat(ToString(wxGetTextFromUser(_("Enter the Y position of the vertice"), _("Positioning"), ToString(mask[selectedPolygon].vertices[selectedPolygonPoint].y))));
+        mask[selectedPolygon].vertices[selectedPolygonPoint].x = gd::String(wxGetTextFromUser(_("Enter the X position of the vertice"), _("Positioning"),
+        	gd::String::From(mask[selectedPolygon].vertices[selectedPolygonPoint].x))).To<float>();
+        mask[selectedPolygon].vertices[selectedPolygonPoint].y = gd::String(wxGetTextFromUser(_("Enter the Y position of the vertice"), _("Positioning"),
+        	gd::String::From(mask[selectedPolygon].vertices[selectedPolygonPoint].y))).To<float>();
     }
 
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
         sprites[i]->SetCustomCollisionMask(mask);
@@ -1575,16 +1580,16 @@ void SpriteObjectEditor::OnMovePolygonSelected(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
-    unsigned int selectedPolygon = polygonEditionHelper.GetSelectedPolygon();
+    std::size_t selectedPolygon = polygonEditionHelper.GetSelectedPolygon();
     if ( selectedPolygon < mask.size() )
     {
-        float xOffset = ToFloat(ToString(wxGetTextFromUser(_("Enter the displacement offset on X axis."), _("Displacement"), "0")));
-        float yOffset = ToFloat(ToString(wxGetTextFromUser(_("Enter the displacement offset on Y axis."), _("Displacement"), "0")));
+        float xOffset = gd::String(wxGetTextFromUser(_("Enter the displacement offset on X axis."), _("Displacement"), "0")).To<float>();
+        float yOffset = gd::String(wxGetTextFromUser(_("Enter the displacement offset on Y axis."), _("Displacement"), "0")).To<float>();
 
         mask[selectedPolygon].Move(xOffset, yOffset);
     }
 
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
         sprites[i]->SetCustomCollisionMask(mask);
@@ -1599,15 +1604,16 @@ void SpriteObjectEditor::OnRotatePolygonSelected(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
-    unsigned int selectedPolygon = polygonEditionHelper.GetSelectedPolygon();
+    std::size_t selectedPolygon = polygonEditionHelper.GetSelectedPolygon();
     if ( selectedPolygon < mask.size() )
     {
-        float angle = ToFloat(ToString(wxGetTextFromUser(_("Enter the angle of the rotation, in degrees"), _("Rotation of the polygon"), "0")))*3.14159/180;
+        float angle = gd::String(wxGetTextFromUser(_("Enter the angle of the rotation, in degrees"),
+        	_("Rotation of the polygon"), "0")).To<float>()*3.14159/180;
 
         mask[selectedPolygon].Rotate(angle);
     }
 
-    for (unsigned int i = 0;i<sprites.size();++i)
+    for (std::size_t i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
         sprites[i]->SetCustomCollisionMask(mask);
@@ -1664,11 +1670,11 @@ void SpriteObjectEditor::OnTimeBetweenFramesSelected(wxCommandEvent& event)
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        std::string newTime = ToString(wxGetTextFromUser(_("Enter time between each image ( in seconds )"),
-                                                         _("Time between each images"),
-                                                         ToString(direction.GetTimeBetweenFrames())));
+        gd::String newTime = wxGetTextFromUser(_("Enter time between each image (in seconds)"),
+			_("Time between each images"), gd::String::From(direction.GetTimeBetweenFrames()));
+
         if ( newTime.empty() ) return;
-        direction.SetTimeBetweenFrames(ToFloat(newTime));
+        direction.SetTimeBetweenFrames(newTime.To<float>());
     }
 }
 
@@ -1755,36 +1761,36 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
             FileDialog.GetPaths(files);
             files.Sort(); //Ensure that the order of insertion is alphabetical.
 
-            std::vector < std::string > filenames;
-            for ( unsigned int i = 0; i < files.GetCount();++i )
-                filenames.push_back(ToString(files[i]));
+            std::vector < gd::String > filenames;
+            for ( std::size_t i = 0; i < files.GetCount();++i )
+                filenames.push_back(files[i]);
 
-            for ( unsigned int i = 0; i < filenames.size();++i )
+            for ( std::size_t i = 0; i < filenames.size();++i )
             {
                 wxFileName file = wxFileName::FileName(filenames[i]);
                 if (!projectDirectory.empty())  //If game is not saved, we keep absolute filenames
                     file.MakeRelativeTo(projectDirectory);
 
-                std::string name = ToString(file.GetFullName());
+                gd::String name = file.GetFullName();
 
                 //Add the resource if it does not exist or if it is not the same resource
-                if ( !game.GetResourcesManager().HasResource(name) || !(game.GetResourcesManager().GetResource(name).GetFile() == file.GetFullPath()) )
+                if ( !game.GetResourcesManager().HasResource(name) || !(game.GetResourcesManager().GetResource(name).GetFile() == gd::String(file.GetFullPath())) )
                 {
                     //Find a new unique name for the resource
                     unsigned int uniqueID = 2;
                     while ( game.GetResourcesManager().HasResource(name) )
                     {
-                        name = ToString(file.GetFullName())+ToString(uniqueID);
+                        name = file.GetFullName()+gd::String::From(uniqueID);
                         uniqueID++;
                     }
 
                     gd::ImageResource image;
-                    image.SetFile(ToString(file.GetFullPath()));
+                    image.SetFile(file.GetFullPath());
                     image.SetName(name);
                     image.SetUserAdded(false);
 
                     game.GetResourcesManager().AddResource(image);
-                    for ( unsigned int j = 0; j < game.GetUsedPlatforms().size();++j)
+                    for ( std::size_t j = 0; j < game.GetUsedPlatforms().size();++j)
                         game.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(game, name);
                 }
 

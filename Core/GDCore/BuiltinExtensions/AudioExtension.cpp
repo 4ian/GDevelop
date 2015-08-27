@@ -21,17 +21,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     #if defined(GD_IDE_ONLY)
     extension.AddAction("PlaySoundCanal",
                    _("Play a sound on a channel"),
-                   _("Play a sound ( small audio file ) on a specific channel,\nso as to be able to manipulate it."),
+                   _("Play a sound (small audio file) on a specific channel,\nso as to be able to manipulate it."),
                    _("Play the sound _PARAM1_ on the channel _PARAM2_"),
                    _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("soundfile", _("Audio file"), "",false)
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("yesorno", _("Repeat the sound \?"), "",true).SetDefaultValue("no")
-        .AddParameter("expression", _("Volume ( From 0 to 100, 100 by default )"), "",true).SetDefaultValue("100")
-        .AddParameter("expression", _("Pitch ( speed ) ( 1 by default )"), "",true).SetDefaultValue("1")
+        .AddParameter("soundfile", _("Audio file"))
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("yesorno", _("Repeat the sound"), "",true).SetDefaultValue("no")
+        .AddParameter("expression", _("Volume (from 0 to 100, 100 by default)"), "",true).SetDefaultValue("100")
+        .AddParameter("expression", _("Pitch (speed) (1 by default)"), "",true).SetDefaultValue("1")
         .MarkAsAdvanced();
 
     extension.AddAction("StopSoundCanal",
@@ -42,7 +42,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
         .MarkAsAdvanced();
 
     extension.AddAction("PauseSoundCanal",
@@ -53,7 +53,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
         .MarkAsAdvanced();
 
     extension.AddAction("RePlaySoundCanal",
@@ -64,7 +64,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
         .MarkAsAdvanced();
 
     extension.AddAction("PlayMusicCanal",
@@ -75,11 +75,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("musicfile", _("Audio file"), "",false)
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("yesorno", _("Repeat the sound \?"), "",true).SetDefaultValue("no")
-        .AddParameter("expression", _("Volume ( From 0 to 100, 100 by default )"), "",true).SetDefaultValue("100")
-        .AddParameter("expression", _("Pitch ( speed ) ( 1 by default )"), "",true).SetDefaultValue("1")
+        .AddParameter("musicfile", _("Audio file"))
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("yesorno", _("Repeat the sound"), "",true).SetDefaultValue("no")
+        .AddParameter("expression", _("Volume (from 0 to 100, 100 by default)"), "",true).SetDefaultValue("100")
+        .AddParameter("expression", _("Pitch (speed) (1 by default)"), "",true).SetDefaultValue("1")
         .MarkAsAdvanced();
 
     extension.AddAction("StopMusicCanal",
@@ -90,7 +90,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
         .MarkAsAdvanced();
 
     extension.AddAction("PauseMusicCanal",
@@ -101,7 +101,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
         .MarkAsAdvanced();
 
     extension.AddAction("RePlayMusicCanal",
@@ -112,7 +112,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
         .MarkAsAdvanced();
 
     extension.AddAction("ModVolumeSoundCanal",
@@ -123,9 +123,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/sonVolume24.png",
                    "res/actions/sonVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -137,9 +137,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/musicVolume24.png",
                    "res/actions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -151,22 +151,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/volume24.png",
                    "res/actions/volume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false)
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     extension.AddAction("ModPitchSoundChannel",
                    _("Pitch of the sound of a channel"),
-                   _("This action modify pitch ( speed ) of the sound on a channel.\n1 is the default pitch."),
+                   _("This action modify pitch (speed) of the sound on a channel.\n1 is the default pitch."),
                    _("Do _PARAM2__PARAM3_ to the pitch of the sound on channel _PARAM1_"),
                    _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -178,9 +178,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -192,9 +192,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -206,9 +206,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("operator", _("Modification's sign"), "",false)
-        .AddParameter("expression", _("Value"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -220,10 +220,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("soundfile", _("Audio file"), "",false)
-        .AddParameter("yesorno", _("Repeat the sound \?"), "",true).SetDefaultValue("no")
-        .AddParameter("expression", _("Volume ( From 0 to 100, 100 by default )"), "",true).SetDefaultValue("100")
-        .AddParameter("expression", _("Pitch ( speed ) ( 1 by default )"), "",true).SetDefaultValue("1")
+        .AddParameter("soundfile", _("Audio file"))
+        .AddParameter("yesorno", _("Repeat the sound"), "",true).SetDefaultValue("no")
+        .AddParameter("expression", _("Volume (from 0 to 100, 100 by default)"), "",true).SetDefaultValue("100")
+        .AddParameter("expression", _("Pitch (speed) (1 by default)"), "",true).SetDefaultValue("1")
         .MarkAsSimple();
 
     extension.AddAction("PlayMusic",
@@ -234,10 +234,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("musicfile", _("Audio file"), "",false)
-        .AddParameter("yesorno", _("Repeat the sound \?"), "",true).SetDefaultValue("no")
-        .AddParameter("expression", _("Volume ( From 0 to 100, 100 by default )"), "",true).SetDefaultValue("100")
-        .AddParameter("expression", _("Pitch ( speed ) ( 1 by default )"), "",true).SetDefaultValue("1")
+        .AddParameter("musicfile", _("Audio file"))
+        .AddParameter("yesorno", _("Repeat the sound"), "",true).SetDefaultValue("no")
+        .AddParameter("expression", _("Volume (from 0 to 100, 100 by default)"), "",true).SetDefaultValue("100")
+        .AddParameter("expression", _("Pitch (speed) (1 by default)"), "",true).SetDefaultValue("1")
         .MarkAsSimple();
 
     extension.AddCondition("MusicPlaying",
@@ -248,7 +248,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/musicplaying24.png",
                    "res/conditions/musicplaying.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false)
+        .AddParameter("expression", _("Channel"))
         .MarkAsAdvanced();
 
     extension.AddCondition("MusicPaused",
@@ -259,7 +259,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/musicpaused24.png",
                    "res/conditions/musicpaused.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false)
+        .AddParameter("expression", _("Channel"))
         .MarkAsAdvanced();
 
     extension.AddCondition("MusicStopped",
@@ -270,7 +270,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/musicstopped24.png",
                    "res/conditions/musicstopped.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false)
+        .AddParameter("expression", _("Channel"))
         .MarkAsAdvanced();
 
     extension.AddCondition("SoundPlaying",
@@ -281,7 +281,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/sonplaying24.png",
                    "res/conditions/sonplaying.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false)
+        .AddParameter("expression", _("Channel"))
         .MarkAsAdvanced();
 
     extension.AddCondition("SoundPaused",
@@ -292,7 +292,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/sonpaused24.png",
                    "res/conditions/sonpaused.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false)
+        .AddParameter("expression", _("Channel"))
         .MarkAsAdvanced();
 
     extension.AddCondition("SoundStopped",
@@ -303,7 +303,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/sonstopped24.png",
                    "res/conditions/sonstopped.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false)
+        .AddParameter("expression", _("Channel"))
         .MarkAsAdvanced();
 
     extension.AddCondition("SoundCanalVolume",
@@ -314,9 +314,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Volume to test"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Volume to test"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -328,9 +328,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Volume to test"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Volume to test"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -342,8 +342,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/volume24.png",
                    "res/conditions/volume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Volume to test"), "",false)
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Volume to test"))
         .SetManipulatedType("number");
 
     extension.AddCondition("SoundChannelPitch",
@@ -354,23 +354,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Pitch to test"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Pitch to test"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     extension.AddCondition("MusicChannelPitch",
                    _("Pitch of the music on a channel"),
-                   _("Test the pitch ( speed ) of the music on specified channel. 1 is the default pitch."),
+                   _("Test the pitch (speed) of the music on specified channel. 1 is the default pitch."),
                    _("The volume of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
                    _("Audio/Musics on channels"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Pitch to test"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Pitch to test"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -382,9 +382,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Position ( in seconds )"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Playing position (in seconds)"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -396,35 +396,35 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Canal ( 0 - 15 )"), "",false)
-        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .AddParameter("expression", _("Position ( in seconds )"), "",false)
+        .AddParameter("expression", _("Channel identifier"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Playing position (in seconds)"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     extension.AddExpression("SoundChannelPlayingOffset", _("Sound playing offset"), _("Sound playing offset"), _("Sounds"), "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false);
+        .AddParameter("expression", _("Channel"));
 
     extension.AddExpression("MusicChannelPlayingOffset", _("Music playing offset"), _("Music playing offset"), _("Musics"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false);
+        .AddParameter("expression", _("Channel"));
 
     extension.AddExpression("SoundChannelVolume", _("Sound volume"), _("Sound volume"), _("Sounds"), "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false);
+        .AddParameter("expression", _("Channel"));
 
     extension.AddExpression("MusicChannelVolume", _("Music volume"), _("Music volume"), _("Musics"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false);
+        .AddParameter("expression", _("Channel"));
 
     extension.AddExpression("SoundChannelPitch", _("Sound's pitch"), _("Sound's pitch"), _("Sounds"), "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false);
+        .AddParameter("expression", _("Channel"));
 
     extension.AddExpression("MusicChannelPitch", _("Music's pitch"), _("Music's pitch"), _("Musics"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Channel"), "",false);
+        .AddParameter("expression", _("Channel"));
 
     extension.AddExpression("GlobalVolume", _("Global volume"), _("Global volume value"), _("Sound level"), "res/conditions/volume.png")
         .AddCodeOnlyParameter("currentScene", "");

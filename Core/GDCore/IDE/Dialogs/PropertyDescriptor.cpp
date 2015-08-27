@@ -1,5 +1,5 @@
 #include "PropertyDescriptor.h"
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 
 namespace gd

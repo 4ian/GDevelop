@@ -19,12 +19,12 @@ Music::~Music()
     //dtor
 }
 
-bool Music::OpenFromFile(const string & filename)
+bool Music::OpenFromFile(const gd::String & filename)
 {
     #if defined(GDE)
     file = filename;
     #endif
-    return music.openFromFile(filename);
+    return music.openFromFile(filename.ToLocale());
 }
 
 void Music::SetBuffer(const char * newbuffer, std::size_t size)
@@ -75,7 +75,7 @@ void Music::SetVolume(float volume_)
     if ( volume < 0 ) volume = 0;
     if ( volume > 100 ) volume = 100;
 
-    UpdateVolume(); //Mise à jour du volume réel
+    UpdateVolume(); //Mise ï¿½ jour du volume rï¿½el
 }
 
 void Music::UpdateVolume()

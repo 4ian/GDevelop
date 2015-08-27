@@ -20,6 +20,7 @@
 //*)
 #include <string>
 #include <vector>
+#include "GDCpp/String.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ class CompilationErrorDialog: public wxDialog
 {
 public:
 
-    CompilationErrorDialog(wxWindow* parent, string report);
+    CompilationErrorDialog(wxWindow* parent, gd::String report);
     virtual ~CompilationErrorDialog();
 
     //(*Declarations(CompilationErrorDialog)

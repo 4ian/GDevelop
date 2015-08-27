@@ -15,10 +15,9 @@
 #include <memory>
 #include "GDCpp/ObjInstancesHolder.h"
 #include "GDCpp/RuntimeLayer.h"
-#include "GDCpp/Text.h"
 #include "GDCpp/InputManager.h"
 #include "GDCpp/ManualTimer.h"
-#include "GDCpp/AutomatismsRuntimeSharedDataHolder.h"
+#include "GDCpp/BehaviorsRuntimeSharedDataHolder.h"
 namespace sf { class RenderWindow; }
 namespace sf { class Event; }
 namespace gd { class Project; }
@@ -27,7 +26,7 @@ namespace gd { class ImageManager; }
 class CppPlatform;
 class RuntimeLayer;
 class RuntimeGame;
-class AutomatismsRuntimeSharedData;
+class BehaviorsRuntimeSharedData;
 class ExtensionBase;
 class Text;
 class CodeExecutionEngine;
@@ -41,9 +40,8 @@ class BaseProfiler;
 /**
  * \brief Represents a scene being played.
  *
- * A RuntimeScene is used when a game is played.<br>
- * It contains everything a scene provide, but also specific
- * functions and members for runtime ( Render functions, objects instances, variables... )
+ * Contains game object instances and all runtime objects needed
+ * to play to a scene rendered in a SFML RenderWindow.
  *
  * \ingroup GameEngine
  */
@@ -90,23 +88,18 @@ public:
     /**
      * Get the layer with specified name.
      */
-    RuntimeLayer & GetRuntimeLayer(const std::string & name);
+    RuntimeLayer & GetRuntimeLayer(const gd::String & name);
 
     /**
-     * Add a text to be displayed on the scene
-     * \deprecated
-     */
-    void DisplayText(Text & text);
-
-    /**
-     * \brief Return the shared data for an automatism.
+     * \brief Return the shared data for a behavior.
      * \warning Be careful, no check is made to ensure that the shared data exist.
-     * \param name The name of the automatism for which shared data must be fetched.
+     * \param name The name of the behavior for which shared data must be fetched.
      */
-    const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
+    const std::shared_ptr<BehaviorsRuntimeSharedData> & GetBehaviorSharedData(const gd::String & behaviorName) const { return behaviorsSharedDatas.GetBehaviorSharedData(behaviorName); }
 
     /**
-     * Set up the RuntimeScene using a Scene.
+     * \brief Set up the RuntimeScene using a gd::Layout.
+     *
      * Typically called automatically by the IDE or by the game executable.
      *
      * \note Similar to calling LoadFromSceneAndCustomInstances(scene, scene.GetInitialInstances());
@@ -115,8 +108,8 @@ public:
     bool LoadFromScene( const gd::Layout & scene );
 
     /**
-     * Set up the Runtime Scene using the \a instances and the \a scene.
-     * \param scene Scene used as context.
+     * \brief Set up the RuntimeScene using the specified \a instances and \a scene.
+     * \param scene gd::Layout that should be loaded
      * \param instances Initial instances to be put on the scene
      */
     bool LoadFromSceneAndCustomInstances( const gd::Layout & scene, const gd::InitialInstancesContainer & instances );
@@ -127,22 +120,22 @@ public:
      * \param container The object containing the initial instances to be created
      * \param xOffset The offset on x axis to be applied to objects created
      * \param yOffset The offset on y axis to be applied to objects created
-     * \param optionalMap An optional pointer to a std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > which will be filled with the index of the initial instances. Can be NULL.
      */
-    void CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0, std::map<const gd::InitialInstance *, std::shared_ptr<RuntimeObject> > * optionalMap = NULL);
+    void CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0);
 
     /**
-     * Change the window used for rendering the scene
+     * \brief Change the window used for rendering the scene
      */
     void ChangeRenderWindow(sf::RenderWindow * window);
 
     /**
-     * Return true if scene is rendered full screen.
+     * \brief Check if scene is rendered full screen.
      */
     bool RenderWindowIsFullScreen() { return isFullScreen; }
 
     /**
-     * Change full screen state. The render window is itself not changed so as to be displayed fullscreen or not.
+     * \brief Change full screen state.
+     * The render window is itself not changed so as to be displayed fullscreen or not.
      */
     void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
 
@@ -153,37 +146,37 @@ public:
     bool RenderAndStep();
 
     /**
-     * Just render a frame.
+     * \brief Just render a frame, without applying logic or events on objects.
      */
     void RenderWithoutStep();
 
     /**
-     * Change scene time scale.
+     * \brief Change scene time scale.
      */
     inline void SetTimeScale(double timeScale_) { timeScale = timeScale_; };
 
     /**
-     * Return scene time scale.
+     * \brief Get the scene time scale.
      */
     inline double GetTimeScale() const { return timeScale; };
 
     /**
-     * Get elapsed time since last frame, in microseconds.
+     * \brief Get elapsed time since last frame, in microseconds.
      */
     inline signed long long GetElapsedTime() const { return elapsedTime; };
 
     /**
-     * Get time elapsed since beginning, in microseconds.
+     * \brief Get time elapsed since beginning, in microseconds.
      */
     inline signed long long GetTimeFromStart() const { return timeFromStart; };
 
     /**
-     * Return true if the scene was just rendered once.
+     * \brief Return true if the scene was just rendered once.
      */
     inline bool IsFirstLoop() const { return firstLoop; };
 
     /**
-     * Notify the scene that something (like a file dialog) stopped scene rendering for a certain amount of time.
+     * \brief Notify the scene that something (like a file dialog) stopped scene rendering for a certain amount of time.
      * \param pauseTime_ Pause duration, in microseconds.
      */
     void NotifyPauseWasMade(signed long long pauseTime_) { pauseTime += pauseTime_; }
@@ -193,13 +186,13 @@ public:
      */
     ///@{
     /**
-     * Give access to the execution engine of the scene.
+     * \brief Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
     std::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
 
     /**
-     * Give access to the execution engine of the scene.
+     * \brief Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
      */
     void SetCodeExecutionEngine(std::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
@@ -211,13 +204,14 @@ public:
             PUSH_SCENE,
             POP_SCENE,
             REPLACE_SCENE,
+            CLEAR_SCENES,
             STOP_GAME
         } change;
-        std::string requestedScene;
+        gd::String requestedScene;
     };
 
     SceneChange GetRequestedChange() { return requestedChange; }
-    void RequestChange(SceneChange::Change change, std::string sceneName = "");
+    void RequestChange(SceneChange::Change change, gd::String sceneName = "");
 
 protected:
 
@@ -237,13 +231,13 @@ protected:
     void Render();
 
     /**
-     * \brief To be called once during a step, to launch automatisms pre-events steps.
+     * \brief To be called once during a step, to launch behaviors pre-events steps.
      */
     void ManageObjectsBeforeEvents();
 
     /**
      * \brief To be called once during a step, to remove objects marked as deleted in events,
-     * and to update objects position, forces and automatisms.
+     * and to update objects position, forces and behaviors.
      */
     void ManageObjectsAfterEvents();
 
@@ -254,7 +248,7 @@ protected:
 
     bool UpdateTime();
 
-    bool DisplayLegacyTexts(std::string layer = "");
+    bool DisplayLegacyTexts(gd::String layer = "");
 
     bool                                    firstLoop; ///<true if the scene was just rendered once.
     bool                                    isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
@@ -267,10 +261,9 @@ protected:
     RuntimeVariablesContainer               variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
-    AutomatismsRuntimeSharedDataHolder      automatismsSharedDatas; ///<Contains all automatisms shared datas.
+    BehaviorsRuntimeSharedDataHolder      behaviorsSharedDatas; ///<Contains all behaviors shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
     std::shared_ptr<CodeExecutionEngine>    codeExecutionEngine;
-    std::vector < Text >                    legacyTexts; ///<Deprecated way of displaying a text
     SceneChange                             requestedChange; ///< What should be done at the end of the frame.
 
     static RuntimeLayer badRuntimeLayer; ///< Null object return by GetLayer when no appropriate layer could be found.

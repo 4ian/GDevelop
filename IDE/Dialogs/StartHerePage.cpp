@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include <wx/config.h>
@@ -80,19 +80,19 @@ void StartHerePage::OnLastProject1Click(wxHyperlinkEvent& event)
 {
 	wxString result;
 	wxConfigBase::Get()->Read( _T( "/Recent/0" ), &result );
-	mainEditor.Open(gd::ToString(result));
+	mainEditor.Open(result);
 }
 
 void StartHerePage::OnLastProject2Click(wxHyperlinkEvent& event)
 {
 	wxString result;
 	wxConfigBase::Get()->Read( _T( "/Recent/1" ), &result );
-	mainEditor.Open(gd::ToString(result));
+	mainEditor.Open(result);
 }
 
 void StartHerePage::OnLastProject3Click(wxHyperlinkEvent& event)
 {
 	wxString result;
 	wxConfigBase::Get()->Read( _T( "/Recent/2" ), &result );
-	mainEditor.Open(gd::ToString(result));
+	mainEditor.Open(result);
 }

@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 #ifndef GDCore_ParameterEditorLauncher_H
 #define GDCore_ParameterEditorLauncher_H
@@ -30,7 +30,7 @@ public:
 	 */
     static void LaunchEditor(wxWindow * parent, gd::Project &, gd::Layout &,
     	const gd::ParameterMetadata & paramMetadata,
-        std::vector<wxTextCtrl * > & paramEdits, unsigned int paramIndex);
+        std::vector<wxTextCtrl * > & paramEdits, std::size_t paramIndex);
 
 private:
 	ParameterEditorLauncher() {};

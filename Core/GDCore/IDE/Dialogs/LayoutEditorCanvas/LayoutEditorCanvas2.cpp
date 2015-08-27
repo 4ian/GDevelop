@@ -22,7 +22,6 @@
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -55,7 +54,7 @@ void LayoutEditorCanvas::OnUpdate()
             if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
                 wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
 
-            for (unsigned int i = 0;i<project.imagesChanged.size();++i)
+            for (std::size_t i = 0;i<project.imagesChanged.size();++i)
                 project.GetImageManager()->ReloadImage(project.imagesChanged[i]);
 
             project.GetImageManager()->LoadPermanentImages();
@@ -142,7 +141,7 @@ void LayoutEditorCanvas::DrawHighlightRectangleGuiElement(std::vector < std::sha
     target.push_back(highlight);
 }
 
-void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName )
+void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const gd::String & buttonName )
 {
     //Declare the button as a gui element
     gd::LayoutEditorCanvasGuiElement guiElement;
@@ -255,7 +254,7 @@ void LayoutEditorCanvas::RenderEdittime()
     InstancesRenderer renderer(*this, GetInitialInstanceUnderCursor(), guiElementsShapes);
 
     //Render objects of each layer
-    for (unsigned int layerIndex =0;layerIndex<layout.GetLayersCount();++layerIndex)
+    for (std::size_t layerIndex =0;layerIndex<layout.GetLayersCount();++layerIndex)
     {
         if ( layout.GetLayer(layerIndex).GetVisibility() )
         {
@@ -310,7 +309,7 @@ void LayoutEditorCanvas::RenderEdittime()
         DrawSelectionRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin));
     }
 
-    for (unsigned int i = 0;i<guiElementsShapes.size();++i)
+    for (std::size_t i = 0;i<guiElementsShapes.size();++i)
     	draw(*guiElementsShapes[i]);
 
     if ( options.windowMask ) RenderWindowMask();
@@ -426,9 +425,9 @@ void LayoutEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
         return;
 
     //Find a new unique name for the object
-    std::string name = ToString(_("NewObject"));
+    gd::String name = _("NewObject");
     for (unsigned int i = 2;layout.HasObjectNamed(name);++i)
-        name =  _("NewObject")+ToString(i);
+        name =  _("NewObject")+gd::String::From(i);
 
     //Add a new object of selected type to objects list
     layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), name, layout.GetObjectsCount());
@@ -524,7 +523,7 @@ void LayoutEditorCanvas::OnPasteSelected(wxCommandEvent & event)
 
     vector < std::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::Get()->Gets();
 
-    for (unsigned int i =0;i<pastedInstances.size();++i)
+    for (std::size_t i =0;i<pastedInstances.size();++i)
     {
         gd::InitialInstance & instance = instances.InsertInitialInstance(*pastedInstances[i]->Clone());
         instance.SetX(instance.GetX()+oldMouseX);
@@ -557,9 +556,9 @@ void LayoutEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
     if ( dialog.ShowModal() != 1 ) return;
 
     float angle = dialog.GetRotationIncrementation();
-    for (unsigned int i = 0;i<dialog.GetYCount();++i)
+    for (std::size_t i = 0;i<dialog.GetYCount();++i)
     {
-        for (unsigned int j = 0;j<dialog.GetXCount();++j)
+        for (std::size_t j = 0;j<dialog.GetXCount();++j)
         {
             gd::InitialInstance & insertedInstance = instances.InsertInitialInstance(*instance);
             insertedInstance.SetX(dialog.GetStartX()+dialog.GetXGap()*j);
@@ -615,7 +614,10 @@ void LayoutEditorCanvas::OnMouseWheel( wxMouseEvent &event )
     }
     else
     {
-        editionView.move(0, -event.GetWheelRotation());
+        if(event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL)
+            editionView.move(0, -event.GetWheelRotation());
+        else
+            editionView.move(event.GetWheelRotation(), 0);
         UpdateScrollbars();
     }
 }

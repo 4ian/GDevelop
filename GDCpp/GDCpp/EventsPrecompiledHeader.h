@@ -10,4 +10,5 @@
 #include "GDCpp/RuntimeContext.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/CommonTools.h"
+#include "GDCpp/String.h"
 #include "GDCpp/SourceFileCommonTools.h"

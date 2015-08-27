@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 #include "LayoutEditorPropertiesPnl.h"
 
@@ -49,7 +49,7 @@ LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Proje
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	grid = new wxPropertyGrid(this,ID_PROPGRID,wxDefaultPosition,wxSize(359,438),0,_T("ID_PROPGRID"));
+	grid = new wxPropertyGrid(this,ID_PROPGRID,wxDefaultPosition,wxSize(359,438), wxPG_HIDE_MARGIN|wxPG_SPLITTER_AUTO_CENTER,_T("ID_PROPGRID"));
 	FlexGridSizer1->Add(grid, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
@@ -83,8 +83,8 @@ void LayoutEditorPropertiesPnl::Refresh()
     {
         std::vector<gd::InitialInstance*> selection = layoutEditorCanvas->GetSelection();
         instancesHelper.RefreshFrom(selection);
-        std::string objectName;
-        for (unsigned int i = 0;i<selection.size();++i)
+        gd::String objectName;
+        for (std::size_t i = 0;i<selection.size();++i)
         {
             if ( !selection[i] ) continue;
             if ( i == 0 ) objectName = selection[i]->GetObjectName();
@@ -163,7 +163,7 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
         //of instances at their original width/height
         if ( event.GetPropertyName() == _("Custom size?") && grid->GetProperty(_("Custom size?"))->GetValue().GetBool() )
         {
-            for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+            for (std::size_t i = 0;i<selectedInitialInstances.size();++i)
             {
                 sf::Vector2f size = layoutEditorCanvas->GetInitialInstanceSize(*selectedInitialInstances[i]);
                 selectedInitialInstances[i]->SetCustomWidth(size.x);

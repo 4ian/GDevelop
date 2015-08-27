@@ -7,6 +7,8 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
+#include "GDCpp/String.h"
+
 class RuntimeObject;
 
 typedef std::vector < std::shared_ptr<RuntimeObject> > RuntimeObjList;
@@ -50,7 +52,7 @@ public:
     /**
      * \brief Get all objects with the specified name
      */
-    inline const RuntimeObjList & GetObjects(const std::string & name)
+    inline const RuntimeObjList & GetObjects(const gd::String & name)
     {
         return objectsInstances[name];
     }
@@ -58,7 +60,7 @@ public:
     /**
      * \brief Get a "raw pointers" list to objects with the specified name
      */
-    std::vector<RuntimeObject*> GetObjectsRawPointers(const std::string & name);
+    std::vector<RuntimeObject*> GetObjectsRawPointers(const gd::String & name);
 
     /**
      * \brief Get a list of all objects contained.
@@ -67,7 +69,7 @@ public:
     {
         RuntimeObjList objList;
 
-        for (std::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (std::unordered_map<gd::String, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
             copy(it->second.begin(), it->second.end(), back_inserter(objList));
 
         return objList;
@@ -84,12 +86,12 @@ public:
      */
     inline void RemoveObject(const RuntimeObjSPtr & object)
     {
-        for (std::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (std::unordered_map<gd::String, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
         {
             RuntimeObjList & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
         }
-        for (std::unordered_map<std::string, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
+        for (std::unordered_map<gd::String, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
         {
             std::vector<RuntimeObject*> & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object.get()), associatedList.end());
@@ -99,7 +101,7 @@ public:
     /**
      * \brief Remove an entire list of object with a given name
      */
-    inline void RemoveObjects(const std::string & name)
+    inline void RemoveObjects(const gd::String & name)
     {
         objectsInstances[name].clear();
         objectsRawPointersInstances[name].clear();
@@ -123,8 +125,8 @@ public:
 private:
     void Init(const ObjInstancesHolder & other);
 
-    std::unordered_map<std::string, RuntimeObjList > objectsInstances; ///< The list of all objects, classified by name
-    std::unordered_map<std::string, std::vector<RuntimeObject*> > objectsRawPointersInstances; ///< Clones of the objectsInstances lists, but with raw pointers instead.
+    std::unordered_map<gd::String, RuntimeObjList > objectsInstances; ///< The list of all objects, classified by name
+    std::unordered_map<gd::String, std::vector<RuntimeObject*> > objectsRawPointersInstances; ///< Clones of the objectsInstances lists, but with raw pointers instead.
 };
 
 #endif // OBJINSTANCESHOLDER_H

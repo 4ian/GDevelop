@@ -187,9 +187,9 @@ object(object_)
 	rightTextureEdit->ChangeValue(object.rightTextureName);
 	backTextureEdit->ChangeValue(object.backTextureName);
 
-	widthEdit->ChangeValue(ToString(object.GetWidth()));
-	heightEdit->ChangeValue(ToString(object.GetHeight()));
-	depthEdit->ChangeValue(ToString(object.GetDepth()));
+	widthEdit->ChangeValue(gd::String::From(object.GetWidth()));
+	heightEdit->ChangeValue(gd::String::From(object.GetHeight()));
+	depthEdit->ChangeValue(gd::String::From(object.GetDepth()));
 
     //Init the image bank editor
     resourcesEditor = new ResourcesEditor( this, game, mainFrameWrapper );
@@ -226,16 +226,16 @@ void Box3DObjectEditor::OncancelBtClick(wxCommandEvent& event)
  */
 void Box3DObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-	object.frontTextureName = string(frontTextureEdit->GetValue().mb_str());
-	object.topTextureName = string(topTextureEdit->GetValue().mb_str());
-	object.bottomTextureName = string(bottomTextureEdit->GetValue().mb_str());
-	object.leftTextureName = string(leftTextureEdit->GetValue().mb_str());
-	object.rightTextureName = string(rightTextureEdit->GetValue().mb_str());
-	object.backTextureName = string(backTextureEdit->GetValue().mb_str());
+	object.frontTextureName = frontTextureEdit->GetValue();
+	object.topTextureName = topTextureEdit->GetValue();
+	object.bottomTextureName = bottomTextureEdit->GetValue();
+	object.leftTextureName = leftTextureEdit->GetValue();
+	object.rightTextureName = rightTextureEdit->GetValue();
+	object.backTextureName = backTextureEdit->GetValue();
 
-	object.SetWidth(ToInt(string(widthEdit->GetValue().mb_str())));
-	object.SetHeight(ToInt(string(heightEdit->GetValue().mb_str())));
-	object.SetDepth(ToInt(string(depthEdit->GetValue().mb_str())));
+	object.SetWidth(gd::String(widthEdit->GetValue()).To<int>());
+	object.SetHeight(gd::String(heightEdit->GetValue()).To<int>());
+	object.SetDepth(gd::String(depthEdit->GetValue()).To<int>());
 
     EndModal(1);
 }
@@ -324,4 +324,3 @@ void Box3DObjectEditor::OnimageBankBtClick(wxCommandEvent& event)
 }
 
 #endif
-

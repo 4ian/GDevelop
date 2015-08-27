@@ -9,6 +9,7 @@ This project is released under the MIT License.
 #define FUNCTIONTOOLS_H
 #include <string>
 #include <vector>
+#include "GDCpp/String.h"
 
 namespace GDpriv
 {
@@ -19,11 +20,10 @@ namespace FunctionTools
  * \brief Return list[index] unless index is out of range.
  * \return list[index] or empty string.
  */
-std::string GD_EXTENSION_API GetSafelyStringFromVector(std::vector<std::string> & list, unsigned int index );
+gd::String GD_EXTENSION_API GetSafelyStringFromVector(std::vector<gd::String> & list, std::size_t index );
 
 }
 }
 
 
 #endif // FUNCTIONTOOLS_H
-

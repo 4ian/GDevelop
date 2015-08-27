@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
 {
     extension.SetExtensionInformation("BuiltinKeyboard",
                           _("Keyboard features"),
-                          _("Built-in extensions allowing to use keyboard"),
+                          _("Built-in extension allowing to use keyboard"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -27,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("key", _("Key"), "",false);
+        .AddParameter("key", _("Key"));
 
     extension.AddCondition("KeyReleased",
                    _("Key released"),
@@ -37,7 +37,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("key", _("Key"), "",false);
+        .AddParameter("key", _("Key"));
 
     extension.AddCondition("KeyFromTextPressed",
                    _("Key pressed (text expression)"),
@@ -47,7 +47,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Expression generating the key to test"), "",false)
+        .AddParameter("string", _("Expression generating the key to test"))
         .MarkAsAdvanced();
 
     extension.AddCondition("KeyFromTextReleased",
@@ -58,7 +58,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Expression generating the key to test"), "",false)
+        .AddParameter("string", _("Expression generating the key to test"))
         .MarkAsAdvanced();
 
     extension.AddCondition("AnyKeyPressed",

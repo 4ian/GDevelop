@@ -8,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
+#include "GDCpp/String.h"
 
 /**
  * \brief FontManager loads and manages SFML fonts.
@@ -28,7 +29,7 @@ public:
      * sfmlText.SetFont(*fontManager->GetFont(fontName));
      * \endcode
      */
-    const sf::Font * GetFont(const std::string & fontName);
+    const sf::Font * GetFont(const gd::String & fontName);
 
     /**
      * \brief Unload all fonts from memory
@@ -57,8 +58,8 @@ private:
 
     void EnsureDefaultFontIsLoaded();
 
-    std::map < std::string, sf::Font* > fonts; ///< The font being loaded.
-    std::map < std::string, char* > fontsBuffer; ///< The buffer associated to each font, if any.
+    std::map < gd::String, sf::Font* > fonts; ///< The font being loaded.
+    std::map < gd::String, char* > fontsBuffer; ///< The buffer associated to each font, if any.
     sf::Font * defaultFont; ///< The default font used when no font is specified. Initialized at first use.
 
     FontManager() : defaultFont(NULL) {};

@@ -11,22 +11,22 @@ class RuntimeObject;
 /**
  * Only used internally by GD events generated code.
  */
-std::string GD_API GetSceneName(RuntimeScene & scene);
+gd::String GD_API GetSceneName(RuntimeScene & scene);
 
 /**
  * Only used internally by GD events generated code.
  */
-bool GD_API LayerVisible(RuntimeScene & scene, const std::string & layer);
+bool GD_API LayerVisible(RuntimeScene & scene, const gd::String & layer);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API ShowLayer(RuntimeScene & scene, const std::string & layer);
+void GD_API ShowLayer(RuntimeScene & scene, const gd::String & layer);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API HideLayer(RuntimeScene & scene, const std::string & layer);
+void GD_API HideLayer(RuntimeScene & scene, const gd::String & layer);
 
 /**
  * Only used internally by GD events generated code.
@@ -36,12 +36,12 @@ void GD_API StopGame(RuntimeScene & scene);
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API ReplaceScene(RuntimeScene & scene, std::string newSceneName);
+void GD_API ReplaceScene(RuntimeScene & scene, gd::String newSceneName, bool clearOthers);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API PushScene(RuntimeScene & scene, std::string newSceneName);
+void GD_API PushScene(RuntimeScene & scene, gd::String newSceneName);
 
 /**
  * Only used internally by GD events generated code.
@@ -66,38 +66,38 @@ void GD_API DisableInputWhenFocusIsLost(RuntimeScene & scene, bool disable);
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, float positionX, float positionY, const std::string & layer);
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, float positionX, float positionY, const gd::String & layer);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, const std::string & objectWanted, float positionX, float positionY, const std::string & layer);
+void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, const gd::String & objectWanted, float positionX, float positionY, const gd::String & layer);
 
 /**
  * Only used internally by GD events generated code.
  *
  * \return true ( always )
  */
-bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists);
 
 /**
  * Only used internally by GD events generated code.
  *
  * \return true if an object was picked, false otherwise
  */
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+bool GD_API PickRandomObject(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists);
 
 /**
  * Only used internally by GD events generated code.
  *
  * \return true if an object was picked, false otherwise
  */
-bool GD_API PickNearestObject(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, bool inverted);
+bool GD_API PickNearestObject(std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, bool inverted);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API ChangeSceneBackground(RuntimeScene & scene, std::string newColor);
+void GD_API ChangeSceneBackground(RuntimeScene & scene, gd::String newColor);
 
 /**
  * Only used internally by GD events generated code.
@@ -111,12 +111,12 @@ bool GD_API GlobalVariableExists(RuntimeScene & scene, const gd::Variable & vari
 /**
  * Only used internally by GD events generated code.
  */
-bool GD_API VariableChildExists(const gd::Variable & variable, const std::string & childName);
+bool GD_API VariableChildExists(const gd::Variable & variable, const gd::String & childName);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API VariableRemoveChild(gd::Variable & variable, const std::string & childName);
+void GD_API VariableRemoveChild(gd::Variable & variable, const gd::String & childName);
 
 /**
  * Only used internally by GD events generated code.
@@ -131,7 +131,7 @@ double GD_API GetVariableValue(const gd::Variable & variable);
 /**
  * Only used internally by GD events generated code.
  */
-const std::string& GD_API GetVariableString(const gd::Variable & variable);
+const gd::String& GD_API GetVariableString(const gd::Variable & variable);
 
 /**
  * Only used internally by GD events generated code.
@@ -146,17 +146,17 @@ void GD_API SetWindowSize(RuntimeScene & scene, int width, int height, bool useT
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName);
+void GD_API SetWindowIcon(RuntimeScene & scene, const gd::String & imageName);
 
 /**
  * Only used internally by GD events generated code.
  */
-void GD_API SetWindowTitle(RuntimeScene & scene, const std::string & newName);
+void GD_API SetWindowTitle(RuntimeScene & scene, const gd::String & newName);
 
 /**
  * Only used internally by GD events generated code.
  */
-const std::string & GD_API GetWindowTitle(RuntimeScene & scene);
+const gd::String & GD_API GetWindowTitle(RuntimeScene & scene);
 
 /**
  * Only used internally by GD events generated code.
@@ -182,11 +182,6 @@ unsigned int GD_API GetScreenHeight();
  * Only used internally by GD events generated code.
  */
 unsigned int GD_API GetScreenColorDepth();
-
-/**
- * Only used internally by GD events generated code.
- */
-void GD_API DisplayLegacyTextOnScene(RuntimeScene & scene, const std::string & str, float x, float y, const std::string & color, float characterSize, const std::string & fontName, const std::string & layer);
 
 #if defined(GD_IDE_ONLY)
 /**

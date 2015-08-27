@@ -15,10 +15,10 @@ BaseObjectExtension::BaseObjectExtension()
     AddRuntimeObject(obj, "", &CreateBaseRuntimeObject);
 
     #if defined(GD_IDE_ONLY)
-    std::map<std::string, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");
-    std::map<std::string, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("");
-    std::map<std::string, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("");
-    std::map<std::string, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
+    std::map<gd::String, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");
+    std::map<gd::String, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("");
+    std::map<gd::String, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("");
+    std::map<gd::String, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
 
     objectConditions["PosX"].SetFunctionName("GetX").SetManipulatedType("number");
     objectActions["MettreX"].SetFunctionName("SetX").SetManipulatedType("number").SetGetter("GetX");
@@ -60,8 +60,8 @@ BaseObjectExtension::BaseObjectExtension()
     objectConditions["VarObjet"].SetFunctionName("ReturnVariable").SetManipulatedType("number");
     objectConditions["VarObjetTxt"].SetFunctionName("ReturnVariable").SetManipulatedType("string");
     objectConditions["VarObjetDef"].SetFunctionName("VariableExists");
-    objectConditions["AutomatismActivated"].SetFunctionName("AutomatismActivated");
-    objectActions["ActivateAutomatism"].SetFunctionName("ActivateAutomatism");
+    objectConditions["BehaviorActivated"].SetFunctionName("BehaviorActivated");
+    objectActions["ActivateBehavior"].SetFunctionName("ActivateBehavior");
     objectActions["AddForceVers"].SetFunctionName("AddForceTowardObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
     objectActions["AddForceTourne"].SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");
     objectActions["MettreAutour"].SetFunctionName("PutAroundObject").SetIncludeFile("GDCpp/BuiltinExtensions/ObjectTools.h");

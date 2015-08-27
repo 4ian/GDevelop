@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include "Credits.h"
@@ -214,16 +214,16 @@ Credits::Credits(wxWindow* parent)
 	florianRival->SetLabel("Florian \"4ian\" Rival");
 
     //Format GDevelop version
-    string nbversion = gd::VersionWrapper::FullString();
-    string status = gd::VersionWrapper::Status();
-    string version ="GDevelop "+nbversion+" "+status+"";
+    gd::String nbversion = gd::VersionWrapper::FullString();
+    gd::String status = gd::VersionWrapper::Status();
+    gd::String version ="GDevelop " + nbversion + " " + status + " (UTF8)";
 	StaticText1->SetLabel(version);
 	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributors: (No special order)")+"</h5>\n"
                       +"<br>"
-                      +_("François Dumortier : GDevelop logo design and website conception.")+"<br>"
+                      +_("Franï¿½ois Dumortier : GDevelop logo design and website conception.")+"<br>"
                       +"( <a href=\"http://www.fdumortier.com\">http://www.fdumortier.com</a> )"+"<br>"
                       +"<br>"
-                      +_("Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path automatism and Sound object extension.")+"<br>"
+                      +_("Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension.")+"<br>"
                       +"( <a href=\"http://www.levasseursoftware.net/\">http://www.levasseursoftware.net</a> )"+"<br>"
                       +"<br>"
                       +_("Constantine Shvetsov: Awesome design of icons")+"<br>"
@@ -240,7 +240,7 @@ Credits::Credits(wxWindow* parent)
                       +"<br>"
                       +_("Thomas Flecy: Original Sound object extension")+"<br>"
                       +"<br>"
-                      +_("Fernando José Martínez López : Spanish translation of the tutorial")+"<br>"
+                      +_("Fernando Josï¿½ Martï¿½nez Lï¿½pez : Spanish translation of the tutorial")+"<br>"
                       +"<br>"
                       +_("conceptgame : Indiegogo super contributor. Thanks!")+"<br>"
                       +"<br>"

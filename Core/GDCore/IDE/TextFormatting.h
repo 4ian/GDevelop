@@ -9,7 +9,7 @@
 #if !defined(GD_NO_WX_GUI)
 #include <wx/colour.h>
 #endif
-#include <string>
+#include "GDCore/String.h"
 
 namespace gd
 {
@@ -25,7 +25,7 @@ namespace gd
 class GD_CORE_API TextFormatting
 {
 public:
-    TextFormatting() : colorRed(0), colorGreen(0), colorBlue(0), bold(false), italic(false), userData(std::string::npos) {}
+    TextFormatting() : colorRed(0), colorGreen(0), colorBlue(0), bold(false), italic(false), userData(gd::String::npos) {}
     ~TextFormatting() {}
 
     /**

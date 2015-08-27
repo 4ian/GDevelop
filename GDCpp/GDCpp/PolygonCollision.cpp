@@ -37,7 +37,7 @@ void project(const sf::Vector2f axis, const Polygon2d & p, float& min, float& ma
     min = dp;
     max = dp;
 
-    for (unsigned int i = 1; i < p.vertices.size(); i++)
+    for (std::size_t i = 1; i < p.vertices.size(); i++)
     {
         dp = dotProduct(axis, p.vertices[i]);
 
@@ -79,7 +79,7 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
     CollisionResult result;
 
     //Iterate over all the edges composing the polygons
-    for (unsigned int i = 0; i < p1.vertices.size() + p2.vertices.size(); i++)
+    for (std::size_t i = 0; i < p1.vertices.size() + p2.vertices.size(); i++)
     {
         if (i < p1.vertices.size()) // or <=
         {
@@ -111,7 +111,7 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
         }
 
         float dist = distance(minA, maxA, minB, maxB);
-        dist = abs(dist);
+        dist = std::abs(dist);
 
         if (dist < min_dist)
         {
@@ -128,4 +128,3 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
 
     return result;
 }
-

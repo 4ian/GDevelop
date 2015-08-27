@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 #include "SearchEvents.h"
 
@@ -255,7 +255,7 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
     if ( onlySelectedEventCheck->GetValue() )
     {
         std::vector < gd::EventItem > selectedEventsInfo = parent->GetSelection().GetAllSelectedEvents();
-        for (unsigned int i = 0;i<selectedEventsInfo.size();++i)
+        for (std::size_t i = 0;i<selectedEventsInfo.size();++i)
         {
             if ( selectedEventsInfo[i].event != std::shared_ptr<gd::BaseEvent>() )
                 eventsToInspect.InsertEvent(selectedEventsInfo[i].event);
@@ -264,8 +264,8 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
 
     gd::EventsRefactorer::ReplaceStringInEvents(project, layout,
                                             onlySelectedEventCheck->GetValue() ? eventsToInspect : *events,
-                                            string(searchToReplaceEdit->GetValue().mb_str()),
-                                            string(replaceEdit->GetValue().mb_str()),
+                                            searchToReplaceEdit->GetValue(),
+                                            replaceEdit->GetValue(),
                                             replaceCaseCheck->GetValue(),
                                             replaceConditionsCheck->GetValue(),
                                             replaceActionsCheck->GetValue());
@@ -279,7 +279,7 @@ void SearchEvents::OnsearchBtClick(wxCommandEvent& event)
     if ( events == NULL ) return;
 
     searchResults = gd::EventsRefactorer::SearchInEvents(project, layout, *events,
-                                            string(searchEdit->GetValue().mb_str()),
+                                            searchEdit->GetValue(),
                                             caseCheck->GetValue(),
                                             conditionsCheck->GetValue(),
                                             actionsCheck->GetValue());

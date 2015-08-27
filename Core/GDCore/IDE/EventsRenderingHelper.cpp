@@ -7,7 +7,7 @@
 #include "EventsRenderingHelper.h"
 #include <utility>
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/renderer.h>
@@ -28,7 +28,7 @@ namespace gd
 
 EventsRenderingHelper * EventsRenderingHelper::singleton = NULL;
 
-wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point)
+wxPoint EventsRenderingHelper::DrawTextInArea(gd::String text, wxDC & dc, wxRect rect, wxPoint point)
 {
     if ( text.empty() || rect.width == 0) return point;
 
@@ -44,14 +44,16 @@ wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRec
     int charactersInALine = floor(static_cast<double>(rect.width)/static_cast<double>(fontCharacterWidth));
     if ( charactersInALine <= 0) charactersInALine = 1;
 
-    int cutCount = ceil(static_cast<double>(text.length())/static_cast<double>(charactersInALine));
+    int textLength = text.size();
+
+    int cutCount = ceil(static_cast<double>(textLength)/static_cast<double>(charactersInALine));
     if ( cutCount <= 0 ) cutCount = 1;
 
     size_t lastCutPosition = 0;
     wxString displayedText;
     for (unsigned int i = 0;i<cutCount;++i)
     {
-        if (i != 0 ) point.y += 15;
+        if (i != 0) point.y += fontCharacterHeight;
 
         #if defined(LINUX)
         try
@@ -75,7 +77,7 @@ wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRec
     return wxPoint(point.x+displayedText.length()*fontCharacterWidth, point.y);
 }
 
-unsigned int EventsRenderingHelper::GetTextHeightInArea(const std::string & text, unsigned int widthAvailable)
+unsigned int EventsRenderingHelper::GetTextHeightInArea(const gd::String & text, unsigned int widthAvailable)
 {
     if ( text.empty() || widthAvailable == 0) return 0;
 
@@ -85,7 +87,7 @@ unsigned int EventsRenderingHelper::GetTextHeightInArea(const std::string & text
     int cutCount = ceil(static_cast<double>(text.length())/static_cast<double>(charactersInALine));
     if ( cutCount <= 0 ) cutCount = 1;
 
-    return cutCount*15;
+    return cutCount * fontCharacterHeight;
 }
 
 EventsRenderingHelper::EventsRenderingHelper() :
@@ -119,16 +121,16 @@ conditionsRectangleFill(wxBrush(wxColour(252,252,255)))
 {
     fakeBmp.Create(10,10,-1);
 
-    //Setup fonts, with "retina" support.
-    int fontSize = gd::GUIContentScaleFactor::Get() > 1 ? 15 : 9;
-    int niceFontSize = gd::GUIContentScaleFactor::Get() > 1 ? 12 : 8;
+    niceFont = wxFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+    niceFont.SetPointSize(10);
 
-    niceFont = wxFont(niceFontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
     #if defined(WINDOWS)
-    SetFont(wxFont(fontSize, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas"));
+    wxFont font(8, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
     #else
-    SetFont(wxFont(fontSize, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false));
+    wxFont font(8, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false);
     #endif
+    font.SetPointSize(10);
+    SetFont(font);
 }
 
 void EventsRenderingHelper::SetFont(const wxFont & font_)
@@ -140,6 +142,7 @@ void EventsRenderingHelper::SetFont(const wxFont & font_)
     dc.SelectObject(fakeBmp);
     dc.SetFont(font);
     fontCharacterWidth = static_cast<float>(dc.GetTextExtent("abcdef").GetWidth())/6.0f;
+    fontCharacterHeight = dc.GetTextExtent("abcdef").GetHeight();
 }
 
 int EventsRenderingHelper::DrawConditionsList(gd::InstructionsList & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
@@ -173,11 +176,11 @@ int EventsRenderingHelper::DrawConditionsList(gd::InstructionsList & conditions,
         dc.SetFont( niceFont.Italic() );
         dc.DrawText( _("No conditions"), x + 2, y + 1 );
 
-        return 15;
+        return fontCharacterHeight;
     }
 
     //Draw each conditions
-    for ( unsigned int j = 0;j < conditions.size();j++ )
+    for ( std::size_t j = 0;j < conditions.size();j++ )
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
@@ -193,7 +196,7 @@ int EventsRenderingHelper::DrawConditionsList(gd::InstructionsList & conditions,
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = InstructionSentenceFormatter::Get()->Translate(conditions[j], instructionMetadata);
+            gd::String text = InstructionSentenceFormatter::Get()->Translate(conditions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
@@ -203,7 +206,7 @@ int EventsRenderingHelper::DrawConditionsList(gd::InstructionsList & conditions,
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = InstructionSentenceFormatter::Get()->Translate(conditions[j], instructionMetadata);
+            gd::String text = InstructionSentenceFormatter::Get()->Translate(conditions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
@@ -274,11 +277,11 @@ int EventsRenderingHelper::DrawActionsList(gd::InstructionsList & actions, wxDC 
         dc.SetFont( niceFont.Italic() );
         dc.DrawText( _("No actions"), x + 2, y + 1 );
 
-        return 15;
+        return fontCharacterHeight;
     }
 
     //Draw each actions
-    for ( unsigned int j = 0;j < actions.size();j++ )
+    for ( std::size_t j = 0;j < actions.size();j++ )
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
@@ -292,7 +295,7 @@ int EventsRenderingHelper::DrawActionsList(gd::InstructionsList & actions, wxDC 
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = InstructionSentenceFormatter::Get()->Translate(actions[j], instructionMetadata);
+            gd::String text = InstructionSentenceFormatter::Get()->Translate(actions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
@@ -302,7 +305,7 @@ int EventsRenderingHelper::DrawActionsList(gd::InstructionsList & actions, wxDC 
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = InstructionSentenceFormatter::Get()->Translate(actions[j], instructionMetadata);
+            gd::String text = InstructionSentenceFormatter::Get()->Translate(actions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
@@ -343,9 +346,9 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const gd::In
     const int iconWidth = 18;
 
     if ( conditions.empty() )
-        return 15;
+        return fontCharacterHeight;
 
-    for ( unsigned int j = 0;j < conditions.size();j++ )
+    for ( std::size_t j = 0;j < conditions.size();j++ )
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
@@ -375,10 +378,10 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const gd::Instr
 
     //Draw Actions rectangle
     if ( actions.empty() )
-        return 15;
+        return fontCharacterHeight;
 
     //Draw each actions
-    for ( unsigned int j = 0;j < actions.size();j++ )
+    for ( std::size_t j = 0;j < actions.size();j++ )
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
@@ -402,44 +405,48 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const gd::Instr
 int EventsRenderingHelper::DrawInstruction(gd::Instruction & instruction, const gd::InstructionMetadata & instructionMetadata, bool isCondition,
                                            wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, gd::EventsEditorItemsAreas & areas, gd::EventsEditorSelection & selection)
 {
-    std::vector< std::pair<std::string, TextFormatting > > formattedStr =
+    std::vector< std::pair<gd::String, TextFormatting > > formattedStr =
         InstructionSentenceFormatter::Get()->GetAsFormattedText(instruction, instructionMetadata);
 
     wxPoint lastPos = point;
     //size_t alreadyWrittenCharCount = 0;
-    for (unsigned int i = 0;i<formattedStr.size();++i)
+    for (std::size_t i = 0;i<formattedStr.size();++i)
     {
         //Update font and properties
         dc.SetTextForeground(!event->IsDisabled() ? formattedStr[i].second.GetWxColor() : wxColour(160,160,160));
         font.SetWeight(formattedStr[i].second.bold ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL);
         font.SetStyle(formattedStr[i].second.italic ? wxFONTSTYLE_ITALIC : wxFONTSTYLE_NORMAL);
-        std::string text = formattedStr[i].first;
+        gd::String text = formattedStr[i].first;
 
         //Verify if we are drawing a parameter
-        if ( formattedStr[i].second.userData != std::string::npos)
+        if ( formattedStr[i].second.userData != gd::String::npos)
         {
             ParameterItem item( formattedStr[i].second.userData < instruction.GetParameters().size() ? &instruction.GetParameter(formattedStr[i].second.userData) : NULL, event );
 
-            int parameterWidth = (text.length()*fontCharacterWidth <= freeWidth-lastPos.x+point.x ? text.length()*fontCharacterWidth : freeWidth-lastPos.x+point.x);
+            std::size_t textLength = text.size();
+            int parameterWidth = (textLength*fontCharacterWidth <= freeWidth-lastPos.x+point.x ? textLength*fontCharacterWidth : freeWidth-lastPos.x+point.x);
             if ( selection.ParameterHighLighted(item) )
             {
                 dc.SetBrush(wxBrush(wxColour(255, 163, 163)));
                 dc.SetPen(wxPen(wxColour(209, 0, 0)));
-                dc.DrawRectangle(lastPos.x, lastPos.y,  parameterWidth, 15);
+                dc.DrawRectangle(lastPos.x, lastPos.y,  parameterWidth, fontCharacterHeight);
             }
 
-            areas.AddParameterArea(wxRect(lastPos.x, lastPos.y, parameterWidth,15) ,item);
+            areas.AddParameterArea(wxRect(lastPos.x, lastPos.y, parameterWidth, fontCharacterHeight) ,item);
         }
 
         dc.SetFont(font);
-        lastPos = DrawTextInArea(text, dc, wxRect(point.x, point.y, freeWidth, 0/*Useless*/), lastPos);
+        lastPos = DrawTextInArea(text,
+                                 dc,
+                                 wxRect(point.x, point.y, freeWidth, 0/*Useless*/),
+                                 lastPos);
     }
 
     font.SetWeight(wxFONTWEIGHT_NORMAL);
     font.SetStyle(wxFONTSTYLE_NORMAL);
     dc.SetFont(font);
 
-    return lastPos.y-point.y+15;
+    return lastPos.y-point.y + fontCharacterHeight;
 }
 
 void EventsRenderingHelper::DrawNiceRectangle(wxDC & dc, const wxRect & rect) const
@@ -469,25 +476,12 @@ void EventsRenderingHelper::DrawNiceRectangle(wxDC & dc, const wxRect & rect) co
     dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
 }
 
-std::string EventsRenderingHelper::GetHTMLText(std::string str)
+gd::String EventsRenderingHelper::GetHTMLText(gd::String str)
 {
-    size_t pos = 0;
-    while ( str.find("&", pos) != string::npos)
-    {
-        str.replace( str.find( "&", pos), 1, "&amp;" );
-        pos = str.find( "&", pos)+1;
-    }
-
-    while ( str.find("<") != string::npos)
-        str.replace( str.find( "<" ), 1, "&lt;" );
-
-    while ( str.find(">") != string::npos)
-        str.replace( str.find( ">" ), 1, "&gt;" );
-
-    while ( str.find("\n") != string::npos)
-        str.replace( str.find( "\n" ), 1, "<br>" );
-
-    return str;
+    return str.FindAndReplace("&", "&amp;")
+        .FindAndReplace("<", "&lt;")
+        .FindAndReplace(">", "&gt;")
+        .FindAndReplace("\n", "<br>");
 }
 
 EventsRenderingHelper * EventsRenderingHelper::Get()

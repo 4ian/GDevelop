@@ -52,9 +52,9 @@ public :
     virtual void OnPositionChanged();
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+    virtual std::size_t GetNumberOfProperties() const;
     #endif
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
@@ -73,10 +73,10 @@ public :
     float GetColumnAt(float x);
     float GetRowAt(float y);
 
-    std::string SaveAsString() const;
-    void LoadFromString(const std::string &str);
+    gd::String SaveAsString() const;
+    void LoadFromString(const gd::String &str);
 
-    void ChangeTexture(const std::string &textureName, RuntimeScene &scene);
+    void ChangeTexture(const gd::String &textureName, RuntimeScene &scene);
 
     TileSetProxy tileSet;
     TileMapProxy tileMap;
@@ -94,11 +94,11 @@ private:
     float oldY;
 };
 
-bool GD_EXTENSION_API SingleTileCollision(std::map<std::string, std::vector<RuntimeObject*>*> tileMapList,
+bool GD_EXTENSION_API SingleTileCollision(std::map<gd::String, std::vector<RuntimeObject*>*> tileMapList,
                          int layer,
                          int column,
                          int row,
-                         std::map<std::string, std::vector<RuntimeObject*>*> objectLists,
+                         std::map<gd::String, std::vector<RuntimeObject*>*> objectLists,
                          bool conditionInverted);
 
 RuntimeObject * CreateRuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object);

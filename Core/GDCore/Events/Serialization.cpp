@@ -24,7 +24,7 @@ namespace gd
 
 void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project, gd::InstructionsList & list, bool instructionsAreActions)
 {
-    for (unsigned int i = 0;i<list.size();++i)
+    for (std::size_t i = 0;i<list.size();++i)
     {
         gd::Instruction & instr = list[i];
 
@@ -55,7 +55,7 @@ void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project,
 
 void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, gd::InstructionsList & list, bool instructionsAreActions)
 {
-    for (unsigned int i = 0;i<list.size();++i)
+    for (std::size_t i = 0;i<list.size();++i)
     {
         gd::Instruction & instr = list[i];
 
@@ -78,7 +78,7 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
             instr.SetParameter(1, instr.GetParameter(5));
             instr.SetParameter(2, instr.GetParameter(3));
         }
-        else if (instr.GetType() == "PhysicsAutomatism::AddRevoluteJointBetweenObjects")
+        else if (instr.GetType() == "PhysicsBehavior::AddRevoluteJointBetweenObjects")
         {
             instr.SetParameter(4, instr.GetParameter(5));
             instr.SetParameter(5, instr.GetParameter(6));
@@ -137,7 +137,7 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
 
         //Common updates for some parameters
         const std::vector< gd::Expression > & parameters = instr.GetParameters();
-        for (unsigned int j = 0;j<parameters.size() && j<metadata.parameters.size();++j)
+        for (std::size_t j = 0;j<parameters.size() && j<metadata.parameters.size();++j)
         {
             if ( metadata.parameters[j].type == "relationalOperator" ||
                  metadata.parameters[j].type == "operator" )
@@ -149,7 +149,7 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
                 else
                 {
                     //Exchange parameters
-                    std::string op = parameters[j+1].GetPlainString();
+                    gd::String op = parameters[j+1].GetPlainString();
                     instr.SetParameter(j+1, parameters[j] );
                     instr.SetParameter(j, gd::Expression(op));
                 }
@@ -163,10 +163,10 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
 void EventsListSerialization::UnserializeEventsFrom(gd::Project & project, EventsList & list, const SerializerElement & events)
 {
     events.ConsiderAsArrayOf("event", "Event");
-    for(unsigned int i = 0; i<events.GetChildrenCount(); ++i)
+    for(std::size_t i = 0; i<events.GetChildrenCount(); ++i)
     {
         SerializerElement & eventElem = events.GetChild(i);
-        std::string type = eventElem.GetChild("type", 0, "Type").GetValue().GetString();
+        gd::String type = eventElem.GetChild("type", 0, "Type").GetValue().GetString();
         gd::BaseEventSPtr event = project.CreateEvent(type);
         if ( event != std::shared_ptr<gd::BaseEvent>())
             event->UnserializeFrom(project, eventElem);
@@ -186,7 +186,7 @@ void EventsListSerialization::UnserializeEventsFrom(gd::Project & project, Event
 void EventsListSerialization::SerializeEventsTo(const EventsList & list, SerializerElement & events)
 {
     events.ConsiderAsArrayOf("event");
-    for ( unsigned int j = 0;j < list.size();j++ )
+    for ( std::size_t j = 0;j < list.size();j++ )
     {
         const gd::BaseEvent & event = list.GetEvent(j);
         SerializerElement & eventElem = events.AddChild("event");
@@ -204,13 +204,14 @@ using namespace std;
 void gd::EventsListSerialization::OpenConditions(gd::Project & project, gd::InstructionsList & conditions, const SerializerElement & elem)
 {
     elem.ConsiderAsArrayOf("condition", "Condition");
-    for(unsigned int i = 0; i<elem.GetChildrenCount(); ++i)
+    for(std::size_t i = 0; i<elem.GetChildrenCount(); ++i)
     {
         gd::Instruction instruction;
         const SerializerElement & conditionElem = elem.GetChild(i);
 
-        instruction.SetType( conditionElem.GetChild("type", 0, "Type").GetStringAttribute("value") );
-        instruction.SetInverted( conditionElem.GetChild("type", 0, "Type").GetBoolAttribute("inverted", false, "Contraire") );
+        instruction.SetType(conditionElem.GetChild("type", 0, "Type").GetStringAttribute("value")
+                .FindAndReplace("Automatism", "Behavior")); //Compatibility with GD <= 4
+        instruction.SetInverted(conditionElem.GetChild("type", 0, "Type").GetBoolAttribute("inverted", false, "Contraire"));
 
         //Read parameters
         vector < gd::Expression > parameters;
@@ -218,7 +219,7 @@ void gd::EventsListSerialization::OpenConditions(gd::Project & project, gd::Inst
         //Compatibility with GD <= 3.3
         if (conditionElem.HasChild("Parametre")) {
 
-            for (unsigned int j = 0;j<conditionElem.GetChildrenCount("Parametre");++j)
+            for (std::size_t j = 0;j<conditionElem.GetChildrenCount("Parametre");++j)
                 parameters.push_back(gd::Expression(conditionElem.GetChild("Parametre", j).GetValue().GetString()));
 
         }
@@ -227,7 +228,7 @@ void gd::EventsListSerialization::OpenConditions(gd::Project & project, gd::Inst
         {
             const SerializerElement & parametersElem = conditionElem.GetChild("parameters");
             parametersElem.ConsiderAsArrayOf("parameter");
-            for (unsigned int j = 0;j<parametersElem.GetChildrenCount();++j)
+            for (std::size_t j = 0;j<parametersElem.GetChildrenCount();++j)
                 parameters.push_back(gd::Expression(parametersElem.GetChild(j).GetValue().GetString()));
         }
 
@@ -251,12 +252,13 @@ void gd::EventsListSerialization::OpenConditions(gd::Project & project, gd::Inst
 void gd::EventsListSerialization::OpenActions(gd::Project & project, gd::InstructionsList & actions, const SerializerElement & elem)
 {
     elem.ConsiderAsArrayOf("action", "Action");
-    for(unsigned int i = 0; i<elem.GetChildrenCount(); ++i)
+    for(std::size_t i = 0; i<elem.GetChildrenCount(); ++i)
     {
         gd::Instruction instruction;
         const SerializerElement & actionElem = elem.GetChild(i);
 
-        instruction.SetType( actionElem.GetChild("type", 0, "Type").GetStringAttribute("value") );
+        instruction.SetType(actionElem.GetChild("type", 0, "Type").GetStringAttribute("value")
+            .FindAndReplace("Automatism", "Behavior")); //Compatibility with GD <= 4
 
         //Read parameters
         vector < gd::Expression > parameters;
@@ -264,7 +266,7 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, gd::Instruc
         //Compatibility with GD <= 3.3
         if (actionElem.HasChild("Parametre")) {
 
-            for (unsigned int j = 0;j<actionElem.GetChildrenCount("Parametre");++j)
+            for (std::size_t j = 0;j<actionElem.GetChildrenCount("Parametre");++j)
                 parameters.push_back(gd::Expression(actionElem.GetChild("Parametre", j).GetValue().GetString()));
 
         }
@@ -273,7 +275,7 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, gd::Instruc
         {
             const SerializerElement & parametersElem = actionElem.GetChild("parameters");
             parametersElem.ConsiderAsArrayOf("parameter");
-            for (unsigned int j = 0;j<parametersElem.GetChildrenCount();++j)
+            for (std::size_t j = 0;j<parametersElem.GetChildrenCount();++j)
                 parameters.push_back(gd::Expression(parametersElem.GetChild(j).GetValue().GetString()));
         }
 
@@ -297,7 +299,7 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, gd::Instruc
 void gd::EventsListSerialization::SaveActions(const gd::InstructionsList & list, SerializerElement & actions)
 {
     actions.ConsiderAsArrayOf("action");
-    for ( unsigned int k = 0;k < list.size();k++ )
+    for ( std::size_t k = 0;k < list.size();k++ )
     {
         SerializerElement & action = actions.AddChild("action");
         action.AddChild("type")
@@ -307,7 +309,7 @@ void gd::EventsListSerialization::SaveActions(const gd::InstructionsList & list,
         //Parameters
         SerializerElement & parameters = action.AddChild("parameters");
         parameters.ConsiderAsArrayOf("parameter");
-        for ( unsigned int l = 0;l < list[k].GetParameters().size();l++ )
+        for ( std::size_t l = 0;l < list[k].GetParameters().size();l++ )
             parameters.AddChild("parameter").SetValue(list[k].GetParameter(l).GetPlainString());
 
         //Sub instructions
@@ -319,7 +321,7 @@ void gd::EventsListSerialization::SaveActions(const gd::InstructionsList & list,
 void gd::EventsListSerialization::SaveConditions(const gd::InstructionsList & list, SerializerElement & conditions)
 {
     conditions.ConsiderAsArrayOf("condition");
-    for ( unsigned int k = 0;k < list.size();k++ )
+    for ( std::size_t k = 0;k < list.size();k++ )
     {
         SerializerElement & condition = conditions.AddChild("condition");
         condition.AddChild("type")
@@ -329,7 +331,7 @@ void gd::EventsListSerialization::SaveConditions(const gd::InstructionsList & li
         //Parameters
         SerializerElement & parameters = condition.AddChild("parameters");
         parameters.ConsiderAsArrayOf("parameter");
-        for ( unsigned int l = 0;l < list[k].GetParameters().size();l++ )
+        for ( std::size_t l = 0;l < list[k].GetParameters().size();l++ )
             parameters.AddChild("parameter").SetValue(list[k].GetParameter(l).GetPlainString());
 
         //Sub instructions

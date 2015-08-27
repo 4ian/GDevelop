@@ -21,9 +21,9 @@ SpriteExtension::SpriteExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    std::map<std::string, gd::InstructionMetadata > & spriteActions = GetAllActionsForObject("Sprite");
-    std::map<std::string, gd::InstructionMetadata > & spriteConditions = GetAllConditionsForObject("Sprite");
-    std::map<std::string, gd::ExpressionMetadata > & spriteExpressions = GetAllExpressionsForObject("Sprite");
+    std::map<gd::String, gd::InstructionMetadata > & spriteActions = GetAllActionsForObject("Sprite");
+    std::map<gd::String, gd::InstructionMetadata > & spriteConditions = GetAllConditionsForObject("Sprite");
+    std::map<gd::String, gd::ExpressionMetadata > & spriteExpressions = GetAllExpressionsForObject("Sprite");
     spriteActions["ChangeBlendMode"].SetFunctionName("setBlendMode").SetIncludeFile("spriteruntimeobject.js");
     spriteActions["Opacity"].SetFunctionName("setOpacity").SetGetter("getOpacity").SetIncludeFile("spriteruntimeobject.js");
     spriteConditions["BlendMode"].SetFunctionName("getBlendMode").SetIncludeFile("spriteruntimeobject.js");
@@ -85,12 +85,12 @@ SpriteExtension::SpriteExtension()
                        "res/copy24.png",
                        "res/copyicon.png")
 
-            .AddParameter("object", _("Object"), "Sprite", false)
+            .AddParameter("object", _("Object"), "Sprite")
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("string", _("Name of the source image"), "",false)
-            .AddParameter("expression", _("X position"), "",false)
-            .AddParameter("expression", _("Y position"), "",false)
-            .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false)
+            .AddParameter("string", _("Name of the source image"))
+            .AddParameter("expression", _("X position"))
+            .AddParameter("expression", _("Y position"))
+            .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"))
             .SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
 
 
@@ -103,8 +103,8 @@ SpriteExtension::SpriteExtension()
                        "res/actions/opacity24.png",
                        "res/actions/opacity.png")
 
-            .AddParameter("object", _("Object"), "Sprite", false)
-            .AddParameter("color", _("Color to make transparent"), "",false)
+            .AddParameter("object", _("Object"), "Sprite")
+            .AddParameter("color", _("Color to make transparent"))
             .SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
     }
 

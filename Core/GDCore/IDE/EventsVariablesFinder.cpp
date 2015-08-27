@@ -25,18 +25,18 @@ class CallbacksForSearchingVariable : public gd::ParserCallbacks
 {
 public:
 
-    CallbacksForSearchingVariable(std::set<std::string> & results_, const std::string & parameterType_, const std::string & objectName_ = "") :
+    CallbacksForSearchingVariable(std::set<gd::String> & results_, const gd::String & parameterType_, const gd::String & objectName_ = "") :
     results(results_),
     parameterType(parameterType_),
     objectName(objectName_)
     {};
     virtual ~CallbacksForSearchingVariable() {};
 
-    virtual void OnConstantToken(std::string text) {}
+    virtual void OnConstantToken(gd::String text) {}
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
-    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
+    virtual void OnStaticFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
+    virtual void OnObjectFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
+    virtual void OnObjectBehaviorFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) { SearchInParameters(parameters, expressionInfo); }
 
     virtual bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
@@ -60,8 +60,8 @@ public:
 
     void SearchInParameters(const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
-        std::string lastObjectParameter = "";
-        for (unsigned int i = 0;i<parameters.size();++i)
+        gd::String lastObjectParameter = "";
+        for (std::size_t i = 0;i<parameters.size();++i)
         {
             if (i >= expressionInfo.parameters.size()) break;
 
@@ -79,56 +79,56 @@ public:
     }
 
 private:
-    std::set< std::string > & results; ///< Reference to the std::set where arguments values must be stored.
-    std::string parameterType; ///< The name of the parameter to be searched for
-    std::string objectName; ///< If not empty, parameters will be taken into account only if the last object parameter is filled with this value.
+    std::set< gd::String > & results; ///< Reference to the std::set where arguments values must be stored.
+    gd::String parameterType; ///< The name of the parameter to be searched for
+    gd::String objectName; ///< If not empty, parameters will be taken into account only if the last object parameter is filled with this value.
 };
 
-std::set < std::string > EventsVariablesFinder::FindAllGlobalVariables(const gd::Platform & platform, const gd::Project & project)
+std::set < gd::String > EventsVariablesFinder::FindAllGlobalVariables(const gd::Platform & platform, const gd::Project & project)
 {
-    std::set < std::string > results;
+    std::set < gd::String > results;
 
-    for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
+    for (std::size_t i = 0;i<project.GetLayoutsCount();++i)
     {
-        std::set < std::string > results2 = FindArgumentsInEvents(platform, project, project.GetLayout(i), project.GetLayout(i).GetEvents(), "globalvar");
+        std::set < gd::String > results2 = FindArgumentsInEvents(platform, project, project.GetLayout(i), project.GetLayout(i).GetEvents(), "globalvar");
         results.insert(results2.begin(), results2.end());
     }
 
     return results;
 }
 
-std::set < std::string > EventsVariablesFinder::FindAllLayoutVariables(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout)
+std::set < gd::String > EventsVariablesFinder::FindAllLayoutVariables(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout)
 {
-    std::set < std::string > results;
+    std::set < gd::String > results;
 
-    std::set < std::string > results2 = FindArgumentsInEvents(platform, project, layout, layout.GetEvents(), "scenevar");
+    std::set < gd::String > results2 = FindArgumentsInEvents(platform, project, layout, layout.GetEvents(), "scenevar");
     results.insert(results2.begin(), results2.end());
 
     return results;
 }
 
-std::set < std::string > EventsVariablesFinder::FindAllObjectVariables(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const gd::Object & object)
+std::set < gd::String > EventsVariablesFinder::FindAllObjectVariables(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, const gd::Object & object)
 {
-    std::set < std::string > results;
+    std::set < gd::String > results;
 
-    std::set < std::string > results2 = FindArgumentsInEvents(platform, project, layout, layout.GetEvents(), "objectvar", object.GetName());
+    std::set < gd::String > results2 = FindArgumentsInEvents(platform, project, layout, layout.GetEvents(), "objectvar", object.GetName());
     results.insert(results2.begin(), results2.end());
 
     return results;
 }
 
-std::set < std::string > EventsVariablesFinder::FindArgumentsInInstructions(const gd::Platform & platform,
+std::set < gd::String > EventsVariablesFinder::FindArgumentsInInstructions(const gd::Platform & platform,
     const gd::Project & project, const gd::Layout & layout, const gd::InstructionsList & instructions,
-    bool instructionsAreConditions, const std::string & parameterType, const std::string & objectName)
+    bool instructionsAreConditions, const gd::String & parameterType, const gd::String & objectName)
 {
-    std::set < std::string > results;
+    std::set < gd::String > results;
 
-    for (unsigned int aId = 0;aId < instructions.size();++aId)
+    for (std::size_t aId = 0;aId < instructions.size();++aId)
     {
-        std::string lastObjectParameter = "";
+        gd::String lastObjectParameter = "";
         gd::InstructionMetadata instrInfos = instructionsAreConditions ? MetadataProvider::GetConditionMetadata(platform, instructions[aId].GetType()) :
                                                                          MetadataProvider::GetActionMetadata(platform, instructions[aId].GetType());
-        for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+        for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //The parameter has the searched type...
             if ( instrInfos.parameters[pNb].type == parameterType )
@@ -145,7 +145,7 @@ std::set < std::string > EventsVariablesFinder::FindArgumentsInInstructions(cons
                 gd::ExpressionParser parser(instructions[aId].GetParameter(pNb).GetPlainString());
                 parser.ParseMathExpression(platform, project, layout, callbacks);
             }
-            //Search in string expressions
+            //Search in gd::String expressions
             else if (instrInfos.parameters[pNb].type == "string"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
                 CallbacksForSearchingVariable callbacks(results, parameterType, objectName);
@@ -168,30 +168,30 @@ std::set < std::string > EventsVariablesFinder::FindArgumentsInInstructions(cons
     return results;
 }
 
-std::set < std::string > EventsVariablesFinder::FindArgumentsInEvents(const gd::Platform & platform,
+std::set < gd::String > EventsVariablesFinder::FindArgumentsInEvents(const gd::Platform & platform,
     const gd::Project & project, const gd::Layout & layout, const gd::EventsList & events,
-    const std::string & parameterType, const std::string & objectName)
+    const gd::String & parameterType, const gd::String & objectName)
 {
-    std::set < std::string > results;
-    for (unsigned int i = 0;i<events.size();++i)
+    std::set < gd::String > results;
+    for (std::size_t i = 0;i<events.size();++i)
     {
         vector < const gd::InstructionsList* > conditionsVectors =  events[i].GetAllConditionsVectors();
-        for (unsigned int j = 0;j < conditionsVectors.size();++j)
+        for (std::size_t j = 0;j < conditionsVectors.size();++j)
         {
-            std::set < std::string > results2 = FindArgumentsInInstructions(platform, project, layout, *conditionsVectors[j], /*conditions=*/true, parameterType, objectName);
+            std::set < gd::String > results2 = FindArgumentsInInstructions(platform, project, layout, *conditionsVectors[j], /*conditions=*/true, parameterType, objectName);
             results.insert(results2.begin(), results2.end());
         }
 
         vector < const gd::InstructionsList* > actionsVectors =  events[i].GetAllActionsVectors();
-        for (unsigned int j = 0;j < actionsVectors.size();++j)
+        for (std::size_t j = 0;j < actionsVectors.size();++j)
         {
-            std::set < std::string > results2 = FindArgumentsInInstructions(platform, project, layout, *actionsVectors[j], /*conditions=*/false, parameterType, objectName);
+            std::set < gd::String > results2 = FindArgumentsInInstructions(platform, project, layout, *actionsVectors[j], /*conditions=*/false, parameterType, objectName);
             results.insert(results2.begin(), results2.end());
         }
 
         if ( events[i].CanHaveSubEvents() )
         {
-            std::set < std::string > results2 = FindArgumentsInEvents(platform, project, layout, events[i].GetSubEvents(), parameterType, objectName);
+            std::set < gd::String > results2 = FindArgumentsInEvents(platform, project, layout, events[i].GetSubEvents(), parameterType, objectName);
             results.insert(results2.begin(), results2.end());
         }
     }

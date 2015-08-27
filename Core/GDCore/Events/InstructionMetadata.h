@@ -7,13 +7,14 @@
 #ifndef INSTRUCTIONMETADATA_H
 #define INSTRUCTIONMETADATA_H
 #if defined(GD_IDE_ONLY)
-#include <string>
+#include "GDCore/String.h"
 #include "GDCore/Events/Instruction.h"
 #include <memory>
 #include <functional>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
+#include "GDCore/String.h"
 class wxBitmap;
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -38,13 +39,13 @@ public:
      * \brief Return the type of the parameter.
      * \see gd::ParameterMetadata::IsObject
      */
-    const std::string & GetType() const { return type; }
+    const gd::String & GetType() const { return type; }
 
     /**
      * \brief Return an optional additional information, used for some parameters with special
      * type (For example, it can contains the type of object accepted by the parameter).
      */
-    const std::string & GetExtraInfo() const { return supplementaryInformation; }
+    const gd::String & GetExtraInfo() const { return supplementaryInformation; }
 
     /**
      * \brief Return true if the parameter is optional.
@@ -54,7 +55,7 @@ public:
     /**
      * \brief Return the description of the parameter
      */
-    const std::string & GetDescription() const { return description; }
+    const gd::String & GetDescription() const { return description; }
 
     /**
      * \brief Return true if the parameter is only meant to be completed during compilation
@@ -65,21 +66,21 @@ public:
     /**
      * \brief Get the default value for the parameter.
      */
-    const std::string & GetDefaultValue() const { return defaultValue; }
+    const gd::String & GetDefaultValue() const { return defaultValue; }
 
-    std::string type; ///< Parameter type
-    std::string supplementaryInformation; ///< Used if needed
+    gd::String type; ///< Parameter type
+    gd::String supplementaryInformation; ///< Used if needed
     bool optional; ///< True if the parameter is optional
 
-    std::string description; ///< Description shown in editor
+    gd::String description; ///< Description shown in editor
     bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
-    std::string defaultValue; ///< Used as a default value in editor or if an optional parameter is empty.
+    gd::String defaultValue; ///< Used as a default value in editor or if an optional parameter is empty.
 
     /**
      * \brief Return true if the type of the parameter is "object", "objectPtr" or "objectList".
      * \see gd::ParameterMetadata::GetType
      */
-    static bool IsObject(const std::string & type) { return type == "object" || type == "objectPtr" || type == "objectList" || type == "objectListWithoutPicking"; }
+    static bool IsObject(const gd::String & type) { return type == "object" || type == "objectPtr" || type == "objectList" || type == "objectListWithoutPicking"; }
 };
 
 /**
@@ -91,28 +92,28 @@ class GD_CORE_API InstructionMetadata
 {
 public:
 
-    InstructionMetadata(const std::string & extensionNamespace,
-                        const std::string & name,
-                        const std::string & fullname,
-                        const std::string & description,
-                        const std::string & sentence,
-                        const std::string & group,
-                        const std::string & icon,
-                        const std::string & smallIcon);
+    InstructionMetadata(const gd::String & extensionNamespace,
+                        const gd::String & name,
+                        const gd::String & fullname,
+                        const gd::String & description,
+                        const gd::String & sentence,
+                        const gd::String & group,
+                        const gd::String & icon,
+                        const gd::String & smallIcon);
     virtual ~InstructionMetadata() {};
 
-    const std::string & GetFullName() const { return fullname; }
-    const std::string & GetDescription() const { return description; }
-    const std::string & GetSentence() const { return sentence; }
-    const std::string & GetGroup() const { return group; }
+    const gd::String & GetFullName() const { return fullname; }
+    const gd::String & GetDescription() const { return description; }
+    const gd::String & GetSentence() const { return sentence; }
+    const gd::String & GetGroup() const { return group; }
     const ParameterMetadata & GetParameter(size_t i) const { return parameters[i]; }
     size_t GetParametersCount() const { return parameters.size(); }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return icon; }
     const wxBitmap & GetSmallBitmapIcon() const { return smallicon; }
 #endif
-    const std::string & GetIconFilename() const { return iconFilename; }
-    const std::string & GetSmallIconFilename() const { return smallIconFilename; }
+    const gd::String & GetIconFilename() const { return iconFilename; }
+    const gd::String & GetSmallIconFilename() const { return smallIconFilename; }
     bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
     /**
@@ -138,7 +139,7 @@ public:
     /**
      * \brief Set the group of the instruction in the IDE.
      */
-    InstructionMetadata & SetGroup(const std::string & str)
+    InstructionMetadata & SetGroup(const gd::String & str)
     {
         group = str;
         return *this;
@@ -157,21 +158,21 @@ public:
      * \param optionalObjectType If type is "object", this parameter will describe which objects are allowed. If it is empty, all objects are allowed.
      * \param parameterIsOptional true if the parameter must be optional, false otherwise.
      */
-    InstructionMetadata & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
+    InstructionMetadata & AddParameter(const gd::String & type, const gd::String & description, const gd::String & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * \brief Add a parameter not displayed in editor.
      * \param type One of the type handled by GDevelop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
      * \param supplementaryInformation Can be used if needed. For example, when type == "inlineCode", the content of supplementaryInformation is inserted in the generated C++ code.
      */
-    InstructionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    InstructionMetadata & AddCodeOnlyParameter(const gd::String & type, const gd::String & supplementaryInformation);
 
     /**
      * \brief Set the default value used in editor (or if an optional parameter is empty during code generation) for the latest added parameter.
      *
      * \see AddParameter
      */
-    InstructionMetadata & SetDefaultValue(std::string defaultValue_)
+    InstructionMetadata & SetDefaultValue(gd::String defaultValue_)
     {
         if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
         return *this;
@@ -225,7 +226,7 @@ public:
          * Set the function name which will be used when generating the code.
          * \param functionName the name of the function to call
          */
-        ExtraInformation & SetFunctionName(const std::string & functionName_)
+        ExtraInformation & SetFunctionName(const gd::String & functionName_)
         {
             functionCallName = functionName_;
             return *this;
@@ -234,7 +235,7 @@ public:
         /**
          * Declare if the instruction being declared is somewhat manipulating in a standard way.
          */
-        ExtraInformation & SetManipulatedType(const std::string & type_)
+        ExtraInformation & SetManipulatedType(const gd::String & type_)
         {
             type = type_;
             return *this;
@@ -262,7 +263,7 @@ public:
          *  DECLARE_END_OBJECT_ACTION()
          * \endcode
          */
-        ExtraInformation & SetGetter(const std::string & getter)
+        ExtraInformation & SetGetter(const gd::String & getter)
         {
             optionalAssociatedInstruction = getter;
             accessType = MutatorAndOrAccessor;
@@ -272,13 +273,13 @@ public:
         /**
          * Set that the function is located in a specific include file
          */
-        ExtraInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        ExtraInformation & SetIncludeFile(const gd::String & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
             return *this;
         }
 
-        ExtraInformation & SetCustomCodeGenerator(std::function<std::string(Instruction & instruction,
+        ExtraInformation & SetCustomCodeGenerator(std::function<gd::String(Instruction & instruction,
             gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> codeGenerator)
         {
             hasCustomCodeGenerator = true;
@@ -289,7 +290,7 @@ public:
         ExtraInformation & RemoveCustomCodeGenerator()
         {
             hasCustomCodeGenerator = false;
-            std::function<std::string(Instruction & instruction,
+            std::function<gd::String(Instruction & instruction,
             gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> emptyFunction;
             customCodeGenerator = emptyFunction;
             return *this;
@@ -297,13 +298,13 @@ public:
 
         bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
-        std::string functionCallName;
-        std::string type;
+        gd::String functionCallName;
+        gd::String type;
         AccessType accessType;
-        std::string optionalAssociatedInstruction;
-        std::string optionalIncludeFile;
+        gd::String optionalAssociatedInstruction;
+        gd::String optionalIncludeFile;
         bool hasCustomCodeGenerator;
-        std::function<std::string(Instruction & instruction,
+        std::function<gd::String(Instruction & instruction,
             gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> customCodeGenerator;
     };
     ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
@@ -313,7 +314,7 @@ public:
      * \param type "number" or "string"
      * \note Shortcut for `codeExtraInformation.SetManipulatedType(type)`.
      */
-    ExtraInformation & SetManipulatedType(const std::string & type_)
+    ExtraInformation & SetManipulatedType(const gd::String & type_)
     {
         return codeExtraInformation.SetManipulatedType(type_);
     }
@@ -324,7 +325,7 @@ public:
      * \param functionName the name of the function to call
      * \note Shortcut for `codeExtraInformation.SetFunctionName`.
      */
-    ExtraInformation & SetFunctionName(const std::string & functionName)
+    ExtraInformation & SetFunctionName(const gd::String & functionName)
     {
         return codeExtraInformation.SetFunctionName(functionName);
     }
@@ -336,18 +337,18 @@ public:
 
     std::vector < ParameterMetadata > parameters;
 private:
-    std::string fullname;
-    std::string description;
-    std::string sentence;
-    std::string group;
+    gd::String fullname;
+    gd::String description;
+    gd::String sentence;
+    gd::String group;
 #if !defined(GD_NO_WX_GUI)
     wxBitmap icon;
     wxBitmap smallicon;
 #endif
-    std::string iconFilename;
-    std::string smallIconFilename;
+    gd::String iconFilename;
+    gd::String smallIconFilename;
     bool canHaveSubInstructions;
-    std::string extensionNamespace;
+    gd::String extensionNamespace;
     bool hidden;
     int usageComplexity; ///< Evaluate the instruction from 0 (simple&easy to use) to 10 (complex to understand)
 };
@@ -356,5 +357,3 @@ private:
 
 #endif
 #endif // INSTRUCTIONMETADATA_H
-
-

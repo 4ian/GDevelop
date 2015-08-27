@@ -7,7 +7,7 @@
 #ifndef GDCORE_EXTERNALEVENTS_H
 #define GDCORE_EXTERNALEVENTS_H
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include <memory>
 #include <ctime>
 #include "GDCore/Events/EventsList.h"
@@ -34,24 +34,24 @@ public:
     /**
      * \brief Get external events name
      */
-    virtual const std::string & GetName() const {return name;};
+    virtual const gd::String & GetName() const {return name;};
 
     /**
      * \brief Change external events name
      */
-    virtual void SetName(const std::string & name_) {name = name_;};
+    virtual void SetName(const gd::String & name_) {name = name_;};
 
     /**
      * \brief Get the layout associated with external events.
      *
      * This is used in the IDE to remember the layout used to edit the external events.
      */
-    virtual const std::string & GetAssociatedLayout() const {return associatedScene;};
+    virtual const gd::String & GetAssociatedLayout() const {return associatedScene;};
 
     /**
      * \brief Set the layout associated with external events.
      */
-    virtual void SetAssociatedLayout(const std::string & name_) {associatedScene = name_;};
+    virtual void SetAssociatedLayout(const gd::String & name_) {associatedScene = name_;};
 
     /**
      * Get the latest time of the build.
@@ -90,8 +90,8 @@ public:
 
 private:
 
-    std::string name;
-    std::string associatedScene;
+    gd::String name;
+    gd::String associatedScene;
     time_t lastChangeTimeStamp; ///< Time of the last build
     gd::EventsList events; ///< List of events
 
@@ -105,8 +105,8 @@ private:
 /**
  * \brief Functor testing ExternalEvents' name
  */
-struct ExternalEventsHasName : public std::binary_function<std::shared_ptr<gd::ExternalEvents>, std::string, bool> {
-    bool operator()(const std::shared_ptr<gd::ExternalEvents> & externalEvents, std::string name) const { return externalEvents->GetName() == name; }
+struct ExternalEventsHasName : public std::binary_function<std::shared_ptr<gd::ExternalEvents>, gd::String, bool> {
+    bool operator()(const std::shared_ptr<gd::ExternalEvents> & externalEvents, gd::String name) const { return externalEvents->GetName() == name; }
 };
 
 }

@@ -21,7 +21,7 @@ SoundWrapperBase::~SoundWrapperBase()
 
 }
 
-bool SoundWrapperBase::LoadFromFile(const std::string &filename, const RuntimeScene &scene)
+bool SoundWrapperBase::LoadFromFile(const gd::String &filename, const RuntimeScene &scene)
 {
     if(LoadFromFileImpl(filename, scene))
     {
@@ -136,7 +136,7 @@ float SoundWrapper::GetPitch() const
     return m_sound.getPitch();
 }
 
-bool SoundWrapper::LoadFromFileImpl(const std::string &filename, const RuntimeScene &scene)
+bool SoundWrapper::LoadFromFileImpl(const gd::String &filename, const RuntimeScene &scene)
 {
     #if !defined(GD_IDE_ONLY)
     if(gd::ResourcesLoader::Get()->HasFile(filename))
@@ -151,7 +151,7 @@ bool SoundWrapper::LoadFromFileImpl(const std::string &filename, const RuntimeSc
     else
     #endif
     {
-        if(m_buffer.loadFromFile(filename))
+        if(m_buffer.loadFromFile(filename.ToLocale()))
         {
             m_sound.setBuffer(m_buffer);
         }
@@ -262,7 +262,7 @@ float MusicWrapper::GetPitch() const
     return m_music.getPitch();
 }
 
-bool MusicWrapper::LoadFromFileImpl(const std::string &filename, const RuntimeScene &scene)
+bool MusicWrapper::LoadFromFileImpl(const gd::String &filename, const RuntimeScene &scene)
 {
     #if !defined(GD_IDE_ONLY)
     if(gd::ResourcesLoader::Get()->HasFile(filename))
@@ -276,7 +276,7 @@ bool MusicWrapper::LoadFromFileImpl(const std::string &filename, const RuntimeSc
     else
     #endif
     {
-        if(m_music.openFromFile(filename))
+        if(m_music.openFromFile(filename.ToLocale()))
         {
             return true;
         }
@@ -284,5 +284,3 @@ bool MusicWrapper::LoadFromFileImpl(const std::string &filename, const RuntimeSc
 
     return false;
 }
-
-

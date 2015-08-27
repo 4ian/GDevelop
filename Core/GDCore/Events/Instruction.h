@@ -5,10 +5,11 @@
  */
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Tools/SPtrList.h"
+#include "GDCore/String.h"
 
 namespace gd
 {
@@ -37,7 +38,7 @@ public:
      * \brief Default constructor
      * \param type The type of the instruction
      */
-    Instruction(std::string type_ = "");
+    Instruction(gd::String type_ = "");
 
     /**
      * \brief Constructor
@@ -45,7 +46,7 @@ public:
      * \param parameters A vector containing the parameters of the instruction
      * \param inverted true to set the instruction as inverted (used for condition instructions).
      */
-    Instruction(std::string type_, const std::vector <gd::Expression> & parameters_, bool inverted = false);
+    Instruction(gd::String type_, const std::vector <gd::Expression> & parameters_, bool inverted = false);
 
     virtual ~Instruction();
 
@@ -53,13 +54,13 @@ public:
      * \brief Return the type of the instruction.
      * \return The type of the instruction
      */
-    const std::string & GetType() const { return type; }
+    const gd::String & GetType() const { return type; }
 
     /**
      * \brief Change the instruction type
      * \param val The new type of the instruction
      */
-    void SetType(const std::string & newType) { type = newType; }
+    void SetType(const gd::String & newType) { type = newType; }
 
     /**
      * \brief Return true if the condition is inverted
@@ -76,14 +77,14 @@ public:
     /**
      * \brief Return the number of parameters of the instruction.
      */
-    unsigned int GetParametersCount() const { return parameters.size(); }
+    std::size_t GetParametersCount() const { return parameters.size(); }
 
     /**
      * \brief Change the number of parameter of the instruction.
      *
      * If the new size if larger than the previous, new blank parameters are added.
      */
-    void SetParametersCount(unsigned int size);
+    void SetParametersCount(std::size_t size);
 
     /**
      * \brief Get the value of a parameter.
@@ -91,7 +92,7 @@ public:
      * Return an empty expression if the parameter requested does not exists.
      * \return The current value of the parameter.
      */
-    const gd::Expression & GetParameter(unsigned int index) const;
+    const gd::Expression & GetParameter(std::size_t index) const;
 
     /**
      * \brief Get the value of a parameter.
@@ -99,13 +100,13 @@ public:
      * Return an empty expression if the parameter requested does not exists.
      * \return The current value of the parameter.
      */
-    gd::Expression & GetParameter(unsigned int index);
+    gd::Expression & GetParameter(std::size_t index);
 
     /** Change the specified parameter
      * \param nb The parameter number
      * \param val The new value of the parameter
      */
-    void SetParameter(unsigned int nb, const gd::Expression & val);
+    void SetParameter(std::size_t nb, const gd::Expression & val);
 
     /** \brief Get a reference to the std::vector containing the parameters.
      * \return A std::vector containing the parameters
@@ -140,7 +141,7 @@ public:
 
 private:
 
-    std::string                             type; ///< Instruction type
+    gd::String                             type; ///< Instruction type
     bool                                    inverted; ///< True if the instruction if inverted. Only applicable for instruction used as conditions by events
     mutable std::vector < gd::Expression >  parameters; ///< Vector containing the parameters
     gd::InstructionsList                    subInstructions; ///< Sub instructions, if applicable.
@@ -151,10 +152,3 @@ private:
 }
 
 #endif // INSTRUCTION_H
-
-
-
-
-
-
-

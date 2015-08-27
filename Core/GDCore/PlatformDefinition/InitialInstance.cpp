@@ -31,7 +31,7 @@ InitialInstance::InitialInstance() :
 
 
 #if defined(GD_IDE_ONLY)
-std::map<std::string, gd::PropertyDescriptor> gd::InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
+std::map<gd::String, gd::PropertyDescriptor> gd::InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
 {
     //Find an object
     if ( layout.HasObjectNamed(GetObjectName()) )
@@ -39,11 +39,11 @@ std::map<std::string, gd::PropertyDescriptor> gd::InitialInstance::GetCustomProp
     else if ( project.HasObjectNamed(GetObjectName()) )
         return project.GetObject(GetObjectName()).GetInitialInstanceProperties(*this, project, layout);
 
-    std::map<std::string, gd::PropertyDescriptor> nothing;
+    std::map<gd::String, gd::PropertyDescriptor> nothing;
     return nothing;
 }
 
-bool gd::InitialInstance::UpdateCustomProperty(const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout)
+bool gd::InitialInstance::UpdateCustomProperty(const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & layout)
 {
     if ( layout.HasObjectNamed(GetObjectName()) )
         return layout.GetObject(GetObjectName()).UpdateInitialInstanceProperty(*this, name, value, project, layout);

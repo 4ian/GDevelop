@@ -1,7 +1,7 @@
 #ifndef GDCORE_PROPERTYDESCRIPTOR
 #define GDCORE_PROPERTYDESCRIPTOR
 
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 
 namespace gd
@@ -17,10 +17,10 @@ class GD_CORE_API PropertyDescriptor
 {
 public:
 	/**
-	 * \brief Create a property being a simple string with the specified value.
+	 * \brief Create a property being a simple gd::String with the specified value.
 	 * \param propertyValue The value of the property.
 	 */
-	PropertyDescriptor(std::string propertyValue) :
+	PropertyDescriptor(gd::String propertyValue) :
 		currentValue(propertyValue),
 		type("string")
 	{
@@ -39,7 +39,7 @@ public:
 	/**
 	 * \brief Change the value displayed in the property grid
 	 */
-	PropertyDescriptor & SetValue(std::string value) { currentValue = value; return *this; }
+	PropertyDescriptor & SetValue(gd::String value) { currentValue = value; return *this; }
 
 	/**
 	 * \brief Change the type of the value displayed in the property grid.
@@ -47,7 +47,7 @@ public:
 	 * or to the documentation of the class which is returning the PropertyDescriptor to learn
 	 * more about valid values for the type.
 	 */
-	PropertyDescriptor & SetType(std::string type_) { type = type_; return *this; }
+	PropertyDescriptor & SetType(gd::String type_) { type = type_; return *this; }
 
 	/**
 	 * \brief Add an information about the property.
@@ -55,16 +55,16 @@ public:
 	 * or to the documentation of the class which is returning the PropertyDescriptor to learn
 	 * more about valid values for the extra information.
 	 */
-	PropertyDescriptor & AddExtraInfo(const std::string & info) { extraInformation.push_back(info); return *this; }
+	PropertyDescriptor & AddExtraInfo(const gd::String & info) { extraInformation.push_back(info); return *this; }
 
-	const std::string & GetValue() const { return currentValue; }
-	const std::string & GetType() const { return type; }
-	const std::vector<std::string> & GetExtraInfo() const { return extraInformation; }
+	const gd::String & GetValue() const { return currentValue; }
+	const gd::String & GetType() const { return type; }
+	const std::vector<gd::String> & GetExtraInfo() const { return extraInformation; }
 
 private:
-	std::string currentValue; ///< The current value to be shown.
-	std::string type; ///< The type of the property. This is arbitrary and interpreted by the class responsible for updating the property grid.
-	std::vector<std::string> extraInformation; ///< Can be used to store for example the available choices, if a property is a displayed as a combo box.
+	gd::String currentValue; ///< The current value to be shown.
+	gd::String type; ///< The type of the property. This is arbitrary and interpreted by the class responsible for updating the property grid.
+	std::vector<gd::String> extraInformation; ///< Can be used to store for example the available choices, if a property is a displayed as a combo box.
 };
 
 }

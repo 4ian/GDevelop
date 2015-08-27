@@ -9,7 +9,6 @@
 #include "GDCore/IDE/wxTools/AuiTabArt.h"
 #include "GDCore/IDE/wxTools/FlatAuiTabArt.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/wxTools/RibbonMetroArtProvider.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/art.h>
@@ -24,7 +23,7 @@
 namespace gd
 {
 
-std::map<std::string, wxBitmap*> SkinHelper::cachedIcons;
+std::map<gd::String, wxBitmap*> SkinHelper::cachedIcons;
 
 /** \brief Internal art provider providing a nice help button instead of the default one.
  */
@@ -366,10 +365,10 @@ wxBitmap SkinHelper::GetIcon(wxString name, unsigned int size)
 {
     wxLogNull noLogPlease;
     wxString skinName;
-    std::string iconName = gd::ToString(name);
-    std::string sizeStr = ToString(size);
+    gd::String iconName = name;
+    gd::String sizeStr = gd::String::From(size);
     wxConfigBase::Get()->Read( _T( "/Skin/Icons" ), &skinName, "default" );
-    std::string identifier = "res/icons_"+gd::ToString(skinName)+"/"+iconName+sizeStr+".png";
+    gd::String identifier = "res/icons_" + gd::String(skinName) + "/" + iconName + sizeStr + ".png";
 
     if ( cachedIcons.find(identifier) != cachedIcons.end() && cachedIcons.find(identifier)->second != NULL )
         return *cachedIcons.find(identifier)->second;
@@ -387,10 +386,10 @@ bool SkinHelper::IconExists(wxString name, unsigned int size)
 {
     wxLogNull noLogPlease;
     wxString skinName;
-    std::string iconName = gd::ToString(name);
-    std::string sizeStr = ToString(size);
+    gd::String iconName = name;
+    gd::String sizeStr = gd::String::From(size);
     wxConfigBase::Get()->Read( _T( "/Skin/Icons" ), &skinName, "default" );
-    std::string identifier = "res/icons_"+gd::ToString(skinName)+"/"+iconName+sizeStr+".png";
+    gd::String identifier = "res/icons_"+skinName+"/"+iconName+sizeStr+".png";
 
     if ( cachedIcons.find(identifier) != cachedIcons.end() && cachedIcons.find(identifier)->second != NULL )
         return true;
@@ -402,7 +401,7 @@ bool SkinHelper::IconExists(wxString name, unsigned int size)
 
 void SkinHelper::ClearIconCache()
 {
-    for(std::map<std::string, wxBitmap*>::iterator it = cachedIcons.begin(); it != cachedIcons.end();++it)
+    for(std::map<gd::String, wxBitmap*>::iterator it = cachedIcons.begin(); it != cachedIcons.end();++it)
     {
         if (it->second != NULL)
             delete it->second;

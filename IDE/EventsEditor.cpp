@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 #include "EventsEditor.h"
 
@@ -313,7 +313,7 @@ void EventsEditor::Init(wxWindow* parent)
         gd::EventsRenderingHelper::Get()->SetFont(eventsEditorFont);
 
     //Create platform list
-    for (unsigned int i = 0;i<game.GetUsedPlatforms().size();++i)
+    for (std::size_t i = 0;i<game.GetUsedPlatforms().size();++i)
     {
         long id = wxNewId();
         idForPlatformsMenu[id] = game.GetUsedPlatforms()[i]->GetName();
@@ -357,7 +357,7 @@ void EventsEditor::RecreateCustomEventsMenu()
     const vector < std::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 
     //Clear the menu
-    for (vector < std::pair<long, std::string> >::iterator idIter = idForEventTypesMenu.begin();
+    for (vector < std::pair<long, gd::String> >::iterator idIter = idForEventTypesMenu.begin();
          idIter != idForEventTypesMenu.end();
          ++idIter)
     {
@@ -366,7 +366,7 @@ void EventsEditor::RecreateCustomEventsMenu()
     idForEventTypesMenu.clear();
 
     //Insert extension specific events types
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (std::size_t i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
 	    if ( find(game.GetUsedExtensions().begin(),
@@ -375,14 +375,14 @@ void EventsEditor::RecreateCustomEventsMenu()
             continue;
 
         //Add each event type provided
-	    std::map<std::string, gd::EventMetadata > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
-        for(std::map<string, gd::EventMetadata>::const_iterator it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
+	    std::map<gd::String, gd::EventMetadata > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
+        for(auto it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
         {
             if (it->second.fullname.empty()) continue;
 
             //Find an identifier for the menu item
             long id = wxID_ANY;
-            for (vector < std::pair<long, std::string> >::iterator idIter = idForEventTypesMenu.begin();
+            for (vector < std::pair<long, gd::String> >::iterator idIter = idForEventTypesMenu.begin();
                  idIter != idForEventTypesMenu.end();
                  ++idIter)
             {
@@ -420,55 +420,55 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Insert"), gd::SkinHelper::GetRibbonIcon("add"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         insertRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        insertRibbonBar->AddButton(idRibbonEvent, !hideLabels ? _("Add an event") : "", gd::SkinHelper::GetRibbonIcon("eventadd"), _("Add a new standard event with conditions and actions"));
-        insertRibbonBar->AddButton(idRibbonSubEvent, !hideLabels ? _("Add a sub event") : "", gd::SkinHelper::GetRibbonIcon("subeventadd"), _("Add a sub event, launched only when the conditions of its parent are fulfilled."));
-        insertRibbonBar->AddButton(idRibbonCom, !hideLabels ? _("Add a comment") : "", gd::SkinHelper::GetRibbonIcon("commentaireadd"), _("Add a comment"));
-        insertRibbonBar->AddDropdownButton(idRibbonSomeEvent, !hideLabels ? _("Add...") : "", gd::SkinHelper::GetRibbonIcon("add"));
+        insertRibbonBar->AddButton(idRibbonEvent, !hideLabels ? _("Add an event") : gd::String(), gd::SkinHelper::GetRibbonIcon("eventadd"), _("Add a new standard event with conditions and actions"));
+        insertRibbonBar->AddButton(idRibbonSubEvent, !hideLabels ? _("Add a sub event") : gd::String(), gd::SkinHelper::GetRibbonIcon("subeventadd"), _("Add a sub event, launched only when the conditions of its parent are fulfilled."));
+        insertRibbonBar->AddButton(idRibbonCom, !hideLabels ? _("Add a comment") : gd::String(), gd::SkinHelper::GetRibbonIcon("commentaireadd"), _("Add a comment"));
+        insertRibbonBar->AddDropdownButton(idRibbonSomeEvent, !hideLabels ? _("Add...") : gd::String(), gd::SkinHelper::GetRibbonIcon("add"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("GDevApp.com"), gd::SkinHelper::GetRibbonIcon("template"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         templateRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        templateRibbonBar->AddButton(idRibbonEventStore, !hideLabels ? _("Insert from the events store") : "", gd::SkinHelper::GetRibbonIcon("addtemplate"));
+        templateRibbonBar->AddButton(idRibbonEventStore, !hideLabels ? _("Insert from the events store") : gd::String(), gd::SkinHelper::GetRibbonIcon("addtemplate"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Delete"), gd::SkinHelper::GetRibbonIcon("delete"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         deleteRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Delete the selection") : "", gd::SkinHelper::GetRibbonIcon("deleteselected"));
+        deleteRibbonBar->AddButton(idRibbonDelEvent, !hideLabels ? _("Delete the selection") : gd::String(), gd::SkinHelper::GetRibbonIcon("deleteselected"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("History"), gd::SkinHelper::GetRibbonIcon("undo"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         undoRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        undoRibbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Undo") : "", gd::SkinHelper::GetRibbonIcon("undo"));
-        undoRibbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", gd::SkinHelper::GetRibbonIcon("redo"));
+        undoRibbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Undo") : gd::String(), gd::SkinHelper::GetRibbonIcon("undo"));
+        undoRibbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : gd::String(), gd::SkinHelper::GetRibbonIcon("redo"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), gd::SkinHelper::GetRibbonIcon("copy"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         clipboardRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", gd::SkinHelper::GetRibbonIcon("copy"));
-        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", gd::SkinHelper::GetRibbonIcon("cut"));
-        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", gd::SkinHelper::GetRibbonIcon("paste"));
+        clipboardRibbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : gd::String(), gd::SkinHelper::GetRibbonIcon("copy"));
+        clipboardRibbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : gd::String(), gd::SkinHelper::GetRibbonIcon("cut"));
+        clipboardRibbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : gd::String(), gd::SkinHelper::GetRibbonIcon("paste"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Search"), gd::SkinHelper::GetRibbonIcon("search"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Search / Replace") : "", gd::SkinHelper::GetRibbonIcon("search"), _("Search for a specific word in the event and/or replace it by another"));
+        ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Search / Replace") : gd::String(), gd::SkinHelper::GetRibbonIcon("search"), _("Search for a specific word in the event and/or replace it by another"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("View"), gd::SkinHelper::GetRibbonIcon("view"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : "", gd::SkinHelper::GetRibbonIcon("foldAll"), _("Hide all subevents"));
-        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : "", gd::SkinHelper::GetRibbonIcon("unFoldAll"), _("Show all hidden subevents"));
+        ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : gd::String(), gd::SkinHelper::GetRibbonIcon("foldAll"), _("Hide all subevents"));
+        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : gd::String(), gd::SkinHelper::GetRibbonIcon("unFoldAll"), _("Show all hidden subevents"));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), gd::SkinHelper::GetRibbonIcon("profiler"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Display performances") : "", gd::SkinHelper::GetRibbonIcon("profiler"), _("For native games, display the time taken by each events during the last preview when profiling was active."));
-        ribbonBar->AddDropdownButton(idRibbonPlatform, !hideLabels ? _("Current platform") : "", gd::SkinHelper::GetRibbonIcon("extension"), _("Choose the current platform being used to edit the events."));
+        ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Display performances") : gd::String(), gd::SkinHelper::GetRibbonIcon("profiler"), _("For native games, display the time taken by each events during the last preview when profiling was active."));
+        ribbonBar->AddDropdownButton(idRibbonPlatform, !hideLabels ? _("Current platform") : gd::String(), gd::SkinHelper::GetRibbonIcon("extension"), _("Choose the current platform being used to edit the events."));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", gd::SkinHelper::GetRibbonIcon("help"), _("Display the help about the events editor"));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : gd::String(), gd::SkinHelper::GetRibbonIcon("help"), _("Display the help about the events editor"));
     }
 }
 
@@ -567,7 +567,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
 {
     int originalYPosition = y;
 
-    for (unsigned int i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();++i)
     {
         if ( scrollTo == &events[i] )
         	scrollBar->SetThumbPosition(y);
@@ -612,7 +612,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
 
             if (profilingActivated && events[i].IsExecutable())
             {
-                dc.DrawText(ToString(i+1), x-leftMargin+2-42, y);
+                dc.DrawText(gd::String::From(i+1), x-leftMargin+2-42, y);
                 dc.SetFont(gd::EventsRenderingHelper::Get()->GetNiceFont().Smaller());
 
                 //Draw profile results
@@ -630,7 +630,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, gd::EventsList & events, int x,
                 dc.SetFont(gd::EventsRenderingHelper::Get()->GetFont());
             }
             else
-                dc.DrawText(ToString(i+1), x-leftMargin+2, y+3);
+                dc.DrawText(gd::String::From(i+1), x-leftMargin+2, y+3);
 
 
             //Event rendering
@@ -816,9 +816,9 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
             {
                 EventItem eventItem = itemsAreas.GetEventAt(x, y);
                 if ( item.isCondition )
-                    LogFileManager::Get()->WriteToLogFile("Condition selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
+                    LogFileManager::Get()->WriteToLogFile("Condition selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+gd::String::From(eventItem.positionInList)+" )");
                 else
-                    LogFileManager::Get()->WriteToLogFile("Action selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
+                    LogFileManager::Get()->WriteToLogFile("Action selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+gd::String::From(eventItem.positionInList)+" )");
             }
         }
     }
@@ -842,7 +842,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
         selection.AddEvent(item);
 
         //Log file
-        LogFileManager::Get()->WriteToLogFile("Event selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(item.positionInList)+" )");
+        LogFileManager::Get()->WriteToLogFile("Event selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+gd::String::From(item.positionInList)+" )");
     }
 }
 
@@ -1105,7 +1105,7 @@ void EventsEditor::DeleteSelection()
 
     //..and events
     std::vector<EventItem> eventsSelection = selection.GetAllSelectedEvents();
-    for (unsigned int i = 0; i<eventsSelection.size();++i)
+    for (std::size_t i = 0; i<eventsSelection.size();++i)
     {
         if ( eventsSelection[i].event != std::shared_ptr<gd::BaseEvent>() && eventsSelection[i].eventsList != NULL)
             eventsSelection[i].eventsList->RemoveEvent(*eventsSelection[i].event);
@@ -1152,7 +1152,7 @@ void EventsEditor::EndLiveEditing()
     }
 
     eventsPanel->SetFocus();
-    *liveEditedParameter.parameter = gd::Expression(ToString(liveEdit->GetValue()));
+    *liveEditedParameter.parameter = gd::Expression(gd::String(liveEdit->GetValue()));
     liveEditedParameter.event->eventHeightNeedUpdate = true;
     liveEditingPanel->Show(false);
 
@@ -1202,7 +1202,7 @@ void EventsEditor::EnsureTriggerOnceIsLastCondition(gd::InstructionsList & condi
 
 	bool endWithTriggerOnce = conditions.Get(conditions.GetCount()-1).GetType() == "BuiltinCommonInstructions::Once";
 	bool multipleOnce = false;
-	for (unsigned int i = 0;i<conditions.size()-1;)
+	for (std::size_t i = 0;i<conditions.size()-1;)
 	{
 		if (conditions[i].GetType() == "BuiltinCommonInstructions::Once")
 		{
@@ -1357,8 +1357,8 @@ void EventsEditor::OnRibbonAddSubEventSelected(wxRibbonButtonBarEvent& evt)
 void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & previousEventItem)
 {
     //Retrieve event type
-    string eventType;
-    for (unsigned int i = 0;i<idForEventTypesMenu.size();++i)
+    gd::String eventType;
+    for (std::size_t i = 0;i<idForEventTypesMenu.size();++i)
     {
     	if ( idForEventTypesMenu[i].first == menuID )
             eventType = idForEventTypesMenu[i].second;
@@ -1435,7 +1435,7 @@ void EventsEditor::OnRibbonUnFoldAll(wxRibbonButtonBarEvent& evt)
 
 void EventsEditor::FoldEventsListAndSubEvents(gd::EventsList & list, bool fold)
 {
-    for (unsigned int i = 0;i<list.size();++i)
+    for (std::size_t i = 0;i<list.size();++i)
     {
         list[i].SetFolded(fold);
         if ( list[i].CanHaveSubEvents() )  FoldEventsListAndSubEvents(list[i].GetSubEvents(), fold);
@@ -1448,7 +1448,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     {
         std::vector < gd::InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
         gd::InstructionsList instructionsToCopy;
-        for (unsigned int i = 0;i<itemsSelected.size();++i)
+        for (std::size_t i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].instruction != NULL)
                 instructionsToCopy.Insert(*itemsSelected[i].instruction);
@@ -1460,7 +1460,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     {
         std::vector < gd::InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
         gd::InstructionsList instructionsToCopy;
-        for (unsigned int i = 0;i<itemsSelected.size();++i)
+        for (std::size_t i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].instruction != NULL)
                 instructionsToCopy.Insert(*itemsSelected[i].instruction);
@@ -1472,7 +1472,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     {
         std::vector < EventItem > itemsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
         gd::EventsList eventsToCopy;
-        for (unsigned int i = 0;i<itemsSelected.size();++i)
+        for (std::size_t i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].event != std::shared_ptr<gd::BaseEvent>())
                 eventsToCopy.InsertEvent(*itemsSelected[i].event);
@@ -1504,13 +1504,13 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 
         //Get information about list where conditions must be pasted
         gd::InstructionsList * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
-        size_t positionInThisList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
+        size_t positionInThisList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().positionInList : gd::String::npos;
         gd::BaseEvent * event = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
         if (instructionList == NULL) return;
 
         //Paste all conditions
         const gd::InstructionsList & instructions = gd::Clipboard::Get()->GetInstructions();
-        for (unsigned int i = 0;i<instructions.size();++i)
+        for (std::size_t i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
                 instructionList->Insert(instructions[i], positionInThisList);
@@ -1529,13 +1529,13 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 
         //Get information about list where actions must be pasted
         gd::InstructionsList * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
-        size_t positionInThisList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
+        size_t positionInThisList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().positionInList : gd::String::npos;
         gd::BaseEvent * event = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
         if (instructionList == NULL) return;
 
         //Paste all actions
         const gd::InstructionsList & instructions = gd::Clipboard::Get()->GetInstructions();
-        for (unsigned int i = 0;i<instructions.size();++i)
+        for (std::size_t i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
                 instructionList->Insert(instructions[i], positionInThisList);
@@ -1550,7 +1550,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
     else
     {
         gd::EventsList * eventsList; //The list where events should be inserted.
-        unsigned int position = std::string::npos; //The position where events should be inserted in the list.
+        std::size_t position = gd::String::npos; //The position where events should be inserted in the list.
 
         //Find where events should be inserted
         if (selection.HasSelectedEvents())
@@ -1692,7 +1692,7 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
 void EventsEditor::OntoggleActivationSelected(wxCommandEvent& event)
 {
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEvents();
-    for (unsigned int i = 0;i<eventsSelected.size();++i)
+    for (std::size_t i = 0;i<eventsSelected.size();++i)
     {
         if ( eventsSelected[i].event != std::shared_ptr<gd::BaseEvent>())
             eventsSelected[i].event->SetDisabled(!eventsSelected[i].event->IsDisabled());
@@ -1777,4 +1777,3 @@ void EventsEditor::OnaddInstrIconPnlMouseLeave(wxMouseEvent& event)
     addInstrBt->Refresh();
     addInstrBt->Update();
 }
-

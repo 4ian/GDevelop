@@ -10,7 +10,7 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include <SFML/Network.hpp>
-#include <string>
+#include "GDCore/String.h"
 #include <iostream>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/config.h>
@@ -31,7 +31,7 @@ void AnalyticsSender::SendProgramOpening()
     #endif
 }
 
-void AnalyticsSender::SendNewGameCreated(std::string platformName, std::string templateName)
+void AnalyticsSender::SendNewGameCreated(gd::String platformName, gd::String templateName)
 {
     #if !defined(GD_NO_WX_GUI)
     wxFileName templateFile = wxFileName::FileName(templateName);
@@ -39,12 +39,12 @@ void AnalyticsSender::SendNewGameCreated(std::string platformName, std::string t
 
     SerializerElement data;
     data.SetAttribute("platform", platformName);
-    data.SetAttribute("templateName", gd::ToString(templateFile.GetFullPath(wxPATH_UNIX)));
+    data.SetAttribute("templateName", gd::String(templateFile.GetFullPath(wxPATH_UNIX)));
     SendData("new_game_creation", data);
     #endif
 }
 
-void AnalyticsSender::SendData(std::string collection, SerializerElement & data)
+void AnalyticsSender::SendData(gd::String collection, SerializerElement & data)
 {
     #if !defined(GD_NO_WX_GUI)
     //Check if we are allowed to send these data.
@@ -53,9 +53,9 @@ void AnalyticsSender::SendData(std::string collection, SerializerElement & data)
     if (!sendInfo) return;
 
     data.SetAttribute("gdVersion", VersionWrapper::FullString());
-    data.SetAttribute("os", gd::ToString(wxGetOsDescription()));
+    data.SetAttribute("os", gd::String(wxGetOsDescription()));
     data.SetAttribute("lang",
-        gd::ToString(wxLocale::GetLanguageCanonicalName(LocaleManager::Get()->GetLanguage())));
+        gd::String(wxLocale::GetLanguageCanonicalName(LocaleManager::Get()->GetLanguage())));
     if (wxConfig::Get())
         data.SetAttribute("openingCount", wxConfig::Get()->ReadDouble("Startup/OpeningCount", 0));
 
@@ -66,7 +66,7 @@ void AnalyticsSender::SendData(std::string collection, SerializerElement & data)
     sf::Http::Request request;
     request.setMethod(sf::Http::Request::Post);
     request.setField("Content-Type", "application/json");
-    request.setUri("/3.0/projects/"+projectId+"/events/"+collection+"?api_key="+writeKey);
+    request.setUri("/3.0/projects/"+projectId.ToLocale()+"/events/"+collection.ToLocale()+"?api_key="+writeKey.ToLocale());
     request.setBody(Serializer::ToJSON(data));
 
     // Send the request

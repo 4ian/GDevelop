@@ -44,7 +44,7 @@ class GD_EXTENSION_API LightObject : public gd::Object
 {
 public :
 
-    LightObject(std::string name_);
+    LightObject(gd::String name_);
     virtual ~LightObject() {};
     virtual gd::Object * Clone() const { return new LightObject(*this);}
 
@@ -124,17 +124,17 @@ public :
     /**
      * Only used internally by GD events generated code
      */
-    void SetGlobalColor(const std::string & color);
+    void SetGlobalColor(const gd::String & color);
 
     /**
      * Only used internally by GD events generated code
      */
-    void SetColor(const std::string & color);
+    void SetColor(const gd::String & color);
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+    virtual std::size_t GetNumberOfProperties() const;
     #endif
 
     static std::map<const gd::Layout*, std::weak_ptr<Light_Manager> > lightManagersList;
@@ -154,7 +154,7 @@ private:
     sf::Color globalLightColor;
 };
 
-gd::Object * CreateLightObject(std::string name);
+gd::Object * CreateLightObject(gd::String name);
 RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // LightObject_H

@@ -10,12 +10,12 @@
 
 using namespace std;
 
-bool GD_API IsKeyPressed(RuntimeScene & scene, std::string key)
+bool GD_API IsKeyPressed(RuntimeScene & scene, gd::String key)
 {
     return scene.GetInputManager().IsKeyPressed(key);
 }
 
-bool GD_API WasKeyReleased(RuntimeScene & scene, std::string key)
+bool GD_API WasKeyReleased(RuntimeScene & scene, gd::String key)
 {
     return scene.GetInputManager().WasKeyReleased(key);
 }
@@ -25,7 +25,7 @@ bool GD_API AnyKeyIsPressed(RuntimeScene & scene)
     return scene.GetInputManager().AnyKeyIsPressed();
 }
 
-std::string GD_API LastPressedKey(RuntimeScene & scene)
+gd::String GD_API LastPressedKey(RuntimeScene & scene)
 {
     return scene.GetInputManager().GetLastPressedKey();
 }

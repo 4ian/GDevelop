@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "GDCpp/String.h"
 class RuntimeObject;
 class RuntimeScene;
 class RuntimeVariablesContainer;
@@ -29,7 +30,7 @@ public:
      * scene->objectsInstances.GetObjectsRawPointers(name)
      * \endcode
      */
-    std::vector<RuntimeObject*> GetObjectsRawPointers(const std::string & name);
+    std::vector<RuntimeObject*> GetObjectsRawPointers(const gd::String & name);
 
     /**
      * \brief Shortcut for scene->GetVariables();
@@ -45,7 +46,7 @@ public:
      * \brief Used by "Trigger once" conditions: Return true only if
      * this method was not called with the same identifier during the last frame.
      */
-    bool TriggerOnce(unsigned int conditionId);
+    bool TriggerOnce(std::size_t conditionId);
 
     /**
      * \brief To be called when events begin so that "Trigger once" conditions
@@ -54,15 +55,15 @@ public:
     void StartNewFrame();
 
     RuntimeContext & ClearObjectListsMap();
-    RuntimeContext & AddObjectListToMap(const std::string & objectName, std::vector<RuntimeObject*> & list);
-    std::map <std::string, std::vector<RuntimeObject*> *> ReturnObjectListsMap();
+    RuntimeContext & AddObjectListToMap(const gd::String & objectName, std::vector<RuntimeObject*> & list);
+    std::map <gd::String, std::vector<RuntimeObject*> *> ReturnObjectListsMap();
 
     RuntimeScene * scene; ///< The associated scene.
 
 private:
-    std::map <std::string, std::vector<RuntimeObject*> *> temporaryMap;
-    std::map <unsigned int, bool> onceConditionsTriggered;
-    std::map <unsigned int, bool> onceConditionsTriggeredLastFrame;
+    std::map <gd::String, std::vector<RuntimeObject*> *> temporaryMap;
+    std::map <std::size_t, bool> onceConditionsTriggered;
+    std::map <std::size_t, bool> onceConditionsTriggeredLastFrame;
 };
 
 #endif // RUNTIMECONTEXT_H

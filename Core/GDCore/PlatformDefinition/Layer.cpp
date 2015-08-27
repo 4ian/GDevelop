@@ -21,7 +21,7 @@ isVisible(true)
 /**
  * Change cameras count, automatically adding/removing them.
  */
-void Layer::SetCameraCount(unsigned int n)
+void Layer::SetCameraCount(std::size_t n)
 {
     while ( cameras.size() < n)
         cameras.push_back(Camera());
@@ -38,7 +38,7 @@ void Layer::SerializeTo(SerializerElement & element) const
 
     SerializerElement & camerasElement = element.AddChild("cameras");
     camerasElement.ConsiderAsArrayOf("camera");
-    for (unsigned int c = 0;c<GetCameraCount();++c)
+    for (std::size_t c = 0;c<GetCameraCount();++c)
     {
         SerializerElement & cameraElement = camerasElement.AddChild("camera");
         cameraElement.SetAttribute("defaultSize", GetCamera(c).UseDefaultSize());
@@ -66,7 +66,7 @@ void Layer::UnserializeFrom(const SerializerElement & element)
     //Compatibility with GD <= 3.3
     if (element.HasChild("Camera"))
     {
-        for (unsigned int i = 0; i < element.GetChildrenCount("Camera"); ++i)
+        for (std::size_t i = 0; i < element.GetChildrenCount("Camera"); ++i)
         {
             const SerializerElement & cameraElement = element.GetChild("Camera", i);
             SetCameraCount(GetCameraCount()+1);
@@ -88,7 +88,7 @@ void Layer::UnserializeFrom(const SerializerElement & element)
     {
         SerializerElement & camerasElement = element.GetChild("cameras");
         camerasElement.ConsiderAsArrayOf("camera");
-        for (unsigned int i = 0; i < camerasElement.GetChildrenCount(); ++i)
+        for (std::size_t i = 0; i < camerasElement.GetChildrenCount(); ++i)
         {
             const SerializerElement & cameraElement = camerasElement.GetChild(i);
 

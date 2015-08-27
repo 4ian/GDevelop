@@ -7,7 +7,7 @@
 #ifndef GDCORE_TreeItemExpressionMetadata_H
 #define GDCORE_TreeItemExpressionMetadata_H
 #include "GDCore/Events/ExpressionMetadata.h"
-#include <string>
+#include "GDCore/String.h"
 #include <wx/treectrl.h>
 
 namespace gd
@@ -26,14 +26,14 @@ namespace gd
 class GD_CORE_API TreeItemExpressionMetadata : public wxTreeItemData
 {
 public:
-    TreeItemExpressionMetadata(const std::string & name_, const gd::ExpressionMetadata & info_) : name(name_), info(info_) { };
+    TreeItemExpressionMetadata(const gd::String & name_, const gd::ExpressionMetadata & info_) : name(name_), info(info_) { };
     virtual ~TreeItemExpressionMetadata() {};
 
-    const std::string & GetName() const { return name; }
+    const gd::String & GetName() const { return name; }
     const gd::ExpressionMetadata & GetExpressionMetadata() const { return info; }
 
 private:
-    std::string name;
+    gd::String name;
     gd::ExpressionMetadata info;
 };
 

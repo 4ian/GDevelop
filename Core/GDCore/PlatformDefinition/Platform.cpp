@@ -8,7 +8,7 @@
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/PlatformDefinition/Object.h"
-#include <string>
+#include "GDCore/String.h"
 
 using namespace std;
 
@@ -34,7 +34,7 @@ Platform::~Platform()
 bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension)
 {
     std::cout << extension->GetName();
-    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    for (std::size_t i =0;i<extensionsLoaded.size();++i)
     {
     	if ( extensionsLoaded[i]->GetName() == extension->GetName() ) {
             std::cout << "(Already loaded!)" << std::endl;
@@ -43,8 +43,8 @@ bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension)
     }
 
     //Load all creation/destruction functions for objects provided by the extension
-    vector < string > objectsTypes = extension->GetExtensionObjectsTypes();
-    for ( unsigned int i = 0; i < objectsTypes.size();++i)
+    vector < gd::String > objectsTypes = extension->GetExtensionObjectsTypes();
+    for ( std::size_t i = 0; i < objectsTypes.size();++i)
     {
         creationFunctionTable[objectsTypes[i]] = extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
     }
@@ -54,9 +54,9 @@ bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension)
     return true;
 }
 
-bool Platform::IsExtensionLoaded(const string & name) const
+bool Platform::IsExtensionLoaded(const gd::String & name) const
 {
-    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    for (std::size_t i =0;i<extensionsLoaded.size();++i)
     {
     	if ( extensionsLoaded[i]->GetName() == name )
     	    return true;
@@ -65,9 +65,9 @@ bool Platform::IsExtensionLoaded(const string & name) const
     return false;
 }
 
-std::shared_ptr<gd::PlatformExtension> Platform::GetExtension(const string & name) const
+std::shared_ptr<gd::PlatformExtension> Platform::GetExtension(const gd::String & name) const
 {
-    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    for (std::size_t i =0;i<extensionsLoaded.size();++i)
     {
     	if ( extensionsLoaded[i]->GetName() == name )
     	    return extensionsLoaded[i];
@@ -76,7 +76,7 @@ std::shared_ptr<gd::PlatformExtension> Platform::GetExtension(const string & nam
     return std::shared_ptr<gd::PlatformExtension> ();
 }
 
-std::shared_ptr<gd::Object> Platform::CreateObject(std::string type, const std::string & name) const
+std::shared_ptr<gd::Object> Platform::CreateObject(gd::String type, const gd::String & name) const
 {
     if ( creationFunctionTable.find(type) == creationFunctionTable.end() )
     {
@@ -95,34 +95,34 @@ std::shared_ptr<gd::Object> Platform::CreateObject(std::string type, const std::
     return std::shared_ptr<gd::Object> (object);
 }
 
-gd::Automatism* Platform::CreateAutomatism(const std::string & automatismType) const
+gd::Behavior* Platform::CreateBehavior(const gd::String & behaviorType) const
 {
-    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    for (std::size_t i =0;i<extensionsLoaded.size();++i)
     {
-        Automatism* automatism = extensionsLoaded[i]->CreateAutomatism(automatismType);
-        if ( automatism != NULL )
-            return automatism;
+        Behavior* behavior = extensionsLoaded[i]->CreateBehavior(behaviorType);
+        if ( behavior != NULL )
+            return behavior;
     }
 
     return NULL;
 }
 
-std::shared_ptr<gd::AutomatismsSharedData> Platform::CreateAutomatismSharedDatas(const std::string & automatismType) const
+std::shared_ptr<gd::BehaviorsSharedData> Platform::CreateBehaviorSharedDatas(const gd::String & behaviorType) const
 {
-    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    for (std::size_t i =0;i<extensionsLoaded.size();++i)
     {
-        std::shared_ptr<gd::AutomatismsSharedData> automatism = extensionsLoaded[i]->CreateAutomatismSharedDatas(automatismType);
-        if ( automatism != std::shared_ptr<gd::AutomatismsSharedData>() )
-            return automatism;
+        std::shared_ptr<gd::BehaviorsSharedData> behavior = extensionsLoaded[i]->CreateBehaviorSharedDatas(behaviorType);
+        if ( behavior != std::shared_ptr<gd::BehaviorsSharedData>() )
+            return behavior;
     }
 
-    return std::shared_ptr<gd::AutomatismsSharedData>();
+    return std::shared_ptr<gd::BehaviorsSharedData>();
 }
 
 #if defined(GD_IDE_ONLY)
-std::shared_ptr<gd::BaseEvent> Platform::CreateEvent(const std::string & eventType) const
+std::shared_ptr<gd::BaseEvent> Platform::CreateEvent(const gd::String & eventType) const
 {
-    for (unsigned int i =0;i<extensionsLoaded.size();++i)
+    for (std::size_t i =0;i<extensionsLoaded.size();++i)
     {
         std::shared_ptr<gd::BaseEvent> event = extensionsLoaded[i]->CreateEvent(eventType);
         if ( event != std::shared_ptr<gd::BaseEvent>() )

@@ -37,14 +37,14 @@ void CodeExecutionEngine::Unload()
     functionName.clear();
 }
 
-bool CodeExecutionEngine::LoadFromDynamicLibrary(const std::string & filename, const std::string & mainFunctionName)
+bool CodeExecutionEngine::LoadFromDynamicLibrary(const gd::String & filename, const gd::String & mainFunctionName)
 {
     if ( loaded ) Unload();
 
     dynamicLibraryFilename = filename;
     functionName = mainFunctionName;
 
-    dynamicLibrary = gd::OpenLibrary(dynamicLibraryFilename.c_str());
+    dynamicLibrary = gd::OpenLibrary(dynamicLibraryFilename.ToLocale().c_str());
     if ( dynamicLibrary == NULL )
     {
         std::cout << "ERROR: Unable to load " << dynamicLibraryFilename << std::endl;

@@ -5,8 +5,9 @@ Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY)
-#include "TextObjectEditor.h" //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include <wx/log.h>
+#include "Dialogs/TextObjectEditor.h" //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
 #include "GDCpp/Object.h"
@@ -28,7 +29,7 @@ namespace gd { class MainFrameWrapper; }
 
 using namespace std;
 
-TextObject::TextObject(std::string name_) :
+TextObject::TextObject(gd::String name_) :
     Object(name_),
     text("Text"),
     characterSize(20),
@@ -136,13 +137,14 @@ bool TextObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumb
 void TextObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
 #if !defined(GD_NO_WX_GUI)
+    wxLogNull logNo;
     TextObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 #endif
 }
 #endif
 
-void TextObject::SetFontFilename(const std::string & fontFilename)
+void TextObject::SetFontFilename(const gd::String & fontFilename)
 {
     fontName = fontFilename;
     #if defined(GD_IDE_ONLY)
@@ -229,6 +231,17 @@ float RuntimeTextObject::GetHeight() const
     return text.getLocalBounds().height + text.getLocalBounds().top;
 }
 
+void RuntimeTextObject::SetString(const gd::String & str)
+{
+    text.setString(str);
+    text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2);
+}
+
+gd::String RuntimeTextObject::GetString() const
+{
+    return text.getString();
+}
+
 /**
  * Change the color filter of the sprite object
  */
@@ -237,15 +250,15 @@ void RuntimeTextObject::SetColor( unsigned int r, unsigned int g, unsigned int b
     text.setColor(sf::Color(r, g, b, opacity));
 }
 
-void RuntimeTextObject::SetColor(const std::string & colorStr)
+void RuntimeTextObject::SetColor(const gd::String & colorStr)
 {
-    std::vector < std::string > colors = SplitString<std::string>(colorStr, ';');
+    std::vector < gd::String > colors = colorStr.Split(U';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
-    SetColor(  ToInt(colors[0]),
-               ToInt(colors[1]),
-               ToInt(colors[2]) );
+    SetColor(  colors[0].To<int>(),
+               colors[1].To<int>(),
+               colors[2].To<int>() );
 }
 
 void RuntimeTextObject::SetOpacity(float val)
@@ -258,7 +271,7 @@ void RuntimeTextObject::SetOpacity(float val)
     text.setColor(sf::Color(currentColor.r, currentColor.g, currentColor.b, opacity));
 }
 
-void RuntimeTextObject::ChangeFont(const std::string & fontName_)
+void RuntimeTextObject::ChangeFont(const gd::String & fontName_)
 {
     if ( !text.getFont() || fontName_ != fontName )
     {
@@ -330,24 +343,24 @@ void RuntimeTextObject::SetSmooth(bool smooth)
 }
 
 #if defined(GD_IDE_ONLY)
-void RuntimeTextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeTextObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Text");                     value = GetString();}
     else if ( propertyNb == 1 ) {name = _("Font");                    value = GetFontFilename();}
-    else if ( propertyNb == 2 ) {name = _("Font Size");      value = ToString(GetCharacterSize());}
-    else if ( propertyNb == 3 ) {name = _("Color");       value = ToString(GetColorR())+";"+ToString(GetColorG())+";"+ToString(GetColorB());}
-    else if ( propertyNb == 4 ) {name = _("Opacity");       value = ToString(GetOpacity());}
+    else if ( propertyNb == 2 ) {name = _("Font Size");      value = gd::String::From(GetCharacterSize());}
+    else if ( propertyNb == 3 ) {name = _("Color");       value = gd::String::From(GetColorR())+";"+gd::String::From(GetColorG())+";"+gd::String::From(GetColorB());}
+    else if ( propertyNb == 4 ) {name = _("Opacity");       value = gd::String::From(GetOpacity());}
     else if ( propertyNb == 5 ) {name = _("Smoothing");       value = smoothed ? _("Yes") : _("No");}
 }
 
-bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeTextObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
     else if ( propertyNb == 1 ) { ChangeFont(newValue); }
-    else if ( propertyNb == 2 ) { SetCharacterSize(ToInt(newValue)); }
+    else if ( propertyNb == 2 ) { SetCharacterSize(newValue.To<int>()); }
     else if ( propertyNb == 3 )
     {
-        string r, gb, g, b;
+        gd::String r, gb, g, b;
         {
             size_t separationPos = newValue.find(";");
 
@@ -368,15 +381,15 @@ bool RuntimeTextObject::ChangeProperty(unsigned int propertyNb, string newValue)
             b = gb.substr(separationPos+1, gb.length());
         }
 
-        SetColor(ToInt(r), ToInt(g), ToInt(b));
+        SetColor(r.To<int>(), g.To<int>(), b.To<int>());
     }
-    else if ( propertyNb == 4 ) { SetOpacity(ToFloat(newValue)); }
+    else if ( propertyNb == 4 ) { SetOpacity(newValue.To<float>()); }
     else if ( propertyNb == 5 ) { SetSmooth(!(newValue == _("No"))); }
 
     return true;
 }
 
-unsigned int RuntimeTextObject::GetNumberOfProperties() const
+std::size_t RuntimeTextObject::GetNumberOfProperties() const
 {
     return 6;
 }
@@ -388,9 +401,7 @@ RuntimeObject * CreateRuntimeTextObject(RuntimeScene & scene, const gd::Object &
     return new RuntimeTextObject(scene, object);
 }
 
-gd::Object * CreateTextObject(std::string name)
+gd::Object * CreateTextObject(gd::String name)
 {
     return new TextObject(name);
 }
-
-

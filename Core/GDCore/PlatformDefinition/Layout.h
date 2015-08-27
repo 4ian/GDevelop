@@ -6,14 +6,14 @@
 
 #ifndef GDCORE_LAYOUT_H
 #define GDCORE_LAYOUT_H
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 #include <map>
 #include <memory>
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/ClassWithObjects.h"
-#include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
+#include "GDCore/PlatformDefinition/BehaviorsSharedData.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/Layer.h"
@@ -57,17 +57,17 @@ public:
     /**
      * Change the name of the layout with the name passed as parameter.
      */
-    void SetName(const std::string & name_);
+    void SetName(const gd::String & name_);
 
     /**
      * Return the name of the layout.
      */
-    const std::string & GetName() const {return name;};
+    const gd::String & GetName() const {return name;};
 
     /**
      * Return the name of the layout mangled by SceneNameMangler.
      */
-    const std::string & GetMangledName() const {return mangledName;};
+    const gd::String & GetMangledName() const {return mangledName;};
 
     /**
      * Set the background color
@@ -92,12 +92,12 @@ public:
     /**
      * Get scene window default title
      */
-    const std::string & GetWindowDefaultTitle() const {return title;};
+    const gd::String & GetWindowDefaultTitle() const {return title;};
 
     /**
      * Set scene window default title
      */
-    void SetWindowDefaultTitle(const std::string & title_) {title = title_;};
+    void SetWindowDefaultTitle(const gd::String & title_) {title = title_;};
 
     ///@}
 
@@ -178,42 +178,42 @@ public:
     /**
      * Must return true if the layer called "name" exists.
      */
-    bool HasLayerNamed(const std::string & name) const;
+    bool HasLayerNamed(const gd::String & name) const;
 
     /**
      * Must return a reference to the layer called "name".
      */
-    Layer & GetLayer(const std::string & name);
+    Layer & GetLayer(const gd::String & name);
 
     /**
      * Must return a reference to the layer called "name".
      */
-    const Layer & GetLayer(const std::string & name) const;
+    const Layer & GetLayer(const gd::String & name) const;
 
     /**
      * Must return a reference to the layer at position "index" in the layers list
      */
-    Layer & GetLayer(unsigned int index);
+    Layer & GetLayer(std::size_t index);
 
     /**
      * Must return a reference to the layer at position "index" in the layers list
      */
-    const Layer & GetLayer (unsigned int index) const;
+    const Layer & GetLayer (std::size_t index) const;
 
     /**
      * Must return the position of the layer called "name" in the layers list
      */
-    unsigned int GetLayerPosition(const std::string & name) const;
+    std::size_t GetLayerPosition(const gd::String & name) const;
 
     /**
      * Must return the number of layers.
      */
-    unsigned int GetLayersCount() const;
+    std::size_t GetLayersCount() const;
 
     /**
      * Must add a new empty the layer sheet called "name" at the specified position in the layout list.
      */
-    void InsertNewLayer(const std::string & name, unsigned int position);
+    void InsertNewLayer(const gd::String & name, std::size_t position);
 
     /**
      * Must add a new the layer constructed from the layout passed as parameter.
@@ -221,28 +221,28 @@ public:
      * \param theLayer The the layer that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the layer must be inserted at the end of the layers list.
      */
-    void InsertLayer(const Layer & theLayer, unsigned int position);
+    void InsertLayer(const Layer & theLayer, std::size_t position);
 
     /**
      * Must delete the layer named "name".
      */
-    void RemoveLayer(const std::string & name);
+    void RemoveLayer(const gd::String & name);
 
     /**
      * Must swap the position of the specified layers.
      */
-    void SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex);
+    void SwapLayers(std::size_t firstLayerIndex, std::size_t secondLayerIndex);
     ///@}
 
     /**
      * Make sure that the scene had an instance of shared data for
-     * every automatism of every object that can be used on the scene
+     * every behavior of every object that can be used on the scene
      * ( i.e. the objects of the scene and the global objects )
      *
-     * Must be called when an automatism have been added/deleted
+     * Must be called when a behavior have been added/deleted
      * or when a scene have been added to a project.
      */
-    void UpdateAutomatismsSharedData(gd::Project & project);
+    void UpdateBehaviorsSharedData(gd::Project & project);
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     /**
@@ -340,7 +340,7 @@ public:
     ///@}
 
     //TODO: Send this to private part.
-    std::map < std::string, std::shared_ptr<gd::AutomatismsSharedData> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
+    std::map < gd::String, std::shared_ptr<gd::BehaviorsSharedData> > behaviorsInitialSharedDatas; ///< Initial shared datas of behaviors
 
     //TODO: GD C++ Platform specific code below
     #if defined(GD_IDE_ONLY)
@@ -373,8 +373,8 @@ public:
      */
     bool CompilationNeeded() { return compilationNeeded; };
 
-    const std::string & GetCompiledEventsFile() const { return compiledEventsFile; }
-    void SetCompiledEventsFile(const std::string & file) { compiledEventsFile = file; }
+    const gd::String & GetCompiledEventsFile() const { return compiledEventsFile; }
+    void SetCompiledEventsFile(const gd::String & file) { compiledEventsFile = file; }
 
     ///@}
 
@@ -414,12 +414,12 @@ public:
     #endif
 
 private:
-    std::string                                 name; ///< Scene name
-    std::string                                 mangledName; ///< The scene name mangled by SceneNameMangler
+    gd::String                                 name; ///< Scene name
+    gd::String                                 mangledName; ///< The scene name mangled by SceneNameMangler
     unsigned int                                backgroundColorR; ///< Background color Red component
     unsigned int                                backgroundColorG; ///< Background color Green component
     unsigned int                                backgroundColorB; ///< Background color Blue component
-    std::string                                 title; ///< Title displayed in the window
+    gd::String                                 title; ///< Title displayed in the window
     gd::VariablesContainer                      variables; ///< Variables list
     gd::InitialInstancesContainer               initialInstances; ///< Initial instances
     std::vector < gd::Layer >                   initialLayers; ///< Initial layers
@@ -443,7 +443,7 @@ private:
     BaseProfiler * profiler; ///< Pointer to the profiler. Can be NULL.
     bool refreshNeeded; ///< If set to true, the IDE will reload the scene( thanks to SceneEditorCanvas notably which check this flag when the scene is being edited )
     bool compilationNeeded; ///< If set to true, the IDE will recompile the events ( thanks to SceneEditorCanvas notably which check this flag when the scene is being edited )
-    std::string compiledEventsFile;
+    gd::String compiledEventsFile;
     #endif
 
     /**
@@ -457,9 +457,16 @@ private:
  * \brief Functor testing layout name.
  * \see gd::Layout
  */
-struct LayoutHasName : public std::binary_function<std::shared_ptr<Layout>, std::string, bool> {
-    bool operator()(const std::shared_ptr<Layout> & layout, std::string name) const { return layout->GetName() == name; }
+struct LayoutHasName : public std::binary_function<std::shared_ptr<Layout>, gd::String, bool> {
+    bool operator()(const std::shared_ptr<Layout> & layout, gd::String name) const { return layout->GetName() == name; }
 };
+
+/**
+ * \brief Get the names of all layers from the given layout
+ * that are invisible.
+ * \see gd::Layout
+ */
+std::vector<gd::String> GetHiddenLayers(const Layout & layout);
 
 /**
  * \brief Get a type from an object/group name.
@@ -467,21 +474,21 @@ struct LayoutHasName : public std::binary_function<std::shared_ptr<Layout>, std:
  *
  * @return Type of the object/group.
  */
-std::string GD_CORE_API GetTypeOfObject(const Project & game, const Layout & layout, std::string objectName, bool searchInGroups = true);
+gd::String GD_CORE_API GetTypeOfObject(const Project & game, const Layout & layout, gd::String objectName, bool searchInGroups = true);
 
 /**
- * \brief Get a type from an automatism name
- * @return Type of the automatism.
+ * \brief Get a type from a behavior name
+ * @return Type of the behavior.
  */
-std::string GD_CORE_API GetTypeOfAutomatism(const Project & game, const Layout & layout, std::string automatismName, bool searchInGroups = true);
+gd::String GD_CORE_API GetTypeOfBehavior(const Project & game, const Layout & layout, gd::String behaviorName, bool searchInGroups = true);
 
 /**
- * \brief Get automatisms of an object/group
- * \note The automatisms of a group are the automatisms which are found in common when looking all the objects of the group.
+ * \brief Get behaviors of an object/group
+ * \note The behaviors of a group are the behaviors which are found in common when looking all the objects of the group.
  *
- * @return Vector containing names of automatisms
+ * @return Vector containing names of behaviors
  */
-std::vector < std::string > GD_CORE_API GetAutomatismsOfObject(const Project & game, const Layout & layout, std::string objectName, bool searchInGroups = true);
+std::vector < gd::String > GD_CORE_API GetBehaviorsOfObject(const Project & game, const Layout & layout, gd::String objectName, bool searchInGroups = true);
 
 }
 

@@ -8,6 +8,7 @@
 #else
 #include <iostream>
 #endif
+#include "GDCore/String.h"
 
 namespace gd {
 
@@ -15,10 +16,10 @@ namespace gd {
  * \brief Standard function that should be used when emitting a warning to be displayed to
  * the user. When used in the IDE, this result in a message box with a exclamation icon.
  */
-void GD_CORE_API LogWarning(const std::string & msg)
+void GD_CORE_API LogWarning(const gd::String & msg)
 {
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-	wxLogWarning(wxString(msg));
+	wxLogWarning(msg.ToWxString());
 #else
 	std::cout << "WARNING: " << msg;
 #endif
@@ -28,10 +29,10 @@ void GD_CORE_API LogWarning(const std::string & msg)
  * \brief Standard function that should be used when emitting an error to be displayed to
  * the user. When used in the IDE, this result in a message box with a error icon.
  */
-void GD_CORE_API LogError(const std::string & msg)
+void GD_CORE_API LogError(const gd::String & msg)
 {
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-	wxLogError(wxString(msg));
+	wxLogError(msg.ToWxString());
 #else
 	std::cout << "ERROR: " << msg;
 #endif
@@ -41,10 +42,10 @@ void GD_CORE_API LogError(const std::string & msg)
  * \brief Standard function that should be used when emitting a message to be displayed to
  * the user. When used in the IDE, this result in a message box.
  */
-void GD_CORE_API LogMessage(const std::string & msg)
+void GD_CORE_API LogMessage(const gd::String & msg)
 {
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-	wxLogMessage(wxString(msg));
+	wxLogMessage(msg.ToWxString());
 #else
 	std::cout << "MESSAGE: " << msg;
 #endif
@@ -53,10 +54,10 @@ void GD_CORE_API LogMessage(const std::string & msg)
  * \brief Standard function that should be used when emitting a status message to be displayed to
  * the user. When used in the IDE, this result in a message displayed in the status bar.
  */
-void GD_CORE_API LogStatus(const std::string & msg)
+void GD_CORE_API LogStatus(const gd::String & msg)
 {
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-	wxLogStatus(wxString(msg));
+	wxLogStatus(msg.ToWxString());
 #else
 	std::cout << "STATUS: " << msg;
 #endif

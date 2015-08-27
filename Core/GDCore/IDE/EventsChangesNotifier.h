@@ -6,7 +6,7 @@
 #ifndef GDCORE_EVENTSCHANGENOTIFIER_H
 #define GDCORE_EVENTSCHANGENOTIFIER_H
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include <memory>
 #include <memory>
 namespace gd { class Layout; }

@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 #include "ParameterEditorLauncher.h"
 #include <vector>
@@ -27,7 +27,7 @@
 #include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseBehaviorDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "../ChoixClavier.h"
 #include "../SigneModification.h"
@@ -41,7 +41,7 @@
 using namespace std;
 
 void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & project, gd::Layout & layout,
-	const gd::ParameterMetadata & metadata, std::vector<wxTextCtrl * > & paramEdits, unsigned int paramIndex)
+	const gd::ParameterMetadata & metadata, std::vector<wxTextCtrl * > & paramEdits, std::size_t paramIndex)
 {
 	if (paramIndex >= paramEdits.size()) return;
 	wxTextCtrl * editCtrl = paramEdits.at(paramIndex);
@@ -56,18 +56,18 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
         }
         return;
     }
-    else if ( metadata.GetType() == "automatism" )
+    else if ( metadata.GetType() == "behavior" )
     {
-        std::string object = paramEdits.empty() ? "" : paramEdits[0]->GetValue().mb_str();
-        gd::ChooseAutomatismDialog dialog(parent, project, layout, object, metadata.GetExtraInfo());
-        if (dialog.DeduceAutomatism() || dialog.ShowModal() == 1 )
-            editCtrl->ChangeValue(dialog.GetChosenAutomatism());
+        gd::String object = paramEdits.empty() ? "" : paramEdits[0]->GetValue();
+        gd::ChooseBehaviorDialog dialog(parent, project, layout, object, metadata.GetExtraInfo());
+        if (dialog.DeduceBehavior() || dialog.ShowModal() == 1 )
+            editCtrl->ChangeValue(dialog.GetChosenBehavior());
 
         return;
     }
     else if ( metadata.GetType() == "expression" )
     {
-        gd::EditExpressionDialog dialog(parent, gd::ToString( editCtrl->GetValue() ), project, layout);
+        gd::EditExpressionDialog dialog(parent, editCtrl->GetValue(), project, layout);
         if ( dialog.ShowModal() == 1 )
         {
             editCtrl->ChangeValue(dialog.GetExpression());
@@ -76,7 +76,7 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
     }
     else if ( metadata.GetType() == "mouse" )
     {
-        ChoixBouton dialog(parent, gd::ToString( editCtrl->GetValue() ));
+        ChoixBouton dialog(parent, editCtrl->GetValue());
         if ( dialog.ShowModal() == 1 )
         {
             editCtrl->ChangeValue(dialog.bouton);
@@ -85,7 +85,7 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
     }
     else if ( metadata.GetType() == "key" )
     {
-        ChoixClavier dialog(parent, gd::ToString( editCtrl->GetValue() ));
+        ChoixClavier dialog(parent, editCtrl->GetValue());
         if ( dialog.ShowModal() == 1 )
         {
             editCtrl->ChangeValue(dialog.selectedKey);
@@ -94,7 +94,7 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
     }
     else if ( metadata.GetType() == "string" )
     {
-        gd::EditStrExpressionDialog dialog(parent, gd::ToString( editCtrl->GetValue() ), project, layout);
+        gd::EditStrExpressionDialog dialog(parent, editCtrl->GetValue(), project, layout);
         if ( dialog.ShowModal() == 1 )
         {
             editCtrl->ChangeValue(dialog.GetExpression());
@@ -130,7 +130,9 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
             wxString v; v << static_cast<int>(color.Green());
             wxString b; b << static_cast<int>(color.Blue());
 
-            editCtrl->ChangeValue("\""+r+";"+v+";"+b+"\"");
+            wxString colorStr = "\""+r+";"+v+";"+b+"\"";
+
+            editCtrl->ChangeValue(colorStr);
         }
         return;
     }
@@ -230,7 +232,7 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
     }
     else if ( metadata.GetType() == "joyaxis" )
     {
-        ChoiceJoyAxis dialog(parent, static_cast<string>( editCtrl->GetValue() ), project, layout);
+        ChoiceJoyAxis dialog(parent, editCtrl->GetValue(), project, layout);
         if( dialog.ShowModal() == 1 )
             editCtrl->ChangeValue(dialog.joyaxis);
 
@@ -238,7 +240,7 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
     }
     else if ( metadata.GetType() == "file" )
     {
-        ChoiceFile dialog(parent, gd::ToString( editCtrl->GetValue() ), project, layout);
+        ChoiceFile dialog(parent, editCtrl->GetValue(), project, layout);
 
         if ( dialog.ShowModal() == 1 )
             editCtrl->ChangeValue(dialog.file);
@@ -249,7 +251,7 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
     {
         if ( paramEdits.empty() ) return;
 
-        std::string objectWanted = gd::ToString(paramEdits[0]->GetValue());
+        gd::String objectWanted = paramEdits[0]->GetValue();
         gd::Object * object = NULL;
 
         if ( layout.HasObjectNamed(objectWanted) )

@@ -20,5 +20,8 @@ describe('gdjs.SceneStack', function() {
 		var scene4 = sceneStack.replace("Scene 1");
 		expect(sceneStack.pop()).to.be(scene4);
 		expect(sceneStack.pop()).to.be(scene2);
+		
+		var scene5 = sceneStack.replace("Scene 2", true);
+		expect(sceneStack.pop()).to.be(false);
 	});
 });

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include "GDCpp/String.h"
 
 class GD_EXTENSION_API ErrorManager
 {
@@ -27,17 +28,17 @@ class GD_EXTENSION_API ErrorManager
         }
     }
 
-    void SetLastError(std::string error)
+    void SetLastError(gd::String error)
     {
         lastErrorString = error;
         #if !defined(RELEASE)
         std::cout << lastErrorString;
         #endif
     };
-    std::string GetLastError() const {return lastErrorString;};
+    gd::String GetLastError() const {return lastErrorString;};
 
     private:
-    std::string lastErrorString;
+    gd::String lastErrorString;
 
     ErrorManager() {};
     ~ErrorManager() {};
@@ -46,4 +47,3 @@ class GD_EXTENSION_API ErrorManager
 };
 
 #endif // ERRORMANAGER_H
-

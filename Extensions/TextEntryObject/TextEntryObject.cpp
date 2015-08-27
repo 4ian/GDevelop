@@ -17,6 +17,7 @@ This project is released under the MIT License.
 #include "GDCpp/Position.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/RuntimeScene.h"
+#include "GDCore/Utf8/utf8.h"
 #include "TextEntryObject.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
@@ -31,13 +32,14 @@ sf::Texture TextEntryObject::edittimeIconImage;
 sf::Sprite TextEntryObject::edittimeIcon;
 #endif
 
-TextEntryObject::TextEntryObject(std::string name_) :
+TextEntryObject::TextEntryObject(gd::String name_) :
     Object(name_)
 {
 }
 
 RuntimeTextEntryObject::RuntimeTextEntryObject(RuntimeScene & scene_, const gd::Object & object) :
     RuntimeObject(scene_, object),
+    text(),
     scene(&scene_),
     activated(true)
 {
@@ -52,15 +54,22 @@ void RuntimeTextEntryObject::UpdateTime(float)
 
     //Retrieve text entered
     const auto & characters = scene->GetInputManager().GetCharactersEntered();
-    for (unsigned int i = 0;i<characters.size();++i)
+    for (std::size_t i = 0;i<characters.size();++i)
     {
         //Skip some non displayable characters
         if (characters[i] > 30 && (characters[i] < 127 || characters[i] > 159))
-            text += characters[i];
+        {
+            std::cout << characters[i] << std::endl;
+            text += static_cast<char32_t>(characters[i]);
+        }
         else if (characters[i] == 8)
         {
-            //Backspace
-            if (!text.empty()) text.erase(text.end()-1);
+            std::cout << "Backspace" << std::endl;
+            //Backspace : find the previous codepoint and remove it
+            if(text.empty())
+                continue;
+
+            text.pop_back();
         }
     }
 }
@@ -87,13 +96,13 @@ bool TextEntryObject::GenerateThumbnail(const gd::Project & project, wxBitmap & 
     return true;
 }
 
-void RuntimeTextEntryObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeTextEntryObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Text in memory");    value = GetString();}
     else if ( propertyNb == 1 ) {name = _("Activated \?");      value = activated ? _("Yes") : _("No");}
 }
 
-bool RuntimeTextEntryObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeTextEntryObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
     else if ( propertyNb == 1 ) { activated = (newValue != _("No")); return true; }
@@ -101,7 +110,7 @@ bool RuntimeTextEntryObject::ChangeProperty(unsigned int propertyNb, string newV
     return true;
 }
 
-unsigned int RuntimeTextEntryObject::GetNumberOfProperties() const
+std::size_t RuntimeTextEntryObject::GetNumberOfProperties() const
 {
     return 2;
 }
@@ -112,9 +121,7 @@ RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Obj
     return new RuntimeTextEntryObject(scene, object);
 }
 
-gd::Object * CreateTextEntryObject(std::string name)
+gd::Object * CreateTextEntryObject(gd::String name)
 {
     return new TextEntryObject(name);
 }
-
-

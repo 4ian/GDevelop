@@ -490,13 +490,13 @@ object(object_)
 	FlexGridSizer57->Add(StaticText41, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	angle1Edit = new wxTextCtrl(Core, ID_TEXTCTRL28, wxEmptyString, wxDefaultPosition, wxSize(55,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL28"));
 	FlexGridSizer57->Add(angle1Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText55 = new wxStaticText(Core, ID_STATICTEXT58, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT58"));
+	StaticText55 = new wxStaticText(Core, ID_STATICTEXT58, _("ï¿½"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT58"));
 	FlexGridSizer57->Add(StaticText55, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText56 = new wxStaticText(Core, ID_STATICTEXT59, _("and"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT59"));
 	FlexGridSizer57->Add(StaticText56, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	angle2Edit = new wxTextCtrl(Core, ID_TEXTCTRL27, wxEmptyString, wxDefaultPosition, wxSize(55,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL27"));
 	FlexGridSizer57->Add(angle2Edit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText57 = new wxStaticText(Core, ID_STATICTEXT60, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT60"));
+	StaticText57 = new wxStaticText(Core, ID_STATICTEXT60, _("ï¿½"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT60"));
 	FlexGridSizer57->Add(StaticText57, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText18 = new wxStaticText(Core, ID_STATICTEXT20, _("Random variation\nbetween:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT20"));
 	StaticText18->SetToolTip(_("Ampltiude of the random variation of the initial transparency"));
@@ -588,7 +588,7 @@ object(object_)
 	FlexGridSizer49->Add(StaticText45, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	simpleConeAngleEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL22, wxEmptyString, wxDefaultPosition, wxSize(66,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL22"));
 	FlexGridSizer49->Add(simpleConeAngleEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText46 = new wxStaticText(Panel4, ID_STATICTEXT49, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT49"));
+	StaticText46 = new wxStaticText(Panel4, ID_STATICTEXT49, _("ï¿½"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT49"));
 	FlexGridSizer49->Add(StaticText46, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer46->Add(FlexGridSizer49, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel4->SetSizer(FlexGridSizer46);
@@ -615,14 +615,14 @@ object(object_)
 	FlexGridSizer41->Add(StaticText35, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	emitterAngleAEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL15, wxEmptyString, wxDefaultPosition, wxSize(62,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL15"));
 	FlexGridSizer41->Add(emitterAngleAEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText9 = new wxStaticText(Panel3, ID_STATICTEXT11, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
+	StaticText9 = new wxStaticText(Panel3, ID_STATICTEXT11, _("ï¿½"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
 	FlexGridSizer41->Add(StaticText9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer41->Add(8,9,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText36 = new wxStaticText(Panel3, ID_STATICTEXT39, _("2nd angle :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT39"));
 	FlexGridSizer41->Add(StaticText36, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	emitterAngleBEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL16, wxEmptyString, wxDefaultPosition, wxSize(62,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL16"));
 	FlexGridSizer41->Add(emitterAngleBEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText12 = new wxStaticText(Panel3, ID_STATICTEXT14, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+	StaticText12 = new wxStaticText(Panel3, ID_STATICTEXT14, _("ï¿½"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
 	FlexGridSizer41->Add(StaticText12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer34->Add(FlexGridSizer41, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel3->SetSizer(FlexGridSizer34);
@@ -656,7 +656,7 @@ object(object_)
 	simpleGravityAngleEdit = new wxTextCtrl(Panel6, ID_TEXTCTRL25, wxEmptyString, wxDefaultPosition, wxSize(62,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL25"));
 	simpleGravityAngleEdit->SetToolTip(_("Gravity on Z axis ( depth )"));
 	FlexGridSizer51->Add(simpleGravityAngleEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText50 = new wxStaticText(Panel6, ID_STATICTEXT53, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT53"));
+	StaticText50 = new wxStaticText(Panel6, ID_STATICTEXT53, _("ï¿½"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT53"));
 	FlexGridSizer51->Add(StaticText50, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer3->Add(FlexGridSizer51, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer50->Add(BoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -768,10 +768,10 @@ object(object_)
         tankEdit->Enable(false);
     }
     else
-        tankEdit->SetValue(ToString(object.GetTank()));
+        tankEdit->SetValue(gd::String::From(object.GetTank()));
 
-    rendererParam1Edit->SetValue(ToString(object.GetRendererParam1()));
-    rendererParam2Edit->SetValue(ToString(object.GetRendererParam2()));
+    rendererParam1Edit->SetValue(gd::String::From(object.GetRendererParam1()));
+    rendererParam2Edit->SetValue(gd::String::From(object.GetRendererParam2()));
     textureEdit->SetValue(object.GetParticleTexture());
     if ( object.GetRendererType() == ParticleEmitterObject::Line )
     {
@@ -787,41 +787,41 @@ object(object_)
 
     if ( !object.IsRenderingAdditive() ) alphaRenderingCheck->SetValue(true);
 
-    flowEdit->SetValue(ToString(object.GetFlow()));
-    emitterForceMinEdit->SetValue(ToString(object.GetEmitterForceMin()));
-    emitterForceMaxEdit->SetValue(ToString(object.GetEmitterForceMax()));
-    emitterDirZEdit->SetValue(ToString(object.GetEmitterZDirection()));
-    emitterAngleAEdit->SetValue(ToString(object.GetEmitterAngleA()));
-    emitterAngleBEdit->SetValue(ToString(object.GetEmitterAngleB()));
-    gravityXEdit->SetValue(ToString(object.GetParticleGravityX()));
-    gravityYEdit->SetValue(ToString(object.GetParticleGravityY()));
-    gravityZEdit->SetValue(ToString(object.GetParticleGravityZ()));
-    frictionEdit->SetValue(ToString(object.GetFriction()));
-    lifeTimeMinEdit->SetValue(ToString(object.GetParticleLifeTimeMin()));
-    lifeTimeMaxEdit->SetValue(ToString(object.GetParticleLifeTimeMax()));
-    zoneRadiusEdit->SetValue(ToString(object.GetZoneRadius()));
-    maxParticleNbEdit->SetValue(ToString(object.GetMaxParticleNb()));
+    flowEdit->SetValue(gd::String::From(object.GetFlow()));
+    emitterForceMinEdit->SetValue(gd::String::From(object.GetEmitterForceMin()));
+    emitterForceMaxEdit->SetValue(gd::String::From(object.GetEmitterForceMax()));
+    emitterDirZEdit->SetValue(gd::String::From(object.GetEmitterZDirection()));
+    emitterAngleAEdit->SetValue(gd::String::From(object.GetEmitterAngleA()));
+    emitterAngleBEdit->SetValue(gd::String::From(object.GetEmitterAngleB()));
+    gravityXEdit->SetValue(gd::String::From(object.GetParticleGravityX()));
+    gravityYEdit->SetValue(gd::String::From(object.GetParticleGravityY()));
+    gravityZEdit->SetValue(gd::String::From(object.GetParticleGravityZ()));
+    frictionEdit->SetValue(gd::String::From(object.GetFriction()));
+    lifeTimeMinEdit->SetValue(gd::String::From(object.GetParticleLifeTimeMin()));
+    lifeTimeMaxEdit->SetValue(gd::String::From(object.GetParticleLifeTimeMax()));
+    zoneRadiusEdit->SetValue(gd::String::From(object.GetZoneRadius()));
+    maxParticleNbEdit->SetValue(gd::String::From(object.GetMaxParticleNb()));
     destroyWhenNoParticlesCheck->SetValue(object.GetDestroyWhenNoParticles());
 
-    red1Edit->SetValue(ToString(object.GetParticleRed1()));
-    red2Edit->SetValue(ToString(object.GetParticleRed2()));
-    green1Edit->SetValue(ToString(object.GetParticleGreen1()));
-    green2Edit->SetValue(ToString(object.GetParticleGreen2()));
-    blue1Edit->SetValue(ToString(object.GetParticleBlue1()));
-    blue2Edit->SetValue(ToString(object.GetParticleBlue2()));
-    alpha1Edit->SetValue(ToString(object.GetParticleAlpha1()));
-    alpha2Edit->SetValue(ToString(object.GetParticleAlpha2()));
-    alpha1RandomnessEdit->SetValue(ToString(object.GetParticleAlphaRandomness1()));
-    alpha2RandomnessEdit->SetValue(ToString(object.GetParticleAlphaRandomness2()));
+    red1Edit->SetValue(gd::String::From(object.GetParticleRed1()));
+    red2Edit->SetValue(gd::String::From(object.GetParticleRed2()));
+    green1Edit->SetValue(gd::String::From(object.GetParticleGreen1()));
+    green2Edit->SetValue(gd::String::From(object.GetParticleGreen2()));
+    blue1Edit->SetValue(gd::String::From(object.GetParticleBlue1()));
+    blue2Edit->SetValue(gd::String::From(object.GetParticleBlue2()));
+    alpha1Edit->SetValue(gd::String::From(object.GetParticleAlpha1()));
+    alpha2Edit->SetValue(gd::String::From(object.GetParticleAlpha2()));
+    alpha1RandomnessEdit->SetValue(gd::String::From(object.GetParticleAlphaRandomness1()));
+    alpha2RandomnessEdit->SetValue(gd::String::From(object.GetParticleAlphaRandomness2()));
 
-    size1Edit->SetValue(ToString(object.GetParticleSize1()));
-    size2Edit->SetValue(ToString(object.GetParticleSize2()));
-    angle1Edit->SetValue(ToString(object.GetParticleAngle1()));
-    angle2Edit->SetValue(ToString(object.GetParticleAngle2()));
-    size1RandomnessEdit->SetValue(ToString(object.GetParticleSizeRandomness1()));
-    size2RandomnessEdit->SetValue(ToString(object.GetParticleSizeRandomness2()));
-    angle1RandomnessEdit->SetValue(ToString(object.GetParticleAngleRandomness1()));
-    angle2RandomnessEdit->SetValue(ToString(object.GetParticleAngleRandomness2()));
+    size1Edit->SetValue(gd::String::From(object.GetParticleSize1()));
+    size2Edit->SetValue(gd::String::From(object.GetParticleSize2()));
+    angle1Edit->SetValue(gd::String::From(object.GetParticleAngle1()));
+    angle2Edit->SetValue(gd::String::From(object.GetParticleAngle2()));
+    size1RandomnessEdit->SetValue(gd::String::From(object.GetParticleSizeRandomness1()));
+    size2RandomnessEdit->SetValue(gd::String::From(object.GetParticleSizeRandomness2()));
+    angle1RandomnessEdit->SetValue(gd::String::From(object.GetParticleAngleRandomness1()));
+    angle2RandomnessEdit->SetValue(gd::String::From(object.GetParticleAngleRandomness2()));
     red2Edit->Enable(false);
     green2Edit->Enable(false);
     blue2Edit->Enable(false);
@@ -894,10 +894,10 @@ object(object_)
 
     simpleFrictionEdit->ChangeValue(frictionEdit->GetValue());
     {
-        float x = ToFloat(string(gravityXEdit->GetValue().mb_str()));
-        float y = ToFloat(string(gravityYEdit->GetValue().mb_str()));
-        simpleGravityAngleEdit->ChangeValue(ToString(atan2(y,x)*180.0f/3.14159f));
-        simpleGravityLengthEdit->ChangeValue(ToString(sqrt(x*x+y*y)));
+        float x = gd::String(gravityXEdit->GetValue()).To<float>();
+        float y = gd::String(gravityYEdit->GetValue()).To<float>();
+        simpleGravityAngleEdit->ChangeValue(gd::String::From(atan2(y,x)*180.0f/3.14159f));
+        simpleGravityLengthEdit->ChangeValue(gd::String::From(sqrt(x*x+y*y)));
     }
 
     //Set last used pages
@@ -927,7 +927,7 @@ ParticleEmitterObjectEditor::~ParticleEmitterObjectEditor()
 }
 void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-    unsigned int particleNb = ToInt(string(maxParticleNbEdit->GetValue().mb_str())) > 0 ? ToInt(string(maxParticleNbEdit->GetValue().mb_str())) : 0;
+    std::size_t particleNb = gd::String(maxParticleNbEdit->GetValue()).To<int>() > 0 ? gd::String(maxParticleNbEdit->GetValue()).To<std::size_t>() : 0;
     if ( particleNb > 30000 )
     {
         if ( wxMessageBox(_("The number of particles is huge. A number too important could crash the game.\nAre you sure you wan to continue\?"), _("Maximum Particles number"), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
@@ -935,7 +935,7 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     }
 
     if ( infiniteTankCheck->GetValue() ) object.SetTank(-1);
-    else object.SetTank(ToFloat(string(tankEdit->GetValue().mb_str())));
+    else object.SetTank(gd::String(tankEdit->GetValue()).To<float>());
 
     if ( lineCheck->GetValue() ) object.SetRendererType(ParticleEmitterObject::Line);
     else if ( quadCheck->GetValue() ) object.SetRendererType(ParticleEmitterObject::Quad);
@@ -944,21 +944,21 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     if ( alphaRenderingCheck->GetValue() ) object.SetRenderingAlpha();
     else object.SetRenderingAdditive();
 
-    object.SetFlow(ToFloat(string(flowEdit->GetValue().mb_str())));
-    object.SetEmitterForceMin(ToFloat(string(emitterForceMinEdit->GetValue().mb_str())));
-    object.SetEmitterForceMax(ToFloat(string(emitterForceMaxEdit->GetValue().mb_str())));
-    object.SetEmitterZDirection(ToFloat(string(emitterDirZEdit->GetValue().mb_str())));
-    object.SetEmitterAngleA(ToFloat(string(emitterAngleAEdit->GetValue().mb_str())));
-    object.SetEmitterAngleB(ToFloat(string(emitterAngleBEdit->GetValue().mb_str())));
-    object.SetParticleGravityX(ToFloat(string(gravityXEdit->GetValue().mb_str())));
-    object.SetParticleGravityY(ToFloat(string(gravityYEdit->GetValue().mb_str())));
-    object.SetParticleGravityZ(ToFloat(string(gravityZEdit->GetValue().mb_str())));
-    object.SetRendererParam1(ToFloat(string(rendererParam1Edit->GetValue().mb_str())));
-    object.SetRendererParam2(ToFloat(string(rendererParam2Edit->GetValue().mb_str())));
-    object.SetParticleLifeTimeMin(ToFloat(string(lifeTimeMinEdit->GetValue().mb_str())));
-    object.SetParticleLifeTimeMax(ToFloat(string(lifeTimeMaxEdit->GetValue().mb_str())));
-    object.SetZoneRadius(ToFloat(string(zoneRadiusEdit->GetValue().mb_str())));
-    object.SetFriction(ToFloat(string(frictionEdit->GetValue().mb_str())));
+    object.SetFlow(gd::String(flowEdit->GetValue()).To<float>());
+    object.SetEmitterForceMin(gd::String(emitterForceMinEdit->GetValue()).To<float>());
+    object.SetEmitterForceMax(gd::String(emitterForceMaxEdit->GetValue()).To<float>());
+    object.SetEmitterZDirection(gd::String(emitterDirZEdit->GetValue()).To<float>());
+    object.SetEmitterAngleA(gd::String(emitterAngleAEdit->GetValue()).To<float>());
+    object.SetEmitterAngleB(gd::String(emitterAngleBEdit->GetValue()).To<float>());
+    object.SetParticleGravityX(gd::String(gravityXEdit->GetValue()).To<float>());
+    object.SetParticleGravityY(gd::String(gravityYEdit->GetValue()).To<float>());
+    object.SetParticleGravityZ(gd::String(gravityZEdit->GetValue()).To<float>());
+    object.SetRendererParam1(gd::String(rendererParam1Edit->GetValue()).To<float>());
+    object.SetRendererParam2(gd::String(rendererParam2Edit->GetValue()).To<float>());
+    object.SetParticleLifeTimeMin(gd::String(lifeTimeMinEdit->GetValue()).To<float>());
+    object.SetParticleLifeTimeMax(gd::String(lifeTimeMaxEdit->GetValue()).To<float>());
+    object.SetZoneRadius(gd::String(zoneRadiusEdit->GetValue()).To<float>());
+    object.SetFriction(gd::String(frictionEdit->GetValue()).To<float>());
     object.SetMaxParticleNb(particleNb);
     object.SetDestroyWhenNoParticles(destroyWhenNoParticlesCheck->GetValue());
 
@@ -972,14 +972,14 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     object.SetParticleAlpha2(alpha2Edit->GetValue());
     object.SetParticleSize1(size1Edit->GetValue());
     object.SetParticleSize2(size2Edit->GetValue());
-    object.SetParticleAngle1(ToFloat(string(angle1Edit->GetValue().mb_str())));
-    object.SetParticleAngle2(ToFloat(string(angle2Edit->GetValue().mb_str())));
+    object.SetParticleAngle1(gd::String(angle1Edit->GetValue()).To<float>());
+    object.SetParticleAngle2(gd::String(angle2Edit->GetValue()).To<float>());
     object.SetParticleAlphaRandomness1(alpha1RandomnessEdit->GetValue());
     object.SetParticleAlphaRandomness2(alpha2RandomnessEdit->GetValue());
     object.SetParticleSizeRandomness1(size1RandomnessEdit->GetValue());
     object.SetParticleSizeRandomness2(size2RandomnessEdit->GetValue());
-    object.SetParticleAngleRandomness1(ToFloat(string(angle1RandomnessEdit->GetValue().mb_str())));
-    object.SetParticleAngleRandomness2(ToFloat(string(angle2RandomnessEdit->GetValue().mb_str())));
+    object.SetParticleAngleRandomness1(gd::String(angle1RandomnessEdit->GetValue()).To<float>());
+    object.SetParticleAngleRandomness2(gd::String(angle2RandomnessEdit->GetValue()).To<float>());
     if ( redRandomCheck->GetValue() ) object.SetRedParameterType(ParticleEmitterObject::Random);
     else if ( redMutableCheck->GetValue() ) object.SetRedParameterType(ParticleEmitterObject::Mutable);
     else object.SetRedParameterType(ParticleEmitterObject::Enabled);
@@ -999,7 +999,7 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     else if ( angleMutableCheck->GetValue() ) object.SetAngleParameterType(ParticleEmitterObject::Mutable);
     else object.SetAngleParameterType(ParticleEmitterObject::Nothing);
 
-    object.SetParticleTexture(string(textureEdit->GetValue().mb_str()));
+    object.SetParticleTexture(textureEdit->GetValue());
 
     //Save last used pages
     object.emissionEditionSimpleMode = false;
@@ -1159,11 +1159,11 @@ void ParticleEmitterObjectEditor::OnsimpleConeAngleText(wxCommandEvent& event)
 
 void ParticleEmitterObjectEditor::OnsimpleGravityAngleText(wxCommandEvent& event)
 {
-    float angle = ToFloat(string(simpleGravityAngleEdit->GetValue().mb_str()))/180.0f*3.14159f;
-    float length = ToFloat(string(simpleGravityLengthEdit->GetValue().mb_str()));
+    float angle = gd::String(simpleGravityAngleEdit->GetValue()).To<float>()/180.0f*3.14159f;
+    float length = gd::String(simpleGravityLengthEdit->GetValue()).To<float>();
 
-    gravityXEdit->SetValue(ToString(cos(angle)*length));
-    gravityYEdit->SetValue(ToString(sin(angle)*length));
+    gravityXEdit->SetValue(gd::String::From(cos(angle)*length));
+    gravityYEdit->SetValue(gd::String::From(sin(angle)*length));
 }
 
 void ParticleEmitterObjectEditor::OnsimpleFrictionEditText(wxCommandEvent& event)
@@ -1208,4 +1208,3 @@ void ParticleEmitterObjectEditor::OnsizeMutableCheckSelect(wxCommandEvent& event
 }
 
 #endif
-

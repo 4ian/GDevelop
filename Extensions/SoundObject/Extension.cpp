@@ -55,7 +55,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
                 .SetFunctionName("SetVolume").SetManipulatedType("number").SetGetter("GetVolume").SetIncludeFile("SoundObject/SoundObject.h");
@@ -68,7 +69,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
                 .SetFunctionName("SetPitch").SetManipulatedType("number").SetGetter("GetPitch").SetIncludeFile("SoundObject/SoundObject.h");
@@ -81,7 +83,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
                 .SetFunctionName("SetAttenuation").SetManipulatedType("number").SetGetter("GetAttenuation").SetIncludeFile("SoundObject/SoundObject.h");
@@ -94,7 +97,8 @@ public:
                            _("Position"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("operator", _("Modification's sign"))
                 .AddParameter("expression", _("Value"))
                 .SetFunctionName("SetZPos").SetManipulatedType("number").SetGetter("GetZPos").SetIncludeFile("SoundObject/SoundObject.h");
@@ -107,7 +111,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("yesorno", _("Loop"))
                 .SetFunctionName("SetLoop").SetIncludeFile("SoundObject/SoundObject.h");
 
@@ -119,7 +124,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("yesorno", _("Relative to the listener"))
                 .SetFunctionName("SetRelativeToListener").SetIncludeFile("SoundObject/SoundObject.h");
 
@@ -128,10 +134,11 @@ public:
                            _("Play"),
                            _("Play a sound."),
                            _("Play sound _PARAM0_"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("Play").SetIncludeFile("SoundObject/SoundObject.h");
 
 
@@ -139,10 +146,11 @@ public:
                            _("Stop"),
                            _("Stop a sound."),
                            _("Stop _PARAM0_"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("Stop").SetIncludeFile("SoundObject/SoundObject.h");
 
 
@@ -150,10 +158,11 @@ public:
                            _("Pause"),
                            _("Pause a sound."),
                            _("Pause _PARAM0_"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("Pause").SetIncludeFile("SoundObject/SoundObject.h");
 
 
@@ -164,7 +173,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
                 .SetFunctionName("GetVolume").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundObject.h");
@@ -177,7 +187,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
                 .SetFunctionName("GetPitch").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundObject.h");
@@ -190,7 +201,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
                 .SetFunctionName("GetAttenuation").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundObject.h");
@@ -203,7 +215,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
                 .SetFunctionName("GetMinDistance").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundObject.h");
@@ -216,7 +229,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .AddParameter("relationalOperator", _("Sign of the test"))
                 .AddParameter("expression", _("Value to test"))
                 .SetFunctionName("GetZPos").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundObject.h");
@@ -229,7 +243,8 @@ public:
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("GetLoop").SetIncludeFile("SoundObject/SoundObject.h");
 
 
@@ -237,10 +252,11 @@ public:
                            _("Being played"),
                            _("Test if a sound is being played."),
                            _("_PARAM0_ is being played"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("IsPlaying").SetIncludeFile("SoundObject/SoundObject.h");
 
 
@@ -248,10 +264,11 @@ public:
                            _("Paused"),
                            _("A sound is paused"),
                            _("_PARAM0_ is paused"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("IsPaused").SetIncludeFile("SoundObject/SoundObject.h");
 
 
@@ -259,10 +276,11 @@ public:
                            _("Stopped"),
                            _("Test if a sound is stopped."),
                            _("_PARAM0_ is stopped"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("IsStopped").SetIncludeFile("SoundObject/SoundObject.h");
 
 
@@ -273,38 +291,39 @@ public:
                            _("Parameters"),
                            "res/conditions/son24.png",
                            "res/conditions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("IsRelativeToListener").SetIncludeFile("SoundObject/SoundObject.h");
 
 
             obj.AddExpression("Volume", _("Sound level"), _("Sound level"), _("Parameters"), "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("GetVolume").SetIncludeFile("SoundObject/SoundObject.h");
 
 
             obj.AddExpression("Pitch", _("Pitch"), _("Pitch"), _("Parameters"), "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("GetPitch").SetIncludeFile("SoundObject/SoundObject.h");
 
 
             obj.AddExpression("Attenuation", _("Attenuation"), _("Attenuation"), _("Parameters"), "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("GetAttenuation").SetIncludeFile("SoundObject/SoundObject.h");
 
 
             obj.AddExpression("MinDistance", _("Minimal distance"), _("Minimal distance"), _("Parameters"), "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("GetMinDistance").SetIncludeFile("SoundObject/SoundObject.h");
 
 
             obj.AddExpression("ZPos", _("Z Position"), _("Z Position"), _("Position"), "res/actions/son.png")
-                .AddParameter("object", _("Object"), "Sound", false)
+                .AddParameter("object", _("Object"), "Sound")
                 .SetFunctionName("GetZPos").SetIncludeFile("SoundObject/SoundObject.h");
 
         #endif
         }
 
-        // Actions liées à l'écouteur
+        // Actions liï¿½es ï¿½ l'ï¿½couteur
         #if defined(GD_IDE_ONLY)
         AddAction("ListenerX",
                        _("X position"),
@@ -390,7 +409,7 @@ public:
             .SetFunctionName("SetListenerDirectionZ").SetManipulatedType("number").SetGetter("GetListenerDirectionZ").SetIncludeFile("SoundObject/SoundListener.h");
 
 
-        // Conditions liées à l'écouteur
+        // Conditions liï¿½es ï¿½ l'ï¿½couteur
         AddCondition("ListenerX",
                        _("X position"),
                        _("Test the position of the listener on X axis."),
@@ -398,6 +417,7 @@ public:
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
+
 
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
@@ -411,6 +431,7 @@ public:
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
+
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
             .SetFunctionName("GetListenerY").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundListener.h");
@@ -423,6 +444,7 @@ public:
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
+
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
             .SetFunctionName("GetListenerZ").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundListener.h");
@@ -434,6 +456,7 @@ public:
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
+
 
             .AddParameter("relationalOperator", _("Sign of the test"))
             .AddParameter("expression", _("Value to test"))
@@ -467,6 +490,7 @@ public:
             .AddParameter("expression", _("Value to test"))
 
             .SetFunctionName("GetListenerDirectionZ").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundListener.h");
+
 
 
 

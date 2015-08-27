@@ -8,8 +8,8 @@ find ../GDCpp/GDCpp/ -name '*.cpp' >> /tmp/listfile.txt
 find ../GDCpp/GDCpp/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.cpp' >> /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
-find ../Extensions/ -name '*.cpp' | grep -v '/TileMapObject/' >> /tmp/listfile.txt
-find ../Extensions/ -name '*.h' -o -name "*.hpp" | grep -v '/TileMapObject/' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.cpp' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.cpp' >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
 
@@ -21,9 +21,8 @@ else
 fi
 
 if type $GETTEXT 2>/dev/null; then
-	$GETTEXT --from-code iso-8859-1  -o source.pot --c++ --no-wrap -f /tmp/listfile.txt -k_
+	$GETTEXT --from-code utf-8  -o source.pot --c++ --keyword=GD_T --no-wrap -f /tmp/listfile.txt -k_
 	echo "source.pot file generated and ready to be sent to Crowdin or used in a translation software like PoEdit."
 else
 	echo "Unable to find xgettext on your system."
 fi
-

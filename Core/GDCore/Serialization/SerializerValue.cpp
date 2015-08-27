@@ -28,7 +28,7 @@ SerializerValue::SerializerValue(bool val) :
 {
 	SetBool(val);
 }
-SerializerValue::SerializerValue(std::string val) :
+SerializerValue::SerializerValue(const gd::String &val) :
 	isUnknown(true),
 	isBoolean(false),
 	isString(false),
@@ -75,46 +75,47 @@ bool SerializerValue::GetBool() const
 		return doubleValue != 0.0;
 
 	return booleanValue;
-};
+}
 
-std::string SerializerValue::GetString() const
+gd::String SerializerValue::GetString() const
 {
 	if (isBoolean)
-		return booleanValue ? "true" : "false";
+		return booleanValue ? gd::String("true") : gd::String("false");
 	else if (isInt)
-		return gd::ToString(intValue);
+		return gd::String::From(intValue);
 	else if (isDouble)
-		return gd::ToString(doubleValue);
+		return gd::String::From(doubleValue);
+	else if (isUnknown)
+		return stringValue;
 
 	return stringValue;
-};
+}
 
 int SerializerValue::GetInt() const
 {
 	if (isBoolean)
 		return booleanValue ? 1 : 0;
 	else if (isString || isUnknown)
-		return gd::ToInt(stringValue);
+		return stringValue.To<int>();
 	else if (isDouble)
 		return doubleValue;
 
 	return intValue;
-};
+}
 
 double SerializerValue::GetDouble() const
 {
 	if (isBoolean)
 		return booleanValue ? 1 : 0;
 	else if (isString || isUnknown)
-		return gd::ToDouble(stringValue);
+		return stringValue.To<double>();
 	else if (isInt)
 		return intValue;
 
 	return doubleValue;
-};
+}
 
-
-void SerializerValue::Set(const std::string & val)
+void SerializerValue::Set(const gd::String & val)
 {
 	isUnknown = true;
 	isBoolean = false;
@@ -123,7 +124,7 @@ void SerializerValue::Set(const std::string & val)
 	isDouble = false;
 
 	stringValue = val;
-};
+}
 
 void SerializerValue::SetBool(bool val)
 {
@@ -134,9 +135,9 @@ void SerializerValue::SetBool(bool val)
 	isDouble = false;
 
 	booleanValue = val;
-};
+}
 
-void SerializerValue::SetString(const std::string & val)
+void SerializerValue::SetString(const gd::String & val)
 {
 	isUnknown = false;
 	isBoolean = false;
@@ -145,7 +146,7 @@ void SerializerValue::SetString(const std::string & val)
 	isDouble = false;
 
 	stringValue = val;
-};
+}
 
 void SerializerValue::SetInt(int val)
 {
@@ -156,7 +157,7 @@ void SerializerValue::SetInt(int val)
 	isDouble = false;
 
 	intValue = val;
-};
+}
 
 void SerializerValue::SetDouble(double val)
 {
@@ -167,6 +168,6 @@ void SerializerValue::SetDouble(double val)
 	isDouble = true;
 
 	doubleValue = val;
-};
+}
 
 }

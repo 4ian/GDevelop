@@ -29,8 +29,8 @@ typedef std::shared_ptr<RuntimeObject> RuntimeObjSPtr;
  *
  * \see Object
  */
-struct ObjectHasName : public std::binary_function<std::shared_ptr<gd::Object>, std::string, bool> {
-    bool operator()(const std::shared_ptr<gd::Object> & object, const std::string & name) const { return object->GetName() == name; }
+struct ObjectHasName : public std::binary_function<std::shared_ptr<gd::Object>, gd::String, bool> {
+    bool operator()(const std::shared_ptr<gd::Object> & object, const gd::String & name) const { return object->GetName() == name; }
 };
 
 #endif // OBJECTHELPERS_H

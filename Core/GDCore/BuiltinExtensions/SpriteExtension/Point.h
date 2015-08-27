@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_POINT_H
 #define GDCORE_POINT_H
-#include <string>
+#include "GDCore/String.h"
 
 /**
  * \brief Named point used by Sprite.
@@ -16,18 +16,18 @@
 class GD_CORE_API Point
 {
 public:
-    Point(const std::string & name_);
+    Point(const gd::String & name_);
     virtual ~Point() {};
 
     /**
      * Change point name
      */
-    void SetName(const std::string & name_) { name = name_; }
+    void SetName(const gd::String & name_) { name = name_; }
 
     /**
      * Get point name
      */
-    const std::string & GetName() const { return name; }
+    const gd::String & GetName() const { return name; }
 
     /**
      * Change point position.
@@ -55,7 +55,7 @@ public:
     float GetY() const { return y; }
 
 private:
-    std::string name;
+    gd::String name;
     float x;
     float y;
 };

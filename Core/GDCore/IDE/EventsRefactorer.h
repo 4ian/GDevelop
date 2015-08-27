@@ -6,7 +6,7 @@
 #ifndef GDCORE_EVENTSREFACTORER_H
 #define GDCORE_EVENTSREFACTORER_H
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include <memory>
 #include "GDCore/Events/Instruction.h"
 namespace gd { class EventsList; }
@@ -29,13 +29,13 @@ namespace gd
 class GD_CORE_API EventsSearchResult
 {
 public:
-    EventsSearchResult(std::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, unsigned int positionInList_ );
+    EventsSearchResult(std::weak_ptr<gd::BaseEvent> event_, gd::EventsList * eventsList_, std::size_t positionInList_ );
     EventsSearchResult();
     ~EventsSearchResult() {};
 
     std::weak_ptr<gd::BaseEvent> event;
     gd::EventsList * eventsList;
-    unsigned int positionInList;
+    std::size_t positionInList;
 };
 
 /**
@@ -55,30 +55,30 @@ public:
      * Replace all occurences of an object name by another name
      * ( include : objects in parameters and in math/text expressions of all events ).
      */
-    static void RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, std::string oldName, std::string newName);
+    static void RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, gd::String oldName, gd::String newName);
 
     /**
      * Remove all actions or conditions using an object
      */
-    static void RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, std::string name);
+    static void RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, gd::String name);
 
     /**
-     * Search for a string in events
+     * Search for a gd::String in events
      *
      * \return A vector containing EventsSearchResult objects filled with events containing the string
      */
     static std::vector < EventsSearchResult > SearchInEvents(gd::Project & project, gd::Layout & layout, gd::EventsList & events,
-                                      std::string search,
+                                      gd::String search,
                                       bool matchCase,
                                       bool inConditions,
                                       bool inAction);
 
     /**
-     * Replace all occurrences of a string in events
+     * Replace all occurrences of a gd::String in events
      */
     static void ReplaceStringInEvents(gd::Project & project, gd::Layout & layout, gd::EventsList & events,
-                                      std::string toReplace,
-                                      std::string newString,
+                                      gd::String toReplace,
+                                      gd::String newString,
                                       bool matchCase,
                                       bool inConditions,
                                       bool inActions);
@@ -91,7 +91,7 @@ private:
      *
      * \return true if something was modified.
      */
-    static bool RenameObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & instructions, std::string oldName, std::string newName);
+    static bool RenameObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & instructions, gd::String oldName, gd::String newName);
 
     /**
      * Replace all occurences of an object name by another name in a condition
@@ -99,38 +99,38 @@ private:
      *
      * \return true if something was modified.
      */
-    static bool RenameObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & instructions, std::string oldName, std::string newName);
+    static bool RenameObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & instructions, gd::String oldName, gd::String newName);
 
     /**
      * Remove all conditions of the list using an object
      *
      * \return true if something was modified.
      */
-    static bool RemoveObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string name);
+    static bool RemoveObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String name);
 
     /**
      * Remove all actions of the list using an object
      *
      * \return true if something was modified.
      */
-    static bool RemoveObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string name);
+    static bool RemoveObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String name);
 
     /**
-     * Replace all occurences of a string in conditions
+     * Replace all occurences of a gd::String in conditions
      *
      * \return true if something was modified.
      */
-    static bool ReplaceStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string toReplace, std::string newString, bool matchCase);
+    static bool ReplaceStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String toReplace, gd::String newString, bool matchCase);
 
     /**
-     * Replace all occurences of a string in actions
+     * Replace all occurences of a gd::String in actions
      *
      * \return true if something was modified.
      */
-    static bool ReplaceStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string toReplace, std::string newString, bool matchCase);
+    static bool ReplaceStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String toReplace, gd::String newString, bool matchCase);
 
-    static bool SearchStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, std::string search, bool matchCase);
-    static bool SearchStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string search, bool matchCase);
+    static bool SearchStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, gd::String search, bool matchCase);
+    static bool SearchStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String search, bool matchCase);
 
     EventsRefactorer() {};
 };

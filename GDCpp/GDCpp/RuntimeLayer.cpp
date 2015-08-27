@@ -11,7 +11,7 @@ RuntimeLayer::RuntimeLayer(gd::Layer & layer, const sf::View & defaultView) :
     name(layer.GetName()),
     isVisible(layer.GetVisibility())
 {
-    for (unsigned int i = 0;i<layer.GetCameraCount();++i)
+    for (std::size_t i = 0;i<layer.GetCameraCount();++i)
         cameras.push_back(RuntimeCamera(layer.GetCamera(i), defaultView));
 }
 

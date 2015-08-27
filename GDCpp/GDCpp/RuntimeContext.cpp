@@ -4,12 +4,12 @@
 #include "GDCpp/profile.h"
 #include <vector>
 
-bool RuntimeContext::TriggerOnce(unsigned int conditionId)
+bool RuntimeContext::TriggerOnce(std::size_t conditionId)
 {
 	onceConditionsTriggered[conditionId] = true; //Remember that we triggered this condition.
 
 	//Return true only if the condition was not triggered the last frame.
-	std::map <unsigned int, bool>::iterator lastFrame = onceConditionsTriggeredLastFrame.find(conditionId);
+	std::map <std::size_t, bool>::iterator lastFrame = onceConditionsTriggeredLastFrame.find(conditionId);
 	return lastFrame == onceConditionsTriggeredLastFrame.end() || lastFrame->second == false;
 }
 
@@ -19,7 +19,7 @@ void RuntimeContext::StartNewFrame()
 	onceConditionsTriggered.clear();
 }
 
-std::vector<RuntimeObject*> RuntimeContext::GetObjectsRawPointers(const std::string & name)
+std::vector<RuntimeObject*> RuntimeContext::GetObjectsRawPointers(const gd::String & name)
 {
     return scene->objectsInstances.GetObjectsRawPointers(name);
 }
@@ -41,14 +41,14 @@ RuntimeContext & RuntimeContext::ClearObjectListsMap()
     return *this;
 }
 
-RuntimeContext & RuntimeContext::AddObjectListToMap(const std::string & objectName, std::vector<RuntimeObject*> & list)
+RuntimeContext & RuntimeContext::AddObjectListToMap(const gd::String & objectName, std::vector<RuntimeObject*> & list)
 {
     temporaryMap[objectName] = &list;
 
     return *this;
 }
 
-std::map <std::string, std::vector<RuntimeObject*> *> RuntimeContext::ReturnObjectListsMap()
+std::map <gd::String, std::vector<RuntimeObject*> *> RuntimeContext::ReturnObjectListsMap()
 {
     return temporaryMap;
 }

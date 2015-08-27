@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 #include <memory>
 #include <memory>
@@ -128,7 +128,7 @@ public:
      *
      * \see gd::EventMetadata
      */
-    virtual std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
+    virtual gd::String GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
     /**
      * Called before events are compiled: the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
@@ -141,7 +141,7 @@ public:
      * \see gd::EventMetadata
      * \see gd::BaseEvent::MustBePreprocessed
      */
-    virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, unsigned int indexOfTheEventInThisList);
+    virtual void Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsList & eventList, std::size_t indexOfTheEventInThisList);
 
     /**
      * \brief If MustBePreprocessed is redefined to return true, the gd::EventMetadata::preprocessing associated to the event will be called
@@ -175,12 +175,12 @@ public:
     /**
      * \brief Return the event type
      */
-    const std::string & GetType() const { return type; };
+    const gd::String & GetType() const { return type; };
 
     /**
      * \brief Change the event type
      */
-    void SetType(std::string type_) { type = type_; };
+    void SetType(gd::String type_) { type = type_; };
 
     /**
      * \brief Set if the event if disabled or not
@@ -265,7 +265,7 @@ protected:
 private:
     bool            folded; ///< True if the subevents should be hidden in the events editor
     bool            disabled; ///<True if the event is disabled and must not be executed
-    std::string     type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
+    gd::String      type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
 
     static gd::EventsList badSubEvents;
 };

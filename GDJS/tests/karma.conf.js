@@ -27,7 +27,7 @@ module.exports = function(config) {
       '../Runtime/variablescontainer.js',
       '../Runtime/eventscontext.js',
       '../Runtime/runtimescene.js',
-      '../Runtime/runtimeautomatism.js',
+      '../Runtime/runtimebehavior.js',
       '../Runtime/runtimeobject.js',
       '../Runtime/spriteruntimeobject.js',
       '../Runtime/soundmanager.js',
@@ -41,9 +41,9 @@ module.exports = function(config) {
       '../Runtime/windowtools.js',
 
       //Extensions:
-      '../../Extensions/DraggableAutomatism/draggableruntimeautomatism.js',
-      '../../Extensions/PlatformAutomatism/platformerobjectruntimeautomatism.js',
-      '../../Extensions/PlatformAutomatism/platformruntimeautomatism.js',
+      '../../Extensions/DraggableBehavior/draggableruntimebehavior.js',
+      '../../Extensions/PlatformBehavior/platformerobjectruntimebehavior.js',
+      '../../Extensions/PlatformBehavior/platformruntimebehavior.js',
       '../../Extensions/LinkedObjects/linkedobjects.js',
 
       //All tests files:

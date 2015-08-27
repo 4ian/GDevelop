@@ -14,13 +14,13 @@
 void GD_API GDLogBanner()
 {
     #if defined(LINUX)
-        std::string sys = "Target system : GNU/Linux, ";
+        gd::String sys = "Target system : GNU/Linux, ";
     #elif defined(WINDOWS)
-        std::string sys = "Target system : Windows, ";
+        gd::String sys = "Target system : Windows, ";
     #elif defined(MACOS)
-        std::string sys = "Target system : Mac OS, ";
+        gd::String sys = "Target system : Mac OS, ";
     #else
-        std::string sys = "Target system : Unknown, ";
+        gd::String sys = "Target system : Unknown, ";
     #endif
     if(sizeof(int*) == 4)
         sys += "32-bits";

@@ -1,399 +1,493 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Project>
-    <GDVersion Major="3" Minor="0" Build="11298" Revision="57009" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Save and load" />
-        <Auteur value="" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="BuiltinExternalLayouts" />
-            <Extension name="TextObject" />
-            <Extension name="CommonDialogs" />
-            <Extension name="DraggableAutomatism" />
-        </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
-            <Platform name="Game Develop JS platform" />
-        </Platforms>
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable />
-        <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-    </Info>
-    <Resources>
-        <Resources>
-            <Resource kind="image" name="Block-Normal.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Block-Normal.png" />
-        </Resources>
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes firstScene="">
-        <Scene nom="Nouvelle scène 1" mangledName="Nouvelle_32sc__4524ne_321" r="94.000000" v="174.000000" b="255.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Bloc" type="Sprite">
-                    <Variables />
-                    <Automatism Type="DraggableAutomatism::Draggable" Name="Draggable" />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Block-Normal.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="35.000000" Y="30.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="ExplanationFR" type="TextObject::Text" smoothed="true" bold="false" italic="false" underlined="false">
-                    <Variables />
-                    <String value="Appuyez sur S pour sauvegarder&#x0A;Appuyez sur L pour charger&#x0A;Appuyez sur A pour ajouter un bloc&#x0A;Appuyez sur D pour le supprimer" />
-                    <Font value="" />
-                    <CharacterSize value="15" />
-                    <Color r="255" g="255" b="255" />
-                </Objet>
-                <Objet nom="Explanation" type="TextObject::Text" smoothed="true" bold="false" italic="false" underlined="false">
-                    <Variables />
-                    <String value="Press S to save&#x0A;Press L to load&#x0A;Press A to add a block&#x0A;Press D to delete a block" />
-                    <Font value="" />
-                    <CharacterSize value="15" />
-                    <Color r="255" g="255" b="255" />
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables>
-                <Variable Name="Etat" Value="" />
-            </Variables>
-            <AutomatismsSharedDatas />
-            <Positions>
-                <Objet nom="ExplanationFR" x="572.000000" y="5.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Explanation" x="298.000000" y="5.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos />
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Adding a block" />
-                    <Com2 value="Ajout d&apos;un bloc" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="a" />
-                        </Condition>
-                        <Condition>
-                            <Type value="Timer" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="0.25" />
-                            <Parametre value='&quot;Insertion&quot;' />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Create" />
-                            <Parametre value="" />
-                            <Parametre value="Bloc" />
-                            <Parametre value="MouseX()" />
-                            <Parametre value="MouseY()" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="ResetTimer" />
-                            <Parametre value="" />
-                            <Parametre value='&quot;Insertion&quot;' />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Deleting a block" />
-                    <Com2 value="Suppression d&apos;un bloc" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="d" />
-                        </Condition>
-                        <Condition>
-                            <Type value="SourisSurObjet" Contraire="false" />
-                            <Parametre value="Bloc" />
-                            <Parametre value="" />
-                            <Parametre value="" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Delete" />
-                            <Parametre value="Bloc" />
-                            <Parametre value="" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Start Saving or loading" />
-                    <Com2 value="Lancement de la sauvegarde/chargement si besoin." />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="s" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarSceneTxt" />
-                            <Parametre value="" />
-                            <Parametre value="Etat" />
-                            <Parametre value="=" />
-                            <Parametre value='&quot;Save&quot;' />
-                        </Action>
-                        <Action>
-                            <Type value="ModVarScene" />
-                            <Parametre value="" />
-                            <Parametre value="ID" />
-                            <Parametre value="=" />
-                            <Parametre value="0" />
-                        </Action>
-                        <Action>
-                            <Type value="DeleteFichier" />
-                            <Parametre value='&quot;Save.txt&quot;' />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="KeyPressed" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="l" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarScene" />
-                            <Parametre value="" />
-                            <Parametre value="ID" />
-                            <Parametre value="=" />
-                            <Parametre value="0" />
-                        </Action>
-                        <Action>
-                            <Type value="ModVarSceneTxt" />
-                            <Parametre value="" />
-                            <Parametre value="Etat" />
-                            <Parametre value="=" />
-                            <Parametre value='&quot;Load&quot;' />
-                        </Action>
-                        <Action>
-                            <Type value="Delete" />
-                            <Parametre value="Bloc" />
-                            <Parametre value="" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Save" />
-                    <Com2 value="Sauvegarde" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarSceneTxt" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Etat" />
-                            <Parametre value="=" />
-                            <Parametre value='&quot;Save&quot;' />
-                        </Condition>
-                    </Conditions>
-                    <Actions />
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Comment" />
-                            <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                            <Com1 value="For each object block,&#x0A;we create an entry in the save file" />
-                            <Com2 value="On passe en revue chaque bloc.&#x0A;Et on enregistre leurs positions." />
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::ForEach" />
-                            <Object value="Bloc" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="EcrireFichierExp" />
-                                    <Parametre value='&quot;Save.txt&quot;' />
-                                    <Parametre value='&quot;Bloc&quot; + VariableString(ID) + &quot;/X&quot;' />
-                                    <Parametre value="Bloc.X()" />
-                                </Action>
-                                <Action>
-                                    <Type value="EcrireFichierExp" />
-                                    <Parametre value='&quot;Save.txt&quot;' />
-                                    <Parametre value='&quot;Bloc&quot; + VariableString(ID) + &quot;/Y&quot;' />
-                                    <Parametre value="Bloc.Y()" />
-                                </Action>
-                                <Action>
-                                    <Type value="ModVarScene" />
-                                    <Parametre value="" />
-                                    <Parametre value="ID" />
-                                    <Parametre value="+" />
-                                    <Parametre value="1" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="ModVarSceneTxt" />
-                                    <Parametre value="" />
-                                    <Parametre value="Etat" />
-                                    <Parametre value="=" />
-                                    <Parametre value="" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                    </Events>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Loading" />
-                    <Com2 value="Chargement" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarSceneTxt" Contraire="false" />
-                            <Parametre value="" />
-                            <Parametre value="Etat" />
-                            <Parametre value="=" />
-                            <Parametre value='&quot;Load&quot;' />
-                        </Condition>
-                    </Conditions>
-                    <Actions />
-                    <Events>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Comment" />
-                            <Couleur r="255.000000" v="230.000000" b="109.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                            <Com1 value="While there is a block in the file,&#x0A;create a new one at the specified position" />
-                            <Com2 value="Tant qu&apos;on peut charger un bloc.&#x0A;On le créé à la position relevée." />
-                        </Event>
-                        <Event disabled="false" folded="false" infiniteLoopWarning="true">
-                            <Type value="BuiltinCommonInstructions::While" />
-                            <WhileConditions>
-                                <Condition>
-                                    <Type value="GroupExists" Contraire="false" />
-                                    <Parametre value='&quot;Save.txt&quot;' />
-                                    <Parametre value='&quot;Bloc&quot; + VariableString(ID) + &quot;/X&quot;' />
-                                </Condition>
-                            </WhileConditions>
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="LireFichierExp" />
-                                    <Parametre value='&quot;Save.txt&quot;' />
-                                    <Parametre value='&quot;Bloc&quot; + VariableString(ID) + &quot;/X&quot;' />
-                                    <Parametre value="" />
-                                    <Parametre value="NewBlocX" />
-                                </Action>
-                                <Action>
-                                    <Type value="LireFichierExp" />
-                                    <Parametre value='&quot;Save.txt&quot;' />
-                                    <Parametre value='&quot;Bloc&quot; + VariableString(ID) + &quot;/Y&quot;' />
-                                    <Parametre value="" />
-                                    <Parametre value="NewBlocY" />
-                                </Action>
-                                <Action>
-                                    <Type value="Create" />
-                                    <Parametre value="" />
-                                    <Parametre value="Bloc" />
-                                    <Parametre value="Variable(NewBlocX)" />
-                                    <Parametre value="Variable(NewBlocY)" />
-                                    <Parametre value="" />
-                                </Action>
-                                <Action>
-                                    <Type value="ModVarScene" />
-                                    <Parametre value="" />
-                                    <Parametre value="ID" />
-                                    <Parametre value="+" />
-                                    <Parametre value="1" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                        <Event disabled="false" folded="false">
-                            <Type value="BuiltinCommonInstructions::Standard" />
-                            <Conditions />
-                            <Actions>
-                                <Action>
-                                    <Type value="ModVarSceneTxt" />
-                                    <Parametre value="" />
-                                    <Parametre value="Etat" />
-                                    <Parametre value="=" />
-                                    <Parametre value="" />
-                                </Action>
-                            </Actions>
-                        </Event>
-                    </Events>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalLayouts />
-    <ExternalSourceFiles />
-</Project>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Save and load</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="TextObject" />
+            <extension name="CommonDialogs" />
+            <extension name="DraggableAutomatism" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+            <platform name="GDevelop JS platform" />
+        </platforms>
+        <currentPlatform>GDevelop JS platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources>
+            <resource alwaysLoaded="false" file="Block-Normal.png" kind="image" name="Block-Normal.png" smoothed="true" userAdded="true" />
+        </resources>
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="255" disableInputWhenNotFocused="true" mangledName="Nouvelle_32sc_232ne_321" name="Nouvelle scÃ¨ne 1" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="94" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="174">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables>
+                <variable name="Etat" value="" />
+            </variables>
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ExplanationFR" width="0.000000" x="572.000000" y="5.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Explanation" width="0.000000" x="298.000000" y="5.000000" zOrder="0">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Bloc" type="Sprite">
+                    <variables />
+                    <automatisms>
+                        <automatism name="Draggable" type="DraggableAutomatism::Draggable" />
+                    </automatisms>
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Block-Normal.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="35.500000" y="30.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="71.000000" y="0.000000" />
+                                                    <vertice x="71.000000" y="61.000000" />
+                                                    <vertice x="0.000000" y="61.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object bold="false" italic="false" name="ExplanationFR" smoothed="true" type="TextObject::Text" underlined="false">
+                    <variables />
+                    <automatisms />
+                    <string>Appuyez sur S pour sauvegarder&#x0A;Appuyez sur L pour charger&#x0A;Appuyez sur A pour ajouter un bloc&#x0A;Appuyez sur D pour le supprimer</string>
+                    <font></font>
+                    <characterSize>15</characterSize>
+                    <color b="255" g="255" r="255" />
+                </object>
+                <object bold="false" italic="false" name="Explanation" smoothed="true" type="TextObject::Text" underlined="false">
+                    <variables />
+                    <automatisms />
+                    <string>Press S to save&#x0A;Press L to load&#x0A;Press A to add a block&#x0A;Press D to delete a block</string>
+                    <font></font>
+                    <characterSize>15</characterSize>
+                    <color b="255" g="255" r="255" />
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Adding a block</comment>
+                    <comment2>Ajout d&apos;un bloc</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>a</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="Timer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>0.25</parameter>
+                                <parameter>&quot;Insertion&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Create" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Bloc</parameter>
+                                <parameter>MouseX()</parameter>
+                                <parameter>MouseY()</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ResetTimer" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>&quot;Insertion&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Deleting a block</comment>
+                    <comment2>Suppression d&apos;un bloc</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>d</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="SourisSurObjet" />
+                            <parameters>
+                                <parameter>Bloc</parameter>
+                                <parameter></parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Delete" />
+                            <parameters>
+                                <parameter>Bloc</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Start Saving or loading</comment>
+                    <comment2>Lancement de la sauvegarde/chargement si besoin.</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>s</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarSceneTxt" />
+                            <parameters>
+                                <parameter>Etat</parameter>
+                                <parameter>=</parameter>
+                                <parameter>&quot;Save&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarScene" />
+                            <parameters>
+                                <parameter>ID</parameter>
+                                <parameter>=</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="DeleteFichier" />
+                            <parameters>
+                                <parameter>&quot;Save.txt&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>l</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarScene" />
+                            <parameters>
+                                <parameter>ID</parameter>
+                                <parameter>=</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarSceneTxt" />
+                            <parameters>
+                                <parameter>Etat</parameter>
+                                <parameter>=</parameter>
+                                <parameter>&quot;Load&quot;</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Delete" />
+                            <parameters>
+                                <parameter>Bloc</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Save</comment>
+                    <comment2>Sauvegarde</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarSceneTxt" />
+                            <parameters>
+                                <parameter>Etat</parameter>
+                                <parameter>=</parameter>
+                                <parameter>&quot;Save&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>For each object block,&#x0A;we create an entry in the save file</comment>
+                            <comment2>On passe en revue chaque bloc.&#x0A;Et on enregistre leurs positions.</comment2>
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::ForEach</type>
+                            <object>Bloc</object>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="EcrireFichierExp" />
+                                    <parameters>
+                                        <parameter>&quot;Save.txt&quot;</parameter>
+                                        <parameter>&quot;Bloc&quot; + VariableString(ID) + &quot;/X&quot;</parameter>
+                                        <parameter>Bloc.X()</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="EcrireFichierExp" />
+                                    <parameters>
+                                        <parameter>&quot;Save.txt&quot;</parameter>
+                                        <parameter>&quot;Bloc&quot; + VariableString(ID) + &quot;/Y&quot;</parameter>
+                                        <parameter>Bloc.Y()</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="ModVarScene" />
+                                    <parameters>
+                                        <parameter>ID</parameter>
+                                        <parameter>+</parameter>
+                                        <parameter>1</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="ModVarSceneTxt" />
+                                    <parameters>
+                                        <parameter>Etat</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Loading</comment>
+                    <comment2>Chargement</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarSceneTxt" />
+                            <parameters>
+                                <parameter>Etat</parameter>
+                                <parameter>=</parameter>
+                                <parameter>&quot;Load&quot;</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>While there is a block in the file,&#x0A;create a new one at the specified position</comment>
+                            <comment2>Tant qu&apos;on peut charger un bloc.&#x0A;On le crÃ©Ã© Ã  la position relevÃ©e.</comment2>
+                        </event>
+                        <event disabled="false" folded="false" infiniteLoopWarning="true">
+                            <type>BuiltinCommonInstructions::While</type>
+                            <whileConditions>
+                                <condition>
+                                    <type inverted="false" value="GroupExists" />
+                                    <parameters>
+                                        <parameter>&quot;Save.txt&quot;</parameter>
+                                        <parameter>&quot;Bloc&quot; + VariableString(ID) + &quot;/X&quot;</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </whileConditions>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="LireFichierExp" />
+                                    <parameters>
+                                        <parameter>&quot;Save.txt&quot;</parameter>
+                                        <parameter>&quot;Bloc&quot; + VariableString(ID) + &quot;/X&quot;</parameter>
+                                        <parameter></parameter>
+                                        <parameter>NewBlocX</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="LireFichierExp" />
+                                    <parameters>
+                                        <parameter>&quot;Save.txt&quot;</parameter>
+                                        <parameter>&quot;Bloc&quot; + VariableString(ID) + &quot;/Y&quot;</parameter>
+                                        <parameter></parameter>
+                                        <parameter>NewBlocY</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="Create" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Bloc</parameter>
+                                        <parameter>Variable(NewBlocX)</parameter>
+                                        <parameter>Variable(NewBlocY)</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="ModVarScene" />
+                                    <parameters>
+                                        <parameter>ID</parameter>
+                                        <parameter>+</parameter>
+                                        <parameter>1</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions />
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="ModVarSceneTxt" />
+                                    <parameters>
+                                        <parameter>Etat</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

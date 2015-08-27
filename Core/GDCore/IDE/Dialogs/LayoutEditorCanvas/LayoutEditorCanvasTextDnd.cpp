@@ -16,10 +16,10 @@ bool LayoutEditorCanvasTextDnd::OnDropText(wxCoord x, wxCoord y, const wxString&
     //Try to workaround a wxMac making string not ending properly
     //See: http://trac.wxwidgets.org/ticket/9522#comment:4
     wxString objectName = text;
-    std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    gd::String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
     objectName = objectName.substr(0, objectName.find_first_not_of(allowedCharacters));
 
-    layoutCanvas.AddObject(gd::ToString(objectName));
+    layoutCanvas.AddObject(objectName);
 
     return true;
 }

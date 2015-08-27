@@ -33,7 +33,7 @@ class GD_EXTENSION_API TileMapObject : public gd::Object
 {
 public :
 
-    TileMapObject(std::string name_);
+    TileMapObject(gd::String name_);
     virtual ~TileMapObject() {};
     virtual gd::Object * Clone() const { return new TileMapObject(*this);}
 
@@ -55,7 +55,7 @@ public :
 
     TileSetProxy tileSet;
     TileMapProxy tileMap;
-    std::string textureName;
+    gd::String textureName;
 
 private:
 
@@ -67,6 +67,6 @@ private:
     sf::VertexArray vertexArray;
 };
 
-gd::Object * CreateTileMapObject(std::string name);
+gd::Object * CreateTileMapObject(gd::String name);
 
 #endif // TILEDSPRITEOBJECT_H

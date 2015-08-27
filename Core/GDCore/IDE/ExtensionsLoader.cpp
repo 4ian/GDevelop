@@ -31,10 +31,10 @@ using namespace std;
 namespace gd
 {
 
-void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Platform & platform, bool forgiving)
+void ExtensionsLoader::LoadAllExtensions(const gd::String & directory, gd::Platform & platform, bool forgiving)
 {
     std::cout << "Loading extensions for " << platform.GetName() << "... ";
-    string suffix = "";
+    gd::String suffix = "";
 
     #if defined(WINDOWS)
         suffix += "w";
@@ -56,11 +56,14 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
         return;
     }
 
-    std::vector<std::string> librariesLoaded;
+    std::vector<gd::String> librariesLoaded;
     while ( (lecture = readdir( rep )) )
     {
-        string lec = lecture->d_name;
-        if ( lec != "." && lec != ".." && lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos)
+        gd::String lec = lecture->d_name;
+        //Load all extensions, except the legacy ones finishing by *Automatism.xgd* from GD3.x
+        if ( lec != "." && lec != ".." && 
+            lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos &&
+            lec.find("Automatism.xgd"+suffix) == string::npos)
         {
             //Use a log file, in IDE only
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -87,8 +90,8 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
 
 	#elif defined(_MSC_VER)
 	WIN32_FIND_DATA f;
-	string dirPart = "/*.xgd";
-	string dirComplete = directory + dirPart + suffix;
+	gd::String dirPart = "/*.xgd";
+	gd::String dirComplete = directory + dirPart + suffix;
 	HANDLE h = FindFirstFile(dirComplete.c_str(), &f);
 	if(h != INVALID_HANDLE_VALUE)
 	{
@@ -117,9 +120,9 @@ void ExtensionsLoader::LoadAllExtensions(const std::string & directory, gd::Plat
     std::cout << " done. " << std::endl;
 }
 
-void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
+void ExtensionsLoader::ExtensionsLoadingDone(const gd::String & directory)
 {
-    string suffix = "";
+    gd::String suffix = "";
 
     #if defined(WINDOWS)
         suffix += "w";
@@ -143,10 +146,10 @@ void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
         return;
     }
 
-    std::vector<std::string> librariesLoaded;
+    std::vector<gd::String> librariesLoaded;
     while ( (lecture = readdir( rep )) )
     {
-        string lec = lecture->d_name;
+        gd::String lec = lecture->d_name;
         if ( lec != "." && lec != ".." && lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos)
         {
             librariesLoaded.push_back(directory+"/"+lec);
@@ -161,14 +164,14 @@ void ExtensionsLoader::ExtensionsLoadingDone(const std::string & directory)
     //as global when loading them as every extension use the same "CreateGDExtension" symbol.
     //SetLibraryGlobal is also setting RTLD_NOW to ensure that all symbols are resolved: Otherwise, we can get weird
     //"symbol lookup error" even if the symbols exist in the extensions!
-    for (unsigned int i = 0;i<librariesLoaded.size();++i)
+    for (std::size_t i = 0;i<librariesLoaded.size();++i)
         SetLibraryGlobal(librariesLoaded[i].c_str());
     #else
     //Nothing to do on Windows.
     #endif
 }
 
-void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform & platform, bool forgiving)
+void ExtensionsLoader::LoadExtension(const gd::String & fullpath, gd::Platform & platform, bool forgiving)
 {
     if ( platform.GetExtensionCreateFunctionName().empty() )
     {
@@ -180,12 +183,12 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
     Handle extensionHdl = OpenLibrary(fullpath.c_str());
     if (extensionHdl == NULL)
     {
-        std::string error = DynamicLibraryLastError();
+        gd::String error = DynamicLibraryLastError();
 
         cout << "Unable to load extension " << fullpath << "." << endl;
         cout << "Error returned : \"" << error << "\"" << endl;
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-        wxString userMsg = string(_("Extension "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations.\n\nDetailed log:\n") + error);
+        wxString userMsg = _("Extension ")+ fullpath + _(" could not be loaded.\nContact the developer for more informations.\n\nDetailed log:\n") + error;
         wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
 
@@ -200,7 +203,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         {
             cout << "Unable to load extension " << fullpath << " (Creation function symbol not found)." << endl;
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-            wxString userMsg = string(_("Extension "))+ fullpath + string(_(" could not be loaded.\nContact the developer for more informations." ));
+            wxString userMsg = _("Extension ")+ fullpath + _(" could not be loaded.\nContact the developer for more informations." );
             wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
             #endif
         }
@@ -210,11 +213,11 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
     }
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    gd::LocaleManager::Get()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
+    gd::LocaleManager::Get()->AddCatalog(wxFileName(fullpath).GetName()); //In editor, load catalog associated with extension, if any.
     #endif
 
     gd::PlatformExtension * extensionPtr = create_extension();
-    string error;
+    gd::String error;
 
     //Perform safety check about the compilation
     if ( !extensionPtr->compilationInfo.informationCompleted )
@@ -246,7 +249,7 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         error += "Not the same GDevelop Core version.\n(Extension is using "+extensionPtr->compilationInfo.gdCoreVersion+", GDevelop is using "+GDCore_RC_FILEVERSION_STRING+")\n";
 
     else if ( extensionPtr->compilationInfo.sizeOfpInt != sizeof(int*))
-        error += "Not the same architecture.\n(Extension sizeof(int*) is "+ToString(extensionPtr->compilationInfo.sizeOfpInt)+", GDevelop sizeof(int*) is "+ToString(sizeof(int*))+")\n";
+        error += "Not the same architecture.\n(Extension sizeof(int*) is "+gd::String::From(extensionPtr->compilationInfo.sizeOfpInt)+", GDevelop sizeof(int*) is "+gd::String::From(sizeof(int*))+")\n";
 
     if ( !error.empty() )
     {
@@ -263,7 +266,8 @@ void ExtensionsLoader::LoadExtension(const std::string & fullpath, gd::Platform 
         #endif
 
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI) && defined(RELEASE) //Show errors in IDE only
-        wxString userMsg = string(_("Extension "))+ fullpath + string(_(" has errors :\n")) + error + string(_("\nThe extension was not loaded. Contact the developer to get more information." ));
+        wxString userMsg = _("Extension ") + fullpath + _(" has errors :\n") +
+            error + _("\nThe extension was not loaded. Contact the developer to get more information." );
         wxMessageBox(userMsg, _("Extension not compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
 

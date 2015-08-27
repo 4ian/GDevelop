@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include "ChoiceFile.h"
@@ -39,7 +39,7 @@ BEGIN_EVENT_TABLE(ChoiceFile,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceFile::ChoiceFile(wxWindow* parent, string file_, gd::Project & game_, gd::Layout & scene_) :
+ChoiceFile::ChoiceFile(wxWindow* parent, gd::String file_, gd::Project & game_, gd::Layout & scene_) :
 file(file_),
 game(game_),
 scene(scene_)
@@ -123,7 +123,7 @@ void ChoiceFile::OnadvancedBtClick(wxCommandEvent& event)
 
 void ChoiceFile::OnokBtClick(wxCommandEvent& event)
 {
-    file = gd::ToString(fileEdit->GetValue());
+    file = fileEdit->GetValue();
     EndModal(1);
 }
 

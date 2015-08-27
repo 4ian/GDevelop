@@ -26,12 +26,6 @@ public:
      */
     TextObjectJsExtension()
     {
-        SetExtensionInformation("TextObject",
-                              _("Text object"),
-                              _("Extension allowing to use an object displaying a text."),
-                              "Compil Games",
-                              "Open source (MIT License)");
-
         DeclareTextObjectExtension(*this);
 
         GetObjectMetadata("TextObject::Text").SetIncludeFile("TextObject/textruntimeobject.js");

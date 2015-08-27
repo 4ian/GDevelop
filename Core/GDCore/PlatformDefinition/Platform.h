@@ -8,24 +8,24 @@
 #define GDCORE_PLATFORM_H
 #include <memory>
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include <map>
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
 namespace gd { class InstructionsMetadataHolder; }
 namespace gd { class Project; }
 namespace gd { class Object; }
-namespace gd { class Automatism; }
-namespace gd { class AutomatismMetadata; }
+namespace gd { class Behavior; }
+namespace gd { class BehaviorMetadata; }
 namespace gd { class ObjectMetadata; }
 namespace gd { class BaseEvent; }
-namespace gd { class AutomatismsSharedData; }
+namespace gd { class BehaviorsSharedData; }
 namespace gd { class PlatformExtension; }
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class ProjectExporter; }
 
 typedef void (*DestroyFunPtr)(gd::Object*);
-typedef gd::Object * (*CreateFunPtr)(std::string name);
+typedef gd::Object * (*CreateFunPtr)(gd::String name);
 
 #undef CreateEvent
 
@@ -46,28 +46,28 @@ public:
     /**
      * \brief Must return the platform name
      */
-    virtual std::string GetName() const { return "Unnamed platform"; }
+    virtual gd::String GetName() const { return "Unnamed platform"; }
 
     /**
      * \brief Must return the platform full name, displayed to users.
      */
-    virtual std::string GetFullName() const { return "Unnamed platform"; }
+    virtual gd::String GetFullName() const { return "Unnamed platform"; }
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Must return a text describing the platform in a few words.
      */
-    virtual std::string GetSubtitle() const { return ""; }
+    virtual gd::String GetSubtitle() const { return ""; }
 
     /**
      * \brief Must return a text describing the platform, displayed to users.
      */
-    virtual std::string GetDescription() const { return ""; }
+    virtual gd::String GetDescription() const { return ""; }
 
     /**
      * \brief Must return a filename to a 32*32 image file for the platform.
      */
-    virtual std::string GetIcon() const { return ""; }
+    virtual gd::String GetIcon() const { return ""; }
     #endif
 
 
@@ -82,7 +82,7 @@ public:
      * For example, GD C++ Platform uses "CreateGDExtension" and GD JS Platform "CreateGDJSExtension".
      * \see gd::ExtensionsLoader
      */
-    virtual std::string GetExtensionCreateFunctionName() { return ""; }
+    virtual gd::String GetExtensionCreateFunctionName() { return ""; }
 
     /**
      * \brief Add an extension to the manager.
@@ -94,13 +94,13 @@ public:
     /**
      * \brief Return true if an extension with the specified name is loaded
      */
-    bool IsExtensionLoaded(const std::string & name) const;
+    bool IsExtensionLoaded(const gd::String & name) const;
 
     /**
      * \brief Get an extension of the platform
      * @return Shared pointer to the extension
      */
-    std::shared_ptr<PlatformExtension> GetExtension(const std::string & name) const;
+    std::shared_ptr<PlatformExtension> GetExtension(const gd::String & name) const;
 
     /**
      * \brief Get all extensions loaded for the platform.
@@ -118,23 +118,23 @@ public:
     /**
      * \brief Create an object of given type with the specified name.
      */
-    std::shared_ptr<gd::Object> CreateObject(std::string type, const std::string & name) const;
+    std::shared_ptr<gd::Object> CreateObject(gd::String type, const gd::String & name) const;
 
     /**
-     * \brief Create an automatism
+     * \brief Create a behavior
      */
-    gd::Automatism* CreateAutomatism(const std::string & type) const;
+    gd::Behavior* CreateBehavior(const gd::String & type) const;
 
     /**
-     * \brief Create an automatism shared data object.
+     * \brief Create a behavior shared data object.
      */
-    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type) const;
+    std::shared_ptr<gd::BehaviorsSharedData> CreateBehaviorSharedDatas(const gd::String & type) const;
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Create an event of given type
      */
-    std::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const;
+    std::shared_ptr<gd::BaseEvent> CreateEvent(const gd::String & type) const;
 
     ///@}
 
@@ -193,7 +193,7 @@ public:
 
 private:
     std::vector < std::shared_ptr<PlatformExtension> > extensionsLoaded; ///< Extensions of the platform
-    std::map < std::string, CreateFunPtr > creationFunctionTable; ///< Creation functions for objects
+    std::map < gd::String, CreateFunPtr > creationFunctionTable; ///< Creation functions for objects
 
     #if defined(GD_IDE_ONLY)
     static ChangesNotifier defaultEmptyChangesNotifier;

@@ -21,7 +21,7 @@
 
 using namespace std;
 
-VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(string & output_,
+VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(gd::String & output_,
                                                                gd::EventsCodeGenerator & codeGenerator_,
                                                                gd::EventsCodeGenerationContext & context_,
                                                                const VariableScope & scope_) :
@@ -35,10 +35,10 @@ VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(string & output
 	}
 }
 
-VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(string & output_,
+VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(gd::String & output_,
                                                                gd::EventsCodeGenerator & codeGenerator_,
                                                                gd::EventsCodeGenerationContext & context_,
-                                                               const std::string & object_) :
+                                                               const gd::String & object_) :
     output(output_),
     codeGenerator(codeGenerator_),
     context(context_),
@@ -47,7 +47,7 @@ VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(string & output
 {
 }
 
-void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
+void VariableCodeGenerationCallbacks::OnRootVariable(gd::String variableName)
 {
 	const gd::VariablesContainer * variables = NULL;
 	if ( scope == LAYOUT_VARIABLE ) {
@@ -59,10 +59,10 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 		variables = &codeGenerator.GetProject().GetVariables();
 	}
 	else {
-	    std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(object, context);
+	    std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(object, context);
 
 	    output = "RuntimeVariablesContainer::GetBadVariablesContainer()";
-	    for (unsigned int i = 0;i<realObjects.size();++i)
+	    for (std::size_t i = 0;i<realObjects.size();++i)
 	    {
         	context.ObjectsListNeeded(realObjects[i]);
 
@@ -84,10 +84,10 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 	//(In this case, it is stored in an array at runtime and we know its position.)
 	if ( variables && variables->Has(variableName) )
 	{
-		unsigned int index = variables->GetPosition(variableName);
+		std::size_t index = variables->GetPosition(variableName);
 		if ( index < variables->Count() )
 		{
-			output += ".Get("+ToString(index)+")";
+			output += ".Get("+gd::String::From(index)+")";
 			return;
 		}
 	}
@@ -95,14 +95,14 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 	output += ".Get(\""+variableName+"\")";
 }
 
-void VariableCodeGenerationCallbacks::OnChildVariable(std::string variableName)
+void VariableCodeGenerationCallbacks::OnChildVariable(gd::String variableName)
 {
 	output += ".GetChild(\""+variableName+"\")";
 }
 
-void VariableCodeGenerationCallbacks::OnChildSubscript(std::string stringExpression)
+void VariableCodeGenerationCallbacks::OnChildSubscript(gd::String stringExpression)
 {
-	std::string argumentCode;
+	gd::String argumentCode;
     gd::CallbacksForGeneratingExpressionCode callbacks(argumentCode, codeGenerator, context);
 
     gd::ExpressionParser parser(stringExpression);

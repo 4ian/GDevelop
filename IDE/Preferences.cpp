@@ -656,7 +656,7 @@ changesNeedRestart(false)
 
     //Events editor parameters property grid
     gd::InstructionSentenceFormatter * eventsEditorConfig = gd::InstructionSentenceFormatter::Get();
-    for (std::map<std::string, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
+    for (std::map<gd::String, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
     {
         eventsEditorParametersProperties->Append( new wxColourProperty(it->first, wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].GetWxColor()) );
         eventsEditorParametersProperties->Append( new wxBoolProperty(it->first+_(": Bold"), wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].bold) );
@@ -834,21 +834,21 @@ changesNeedRestart(false)
 
     {
         //Retrieve available languages files
-        std::vector <std::string> languagesAvailables;
+        std::vector <gd::String> languagesAvailables;
         wxDir dir(wxGetCwd()+"/locale/");
         wxString filename;
 
         bool cont = dir.GetFirst(&filename, "", wxDIR_DIRS);
         while ( cont )
         {
-            languagesAvailables.push_back(string(filename.mb_str()));
+            languagesAvailables.push_back(filename);
             cont = dir.GetNext(&filename);
         }
 
         langChoice->Clear();
 
         //Add languages to list and retrieve selected language
-        for (unsigned int i = 0;i<languagesAvailables.size();++i)
+        for (std::size_t i = 0;i<languagesAvailables.size();++i)
         {
             const wxLanguageInfo * language = wxLocale::FindLanguageInfo(languagesAvailables[i]);
             langChoice->Append(language->Description);
@@ -865,7 +865,7 @@ changesNeedRestart(false)
         pConfig->Read( _T( "/Autosave/Time" ), &time );
         pConfig->Read( _T( "/Autosave/Activated" ), &activated );
 
-        autosaveTimeEdit->ChangeValue( gd::ToString(static_cast<float>(time)/60.0f/1000.0f) );
+        autosaveTimeEdit->ChangeValue( gd::String::From(static_cast<float>(time)/60.0f/1000.0f) );
         autosaveActivatedCheck->SetValue(activated);
     }
 
@@ -901,7 +901,7 @@ changesNeedRestart(false)
         if ( avertOnSave ) avertOnSaveCheck->SetValue(true);
     }
 
-	conditionsColumnWidthEdit->SetValue(gd::ToString(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
+	conditionsColumnWidthEdit->SetValue(gd::String::From(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
 	hideContextPanelsLabels->SetValue(pConfig->ReadBool("EventsEditor/HideContextPanelsLabels", false));
 
 	wxFont eventsEditorFont;
@@ -1048,7 +1048,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     }
 
     pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());
-    pConfig->Write( "/Autosave/Time", ToFloat(string(autosaveTimeEdit->GetValue().mb_str()))*60*1000);
+    pConfig->Write( "/Autosave/Time", gd::String(autosaveTimeEdit->GetValue()).To<int>()*60*1000);
 
     pConfig->Write( "/SceneEditor/SceneEventsTab", sceneEventsTabPosition->GetSelection());
 
@@ -1064,7 +1064,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write("/Save/AvertOnSaveAs", avertOnSaveCheck->GetValue());
 
     gd::InstructionSentenceFormatter * eventsEditorConfig = gd::InstructionSentenceFormatter::Get();
-    for (std::map<std::string, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
+    for (std::map<gd::String, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
     {
         if ( eventsEditorParametersProperties->GetProperty(it->first) != NULL)
         {
@@ -1087,7 +1087,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     }
 
     gd::InstructionSentenceFormatter::Get()->SaveTypesFormattingToConfig();
-	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(gd::ToString(conditionsColumnWidthEdit->GetValue())));
+	pConfig->Write("EventsEditor/ConditionColumnWidth", gd::String(conditionsColumnWidthEdit->GetValue()).To<int>());
 	pConfig->Write("EventsEditor/HideContextPanelsLabels", hideContextPanelsLabels->GetValue());
 	pConfig->Write("EventsEditor/Font", eventsEditorFontDialog->GetFontData().GetChosenFont());
 

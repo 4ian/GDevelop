@@ -21,58 +21,58 @@
 namespace gd
 {
 
-void ObjectListDialogsHelper::SetSearchText(std::string searchText_)
+void ObjectListDialogsHelper::SetSearchText(gd::String searchText_)
 {
     searchText = searchText_;
-    searchText = gd::StrUppercase(searchText);
+    searchText = searchText.CaseFold();
 }
 
-std::vector<std::string> ObjectListDialogsHelper::GetMatchingObjects() const
+std::vector<gd::String> ObjectListDialogsHelper::GetMatchingObjects() const
 {
     bool searching = searchText.empty() ? false : true;
-    std::vector<std::string> results;
+    std::vector<gd::String> results;
 
-    for ( unsigned int i = 0;i < project.GetObjectsCount();i++ )
+    for ( std::size_t i = 0;i < project.GetObjectsCount();i++ )
     {
-        std::string name = project.GetObject(i).GetName();
+        gd::String name = project.GetObject(i).GetName();
 
         //Only add the object if it has the correct type
         if ((objectTypeAllowed.empty() || project.GetObject(i).GetType() == objectTypeAllowed ) &&
-            ( !searching || (searching && gd::StrUppercase(name).find(gd::StrUppercase(searchText)) != std::string::npos)))
+            ( !searching || (searching && name.CaseFold().find(searchText.CaseFold()) != gd::String::npos)))
         {
             results.push_back(name);
         }
     }
-    for ( unsigned int i = 0;i < project.GetObjectGroups().size();i++ )
+    for ( std::size_t i = 0;i < project.GetObjectGroups().size();i++ )
     {
-        std::string name = project.GetObjectGroups()[i].GetName();
+        gd::String name = project.GetObjectGroups()[i].GetName();
 
         //Only add the group if it has all objects of the correct type
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, project.GetObjectGroups()[i].GetName()) == objectTypeAllowed ) &&
-            ( !searching || (searching && gd::StrUppercase(name).find(gd::StrUppercase(searchText)) != std::string::npos)))
+            ( !searching || (searching && name.CaseFold().find(searchText.CaseFold()) != gd::String::npos)))
         {
             results.push_back(name);
         }
     }
-    for ( unsigned int i = 0;i < layout.GetObjectsCount();i++ )
+    for ( std::size_t i = 0;i < layout.GetObjectsCount();i++ )
     {
-        std::string name = layout.GetObject(i).GetName();
+        gd::String name = layout.GetObject(i).GetName();
 
         //Only add the object if it has the correct type
         if (( objectTypeAllowed.empty() || layout.GetObject(i).GetType() == objectTypeAllowed ) &&
-            ( !searching || (searching && gd::StrUppercase(name).find(gd::StrUppercase(searchText)) != std::string::npos)))
+            ( !searching || (searching && name.CaseFold().find(searchText.CaseFold()) != gd::String::npos)))
         {
             results.push_back(name);
         }
     }
 
-    for ( unsigned int i = 0;i < layout.GetObjectGroups().size();i++ )
+    for ( std::size_t i = 0;i < layout.GetObjectGroups().size();i++ )
     {
-        std::string name = layout.GetObjectGroups()[i].GetName();
+        gd::String name = layout.GetObjectGroups()[i].GetName();
 
         //Only add the group if it has all objects of the correct type
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, layout.GetObjectGroups()[i].GetName()) == objectTypeAllowed ) &&
-            ( !searching || (searching && gd::StrUppercase(name).find(gd::StrUppercase(searchText)) != std::string::npos)))
+            ( !searching || (searching && name.CaseFold().find(searchText.CaseFold()) != gd::String::npos)))
         {
             results.push_back(name);
         }
@@ -115,13 +115,13 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
     bool searching = searchText.empty() ? false : true;
 
     wxTreeItemId lastAddedItem;
-    for ( unsigned int i = 0;i < objects.GetObjectsCount();i++ )
+    for ( std::size_t i = 0;i < objects.GetObjectsCount();i++ )
     {
-        std::string name = objects.GetObject(i).GetName();
+        gd::String name = objects.GetObject(i).GetName();
 
         //Only add objects if they match the search criteria
         if ((objectTypeAllowed.empty() || objects.GetObject(i).GetType() == objectTypeAllowed ) &&
-            ( !searching || (searching && gd::StrUppercase(name).find(searchText) != std::string::npos)) )
+            ( !searching || (searching && name.CaseFold().find(searchText.CaseFold()) != gd::String::npos)) )
         {
             wxTreeItemId item = objectsList->AppendItem(rootItem, "theobject");
             MakeObjectItem(objectsList, item, objects.GetObject(i), globalObjects);
@@ -138,10 +138,10 @@ wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, 
     bool searching = searchText.empty() ? false : true;
 
     wxTreeItemId lastAddedItem;
-    for (unsigned int i = 0;i<groups.size();++i)
+    for (std::size_t i = 0;i<groups.size();++i)
     {
         if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(project, layout, groups[i].GetName()) == objectTypeAllowed ) &&
-            ( !searching || (searching && gd::StrUppercase(groups[i].GetName()).find(searchText) != std::string::npos)) )
+            ( !searching || (searching && groups[i].GetName().CaseFold().find(searchText.CaseFold()) != gd::String::npos)) )
         {
             wxTreeItemId item = objectsList->AppendItem(rootItem, "thegroup");
             MakeGroupItem(objectsList, item, groups[i], globalGroups);

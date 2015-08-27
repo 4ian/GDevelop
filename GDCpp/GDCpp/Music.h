@@ -7,6 +7,7 @@
 #define MUSIC_H
 #include <SFML/Audio.hpp>
 #include <string>
+#include "GDCpp/String.h"
 
 /**
  * \brief Represents a music to be played
@@ -30,7 +31,7 @@ public:
      * myMusic.Play();
      * \endcode
      */
-    bool OpenFromFile(const std::string & filename);
+    bool OpenFromFile(const gd::String & filename);
 
     /**
      * \brief Change music buffer.
@@ -115,7 +116,7 @@ public:
     void UpdateVolume();
 
     #if defined(GD_IDE_ONLY)
-    std::string file; ///< Only useful for GD debugger
+    gd::String file; ///< Only useful for GD debugger
     #endif
 
 private:

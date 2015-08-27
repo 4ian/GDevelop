@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include <iostream>
@@ -291,7 +291,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     #endif
 
     //Update the file menu with exporting items
-    for (unsigned int i = 0;i<gd::PlatformManager::Get()->GetAllPlatforms().size();++i)
+    for (std::size_t i = 0;i<gd::PlatformManager::Get()->GetAllPlatforms().size();++i)
     {
         std::shared_ptr<gd::ProjectExporter> exporter = gd::PlatformManager::Get()->GetAllPlatforms()[i]->GetProjectExporter();
         if ( exporter != std::shared_ptr<gd::ProjectExporter>()
@@ -348,7 +348,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     static int widths[2] = { -1, 175 };
     statusBar->SetFieldsCount(2);
     statusBar->SetStatusWidths(2, widths);
-    statusBar->SetStatusText( "2008-2014", 1 );
+    statusBar->SetStatusText( "2008-2015", 1 );
     SetStatusBar(statusBar);
 
     std::vector<wxWindow*> controlsToBeDisabledOnPreview; //Used below:
@@ -375,33 +375,33 @@ MainFrame::MainFrame( wxWindow* parent ) :
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Adding resources"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Add an image") : "", gd::SkinHelper::GetRibbonIcon("add"), _("Add an image to the resources"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Add from the library") : "", gd::SkinHelper::GetRibbonIcon("addFromLibrary"), _("Add an image from a library of images"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Add a virtual folder") : "", gd::SkinHelper::GetRibbonIcon("virtualfolderadd"), _("Add a virtual folder to organize resources"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Add an image") : gd::String(), gd::SkinHelper::GetRibbonIcon("add"), _("Add an image to the resources"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Add from the library") : gd::String(), gd::SkinHelper::GetRibbonIcon("addFromLibrary"), _("Add an image from a library of images"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Add a virtual folder") : gd::String(), gd::SkinHelper::GetRibbonIcon("virtualfolderadd"), _("Add a virtual folder to organize resources"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("List management"), gd::SkinHelper::GetRibbonIcon("list"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDel, !hideLabels ? _("Delete") : "", gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected resource"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Remove useless resources") : "", gd::SkinHelper::GetRibbonIcon("deleteunknown"), _("Check if there are useless resources that can be removed"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Move up") : "", gd::SkinHelper::GetRibbonIcon("up"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Move down") : "", gd::SkinHelper::GetRibbonIcon("down"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh") : "", gd::SkinHelper::GetRibbonIcon("refresh"), _("Refresh the list, if you've done changes in another window"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDel, !hideLabels ? _("Delete") : gd::String(), gd::SkinHelper::GetRibbonIcon("delete"), _("Delete the selected resource"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Remove useless resources") : gd::String(), gd::SkinHelper::GetRibbonIcon("deleteunknown"), _("Check if there are useless resources that can be removed"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Move up") : gd::String(), gd::SkinHelper::GetRibbonIcon("up"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Move down") : gd::String(), gd::SkinHelper::GetRibbonIcon("down"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh") : gd::String(), gd::SkinHelper::GetRibbonIcon("refresh"), _("Refresh the list, if you've done changes in another window"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
 
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("View"), gd::SkinHelper::GetRibbonIcon("edit"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPreview, !hideLabels ? _("Preview") : "", gd::SkinHelper::GetRibbonIcon("view"), _("Show a panel with the image displayed inside"));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties") : "", gd::SkinHelper::GetRibbonIcon("editprop"), _("Show the properties of the resource"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPreview, !hideLabels ? _("Preview") : gd::String(), gd::SkinHelper::GetRibbonIcon("view"), _("Show a panel with the image displayed inside"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties") : gd::String(), gd::SkinHelper::GetRibbonIcon("editprop"), _("Show the properties of the resource"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Help"), gd::SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Help") : "", gd::SkinHelper::GetRibbonIcon("help"), _("Open the online help"));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Help") : gd::String(), gd::SkinHelper::GetRibbonIcon("help"), _("Open the online help"));
             controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
     }
@@ -487,7 +487,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     //Construct the lightweight wrapper used by editors to access to the main frame.
     mainFrameWrapper = gd::MainFrameWrapper(ribbon, ribbonSceneEditorButtonBar, this, &m_mgr, editorsNotebook, infoBar, &scenesLockingShortcuts, wxGetCwd());
     mainFrameWrapper.AddControlToBeDisabledOnPreview(projectManager);
-    for (unsigned int i = 0;i<controlsToBeDisabledOnPreview.size();++i) mainFrameWrapper.AddControlToBeDisabledOnPreview(controlsToBeDisabledOnPreview[i]);
+    for (std::size_t i = 0;i<controlsToBeDisabledOnPreview.size();++i) mainFrameWrapper.AddControlToBeDisabledOnPreview(controlsToBeDisabledOnPreview[i]);
 
     SetSize(900,740);
     Center();
@@ -513,7 +513,7 @@ MainFrame::~MainFrame()
 
 /** Change current project
   */
-void MainFrame::SetCurrentGame(unsigned int i, bool refreshProjectManager)
+void MainFrame::SetCurrentGame(std::size_t i, bool refreshProjectManager)
 {
     projectCurrentlyEdited = i;
     if ( i >= games.size())
@@ -574,7 +574,7 @@ void MainFrame::OnRibbonCppToolsClicked(wxRibbonButtonBarEvent& evt)
  */
 void MainFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt)
 {
-    for (unsigned int i = 0;i<editorsNotebook->GetPageCount();++i)
+    for (std::size_t i = 0;i<editorsNotebook->GetPageCount();++i)
     {
     	if ( dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(i)) != NULL )
     	{
@@ -596,7 +596,7 @@ void MainFrame::UpdateOpenedProjectsLogFile()
     if ( !projectsLogFile.IsOpened() ) return;
     projectsLogFile.Clear();
 
-    for(unsigned int i = 0;i<games.size();++i)
+    for(std::size_t i = 0;i<games.size();++i)
         projectsLogFile.AddLine(games[i]->GetProjectFile());
 
     projectsLogFile.Write();
@@ -608,10 +608,10 @@ void MainFrame::UpdateOpenedProjectsLogFile()
  */
 void MainFrame::OnClose( wxCloseEvent& event )
 {
-    for(unsigned int i = 0;i<games.size();++i) {
+    for(std::size_t i = 0;i<games.size();++i) {
         if ( games[i]->IsDirty() ) {
-            wxString fullMessage = wxString::Format(wxString(_("Project \"%s\" has been changed.\n\n")), games[i]->GetName());
-            fullMessage += wxString::Format(wxString(_("Do you want to save it in %s?")), games[i]->GetProjectFile());
+            wxString fullMessage = wxString::Format(wxString(_("Project \"%s\" has been changed.\n\n")), games[i]->GetName().ToWxString());
+            fullMessage += wxString::Format(wxString(_("Do you want to save it in %s?")), games[i]->GetProjectFile().ToWxString());
             int whatToDo = wxMessageBox(fullMessage, _("Project not saved"), wxYES_NO|wxCANCEL|wxCANCEL_DEFAULT);
 
             if (whatToDo == wxCANCEL) return;
@@ -803,14 +803,14 @@ void MainFrame::PrepareAutosave()
  */
 void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
 {
-    for (unsigned int i = 0;i<games.size();++i)
+    for (std::size_t i = 0;i<games.size();++i)
     {
         wxFileName filename(games[i]->GetProjectFile());
         if (games[i]->GetProjectFile().empty()) continue;
         if (!filename.IsFileWritable()) continue;
 
         wxString autosaveFilename = filename.GetPath() + "/" + filename.GetName()+".gdg.autosave";
-        if ( !games[i]->SaveToFile(gd::ToString(autosaveFilename)) )
+        if ( !games[i]->SaveToFile(autosaveFilename) )
             gd::LogStatus( _("Autosave failed!") );
     }
 }

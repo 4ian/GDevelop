@@ -17,7 +17,7 @@ namespace GDpriv
 namespace PrimitiveDrawingTools
 {
 
-void GD_EXTENSION_API CopyImageOnAnother( const std::string & destName, const std::string & srcName, float destX, float destY, bool useTransparency,RuntimeScene & scene )
+void GD_EXTENSION_API CopyImageOnAnother( const gd::String & destName, const gd::String & srcName, float destX, float destY, bool useTransparency,RuntimeScene & scene )
 {
     if ( !scene.GetImageManager()->HasLoadedSFMLTexture(destName) ) return;
     if ( !scene.GetImageManager()->HasLoadedSFMLTexture(srcName) ) return;
@@ -32,12 +32,12 @@ void GD_EXTENSION_API CopyImageOnAnother( const std::string & destName, const st
     dest->texture.loadFromImage(dest->image);
 }
 
-void GD_EXTENSION_API CaptureScreen( RuntimeScene & scene, const std::string & destFileName, const std::string & destImageName )
+void GD_EXTENSION_API CaptureScreen( RuntimeScene & scene, const gd::String & destFileName, const gd::String & destImageName )
 {
     if ( !scene.renderWindow ) return;
     sf::Image capture = scene.renderWindow->capture();
 
-    if ( !destFileName.empty() ) capture.saveToFile(destFileName);
+    if ( !destFileName.empty() ) capture.saveToFile(destFileName.ToLocale());
     if ( !destImageName.empty() && scene.GetImageManager()->HasLoadedSFMLTexture(destImageName) )
     {
         std::shared_ptr<SFMLTextureWrapper> sfmlTexture = scene.GetImageManager()->GetSFMLTexture(destImageName);
@@ -51,7 +51,7 @@ namespace
 
 }
 
-void GD_EXTENSION_API CreateSFMLTexture( RuntimeScene & scene, const std::string & imageName, unsigned int width, unsigned int height, const std::string & colorStr )
+void GD_EXTENSION_API CreateSFMLTexture( RuntimeScene & scene, const gd::String & imageName, unsigned int width, unsigned int height, const gd::String & colorStr )
 {
     //Get or create the texture in memory
     std::shared_ptr<SFMLTextureWrapper> newTexture;
@@ -63,11 +63,11 @@ void GD_EXTENSION_API CreateSFMLTexture( RuntimeScene & scene, const std::string
     //Get the color
     sf::Color color;
     bool colorIsOk = false;
-    std::vector < std::string > colors = SplitString<std::string>(colorStr, ';');
+    std::vector < gd::String > colors = colorStr.Split(U';');
     if ( colors.size() == 3 )
     {
         colorIsOk = true;
-        color = sf::Color(ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]));
+        color = sf::Color(colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>());
     }
 
     //Create the SFML image and the SFML texture
@@ -79,7 +79,7 @@ void GD_EXTENSION_API CreateSFMLTexture( RuntimeScene & scene, const std::string
     scene.GetImageManager()->SetSFMLTextureAsPermanentlyLoaded(imageName, newTexture); //Otherwise
 }
 
-void GD_EXTENSION_API OpenSFMLTextureFromFile( RuntimeScene & scene, const std::string & fileName, const std::string & imageName )
+void GD_EXTENSION_API OpenSFMLTextureFromFile( RuntimeScene & scene, const gd::String & fileName, const gd::String & imageName )
 {
     //Get or create the texture in memory
     std::shared_ptr<SFMLTextureWrapper> newTexture;
@@ -89,19 +89,18 @@ void GD_EXTENSION_API OpenSFMLTextureFromFile( RuntimeScene & scene, const std::
         newTexture = scene.GetImageManager()->GetSFMLTexture(imageName);
 
     //Open the SFML image and the SFML texture
-    newTexture->image.loadFromFile(fileName);
+    newTexture->image.loadFromFile(fileName.ToLocale());
     newTexture->texture.loadFromImage(newTexture->image); //Do not forget to update the associated texture
 
     scene.GetImageManager()->SetSFMLTextureAsPermanentlyLoaded(imageName, newTexture);
 }
 
-void GD_EXTENSION_API SaveSFMLTextureToFile( RuntimeScene & scene, const std::string & fileName, const std::string & imageName )
+void GD_EXTENSION_API SaveSFMLTextureToFile( RuntimeScene & scene, const gd::String & fileName, const gd::String & imageName )
 {
     if ( !scene.GetImageManager()->HasLoadedSFMLTexture(imageName) ) return;
 
-    scene.GetImageManager()->GetSFMLTexture(imageName)->image.saveToFile(fileName);
+    scene.GetImageManager()->GetSFMLTexture(imageName)->image.saveToFile(fileName.ToLocale());
 }
 
 }
 }
-

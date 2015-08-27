@@ -1,15 +1,15 @@
 #include "CompilationChecker.h"
 #include "GDCore/Tools/Version.h"
 #include "GDCore/Tools/VersionWrapper.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/String.h"
 #include <iostream>
 
 using namespace std;
 
 bool CompilationChecker::EnsureCorrectGDVersion()
 {
-    std::string versionString =  ToString(gd::VersionWrapper::Major()) + ", " + ToString(gd::VersionWrapper::Minor()) + ", " +
-                            ToString(gd::VersionWrapper::Build()) + ", " + ToString(gd::VersionWrapper::Revision());
+    std::string versionString =  gd::String::From(gd::VersionWrapper::Major()).ToUTF8() + ", " + gd::String::From(gd::VersionWrapper::Minor()).ToUTF8() + ", " +
+                            gd::String::From(gd::VersionWrapper::Build()).ToUTF8() + ", " + gd::String::From(gd::VersionWrapper::Revision()).ToUTF8();
 
     if (versionString != GDCore_RC_FILEVERSION_STRING)
     {

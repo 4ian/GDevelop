@@ -125,8 +125,8 @@ object(object_)
 
 	frontTextureEdit->ChangeValue(object.textureName);
 
-	widthEdit->ChangeValue(ToString(object.GetWidth()));
-	heightEdit->ChangeValue(ToString(object.GetHeight()));
+	widthEdit->ChangeValue(gd::String::From(object.GetWidth()));
+	heightEdit->ChangeValue(gd::String::From(object.GetHeight()));
 
     //Init the image bank editor
     resourcesEditor = new ResourcesEditor( this, game, mainFrameWrapper );
@@ -166,10 +166,10 @@ void TiledSpriteObjectEditor::OncancelBtClick(wxCommandEvent& event)
  */
 void TiledSpriteObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-	object.textureName = ToString(frontTextureEdit->GetValue());
+	object.textureName = frontTextureEdit->GetValue();
 
-	object.SetWidth(ToInt(ToString(widthEdit->GetValue())));
-	object.SetHeight(ToInt(ToString(heightEdit->GetValue())));
+	object.SetWidth(gd::String(widthEdit->GetValue()).To<int>());
+	object.SetHeight(gd::String(heightEdit->GetValue()).To<int>());
 
     EndModal(1);
 }
@@ -200,4 +200,3 @@ void TiledSpriteObjectEditor::OnimageBankBtClick(wxCommandEvent& event)
 }
 
 #endif
-

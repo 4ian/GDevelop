@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 #ifndef PROJECTMANAGER_H
 #define PROJECTMANAGER_H
@@ -13,6 +13,7 @@
 #include <wx/panel.h>
 //*)
 #include <string>
+#include "GDCore/String.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
@@ -37,7 +38,7 @@ public:
     /**
      * Open a source file. Game can be NULL.
      */
-	void EditSourceFile(gd::Project * game, std::string filename, size_t line = std::string::npos);
+	void EditSourceFile(gd::Project * game, gd::String filename, size_t line = gd::String::npos);
 
     /**
      * Open a \a layout from a \a project.
@@ -239,7 +240,7 @@ private:
 	void OnRibbonHelpSelected(wxRibbonButtonBarEvent& event);
 	void EditExtensionsOfGame(gd::Project & project);
 	void OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event);
-	void AddLayoutToProject(gd::Project * project, unsigned int position);
+	void AddLayoutToProject(gd::Project * project, std::size_t position);
 	void OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event);
 	void EditResourcesOfProject(gd::Project * project);
 	void OnRibbonAddExternalEventsSelected(wxRibbonButtonBarEvent& event);
@@ -247,19 +248,18 @@ private:
 	void OnRibbonAddExternalLayoutSelected(wxRibbonButtonBarEvent& event);
 	void AddExternalLayoutToGame(gd::Project * project);
 	void OnRibbonEditSelectionSelected(wxRibbonButtonBarEvent& event);
-	std::string AutodetectFileLanguage(wxString filename);
+	gd::String AutodetectFileLanguage(wxString filename);
     void UpdateRibbonButtonsState();
 
     wxTreeItemId selectedItem;
-    std::string itemTextBeforeEditing;
+    gd::String itemTextBeforeEditing;
 
     static wxRibbonButtonBar * projectRibbonBar;
     static wxRibbonButtonBar * operationsRibbonBar;
 
-    static const unsigned int gameMaxCharDisplayedInEditor = 15;
+    static const std::size_t gameMaxCharDisplayedInEditor = 15;
 
 	DECLARE_EVENT_TABLE()
 };
 
 #endif
-

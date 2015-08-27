@@ -57,7 +57,7 @@ ProjectExportDialog::ExportType ProjectExportDialog::GetExportType()
     switch(exportChoice->GetSelection())
     {
         case 1:
-            return IntelXDK;
+            return Cordova;
         case 2:
             return CocoonJS;
         default:
@@ -68,7 +68,7 @@ ProjectExportDialog::ExportType ProjectExportDialog::GetExportType()
 wxString ProjectExportDialog::DeleteInvalidCharacters(const wxString & directoryName) const
 {
     wxString result = directoryName;
-    for (unsigned int i =0;i<result.size();)
+    for (std::size_t i =0;i<result.size();)
     {
         wxChar character = result[i];
         if ( character == '/' || character == '\\' || character == '"' || character == '*' || character == ':' || character == '|' || character == '<' || character == '>' || character == '?' )
@@ -107,12 +107,12 @@ void ProjectExportDialog::OnBrowseBtClick(wxCommandEvent& event)
         exportFolderEdit->SetValue(dialog.GetPath());
 }
 
-std::string ProjectExportDialog::GetExportDir()
+gd::String ProjectExportDialog::GetExportDir()
 {
     if ( GetExportType() == Normal )
-        return std::string(exportFolderEdit->GetValue().mb_str());
+        return gd::String(exportFolderEdit->GetValue());
     else
-        return gd::ToString(wxFileName::GetHomeDir()+wxFileName::GetPathSeparator()+DeleteInvalidCharacters(project.GetName()));
+        return gd::String(wxFileName::GetHomeDir())+wxString(wxFileName::GetPathSeparator())+gd::String(DeleteInvalidCharacters(project.GetName()));
 }
 
 bool ProjectExportDialog::RequestMinify()

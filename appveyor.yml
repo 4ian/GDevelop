@@ -1,0 +1,25 @@
+version: 4.{branch}.{build}
+clone_depth: 5 # Avoid cloning entire repository history
+build_script:
+- cd Binaries
+- mkdir build
+- cd build
+#Clean the path for CMake
+- set PATH=c:\mingw\bin;C:\Program Files (x86)\CMake\bin;C:\Windows\System32
+- echo PATH set to %PATH%
+- cmake -G "MinGW Makefiles" -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_EXTENSIONS=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE ..\..
+- C:\MinGW\bin\mingw32-make.exe -j4
+test_script:
+#Copy test to GD directory
+- move Core\GDCore_tests.exe ..\Output\Release_Windows\
+- move GDCpp\GDCpp_tests.exe ..\Output\Release_Windows\CppPlatform\Runtime
+- cd ..\..\IDE\scripts\
+#Manually copy needed dlls as IDE wasn't built 
+- copyWindowsLibraries.bat ..\..\Binaries\Output\Release_Windows ..\..\Binaries\build\ExtLibs\
+- cd ..\..\Binaries\Output\Release_Windows\
+- xcopy sfml* CppPlatform\Runtime\
+- xcopy lib*.dll CppPlatform\Runtime\
+- xcopy openal32.dll CppPlatform\Runtime\
+#Launch tests
+- GDCore_tests.exe
+- CppPlatform\Runtime\GDCpp_tests.exe

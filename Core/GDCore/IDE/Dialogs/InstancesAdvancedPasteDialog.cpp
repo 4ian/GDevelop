@@ -127,7 +127,7 @@ InstancesAdvancedPasteDialog::InstancesAdvancedPasteDialog(wxWindow* parent,wxWi
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	rotationEdit = new wxTextCtrl(this, ID_TEXTCTRL1, _("0"), wxDefaultPosition, wxSize(44,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer4->Add(rotationEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("�"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("deg"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer4->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer2->Add(FlexGridSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -178,50 +178,50 @@ void InstancesAdvancedPasteDialog::OncancelBtClick(wxCommandEvent& event)
 
 void InstancesAdvancedPasteDialog::SetStartX(float xStart)
 {
-    xStartEdit->SetValue(ToString(xStart));
+    xStartEdit->SetValue(gd::String::From(xStart));
 }
 void InstancesAdvancedPasteDialog::SetStartY(float yStart)
 {
-    yStartEdit->SetValue(ToString(yStart));
+    yStartEdit->SetValue(gd::String::From(yStart));
 }
 void InstancesAdvancedPasteDialog::SetXGap(float xGap)
 {
-    xGapEdit->SetValue(ToString(xGap));
+    xGapEdit->SetValue(gd::String::From(xGap));
 }
 void InstancesAdvancedPasteDialog::SetYGap(float yGap)
 {
-    yGapEdit->SetValue(ToString(yGap));
+    yGapEdit->SetValue(gd::String::From(yGap));
 }
 
-unsigned int InstancesAdvancedPasteDialog::GetXCount() const
+std::size_t InstancesAdvancedPasteDialog::GetXCount() const
 {
     return xCountEdit->GetValue();
 }
 
-unsigned int InstancesAdvancedPasteDialog::GetYCount() const
+std::size_t InstancesAdvancedPasteDialog::GetYCount() const
 {
     return yCountEdit->GetValue();
 }
 
 float InstancesAdvancedPasteDialog::GetStartX() const
 {
-    return ToFloat(ToString(xStartEdit->GetValue()));
+    return gd::String(xStartEdit->GetValue()).To<float>();
 }
 float InstancesAdvancedPasteDialog::GetStartY() const
 {
-    return ToFloat(ToString(yStartEdit->GetValue()));
+    return gd::String(yStartEdit->GetValue()).To<float>();
 }
 float InstancesAdvancedPasteDialog::GetXGap() const
 {
-    return ToFloat(ToString(xGapEdit->GetValue()));
+    return gd::String(xGapEdit->GetValue()).To<float>();
 }
 float InstancesAdvancedPasteDialog::GetYGap() const
 {
-    return ToFloat(ToString(yGapEdit->GetValue()));
+    return gd::String(yGapEdit->GetValue()).To<float>();
 }
 float InstancesAdvancedPasteDialog::GetRotationIncrementation() const
 {
-    return ToFloat(ToString(rotationEdit->GetValue()));
+    return gd::String(rotationEdit->GetValue()).To<float>();
 }
 
 

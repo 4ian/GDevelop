@@ -96,9 +96,9 @@ void LayersEditorPanel::Refresh()
 {
     m_layersList->DeleteAllItems();
 
-    for (unsigned int i = 0; i < m_layout.GetLayersCount(); ++i)
+    for (std::size_t i = 0; i < m_layout.GetLayersCount(); ++i)
     {
-        std::string name = m_layout.GetLayer(i).GetName();
+        gd::String name = m_layout.GetLayer(i).GetName();
         if ( name == "" ) name = _("Base layer");
         m_layersList->InsertItem(0, name);
 
@@ -120,7 +120,7 @@ void LayersEditorPanel::UpdateSelectedLayerIcon()
     if ( !m_layoutCanvas )
         return;
 
-    for (unsigned int i = 0; i<m_layout.GetLayersCount(); ++i)
+    for (std::size_t i = 0; i<m_layout.GetLayersCount(); ++i)
     {
         if ( m_layout.GetLayer(i).GetName() == m_layoutCanvas->GetCurrentLayer() )
             m_layersList->SetItemImage(m_layout.GetLayersCount()-i-1,1,1);
@@ -139,7 +139,7 @@ Layer* LayersEditorPanel::GetSelectedLayer()
         if (itemIndex == -1) break;
 
         // Got the selected item index
-        unsigned int layerId = m_layout.GetLayersCount()-itemIndex-1;
+        std::size_t layerId = m_layout.GetLayersCount()-itemIndex-1;
         if ( layerId < m_layout.GetLayersCount() )
         {
             return &m_layout.GetLayer(layerId);
@@ -155,7 +155,7 @@ void LayersEditorPanel::EditSelectedLayer()
     gd::Layer * layer = GetSelectedLayer();
     if ( !layer ) return;
 
-    std::string oldName = layer->GetName();
+    gd::String oldName = layer->GetName();
     layer->EditLayer();
 
     //Be sure to update instances if the layer name has changed.
@@ -240,11 +240,11 @@ void LayersEditorPanel::OnlayersListItemRClick(wxListEvent& event)
 
 void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
 {
-    wxString name = _("New layer");
+    gd::String name = _("New layer");
 
     bool alreadyExist = false;
-    int nb = 0;
-    for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+    unsigned int nb = 0;
+    for (std::size_t i = 0;i<m_layout.GetLayersCount();++i)
     {
         if ( m_layout.GetLayer(i).GetName() == name )
             alreadyExist = true;
@@ -252,18 +252,18 @@ void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
     while ( alreadyExist )
     {
         ++nb;
-        name = _("New layer ") + ToString(nb);
+        name = _("New layer ") + gd::String::From(nb);
 
         alreadyExist = false;
-        for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+        for (std::size_t i = 0;i<m_layout.GetLayersCount();++i)
         {
             if ( m_layout.GetLayer(i).GetName() == name )
                 alreadyExist = true;
         }
     }
 
-    m_layout.InsertNewLayer(ToString(name), m_layout.GetLayersCount()-1);
-    m_layout.GetLayer(ToString(name)).SetCameraCount(1);
+    m_layout.InsertNewLayer(name, m_layout.GetLayersCount()-1);
+    m_layout.GetLayer(name).SetCameraCount(1);
 
     Refresh();
 }
@@ -274,17 +274,17 @@ void LayersEditorPanel::OnDeleteLayerClicked(wxCommandEvent& event)
     Layer * selectedLayer = GetSelectedLayer();
     if ( !selectedLayer || selectedLayer->GetName().empty() ) return;
 
-    std::string name = selectedLayer->GetName();
+    gd::String name = selectedLayer->GetName();
 
-    for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+    for (std::size_t i = 0;i<m_layout.GetLayersCount();++i)
     {
         if ( &m_layout.GetLayer(i) == selectedLayer )
         {
             //Ask the user what he wants to do with the existing instances.
             if ( m_layout.GetInitialInstances().SomeInstancesAreOnLayer(name) )
             {
-                std::vector<std::string> availableLayers;
-                for (unsigned int j = 0;j<m_layout.GetLayersCount();++j)
+                std::vector<gd::String> availableLayers;
+                for (std::size_t j = 0;j<m_layout.GetLayersCount();++j)
                 {
                     if (i!=j) availableLayers.push_back(m_layout.GetLayer(j).GetName());
                 }
@@ -328,7 +328,7 @@ void LayersEditorPanel::OnLayerDownClicked(wxCommandEvent& event)
     Layer * selectedLayer = GetSelectedLayer();
     if ( !selectedLayer ) return;
 
-    for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+    for (std::size_t i = 0;i<m_layout.GetLayersCount();++i)
     {
         if ( &m_layout.GetLayer(i) == selectedLayer )
         {
@@ -353,7 +353,7 @@ void LayersEditorPanel::OnLayerUpClicked(wxCommandEvent& event)
     Layer * selectedLayer = GetSelectedLayer();
     if ( !selectedLayer ) return;
 
-    for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
+    for (std::size_t i = 0;i<m_layout.GetLayersCount();++i)
     {
         if ( &m_layout.GetLayer(i) == selectedLayer )
         {

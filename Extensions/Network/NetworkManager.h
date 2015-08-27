@@ -51,7 +51,7 @@ public:
      */
     void Send(sf::Packet & packet)
     {
-        for (unsigned int i = 0;i<recipientsList.size();++i)
+        for (std::size_t i = 0;i<recipientsList.size();++i)
             socket.send(packet, recipientsList[i].first, recipientsList[i].second);
     }
 
@@ -107,4 +107,3 @@ private:
 };
 
 #endif // NETWORKMANAGER_H
-

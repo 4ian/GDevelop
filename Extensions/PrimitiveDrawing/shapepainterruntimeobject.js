@@ -36,12 +36,12 @@ gdjs.ShapePainterRuntimeObject.prototype.onDeletedFromScene = function(runtimeSc
     runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._graphics);
 };
 
-gdjs.ShapePainterRuntimeObject.prototype.stepAutomatismsPreEvents = function(runtimeScene) {
-    //We redefine stepAutomatismsPreEvents just to clear the graphics before running events.
+gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeScene) {
+    //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
     this._graphics.clear();
     this._graphics.lineStyle(this._outlineSize, this._outlineColor, this._outlineOpacity/255);
 
-    gdjs.RuntimeObject.prototype.stepAutomatismsPreEvents.call(this, runtimeScene);
+    gdjs.RuntimeObject.prototype.stepBehaviorsPreEvents.call(this, runtimeScene);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawRectangle = function(x1, y1, x2, y2) {

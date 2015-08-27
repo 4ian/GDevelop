@@ -21,14 +21,13 @@
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasTextDnd.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"
@@ -229,7 +228,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
         deleteItem->SetBitmap(gd::SkinHelper::GetIcon("delete", 16));
 
         contextMenu.Append(ID_PROPMENU, _("Properties"));
-        contextMenu.Append(ID_AUTOMENU, _("Add an automatism to the object"));
+        contextMenu.Append(ID_AUTOMENU, _("Add a behavior to the object"));
         contextMenu.AppendSeparator();
         contextMenu.Append(ID_CREATEOBJECTMENU, _("Insert a new object"));
         contextMenu.AppendSeparator();
@@ -273,7 +272,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     }
 
     //Initialize previewers
-    for (unsigned int i = 0;i<project.GetUsedPlatforms().size();++i)
+    for (std::size_t i = 0;i<project.GetUsedPlatforms().size();++i)
     {
         std::shared_ptr<gd::LayoutEditorPreviewer> previewer = project.GetUsedPlatforms()[i]->GetLayoutPreviewer(*this);
         previewers[project.GetUsedPlatforms()[i]->GetName()] = previewer;
@@ -419,7 +418,7 @@ void LayoutEditorCanvas::OnGuiElementReleased(const gd::LayoutEditorCanvasGuiEle
 
 void LayoutEditorCanvas::OnPreviewForPlatformSelected( wxCommandEvent & event )
 {
-    std::string platformName = idForPlatformsMenu[event.GetId()];
+    gd::String platformName = idForPlatformsMenu[event.GetId()];
     currentPreviewer = previewers[platformName];
 
     wxCommandEvent useless;
@@ -518,8 +517,8 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), SkinHelper::GetRibbonIcon("preview"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         modeRibbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Stop the preview") : "", SkinHelper::GetRibbonIcon("edit"), _("Stop the preview and go back to editing"));
-        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", SkinHelper::GetRibbonIcon("preview"), _("Launch a preview"), wxRIBBON_BUTTON_HYBRID);
+        modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Stop the preview") : gd::String(), SkinHelper::GetRibbonIcon("edit"), _("Stop the preview and go back to editing"));
+        modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : gd::String(), SkinHelper::GetRibbonIcon("preview"), _("Launch a preview"), wxRIBBON_BUTTON_HYBRID);
     }
 
     wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -528,7 +527,7 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), SkinHelper::GetRibbonIcon("help"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", SkinHelper::GetRibbonIcon("help"));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : gd::String(), SkinHelper::GetRibbonIcon("help"));
     }
 
     return ribbonToolbar;
@@ -554,16 +553,16 @@ void LayoutEditorCanvas::CreateEditionRibbonTools()
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     wxRibbonButtonBar * ribbonToolbar = mainFrameWrapper.GetRibbonSceneEditorButtonBar();
-    ribbonToolbar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects editor") : "", gd::SkinHelper::GetRibbonIcon("objects"), _("Show the list of objects of the scene"));
-    ribbonToolbar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers editor") : "", gd::SkinHelper::GetRibbonIcon("layers"), _("Show the layers editor"));
-    ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Instances") : "", gd::SkinHelper::GetRibbonIcon("ObjectsPositionsList"), _("Open a list of all instances of objects put on the scene"));
-    ribbonToolbar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Undo") : "", gd::SkinHelper::GetRibbonIcon("undo"), _("Undo the last change"));
-    ribbonToolbar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", gd::SkinHelper::GetRibbonIcon("redo"));
-    ribbonToolbar->AddButton(idRibbonGrid, !hideLabels ? _("Grid") : "", gd::SkinHelper::GetRibbonIcon("grid"));
-    ribbonToolbar->AddButton(idRibbonGridSetup, !hideLabels ? _("Edit the grid") : "", gd::SkinHelper::GetRibbonIcon("gridedit"), _("Edit the size of the grid"));
-    ribbonToolbar->AddButton(idRibbonWindowMask, !hideLabels ? _("Mask") : "", gd::SkinHelper::GetRibbonIcon("windowMask"), _("Show a mask corresponding to the size of the game window"));
-    ribbonToolbar->AddButton(idRibbonOrigine, !hideLabels ? _("Return to the initial position ( 0;0 )") : "", gd::SkinHelper::GetRibbonIcon("center"), _("Go back to the origin of the scene"));
-    ribbonToolbar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Initial zoom") : "", gd::SkinHelper::GetRibbonIcon("zoom"), _("Go back to the initial zoom level"));
+    ribbonToolbar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects editor") : gd::String(), gd::SkinHelper::GetRibbonIcon("objects"), _("Show the list of objects of the scene"));
+    ribbonToolbar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers editor") : gd::String(), gd::SkinHelper::GetRibbonIcon("layers"), _("Show the layers editor"));
+    ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Instances") : gd::String(), gd::SkinHelper::GetRibbonIcon("ObjectsPositionsList"), _("Open a list of all instances of objects put on the scene"));
+    ribbonToolbar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Undo") : gd::String(), gd::SkinHelper::GetRibbonIcon("undo"), _("Undo the last change"));
+    ribbonToolbar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : gd::String(), gd::SkinHelper::GetRibbonIcon("redo"));
+    ribbonToolbar->AddButton(idRibbonGrid, !hideLabels ? _("Grid") : gd::String(), gd::SkinHelper::GetRibbonIcon("grid"));
+    ribbonToolbar->AddButton(idRibbonGridSetup, !hideLabels ? _("Edit the grid") : gd::String(), gd::SkinHelper::GetRibbonIcon("gridedit"), _("Edit the size of the grid"));
+    ribbonToolbar->AddButton(idRibbonWindowMask, !hideLabels ? _("Mask") : gd::String(), gd::SkinHelper::GetRibbonIcon("windowMask"), _("Show a mask corresponding to the size of the game window"));
+    ribbonToolbar->AddButton(idRibbonOrigine, !hideLabels ? _("Return to the initial position ( 0;0 )") : gd::String(), gd::SkinHelper::GetRibbonIcon("center"), _("Go back to the origin of the scene"));
+    ribbonToolbar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Initial zoom") : gd::String(), gd::SkinHelper::GetRibbonIcon("zoom"), _("Go back to the initial zoom level"));
 }
 
 void LayoutEditorCanvas::UpdateContextMenu()
@@ -571,7 +570,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
     if ( selectedInstances.empty() ) return;
 
     //Can we send the objects on a higher layer ?
-    unsigned int lowestLayer = layout.GetLayersCount()-1;
+    std::size_t lowestLayer = layout.GetLayersCount()-1;
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if (it->first == NULL) continue;
@@ -581,14 +580,14 @@ void LayoutEditorCanvas::UpdateContextMenu()
     contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
     if ( lowestLayer+1 < layout.GetLayersCount() )
     {
-        string name = layout.GetLayer(lowestLayer+1).GetName();
+        gd::String name = layout.GetLayer(lowestLayer+1).GetName();
         if ( name == "" ) name = _("Base layer");
         contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(string(_("Put the object(s) on the layer \"")) + name +"\"");
+        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
     }
 
     //Can we send the objects on a lower layer ?
-    unsigned int highestLayer = 0;
+    std::size_t highestLayer = 0;
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if (it->first == NULL) continue;
@@ -598,17 +597,17 @@ void LayoutEditorCanvas::UpdateContextMenu()
     contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(false);
     if ( highestLayer >= 1 )
     {
-        string name = layout.GetLayer(highestLayer-1).GetName();
+        gd::String name = layout.GetLayer(highestLayer-1).GetName();
         if ( name == "" ) name = _("Base layer");
 
         contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(string(_("Put the object(s) on the layer \"")) + name +"\"");
+        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
     }
 }
 
 void LayoutEditorCanvas::OnLayerUpSelected(wxCommandEvent & event)
 {
-    unsigned int lowestLayer = layout.GetLayersCount()-1;
+    std::size_t lowestLayer = layout.GetLayersCount()-1;
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if (it->first == NULL) continue;
@@ -620,7 +619,7 @@ void LayoutEditorCanvas::OnLayerUpSelected(wxCommandEvent & event)
 
 void LayoutEditorCanvas::OnLayerDownSelected(wxCommandEvent & event)
 {
-    unsigned int highestLayer = 0;
+    std::size_t highestLayer = 0;
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if (it->first == NULL) continue;
@@ -630,7 +629,7 @@ void LayoutEditorCanvas::OnLayerDownSelected(wxCommandEvent & event)
     if ( highestLayer >= 1 ) SendSelectionToLayer(layout.GetLayer(highestLayer-1).GetName());
 }
 
-void LayoutEditorCanvas::SendSelectionToLayer(const std::string & newLayerName)
+void LayoutEditorCanvas::SendSelectionToLayer(const gd::String & newLayerName)
 {
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
@@ -657,7 +656,7 @@ void LayoutEditorCanvas::OnAddAutoObjSelected(wxCommandEvent & event)
 
     gd::Object * object = GetObjectLinkedToInitialInstance(*selection[0]);
     bool globalObject = false;
-    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<project.GetObjectsCount();++i)
     {
         if ( &project.GetObject(i) == object )
         {
@@ -666,7 +665,7 @@ void LayoutEditorCanvas::OnAddAutoObjSelected(wxCommandEvent & event)
         }
     }
 
-    gd::ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(this, project,
+    gd::ChooseBehaviorTypeDialog::ChooseAndAddBehaviorToObject(this, project,
         object, &layout, globalObject);
 
     //Show the properties panel and ensure other editors are refreshed:
@@ -677,12 +676,12 @@ void LayoutEditorCanvas::OnAddAutoObjSelected(wxCommandEvent & event)
         (*it)->InitialInstancesUpdated();
 }
 
-void LayoutEditorCanvas::AddObject(const std::string & objectName)
+void LayoutEditorCanvas::AddObject(const gd::String & objectName)
 {
     AddObject(objectName, GetMouseXOnLayout(), GetMouseYOnLayout());
 }
 
-void LayoutEditorCanvas::AddObject(const std::string & objectName, float x, float y)
+void LayoutEditorCanvas::AddObject(const gd::String & objectName, float x, float y)
 {
     if ( !editing || objectName.empty() ) return;
     isMovingInstance = false;
@@ -734,7 +733,7 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
     double mouseY = GetMouseYOnLayout();
 
     //Check if there is a click on a gui element inside the layout
-    for (unsigned int i = 0;i<guiElements.size();++i)
+    for (std::size_t i = 0;i<guiElements.size();++i)
     {
         if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
         {
@@ -769,7 +768,7 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
             if (!isMovingInstance && ctrlPressed) //Clone objects
             {
                 std::vector < InitialInstance* > selection = GetSelection();
-                for (unsigned int i = 0;i<selection.size();++i)
+                for (std::size_t i = 0;i<selection.size();++i)
                     instances.InsertInitialInstance(*selection[i]);
 
                 for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
@@ -853,7 +852,7 @@ void LayoutEditorCanvas::UnselectInstance(InitialInstance * instance)
 
 void LayoutEditorCanvas::DeleteInstances(std::vector<InitialInstance *> instancesToDelete)
 {
-    for (unsigned int i = 0;i<instancesToDelete.size();++i)
+    for (std::size_t i = 0;i<instancesToDelete.size();++i)
     {
         if (instancesToDelete[i] == NULL ) continue;
 
@@ -878,6 +877,7 @@ public:
     {
         gd::InitialInstance & instance = *instancePtr;
         if ( ignoreLockedInstances && instance.IsLocked() ) return;
+        if ( excludedLayers.find(instance.GetLayer()) != excludedLayers.end() ) return;
 
         sf::Vector2f size = editor.GetInitialInstanceSize(instance);
         sf::Vector2f origin = editor.GetInitialInstanceOrigin(instance);
@@ -890,13 +890,18 @@ public:
         }
     }
 
-    std::vector<InitialInstance*> & GetSelectedList() { return selectedList; };
-    InstancesInAreaPicker & IgnoreLockedInstances() { ignoreLockedInstances = true; return *this; };
+    std::vector<InitialInstance*> & GetSelectedList() { return selectedList; }
+    InstancesInAreaPicker & IgnoreLockedInstances() { ignoreLockedInstances = true; return *this; }
+    InstancesInAreaPicker & ExcludeLayer(const gd::String & layerName) {
+        excludedLayers.insert(layerName);
+        return *this;
+    }
 
 private:
     const LayoutEditorCanvas & editor;
     std::vector<InitialInstance*> selectedList; ///< This list will be filled with the instances that are into the selectionRectangle
     bool ignoreLockedInstances;
+    std::set<gd::String> excludedLayers;
 };
 
 void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
@@ -918,7 +923,7 @@ void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
     }
 
     //Check if there is a click released on a gui element inside the layout
-    for (unsigned int i = 0;i<guiElements.size();++i)
+    for (std::size_t i = 0;i<guiElements.size();++i)
     {
         if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
         {
@@ -967,10 +972,12 @@ void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
 
         //Select the instances that are inside the selection rectangle
         InstancesInAreaPicker picker(*this);
+        for(auto hiddenLayer : gd::GetHiddenLayers(layout))
+            picker.ExcludeLayer(hiddenLayer);
         picker.IgnoreLockedInstances();
         instances.IterateOverInstances(picker);
 
-        for ( unsigned int i = 0; i<picker.GetSelectedList().size();++i)
+        for ( std::size_t i = 0; i<picker.GetSelectedList().size();++i)
             SelectInstance(picker.GetSelectedList()[i]);
 
         isSelecting = false;
@@ -1064,12 +1071,12 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
         double mouseX = GetMouseXOnLayout();
         double mouseY = GetMouseYOnLayout();
 
-        gd::LogStatus( gd::ToString(wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
-            mouseX, mouseY )) );
+        gd::LogStatus( wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
+            mouseX, mouseY ));
 
         //Check if there is a gui element hovered inside the layout
         bool hoveringSomething = false;
-        for (unsigned int i = 0;i<guiElements.size();++i)
+        for (std::size_t i = 0;i<guiElements.size();++i)
         {
             if ( guiElements[i].area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) ) {
                 OnGuiElementHovered(guiElements[i]);
@@ -1250,6 +1257,7 @@ public:
     {
         gd::InitialInstance & instance = *instancePtr;
         if ( pickLockedOnly != instance.IsLocked() ) return;
+        if ( excludedLayers.find(instance.GetLayer()) != excludedLayers.end() ) return;
 
         sf::Vector2f size = editor.GetInitialInstanceSize(instance);
         sf::Vector2f origin = editor.GetInitialInstanceOrigin(instance);
@@ -1269,6 +1277,7 @@ public:
     InitialInstance * GetSmallestInstanceUnderCursor() { return smallestInstance; };
 
     void PickLockedInstancesAndOnlyThem() { pickLockedOnly = true; }
+    void ExcludeLayer(const gd::String & layerName) { excludedLayers.insert(layerName); }
 
 private:
     const LayoutEditorCanvas & editor;
@@ -1277,11 +1286,15 @@ private:
     const double xPosition;
     const double yPosition;
     bool pickLockedOnly;
+    std::set<gd::String> excludedLayers;
 };
 
 InitialInstance * LayoutEditorCanvas::GetInitialInstanceAtPosition(double xPosition, double yPosition, bool pickOnlyLockedInstances)
 {
     SmallestInstanceUnderCursorPicker picker(*this, xPosition, yPosition);
+
+    for(auto hiddenLayer : gd::GetHiddenLayers(layout))
+        picker.ExcludeLayer(hiddenLayer);
     if ( pickOnlyLockedInstances ) picker.PickLockedInstancesAndOnlyThem();
     instances.IterateOverInstances(picker);
 
@@ -1341,9 +1354,9 @@ void LayoutEditorCanvas::OnUndoBtClick( wxCommandEvent & event )
     Undo();
 }
 
-void LayoutEditorCanvas::Undo(unsigned int times)
+void LayoutEditorCanvas::Undo(std::size_t times)
 {
-    for (unsigned int i = 0;i<times;++i)
+    for (std::size_t i = 0;i<times;++i)
     {
         if ( history.empty() ) return;
 
@@ -1364,9 +1377,9 @@ void LayoutEditorCanvas::OnClearHistorySelected(wxCommandEvent& event)
     redoHistory.clear();
 }
 
-void LayoutEditorCanvas::Redo( unsigned int times )
+void LayoutEditorCanvas::Redo( std::size_t times )
 {
-    for (unsigned int i = 0;i<times;++i)
+    for (std::size_t i = 0;i<times;++i)
     {
         if ( redoHistory.empty() ) return;
 
@@ -1432,7 +1445,7 @@ gd::Object * LayoutEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialIns
     return NULL;
 }
 
-void LayoutEditorCanvas::UpdateMouseResizeCursor(const std::string & currentDraggableBt)
+void LayoutEditorCanvas::UpdateMouseResizeCursor(const gd::String & currentDraggableBt)
 {
     if ( currentDraggableBt == "resizeUp" || currentDraggableBt == "resizeDown"  )
         SetCursor(wxCursor(wxCURSOR_SIZENS));
@@ -1461,7 +1474,7 @@ void LayoutEditorCanvas::PausePreview()
 void LayoutEditorCanvas::SetParentAuiManager(wxAuiManager * parentAuiManager_)
 {
     parentAuiManager = parentAuiManager_;
-    for(std::map<std::string, std::shared_ptr<gd::LayoutEditorPreviewer> >::iterator it = previewers.begin();
+    for(std::map<gd::String, std::shared_ptr<gd::LayoutEditorPreviewer> >::iterator it = previewers.begin();
         it != previewers.end();
         ++it)
     {
@@ -1474,9 +1487,9 @@ void LayoutEditorCanvas::ReloadResources()
     if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
         wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
 
-    for (unsigned int i = 0;i<layout.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<layout.GetObjectsCount();++i)
         layout.GetObject(i).LoadResources(project, layout);
-    for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+    for (std::size_t i = 0;i<project.GetObjectsCount();++i)
         project.GetObject(i).LoadResources(project, layout);
 
     wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());

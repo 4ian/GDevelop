@@ -21,14 +21,14 @@ namespace TimedEvents
  * \param mangledTimedEventName Mangled timed event name
  * \return Time elapsed, in microseconds, of the timed event
  */
-signed long long GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, std::string mangledTimedEventName);
+signed long long GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, gd::String mangledTimedEventName);
 
 /**
  * Reset a timed event.
  * \param scene Scene used
  * \param timedEventName Unmangled timed event name. The name will be mangled to "GDNamedTimedEvent_"+timedEventName.
  */
-void GD_EXTENSION_API Reset(RuntimeScene & scene, std::string timedEventName);
+void GD_EXTENSION_API Reset(RuntimeScene & scene, gd::String timedEventName);
 
 }
 

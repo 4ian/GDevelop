@@ -175,8 +175,8 @@ object(object_)
 	//*)
 
     VolumeSpinCtrl->SetValue(object.GetVolume());
-    AttenuationSpinCtrl->SetValue(wxString(ToString(object.GetAttenuation()).c_str()));
-    pitchTextCtrl->SetValue(wxString(ToString(object.GetPitch()).c_str()));
+    AttenuationSpinCtrl->SetValue(wxString(gd::String::From(object.GetAttenuation()).c_str()));
+    pitchTextCtrl->SetValue(wxString(gd::String::From(object.GetPitch()).c_str()));
     LoopCheckBox->SetValue(object.IsLooping());
     FileNameTextCtrl->SetValue(object.GetSoundFileName());
     MinDistanceSpinCtrl->SetValue(object.GetMinDistance());
@@ -199,11 +199,11 @@ void SoundObjectEditor::OnValidateButtonClick(wxCommandEvent& event)
         object.SetSoundType("Music");
 
     object.SetVolume(VolumeSpinCtrl->GetValue());
-    object.SetAttenuation(ToFloat(ToString(AttenuationSpinCtrl->GetValue())));
-    object.SetPitch(ToFloat(ToString(pitchTextCtrl->GetValue())));
+    object.SetAttenuation(gd::String(AttenuationSpinCtrl->GetValue()).To<float>());
+    object.SetPitch(gd::String(pitchTextCtrl->GetValue()).To<float>());
     object.SetMinDistance(MinDistanceSpinCtrl->GetValue());
     object.SetLooping(LoopCheckBox->IsChecked());
-    object.SetSoundFileName(ToString(FileNameTextCtrl->GetValue()));
+    object.SetSoundFileName(FileNameTextCtrl->GetValue());
 
     EndModal(1);
 }
@@ -226,4 +226,3 @@ void SoundObjectEditor::OnButton1Click(wxCommandEvent& event)
     }
 }
 #endif
-

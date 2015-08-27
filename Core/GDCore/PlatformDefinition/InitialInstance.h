@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_INITIALINSTANCE_H
 #define GDCORE_INITIALINSTANCE_H
-#include <string>
+#include "GDCore/String.h"
 #include <map>
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 namespace gd { class PropertyDescriptor; }
@@ -47,12 +47,12 @@ public:
     /**
      * \brief Get the name of object instantiated on the layout.
      */
-    const std::string & GetObjectName() const { return objectName; }
+    const gd::String & GetObjectName() const { return objectName; }
 
     /**
      * \brief Set the name of object instantiated on the layout.
      */
-    void SetObjectName(const std::string & name) { objectName = name; }
+    void SetObjectName(const gd::String & name) { objectName = name; }
 
     /**
      * \brief Get the X position of the instance
@@ -97,12 +97,12 @@ public:
     /**
      * \brief Get the layer the instance belongs to.
      */
-    const std::string & GetLayer() const {return layer;}
+    const gd::String & GetLayer() const {return layer;}
 
     /**
      * \brief Set the layer the instance belongs to.
      */
-    void SetLayer(const std::string & layer_) {layer = layer_;}
+    void SetLayer(const gd::String & layer_) {layer = layer_;}
 
     /**
      * \brief Return true if the instance has a size which is different from its object default size.
@@ -163,13 +163,13 @@ public:
     /** \name Others properties management
      * Members functions related to exposing others properties of the instance.
      *
-     * \note Extensions writers: Even if we can define new types of object by inheriting from gd::Object class,
+     * \note Extensions writers: even if we can define new types of object by inheriting from gd::Object class,
      * we cannot define new gd::InitialInstance classes. However, objects can store custom
-     * properties for their associated initial instances : These properties can be stored
+     * properties for their associated initial instances: these properties can be stored
      * into floatInfos and stringInfos members. When the IDE want to get the custom properties, it
      * will call GetProperties and UpdateProperty methods. These
      * methods are here defined to forward the call to the gd::Object associated to the gd::InitialInstance.
-     * ( By looking at the value returned by GetObjectName() ).
+     * (by looking at the value returned by GetObjectName()).
      *
      * \see gd::Object
      */
@@ -178,30 +178,29 @@ public:
      * \brief Return a map containing the properties names (as keys) and their values.
      * \note Common properties ( name, position... ) do not need to be inserted in this map
      */
-    std::map<std::string, gd::PropertyDescriptor> GetCustomProperties(gd::Project & project, gd::Layout & layout);
+    std::map<gd::String, gd::PropertyDescriptor> GetCustomProperties(gd::Project & project, gd::Layout & layout);
 
     /**
      * \brief Update the property called \a name with the new \a value.
      *
      * \return false if the property could not be updated.
      */
-    bool UpdateCustomProperty(const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout);
+    bool UpdateCustomProperty(const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & layout);
     ///@}
     #endif
 
-    //TODO : Refactor this:
     //In our implementation, more properties can be stored in floatInfos and stringInfos.
     //These properties are then managed by the Object class.
-    std::map < std::string, float > floatInfos; ///< More data which can be used by the object
-    std::map < std::string, std::string > stringInfos; ///< More data which can be used by the object
+    std::map < gd::String, float > floatInfos; ///< More data which can be used by the object
+    std::map < gd::String, gd::String > stringInfos; ///< More data which can be used by the object
 private:
 
-    std::string objectName; ///< Object name
+    gd::String objectName; ///< Object name
     float x; ///< Object initial X position
     float y; ///< Object initial Y position
     float angle; ///< Object initial angle
     int zOrder; ///< Object initial Z order
-    std::string layer; ///< Object initial layer
+    gd::String layer; ///< Object initial layer
     bool personalizedSize; ///< True if object has a custom size
     float width;  ///< Object custom width
     float height; ///< Object custom height

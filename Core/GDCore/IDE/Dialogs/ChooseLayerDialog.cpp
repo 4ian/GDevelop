@@ -62,9 +62,9 @@ addQuotes(addQuotes_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseLayerDialog::OncancelBtClick);
 	//*)
 
-	for (unsigned int i =0;i<layout.GetLayersCount();++i)
+	for (std::size_t i =0;i<layout.GetLayersCount();++i)
 	{
-	    std::string name = layout.GetLayer(i).GetName();
+	    gd::String name = layout.GetLayer(i).GetName();
 	    if ( name == "" ) name = _("Base layer");
 		layersList->Insert(name, 0);
 	}
@@ -78,7 +78,7 @@ ChooseLayerDialog::~ChooseLayerDialog()
 
 void ChooseLayerDialog::OnokBtClick(wxCommandEvent& event)
 {
-    chosenLayer = ToString(layersList->GetStringSelection());
+    chosenLayer = layersList->GetStringSelection();
     if ( chosenLayer == _("Base layer") ) chosenLayer = "";
 
     if ( addQuotes ) chosenLayer = "\""+chosenLayer+"\"";

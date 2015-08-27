@@ -6,7 +6,7 @@
 #ifndef GDCORE_EXPRESSIONPARSER_H
 #define GDCORE_EXPRESSIONPARSER_H
 
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 namespace gd { class Expression; }
 namespace gd { class ParserCallbacks; }
@@ -27,7 +27,7 @@ namespace gd
 class GD_CORE_API ExpressionParser
 {
 public:
-    ExpressionParser(const std::string & expressionPlainString_);
+    ExpressionParser(const gd::String & expressionPlainString_);
     virtual ~ExpressionParser() {};
 
     /**
@@ -42,7 +42,7 @@ public:
      */
     bool ParseStringExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks);
 
-    std::string firstErrorStr;
+    gd::String firstErrorStr;
     size_t firstErrorPos;
 
 private:
@@ -50,7 +50,7 @@ private:
     /**
      * Tool function to add a parameter
      */
-    bool AddParameterToList(const gd::Project & project, const gd::Layout & layout, ParserCallbacks &, std::vector < gd::Expression > & parameters, std::string parameterStr, std::vector < gd::ParameterMetadata > parametersInfos, const size_t positionInExpression);
+    bool AddParameterToList(const gd::Project & project, const gd::Layout & layout, ParserCallbacks &, std::vector < gd::Expression > & parameters, gd::String parameterStr, std::vector < gd::ParameterMetadata > parametersInfos, const size_t positionInExpression);
 
     /**
      * Tool function to prepare a parameter
@@ -67,10 +67,10 @@ private:
      */
     size_t GetMaximalParametersNumber(const std::vector < gd::ParameterMetadata > & parametersInfos);
 
-    bool ValidSyntax(const std::string & str);
+    bool ValidSyntax(const gd::String & str);
 
-    std::string expressionPlainString;
-    static std::string parserSeparators;
+    gd::String expressionPlainString;
+    static gd::String parserSeparators;
 };
 
 /** \brief Callbacks called by parser during parsing
@@ -90,20 +90,20 @@ public:
      * \brief Get the type of the expression for which callbacks are used:
      * "expression" or "string".
      */
-    const std::string & GetReturnType() { return returnType; }
+    const gd::String & GetReturnType() { return returnType; }
 
-    virtual void OnConstantToken(std::string text) = 0;
+    virtual void OnConstantToken(gd::String text) = 0;
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
+    virtual void OnStaticFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
 
-    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
+    virtual void OnObjectFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
+    virtual void OnObjectBehaviorFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
 
     virtual bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
     virtual bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
 
-    std::string firstErrorStr;
+    gd::String firstErrorStr;
     size_t firstErrorPos;
 private:
     /**
@@ -111,9 +111,9 @@ private:
      * which Parse* method is called.
      * \see gd::ExpressionParser
      */
-    void SetReturnType(std::string type) { returnType = type; }
+    void SetReturnType(gd::String type) { returnType = type; }
 
-    std::string returnType; //The type of the expression ("expression" (default), "string"...)
+    gd::String returnType; //The type of the expression ("expression" (default), "string"...)
 };
 
 }

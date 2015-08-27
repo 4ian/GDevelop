@@ -131,10 +131,10 @@ b(b_)
 	//*)
 
 	snapCheck->SetValue(snap);
-	offsetXEdit->ChangeValue(ToString(gridOffsetX));
-	offsetYEdit->ChangeValue(ToString(gridOffsetY));
-	widthEdit->ChangeValue(ToString(gridWidth));
-	heightEdit->ChangeValue(ToString(gridHeight));
+	offsetXEdit->ChangeValue(gd::String::From(gridOffsetX));
+	offsetYEdit->ChangeValue(gd::String::From(gridOffsetY));
+	widthEdit->ChangeValue(gd::String::From(gridWidth));
+	heightEdit->ChangeValue(gd::String::From(gridHeight));
     colorPanel->SetBackgroundColour( wxColor(r,g,b) );
 }
 
@@ -148,21 +148,21 @@ GridSetupDialog::~GridSetupDialog()
 void GridSetupDialog::OnokBtClick(wxCommandEvent& event)
 {
     snap = snapCheck->GetValue();
-    if ( ToInt(static_cast<string>(widthEdit->GetValue())) < 1)
+    if ( gd::String(widthEdit->GetValue()).To<int>() < 1)
     {
         gd::LogWarning(_("The width of the grid is wrong."));
         return;
     }
-    if ( ToInt(static_cast<string>(heightEdit->GetValue())) < 1)
+    if ( gd::String(heightEdit->GetValue()).To<int>() < 1)
     {
         gd::LogWarning(_("The height of the grid is wrong."));
         return;
     }
 
-    gridOffsetX = ToInt(static_cast<string>(offsetXEdit->GetValue()));
-    gridOffsetY = ToInt(static_cast<string>(offsetYEdit->GetValue()));
-    gridWidth = ToInt(static_cast<string>(widthEdit->GetValue()));
-    gridHeight = ToInt(static_cast<string>(heightEdit->GetValue()));
+    gridOffsetX = gd::String(offsetXEdit->GetValue()).To<int>();
+    gridOffsetY = gd::String(offsetYEdit->GetValue()).To<int>();
+    gridWidth = gd::String(widthEdit->GetValue()).To<int>();
+    gridHeight = gd::String(heightEdit->GetValue()).To<int>();
 
     EndModal(1);
 }

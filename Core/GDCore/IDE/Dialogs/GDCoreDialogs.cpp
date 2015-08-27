@@ -70,11 +70,12 @@ LayersEditorPanelBase::LayersEditorPanelBase(wxWindow* parent, wxWindowID id, co
     m_layersList = new wxListCtrl(m_panel7, LAYERS_LIST_ID, wxDefaultPosition, wxDefaultSize, wxLC_REPORT);
     flexGridSizer13->Add(m_layersList, 0, wxALL|wxEXPAND, 0);
     
+    SetName(wxT("LayersEditorPanelBase"));
     SetSizeHints(500,300);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    Centre(wxBOTH);
+    CentreOnParent(wxBOTH);
     // Connect events
     this->Connect(ADD_LAYER_TOOL, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(LayersEditorPanelBase::OnAddLayerClicked), NULL, this);
     this->Connect(DELETE_LAYER_TOOL, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(LayersEditorPanelBase::OnDeleteLayerClicked), NULL, this);
@@ -179,11 +180,19 @@ BaseGroupEventDialog::BaseGroupEventDialog(wxWindow* parent, wxWindowID id, cons
     
     flexGridSizer45->Add(cancelBt, 0, wxALL, 5);
     
+    SetName(wxT("BaseGroupEventDialog"));
     SetSizeHints(400,200);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    Centre(wxBOTH);
+    CentreOnParent(wxBOTH);
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
     // Connect events
     backColorBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onChooseBackgroundBtClick), NULL, this);
     okBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseGroupEventDialog::onOkBtClick), NULL, this);
@@ -316,12 +325,20 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     
     flexGridSizer7712->Add(cancelBt, 0, wxALL, 5);
     
+    SetName(wxT("BaseEventStoreDialog"));
     SetMinSize( wxSize(500,300) );
     SetSizeHints(750,450);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    Centre(wxBOTH);
+    CentreOnParent(wxBOTH);
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
     // Connect events
     searchCtrl->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(BaseEventStoreDialog::OnSearchCtrlText), NULL, this);
     okBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnOkBtClick), NULL, this);

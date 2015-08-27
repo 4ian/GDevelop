@@ -12,13 +12,13 @@
 
 bool DndTextResourcesEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text)
 {
-    std::vector<std::string > command = gd::SplitString<std::string>(gd::ToString(text), ';');
+    std::vector<gd::String > command = gd::String::FromWxString(text).Split(U';');
 
     //"Normal" drop of one or more images.
     if (command.size() >= 2 && command[0] == "NORMAL")
     {
-        std::vector<std::string > resources;
-        for (unsigned int i = 1;i<command.size();++i)
+        std::vector<gd::String > resources;
+        for (std::size_t i = 1;i<command.size();++i)
             resources.push_back(command[i]);
 
         editor.TriggerDrop(x, y, resources);
@@ -26,8 +26,8 @@ bool DndTextResourcesEditor::OnDropText(wxCoord x, wxCoord y, const wxString& te
     //This is a "special" drop coming from the resource library dialog
     else if (command.size() >= 3 && command[0] == "COPYANDADDRESOURCES")
     {
-        std::vector<std::string > files;
-        for (unsigned int i = 2;i<command.size();++i)
+        std::vector<gd::String > files;
+        for (std::size_t i = 2;i<command.size();++i)
             files.push_back(command[i]);
 
         editor.CopyAndAddResources(files, command[1]);
@@ -38,4 +38,3 @@ bool DndTextResourcesEditor::OnDropText(wxCoord x, wxCoord y, const wxString& te
     return true;
 }
 #endif
-

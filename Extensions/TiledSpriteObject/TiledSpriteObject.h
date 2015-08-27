@@ -29,7 +29,7 @@ class GD_EXTENSION_API TiledSpriteObject : public gd::Object
 {
 public :
 
-    TiledSpriteObject(std::string name_);
+    TiledSpriteObject(gd::String name_);
     virtual ~TiledSpriteObject() {};
     virtual gd::Object * Clone() const { return new TiledSpriteObject(*this);}
 
@@ -49,10 +49,10 @@ public :
     virtual void SetWidth(float newWidth) { width = newWidth; };
     virtual void SetHeight(float newHeight) { height = newHeight; };
 
-    void SetTexture(const std::string & newTextureName) { textureName = newTextureName; };
-    const std::string & GetTexture() const { return textureName; };
+    void SetTexture(const gd::String & newTextureName) { textureName = newTextureName; };
+    const gd::String & GetTexture() const { return textureName; };
 
-    std::string textureName;
+    gd::String textureName;
 
 private:
 
@@ -92,15 +92,15 @@ public :
     void SetYOffset(float yOffset_) { yOffset = yOffset_; };
     float GetYOffset() const { return yOffset; };
 
-    void ChangeAndReloadImage(const std::string &texture, const RuntimeScene &scene);
+    void ChangeAndReloadImage(const gd::String &texture, const RuntimeScene &scene);
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+    virtual std::size_t GetNumberOfProperties() const;
     #endif
 
-    std::string textureName;
+    gd::String textureName;
 
 private:
 
@@ -114,7 +114,7 @@ private:
     std::shared_ptr<SFMLTextureWrapper> texture;
 };
 
-gd::Object * CreateTiledSpriteObject(std::string name);
+gd::Object * CreateTiledSpriteObject(gd::String name);
 RuntimeObject * CreateRuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // TILEDSPRITEOBJECT_H

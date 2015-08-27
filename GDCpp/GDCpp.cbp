@@ -639,12 +639,12 @@
 		<Unit filename="GDCpp/Animation.cpp" />
 		<Unit filename="GDCpp/Animation.h" />
 		<Unit filename="GDCpp/Arial.hpp" />
-		<Unit filename="GDCpp/Automatism.cpp" />
-		<Unit filename="GDCpp/Automatism.h" />
-		<Unit filename="GDCpp/AutomatismsRuntimeSharedData.cpp" />
-		<Unit filename="GDCpp/AutomatismsRuntimeSharedData.h" />
-		<Unit filename="GDCpp/AutomatismsSharedData.cpp" />
-		<Unit filename="GDCpp/AutomatismsSharedData.h" />
+		<Unit filename="GDCpp/Behavior.cpp" />
+		<Unit filename="GDCpp/Behavior.h" />
+		<Unit filename="GDCpp/BehaviorsRuntimeSharedData.cpp" />
+		<Unit filename="GDCpp/BehaviorsRuntimeSharedData.h" />
+		<Unit filename="GDCpp/BehaviorsSharedData.cpp" />
+		<Unit filename="GDCpp/BehaviorsSharedData.h" />
 		<Unit filename="GDCpp/BuiltinExtensions/AdvancedExtension.cpp" />
 		<Unit filename="GDCpp/BuiltinExtensions/AdvancedExtension.h" />
 		<Unit filename="GDCpp/BuiltinExtensions/AudioExtension.cpp" />
@@ -848,8 +848,6 @@
 		<Unit filename="GDCpp/Sprite.cpp" />
 		<Unit filename="GDCpp/Sprite.h" />
 		<Unit filename="GDCpp/SpriteObject.cpp" />
-		<Unit filename="GDCpp/Text.cpp" />
-		<Unit filename="GDCpp/Text.h" />
 		<Unit filename="GDCpp/Tools/AES.cpp" />
 		<Unit filename="GDCpp/Tools/AES.h" />
 		<Unit filename="GDCpp/Tools/md5.cpp" />
@@ -862,7 +860,6 @@
 		<Unit filename="GDCpp/Version.h" />
 		<Unit filename="GDCpp/XmlFilesHelper.cpp" />
 		<Unit filename="GDCpp/XmlFilesHelper.h" />
-		<Unit filename="GDCpp/XmlMacros.h" />
 		<Unit filename="GDCpp/btAlignedAllocator.h" />
 		<Unit filename="GDCpp/btScalar.h" />
 		<Unit filename="GDCpp/profile.cpp" />
@@ -894,11 +891,11 @@
 					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDCpp/IDE/Dialogs/EditComment.cpp" hdr="GDCpp/IDE/Dialogs/EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />
 					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDCpp/IDE/Dialogs/EditForEachEvent.cpp" hdr="GDCpp/IDE/Dialogs/EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDCpp/IDE/Dialogs/EditRepeatEvent.cpp" hdr="GDCpp/IDE/Dialogs/EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/EditCppCodeEvent.wxs" src="GDCpp\IDE\Dialogs\EditCppCodeEvent.cpp" hdr="GDCpp\IDE\Dialogs\EditCppCodeEvent.h" fwddecl="0" i18n="1" name="EditCppCodeEvent" language="CPP" />
-					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="GDCpp\IDE\Dialogs\ProfileDlg.cpp" hdr="GDCpp\IDE\Dialogs\ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
-					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="GDCpp\IDE\Dialogs\RenderDialog.cpp" hdr="GDCpp\IDE\Dialogs\RenderDialog.h" fwddecl="0" i18n="1" name="RenderDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ProjectExportDialog.wxs" src="GDCpp\IDE\Dialogs\ProjectExportDialog.cpp" hdr="GDCpp\IDE\Dialogs\ProjectExportDialog.h" fwddecl="0" i18n="1" name="ProjectExportDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/CompilationErrorDialog.wxs" src="GDCpp\IDE\Dialogs\CompilationErrorDialog.cpp" hdr="GDCpp\IDE\Dialogs\CompilationErrorDialog.h" fwddecl="0" i18n="1" name="CompilationErrorDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditCppCodeEvent.wxs" src="GDCpp/IDE/Dialogs/EditCppCodeEvent.cpp" hdr="GDCpp/IDE/Dialogs/EditCppCodeEvent.h" fwddecl="0" i18n="1" name="EditCppCodeEvent" language="CPP" />
+					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="GDCpp/IDE/Dialogs/ProfileDlg.cpp" hdr="GDCpp/IDE/Dialogs/ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
+					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="GDCpp/IDE/Dialogs/RenderDialog.cpp" hdr="GDCpp/IDE/Dialogs/RenderDialog.h" fwddecl="0" i18n="1" name="RenderDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ProjectExportDialog.wxs" src="GDCpp/IDE/Dialogs/ProjectExportDialog.cpp" hdr="GDCpp/IDE/Dialogs/ProjectExportDialog.h" fwddecl="0" i18n="1" name="ProjectExportDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/CompilationErrorDialog.wxs" src="GDCpp/IDE/Dialogs/CompilationErrorDialog.cpp" hdr="GDCpp/IDE/Dialogs/CompilationErrorDialog.h" fwddecl="0" i18n="1" name="CompilationErrorDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

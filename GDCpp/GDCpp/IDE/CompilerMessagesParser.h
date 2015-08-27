@@ -10,6 +10,7 @@
 #define COMPILERERRORSPARSER_H
 #include <string>
 #include <vector>
+#include "GDCpp/String.h"
 
 namespace GDpriv
 {
@@ -20,12 +21,12 @@ namespace GDpriv
 class GD_API CompilerMessage
 {
 public:
-    CompilerMessage() : line(std::string::npos), column(std::string::npos) {};
+    CompilerMessage() : line(gd::String::npos), column(gd::String::npos) {};
 
-    std::string file;
+    gd::String file;
     size_t line;
     size_t column;
-    std::string message;
+    gd::String message;
     enum MessageType
     {
         simple,
@@ -42,7 +43,7 @@ class GD_API CompilerMessagesParser
         CompilerMessagesParser() {};
         virtual ~CompilerMessagesParser() {};
 
-        void ParseOutput(std::string output);
+        void ParseOutput(gd::String output);
 
         std::vector < CompilerMessage > parsedMessages;
 
@@ -54,4 +55,3 @@ class GD_API CompilerMessagesParser
 #endif // COMPILERERRORSPARSER_H
 
 #endif
-

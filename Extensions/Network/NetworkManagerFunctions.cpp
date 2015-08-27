@@ -31,9 +31,9 @@ void GD_EXTENSION_API ActStopListening()
     NetworkManager::Get()->StopListening();
 }
 
-void GD_EXTENSION_API AddRecipient( const std::string & adressStr, short unsigned int port  )
+void GD_EXTENSION_API AddRecipient( const gd::String & adressStr, short unsigned int port  )
 {
-    sf::IpAddress address = adressStr;
+    sf::IpAddress address = adressStr.ToLocale();
 
     if ( port == 0 ) port = 50001; //Default value
 
@@ -52,7 +52,7 @@ void GD_EXTENSION_API ListenToPort( short unsigned int port )
     NetworkManager::Get()->ListenToPort(port);
 }
 
-void GD_EXTENSION_API SendValue( const std::string & title, double data )
+void GD_EXTENSION_API SendValue( const gd::String & title, double data )
 {
     sf::Packet packet;
     packet  << sf::Int32(0) //0 indicate that the packet contains a double
@@ -62,7 +62,7 @@ void GD_EXTENSION_API SendValue( const std::string & title, double data )
     NetworkManager::Get()->Send(packet);
 }
 
-void GD_EXTENSION_API SendString( const std::string & title, const std::string & data )
+void GD_EXTENSION_API SendString( const gd::String & title, const gd::String & data )
 {
     sf::Packet packet;
     packet  << sf::Int32(1) //1 indicate that the packet contains a string
@@ -77,31 +77,30 @@ void GD_EXTENSION_API ReceivePackets(  )
     NetworkManager::Get()->ReceivePackets();
 }
 
-std::string GD_EXTENSION_API GetReceivedDataString( const std::string & title)
+gd::String GD_EXTENSION_API GetReceivedDataString( const gd::String & title)
 {
     return ReceivedDataManager::Get()->strings[title];
 }
 
-double GD_EXTENSION_API GetReceivedDataValue( const std::string & title )
+double GD_EXTENSION_API GetReceivedDataValue( const gd::String & title )
 {
     return ReceivedDataManager::Get()->values[title];
 }
 
-std::string GD_EXTENSION_API GetLastError()
+gd::String GD_EXTENSION_API GetLastError()
 {
     return ErrorManager::Get()->GetLastError();
 }
 
-std::string GD_EXTENSION_API GetPublicAddress(float timeoutInSeconds)
+gd::String GD_EXTENSION_API GetPublicAddress(float timeoutInSeconds)
 {
-    return sf::IpAddress::getPublicAddress(sf::seconds(timeoutInSeconds)).toString();
+    return gd::String::FromLocale(sf::IpAddress::getPublicAddress(sf::seconds(timeoutInSeconds)).toString());
 }
 
-std::string GD_EXTENSION_API GetLocalAddress()
+gd::String GD_EXTENSION_API GetLocalAddress()
 {
-    return sf::IpAddress::getLocalAddress().toString();
+    return gd::String::FromLocale(sf::IpAddress::getLocalAddress().toString());
 }
 
 }
 }
-

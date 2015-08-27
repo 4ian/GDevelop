@@ -63,7 +63,7 @@ void InputManager::HandleEvent(sf::Event & event)
         windowHasFocus = false;
 }
 
-bool InputManager::IsKeyPressed(std::string key) const
+bool InputManager::IsKeyPressed(gd::String key) const
 {
     if (!windowHasFocus && disableInputWhenNotFocused)
         return false;
@@ -72,14 +72,14 @@ bool InputManager::IsKeyPressed(std::string key) const
         keysPressed.find(key)->second;
 }
 
-bool InputManager::WasKeyReleased(std::string key) const
+bool InputManager::WasKeyReleased(gd::String key) const
 {
     return oldKeysPressed.find(key) != oldKeysPressed.end() &&
         oldKeysPressed.find(key)->second &&
         !IsKeyPressed(key);
 }
 
-std::string InputManager::GetLastPressedKey() const
+gd::String InputManager::GetLastPressedKey() const
 {
     const auto & keyMap = GetSfKeyToKeyNameMap();
     auto it = keyMap.find(lastPressedKey);
@@ -105,7 +105,7 @@ sf::Vector2i InputManager::GetMousePosition() const
     return sf::Mouse::getPosition(*window);
 }
 
-bool InputManager::IsMouseButtonPressed(const std::string & button) const
+bool InputManager::IsMouseButtonPressed(const gd::String & button) const
 {
     if (!windowHasFocus && disableInputWhenNotFocused)
         return false;
@@ -114,7 +114,7 @@ bool InputManager::IsMouseButtonPressed(const std::string & button) const
         buttonsPressed.find(button)->second;
 }
 
-bool InputManager::IsMouseButtonReleased(const std::string & button) const
+bool InputManager::IsMouseButtonReleased(const gd::String & button) const
 {
     return oldButtonsPressed.find(button) != oldButtonsPressed.end() &&
         oldButtonsPressed.find(button)->second &&
@@ -129,10 +129,10 @@ int InputManager::GetMouseWheelDelta() const
     return mouseWheelDelta;
 }
 
-const std::map<std::string, int> & InputManager::GetKeyNameToSfKeyMap()
+const std::map<gd::String, int> & InputManager::GetKeyNameToSfKeyMap()
 {
     static bool initialized = false;
-    static std::map<std::string, int> * map = new std::map<std::string, int>();
+    static std::map<gd::String, int> * map = new std::map<gd::String, int>();
     if (!initialized)
     {
         (*map)["a"] = sf::Keyboard::A;
@@ -250,10 +250,10 @@ const std::map<std::string, int> & InputManager::GetKeyNameToSfKeyMap()
     return *map;
 }
 
-const std::map<int, std::string> & InputManager::GetSfKeyToKeyNameMap()
+const std::map<int, gd::String> & InputManager::GetSfKeyToKeyNameMap()
 {
     static bool initialized = false;
-    static std::map<int, std::string> * map = new std::map<int, std::string>();
+    static std::map<int, gd::String> * map = new std::map<int, gd::String>();
     if (!initialized)
     {
         const auto & keyMap = GetKeyNameToSfKeyMap();
@@ -266,10 +266,10 @@ const std::map<int, std::string> & InputManager::GetSfKeyToKeyNameMap()
     return *map;
 }
 
-const std::map<std::string, int> & InputManager::GetButtonNameToSfButtonMap()
+const std::map<gd::String, int> & InputManager::GetButtonNameToSfButtonMap()
 {
     static bool initialized = false;
-    static std::map<std::string, int> * map = new std::map<std::string, int>();
+    static std::map<gd::String, int> * map = new std::map<gd::String, int>();
     if (!initialized)
     {
         (*map)["Left"] = sf::Mouse::Left;
@@ -284,10 +284,10 @@ const std::map<std::string, int> & InputManager::GetButtonNameToSfButtonMap()
     return *map;
 }
 
-const std::map<int, std::string> & InputManager::GetSfButtonToButtonNameMap()
+const std::map<int, gd::String> & InputManager::GetSfButtonToButtonNameMap()
 {
     static bool initialized = false;
-    static std::map<int, std::string> * map = new std::map<int, std::string>();
+    static std::map<int, gd::String> * map = new std::map<int, gd::String>();
     if (!initialized)
     {
         const auto & buttonMap = GetButtonNameToSfButtonMap();

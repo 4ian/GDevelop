@@ -25,10 +25,10 @@ BaseObjectExtension::BaseObjectExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    std::map<std::string, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");
-    std::map<std::string, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("");
-    std::map<std::string, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("");
-    std::map<std::string, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
+    std::map<gd::String, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");
+    std::map<gd::String, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("");
+    std::map<gd::String, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("");
+    std::map<gd::String, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
 
     objectActions["MettreX"].SetFunctionName("setX").SetGetter("getX").SetIncludeFile("runtimeobject.js");
     objectActions["MettreY"].SetFunctionName("setY").SetGetter("getY").SetIncludeFile("runtimeobject.js");
@@ -68,8 +68,8 @@ BaseObjectExtension::BaseObjectExtension()
         .SetFunctionName("separateObjectsWithoutForces").SetIncludeFile("runtimeobject.js");
     objectActions["Rebondir"].codeExtraInformation //Deprecated
         .SetFunctionName("separateObjectsWithForces").SetIncludeFile("runtimeobject.js");
-    objectConditions["AutomatismActivated"].SetFunctionName("automatismActivated").SetIncludeFile("runtimeobject.js");
-    objectActions["ActivateAutomatism"].SetFunctionName("activateAutomatism").SetIncludeFile("runtimeobject.js");
+    objectConditions["BehaviorActivated"].SetFunctionName("behaviorActivated").SetIncludeFile("runtimeobject.js");
+    objectActions["ActivateBehavior"].SetFunctionName("activateBehavior").SetIncludeFile("runtimeobject.js");
     objectConditions["ObjectVariableChildExists"].SetFunctionName("variableChildExists").SetIncludeFile("runtimeobject.js");
     objectActions["ObjectVariableRemoveChild"].SetFunctionName("variableRemoveChild").SetIncludeFile("runtimeobject.js");
 
@@ -117,18 +117,18 @@ BaseObjectExtension::BaseObjectExtension()
         });
 
     objectActions["MettreXY"].codeExtraInformation
-        .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) -> std::string {
-            std::string outputCode;
+        .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) -> gd::String {
+            gd::String outputCode;
 
-            std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(instruction.GetParameter(0).GetPlainString(), context);
-            for (unsigned int i = 0;i<realObjects.size();++i)
+            std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(instruction.GetParameter(0).GetPlainString(), context);
+            for (std::size_t i = 0;i<realObjects.size();++i)
             {
                 context.SetCurrentObject(realObjects[i]);
                 context.ObjectsListNeeded(realObjects[i]);
 
-                std::string newX, newY;
+                gd::String newX, newY;
 
-                std::string expression1Code;
+                gd::String expression1Code;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expression1Code, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
@@ -136,7 +136,7 @@ BaseObjectExtension::BaseObjectExtension()
                         expression1Code = "0";
                 }
 
-                std::string expression2Code;
+                gd::String expression2Code;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(expression2Code, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[4].GetPlainString());
@@ -144,14 +144,14 @@ BaseObjectExtension::BaseObjectExtension()
                         expression2Code = "0";
                 }
 
-                std::string op1 = instruction.GetParameter(1).GetPlainString();
+                gd::String op1 = instruction.GetParameter(1).GetPlainString();
                 if ( op1 == "=" || op1.empty() )
                     newX = expression1Code;
                 else if ( op1 == "/" || op1 == "*" || op1 == "-" || op1 == "+" )
                     newX = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].getX() "+op1 + expression1Code;
                 else
                     return "";
-                std::string op2 = instruction.GetParameter(3).GetPlainString();
+                gd::String op2 = instruction.GetParameter(3).GetPlainString();
                 if ( op2 == "=" || op2.empty() )
                     newY = expression2Code;
                 else if ( op2 == "/" || op2 == "*" || op2 == "-" || op2 == "+" )
@@ -159,7 +159,7 @@ BaseObjectExtension::BaseObjectExtension()
                 else
                     return "";
 
-                std::string call = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].setPosition("+newX+","+newY+")";
+                gd::String call = codeGenerator.GetObjectListName(realObjects[i], context)+"[i].setPosition("+newX+","+newY+")";
 
                 outputCode += "for(var i = 0, len = "+codeGenerator.GetObjectListName(realObjects[i], context)+".length ;i < len;++i) {\n";
                 outputCode += "    "+call+";\n";

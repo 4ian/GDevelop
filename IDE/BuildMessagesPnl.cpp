@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include "BuildMessagesPnl.h"
@@ -76,11 +76,11 @@ void BuildMessagesPnl::RefreshWith(gd::Project * game, std::vector < CompilerMes
     gameAssociatedWithErrors = game;
 
     messagesList->DeleteAllItems();
-    for (unsigned int i = 0; i<messages.size(); ++i)
+    for (std::size_t i = 0; i<messages.size(); ++i)
     {
         messagesList->InsertItem(i, messages[i].file);
-        messagesList->SetItem(i, 1, messages[i].line != std::string::npos ? ToString(messages[i].line) : "");
-        messagesList->SetItem(i, 2, messages[i].column != std::string::npos ? ToString(messages[i].column) : "");
+        messagesList->SetItem(i, 1, messages[i].line != gd::String::npos ? gd::String::From(messages[i].line) : "");
+        messagesList->SetItem(i, 2, messages[i].column != gd::String::npos ? gd::String::From(messages[i].column) : "");
         messagesList->SetItem(i, 3, messages[i].message);
 
         if ( messages[i].messageType == CompilerMessage::error)
@@ -100,8 +100,8 @@ void BuildMessagesPnl::OpenFileContainingFirstError()
     row_info.m_mask = wxLIST_MASK_TEXT;
 
     messagesList->GetItem( row_info );
-    size_t line = row_info.m_text.empty() ? std::string::npos : ToInt(string(row_info.m_text.mb_str()));
-    std::string file = ToString(messagesList->GetItemText(0));
+    size_t line = row_info.m_text.empty() ? gd::String::npos : gd::String(row_info.m_text).To<int>();
+    gd::String file = messagesList->GetItemText(0);
 
     if ( projectManager && wxFileExists(file) ) projectManager->EditSourceFile(gameAssociatedWithErrors, file, line);
 }
@@ -115,8 +115,8 @@ void BuildMessagesPnl::OnmessagesListItemActivated(wxListEvent& event)
     row_info.m_mask = wxLIST_MASK_TEXT;
 
     messagesList->GetItem( row_info );
-    size_t line = row_info.m_text.empty() ? std::string::npos : ToInt(string(row_info.m_text.mb_str()));
-    std::string file = string(messagesList->GetItemText(event.GetIndex()).mb_str());
+    size_t line = row_info.m_text.empty() ? gd::String::npos : gd::String(row_info.m_text).To<int>();
+    gd::String file = messagesList->GetItemText(event.GetIndex());
 
     if ( projectManager && wxFileExists(file) ) projectManager->EditSourceFile(gameAssociatedWithErrors, file, line);
 }
@@ -128,4 +128,3 @@ void BuildMessagesPnl::OnResize(wxSizeEvent& event)
     messagesList->SetColumnWidth(2, 35);
     messagesList->SetColumnWidth(3, messagesList->GetSize().GetWidth()-messagesList->GetColumnWidth(0)-messagesList->GetColumnWidth(1)-messagesList->GetColumnWidth(2));
 }
-

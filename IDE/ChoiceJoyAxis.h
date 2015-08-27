@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #ifndef CHOICEJOYAXIS_H
@@ -19,10 +19,9 @@
 //*)
 #include <string>
 #include <vector>
+#include "GDCore/String.h"
 namespace gd { class Project; }
 namespace gd { class Layout; }
-
-using namespace std;
 
 /**
  * \brief Dialog to let the user choose a joystick axis, for parameters of actions/conditions/expressions.
@@ -31,7 +30,7 @@ class ChoiceJoyAxis: public wxDialog
 {
 	public:
 
-		ChoiceJoyAxis(wxWindow* parent, string joyaxis_, gd::Project & game_, gd::Layout & scene_);
+		ChoiceJoyAxis(wxWindow* parent, gd::String joyaxis_, gd::Project & game_, gd::Layout & scene_);
 		virtual ~ChoiceJoyAxis();
 
 		//(*Declarations(ChoiceJoyAxis)
@@ -45,7 +44,7 @@ class ChoiceJoyAxis: public wxDialog
 		wxButton* annulerBt;
 		//*)
 
-		string joyaxis;
+		gd::String joyaxis;
 
 	protected:
 
@@ -78,4 +77,3 @@ class ChoiceJoyAxis: public wxDialog
 };
 
 #endif
-

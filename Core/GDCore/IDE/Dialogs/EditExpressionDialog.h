@@ -7,7 +7,7 @@
 #ifndef EditExpressionDialog_H
 #define EditExpressionDialog_H
 
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 //(*Headers(EditExpressionDialog)
 #include <wx/treectrl.h>
@@ -47,13 +47,13 @@ public:
      * \param project Project
      * \param layout Layout
      */
-    EditExpressionDialog(wxWindow* parent, const std::string & expression, gd::Project & project_, gd::Layout & layout_);
+    EditExpressionDialog(wxWindow* parent, const gd::String & expression, gd::Project & project_, gd::Layout & layout_);
     virtual ~EditExpressionDialog();
 
     /**
      * Return the expression
      */
-    const std::string & GetExpression() const {return expression;}
+    const gd::String & GetExpression() const {return expression;}
 
 private:
 
@@ -207,10 +207,10 @@ private:
     //*)
     void TextModified(wxStyledTextEvent& event);
     void UpdateTextCtrl(wxStyledTextEvent& event);
-    std::string ShowParameterDialog(const gd::ParameterMetadata & parameter, bool & userCancelled, std::string associatedObject = "");
+    gd::String ShowParameterDialog(const gd::ParameterMetadata & parameter, bool & userCancelled, gd::String associatedObject = "");
     void RefreshLists();
 
-    std::string expression;
+    gd::String expression;
 
     wxImageList * imageListObj;
     wxImageList * imageListVal;

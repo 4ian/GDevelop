@@ -4,7 +4,7 @@
  * \section welcome Welcome
  * This is the help file for the GDevelop C++ Platform, which contains a reference of all the features provided
  * by the C++ Platform and explains how to create extensions for this platform.<br>
- * Creating extensions need some knowledge in C++ language. GDevelop use mainly SFML and wxWidgets libraries.
+ * To create new extensions, you should have some basic knowledge of C++. GDevelop mainly uses SFML and wxWidgets libraries.
  *
  * ### GDevelop Core documentation
  * Some classes and features are provided by the *GDevelop Core library*: When you're working with a class in the <code>gd</code>
@@ -26,7 +26,7 @@
  *
  * \subsection runtimeObject RuntimeObject
  *
- * The RuntimeObject is used as a base class for all objects. It defines some common properties like position, angle, size or visibility of an object.
+ * RuntimeObject is used as a base class for all objects. It defines some common properties like position, angle, size or visibility of an object.
  *
  * \section storageAndIdeClasses Some important classes used by the IDE or for storage
  *
@@ -34,7 +34,7 @@
  * <br>
  * It is important to make the distinction between the classes used by the IDE or for storage only and the classes used by the game engine.<br>
  * When a game is being played, it is first loaded using the classes listed below. Then, in a second part, the game engine classes are initialized, most
- * of the time using their <i>edittime</i> class counterpart (For example, a RuntimeScene can be loaded from a gd::Layout: See below).<br>
+ * of the time using their <i>edittime</i> class counterpart (For example, a RuntimeScene is loaded from a gd::Layout: see below).<br>
  * <br>
  * <i>Edittime</i> is often used to refer to a class being used for storage or by the IDE, while <i>Runtime</i> is used to refer to the class
  * belonging to the game engine.
@@ -53,10 +53,10 @@
  * Objects are represented by the gd::Object class. Again, this class is used only for the storage or by the IDE: When a game is played, RuntimeObject
  * is used.<br>
  *
- * \subsection automatism gd::Automatism
+ * \subsection behavior gd::Behavior
 
- * Each automatism is an instance of a class that derive from gd::Automatism.  Automatisms are linked to an object (thus, automatisms can access to their object by using their member `object`) and they are also managed by this object.<br>
- * gd::Automatism is the only exception to the rule explained below: Whereas the classes described in this section are used only for storage, this class
+ * Each behavior is an instance of a class that derive from gd::Behavior.  Behaviors are linked to an object (thus, behaviors can access to their object by using their member `object`) and they are also managed by this object.<br>
+ * gd::Behavior is the only exception to the rule explained below: Whereas the classes described in this section are used only for storage, this class
  * is used both for storage and by the game engine.
  *
  * \subsection event gd::BaseEvent
@@ -64,15 +64,22 @@
  * Each event type is represented by a class, which define how the event is rendered (BaseEvent::Render), how the code is generated (BaseEvent::GenerateEventCode), and various properties (BaseEvent::CanHaveSubEvents for example)...<br>
  * As the other classes list in this section, this class is only at <i>edittime</i> used by the IDE.
  *
- * The classes described in this section are not documented here: Please refer to the documentation of <b>GDevelop Core</b> if you need help using them.
+ * The classes described in this section are not documented here: please refer to the documentation of <b>GDevelop Core</b> if you need help using them.
  *
  * \section aboutShared_ptr About shared pointers
  *
  * GDevelop use shared pointers (`std::shared_ptr`), for managing lots of objects like scenes or objects.
  *
- * Shared pointers are used like raw pointers (*myPointer to dereference the pointer and get the object, myPointer->myMember to access to a function/member of the object...).
+ * Shared pointers are used like raw pointers (`*myPointer` to dereference the pointer and get the object, `myPointer->myMember` to access to a function/member of the object...).
  * They don't need to be deleted manually: The pointed object is deleted when no more shared pointers are pointing to the object.
  * For instance, scenes don't have to manually delete the objects they own in their destructors.
+ *
+ * \section utf8section UTF8 strings
+ *
+ * GDevelop uses UTF8 encoded gd::String as string parameters passed to actions/conditions and expressions and as return value for string expressions.
+ * This class is a wrapper around std::string and is UTF8-aware.
+ *
+ * For more information, see [gd::String](../GDCore Documentation/classgd_1_1_string.html) reference in the [GDCore documentation](../GDCore Documentation/index.html).
  */
 
 //Group definitions:
@@ -222,5 +229,3 @@
  * \brief Part of the tinyxml library
  * \ingroup TinyXml
  */
-
-

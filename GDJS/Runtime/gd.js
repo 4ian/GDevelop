@@ -9,7 +9,7 @@
  */
 var gdjs = gdjs || {
     objectsTypes:new Hashtable(),
-    automatismsTypes:new Hashtable(),
+    behaviorsTypes:new Hashtable(),
     evtTools:{},
     callbacksRuntimeSceneLoaded: [],
     callbacksRuntimeSceneUnloaded: [],
@@ -125,23 +125,23 @@ gdjs.registerObjects = function() {
 };
 
 /**
- * Register the runtime automatisms that can be used bt runtimeObject.<br>
- * Automatisms must be part of gdjs and have their property "thisIsARuntimeAutomatismConstructor"
- * defined and set to the name of the type of the automatism so as to be recognized.
- * The name of the type of the automatism must be complete, with the namespace if any. For
- * example, if you are providing a Draggable automatism in the DraggableAutomatism extension,
- * the full name of the type of the automatism is "DraggableAutomatism::Draggable".
+ * Register the runtime behaviors that can be used bt runtimeObject.<br>
+ * Behaviors must be part of gdjs and have their property "thisIsARuntimeBehaviorConstructor"
+ * defined and set to the name of the type of the behavior so as to be recognized.
+ * The name of the type of the behavior must be complete, with the namespace if any. For
+ * example, if you are providing a Draggable behavior in the DraggableBehavior extension,
+ * the full name of the type of the behavior is "DraggableBehavior::Draggable".
  *
- * @method registerAutomatisms
+ * @method registerBehaviors
  * @static
  */
-gdjs.registerAutomatisms = function() {
-    gdjs.automatismsTypes.clear();
+gdjs.registerBehaviors = function() {
+    gdjs.behaviorsTypes.clear();
 
     for (var p in this) {
         if (this.hasOwnProperty(p)) {
-            if ( gdjs[p].thisIsARuntimeAutomatismConstructor != undefined) {
-                gdjs.automatismsTypes.put(gdjs[p].thisIsARuntimeAutomatismConstructor, gdjs[p]);
+            if ( gdjs[p].thisIsARuntimeBehaviorConstructor != undefined) {
+                gdjs.behaviorsTypes.put(gdjs[p].thisIsARuntimeBehaviorConstructor, gdjs[p]);
             }
         }
     }
@@ -205,18 +205,18 @@ gdjs.getObjectConstructor = function(name) {
 };
 
 /**
- * Get the constructor of an automatism.
+ * Get the constructor of a behavior.
  *
- * @method getAutomatismConstructor
+ * @method getBehaviorConstructor
  * @static
- * @param name {String} The name of the type of the automatism.
+ * @param name {String} The name of the type of the behavior.
  */
-gdjs.getAutomatismConstructor = function(name) {
-    if ( name !== undefined && gdjs.automatismsTypes.containsKey(name) )
-        return gdjs.automatismsTypes.get(name);
+gdjs.getBehaviorConstructor = function(name) {
+    if ( name !== undefined && gdjs.behaviorsTypes.containsKey(name) )
+        return gdjs.behaviorsTypes.get(name);
 
-    console.warn("Automatism type \""+name+"\" was not found.");
-    return gdjs.automatismsTypes.get(""); //Create a base empty runtime automatism.
+    console.warn("Behavior type \""+name+"\" was not found.");
+    return gdjs.behaviorsTypes.get(""); //Create a base empty runtime behavior.
 };
 
 Array.prototype.remove = function(from) {

@@ -64,16 +64,16 @@ RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object 
     const gd::SpriteObject & spriteObject = static_cast<const gd::SpriteObject&>(object);
 
     animations.clear();
-    for (unsigned int i = 0; i < spriteObject.GetAllAnimations().size(); ++i)
+    for (std::size_t i = 0; i < spriteObject.GetAllAnimations().size(); ++i)
         animations.push_back(AnimationProxy(spriteObject.GetAllAnimations()[i]));
 
     //Load resources
-    for ( unsigned int j = 0; j < animations.size();j++ )
+    for ( std::size_t j = 0; j < animations.size();j++ )
     {
         gd::Animation & anim = animations[j].GetNonConst();
-        for ( unsigned int k = 0;k < anim.GetDirectionsCount();k++ )
+        for ( std::size_t k = 0;k < anim.GetDirectionsCount();k++ )
         {
-            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpritesCount();l++ )
+            for ( std::size_t l = 0;l < anim.GetDirection(k).GetSpritesCount();l++ )
             {
                 gd::Sprite & sprite = anim.GetDirection(k).GetSprite(l);
 
@@ -158,7 +158,7 @@ float RuntimeSpriteObject::GetCenterY() const
     return GetCurrentSprite().GetCenter().GetY()*fabs(scaleY);
 }
 
-float RuntimeSpriteObject::GetPointX(const std::string & name) const
+float RuntimeSpriteObject::GetPointX(const gd::String & name) const
 {
     if ( !name.empty() )
     {
@@ -169,7 +169,7 @@ float RuntimeSpriteObject::GetPointX(const std::string & name) const
     return GetX();
 }
 
-float RuntimeSpriteObject::GetPointY(const std::string & name) const
+float RuntimeSpriteObject::GetPointY(const gd::String & name) const
 {
     if ( !name.empty() )
     {
@@ -180,7 +180,7 @@ float RuntimeSpriteObject::GetPointY(const std::string & name) const
     return GetY();
 }
 
-void RuntimeSpriteObject::ChangeScale( const std::string & operatorStr, double newScale)
+void RuntimeSpriteObject::ChangeScale( const gd::String & operatorStr, double newScale)
 {
     //TODO : Generate appropriate code calling SetScaleX/Y instead of this.
     if ( operatorStr == "=" )
@@ -240,7 +240,7 @@ float RuntimeSpriteObject::GetScaleY() const
     return fabs(scaleY);
 }
 
-void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency)
+void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const gd::String & imageName, float xPosition, float yPosition, bool useTransparency)
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
@@ -256,30 +256,30 @@ void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, 
     dest->texture.loadFromImage(dest->image);
 }
 
-void RuntimeSpriteObject::MakeColorTransparent( const std::string & colorStr )
+void RuntimeSpriteObject::MakeColorTransparent( const gd::String & colorStr )
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
     std::shared_ptr<SFMLTextureWrapper> dest = ptrToCurrentSprite->GetSFMLTexture();
 
-    std::vector < std::string > colors = SplitString <std::string> (colorStr, ';');
+    std::vector < gd::String > colors = colorStr.Split(U';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
     //Update texture and pixel perfect collision mask
-    dest->image.createMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
+    dest->image.createMaskFromColor(  sf::Color( colors[0].To<int>(), colors[1].To<int>(), colors[2].To<int>()));
     dest->texture.loadFromImage(dest->image);
 }
 
-void RuntimeSpriteObject::SetColor(const std::string & colorStr)
+void RuntimeSpriteObject::SetColor(const gd::String & colorStr)
 {
-    std::vector < std::string > colors = SplitString<std::string>(colorStr, ';');
+    std::vector < gd::String > colors = colorStr.Split(U';');
     if ( colors.size() < 3 ) return; //Color is not valid
 
-    SetColor(  ToInt(colors[0]),
-               ToInt(colors[1]),
-               ToInt(colors[2]) );
+    SetColor(  colors[0].To<int>(),
+               colors[1].To<int>(),
+               colors[2].To<int>() );
 }
 
 /**
@@ -295,7 +295,7 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
         gd::Animation & animation = animations[currentAnimation].GetNonConst();
         multipleDirections = animation.useMultipleDirections;
 
-        unsigned int directionIndex = multipleDirections ? currentDirection : 0;
+        std::size_t directionIndex = multipleDirections ? currentDirection : 0;
         if ( directionIndex >= animation.GetDirectionsCount() )
             ptrToCurrentSprite = badSpriteDatas;
         else
@@ -334,7 +334,7 @@ void RuntimeSpriteObject::UpdateTime(float elapsedTime)
     {
         if ( delay != 0 )
         {
-            unsigned int frameCount = static_cast<unsigned int>( timeElapsedOnCurrentSprite / delay );
+            std::size_t frameCount = static_cast<std::size_t>( timeElapsedOnCurrentSprite / delay );
             currentSprite += frameCount;
         }
         else currentSprite++;
@@ -374,9 +374,9 @@ std::vector<Polygon2d> RuntimeSpriteObject::GetHitBoxes() const
     const sf::Sprite & currentSFMLSprite = GetCurrentSFMLSprite();
 
     std::vector<Polygon2d> polygons = GetCurrentSprite().GetCollisionMask();
-    for (unsigned int i = 0;i<polygons.size();++i)
+    for (std::size_t i = 0;i<polygons.size();++i)
     {
-        for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
+        for (std::size_t j = 0;j<polygons[i].vertices.size();++j)
         {
             sf::Vector2f newVertice = currentSFMLSprite.getTransform().transformPoint(
                             !isFlippedX ? polygons[i].vertices[j].x : GetCurrentSprite().GetSFMLSprite().getLocalBounds().width-polygons[i].vertices[j].x,
@@ -388,7 +388,7 @@ std::vector<Polygon2d> RuntimeSpriteObject::GetHitBoxes() const
     return polygons;
 }
 
-bool RuntimeSpriteObject::SetSprite( unsigned int nb )
+bool RuntimeSpriteObject::SetSprite( std::size_t nb )
 {
     if ( currentAnimation >= GetAnimationsCount() ||
         currentDirection >= animations[currentAnimation].Get().GetDirectionsCount() ||
@@ -401,7 +401,7 @@ bool RuntimeSpriteObject::SetSprite( unsigned int nb )
     return true;
 }
 
-bool RuntimeSpriteObject::SetCurrentAnimation( unsigned int nb )
+bool RuntimeSpriteObject::SetCurrentAnimation( std::size_t nb )
 {
     if ( nb >= GetAnimationsCount() ) return false;
 
@@ -518,7 +518,8 @@ void RuntimeSpriteObject::FlipX(bool flip)
         needUpdateCurrentSprite = true;
     }
     isFlippedX = flip;
-};
+}
+
 void RuntimeSpriteObject::FlipY(bool flip)
 {
     if ( flip != isFlippedY )
@@ -527,13 +528,13 @@ void RuntimeSpriteObject::FlipY(bool flip)
         needUpdateCurrentSprite = true;
     }
     isFlippedY = flip;
-};
+}
 
 bool RuntimeSpriteObject::CursorOnObject(RuntimeScene & scene, bool accurate)
 {
     RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
 
-    for (unsigned int cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
+    for (std::size_t cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
     {
         sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
             scene.GetInputManager().GetMousePosition(), theLayer.GetCamera(cameraIndex).GetSFMLView());
@@ -562,39 +563,39 @@ void RuntimeSpriteObject::TurnTowardObject(RuntimeObject * object, RuntimeScene 
 }
 
 #if defined(GD_IDE_ONLY)
-void RuntimeSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, std::string & name, std::string & value) const
+void RuntimeSpriteObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Animation");     value = ToString(GetCurrentAnimation());}
-    else if ( propertyNb == 1 ) {name = _("Direction");     value = ToString(GetCurrentDirection());}
-    else if ( propertyNb == 2 ) {name = _("Image");         value = ToString(GetSpriteNb());}
-    else if ( propertyNb == 3 ) {name = _("Opacity");       value = ToString(GetOpacity());}
+    if      ( propertyNb == 0 ) {name = _("Animation");     value = gd::String::From(GetCurrentAnimation());}
+    else if ( propertyNb == 1 ) {name = _("Direction");     value = gd::String::From(GetCurrentDirection());}
+    else if ( propertyNb == 2 ) {name = _("Image");         value = gd::String::From(GetSpriteNb());}
+    else if ( propertyNb == 3 ) {name = _("Opacity");       value = gd::String::From(GetOpacity());}
     else if ( propertyNb == 4 ) {name = _("Blend mode");   if ( blendMode == 0) value = "0 (Alpha)";
                                                                     else if ( blendMode == 1) value = "1 (Add)";
                                                                     else if ( blendMode == 2) value = "2 (Multiply)";
                                                                     else if ( blendMode == 3) value = "3 (None)";}
-    else if ( propertyNb == 5 ) {name = _("X Scale");       value = ToString(GetScaleX());}
-    else if ( propertyNb == 6 ) {name = _("Y Scale");       value = ToString(GetScaleY());}
+    else if ( propertyNb == 5 ) {name = _("X Scale");       value = gd::String::From(GetScaleX());}
+    else if ( propertyNb == 6 ) {name = _("Y Scale");       value = gd::String::From(GetScaleY());}
 }
 
-bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, std::string newValue)
+bool RuntimeSpriteObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
-    if ( propertyNb == 0 ) { return SetCurrentAnimation(ToInt(newValue)); }
+    if ( propertyNb == 0 ) { return SetCurrentAnimation(newValue.To<int>()); }
     else if ( propertyNb == 1 )
     {
         if ( currentAnimation >= GetAnimationsCount() ) return false;
 
-        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue));
+        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(newValue.To<std::size_t>()) : SetAngle(newValue.To<float>());
     }
-    else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
-    else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
-    else if ( propertyNb == 4 ) { SetBlendMode(ToInt(newValue)); }
-    else if ( propertyNb == 5 ) {SetScaleX(ToFloat(newValue));}
-    else if ( propertyNb == 6 ) {SetScaleY(ToFloat(newValue));}
+    else if ( propertyNb == 2 ) { return SetSprite(newValue.To<int>()); }
+    else if ( propertyNb == 3 ) { SetOpacity(newValue.To<float>()); }
+    else if ( propertyNb == 4 ) { SetBlendMode(newValue.To<int>()); }
+    else if ( propertyNb == 5 ) {SetScaleX(newValue.To<float>());}
+    else if ( propertyNb == 6 ) {SetScaleY(newValue.To<float>());}
 
     return true;
 }
 
-unsigned int RuntimeSpriteObject::GetNumberOfProperties() const
+std::size_t RuntimeSpriteObject::GetNumberOfProperties() const
 {
     return 7;
 }

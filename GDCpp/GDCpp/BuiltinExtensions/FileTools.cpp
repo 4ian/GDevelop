@@ -15,31 +15,31 @@
 
 using namespace std;
 
-bool GD_API FileExists( const std::string & file )
+bool GD_API FileExists( const gd::String & file )
 {
     TiXmlDocument doc;
-    if ( !doc.LoadFile(file.c_str()) && doc.ErrorId() == 2)
+    if ( !doc.LoadFile(file.ToLocale().c_str()) && doc.ErrorId() == 2)
         return false;
 
     return true ;
 }
 
-bool GD_API GroupExists( const std::string & filename, const std::string & group )
+bool GD_API GroupExists( const gd::String & filename, const gd::String & group )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
-    //Découpage des groupes
-    istringstream groupsStr( group );
-    string Str;
-    vector < string > groups;
-    while ( std::getline( groupsStr, Str, '/' ) )
-        groups.push_back(Str);
+    //Dï¿½coupage des groupes
+    istringstream groupsStr( group.Raw() );
+    std::string str;
+    vector < gd::String > groups;
+    while ( std::getline( groupsStr, str, '/' ) )
+        groups.push_back(gd::String::FromUTF8(str));
 
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
-    //On avance petit à petit dans le fichier
-    for (unsigned int i =0;i<groups.size();i++)
+    //On avance petit ï¿½ petit dans le fichier
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
             return false;
@@ -54,22 +54,22 @@ bool GD_API GroupExists( const std::string & filename, const std::string & group
 /**
  * Launch a file
  */
-void GD_API LaunchFile( const std::string & file )
+void GD_API LaunchFile( const gd::String & file )
 {
 #ifdef WINDOWS
-    //Création de l'adresse internet à lancer
-    string appel = "start \"\" \""+file+"\""; //quotes are important
+    //Crï¿½ation de l'adresse internet ï¿½ lancer
+    gd::String appel = "start \"\" \""+file+"\""; //quotes are important
 
-    system(appel.c_str());
+    system(appel.ToLocale().c_str());
 #elif defined(LINUX)
-    //Nécessite le paquet xdg-utils
-    string appel = "xdg-open \""+file+"\"";
+    //Nï¿½cessite le paquet xdg-utils
+    gd::String appel = "xdg-open \""+file+"\"";
 
-    system(appel.c_str());
+    system(appel.ToLocale().c_str());
 #elif defined(MACOS)
-    string appel = "open \""+file+"\"";
+    gd::String appel = "open \""+file+"\"";
 
-    system(appel.c_str());
+    system(appel.ToLocale().c_str());
 #endif
 
     return;
@@ -78,9 +78,9 @@ void GD_API LaunchFile( const std::string & file )
 /**
  * Execute a system-specific command
  */
-void GD_API ExecuteCmd( const std::string & cmd )
+void GD_API ExecuteCmd( const gd::String & cmd )
 {
-    system(cmd.c_str());
+    system(cmd.ToLocale().c_str());
 
     return;
 }
@@ -88,9 +88,9 @@ void GD_API ExecuteCmd( const std::string & cmd )
 /**
  * Delete a file
  */
-void GD_API GDDeleteFile( const std::string & filename )
+void GD_API GDDeleteFile( const gd::String & filename )
 {
-    remove(filename.c_str());
+    remove(filename.ToLocale().c_str());
 
     return;
 }
@@ -98,7 +98,7 @@ void GD_API GDDeleteFile( const std::string & filename )
 /**
  * Load a file in memory
  */
-void GD_API LoadFileInMemory( const std::string & filename )
+void GD_API LoadFileInMemory( const gd::String & filename )
 {
     XmlFilesManager::LoadFile(filename);
 
@@ -108,25 +108,25 @@ void GD_API LoadFileInMemory( const std::string & filename )
 /**
  * Unload a file from memory
  */
-void GD_API UnloadFileFromMemory( const std::string & filename )
+void GD_API UnloadFileFromMemory( const gd::String & filename )
 {
     XmlFilesManager::UnloadFile(filename);
 
     return;
 }
 
-void GD_API DeleteGroupFromFile( const std::string & filename, const std::string & group )
+void GD_API DeleteGroupFromFile( const gd::String & filename, const gd::String & group )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
-    //Découpage des groupes
-    istringstream groupsStr( group );
-    string Str;
-    vector < string > groups;
-    while ( std::getline( groupsStr, Str, '/' ) )
+    //Dï¿½coupage des groupes
+    istringstream groupsStr( group.Raw() );
+    std::string str;
+    vector < gd::String > groups;
+    while ( std::getline( groupsStr, str, '/' ) )
     {
-        groups.push_back(Str);
+        groups.push_back(gd::String::FromUTF8(str));
     }
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
@@ -134,14 +134,14 @@ void GD_API DeleteGroupFromFile( const std::string & filename, const std::string
         return;
     groups.push_back("");
 
-    //A chaque fois, on vérifie si le groupe voulu existe
-    for (unsigned int i =0;i<groups.size();i++)
+    //A chaque fois, on vï¿½rifie si le groupe voulu existe
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
             return;
 
         //Si on arrive au groupe parent du groupe
-        //à supprimer
+        //ï¿½ supprimer
         if ( i >= (groups.size()-1)-1 )
         {
             hdl.ToNode()->RemoveChild(hdl.FirstChildElement(groups.at(i).c_str()).ToNode());
@@ -154,45 +154,45 @@ void GD_API DeleteGroupFromFile( const std::string & filename, const std::string
     return;
 }
 
-void GD_API WriteValueInFile( const std::string & filename, const std::string & group, double value )
+void GD_API WriteValueInFile( const gd::String & filename, const gd::String & group, double value )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
-    //Découpage des groupes
-    istringstream groupsStr( group );
-    string Str;
-    vector < string > groups;
-    while ( std::getline( groupsStr, Str, '/' ) )
+    //Dï¿½coupage des groupes
+    istringstream groupsStr( group.Raw() );
+    std::string str;
+    vector < gd::String > groups;
+    while ( std::getline( groupsStr, str, '/' ) )
     {
-        groups.push_back(Str);
+        groups.push_back(gd::String::FromUTF8(str));
     }
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     if ( groups.empty() )
         return;
 
-    //Insertion de la déclaration
-    TiXmlDeclaration decl( "1.0", "ISO-8859-1", "" );
+    //Insertion de la dï¿½claration
+    TiXmlDeclaration decl( "1.0", "UTF-8", "" );
     if ( hdl.FirstChildElement().Element() != NULL )
     {
-        //Il y a déjà un noeud, on vérifie que c'est pas une déclaration
+        //Il y a dï¿½jï¿½ un noeud, on vï¿½rifie que c'est pas une dï¿½claration
         if ( hdl.FirstChild().ToNode()->ToDeclaration() == NULL )
             file->GetTinyXmlDocument().InsertBeforeChild(hdl.FirstChildElement().Element(), decl);
     }
     else
-        file->GetTinyXmlDocument().InsertEndChild(decl); //Il n'y a rien, on peut insérer notre déclaration
+        file->GetTinyXmlDocument().InsertEndChild(decl); //Il n'y a rien, on peut insï¿½rer notre dï¿½claration
 
-    //Création si besoin est de la racine
+    //Crï¿½ation si besoin est de la racine
     if ( hdl.FirstChildElement(groups.at(0).c_str()).Element() == NULL )
     {
         TiXmlElement root(groups.at(0).c_str());
         file->GetTinyXmlDocument().InsertEndChild(root);
     }
 
-    //A chaque fois, on vérifie si le groupe voulu existe, si non on le créé,
-    //et on se déplace dedans.
-    for (unsigned int i =0;i<groups.size();i++)
+    //A chaque fois, on vï¿½rifie si le groupe voulu existe, si non on le crï¿½ï¿½,
+    //et on se dï¿½place dedans.
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
         {
@@ -210,45 +210,45 @@ void GD_API WriteValueInFile( const std::string & filename, const std::string & 
     return;
 }
 
-void GD_API WriteStringInFile( const std::string & filename, const std::string & group, const std::string & str )
+void GD_API WriteStringInFile( const gd::String & filename, const gd::String & group, const gd::String & str )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
-    //Découpage des groupes
-    istringstream groupsStr( group );
-    string Str;
-    vector < string > groups;
-    while ( std::getline( groupsStr, Str, '/' ) )
+    //Dï¿½coupage des groupes
+    istringstream groupsStr( group.Raw() );
+    std::string gstr;
+    vector < gd::String > groups;
+    while ( std::getline( groupsStr, gstr, '/' ) )
     {
-        groups.push_back(Str);
+        groups.push_back(gd::String::FromUTF8(gstr));
     }
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
     if ( groups.empty() )
         return;
 
-    //Insertion de la déclaration
+    //Insertion de la dï¿½claration
     TiXmlDeclaration decl( "1.0", "ISO-8859-1", "" );
     if ( hdl.FirstChildElement().Element() != NULL )
     {
-        //Il y a déjà un noeud, on vérifie que c'est pas une déclaration
+        //Il y a dï¿½jï¿½ un noeud, on vï¿½rifie que c'est pas une dï¿½claration
         if ( hdl.FirstChild().ToNode()->ToDeclaration() == NULL )
             file->GetTinyXmlDocument().InsertBeforeChild(hdl.FirstChildElement().Element(), decl);
     }
     else
-        file->GetTinyXmlDocument().InsertEndChild(decl); //Il n'y a rien, on peut insérer notre déclaration
+        file->GetTinyXmlDocument().InsertEndChild(decl); //Il n'y a rien, on peut insï¿½rer notre dï¿½claration
 
-    //Création si besoin est de la racine
+    //Crï¿½ation si besoin est de la racine
     if ( hdl.FirstChildElement(groups.at(0).c_str()).Element() == NULL )
     {
         TiXmlElement root(groups.at(0).c_str());
         file->GetTinyXmlDocument().InsertEndChild(root);
     }
 
-    //A chaque fois, on vérifie si le groupe voulu existe, si non on le créé,
-    //et on se déplace dedans.
-    for (unsigned int i =0;i<groups.size();i++)
+    //A chaque fois, on vï¿½rifie si le groupe voulu existe, si non on le crï¿½ï¿½,
+    //et on se dï¿½place dedans.
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
         {
@@ -265,23 +265,23 @@ void GD_API WriteStringInFile( const std::string & filename, const std::string &
     return;
 }
 
-void GD_API ReadValueFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, gd::Variable & variable )
+void GD_API ReadValueFromFile( const gd::String & filename, const gd::String & group, RuntimeScene & scene, gd::Variable & variable )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
-    //Découpage des groupes
-    istringstream groupsStr( group );
-    string Str;
-    vector < string > groups;
-    while ( std::getline( groupsStr, Str, '/' ) )
+    //Dï¿½coupage des groupes
+    istringstream groupsStr( group.Raw() );
+    std::string str;
+    vector < gd::String > groups;
+    while ( std::getline( groupsStr, str, '/' ) )
     {
-        groups.push_back(Str);
+        groups.push_back(gd::String::FromUTF8(str));
     }
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
-    //On avance petit à petit dans le fichier
-    for (unsigned int i =0;i<groups.size();i++)
+    //On avance petit ï¿½ petit dans le fichier
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {
@@ -301,23 +301,23 @@ void GD_API ReadValueFromFile( const std::string & filename, const std::string &
     return;
 }
 
-void GD_API ReadStringFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, gd::Variable & variable )
+void GD_API ReadStringFromFile( const gd::String & filename, const gd::String & group, RuntimeScene & scene, gd::Variable & variable )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
     TiXmlHandle hdl( &file->GetTinyXmlDocument() );
 
-    //Découpage des groupes
-    istringstream groupsStr( group );
-    string Str;
-    vector < string > groups;
-    while ( std::getline( groupsStr, Str, '/' ) )
+    //Dï¿½coupage des groupes
+    istringstream groupsStr( group.Raw() );
+    std::string str;
+    vector < gd::String > groups;
+    while ( std::getline( groupsStr, str, '/' ) )
     {
-        groups.push_back(Str);
+        groups.push_back(gd::String::FromUTF8(str));
     }
     groups.erase(std::remove_if(groups.begin(), groups.end(), StringEmpty()), groups.end());
 
-    //On avance petit à petit dans le fichier
-    for (unsigned int i =0;i<groups.size();i++)
+    //On avance petit ï¿½ petit dans le fichier
+    for (std::size_t i =0;i<groups.size();i++)
     {
         if ( !hdl.FirstChildElement(groups.at(i).c_str()).ToElement())
         {

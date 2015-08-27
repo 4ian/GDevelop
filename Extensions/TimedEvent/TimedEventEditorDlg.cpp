@@ -127,8 +127,8 @@ TimedEventEditorDlg::~TimedEventEditorDlg()
 
 void TimedEventEditorDlg::OnokBtClick(wxCommandEvent& event)
 {
-    eventEdited.SetTimeoutExpression(ToString(timeoutEdit->GetValue()));
-    eventEdited.SetName(ToString(nameEdit->GetValue()));
+    eventEdited.SetTimeoutExpression(timeoutEdit->GetValue());
+    eventEdited.SetName(nameEdit->GetValue());
     EndModal(1);
 }
 
@@ -139,9 +139,8 @@ void TimedEventEditorDlg::OncancelBtClick(wxCommandEvent& event)
 
 void TimedEventEditorDlg::OnexpressionBtClick(wxCommandEvent& event)
 {
-    gd::EditExpressionDialog dialog(this, ToString( timeoutEdit->GetValue() ), game, scene);
+    gd::EditExpressionDialog dialog(this, timeoutEdit->GetValue(), game, scene);
     if ( dialog.ShowModal() == 1 ) timeoutEdit->ChangeValue(dialog.GetExpression());
 }
 
 #endif
-

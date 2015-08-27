@@ -5,8 +5,8 @@ if type msgcat 2>/dev/null; then
     MSGCAT=msgcat
     MSGFMT=msgfmt
 else
-	MSGCAT=$(find /**/* -name "msgcat" -print -quit 2>/dev/null)
-	MSGFMT=$(find /**/* -name "msgfmt" -print -quit 2>/dev/null)
+	MSGCAT=$(find /usr -name "msgcat" -print -quit 2>/dev/null)
+	MSGFMT=$(find /usr -name "msgfmt" -print -quit 2>/dev/null)
 fi
 
 if type $MSGCAT 2>/dev/null; then
@@ -14,6 +14,7 @@ if type $MSGCAT 2>/dev/null; then
 	do
 	    if [ $D != "./en_GB" -a $D != "." ]; then
 			$MSGCAT $D/GD.po | $MSGFMT -o $D/GD.mo -
+			$MSGCAT $D/wxstd.po | $MSGFMT -o $D/wxstd.mo -
 		fi
 	done
 else

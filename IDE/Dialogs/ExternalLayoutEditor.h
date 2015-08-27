@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 #ifndef EXTERNALLAYOUTEDITOR_H
 #define EXTERNALLAYOUTEDITOR_H
@@ -18,6 +18,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/String.h"
 namespace gd { class Project; }
 namespace gd { class ExternalLayout; }
 namespace gd { class LayersEditorPanel; }
@@ -112,4 +113,3 @@ private:
 };
 
 #endif
-

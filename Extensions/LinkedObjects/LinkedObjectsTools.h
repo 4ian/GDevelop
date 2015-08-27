@@ -10,6 +10,7 @@ This project is released under the MIT License.
 #include <string>
 #include <map>
 #include <vector>
+#include "GDCpp/String.h"
 class RuntimeObject;
 class RuntimeScene;
 
@@ -22,11 +23,10 @@ namespace LinkedObjects
 void GD_EXTENSION_API LinkObjects(RuntimeScene & scene, RuntimeObject * a, RuntimeObject * b );
 void GD_EXTENSION_API RemoveLinkBetween(RuntimeScene & scene, RuntimeObject * a, RuntimeObject * b);
 void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, RuntimeObject * object);
-bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectsLists, RuntimeObject * object);
+bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectsLists, RuntimeObject * object);
 
 }
 
 }
 
 #endif // LINKEDOBJECTSTOOLS_H_INCLUDED
-

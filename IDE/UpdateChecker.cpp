@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include "UpdateChecker.h"
@@ -62,8 +62,8 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
         return;
     }
 
-	std::string updateInfoFileName = wxFileName::GetTempDir().ToStdString()+"/GDTemporaries/updateinfo.xml";
-    TiXmlDocument doc( updateInfoFileName.c_str() );
+	gd::String updateInfoFileName = wxFileName::GetTempDir()+"/GDTemporaries/updateinfo.xml";
+    TiXmlDocument doc( updateInfoFileName.ToLocale().c_str() );
     if ( !doc.LoadFile() )
     {
         gd::LogWarning( _( "Error while loading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
@@ -99,8 +99,10 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
     elem = hdl.FirstChildElement().FirstChildElement("Info").Element();
     if (elem)
     {
-        if (elem->Attribute( "Info") != NULL) info = elem->Attribute( "Info");
-        if (elem->Attribute( "Lien") != NULL) link = elem->Attribute( "Lien");
+        if (elem->Attribute( "Info") != NULL) info = gd::String(elem->Attribute( "Info"));
+        if (elem->Attribute( "Lien") != NULL) link = gd::String(elem->Attribute( "Lien"));
+        info.ReplaceInvalid();
+        link.ReplaceInvalid();
     }
 
     elem = hdl.FirstChildElement().FirstChildElement("CommunityNews").Element();
@@ -120,6 +122,12 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
         std::cout << newsLinkLabel2 << std::endl;
         std::cout << newsLink1 << std::endl;
         std::cout << newsLink2 << std::endl;
+
+        news.ReplaceInvalid();
+        newsLink1.ReplaceInvalid();
+        newsLink2.ReplaceInvalid();
+        newsLinkLabel1.ReplaceInvalid();
+        newsLinkLabel2.ReplaceInvalid();
     }
     else
         std::cout << "No community news" << std::endl;

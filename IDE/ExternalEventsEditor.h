@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 #ifndef EXTERNALEVENTSEDITOR_H
 #define EXTERNALEVENTSEDITOR_H
@@ -17,6 +17,7 @@ namespace gd { class Project; }
 class EventsEditor;
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/String.h"
 
 /**
  * \brief A panel displaying an events editor to edit
@@ -68,4 +69,3 @@ private:
 };
 
 #endif
-

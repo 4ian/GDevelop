@@ -6,7 +6,7 @@
 #if !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_SKINHELPER_H
 #define GDCORE_SKINHELPER_H
-#include <string>
+#include "GDCore/String.h"
 #include <map>
 class wxRibbonBar;
 class wxAuiManager;
@@ -106,7 +106,7 @@ private:
     SkinHelper();
     virtual ~SkinHelper();
 
-    static std::map<std::string, wxBitmap*> cachedIcons;
+    static std::map<gd::String, wxBitmap*> cachedIcons;
 };
 
 }

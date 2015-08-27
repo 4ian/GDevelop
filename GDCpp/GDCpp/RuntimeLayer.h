@@ -6,6 +6,7 @@
 #ifndef RUNTIMELAYER_H
 #define RUNTIMELAYER_H
 #include <SFML/Graphics.hpp>
+#include "GDCpp/String.h"
 namespace gd { class Camera; }
 namespace gd { class Layer; }
 
@@ -117,12 +118,12 @@ public:
     /**
      * Change layer name
      */
-    virtual void SetName(const std::string & name_) { name = name_; }
+    virtual void SetName(const gd::String & name_) { name = name_; }
 
     /**
      * Get layer name
      */
-    virtual const std::string & GetName() const { return name; }
+    virtual const gd::String & GetName() const { return name; }
 
     /**
      * Change if layer is displayed or not
@@ -137,22 +138,22 @@ public:
     /**
      * Get cameras count.
      */
-    inline unsigned int GetCameraCount() const { return cameras.size(); };
+    inline std::size_t GetCameraCount() const { return cameras.size(); };
 
     /**
      * Return a reference to a camera
      */
-    inline const RuntimeCamera & GetCamera(unsigned int n) const { return cameras[n]; }
+    inline const RuntimeCamera & GetCamera(std::size_t n) const { return cameras[n]; }
 
     /**
      * Return a reference to a camera
      */
-    inline RuntimeCamera & GetCamera(unsigned int n) { return cameras[n]; }
+    inline RuntimeCamera & GetCamera(std::size_t n) { return cameras[n]; }
 
     /**
      * Delete a specific camera.
      */
-    inline void DeleteCamera(unsigned int n) { if ( n < cameras.size() ) cameras.erase(cameras.begin()+n); }
+    inline void DeleteCamera(std::size_t n) { if ( n < cameras.size() ) cameras.erase(cameras.begin()+n); }
 
     /**
      * Add an already existing camera.
@@ -161,7 +162,7 @@ public:
 
 private:
 
-    std::string name; ///< The name of the layer
+    gd::String name; ///< The name of the layer
     bool isVisible; ///< True if the layer is visible
     std::vector < RuntimeCamera > cameras; ///< The camera displayed by the layer
 };

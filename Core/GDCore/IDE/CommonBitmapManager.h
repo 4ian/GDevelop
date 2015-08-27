@@ -25,7 +25,7 @@ public:
 
     wxBitmap expressionBt;
     wxBitmap objectBt;
-    wxBitmap automatismBt;
+    wxBitmap behaviorBt;
     wxBitmap signeBt;
     wxBitmap fileBt;
     wxBitmap yesnoBt;

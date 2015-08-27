@@ -6,7 +6,7 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 //(*InternalHeaders(ChooseObjectTypeDialog)
 #include <wx/bitmap.h>
@@ -111,7 +111,7 @@ project(project_)
     if(theme) theme->SetWindowTheme((HWND) objectsList->GetHWND(), L"EXPLORER", NULL);
     #endif
 
-    for (unsigned int i = 0;i<project.GetUsedPlatforms().size();++i)
+    for (std::size_t i = 0;i<project.GetUsedPlatforms().size();++i)
     {
         platformChoice->Append( project.GetUsedPlatforms()[i]->GetFullName() );
         if ( project.GetUsedPlatforms()[i] == &project.GetCurrentPlatform() ) platformChoice->SetSelection(i);
@@ -119,8 +119,8 @@ project(project_)
 
     if ( project.GetUsedPlatforms().size() != 1 ) platformChoice->Show();
 
-    objectsList->InsertColumn(0,_("Object"), wxLIST_FORMAT_LEFT, 320);
-    objectsList->InsertColumn(1,_("Description"), wxLIST_FORMAT_LEFT, 320);
+    objectsList->InsertColumn(0, _("Object"), wxLIST_FORMAT_LEFT, 320);
+    objectsList->InsertColumn(1, _("Description"), wxLIST_FORMAT_LEFT, 320);
     RefreshList();
 
     int x;
@@ -161,15 +161,17 @@ void ChooseObjectTypeDialog::RefreshList()
 
     //Insert extension objects
     const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (std::size_t i = 0;i<extensions.size();++i)
 	{
+        if (extensions[i]->IsDeprecated()) continue;
+
 	    //Verify if this extension is enabled
 	    bool extensionEnabled = find(project.GetUsedExtensions().begin(),
                                       project.GetUsedExtensions().end(),
                                       extensions[i]->GetName()) != project.GetUsedExtensions().end();
 
-	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-	    for(unsigned int j = 0;j<objectsTypes.size();++j)
+	    std::vector<gd::String> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    for(std::size_t j = 0;j<objectsTypes.size();++j)
 	    {
 	        if ( objectsTypes[j] != "" ) //Cannot use directly a base object
 	        {
@@ -231,9 +233,9 @@ void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
     const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
     std::shared_ptr<PlatformExtension> extension = std::shared_ptr<PlatformExtension>();
 
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (std::size_t i = 0;i<extensions.size();++i)
 	{
-	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    std::vector<gd::String> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
 	    if ( find(objectsTypes.begin(), objectsTypes.end(), selectedObjectType) != objectsTypes.end() )
         {
             extension = extensions[i]; break;
@@ -251,7 +253,9 @@ void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
             if (wxMessageBox(_("This object is provided by the ")+
                              extension->GetFullName()+
                              _(" extension, but this extension is not activated for the current game.\n\nDo you want to use this extension in your game?"),
-                             _("Activate extension ")+extension->GetFullName(), wxYES_NO|wxICON_QUESTION|wxYES_DEFAULT ) == wxNO)
+                             _("Activate extension ")+extension->GetFullName(),
+                             wxYES_NO|wxICON_QUESTION|wxYES_DEFAULT
+                            ) == wxNO)
             {
                 return;
             }

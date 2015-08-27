@@ -28,7 +28,7 @@ BEGIN_EVENT_TABLE( ChoixBouton, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
+ChoixBouton::ChoixBouton( wxWindow* parent, gd::String pBouton ) :
         bouton( pBouton )
 {
     //(*Initialize(ChoixBouton)
@@ -90,7 +90,7 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     //*)
 
 
-    if ( bouton == "" ) { bouton = "Left"; RadioBox1->SetSelection( 0 ); } //Valeur par défaut
+    if ( bouton == "" ) { bouton = "Left"; RadioBox1->SetSelection( 0 ); } //Valeur par dï¿½faut
     if ( bouton == "Left" ) { RadioBox1->SetSelection( 0 ); }
     if ( bouton == "Right" ) { RadioBox1->SetSelection( 1 ); }
     if ( bouton == "Middle" ) { RadioBox1->SetSelection( 2 ); }

@@ -42,7 +42,7 @@ class GD_CORE_API SpriteObject : public gd::Object
 {
 public :
 
-    SpriteObject(std::string name_);
+    SpriteObject(gd::String name_);
     virtual ~SpriteObject();
     virtual gd::Object * Clone() const { return new SpriteObject(*this);}
 
@@ -50,8 +50,8 @@ public :
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
-    virtual std::map<std::string, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
-    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & scene);
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & scene);
     virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
     #if !defined(EMSCRIPTEN)
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
@@ -71,18 +71,18 @@ public :
      * \brief Return the animation at the specified index.
      * If the index is out of bound, a "bad animation" object is returned.
      */
-    const Animation & GetAnimation(unsigned int nb) const;
+    const Animation & GetAnimation(std::size_t nb) const;
 
     /**
      * \brief Return the animation at the specified index.
      * If the index is out of bound, a "bad animation" object is returned.
      */
-    Animation & GetAnimation(unsigned int nb);
+    Animation & GetAnimation(std::size_t nb);
 
     /**
      * \brief Return the number of animations this object has.
      */
-    unsigned int GetAnimationsCount() const { return animations.size(); };
+    std::size_t GetAnimationsCount() const { return animations.size(); };
 
     /**
      * \brief Add an animation at the end of the existing ones.
@@ -92,7 +92,7 @@ public :
     /**
      * \brief Remove an animation.
      */
-    bool RemoveAnimation(unsigned int nb);
+    bool RemoveAnimation(std::size_t nb);
 
     /**
      * \brief Remove all animations.
@@ -107,7 +107,7 @@ public :
     /**
      * \brief Swap the position of two sprites
      */
-    void SwapAnimations(unsigned int firstIndex, unsigned int secondIndex);
+    void SwapAnimations(std::size_t firstIndex, std::size_t secondIndex);
 
     /**
      * \brief Return a read-only reference to the vector containing all the animation of the object.
@@ -128,7 +128,7 @@ private:
     static Animation badAnimation; //< Bad animation when an out of bound animation is requested.
 };
 
-GD_CORE_API gd::Object * CreateSpriteObject(std::string name);
+GD_CORE_API gd::Object * CreateSpriteObject(gd::String name);
 
 }
 #endif // GDCORE_SPRITEOBJECT_H

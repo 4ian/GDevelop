@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #include "SceneLightObstacleDatas.h"
 #include <iostream>
 
-RuntimeSceneLightObstacleDatas::RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & automatismSharedDatas)
+RuntimeSceneLightObstacleDatas::RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & behaviorSharedDatas)
 {
 }
 

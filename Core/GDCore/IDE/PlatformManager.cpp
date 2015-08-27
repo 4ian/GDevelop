@@ -21,7 +21,7 @@ PlatformManager::~PlatformManager()
 
 bool PlatformManager::AddPlatform(std::shared_ptr<gd::Platform> newPlatform)
 {
-    for (unsigned int i = 0;i<platformsLoaded.size();++i)
+    for (std::size_t i = 0;i<platformsLoaded.size();++i)
     {
         if ( platformsLoaded[i]->GetName() == newPlatform->GetName() )
             return false;
@@ -31,9 +31,9 @@ bool PlatformManager::AddPlatform(std::shared_ptr<gd::Platform> newPlatform)
     return true;
 }
 
-gd::Platform* PlatformManager::GetPlatform(const std::string & platformName) const
+gd::Platform* PlatformManager::GetPlatform(const gd::String & platformName) const
 {
-    for (unsigned int i = 0;i<platformsLoaded.size();++i)
+    for (std::size_t i = 0;i<platformsLoaded.size();++i)
     {
         if ( platformsLoaded[i]->GetName() == platformName )
             return platformsLoaded[i].get();
@@ -44,7 +44,7 @@ gd::Platform* PlatformManager::GetPlatform(const std::string & platformName) con
 
 void PlatformManager::NotifyPlatformIDEInitialized() const
 {
-    for (unsigned int i = 0;i<platformsLoaded.size();++i)
+    for (std::size_t i = 0;i<platformsLoaded.size();++i)
     {
         if ( platformsLoaded[i] != std::shared_ptr<gd::Platform>() )
             platformsLoaded[i]->OnIDEInitialized();

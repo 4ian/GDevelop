@@ -45,11 +45,11 @@ public:
     const gd::InstructionsList & GetActions() const { return actions; };
     gd::InstructionsList & GetActions() { return actions; };
 
-    std::string GetName() const { return name; };
-    void SetName(std::string name_) { name = name_; };
+    gd::String GetName() const { return name; };
+    void SetName(gd::String name_) { name = name_; };
 
-    const std::string & GetObjectsPassedAsArgument() const { return objectsPassedAsArgument; };
-    void SetObjectsPassedAsArgument(const std::string & objects) { objectsPassedAsArgument = objects; };
+    const gd::String & GetObjectsPassedAsArgument() const { return objectsPassedAsArgument; };
+    void SetObjectsPassedAsArgument(const gd::String & objects) { objectsPassedAsArgument = objects; };
 
     virtual std::vector < gd::InstructionsList* > GetAllConditionsVectors();
     virtual std::vector < gd::InstructionsList* > GetAllActionsVectors();
@@ -78,17 +78,17 @@ public:
      * \brief Tool function to generate an unique C++ name for a function used
      * inside a layout.
      */
-    static std::string MangleFunctionName(const gd::Layout & layout, const FunctionEvent & functionEvent);
+    static gd::String MangleFunctionName(const gd::Layout & layout, const FunctionEvent & functionEvent);
 
     /**
      * \brief Tool function to search for a function event in an event list.
      * \return NULL if the function was not found.
      */
-    static const FunctionEvent* SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const std::string & functionName);
+    static const FunctionEvent* SearchForFunctionInEvents(const gd::Project & project, const gd::EventsList & events, const gd::String & functionName);
 
 private:
-    std::string name;
-    std::string objectsPassedAsArgument;
+    gd::String name;
+    gd::String objectsPassedAsArgument;
     gd::InstructionsList conditions;
     gd::InstructionsList actions;
     gd::EventsList events;

@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include "EditObjectGroup.h"
@@ -150,7 +150,7 @@ void EditObjectGroup::OnAnnulerBtClick(wxCommandEvent& event)
 {
     if ( modificationCount > 7 )
     {
-        wxMessageDialog msgDlg(this, _("You made ")+ToString(modificationCount)+_(" changes. Are you sure you want to cancel all changes\?"), _("Lot's of changes made."), wxYES_NO | wxICON_QUESTION);
+        wxMessageDialog msgDlg(this, _("You made ")+gd::String::From(modificationCount)+_(" changes. Are you sure you want to cancel all changes\?"), _("Lot's of changes made."), wxYES_NO | wxICON_QUESTION);
         if ( msgDlg.ShowModal() == wxID_NO )
             return;
     }
@@ -163,8 +163,8 @@ void EditObjectGroup::Refresh()
     ObjetsList->DeleteAllItems();
     ObjetsList->AddRoot( _( "All objects of the group" ) );
 
-    vector < string > allObjects = group.GetAllObjectsNames();
-    for ( unsigned int i = 0;i < allObjects.size();i++ )
+    std::vector< gd::String > allObjects = group.GetAllObjectsNames();
+    for ( std::size_t i = 0;i < allObjects.size();i++ )
         ObjetsList->AppendItem( ObjetsList->GetRootItem(), allObjects.at(i) );
 
     ObjetsList->ExpandAll();
@@ -194,9 +194,9 @@ void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
     gd::ChooseObjectDialog dialog(this, project, layout, false /*No groups*/, "" /*All objects types*/, true /*Allow multiple selection*/ );
     if ( dialog.ShowModal() == 1 )
     {
-        for (unsigned int i = 0;i<dialog.GetChosenObjects().size();++i)
+        for (std::size_t i = 0;i<dialog.GetChosenObjects().size();++i)
         {
-            //On l'ajoute si il n'est pas déjà dans le groupe
+            //On l'ajoute si il n'est pas dï¿½jï¿½ dans le groupe
             if ( !group.Find( dialog.GetChosenObjects()[i] ) )
             {
                 group.AddObject( dialog.GetChosenObjects()[i] );
@@ -212,13 +212,13 @@ void EditObjectGroup::OnDelObjetSelected(wxCommandEvent& event)
 {
     //Get selection and construct list of objects to remove.
     wxArrayTreeItemIds selection;
-    unsigned int count = ObjetsList->GetSelections(selection);
-    std::vector <std::string> objectsToRemove;
+    std::size_t count = ObjetsList->GetSelections(selection);
+    std::vector <gd::String> objectsToRemove;
 
-    for (unsigned int i = 0;i<count;++i)
-        objectsToRemove.push_back(ToString(ObjetsList->GetItemText( selection.Item(i) )));
+    for (std::size_t i = 0;i<count;++i)
+        objectsToRemove.push_back(ObjetsList->GetItemText( selection.Item(i) ));
 
-    for (unsigned int i = 0;i<objectsToRemove.size();++i)
+    for (std::size_t i = 0;i<objectsToRemove.size();++i)
     {
         if ( group.Find( objectsToRemove[i] ) )
             group.RemoveObject(objectsToRemove[i]);

@@ -23,31 +23,31 @@ const SerializerValue & SerializerElement::GetValue() const
 	return elementValue;
 }
 
-SerializerElement & SerializerElement::SetAttribute(const std::string & name, bool value)
+SerializerElement & SerializerElement::SetAttribute(const gd::String & name, bool value)
 {
 	attributes[name].SetBool(value);
 	return *this;
 }
 
-SerializerElement & SerializerElement::SetAttribute(const std::string & name, const std::string & value)
+SerializerElement & SerializerElement::SetAttribute(const gd::String & name, const gd::String & value)
 {
 	attributes[name].SetString(value);
 	return *this;
 }
 
-SerializerElement & SerializerElement::SetAttribute(const std::string & name, int value)
+SerializerElement & SerializerElement::SetAttribute(const gd::String & name, int value)
 {
 	attributes[name].SetInt(value);
 	return *this;
 }
 
-SerializerElement & SerializerElement::SetAttribute(const std::string & name, double value)
+SerializerElement & SerializerElement::SetAttribute(const gd::String & name, double value)
 {
 	attributes[name].SetDouble(value);
 	return *this;
 }
 
-bool SerializerElement::GetBoolAttribute(const std::string & name, bool defaultValue, std::string deprecatedName) const
+bool SerializerElement::GetBoolAttribute(const gd::String & name, bool defaultValue, gd::String deprecatedName) const
 {
 	if (attributes.find(name) != attributes.end()) {
 		return attributes.find(name)->second.GetBool();
@@ -67,7 +67,7 @@ bool SerializerElement::GetBoolAttribute(const std::string & name, bool defaultV
 	return defaultValue;
 }
 
-std::string SerializerElement::GetStringAttribute(const std::string & name, std::string defaultValue, std::string deprecatedName) const
+gd::String SerializerElement::GetStringAttribute(const gd::String & name, gd::String defaultValue, gd::String deprecatedName) const
 {
 	if (attributes.find(name) != attributes.end())
 		return attributes.find(name)->second.GetString();
@@ -84,7 +84,7 @@ std::string SerializerElement::GetStringAttribute(const std::string & name, std:
 	return defaultValue;
 }
 
-int SerializerElement::GetIntAttribute(const std::string & name, int defaultValue, std::string deprecatedName) const
+int SerializerElement::GetIntAttribute(const gd::String & name, int defaultValue, gd::String deprecatedName) const
 {
 	if (attributes.find(name) != attributes.end())
 		return attributes.find(name)->second.GetInt();
@@ -101,7 +101,7 @@ int SerializerElement::GetIntAttribute(const std::string & name, int defaultValu
 	return defaultValue;
 }
 
-double SerializerElement::GetDoubleAttribute(const std::string & name, double defaultValue, std::string deprecatedName) const
+double SerializerElement::GetDoubleAttribute(const gd::String & name, double defaultValue, gd::String deprecatedName) const
 {
 	if (attributes.find(name) != attributes.end())
 		return attributes.find(name)->second.GetDouble();
@@ -118,12 +118,12 @@ double SerializerElement::GetDoubleAttribute(const std::string & name, double de
 	return defaultValue;
 }
 
-bool SerializerElement::HasAttribute(const std::string & name)
+bool SerializerElement::HasAttribute(const gd::String & name)
 {
 	return attributes.find(name) != attributes.end();
 }
 
-SerializerElement & SerializerElement::AddChild(std::string name)
+SerializerElement & SerializerElement::AddChild(gd::String name)
 {
 	if ( !arrayOf.empty() )
 	{
@@ -141,7 +141,7 @@ SerializerElement & SerializerElement::AddChild(std::string name)
 	return *newElement;
 }
 
-SerializerElement & SerializerElement::GetChild(unsigned int index) const
+SerializerElement & SerializerElement::GetChild(std::size_t index) const
 {
 	if ( arrayOf.empty() )
 	{
@@ -149,7 +149,7 @@ SerializerElement & SerializerElement::GetChild(unsigned int index) const
 		return nullElement;
 	}
 
-	unsigned int currentIndex = 0;
+	std::size_t currentIndex = 0;
 	for (size_t i = 0; i < children.size(); ++i)
 	{
 		if (children[i].second == std::shared_ptr<SerializerElement>())
@@ -168,7 +168,7 @@ SerializerElement & SerializerElement::GetChild(unsigned int index) const
 	return nullElement;
 }
 
-SerializerElement & SerializerElement::GetChild(std::string name, unsigned int index, std::string deprecatedName) const
+SerializerElement & SerializerElement::GetChild(gd::String name, std::size_t index, gd::String deprecatedName) const
 {
 	if ( !arrayOf.empty() )
 	{
@@ -180,7 +180,7 @@ SerializerElement & SerializerElement::GetChild(std::string name, unsigned int i
 		}
 	}
 
-	unsigned int currentIndex = 0;
+	std::size_t currentIndex = 0;
 	for (size_t i = 0; i < children.size(); ++i)
 	{
 		if (children[i].second == std::shared_ptr<SerializerElement>())
@@ -199,7 +199,7 @@ SerializerElement & SerializerElement::GetChild(std::string name, unsigned int i
 	return nullElement;
 }
 
-unsigned int SerializerElement::GetChildrenCount(std::string name, std::string deprecatedName) const
+std::size_t SerializerElement::GetChildrenCount(gd::String name, gd::String deprecatedName) const
 {
 	if (name.empty())
 	{
@@ -213,7 +213,7 @@ unsigned int SerializerElement::GetChildrenCount(std::string name, std::string d
 		deprecatedName = deprecatedArrayOf;
 	}
 
-	unsigned int currentIndex = 0;
+	std::size_t currentIndex = 0;
 	for (size_t i = 0; i < children.size(); ++i)
 	{
 		if (children[i].second == std::shared_ptr<SerializerElement>())
@@ -226,7 +226,7 @@ unsigned int SerializerElement::GetChildrenCount(std::string name, std::string d
 	return currentIndex;
 }
 
-bool SerializerElement::HasChild(const std::string & name, std::string deprecatedName) const
+bool SerializerElement::HasChild(const gd::String & name, gd::String deprecatedName) const
 {
 	for (size_t i = 0; i < children.size(); ++i)
 	{

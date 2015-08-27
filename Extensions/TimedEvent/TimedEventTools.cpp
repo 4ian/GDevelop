@@ -14,14 +14,14 @@ namespace GDpriv
 namespace TimedEvents
 {
 
-signed long long GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, std::string timedEventName)
+signed long long GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, gd::String timedEventName)
 {
     TimedEventsManager & manager = TimedEventsManager::managers[&scene];
     manager.timedEvents[timedEventName].UpdateTime(scene.GetElapsedTime());
     return manager.timedEvents[timedEventName].GetTime();
 }
 
-void GD_EXTENSION_API Reset(RuntimeScene & scene, std::string timedEventName)
+void GD_EXTENSION_API Reset(RuntimeScene & scene, gd::String timedEventName)
 {
     TimedEventsManager & manager = TimedEventsManager::managers[&scene];
     manager.timedEvents[timedEventName].Reset();

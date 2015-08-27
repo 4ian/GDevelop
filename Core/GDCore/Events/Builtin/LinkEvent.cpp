@@ -42,14 +42,14 @@ const EventsList * LinkEvent::GetLinkedEvents(const gd::Project & project) const
     return events;
 }
 
-void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, unsigned int indexOfTheEventInThisList)
+void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, std::size_t indexOfTheEventInThisList)
 {
     //Finding what to link to.
     const EventsList * eventsToInclude = GetLinkedEvents(project);
     if ( eventsToInclude != NULL )
     {
-        unsigned int firstEvent = IncludeAllEvents() ? 0 : GetIncludeStart();
-        unsigned int lastEvent = IncludeAllEvents() ? eventsToInclude->size() - 1 : GetIncludeEnd();
+        std::size_t firstEvent = IncludeAllEvents() ? 0 : GetIncludeStart();
+        std::size_t lastEvent = IncludeAllEvents() ? eventsToInclude->size() - 1 : GetIncludeEnd();
 
         //Check bounds
         if ( firstEvent >= eventsToInclude->size() )
@@ -148,13 +148,14 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
         dc.SetTextForeground( wxColour( 0, 0, 0 ) );
     else
         dc.SetTextForeground( wxColour( 160, 160, 160 ) );
+
     dc.SetFont(renderingHelper->GetNiceFont());
     dc.DrawText( _("Link to ")+GetTarget(), x+32, y + 3 );
 
     if ( !IncludeAllEvents() )
     {
         wxRect textRect = dc.GetTextExtent(_("Link to ")+GetTarget());
-        dc.DrawText( _("Include only events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+textRect.GetWidth()+32+10, y + 5 );
+        dc.DrawText( _("Include only events ")+gd::String::From(GetIncludeStart()+1)+_(" to ")+gd::String::From(GetIncludeEnd()+1), x+textRect.GetWidth()+32+10, y + 5 );
     }
 #endif
 }
@@ -187,5 +188,3 @@ unsigned int LinkEvent::GetRenderedHeight(unsigned int width, const gd::Platform
 }
 
 }
-
-

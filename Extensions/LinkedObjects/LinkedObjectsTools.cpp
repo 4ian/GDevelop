@@ -25,7 +25,7 @@ namespace LinkedObjects
 std::map < RuntimeScene* , ObjectsLinksManager > ObjectsLinksManager::managers;
 
 bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene,
-                                          std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectsLists,
+                                          std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectsLists,
                                           RuntimeObject * object)
 {
     if (!object) return false;
@@ -56,4 +56,3 @@ void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, RuntimeObject * obj
 
 }
 }
-

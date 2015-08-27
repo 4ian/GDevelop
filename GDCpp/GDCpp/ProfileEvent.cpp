@@ -25,7 +25,7 @@ ProfileEvent::~ProfileEvent()
 {
 }
 
-std::string ProfileEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
+gd::String ProfileEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
     const gd::Layout & scene = codeGenerator.GetLayout();
     codeGenerator.AddIncludeFile("GDCpp/BuiltinExtensions/ProfileTools.h");
@@ -38,12 +38,12 @@ std::string ProfileEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenera
         scene.GetProfiler()->profileEventsInformation.push_back(profileLink);
         index = scene.GetProfiler()->profileEventsInformation.size()-1;
     }
-    std::string code;
+    gd::String code;
 
     if ( previousProfileEvent )
-        code += "EndProfileTimer(*runtimeContext->scene, "+ToString(previousProfileEvent->index)+");\n";
+        code += "EndProfileTimer(*runtimeContext->scene, "+gd::String::From(previousProfileEvent->index)+");\n";
 
-    code += "StartProfileTimer(*runtimeContext->scene, "+ToString(index)+");\n";
+    code += "StartProfileTimer(*runtimeContext->scene, "+gd::String::From(index)+");\n";
 
     return code;
 }
@@ -81,4 +81,3 @@ ProfileEvent& ProfileEvent::operator=(const ProfileEvent & event)
 }
 
 #endif
-

@@ -7,7 +7,8 @@ This project is released under the MIT License.
 
 #ifndef AESACTIONS_H_INCLUDED
 #define AESACTIONS_H_INCLUDED
-#include <string>
+
+#include "GDCpp/String.h"
 
 namespace GDpriv
 {
@@ -15,12 +16,11 @@ namespace GDpriv
 namespace AES
 {
 
-void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::string & destFile, std::string passwordWith24characters );
-void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::string & destFile, std::string passwordWith24characters );
+void GD_EXTENSION_API EncryptFile( const gd::String & srcFile, const gd::String & destFile, gd::String passwordWith24characters );
+void GD_EXTENSION_API DecryptFile( const gd::String & srcFile, const gd::String & destFile, gd::String passwordWith24characters );
 
 }
 
 }
 
 #endif // AESACTIONS_H_INCLUDED
-

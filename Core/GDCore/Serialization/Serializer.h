@@ -49,6 +49,10 @@ public:
     ///@{
 	static std::string ToJSON(const SerializerElement & element);
 	static SerializerElement FromJSON(const std::string & json);
+    static SerializerElement FromJSON(const gd::String & json)
+    {
+        return FromJSON(json.ToUTF8());
+    }
     ///@}
 
 	virtual ~Serializer() {};

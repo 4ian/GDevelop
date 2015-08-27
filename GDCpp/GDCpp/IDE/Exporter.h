@@ -22,7 +22,7 @@ public:
      * \brief Return the label that will be displayed on the button or menu item
      * allowing the user to export the project for the JS Platform.
      */
-    virtual std::string GetProjectExportButtonLabel();
+    virtual gd::String GetProjectExportButtonLabel();
 };
 
 #endif

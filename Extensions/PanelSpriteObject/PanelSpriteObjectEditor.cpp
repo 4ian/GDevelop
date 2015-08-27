@@ -185,12 +185,12 @@ object(object_)
 
 	frontTextureEdit->ChangeValue(object.textureName);
 
-	widthEdit->ChangeValue(ToString(object.GetWidth()));
-	heightEdit->ChangeValue(ToString(object.GetHeight()));
-	leftMarginTextCtrl->ChangeValue(ToString(object.GetLeftMargin()));
-	topMarginTextCtrl->ChangeValue(ToString(object.GetTopMargin()));
-	rightMarginTextCtrl->ChangeValue(ToString(object.GetRightMargin()));
-	bottomMarginTextCtrl->ChangeValue(ToString(object.GetBottomMargin()));
+	widthEdit->ChangeValue(gd::String::From(object.GetWidth()));
+	heightEdit->ChangeValue(gd::String::From(object.GetHeight()));
+	leftMarginTextCtrl->ChangeValue(gd::String::From(object.GetLeftMargin()));
+	topMarginTextCtrl->ChangeValue(gd::String::From(object.GetTopMargin()));
+	rightMarginTextCtrl->ChangeValue(gd::String::From(object.GetRightMargin()));
+	bottomMarginTextCtrl->ChangeValue(gd::String::From(object.GetBottomMargin()));
 	smoothCheckBox->SetValue(object.IsSmooth());
 
     //Init the image bank editor
@@ -231,14 +231,14 @@ void PanelSpriteObjectEditor::OncancelBtClick(wxCommandEvent& event)
  */
 void PanelSpriteObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-	object.textureName = ToString(frontTextureEdit->GetValue());
+	object.textureName = frontTextureEdit->GetValue();
 
-	object.SetWidth(ToInt(ToString(widthEdit->GetValue())));
-	object.SetHeight(ToInt(ToString(heightEdit->GetValue())));
-	object.SetLeftMargin(ToInt(ToString(leftMarginTextCtrl->GetValue())));
-	object.SetTopMargin(ToInt(ToString(topMarginTextCtrl->GetValue())));
-	object.SetRightMargin(ToInt(ToString(rightMarginTextCtrl->GetValue())));
-	object.SetBottomMargin(ToInt(ToString(bottomMarginTextCtrl->GetValue())));
+	object.SetWidth(gd::String(widthEdit->GetValue()).To<float>());
+	object.SetHeight(gd::String(heightEdit->GetValue()).To<float>());
+	object.SetLeftMargin(gd::String(leftMarginTextCtrl->GetValue()).To<float>());
+	object.SetTopMargin(gd::String(topMarginTextCtrl->GetValue()).To<float>());
+	object.SetRightMargin(gd::String(rightMarginTextCtrl->GetValue()).To<float>());
+	object.SetBottomMargin(gd::String(bottomMarginTextCtrl->GetValue()).To<float>());
 	object.SetSmooth(smoothCheckBox->GetValue());
 
     EndModal(1);
@@ -271,4 +271,3 @@ void PanelSpriteObjectEditor::OnimageBankBtClick(wxCommandEvent& event)
 }
 
 #endif
-

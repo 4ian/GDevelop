@@ -11,6 +11,7 @@ This project is released under the MIT License.
 #include <SFML/Graphics/Text.hpp>
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeObject.h"
+#include "GDCpp/String.h"
 class ImageManager;
 class RuntimeScene;
 namespace gd { class Object; }
@@ -31,7 +32,7 @@ class GD_EXTENSION_API TextObject : public gd::Object
 {
 public :
 
-    TextObject(std::string name_);
+    TextObject(gd::String name_);
     virtual ~TextObject();
     virtual gd::Object * Clone() const { return new TextObject(*this); }
 
@@ -46,11 +47,11 @@ public :
 
     /** \brief Change the text.
      */
-    inline void SetString(const std::string & str) { text = str; };
+    inline void SetString(const gd::String & str) { text = str; };
 
     /** \brief Get the text.
      */
-    inline const std::string & GetString() const { return text; };
+    inline const gd::String & GetString() const { return text; };
 
     /** \brief Change the character size.
      */
@@ -62,11 +63,11 @@ public :
 
     /** \brief Return the font filename.
      */
-    inline const std::string & GetFontFilename() const {return fontName; };
+    inline const gd::String & GetFontFilename() const {return fontName; };
 
     /** \brief Change the font filename.
      */
-    void SetFontFilename(const std::string & fontFilename);
+    void SetFontFilename(const gd::String & fontFilename);
 
     bool IsBold() const { return bold; };
     void SetBold(bool enable) { bold = enable; };
@@ -90,9 +91,9 @@ private:
     virtual void DoSerializeTo(gd::SerializerElement & element) const;
     #endif
 
-    std::string text;
+    gd::String text;
     float characterSize;
-    std::string fontName;
+    gd::String fontName;
     bool smoothed;
     bool bold, italic, underlined;
     unsigned int colorR;
@@ -124,19 +125,19 @@ public :
     virtual bool SetAngle(float newAngle) { angle = newAngle; text.setRotation(angle); return true;};
     virtual float GetAngle() const {return angle;};
 
-    inline void SetString(const std::string & str) { text.setString(str); text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2); };
-    inline std::string GetString() const {return text.getString();};
+    void SetString(const gd::String & str);
+    gd::String GetString() const;
 
     inline void SetCharacterSize(float size) { text.setCharacterSize(size); text.setOrigin(text.getLocalBounds().width/2, text.getLocalBounds().height/2); };
     inline float GetCharacterSize() const { return text.getCharacterSize(); };
 
     /** \brief Change the text object font filename and reload the font
      */
-    void ChangeFont(const std::string & fontFilename);
+    void ChangeFont(const gd::String & fontFilename);
 
     /** \brief Return the font file name.
      */
-    inline std::string GetFontFilename() const {return fontName; };
+    inline gd::String GetFontFilename() const {return fontName; };
 
     void SetFontStyle(int style);
     int GetFontStyle();
@@ -156,7 +157,7 @@ public :
     float GetOpacity() const { return opacity; };
 
     void SetColor(unsigned int r, unsigned int g, unsigned int b);
-    void SetColor(const std::string & colorStr);
+    void SetColor(const gd::String & colorStr);
     unsigned int GetColorR() const { return text.getColor().r; };
     unsigned int GetColorG() const { return text.getColor().g; };
     unsigned int GetColorB() const { return text.getColor().b; };
@@ -164,20 +165,20 @@ public :
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
+    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+    virtual std::size_t GetNumberOfProperties() const;
     #endif
 
 private:
     sf::Text text;
-    std::string fontName;
+    gd::String fontName;
     float opacity;
     bool smoothed;
     float angle;
 };
 
-gd::Object * CreateTextObject(std::string name);
+gd::Object * CreateTextObject(gd::String name);
 RuntimeObject * CreateRuntimeTextObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // TEXTOBJECT_H

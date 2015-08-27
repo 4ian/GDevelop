@@ -7,6 +7,7 @@
 #ifndef HTTPSERVER_H
 #define HTTPSERVER_H
 #include <string>
+#include "GDCore/String.h"
 struct mg_context;
 
 namespace gdjs
@@ -36,7 +37,7 @@ public:
      * \brief Run a web server, on port 2828, which index is located at \a indexDirectory.
      * \param indexDirectory The root of the webserver.
      */
-    void Run(std::string indexDirectory);
+    void Run(gd::String indexDirectory);
 
     /**
      * \brief Stop the webserver if it was running

@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #ifndef NEWPROJECTDIALOG_H
@@ -17,6 +17,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
+#include "GDCore/String.h"
 
 class NewProjectDialog: public wxDialog
 {
@@ -29,18 +30,18 @@ public:
      * Return the file of the chosen template. If empty, the user choose an empty project.
      * Be sure to check that the call to ShowModal() returned 1 and not 0 ( in this case, the user canceled ).
      */
-    std::string GetChosenTemplateFile() const { return chosenTemplateFile; }
+    gd::String GetChosenTemplateFile() const { return chosenTemplateFile; }
 
     /**
      * Return the filename chosen where the game must be created. If empty, the user choose an empty project.
      * Be sure to check that the call to ShowModal() returned 1 and not 0 ( in this case, the user canceled ).
      */
-    std::string GetChosenFilename() const { return chosenFilename; }
+    gd::String GetChosenFilename() const { return chosenFilename; }
 
     /**
      * Return the platform used by the chosen template. If empty, the user canceled ( ShowModal() returned 0 )
      */
-    std::string GetChosenTemplatePlatform() const { return chosenTemplatePlatform; }
+    gd::String GetChosenTemplatePlatform() const { return chosenTemplatePlatform; }
 
     /**
      * Return true if the user clicked on the button to browse examples ( ShowModal() returned 0 )
@@ -96,9 +97,9 @@ private:
 
     wxString newProjectBaseFolder; ///< Computed in the constructor
 
-    std::string chosenFilename;
-    std::string chosenTemplateFile;
-    std::string chosenTemplatePlatform;
+    gd::String chosenFilename;
+    gd::String chosenTemplateFile;
+    gd::String chosenTemplatePlatform;
     bool userWantToBrowseExamples;
 
     DECLARE_EVENT_TABLE()

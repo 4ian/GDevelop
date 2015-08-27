@@ -47,11 +47,12 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
                    _("Setup"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
+
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-        .SetFunctionName("GetRendererParam1").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
+        .SetFunctionName("GetRendererParam1").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddAction("RendererParam2",
                    _("Rendering second parameter"),
@@ -274,6 +275,7 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
     obj.AddExpression("ParticleAngle2", _("Parameter 2 of angle"), _("Parameter 2 of angle"), _("Setup"), "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", _("Object"), "ParticleEmitter", false)
         .SetFunctionName("GetParticleAngle2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+
     #endif
 }
 

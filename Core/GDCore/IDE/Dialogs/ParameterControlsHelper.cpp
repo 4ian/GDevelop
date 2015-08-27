@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h>
 #include <vector>
-#include <string>
+#include "GDCore/String.h"
 #include <iostream>
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
@@ -31,22 +31,22 @@ const long ParameterControlsHelper::ID_TEXTARRAY = wxNewId();
 const long ParameterControlsHelper::ID_BUTTONARRAY = wxNewId();
 const long ParameterControlsHelper::ID_CHECKARRAY = wxNewId();
 
-void ParameterControlsHelper::UpdateControls(unsigned int count)
+void ParameterControlsHelper::UpdateControls(std::size_t count)
 {
     if (!sizer || !window) return;
 
     paramMetadata.resize(count);
     while ( paramEdits.size() < count )
     {
-        const string num = gd::ToString( paramEdits.size() );
+        const gd::String num = gd::String::From( paramEdits.size() );
         long id = wxNewId(); //Bitmap buttons want an unique id so as to be displayed properly
 
         //Addings controls
         paramCheckboxes.push_back(new wxCheckBox(window, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num));
-        paramTexts.push_back(new wxStaticText(window, ID_TEXTARRAY, _("Parameter:"), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num )));
+        paramTexts.push_back(new wxStaticText(window, ID_TEXTARRAY, _("Parameter:"), wxDefaultPosition, wxDefaultSize, 0, "TxtPara" + num ));
         paramSpacers1.push_back(new wxPanel(window));
         paramSpacers2.push_back(new wxPanel(window));
-        paramEdits.push_back(new wxTextCtrl( window, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num )));
+        paramEdits.push_back(new wxTextCtrl( window, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "EditPara" + num ));
         paramBmpBts.push_back(new wxBitmapButton( window, id, gd::CommonBitmapManager::Get()->expressionBt, wxDefaultPosition, wxSize(32,-1), wxBU_AUTODRAW, wxDefaultValidator, num));
         paramBmpBts.back()->SetMinSize(wxSize(32, 32));
 
@@ -84,7 +84,7 @@ void ParameterControlsHelper::UpdateControls(unsigned int count)
     window->Layout(); //Ensure widgets just added are properly rendered.
 }
 
-void ParameterControlsHelper::UpdateParameterContent(unsigned int i, const ParameterMetadata & metadata, std::string content)
+void ParameterControlsHelper::UpdateParameterContent(std::size_t i, const ParameterMetadata & metadata, gd::String content)
 {
     if (i >= paramEdits.size()) return;
     paramMetadata[i] = metadata;
@@ -98,16 +98,16 @@ void ParameterControlsHelper::UpdateParameterContent(unsigned int i, const Param
         return;
     }
 
-    const std::string & type = metadata.GetType();
+    const gd::String & type = metadata.GetType();
     paramCheckboxes.at(i)->Show(metadata.IsOptional());
     paramTexts.at(i)->Show();
     paramBmpBts.at(i)->Show(!type.empty());
     paramEdits.at(i)->Show();
 
     paramCheckboxes.at(i)->SetValue(!paramEdits.at(i)->GetValue().empty());
-    paramTexts.at(i)->SetLabel( metadata.GetDescription() + _(":") );
-    paramBmpBts.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::Get()->BitmapFromType(type));
-    paramBmpBts.at(i)->SetToolTip( gd::InstructionSentenceFormatter::Get()->LabelFromType(type));
+    paramTexts.at(i)->SetLabel(metadata.GetDescription() + _(":"));
+    paramBmpBts.at(i)->SetBitmapLabel(gd::InstructionSentenceFormatter::Get()->BitmapFromType(type));
+    paramBmpBts.at(i)->SetToolTip(gd::InstructionSentenceFormatter::Get()->LabelFromType(type));
     paramEdits.at(i)->SetValue(content);
 
     //De/activate widgets if parameter is optional
@@ -131,7 +131,7 @@ void ParameterControlsHelper::OnOptionalCheckboxClick(wxCommandEvent& event)
     wxWindow * control = dynamic_cast<wxWindow*>(event.GetEventObject());
     if (!control) return;
 
-    unsigned int i = gd::ToInt(gd::ToString(control->GetName()));
+    std::size_t i = gd::String(control->GetName()).To<std::size_t>();
     if (i >= paramCheckboxes.size()) return;
 
     bool enable = paramCheckboxes.at(i)->GetValue();
@@ -145,7 +145,7 @@ void ParameterControlsHelper::OnParameterBtClick(wxCommandEvent& event)
     wxWindow * control = dynamic_cast<wxWindow*>(event.GetEventObject());
     if (!control) return;
 
-    unsigned int i = ToInt(gd::ToString(control->GetName()));
+    std::size_t i = gd::String(control->GetName()).To<std::size_t>();
     if (i >= paramMetadata.size() || i >= paramEdits.size()) return;
     if (!editionCallback || !editionCallbackProject || !editionCallbackLayout) return;
 

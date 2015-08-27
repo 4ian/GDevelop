@@ -20,8 +20,8 @@ gdjs.RuntimeGame = function(data, spec)
     //Safety check: Do gdjs initialization if not already done
     if ( gdjs.objectsTypes.keys.length === 0)
         gdjs.registerObjects();
-    if ( gdjs.automatismsTypes.keys.length === 0)
-        gdjs.registerAutomatisms();
+    if ( gdjs.behaviorsTypes.keys.length === 0)
+        gdjs.registerBehaviors();
     if ( gdjs.callbacksRuntimeSceneLoaded.length === 0 &&
          gdjs.callbacksRuntimeSceneUnloaded.length === 0 &&
          gdjs.callbacksObjectDeletedFromScene.length === 0)

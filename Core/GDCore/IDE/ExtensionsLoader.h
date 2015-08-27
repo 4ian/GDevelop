@@ -6,8 +6,9 @@
 
 #ifndef EXTENSIONSLOADER_H
 #define EXTENSIONSLOADER_H
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
+#include "GDCore/String.h"
 namespace gd { class Platform; }
 
 namespace gd
@@ -35,7 +36,7 @@ public:
      * \note Extensions files must have extensions *.xgd(w|l|m)(e),
      * w for Windows, l for Linux, m for Mac, e for Edittime extensions.
      */
-    static void LoadAllExtensions(const std::string & directory, gd::Platform & platform, bool forgiving = false);
+    static void LoadAllExtensions(const gd::String & directory, gd::Platform & platform, bool forgiving = false);
 
     /**
      * \brief Load an extension from a file and add it to a platform.
@@ -46,7 +47,7 @@ public:
      * searching for the platform creation function symbol won't be logged as an error.
      * (All other errors are still reparted as usual).
      */
-    static void LoadExtension(const std::string & fullpath, gd::Platform & platform, bool forgiving = false);
+    static void LoadExtension(const gd::String & fullpath, gd::Platform & platform, bool forgiving = false);
 
     /**
      * \brief To be called when extensions loading is done.
@@ -54,7 +55,7 @@ public:
      * This is necessary on Linux to make symbols exported by extensions available.
      * \param directory The directory where extensions have been loaded from.
      */
-    static void ExtensionsLoadingDone(const std::string & directory);
+    static void ExtensionsLoadingDone(const gd::String & directory);
 
 private:
     ExtensionsLoader() {};

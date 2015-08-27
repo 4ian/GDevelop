@@ -20,7 +20,7 @@ About directory structure
 * scripts: Various scripts, notably scripts to package GD (ReleaseProcedure* scripts).
 * docs: Directory where the documentation is generated. To avoid you to generate it by yourself, it is [available here](http://4ian.github.io/GD-Documentation).
 
-How to build [![Build Status](https://travis-ci.org/4ian/GD.svg?branch=master)](https://travis-ci.org/4ian/GD)
+How to build [![Build Status](https://travis-ci.org/4ian/GD.svg?branch=master)](https://travis-ci.org/4ian/GD) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/4ian/GD?branch=master&svg=true)](https://ci.appveyor.com/project/4ian/gd)
 ------------
 
 Full and detailed instructions are in the getting started page of the [documentation available here](http://4ian.github.io/GD-Documentation).

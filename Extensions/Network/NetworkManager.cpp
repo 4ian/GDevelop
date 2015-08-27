@@ -23,7 +23,7 @@ void NetworkManager::ReceivePackets()
             {
             case 0:
             {
-                std::string title;
+                sf::String title;
                 packet >> title;
                 double number;
                 packet >> number;
@@ -33,19 +33,18 @@ void NetworkManager::ReceivePackets()
             }
             case 1:
             {
-                std::string title;
+                sf::String title;
                 packet >> title;
-                std::string str;
+                sf::String str;
                 packet >> str;
 
                 ReceivedDataManager::Get()->strings[title] = str;
                 break;
             }
             default:
-                ErrorManager::Get()->SetLastError("Received unknown data ( Type "+ToString(type)+" )\n");
+                ErrorManager::Get()->SetLastError("Received unknown data ( Type "+gd::String::From(type)+" )\n");
                 break;
             }
         }
     }
 }
-

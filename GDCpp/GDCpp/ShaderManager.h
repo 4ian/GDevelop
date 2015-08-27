@@ -10,6 +10,8 @@
 #include <memory>
 
 #include <SFML/Graphics.hpp>
+#include "GDCpp/String.h"
+
 namespace gd { class Project; }
 
 /**
@@ -26,10 +28,10 @@ public:
     virtual ~ShaderManager() {};
     void SetGame(gd::Project * game_) { game = game_; }
 
-    std::shared_ptr<sf::Shader> GetSFMLShader(const std::vector<std::string> & shaders);
+    std::shared_ptr<sf::Shader> GetSFMLShader(const std::vector<gd::String> & shaders);
 
 private:
-    mutable std::map < std::vector<std::string>, std::weak_ptr<sf::Shader> > alreadyLoadedShader;
+    mutable std::map < std::vector<gd::String>, std::weak_ptr<sf::Shader> > alreadyLoadedShader;
 
     gd::Project * game;
 };

@@ -21,12 +21,12 @@ using namespace std;
 namespace gd
 {
 
-std::string ExpressionParser::parserSeparators = " ,+-*/%.<>=&|;()#^![]{}";
+gd::String ExpressionParser::parserSeparators = " ,+-*/%.<>=&|;()#^![]{}";
 
 size_t ExpressionParser::GetMinimalParametersNumber(const std::vector < gd::ParameterMetadata > & parametersInfos)
 {
     size_t nb = 0;
-    for (unsigned int i = 0;i<parametersInfos.size();++i)
+    for (std::size_t i = 0;i<parametersInfos.size();++i)
     {
     	if ( !parametersInfos[i].optional && !parametersInfos[i].codeOnly ) nb++;
     }
@@ -37,24 +37,12 @@ size_t ExpressionParser::GetMinimalParametersNumber(const std::vector < gd::Para
 size_t ExpressionParser::GetMaximalParametersNumber(const std::vector < gd::ParameterMetadata > & parametersInfos)
 {
     size_t nb = 0;
-    for (unsigned int i = 0;i<parametersInfos.size();++i)
+    for (std::size_t i = 0;i<parametersInfos.size();++i)
     {
     	if ( !parametersInfos[i].codeOnly ) nb++;
     }
 
     return nb;
-}
-
-std::string ReplaceTildesBySpaces(std::string text)
-{
-    size_t foundPos=text.find("~");
-    while(foundPos != string::npos)
-    {
-        if(foundPos != string::npos) text.replace(foundPos,1," ");
-        foundPos=text.find("~", foundPos+1);
-    }
-
-    return text;
 }
 
 /**
@@ -65,7 +53,7 @@ std::string ReplaceTildesBySpaces(std::string text)
 std::vector<gd::Expression> CompleteParameters(const std::vector < gd::ParameterMetadata > & parametersInfo, const std::vector < gd::Expression > & parameters)
 {
     std::vector<gd::Expression> completeParameters = parameters;
-    for (unsigned int i = 0;i<parametersInfo.size();++i) //Code only parameters are not included in expressions parameters.
+    for (std::size_t i = 0;i<parametersInfo.size();++i) //Code only parameters are not included in expressions parameters.
     {
         if ( parametersInfo[i].codeOnly)
         {
@@ -90,24 +78,25 @@ std::vector<gd::Expression> CompleteParameters(const std::vector < gd::Parameter
     return completeParameters;
 }
 
-bool ExpressionParser::ValidSyntax(const std::string & str)
+bool ExpressionParser::ValidSyntax(const gd::String & str)
 {
-    static const std::string numerics = "0123456789.e";
-    static const std::string operators = "+/*-%";
+    static const gd::String numerics = "0123456789.e";
+    static const gd::String operators = "+/*-%";
 
     size_t parenthesisLevel = 0;
-    std::string lastOperator;
+    gd::String lastOperator;
 
     bool parsingNumber = false;
     bool parsingScientificNotationNumber = false;
     bool parsingDecimalNumber = false;
     bool requestNumber = false;
-    std::string lastNumber;
+    gd::String lastNumber;
     bool numberWasParsedLast = false;
 
-    for (unsigned int parsePos = 0;parsePos<str.length();++parsePos)
+    for( auto it = str.begin(); it != str.end(); ++it )
     {
-        if ( str[parsePos] == ' ' || str[parsePos] == '\n' )
+        char32_t currentChar = *it;
+        if ( currentChar == U' ' || currentChar == U'\n' )
         {
             if ( requestNumber )
             {
@@ -126,11 +115,11 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
                 numberWasParsedLast = true;
             }
         }
-        else if ( numerics.find_first_of(str[parsePos]) != std::string::npos )
+        else if ( numerics.find(currentChar) != gd::String::npos )
         {
             requestNumber = false;
 
-            if ( str[parsePos] == '.' )
+            if ( currentChar == U'.' )
             {
                 if ( !parsingNumber )
                 {
@@ -149,7 +138,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
                 parsingDecimalNumber = true;
             }
 
-            if ( str[parsePos] == 'e' )
+            if ( currentChar == U'e' )
             {
                 if ( parsingScientificNotationNumber )
                 {
@@ -170,9 +159,9 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
             }
 
             parsingNumber = true;
-            lastNumber += str[parsePos];
+            lastNumber += currentChar;
         }
-        else if ( str[parsePos] == ')' )
+        else if ( currentChar == U')' )
         {
             if ( requestNumber )
             {
@@ -205,14 +194,15 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
                 return false;
             }
 
-            if ( str[parsePos-1] == '(' )
+            auto previousIt = it; --previousIt;
+            if ( *previousIt == U'(' )
             {
                 firstErrorStr = _("Empty paranthesis");
 
                 return false;
             }
         }
-        else if ( str[parsePos] == '(' )
+        else if ( currentChar == U'(' )
         {
             if ( requestNumber )
             {
@@ -240,11 +230,11 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
             parenthesisLevel++;
             numberWasParsedLast = false;
         }
-        else if ( operators.find_first_of(str[parsePos]) != std::string::npos )
+        else if ( operators.find(currentChar) != gd::String::npos )
         {
-            if ( str[parsePos] == '-' && parsingNumber && parsingScientificNotationNumber )
+            if ( currentChar == U'-' && parsingNumber && parsingScientificNotationNumber )
             {
-                lastNumber += str[parsePos];
+                lastNumber += currentChar;
                 requestNumber = true;
             }
             else
@@ -265,7 +255,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
                     numberWasParsedLast = true;
                 }
 
-                if ( str[parsePos] != '-' && str[parsePos] != '+' && !numberWasParsedLast )
+                if ( currentChar != U'-' && currentChar != U'+' && !numberWasParsedLast )
                 {
                     firstErrorStr = _("Operators without any number between them");
 
@@ -318,16 +308,16 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks)
 {
     callbacks.SetReturnType("expression");
-    string expression = expressionPlainString;
+    gd::String expression = expressionPlainString;
 
     size_t parsePosition = 0;
 
     size_t firstPointPos = expression.find(".");
     size_t firstParPos = expression.find("(");
 
-    std::string expressionWithoutFunctions;
-    std::string nonFunctionToken;
-    size_t nonFunctionTokenStartPos = std::string::npos;
+    gd::String expressionWithoutFunctions;
+    gd::String nonFunctionToken;
+    size_t nonFunctionTokenStartPos = gd::String::npos;
 
     while ( firstPointPos != string::npos || firstParPos != string::npos )
     {
@@ -336,11 +326,11 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
         size_t nameStart = expression.find_last_of(parserSeparators, nameEnd-1);
         nameStart++;
 
-        string nameBefore = expression.substr(nameStart, nameEnd-nameStart);
-        string objectName = ReplaceTildesBySpaces(nameBefore);
+        gd::String nameBefore = expression.substr(nameStart, nameEnd-nameStart);
+        gd::String objectName = nameBefore.FindAndReplace("~", " ");
 
         //Identify function name
-        string functionName = nameBefore;
+        gd::String functionName = nameBefore;
         size_t functionNameEnd = nameEnd;
         vector < gd::Expression > parameters;
 
@@ -365,7 +355,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
             bool functionFound = false;
             bool staticFunctionFound = false;
             bool objectFunctionFound = false;
-            bool automatismFunctionFound = false;
+            bool behaviorFunctionFound = false;
 
             //First try to bind to a static expression
             if ( nameIsFunction && MetadataProvider::HasExpression(platform, functionName) )
@@ -379,31 +369,31 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                 functionFound = true; objectFunctionFound = true;
                 instructionInfos = MetadataProvider::GetObjectExpressionMetadata(platform, gd::GetTypeOfObject(project, layout, objectName), functionName);
             }
-            //And in automatisms expressions
+            //And in behaviors expressions
             else if ( !nameIsFunction )
             {
                 size_t firstDoublePoints = functionName.find("::");
                 if ( firstDoublePoints != string::npos )
                 {
-                    std::string autoName = functionName.substr(0, firstDoublePoints);
+                    gd::String autoName = functionName.substr(0, firstDoublePoints);
                     if ( firstDoublePoints+2 < functionName.length() )
                         functionName = functionName.substr(firstDoublePoints+2, functionName.length());
                     else
                         functionName = "";
 
-                    if ( MetadataProvider::HasAutomatismExpression(platform, gd::GetTypeOfAutomatism(project, layout, autoName), functionName) )
+                    if ( MetadataProvider::HasBehaviorExpression(platform, gd::GetTypeOfBehavior(project, layout, autoName), functionName) )
                     {
                         parameters.push_back(gd::Expression(autoName));
-                        functionFound = true; automatismFunctionFound = true;
+                        functionFound = true; behaviorFunctionFound = true;
 
-                        instructionInfos = MetadataProvider::GetAutomatismExpressionMetadata(platform,
-                                                                                             gd::GetTypeOfAutomatism(project, layout, autoName), functionName);
+                        instructionInfos = MetadataProvider::GetBehaviorExpressionMetadata(platform,
+                                                                                             gd::GetTypeOfBehavior(project, layout, autoName), functionName);
 
-                        //Verify that object has automatism.
-                        vector < std::string > automatisms = gd::GetAutomatismsOfObject(project, layout, objectName);
-                        if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
+                        //Verify that object has behavior.
+                        vector < gd::String > behaviors = gd::GetBehaviorsOfObject(project, layout, objectName);
+                        if ( find(behaviors.begin(), behaviors.end(), autoName) == behaviors.end() )
                         {
-                            cout << "Bad automatism requested" << endl;
+                            cout << "Bad behavior requested" << endl;
                             functionFound = false;
                         }
                     }
@@ -414,8 +404,8 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
             {
                 //Identify parameters
                 size_t parametersEnd = expression.find_first_of("(", functionNameEnd);
-                string currentParameterStr;
-                char previousChar = '(';
+                gd::String currentParameterStr;
+                char32_t previousChar = '(';
                 bool takeSymbolsInAccount = true;
                 if ( parametersEnd != string::npos )
                 {
@@ -425,14 +415,14 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                     while ( parametersEnd < expression.length() && !(expression[parametersEnd] == ')' && level == 0) )
                     {
                         //Be sure we are not in quotes
-                        if ( expression[parametersEnd] == '\"' && previousChar != '\\') takeSymbolsInAccount = !takeSymbolsInAccount;
+                        if ( expression[parametersEnd] == U'\"' && previousChar != U'\\') takeSymbolsInAccount = !takeSymbolsInAccount;
 
                         //So as to be sure paranthesis don't belong to a parameter
-                        if ( expression[parametersEnd] == '(' && takeSymbolsInAccount ) level++;
-                        if ( expression[parametersEnd] == ')' && takeSymbolsInAccount ) level--;
+                        if ( expression[parametersEnd] == U'(' && takeSymbolsInAccount ) level++;
+                        if ( expression[parametersEnd] == U')' && takeSymbolsInAccount ) level--;
 
                         //Add the character to the current parameter or terminate the latter
-                        if ( (expression[parametersEnd] == ',' && level == 0) && takeSymbolsInAccount )
+                        if ( (expression[parametersEnd] == U',' && level == 0) && takeSymbolsInAccount )
                         {
                             parameters.push_back(currentParameterStr);
                             currentParameterStr.clear();
@@ -448,7 +438,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                     }
 
                     //Testing function call is properly closed
-                    if(parametersEnd == expression.length() || expression[parametersEnd] != ')')
+                    if(parametersEnd == expression.length() || expression[parametersEnd] != U')')
                     {
                         firstErrorStr = _("Paranthesis not closed");
                         firstErrorPos = parametersEnd-1;
@@ -463,17 +453,17 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                         firstErrorStr = _("Incorrect number of parameters");
                         firstErrorStr += " ";
                         firstErrorStr += _("Excepted ( maximum ) :");
-                        firstErrorStr += ToString(GetMaximalParametersNumber(instructionInfos.parameters));
+                        firstErrorStr += gd::String::From(GetMaximalParametersNumber(instructionInfos.parameters));
 
                         return false;
                     }
 
                     //Preparing parameters
                     parameters = CompleteParameters(instructionInfos.parameters, parameters);
-                    for (unsigned int i = 0;i<instructionInfos.parameters.size();++i)
+                    for (std::size_t i = 0;i<instructionInfos.parameters.size();++i)
                     {
                         if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], instructionInfos.parameters[i], functionNameEnd) )
-                            return false; //TODO : Boarf, paramètres optionels sont rajoutés et évalués : Problème avec les calques par exemple ( Au minimum, il faut "" )
+                            return false; //TODO : Boarf, paramï¿½tres optionels sont rajoutï¿½s et ï¿½valuï¿½s : Problï¿½me avec les calques par exemple ( Au minimum, il faut "" )
                     }
                 }
                 else
@@ -487,13 +477,13 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                 callbacks.OnConstantToken(nonFunctionToken+expression.substr(parsePosition, nameStart-parsePosition));
                 expressionWithoutFunctions += expression.substr(parsePosition, nameStart-parsePosition);
                 nonFunctionToken.clear();
-                nonFunctionTokenStartPos = std::string::npos;
+                nonFunctionTokenStartPos = gd::String::npos;
 
                 if      ( objectFunctionFound ) callbacks.OnObjectFunction(functionName, parameters, instructionInfos);
-                else if ( automatismFunctionFound ) callbacks.OnObjectAutomatismFunction(functionName, parameters, instructionInfos);
+                else if ( behaviorFunctionFound ) callbacks.OnObjectBehaviorFunction(functionName, parameters, instructionInfos);
                 else if ( staticFunctionFound ) callbacks.OnStaticFunction(functionName, parameters, instructionInfos);
 
-                if ( objectFunctionFound || automatismFunctionFound || staticFunctionFound ) expressionWithoutFunctions += "0";
+                if ( objectFunctionFound || behaviorFunctionFound || staticFunctionFound ) expressionWithoutFunctions += "0";
 
                 parsePosition = parametersEnd+1;
                 firstPointPos = expression.find(".", parametersEnd+1);
@@ -503,7 +493,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
             {
                 nonFunctionToken += expression.substr(parsePosition, functionNameEnd+1-parsePosition);
                 expressionWithoutFunctions += expression.substr(parsePosition, functionNameEnd+1-parsePosition);
-                nonFunctionTokenStartPos = (nonFunctionTokenStartPos != std::string::npos ? nonFunctionTokenStartPos : parsePosition);
+                nonFunctionTokenStartPos = (nonFunctionTokenStartPos != gd::String::npos ? nonFunctionTokenStartPos : parsePosition);
                 parsePosition = functionNameEnd+1;
                 firstPointPos = expression.find(".", functionNameEnd+1);
                 firstParPos = expression.find("(", functionNameEnd+1);
@@ -513,7 +503,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
         {
             nonFunctionToken += expression.substr(parsePosition, nameEnd+1-parsePosition);
             expressionWithoutFunctions += expression.substr(parsePosition, nameEnd+1-parsePosition);
-            nonFunctionTokenStartPos = (nonFunctionTokenStartPos != std::string::npos ? nonFunctionTokenStartPos : parsePosition);
+            nonFunctionTokenStartPos = (nonFunctionTokenStartPos != gd::String::npos ? nonFunctionTokenStartPos : parsePosition);
             parsePosition = nameEnd+1;
             firstPointPos = expression.find(".", nameEnd+1);
             firstParPos = expression.find("(", nameEnd+1);
@@ -531,7 +521,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
 bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks)
 {
     callbacks.SetReturnType("string");
-    string expression = expressionPlainString;
+    gd::String expression = expressionPlainString;
 
     size_t parsePosition = 0;
 
@@ -568,7 +558,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
             }
 
             //Generating final text, by replacing \" by quotes
-            string finalText = expression.substr(firstQuotePos+1, finalQuotePosition-(firstQuotePos+1));
+            gd::String finalText = expression.substr(firstQuotePos+1, finalQuotePosition-(firstQuotePos+1));
 
             size_t foundPos=finalText.find("\\\"");
             while(foundPos != string::npos)
@@ -596,11 +586,11 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
             callbacks.OnConstantToken(expression.substr(parsePosition, nameStart-parsePosition));
 
-            string nameBefore = expression.substr(nameStart, nameEnd-nameStart);
-            string objectName = ReplaceTildesBySpaces(nameBefore);
+            gd::String nameBefore = expression.substr(nameStart, nameEnd-nameStart);
+            gd::String objectName = nameBefore.FindAndReplace("~", " ");
 
             //Identify function name
-            string functionName = nameBefore;
+            gd::String functionName = nameBefore;
             size_t functionNameEnd = nameEnd;
             vector < gd::Expression > parameters;
 
@@ -614,18 +604,18 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
             //Identify parameters
             size_t parametersEnd = expression.find_first_of("(", functionNameEnd)+1;
-            char previousChar = '(';
+            char32_t previousChar = U'(';
             bool takeSymbolsInAccount = true;
             size_t level = 0;
-            string currentParameterStr;
-            while ( parametersEnd < expression.length() && !(expression[parametersEnd] == ')' && level == 0) )
+            gd::String currentParameterStr;
+            while ( parametersEnd < expression.length() && !(expression[parametersEnd] == U')' && level == 0) )
             {
                 //Be sure we are not in quotes
-                if ( expression[parametersEnd] == '\"' && previousChar != '\\') takeSymbolsInAccount = !takeSymbolsInAccount;
+                if ( expression[parametersEnd] == U'\"' && previousChar != U'\\') takeSymbolsInAccount = !takeSymbolsInAccount;
 
                 //So as to be sure paranthesis don't belong to a parameter
-                if ( expression[parametersEnd] == '(' && takeSymbolsInAccount ) level++;
-                if ( expression[parametersEnd] == ')' && takeSymbolsInAccount ) level--;
+                if ( expression[parametersEnd] == U'(' && takeSymbolsInAccount ) level++;
+                if ( expression[parametersEnd] == U')' && takeSymbolsInAccount ) level--;
 
                 //Add the character to the current parameter or terminate the latter
                 if ( (expression[parametersEnd] == ',' && level == 0) && takeSymbolsInAccount )
@@ -641,7 +631,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
                 parametersEnd++;
             }
 
-            if ( parametersEnd == expression.length() || expression[parametersEnd] != ')' )
+            if ( parametersEnd == expression.length() || expression[parametersEnd] != U')' )
             {
                 firstErrorPos = parametersEnd-1;
                 firstErrorStr = _("Paranthesis not closed");
@@ -674,7 +664,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
                 //Preparing parameters
                 parameters = CompleteParameters(expressionInfo.parameters, parameters);
-                for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
+                for (std::size_t i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                 {
                     if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
                         return false;
@@ -694,7 +684,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
                     firstErrorPos = functionNameEnd;
                     firstErrorStr = _("Incorrect number of parameters");
 
-                    for (unsigned int i = 0;i<parameters.size();++i)
+                    for (std::size_t i = 0;i<parameters.size();++i)
                         cout << "Param:" << parameters[i].GetPlainString() << endl;
 
                     return false;
@@ -702,7 +692,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
                 //Preparing parameters
                 parameters = CompleteParameters(expressionInfo.parameters, parameters);
-                for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
+                for (std::size_t i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                 {
                     if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
                         return false;
@@ -710,31 +700,31 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
                 callbacks.OnObjectFunction(functionName, parameters, expressionInfo);
             }
-            //And search automatisms expressions
+            //And search behaviors expressions
             else
             {
                 size_t firstDoublePoints = functionName.find("::");
                 if ( firstDoublePoints != string::npos )
                 {
-                    std::string autoName = functionName.substr(0, firstDoublePoints);
+                    gd::String autoName = functionName.substr(0, firstDoublePoints);
                     if ( firstDoublePoints+2 < functionName.length() )
                         functionName = functionName.substr(firstDoublePoints+2, functionName.length());
                     else
                         functionName = "";
 
-                    if ( MetadataProvider::HasAutomatismStrExpression(platform, gd::GetTypeOfAutomatism(project, layout, autoName), functionName) )
+                    if ( MetadataProvider::HasBehaviorStrExpression(platform, gd::GetTypeOfBehavior(project, layout, autoName), functionName) )
                     {
                         parameters.push_back(gd::Expression(autoName));
                         functionFound = true;
 
-                        const gd::ExpressionMetadata & expressionInfo = MetadataProvider::GetAutomatismStrExpressionMetadata(platform,
-                                                                                                                                gd::GetTypeOfAutomatism(project, layout, autoName), functionName);
+                        const gd::ExpressionMetadata & expressionInfo = MetadataProvider::GetBehaviorStrExpressionMetadata(platform,
+                                                                                                                                gd::GetTypeOfBehavior(project, layout, autoName), functionName);
 
-                        //Verify that object has automatism.
-                        vector < std::string > automatisms = gd::GetAutomatismsOfObject(project, layout, objectName);
-                        if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
+                        //Verify that object has behavior.
+                        vector < gd::String > behaviors = gd::GetBehaviorsOfObject(project, layout, objectName);
+                        if ( find(behaviors.begin(), behaviors.end(), autoName) == behaviors.end() )
                         {
-                            cout << "Bad automatism requested" << endl;
+                            cout << "Bad behavior requested" << endl;
                             functionFound = false;
                         }
                         else
@@ -750,13 +740,13 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
 
                             //Preparing parameters
                             parameters = CompleteParameters(expressionInfo.parameters, parameters);
-                            for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
+                            for (std::size_t i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                             {
                                 if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
                                     return false;
                             }
 
-                            callbacks.OnObjectAutomatismFunction(functionName, parameters, expressionInfo);
+                            callbacks.OnObjectBehaviorFunction(functionName, parameters, expressionInfo);
                         }
                     }
                 }
@@ -805,7 +795,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, cons
         }
     }
 
-    if ( expression.substr(parsePosition, expression.length()).find_first_not_of(" \n") != std::string::npos )
+    if ( expression.substr(parsePosition, expression.length()).find_first_not_of(" \n") != gd::String::npos )
     {
         firstErrorPos = parsePosition;
         firstErrorStr = _("Bad symbol at the end of the expression.");
@@ -848,7 +838,7 @@ bool ExpressionParser::PrepareParameter(const gd::Platform & platform, const gd:
     return true;
 }
 
-ExpressionParser::ExpressionParser(const std::string & expressionPlainString_) :
+ExpressionParser::ExpressionParser(const gd::String & expressionPlainString_) :
 expressionPlainString(expressionPlainString_)
 {
 }

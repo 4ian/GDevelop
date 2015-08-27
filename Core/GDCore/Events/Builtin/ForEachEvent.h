@@ -45,8 +45,8 @@ public:
     const gd::InstructionsList & GetActions() const { return actions; };
     gd::InstructionsList & GetActions() { return actions; };
 
-    const std::string & GetObjectToPick() const { return objectsToPick.GetPlainString(); };
-    void SetObjectToPick(std::string objectsToPick_) { objectsToPick = gd::Expression(objectsToPick_); };
+    const gd::String & GetObjectToPick() const { return objectsToPick.GetPlainString(); };
+    void SetObjectToPick(gd::String objectsToPick_) { objectsToPick = gd::Expression(objectsToPick_); };
 
     virtual std::vector < const gd::InstructionsList* > GetAllConditionsVectors() const;
     virtual std::vector < const gd::InstructionsList* > GetAllActionsVectors() const;

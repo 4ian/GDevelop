@@ -13,14 +13,13 @@
 
 #include <string>
 #include <vector>
-
-using namespace std;
+#include "GDCore/String.h"
 
 class ChoixBouton: public wxDialog
 {
 public:
 
-	ChoixBouton(wxWindow* parent, string pBouton);
+	ChoixBouton(wxWindow* parent, gd::String pBouton);
 	virtual ~ChoixBouton();
 
 	//(*Declarations(ChoixBouton)
@@ -32,7 +31,7 @@ public:
 	wxPanel* TestPanel;
 	//*)
 
-	string bouton;
+	gd::String bouton;
 
 protected:
 
@@ -61,4 +60,3 @@ private:
 };
 
 #endif
-

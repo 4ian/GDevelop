@@ -57,9 +57,9 @@ struct GRPICONHEADER
 #endif
 
 #if defined(WINDOWS)
-bool ExecutableIconChanger::LoadIcon(std::string iconFile, ICONHEADER*& pHeader, ICONIMAGE**& pIcons, GRPICONHEADER*& pGrpHeader)
+bool ExecutableIconChanger::LoadIcon(gd::String iconFile, ICONHEADER*& pHeader, ICONIMAGE**& pIcons, GRPICONHEADER*& pGrpHeader)
 {
-	HANDLE hFile = CreateFile(iconFile.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(iconFile.ToLocale().c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if(hFile == INVALID_HANDLE_VALUE) {
 		return false;
 	}
@@ -105,14 +105,14 @@ bool ExecutableIconChanger::LoadIcon(std::string iconFile, ICONHEADER*& pHeader,
 }
 #endif
 
-bool ExecutableIconChanger::ChangeWindowsExecutableIcon(std::string exeFile, std::string iconFile)
+bool ExecutableIconChanger::ChangeWindowsExecutableIcon(gd::String exeFile, gd::String iconFile)
 {
 #if defined(WINDOWS)
 	// Read icon file
 	ICONHEADER* pHeader;
 	ICONIMAGE** pIcons;
 	GRPICONHEADER* pGrpHeader;
-	bool res = LoadIcon(iconFile.c_str(), pHeader, pIcons, pGrpHeader);
+	bool res = LoadIcon(iconFile.ToLocale().c_str(), pHeader, pIcons, pGrpHeader);
 	if(!res) {
 		return false;
 	}
@@ -139,4 +139,3 @@ bool ExecutableIconChanger::ChangeWindowsExecutableIcon(std::string exeFile, std
 #endif
 }
 #endif
-

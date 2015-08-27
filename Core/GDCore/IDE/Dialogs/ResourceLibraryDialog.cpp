@@ -217,7 +217,7 @@ void ResourceLibraryDialog::OnlistCtrlItemActivated(wxListEvent& event)
     {
         wxFileName filename = wxFileName::FileName(currentDir+"/"+event.GetLabel());
         filename.Normalize();
-        currentDir = gd::ToString(filename.GetFullPath());
+        currentDir = filename.GetFullPath();
         ConstructList();
     }
 }

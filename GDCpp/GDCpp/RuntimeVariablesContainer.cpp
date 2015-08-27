@@ -29,16 +29,16 @@ RuntimeVariablesContainer& RuntimeVariablesContainer::operator=(const gd::Variab
 void RuntimeVariablesContainer::Clear()
 {
     variablesArray.clear();
-    for(std::map < std::string, gd::Variable* >::iterator it = variables.begin();it != variables.end();++it)
+    for(std::map < gd::String, gd::Variable* >::iterator it = variables.begin();it != variables.end();++it)
         delete it->second;
     variables.clear();
 }
 
 void RuntimeVariablesContainer::Merge(const gd::VariablesContainer & container)
 {
-    for ( unsigned int i = 0; i<container.Count();++i)
+    for ( std::size_t i = 0; i<container.Count();++i)
     {
-        const std::pair<std::string, gd::Variable> & variable = container.Get(i);
+        const std::pair<gd::String, gd::Variable> & variable = container.Get(i);
 
         if ( Has(variable.first) )
             Get(variable.first) = variable.second;
@@ -51,9 +51,9 @@ void RuntimeVariablesContainer::Merge(const gd::VariablesContainer & container)
     }
 }
 
-gd::Variable & RuntimeVariablesContainer::Get(const std::string & name)
+gd::Variable & RuntimeVariablesContainer::Get(const gd::String & name)
 {
-    std::map < std::string, gd::Variable* >::const_iterator var = variables.find(name);
+    std::map < gd::String, gd::Variable* >::const_iterator var = variables.find(name);
 
     if ( var != variables.end() ) return *(var->second);
 
@@ -62,9 +62,9 @@ gd::Variable & RuntimeVariablesContainer::Get(const std::string & name)
     return *newVariable;
 }
 
-const gd::Variable & RuntimeVariablesContainer::Get(const std::string & name) const
+const gd::Variable & RuntimeVariablesContainer::Get(const gd::String & name) const
 {
-    std::map < std::string, gd::Variable* >::const_iterator var = variables.find(name);
+    std::map < gd::String, gd::Variable* >::const_iterator var = variables.find(name);
 
     if ( var != variables.end() ) return *(var->second);
 

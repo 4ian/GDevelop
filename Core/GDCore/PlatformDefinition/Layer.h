@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_LAYER_H
 #define GDCORE_LAYER_H
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 namespace gd { class Camera; }
 namespace gd { class SerializerElement; }
@@ -28,12 +28,12 @@ public:
     /**
      * \brief Change layer name
      */
-    void SetName(const std::string & name_) { name = name_; }
+    void SetName(const gd::String & name_) { name = name_; }
 
     /**
      * \brief Get layer name
      */
-    const std::string & GetName() const { return name; }
+    const gd::String & GetName() const { return name; }
 
     /**
      * \brief Change if layer is displayed or not
@@ -48,27 +48,27 @@ public:
     /**
      * \brief Change the number of cameras inside the layer.
      */
-    void SetCameraCount(unsigned int n);
+    void SetCameraCount(std::size_t n);
 
     /**
      * \brief Get cameras count.
      */
-    inline unsigned int GetCameraCount() const { return cameras.size(); };
+    inline std::size_t GetCameraCount() const { return cameras.size(); };
 
     /**
      * \brief Return a reference to a camera
      */
-    inline const Camera & GetCamera(unsigned int n) const { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
+    inline const Camera & GetCamera(std::size_t n) const { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
 
     /**
      * \brief Return a reference to a camera
      */
-    inline Camera & GetCamera(unsigned int n) { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
+    inline Camera & GetCamera(std::size_t n) { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
 
     /**
      * \brief Delete a specific camera.
      */
-    inline void DeleteCamera(unsigned int n) { if ( n >= GetCameraCount() ) return; cameras.erase(cameras.begin()+n); }
+    inline void DeleteCamera(std::size_t n) { if ( n >= GetCameraCount() ) return; cameras.erase(cameras.begin()+n); }
 
     /**
      * \brief Add an already existing camera.
@@ -94,7 +94,7 @@ public:
 
 private:
 
-    std::string name; ///< The name of the layer
+    gd::String name; ///< The name of the layer
     bool isVisible; ///< True if the layer is visible
     std::vector < gd::Camera > cameras; ///< The camera displayed by the layer
 
@@ -106,8 +106,8 @@ private:
  *
  * \see gd::Layer
  */
-struct LayerHasName : public std::binary_function<gd::Layer, std::string, bool> {
-    bool operator()(const Layer & layer, const std::string & name) const { return layer.GetName() == name; }
+struct LayerHasName : public std::binary_function<gd::Layer, gd::String, bool> {
+    bool operator()(const Layer & layer, const gd::String & name) const { return layer.GetName() == name; }
 };
 
 

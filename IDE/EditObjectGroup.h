@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #ifndef EDITOBJECTGROUP_H
@@ -93,7 +93,7 @@ private:
     gd::Project & project;
     gd::Layout & layout;
 
-    unsigned int modificationCount; ///< Track the number of modification. If the user made lots of modifications and wants to cancel, he will be warned.
+    std::size_t modificationCount; ///< Track the number of modification. If the user made lots of modifications and wants to cancel, he will be warned.
 
     DECLARE_EVENT_TABLE()
 };

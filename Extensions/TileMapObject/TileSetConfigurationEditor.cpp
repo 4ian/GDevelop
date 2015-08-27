@@ -109,7 +109,7 @@ void TileSetConfigurationEditor::OnCancelButtonClicked(wxCommandEvent& event)
 
 void TileSetConfigurationEditor::OnOkButtonClicked(wxCommandEvent& event)
 {
-    tileSet.textureName = gd::ToString(m_textureNameTextCtrl->GetValue());
+    tileSet.textureName = m_textureNameTextCtrl->GetValue();
     tileSet.tileSize.x = m_tileWidthSpin->GetValue();
     tileSet.tileSize.y = m_tileHeightSpin->GetValue();
     tileSet.tileSpacing.x = m_spacingWidthSpin->GetValue();

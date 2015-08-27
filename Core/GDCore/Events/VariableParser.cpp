@@ -3,7 +3,7 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 #include "GDCore/Events/VariableParser.h"
 namespace gd { class Layout; }
@@ -24,7 +24,7 @@ bool VariableParser::Parse(VariableParserCallbacks & callbacks_)
     rootVariableParsed = false;
 	firstErrorStr.clear();
 	firstErrorPos = 0;
-	currentPosition = 0;
+	currentPositionIt = expression.begin();
 	currentTokenType = TS_INVALID;
 	currentToken.clear();
 	S();
@@ -36,38 +36,39 @@ void VariableParser::ReadToken()
 {
 	currentTokenType = TS_INVALID;
 	currentToken.clear();
-	while ( currentPosition < expression.length() ) {
-
-		if ( expression[currentPosition] == '[' ||
-			expression[currentPosition] == ']' ||
-			expression[currentPosition] == '.' )
+	while ( currentPositionIt != expression.end() )
+	{
+		char32_t currentChar = *currentPositionIt;
+		if ( currentChar == U'[' ||
+			currentChar == U']' ||
+			currentChar == U'.' )
 		{
 			if ( currentTokenType == TS_VARNAME )
 				return; //We've parsed a variable name.
 		}
 
-		if ( expression[currentPosition] == '[' ) {
+		if ( currentChar == U'[' ) {
 			currentTokenType = TS_OPENING_BRACKET;
 			currentToken.clear();
-			currentPosition++;
+			++currentPositionIt;
 			return;
 		}
-		else if ( expression[currentPosition] == ']' ) {
+		else if ( currentChar == U']' ) {
 			currentTokenType = TS_CLOSING_BRACKET;
 			currentToken.clear();
-			currentPosition++;
+			++currentPositionIt;
 			return;
 		}
-		else if ( expression[currentPosition] == '.' ) {
+		else if ( currentChar == U'.' ) {
 			currentTokenType = TS_PERIOD;
 			currentToken.clear();
-			currentPosition++;
+			++currentPositionIt;
 			return;
 		}
 
 		currentTokenType = TS_VARNAME; //We're parsing a variable name.
-		currentToken += expression[currentPosition];
-		currentPosition++;
+		currentToken.push_back(currentChar);
+		++currentPositionIt;
 	}
 
 	//Can be reached if we are at the end of the expression. In this case,
@@ -80,7 +81,7 @@ void VariableParser::S()
 	if (currentTokenType != TS_VARNAME)
 	{
 	    firstErrorStr = _("Expecting a variable name.");
-	    firstErrorPos = currentPosition;
+	    firstErrorPos = std::distance<gd::String::const_iterator>(expression.begin(), currentPositionIt);
 	    return;
 	}
 
@@ -104,13 +105,13 @@ void VariableParser::X()
 	    S();
 	else if (currentTokenType == TS_OPENING_BRACKET)
 	{
-		std::string strExpr = SkipStringExpression();
+		gd::String strExpr = SkipStringExpression();
 
 		ReadToken();
 		if (currentTokenType != TS_CLOSING_BRACKET)
 		{
 		    firstErrorStr = _("Expecting ]");
-		    firstErrorPos = currentPosition;
+		    firstErrorPos = std::distance<gd::String::const_iterator>(expression.begin(), currentPositionIt);
 		    return;
 		}
 		if ( callbacks ) callbacks->OnChildSubscript(strExpr);
@@ -119,30 +120,32 @@ void VariableParser::X()
 
 }
 
-std::string VariableParser::SkipStringExpression()
+gd::String VariableParser::SkipStringExpression()
 {
-	std::string stringExpression;
+	gd::String stringExpression;
 	bool insideStringLiteral = false;
 	bool lastCharacterWasBackslash = false;
 	unsigned int nestedBracket = 0;
-	while ( currentPosition < expression.length() ) {
-		if ( expression[currentPosition] == '\"' ) {
+	while ( currentPositionIt != expression.end() )
+	{
+		char32_t currentChar = *currentPositionIt;
+		if ( currentChar == U'\"' ) {
 			if ( !insideStringLiteral )
 				insideStringLiteral = true;
 			else if ( !lastCharacterWasBackslash )
 				insideStringLiteral = false;
 		}
-		else if ( expression[currentPosition] == '[' && !insideStringLiteral ) {
+		else if ( currentChar == U'[' && !insideStringLiteral ) {
 			nestedBracket++;
 		}
-		else if ( expression[currentPosition] == ']' && !insideStringLiteral ) {
+		else if ( currentChar == U']' && !insideStringLiteral ) {
 			if ( nestedBracket == 0 ) return stringExpression; //Found the end of the string litteral.
 			nestedBracket--;
 		}
 
-		lastCharacterWasBackslash = expression[currentPosition] == '\\';
-		stringExpression += expression[currentPosition];
-		currentPosition++;
+		lastCharacterWasBackslash = currentChar == U'\\';
+		stringExpression.push_back(currentChar);
+		++currentPositionIt;
 	}
 
 	//End of the expression reached ( So expression is invalid by the way )

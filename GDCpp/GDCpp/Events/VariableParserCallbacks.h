@@ -8,6 +8,7 @@
 #define VARIABLEPARSERCALLBACKS_H
 
 #include <string>
+#include "GDCpp/String.h"
 #include <vector>
 #include "GDCore/Events/VariableParser.h"
 
@@ -45,7 +46,7 @@ public:
      * \param context The current code generation context.
      * \param scope The scope of the variable being accessed: LAYOUT_VARIABLE, PROJECT_VARIABLE.
      */
-    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_,
+    VariableCodeGenerationCallbacks(gd::String & output, gd::EventsCodeGenerator & codeGenerator_,
         gd::EventsCodeGenerationContext & context_, const VariableScope & scope_);
     /**
 
@@ -55,34 +56,34 @@ public:
      * \param context The current code generation context.
      * \param object The name of the object
      */
-    VariableCodeGenerationCallbacks(std::string & output, gd::EventsCodeGenerator & codeGenerator_,
-        gd::EventsCodeGenerationContext & context_, const std::string & object);
+    VariableCodeGenerationCallbacks(gd::String & output, gd::EventsCodeGenerator & codeGenerator_,
+        gd::EventsCodeGenerationContext & context_, const gd::String & object);
 
     /**
      * \brief Called when the first variable has been parsed.
      * \param variableName The variable name.
      */
-    virtual void OnRootVariable(std::string variableName);
+    virtual void OnRootVariable(gd::String variableName);
 
     /**
      * \brief Called when accessing the child of a structure variable.
      * \param variableName The child variable name.
      */
-    virtual void OnChildVariable(std::string variableName);
+    virtual void OnChildVariable(gd::String variableName);
 
     /**
      * \brief Called when accessing the child of a structure variable using a string expression
      * in square brackets.
      * \param variableName The expression used to access the child variable.
      */
-    virtual void OnChildSubscript(std::string stringExpression);
+    virtual void OnChildSubscript(gd::String stringExpression);
 
 private:
-    std::string & output;
+    gd::String & output;
     gd::EventsCodeGenerator & codeGenerator;
     gd::EventsCodeGenerationContext & context;
     VariableScope scope;
-    const std::string object; ///< The object name, when scope == OBJECT_VARIABLE.
+    const gd::String object; ///< The object name, when scope == OBJECT_VARIABLE.
 };
 
 #endif // VARIABLEPARSERCALLBACKS_H

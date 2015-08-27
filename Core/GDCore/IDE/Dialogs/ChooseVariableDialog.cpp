@@ -165,7 +165,7 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
     RefreshAll();
 
     //Give a convenient size
-    unsigned int itemCount = 0;
+    std::size_t itemCount = 0;
     for ( wxTreeListItem item = variablesList->GetFirstItem();
         item.IsOk();
         item = variablesList->GetNextItem(item) )
@@ -184,14 +184,14 @@ void ChooseVariableDialog::UpdateTitle()
 {
     if ( editingOnly )
     {
-        std::string context = "";
+        wxString context = "";
         if ( associatedProject != NULL && associatedLayout == NULL ) context = _("Global variables");
-        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject == NULL  ) context = associatedLayout->GetName() + " " + _("scene variables");
-        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject != NULL ) context = associatedObject->GetName();
+        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject == NULL  ) context = wxString::Format(_("\"%s\" scene variables").ToWxString(), associatedLayout->GetName().ToWxString());
+        else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject != NULL ) context = wxString::Format(_("\"%s\" object variables").ToWxString(), associatedObject->GetName().ToWxString());
         else context = "Instance variables";
 
         SetTitle(wxString::Format(wxString(_("Edit the variables (%s)")),
-            context.c_str()));
+            context));
         okBt->SetLabel(_("Ok"));
     }
 }
@@ -207,7 +207,7 @@ ChooseVariableDialog::~ChooseVariableDialog()
 /**
  * Refresh the list with variables.
  */
-void ChooseVariableDialog::RefreshVariable(wxTreeListItem item, const std::string & name, const gd::Variable & variable)
+void ChooseVariableDialog::RefreshVariable(wxTreeListItem item, const gd::String & name, const gd::Variable & variable)
 {
     //Update the name and remove children
     variablesList->SetItemText(item, 0, name);
@@ -224,10 +224,10 @@ void ChooseVariableDialog::RefreshVariable(wxTreeListItem item, const std::strin
         variablesList->SetItemText(item, 1, "(Structure)");
 
         //Add/update children
-        const std::map<std::string, gd::Variable> & children = variable.GetAllChildren();
+        const std::map<gd::String, gd::Variable> & children = variable.GetAllChildren();
         wxTreeListItem currentChildItem = variablesList->GetFirstChild(item);
         wxTreeListItem lastChildItem;
-        for(std::map<std::string, gd::Variable>::const_iterator it = children.begin();it != children.end();++it)
+        for(std::map<gd::String, gd::Variable>::const_iterator it = children.begin();it != children.end();++it)
         {
             if ( !currentChildItem.IsOk() ) currentChildItem = variablesList->AppendItem(item, it->first);
             RefreshVariable(currentChildItem, it->first, it->second);
@@ -252,9 +252,9 @@ void ChooseVariableDialog::RefreshAll()
 {
     variablesList->DeleteAllItems();
 
-    for (unsigned int i = 0;i<temporaryContainer->Count();++i)
+    for (std::size_t i = 0;i<temporaryContainer->Count();++i)
     {
-        const std::pair<std::string, gd::Variable> & variable = temporaryContainer->Get(i);
+        const std::pair<gd::String, gd::Variable> & variable = temporaryContainer->Get(i);
 
     	wxTreeListItem item = variablesList->AppendItem(variablesList->GetRootItem(), variable.first);
         RefreshVariable(item, variable.first, variable.second);
@@ -282,7 +282,7 @@ void ChooseVariableDialog::OncancelBtClick(wxCommandEvent& event)
 {
     if ( modificationCount > 4 )
     {
-        wxMessageDialog msgDlg(this, _("You made ")+ToString(modificationCount)+_(" changes. Are you sure you want to cancel all changes\?"), _("Lot's of changes made."), wxYES_NO | wxICON_QUESTION);
+        wxMessageDialog msgDlg(this, _("You made ")+gd::String::From(modificationCount)+_(" changes. Are you sure you want to cancel all changes\?"), _("Lot's of changes made."), wxYES_NO | wxICON_QUESTION);
         if ( msgDlg.ShowModal() == wxID_NO )
             return;
     }
@@ -296,15 +296,15 @@ void ChooseVariableDialog::OncancelBtClick(wxCommandEvent& event)
 void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
 {
     //Find a new unique name
-    std::string newName = ToString(_("NewVariable"));
+    gd::String newName = _("NewVariable");
     unsigned int tries = 2;
     while ( temporaryContainer->Has(newName) )
     {
-        newName = ToString(_("NewVariable"))+ToString(tries);
+        newName = _("NewVariable")+gd::String::From(tries);
         tries++;
     }
 
-    newName = gd::ToString(wxGetTextFromUser(_("Please choose a new name for the new variable"), _("New variable name"), newName));
+    newName = wxGetTextFromUser(_("Please choose a new name for the new variable"), _("New variable name"), newName);
     if ( newName.empty() ) return;
 
     if ( temporaryContainer->Has(newName) )
@@ -329,12 +329,12 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
 void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 {
     UpdateSelectedAndParentVariable();
-    for (unsigned int i = 1;i<temporaryContainer->Count();++i)
+    for (std::size_t i = 1;i<temporaryContainer->Count();++i)
     {
-        const std::pair<std::string, gd::Variable> & currentVar = temporaryContainer->Get(i);
+        const std::pair<gd::String, gd::Variable> & currentVar = temporaryContainer->Get(i);
         if ( currentVar.first == selectedVariableName)
         {
-            const std::pair<std::string, gd::Variable> & prevVar = temporaryContainer->Get(i-1);
+            const std::pair<gd::String, gd::Variable> & prevVar = temporaryContainer->Get(i-1);
             temporaryContainer->Swap(i, i-1);
             RefreshAll();
 
@@ -351,12 +351,12 @@ void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 void ChooseVariableDialog::OnMoveDownVarSelected(wxCommandEvent& event)
 {
     UpdateSelectedAndParentVariable();
-    for (unsigned int i = 0;i<temporaryContainer->Count()-1;++i)
+    for (std::size_t i = 0;i<temporaryContainer->Count()-1;++i)
     {
-        const std::pair<std::string, gd::Variable> & currentVar = temporaryContainer->Get(i);
+        const std::pair<gd::String, gd::Variable> & currentVar = temporaryContainer->Get(i);
         if ( currentVar.first == selectedVariableName)
         {
-            const std::pair<std::string, gd::Variable> & nextVar = temporaryContainer->Get(i+1);
+            const std::pair<gd::String, gd::Variable> & nextVar = temporaryContainer->Get(i+1);
 
             temporaryContainer->Swap(i, i+1);
             RefreshAll();
@@ -412,7 +412,7 @@ void ChooseVariableDialog::OnvariablesListKeyDown1(wxKeyEvent& event)
 
 void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
 {
-    std::set<std::string> allVariables;
+    std::set<gd::String> allVariables;
     if ( associatedProject != NULL && associatedLayout == NULL ) allVariables = EventsVariablesFinder::FindAllGlobalVariables(associatedProject->GetCurrentPlatform(), *associatedProject);
     else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject == NULL  ) allVariables = EventsVariablesFinder::FindAllLayoutVariables(associatedProject->GetCurrentPlatform(), *associatedProject, *associatedLayout);
     else if ( associatedProject != NULL && associatedLayout != NULL && associatedObject != NULL ) allVariables = EventsVariablesFinder::FindAllObjectVariables(associatedProject->GetCurrentPlatform(), *associatedProject, *associatedLayout, *associatedObject);
@@ -420,7 +420,7 @@ void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
 
     //Construct a wxArrayString with not declared variables
     wxArrayString variablesNotDeclared;
-    for (std::set<std::string>::const_iterator it = allVariables.begin();it!=allVariables.end();++it)
+    for (std::set<gd::String>::const_iterator it = allVariables.begin();it!=allVariables.end();++it)
     {
         if ( !temporaryContainer->Has(*it) )
             variablesNotDeclared.push_back(*it);
@@ -432,9 +432,9 @@ void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
 
     //Add selection
     wxArrayInt selection = dialog.GetSelections();
-    for (unsigned int i = 0;i<selection.size();++i)
+    for (std::size_t i = 0;i<selection.size();++i)
     {
-        temporaryContainer->InsertNew(ToString(variablesNotDeclared[selection[i]]),temporaryContainer->Count());
+        temporaryContainer->InsertNew(variablesNotDeclared[selection[i]],temporaryContainer->Count());
         modificationCount++;
     }
 
@@ -448,7 +448,7 @@ void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
 void ChooseVariableDialog::OnvariablesListEndLabelEdit(wxListEvent& event)
 {
     UpdateSelectedAndParentVariable();
-    std::string newName = ToString(event.GetLabel());
+    gd::String newName = ToString(event.GetLabel());
     if ( newName != oldName )
     {
         if ( !temporaryContainer->Has(newName))
@@ -466,7 +466,7 @@ void ChooseVariableDialog::OnEditValueSelected(wxCommandEvent& event)
     UpdateSelectedAndParentVariable();
     if ( !selectedVariable || selectedVariable->IsStructure() ) return;
 
-    std::string value = ToString(wxGetTextFromUser(_("Enter the initial value of the variable"), _("Initial value"), selectedVariable->GetString()));
+    gd::String value = wxGetTextFromUser(_("Enter the initial value of the variable"), _("Initial value"), selectedVariable->GetString());
     selectedVariable->SetString(value);
     RefreshVariable(variablesList->GetSelection(), selectedVariableName, *selectedVariable);
 
@@ -478,7 +478,7 @@ void ChooseVariableDialog::OnRenameSelected(wxCommandEvent& event)
     UpdateSelectedAndParentVariable();
     if ( !selectedVariable ) return;
 
-    std::string newName = ToString(wxGetTextFromUser(_("Enter the new name of the variable"), _("New name"), selectedVariableName));
+    gd::String newName = wxGetTextFromUser(_("Enter the new name of the variable"), _("New name"), selectedVariableName);
     if ( newName.empty() || newName == selectedVariableName ) return;
 
 
@@ -515,9 +515,9 @@ void ChooseVariableDialog::OnAddChildSelected(wxCommandEvent& event)
     UpdateSelectedAndParentVariable();
     if(!selectedVariable) return;
 
-    std::string newChildName = ToString(_("NewChild"));
+    gd::String newChildName = _("NewChild");
     for(unsigned int i = 2;selectedVariable->HasChild(newChildName);++i )
-        newChildName = ToString(_("NewChild"))+ToString(i);
+        newChildName = _("NewChild")+gd::String::From(i);
 
     selectedVariable->GetChild(newChildName);
     UpdateSelectedAndParentVariable();
@@ -574,14 +574,14 @@ void ChooseVariableDialog::UpdateSelectedAndParentVariable()
         selectedVariable = NULL;
         parentVariable = NULL;
         //Create a list containing the parents.
-        std::vector<std::string> parents;
+        std::vector<gd::String> parents;
         while(parent != variablesList->GetRootItem() && parent.IsOk() )
         {
-            parents.insert(parents.begin(), ToString(variablesList->GetItemText(parent)));
+            parents.insert(parents.begin(), variablesList->GetItemText(parent));
             parent = variablesList->GetItemParent(parent);
         }
 
-        for(unsigned int i = 0;i<parents.size();++i)
+        for(std::size_t i = 0;i<parents.size();++i)
         {
             //Generate the full name
             selectedVariableFullName += parents[i]+".";

@@ -15,20 +15,20 @@
 namespace gd
 {
 InstructionMetadata::InstructionMetadata() :
-    sentence(gd::ToString(_("Unknown or unsupported instruction"))),
+    sentence(_("Unknown or unsupported instruction")),
     canHaveSubInstructions(false),
     hidden(true)
 {
 }
 
-InstructionMetadata::InstructionMetadata(const std::string & extensionNamespace_,
-                        const std::string & name_,
-                        const std::string & fullname_,
-                        const std::string & description_,
-                        const std::string & sentence_,
-                        const std::string & group_,
-                        const std::string & icon_,
-                        const std::string & smallIcon_) :
+InstructionMetadata::InstructionMetadata(const gd::String & extensionNamespace_,
+                        const gd::String & name_,
+                        const gd::String & fullname_,
+                        const gd::String & description_,
+                        const gd::String & sentence_,
+                        const gd::String & group_,
+                        const gd::String & icon_,
+                        const gd::String & smallIcon_) :
 fullname(fullname_),
 description(description_),
 sentence(sentence_),
@@ -58,7 +58,7 @@ codeOnly(false)
 {
 }
 
-InstructionMetadata & InstructionMetadata::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
+InstructionMetadata & InstructionMetadata::AddParameter(const gd::String & type, const gd::String & description, const gd::String & optionalObjectType, bool parameterIsOptional)
 {
     ParameterMetadata info;
     info.type = type;
@@ -71,7 +71,7 @@ InstructionMetadata & InstructionMetadata::AddParameter(const std::string & type
     return *this;
 }
 
-InstructionMetadata & InstructionMetadata::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
+InstructionMetadata & InstructionMetadata::AddCodeOnlyParameter(const gd::String & type, const gd::String & supplementaryInformation)
 {
     ParameterMetadata info;
     info.type = type;
@@ -83,10 +83,3 @@ InstructionMetadata & InstructionMetadata::AddCodeOnlyParameter(const std::strin
 }
 
 }
-
-
-
-
-
-
-

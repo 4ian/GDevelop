@@ -11,7 +11,7 @@
 #include <string>
 #include <memory>
 #include <map>
-
+#include "GDCpp/String.h"
 
 /**
  * \brief Helper class wrapping a tinyxml document in RAII fashion
@@ -25,7 +25,7 @@ class XmlFile
         /**
          * Open file
          */
-        XmlFile(std::string filename) : doc(filename.c_str()), modified(false) { doc.LoadFile(); };
+        XmlFile(gd::String filename) : doc(filename.ToLocale().c_str()), modified(false) { doc.LoadFile(); };
 
         /**
          * Save file is the document was marked as modified.
@@ -59,14 +59,14 @@ class XmlFile
  */
 class XmlFilesManager
 {
-    static std::map<std::string, std::shared_ptr<XmlFile> > openedFiles;
+    static std::map<gd::String, std::shared_ptr<XmlFile> > openedFiles;
 
     public:
 
     /**
      * Load a file and keep it in memory
      */
-    static void LoadFile(std::string filename)
+    static void LoadFile(gd::String filename)
     {
         if ( openedFiles.find(filename) == openedFiles.end() )
             openedFiles[filename] = std::shared_ptr<XmlFile>(new XmlFile(filename));
@@ -75,7 +75,7 @@ class XmlFilesManager
     /**
      * Unload a file kept in memory
      */
-    static void UnloadFile(std::string filename)
+    static void UnloadFile(gd::String filename)
     {
         if ( openedFiles.find(filename) != openedFiles.end() )
             openedFiles.erase(filename);
@@ -85,7 +85,7 @@ class XmlFilesManager
      * Get access to a file. If the file has not been loaded with LoadFile,
      * it will be loaded now, and unload as soon as it is not used anymore.
      */
-    static std::shared_ptr<XmlFile> GetFile(std::string filename, bool isGoingToModifyFile = true)
+    static std::shared_ptr<XmlFile> GetFile(gd::String filename, bool isGoingToModifyFile = true)
     {
         std::shared_ptr<XmlFile> file = openedFiles.find(filename) != openedFiles.end() ? openedFiles[filename] : std::shared_ptr<XmlFile>(new XmlFile(filename));
         if ( isGoingToModifyFile ) file->MarkAsModified();
@@ -94,8 +94,7 @@ class XmlFilesManager
     }
 
 
-    static std::map<std::string, std::shared_ptr<XmlFile> > GetOpenedFilesList() { return openedFiles; }
+    static std::map<gd::String, std::shared_ptr<XmlFile> > GetOpenedFilesList() { return openedFiles; }
 };
 
 #endif // XMLFILESHELPER_H
-

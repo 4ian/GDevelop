@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #include "BugReport.h"
@@ -58,7 +58,7 @@ BEGIN_EVENT_TABLE( BugReport, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedFiles_ ) :
+BugReport::BugReport( wxWindow* parent, const std::vector<gd::String> & openedFiles_ ) :
     openedFiles(openedFiles_)
 {
     //(*Initialize(BugReport)
@@ -176,9 +176,9 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&BugReport::OnCloseBtClick);
     //*)
 
-    for (unsigned int i = 0; i < openedFiles.size(); ++i)
+    for (std::size_t i = 0; i < openedFiles.size(); ++i)
     {
-        std::string file = openedFiles[i];
+        gd::String file = openedFiles[i];
         if (!wxFileExists(file+".autosave"))
             file += _(" (Autosave not found!)");
         openedFilesEdit->AppendText(file+"\n");
@@ -189,7 +189,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
     }
 
     CreateRapportBt->Disable();
-    bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::ToString(gd::VersionWrapper::Major())+gd::ToString(gd::VersionWrapper::Minor())+gd::ToString(gd::VersionWrapper::Build()));
+    bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::String::From(gd::VersionWrapper::Major())+gd::String::From(gd::VersionWrapper::Minor())+gd::String::From(gd::VersionWrapper::Build()));
 }
 
 BugReport::~BugReport()
@@ -245,7 +245,7 @@ void BugReport::OnCreateRapportBtClick( wxCommandEvent& event )
     request.setMethod(sf::Http::Request::Post);
     request.setField("Content-Type", "application/x-www-form-urlencoded");
     request.setUri("/bugs/report.php");
-    request.setBody(gd::ToString(requestURI.GetQuery()));
+    request.setBody(gd::String(requestURI.GetQuery()).ToSfString());
 
     // Send the request
     sf::Http::Response response = Http.sendRequest(request, sf::seconds(5));

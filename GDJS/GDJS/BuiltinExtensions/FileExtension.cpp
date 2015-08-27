@@ -53,7 +53,7 @@ FileExtension::FileExtension()
                    _("Files"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")
-        .AddParameter("file", _("Filename"), "",false)
+        .AddParameter("file", _("Filename"))
         .SetFunctionName("FileExists").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
 
     AddAction("ExecuteCmd",
@@ -63,7 +63,7 @@ FileExtension::FileExtension()
                    _("Files"),
                    "res/actions/launchFile24.png",
                    "res/actions/launchFile.png")
-        .AddParameter("string", _("Command"), "",false)
+        .AddParameter("string", _("Command"))
         .SetFunctionName("ExecuteCmd").SetIncludeFile("GDCpp/BuiltinExtensions/FileTools.h");
     */
 }

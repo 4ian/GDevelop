@@ -18,6 +18,8 @@ namespace gd {
  * \see Animation
  * \see Sprite
  * \ingroup SpriteObjectExtension
+ *
+ * \todo Support UTF8 (currently convert all loaded strings from UTF8 to the current locale)
  */
 class GD_CORE_API Direction
 {
@@ -51,14 +53,14 @@ public:
      * \param nb The index of the sprite to be accessed. Bound checking is not made.
      * \return A reference to the sprite.
      */
-    const Sprite & GetSprite(unsigned int nb) const;
+    const Sprite & GetSprite(std::size_t nb) const;
 
     /**
      * Return a reference to a sprite of the direction.
      * \param nb The index of the sprite to be accessed. Bound checking is not made.
      * \return A reference to the sprite.
      */
-    Sprite & GetSprite(unsigned int nb);
+    Sprite & GetSprite(std::size_t nb);
 
     /**
      * Check if the direction contains sprites.
@@ -70,13 +72,13 @@ public:
      * Return the number of sprite used in the direction
      * \return The number of sprite used in the direction
      */
-    unsigned int GetSpritesCount() const;
+    std::size_t GetSpritesCount() const;
 
     /**
      * Remove the sprite at the specified position.
      * Bound-checking is made.
      */
-    void RemoveSprite(unsigned int index);
+    void RemoveSprite(std::size_t index);
 
     /**
      * Clear the direction from all of its sprites
@@ -91,7 +93,7 @@ public:
     /**
      * Swap the position of two sprites
      */
-    void SwapSprites(unsigned int firstSpriteIndex, unsigned int secondSpriteIndex);
+    void SwapSprites(std::size_t firstSpriteIndex, std::size_t secondSpriteIndex);
 
     void UnserializeFrom(const gd::SerializerElement & element);
     #if defined(GD_IDE_ONLY)

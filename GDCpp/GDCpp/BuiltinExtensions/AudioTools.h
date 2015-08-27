@@ -5,7 +5,9 @@
  */
 #ifndef AUDIOTOOLS_H
 #define AUDIOTOOLS_H
+
 #include <string>
+#include "GDCpp/String.h"
 
 class RuntimeScene;
 
@@ -15,13 +17,13 @@ bool GD_API MusicStopped( RuntimeScene & scene, unsigned int channel );
 bool GD_API SoundPlaying( RuntimeScene & scene, unsigned int channel );
 bool GD_API SoundPaused( RuntimeScene & scene, unsigned int channel );
 bool GD_API SoundStopped( RuntimeScene & scene, unsigned int channel );
-void GD_API PlaySound( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch );
-void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel, bool repeat, float volume, float pitch );
+void GD_API PlaySound( RuntimeScene & scene, const gd::String & file, bool repeat, float volume, float pitch );
+void GD_API PlaySoundOnChannel( RuntimeScene & scene, const gd::String & file, unsigned int channel, bool repeat, float volume, float pitch );
 void GD_API StopSoundOnChannel( RuntimeScene & scene, unsigned int channel );
 void GD_API PauseSoundOnChannel( RuntimeScene & scene, unsigned int channel );
 void GD_API RePlaySoundOnChannel( RuntimeScene & scene, unsigned int channel );
-void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch );
-void GD_API PlayMusicOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel, bool repeat, float volume, float pitch );
+void GD_API PlayMusic( RuntimeScene & scene, const gd::String & file, bool repeat, float volume, float pitch );
+void GD_API PlayMusicOnChannel( RuntimeScene & scene, const gd::String & file, unsigned int channel, bool repeat, float volume, float pitch );
 void GD_API StopMusicOnChannel( RuntimeScene & scene, unsigned int channel );
 void GD_API PauseMusicOnChannel( RuntimeScene & scene, unsigned int channel );
 void GD_API RePlayMusicOnChannel( RuntimeScene & scene, unsigned int channel );

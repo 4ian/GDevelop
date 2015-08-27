@@ -29,7 +29,7 @@ BEGIN_EVENT_TABLE(ChoixClavier,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoixClavier::ChoixClavier(wxWindow* parent, string pTouche)
+ChoixClavier::ChoixClavier(wxWindow* parent, gd::String pTouche)
 {
 	//(*Initialize(ChoixClavier)
 	wxFlexGridSizer* FlexGridSizer3;

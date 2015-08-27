@@ -131,14 +131,14 @@ game(game_)
 	if ( !editedEvent.IncludeAllEvents() )
 	{
 	    OnlyEventsCheck->SetValue(true);
-	    StartEdit->ChangeValue(ToString(editedEvent.GetIncludeStart()+1));
-	    EndEdit->ChangeValue(ToString(editedEvent.GetIncludeEnd()+1));
+	    StartEdit->ChangeValue(gd::String::From(editedEvent.GetIncludeStart()+1));
+	    EndEdit->ChangeValue(gd::String::From(editedEvent.GetIncludeEnd()+1));
 	}
 
-	for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
+	for (std::size_t i = 0;i<game.GetExternalEventsCount();++i)
         linkedNameEdit->Append(game.GetExternalEvents(i).GetName());
 
-    for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
+    for (std::size_t i = 0;i<game.GetLayoutsCount();++i)
     	linkedNameEdit->Append(game.GetLayout(i).GetName());
 }
 
@@ -167,13 +167,15 @@ void EditLink::OnAnnulerBtClick(wxCommandEvent& event)
  */
 void EditLink::OnOkBtClick(wxCommandEvent& event)
 {
-    editedEvent.SetTarget(ToString(linkedNameEdit->GetValue()));
+    editedEvent.SetTarget(linkedNameEdit->GetValue());
     if ( AllEventsCheck->GetValue() == true )
         editedEvent.SetIncludeAllEvents(true);
     else
     {
         editedEvent.SetIncludeAllEvents(false);
-        editedEvent.SetIncludeStartAndEnd(ToInt(ToString(StartEdit->GetValue()))-1, ToInt(ToString(EndEdit->GetValue()))-1);
+        editedEvent.SetIncludeStartAndEnd(
+        	gd::String(StartEdit->GetValue()).To<std::size_t>() - 1,
+        	gd::String(EndEdit->GetValue()).To<std::size_t>() - 1);
     }
     EndModal(1);
 }

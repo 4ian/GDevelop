@@ -13,7 +13,7 @@
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ObjectMetadata.h"
-#include "GDCore/Events/AutomatismMetadata.h"
+#include "GDCore/Events/BehaviorMetadata.h"
 
 using namespace std;
 
@@ -30,10 +30,10 @@ namespace gd
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Get
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
+gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String>  & arguments, const gd::String & callStartString, std::size_t startFromArgument)
 {
-    unsigned int relationalOperatorIndex = instrInfos.parameters.size();
-    for (unsigned int i = startFromArgument;i<instrInfos.parameters.size();++i)
+    std::size_t relationalOperatorIndex = instrInfos.parameters.size();
+    for (std::size_t i = startFromArgument;i<instrInfos.parameters.size();++i)
     {
         if ( instrInfos.parameters[i].type == "relationalOperator" )
             relationalOperatorIndex = i;
@@ -45,12 +45,12 @@ string EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::Instruction
         return "";
     }
 
-    string relationalOperator = arguments[relationalOperatorIndex];
+    gd::String relationalOperator = arguments[relationalOperatorIndex];
     if ( relationalOperator.size() > 2 ) relationalOperator = relationalOperator.substr(1, relationalOperator.length()-1-1); //Relational operator contains quote which must be removed.
 
-    string rhs = arguments[relationalOperatorIndex+1];
-    string argumentsStr;
-    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    gd::String rhs = arguments[relationalOperatorIndex+1];
+    gd::String argumentsStr;
+    for (std::size_t i = startFromArgument;i<arguments.size();++i)
     {
         if ( i != relationalOperatorIndex && i != relationalOperatorIndex+1)
         {
@@ -73,10 +73,10 @@ string EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::Instruction
  * \param String to be placed at the start of the call of the getter ( the "getter" function to be called typically ). Example : MyObject->Get
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<string> & arguments, const string & callStartString, const string & getterStartString, unsigned int startFromArgument)
+gd::String EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String>  & arguments, const gd::String & callStartString, const gd::String & getterStartString, std::size_t startFromArgument)
 {
-    unsigned int operatorIndex = instrInfos.parameters.size();
-    for (unsigned int i = startFromArgument;i<instrInfos.parameters.size();++i)
+    std::size_t operatorIndex = instrInfos.parameters.size();
+    for (std::size_t i = startFromArgument;i<instrInfos.parameters.size();++i)
     {
         if ( instrInfos.parameters[i].type == "operator" )
             operatorIndex = i;
@@ -89,14 +89,14 @@ string EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata &
         return "";
     }
 
-    string operatorStr = arguments[operatorIndex];
+    gd::String operatorStr = arguments[operatorIndex];
     if ( operatorStr.size() > 2 ) operatorStr = operatorStr.substr(1, operatorStr.length()-1-1); //Operator contains quote which must be removed.
 
-    string rhs = arguments[operatorIndex+1];
+    gd::String rhs = arguments[operatorIndex+1];
 
     //Generate arguments for calling the "getter" function
-    string getterArgumentsStr;
-    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    gd::String getterArgumentsStr;
+    for (std::size_t i = startFromArgument;i<arguments.size();++i)
     {
         if ( i != operatorIndex && i != operatorIndex+1)
         {
@@ -106,8 +106,8 @@ string EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata &
     }
 
     //Generate arguments for calling the function ("setter")
-    string argumentsStr;
-    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    gd::String argumentsStr;
+    for (std::size_t i = startFromArgument;i<arguments.size();++i)
     {
         if ( i != operatorIndex && i != operatorIndex+1) //Generate classic arguments
         {
@@ -138,10 +138,10 @@ string EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata &
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Set
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
+gd::String EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String>  & arguments, const gd::String & callStartString, std::size_t startFromArgument)
 {
-    unsigned int operatorIndex = instrInfos.parameters.size();
-    for (unsigned int i = startFromArgument;i<instrInfos.parameters.size();++i)
+    std::size_t operatorIndex = instrInfos.parameters.size();
+    for (std::size_t i = startFromArgument;i<instrInfos.parameters.size();++i)
     {
         if ( instrInfos.parameters[i].type == "operator" )
             operatorIndex = i;
@@ -154,10 +154,10 @@ string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMe
         return "";
     }
 
-    string operatorStr = arguments[operatorIndex];
+    gd::String operatorStr = arguments[operatorIndex];
     if ( operatorStr.size() > 2 ) operatorStr = operatorStr.substr(1, operatorStr.length()-1-1); //Operator contains quote which must be removed.
 
-    string rhs = arguments[operatorIndex+1];
+    gd::String rhs = arguments[operatorIndex+1];
 
     //Generate real operator string.
     if ( operatorStr == "+" ) operatorStr = "+=";
@@ -166,8 +166,8 @@ string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMe
     else if ( operatorStr == "*" ) operatorStr = "*=";
 
     //Generate arguments for calling the function ("setter")
-    string argumentsStr;
-    for (unsigned int i = startFromArgument;i<arguments.size();++i)
+    gd::String argumentsStr;
+    for (std::size_t i = startFromArgument;i<arguments.size();++i)
     {
         if ( i != operatorIndex && i != operatorIndex+1) //Generate classic arguments
         {
@@ -179,9 +179,9 @@ string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMe
     return callStartString+"("+argumentsStr+") "+operatorStr+" ("+rhs+")";
 }
 
-std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GenerateConditionCode(gd::Instruction & condition, gd::String returnBoolean, EventsCodeGenerationContext & context)
 {
-    std::string conditionCode;
+    gd::String conditionCode;
 
     gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, condition.GetType());
 
@@ -208,11 +208,11 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
     }
 
     //Verify that there are not mismatch between object type in parameters
-    for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+    for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
     {
         if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) )
         {
-            string objectInParameter = condition.GetParameter(pNb).GetPlainString();
+            gd::String objectInParameter = condition.GetParameter(pNb).GetPlainString();
 
             if ( !scene.HasObjectNamed(objectInParameter) && !project.HasObjectNamed(objectInParameter)
                  && find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == scene.GetObjectGroups().end()
@@ -240,20 +240,20 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
     if ( MetadataProvider::HasCondition(platform, condition.GetType()))
     {
         //Prepare arguments
-        std::vector < std::pair<std::string, std::string> > supplementaryParametersTypes;
+        std::vector < std::pair<gd::String, gd::String> > supplementaryParametersTypes;
         supplementaryParametersTypes.push_back(std::make_pair("conditionInverted", condition.IsInverted() ? "true" : "false"));
-        vector<string> arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context, &supplementaryParametersTypes);
+        vector<gd::String>  arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context, &supplementaryParametersTypes);
 
         conditionCode += GenerateFreeCondition(arguments, instrInfos, returnBoolean, condition.IsInverted(), context);
     }
 
     //Generate object condition if available
-    string objectName = condition.GetParameters().empty() ? "" : condition.GetParameter(0).GetPlainString();
-    string objectType = gd::GetTypeOfObject(project, scene, objectName);
+    gd::String objectName = condition.GetParameters().empty() ? "" : condition.GetParameter(0).GetPlainString();
+    gd::String objectType = gd::GetTypeOfObject(project, scene, objectName);
     if ( !objectName.empty() && MetadataProvider::HasObjectCondition(platform, objectType, condition.GetType()) && !instrInfos.parameters.empty())
     {
-        std::vector<std::string> realObjects = ExpandObjectsName(objectName, context);
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             //Set up the context
             const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(platform, objectType);
@@ -262,29 +262,29 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
             context.ObjectsListNeeded(realObjects[i]);
 
             //Prepare arguments and generate the condition whole code
-            vector<string> arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context);
+            vector<gd::String>  arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context);
             conditionCode += GenerateObjectCondition(realObjects[i], objInfo, arguments, instrInfos, returnBoolean, condition.IsInverted(), context);
 
             context.SetNoCurrentObject();
         }
     }
 
-    //Generate automatism condition if available
-    string automatismType = gd::GetTypeOfAutomatism(project, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
-    if (MetadataProvider::HasAutomatismCondition(platform, automatismType, condition.GetType()) && instrInfos.parameters.size() >= 2)
+    //Generate behavior condition if available
+    gd::String behaviorType = gd::GetTypeOfBehavior(project, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
+    if (MetadataProvider::HasBehaviorCondition(platform, behaviorType, condition.GetType()) && instrInfos.parameters.size() >= 2)
     {
-        std::vector<std::string> realObjects = ExpandObjectsName(objectName, context);
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             //Setup context
-            const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(platform, automatismType);
+            const BehaviorMetadata & autoInfo = MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
             AddIncludeFiles(autoInfo.includeFiles);
             context.SetCurrentObject(realObjects[i]);
             context.ObjectsListNeeded(realObjects[i]);
 
             //Prepare arguments and generate the whole condition code
-            vector<string> arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context);
-            conditionCode += GenerateAutomatismCondition(realObjects[i], condition.GetParameter(1).GetPlainString(), autoInfo, arguments,
+            vector<gd::String>  arguments = GenerateParametersCodes(condition.GetParameters(), instrInfos.parameters, context);
+            conditionCode += GenerateBehaviorCondition(realObjects[i], condition.GetParameter(1).GetPlainString(), autoInfo, arguments,
                                                                instrInfos, returnBoolean, condition.IsInverted(), context);
 
             context.SetNoCurrentObject();
@@ -298,24 +298,24 @@ std::string EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditi
  * Generate code for a list of conditions.
  * Bools containing conditions results are named conditionXIsTrue.
  */
-string EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, EventsCodeGenerationContext & context)
 {
-    string outputCode;
+    gd::String outputCode;
 
-    for (unsigned int i = 0;i<conditions.size();++i)
-        outputCode += GenerateBooleanInitializationToFalse("condition"+ToString(i)+"IsTrue", context);
+    for (std::size_t i = 0;i<conditions.size();++i)
+        outputCode += GenerateBooleanInitializationToFalse("condition"+gd::String::From(i) +"IsTrue", context);
 
-    for (unsigned int cId =0;cId < conditions.size();++cId)
+    for (std::size_t cId =0;cId < conditions.size();++cId)
     {
         gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
 
-        string conditionCode = GenerateConditionCode(conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
+        gd::String conditionCode = GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId) +"IsTrue", context);
         if ( !conditions[cId].GetType().empty() )
         {
-            for (unsigned int i = 0;i<cId;++i) //Skip conditions if one condition is false. //TODO : Can be optimized
+            for (std::size_t i = 0;i<cId;++i) //Skip conditions if one condition is false. //TODO : Can be optimized
             {
                 if (i == 0) outputCode += "if ( "; else outputCode += " && ";
-                outputCode += "condition"+ToString(i)+"IsTrue";
+                outputCode += "condition"+gd::String::From(i) +"IsTrue";
                 if (i == cId-1) outputCode += ") ";
             }
 
@@ -333,9 +333,9 @@ string EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & co
 /**
  * Generate code for an action.
  */
-std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, EventsCodeGenerationContext & context)
 {
-    string actionCode;
+    gd::String actionCode;
 
     gd::InstructionMetadata instrInfos = MetadataProvider::GetActionMetadata(platform, action.GetType());
 
@@ -355,11 +355,11 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
     }
 
     //Verify that there are not mismatch between object type in parameters
-    for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
+    for (std::size_t pNb = 0;pNb < instrInfos.parameters.size();++pNb)
     {
         if ( ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) )
         {
-            string objectInParameter = action.GetParameter(pNb).GetPlainString();
+            gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
             if ( !scene.HasObjectNamed(objectInParameter) && !project.HasObjectNamed(objectInParameter)
                  && find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == scene.GetObjectGroups().end()
                  && find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == project.GetObjectGroups().end() )
@@ -371,7 +371,7 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
             else if ( !instrInfos.parameters[pNb].supplementaryInformation.empty()
                      && gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
-                cout << "Bad object type in parameter "+ToString(pNb)+" of an action " << action.GetType() << endl;
+                cout << "Bad object type in parameter "+gd::String::From(pNb)+" of an action " << action.GetType() << endl;
                 cout << "Action wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
                 cout << "Action has received " << objectInParameter << " of type " << gd::GetTypeOfObject(project, scene, objectInParameter) << endl;
 
@@ -384,17 +384,17 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
     //Call free function first if available
     if (MetadataProvider::HasAction(platform, action.GetType()))
     {
-        vector<string> arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
+        vector<gd::String>  arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
         actionCode += GenerateFreeAction(arguments, instrInfos, context);
     }
 
     //Call object function if available
-    string objectName = action.GetParameters().empty() ? "" : action.GetParameter(0).GetPlainString();
-    string objectType = gd::GetTypeOfObject(project, scene, objectName);
+    gd::String objectName = action.GetParameters().empty() ? "" : action.GetParameter(0).GetPlainString();
+    gd::String objectType = gd::GetTypeOfObject(project, scene, objectName);
     if (MetadataProvider::HasObjectAction(platform, objectType, action.GetType()) && !instrInfos.parameters.empty())
     {
-        std::vector<std::string> realObjects = ExpandObjectsName(objectName, context);
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             //Setup context
             const ObjectMetadata & objInfo = MetadataProvider::GetObjectMetadata(platform, objectType);
@@ -403,29 +403,29 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
             context.ObjectsListNeeded(realObjects[i]);
 
             //Prepare arguments and generate the whole action code
-            vector<string> arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
+            vector<gd::String>  arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
             actionCode += GenerateObjectAction(realObjects[i], objInfo, arguments, instrInfos, context);
 
             context.SetNoCurrentObject();
         }
     }
 
-    //Affection to an automatism member function if found
-    string automatismType = gd::GetTypeOfAutomatism(project, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
-    if (MetadataProvider::HasAutomatismAction(platform, automatismType, action.GetType()) && instrInfos.parameters.size() >= 2)
+    //Assign to a behavior member function if found
+    gd::String behaviorType = gd::GetTypeOfBehavior(project, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
+    if (MetadataProvider::HasBehaviorAction(platform, behaviorType, action.GetType()) && instrInfos.parameters.size() >= 2)
     {
-        std::vector<std::string> realObjects = ExpandObjectsName(objectName, context);
-        for (unsigned int i = 0;i<realObjects.size();++i)
+        std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
+        for (std::size_t i = 0;i<realObjects.size();++i)
         {
             //Setup context
-            const AutomatismMetadata & autoInfo = MetadataProvider::GetAutomatismMetadata(platform, automatismType);
+            const BehaviorMetadata & autoInfo = MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
             AddIncludeFiles(autoInfo.includeFiles);
             context.SetCurrentObject(realObjects[i]);
             context.ObjectsListNeeded(realObjects[i]);
 
             //Prepare arguments and generate the whole action code
-            vector<string> arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
-            actionCode += GenerateAutomatismAction(realObjects[i], action.GetParameter(1).GetPlainString(), autoInfo, arguments, instrInfos, context);
+            vector<gd::String>  arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
+            actionCode += GenerateBehaviorAction(realObjects[i], action.GetParameter(1).GetPlainString(), autoInfo, arguments, instrInfos, context);
 
             context.SetNoCurrentObject();
         }
@@ -437,14 +437,14 @@ std::string EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Ev
 /**
  * Generate actions code.
  */
-string EventsCodeGenerator::GenerateActionsListCode(gd::InstructionsList & actions, EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GenerateActionsListCode(gd::InstructionsList & actions, EventsCodeGenerationContext & context)
 {
-    string outputCode;
-    for (unsigned int aId =0;aId < actions.size();++aId)
+    gd::String outputCode;
+    for (std::size_t aId =0;aId < actions.size();++aId)
     {
         gd::InstructionMetadata instrInfos = MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
 
-        string actionCode = GenerateActionCode(actions[aId], context);
+        gd::String actionCode = GenerateActionCode(actions[aId], context);
 
         outputCode += "{";
         if ( !actions[aId].GetType().empty() ) outputCode += actionCode;
@@ -454,12 +454,12 @@ string EventsCodeGenerator::GenerateActionsListCode(gd::InstructionsList & actio
     return outputCode;
 }
 
-std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parameter, const gd::ParameterMetadata & metadata,
                                                         gd::EventsCodeGenerationContext & context,
-                                                        const std::string & previousParameter,
-                                                        std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
+                                                        const gd::String & previousParameter,
+                                                        std::vector < std::pair<gd::String, gd::String> > * supplementaryParametersTypes)
 {
-    std::string argOutput;
+    gd::String argOutput;
 
     if ( metadata.type == "expression" || metadata.type == "camera" )
     {
@@ -511,7 +511,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
 
         argOutput = "\""+argOutput+"\"";
     }
-    else if ( metadata.type == "object" || metadata.type == "automatism" )
+    else if ( metadata.type == "object" || metadata.type == "behavior" )
     {
         argOutput = "\""+ConvertToString(parameter)+"\"";
     }
@@ -547,7 +547,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
         //Try supplementary types if provided
         if ( supplementaryParametersTypes )
         {
-            for (unsigned int i = 0;i<supplementaryParametersTypes->size();++i)
+            for (std::size_t i = 0;i<supplementaryParametersTypes->size();++i)
             {
                 if ( (*supplementaryParametersTypes)[i].first == metadata.type )
                     argOutput += (*supplementaryParametersTypes)[i].second;
@@ -565,19 +565,19 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     return argOutput;
 }
 
-vector<string> EventsCodeGenerator::GenerateParametersCodes(vector < gd::Expression > parameters, const vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
+vector<gd::String>  EventsCodeGenerator::GenerateParametersCodes(vector < gd::Expression > parameters, const vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<gd::String, gd::String> > * supplementaryParametersTypes)
 {
-    vector<string> arguments;
+    vector<gd::String>  arguments;
 
     while(parameters.size() < parametersInfo.size())
         parameters.push_back(gd::Expression(""));
 
-    for (unsigned int pNb = 0;pNb < parametersInfo.size() && pNb < parameters.size();++pNb)
+    for (std::size_t pNb = 0;pNb < parametersInfo.size() && pNb < parameters.size();++pNb)
     {
         if ( parameters[pNb].GetPlainString().empty() && parametersInfo[pNb].optional  )
             parameters[pNb] = gd::Expression(parametersInfo[pNb].defaultValue);
 
-        std::string argOutput = GenerateParameterCodes(parameters[pNb].GetPlainString(), parametersInfo[pNb], context,
+        gd::String argOutput = GenerateParameterCodes(parameters[pNb].GetPlainString(), parametersInfo[pNb], context,
             pNb == 0 ? "" : parameters[pNb-1].GetPlainString(), supplementaryParametersTypes);
 
         arguments.push_back(argOutput);
@@ -586,10 +586,10 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(vector < gd::Express
     return arguments;
 }
 
-std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(EventsCodeGenerationContext & context)
 {
-    std::string declarationsCode;
-    for ( set<string>::iterator it = context.objectsListsToBeDeclared.begin() ; it != context.objectsListsToBeDeclared.end(); ++it )
+    gd::String declarationsCode;
+    for ( set<gd::String>::iterator it = context.objectsListsToBeDeclared.begin() ; it != context.objectsListsToBeDeclared.end(); ++it )
     {
         if ( context.alreadyDeclaredObjectsLists.find(*it) == context.alreadyDeclaredObjectsLists.end() )
         {
@@ -604,7 +604,7 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(EventsCodeGenera
             declarationsCode += "std::vector<RuntimeObject*> "+GetObjectListName(*it, context)+" = "+GetObjectListName(*it, context)+"T;\n";
         }
     }
-    for ( set<string>::iterator it = context.emptyObjectsListsToBeDeclared.begin() ; it != context.emptyObjectsListsToBeDeclared.end(); ++it )
+    for ( set<gd::String>::iterator it = context.emptyObjectsListsToBeDeclared.begin() ; it != context.emptyObjectsListsToBeDeclared.end(); ++it )
     {
         if ( context.alreadyDeclaredObjectsLists.find(*it) == context.alreadyDeclaredObjectsLists.end() )
         {
@@ -625,20 +625,20 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(EventsCodeGenera
 /**
  * Generate events list code.
  */
-string EventsCodeGenerator::GenerateEventsListCode(gd::EventsList & events, const EventsCodeGenerationContext & parentContext)
+gd::String EventsCodeGenerator::GenerateEventsListCode(gd::EventsList & events, const EventsCodeGenerationContext & parentContext)
 {
-    string output;
+    gd::String output;
 
-    for ( unsigned int eId = 0; eId < events.size();++eId )
+    for ( std::size_t eId = 0; eId < events.size();++eId )
     {
         //Each event has its own context : Objects picked in an event are totally different than the one picked in another.
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext); //Events in the same "level" share the same context as their parent.
 
-        string eventCoreCode = events[eId].GenerateEventCode(*this, context);
-        string scopeBegin = GenerateScopeBegin(context);
-        string scopeEnd = GenerateScopeEnd(context);
-        string declarationsCode = GenerateObjectsDeclarationCode(context);
+        gd::String eventCoreCode = events[eId].GenerateEventCode(*this, context);
+        gd::String scopeBegin = GenerateScopeBegin(context);
+        gd::String scopeEnd = GenerateScopeEnd(context);
+        gd::String declarationsCode = GenerateObjectsDeclarationCode(context);
 
         output += "\n"+ scopeBegin +"\n" + declarationsCode + "\n" + eventCoreCode + "\n"+ scopeEnd +"\n";
     }
@@ -646,7 +646,7 @@ string EventsCodeGenerator::GenerateEventsListCode(gd::EventsList & events, cons
     return output;
 }
 
-std::string EventsCodeGenerator::ConvertToString(std::string plainString)
+gd::String EventsCodeGenerator::ConvertToString(gd::String plainString)
 {
     for (size_t i = 0;i<plainString.length();++i)
     {
@@ -669,21 +669,19 @@ std::string EventsCodeGenerator::ConvertToString(std::string plainString)
         }
     }
 
-    while ( plainString.find('\n') != std::string::npos)
-        plainString.replace(plainString.find('\n'), 1, "\\n");
-
+    plainString = plainString.FindAndReplace("\n", "\\n");
 
     return plainString;
 }
 
-std::string EventsCodeGenerator::ConvertToStringExplicit(std::string plainString)
+gd::String EventsCodeGenerator::ConvertToStringExplicit(gd::String plainString)
 {
     return "\""+ConvertToString(plainString)+"\"";
 }
 
-std::vector<std::string> EventsCodeGenerator::ExpandObjectsName(const std::string & objectName, const EventsCodeGenerationContext & context) const
+std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(const gd::String & objectName, const EventsCodeGenerationContext & context) const
 {
-    std::vector<std::string> realObjects;
+    std::vector<gd::String> realObjects;
     vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(project.GetObjectGroups().begin(),
                                                                     project.GetObjectGroups().end(),
                                                                     bind2nd(gd::GroupHasTheSameName(), objectName));
@@ -706,7 +704,7 @@ std::vector<std::string> EventsCodeGenerator::ExpandObjectsName(const std::strin
     }
 
     //Ensure that all returned objects actually exists.
-    for (unsigned int i = 0; i < realObjects.size();)
+    for (std::size_t i = 0; i < realObjects.size();)
     {
         if ( !scene.HasObjectNamed(realObjects[i]) && !project.HasObjectNamed(realObjects[i]) )
             realObjects.erase(realObjects.begin()+i);
@@ -719,7 +717,7 @@ std::vector<std::string> EventsCodeGenerator::ExpandObjectsName(const std::strin
 
 void EventsCodeGenerator::DeleteUselessEvents(gd::EventsList & events)
 {
-    for ( unsigned int eId = events.size()-1; eId < events.size();--eId )
+    for ( std::size_t eId = events.size()-1; eId < events.size();--eId )
     {
         if ( events[eId].CanHaveSubEvents() ) //Process sub events, if any
             DeleteUselessEvents(events[eId].GetSubEvents());
@@ -734,7 +732,7 @@ void EventsCodeGenerator::DeleteUselessEvents(gd::EventsList & events)
  */
 void EventsCodeGenerator::PreprocessEventList(gd::EventsList & listEvent)
 {
-    for ( unsigned int i = 0;i < listEvent.GetEventsCount();++i )
+    for ( std::size_t i = 0;i < listEvent.GetEventsCount();++i )
     {
         listEvent[i].Preprocess(*this, listEvent, i);
         if ( i < listEvent.GetEventsCount() ) { //Be sure that that there is still an event! ( Preprocess can remove it. )
@@ -749,44 +747,44 @@ void EventsCodeGenerator::ReportError()
     errorOccurred = true;
 }
 
-std::string EventsCodeGenerator::GenerateObjectFunctionCall(std::string objectListName,
+gd::String EventsCodeGenerator::GenerateObjectFunctionCall(gd::String objectListName,
                                                       const gd::ObjectMetadata & objMetadata,
                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
-                                                      std::string parametersStr,
-                                                      std::string defaultOutput,
+                                                      gd::String parametersStr,
+                                                      gd::String defaultOutput,
                                                       gd::EventsCodeGenerationContext & context)
 {
     return "TODO (GenerateObjectFunctionCall)";
 }
 
-std::string EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(std::string objectListName,
-                                                      std::string automatismName,
-                                                      const gd::AutomatismMetadata & autoInfo,
+gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(gd::String objectListName,
+                                                      gd::String behaviorName,
+                                                      const gd::BehaviorMetadata & autoInfo,
                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
-                                                      std::string parametersStr,
-                                                      std::string defaultOutput,
+                                                      gd::String parametersStr,
+                                                      gd::String defaultOutput,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    return "TODO (GenerateObjectAutomatismFunctionCall)";
+    return "TODO (GenerateObjectBehaviorFunctionCall)";
 }
 
 
-std::string EventsCodeGenerator::GenerateFreeCondition(const std::vector<std::string> & arguments,
+gd::String EventsCodeGenerator::GenerateFreeCondition(const std::vector<gd::String> & arguments,
                                                              const gd::InstructionMetadata & instrInfos,
-                                                             const std::string & returnBoolean,
+                                                             const gd::String & returnBoolean,
                                                              bool conditionInverted,
                                                              gd::EventsCodeGenerationContext & context)
 {
     //Generate call
-    string predicat;
+    gd::String predicat;
     if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string")
     {
         predicat = GenerateRelationalOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName);
     }
     else
     {
-        string argumentsStr;
-        for (unsigned int i = 0;i<arguments.size();++i)
+        gd::String argumentsStr;
+        for (std::size_t i = 0;i<arguments.size();++i)
         {
             if ( i != 0 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -797,7 +795,7 @@ std::string EventsCodeGenerator::GenerateFreeCondition(const std::vector<std::st
 
     //Add logical not if needed
     bool conditionAlreadyTakeCareOfInversion = false;
-    for (unsigned int i = 0;i<instrInfos.parameters.size();++i) //Some conditions already have a "conditionInverted" parameter
+    for (std::size_t i = 0;i<instrInfos.parameters.size();++i) //Some conditions already have a "conditionInverted" parameter
     {
         if( instrInfos.parameters[i].type == "conditionInverted" )
             conditionAlreadyTakeCareOfInversion = true;
@@ -808,31 +806,31 @@ std::string EventsCodeGenerator::GenerateFreeCondition(const std::vector<std::st
     return returnBoolean+" = "+predicat+";\n";
 }
 
-std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & objectName,
+gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objectName,
                                                                    const gd::ObjectMetadata & objInfo,
-                                                                   const std::vector<std::string> & arguments,
+                                                                   const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
-                                                                   const std::string & returnBoolean,
+                                                                   const gd::String & returnBoolean,
                                                                    bool conditionInverted,
                                                                    gd::EventsCodeGenerationContext & context)
 {
     //Prepare call
     //Add a static_cast if necessary
-    string objectFunctionCallNamePart =
+    gd::String objectFunctionCallNamePart =
     ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ?
         "static_cast<"+objInfo.className+"*>("+GetObjectListName(objectName, context)+"[i])->"+instrInfos.codeExtraInformation.functionCallName
     :   GetObjectListName(objectName, context)+"[i]->"+instrInfos.codeExtraInformation.functionCallName;
 
     //Create call
-    string predicat;
+    gd::String predicat;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         predicat = GenerateRelationalOperatorCall(instrInfos, arguments, objectFunctionCallNamePart, 1);
     }
     else
     {
-        string argumentsStr;
-        for (unsigned int i = 1;i<arguments.size();++i)
+        gd::String argumentsStr;
+        for (std::size_t i = 1;i<arguments.size();++i)
         {
             if ( i != 1 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -845,25 +843,25 @@ std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & obj
     return "For each picked object \""+objectName+"\", check "+predicat+".\n";
 }
 
-std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string & objectName,
-                                                                       const std::string & automatismName,
-                                                                   const gd::AutomatismMetadata & autoInfo,
-                                                                   const std::vector<std::string> & arguments,
+gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & objectName,
+                                                                       const gd::String & behaviorName,
+                                                                   const gd::BehaviorMetadata & autoInfo,
+                                                                   const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
-                                                                   const std::string & returnBoolean,
+                                                                   const gd::String & returnBoolean,
                                                                    bool conditionInverted,
                                                                    gd::EventsCodeGenerationContext & context)
 {
     //Create call
-    string predicat;
+    gd::String predicat;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         predicat = GenerateRelationalOperatorCall(instrInfos, arguments, "", 2);
     }
     else
     {
-        string argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        gd::String argumentsStr;
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -873,14 +871,14 @@ std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string &
     }
     if ( conditionInverted ) predicat = GenerateNegatedPredicat(predicat);
 
-    return "For each picked object \""+objectName+"\", check "+predicat+" for automatism \""+automatismName+"\".\n";
+    return "For each picked object \""+objectName+"\", check "+predicat+" for behavior \""+behaviorName+"\".\n";
 }
 
-std::string EventsCodeGenerator::GenerateFreeAction(const std::vector<std::string> & arguments, const gd::InstructionMetadata & instrInfos,
+gd::String EventsCodeGenerator::GenerateFreeAction(const std::vector<gd::String> & arguments, const gd::InstructionMetadata & instrInfos,
                                                     gd::EventsCodeGenerationContext & context)
 {
     //Generate call
-    string call;
+    gd::String call;
     if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string" )
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
@@ -890,8 +888,8 @@ std::string EventsCodeGenerator::GenerateFreeAction(const std::vector<std::strin
     }
     else
     {
-        string argumentsStr;
-        for (unsigned int i = 0;i<arguments.size();++i)
+        gd::String argumentsStr;
+        for (std::size_t i = 0;i<arguments.size();++i)
         {
             if ( i != 0 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -902,14 +900,14 @@ std::string EventsCodeGenerator::GenerateFreeAction(const std::vector<std::strin
     return call+";\n";
 }
 
-std::string EventsCodeGenerator::GenerateObjectAction(const std::string & objectName,
+gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectName,
                                                       const gd::ObjectMetadata & objInfo,
-                                                      const std::vector<std::string> & arguments,
+                                                      const std::vector<gd::String> & arguments,
                                                       const gd::InstructionMetadata & instrInfos,
                                                       gd::EventsCodeGenerationContext & context)
 {
     //Create call
-    string call;
+    gd::String call;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
@@ -921,8 +919,8 @@ std::string EventsCodeGenerator::GenerateObjectAction(const std::string & object
     }
     else
     {
-        string argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        gd::String argumentsStr;
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -934,15 +932,15 @@ std::string EventsCodeGenerator::GenerateObjectAction(const std::string & object
 
 }
 
-std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & objectName,
-                                                                   const std::string & automatismName,
-                                                                   const gd::AutomatismMetadata & autoInfo,
-                                                                   const std::vector<std::string> & arguments,
+gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & objectName,
+                                                                   const gd::String & behaviorName,
+                                                                   const gd::BehaviorMetadata & autoInfo,
+                                                                   const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                                    gd::EventsCodeGenerationContext & context)
 {
     //Create call
-    string call;
+    gd::String call;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
@@ -950,12 +948,12 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
         else
             call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName,2);
         return "For each picked object \""+objectName+"\", call "+call
-                +" for automatism \""+automatismName+"\".\n";
+                +" for behavior \""+behaviorName+"\".\n";
     }
     else
     {
-        string argumentsStr;
-        for (unsigned int i = 2;i<arguments.size();++i)
+        gd::String argumentsStr;
+        for (std::size_t i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
             argumentsStr += arguments[i];
@@ -963,12 +961,12 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
 
         call = instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
         return "For each picked object \""+objectName+"\", call "+call+"("+argumentsStr+")"
-                +" for automatism \""+automatismName+"\".\n";
+                +" for behavior \""+behaviorName+"\".\n";
     }
 
 }
 
-std::string EventsCodeGenerator::GetObjectListName(const std::string & name, const gd::EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GetObjectListName(const gd::String & name, const gd::EventsCodeGenerationContext & context)
 {
     return ManObjListName(name);
 }

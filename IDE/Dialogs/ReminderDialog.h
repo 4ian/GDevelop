@@ -11,6 +11,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
+#include "GDCore/String.h"
 
 class ReminderDialog: public wxDialog
 {
@@ -64,7 +65,7 @@ private:
     //*)
     void OpenLink(wxString link);
 
-    std::string imageId; ///< The ID of the image displayed.
+    gd::String imageId; ///< The ID of the image displayed.
     bool feedbackWritten;
 
     DECLARE_EVENT_TABLE()

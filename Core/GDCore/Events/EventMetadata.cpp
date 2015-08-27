@@ -11,8 +11,8 @@
 namespace gd
 {
 
-EventMetadata::EventMetadata(const std::string & name_, const std::string & fullname_,
-	const std::string & description_, const std::string & group_, const std::string & smallicon_,
+EventMetadata::EventMetadata(const gd::String & name_, const gd::String & fullname_,
+	const gd::String & description_, const gd::String & group_, const gd::String & smallicon_,
 	std::shared_ptr<gd::BaseEvent> instance_) :
 	fullname(fullname_),
 	description(description_),
@@ -23,14 +23,13 @@ EventMetadata::EventMetadata(const std::string & name_, const std::string & full
     if (instance) instance->SetType(name_);
 }
 
-
 void EventMetadata::ClearCodeGenerationAndPreprocessing()
 {
 	hasCustomCodeGenerator = false;
 	codeGeneration = [](gd::BaseEvent &, gd::EventsCodeGenerator &, gd::EventsCodeGenerationContext &) {
 	    return "";
 	};
-	preprocessing = [](gd::BaseEvent &, gd::EventsCodeGenerator &, gd::EventsList &, unsigned int) {
+	preprocessing = [](gd::BaseEvent &, gd::EventsCodeGenerator &, gd::EventsList &, std::size_t) {
 		//Do nothing
 	};
 }

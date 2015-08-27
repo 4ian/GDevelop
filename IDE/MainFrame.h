@@ -1,7 +1,7 @@
 /*
  * GDevelop IDE
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the GNU General Public License.
+ * This project is released under the GNU General Public License version 3.
  */
 
 #ifndef GDIDE_MAINFRAME_H
@@ -38,6 +38,7 @@
 #include <wx/msw/winundef.h>
 #endif
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
+#include "GDCore/String.h"
 #include "EditorScene.h"
 #include "RecentList.h"
 namespace gd { class Project; }
@@ -65,7 +66,7 @@ public:
     virtual ~MainFrame();
 
     vector < std::shared_ptr<gd::Project> > games; ///< All games opened
-    unsigned int projectCurrentlyEdited; ///< Index of the current game ( "Current" means chosen in the project manager )
+    std::size_t projectCurrentlyEdited; ///< Index of the current game ( "Current" means chosen in the project manager )
 
     /**
      * Get a shared pointer to the current game ( "Current" means choosen in the project manager )
@@ -90,12 +91,12 @@ public:
     /**
      *  \briefChange the current game
      */
-    void SetCurrentGame(unsigned int i, bool refreshProjectManager = true);
+    void SetCurrentGame(std::size_t i, bool refreshProjectManager = true);
 
     /**
      *  \brief Open a game from its filename
      */
-    void Open(string filename);
+    void Open(gd::String filename);
 
     /**
      *  \briefOpen the new project dialog
@@ -347,4 +348,3 @@ private:
 };
 
 #endif // GDIDE_MAINFRAME_H
-

@@ -1,662 +1,780 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<Project>
-    <GDVersion Major="3" Minor="0" Build="11297" Revision="57008" />
-    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
-        <Nom value="Aimant" />
-        <Auteur value="" />
-        <Extensions>
-            <Extension name="BuiltinObject" />
-            <Extension name="BuiltinAudio" />
-            <Extension name="BuiltinVariables" />
-            <Extension name="BuiltinTime" />
-            <Extension name="BuiltinMouse" />
-            <Extension name="BuiltinKeyboard" />
-            <Extension name="BuiltinJoystick" />
-            <Extension name="BuiltinCamera" />
-            <Extension name="BuiltinWindow" />
-            <Extension name="BuiltinFile" />
-            <Extension name="BuiltinNetwork" />
-            <Extension name="BuiltinScene" />
-            <Extension name="BuiltinAdvanced" />
-            <Extension name="Sprite" />
-            <Extension name="BuiltinCommonInstructions" />
-            <Extension name="BuiltinCommonConversions" />
-            <Extension name="BuiltinStringInstructions" />
-            <Extension name="BuiltinMathematicalTools" />
-            <Extension name="BuiltinExternalLayouts" />
-            <Extension name="CommonDialogs" />
-        </Extensions>
-        <Platforms current="Game Develop C++ platform">
-            <Platform name="Game Develop C++ platform" />
-        </Platforms>
-        <WindowW value="800" />
-        <WindowH value="600" />
-        <Portable />
-        <LatestCompilationDirectory value="" />
-        <FPSmax value="60" />
-        <FPSmin value="10" />
-        <verticalSync value="false" />
-    </Info>
-    <Resources>
-        <Resources>
-            <Resource kind="image" name="Bille.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Bille.png" />
-            <Resource kind="image" name="Trou.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Trou.png" />
-            <Resource kind="image" name="Aimant.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Aimant.png" />
-            <Resource kind="image" name="Bois.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="Bois.png" />
-            <Resource kind="image" name="ombre.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="ombre.png" />
-            <Resource kind="image" name="zoneperdu.png" alwaysLoaded="false" smoothed="true" userAdded="true" file="zoneperdu.png" />
-        </Resources>
-        <ResourceFolders />
-    </Resources>
-    <Objects />
-    <ObjectGroups />
-    <Variables />
-    <Scenes firstScene="">
-        <Scene nom="Nouvelle scène 1" mangledName="Nouvelle_32sc__4524ne_321" r="125.000000" v="125.000000" b="125.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" disableInputWhenNotFocused="true">
-            <UISettings gridWidth="32.000000" grid="false" snap="true" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" zoomFactor="1.000000" windowMask="false" associatedLayout="" />
-            <GroupesObjets />
-            <Objets>
-                <Objet nom="Balle" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Bille.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="20.000000" Y="20.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Trou" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Trou.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="74.000000" Y="49.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Aimant" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="false">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Aimant.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="80.000000" Y="45.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="Arrière" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="Bois.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="179.000000" Y="134.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="OmbreBalle" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="ombre.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="7.000000" Y="5.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-                <Objet nom="ZonePerdu" type="Sprite">
-                    <Variables />
-                    <Animations>
-                        <Animation typeNormal="true">
-                            <Direction boucle="false" tempsEntre="1.000000">
-                                <Sprites>
-                                    <Sprite image="zoneperdu.png">
-                                        <Points />
-                                        <PointOrigine nom="origine" X="0.000000" Y="0.000000" />
-                                        <PointCentre nom="centre" X="15.000000" Y="15.000000" automatic="true" />
-                                        <CustomCollisionMask custom="false" />
-                                    </Sprite>
-                                </Sprites>
-                            </Direction>
-                        </Animation>
-                    </Animations>
-                </Objet>
-            </Objets>
-            <Layers>
-                <Layer Name="" Visibility="true">
-                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
-                </Layer>
-            </Layers>
-            <Variables />
-            <AutomatismsSharedDatas />
-            <Positions>
-                <Objet nom="Balle" x="413.000000" y="184.000000" plan="20" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="112.000000" y="196.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="548.000000" y="120.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="-62.000000" y="-46.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="296.000000" y="-45.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="-61.000000" y="222.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="297.000000" y="223.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="654.000000" y="-44.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="654.000000" y="223.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="291.000000" y="294.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="553.000000" y="245.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="622.000000" y="183.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="158.000000" y="262.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Aimant" x="19.000000" y="6.000000" plan="5" layer="" angle="0.795724" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="OmbreBalle" x="425.000000" y="213.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="172.000000" y="232.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="217.000000" y="299.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="352.000000" y="331.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="612.000000" y="282.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="683.000000" y="221.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="606.000000" y="156.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="-59.000000" y="488.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="295.000000" y="489.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="654.000000" y="488.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="1009.000000" y="-44.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="1009.000000" y="225.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Arrière" x="1012.000000" y="493.000000" plan="-50" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="537.000000" y="414.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="227.000000" y="356.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="227.000000" y="425.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="687.000000" y="275.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="774.000000" y="330.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="405.000000" y="522.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="759.000000" y="470.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="645.000000" y="582.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="263.000000" y="493.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="Trou" x="795.000000" y="401.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="286.000000" y="393.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="289.000000" y="463.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="321.000000" y="526.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="744.000000" y="309.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="594.000000" y="450.000000" plan="1" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="463.000000" y="559.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="836.000000" y="365.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="854.000000" y="436.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="817.000000" y="508.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-                <Objet nom="ZonePerdu" x="701.000000" y="621.000000" plan="0" layer="" angle="0.000000" personalizedSize="false" width="0.000000" height="0.000000" locked="false">
-                    <floatInfos>
-                        <Info name="animation" value="0.000000" />
-                    </floatInfos>
-                    <stringInfos />
-                    <InitialVariables />
-                </Objet>
-            </Positions>
-            <Events>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Moving the magnet" />
-                    <Com2 value="Déplacement de l&apos;aimant" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="TourneVers" />
-                            <Parametre value="Aimant" />
-                            <Parametre value="Balle" />
-                        </Action>
-                        <Action>
-                            <Type value="CentreCamera" />
-                            <Parametre value="" />
-                            <Parametre value="Balle" />
-                            <Parametre value="" />
-                            <Parametre value="" />
-                        </Action>
-                        <Action>
-                            <Type value="MettreX" />
-                            <Parametre value="Aimant" />
-                            <Parametre value="=" />
-                            <Parametre value="MouseX()" />
-                        </Action>
-                        <Action>
-                            <Type value="MettreY" />
-                            <Parametre value="Aimant" />
-                            <Parametre value="=" />
-                            <Parametre value="MouseY()" />
-                        </Action>
-                        <Action>
-                            <Type value="Cache" />
-                            <Parametre value="ZonePerdu" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions />
-                    <Actions>
-                        <Action>
-                            <Type value="MettreX" />
-                            <Parametre value="Balle" />
-                            <Parametre value="=" />
-                            <Parametre value="OmbreBalle.X()-9" />
-                        </Action>
-                        <Action>
-                            <Type value="MettreY" />
-                            <Parametre value="Balle" />
-                            <Parametre value="=" />
-                            <Parametre value="OmbreBalle.Y()-29" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="While ball is not in a hole, make it move toward the magnet." />
-                    <Com2 value="Faire bouger la balle tant qu&apos;elle ne touche pas un trou" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Balle" />
-                            <Parametre value="Tombe" />
-                            <Parametre value="=" />
-                            <Parametre value="0" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="AddForceVers" />
-                            <Parametre value="OmbreBalle" />
-                            <Parametre value="Aimant" />
-                            <Parametre value="1/Balle.Distance(Aimant)*400" />
-                            <Parametre value="0.25" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Don&apos;t move when ball is over the magnet." />
-                    <Com2 value="" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="Collision" Contraire="false" />
-                            <Parametre value="Balle" />
-                            <Parametre value="Aimant" />
-                        </Condition>
-                        <Condition>
-                            <Type value="VarObjet" Contraire="false" />
-                            <Parametre value="Balle" />
-                            <Parametre value="Tombe" />
-                            <Parametre value="=" />
-                            <Parametre value="0" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="Arreter" />
-                            <Parametre value="OmbreBalle" />
-                        </Action>
-                    </Actions>
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Comment" />
-                    <Couleur r="255.000000" v="255.000000" b="128.000000" textR="0.000000" textG="0.000000" textB="0.000000" />
-                    <Com1 value="Make the ball fall in an hole, until it reach the bottom of the hole." />
-                    <Com2 value="Faire tomber la balle dans un trou tant qu&apos;elle ne touche pas le fond" />
-                </Event>
-                <Event disabled="false" folded="false">
-                    <Type value="BuiltinCommonInstructions::Standard" />
-                    <Conditions>
-                        <Condition>
-                            <Type value="Collision" Contraire="false" />
-                            <Parametre value="OmbreBalle" />
-                            <Parametre value="Trou" />
-                        </Condition>
-                        <Condition>
-                            <Type value="Collision" Contraire="true" />
-                            <Parametre value="OmbreBalle" />
-                            <Parametre value="ZonePerdu" />
-                        </Condition>
-                    </Conditions>
-                    <Actions>
-                        <Action>
-                            <Type value="ModVarObjet" />
-                            <Parametre value="Balle" />
-                            <Parametre value="Tombe" />
-                            <Parametre value="=" />
-                            <Parametre value="1" />
-                        </Action>
-                        <Action>
-                            <Type value="Arreter" />
-                            <Parametre value="OmbreBalle" />
-                        </Action>
-                        <Action>
-                            <Type value="AddForceVers" />
-                            <Parametre value="OmbreBalle" />
-                            <Parametre value="Trou" />
-                            <Parametre value="150" />
-                            <Parametre value="0" />
-                        </Action>
-                    </Actions>
-                </Event>
-            </Events>
-        </Scene>
-    </Scenes>
-    <ExternalEvents />
-    <ExternalLayouts />
-    <ExternalSourceFiles />
-</Project>
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="84" major="3" minor="6" revision="0" />
+    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Aimant</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="CommonDialogs" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+        </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources>
+            <resource alwaysLoaded="false" file="Bille.png" kind="image" name="Bille.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Trou.png" kind="image" name="Trou.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Aimant.png" kind="image" name="Aimant.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Bois.png" kind="image" name="Bois.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="ombre.png" kind="image" name="ombre.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="zoneperdu.png" kind="image" name="zoneperdu.png" smoothed="true" userAdded="true" />
+        </resources>
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="125" disableInputWhenNotFocused="true" mangledName="Nouvelle_32sc_232ne_321" name="Nouvelle scÃ¨ne 1" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="125" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="125">
+            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <objectsGroups />
+            <variables />
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Balle" width="0.000000" x="413.000000" y="184.000000" zOrder="20">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="112.000000" y="196.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="548.000000" y="120.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="-62.000000" y="-46.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="296.000000" y="-45.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="-61.000000" y="222.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="297.000000" y="223.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="654.000000" y="-44.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="654.000000" y="223.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="291.000000" y="294.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="553.000000" y="245.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="622.000000" y="183.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="158.000000" y="262.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.795724" customSize="false" height="0.000000" layer="" locked="false" name="Aimant" width="0.000000" x="19.000000" y="6.000000" zOrder="5">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="OmbreBalle" width="0.000000" x="425.000000" y="213.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="172.000000" y="232.000000" zOrder="1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="217.000000" y="299.000000" zOrder="1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="352.000000" y="331.000000" zOrder="1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="612.000000" y="282.000000" zOrder="1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="683.000000" y="221.000000" zOrder="1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="606.000000" y="156.000000" zOrder="1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="-59.000000" y="488.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="295.000000" y="489.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="654.000000" y="488.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="1009.000000" y="-44.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="1009.000000" y="225.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ArriÃ¨re" width="0.000000" x="1012.000000" y="493.000000" zOrder="-50">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="537.000000" y="414.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="227.000000" y="356.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="227.000000" y="425.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="687.000000" y="275.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="774.000000" y="330.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="405.000000" y="522.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="759.000000" y="470.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="645.000000" y="582.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="263.000000" y="493.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Trou" width="0.000000" x="795.000000" y="401.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="286.000000" y="393.000000" zOrder="1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="289.000000" y="463.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="321.000000" y="526.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="744.000000" y="309.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="594.000000" y="450.000000" zOrder="1">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="463.000000" y="559.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="836.000000" y="365.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="854.000000" y="436.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="817.000000" y="508.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="ZonePerdu" width="0.000000" x="701.000000" y="621.000000" zOrder="0">
+                    <numberProperties>
+                        <property name="animation" value="0.000000" />
+                    </numberProperties>
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Balle" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Bille.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="20.000000" y="20.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="40.000000" y="0.000000" />
+                                                    <vertice x="40.000000" y="40.000000" />
+                                                    <vertice x="0.000000" y="40.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Trou" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Trou.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="74.500000" y="49.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="149.000000" y="0.000000" />
+                                                    <vertice x="149.000000" y="98.000000" />
+                                                    <vertice x="0.000000" y="98.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Aimant" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Aimant.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="80.000000" y="45.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="160.000000" y="0.000000" />
+                                                    <vertice x="160.000000" y="91.000000" />
+                                                    <vertice x="0.000000" y="91.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="ArriÃ¨re" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Bois.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="179.500000" y="134.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="359.000000" y="0.000000" />
+                                                    <vertice x="359.000000" y="269.000000" />
+                                                    <vertice x="0.000000" y="269.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="OmbreBalle" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="ombre.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="7.500000" y="5.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="15.000000" y="0.000000" />
+                                                    <vertice x="15.000000" y="10.000000" />
+                                                    <vertice x="0.000000" y="10.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="ZonePerdu" type="Sprite">
+                    <variables />
+                    <automatisms />
+                    <animations>
+                        <animation useMultipleDirections="true">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="zoneperdu.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="0.000000" y="0.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Moving the magnet</comment>
+                    <comment2>DÃ©placement de l&apos;aimant</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="TourneVers" />
+                            <parameters>
+                                <parameter>Aimant</parameter>
+                                <parameter>Balle</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="CentreCamera" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>Balle</parameter>
+                                <parameter></parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="MettreX" />
+                            <parameters>
+                                <parameter>Aimant</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseX()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="MettreY" />
+                            <parameters>
+                                <parameter>Aimant</parameter>
+                                <parameter>=</parameter>
+                                <parameter>MouseY()</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Cache" />
+                            <parameters>
+                                <parameter>ZonePerdu</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="MettreX" />
+                            <parameters>
+                                <parameter>Balle</parameter>
+                                <parameter>=</parameter>
+                                <parameter>OmbreBalle.X()-9</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="MettreY" />
+                            <parameters>
+                                <parameter>Balle</parameter>
+                                <parameter>=</parameter>
+                                <parameter>OmbreBalle.Y()-29</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>While ball is not in a hole, make it move toward the magnet.</comment>
+                    <comment2>Faire bouger la balle tant qu&apos;elle ne touche pas un trou</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Balle</parameter>
+                                <parameter>Tombe</parameter>
+                                <parameter>=</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="AddForceVers" />
+                            <parameters>
+                                <parameter>OmbreBalle</parameter>
+                                <parameter>Aimant</parameter>
+                                <parameter>1/Balle.Distance(Aimant)*400</parameter>
+                                <parameter>0.25</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Don&apos;t move when ball is over the magnet.</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="Collision" />
+                            <parameters>
+                                <parameter>Balle</parameter>
+                                <parameter>Aimant</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>Balle</parameter>
+                                <parameter>Tombe</parameter>
+                                <parameter>=</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="Arreter" />
+                            <parameters>
+                                <parameter>OmbreBalle</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="255" textB="0" textG="0" textR="0" />
+                    <comment>Make the ball fall in an hole, until it reach the bottom of the hole.</comment>
+                    <comment2>Faire tomber la balle dans un trou tant qu&apos;elle ne touche pas le fond</comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="Collision" />
+                            <parameters>
+                                <parameter>OmbreBalle</parameter>
+                                <parameter>Trou</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="true" value="Collision" />
+                            <parameters>
+                                <parameter>OmbreBalle</parameter>
+                                <parameter>ZonePerdu</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>Balle</parameter>
+                                <parameter>Tombe</parameter>
+                                <parameter>=</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="Arreter" />
+                            <parameters>
+                                <parameter>OmbreBalle</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="AddForceVers" />
+                            <parameters>
+                                <parameter>OmbreBalle</parameter>
+                                <parameter>Trou</parameter>
+                                <parameter>150</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                </layer>
+            </layers>
+            <automatismsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

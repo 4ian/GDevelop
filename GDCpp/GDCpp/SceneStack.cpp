@@ -24,7 +24,9 @@ bool SceneStack::Step()
         } else if (request.change == RuntimeScene::SceneChange::PUSH_SCENE) {
         	Push(request.requestedScene);
         } else if (request.change == RuntimeScene::SceneChange::REPLACE_SCENE) {
-        	Replace(request.requestedScene);
+            Replace(request.requestedScene);
+        } else if (request.change == RuntimeScene::SceneChange::CLEAR_SCENES) {
+        	Replace(request.requestedScene, true);
         } else {
         	if (errorCallback) errorCallback("Unrecognized change in scene stack.");
         	return false;
@@ -43,8 +45,14 @@ std::shared_ptr<RuntimeScene> SceneStack::Pop()
 	return scene;
 }
 
-std::shared_ptr<RuntimeScene> SceneStack::Push(std::string newSceneName)
+std::shared_ptr<RuntimeScene> SceneStack::Push(gd::String newSceneName)
 {
+    if (!game.HasLayoutNamed(newSceneName))
+    {
+        if (errorCallback) errorCallback("Scene \"" + newSceneName + "\" does not exist.");
+        return std::shared_ptr<RuntimeScene>();
+    }
+
 	auto newScene = std::make_shared<RuntimeScene>(window, &game);
     if (!newScene->LoadFromScene(game.GetLayout(newSceneName)))
     {
@@ -52,7 +60,8 @@ std::shared_ptr<RuntimeScene> SceneStack::Push(std::string newSceneName)
         return std::shared_ptr<RuntimeScene>();
     }
 
-    if (!newScene->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
+    if (!codeLibraryName.empty() &&
+        !newScene->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
         "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(newScene->GetName())))
     {
         if (errorCallback) errorCallback("Unable to setup execution engine for scene \"" + newScene->GetName() + "\".");
@@ -64,8 +73,15 @@ std::shared_ptr<RuntimeScene> SceneStack::Push(std::string newSceneName)
 	return newScene;
 }
 
-std::shared_ptr<RuntimeScene> SceneStack::Replace(std::string newSceneName)
+std::shared_ptr<RuntimeScene> SceneStack::Replace(gd::String newSceneName, bool clear)
 {
-	Pop();
-	Push(newSceneName);
+    if (clear)
+    {
+        while (!stack.empty()) stack.pop_back();
+    }
+    else
+    {
+        if (!stack.empty()) stack.pop_back();
+    }
+	return Push(newSceneName);
 }

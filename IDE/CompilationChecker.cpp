@@ -9,8 +9,8 @@ using namespace gd;
 
 bool CompilationChecker::EnsureCorrectGDVersion()
 {
-    string versionString =  ToString(VersionWrapper::Major()) + ", " + ToString(VersionWrapper::Minor()) + ", " +
-                            ToString(VersionWrapper::Build()) + ", " + ToString(VersionWrapper::Revision());
+    string versionString =  gd::String::From(VersionWrapper::Major()).ToUTF8() + ", " + gd::String::From(VersionWrapper::Minor()).ToUTF8() + ", " +
+                            gd::String::From(VersionWrapper::Build()).ToUTF8() + ", " + gd::String::From(VersionWrapper::Revision()).ToUTF8();
 
     if (versionString != GDCore_RC_FILEVERSION_STRING)
     {
@@ -39,4 +39,3 @@ bool CompilationChecker::EnsureCorrectGDVersion()
 
     return true;
 }
-

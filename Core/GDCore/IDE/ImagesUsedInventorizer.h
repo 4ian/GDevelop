@@ -8,7 +8,7 @@
 #ifndef IMAGESUSEDINVENTORIZER_H
 #define IMAGESUSEDINVENTORIZER_H
 
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 #include <set>
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
@@ -24,7 +24,7 @@ namespace gd {
 	project.ExposeResources(inventorizer);
 
 	//Get a set with the name of all images in the project:
-    std::set<std::string> & usedImages = inventorizer.GetAllUsedImages();
+    std::set<gd::String> & usedImages = inventorizer.GetAllUsedImages();
 \endcode
  *
  * \ingroup IDE
@@ -36,14 +36,14 @@ public:
     ImagesUsedInventorizer() : gd::ArbitraryResourceWorker() {};
     virtual ~ImagesUsedInventorizer() {};
 
-    std::set<std::string> & GetAllUsedImages() { return allUsedImages; };
+    std::set<gd::String> & GetAllUsedImages() { return allUsedImages; };
 
-    virtual void ExposeFile(std::string & resource) {};
-    virtual void ExposeImage(std::string & imageName) {allUsedImages.insert(imageName);};
-    virtual void ExposeShader(std::string & shaderName) {};
+    virtual void ExposeFile(gd::String & resource) {};
+    virtual void ExposeImage(gd::String & imageName) {allUsedImages.insert(imageName);};
+    virtual void ExposeShader(gd::String & shaderName) {};
 
 protected:
-    std::set<std::string> allUsedImages;
+    std::set<gd::String> allUsedImages;
 };
 
 }

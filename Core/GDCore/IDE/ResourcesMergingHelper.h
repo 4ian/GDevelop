@@ -6,7 +6,7 @@
 #ifndef RESOURCESMERGINGHELPER_H
 #define RESOURCESMERGINGHELPER_H
 
-#include <string>
+#include "GDCore/String.h"
 #include <vector>
 #include <map>
 #include <memory>
@@ -34,7 +34,7 @@ public:
      * \brief Set the directory used as base directory: All resources filename are relative to this directory.
      * (usually, it is the project directory).
      */
-    void SetBaseDirectory(const std::string & baseDirectory);
+    void SetBaseDirectory(const gd::String & baseDirectory);
 
     /**
      * \brief Set if the directories structure, starting from the base directory, must be preserved.
@@ -51,19 +51,19 @@ public:
      * \brief Return a map containing the resources old absolute filename as key, and the resources new filenames as value.
      * The new filenames are relative to the Base Directory.
      */
-    std::map<std::string, std::string> & GetAllResourcesOldAndNewFilename() { return resourcesNewFilename; };
+    std::map<gd::String, gd::String> & GetAllResourcesOldAndNewFilename() { return resourcesNewFilename; };
 
     /**
      * Resources merging helper collects all resources filenames and update these filenames.
      */
-    virtual void ExposeFile(std::string & resource);
+    virtual void ExposeFile(gd::String & resource);
 
-    virtual void ExposeImage(std::string & imageName) {};
-    virtual void ExposeShader(std::string & shaderName) {};
+    virtual void ExposeImage(gd::String & imageName) {};
+    virtual void ExposeShader(gd::String & shaderName) {};
 
 protected:
-    std::map<std::string, std::string> resourcesNewFilename;
-    std::string baseDirectory;
+    std::map<gd::String, gd::String> resourcesNewFilename;
+    gd::String baseDirectory;
     bool preserveDirectoriesStructure; ///< If set to true, the directory structure, starting from baseDirectory, will be preserved in filenames.
     bool preserveAbsoluteFilenames; ///< If set to true, the filenames which are absolute ( C:\MyFile.png ) will not be transformed into their filenames ( MyFile.png ).
     gd::AbstractFileSystem & fs; ///< The gd::AbstractFileSystem used to manipulate files.

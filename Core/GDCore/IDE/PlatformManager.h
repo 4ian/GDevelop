@@ -36,7 +36,7 @@ public:
      * \brief Get a pointer to the platform called \a platformName.
      * \note The PlatformManager is the owner of the platform, so the pointer should not be freed or deleted.
      */
-    gd::Platform* GetPlatform(const std::string & platformName) const;
+    gd::Platform* GetPlatform(const gd::String & platformName) const;
 
     /**
      * \brief Get a list of all platforms available.
@@ -68,7 +68,7 @@ public:
     {
         if ( NULL != _singleton )
         {
-            for (unsigned int i = 0;i<_singleton->platformsLoaded.size();++i)
+            for (std::size_t i = 0;i<_singleton->platformsLoaded.size();++i)
             {
                 if ( _singleton->platformsLoaded[i] != std::shared_ptr<gd::Platform>() )
                     _singleton->platformsLoaded[i]->OnIDEClosed();

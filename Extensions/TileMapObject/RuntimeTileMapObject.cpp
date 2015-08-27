@@ -118,17 +118,17 @@ void RuntimeTileMapObject::OnPositionChanged()
 }
 
 #ifdef GD_IDE_ONLY
-void RuntimeTileMapObject::GetPropertyForDebugger(unsigned int propertyNb, std::string & name, std::string & value) const
+void RuntimeTileMapObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
 
 }
 
-bool RuntimeTileMapObject::ChangeProperty(unsigned int propertyNb, std::string newValue)
+bool RuntimeTileMapObject::ChangeProperty(std::size_t propertyNb, gd::String newValue)
 {
     return true;
 }
 
-unsigned int RuntimeTileMapObject::GetNumberOfProperties() const
+std::size_t RuntimeTileMapObject::GetNumberOfProperties() const
 {
     return 0;
 }
@@ -198,29 +198,29 @@ float RuntimeTileMapObject::GetRowAt(float y)
     return static_cast<float>(floor((y - GetY())/tileSet.Get().tileSize.y));
 }
 
-std::string RuntimeTileMapObject::SaveAsString() const
+gd::String RuntimeTileMapObject::SaveAsString() const
 {
     return tileMap.Get().SerializeToString();
 }
 
-void RuntimeTileMapObject::LoadFromString(const std::string &str)
+void RuntimeTileMapObject::LoadFromString(const gd::String &str)
 {
     tileMap.Get().UnserializeFromString(str);
     needGeneration = true;
 }
 
-void RuntimeTileMapObject::ChangeTexture(const std::string &textureName, RuntimeScene &scene)
+void RuntimeTileMapObject::ChangeTexture(const gd::String &textureName, RuntimeScene &scene)
 {
     tileSet.Get().textureName = textureName;
     tileSet.Get().LoadResources(*(scene.game));
     needGeneration = true;
 }
 
-bool GD_EXTENSION_API SingleTileCollision(std::map<std::string, std::vector<RuntimeObject*>*> tileMapList,
+bool GD_EXTENSION_API SingleTileCollision(std::map<gd::String, std::vector<RuntimeObject*>*> tileMapList,
                          int layer,
                          int column,
                          int row,
-                         std::map<std::string, std::vector<RuntimeObject*>*> objectLists,
+                         std::map<gd::String, std::vector<RuntimeObject*>*> objectLists,
                          bool conditionInverted)
 {
     return TwoObjectListsTest(tileMapList, objectLists, conditionInverted, [layer, column, row](RuntimeObject* tileMapObject_, RuntimeObject * object) {

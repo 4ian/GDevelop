@@ -30,7 +30,7 @@ void GroupEventDialog::onCancelBtClick(wxCommandEvent& )
 }
 void GroupEventDialog::onOkBtClick(wxCommandEvent& )
 {
-	event.SetName(gd::ToString(groupNameEdit->GetValue()));
+	event.SetName(groupNameEdit->GetValue());
     event.SetBackgroundColor(backColorBt->GetBackgroundColour().Red(),
     	backColorBt->GetBackgroundColour().Green(), backColorBt->GetBackgroundColour().Blue());
     event.SetFolded(hideCheck->GetValue());

@@ -571,10 +571,10 @@
 		<Unit filename="LightObject.h" />
 		<Unit filename="LightObjectEditor.cpp" />
 		<Unit filename="LightObjectEditor.h" />
-		<Unit filename="LightObstacleAutomatism.cpp" />
-		<Unit filename="LightObstacleAutomatism.h" />
-		<Unit filename="LightObstacleAutomatismEditor.cpp" />
-		<Unit filename="LightObstacleAutomatismEditor.h" />
+		<Unit filename="LightObstacleBehavior.cpp" />
+		<Unit filename="LightObstacleBehavior.h" />
+		<Unit filename="LightObstacleBehaviorEditor.cpp" />
+		<Unit filename="LightObstacleBehaviorEditor.h" />
 		<Unit filename="RuntimeSceneLightObstacleDatas.cpp" />
 		<Unit filename="RuntimeSceneLightObstacleDatas.h" />
 		<Unit filename="SceneLightObstacleDatas.cpp" />
@@ -588,7 +588,7 @@
 				<gui name="wxWidgets" src="" main="" init_handlers="necessary" language="CPP" />
 				<resources>
 					<wxDialog wxs="wxsmith/LightObjectEditor.wxs" src="LightObjectEditor.cpp" hdr="LightObjectEditor.h" fwddecl="0" i18n="1" name="LightObjectEditor" language="CPP" />
-					<wxDialog wxs="wxsmith/LightObstacleAutomatismEditor.wxs" src="LightObstacleAutomatismEditor.cpp" hdr="LightObstacleAutomatismEditor.h" fwddecl="0" i18n="1" name="LightObstacleAutomatismEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/LightObstacleBehaviorEditor.wxs" src="LightObstacleBehaviorEditor.cpp" hdr="LightObstacleBehaviorEditor.h" fwddecl="0" i18n="1" name="LightObstacleBehaviorEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

@@ -8,8 +8,8 @@
 #include <string>
 #include <iostream>
 #include "GDCpp/ExtensionBase.h"
-#include "GDCpp/Automatism.h"
-#include "GDCpp/AutomatismsSharedData.h"
+#include "GDCpp/Behavior.h"
+#include "GDCpp/BehaviorsSharedData.h"
 #include "GDCpp/CommonTools.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Event.h"
@@ -21,7 +21,7 @@ ExtensionBase::~ExtensionBase()
 {
 };
 
-CreateRuntimeObjectFunPtr ExtensionBase::GetRuntimeObjectCreationFunctionPtr(std::string objectType) const
+CreateRuntimeObjectFunPtr ExtensionBase::GetRuntimeObjectCreationFunctionPtr(gd::String objectType) const
 {
     if ( runtimeObjectCreationFunctionTable.find(objectType) != runtimeObjectCreationFunctionTable.end())
         return runtimeObjectCreationFunctionTable.find(objectType)->second;
@@ -29,7 +29,7 @@ CreateRuntimeObjectFunPtr ExtensionBase::GetRuntimeObjectCreationFunctionPtr(std
     return NULL;
 }
 
-void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, std::string className, CreateRuntimeObjectFunPtr createFun)
+void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, gd::String className, CreateRuntimeObjectFunPtr createFun)
 {
 #if defined(GD_IDE_ONLY)
     object.className = className;
@@ -42,5 +42,5 @@ void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, std::string cl
 //when compiling for runtime:
 #include "GDCore/PlatformDefinition/PlatformExtension.cpp"
 #include "GDCore/Events/ObjectMetadata.cpp"
-#include "GDCore/Events/AutomatismMetadata.cpp"
+#include "GDCore/Events/BehaviorMetadata.cpp"
 #endif

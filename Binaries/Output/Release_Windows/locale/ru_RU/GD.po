@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-09 03:03-0400\n"
+"PO-Revision-Date: 2015-08-27 16:35-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -25,19 +25,19 @@ msgid "It seems that GDevelop has closed abruptly after an\n"
 "error. GDevelop should never freeze or crash whatever \n"
 "the user make. You can help us correct the problem by filling\n"
 "the error report."
-msgstr "Похоже GDevelop ошибочно завершил работу после непредвиденной \n"
-"ошибки. GDevelop рассчитан на стабильную работу без зависаний или критических ошибок, \n"
-"но всякое случается. Вы можете помочь нам исправить проблему заполнив \n"
+msgstr "Похоже GDevelop завершил работу после непредвиденной\n"
+"ошибки. GDevelop рассчитан на стабильную работу, без зависаний или критических ошибок,\n"
+"но всякое случается. Вы можете помочь нам исправить проблему, заполнив\n"
 "отчёт об ошибке."
 
 #: ../IDE/BugReport.cpp:93
 msgid "Known bugs for this version of GDevelop"
-msgstr "Известные ошибки для этой версии GDevelop"
+msgstr "Известные ошибки этой версии GDevelop"
 
 #: ../IDE/BugReport.cpp:100
 msgid "You can visit a page on our website which can\n"
 "contain known bugs for this version of GDevelop:"
-msgstr "Вы можете посетить наш вебсайт, где могут быть \n"
+msgstr "Вы можете посетить наш вебсайт, где\n"
 "собраны известные ошибки данной версии GDevelop:"
 
 #: ../IDE/BugReport.cpp:102
@@ -61,7 +61,7 @@ msgstr "Что бы помочь нам решить эту проблему, п
 
 #: ../IDE/BugReport.cpp:121
 msgid "You can enter your email: (optional, so as to contact you if we need more information)"
-msgstr "Вы можете указать свой электронный адрес(e-mail):(Не является обязательным, может понадобится если нам понадобится больше информации)"
+msgstr "Вы можете указать свой e-mail (это не обязательно, но может пригодиться если нам понадобится больше информации)"
 
 #: ../IDE/BugReport.cpp:129
 msgid "When you've described the error, click on the button\n"
@@ -77,13 +77,14 @@ msgstr "Отправить мой отчёт!"
 
 #: ../IDE/BugReport.cpp:146
 msgid "Here is a list of the projects opened during the last session:"
-msgstr "Список проектов открытых в ходе последнего использования:"
+msgstr "Список проектов открытых во время последнего использования:"
 
 #: ../IDE/BugReport.cpp:151
 msgid "GDevelop may have made automatic backups of these projects. When you'll\n"
 "close this window, the backups will be opened. If these backup are not corrupted,\n"
 "you can save them over the original project files."
-msgstr "GDevelop, возможно, сделал автоматическое резервное копирование этих проектов. Когда вы будете закрывать в этом окне, резервные копии будут открыты. Если эти резервные не повреждены, \\ Nyou можете сохранить их на исходные файлы проекта."
+msgstr "Возможно, GDevelop сделал автоматическое резервное копирование этих проектов. Когда вы закроете это окно, будут открыты резервные копии. Если эти копии не повреждены,\n"
+"вы можете сохранить их в исходные файлы проекта."
 
 #: ../IDE/BugReport.cpp:154
 msgid "Close but don't open the autosave(s)"
@@ -112,7 +113,7 @@ msgstr "Сообщить об ошибке"
 
 #: ../IDE/BugReport.cpp:164
 msgid "Load autosaves"
-msgstr "Загрузить авто сохранение"
+msgstr "Загрузить авто сохранения"
 
 #: ../IDE/BugReport.cpp:183
 msgid " (Autosave not found!)"
@@ -120,7 +121,7 @@ msgstr "(Авто сохранение не найдено!)"
 
 #: ../IDE/BugReport.cpp:192
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd"
-msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/knownbugs/gd"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/knownbugs/gd"
 
 #: ../IDE/BugReport.cpp:256
 msgid "Thanks for reporting the error!"
@@ -145,7 +146,7 @@ msgstr "Файл"
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:265
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:59
 msgid "Line"
-msgstr "Линия"
+msgstr "Строка"
 
 #: ../IDE/BuildMessagesPnl.cpp:56
 msgid "Column"
@@ -160,7 +161,7 @@ msgstr "Сообщение"
 
 #: ../IDE/BuildProgressPnl.cpp:73 ../IDE/BuildProgressPnl.cpp:74
 msgid "Task in progress:"
-msgstr "Прогресс работы: "
+msgstr "Задача в процессе:"
 
 #: ../IDE/BuildProgressPnl.cpp:78 ../IDE/BuildProgressPnl.cpp:79
 msgid "The task "
@@ -172,12 +173,12 @@ msgstr "не удалось."
 
 #: ../IDE/BuildProgressPnl.cpp:87 ../IDE/BuildProgressPnl.cpp:88
 msgid "Some tasks failed."
-msgstr "Компиляция завершена, но одна или более задач не удались."
+msgstr "Некоторые задачи не выполнены."
 
 #: ../IDE/BuildProgressPnl.cpp:92
 #, c-format
 msgid "( %ld seconds )"
-msgstr "( %ld secondes )"
+msgstr "(%ld секунд)"
 
 #: ../IDE/BuildProgressPnl.cpp:95
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:213
@@ -193,19 +194,19 @@ msgstr ", но "
 
 #: ../IDE/BuildProgressPnl.cpp:95 ../IDE/BuildProgressPnl.cpp:96
 msgid " task(s) are waiting."
-msgstr " ожидание запуска задачи."
+msgstr " ожидание запуска задач(и)."
 
 #: ../IDE/BuildProgressPnl.cpp:96
 msgid "Tasks finished "
-msgstr "Задачи были завершены "
+msgstr "Задачи завершены "
 
 #: ../IDE/BuildProgressPnl.cpp:101
 msgid "Compilation finished."
-msgstr "Компиляция закончена."
+msgstr "Компиляция завершена."
 
 #: ../IDE/BuildProgressPnl.cpp:102
 msgid "All tasks have been completed."
-msgstr "Все задачи были завершены."
+msgstr "Все задачи завершены."
 
 #: ../IDE/BuildToolsPnl.cpp:40 ../IDE/Preferences.cpp:303
 msgid "Compilation"
@@ -221,7 +222,7 @@ msgstr "Выберите файл"
 
 #: ../IDE/ChoiceFile.cpp:60
 msgid "Enter a file name :"
-msgstr "Введите имя файла :"
+msgstr "Введите имя файла:"
 
 #: ../IDE/ChoiceFile.cpp:66 ../IDE/Dialogs/NewProjectDialog.cpp:83
 #: ../IDE/Dialogs/StartHerePage.cpp:60
@@ -233,7 +234,7 @@ msgstr "..."
 
 #: ../IDE/ChoiceFile.cpp:69
 msgid "The file is relative to the directory of the .gdg file."
-msgstr "Файл принадлежит директории .gdg файла."
+msgstr "Файл принадлежит папке .gdg файла."
 
 #: ../IDE/ChoiceFile.cpp:81 ../IDE/ChoiceJoyAxis.cpp:76
 #: ../IDE/ChoixBouton.cpp:70 ../IDE/ChoixClavier.cpp:62
@@ -272,7 +273,7 @@ msgstr "Файл принадлежит директории .gdg файла."
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:190
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:132
 msgid "Help"
-msgstr "Помощь"
+msgstr "Справка"
 
 #: ../IDE/ChoiceFile.cpp:82 ../IDE/ChoiceJoyAxis.cpp:77
 #: ../IDE/ChoixBouton.cpp:71 ../IDE/ChoixClavier.cpp:63
@@ -298,7 +299,7 @@ msgstr "Помощь"
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:144
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:191
 msgid "Display help about this window"
-msgstr "Показать справку в окне"
+msgstr "Показать справку об этом окне"
 
 #: ../IDE/ChoiceFile.cpp:85 ../IDE/ChoiceJoyAxis.cpp:80
 #: ../IDE/ChoixBouton.cpp:74 ../IDE/Credits.cpp:193
@@ -339,7 +340,7 @@ msgstr "Показать справку в окне"
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:147
 #: ../Core/GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp:44
 msgid "Ok"
-msgstr "Да"
+msgstr "Ок"
 
 #: ../IDE/ChoiceFile.cpp:87 ../IDE/ChoiceJoyAxis.cpp:82
 #: ../IDE/ChoixBouton.cpp:76 ../IDE/ChoixClavier.cpp:66
@@ -421,22 +422,22 @@ msgstr "Отмена"
 #: ../Core/GDCore/BuiltinExtensions/CommonInstructionsExtension.cpp:56
 #: ../Core/GDCore/BuiltinExtensions/CommonInstructionsExtension.cpp:66
 msgid "Advanced"
-msgstr "Продвинутые условия"
+msgstr "Дополнительные функции"
 
 #: ../IDE/ChoiceFile.cpp:151 ../IDE/ChoiceJoyAxis.cpp:148
 #: ../IDE/ChoixBouton.cpp:148 ../IDE/ChoixClavier.cpp:101
 #: ../IDE/GeneratePassword.cpp:157 ../IDE/SigneModification.cpp:79
 #: ../IDE/SigneTest.cpp:86 ../IDE/TrueOrFalse.cpp:100
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/parameters"
-msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manual/events_editor/parameters"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/events_editor/parameters"
 
 #: ../IDE/ChoiceJoyAxis.cpp:51
 msgid "Choose joystick's axis"
-msgstr "Выберите ось джйстика"
+msgstr "Выбор оси геймпада"
 
 #: ../IDE/ChoiceJoyAxis.cpp:53
 msgid "Choose directly Joystick axis :"
-msgstr "Выбрать непосредственно оси джойстика :"
+msgstr "Выберите ось геймпада из предложенных:"
 
 #: ../IDE/ChoiceJoyAxis.cpp:57
 msgid "AxisX"
@@ -479,7 +480,7 @@ msgstr "Ось"
 
 #: ../IDE/ChoixBouton.cpp:40
 msgid "Choose a mouse button"
-msgstr "Выберите кнопку мыши"
+msgstr "Выбор кнопки мыши"
 
 #: ../IDE/ChoixBouton.cpp:50
 msgid "Left button"
@@ -491,7 +492,7 @@ msgstr "Правая кнопка"
 
 #: ../IDE/ChoixBouton.cpp:52
 msgid "Center button"
-msgstr "Центр. кнопка"
+msgstr "Центральная кнопка"
 
 #: ../IDE/ChoixBouton.cpp:53
 msgid "Special button 1"
@@ -503,7 +504,7 @@ msgstr "Спец. кнопка 2"
 
 #: ../IDE/ChoixBouton.cpp:56
 msgid "Choose the button :"
-msgstr "Выберите кнопку :"
+msgstr "Выберите кнопку:"
 
 #: ../IDE/ChoixBouton.cpp:60
 msgid "Click with a button to automatically select this latter from the list"
@@ -511,17 +512,17 @@ msgstr "Нажмите кнопку, чтобы автоматически вы�
 
 #: ../IDE/ChoixClavier.cpp:40
 msgid "Choose a key"
-msgstr "Выберите любую клавишу"
+msgstr "Клавиша"
 
 #: ../IDE/ChoixClavier.cpp:48
 msgid "Press a key"
-msgstr "Нажмите на клавишу"
+msgstr "Нажмите клавишу"
 
 #: ../IDE/ChoixClavier.cpp:202
 msgid "Right Control : No\n"
 "Left Control : Yes"
-msgstr "Right Control : No\n"
-"Left Control : Yes"
+msgstr "Правый Ctrl: Нет\n"
+"Левый Ctrl : Да"
 
 #: ../IDE/ChoixClavier.cpp:202 ../IDE/ChoixClavier.cpp:209
 #: ../IDE/ChoixClavier.cpp:216
@@ -531,14 +532,14 @@ msgstr "Выберите клавишу"
 #: ../IDE/ChoixClavier.cpp:209
 msgid "Right Alt : No\n"
 "Left alt : Yes"
-msgstr "Правый Alt : Нет\n"
-"Левый alt : Да"
+msgstr "Правый Alt: Нет\n"
+"Левый Alt: Да"
 
 #: ../IDE/ChoixClavier.cpp:216
 msgid "Right Shift : No\n"
 "Left Shift : Yes"
-msgstr "Правый Shift : Нет\n"
-"Левый Shift : Да"
+msgstr "Правый Shift: Нет\n"
+"Левый Shift: Да"
 
 #: ../IDE/CodeEditor.cpp:63 ../IDE/CodeEditor.cpp:128
 #: ../IDE/Dialogs/ObjectsEditor.cpp:300 ../IDE/Dialogs/ObjectsEditor.cpp:404
@@ -567,7 +568,7 @@ msgstr "Вставить"
 #: ../IDE/EventsEditor.cpp:230 ../IDE/EventsEditor.cpp:442
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:561
 msgid "Redo"
-msgstr "Повтор"
+msgstr "Повторить"
 
 #: ../IDE/CodeEditor.cpp:123 ../IDE/ProjectManager.cpp:379
 msgid "Save"
@@ -587,7 +588,7 @@ msgstr "История"
 #: ../Extensions//PhysicsAutomatism/CustomPolygonDialog.cpp:142
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:525
 msgid "Tools"
-msgstr "Инструментарий"
+msgstr "Инструменты"
 
 #: ../IDE/CodeEditor.cpp:141 ../IDE/EventsEditor.cpp:454
 msgid "Search / Replace"
@@ -635,27 +636,27 @@ msgstr "Опции"
 
 #: ../IDE/CodeEditor.cpp:152
 msgid "GDL doc."
-msgstr "Doc. GDL"
+msgstr "Док. GDL"
 
 #: ../IDE/CodeEditor.cpp:153
 msgid "SFML doc."
-msgstr "Doc. SFML"
+msgstr "Док. SFML"
 
 #: ../IDE/CodeEditor.cpp:154
 msgid "wxWidgets doc."
-msgstr "Doc. wxWidgets"
+msgstr "Док. wxWidgets"
 
 #: ../IDE/CodeEditor.cpp:155
 msgid "Boost doc."
-msgstr "Doc. Boost"
+msgstr "Док. Boost"
 
 #: ../IDE/CodeEditor.cpp:246
 msgid "Editor Preferences"
-msgstr "Настройка"
+msgstr "Изменить Настройки"
 
 #: ../IDE/Credits.cpp:79
 msgid "About GDevelop"
-msgstr "О программе GDevelop"
+msgstr "О программе"
 
 #: ../IDE/Credits.cpp:92 ../IDE/MainFrame.cpp:142
 msgid "GDevelop"
@@ -663,7 +664,7 @@ msgstr "GDevelop"
 
 #: ../IDE/Credits.cpp:97
 msgid "was created by"
-msgstr "был создан"
+msgstr "Автор программы:"
 
 #: ../IDE/Credits.cpp:100
 msgid "Florian \"4ian\" Rival"
@@ -675,7 +676,7 @@ msgstr "http://www.florianrival.com"
 
 #: ../IDE/Credits.cpp:108
 msgid "Contribute and get help on:"
-msgstr "Помочь и получите помощь:"
+msgstr "Помогите и получите помощь:"
 
 #: ../IDE/Credits.cpp:110
 msgid "www.compilgames.net"
@@ -704,12 +705,12 @@ msgid "GDevelop is an open source software:\n\n"
 "  * The name, GDevelop, and its logo are the exclusive property of Florian Rival.\n\n"
 "About games created with GDevelop\n\n"
 "Games exported with GDevelop are based on the native and/or HTML5 platforms: these platforms are distributed under the MIT license, so that you can distribute, sell or do anything with the games you created with GDevelop. In particular, you are not forced to make your game open source."
-msgstr "GDevelop это программа с открытым исходным кодом:\n\n"
-"  * Библиотека Core, для основной и HTML5 платформ и все расширения (соответственно Core, GDCpp, GDJS и директории Extensions) лицензированы согласно MIT.\n"
+msgstr "GDevelop - это программа с открытым исходным кодом:\n\n"
+"  * Библиотека Core для нативной и HTML5 платформ и все расширения (соответственно Core, GDCpp, GDJS и директории Extensions) лицензированы согласно MIT.\n"
 "  * IDE (в директории IDE) лицензирован согласно GPL v3.\n"
 "  * Название GDevelop и его логотип являются исключительной собственностью Florian Rival.\n\n"
 "О играх созданных с помощью GDevelop\n\n"
-"Игры экспортированные с помощью GDevelop и основанные на основной или HTML5 платформе: эти платформы распространяются согласно лицензии MIT, так что вы можете распространять, продавать или делать что захотите с играми, созданными с помощью GDevelop. Обратите внимание, что вам не обязательно открывать исходный код своих игр."
+"Игры экспортированные с помощью GDevelop и основанные на нативной или HTML5 платформе: распространяются согласно лицензии MIT, так что вы можете распространять, продавать или делать что захотите с играми, созданными с помощью GDevelop. Обратите внимание, что вам не обязательно открывать исходный код своих игр."
 
 #: ../IDE/Credits.cpp:147
 msgid "Programmed in C++, compiled with TDM-GCC, written with Sublime Text"
@@ -733,7 +734,7 @@ msgstr "Лицензия"
 
 #: ../IDE/Credits.cpp:190
 msgid "Thanks"
-msgstr "Спасибо"
+msgstr "Благодарности"
 
 #: ../IDE/Credits.cpp:191
 msgid "Used technologies"
@@ -741,15 +742,15 @@ msgstr "Используемые технологии"
 
 #: ../IDE/Credits.cpp:221
 msgid "Contributors: (No special order)"
-msgstr "Нас поддержали: (No special order)"
+msgstr "Нас поддержали:"
 
 #: ../IDE/Credits.cpp:223
 msgid "François Dumortier : GDevelop logo design and website conception."
-msgstr "François Dumortier : Разработчик логотипа  и концепта вебсайта GDevelop."
+msgstr "François Dumortier: Разработчик логотипа и концепта веб-сайта GDevelop."
 
 #: ../IDE/Credits.cpp:226
 msgid "Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path automatism and Sound object extension."
-msgstr "Victor Levasseur : Extension Widgets, XML avancé, Arrière plan répété et contributions aux extensions Automatisme Moteur physique, Objet texte, Objet vidéo, Automatisme Chemin, Objet son"
+msgstr "Victor Levasseur: Виджеты, расширенный XML, расширение Тайл-Спрайт, доработка Физического Движка, объект Текст, объект Видео, автоматизация Поиск Пути и расширение объекта Звук."
 
 #: ../IDE/Credits.cpp:229
 msgid "Constantine Shvetsov: Awesome design of icons"
@@ -765,23 +766,23 @@ msgstr "Franco Maciel: Испанский перевод"
 
 #: ../IDE/Credits.cpp:236
 msgid "MillionthVector : Graphics of various examples."
-msgstr "MillionthVector : Graphismes de l'exemple Shoot"
+msgstr "MillionthVector: Графика в различных примерах."
 
 #: ../IDE/Credits.cpp:239
 msgid "Diego Schiavon : English translation of the tutorial and Indiegogo Ubuntu contributor"
-msgstr "Diego Schiavon : Перевод обучения на английский и участник Indiegogo Ubuntu"
+msgstr "Diego Schiavon: Перевод уроков на английский и участник Indiegogo Ubuntu"
 
 #: ../IDE/Credits.cpp:241
 msgid "Thomas Flecy: Original Sound object extension"
-msgstr "Thomas Flecy : Version originale de l'extension Objet son"
+msgstr "Thomas Flecy: оригинальное расширение объекта Звук"
 
 #: ../IDE/Credits.cpp:243
 msgid "Fernando José Martínez López : Spanish translation of the tutorial"
-msgstr "Fernando José Martínez López : Traduction espagnole du tutoriel"
+msgstr "Fernando José Martínez López: перевод уроков на испанский"
 
 #: ../IDE/Credits.cpp:245
 msgid "conceptgame : Indiegogo super contributor. Thanks!"
-msgstr "conceptgame : супер-участник Indiegogo. Спасибо!"
+msgstr "conceptgame: супер-участник Indiegogo. Спасибо!"
 
 #: ../IDE/Credits.cpp:247
 msgid "Images and other icons:"
@@ -793,7 +794,7 @@ msgstr "Некоторые иконки взяты из Crystal Project Icons з
 
 #: ../IDE/Credits.cpp:251
 msgid "Some icons came from Fugue Icons by Yusuke Kamiyamane"
-msgstr "Quelques icônes proviennent de Fugue Icons par Yusuke Kamiyamane"
+msgstr "Некоторые иконки взяты из Fugue Icons от Yusuke Kamiyamane"
 
 #: ../IDE/Credits.cpp:253
 msgid "Some images of examples came from images pack by Daniel Cook"
@@ -826,7 +827,7 @@ msgstr "http://www.boost.org/"
 
 #: ../IDE/Credits.cpp:355
 msgid "https://en.wikipedia.org/wiki/JavaScript"
-msgstr "https://fr.wikipedia.org/wiki/JavaScript"
+msgstr "https://ru.wikipedia.org/wiki/JavaScript"
 
 #: ../IDE/Credits.cpp:360
 msgid "http://jquery.com/"
@@ -838,7 +839,7 @@ msgstr "http://www.pixijs.com/"
 
 #: ../IDE/Dialogs/ExternalLayoutEditor.cpp:77
 msgid "Edit as if the objects were included to scene :"
-msgstr "Редактировать как если объекты были включены в сцене :"
+msgstr "Редактировать, как если бы объекты были добавлены в сцену:"
 
 #: ../IDE/Dialogs/ExternalLayoutEditor.cpp:80
 #: ../IDE/ExternalEventsEditor.cpp:53 ../IDE/ExternalEventsEditor.cpp:133
@@ -847,7 +848,7 @@ msgstr "Нет сцены"
 
 #: ../IDE/Dialogs/ExternalLayoutEditor.cpp:102
 msgid "Choose the scene to be used as a base for editing the external layout"
-msgstr "Выберите сцену, который будет использоваться в качестве базы"
+msgstr "Выберите сцену, для использоваться в качестве основы для изменения внешних макетов"
 
 #: ../IDE/Dialogs/ExternalLayoutEditor.cpp:134 ../IDE/EditorScene.cpp:130
 msgid "Scene's editor"
@@ -875,7 +876,7 @@ msgstr "Свойства"
 #: ../IDE/Dialogs/ExternalLayoutEditor.cpp:246 ../IDE/EditorScene.cpp:134
 #: ../IDE/EditorScene.cpp:162
 msgid "Instances list"
-msgstr "Объекты на сцене"
+msgstr "Список экземпляров"
 
 #: ../IDE/Dialogs/ExternalLayoutEditor.cpp:278
 #: ../IDE/ExternalEventsEditor.cpp:109 ../IDE/ProjectManager.cpp:756
@@ -887,27 +888,27 @@ msgstr "Сцена не найдена."
 
 #: ../IDE/Dialogs/ExternalLayoutEditor.cpp:291
 msgid "No layout"
-msgstr "Нет сцены"
+msgstr "Без макета"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:44
 msgid "The open source, codingless game creator"
-msgstr "С открытым исходным кодом, создание игр без программирования"
+msgstr "Программа с открытым исходным кодом для создания игр без программирования."
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:71
 msgid "Getting started"
-msgstr "Приступая к работе"
+msgstr "Для начала работы"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:82
 msgid "Start a platformer game in 5 minutes"
-msgstr "Создать игру платформер за 5 минут"
+msgstr "Создание игры платформера за 5 минут"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:89
 msgid "Step-by-step Beginner Tutorial"
-msgstr "Пошаговый обучающий урок для новичков"
+msgstr "Пошаговый урок для новичков"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:96
 msgid "More videos and tutorials on the wiki"
-msgstr "Больше видео уроков на Википедии"
+msgstr "Больше видео и уроков на Википедии"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:119
 msgid "Latest projects"
@@ -925,15 +926,15 @@ msgstr "Сообщество"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:178
 msgid "Go on GDevelop community forums"
-msgstr "Перейти на форумах сообщества GDevelop"
+msgstr "Перейти на форум сообщества GDevelop"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:185
 msgid "Facebook page"
-msgstr "Страница Facebook"
+msgstr "Страница на Facebook"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:192
 msgid "Follow GDevelop on Twitter"
-msgstr "Следить за GDevelop в Twitter"
+msgstr "Следите за GDevelop в Twitter"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:215
 msgid "Latest news"
@@ -941,15 +942,15 @@ msgstr "Последние новости"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:252
 msgid "GDevelop is open source:"
-msgstr "GDevelop с открытым исходным кодом:"
+msgstr "GDevelop - проект с открытым исходным кодом:"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:260
 msgid "Donate if you like it"
-msgstr "Пожертвовать, если вам это нравится"
+msgstr "Пожертвуйте, если вам нравится программа"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:271
 msgid "Contribute on GitHub"
-msgstr "Внести свой вклад на GitHub"
+msgstr "Внесите свой вклад на GitHub"
 
 #: ../IDE/Dialogs/GDIDEDialogs.cpp:282
 msgid "Help to translate GD in your language"
@@ -962,19 +963,19 @@ msgstr "Особый размер?"
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:56
 msgid "Create a new project"
-msgstr "Создать новый проект"
+msgstr "Создание нового проекта"
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:62
 msgid "Choose a platform and a template:"
-msgstr "Выбрать платформу и шаблон :"
+msgstr "Выберите платформу и шаблон:"
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:75
 msgid "Choose a file for the project:"
-msgstr "Выбрать файл для проекта :"
+msgstr "Выберите файл для проекта:"
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:90
 msgid "You can also browse the examples"
-msgstr "Вы также можете просмотреть примеры"
+msgstr "Также вы можете посмотреть примеры"
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:92
 msgid "Create the new project"
@@ -993,7 +994,7 @@ msgstr "Мой проект"
 #: ../IDE/Dialogs/NewProjectDialog.cpp:139
 #: ../IDE/Dialogs/NewProjectDialog.cpp:335
 msgid "Project.gdg"
-msgstr "Project.gdg"
+msgstr "Проект.gdg"
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:150
 #: ../Extensions//PlatformAutomatism/Extension.cpp:404
@@ -1024,7 +1025,7 @@ msgstr "Создать новый пустой проект"
 
 #: ../IDE/Dialogs/NewProjectDialog.cpp:335
 msgid "Choose a file for the project"
-msgstr "Выбрать файл для проекта"
+msgstr "Выберите файл для проекта"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:143 ../IDE/Dialogs/ObjectsEditor.cpp:957
 msgid "The group was correctly added."
@@ -1039,11 +1040,11 @@ msgstr "Группа была успешно добавлена."
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:75
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:134
 msgid "Edit"
-msgstr "Редактировать"
+msgstr "Изменить"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:247
 msgid "Add an automatism"
-msgstr "Добавить автоматизм"
+msgstr "Добавить автоматизацию"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:249
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:693
@@ -1080,7 +1081,7 @@ msgstr "Переместить вверх\tCtrl-Up"
 #: ../IDE/Dialogs/ObjectsEditor.cpp:268 ../IDE/ProjectManager.cpp:167
 #: ../IDE/ProjectManager.cpp:219 ../IDE/ProjectManager.cpp:270
 msgid "Move down\tCtrl-Down"
-msgstr "Вниз\tCtrl-Down"
+msgstr "Переместить вниз\tCtrl-Down"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:272 ../IDE/ProjectManager.cpp:171
 #: ../IDE/ProjectManager.cpp:223 ../IDE/ProjectManager.cpp:274
@@ -1095,7 +1096,7 @@ msgstr "Вырезать\tCtrl-X"
 #: ../IDE/Dialogs/ObjectsEditor.cpp:278 ../IDE/ProjectManager.cpp:177
 #: ../IDE/ProjectManager.cpp:229 ../IDE/ProjectManager.cpp:280
 msgid "Paste\tCtrl-V"
-msgstr "Вставить \tCtrl-V"
+msgstr "Вставить\tCtrl-V"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:281 ../IDE/EventsEditor.cpp:202
 #: ../IDE/ProjectManager.cpp:160 ../IDE/ProjectManager.cpp:212
@@ -1141,11 +1142,11 @@ msgstr "Объекты и группы"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:389
 msgid "Add a new object to the list of the objects of the scene"
-msgstr "Добавить новый элемент в список объектов на сцене"
+msgstr "Добавить новый элемент в список объектов сцены"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:390
 msgid "Add a new group to the scene"
-msgstr "Добавить новую группу на сцену"
+msgstr "Добавить новую группу в сцену"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:391
 msgid "Delete the selected object or group"
@@ -1159,7 +1160,7 @@ msgstr "Переместить вверх"
 #: ../IDE/Dialogs/ObjectsEditor.cpp:393 ../IDE/MainFrame.cpp:389
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:152
 msgid "Move down"
-msgstr "Вниз"
+msgstr "Переместить вниз"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:396
 msgid "Selection"
@@ -1167,7 +1168,7 @@ msgstr "Выбор"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:398
 msgid "Edit the selected object"
-msgstr "Редактировать выбранный объект"
+msgstr "Изменить выбранный объект"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:399
 msgid "Rename the selected item"
@@ -1179,11 +1180,11 @@ msgstr "Показать онлайн справку"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:418
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/edit_object"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:618
 msgid "Unable to rename the object : \n"
-msgstr "Невозможно переименовать объект: \n"
+msgstr "Не удалось переименовать объект: \n"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:627
 msgid "Invalid name"
@@ -1191,7 +1192,7 @@ msgstr "Недопустимое имя"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:704
 msgid "Unable to rename the group : \n"
-msgstr "Unable to rename the group : \n"
+msgstr "Не удалось переименовать группу:\n"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:784
 msgid "Unfold the group to see the objects inside it."
@@ -1213,17 +1214,17 @@ msgstr "НоваяГруппа"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:988
 msgid "Delete also all references to this item in groups and events ( i.e. Actions and conditions using the object )?"
-msgstr "Удалить все ссылки на этот элемент в группах и событиях ( т.е. действия и условия используемые этим объектом ) ?"
+msgstr "Удалить все ссылки на этот элемент в группах и событиях (т.е. действия и условия использующие этот объект)?"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:989
 #, c-format
 msgid "Delete also all references to these %i items in groups and events ( i.e. Actions and conditions using the objects )?"
-msgstr "Удалить все ссылки на эти %i элементы в группах и событиях ( т.е. действия и условия используемые этими объектами ) ?"
+msgstr "Удалить все ссылки на эти %i элементы в группах и событиях (т.е. действия и условия использующие эти объекты)?"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:990
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:490
 msgid "Confirm deletion"
-msgstr "Подтвердите удаление"
+msgstr "Подтверждение удаления"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1275 ../IDE/Dialogs/ObjectsEditor.cpp:1277
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1301 ../IDE/Dialogs/ObjectsEditor.cpp:1303
@@ -1232,11 +1233,11 @@ msgstr "Копия"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1343 ../IDE/Dialogs/ObjectsEditor.cpp:1387
 msgid "Can't set \""
-msgstr "Can't set \""
+msgstr "Не удалось установить \""
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1343 ../IDE/Dialogs/ObjectsEditor.cpp:1387
 msgid "\" global because :\n"
-msgstr "\" global because :\n"
+msgstr "\" глобальным потому что:\n"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1442
 msgid "Create a new group"
@@ -1245,7 +1246,7 @@ msgstr "Создать новую группу"
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1452
 #: ../Core/GDCore/IDE/Dialogs/ObjectListDialogsHelper.cpp:98
 msgid "Groups"
-msgstr "Список групп"
+msgstr "Группы"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1619
 msgid "an object"
@@ -1257,7 +1258,7 @@ msgstr "группа"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1623
 msgid "with the same name exists in the current scene"
-msgstr "с таким названием существует на данной сцене"
+msgstr "с таким названием существует в данной сцене"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1633
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:237
@@ -1266,36 +1267,36 @@ msgstr "объекты"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1636
 msgid "/ groups"
-msgstr "/ groups"
+msgstr "/ группы"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1637
 msgid "groups"
-msgstr "groups"
+msgstr "группы"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1639
 msgid "with the same name exist in these scenes : "
-msgstr "with the same name exist in these scenes : "
+msgstr " с таким же именем существуют в этих сценах: "
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1654
 msgid "a global object with the same name exists"
-msgstr "a global object with the same name exists"
+msgstr "существует глобальный объект с таким же именем"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:1656
 msgid "a global group with the same name exists"
-msgstr "a global group with the same name exists"
+msgstr "существует глобальная группа с таким же именем"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:140
 #: ../Extensions//TextObject/TextObjectEditor.cpp:193
 msgid "Choose a font ( ttf/ttc files )"
-msgstr "Выберите шрифт ( файлы ttf, ttc )"
+msgstr "Выберите шрифт (файлы ttf, ttc)"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:154
 msgid "Choose a music ( ogg files )"
-msgstr "Выбрать музыку ( файлы ogg )"
+msgstr "Выберите музыку (файлы ogg)"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:154
 msgid "Audio files (*.ogg)|*.ogg"
-msgstr "Файлы аудио (*.ogg)|*.ogg"
+msgstr "Аудио файлы (*.ogg)|*.ogg"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:168
 msgid "Choose a sound"
@@ -1303,28 +1304,28 @@ msgstr "Выберите звук"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:168
 msgid "Audio files (*.wav, *.ogg)|*.wav;*.ogg"
-msgstr "Файлы аудио (*.wav, *.ogg)|*.wav;*.ogg"
+msgstr "Аудио файлы (*.wav, *.ogg)|*.wav;*.ogg"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:208
 msgid "Choose True or False to fill the parameter"
-msgstr "Выбрать True или False и заполнить параметр"
+msgstr "Выберите значение Правда или Ложь для заполнения параметра"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:208
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:132
 msgid "True or False"
-msgstr "True или False"
+msgstr "Правда или Ложь"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:210 ../IDE/TrueOrFalse.cpp:58
 msgid "True"
-msgstr "Правильное значение"
+msgstr "Правда"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:212 ../IDE/TrueOrFalse.cpp:60
 msgid "False"
-msgstr "Ложное значение"
+msgstr "Ложь"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:216
 msgid "Choose yes or no to fullfil parent parameter:"
-msgstr "Choose yes or no to fullfil parent parameter:"
+msgstr "Выберите Да или Нет для заполнения родительского параметра:"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:216
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:129
@@ -1333,7 +1334,7 @@ msgstr "Да или нет"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:217
 msgid "yes"
-msgstr "Да"
+msgstr "да"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:219
 msgid "no"
@@ -1351,7 +1352,7 @@ msgstr "Название проекта"
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1051
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1052
 msgid "Activate the use of C++/JS source files"
-msgstr "Включить использование C++/JS исходных файлов"
+msgstr "Включить использование исходных файлов C++/JS"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:53
 msgid "Support GDevelop"
@@ -1359,13 +1360,13 @@ msgstr "Поддержка GDevelop"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:56
 msgid "Thank you for using GDevelop!"
-msgstr "Спасибо что используете GDevelop!"
+msgstr "Спасибо, что используете GDevelop!"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:62
 msgid "We'd love to get your feedback about GDevelop! You can write us something\n"
 "about the software:"
-msgstr "Мы хотим узнать ваше мнение о GDevelop! Вы можете оставить здесь\n"
-"отзыв об этом продукте:"
+msgstr "Мы хотим узнать ваше мнение о GDevelop! Здесь вы можете оставить\n"
+"отзыв об этом приложении:"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:64
 msgid "Write a short sentence about GD!"
@@ -1373,11 +1374,11 @@ msgstr "Написать короткий отзыв о GD!"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:68
 msgid "Your mail address:"
-msgstr "Адрес вашей электронной почты:"
+msgstr "Ваш электронный адрес:"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:71
 msgid "No worries, it won't be shared with any 3rd parties! It's just useful for us if we want to discuss with you :D"
-msgstr "Не волнуйтесь, он не будет передан третьим лицам! Это нужно, если мы захотим пообщаться с вами :D"
+msgstr "Не волнуйтесь, он не будет передан третьим лицам! Он понадобится, если мы захотим с вами пообщаться :D"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:73
 msgid "Send!"
@@ -1385,7 +1386,7 @@ msgstr "Отправить!"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:82
 msgid "This image is chosen at random each time the window is shown!"
-msgstr "Это изображение выбирается случайно каждый раз, при открытии окна !"
+msgstr "Это изображение выбирается случайно каждый раз, когда открывается окно!"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:89
 msgid "GDevelop is an open source software:\n"
@@ -1394,8 +1395,8 @@ msgid "GDevelop is an open source software:\n"
 "If GDevelop proves to be useful to you, you\n"
 "can support its authors by donating or contributing\n"
 "to the project:"
-msgstr "GDevelop это программа с открытым исходным кодом:\n"
-"Вы можете использовать его свободно, но его развитие стоит\n"
+msgstr "GDevelop - это программа с открытым исходным кодом:\n"
+"Вы можете свободно ее использовать, но ее развитие требует\n"
 "много времени, а также денег.\n\n"
 "Если GDevelop оказался полезным для вас, вы\n"
 "можете поддержать его авторов, пожертвовав или способствуя\n"
@@ -1407,11 +1408,11 @@ msgstr "Пожертвовать или внести вклад в GDevelop"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:96
 msgid "Never show again ;)"
-msgstr "Не показывать ;)"
+msgstr "Больше не показывать ;)"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:98
 msgid "No thanks, maybe later! :)"
-msgstr "Нет, спасибо, может быть, позже ! :)"
+msgstr "Нет, спасибо, может быть позже! :)"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:99
 msgid "This window will be shown when you'll be launching GD for the third time in a row"
@@ -1419,7 +1420,7 @@ msgstr "Это окно появится после трех запусков Ga
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:188
 msgid "You didn't entered any feedback! :O"
-msgstr "Вы не написали не одного отзыва! : O"
+msgstr "Вы не написали ни одного отзыва! : O"
 
 #: ../IDE/Dialogs/ReminderDialog.cpp:215
 msgid "Thanks for your feedback!"
@@ -1427,11 +1428,11 @@ msgstr "Спасибо за ваш отзыв!"
 
 #: ../IDE/Dialogs/StartHerePage.cpp:70
 msgid "No news for now!"
-msgstr "На данный момент новостей нет !"
+msgstr "На данный момент новостей нет!"
 
 #: ../IDE/EditObjectGroup.cpp:69
 msgid "Edit the objects group"
-msgstr "Редактировать группу объектов"
+msgstr "Изменить группу объектов"
 
 #: ../IDE/EditObjectGroup.cpp:80
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:186
@@ -1445,7 +1446,7 @@ msgstr "Редактировать группу объектов"
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:134
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:147
 msgid "Pane caption"
-msgstr "Заголовок окна"
+msgstr "Заголовок панели"
 
 #: ../IDE/EditObjectGroup.cpp:107
 msgid "Delete the object"
@@ -1464,7 +1465,7 @@ msgstr "Вы сделали "
 #: ../IDE/EditObjectGroup.cpp:153
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:285
 msgid " changes. Are you sure you want to cancel all changes?"
-msgstr " изменения. Вы уверены в отказе от изменений ?"
+msgstr " несколько изменений. Вы уверены, что хотите отменить их?"
 
 #: ../IDE/EditObjectGroup.cpp:153
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:285
@@ -1485,15 +1486,15 @@ msgstr "уже в этой группе."
 
 #: ../IDE/EditObjectGroup.cpp:235
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/edit_group"
 
 #: ../IDE/EditorScene.cpp:73
 msgid "Edit the layout of the scene"
-msgstr "Редактировать макет сцены"
+msgstr "Изменить макет сцены"
 
 #: ../IDE/EditorScene.cpp:81
 msgid "Edit the events of the scene"
-msgstr "Редактировать события сцены"
+msgstr "Изменить события сцены"
 
 #: ../IDE/EditorScene.cpp:90 ../IDE/EditorScene.cpp:185
 #: ../IDE/MainFrame.cpp:409
@@ -1514,7 +1515,7 @@ msgstr "События"
 
 #: ../IDE/EditPropScene.cpp:71 ../IDE/EditPropScene.cpp:162
 msgid "Properties of "
-msgstr "Свойства..."
+msgstr "Свойства "
 
 #: ../IDE/EditPropScene.cpp:79
 msgid "Basic properties"
@@ -1522,11 +1523,11 @@ msgstr "Основные свойства"
 
 #: ../IDE/EditPropScene.cpp:84
 msgid "Window default title:"
-msgstr "Назавание окна :"
+msgstr "Заголовок окна по умолчанию:"
 
 #: ../IDE/EditPropScene.cpp:88
 msgid "Background color:"
-msgstr "Цвет фона :"
+msgstr "Цвет фона:"
 
 #: ../IDE/EditPropScene.cpp:94
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:79
@@ -1539,19 +1540,19 @@ msgstr "Остановить все звуки и музыку при старт
 
 #: ../IDE/EditPropScene.cpp:101
 msgid "Objects internal sort:"
-msgstr "Внутренняя сортировка объектов :"
+msgstr "Сортировка добавленных объектов:"
 
 #: ../IDE/EditPropScene.cpp:103
 msgid "Fast sort ( faster but risk of \"flickering\")"
-msgstr "Быстрая сортировка ( скорость, но есть риск \"мерцания\" )"
+msgstr "Быстрая сортировка (быстро, но есть риск \"мерцания\")"
 
 #: ../IDE/EditPropScene.cpp:107
 msgid "Stable sort (slower but less \"flickering\")"
-msgstr "Стабильная сортировка ( медленнее, но без \"мерцания\" )"
+msgstr "Стабильная сортировка (медленнее, но без \"мерцания\")"
 
 #: ../IDE/EditPropScene.cpp:114
 msgid "OpenGL Field of view :"
-msgstr "Поле зрения OpenGL :"
+msgstr "OpenGL Field вид :"
 
 #: ../IDE/EditPropScene.cpp:118
 msgid "90"
@@ -1594,7 +1595,7 @@ msgstr "500"
 
 #: ../IDE/EditPropScene.cpp:233
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_projman"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_projman"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/edit_projman"
 
 #: ../IDE/EventsEditor.cpp:172 ../IDE/EventsEditor.cpp:174
 #: ../IDE/EventsEditor.cpp:423
@@ -1611,7 +1612,7 @@ msgstr "Вложенное событие"
 
 #: ../IDE/EventsEditor.cpp:182
 msgid "Another event type"
-msgstr "Добавить еще один тип события"
+msgstr "Другой тип события"
 
 #: ../IDE/EventsEditor.cpp:184
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:168
@@ -1629,7 +1630,7 @@ msgstr "Добавить условие"
 
 #: ../IDE/EventsEditor.cpp:205
 msgid "De/activate"
-msgstr "Де/активироавть"
+msgstr "Де/активировать"
 
 #: ../IDE/EventsEditor.cpp:208
 msgid "Copy\tCtrl+C"
@@ -1653,11 +1654,11 @@ msgstr "Повторить\tCtrl-Y"
 
 #: ../IDE/EventsEditor.cpp:320
 msgid "Edit events using "
-msgstr "Редактировать события, используя"
+msgstr "Изменить события с помощью "
 
 #: ../IDE/EventsEditor.cpp:321
 msgid "Display the events as they are interpreted by the selected platform."
-msgstr "Просмотр событий в трактовке выбранной платформы."
+msgstr "Посмотреть, как используются события в выбранной платформе."
 
 #: ../IDE/EventsEditor.cpp:421
 msgid "Insert"
@@ -1665,11 +1666,11 @@ msgstr "Вставить"
 
 #: ../IDE/EventsEditor.cpp:423
 msgid "Add a new standard event with conditions and actions"
-msgstr "Добавить новое событие условий и действий"
+msgstr "Добавить новое стандартное событие с условиями и действиями"
 
 #: ../IDE/EventsEditor.cpp:424
 msgid "Add a sub event, launched only when the conditions of its parent are fulfilled."
-msgstr "Добавляет подменю события, запускаемые только тогда, когда условия родителя выполнены"
+msgstr "Добавить вложенное событие, запускаемое только тогда, когда выполнены условия родителя."
 
 #: ../IDE/EventsEditor.cpp:425
 msgid "Add a comment"
@@ -1697,7 +1698,7 @@ msgstr "Удалить выделенное"
 #: ../IDE/EventsEditor.cpp:441
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:560
 msgid "Undo"
-msgstr "Отмена"
+msgstr "Отменить"
 
 #: ../IDE/EventsEditor.cpp:452 ../IDE/SearchEvents.cpp:105
 #: ../IDE/SearchEvents.cpp:149 ../IDE/SearchEvents.cpp:224
@@ -1706,12 +1707,12 @@ msgstr "Поиск"
 
 #: ../IDE/EventsEditor.cpp:454
 msgid "Search for a specific word in the event and/or replace it by another"
-msgstr "Поиск конктретного слова и/или замена его другим"
+msgstr "Поиск конктретного слова в событии и/или замена его другим"
 
 #: ../IDE/EventsEditor.cpp:457 ../IDE/MainFrame.cpp:395
 #: ../IDE/ProjectManager.cpp:393
 msgid "View"
-msgstr "Вид"
+msgstr "Просмотр"
 
 #: ../IDE/EventsEditor.cpp:459
 msgid "Fold all"
@@ -1719,49 +1720,49 @@ msgstr "Свернуть все"
 
 #: ../IDE/EventsEditor.cpp:459
 msgid "Hide all subevents"
-msgstr "Скрыть все события"
+msgstr "Скрыть все вложенные события"
 
 #: ../IDE/EventsEditor.cpp:460
 msgid "Unfold"
-msgstr "Развернуть все"
+msgstr "Развернуть"
 
 #: ../IDE/EventsEditor.cpp:460
 msgid "Show all hidden subevents"
-msgstr "Показать все скрытые события"
+msgstr "Показать все скрытые вложенные события"
 
 #: ../IDE/EventsEditor.cpp:465
 msgid "Display performances"
-msgstr "Мониторинг производительности"
+msgstr "Отображение производительности"
 
 #: ../IDE/EventsEditor.cpp:465
 msgid "For native games, display the time taken by each events during the last preview when profiling was active."
-msgstr "Показывает время, необходимое для каждого события, во время просмотра игры, если мониторинг производительности был включен."
+msgstr "Для нативных игр. Если профайлер был включен, показывает время, необходимое для выполнения каждого события, во время пред-просмотра игры."
 
 #: ../IDE/EventsEditor.cpp:466
 msgid "Current platform"
-msgstr "Платформа"
+msgstr "Текущая платформа"
 
 #: ../IDE/EventsEditor.cpp:466
 msgid "Choose the current platform being used to edit the events."
-msgstr "Выбрать платформу используемую для редактирования события."
+msgstr "Выбрать текущую платформу для редактирования событий."
 
 #: ../IDE/EventsEditor.cpp:471
 msgid "Display the help about the events editor"
-msgstr "Отображение справки о редакторе событий"
+msgstr "Показать справку о редакторе событий"
 
 #: ../IDE/EventsEditor.cpp:547
 msgid "Add an event with the ribbon.\n"
 "Highlight then an event/action/condition with the cursor to get more edition options,\n"
 "or make a double click to edit an item."
-msgstr "Добавьте событие при помощи кнопки на верхней панели редактора.\n"
+msgstr "Добавьте событие с помощью кнопки на Ленте.\n"
 "Затем выделите событие/действие/условие с помощью курсора мыши, для получения дополнительных опций редактирования,\n"
-"или дважды щелкните мышкой для редактирования элемента."
+"или дважды щелкните мышкой для изменения элемента."
 
 #: ../IDE/EventsEditor.cpp:549
 msgid "Highlight then an event/action/condition with the cursor to get more edition options,\n"
 "or make a double click to edit an item."
-msgstr "Для выбор варианта редактирования наведите указатель мыши на событие/действие/условие,\n"
-"или дважды щелкните на редактируемом элементе."
+msgstr "Выделите событие/действие/условие с помощью курсора мыши, для получения дополнительных опций редактирования,\n"
+"или дважды щелкните мышкой для изменения элемента."
 
 #: ../IDE/EventsEditor.cpp:958
 msgid "Add an action"
@@ -1769,34 +1770,34 @@ msgstr "Добавить действие"
 
 #: ../IDE/EventsEditor.cpp:1224
 msgid "Only one \"Trigger Once\" condition is needed in a list of conditions."
-msgstr "Только одно условие \"Trigger Once\" необходимо в списке условий."
+msgstr "В списке условий необходимо только одно условие «Триггер Как только»."
 
 #: ../IDE/EventsEditor.cpp:1269 ../IDE/EventsEditor.cpp:1336
 msgid "Unable to create standard event."
-msgstr "Невозможно создать стандартное событие."
+msgstr "Не удалось создать стандартное событие."
 
 #: ../IDE/EventsEditor.cpp:1316
 msgid "Unable to create a comment event."
-msgstr "Невозможно создать комментарий события."
+msgstr "Не удалось создать событие комментарий."
 
 #: ../IDE/EventsEditor.cpp:1608
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/edit_event"
 
 #: ../IDE/EventsEditor.cpp:1652
 msgid "Profiling is not activated. Activate profiling thanks to the Profiling window when previewing a scene."
-msgstr "Мониторинг производительности не включен. Включите трассировку событий с помощью окна Производительность в режиме предварит. просмотра сцены."
+msgstr "Мониторинг не включен. Включите мониторинг с помощью окна Профайлера в режиме пред-просмотра сцены."
 
 #: ../IDE/ExtensionBugReportDlg.cpp:42
 #: ../Core/GDCore/IDE/ExtensionsLoader.cpp:189
 #: ../Core/GDCore/IDE/ExtensionsLoader.cpp:204
 #: ../Core/GDCore/IDE/ExtensionsLoader.cpp:267
 msgid "Extension not compatible"
-msgstr "Не совместимое расширение"
+msgstr "Расширение не совместимо"
 
 #: ../IDE/ExtensionBugReportDlg.cpp:50
 msgid "An extension seems to be incompatible and make GDevelop crashing."
-msgstr "Расширение, кажется, несовместимо и приводит к аварии GDevelop."
+msgstr "Кажется, расширение несовместимо и может привести к ошибкам в GDevelop."
 
 #: ../IDE/ExtensionBugReportDlg.cpp:62
 msgid "GDevelop crashed while loading this file:"
@@ -1809,7 +1810,7 @@ msgstr "Неизвестный файл"
 #: ../IDE/ExtensionBugReportDlg.cpp:69
 msgid "To launch GDevelop without errors,\n"
 "delete the file from the extension and relaunch GDevelop."
-msgstr "Для запуска GDevelop без ошибок, \n"
+msgstr "Для запуска GDevelop без ошибок,\n"
 "удалите файл с расширением и перезапустить GDevelop."
 
 #: ../IDE/ExtensionBugReportDlg.cpp:73
@@ -1822,7 +1823,7 @@ msgstr "Закрыть GDevelop"
 
 #: ../IDE/ExtensionBugReportDlg.cpp:84
 msgid "loadWithoutExtensionsBt"
-msgstr "loadWithoutExtensionsBt"
+msgstr "загрузкаБезРасширенийBt"
 
 #: ../IDE/ExtensionBugReportDlg.cpp:86
 msgid "Launch GDevelop anyway"
@@ -1830,7 +1831,7 @@ msgstr "Все равно запустить GDevelop"
 
 #: ../IDE/ExtensionBugReportDlg.cpp:98
 msgid "Launch GDevelop without any extension"
-msgstr "Запуск GDevelop без каких-либо расширений"
+msgstr "Запустить GDevelop без всех расширений"
 
 #: ../IDE/ExtensionBugReportDlg.cpp:99
 msgid "More options"
@@ -1838,7 +1839,7 @@ msgstr "Дополнительные опции"
 
 #: ../IDE/ExternalEventsEditor.cpp:50
 msgid "Edit as if the events were included to scene :"
-msgstr "Отредактировать, как если бы события были включены в сцену :"
+msgstr "Редактировать как будто события были включены в сцену:"
 
 #: ../IDE/GDevelopIDEApp.cpp:215
 msgid "It seems that GDevelop is busy and can't open the requested file.\n"
@@ -1848,7 +1849,7 @@ msgstr "Кажется, что GDevelop занят и не может откры
 
 #: ../IDE/GDevelopIDEApp.cpp:216
 msgid "Sorry! :/"
-msgstr "Извините ! :/"
+msgstr "Извините! :/"
 
 #: ../IDE/GeneratePassword.cpp:49
 msgid "Automatic creation of a password"
@@ -1856,7 +1857,7 @@ msgstr "Автоматическое создание пароля"
 
 #: ../IDE/GeneratePassword.cpp:54
 msgid "Length of the password to create :"
-msgstr "Длина создаваемого пароля :"
+msgstr "Длина создаваемого пароля:"
 
 #: ../IDE/GeneratePassword.cpp:56
 msgid "45"
@@ -1880,7 +1881,7 @@ msgstr "Импорт изображений"
 
 #: ../IDE/ImportImage.cpp:123
 msgid "Animated GIF :"
-msgstr "Gif анимация :"
+msgstr "Gif анимация:"
 
 #: ../IDE/ImportImage.cpp:127 ../IDE/ImportImage.cpp:161
 #: ../IDE/ImportImage.cpp:192
@@ -1889,7 +1890,7 @@ msgstr "Обзор..."
 
 #: ../IDE/ImportImage.cpp:131 ../IDE/ImportImage.cpp:165
 msgid "Decomposed into several images named:"
-msgstr "Разбить изображения по имени :"
+msgstr "Разрезать на несколько изображений с именем:"
 
 #: ../IDE/ImportImage.cpp:135 ../IDE/ImportImage.cpp:169
 #: ../IDE/ImportImage.cpp:273
@@ -1904,31 +1905,31 @@ msgstr "X.png"
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:522
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:149
 msgid "Preview"
-msgstr "Просмотр"
+msgstr "Пред-просмотр"
 
 #: ../IDE/ImportImage.cpp:140
 msgid "Number of images:"
-msgstr "Количество изображений :"
+msgstr "Количество изображений:"
 
 #: ../IDE/ImportImage.cpp:144 ../IDE/ImportImage.cpp:178
 #: ../IDE/ImportImage.cpp:275
 msgid "Decompose"
-msgstr "Разбивать"
+msgstr "Разрезать"
 
 #: ../IDE/ImportImage.cpp:153
 msgid "GDevelop decompose spritesheets of characters\n"
 "with 4 directions with 4 images."
-msgstr "GDevelop разрезает спрайт лист на части\n"
-"with 4 directions with 4 images."
+msgstr "GDevelop разрезает спрайт лист персонажей\n"
+"в 4-х направлениях на 4 изображения."
 
 #: ../IDE/ImportImage.cpp:157 ../IDE/ImportImage.cpp:188
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:279
 msgid "Image :"
-msgstr "Изображение :"
+msgstr "Изображение:"
 
 #: ../IDE/ImportImage.cpp:174
 msgid "Size of an image :"
-msgstr "Размер изображения :"
+msgstr "Размер изображения:"
 
 #: ../IDE/ImportImage.cpp:196
 msgid "Size of an image"
@@ -1936,7 +1937,7 @@ msgstr "Размер изображения"
 
 #: ../IDE/ImportImage.cpp:199
 msgid "Size (pixels):"
-msgstr "Размер ( пикс ):"
+msgstr "Размер (пикс):"
 
 #: ../IDE/ImportImage.cpp:202 ../IDE/ImportImage.cpp:206
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:99
@@ -1960,7 +1961,7 @@ msgstr "Количество изображений"
 
 #: ../IDE/ImportImage.cpp:213
 msgid "Number of columns of images:"
-msgstr "Количество столбцов изображений :"
+msgstr "Количество столбцов изображений:"
 
 #: ../IDE/ImportImage.cpp:215 ../IDE/ImportImage.cpp:229
 #: ../IDE/ImportImage.cpp:233 ../IDE/ImportImage.cpp:244
@@ -1993,15 +1994,15 @@ msgstr "0"
 
 #: ../IDE/ImportImage.cpp:217
 msgid "Number of rows of images:"
-msgstr "Количество строк изображений :"
+msgstr "Количество строк изображений:"
 
 #: ../IDE/ImportImage.cpp:223
 msgid "Origin of the decomposition"
-msgstr "Оригинал разбивки"
+msgstr "Оригинал разрезания"
 
 #: ../IDE/ImportImage.cpp:226
 msgid "Origin ( pixels):"
-msgstr "Оригинал ( pixels ):"
+msgstr "Оригинал (pixels):"
 
 #: ../IDE/ImportImage.cpp:231
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:208
@@ -2018,11 +2019,11 @@ msgstr "Расстояние между каждым изображением"
 
 #: ../IDE/ImportImage.cpp:242
 msgid "Horizontal spacing (pixels):"
-msgstr "Расстояние по горизонтали ( pixels ):"
+msgstr "Расстояние по горизонтали (пикс.):"
 
 #: ../IDE/ImportImage.cpp:246
 msgid "Vertical spacing (pixels):"
-msgstr "Расстояние по вертикали ( pixels ):"
+msgstr "Расстояние по вертикали (пикс.):"
 
 #: ../IDE/ImportImage.cpp:254
 msgid "Make a color transparent"
@@ -2030,7 +2031,7 @@ msgstr "Сделать цвет прозрачным"
 
 #: ../IDE/ImportImage.cpp:257
 msgid "Make a color transparent:"
-msgstr "Цвет, который сделать прозрачным :"
+msgstr "Сделать цвет прозрачным:"
 
 #: ../IDE/ImportImage.cpp:260
 msgid "( ; ; )"
@@ -2046,7 +2047,7 @@ msgstr "Выбрать"
 
 #: ../IDE/ImportImage.cpp:269
 msgid "Decompose in :"
-msgstr "Разложить в :"
+msgstr "Разрезать в:"
 
 #: ../IDE/ImportImage.cpp:281
 msgid "Animated GIF"
@@ -2062,55 +2063,55 @@ msgstr "Общий спрайт лист"
 
 #: ../IDE/ImportImage.cpp:334
 msgid "Choose the animated GIF to decompose"
-msgstr "Выбрать анимированный GIF для разложения"
+msgstr "Выбрать анимированный GIF для разрезания"
 
 #: ../IDE/ImportImage.cpp:349
 msgid "Number of images : "
-msgstr "Количество изображений : "
+msgstr "Количество изображений: "
 
 #: ../IDE/ImportImage.cpp:351
 msgid "Number of images : ?"
-msgstr "Количество изображений : ?"
+msgstr "Количество изображений: ?"
 
 #: ../IDE/ImportImage.cpp:362
 msgid "Unable to open the GIF file!"
-msgstr "невозможно открыть файл GIF !"
+msgstr "Не удалось открыть GIF файл!"
 
 #: ../IDE/ImportImage.cpp:375
 msgid "Decomposition of the GIF completed!"
-msgstr "Разложение GIF завершено !"
+msgstr "Разрезание GIF завершено!"
 
 #: ../IDE/ImportImage.cpp:383
 msgid "Choose the RPG Maker Spritesheet to decompose"
-msgstr "Выбрать спрайт лист RPG Maker для разложения"
+msgstr "Выбрать спрайт лист RPG Maker для разрезания"
 
 #: ../IDE/ImportImage.cpp:395
 msgid "Choose the spritesheet to decompose"
-msgstr "Выбрать спрайт лист для разложения"
+msgstr "Выбрать спрайт лист для разрезания"
 
 #: ../IDE/ImportImage.cpp:409
 msgid "Size of an image : "
-msgstr "Размер изображения : "
+msgstr "Размер изображения: "
 
 #: ../IDE/ImportImage.cpp:411
 msgid "Size of an image : ?x?"
-msgstr "Размер изображения : ?x?"
+msgstr "Размер изображения: ?x?"
 
 #: ../IDE/ImportImage.cpp:422 ../IDE/ImportImage.cpp:460
 msgid "Unable to open the file !"
-msgstr "невозможно открыть файл !"
+msgstr "Не удалось открыть файл!"
 
 #: ../IDE/ImportImage.cpp:449
 msgid "The decomposition of the image is completed !"
-msgstr "Разложение изображения завершено !"
+msgstr "Разрезание изображения завершено!"
 
 #: ../IDE/ImportImage.cpp:476
 msgid "The number of lines is invalid: The minimum is one line."
-msgstr "Недопустимое число строк : минимум одна строк."
+msgstr "Недопустимое число строк: минимум одна строка."
 
 #: ../IDE/ImportImage.cpp:483
 msgid "The number of columns is invalid: The minimum is one column."
-msgstr "Недопустимое число столбцов : минимум один столбец."
+msgstr "Недопустимое число столбцов: минимум один столбец."
 
 #: ../IDE/ImportImage.cpp:494
 msgid "The size of a sprite is invalid."
@@ -2118,11 +2119,11 @@ msgstr "Недопустимый размер спрайта."
 
 #: ../IDE/ImportImage.cpp:501
 msgid "The horizontal spacing is invalid (must be greater than or equal to 0)."
-msgstr "Горизонтальный шаг недопустим ( должен быть больше или равен 0 )."
+msgstr "Недопустимый горизонтальный шаг (должен быть больше или равен 0)."
 
 #: ../IDE/ImportImage.cpp:507
 msgid "The vertical spacing is invalid (must be greater than or equal to 0)."
-msgstr "Вертикальный шаг недопустим ( должен быть больше или равен 0 )."
+msgstr "Недопустимый вертикальный шаг (должен быть больше или равен 0)."
 
 #: ../IDE/InitialPositionBrowserDlg.cpp:53
 #: ../Extensions//Box3DObject/Extension.cpp:52
@@ -2644,7 +2645,7 @@ msgstr "Объект"
 
 #: ../IDE/InitialPositionBrowserDlg.cpp:54
 msgid "Locked?"
-msgstr "Запереть ?"
+msgstr "Заблокировать?"
 
 #: ../IDE/InitialPositionBrowserDlg.cpp:55
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:69
@@ -2708,15 +2709,15 @@ msgstr "Угол"
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:640
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:643
 msgid "Z order"
-msgstr "Z плоскость"
+msgstr "Z-вектор"
 
 #: ../IDE/InstructionSelectorDialog.cpp:90
 msgid "Edit the action"
-msgstr "Править действие"
+msgstr "Изменить действие"
 
 #: ../IDE/InstructionSelectorDialog.cpp:90
 msgid "Edit the condition"
-msgstr "Изменение условий"
+msgstr "Изменить условие"
 
 #: ../IDE/InstructionSelectorDialog.cpp:104
 msgid "Choose the action to use"
@@ -2744,7 +2745,7 @@ msgstr "Выберите условие в списке"
 
 #: ../IDE/InstructionSelectorDialog.cpp:142
 msgid "Inversion"
-msgstr "Инверсия"
+msgstr "Инвертировать?"
 
 #: ../IDE/InstructionSelectorDialog.cpp:146
 msgid "Invert the condition"
@@ -2752,11 +2753,11 @@ msgstr "Обратное условие"
 
 #: ../IDE/InstructionSelectorDialog.cpp:148
 msgid "When inverted, a condition will check the negation of what it normally does."
-msgstr "Обратное условие, будет проверять отрицание того, что оно обычно делает."
+msgstr "Обратное условие будет проверять отрицание того, что оно обычно делает."
 
 #: ../IDE/InstructionSelectorDialog.cpp:160
 msgid "More actions"
-msgstr "Дополнительно"
+msgstr "Еще действия"
 
 #: ../IDE/InstructionSelectorDialog.cpp:160
 msgid "More conditions"
@@ -2781,29 +2782,29 @@ msgstr "Все объекты"
 #: ../IDE/InstructionSelectorDialog.cpp:455
 msgid "The instruction has to many parameters. This can be a bug of GDevelop.\n"
 "Read Help to know how report a bug."
-msgstr "Инструкция имеет много параметров. Это может быть ошибка GDevelop.\n"
-"Смотри в Помощи, как сообщить об ошибке."
+msgstr "Инструкция имеет много параметров. Это может быть ошибкой в GDevelop.\n"
+"Смотри в Справке, как сообщить об ошибке."
 
 #: ../IDE/InstructionSelectorDialog.cpp:495
 #, c-format
 msgid "Error in parameter #%i: %s\n\n"
 "You should correct it before closing this dialog.\n"
 "Close the dialog anyway?"
-msgstr "Ошибка в параметре n°%i : %s\n\n"
-"Надо исправить, прежде чем продолжить.\n"
-"Вы уверены, что хотите закрыть окно ?"
+msgstr "Ошибка в параметре n°%i: %s\n\n"
+"Ее надо исправить, прежде чем продолжить.\n"
+"Вы уверены, что хотите закрыть окно?"
 
 #: ../IDE/InstructionSelectorDialog.cpp:496
 msgid "The instruction contains one or more errors."
-msgstr "Инструкция содержит одну или больше ошибок."
+msgstr "Инструкция содержит одну или более ошибок."
 
 #: ../IDE/InstructionSelectorDialog.cpp:523
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/events_editor/action"
 
 #: ../IDE/InstructionSelectorDialog.cpp:524
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/events_editor/condition"
 
 #: ../IDE/MainFrame.cpp:167 ../IDE/MainFrame.cpp:190
 #: ../IDE/MainFrame_Files.cpp:135
@@ -2816,15 +2817,15 @@ msgstr "Сохранить как..."
 
 #: ../IDE/MainFrame.cpp:172
 msgid "Decompose an animated GIF"
-msgstr "Разбить GIF анимацию"
+msgstr "Разрезать GIF анимацию"
 
 #: ../IDE/MainFrame.cpp:175
 msgid "Decompose a RPG Maker character"
-msgstr "Разбить персонажа из RPG Maker"
+msgstr "Разрезать персонажа RPG Maker"
 
 #: ../IDE/MainFrame.cpp:178
 msgid "Decompose a spritesheet"
-msgstr "Разбить спрайт лист"
+msgstr "Разрезать спрайт лист"
 
 #: ../IDE/MainFrame.cpp:183
 msgid "New\tCtrl+N"
@@ -2876,20 +2877,20 @@ msgstr "Проверка обновлений"
 
 #: ../IDE/MainFrame.cpp:232
 msgid "Official web site"
-msgstr "Веб сайт Game Develop"
+msgstr "Официальный сайт"
 
 #: ../IDE/MainFrame.cpp:235
 msgid "About..."
-msgstr "A propos..."
+msgstr "О программе..."
 
 #: ../IDE/MainFrame.cpp:238 ../IDE/MainFrame.cpp:681
 msgid "Please stop the preview before continuing"
-msgstr "Остановить просмотр, прежде чем продолжить"
+msgstr "Пожалуйста, остановите просмотр, прежде чем продолжить"
 
 #: ../IDE/MainFrame.cpp:369 ../IDE/ProjectManager.cpp:371
 #: ../IDE/ProjectManager.cpp:395 ../IDE/ProjectManager.cpp:458
 msgid "Projects"
-msgstr "Проект"
+msgstr "Проекты"
 
 #: ../IDE/MainFrame.cpp:373 ../IDE/ProjectManager.cpp:1092
 msgid "Images bank"
@@ -2924,11 +2925,11 @@ msgstr "Добавить виртуальную папку"
 
 #: ../IDE/MainFrame.cpp:380
 msgid "Add a virtual folder to organize resources"
-msgstr "Добавить виртуальную папку"
+msgstr "Добавить виртуальную папку для организации ресурсов"
 
 #: ../IDE/MainFrame.cpp:384
 msgid "List management"
-msgstr "Управление списками"
+msgstr "Управление списком"
 
 #: ../IDE/MainFrame.cpp:386
 msgid "Delete the selected resource"
@@ -2940,7 +2941,7 @@ msgstr "Удалить ненужные изображения"
 
 #: ../IDE/MainFrame.cpp:387
 msgid "Check if there are useless resources that can be removed"
-msgstr "Проверка наличия бесполезных ресурсов для удаления"
+msgstr "Проверить наличие неиспользуемых ресурсов, которые можно удалить"
 
 #: ../IDE/MainFrame.cpp:390
 msgid "Refresh"
@@ -2952,7 +2953,7 @@ msgstr "Обновить список, если вы сделали измене
 
 #: ../IDE/MainFrame.cpp:397
 msgid "Show a panel with the image displayed inside"
-msgstr "Предварительный просмотр изображения"
+msgstr "Показать панель с пред-просмотром изображения"
 
 #: ../IDE/MainFrame.cpp:398
 msgid "Show the properties of the resource"
@@ -2960,7 +2961,7 @@ msgstr "Показать свойства ресурса"
 
 #: ../IDE/MainFrame.cpp:404
 msgid "Open the online help"
-msgstr "Интерактивная справка"
+msgstr "Открыть онлайн справку"
 
 #: ../IDE/MainFrame.cpp:417 ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:79
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:78
@@ -2977,7 +2978,7 @@ msgstr "Интерактивная справка"
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:823
 #: ../Core/GDCore/IDE/Dialogs/ObjectListDialogsHelper.cpp:97
 msgid "Objects"
-msgstr "Объект"
+msgstr "Объекты"
 
 #: ../IDE/MainFrame.cpp:421
 msgid "Code"
@@ -2986,11 +2987,11 @@ msgstr "Код"
 #: ../IDE/MainFrame.cpp:444 ../IDE/MainFrame.cpp:587
 #: ../IDE/ProjectManager.cpp:396
 msgid "Start page"
-msgstr "Домашняя страница"
+msgstr "Стартовая страница"
 
 #: ../IDE/MainFrame.cpp:457 ../IDE/MainFrame.cpp:469
 msgid "Project manager"
-msgstr "Менеджер проекта"
+msgstr "Управление проектом"
 
 #: ../IDE/MainFrame.cpp:458
 msgid "Main editor"
@@ -2998,11 +2999,11 @@ msgstr "Основной редактор"
 
 #: ../IDE/MainFrame.cpp:459
 msgid "Ribbon"
-msgstr "Ruban"
+msgstr "Лента"
 
 #: ../IDE/MainFrame.cpp:460 ../IDE/MainFrame.cpp:470
 msgid "Compilation tools"
-msgstr "Средства компиляции"
+msgstr "Инструменты компиляции"
 
 #: ../IDE/MainFrame.cpp:461 ../IDE/MainFrame.cpp:471
 msgid "Project properties"
@@ -3016,7 +3017,7 @@ msgstr "Проект \"%s\" был изменен.\n\n"
 #: ../IDE/MainFrame.cpp:614
 #, c-format
 msgid "Do you want to save it in %s?"
-msgstr "Хотите сохранить его в %s ?"
+msgstr "Хотите сохранить его в %s?"
 
 #: ../IDE/MainFrame.cpp:615
 msgid "Project not saved"
@@ -3025,15 +3026,15 @@ msgstr "Проект не сохранен"
 #: ../IDE/MainFrame.cpp:620 ../IDE/MainFrame_Files.cpp:239
 #: ../IDE/MainFrame_Files.cpp:286 ../IDE/MainFrame_Files.cpp:296
 msgid "Save failed!"
-msgstr "Сохранить не удалось!"
+msgstr "Не удалось сохранить!"
 
 #: ../IDE/MainFrame.cpp:622
 msgid "Project properly saved."
-msgstr "Сохранение проекта."
+msgstr "Проект сохранен."
 
 #: ../IDE/MainFrame.cpp:776
 msgid "Please close the preview before closing the editor."
-msgstr "Закройте предварительный просмотр сцены, до закрытия редактора."
+msgstr "Пожалуйста, перед закрытием редактора, закройте пред-просмотр."
 
 #: ../IDE/MainFrame.cpp:814
 msgid "Autosave failed!"
@@ -3056,13 +3057,13 @@ msgstr "Выберите открываемый проект"
 
 #: ../IDE/MainFrame_Files.cpp:216
 msgid "One or more extensions are used by the project but are not installed for the platform used by the project :\n"
-msgstr "Одно или более расширений используются в проекте, но не установлены для платформы в рамках проекта :\n"
+msgstr "В проекте используются одно или более расширений, которые не установлены для платформы использующейся для проекта:\n"
 
 #: ../IDE/MainFrame_Files.cpp:218
 msgid "\n"
 "Some objects, actions, conditions or expressions can be unavailable or not working."
 msgstr "\n"
-"Некоторые объекты, действия, условия или выражения могут отсутствовать или быть неизвестны."
+"Некоторые объекты, действия, условия или выражения могут отсутствовать или не работать."
 
 #: ../IDE/MainFrame_Files.cpp:237
 msgid "Save ended."
@@ -3084,7 +3085,7 @@ msgstr "Проект был сохранен в новой папке.\n"
 
 #: ../IDE/MainFrame_Files.cpp:349
 msgid "Saving in a new directory"
-msgstr "Сохранить в новом каталоге"
+msgstr "Сохранить в новой папке"
 
 #: ../IDE/MainFrame_Files.cpp:350
 msgid "Do not show again"
@@ -3092,7 +3093,7 @@ msgstr "Не показывать это сообщение"
 
 #: ../IDE/MainFrame_Files.cpp:355
 msgid "Save progress"
-msgstr "Прогресс сохранения"
+msgstr "Сохранить прогресс"
 
 #: ../IDE/MainFrame_Files.cpp:355
 msgid "Exporting resources..."
@@ -3100,23 +3101,23 @@ msgstr "Экспорт ресурсов..."
 
 #: ../IDE/MainFrame_Files.cpp:368
 msgid "The project could not be saved properly!"
-msgstr "Проект не может быть сохранен !"
+msgstr "Проект не может быть правильно сохранен!"
 
 #: ../IDE/MainFrame_Help.cpp:20 ../IDE/ProjectManager.cpp:1978
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation"
+msgstr "http://wiki.compilgames.net/doku.php/ru/gdevelop/documentation"
 
 #: ../IDE/MainFrame_Help.cpp:28
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials/beginnertutorial"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/tutoriels"
+msgstr "http://wiki.compilgames.net/doku.php/ru/gdevelop/tutorials/beginnertutorial2"
 
 #: ../IDE/MAJ.cpp:71
 msgid "Your version :"
-msgstr "Ваша версия :"
+msgstr "Ваша версия:"
 
 #: ../IDE/MAJ.cpp:77
 msgid "Available version :"
-msgstr "Доступная версия :"
+msgstr "Доступная версия:"
 
 #: ../IDE/MAJ.cpp:79
 msgid "No informations available"
@@ -3128,11 +3129,11 @@ msgstr "Нет информации о новой версии"
 
 #: ../IDE/MAJ.cpp:94
 msgid "Automatic download :"
-msgstr "Авто загрузка :"
+msgstr "Авто-загрузка:"
 
 #: ../IDE/MAJ.cpp:97
 msgid "Install the new version"
-msgstr "Установите новую версию"
+msgstr "Установить новую версию"
 
 #: ../IDE/MAJ.cpp:101
 msgid "Download it here:"
@@ -3148,7 +3149,7 @@ msgstr "Проверить наличие обновлений"
 
 #: ../IDE/MAJ.cpp:139
 msgid "A new version of GDevelop is available !"
-msgstr "Новая версия GDevelop доступна !"
+msgstr "Доступна новая версия GDevelop!"
 
 #: ../IDE/MAJ.cpp:159
 msgid "No informations about the new version."
@@ -3158,13 +3159,13 @@ msgstr "Нет информации о новой версии."
 msgid "No download link is available.\n"
 "Go on our web site so as to download the last version of GDevelop."
 msgstr "Ссылка на скачивание не доступна.\n"
-"Перейди на наш сайт, чтобы скачать последнюю версию GDevelop."
+"Перейдите на наш сайт, чтобы скачать последнюю версию GDevelop."
 
 #: ../IDE/MAJ.cpp:219
 msgid "GDevelop will be closed at the end of the download so as to install the new version. Don't forget to save your work.\n"
 "Download and install the new version ?"
-msgstr "В конце загрузки GDevelop будет закрыт, чтобы установить новую версию. Не забудь сохранить свою работу.\n"
-"Скачать и установить новую версию ?"
+msgstr "В конце загрузки, GDevelop будет закрыт, чтобы установить новую версию. Не забудь сохранить свою работу.\n"
+"Скачать и установить новую версию?"
 
 #: ../IDE/MAJ.cpp:219
 msgid "Installation of the new version"
@@ -3182,11 +3183,11 @@ msgstr "Прогресс"
 msgid "Stop the download ?\n\n"
 "You can also get the new version by downloading it on our website."
 msgstr "Остановить загрузку ?\n\n"
-"Вы также можете получить новую версию на нашем сайте."
+"Также, вы можете скачать новую версию на нашем сайте."
 
 #: ../IDE/MAJ.cpp:241
 msgid "Stop the download"
-msgstr "Остановка загрузки"
+msgstr "Остановить загрузку"
 
 #: ../IDE/MAJ.cpp:255
 msgid "Unable to connect to the server so as to check for updates.\n"
@@ -3195,26 +3196,24 @@ msgid "Unable to connect to the server so as to check for updates.\n"
 "-Your firewall-If you can manually access  our site.\n\n"
 "You can disable Check for updates in the preferences of GDevelop."
 msgstr "Не удается подключиться к серверу, чтобы проверить наличие обновлений.\n"
-"Проверь :\n"
-"-Твое интернет соединение\n"
-"-Твой брандмауэр позволяет вручную открыть наш сайт.\n\n"
+"Проверьте:\n"
+"-Ваше интернет соединение\n"
+"-Что ваш брандмауэр позволяет вручную открыть наш сайт.\n\n"
 "Вы можете отключить проверку обновлений в настройках GDevelop."
 
 #: ../IDE/MAJ.cpp:266
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/update"
-msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manual/update"
+msgstr "http://wiki.compilgames.net/doku.php/ru/gdevelop/documentation/manual/update"
 
 #: ../IDE/mp3ogg.cpp:54
 msgid "Convert MP3 to OGG Vorbis"
-msgstr "Конвертер Mp3 в OGG Vorbis"
+msgstr "Конвертирование Mp3 в OGG Vorbis"
 
 #: ../IDE/mp3ogg.cpp:63
 msgid "GDevelop can not read the MP3 format (owing to license\n"
 "and algorithms patented by Fraunhofer-Gesellschaft), you can\n"
 "convert a MP3 file to the free OGG Vorbis format or WAV."
-msgstr "GDevelop не работает с форматом MP3 (права на лицензию \n"
-"и запатентованные алгоритмы принадлежат Fraunhofer-Gesellschaft). Вы можете\n"
-"конвертировать MP3 файл в бесплатные форматы OGG Vorbis или WAV."
+msgstr "GDevelop не работает с форматом MP3 (права на лицензию и запатентованные алгоритмы принадлежат Fraunhofer-Gesellschaft). Вы можете конвертировать MP3 файл в бесплатные форматы OGG Vorbis или WAV."
 
 #: ../IDE/mp3ogg.cpp:71
 #: ../Core/GDCore/BuiltinExtensions/CommonConversionsExtension.cpp:26
@@ -3224,32 +3223,30 @@ msgstr "GDevelop не работает с форматом MP3 (права на 
 #: ../Core/GDCore/BuiltinExtensions/CommonConversionsExtension.cpp:55
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:79
 msgid "Conversion"
-msgstr "Конверсия"
+msgstr "Конвертировать"
 
 #: ../IDE/mp3ogg.cpp:74
 msgid "A MP3 file is a music, or is meant to be played as a music :"
-msgstr "MP3 является муз. файлом , или предназначен для воспроизведения\n"
-"как музыки :"
+msgstr "OGG-файл — это музыка, или предназначен для воспроизведения музыки:"
 
 #: ../IDE/mp3ogg.cpp:76
 msgid "Choose a MP3 file and encode in OGG Vorbis"
-msgstr "Выбрать файл MP3 и кодировать его в OGG Vorbis"
+msgstr "Выбрать MP3 файл и конвертировать его в OGG Vorbis"
 
 #: ../IDE/mp3ogg.cpp:78
 msgid "A WAV file is a sound, an effect, or is meant to be played as a sound :"
-msgstr "WAV файл звука, эффектов, шумового оформление, предназначен быть сыгранным\n"
-"в качестве звука :"
+msgstr "WAV файл - звук, эффект, или предназначен для воспроизведения звука:"
 
 #: ../IDE/mp3ogg.cpp:80
 msgid "Choose a MP3 file and encode in WAV"
-msgstr "Выбрать файл MP3 и кодировать его в WAV"
+msgstr "Выбрать MP3 файл и конвертировать его в WAV"
 
 #: ../IDE/mp3ogg.cpp:84 ../GDJS/GDJS//Dialogs/GDJSDialogs.cpp:113
 #: ../GDJS/GDJS//Dialogs/GDJSDialogs.cpp:162
 #: ../GDJS/GDJS//Dialogs/GDJSDialogs.cpp:205
 #: ../Extensions//SoundObject/SoundObjectEditor.cpp:96
 msgid "Note"
-msgstr "Тон"
+msgstr "Примечание"
 
 #: ../IDE/mp3ogg.cpp:85
 msgid "This utility uses lame.exe ( free MP3 Encoder )\n"
@@ -3273,15 +3270,15 @@ msgstr "Утилита использует lame.exe ( свободный MP3 En
 
 #: ../IDE/mp3ogg.cpp:131 ../IDE/mp3ogg.cpp:159
 msgid "Choose the MP3 file to encode in OGG Vorbis"
-msgstr "Выбрать файл MP3 для кодирования в OGG Vorbis"
+msgstr "Выбрать MP3 файл для конвертирования в OGG Vorbis"
 
 #: ../IDE/mp3ogg.cpp:148
 msgid "The encoding is finished. The OGG  file is located in the same directory as the MP3 file."
-msgstr "Кодирование завершено. Файл OGG находится в том же каталоге, что и MP3."
+msgstr "Конвертирование завершено. Файл OGG находится в том же каталоге, что и MP3."
 
 #: ../IDE/mp3ogg.cpp:172
 msgid "The encoding is finished. The WAV file is located in the same directory as the MP3 file."
-msgstr "Кодирование завершено. Файл WAV находится в том же каталоге, что и MP3."
+msgstr "Конвертирование завершено. Файл WAV находится в том же каталоге, что и MP3."
 
 #: ../IDE/Preferences.cpp:203
 msgid "GDevelop settings"
@@ -3291,7 +3288,7 @@ msgstr "Настройки GDevelop"
 msgid "This window allows you to customize GDevelop. \n"
 "Each user of the computer has his own options."
 msgstr "Это окно позволит настроить GDevelop. \n"
-"Каждый пользователь ПК имеет свои предпочтения."
+"Каждый пользователь может настроить программу с учетом своих предпочтений."
 
 #: ../IDE/Preferences.cpp:227
 msgid "Startup"
@@ -3299,7 +3296,7 @@ msgstr "Запуск"
 
 #: ../IDE/Preferences.cpp:232
 msgid "Send anonymous statistics about GDevelop ( version, language used )"
-msgstr "Отправлять анонимную статистику о GDevelop ( использует версию и язык )"
+msgstr "Отправлять анонимную статистику о GDevelop (используемые версии и язык)"
 
 #: ../IDE/Preferences.cpp:234
 msgid "When checked, GDevelop will send some anonymous information to our server so as to get some statistics about the software"
@@ -3311,7 +3308,7 @@ msgstr "Автосохранение"
 
 #: ../IDE/Preferences.cpp:242
 msgid "Make a backup of opened projects every"
-msgstr "Создание резервной копии всех открытых проектов"
+msgstr "Создавать резервной копии открытых проектов каждые"
 
 #: ../IDE/Preferences.cpp:245
 msgid "3"
@@ -3332,11 +3329,11 @@ msgstr "Разное"
 
 #: ../IDE/Preferences.cpp:255
 msgid "Activate a log file"
-msgstr "Включить мониторинг с записью в лог файл журнала"
+msgstr "Включить лог файл"
 
 #: ../IDE/Preferences.cpp:258
 msgid "Warn when saving a project in a new directory"
-msgstr "Предупреждать при сохранении проекта в новый каталог"
+msgstr "Предупреждать при сохранении проекта в новую папку"
 
 #: ../IDE/Preferences.cpp:260
 msgid "Warn, when the project is saved in a new folder, that project resources should also be copied to the folder."
@@ -3344,11 +3341,11 @@ msgstr "Предупреждать, при сохр. проекта в ново�
 
 #: ../IDE/Preferences.cpp:268
 msgid "Language:"
-msgstr "Язык :"
+msgstr "Язык:"
 
 #: ../IDE/Preferences.cpp:271
 msgid "English"
-msgstr "English"
+msgstr "Английский"
 
 #: ../IDE/Preferences.cpp:279
 msgid "New projects"
@@ -3356,7 +3353,7 @@ msgstr "Новые проекты"
 
 #: ../IDE/Preferences.cpp:282
 msgid "New projects default folder:"
-msgstr "Каталог по умолчанию для новых проектов :"
+msgstr "Папка по умолчанию для новых проектов:"
 
 #: ../IDE/Preferences.cpp:285 ../IDE/Preferences.cpp:297
 msgid "Path to the image editing program."
@@ -3367,7 +3364,7 @@ msgstr "Путь к программе для редактирования из�
 #: ../IDE/Preferences.cpp:336 ../IDE/Preferences.cpp:546
 #: ../Extensions//SoundObject/SoundObjectEditor.cpp:149
 msgid "Browse"
-msgstr "Просмотр"
+msgstr "Обзор"
 
 #: ../IDE/Preferences.cpp:291
 msgid "External programs"
@@ -3379,14 +3376,14 @@ msgstr "Редактирование изображений :"
 
 #: ../IDE/Preferences.cpp:306
 msgid "Temporary deployment directory:"
-msgstr "Временный каталог развертывания :"
+msgstr "Папка временного развертывания:"
 
 #: ../IDE/Preferences.cpp:309 ../IDE/Preferences.cpp:319
 #: ../IDE/Preferences.cpp:334
 msgid "Folder used to store temporary files when compiling a game.\n"
 "We must own write permissions on this folder.\n"
 "If empty, the default temporary folder of the system is used."
-msgstr "Папка хранения врем. файлов при компиляции игры\n"
+msgstr "Папка хранения временных файлов при компиляции игры.\n"
 "Нужно обладать правами на запись в эту папку.\n"
 "Если не указано, используется временная папка системы."
 
@@ -3396,7 +3393,7 @@ msgstr "Временная папка для компиляции :"
 
 #: ../IDE/Preferences.cpp:324
 msgid "Delete temporaries as soon as possible"
-msgstr "Удалить временные файлы компиляции как можно скорее"
+msgstr "Удалять временные файлы компиляции как можно скорее"
 
 #: ../IDE/Preferences.cpp:328
 msgid "Java"
@@ -3404,7 +3401,7 @@ msgstr "Java"
 
 #: ../IDE/Preferences.cpp:331
 msgid "Directory containing the Java executable:"
-msgstr "Каталог, содержащий исполняемый файл java:"
+msgstr "Папка, содержащая исполняемый файл java:"
 
 #: ../IDE/Preferences.cpp:346
 msgid "Scene editor"
@@ -3412,7 +3409,7 @@ msgstr "Редактор сцены"
 
 #: ../IDE/Preferences.cpp:348
 msgid "Scene/Events tab:"
-msgstr "Вкладка Сцены/События :"
+msgstr "Вкладка Сцена/События:"
 
 #: ../IDE/Preferences.cpp:351
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:58
@@ -3426,7 +3423,7 @@ msgstr "Снизу"
 
 #: ../IDE/Preferences.cpp:362
 msgid "Predefined appearance "
-msgstr "Предустановленные"
+msgstr "Предустановленный внешний вид"
 
 #: ../IDE/Preferences.cpp:364
 msgid "GDevelop Metro"
@@ -3434,23 +3431,23 @@ msgstr "GDevelop Metro"
 
 #: ../IDE/Preferences.cpp:366
 msgid "Metro White"
-msgstr "Metro White"
+msgstr "Metro Белый"
 
 #: ../IDE/Preferences.cpp:368
 msgid "GDevelop Office"
-msgstr "GDevelop Office"
+msgstr "GDevelop Офис"
 
 #: ../IDE/Preferences.cpp:370
 msgid "Office Blue"
-msgstr "Office Blue"
+msgstr "Office Синий"
 
 #: ../IDE/Preferences.cpp:372
 msgid "Radiance"
-msgstr "Radiance"
+msgstr "Блеск"
 
 #: ../IDE/Preferences.cpp:374
 msgid "Oxygen"
-msgstr "Oxygen"
+msgstr "Кислород"
 
 #: ../IDE/Preferences.cpp:381
 msgid "Microsoft Office"
@@ -3458,7 +3455,7 @@ msgstr "Microsoft Office"
 
 #: ../IDE/Preferences.cpp:382
 msgid "wxAUI"
-msgstr "wxAUI"
+msgstr "wxA Интерфейс Пользователя"
 
 #: ../IDE/Preferences.cpp:383
 msgid "Metro"
@@ -3466,23 +3463,23 @@ msgstr "Metro"
 
 #: ../IDE/Preferences.cpp:385
 msgid "Ribbon's style"
-msgstr "Стиль шапки"
+msgstr "Стиль Ленты"
 
 #: ../IDE/Preferences.cpp:387
 msgid "Ribbon's colors"
-msgstr "Цвет шапки"
+msgstr "Цвета Ленты"
 
 #: ../IDE/Preferences.cpp:389
 msgid "Primary :"
-msgstr "Первичный :"
+msgstr "Первичный:"
 
 #: ../IDE/Preferences.cpp:393
 msgid "Secondary :"
-msgstr "Вторичный :"
+msgstr "Вторичный:"
 
 #: ../IDE/Preferences.cpp:399
 msgid "Ribbon labels"
-msgstr "Текст на шапке"
+msgstr "Текст в Ленте"
 
 #: ../IDE/Preferences.cpp:402
 msgid "Hide the button's labels"
@@ -3490,11 +3487,11 @@ msgstr "Скрыть названия кнопок"
 
 #: ../IDE/Preferences.cpp:405
 msgid "Hide tabs of ribbon's pages"
-msgstr "Скрать вкладки на шапке"
+msgstr "Скрыть вкладки страниц Ленты"
 
 #: ../IDE/Preferences.cpp:410
 msgid "File button"
-msgstr "Bouton Fichier"
+msgstr "Кнопка Файл"
 
 #: ../IDE/Preferences.cpp:412 ../Extensions//Light/Extension.cpp:46
 #: ../Extensions//Light/Extension.cpp:53
@@ -3514,27 +3511,27 @@ msgstr "Цвет"
 
 #: ../IDE/Preferences.cpp:420
 msgid "Panes' color"
-msgstr "Цвет панели"
+msgstr "Цвет панелей"
 
 #: ../IDE/Preferences.cpp:422
 msgid "Active editor :"
-msgstr "Активной :"
+msgstr "Активный редактор:"
 
 #: ../IDE/Preferences.cpp:428
 msgid "Inactive editor :"
-msgstr "Неактивной :"
+msgstr "Неактивный редактор:"
 
 #: ../IDE/Preferences.cpp:436
 msgid "Sash's color"
-msgstr "Цветоделение"
+msgstr "Цвет разделителей"
 
 #: ../IDE/Preferences.cpp:438
 msgid "Background :"
-msgstr "Фоновый :"
+msgstr "Фон:"
 
 #: ../IDE/Preferences.cpp:442
 msgid "Borders :"
-msgstr "Рамка :"
+msgstr "Рамка:"
 
 #: ../IDE/Preferences.cpp:448
 msgid "Text's color"
@@ -3542,11 +3539,11 @@ msgstr "Цвет текста"
 
 #: ../IDE/Preferences.cpp:450 ../IDE/Preferences.cpp:465
 msgid "Active :"
-msgstr "Акт :"
+msgstr "Активный:"
 
 #: ../IDE/Preferences.cpp:454 ../IDE/Preferences.cpp:469
 msgid "Inactive :"
-msgstr "Неакт :"
+msgstr "Неактивный:"
 
 #: ../IDE/Preferences.cpp:462
 msgid "Tabs"
@@ -3554,11 +3551,11 @@ msgstr "Вкладки"
 
 #: ../IDE/Preferences.cpp:476 ../IDE/Preferences.cpp:494
 msgid "Normal"
-msgstr "Нормальный"
+msgstr "Нормальные"
 
 #: ../IDE/Preferences.cpp:477 ../IDE/Preferences.cpp:495
 msgid "Flat"
-msgstr "Plat"
+msgstr "Плоские"
 
 #: ../IDE/Preferences.cpp:479 ../IDE/Preferences.cpp:497
 #: ../Extensions//TextObject/Extension.cpp:135
@@ -3574,15 +3571,15 @@ msgstr "Стиль"
 
 #: ../IDE/Preferences.cpp:483
 msgid "Toolbars"
-msgstr "Панель инструментов"
+msgstr "Панели инструментов"
 
 #: ../IDE/Preferences.cpp:486
 msgid "Custom color:"
-msgstr "Пользовательский :"
+msgstr "Настроить:"
 
 #: ../IDE/Preferences.cpp:509
 msgid "Default width of the condition column:"
-msgstr "Размер ширины столбца по умолчанию:"
+msgstr "Ширина столбца условий по умолчанию:"
 
 #: ../IDE/Preferences.cpp:513 ../Extensions//Light/LightObjectEditor.cpp:76
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:75
@@ -3598,7 +3595,7 @@ msgstr "Скрыть имена кнопок в контекстных пане�
 
 #: ../IDE/Preferences.cpp:519
 msgid "Parameters colors"
-msgstr "Настройки цвета"
+msgstr "Настройки цветов"
 
 #: ../IDE/Preferences.cpp:526
 msgid "Choose the font used by events editors"
@@ -3606,23 +3603,23 @@ msgstr "Выбрать шрифт, используемый в редактор�
 
 #: ../IDE/Preferences.cpp:534
 msgid "Edit sources"
-msgstr "Редактирование источников"
+msgstr "Изменить источники"
 
 #: ../IDE/Preferences.cpp:537
 msgid "Edit sources using internal GDevelop code editor"
-msgstr "Изменить источники, с помощью внутреннего редактора кода GDevelop"
+msgstr "Изменить исходный код, с помощью внутреннего редактора кода GDevelop"
 
 #: ../IDE/Preferences.cpp:542
 msgid "Use an external program :"
-msgstr "Использовать внешнюю прогр :"
+msgstr "Использовать внешнюю программу:"
 
 #: ../IDE/Preferences.cpp:551
 msgid "Internal code compiler"
-msgstr "Компилятор внутр. кода"
+msgstr "Внутренний компилятор кода"
 
 #: ../IDE/Preferences.cpp:553
 msgid "Maximum thread number for code compiler :"
-msgstr "Макс количество потоков для компилятора кода :"
+msgstr "Максимальное количество потоков для компилятора кода:"
 
 #: ../IDE/Preferences.cpp:563 ../IDE/Preferences.cpp:649
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:509
@@ -3638,11 +3635,11 @@ msgstr "Язык"
 
 #: ../IDE/Preferences.cpp:565 ../IDE/Preferences.cpp:651
 msgid "Folders"
-msgstr "Пути по умолчанию"
+msgstr "Папки"
 
 #: ../IDE/Preferences.cpp:566 ../IDE/Preferences.cpp:652
 msgid "Default position"
-msgstr "Позиции вкладок"
+msgstr "Позиция по умолчанию"
 
 #: ../IDE/Preferences.cpp:567 ../IDE/Preferences.cpp:653
 msgid "Appearance"
@@ -3658,11 +3655,11 @@ msgstr "Компиляция C++"
 
 #: ../IDE/Preferences.cpp:631
 msgid "Check for the news"
-msgstr "Check for the news"
+msgstr "Проверить на наличие новостей"
 
 #: ../IDE/Preferences.cpp:654
 msgid "Events editors"
-msgstr "Настройка ред. событий"
+msgstr "Редактор событий"
 
 #: ../IDE/Preferences.cpp:662 ../IDE/Preferences.cpp:1076
 #: ../IDE/Preferences.cpp:1078
@@ -3676,11 +3673,11 @@ msgstr ": Курсив"
 
 #: ../IDE/Preferences.cpp:1047
 msgid "GDevelop must be relaunched to apply changes."
-msgstr "GDevelop должен быть перезапущен для применения изменений."
+msgstr "Для применения изменений, нужно перезапустить GDevelop."
 
 #: ../IDE/Preferences.cpp:1506
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation"
 
 #: ../IDE/Preferences.cpp:1511
 msgid "Choose a temporary folder for deployment"
@@ -3688,7 +3685,7 @@ msgstr "Выбрать временную папку для развертыва
 
 #: ../IDE/Preferences.cpp:1521
 msgid "Choose the default folder for new projects"
-msgstr "Выберите папку по умолчанию для новых проектов"
+msgstr "Выбрать папку по умолчанию для новых проектов"
 
 #: ../IDE/Preferences.cpp:1529
 msgid "Choose a temporary folder for compilation"
@@ -3708,7 +3705,7 @@ msgstr "Выбрать внешний редактор кода"
 
 #: ../IDE/Preferences.cpp:1620
 msgid "Program (*.exe)|*.exe"
-msgstr "Program (*.exe)|*.exe"
+msgstr "Программы (*.exe) | * .exe"
 
 #: ../IDE/Preferences.cpp:1702
 msgid "Choose where the log file must be saved"
@@ -4215,7 +4212,7 @@ msgstr "Приостановленная музыка :"
 
 #: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:439
 msgid "C++ code (Experimental)"
-msgstr "C++ code (Experimental)"
+msgstr "Код C++ (экспериментально)"
 
 #: ../GDCpp/GDCpp//BuiltinExtensions/CommonInstructionsExtension.cpp:440
 msgid "Execute C++ code"
@@ -5690,7 +5687,7 @@ msgstr "http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtousei
 
 #: ../GDJS/GDJS//Dialogs/ProjectExportDialog.cpp:95
 msgid "The export folder is not empty"
-msgstr "The export folder is not empty"
+msgstr "Экспортируемая папка не является пустой"
 
 #: ../GDJS/GDJS//Dialogs/ProjectExportDialog.cpp:105
 msgid "Choose a folder, empty if possible, where the game should be exported."
@@ -6911,7 +6908,7 @@ msgstr "Изменить шаг вращения 3D Box."
 
 #: ../Extensions//Box3DObject/Extension.cpp:177
 msgid "Do _PARAM1__PARAM2_ to pitch of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to pitch of _PARAM0_"
+msgstr "Применить _PARAM1__PARAM2_ к высоте звука объекта _PARAM0_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:189
 msgid "Compare Pitch of a 3D Box object."
@@ -6928,7 +6925,7 @@ msgstr "Изменить крен 3D Box объекта."
 
 #: ../Extensions//Box3DObject/Extension.cpp:203
 msgid "Do _PARAM1__PARAM2_ to roll of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to roll of _PARAM0_"
+msgstr "Сделать _PARAM1__PARAM2_ вращать _PARAM0_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:215
 msgid "Compare Roll of a 3D Box object."
@@ -8009,7 +8006,7 @@ msgstr "Автоматическое сетевое обновление"
 
 #: ../Extensions//Network/Extension.cpp:172
 msgid "NetworkUpdater"
-msgstr "NetworkUpdater"
+msgstr "ОбновлениеСети"
 
 #: ../Extensions//Network/Extension.cpp:173
 msgid "Allows to automatically synchronize the objects of a game on the network."
@@ -8151,7 +8148,7 @@ msgstr "Формат данных"
 
 #: ../Extensions//Network/NetworkAutomatismEditor.cpp:100
 msgid "X/Data"
-msgstr "X/Data"
+msgstr "X/Данные"
 
 #: ../Extensions//Network/NetworkAutomatismEditor.cpp:103
 msgid "X represent identifier number and Data the data title."
@@ -9298,11 +9295,11 @@ msgstr "Четырехугольник"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:271
 msgid "rendererParam1 :"
-msgstr "rendererParam1 :"
+msgstr "rendererParam1:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:275
 msgid "rendererParam2 :"
-msgstr "rendererParam2 :"
+msgstr "rendererParam2:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:287
 msgid "Standard rendering"
@@ -9998,7 +9995,7 @@ msgstr "Изменяет скорость объекта на пути."
 
 #: ../Extensions//PathAutomatism/Extension.cpp:332
 msgid "Do _PARAM1__PARAM2_ to the speed of _PARAM0_ on the path"
-msgstr "Do _PARAM1__PARAM2_ to the speed of _PARAM0_ on the path"
+msgstr "Придать _PARAM1__PARAM2_ скорость _PARAM0_ по пути"
 
 #: ../Extensions//PathAutomatism/Extension.cpp:342
 msgid "Moving speed on the path"
@@ -10334,7 +10331,7 @@ msgstr "Изменение ширины клеток виртаульной се
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:87
 msgid "Do _PARAM2__PARAM3_ to the width of the virtual cells of _PARAM0_"
-msgstr "Do _PARAM2__PARAM3_ to the width of the virtual cells of _PARAM0_"
+msgstr "Сделать _PARAM2__PARAM3_ по ширине виртуальные ячейки _PARAM0_"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:88
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:101
@@ -10373,7 +10370,7 @@ msgstr "Изменение высоты клеток виртуальной се
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:113
 msgid "Do _PARAM2__PARAM3_ to the height of the virtual cells of _PARAM0_"
-msgstr "Do _PARAM2__PARAM3_ to the height of the virtual cells of _PARAM0_"
+msgstr "Сделать _PARAM2__PARAM3_ на высоту виртуальные ячейки _PARAM0_"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:120
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:133
@@ -10417,7 +10414,7 @@ msgstr "Изменение ускорения при перемещении об
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:139
 msgid "Do _PARAM2__PARAM3_ to the acceleration of _PARAM0_ on the path"
-msgstr "Do _PARAM2__PARAM3_ to the acceleration of _PARAM0_ on the path"
+msgstr "Сделать _PARAM2__PARAM3_ ускорение _PARAM0_ на пути"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:151
 msgid "Compare the acceleration when moving the object"
@@ -10446,7 +10443,7 @@ msgstr "Изменение макс скорости при перемещени
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:165
 msgid "Do _PARAM2__PARAM3_ to the max. speed of _PARAM0_ on the path"
-msgstr "Do _PARAM2__PARAM3_ to the max. speed of _PARAM0_ on the path"
+msgstr "Сделайте _PARAM2__PARAM3_ на Макс. скорость _PARAM0_ на пути"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:177
 msgid "Compare the maximum speed when moving the object"
@@ -10463,7 +10460,7 @@ msgstr "Изменение скорости объекта на пути"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:191
 msgid "Do _PARAM2__PARAM3_ to the speed of _PARAM0_ on the path"
-msgstr "Do _PARAM2__PARAM3_ to the speed of _PARAM0_ on the path"
+msgstr "Сделать _PARAM2__PARAM3_ для скорости _PARAM0_ на пути"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:203
 msgid "Compare the speed of the object on the path"
@@ -10489,7 +10486,7 @@ msgstr "Изменение макс угловой скорости при дв�
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:217
 msgid "Do _PARAM2__PARAM3_ to the max. angular speed of _PARAM0_ on the path"
-msgstr "Do _PARAM2__PARAM3_ to the max. angular speed of _PARAM0_ on the path"
+msgstr "Сделайте _PARAM2__PARAM3_ на Макс. Угловая скорость _PARAM0_ на пути"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:229
 msgid "Compare the maximum angular speed when moving the object"
@@ -10516,7 +10513,7 @@ msgstr "Изменить приращение поворота при перем
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:243
 msgid "Do _PARAM2__PARAM3_ to the rotation offset of _PARAM0_ on the path"
-msgstr "Do _PARAM2__PARAM3_ to the rotation offset of _PARAM0_ on the path"
+msgstr "Сделать _PARAM2__PARAM3_ на вращение смещение _PARAM0_ на пути"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:255
 msgid "Compare the rotation offset when moving the object"
@@ -10538,7 +10535,7 @@ msgstr "Изменить размер особых границ применяе
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:269
 msgid "Do _PARAM2__PARAM3_ to the extra border of _PARAM0_ on the path"
-msgstr "Do _PARAM2__PARAM3_ to the extra border of _PARAM0_ on the path"
+msgstr "Сделать _PARAM2__PARAM3_ для дополнительных границы _PARAM0_ на пути"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:276
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:289
@@ -10719,7 +10716,7 @@ msgstr "Изменить сложность на прохождение объе
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:449
 msgid "Do _PARAM2__PARAM3_ to the cost of _PARAM0_"
-msgstr "Do _PARAM2__PARAM3_ to the cost of _PARAM0_"
+msgstr "Сделать _PARAM2__PARAM3_ стоимости _PARAM0_"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:450
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:463
@@ -11232,7 +11229,7 @@ msgstr "Применить импульс к объекту, используя 
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:217
 msgid "Apply to _PARAM0_ impulse _PARAM3_ with angle: _PARAM2_°"
-msgstr "Apply to _PARAM0_ impulse _PARAM3_ with angle: _PARAM2_°"
+msgstr "Применить к _PARAM0_ импульса _PARAM3_ с углом: _PARAM2_ °"
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:224
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:239
@@ -11581,7 +11578,7 @@ msgstr "Массовая плотность :"
 
 #: ../Extensions//PhysicsAutomatism/PhysicsAutomatismEditor.cpp:140
 msgid "0.8"
-msgstr "0.8"
+msgstr "0,8"
 
 #: ../Extensions//PhysicsAutomatism/PhysicsAutomatismEditor.cpp:145
 msgid "Restitution ( Elasticity ) :"
@@ -11846,7 +11843,7 @@ msgstr "Разрешить _PARAM0_ двойной прыжок"
 #: ../Extensions//PlatformAutomatism/Extension.cpp:275
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:37
 msgid "Simulate left key press"
-msgstr "Имитация нажатия клавиши в лево"
+msgstr "Имитация нажатия клавиши влево"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:276
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:38
@@ -11878,12 +11875,12 @@ msgstr "Управление"
 #: ../Extensions//PlatformAutomatism/Extension.cpp:287
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:49
 msgid "Simulate right key press"
-msgstr "Имитация нажатия клавиши в право"
+msgstr "Имитация нажатия клавиши вправо"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:288
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:50
 msgid "Simulate a pressing on right key."
-msgstr "Имитация нажатия клавиши движения в право."
+msgstr "Имитация нажатия клавиши движения вправо."
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:289
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:51
@@ -12000,7 +11997,7 @@ msgstr "Примменить максимальную скорость паде�
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:406
 msgid "Platform on which Platformer characters can run."
-msgstr "Platform on which Platformer characters can run."
+msgstr "Платформа, по которой персонаж-платформер может бегать."
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:417
 msgid "Change platform type"
@@ -12049,7 +12046,7 @@ msgstr "Управление по умолчанию"
 #: ../Extensions//PlatformAutomatism/PlatformerObjectAutomatism.cpp:573
 #: ../Extensions//PlatformAutomatism/PlatformerObjectAutomatism.cpp:599
 msgid "Slope max. angle"
-msgstr "Slope max. angle"
+msgstr "Максимальный угол наклона"
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:16
 msgid "Primitive drawing"
@@ -12061,7 +12058,7 @@ msgstr "Расширение позволяющее рисовать фигур�
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:22
 msgid "Shape painter"
-msgstr "Shape painter"
+msgstr "Прорисовщик формы"
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:23
 msgid "Allows to draw simple shapes on the screen"
@@ -12093,7 +12090,7 @@ msgstr "Рисование"
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:151
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:163
 msgid "Shape Painter object"
-msgstr "Shape Painter object"
+msgstr "Объект, Прорисовывающий Форму"
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:39
 msgid "Top left side: X Position"
@@ -12137,7 +12134,7 @@ msgstr "Рисует линию на экране"
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:61
 msgid "Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line (thickness  : _PARAM5_) with _PARAM0_"
-msgstr "Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line (thickness  : _PARAM5_) with _PARAM0_"
+msgstr "Нарисовать линию от _PARAM1_;_PARAM2_  до _PARAM3_;_PARAM4_ (толщина : _PARAM5_) с помощью _PARAM0_"
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:66
 msgid "X Position of start point"
@@ -12353,7 +12350,7 @@ msgstr "Сохранить изображение _PARAM2_ как файл _PARA
 
 #: ../Extensions//PrimitiveDrawing/ShapePainterObjectEditor.cpp:58
 msgid "Edit the Shape Painter object"
-msgstr "Edit the Shape Painter object"
+msgstr "Изменить объект, Прорисовывающий Форму"
 
 #: ../Extensions//PrimitiveDrawing/ShapePainterObjectEditor.cpp:62
 msgid "Filling"
@@ -12392,7 +12389,7 @@ msgstr "Absolues"
 
 #: ../Extensions//PrimitiveDrawing/ShapePainterObjectEditor.cpp:101
 msgid "Relative to the position of the Shape Painter object"
-msgstr "Relative to the position of the Shape Painter object"
+msgstr "Относительно положения объекта Shape художник"
 
 #: ../Extensions//PrimitiveDrawing/ShapePainterObjectEditor.cpp:103
 msgid "Drawing coordinates"
@@ -13832,7 +13829,7 @@ msgstr "Тест наличия воспроизведения музыки на
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:246
 msgid "Music on channel _PARAM1_ is being played"
-msgstr "Music on channel _PARAM1_ is being played"
+msgstr "Музыка на канале_PARAM1_проиграна"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:251
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:262
@@ -13859,7 +13856,7 @@ msgstr "Тест наличия паузы музыки на канале."
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:257
 msgid "Music on channel _PARAM1_ is paused"
-msgstr "Music on channel _PARAM1_ is paused"
+msgstr "Музыка на канале_PARAM1_приостановлена"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:266
 msgid "A music is stopped"
@@ -13871,7 +13868,7 @@ msgstr "Тест остановленной музыки на указанном
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:268
 msgid "Music on channel _PARAM1_ is stopped"
-msgstr "Music on channel _PARAM1_ is stopped"
+msgstr "Музыка на канале_PARAM1_остановлена"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:277
 msgid "A sound is being played"
@@ -13883,7 +13880,7 @@ msgstr "Тест проигрывания звука на указанном к�
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:279
 msgid "Sound on channel _PARAM1_ is being played"
-msgstr "Sound on channel _PARAM1_ is being played"
+msgstr "Звук на канале _PARAM1_ играет"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:289
 msgid "Test if the sound on the specified channel is paused."
@@ -13891,7 +13888,7 @@ msgstr "Тест на паузу звука в указанном канале."
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:290
 msgid "Sound on channel _PARAM1_ is paused"
-msgstr "Sound on channel _PARAM1_ is paused"
+msgstr "Звук на канале _PARAM1_ приостановлен"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:299
 msgid "A sound is stopped"
@@ -14089,7 +14086,7 @@ msgstr "Поместить объект вокруг позиции, с зада
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:103
 msgid "Put _PARAM0_ around _PARAM1_;_PARAM2_, with an angle of _PARAM4_ degrees and _PARAM3_ pixels distance."
-msgstr "Put _PARAM0_ around _PARAM1_;_PARAM2_, with an angle of _PARAM4_ degrees and _PARAM3_ pixels distance."
+msgstr "Поставьте _PARAM0_ вокруг _PARAM1_; _PARAM2_, с углом градусов _PARAM4_ и _PARAM3_ пикселей расстояния."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:111
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:556
@@ -14110,7 +14107,7 @@ msgstr "Изменить угол вращения объекта"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:118
 msgid "Do _PARAM1__PARAM2_ to angle of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to angle of _PARAM0_"
+msgstr "Сделать _PARAM1__PARAM2_ в угол _PARAM0_"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:129
 msgid "Rotate"
@@ -14118,7 +14115,7 @@ msgstr "Вращение"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:130
 msgid "Rotate an object, clockwise if the speed is positive, counterclockwise otherwise."
-msgstr "Rotate an object, clockwise if the speed is positive, counterclockwise otherwise."
+msgstr "Объект поворачивается, по часовой стрелке, если скорость положительная, против часовой стрелки, если отрицательная."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:131
 msgid "Rotate _PARAM0_ at speed _PARAM1_deg/second"
@@ -14138,7 +14135,7 @@ msgstr "Поворот объекта по углу с заданной скор
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:144
 msgid "Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_deg/second"
-msgstr "Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_deg/second"
+msgstr "Поворот _PARAM0_ к _PARAM1_ на скорость _PARAM2_deg в секунду"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:150
 msgid "Angle to rotate towards (in degrees)"
@@ -14159,7 +14156,7 @@ msgstr "Поворот объекта по позиции с заданной с
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:157
 msgid "Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second"
-msgstr "Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second"
+msgstr "Поворот _PARAM0_ к _PARAM1_; _PARAM2_ на скорость _PARAM3_deg в секунду"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:170
 msgid "Add a force to an object"
@@ -14196,7 +14193,7 @@ msgstr "Добавить силу к объекту. Объект будет д�
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:185
 msgid "Add to _PARAM0_ a force, angle: _PARAM1_ degrees and length: _PARAM2_ pixels"
-msgstr "Add to _PARAM0_ a force, angle: _PARAM1_ degrees and length: _PARAM2_ pixels"
+msgstr "В _PARAM0_ силу, угол: _PARAM1_ градусов и длина: _PARAM2_ пикселей"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:192
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:207
@@ -14229,7 +14226,7 @@ msgstr "Добавить силу к предмету, для его повор�
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:214
 msgid "Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with _PARAM3_ deg/sec and _PARAM4_ pixels away"
-msgstr "Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with _PARAM3_ deg/sec and _PARAM4_ pixels away"
+msgstr "Поворот вокруг _PARAM1_; _PARAM0_ _PARAM2_ с _PARAM3_ градусов/сек и _PARAM4_ пикселей прочь"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:220
 msgid "X position of the center"
@@ -14447,7 +14444,7 @@ msgstr "Тест угла указанного объекта."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:354
 msgid "Angle of _PARAM0_ is _PARAM1__PARAM2_ deg."
-msgstr "Angle of _PARAM0_ is _PARAM1__PARAM2_ deg."
+msgstr "Угол _PARAM0_ является _PARAM1__PARAM2_ град."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:361
 msgid "Value to compare (in degrees)"
@@ -14463,7 +14460,7 @@ msgstr "Тест Z-плоскости заданного объекта."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:368
 msgid "Z Order of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Z Order of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Z-порядок _PARAM0_ — _PARAM1__PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:380
 msgid "Compare layer"
@@ -14515,7 +14512,7 @@ msgstr "Проверка общей скорости объекта"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:427
 msgid "Overall speed of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Overall speed of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Общая скорость _PARAM0_-_PARAM1__PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:440
 msgid "Compare the angle of displacement of an object"
@@ -14523,7 +14520,7 @@ msgstr "Тест угла смещения объекта"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:441
 msgid "Angle of displacement of _PARAM0_ is _PARAM1_ (tolerance : _PARAM2_ degrees)"
-msgstr "Angle of displacement of _PARAM0_ is _PARAM1_ (tolerance : _PARAM2_ degrees)"
+msgstr "Угол смещения _PARAM0_ является _PARAM1_ (допуск: _PARAM2_ градусов)"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:448
 msgid "Tolerance"
@@ -14629,7 +14626,7 @@ msgstr "Добавить силу к объекту для вращения ег
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:533
 msgid "Rotate _PARAM0_ around _PARAM1_ with _PARAM2_ deg/sec and _PARAM3_ pixels away"
-msgstr "Rotate _PARAM0_ around _PARAM1_ with _PARAM2_ deg/sec and _PARAM3_ pixels away"
+msgstr "Поворот _PARAM0_ вокруг _PARAM1_ с _PARAM2_ градусов/сек и _PARAM3_ пикселей прочь"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:539
 msgid "Rotate around this object"
@@ -14653,7 +14650,7 @@ msgstr "Расположение объекта вокруг другого, с 
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:549
 msgid "Put _PARAM0_ around _PARAM1_, with an angle of _PARAM3_ degrees and _PARAM2_ pixels distance."
-msgstr "Put _PARAM0_ around _PARAM1_, with an angle of _PARAM3_ degrees and _PARAM2_ pixels distance."
+msgstr "Поставьте _PARAM0_ вокруг _PARAM1_, с углом градусов _PARAM3_ и _PARAM2_ пикселей расстояния."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:555
 msgid "\"Center\" Object"
@@ -14699,7 +14696,7 @@ msgstr "Отодвинуть объекты друг от друга, испол
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:591
 msgid "Move away _PARAM0_ of _PARAM1_ (only _PARAM0_ will move)"
-msgstr "Move away _PARAM0_ of _PARAM1_ (only _PARAM0_ will move)"
+msgstr "Уйти _PARAM0_ _PARAM1_ (будет двигаться только _PARAM0_)"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:600
 msgid "X position of the object"
@@ -14886,24 +14883,24 @@ msgstr "Угол отклонения"
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:739
 msgid "Test the distance between two objects.\n"
 "If condition is inverted, only objects that have a distance greater than specified to any other object will be picked."
-msgstr "Test the distance between two objects.\n"
-"If condition is inverted, only objects that have a distance greater than specified to any other object will be picked."
+msgstr "Проверка расстояния между двумя объектами. \n"
+"Если условие будет инвертировано, то будут выбраны только те объекты, у которых есть расстояние, больше, чем указанное к любому другому объекту."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:740
 msgid "_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"
-msgstr "_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"
+msgstr "_PARAM0_ расстояние до _PARAM1_ составляет ниже _PARAM2_ пикселей"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:773
 msgid "Pick nearest object"
-msgstr "Pick nearest object"
+msgstr "Выбрать ближайший объект"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:774
 msgid "Among the objects, pick the one that is nearest (or furthest if condition is inverted) from the specified position."
-msgstr "Among the objects, pick the one that is nearest (or furthest if condition is inverted) from the specified position."
+msgstr "Среди объектов, выбрать тот, который является ближайшим (или дальним, если условие инвертировано) от указанной позиции."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:775
 msgid "Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"
-msgstr "Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"
+msgstr "Выбрать ближайший _PARAM0_ для _PARAM1_; _PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:787
 msgid "Test the number of concerned objects."
@@ -14923,7 +14920,7 @@ msgstr "Тест столкновения между двумя объектам
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:801
 msgid "_PARAM0_ is in collision with _PARAM1_"
-msgstr "_PARAM0_ is in collision with _PARAM1_"
+msgstr "_PARAM0_ находится в столкновение с _PARAM1_"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:811
 msgid "An object is turned toward another"
@@ -14951,7 +14948,7 @@ msgstr "Угол допуска, в градусах ( 0 : минимальны�
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:823
 msgid "Count the number of the specified objects currently picked"
-msgstr "Count the number of the specified objects currently picked"
+msgstr "Подсчитать количество внастоящее время выбранных указанных объектов"
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:23
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:53
@@ -15149,7 +15146,7 @@ msgstr "Изменяет зону рендеринга камеры для ук�
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:187
 msgid "Set the render zone of camera _PARAM2_ from layer _PARAM1_ to _PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"
-msgstr "Set the render zone of camera _PARAM2_ from layer _PARAM1_ to _PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"
+msgstr "Установите визуализации зоне камеры _PARAM2_ от _PARAM1_ слой для _PARAM3_; _PARAM4_ _PARAM5_; _PARAM6_"
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:201
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:202
@@ -15431,7 +15428,7 @@ msgstr "Отображение текста в редакторе событий
 
 #: ../Core/GDCore/BuiltinExtensions/CommonInstructionsExtension.cpp:85
 msgid "While"
-msgstr "While"
+msgstr "В то время как"
 
 #: ../Core/GDCore/BuiltinExtensions/CommonInstructionsExtension.cpp:86
 msgid "The event is repeated while the conditions are true"
@@ -15457,7 +15454,7 @@ msgstr "Повторить событие для каждого указанно
 
 #: ../Core/GDCore/BuiltinExtensions/CommonInstructionsExtension.cpp:101
 msgid "Group containing events"
-msgstr "Group containing events"
+msgstr "Группа, содержащая события"
 
 #: ../Core/GDCore/BuiltinExtensions/ExternalLayoutsExtension.cpp:23
 msgid "Create objects from an external layout"
@@ -15677,7 +15674,7 @@ msgstr "Открыть ссылку или файл"
 
 #: ../Core/GDCore/BuiltinExtensions/FileExtension.cpp:131
 msgid "This action launch the specified file or URL, in a browser (or in a new tab if the game is using the Web platform and is launched inside a browser)."
-msgstr "This action launch the specified file or URL, in a browser (or in a new tab if the game is using the Web platform and is launched inside a browser)."
+msgstr "Данное действие запускает указанный файл или URL-адрес в браузере (или в новой вкладке; если игра использует Веб-платформу и запускается через браузер)"
 
 #: ../Core/GDCore/BuiltinExtensions/FileExtension.cpp:132
 msgid "Open URL (or file) _PARAM0_"
@@ -15773,7 +15770,7 @@ msgstr "Встроенные расширения позволяющие исп�
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:23
 msgid "Key pressed"
-msgstr "Key pressed"
+msgstr "Клавиша нажата"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:24
 msgid "Test if a key is pressed"
@@ -15795,20 +15792,20 @@ msgstr "Клавиатура"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:33
 msgid "Key released"
-msgstr "Key released"
+msgstr "Клавиша отпущена"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:34
 msgid "Test if a key was just released"
-msgstr "Test if a key was just released"
+msgstr "Тест, если клавиша была просто отпущена"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:35
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:56
 msgid "_PARAM1_ key is released"
-msgstr "_PARAM1_ key is released"
+msgstr "Клавиша _PARAM1_ отпущена"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:43
 msgid "Key pressed (text expression)"
-msgstr "Key pressed (text expression)"
+msgstr "Клавиша нажата (текстовое выражение)"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:44
 msgid "Test if a key, retrieved from the result of the expression, is pressed"
@@ -15821,15 +15818,15 @@ msgstr "Выражение, генерирующее клавишу для те�
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:54
 msgid "Key released (text expression)"
-msgstr "Key released (text expression)"
+msgstr "Клавиша отпущена (текстовое выражение)"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:55
 msgid "Test if a key, retrieved from the result of the expression, was just released"
-msgstr "Test if a key, retrieved from the result of the expression, was just released"
+msgstr "Тест, если клавиша, полученная из результата выражения, была просто отпущена"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:65
 msgid "Any key pressed"
-msgstr "Any key pressed"
+msgstr "Нажата любая клавиша"
 
 #: ../Core/GDCore/BuiltinExtensions/KeyboardExtension.cpp:66
 msgid "Test if any key is pressed"
@@ -16110,15 +16107,15 @@ msgstr "Линейная интерполяция a для b по x"
 
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:178
 msgid "a (in a+(b-a)*x)"
-msgstr "a (in a+(b-a)*x)"
+msgstr "a (в a+(b-a)*x)"
 
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:179
 msgid "b (in a+(b-a)*x)"
-msgstr "b (in a+(b-a)*x)"
+msgstr "b (в a+(b-a)*x)"
 
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:180
 msgid "x (in a+(b-a)*x)"
-msgstr "x (in a+(b-a)*x)"
+msgstr "x (в a+(b-a)*x)"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:23
 msgid "The cursor/touch is on an object"
@@ -16273,15 +16270,15 @@ msgstr "Тест кнопки"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:155
 msgid "Mouse button released"
-msgstr "Mouse button released"
+msgstr "Кнопка мыши отпущена"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:156
 msgid "Return true if the specified button of the mouse was released."
-msgstr "Return true if the specified button of the mouse was released."
+msgstr "Возвращает значение Правда, если указанная кнопка мыши была отпущена."
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:157
 msgid "_PARAM1_ mouse button was released"
-msgstr "_PARAM1_ mouse button was released"
+msgstr "_PARAM1_ кнопка мыши отпущена"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:166
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:239
@@ -16612,11 +16609,11 @@ msgstr "Выражение 2"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:167
 msgid "Edit the Sprite object"
-msgstr "Edit the Sprite object"
+msgstr "Измените объект Sprite"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:179
 msgid "Edit the collision masks (hitbox)"
-msgstr "Edit the collision masks (hitbox)"
+msgstr "Редактировать маски столкновений (попадания)"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:180
 msgid "Edit the image's point"
@@ -16788,11 +16785,11 @@ msgstr "Положение точки \"Центр\""
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1315
 msgid "Enter the X position of the point (relative to the image)."
-msgstr "Enter the X position of the point (relative to the image)."
+msgstr "Укажите X позицию точки (относительно изображения)."
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1316
 msgid "Enter the Y position of the point (relative to the image)."
-msgstr "Enter the Y position of the point (relative to the image)."
+msgstr "Укажите Y позицию точки (относительно изображения)."
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1397
 msgid "Enter the width of the rectangle"
@@ -16982,7 +16979,7 @@ msgstr "Изменение скорости анимации (1 = по умол�
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:113
 msgid "Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"
+msgstr "Сделать _PARAM1__PARAM2_ анимация скорость шкалы _PARAM0_"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:125
 msgid "Rotate an object toward a position"
@@ -17304,7 +17301,7 @@ msgstr "Возвращает \"Истина\", если происходит с�
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:462
 msgid "_PARAM0_ is in collision with _PARAM1_ (pixel perfect)"
-msgstr "_PARAM0_ is in collision with _PARAM1_ (pixel perfect)"
+msgstr "_PARAM0_ находится в столкновение с _PARAM1_ (идеальный пиксель)"
 
 #: ../Core/GDCore/BuiltinExtensions/StringInstructionsExtension.cpp:17
 msgid "Built-in extension providing expressions for manipulating texts."
@@ -17411,7 +17408,7 @@ msgstr "Тест времени таймера, достигнет или пре
 
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:26
 msgid "The timer _PARAM2_ is greater than _PARAM1_ seconds"
-msgstr "The timer _PARAM2_ is greater than _PARAM1_ seconds"
+msgstr "Таймер _PARAM2_ больше чем _PARAM1_ секунд"
 
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:27
 #: ../Core/GDCore/BuiltinExtensions/TimeExtension.cpp:38
@@ -17765,7 +17762,7 @@ msgstr "Это действие активирует или отключает �
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:42
 msgid "Activate fullscreen:  _PARAM1_ (Keep aspect ratio: _PARAM2_)"
-msgstr "Activate fullscreen:  _PARAM1_ (Keep aspect ratio: _PARAM2_)"
+msgstr "Активировать полноэкранный режим: _PARAM1_ (сохранить пропорции: _PARAM2_)"
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:43
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:54
@@ -17813,7 +17810,7 @@ msgstr "Это действие изменяет размер экрана иг�
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:66
 msgid "Change window size: _PARAM1_x_PARAM2_"
-msgstr "Change window size: _PARAM1_x_PARAM2_"
+msgstr "Изменить размер окна: _PARAM1_x_PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:73
 msgid "Use this size as default size for new scene cameras?\n"
@@ -17859,7 +17856,7 @@ msgstr "Ширина окна сцены"
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:95
 msgid "Width of the scene window (or scene canvas for HTML5 games)"
-msgstr "Ширина окна сцены (или холст для HTML5 игр)"
+msgstr "Ширина окна сцены (или экран канваса для HTML5 игр)"
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:95
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:98
@@ -17876,7 +17873,7 @@ msgstr "Высота окна сцены"
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:98
 msgid "Height of the scene window (or scene canvas for HTML5 games)"
-msgstr "Высота окна сцены (или холст для HTML5 игр)"
+msgstr "Высота окна сцены (или экрана канваса для HTML5 игр)"
 
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:101
 msgid "Width of the screen/page"
@@ -17919,7 +17916,7 @@ msgstr "Ссылка на "
 
 #: ../Core/GDCore/Events/Builtin/LinkEvent.cpp:157
 msgid "Include only events "
-msgstr "Включить только события "
+msgstr "Включать только события "
 
 #: ../Core/GDCore/Events/Builtin/LinkEvent.cpp:157
 msgid " to "
@@ -17939,15 +17936,15 @@ msgstr "Повтор :"
 
 #: ../Core/GDCore/Events/Builtin/WhileEvent.cpp:162
 msgid "Do you want to activate the display of a message if the event is repeated 100000 times? This message prevent the software from being frozen if you accidentally create an infinite loop ( by letting the conditions empty for example )."
-msgstr "Вы хотите активировать отображение сообщения, если событие повторяется 100000 раз ? Это сообщение предотвратит замораживание программы, если вы случайно создадите бесконечный цикл, что позволит остановить просмотр."
+msgstr "Вы хотите активировать отображение сообщения, если событие повторится 100000 раз? Это сообщение предотвратит зависание программы, если вы случайно создадите бесконечный цикл (например оставив условия пустыми)."
 
 #: ../Core/GDCore/Events/Builtin/WhileEvent.cpp:163
 msgid "Protection against infinite loops."
-msgstr "Защита от бесконечных циклов"
+msgstr "Защита от бесконечных циклов."
 
 #: ../Core/GDCore/Events/Builtin/WhileEvent.cpp:166
 msgid "This message is activated by default for \"While\" events in the IDE, and is deactivated when the game is compiled to an executable."
-msgstr "Это сообщение включено по умолчанию для событий \"While\" редактора, и отключается когда игра компилируется в исполняемый файл."
+msgstr "Это сообщение, по умолчанию, включено для событий \"В то время как...\" редактора, и отключается когда игра компилируется в исполняемый файл."
 
 #: ../Core/GDCore/Events/Builtin/WhileEvent.cpp:167
 msgid "Deactivate"
@@ -17959,17 +17956,17 @@ msgstr "Деактивировать"
 #: ../Core/GDCore/Events/ExpressionParser.cpp:254
 #: ../Core/GDCore/Events/ExpressionParser.cpp:296
 msgid "Number excepted"
-msgstr "Ожидаемое число"
+msgstr "Число исключено"
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:137
 #: ../Core/GDCore/Events/ExpressionParser.cpp:280
 msgid "Syntax error"
-msgstr "Синтаксическая ошибка"
+msgstr "Ошибка синтекса"
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:144
 #: ../Core/GDCore/Events/ExpressionParser.cpp:156
 msgid "Syntax error in a number."
-msgstr "Синтаксическая ошибка в образовании числа."
+msgstr "Ошибка синтекса в числе."
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:167
 msgid "Operator missing before a number"
@@ -17993,7 +17990,7 @@ msgstr "Отсутствует оператор перед скобками"
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:270
 msgid "Operators without any number between them"
-msgstr "Opérateurs accolés sans nombres entre eux"
+msgstr "Отсутствие число между операторами"
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:303
 msgid "Paranthesis mismatch"
@@ -18013,11 +18010,11 @@ msgstr "Не закрытые скобки"
 #: ../Core/GDCore/Events/ExpressionParser.cpp:695
 #: ../Core/GDCore/Events/ExpressionParser.cpp:746
 msgid "Incorrect number of parameters"
-msgstr "Номер некорректного параметра."
+msgstr "Неверное количество параметров"
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:465
 msgid "Excepted ( maximum ) :"
-msgstr "Исключенный ( максимум ) :"
+msgstr "Исключение (максимум):"
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:482
 msgid "Parameters' parenthesis missing"
@@ -18025,11 +18022,11 @@ msgstr "Отсутствуют параметры в скобках"
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:546
 msgid "The expression is invalid or empty. Enter a text ( surrounded by quotes ) or a function."
-msgstr "Выражение недействительно или пустое. Введите текст ( окруженный кавычками ) или функцию."
+msgstr "Выражение недопустимо или пустое. Введите текст (в кавычках) или функцию."
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:565
 msgid "Quotes not closed."
-msgstr "Незамкнутые кавычки."
+msgstr "Незакрытые кавычки."
 
 #: ../Core/GDCore/Events/ExpressionParser.cpp:770
 msgid "Function not recognized."
@@ -18046,7 +18043,7 @@ msgstr "Ошибочный символ в конце выражения."
 
 #: ../Core/GDCore/Events/InstructionMetadata.cpp:18
 msgid "Unknown or unsupported instruction"
-msgstr "Неизвестна или не поддерживается инструкция"
+msgstr "Неизвестна или не поддерживаемая инструкция"
 
 #: ../Core/GDCore/Events/VariableParser.cpp:82
 msgid "Expecting a variable name."
@@ -18062,58 +18059,58 @@ msgstr "Открыть редактор выражений"
 
 #: ../Core/GDCore/IDE/Dialogs/AdvancedEntryDialog.cpp:83
 msgid "Open a text editor"
-msgstr "Открыть текстовый редактор"
+msgstr "Открыть редактор текста"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismDialog.cpp:58
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:66
 msgid "Choose an automatism"
-msgstr "Выбрать автоматизм"
+msgstr "Выбрать автоматизацию"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismDialog.cpp:69
 msgid "Choose an automatism of the object."
-msgstr "Добавить автоматизм объекту."
+msgstr "Добавить автоматизацию к объекту."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismDialog.cpp:122
 msgid "This object doesn't have the appropriate automatism attached to it.\n"
 "Check that you selected the right object or add the automatism in the object properties."
-msgstr "Этот объект не имеет соответствующий автоматизм.\n"
-"Убедитесь, что вы выбрали правильный объект или добавьте автоматизм в свойствах объекта."
+msgstr "Этот объект не имеет соответствующий автоматизации.\n"
+"Убедитесь, что выбрали правильный объект или добавьте автоматизацию в свойствах объекта."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismDialog.cpp:126
 #, c-format
 msgid "This object doesn't have automatism \"%s\" attached to it.\n"
 "Check that you selected the right object or add this automatism in the object properties."
-msgstr "Этот объект не имеет автоматизм \"%s\" установленный ему.\n"
-"Убедитесь, что вы выбрали правильный объект или добавьте автоматизм в свойствах объекта."
+msgstr "К этому объекту не добавлена автоматизация \"%s\".\n"
+"Убедитесь, что выбрали правильный объект или добавьте автоматизацию в свойствах объекта."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:70
 msgid "Automatisms can be used to add a specific behaviour\n"
 "to an object. Choose the automatism to add:"
-msgstr "Автоматизмы могут быть использованы, чтобы добавить\n"
-"определенное поведение объекту. Выбрать надстройку автоматизма :"
+msgstr "Автоматизации можно использовать, чтобы добавить\n"
+"определенное поведение к объекту. Выберите какую автоматизацию добавить :"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:74
 msgid "You can also use the grayed automatisms:\n"
 "Their associated extension will be automatically enabled."
-msgstr "Вы можете воспользоваться и серыми автоматизмами :\n"
-"Их расширение автоматически подключится к проекту."
+msgstr "Вы также можете использовать автоматизации выделенные серым:\n"
+"связанные с ними расширения подключатся автоматически."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:239
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:251
 msgid "This object is provided by the "
-msgstr "Эта задача представлена расширением "
+msgstr "Этот объект работает за счет"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:241
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:253
 msgid " extension, but this extension is not activated for the current game.\n\n"
 "Do you want to use this extension in your game?"
-msgstr ", но на данный момент не активирована в игре.\n\n"
-"Хотите использовать это расширение в игре ?"
+msgstr " расширения, но это расширение не активировано для текущей игры.\n\n"
+"Вы хотите использовать это расширение в вашей игре?"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:242
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:254
 msgid "Activate extension "
-msgstr "Активация расширения "
+msgstr "Активировать расширение "
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.cpp:276
 msgid "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_object"
@@ -18132,7 +18129,7 @@ msgstr "Выбрать слой"
 #: ../Core/GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.cpp:90
 #: ../Core/GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.cpp:113
 msgid "Base layer"
-msgstr "Базовый слой"
+msgstr "Основной слой"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectDialog.cpp:55
 msgid "Choose an object"
@@ -18144,7 +18141,7 @@ msgstr "Выбрать этот объект"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectDialog.cpp:85
 msgid "To add some objects, use the objects editor"
-msgstr "Для добавления объекта, используйте редактор объектов"
+msgstr "Для добавления объектов, используйте редактор объектов"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectDialog.cpp:87
 msgid "Choose this group"
@@ -18152,29 +18149,29 @@ msgstr "Выбрать эту группу"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectDialog.cpp:96
 msgid "To add some groups, use the objects groups editor"
-msgstr "Для добавления группы, используйте редактор объектов группы"
+msgstr "Для добавления группы, используйте редактор групп объектов"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:65
 msgid "Choose an object type"
-msgstr "Выбор типа объекта"
+msgstr "Выбрать тип объекта"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:69
 msgid "Choose the kind of object to add:"
-msgstr "Выбрать добавляемый объект :"
+msgstr "Выберите тип объекта для добавления:"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:73
 msgid "You can also use the grayed objects:\n"
 "Their associated extension will be automatically enabled."
-msgstr "При выборе объектов серого цвета :\n"
+msgstr "Вы также можете использовать объекты выделенные серым:\n"
 "связанные с ними расширения подключатся автоматически."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:282
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_object"
+msgstr "http://wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/edit_object"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:77
 msgid "Choose a variable"
-msgstr "Выбор переменной"
+msgstr "Выбрать переменную"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:108
 msgid "Edit initial value"
@@ -18219,11 +18216,11 @@ msgstr "Поиск необъявленных переменных в проек
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:156
 msgid "Help about variables"
-msgstr "Помощь по переменным"
+msgstr "Справка о переменных"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:189
 msgid "scene variables"
-msgstr "scene variables"
+msgstr "Переменные сцены"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:193
 #, c-format
@@ -18237,7 +18234,7 @@ msgstr "Новая Переменная"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:307
 msgid "Please choose a new name for the new variable"
-msgstr "Пожалуйста, выберите новое имя для новой переменной"
+msgstr "Пожалуйста, выберите имя для новой переменной"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:307
 msgid "New variable name"
@@ -18245,13 +18242,13 @@ msgstr "Новое имя переменной"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:393
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/global_variables"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/global_variables"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/global_variables"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:430
 msgid "These variables are used but not declared:\n"
 "Check the variables to be added to the list."
-msgstr "Эти переменные используются, но не объявлены :\n"
-"Проверьте переменные, которые будут добавлены в список."
+msgstr "Эти переменные используются, но не объявлены:\n"
+"Выберите переменные, которые будут добавлены в список."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:430
 msgid "Adding undeclared variables"
@@ -18296,7 +18293,7 @@ msgstr "Цвет текста"
 
 #: ../Core/GDCore/IDE/Dialogs/EditComment.cpp:150
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/comment_events"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/comment_events"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/comment_events"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:121
 msgid "Edit the expression"
@@ -18344,7 +18341,7 @@ msgstr "pow"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:180
 msgid "pow(x,n) raise x to power n"
-msgstr "pow(x,n) raise x to power n"
+msgstr "Pow(x,n) поднять x для питания n"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:182
 msgid "E10"
@@ -18352,7 +18349,7 @@ msgstr "E10"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:185
 msgid "sqrt(x) compute the square root of x."
-msgstr "sqrt(x) квадратный корень из x."
+msgstr "sqrt(x) вычислить квадратный корень из x."
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:188
 msgid "Nth root of a number. nthroot(27, 3) will return 3."
@@ -18458,7 +18455,7 @@ msgstr "sec"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:263
 msgid "Secant ( 1/cos(x) )"
-msgstr "Secant ( 1/cos(x) )"
+msgstr "Синус ( 1/cos(x) )"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:265
 msgid "csc"
@@ -18466,7 +18463,7 @@ msgstr "csc"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:268
 msgid "Cosecant ( 1/sin(x) )"
-msgstr "Cosecant ( 1/sin(x) )"
+msgstr "Косинунс ( 1/sin(x) )"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:270
 msgid "cot"
@@ -18474,7 +18471,7 @@ msgstr "cot"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:273
 msgid "Cotangent ( 1/tan(x) )"
-msgstr "Cotangent ( 1/tan(x) )"
+msgstr "Котангенс (1/tan(x))"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:275
 msgid "abs"
@@ -18507,7 +18504,7 @@ msgstr "Другие функции"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:499
 msgid "The expression is malformed. Are you sure you want to validate this expression?"
-msgstr "Выражение имеет неверный формат. Вы уверены, что хотите использовать его?"
+msgstr "Выражение имеет неверный формат. Вы уверены, что хотите проверить его?"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:499
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:405
@@ -18535,11 +18532,11 @@ msgstr "Параметр"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:974
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_expr"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_expr"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/edit_expr"
 
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:55
 msgid "Edit the \"For each object\" event"
-msgstr "Edit the \"For each object\" event"
+msgstr "Изменить событие «для каждого объекта»"
 
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:61
 msgid "Repeat event for each object:"
@@ -18547,7 +18544,7 @@ msgstr "Повтор события для каждого объекта :"
 
 #: ../Core/GDCore/IDE/Dialogs/EditForEachEvent.cpp:131
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/foreach_events"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/foreach_events"
+msgstr "http://wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/foreach_events"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:76
 msgid "Modify the parameters of the layer"
@@ -18564,11 +18561,11 @@ msgstr "Видимый"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:87
 msgid "Cameras"
-msgstr "Камера"
+msgstr "Камеры"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:90
 msgid "Camera No."
-msgstr "Камера N°"
+msgstr "Камера №"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:98
 msgid "Add another camera"
@@ -18576,7 +18573,7 @@ msgstr "Добавить другую камеру"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:101
 msgid "Editing the camera"
-msgstr "Редактирование камеры"
+msgstr "Изменить камеру"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:105
 msgid "Custom size :"
@@ -18584,14 +18581,13 @@ msgstr "Особый размер :"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:118
 msgid "Custom viewport :"
-msgstr "Пользов окно просмотра :"
+msgstr "Пользовательское окно просмотра :"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:144
 msgid "For example, a camera which takes the left side of the window would be defined with 0, 0, 0.5, 1.\n"
 "By default, a camera has a viewport which covers the entire window."
-msgstr "Выражается как показатель размера окна. Примеры :\n"
-"0, 0, 1, 1 принять все окно.\n"
-"0, 0, 0.5, 1 на левую сторону окна."
+msgstr "Например, камера, которая захватывает левую половину окна будет определяться через 0, 0, 0,5, 1.\n"
+"По умолчанию, камера охватывает все окно."
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:224
 msgid "The name is incorrect"
@@ -18603,7 +18599,7 @@ msgstr "Слой должен иметь как минимум одну каме
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:428
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/editors/scene_editor/edit_layer"
+msgstr "http://wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/editors/scene_editor/edit_layer"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:61
 msgid "Create a link to another scene"
@@ -18611,7 +18607,7 @@ msgstr "Создать ссылку на другую сцену"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:66
 msgid "Link to scene/external events:"
-msgstr "Ссылка на сцено/внешние события :"
+msgstr "Ссылка на сцену/внешние события:"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:71
 msgid "Include"
@@ -18640,12 +18636,12 @@ msgstr "(включенный)"
 #: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:93
 msgid "Remember to update the numbers of the events if\n"
 "you delete or add events in the scene linked."
-msgstr "Не забывайте обновлять номера событий ссылки,\n"
-"если вы удаляете, добавляете события на связанной сцене."
+msgstr "Не забывайте обновлять номера событий,\n"
+"если вы удаляете или добавляете события на привязанной сцене."
 
 #: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:151
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/link_events"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/link_events"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/link_events"
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:54
 msgid "Edit the \"Repeat\" event"
@@ -18657,11 +18653,11 @@ msgstr "Число повторений события :"
 
 #: ../Core/GDCore/IDE/Dialogs/EditRepeatEvent.cpp:130
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/repeat_events"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/repeat_events"
+msgstr "http://wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/repeat_events"
 
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:77
 msgid "Edit the text"
-msgstr "Правка текста"
+msgstr "Изменить текст"
 
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:405
 msgid "The expression is malformed. Are you sur you want to validate this expression ?"
@@ -18669,7 +18665,7 @@ msgstr "Выражение имеет неверный формат. Вы уве
 
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:622
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_text"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_text"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/edit_text"
 
 #: ../Core/GDCore/IDE/Dialogs/EventStoreDialog.cpp:36
 msgid "Please choose a template in the list."
@@ -18677,7 +18673,7 @@ msgstr "Пожалуйста, выберите шаблон в списке."
 
 #: ../Core/GDCore/IDE/Dialogs/EventStoreDialog.cpp:133
 msgid "By "
-msgstr "By "
+msgstr "От "
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:35
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:558
@@ -18699,7 +18695,7 @@ msgstr "Удалить выбранный слой"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:43
 msgid "Edit the properties of the layer"
-msgstr "Редактирование свойств слоя"
+msgstr "Изменить свойства слоя"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:45
 msgid "Move the layer over"
@@ -18715,7 +18711,7 @@ msgstr "Обновить список"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:55
 msgid "Display help about the layers editor"
-msgstr "Показ справки о редакторе слоя"
+msgstr "Показать справку о редакторе слоев"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:128
 msgid "Group name:"
@@ -18743,11 +18739,11 @@ msgstr "Параметры сетки"
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:71
 msgid "Grid offset X:"
-msgstr "Grid offset X:"
+msgstr "Смещение сетки X:"
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:77
 msgid "Grid offset Y:"
-msgstr "Grid offset Y:"
+msgstr "Смещение сетки Y:"
 
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:83
 msgid "Width of a cell:"
@@ -18772,7 +18768,7 @@ msgstr "Некорректная высота сетки."
 #: ../Core/GDCore/IDE/Dialogs/GridSetupDialog.cpp:194
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:230
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"
+msgstr "http://wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:55
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:56
@@ -18783,7 +18779,7 @@ msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/e
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:63
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:72
 msgid "(Multiples values)"
-msgstr "(Расширен. значения)"
+msgstr "(Кратные значения)"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:86
 msgid "Instance properties"
@@ -18791,11 +18787,11 @@ msgstr "Свойства экземпляра"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:90
 msgid "Z Order"
-msgstr "Z плоскость"
+msgstr "Z Плоскость"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:92
 msgid "Locked"
-msgstr "Запереть"
+msgstr "Заблокировать"
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:104
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:106
@@ -18810,17 +18806,17 @@ msgstr "Запереть"
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1001
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1003
 msgid "Click to edit..."
-msgstr "Щелкнуть для редактирования..."
+msgstr "Щелкнуть для изменения..."
 
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:69
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:251
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:267
 msgid "Special paste"
-msgstr "Спец. вставка"
+msgstr "Специальная вставка"
 
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:80
 msgid "Start pasting at :"
-msgstr "Запустить вставку в :"
+msgstr "Начать вставку на :"
 
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:90
 msgid "Number of copies:"
@@ -18836,7 +18832,7 @@ msgstr "высота ( Y )"
 
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:113
 msgid "Spaces between each obejects"
-msgstr "Отделять промежутками каждый объект :"
+msgstr "Промежуток между каждым объектом"
 
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:118
 msgid "pixels in width"
@@ -18848,7 +18844,7 @@ msgstr "пикселей в высоту"
 
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:125
 msgid "Apply progressively to each created object :"
-msgstr "Прогрессивно применять к каждому созд. объекту :"
+msgstr "Постепенно применять к каждому созданному объекту :"
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:49
 msgid "Edit the layer properties"
@@ -18876,24 +18872,24 @@ msgstr "Новый слой"
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:312
 msgid "Can't find the layer to delete !"
-msgstr "Не удается найти слой для удаления !"
+msgstr "Не удалось найти слой для удаления !"
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:322
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/editors/scene_editor/edit_layer"
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:347
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:372
 msgid "Can't find the layer to move  !"
-msgstr "Не удается найти слой для перемещения !"
+msgstr "Не удалось найти слой для перемещения !"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:191
 msgid "Cancel 10 changes"
-msgstr "Отменить 10 предыдущих действий"
+msgstr "Отменить 10 изменений"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:193
 msgid "Cancel 20 changes"
-msgstr "Отменить 20 предыдущих действий"
+msgstr "Отменить 20 изменение"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:196
 msgid "Delete the history"
@@ -18933,19 +18929,19 @@ msgstr "500%"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:224
 msgid "Put the object(s) on the higher layer"
-msgstr "Поместить объект(ы) на более высокий уровень (слой)"
+msgstr "Переместить объект(ы) на наивысший слой"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:226
 msgid "Put the object(s) on the lower layer"
-msgstr "Поместить объект(ы) на нижний слой"
+msgstr "Переместить объект(ы) на нижний слой"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:228
 msgid "Delete the selection\tDEL"
-msgstr "Удалить выделение\tDEL"
+msgstr "Удалить выбранное\tDEL"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:232
 msgid "Add an automatism to the object"
-msgstr "Add an automatism to the object"
+msgstr "Добавить автоматизм к объекту"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:262
@@ -18962,23 +18958,23 @@ msgstr "Разблокировать объект под курсором"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:285
 msgid "Preview for "
-msgstr "Предварительный для "
+msgstr "Пред-просмотр для "
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:286
 msgid "Launch a preview for this platform"
-msgstr "Запустить пред. просмотр для этой платформы"
+msgstr "Запустить пред-просмотр для этой платформы"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:291
 msgid "No preview available for "
-msgstr "Пред. просмотр не доступен для "
+msgstr "Пред-просмотр не доступен для "
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:291
 msgid "No preview can be done for this platform"
-msgstr "Нет пред. просмотра для этой платформы"
+msgstr "Недоступен пред-просмотр для этой платформы"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:445
 msgid "This platform does not support launching previews."
-msgstr "Эта платформа не поддерживает запуск пред. просмотра."
+msgstr "Эта платформа не поддерживает запуск пред-просмотра."
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:519
 msgid "Mode"
@@ -18986,15 +18982,15 @@ msgstr "Режим"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:521
 msgid "Stop the preview"
-msgstr "Редактировать"
+msgstr "Остановить пред-просмотр"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:521
 msgid "Stop the preview and go back to editing"
-msgstr "Остановить и вернуться к редактированию"
+msgstr "Остановить пред-просмотр и вернуться к редактированию"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:522
 msgid "Launch a preview"
-msgstr "Запуск предпросмотра сцены"
+msgstr "Запуск пред-просмотра"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:557
 msgid "Objects editor"
@@ -19006,15 +19002,15 @@ msgstr "Показать список объектов сцены"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:558
 msgid "Show the layers editor"
-msgstr "Открыть редактор слоя"
+msgstr "Показать редактор слоев"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:559
 msgid "Instances"
-msgstr "Объекты сцены"
+msgstr "Экземпляры"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:559
 msgid "Open a list of all instances of objects put on the scene"
-msgstr "Открыть список объектов помещенных на сцене"
+msgstr "Открыть список всех экземпляров объектов помещенных на сцену"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:560
 msgid "Undo the last change"
@@ -19026,7 +19022,7 @@ msgstr "Сетка"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:563
 msgid "Edit the grid"
-msgstr "Редактировать сетку"
+msgstr "Изменить сетку"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:563
 msgid "Edit the size of the grid"
@@ -19034,7 +19030,7 @@ msgstr "Изменить размер сетки"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:564
 msgid "Mask"
-msgstr "Маска окна"
+msgstr "Маска"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:564
 msgid "Show a mask corresponding to the size of the game window"
@@ -19042,7 +19038,7 @@ msgstr "Отображает маску, соответствующую разм
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:565
 msgid "Return to the initial position ( 0;0 )"
-msgstr "Вернуться к началу координат"
+msgstr "Вернуться к началу координат ( 0;0 )"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:565
 msgid "Go back to the origin of the scene"
@@ -19059,24 +19055,24 @@ msgstr "Вернуться к исходному уровню масштабир
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:587
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:605
 msgid "Put the object(s) on the layer \""
-msgstr "Поместить объект(ы) на слое \""
+msgstr "Переместить объект(ы) на слой \""
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:1067
 #, c-format
 msgid "Position %f;%f. SHIFT for multiple selection, right click for more options."
-msgstr "Позиция %f;%f. SHIFT для выбора нескольких, щелкните ПКМ для выбора параметров."
+msgstr "Позиция %f;%f. Зажмите SHIFT для выбора нескольких, щелкните ПКМ для выбора параметров."
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:1360
 msgid "Are you sure you want to clear the Undo History?"
-msgstr "Вы уверены, что хотите очистить пред историю?"
+msgstr "Вы уверены, что хотите очистить историю?"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:761
 msgid "http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"
-msgstr "http://www.wiki.compilgames.net/doku.php/en/project_develop/documentation/manual/edit_layout"
+msgstr "http://www.wiki.compilgames.net/doku.php/ru/project_develop/documentation/manual/edit_layout"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.cpp:48
 msgid "Objects on the layer to delete"
-msgstr "Удаляемые объекты на слое"
+msgstr "Объекты на удаляемом слое"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.cpp:57
 msgid "What to make of objects on the layer to delete ?"
@@ -19092,7 +19088,7 @@ msgstr "Переместить их"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.cpp:71
 msgid "on the layer :"
-msgstr "на слое :"
+msgstr "на слой :"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:39
 msgid "General object properties"
@@ -19110,7 +19106,7 @@ msgstr "Переменные объекта"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:55
 msgid "Add automatism"
-msgstr "Добавить автоматизм"
+msgstr "Добавить автоматизацию"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:61
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:62
@@ -19124,15 +19120,15 @@ msgstr "Переименовать..."
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:179
 msgid "Choose the automatism to delete"
-msgstr "Выбрать автоматизм для удаления"
+msgstr "Выбрать автоматизацию для удаления"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:198
 msgid "Enter a new name for the automatism"
-msgstr "Введите новое имя для автоматизма"
+msgstr "Введите новое имя для автоматизации"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:198
 msgid "Rename an automatism"
-msgstr "Переименовать автоматизм"
+msgstr "Переименовать автоматизацию"
 
 #: ../Core/GDCore/IDE/Dialogs/ParameterControlsHelper.cpp:46
 msgid "Parameter:"
@@ -19149,7 +19145,7 @@ msgstr "Используйте модули расширения для GDevelop
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:106
 msgid "Right click to add or remove a platform.\n"
 "Platforms which are not used by the project are grayed."
-msgstr "Правый клик, для добавления или удаления платформы.\n"
+msgstr "Кликните ПКМ, для добавления или удаления платформы.\n"
 "Платформы, не используемые в проекте выделены серым цветом."
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:112
@@ -19184,12 +19180,11 @@ msgstr "Совместимость :"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:172
 msgid "More extensions"
-msgstr "Дополнительные расширения"
+msgstr "Другие расширения"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:174
 msgid "A list of extensions provided by others developers is available on the wiki :"
-msgstr "Список расширений, предоставляемых другими разработчиками\n"
-"доступно на wiki :"
+msgstr "Список расширений, созданных другими разработчиками доступен на wiki :"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:176
 msgid "Go to the wiki unofficial extensions page"
@@ -19213,7 +19208,7 @@ msgstr "Не использовать эту платформу"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:396
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/extensions"
-msgstr "http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/extensions"
+msgstr "http://wiki.compilgames.net/doku.php/ru/game_develop/documentation/manual/extensions"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:416
 msgid "Unable to remove this platform: The project must use at least one plaform."
@@ -19226,13 +19221,13 @@ msgstr "Обновление проекта"
 #: ../Core/GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp:36
 msgid "If you save your project using this version of GDevelop, you won't be able to use it with\n"
 "a previous version of GDevelop due to these changes :"
-msgstr "Если вы сохраните проект с этой версией GDevelop, вы не сможете использовать его с\n"
+msgstr "Если вы сохраните проект в этой версии GDevelop, вы не сможете использовать его в\n"
 "предыдущей версией GDevelop из-за этих изменений :"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp:40
 msgid "Remember to always make regular saves of your projects so as to have backup if something\n"
 "goes wrong."
-msgstr "Не забывайте делать регулярное сохранение ваших проектов, чтобы иметь резервные копии,\n"
+msgstr "Не забывайте делать регулярные сохранения ваших проектов, чтобы иметь резервные копии,\n"
 "на случай если что-то пойдет не так."
 
 #: ../Core/GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp:55
@@ -19246,12 +19241,12 @@ msgstr "Перетащите изобр. для добавления в банк
 #: ../Core/GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp:81
 msgid "Images are copied into the project folder when you drag and drop them in the\n"
 "image bank. You can choose a specific subfolder:"
-msgstr "Изображения копируются в папку проекта, когда вы перетащите их в область\n"
-"банка изображений. Вы можете выбрать и вложенную папку :"
+msgstr "Изображения копируются в папку проекта, когда вы перетащите их в вкладку\n"
+"банка изображений. Так же вы можете выбрать вложенную папку:"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp:86
 msgid "Sub folder where copy images:"
-msgstr "Вложенная папка для копирования изображений :"
+msgstr "Вложенная папка для копирования изображений:"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp:89
 msgid "The file is relative to the folder of the project"
@@ -19290,16 +19285,16 @@ msgstr "Переместить вверх\tCtrl-J"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:174
 msgid "Move the image up"
-msgstr "Переместить вверх по списку"
+msgstr "Перемещение изображения вверх"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:177
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:205
 msgid "Move down\tCtrl-K"
-msgstr "Вниз\tCtrl-K"
+msgstr "Переместить вниз\tCtrl-K"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:177
 msgid "Move the image down"
-msgstr "Переместить вниз по списку"
+msgstr "Перемещение изображения вниз"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:184
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:198
@@ -19308,7 +19303,7 @@ msgstr "Добавить папку"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:356
 msgid "Adding images"
-msgstr "Добавление изображения"
+msgstr "Добавление изображений"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:369
 msgid "Resources successfully added"
@@ -19316,11 +19311,11 @@ msgstr "Ресурсы успешно добавлены"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:424
 msgid "Adding "
-msgstr "Добавление"
+msgstr "Добавление "
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:450
 msgid "Some images in the list have already the same name, and have not been added:"
-msgstr "Изображение с этим именем уже присутствует, поэтому не были добавлены в список всех изображений :"
+msgstr "Некоторые изображения в списке имеют такие же имена, поэтому не были добавлены:"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:482
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:537
@@ -19342,7 +19337,7 @@ msgstr "Выбрать файл ресурсов"
 msgid "File of the resource.\n"
 "The filename is relative to the project directory."
 msgstr "Файл ресурсов.\n"
-"Имя файла задается относительно каталога проекта."
+"Имя файла относительно каталога проекта."
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:674
 msgid "N/A"
@@ -19365,8 +19360,8 @@ msgstr "Все изображения"
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:960
 msgid "These resources seems to be useless:\n"
 "Check resources to delete."
-msgstr "Кажется эти изображения не используются в проекте :\n"
-"Убедитесь в их удалении."
+msgstr "Кажется эти изображения не используются в проекте:\n"
+"Отметьте ресурсы для удаления."
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:989
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"
@@ -19374,11 +19369,11 @@ msgstr "http://www.wiki.compilgames.net/doku.php/game_develop/documentation/manu
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1022
 msgid "Choose the program for editing this kind of resource"
-msgstr "Выберите программу для редактирования такого рода ресурса"
+msgstr "Выберите программу для редактирования такого типа ресурсов"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1022
 msgid "Programs (*.exe)|*.exe"
-msgstr "Programmes (*.exe)|*.exe"
+msgstr "Программы (*.exe)|*.exe"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1048
 msgid "Choose a resource in the\n"
@@ -19389,14 +19384,14 @@ msgstr "Чтобы отобразить ресурс,\n"
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1049
 msgid "You can add and\n"
 "modify resources using the ribbon."
-msgstr "Вы можете добавлять и изменять ресурсы,\n"
-"используя вкладки."
+msgstr "Вы можете добавлять и\n"
+"изменять ресурсы, с помощью ленты."
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1049
 msgid "You can add and\n"
 "modify resources using the toolbar"
-msgstr "Вы можете добавлять и изменять ресурсы,\n"
-"с панели инструментов"
+msgstr "Вы можете добавлять и\n"
+"изменять ресурсы, с панели инструментов"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1227
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1231
@@ -19433,7 +19428,7 @@ msgstr " не может быть загружено.\n"
 
 #: ../Core/GDCore/IDE/ExtensionsLoader.cpp:266
 msgid " has errors :\n"
-msgstr "есть ошибки :\n"
+msgstr " есть ошибки :\n"
 
 #: ../Core/GDCore/IDE/ExtensionsLoader.cpp:266
 msgid "\n"
@@ -19451,7 +19446,7 @@ msgstr "Оператор сравнения"
 
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:128
 msgid "Mouse button"
-msgstr "Кнопки мыши"
+msgstr "Кнопка мыши"
 
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:133
 msgid "String"
@@ -19463,7 +19458,7 @@ msgstr "Переменная объекта"
 
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:140
 msgid "Scene variable"
-msgstr "Переменные сцены"
+msgstr "Переменная сцены"
 
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:143
 msgid "Unknown"
@@ -19472,7 +19467,7 @@ msgstr "Неизвестный"
 #: ../Core/GDCore/IDE/PlatformLoader.cpp:89
 #: ../Core/GDCore/IDE/PlatformLoader.cpp:105
 msgid "Platform "
-msgstr "Platforme"
+msgstr "Платформа "
 
 #: ../Core/GDCore/IDE/PlatformLoader.cpp:89
 msgid " could not be loaded.\n"
@@ -19492,16 +19487,16 @@ msgid " could not be loaded.\n"
 "Contact the developer for more information.\n\n"
 "Detailed log:\n"
 "No valid create/destroy functions."
-msgstr " и не может быть загружена.\n"
+msgstr " не может быть загружена.\n"
 "Свяжитесь с разработчиком для получения информации.\n\n"
-"Подробно об ошибке :\n"
-"Нет применимых функций строить/разрушать."
+"Подробно об ошибке:\n"
+"Нет применимых функций создания/уничтожения."
 
 #: ../Core/GDCore/IDE/ProjectResourcesCopier.cpp:43
 msgid "Some resources are using absolute filenames.\n"
 "Do you want them to be copied in the new folder of the project? If you choose No, they won't be modified."
 msgstr "Ресурсы используют абсолютные имена файлов.\n"
-"Вы хотите, чтобы они копировались в новый каталог проекта ? Если выбираете нет, они не будут изменены."
+"Вы хотите, чтобы они копировались в новую папку проекта? Если выберите нет, они не будут изменены."
 
 #: ../Core/GDCore/IDE/ProjectResourcesCopier.cpp:44
 msgid "Some resources are using absolute filenames."
@@ -19536,40 +19531,40 @@ msgid "The version of GDevelop used to create this game seems to be a new versio
 "GDevelop may fail to open the game, or data may be missing.\n"
 "You should check if a new version of GDevelop is available."
 msgstr "Игра создана в более новой версии GDevelop.\n"
-"GDevelop может и не открыть игру, или могут отсутствовать данные.\n"
+"GDevelop может не открыть игру или могут отсутствовать данные.\n"
 "Проверьте, доступна ли новая версия GDevelop."
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:506
 msgid "The version of GDevelop used to create this game seems to be greater.\n"
 "GDevelop may fail to open the game, or data may be missing.\n"
 "You should check if a new version of GDevelop is available."
-msgstr "Игра создана в более старшей версии GDevelop.\n"
-"GDevelop может и не открыть игру, или могут отсутствовать данне.\n"
+msgstr "Игра создана в более старой версии GDevelop.\n"
+"GDevelop может не открыть игру или могут отсутствовать данные.\n"
 "Проверьте, доступна ли новая версия GDevelop."
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:513
 msgid "The game was saved with version of GDevelop which is too old. Please open and save the game with one of the first version of GDevelop 2. You will then be able to open your game with this GDevelop version."
-msgstr "Игра была сохранена с очень старой версией GDevelop. Пожалуйста, откройте и сохраните игру с одной из первых версий GDevelop 2. Тогда вы будете в состоянии открыть свою игру с этой версией GDevelop."
+msgstr "Игра была сохранена в очень старой версии GDevelop. Пожалуйста, откройте и сохраните игру в одной из первых версий GDevelop 2. Тогда вы сможете открыть свою игру в этой версии GDevelop."
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:598
 msgid "Sprite scaling has changed since GD 2: The resizing is made so that the origin point of the object won't move whatever the scale of the object.\n"
-msgstr "Изменение размеров спрайт объектов изменилось в GD 2 : Масштабирование теперь сделано так, что исходная точка объекта не перемещается и не зависит от размера объекта.\n"
+msgstr "Начиная с GD 2, изменилось изменение размеров спрайта: Масштабирование теперь сделано так, что исходная точка объекта не перемещается и не зависит от размера объекта.\n"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:599
 msgid "You may have to slightly change the position of some objects if you have changed their size.\n\n"
-msgstr "Возможно вам придется немного подправить местоположение объектов, при изменении их размера.\n\n"
+msgstr "Возможно, при изменении размера объектов, вам придется немного подправить их расположение.\n\n"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:600
 msgid "Thank you for your understanding.\n"
-msgstr "Спасибо за ваше понимание.\n"
+msgstr "Спасибо за понимание.\n"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:623
 msgid "The project is using the pathfinding automatism. This automatism has been replaced by a new one:\n"
-msgstr "Проект с использованием автоматизма поиска пути. Этот автоматизм был заменен на новый:\n"
+msgstr "Проект использует автоматизацию поиска пути. Эта автоматизация была заменена на новую:\n"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:624
 msgid "You must add the new 'Pathfinding' automatism to the objects that need to be moved, and add the 'Pathfinding Obstacle' to the objects that must act as obstacles."
-msgstr "Добавить новый автоматизм 'Поиск пути' к перемещающимся объектам, и добавить 'Препятствия поиска пути' к объектам препятствий."
+msgstr "Вы должны добавить новую автоматизацию 'Поиск пути' к перемещающимся объектам, и добавить 'Препятствия поиска пути' к объектам препятствий."
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:714
 msgid "Error while loading :"
@@ -19599,9 +19594,7 @@ msgstr " !\n"
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:894
 msgid "Please use only letters, digits\n"
 "and underscores ( _ )."
-msgstr "Пожалуйста, используйте только\n"
-"буквы, цифры и знак\n"
-"подчеркивания ( _ )."
+msgstr "Пожалуйста, используйте только буквы, цифры и знак подчеркивания ( _ )."
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:990
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1028
@@ -19624,7 +19617,7 @@ msgstr "Вертикальная синхронизация"
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1057
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1058
 msgid "Limit the framerate"
-msgstr "Огранич частоты кадров"
+msgstr "Ограничение частоты кадров"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:998
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1008
@@ -19672,7 +19665,7 @@ msgstr "Имя исполняемого файла Mac OS"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1020
 msgid "C++ features"
-msgstr "Особенности C++"
+msgstr "C++ функции"
 
 #: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:177
 msgid "Smooth the image"
@@ -19689,12 +19682,11 @@ msgstr "Всегда хранить изображение в памяти"
 #: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:183
 msgid "Set this to \"Yes\" to let the image always loaded in memory.\n"
 "Useful when the image is used by actions."
-msgstr "Установить \"Да\" для хранения изображения в памяти.\n"
-"Utile quand l'image est utilisée par des actions."
+msgstr "Установите \"Да\" для хранения изображения в памяти. Полезно, когда изображение используется действиями."
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.h:90
 msgid "Edit the events group properties"
-msgstr "Редактирование свойств группы событий"
+msgstr "Изменение свойств группы событий"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.h:119
 msgid "Add a template from the event store"

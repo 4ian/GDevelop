@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-09 03:02-0400\n"
+"PO-Revision-Date: 2015-08-27 16:35-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -6203,31 +6203,31 @@ msgstr "Testo di un attributo di un elemento"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:267
 msgid "Get the text of an attribute of an element"
-msgstr "Get the text of an attribute of an element"
+msgstr "Ottenere il testo di un attributo di un elemento"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:279
 msgid "Change the text of an attribute"
-msgstr "Change the text of an attribute"
+msgstr "Cambia il testo di un attributo"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:280
 msgid "Change the text of an attribute of an element ( which must be a Tag element )."
-msgstr "Change the text of an attribute of an element ( which must be a Tag element )."
+msgstr "Cambia il testo di un attributo di un elemento (che dev'essere un elemento Tag)."
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:294
 msgid "Delete an attribute"
-msgstr "Delete an attribute"
+msgstr "Elimina un attributo"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:295
 msgid "Delete an attribute from an element ( which must be a Tag element)."
-msgstr "Delete an attribute from an element ( which must be a Tag element)."
+msgstr "Elimina un attributo da un elemento (che dev'essere un elemento Tag)."
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:296
 msgid "Delete attribute _PARAM1_ from the element _PARAM0_"
-msgstr "Delete attribute _PARAM1_ from the element _PARAM0_"
+msgstr "Eliminare l'attributo _PARAM1_ dalla _PARAM0_ elemento"
 
 #: ../Extensions//AES/Extension.cpp:25
 msgid "AES encryption algorithm"
-msgstr "AES encryption algorithm"
+msgstr "Algoritmo di crittografia AES"
 
 #: ../Extensions//AES/Extension.cpp:26
 msgid "Extension to encrypt files with AES algorithm."
@@ -6591,7 +6591,7 @@ msgstr "Modification's sign"
 
 #: ../Extensions//Box3DObject/Extension.cpp:59
 msgid "Compare the width of a 3D Box."
-msgstr "Compare the width of a 3D Box."
+msgstr "Confronta la larghezza di una finestra 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:60
 msgid "width of _PARAM0_ is _PARAM1__PARAM2_"
@@ -6821,7 +6821,7 @@ msgstr "Valore da testare"
 
 #: ../Extensions//Box3DObject/Extension.cpp:72
 msgid "Modify the height of a 3D Box."
-msgstr "Modify the height of a 3D Box."
+msgstr "Modificare l'altezza di una finestra 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:73
 #: ../Extensions//PanelSpriteObject/Extension.cpp:62
@@ -6993,7 +6993,7 @@ msgstr "Wildcard filter ( \"FileType|*.ext;*.ext2|2ndFileType|*.ext3\" ) ( Windo
 
 #: ../Extensions//CommonDialogs/Extension.cpp:61
 msgid "Show a window to enter a text"
-msgstr "Show a window to enter a text"
+msgstr "Mostra una finestra per inserire un testo"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:62
 msgid "Show a window allowing to enter a text.\n"
@@ -7003,7 +7003,7 @@ msgstr "Show a window allowing to enter a text.\n"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:63
 msgid "Open a text input dialog, and save the result in _PARAM1_"
-msgstr "Open a text input dialog, and save the result in _PARAM1_"
+msgstr "Apri una finestra di input e salva il risultato in _PARAM1_"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:76
 msgid "Display a Yes/No message box"
@@ -7044,7 +7044,7 @@ msgstr "Automatically destroy the object when it goes outside the screen"
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:35
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:49
 msgid "Additional border"
-msgstr "Additional border"
+msgstr "Bordo aggiuntivo"
 
 #: ../Extensions//DestroyOutsideAutomatism/Extension.cpp:36
 msgid "Compare the additional border that the object must cross before being deleted."
@@ -7269,7 +7269,7 @@ msgstr "Automatism allowing to move objects with the mouse"
 
 #: ../Extensions//DraggableAutomatism/Extension.cpp:22
 msgid "Draggable object"
-msgstr "Draggable object"
+msgstr "Oggetto trascinabile"
 
 #: ../Extensions//DraggableAutomatism/Extension.cpp:23
 msgid "Draggable"

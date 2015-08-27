@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-07 22:29+1200\n"
-"PO-Revision-Date: 2015-07-12 04:35-0400\n"
+"PO-Revision-Date: 2015-08-27 16:35-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -8783,7 +8783,7 @@ msgstr "Test-Parameter 1 der roten Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:59
 msgid "Parameter 1 of red color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Parameter 1 of red color of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Parameter 1 von der roten Farbe _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:70
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:83
@@ -8796,7 +8796,7 @@ msgstr "Ändere Parameter 2 der roten Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:72
 msgid "Do _PARAM1__PARAM2_ to parameter 2 of red color of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to parameter 2 of red color of _PARAM0_"
+msgstr "Mache _PARAM1__PARAM2_ zu dem Parameter 2 von der roten Farbe zu _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:84
 msgid "Test parameter 2 of the red color"
@@ -8804,7 +8804,7 @@ msgstr "Teste Parameter 2 der roten Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:85
 msgid "Parameter 2 of red color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Parameter 2 of red color of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Parameter 2 von der roten Farbe _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:96
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:109
@@ -8817,7 +8817,7 @@ msgstr "Modifiziere den Parameter 1 mit Blauer Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:98
 msgid "Do _PARAM1__PARAM2_ to the parameter 1 of blue color of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to the parameter 1 of blue color of _PARAM0_"
+msgstr "Mache _PARAM1__PARAM2_ zu dem Parameter 1 von der blauen Farbe zu _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:110
 msgid "Test parameter 1 of blue color"
@@ -8825,7 +8825,7 @@ msgstr "Teste Parameter 1 der blauen Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:111
 msgid "Parameter 1 of blue color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Parameter 1 of blue color of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Parameter 1 von der blauen Farbe _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:122
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:135
@@ -8838,7 +8838,7 @@ msgstr "Ändere Parameter 2 der blauen Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:124
 msgid "Do _PARAM1__PARAM2_ to the parameter 2 of blue color of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to the parameter 2 of blue color of _PARAM0_"
+msgstr "Mache _PARAM1__PARAM2_ zu dem Parameter 2 von der blauen Farbe zu _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:136
 msgid "Test parameter 2 of blue color"
@@ -8846,7 +8846,7 @@ msgstr "Test-Parameter 2 der blauen Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:137
 msgid "Parameter 2 of blue color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Parameter 2 of blue color of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Parameter 2 von der blauen Farbe _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:148
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:161
@@ -8855,11 +8855,11 @@ msgstr "Grüne Farbe, Parameter 1"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:149
 msgid "Modify parameter 1 of green color"
-msgstr "Modify parameter 1 of green color"
+msgstr "Ändere den Parameter 1 der Grünfärbung"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:150
 msgid "Do _PARAM1__PARAM2_ to the parameter 1 of green color of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to the parameter 1 of green color of _PARAM0_"
+msgstr "Mache _PARAM1__PARAM2_ zu dem Parameter 1 von der grünen Farbe zu _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:162
 msgid "Test parameter 1 of green color"
@@ -8867,7 +8867,7 @@ msgstr "Test-Parameter 1 der grünen Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:163
 msgid "Parameter 1 of green color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Parameter 1 of green color of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Parameter 1 von der grünen Farbe _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:175
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:188
@@ -8876,11 +8876,11 @@ msgstr "Grüne Farbe, Parameter 2"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:176
 msgid "Modify the parameter 2 of the green color"
-msgstr "Modify the parameter 2 of the green color"
+msgstr "Ändern Sie den Parameter 2 der grünen Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:177
 msgid "Do _PARAM1__PARAM2_ to the parameter 2 of green color of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to the parameter 2 of green color of _PARAM0_"
+msgstr "Mache _PARAM1__PARAM2_ zu dem Parameter 2 von der grünen Farbe zu _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:189
 msgid "Test the parameter 2 of the green color"
@@ -8888,7 +8888,7 @@ msgstr "Testet den Parameter 2 der grünen Farbe"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:190
 msgid "Parameter 2 of green color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "Parameter 2 of green color of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Parameter 2 von der grünen Farbe _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:202
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:215
@@ -8901,7 +8901,7 @@ msgstr "Ändert Parameter 1 der Partikelgröße"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:204
 msgid "Do _PARAM1__PARAM2_ to the parameter 1 of size of _PARAM0_"
-msgstr "Do _PARAM1__PARAM2_ to the parameter 1 of size of _PARAM0_"
+msgstr "Mache _PARAM1__PARAM2_ zu dem Parameter 1 von der größe zu _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:216
 msgid "Test parameter 1 of the size of particles"
@@ -9630,7 +9630,7 @@ msgstr "Pfad"
 
 #: ../Extensions//PathAutomatism/Extension.cpp:40
 msgid "Make objects move on a predefined path."
-msgstr "Make objects move on a predefined path."
+msgstr "Objekte bewegen lassen auf einem vordefinierten Pfad."
 
 #: ../Extensions//PathAutomatism/Extension.cpp:52
 msgid "De/activate rounding"
@@ -9657,7 +9657,7 @@ msgstr "De/activate the stop at the end of the path"
 
 #: ../Extensions//PathAutomatism/Extension.cpp:65
 msgid "Activate or deactivate the stop at the end of the object"
-msgstr "Activate or deactivate the stop at the end of the object"
+msgstr "Den Halt am Ende des Objekts aktivieren oder deaktivieren"
 
 #: ../Extensions//PathAutomatism/Extension.cpp:66
 msgid "Stop _PARAM0_ when the end of the path is reached: _PARAM2_"
@@ -10133,8 +10133,8 @@ msgstr "Nicht in der Lage auf gemeinsam genutzte Daten zuzugreifen: Schlechter D
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:367
 msgid "A global path with the same name already exists.\n"
 "To avoid name conflict, please rename the local path:"
-msgstr "A global path with the same name already exists.\n"
-"To avoid name conflict, please rename the local path:"
+msgstr "Ein globaler Pfad mit demselben Name existiert bereits.\n"
+"Um einen Namenskonflikt vorzubeugen, benennen Sie bitte den lokalen Pfad um:"
 
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:367
 msgid "Path conflict"
@@ -10250,7 +10250,7 @@ msgstr "The objet's main path cannot be made global."
 
 #: ../Extensions//PathAutomatism/PathAutomatismEditor.cpp:986
 msgid "Choose an image to be displayed"
-msgstr "Choose an image to be displayed"
+msgstr "Wählen Sie ein Bild zum Anzeigen"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:28
 #: ../Extensions//PathfindingAutomatism/JsExtension.cpp:26
@@ -10314,7 +10314,7 @@ msgstr "Meldet \"Wahr\" (true) zurück wenn das Ziel erreicht wurde."
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:76
 msgid "_PARAM0_ reached its destination"
-msgstr "_PARAM0_ reached its destination"
+msgstr "_PARAM0_ erreicht seinen Bestimmungsort"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:85
 msgid "Width of the cells"
@@ -10608,12 +10608,12 @@ msgstr "_PARAM0_ is rotated when traveling on its path"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:338
 msgid "Get a waypoint X position"
-msgstr "Get a waypoint X position"
+msgstr "Eine Position von Wegpunkt X erhalten"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:338
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:360
 msgid "Get next waypoint X position"
-msgstr "Get next waypoint X position"
+msgstr "Nächsten Wegpunkt X Position"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:341
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:347
@@ -10627,11 +10627,11 @@ msgstr "Get a waypoint Y position"
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:344
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:365
 msgid "Get next waypoint Y position"
-msgstr "Get next waypoint Y position"
+msgstr "Nächsten Wegpunkt Y Position"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:350
 msgid "Index of the next waypoint"
-msgstr "Index of the next waypoint"
+msgstr "Index des nächsten Wegpunktes"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:350
 msgid "Get the index of the next waypoint to reach"
@@ -10647,11 +10647,11 @@ msgstr "Get the number of waypoints on the path"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:370
 msgid "Last waypoint X position"
-msgstr "Last waypoint X position"
+msgstr "Letzten Wegpunkt X Position"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:375
 msgid "Last waypoint Y position"
-msgstr "Last waypoint Y position"
+msgstr "Letzten Wegpunkt Y Position"
 
 #: ../Extensions//PathfindingAutomatism/Extension.cpp:390
 msgid "Acceleration of the object on the path"
@@ -10898,7 +10898,7 @@ msgstr "Turn the polygon around a point"
 #: ../Extensions//PhysicsAutomatism/CustomPolygonDialog.cpp:153
 #: ../Extensions//PhysicsAutomatism/CustomPolygonDialog.cpp:503
 msgid "Round..."
-msgstr "Round..."
+msgstr "Runde..."
 
 #: ../Extensions//PhysicsAutomatism/CustomPolygonDialog.cpp:154
 msgid "Round coordinates"
@@ -11003,7 +11003,7 @@ msgstr "Make object dynamic ( affected by forces and other objects )."
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:65
 msgid "Make _PARAM0_ dynamic"
-msgstr "Make _PARAM0_ dynamic"
+msgstr "_PARAM0_ dynamisch machen"
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:75
 msgid "The object is dynamic"
@@ -11015,19 +11015,19 @@ msgstr "Test if an object is dynamic ( affected by forces and the other objects 
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:77
 msgid "_PARAM0_ is dynamic"
-msgstr "_PARAM0_ is dynamic"
+msgstr "_PARAM0_ ist dynamisch"
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:86
 msgid "Fix rotation"
-msgstr "Fix rotation"
+msgstr "Rotation fixieren"
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:87
 msgid "Prevent the object from rotating"
-msgstr "Prevent the object from rotating"
+msgstr "Objekt vor Rotation hindern"
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:88
 msgid "Fix rotation of _PARAM0_"
-msgstr "Fix rotation of _PARAM0_"
+msgstr "Rotation von _PARAM0_ fixieren"
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:89
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:144
@@ -11484,7 +11484,7 @@ msgstr "Change collision polygon of _PARAM0_ X scale to _PARAM2_"
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:517
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:523
 msgid "Collision polygon"
-msgstr "Collision polygon"
+msgstr "Polygonkollision"
 
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:472
 #: ../Extensions//PhysicsAutomatism/Extension.cpp:485
@@ -11550,7 +11550,7 @@ msgstr "Kreis"
 
 #: ../Extensions//PhysicsAutomatism/PhysicsAutomatismEditor.cpp:112
 msgid "Custom polygon"
-msgstr "Custom polygon"
+msgstr "Benutzerdefiniertes Polygon"
 
 #: ../Extensions//PhysicsAutomatism/PhysicsAutomatismEditor.cpp:114
 msgid "Setup the shape..."
@@ -11595,7 +11595,7 @@ msgstr "Global parameters of physics engine"
 
 #: ../Extensions//PhysicsAutomatism/PhysicsAutomatismEditor.cpp:169
 msgid "Gravity coordinates :"
-msgstr "Gravity coordinates :"
+msgstr "Schwerkraftkoordinaten:"
 
 #: ../Extensions//PhysicsAutomatism/PhysicsAutomatismEditor.cpp:179
 msgid "Scale of the virtual world :"
@@ -11675,7 +11675,7 @@ msgstr "Springt"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:75
 msgid "Check if the object is jumping."
-msgstr "Check if the object is jumping."
+msgstr "Prüfen ob das Objekt springt."
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:76
 msgid "_PARAM0_ is jumping"
@@ -11830,7 +11830,7 @@ msgstr "Einem Objekt erlauben wiederholt zu springen, auch wenn es in der Luft i
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:265
 msgid "Allow _PARAM0_ to jump again"
-msgstr "Allow _PARAM0_ to jump again"
+msgstr "_PARAM0_ erlauben, nochmal zu spingen"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:275
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:37
@@ -11845,7 +11845,7 @@ msgstr "Simuliert das drücken der linken Taste."
 #: ../Extensions//PlatformAutomatism/Extension.cpp:277
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:39
 msgid "Simulate pressing Left for _PARAM0_"
-msgstr "Simulate pressing Left for _PARAM0_"
+msgstr "Drücken der Linkstaste für _PARAM0_ simulieren"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:278
 #: ../Extensions//PlatformAutomatism/Extension.cpp:290
@@ -11867,17 +11867,17 @@ msgstr "Steuerung"
 #: ../Extensions//PlatformAutomatism/Extension.cpp:287
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:49
 msgid "Simulate right key press"
-msgstr "Simulate right key press"
+msgstr "Rechte Taste simulieren"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:288
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:50
 msgid "Simulate a pressing on right key."
-msgstr "Simulate a pressing on right key."
+msgstr "Rechten Tastendruck simulieren."
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:289
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:51
 msgid "Simulate pressing Right for _PARAM0_"
-msgstr "Simulate pressing Right for _PARAM0_"
+msgstr "Drücken der Rechtstaste für _PARAM0_ simulieren"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:299
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:61
@@ -11887,12 +11887,12 @@ msgstr "Simuliere Pfeil-Hoch Taste"
 #: ../Extensions//PlatformAutomatism/Extension.cpp:300
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:62
 msgid "Simulate a pressing on up key ( Used when on a ladder )."
-msgstr "Simulate a pressing on up key ( Used when on a ladder )."
+msgstr "Drücken der Nach oben-Taste simulieren (Wird zum Benutzen einer Leiter verwendet)."
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:301
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:63
 msgid "Simulate pressing Up for _PARAM0_"
-msgstr "Simulate pressing Up for _PARAM0_"
+msgstr "Drücken der Obentaste für _PARAM0_ simulieren"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:311
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:73
@@ -11902,12 +11902,12 @@ msgstr "Simuliere Pfeil-Runter Taste"
 #: ../Extensions//PlatformAutomatism/Extension.cpp:312
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:74
 msgid "Simulate a pressing on down key ( Used when on a ladder )."
-msgstr "Simulate a pressing on down key ( Used when on a ladder )."
+msgstr "Drücken der Nach unten-Taste simulieren (Wird zum Benutzen einer Leiter verwendet)."
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:313
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:75
 msgid "Simulate pressing Down for _PARAM0_"
-msgstr "Simulate pressing Down for _PARAM0_"
+msgstr "Drücken der Untentaste für _PARAM0_ simulieren"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:323
 msgid "Simulate ladder key press"
@@ -11985,15 +11985,15 @@ msgstr "Get the gravity applied on the object"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:376
 msgid "Get the maximum falling speed"
-msgstr "Get the maximum falling speed"
+msgstr "Erreiche die maximale Fallgeschwindigkeit"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:406
 msgid "Platform on which Platformer characters can run."
-msgstr "Platform on which Platformer characters can run."
+msgstr "Platform auf welcher Platformcharaktere rennen können."
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:417
 msgid "Change platform type"
-msgstr "Change platform type"
+msgstr "Plattformtyp ändern"
 
 #: ../Extensions//PlatformAutomatism/Extension.cpp:418
 msgid "Change the platform type of the object: Platform, Jumpthru or Ladder."
@@ -12195,7 +12195,7 @@ msgstr "Größe in Pixeln"
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:109
 msgid "Test the size of the outline."
-msgstr "Test the size of the outline."
+msgstr "Teste die Größe des Umrisses."
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:110
 msgid "The size of the outline of _PARAM0_ is _PARAM1__PARAM2_"
@@ -12333,11 +12333,11 @@ msgstr "Load in memory file _PARAM1_ inside image _PARAM2_"
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:250
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:251
 msgid "Save an image to a file"
-msgstr "Save an image to a file"
+msgstr "Ein Bild in einer Datei speichern"
 
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:252
 msgid "Save image _PARAM2_ to file _PARAM1_"
-msgstr "Save image _PARAM2_ to file _PARAM1_"
+msgstr "Speichern Sie Bild _PARAM2_ in _PARAM1_"
 
 #: ../Extensions//PrimitiveDrawing/ShapePainterObjectEditor.cpp:58
 msgid "Edit the Shape Painter object"
@@ -12577,7 +12577,7 @@ msgstr "Teste, ob sich ein Sound wiederholt."
 
 #: ../Extensions//SoundObject/Extension.cpp:228
 msgid "_PARAM0_ is looping"
-msgstr "_PARAM0_ is looping"
+msgstr "_PARAM0_ loopen"
 
 #: ../Extensions//SoundObject/Extension.cpp:237
 msgid "Being played"
@@ -12615,7 +12615,7 @@ msgstr "Teste, ob ein Sound gestoppt ist."
 #: ../Extensions//SoundObject/Extension.cpp:261
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:416
 msgid "_PARAM0_ is stopped"
-msgstr "_PARAM0_ is stopped"
+msgstr "_PARAM0_ stoppen"
 
 #: ../Extensions//SoundObject/Extension.cpp:271
 msgid "Test if a sound is relative to the listener."
@@ -12929,7 +12929,7 @@ msgstr "Test the text of a Text Entry object."
 
 #: ../Extensions//TextEntryObject/Extension.cpp:46
 msgid "The text of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr "The text of _PARAM0_ is _PARAM1__PARAM2_"
+msgstr "Der Text von _PARAM0_ ist _PARAM1__PARAM2_"
 
 #: ../Extensions//TextEntryObject/Extension.cpp:56
 msgid "De/activate capturing text input"
@@ -12973,12 +12973,12 @@ msgstr "Roll :"
 
 #: ../Extensions//TextEntryObject/TextEntryObject.cpp:93
 msgid "Activated ?"
-msgstr "Activated ?"
+msgstr "Aktiviert ?"
 
 #: ../Extensions//TextObject/Extension.cpp:21
 #: ../Extensions//TextObject/JsExtension.cpp:30
 msgid "Text object"
-msgstr "Text object"
+msgstr "Textobjekte"
 
 #: ../Extensions//TextObject/Extension.cpp:22
 #: ../Extensions//TextObject/JsExtension.cpp:31
@@ -13380,7 +13380,7 @@ msgstr "Top-down movement"
 
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:18
 msgid "Move objects in 4 or 8 directions"
-msgstr "Move objects in 4 or 8 directions"
+msgstr "Verschieben von Objekten in 4 oder 8 Richtungen"
 
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:23
 msgid "Top-down movement (4 or 8 directions)"
@@ -13482,11 +13482,11 @@ msgstr "_PARAM0_ is rotated when moving"
 
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:322
 msgid "Acceleration of the object"
-msgstr "Acceleration of the object"
+msgstr "Beschleunigung des Objekts"
 
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:327
 msgid "Deceleration of the object"
-msgstr "Deceleration of the object"
+msgstr "Verlangsamung des Objekts"
 
 #: ../Extensions//TopDownMovementAutomatism/Extension.cpp:332
 msgid "Maximum speed of the object"
@@ -13520,12 +13520,12 @@ msgstr "Wiedergeben eines Sounds auf einem Kanal"
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:24
 msgid "Play a sound ( small audio file ) on a specific channel,\n"
 "so as to be able to manipulate it."
-msgstr "Play a sound ( small audio file ) on a specific channel,\n"
-"so as to be able to manipulate it."
+msgstr "Spiele einen Sound (kurze Audiodatei) auf einem spezifischen Audiokanal ab,\n"
+" sodass es in Stande ist, es zu manipulieren."
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:25
 msgid "Play the sound _PARAM1_ on the channel _PARAM2_"
-msgstr "Play the sound _PARAM1_ on the channel _PARAM2_"
+msgstr "Spiel den Sound _PARAM1_ auf den Kanal _PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:26
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:41
@@ -13585,7 +13585,7 @@ msgstr "Den Ton wiederholen?"
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:225
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:239
 msgid "Volume ( From 0 to 100, 100 by default )"
-msgstr "Volume ( From 0 to 100, 100 by default )"
+msgstr "Lautstärke (Von 0 bis 100, 100 ist Standard)"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:34
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:82
@@ -13596,23 +13596,23 @@ msgstr "Tonlage (Geschwindigkeit) (Standardmäßig 1)"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:38
 msgid "Stop the sound of a channel"
-msgstr "Stop the sound of a channel"
+msgstr "Stoppt den Sound eines Kanals"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:39
 msgid "Stop the sound on the specified channel."
-msgstr "Stop the sound on the specified channel."
+msgstr "Stoppt den Sound eines spezifischen Kanals."
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:40
 msgid "Stop the sound of channel _PARAM1_"
-msgstr "Stop the sound of channel _PARAM1_"
+msgstr "Stoppt den Sound von Channel _PARAM1_"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:49
 msgid "Pause the sound of a channel"
-msgstr "Pause the sound of a channel"
+msgstr "Pausiert den Sound von einem Kanal"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:50
 msgid "Pause the sound played on the specified channel."
-msgstr "Pause the sound played on the specified channel."
+msgstr "Pausiert den gespielten Sound auf dem spezifischen Kanal."
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:51
 msgid "Pause the sound of channel _PARAM1_"
@@ -13620,15 +13620,15 @@ msgstr "Pause the sound of channel _PARAM1_"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:60
 msgid "Play the sound of a channel"
-msgstr "Play the sound of a channel"
+msgstr "Spielen Sie den Sound eines Kanals"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:61
 msgid "Play the sound of the channel."
-msgstr "Play the sound of the channel."
+msgstr "Spielen Sie den Sound des Kanals."
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:62
 msgid "Play the sound of channel _PARAM1_"
-msgstr "Play the sound of channel _PARAM1_"
+msgstr "Spielen Sie den Sound des Kanal-_PARAM1_"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:71
 msgid "Play a music on a channel"
@@ -13790,7 +13790,7 @@ msgstr "Do _PARAM2__PARAM3_ to the playing offset of the music on channel _PARAM
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:216
 msgid "Play a sound"
-msgstr "Play a sound"
+msgstr "Wiedergeben eines Sounds"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:218
 msgid "Play the sound _PARAM1_"
@@ -13806,11 +13806,11 @@ msgstr "Spielt Musik."
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:232
 msgid "Play the music _PARAM1_"
-msgstr "Play the music _PARAM1_"
+msgstr "Spielen Sie die Musik-_PARAM1_"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:244
 msgid "A music is being played"
-msgstr "A music is being played"
+msgstr "Eine Musik wird abgespielt"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:245
 msgid "Test if the music on a channel is being played"
@@ -14003,7 +14003,7 @@ msgstr "Music's pitch"
 
 #: ../Core/GDCore/BuiltinExtensions/AudioExtension.cpp:429
 msgid "Global volume value"
-msgstr "Global volume value"
+msgstr "Globaler Lautstärkewert"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:30
 msgid "Compare X position of an object"
@@ -14059,7 +14059,7 @@ msgstr "Position eines Objekts"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:87
 msgid "Change the position of an object."
-msgstr "Change the position of an object."
+msgstr "Verändert die Position eines Objekts."
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:88
 msgid "Do _PARAM1__PARAM2_;_PARAM3__PARAM4_ to the position of _PARAM0_"
@@ -15962,7 +15962,7 @@ msgstr "Cosecant of a number"
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:108
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:112
 msgid "Round"
-msgstr "Round"
+msgstr "Runde"
 
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:104
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:108
@@ -16008,7 +16008,7 @@ msgstr "Nth root of a number"
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:138
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:143
 msgid "Number"
-msgstr "Number"
+msgstr "Nummer"
 
 #: ../Core/GDCore/BuiltinExtensions/MathematicalToolsExtension.cpp:139
 msgid "N"
@@ -16255,7 +16255,7 @@ msgstr "Button to test"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:155
 msgid "Mouse button released"
-msgstr "Mouse button released"
+msgstr "Maustaste losgelassen"
 
 #: ../Core/GDCore/BuiltinExtensions/MouseExtension.cpp:156
 msgid "Return true if the specified button of the mouse was released."
@@ -16383,35 +16383,35 @@ msgstr ".php page URL ( Don't forget the protocol http:// ) "
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:30
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:136
 msgid "Password"
-msgstr "Password"
+msgstr "Passwort"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:31
 msgid "Data 1"
-msgstr "Data 1"
+msgstr "Datei 1"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:32
 msgid "Data 2"
-msgstr "Data 2"
+msgstr "Datei 2"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:33
 msgid "Data 3"
-msgstr "Data 3"
+msgstr "Datei 3"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:34
 msgid "Data 4"
-msgstr "Data 4"
+msgstr "Datei 4"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:35
 msgid "Data 5"
-msgstr "Data 5"
+msgstr "Datei 5"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:36
 msgid "Data 6"
-msgstr "Data 6"
+msgstr "Datei 6"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:40
 msgid "Send a request to a web page"
-msgstr "Send a request to a web page"
+msgstr "Senden Sie eine Anfrage zu einer Webseite"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:41
 msgid "Send a request to the specified web page.\n\n"
@@ -16425,11 +16425,11 @@ msgstr "Send _PARAM3_ request to _PARAM0__PARAM1_ with body: _PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:46
 msgid "Host (Example: http://www.some-server.org/)"
-msgstr "Host (Example: http://www.some-server.org/)"
+msgstr "Host (Beispiel: http://www.some-server.org/)"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:47
 msgid "Path to page (Example: /page.php)"
-msgstr "Path to page (Example: /page.php)"
+msgstr "Pfad zur Seite (Beispiel: /page.php)"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:48
 msgid "Request body content"
@@ -16449,11 +16449,11 @@ msgstr "Store the response in this variable"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:55
 msgid "Download a file"
-msgstr "Download a file"
+msgstr "Laden Sie eine Datei herunter"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:56
 msgid "Download a file from a web site"
-msgstr "Download a file from a web site"
+msgstr "Laden Sie eine Datei von einer Website herunter"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:57
 msgid "Download file _PARAM1_ from _PARAM0_ under the name of _PARAM2_"
@@ -16461,15 +16461,15 @@ msgstr "Download file _PARAM1_ from _PARAM0_ under the name of _PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:61
 msgid "Host ( For example : http://www.website.com )"
-msgstr "Host ( For example : http://www.website.com )"
+msgstr "Host (z. B.: http://www.website.com)"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:62
 msgid "Path to file ( For example : /folder/file.txt )"
-msgstr "Path to file ( For example : /folder/file.txt )"
+msgstr "Pfad zur Datei (z. B.: /folder/file.txt)"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:63
 msgid "Save as"
-msgstr "Save as"
+msgstr "Speichern unter"
 
 #: ../Core/GDCore/BuiltinExtensions/NetworkExtension.cpp:66
 msgid "Convert JSON to variable"
@@ -16619,11 +16619,11 @@ msgstr "Item label"
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:219
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:307
 msgid "Add an animation"
-msgstr "Add an animation"
+msgstr "Hinzufügen einer animation"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:220
 msgid "Delete an animation"
-msgstr "Delete an animation"
+msgstr "Löschen einer animation"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:222
 msgid "De/activate loop"
@@ -16633,11 +16633,11 @@ msgstr "De/activate loop"
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:928
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1668
 msgid "Time between each images"
-msgstr "Time between each images"
+msgstr "Zeit zwischen den einzelnen Bildern"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:234
 msgid "Animations"
-msgstr "Animations"
+msgstr "Animationen"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:259
 msgid "Go back to default mask"
@@ -16661,7 +16661,7 @@ msgstr "8 Directions"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:302
 msgid "Time between each image :"
-msgstr "Time between each image :"
+msgstr "Zeit zwischen jedem Bild:"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:304
 msgid "Loop the animation"
@@ -16670,7 +16670,7 @@ msgstr "Loop the animation"
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:316
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:339
 msgid "Add an image from a file"
-msgstr "Add an image from a file"
+msgstr "Bild aus einer Datei hinzufügen"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:319
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:342
@@ -16683,11 +16683,11 @@ msgstr "Remove\tDEL"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:324
 msgid "Move left\tJ"
-msgstr "Move left\tJ"
+msgstr "Nach links bewegen\t"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:327
 msgid "Move right\tK"
-msgstr "Move right\tK"
+msgstr "Nach rechts bewegen\t"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:333
 msgid "Move the entire polygon"
@@ -16707,7 +16707,7 @@ msgstr "Drag an image from the image bank to the area below to add it to the ani
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:524
 msgid "All animations"
-msgstr "All animations"
+msgstr "Alle Animationen"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:528
 msgid "Animation "
@@ -16715,11 +16715,11 @@ msgstr "Animation "
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:535
 msgid "Direction "
-msgstr "Direction "
+msgstr "Richtung "
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:801
 msgid "Triangle"
-msgstr "Triangle"
+msgstr "Dreieck"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:805
 msgid "Polygon"
@@ -16735,11 +16735,11 @@ msgstr "Vertice"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:831
 msgid "Default"
-msgstr "Default"
+msgstr "Standard"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:935
 msgid "Time between each images: "
-msgstr "Time between each images: "
+msgstr "Zeit zwischen den einzelnen Bildern: "
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:935
 msgid "s"
@@ -17067,7 +17067,7 @@ msgstr "Animation frame to test"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:226
 msgid "Animation paused"
-msgstr "Animation paused"
+msgstr "Animation angehalten"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:227
 msgid "Test if the animation of an object is paused"
@@ -17079,7 +17079,7 @@ msgstr "The animation of _PARAM0_ is paused"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:237
 msgid "Animation finished"
-msgstr "Animation finished"
+msgstr "Animation abgeschlossen"
 
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/SpriteExtension.cpp:238
 msgid "Check if the animation being played by the Sprite object is finished."
@@ -18285,7 +18285,7 @@ msgstr "Ausdruck bearbeiten"
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:96
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:524
 msgid "No errors."
-msgstr "No errors."
+msgstr "Keine Fehler."
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:141
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:97
@@ -18471,7 +18471,7 @@ msgstr "Mathematical functions and operators"
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:119
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:131
 msgid "Add"
-msgstr "Add"
+msgstr "Hinzufügen"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:294
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:124
@@ -18495,7 +18495,7 @@ msgstr "Der Ausdruck enthält einen oder mehrere Fehler."
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:509
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:164
 msgid "All properties"
-msgstr "All properties"
+msgstr "Alle Eigenschaften"
 
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:512
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:167
@@ -18538,7 +18538,7 @@ msgstr "Name :"
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:83
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:82
 msgid "Visible"
-msgstr "Visible"
+msgstr "Sichtbar"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:87
 msgid "Cameras"
@@ -18546,15 +18546,15 @@ msgstr "Cameras"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:90
 msgid "Camera No."
-msgstr "Camera No."
+msgstr "Kamera Nr."
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:98
 msgid "Add another camera"
-msgstr "Add another camera"
+msgstr "Kamera hinzufügen"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:101
 msgid "Editing the camera"
-msgstr "Editing the camera"
+msgstr "Kamera bearbeiten"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:105
 msgid "Custom size :"
@@ -18572,11 +18572,11 @@ msgstr "For example, a camera which takes the left side of the window would be d
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:224
 msgid "The name is incorrect"
-msgstr "The name is incorrect"
+msgstr "Der Name ist falsch"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:414
 msgid "The layer must have at least one camera."
-msgstr "The layer must have at least one camera."
+msgstr "Die Ebene muss mindestens eine Kamera haben."
 
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:428
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"
@@ -18612,7 +18612,7 @@ msgstr "Number of the last event"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:88
 msgid "(included)"
-msgstr "(included)"
+msgstr "(hinzugefügt)"
 
 #: ../Core/GDCore/IDE/Dialogs/EditLink.cpp:93
 msgid "Remember to update the numbers of the events if\n"
@@ -18638,7 +18638,7 @@ msgstr "http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manua
 
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:77
 msgid "Edit the text"
-msgstr "Edit the text"
+msgstr "Text bearbeiten"
 
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:405
 msgid "The expression is malformed. Are you sur you want to validate this expression ?"
@@ -18650,29 +18650,29 @@ msgstr "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/m
 
 #: ../Core/GDCore/IDE/Dialogs/EventStoreDialog.cpp:36
 msgid "Please choose a template in the list."
-msgstr "Please choose a template in the list."
+msgstr "Bitte wählen Sie eine Vorlage aus der Liste."
 
 #: ../Core/GDCore/IDE/Dialogs/EventStoreDialog.cpp:133
 msgid "By "
-msgstr "By "
+msgstr "Von "
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:35
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:558
 msgid "Layers editor"
-msgstr "Layers editor"
+msgstr "Ebenen-Editor"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:37
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:53
 msgid "Add a layer"
-msgstr "Add a layer"
+msgstr "Ebene hinzufügen"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:37
 msgid "Add a new layer"
-msgstr "Add a new layer"
+msgstr "Eine neue Ebene hinzufügen"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:39
 msgid "Delete the selected layer"
-msgstr "Delete the selected layer"
+msgstr "Ausgewählte Ebene löschen"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:43
 msgid "Edit the properties of the layer"
@@ -18696,11 +18696,11 @@ msgstr "Display help about the layers editor"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:128
 msgid "Group name:"
-msgstr "Group name:"
+msgstr "Gruppename:"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:141
 msgid "Choose background color"
-msgstr "Choose background color"
+msgstr "Wählen Sie eine Hintergrundfarbe"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:147
 msgid "Hide the events contained in the group"
@@ -18708,7 +18708,7 @@ msgstr "Hide the events contained in the group"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:247
 msgid "No template chosen"
-msgstr "No template chosen"
+msgstr "Keine Vorlage ausgewählt"
 
 #: ../Core/GDCore/IDE/Dialogs/GDCoreDialogs.cpp:304
 msgid "Publish your own events on GDevApp.com"
@@ -18845,11 +18845,11 @@ msgstr "Move below"
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:243
 msgid "New layer"
-msgstr "New layer"
+msgstr "Neue Ebene"
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:255
 msgid "New layer "
-msgstr "New layer "
+msgstr "Neue Ebene "
 
 #: ../Core/GDCore/IDE/Dialogs/LayersEditorPanel.cpp:312
 msgid "Can't find the layer to delete !"
@@ -18927,11 +18927,11 @@ msgstr "Add an automatism to the object"
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:262
 msgid "Insert a new object"
-msgstr "Insert a new object"
+msgstr "Neues Objekt hinzufügen"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:255
 msgid "Lock the object(s)"
-msgstr "Lock the object(s)"
+msgstr "Sperre das/die Objekt(e)"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:270
 msgid "Unlock the object under the cursor"
@@ -18959,7 +18959,7 @@ msgstr "This platform does not support launching previews."
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:519
 msgid "Mode"
-msgstr "Mode"
+msgstr "Modus"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:521
 msgid "Stop the preview"
@@ -18971,7 +18971,7 @@ msgstr "Vorschau anhalten und zur Bearbeitung zurückkehren"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:522
 msgid "Launch a preview"
-msgstr "Launch a preview"
+msgstr "Eine Vorschau starten"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:557
 msgid "Objects editor"
@@ -19011,7 +19011,7 @@ msgstr "Rastergröße ändern"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:564
 msgid "Mask"
-msgstr "Mask"
+msgstr "Maske"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:564
 msgid "Show a mask corresponding to the size of the game window"
@@ -19149,19 +19149,19 @@ msgstr "No information about the extension."
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:137
 msgid "Author :"
-msgstr "Author :"
+msgstr "Autor :"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:149
 msgid "License :"
-msgstr "License :"
+msgstr "Lizenz :"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:160
 msgid "Compatibility :"
-msgstr "Compatibility :"
+msgstr "Kompatibilität:"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:172
 msgid "More extensions"
-msgstr "More extensions"
+msgstr "Mehr Erweiterungen"
 
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:174
 msgid "A list of extensions provided by others developers is available on the wiki :"
@@ -19237,7 +19237,7 @@ msgstr "The file is relative to the folder of the project"
 #: ../Core/GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp:210
 #: ../Core/GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp:240
 msgid "Parent folder"
-msgstr "Parent folder"
+msgstr "Übergeordnetes Verzeichnis"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:130
 msgid "Add from resource library"
@@ -19280,11 +19280,11 @@ msgstr "Move the image down"
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:184
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:198
 msgid "Add a folder"
-msgstr "Add a folder"
+msgstr "Neuer Ordner"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:356
 msgid "Adding images"
-msgstr "Adding images"
+msgstr "Bilder Hinzufügen"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:369
 msgid "Resources successfully added"
@@ -19292,7 +19292,7 @@ msgstr "Resources successfully added"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:424
 msgid "Adding "
-msgstr "Adding "
+msgstr "Hinzufügen "
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:450
 msgid "Some images in the list have already the same name, and have not been added:"
@@ -19302,7 +19302,7 @@ msgstr "Some images in the list have already the same name, and have not been ad
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:537
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:547
 msgid "No image selected"
-msgstr "No image selected"
+msgstr "Kein Bild ausgewählt"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:652
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:684
@@ -19327,12 +19327,12 @@ msgstr "N/A"
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:786
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:862
 msgid "Unable to rename the image: another image has already this name."
-msgstr "Unable to rename the image: another image has already this name."
+msgstr "Bild konnte nicht umbennant werden: Name bereits vergeben."
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:799
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:848
 msgid "Unable to rename the folder: another folder has already this name."
-msgstr "Unable to rename the folder: another folder has already this name."
+msgstr "Ordner konnte nicht umbennant werden: Name bereits vergeben."
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:930
 msgid "All images"
@@ -19354,7 +19354,7 @@ msgstr "Choose the program for editing this kind of resource"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1022
 msgid "Programs (*.exe)|*.exe"
-msgstr "Programs (*.exe)|*.exe"
+msgstr "Programme (*.exe) | * .exe"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1048
 msgid "Choose a resource in the\n"
@@ -19377,21 +19377,21 @@ msgstr "Sie können Ressourcen mit\n"
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1227
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:1231
 msgid "New folder"
-msgstr "New folder"
+msgstr "Neuer Ordner"
 
 #: ../Core/GDCore/IDE/EventsRenderingHelper.cpp:174
 msgid "No conditions"
-msgstr "No conditions"
+msgstr "Keine Bedingung"
 
 #: ../Core/GDCore/IDE/EventsRenderingHelper.cpp:275
 msgid "No actions"
-msgstr "No actions"
+msgstr "Keine Aktionen"
 
 #: ../Core/GDCore/IDE/ExtensionsLoader.cpp:188
 #: ../Core/GDCore/IDE/ExtensionsLoader.cpp:203
 #: ../Core/GDCore/IDE/ExtensionsLoader.cpp:266
 msgid "Extension "
-msgstr "Extension "
+msgstr "Erweiterung "
 
 #: ../Core/GDCore/IDE/ExtensionsLoader.cpp:188
 msgid " could not be loaded.\n"
@@ -19582,24 +19582,24 @@ msgstr "Please use only letters, digits\n"
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1028
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1029
 msgid "Author"
-msgstr "Author"
+msgstr "Autor"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:993
 msgid "Window"
-msgstr "Window"
+msgstr "Fenster"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:996
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1034
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1035
 msgid "Vertical Synchronization"
-msgstr "Vertical Synchronization"
+msgstr "Vertikale Synchronisation"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:997
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1036
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1057
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1058
 msgid "Limit the framerate"
-msgstr "Limit the framerate"
+msgstr "Die Framerate begrenzen"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:998
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1008
@@ -19609,13 +19609,13 @@ msgstr "Limit the framerate"
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1039
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1058
 msgid "Maximum FPS"
-msgstr "Maximum FPS"
+msgstr "Maximale FPS"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:999
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1040
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1041
 msgid "Minimum FPS"
-msgstr "Minimum FPS"
+msgstr "Minimale FPS"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1014
 msgid "Generation"
@@ -19647,11 +19647,11 @@ msgstr "Mac OS executable name"
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:1020
 msgid "C++ features"
-msgstr "C++ features"
+msgstr "C++-features"
 
 #: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:177
 msgid "Smooth the image"
-msgstr "Smooth the image"
+msgstr "Glätten Sie das Bild"
 
 #: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:178
 msgid "Set this to \"Yes\" to set a smooth filter on the image"

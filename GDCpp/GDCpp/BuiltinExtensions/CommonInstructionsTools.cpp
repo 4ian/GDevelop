@@ -6,6 +6,8 @@
 #include "GDCpp/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDCpp/profile.h"
 #include <SFML/Graphics.hpp>
+#include <chrono>
+#include <random>
 #include <sstream>
 
 namespace GDpriv
@@ -14,31 +16,30 @@ namespace GDpriv
 namespace CommonInstructions
 {
 
-/**
- * Private data to initialize randomizer global seed.
- * Original code by Laurent Gomila.
- */
 namespace
 {
-    // Initialize the generator's seed with the current system time
-    // in milliseconds, so that it is always different
-    unsigned int InitializeSeed()
+    /**
+     * Create and initialize the random engine.
+     * If the system provides a undeterministic random_device, it's used to get
+     * a totally random seed for the pseudo-random engine. Otherwise, the time
+     * since epoch is used
+     */
+    std::mt19937 InitializeRandomEngine()
     {
-        unsigned int seed = static_cast<unsigned int>(std::time(NULL));
-        std::srand(seed);
-        return seed;
+        std::random_device randomDevice;
+        return std::mt19937(randomDevice.entropy() > 0 ? randomDevice() : std::chrono::high_resolution_clock::now().time_since_epoch().count());
     }
 
     // Global variable storing the current seed
-    unsigned int globalSeed = InitializeSeed();
+    std::mt19937 randomEngine = InitializeRandomEngine();
 }
 
 double GD_API Random(int end)
 {
     if ( end <= 0 ) return 0;
 
-    int begin = 0;
-    return std::rand() % (end - begin + 1) + begin;
+    std::uniform_int_distribution<int> randomDist(0, end);
+    return randomDist(randomEngine);
 }
 
 bool GD_API LogicalNegation(bool param)

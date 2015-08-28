@@ -10,10 +10,10 @@
     #include <wx/intl.h>
     #include "GDCore/String.h"
     //Create a new macro to return UTF8 gd::String from a translation
- 	  #if defined(_)
+ 	#if defined(_)
         #undef _
     #endif
-    #define _(s) gd::String(wxGetTranslation(u8##s))
+    #define _(s) gd::String(wxGetTranslation(wxString::FromUTF8(u8##s)))
 #else
     //Create a new macro to return UTF8 gd::String from a translation
  	  #if defined(_)

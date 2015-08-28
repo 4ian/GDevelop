@@ -14,6 +14,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/mimetype.h> // mimetype support
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include <string>
 #include <vector>
@@ -218,7 +219,8 @@ Credits::Credits(wxWindow* parent)
     gd::String status = gd::VersionWrapper::Status();
     gd::String version ="GDevelop " + nbversion + " " + status + " (UTF8)";
 	StaticText1->SetLabel(version);
-	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributors: (No special order)")+"</h5>\n"
+	HtmlWindow1->SetPage(gd::String("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head>\n<body>\n<h5>"
+					  +_("Contributors: (No special order)")+"</h5>\n"
                       +"<br>"
                       +_("Fran\303\247ois Dumortier : GDevelop logo design and website conception.")+"<br>"
                       +"( <a href=\"http://www.fdumortier.com\">http://www.fdumortier.com</a> )"+"<br>"
@@ -255,7 +257,7 @@ Credits::Credits(wxWindow* parent)
                       +_("Some images of examples came from images pack by Ari Feldman")+"<br>"
                       +"( <a href=\"http://www.widgetworx.com/widgetworx/portfolio/spritelib.html\">http://www.widgetworx.com/widgetworx/portfolio/spritelib.html</a> )"+"<br>"
                       +"<br>"
-                      +"\n<center><h5>"+_("Thanks to all the community and users of GDevelop")+"</h5><br></center>\n</body>\n</html>");
+                      +"\n<center><h5>"+_("Thanks to all the community and users of GDevelop")+"</h5><br></center>\n</body>\n</html>"));
 
 	FlexGridSizer3->Layout();
 }

@@ -220,7 +220,7 @@ Credits::Credits(wxWindow* parent)
 	StaticText1->SetLabel(version);
 	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributors: (No special order)")+"</h5>\n"
                       +"<br>"
-                      +_("Fran�ois Dumortier : GDevelop logo design and website conception.")+"<br>"
+                      +_("Fran\303\247ois Dumortier : GDevelop logo design and website conception.")+"<br>"
                       +"( <a href=\"http://www.fdumortier.com\">http://www.fdumortier.com</a> )"+"<br>"
                       +"<br>"
                       +_("Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension.")+"<br>"
@@ -240,7 +240,7 @@ Credits::Credits(wxWindow* parent)
                       +"<br>"
                       +_("Thomas Flecy: Original Sound object extension")+"<br>"
                       +"<br>"
-                      +_("Fernando Jos� Mart�nez L�pez : Spanish translation of the tutorial")+"<br>"
+                      +_("Fernando Jos\303\251 Mart\303\255nez L\303\263pez : Spanish translation of the tutorial")+"<br>"
                       +"<br>"
                       +_("conceptgame : Indiegogo super contributor. Thanks!")+"<br>"
                       +"<br>"

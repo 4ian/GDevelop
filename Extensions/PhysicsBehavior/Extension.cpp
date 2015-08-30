@@ -215,7 +215,7 @@ public:
             aut.AddAction("ApplyImpulseUsingPolarCoordinates",
                            _("Apply an impulse (angle)"),
                            _("Apply an impulse to an object, using a angle and a length as coordinates."),
-                           _("Apply to _PARAM0_ impulse _PARAM3_ with angle: _PARAM2_�"),
+                           _("Apply to _PARAM0_ impulse _PARAM3_ with angle: _PARAM2_\302\260"), //\302\260 <=> DEGREE SIGN
                            _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")

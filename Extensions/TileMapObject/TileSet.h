@@ -12,6 +12,7 @@ This project is released under the MIT License.
 #include <wx/bitmap.h>
 #endif
 
+#include <map>
 #include <string>
 #include <vector>
 #include <SFML/System/Vector2.hpp>
@@ -47,8 +48,10 @@ struct TileHitbox
         BottomLeft ///< In the bottom-left hand corner
     };
 
-    bool collidable; ///< True to make the tile collidable
     Polygon2d hitbox; ///< The polygonal hitbox
+
+    bool operator==(const TileHitbox &other) const;
+    bool operator!=(const TileHitbox &other) const;
 
     /**
      * Generates a default hitbox (rectangle of the size of the tile).
@@ -98,11 +101,10 @@ public:
      */
     ///\{
     /**
-     * Returns true if the tileset hasn't been loaded and generated from a picture.
-     * \warning Can return true even if the loaded texture doesn't correspond to the TileSet::textureName or
-     * if the TileSet::tileSize or TileSet::tileSpacing have been modified as the object is not in a invalid state.
+     * Returns true if the tileset hasn't been loaded (texture not loaded) or have an invalid tile size.
+     * \warning Can return true even if the loaded texture doesn't correspond to the TileSet::textureName
      */
-    bool IsDirty() const {return m_dirty;};
+    bool IsDirty() const {return (!m_tilesetTexture || tileSize.x == 0.f || tileSize.y == 0.f);}
 
     /**
      * Load the image for the tilemap. Need to be called when using the TileSet for the first or after a texture change.
@@ -117,13 +119,6 @@ public:
      * in the scene preview or in a release game.
      */
     void LoadResources(RuntimeGame &game);
-
-    /**
-     * Generate the tile texture coords and temporary bitmaps for the IDE.
-     * Need to be called after a change in TileSet::textureName (in that case after TileSet::LoadResources) or after a change in the TileSet::tileSize or TileSet::tileSpacing.
-     * \sa TileSet::LoadResources
-     */
-    void Generate();
     ///\}
 
     /**
@@ -167,15 +162,29 @@ public:
      */
     void ResetHitboxes();
 
+    bool IsTileCollidable(int id) const;
+
+    void SetTileCollidable(int id, bool collidable);
+
     /**
-     * \return the hitbox of a tile.
+     * \return a reference to the hitbox of a tile.
+     * Allows the edition of the hitbox.
      */
-    TileHitbox& GetTileHitbox(int id);
+    TileHitbox& GetTileHitboxRef(int id);
 
     /**
      * \return the hitbox of a tile.
      */
-    const TileHitbox& GetTileHitbox(int id) const;
+    TileHitbox GetTileHitbox(int id) const;
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Strips useless hitboxes (the default rectangle hitbox) from the hitboxes data of the tileset.
+     * The tileset keeps only non-default hitboxes in memory (the default hitbox for tiles is a rectangle with the same size as tiles).
+     * This method checks if the tileset stores default hitbox and remove them as they are useless.
+     */
+    void StripUselessHitboxes();
+    #endif
     ///\}
 
     /**
@@ -185,12 +194,17 @@ public:
     /**
      * Return the tile ID according to its position.
      */
-    int GetTileIDFromPosition(sf::Vector2f position);
+    int GetTileIDFromPosition(sf::Vector2f position) const;
 
     /**
      * Return the tile ID according to its row and column.
      */
-    int GetTileIDFromCell(int col, int row);
+    int GetTileIDFromCell(int col, int row) const;
+
+    /**
+     * Return the tile cell (col, row) from its ID.
+     */
+    sf::Vector2u GetTileCellFromID(int id) const;
 
     /**
      * \return the number of tiles of the tileset.
@@ -230,16 +244,14 @@ public:
 private:
 
     std::shared_ptr<SFMLTextureWrapper> m_tilesetTexture; ///< The tileset texture (SFML)
-    std::vector<TileTextureCoords> m_coords; ///< The tileset coords
 
-    std::vector<TileHitbox> m_hitboxes;
+    std::vector<bool> m_collidable;
+    std::map<int, TileHitbox> m_hitboxes;
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     wxBitmap m_tilesetBitmap; ///< The tileset texture
     static wxBitmap m_invalidBitmap;
     #endif
-
-    bool m_dirty;
 
 };
 

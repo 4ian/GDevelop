@@ -22,10 +22,30 @@ This project is released under the MIT License.
 wxBitmap TileSet::m_invalidBitmap = wxBitmap();
 #endif
 
+bool TileHitbox::operator==(const TileHitbox &other) const
+{
+    if(hitbox.vertices.size() == other.hitbox.vertices.size())
+    {
+        for(unsigned int i = 0; i < hitbox.vertices.size(); ++i)
+        {
+            if( fabs( hitbox.vertices[i].x - other.hitbox.vertices[i].x ) > 0.01f ||
+                fabs( hitbox.vertices[i].y - other.hitbox.vertices[i].y ) > 0.01f )
+                return false;
+        }
+        return true;
+    }
+    else
+        return false;
+}
+
+bool TileHitbox::operator!=(const TileHitbox &other) const
+{
+    return !(operator==(other));
+}
+
 TileHitbox TileHitbox::Rectangle(sf::Vector2f tileSize)
 {
     TileHitbox hitbox;
-    hitbox.collidable = true;
     hitbox.hitbox = Polygon2d::CreateRectangle(tileSize.x, tileSize.y);
     hitbox.hitbox.Move(tileSize.x/2.f, tileSize.y/2.f);
 
@@ -35,7 +55,6 @@ TileHitbox TileHitbox::Rectangle(sf::Vector2f tileSize)
 TileHitbox TileHitbox::Triangle(sf::Vector2f tileSize, TriangleOrientation orientation)
 {
     TileHitbox hitbox;
-    hitbox.collidable = true;
 
     if(orientation != TileHitbox::BottomRight)
         hitbox.hitbox.vertices.push_back(sf::Vector2f(0,0));
@@ -54,8 +73,6 @@ TileHitbox TileHitbox::Triangle(sf::Vector2f tileSize, TriangleOrientation orien
 
 void TileHitbox::SerializeTo(gd::SerializerElement &element) const
 {
-    element.SetAttribute("collidable", collidable);
-
     //Serialize the polygon
     gd::String polygonStr;
     for(std::vector<sf::Vector2f>::const_iterator vertexIt = hitbox.vertices.begin(); vertexIt != hitbox.vertices.end(); vertexIt++)
@@ -70,8 +87,6 @@ void TileHitbox::SerializeTo(gd::SerializerElement &element) const
 
 void TileHitbox::UnserializeFrom(const gd::SerializerElement &element, sf::Vector2f defaultTileSize)
 {
-    collidable = element.GetBoolAttribute("collidable", true);
-
     hitbox.vertices.clear();
 
     gd::String defaultPolygonStr = "0;0|"
@@ -89,7 +104,7 @@ void TileHitbox::UnserializeFrom(const gd::SerializerElement &element, sf::Vecto
     }
 }
 
-TileSet::TileSet() : textureName(), tileSize(24, 24), tileSpacing(0, 0), m_tilesetTexture(), m_dirty(true)
+TileSet::TileSet() : textureName(), tileSize(24, 24), tileSpacing(0, 0), m_tilesetTexture()
 {
 
 }
@@ -101,14 +116,11 @@ TileSet::~TileSet()
 
 void TileSet::LoadResources(RuntimeGame &game)
 {
-    m_dirty = true;
     m_tilesetTexture = game.GetImageManager()->GetSFMLTexture(textureName);
 }
 
 void TileSet::LoadResources(gd::Project &game)
 {
-    m_dirty = true;
-
     if(game.GetResourcesManager().HasResource(textureName))
     {
         gd::ImageResource & image = dynamic_cast<gd::ImageResource&>(game.GetResourcesManager().GetResource(textureName));
@@ -125,10 +137,12 @@ void TileSet::LoadResources(gd::Project &game)
         wxSetWorkingDirectory(oldWorkingDir);
         if ( wxFileExists(image.GetAbsoluteFile(game)) )
         {
-            wxBitmap bmp( image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
-            m_tilesetBitmap = bmp;
+            m_tilesetBitmap.LoadFile(image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
         }
 #endif
+
+        //Readjust the m_collidable std::vector according to the number of tiles
+        m_collidable.resize(GetTilesCount(), true);
     }
     else
     {
@@ -136,60 +150,18 @@ void TileSet::LoadResources(gd::Project &game)
     }
 }
 
-void TileSet::Generate()
-{
-    m_dirty = true;
-
-    if (!m_tilesetTexture)
-        return;
-
-    std::cout << "Generating texture coords..." << std::endl;
-
-    //Calculates the number of rows and columns in the tileset
-    int columns(0), rows(0);
-    if (tileSize.x == 0 || tileSize.y == 0)
-        return;
-    columns = (m_tilesetTexture->texture.getSize().x + tileSpacing.x) / (tileSize.x + tileSpacing.x);
-    rows = (m_tilesetTexture->texture.getSize().y + tileSpacing.y) / (tileSize.y + tileSpacing.y);
-
-    //Generate the TextureCoords and the sub-bitmaps (only in IDE)
-    m_coords.clear();
-    for(int row = 0; row < rows; row++)
-    {
-        for(int col = 0; col < columns; col++)
-        {
-            //TileTextureCoords
-            TileTextureCoords tileCoords;
-            tileCoords.topLeft = sf::Vector2f(col * (tileSize.x + tileSpacing.x),
-                                              row * (tileSize.y + tileSpacing.y));
-            tileCoords.topRight = sf::Vector2f(col * (tileSize.x + tileSpacing.x) + tileSize.x,
-                                               row * (tileSize.y + tileSpacing.y));
-            tileCoords.bottomRight = sf::Vector2f(col * (tileSize.x + tileSpacing.x) + tileSize.x,
-                                                  row * (tileSize.y + tileSpacing.y) + tileSize.y);
-            tileCoords.bottomLeft = sf::Vector2f(col * (tileSize.x + tileSpacing.x),
-                                                 row * (tileSize.y + tileSpacing.y) + tileSize.y);
-            m_coords.push_back(tileCoords);
-        }
-    }
-
-    //Puts the default hitbox for new tiles (if there are more tiles than before)
-    if (GetTilesCount() > m_hitboxes.size())
-        m_hitboxes.insert(m_hitboxes.end(), (GetTilesCount()-m_hitboxes.size()), TileHitbox::Rectangle(tileSize));
-
-    std::cout << "OK" << std::endl;
-    m_dirty = false;
-}
-
 void TileSet::ResetHitboxes()
 {
+    m_collidable.clear();
     m_hitboxes.clear();
-    if (m_dirty)
+
+    if (IsDirty())
         return;
 
-    m_hitboxes.assign(GetTilesCount(), TileHitbox::Rectangle(tileSize));
+    m_collidable.assign(GetTilesCount(), true);
 }
 
-int TileSet::GetTileIDFromPosition(sf::Vector2f position)
+int TileSet::GetTileIDFromPosition(sf::Vector2f position) const
 {
     int columns = GetColumnsCount();
     int rows = GetRowsCount();
@@ -200,12 +172,19 @@ int TileSet::GetTileIDFromPosition(sf::Vector2f position)
     return (tileColumn * columns + tileRow);
 }
 
-int TileSet::GetTileIDFromCell(int col, int row)
+int TileSet::GetTileIDFromCell(int col, int row) const
 {
     int columns = GetColumnsCount();
     int rows = GetRowsCount();
 
     return (row * columns + col);
+}
+
+sf::Vector2u TileSet::GetTileCellFromID(int id) const
+{
+    int columns = GetColumnsCount();
+    int rows = GetRowsCount();
+    return sf::Vector2u(id - (id / columns) * columns, id / columns);
 }
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
@@ -227,7 +206,19 @@ const sf::Texture& TileSet::GetTexture() const
 
 TileTextureCoords TileSet::GetTileTextureCoords(int id) const
 {
-    return m_coords.at(id);
+    //Calculate the tile coords
+    sf::Vector2u cell = GetTileCellFromID(id);
+
+    TileTextureCoords tileCoords;
+    tileCoords.topLeft = sf::Vector2f(cell.x * (tileSize.x + tileSpacing.x),
+                                      cell.y * (tileSize.y + tileSpacing.y));
+    tileCoords.topRight = sf::Vector2f(cell.x * (tileSize.x + tileSpacing.x) + tileSize.x,
+                                       cell.y * (tileSize.y + tileSpacing.y));
+    tileCoords.bottomRight = sf::Vector2f(cell.x * (tileSize.x + tileSpacing.x) + tileSize.x,
+                                          cell.y * (tileSize.y + tileSpacing.y) + tileSize.y);
+    tileCoords.bottomLeft = sf::Vector2f(cell.x * (tileSize.x + tileSpacing.x),
+                                         cell.y * (tileSize.y + tileSpacing.y) + tileSize.y);
+    return tileCoords;
 }
 
 sf::Vector2u TileSet::GetSize() const
@@ -238,14 +229,43 @@ sf::Vector2u TileSet::GetSize() const
     return m_tilesetTexture->texture.getSize();
 }
 
-TileHitbox& TileSet::GetTileHitbox(int id)
+bool TileSet::IsTileCollidable(int id) const
 {
+    return m_collidable[id];
+}
+
+void TileSet::SetTileCollidable(int id, bool collidable)
+{
+    m_collidable[id] = collidable;
+}
+
+#if defined(GD_IDE_ONLY)
+void TileSet::StripUselessHitboxes()
+{
+    auto it = m_hitboxes.begin();
+    while(it != m_hitboxes.end())
+    {
+        if( (it->second) == TileHitbox::Rectangle(tileSize) ) //This is an useless hitbox, remove it.
+            it = m_hitboxes.erase(it);
+        else
+            ++it;
+    }
+}
+#endif
+
+TileHitbox& TileSet::GetTileHitboxRef(int id)
+{
+    if(m_hitboxes.count(id) == 0)
+        m_hitboxes[id] = TileHitbox::Rectangle(tileSize);
     return m_hitboxes[id];
 }
 
-const TileHitbox& TileSet::GetTileHitbox(int id) const
+TileHitbox TileSet::GetTileHitbox(int id) const
 {
-    return m_hitboxes.at(id);
+    if(m_hitboxes.count(id) == 0)
+        return TileHitbox::Rectangle(tileSize);
+    else
+        return m_hitboxes.at(id);
 }
 
 int TileSet::GetColumnsCount() const
@@ -261,26 +281,35 @@ int TileSet::GetRowsCount() const
 #if defined(GD_IDE_ONLY)
 void TileSet::SerializeTo(gd::SerializerElement &element) const
 {
+    element.SetAttribute("version", 2);
     element.SetAttribute("textureName", textureName);
     element.SetAttribute("tileSizeX", tileSize.x);
     element.SetAttribute("tileSizeY", tileSize.y);
     element.SetAttribute("tileSpacingX", tileSpacing.x);
     element.SetAttribute("tileSpacingY", tileSpacing.y);
 
-    gd::SerializerElement &tilesElem = element.AddChild("hitboxes");
+    //Save if it is collidable or not
+    gd::SerializerElement &collidableElem = element.AddChild("collidable");
+    for(auto it = m_collidable.begin(); it != m_collidable.end(); ++it)
+    {
+        gd::SerializerElement &tileElem = collidableElem.AddChild("tile");
+        tileElem.SetAttribute("collidable", *it);
+    }
 
-    //Save polygons
-    for(std::vector<TileHitbox>::const_iterator it = m_hitboxes.begin(); it != m_hitboxes.end(); it++)
+    //Save polygons hitboxes
+    gd::SerializerElement &tilesElem = element.AddChild("hitboxes");
+    for(auto it = m_hitboxes.begin(); it != m_hitboxes.end(); ++it)
     {
         gd::SerializerElement &hitboxElem = tilesElem.AddChild("tileHitbox");
-        it->SerializeTo(hitboxElem);
+        hitboxElem.SetAttribute("tileId", it->first);
+        it->second.SerializeTo(hitboxElem);
     }
 }
 #endif
 
 void TileSet::UnserializeFrom(const gd::SerializerElement &element)
 {
-    ResetHitboxes();
+    int serializationVersion = element.GetIntAttribute("version", 1);
 
     textureName = element.GetStringAttribute("textureName", "");
     tileSize.x = element.GetIntAttribute("tileSizeX", 32);
@@ -288,17 +317,39 @@ void TileSet::UnserializeFrom(const gd::SerializerElement &element)
     tileSpacing.x = element.GetIntAttribute("tileSpacingX", 0);
     tileSpacing.y = element.GetIntAttribute("tileSpacingY", 0);
 
-    if (element.HasChild("hitboxes"))
+    ResetHitboxes();
+    m_collidable.clear();
+
+    if(serializationVersion == 1)
     {
-        gd::SerializerElement &tilesElem = element.GetChild("hitboxes");
-        tilesElem.ConsiderAsArrayOf("tileHitbox");
-        for(int i = 0; i < tilesElem.GetChildrenCount("tileHitbox"); i++)
+        if(element.HasChild("hitboxes"))
         {
-            TileHitbox newHitbox;
-            newHitbox.UnserializeFrom(tilesElem.GetChild(i), tileSize);
-            m_hitboxes.push_back(newHitbox);
+            gd::SerializerElement &tilesElem = element.GetChild("hitboxes");
+            tilesElem.ConsiderAsArrayOf("tileHitbox");
+            for(int i = 0; i < tilesElem.GetChildrenCount("tileHitbox"); i++)
+            {
+                m_collidable.push_back(tilesElem.GetChild(i).GetBoolAttribute("collidable", true));
+                TileHitbox newHitbox;
+                newHitbox.UnserializeFrom(tilesElem.GetChild(i), tileSize);
+                if(newHitbox != TileHitbox::Rectangle(tileSize))
+                    m_hitboxes[i] = newHitbox;
+            }
         }
     }
+    else if(serializationVersion == 2)
+    {
+        gd::SerializerElement &collidableElem = element.GetChild("collidable");
+        collidableElem.ConsiderAsArrayOf("tile");
+        for(int i = 0; i < collidableElem.GetChildrenCount("tile"); i++)
+        {
+            m_collidable.push_back(collidableElem.GetChild(i).GetBoolAttribute("collidable", true));
+        }
 
-    m_dirty = true;
+        gd::SerializerElement &hitboxesElem = element.GetChild("hitboxes");
+        hitboxesElem.ConsiderAsArrayOf("tileHitbox");
+        for(int i = 0; i < hitboxesElem.GetChildrenCount("tileHitbox"); i++)
+        {
+            m_hitboxes[hitboxesElem.GetChild(i).GetIntAttribute("tileId", -1)].UnserializeFrom(hitboxesElem.GetChild(i), tileSize);
+        }
+    }
 }

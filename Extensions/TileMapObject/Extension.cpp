@@ -164,7 +164,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddAction("ChangeTexture",
                    _("Change the tileset texture"),
-                   _("Change the tileset texture."),
+                   _("Change the tileset texture.\nNote: if the texture has a different size, it may produce strange results such as texture offset..."),
                    _("Change the tileset texture of _PARAM0_ to _PARAM1_"),
                    _("Tileset"),
                    "CppPlatform/Extensions/TileMapIcon24.png",

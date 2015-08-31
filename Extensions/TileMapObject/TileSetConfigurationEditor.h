@@ -28,7 +28,7 @@ private:
 	TileSet previewTileSet;
 	ResourcesEditor *resourcesEditorPnl;
 
-	void UpdatePreviewTileSetPanel();
+	void UpdatePreviewTileSetPanel(bool newTexture = false);
 
 protected:
     virtual void OnHelpButtonClicked(wxHyperlinkEvent& event);

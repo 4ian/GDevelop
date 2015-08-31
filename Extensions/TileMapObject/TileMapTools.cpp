@@ -87,7 +87,7 @@ std::vector<Polygon2d> GenerateHitboxes(TileSet &tileSet, TileMap &tileMap)
                 //Note : a hitbox is also added for empty/non-collidable tiles to ease the hitbox update when changing a tile
                 Polygon2d newPolygon;
 
-                if(tileMap.GetTile(layer, col, row) != -1 && tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).collidable)
+                if(tileMap.GetTile(layer, col, row) != -1 && tileSet.IsTileCollidable(tileMap.GetTile(layer, col, row)))
                 {
                     newPolygon = tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).hitbox;
                 }
@@ -136,7 +136,7 @@ void UpdateHitboxes(std::vector<Polygon2d> &polygons, sf::Vector2f position, int
     const int tileWidth = tileSet.tileSize.x;
     const int tileHeight = tileSet.tileSize.y;
 
-    if(tileMap.GetTile(layer, col, row) != -1 && tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).collidable)
+    if(tileMap.GetTile(layer, col, row) != -1 && tileSet.IsTileCollidable(tileMap.GetTile(layer, col, row)))
     {
         polygons[vertexPos] = tileSet.GetTileHitbox(tileMap.GetTile(layer, col, row)).hitbox;
     }

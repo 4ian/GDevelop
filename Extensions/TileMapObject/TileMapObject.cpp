@@ -90,7 +90,6 @@ void TileMapObject::DoSerializeTo(gd::SerializerElement & element) const
 void TileMapObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
     tileSet.Get().LoadResources(project);
-    tileSet.Get().Generate();
     vertexArray = TileMapExtension::GenerateVertexArray(tileSet.Get(), tileMap.Get());
 }
 
@@ -156,4 +155,3 @@ gd::Object * CreateTileMapObject(gd::String name)
 {
     return new TileMapObject(name);
 }
-

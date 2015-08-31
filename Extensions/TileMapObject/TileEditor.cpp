@@ -62,8 +62,9 @@ void TileEditor::OnTileSetSelectionChanged(TileSelectionEvent &event)
     if(!m_tileset || m_tileset->IsDirty())
         return;
 
+    //Update the editor with the new tile
     m_currentTile = event.GetSelectedTile();
-    m_mainToolbar->ToggleTool(COLLIDABLE_TOOL_ID, m_tileset->GetTileHitbox(m_currentTile).collidable);
+    m_mainToolbar->ToggleTool(COLLIDABLE_TOOL_ID, m_tileset->IsTileCollidable(m_currentTile));
     UpdateScrollbars();
     m_tilePreviewPanel->Refresh();
 
@@ -150,7 +151,7 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
 
 void TileEditor::OnCollidableToolToggled(wxCommandEvent& event)
 {
-    m_tileset->GetTileHitbox(m_currentTile).collidable = event.IsChecked();
+    m_tileset->SetTileCollidable(m_currentTile, event.IsChecked());
 }
 
 void TileEditor::OnPredefinedShapeToolClicked(wxCommandEvent& event)
@@ -167,33 +168,33 @@ void TileEditor::OnPredefinedShapeMenuItemClicked(wxCommandEvent& event)
     switch(event.GetId())
     {
         case RECTANGLE_SHAPE_TOOL_ID:
-            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(m_tileset->tileSize);
+            m_tileset->GetTileHitboxRef(m_currentTile) = TileHitbox::Rectangle(m_tileset->tileSize);
             break;
         case TRIANGLE_TL_SHAPE_TOOL_ID:
-            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::TopLeft);
+            m_tileset->GetTileHitboxRef(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::TopLeft);
             break;
         case TRIANGLE_TR_SHAPE_TOOL_ID:
-            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::TopRight);
+            m_tileset->GetTileHitboxRef(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::TopRight);
             break;
         case TRIANGLE_BR_SHAPE_TOOL_ID:
-            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::BottomRight);
+            m_tileset->GetTileHitboxRef(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::BottomRight);
             break;
         case TRIANGLE_BL_SHAPE_TOOL_ID:
-            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::BottomLeft);
+            m_tileset->GetTileHitboxRef(m_currentTile) = TileHitbox::Triangle(m_tileset->tileSize, TileHitbox::BottomLeft);
             break;
         case SEMIRECT_T_SHAPE_TOOL_ID:
-            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x, m_tileset->tileSize.y/2.f));
+            m_tileset->GetTileHitboxRef(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x, m_tileset->tileSize.y/2.f));
             break;
         case SEMIRECT_R_SHAPE_TOOL_ID:
-            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x/2.f, m_tileset->tileSize.y));
-            m_tileset->GetTileHitbox(m_currentTile).hitbox.Move(m_tileset->tileSize.x/2.f, 0);
+            m_tileset->GetTileHitboxRef(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x/2.f, m_tileset->tileSize.y));
+            m_tileset->GetTileHitboxRef(m_currentTile).hitbox.Move(m_tileset->tileSize.x/2.f, 0);
             break;
         case SEMIRECT_B_SHAPE_TOOL_ID:
-            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x, m_tileset->tileSize.y/2.f));
-            m_tileset->GetTileHitbox(m_currentTile).hitbox.Move(0, m_tileset->tileSize.y/2.f);
+            m_tileset->GetTileHitboxRef(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x, m_tileset->tileSize.y/2.f));
+            m_tileset->GetTileHitboxRef(m_currentTile).hitbox.Move(0, m_tileset->tileSize.y/2.f);
             break;
         case SEMIRECT_L_SHAPE_TOOL_ID:
-            m_tileset->GetTileHitbox(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x/2.f, m_tileset->tileSize.y));
+            m_tileset->GetTileHitboxRef(m_currentTile) = TileHitbox::Rectangle(sf::Vector2f(m_tileset->tileSize.x/2.f, m_tileset->tileSize.y));
             break;
     }
 
@@ -207,7 +208,7 @@ void TileEditor::OnAddPointToolClicked(wxCommandEvent& event)
     if(!m_tileset || m_tileset->IsDirty())
         return;
 
-    Polygon2d &mask = m_tileset->GetTileHitbox(m_currentTile).hitbox;
+    Polygon2d &mask = m_tileset->GetTileHitboxRef(m_currentTile).hitbox;
 
     int selectedPoint = m_polygonHelper.GetSelectedPoint();
     if(selectedPoint >= mask.vertices.size() || selectedPoint < 0)
@@ -234,7 +235,7 @@ void TileEditor::OnEditPointToolClicked(wxCommandEvent& event)
     if(!m_tileset || m_tileset->IsDirty())
         return;
 
-    Polygon2d &mask = m_tileset->GetTileHitbox(m_currentTile).hitbox;
+    Polygon2d &mask = m_tileset->GetTileHitboxRef(m_currentTile).hitbox;
     int selectedPoint = m_polygonHelper.GetSelectedPoint();
     if(selectedPoint >= mask.vertices.size() || selectedPoint < 0)
         return;
@@ -253,7 +254,7 @@ void TileEditor::OnRemovePointToolClicked(wxCommandEvent& event)
     if(!m_tileset || m_tileset->IsDirty())
         return;
 
-    Polygon2d &mask = m_tileset->GetTileHitbox(m_currentTile).hitbox;
+    Polygon2d &mask = m_tileset->GetTileHitboxRef(m_currentTile).hitbox;
     if(mask.vertices.size() <= 3)
         return;
 
@@ -274,9 +275,9 @@ void TileEditor::OnPreviewLeftDown(wxMouseEvent& event)
     event.SetX(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).x);
     event.SetY(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).y);
 
-    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);
+    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitboxRef(m_currentTile).hitbox);
     m_polygonHelper.OnMouseLeftDown(polygonList, event, wxPoint(m_xOffset, m_yOffset));
-    m_tileset->GetTileHitbox(m_currentTile).hitbox = polygonList[0];
+    m_tileset->GetTileHitboxRef(m_currentTile).hitbox = polygonList[0];
 
     m_tilePreviewPanel->Refresh();
 }
@@ -299,9 +300,9 @@ void TileEditor::OnPreviewMotion(wxMouseEvent& event)
     event.SetX(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).x);
     event.SetY(m_tilePreviewPanel->CalcUnscrolledPosition(wxPoint(event.GetX(), event.GetY())).y);
 
-    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitbox(m_currentTile).hitbox);
+    std::vector<Polygon2d> polygonList(1, m_tileset->GetTileHitboxRef(m_currentTile).hitbox);
     m_polygonHelper.OnMouseMove(polygonList, event, wxPoint(m_xOffset, m_yOffset), 0.f, 0.f, m_tileset->tileSize.x, m_tileset->tileSize.y);
-    m_tileset->GetTileHitbox(m_currentTile).hitbox = polygonList[0];
+    m_tileset->GetTileHitboxRef(m_currentTile).hitbox = polygonList[0];
 
     m_tilePreviewPanel->Refresh();
 }

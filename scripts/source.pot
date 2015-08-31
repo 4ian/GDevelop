@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 23:11+0200\n"
+"POT-Creation-Date: 2015-08-30 18:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -327,7 +327,7 @@ msgid "Display help about this window"
 msgstr ""
 
 #: ../IDE/ChoiceFile.cpp:85 ../IDE/ChoiceJoyAxis.cpp:80
-#: ../IDE/ChoixBouton.cpp:74 ../IDE/Credits.cpp:193
+#: ../IDE/ChoixBouton.cpp:74 ../IDE/Credits.cpp:194
 #: ../IDE/EditObjectGroup.cpp:97 ../IDE/EditPropScene.cpp:145
 #: ../IDE/GeneratePassword.cpp:79 ../IDE/InstructionSelectorDialog.cpp:173
 #: ../IDE/Preferences.cpp:575 ../IDE/SigneModification.cpp:50
@@ -678,51 +678,51 @@ msgstr ""
 msgid "Editor Preferences"
 msgstr ""
 
-#: ../IDE/Credits.cpp:79
+#: ../IDE/Credits.cpp:80
 msgid "About GDevelop"
 msgstr ""
 
-#: ../IDE/Credits.cpp:92 ../IDE/MainFrame.cpp:142
+#: ../IDE/Credits.cpp:93 ../IDE/MainFrame.cpp:142
 msgid "GDevelop"
 msgstr ""
 
-#: ../IDE/Credits.cpp:97
+#: ../IDE/Credits.cpp:98
 msgid "was created by"
 msgstr ""
 
-#: ../IDE/Credits.cpp:100
+#: ../IDE/Credits.cpp:101
 msgid "Florian \"4ian\" Rival"
 msgstr ""
 
-#: ../IDE/Credits.cpp:100
+#: ../IDE/Credits.cpp:101
 msgid "http://www.florianrival.com"
 msgstr ""
 
-#: ../IDE/Credits.cpp:108
+#: ../IDE/Credits.cpp:109
 msgid "Contribute and get help on:"
 msgstr ""
 
-#: ../IDE/Credits.cpp:110
+#: ../IDE/Credits.cpp:111
 msgid "www.compilgames.net"
 msgstr ""
 
-#: ../IDE/Credits.cpp:110
+#: ../IDE/Credits.cpp:111
 msgid "http://www.compilgames.net"
 msgstr ""
 
-#: ../IDE/Credits.cpp:117
+#: ../IDE/Credits.cpp:118
 msgid "You like GDevelop?"
 msgstr ""
 
-#: ../IDE/Credits.cpp:119
+#: ../IDE/Credits.cpp:120
 msgid "You can make a donation to the author."
 msgstr ""
 
-#: ../IDE/Credits.cpp:119
+#: ../IDE/Credits.cpp:120
 msgid "http://www.compilgames.net/donate.php?utm&source=GDutm&medium=CreditsLinkutm&campaign=paywhatyouwant"
 msgstr ""
 
-#: ../IDE/Credits.cpp:129
+#: ../IDE/Credits.cpp:130
 msgid ""
 "GDevelop is an open source software:\n"
 "\n"
@@ -735,128 +735,128 @@ msgid ""
 "Games exported with GDevelop are based on the native and/or HTML5 platforms: these platforms are distributed under the MIT license, so that you can distribute, sell or do anything with the games you created with GDevelop. In particular, you are not forced to make your game open source."
 msgstr ""
 
-#: ../IDE/Credits.cpp:147
+#: ../IDE/Credits.cpp:148
 msgid "Programmed in C++, compiled with TDM-GCC, written with Sublime Text"
 msgstr ""
 
-#: ../IDE/Credits.cpp:162
+#: ../IDE/Credits.cpp:163
 msgid "Use SFML, Boost, wxWidgets and TinyXml libraries."
 msgstr ""
 
-#: ../IDE/Credits.cpp:175
+#: ../IDE/Credits.cpp:176
 msgid "The Web platform is written in Javascript and uses Pixi.js"
 msgstr ""
 
-#: ../IDE/Credits.cpp:188
+#: ../IDE/Credits.cpp:189
 msgid "About"
 msgstr ""
 
-#: ../IDE/Credits.cpp:189
+#: ../IDE/Credits.cpp:190
 msgid "Licence"
 msgstr ""
 
-#: ../IDE/Credits.cpp:190
+#: ../IDE/Credits.cpp:191
 msgid "Thanks"
 msgstr ""
 
-#: ../IDE/Credits.cpp:191
+#: ../IDE/Credits.cpp:192
 msgid "Used technologies"
 msgstr ""
 
-#: ../IDE/Credits.cpp:221
+#: ../IDE/Credits.cpp:223
 msgid "Contributors: (No special order)"
 msgstr ""
 
-#: ../IDE/Credits.cpp:223
-msgid "Fran�ois Dumortier : GDevelop logo design and website conception."
+#: ../IDE/Credits.cpp:225
+msgid "François Dumortier : GDevelop logo design and website conception."
 msgstr ""
 
-#: ../IDE/Credits.cpp:226
+#: ../IDE/Credits.cpp:228
 msgid "Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension."
 msgstr ""
 
-#: ../IDE/Credits.cpp:229
+#: ../IDE/Credits.cpp:231
 msgid "Constantine Shvetsov: Awesome design of icons"
 msgstr ""
 
-#: ../IDE/Credits.cpp:231
+#: ../IDE/Credits.cpp:233
 msgid "Airvikar: Russian translation"
 msgstr ""
 
-#: ../IDE/Credits.cpp:234
+#: ../IDE/Credits.cpp:236
 msgid "Franco Maciel: Spanish translation"
 msgstr ""
 
-#: ../IDE/Credits.cpp:236
+#: ../IDE/Credits.cpp:238
 msgid "MillionthVector : Graphics of various examples."
 msgstr ""
 
-#: ../IDE/Credits.cpp:239
+#: ../IDE/Credits.cpp:241
 msgid "Diego Schiavon : English translation of the tutorial and Indiegogo Ubuntu contributor"
 msgstr ""
 
-#: ../IDE/Credits.cpp:241
+#: ../IDE/Credits.cpp:243
 msgid "Thomas Flecy: Original Sound object extension"
 msgstr ""
 
-#: ../IDE/Credits.cpp:243
-msgid "Fernando Jos� Mart�nez L�pez : Spanish translation of the tutorial"
-msgstr ""
-
 #: ../IDE/Credits.cpp:245
-msgid "conceptgame : Indiegogo super contributor. Thanks!"
+msgid "Fernando José Martínez López : Spanish translation of the tutorial"
 msgstr ""
 
 #: ../IDE/Credits.cpp:247
-msgid "Images and other icons:"
+msgid "conceptgame : Indiegogo super contributor. Thanks!"
 msgstr ""
 
 #: ../IDE/Credits.cpp:249
-msgid "Some icons came from Crystal Project Icons by Everaldo Coelho"
+msgid "Images and other icons:"
 msgstr ""
 
 #: ../IDE/Credits.cpp:251
-msgid "Some icons came from Fugue Icons by Yusuke Kamiyamane"
+msgid "Some icons came from Crystal Project Icons by Everaldo Coelho"
 msgstr ""
 
 #: ../IDE/Credits.cpp:253
-msgid "Some images of examples came from images pack by Daniel Cook"
+msgid "Some icons came from Fugue Icons by Yusuke Kamiyamane"
 msgstr ""
 
 #: ../IDE/Credits.cpp:255
+msgid "Some images of examples came from images pack by Daniel Cook"
+msgstr ""
+
+#: ../IDE/Credits.cpp:257
 msgid "Some images of examples came from images pack by Ari Feldman"
 msgstr ""
 
-#: ../IDE/Credits.cpp:258
+#: ../IDE/Credits.cpp:260
 msgid "Thanks to all the community and users of GDevelop"
 msgstr ""
 
-#: ../IDE/Credits.cpp:330 ../IDE/Dialogs/ReminderDialog.cpp:157
+#: ../IDE/Credits.cpp:332 ../IDE/Dialogs/ReminderDialog.cpp:157
 #: ../IDE/Dialogs/StartHerePage.cpp:34
 msgid "http://www.compilgames.net/donate.php"
 msgstr ""
 
-#: ../IDE/Credits.cpp:339
+#: ../IDE/Credits.cpp:341
 msgid "http://clang.llvm.org/"
 msgstr ""
 
-#: ../IDE/Credits.cpp:344
+#: ../IDE/Credits.cpp:346
 msgid "http://www.grinninglizard.com/tinyxml/"
 msgstr ""
 
-#: ../IDE/Credits.cpp:349
+#: ../IDE/Credits.cpp:351
 msgid "http://www.boost.org/"
 msgstr ""
 
-#: ../IDE/Credits.cpp:355
+#: ../IDE/Credits.cpp:357
 msgid "https://en.wikipedia.org/wiki/JavaScript"
 msgstr ""
 
-#: ../IDE/Credits.cpp:360
+#: ../IDE/Credits.cpp:362
 msgid "http://jquery.com/"
 msgstr ""
 
-#: ../IDE/Credits.cpp:365
+#: ../IDE/Credits.cpp:367
 msgid "http://www.pixijs.com/"
 msgstr ""
 
@@ -11385,7 +11385,7 @@ msgid "Apply an impulse to an object, using a angle and a length as coordinates.
 msgstr ""
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:218
-msgid "Apply to _PARAM0_ impulse _PARAM3_ with angle: _PARAM2_�"
+msgid "Apply to _PARAM0_ impulse _PARAM3_ with angle: _PARAM2_°"
 msgstr ""
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:225

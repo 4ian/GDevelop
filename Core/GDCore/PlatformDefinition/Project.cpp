@@ -818,7 +818,7 @@ bool Project::LoadFromFile(const gd::String & filename)
             doc.LoadFile(std::string(tmpFileName).c_str(), TIXML_ENCODING_UTF8);
 
             std::cout << "Finished." << std::endl;
-            gd::LogMessage(_("Your project has been converted to the new encoding used by GDevelop 4 (UTF8).\nYou can save it to apply the change but it will be incompatible with old GDevelop version."));
+            gd::LogMessage(_("Your project has been upgraded to be used with GDevelop 4.\nIf you save it, you won't be able to open it with an older version: please do a backup of your project file if you want to go back to GDevelop 3."));
         }
     }
     #endif

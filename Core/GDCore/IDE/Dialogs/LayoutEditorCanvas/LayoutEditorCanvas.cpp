@@ -1006,18 +1006,36 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
         instance->SetHasCustomSize(true);
         instance->SetCustomWidth(resizeOriginalWidths[instance]);
     };
+    auto snapCoordinates = [this](double & x, double & y) {
+        if (!options.grid || !options.snap) return;
+        
+        x = gd::Round((x-options.gridOffsetX) / options.gridWidth) * options.gridWidth + options.gridOffsetX;
+        y = gd::Round((y-options.gridOffsetY) / options.gridHeight) * options.gridHeight + options.gridOffsetY;
+    };
+    auto snapWidth = [this](double width) {
+        if (!options.grid || !options.snap) return 0;        
+        return gd::Round(width / options.gridWidth) * options.gridWidth;
+    };
+    auto snapHeight = [this](double height) {
+        if (!options.grid || !options.snap) return 0;        
+        return gd::Round(height / options.gridHeight) * options.gridWidth;
+    };
 
     //First check if we're using a resize button
     if ( currentDraggableBt.substr(0,6) == "resize")
     {
+        auto mouseX = GetMouseXOnLayout();
+        auto mouseY = GetMouseYOnLayout();
+
         if ( currentDraggableBt == "resizeRight" || currentDraggableBt == "resizeRightUp" || currentDraggableBt == "resizeRightDown" )
         {
             for (auto & it : selectedInstances)
             {
-                if (resizeOriginalWidths[it.first]+GetMouseXOnLayout()-resizeMouseStartPosition.x < 0) continue;
+                auto newWidth = snapWidth(resizeOriginalWidths[it.first] + mouseX - resizeMouseStartPosition.x);
+                if (newWidth < 0) continue;
 
                 ensureHasCustomHeight(it.first);
-                it.first->SetCustomWidth(resizeOriginalWidths[it.first]+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+                it.first->SetCustomWidth(newWidth);
                 if (shiftPressed) preserveHeightRatio(it.first);
             }
         }
@@ -1025,10 +1043,11 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
         {
             for (auto & it : selectedInstances)
             {
-                if ( resizeOriginalHeights[it.first]+GetMouseYOnLayout()-resizeMouseStartPosition.y < 0 ) continue;
+                auto newHeight = snapHeight(resizeOriginalHeights[it.first] + mouseY - resizeMouseStartPosition.y);
+                if (newHeight < 0) continue;
 
                 ensureHasCustomWidth(it.first);
-                it.first->SetCustomHeight(resizeOriginalHeights[it.first]+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+                it.first->SetCustomHeight(newHeight);
                 if (shiftPressed) preserveWidthRatio(it.first);
             }
         }
@@ -1036,11 +1055,12 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
         {
             for (auto & it : selectedInstances)
             {
-                if (resizeOriginalWidths[it.first]-GetMouseXOnLayout()+resizeMouseStartPosition.x < 0) continue;
+                auto newWidth = snapWidth(resizeOriginalWidths[it.first] - mouseX + resizeMouseStartPosition.x);
+                if (newWidth < 0) continue;
 
                 ensureHasCustomHeight(it.first);
-                it.first->SetCustomWidth(resizeOriginalWidths[it.first]-GetMouseXOnLayout()+resizeMouseStartPosition.x);
-                it.first->SetX(it.second.x+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+                it.first->SetCustomWidth(newWidth);
+                it.first->SetX(it.second.x + mouseX - resizeMouseStartPosition.x);
 
                 if (shiftPressed) preserveHeightRatio(it.first);
             }
@@ -1049,11 +1069,12 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
         {
             for (auto & it : selectedInstances)
             {
-                if ( resizeOriginalHeights[it.first]-GetMouseYOnLayout()+resizeMouseStartPosition.y < 0 ) continue;
+                auto newHeight = snapHeight(resizeOriginalHeights[it.first] - mouseY + resizeMouseStartPosition.y);
+                if (newHeight < 0) continue;
 
                 ensureHasCustomWidth(it.first);
-                it.first->SetCustomHeight(resizeOriginalHeights[it.first]-GetMouseYOnLayout()+resizeMouseStartPosition.y);
-                it.first->SetY(it.second.y+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+                it.first->SetCustomHeight(newHeight);
+                it.first->SetY(it.second.y + mouseY - resizeMouseStartPosition.y);
 
                 if (shiftPressed) preserveWidthRatio(it.first);
             }
@@ -1105,20 +1126,15 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
         if ( isMovingInstance )
         {
             //Get the displacement of the cursor
-            float deltaX = mouseX - oldMouseX;
-            float deltaY = mouseY - oldMouseY;
+            double deltaX = mouseX - oldMouseX;
+            double deltaY = mouseY - oldMouseY;
 
             for (auto & it : selectedInstances)
             {
                 //Compute new position
-                float newX = it.second.x + deltaX;
-                float newY = it.second.y + deltaY;
-
-                if ( options.grid && options.snap )
-                {
-                    newX = std::floor((newX-options.gridOffsetX)/options.gridWidth +0.5)*options.gridWidth + options.gridOffsetX;
-                    newY = std::floor((newY-options.gridOffsetY)/options.gridHeight+0.5)*options.gridHeight + options.gridOffsetY;
-                }
+                double newX = it.second.x + deltaX;
+                double newY = it.second.y + deltaY;
+                snapCoordinates(newX, newY);
 
                 //Move the initial instance
                 it.first->SetX(newX);

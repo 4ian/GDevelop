@@ -409,8 +409,8 @@ sf::Vector2f LayoutEditorCanvas::ConvertToWindowCoordinates(float x, float y, co
 void LayoutEditorCanvas::OnDeleteObjectSelected(wxCommandEvent & event)
 {
     std::vector<gd::InitialInstance*> instancesToDelete;
-    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
-        instancesToDelete.push_back(it->first);
+    for (auto & it : selectedInstances)
+        instancesToDelete.push_back(it.first);
 
     DeleteInstances(instancesToDelete);
 
@@ -432,8 +432,8 @@ void LayoutEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
     //Add a new object of selected type to objects list
     layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), name, layout.GetObjectsCount());
 
-    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
-        (*it)->ObjectsUpdated();
+    for (auto & it : associatedEditors)
+        it->ObjectsUpdated();
 
     //Add it on the layout ( Use oldMouseX/Y as the cursor has moved since the right click )
     AddObject(name, oldMouseX, oldMouseY);
@@ -454,25 +454,25 @@ void LayoutEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
 
 void LayoutEditorCanvas::OnLockSelected(wxCommandEvent & event)
 {
-    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
-        if ( it->first ) it->first->SetLocked();
+    for (auto & it : selectedInstances)
+        if (it.first) it.first->SetLocked();
 
     ClearSelection();
-    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
-        (*it)->InitialInstancesUpdated();
+    for (auto & it : associatedEditors)
+        it->InitialInstancesUpdated();
 }
 
 void LayoutEditorCanvas::OnUnLockSelected(wxCommandEvent & event)
 {
     gd::InitialInstance * instance = GetInitialInstanceAtPosition(oldMouseX, oldMouseY, /*pickOnlyLockedInstances=*/true);
-    if ( instance )
+    if (instance)
     {
         instance->SetLocked(false);
 
         ClearSelection();
         SelectInstance(instance);
-        for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
-            (*it)->InitialInstancesUpdated();
+        for (auto & it : associatedEditors)
+            it->InitialInstancesUpdated();
     }
 }
 
@@ -480,11 +480,11 @@ void LayoutEditorCanvas::OnCopySelected(wxCommandEvent & event)
 {
     vector < std::shared_ptr<gd::InitialInstance> > copiedPositions;
 
-    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    for(auto & it : selectedInstances)
     {
-        if ( it->first == NULL ) continue;
+        if (it.first == NULL) continue;
 
-        copiedPositions.push_back(std::shared_ptr<gd::InitialInstance>(it->first->Clone()));
+        copiedPositions.push_back(std::shared_ptr<gd::InitialInstance>(it.first->Clone()));
         copiedPositions.back()->SetX(copiedPositions.back()->GetX() - oldMouseX);
         copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
     }
@@ -496,11 +496,11 @@ void LayoutEditorCanvas::OnCutSelected(wxCommandEvent & event)
 {
     vector < std::shared_ptr<gd::InitialInstance> > copiedPositions;
 
-    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    for (auto & it : selectedInstances)
     {
-        if ( it->first == NULL ) continue;
+        if ( it.first == NULL ) continue;
 
-        copiedPositions.push_back(std::shared_ptr<gd::InitialInstance>(it->first->Clone()));
+        copiedPositions.push_back(std::shared_ptr<gd::InitialInstance>(it.first->Clone()));
         copiedPositions.back()->SetX(copiedPositions.back()->GetX() - oldMouseX);
         copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
     }
@@ -509,12 +509,12 @@ void LayoutEditorCanvas::OnCutSelected(wxCommandEvent & event)
 
     //Do not forget to remove the cut instances
     std::vector<gd::InitialInstance*> instancesToDelete;
-    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
-        instancesToDelete.push_back(it->first);
+    for (auto & it : selectedInstances)
+        instancesToDelete.push_back(it.first);
 
     DeleteInstances(instancesToDelete);
-    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
-        (*it)->InitialInstancesUpdated();
+    for (auto & it : associatedEditors)
+        it->InitialInstancesUpdated();
 }
 
 void LayoutEditorCanvas::OnPasteSelected(wxCommandEvent & event)
@@ -523,16 +523,16 @@ void LayoutEditorCanvas::OnPasteSelected(wxCommandEvent & event)
 
     vector < std::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::Get()->Gets();
 
-    for (std::size_t i =0;i<pastedInstances.size();++i)
+    for (auto & it : pastedInstances)
     {
-        gd::InitialInstance & instance = instances.InsertInitialInstance(*pastedInstances[i]->Clone());
+        gd::InitialInstance & instance = instances.InsertInitialInstance(*it->Clone());
         instance.SetX(instance.GetX()+oldMouseX);
         instance.SetY(instance.GetY()+oldMouseY);
     }
 
     ChangesMade();
-    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
-        (*it)->InitialInstancesUpdated();
+    for (auto & it : associatedEditors)
+        it->InitialInstancesUpdated();
 }
 
 void LayoutEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
@@ -570,8 +570,8 @@ void LayoutEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
     }
 
     ChangesMade();
-    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
-        (*it)->InitialInstancesUpdated();
+    for (auto & it : associatedEditors)
+        it->InitialInstancesUpdated();
 }
 
 void LayoutEditorCanvas::EnsureVisible(const gd::InitialInstance & instance)

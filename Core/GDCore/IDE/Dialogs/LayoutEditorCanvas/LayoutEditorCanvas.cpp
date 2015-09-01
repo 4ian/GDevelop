@@ -988,61 +988,74 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
 {
     if (!editing) return;
 
+    auto preserveWidthRatio = [this](gd::InitialInstance * instance) {
+        auto ratio = resizeOriginalHeights[instance] / resizeOriginalWidths[instance];
+        instance->SetCustomWidth(instance->GetCustomHeight() / ratio);
+    };
+    auto preserveHeightRatio = [this](gd::InitialInstance * instance) {
+        auto ratio = resizeOriginalHeights[instance] / resizeOriginalWidths[instance];
+        instance->SetCustomHeight(instance->GetCustomWidth() * ratio);
+    };
+    auto ensureHasCustomHeight = [this](gd::InitialInstance * instance) {
+        if (instance->HasCustomSize()) return;
+        instance->SetHasCustomSize(true);
+        instance->SetCustomHeight(resizeOriginalHeights[instance]);
+    };
+    auto ensureHasCustomWidth = [this](gd::InitialInstance * instance) {
+        if (instance->HasCustomSize()) return;
+        instance->SetHasCustomSize(true);
+        instance->SetCustomWidth(resizeOriginalWidths[instance]);
+    };
+
     //First check if we're using a resize button
     if ( currentDraggableBt.substr(0,6) == "resize")
     {
         if ( currentDraggableBt == "resizeRight" || currentDraggableBt == "resizeRightUp" || currentDraggableBt == "resizeRightDown" )
         {
-            for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            for (auto & it : selectedInstances)
             {
-                if (resizeOriginalWidths[it->first]+GetMouseXOnLayout()-resizeMouseStartPosition.x < 0) continue;
+                if (resizeOriginalWidths[it.first]+GetMouseXOnLayout()-resizeMouseStartPosition.x < 0) continue;
 
-                if ( !it->first->HasCustomSize() ) {
-                    it->first->SetHasCustomSize(true);
-                    it->first->SetCustomHeight(resizeOriginalHeights[it->first]);
-                }
-                it->first->SetCustomWidth(resizeOriginalWidths[it->first]+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+                ensureHasCustomHeight(it.first);
+                it.first->SetCustomWidth(resizeOriginalWidths[it.first]+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+                if (shiftPressed) preserveHeightRatio(it.first);
             }
         }
         if ( currentDraggableBt == "resizeDown" || currentDraggableBt == "resizeRightDown" || currentDraggableBt == "resizeLeftDown" )
         {
-            for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            for (auto & it : selectedInstances)
             {
-                if ( resizeOriginalHeights[it->first]+GetMouseYOnLayout()-resizeMouseStartPosition.y < 0 ) continue;
+                if ( resizeOriginalHeights[it.first]+GetMouseYOnLayout()-resizeMouseStartPosition.y < 0 ) continue;
 
-                if ( !it->first->HasCustomSize() ) {
-                    it->first->SetHasCustomSize(true);
-                    it->first->SetCustomWidth(resizeOriginalWidths[it->first]);
-                }
-                it->first->SetCustomHeight(resizeOriginalHeights[it->first]+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+                ensureHasCustomWidth(it.first);
+                it.first->SetCustomHeight(resizeOriginalHeights[it.first]+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+                if (shiftPressed) preserveWidthRatio(it.first);
             }
         }
         if ( currentDraggableBt == "resizeLeft" || currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeLeftDown" )
         {
-            for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            for (auto & it : selectedInstances)
             {
-                if (resizeOriginalWidths[it->first]-GetMouseXOnLayout()+resizeMouseStartPosition.x < 0) continue;
+                if (resizeOriginalWidths[it.first]-GetMouseXOnLayout()+resizeMouseStartPosition.x < 0) continue;
 
-                if ( !it->first->HasCustomSize() ) {
-                    it->first->SetHasCustomSize(true);
-                    it->first->SetCustomHeight(resizeOriginalHeights[it->first]);
-                }
-                it->first->SetCustomWidth(resizeOriginalWidths[it->first]-GetMouseXOnLayout()+resizeMouseStartPosition.x);
-                it->first->SetX(it->second.x+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+                ensureHasCustomHeight(it.first);
+                it.first->SetCustomWidth(resizeOriginalWidths[it.first]-GetMouseXOnLayout()+resizeMouseStartPosition.x);
+                it.first->SetX(it.second.x+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+
+                if (shiftPressed) preserveHeightRatio(it.first);
             }
         }
         if ( currentDraggableBt == "resizeUp" || currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeRightUp" )
         {
-            for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            for (auto & it : selectedInstances)
             {
-                if ( resizeOriginalHeights[it->first]-GetMouseYOnLayout()+resizeMouseStartPosition.y < 0 ) continue;
+                if ( resizeOriginalHeights[it.first]-GetMouseYOnLayout()+resizeMouseStartPosition.y < 0 ) continue;
 
-                if ( !it->first->HasCustomSize() ) {
-                    it->first->SetHasCustomSize(true);
-                    it->first->SetCustomWidth(resizeOriginalWidths[it->first]);
-                }
-                it->first->SetCustomHeight(resizeOriginalHeights[it->first]-GetMouseYOnLayout()+resizeMouseStartPosition.y);
-                it->first->SetY(it->second.y+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+                ensureHasCustomWidth(it.first);
+                it.first->SetCustomHeight(resizeOriginalHeights[it.first]-GetMouseYOnLayout()+resizeMouseStartPosition.y);
+                it.first->SetY(it.second.y+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+
+                if (shiftPressed) preserveWidthRatio(it.first);
             }
         }
 
@@ -1050,10 +1063,11 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
     }
     else if (currentDraggableBt == "angle") //Check if we are dragging a angle button
     {
-        for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        for ( auto & it : selectedInstances)
         {
             float newAngle = atan2(sf::Mouse::getPosition(*this).y-angleButtonCenter.y, sf::Mouse::getPosition(*this).x-angleButtonCenter.x)*180/3.14159;
-            it->first->SetAngle(newAngle);
+            if (shiftPressed) newAngle = gd::Round(newAngle / 45.0) * 45.0;
+            it.first->SetAngle(newAngle);
         }
 
         UpdateMouseResizeCursor(currentDraggableBt);
@@ -1094,11 +1108,11 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
             float deltaX = mouseX - oldMouseX;
             float deltaY = mouseY - oldMouseY;
 
-            for ( std::map <InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            for (auto & it : selectedInstances)
             {
                 //Compute new position
-                float newX = it->second.x + deltaX;
-                float newY = it->second.y + deltaY;
+                float newX = it.second.x + deltaX;
+                float newY = it.second.y + deltaY;
 
                 if ( options.grid && options.snap )
                 {
@@ -1107,8 +1121,8 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
                 }
 
                 //Move the initial instance
-                it->first->SetX(newX);
-                it->first->SetY(newY);
+                it.first->SetX(newX);
+                it.first->SetY(newY);
             }
         }
         if ( isSelecting )

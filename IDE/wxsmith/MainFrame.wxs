@@ -120,6 +120,11 @@
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;saveas&quot;, 16)' />
 				<handler function="OnMenuSaveAsSelected" entry="EVT_MENU" />
 			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem5" member="yes">
+				<label>Save as folder project</label>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;open&quot;, 16)' />
+				<handler function="OnMenuSaveAsFolderSelected" entry="EVT_MENU" />
+			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM16" variable="MenuItem12" member="yes">
 				<label>Save all</label>
 				<accel>Ctrl+Shift+S</accel>

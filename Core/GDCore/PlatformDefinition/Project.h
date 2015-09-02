@@ -73,7 +73,7 @@ public:
      * \brief Get project author name.
      */
     const gd::String & GetAuthor() const { return author; }
-    
+
     /**
      * \brief Change project package name.
      */
@@ -94,6 +94,18 @@ public:
      * \see gd::Project::SetProjectFile
      */
     const gd::String & GetProjectFile() const { return gameFile; }
+
+    /**
+     * Set that the project should be saved as a folder project.
+     * \param enable True to flag as a folder project, false to set it as single file project.
+     */
+    void SetFolderProject(bool enable = true) { folderProject = enable; }
+
+    /**
+     * Check if the project is saved as a folder project.
+     * \see gd::Project::SetFolderProject
+     */
+    bool IsFolderProject() const { return folderProject; }
 
     /**
      * Called when project file has changed.
@@ -358,46 +370,12 @@ public:
 
     ///@}
 
-    /** \name Saving and loading
-     * Members functions related to saving and loading the project.
-     */
-    ///@{
-    #if !defined(EMSCRIPTEN)
-    /**
-     * \brief Load the project from a XML file.
-     */
-    bool LoadFromFile(const gd::String & filename);
-
-    #if defined(GD_IDE_ONLY)
-    /**
-     * \brief Load the project from a JSON file.
-     */
-    bool LoadFromJSONFile(const gd::String & filename);
-    #endif
-    #endif
-
     /**
      * \brief Unserialize the project from an element.
      */
     void UnserializeFrom(const SerializerElement & element);
 
     #if defined(GD_IDE_ONLY)
-    #if !defined(EMSCRIPTEN)
-    /**
-     * \brief Save the project to a XML file.
-     *
-     * "Dirty" flag is set to false when save is done.
-     */
-    bool SaveToFile(const gd::String & filename);
-
-    /**
-     * \brief Save the project to a JSON file.
-     *
-     * "Dirty" flag is set to false when save is done.
-     */
-    bool SaveToJSONFile(const gd::String & filename);
-    #endif
-
     /**
      * \brief Called to serialize the project to a TiXmlElement.
      *
@@ -407,13 +385,13 @@ public:
 
     /**
      * \brief Return true if the project is marked as being modified (The IDE or application
-     * using the project should ask for save the project if the project is closed).
+     * using the project should ask to save the project if the project is closed).
      */
     bool IsDirty() { return dirty; }
 
     /**
      * \brief Mark the project as being modified (The IDE or application
-     * using the project should ask for save the project if the project is closed).
+     * using the project should ask to save the project if the project is closed).
      */
     void SetDirty(bool enable = true) { dirty = enable; }
 
@@ -427,7 +405,6 @@ public:
      */
     unsigned int GetLastSaveGDMinorVersion() { return GDMinorVersion; };
     #endif
-    ///@}
 
     /** \name External events management
      * Members functions related to external events management.
@@ -759,6 +736,7 @@ private:
     std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
     gd::String                                         author; ///< Game author name
     gd::String                                         packageName; ///< Game package name
+    bool                                                folderProject; ///< True if folder project, false if single file project.
     gd::String                                         gameFile; ///< File of the game
     gd::String                                         latestCompilationDirectory; ///< File of the game
     gd::Platform*                                       currentPlatform; ///< The platform being used to edit the project.

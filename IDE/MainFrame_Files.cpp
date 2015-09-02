@@ -17,6 +17,7 @@
 #include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/ProjectFileWriter.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
 #include "Dialogs/NewProjectDialog.h"
@@ -61,7 +62,7 @@ void MainFrame::CreateNewProject()
             if ( !dialog.GetChosenTemplateFile().empty() )
             {
                 newProject->SetProjectFile(dialog.GetChosenTemplateFile());
-                newProject->LoadFromFile(newProject->GetProjectFile());
+                gd::ProjectFileWriter::LoadFromFile(*newProject, newProject->GetProjectFile());
                 gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, gd::NativeFileSystem::Get(),
                     targetDirectory, false);
             }
@@ -114,7 +115,12 @@ void MainFrame::OnMenuOpenSelected( wxCommandEvent& event )
     wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
     if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
-        Open( openFileDialog.GetPath() );
+        Open(openFileDialog.GetPath());
+}
+void MainFrame::OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt)
+{
+    wxCommandEvent uselessEvent;
+    OnMenuOpenSelected(uselessEvent);
 }
 
 /**
@@ -124,28 +130,17 @@ void MainFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-    #if defined(WINDOWS)
-    wxString examplesDir = wxGetCwd()+"\\Examples";
-    std::cout << examplesDir;
-    #else
-    wxString examplesDir = wxGetCwd()+"/Examples/";
-    #endif
+    wxString examplesDir = wxGetCwd() + wxFileName::GetPathSeparator()
+        + "Examples" + wxFileName::GetPathSeparator();
 
     wxString oldWorkingDir = wxGetCwd();
-    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json" );
+    wxFileDialog open(NULL, _("Open an example"), examplesDir, "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json");
     wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
-    if ( open.ShowModal() != wxID_CANCEL && !open.GetPath().empty() )
+    if (open.ShowModal() != wxID_CANCEL && !open.GetPath().empty())
         Open(open.GetPath());
 }
-/**
- * Adapter for the ribbon
- */
-void MainFrame::OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt)
-{
-    wxCommandEvent uselessEvent;
-    OnMenuOpenSelected(uselessEvent);
-}
+
 void MainFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEvent& evt)
 {
     evt.PopupMenu(&openContextMenu);
@@ -169,18 +164,15 @@ void MainFrame::Open( gd::String file )
     bool isJSON = wxString(file).EndsWith(".json");
 
     std::shared_ptr<gd::Project> newProject(new gd::Project);
-    if ( (!isJSON && newProject->LoadFromFile(file)) ||
-         (isJSON  && newProject->LoadFromJSONFile(file)) )
+    if ((!isJSON && gd::ProjectFileWriter::LoadFromFile(*newProject, file)) ||
+        (isJSON  && gd::ProjectFileWriter::LoadFromJSONFile(*newProject, file)))
     {
         //Ensure working directory is set to the IDE one.
         wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 
         games.push_back(newProject);
 
-        //Sauvegarde fichiers r�cents
         SetLastUsedFile( file );
-
-        //Mise � jour des �diteurs
         SetCurrentGame(games.size()-1);
         if ( startPage ) startPage->Refresh();
 
@@ -219,6 +211,7 @@ void MainFrame::Open( gd::String file )
             gd::LogWarning(errorMsg);
         }
     }
+
     //Ensure working directory is set to the IDE one.
     wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
     m_mgr.GetPane("PM").Show();
@@ -233,18 +226,12 @@ void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
         SaveAs();
     else
     {
-        if (Save(*GetCurrentGame(), GetCurrentGame()->GetProjectFile()))
-            gd::LogStatus( _("Save ended."));
-        else
+        if (!Save(*GetCurrentGame(), GetCurrentGame()->GetProjectFile()))
             gd::LogError( _("Save failed!") );
-
-        SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
-        return;
     }
+
+    gd::LogStatus( _("Save ended."));
 }
-/**
- * Adapter for the ribbon
- */
 void MainFrame::OnRibbonSaveClicked(wxRibbonButtonBarEvent& evt)
 {
     wxCommandEvent uselessEvent;
@@ -258,73 +245,64 @@ void MainFrame::OnRibbonSaveDropDownClicked(wxRibbonButtonBarEvent& evt)
 /**
  * Save all
  */
-void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent&)
 {
     for (std::size_t i = 0;i<games.size();++i)
     {
-        //TODO: Factor using SaveAs.
         if ( games[i]->GetProjectFile().empty() || wxString(games[i]->GetProjectFile()).EndsWith(".autosave") )
-        {
-            sf::Lock lock(CodeCompiler::openSaveDialogMutex);
-
-            wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json", wxFD_SAVE );
-            fileDialog.ShowModal();
-
-            gd::String path = fileDialog.GetPath();
-
-            #if defined(LINUX) //Extension seems not be added with wxGTK?
-            if ( fileDialog.GetFilterIndex() == 0 && !path.empty() && !fileDialog.GetPath().EndsWith(".json") )
-                path += ".gdg";
-            #endif
-
-            //A t on  un fichier � enregistrer ?
-            if ( !path.empty() )
-            {
-                //oui, donc on l'enregistre
-                games[i]->SetProjectFile(path);
-
-                if ( !Save(*games[i], games[i]->GetProjectFile()) ) gd::LogError( _("Save failed!") );
-                SetLastUsedFile( games[i]->GetProjectFile() );
-
-                if ( games[i] == GetCurrentGame() )
-                    SetCurrentGame(i);
-                UpdateOpenedProjectsLogFile();
-            }
-        }
+            SaveAs(games[i]);
         else
         {
-            if ( !Save(*games[i], games[i]->GetProjectFile()) ) gd::LogError( _("Save failed!") );
+            if (!Save(*games[i], games[i]->GetProjectFile()))
+                gd::LogError( _("Save failed!") );
         }
     }
 
     gd::LogStatus( _("Saves ended."));
 }
-void MainFrame::OnMenuSaveAllSelected(wxCommandEvent& event)
+void MainFrame::OnMenuSaveAllSelected(wxCommandEvent&)
 {
     wxRibbonButtonBarEvent uselessEvent;
     OnRibbonSaveAllClicked(uselessEvent);
 }
 
-void MainFrame::OnMenuSaveAsSelected( wxCommandEvent& event )
+void MainFrame::OnMenuSaveAsSelected(wxCommandEvent&)
 {
+    if ( !CurrentGameIsValid() ) return;
+
+    GetCurrentGame()->SetFolderProject(false);
     SaveAs();
 }
+
+void MainFrame::OnMenuSaveAsFolderSelected(wxCommandEvent&)
+{
+    if ( !CurrentGameIsValid() ) return;
+
+    GetCurrentGame()->SetFolderProject();
+    SaveAs();
+}
+
 
 bool MainFrame::Save(gd::Project & project, wxString file)
 {
     bool isJSON = file.EndsWith(".json");
     bool success =
-        (!isJSON && project.SaveToFile(file)) ||
-        (isJSON  && project.SaveToJSONFile(file));
+        (!isJSON && gd::ProjectFileWriter::SaveToFile(project, file)) ||
+        (isJSON  && gd::ProjectFileWriter::SaveToJSONFile(project, file));
 
+    SetLastUsedFile(project.GetProjectFile());
     return success;
 }
 
-void MainFrame::SaveAs()
+void MainFrame::SaveAs(std::shared_ptr<gd::Project> project)
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-    if ( !CurrentGameIsValid() ) return;
+    if (!project)
+    {
+        if (!CurrentGameIsValid()) return;
+        project = GetCurrentGame();
+    }
 
     //Display dialog box
     wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json", wxFD_SAVE );
@@ -336,44 +314,38 @@ void MainFrame::SaveAs()
         file += ".gdg";
     #endif
 
-    if ( !file.empty() )
+    if (file.empty()) return;
+
+    wxString oldPath = !project->GetProjectFile().empty() ? wxFileName::FileName(project->GetProjectFile()).GetPath() : "";
+
+    //Warn the user that resources should maybe be also moved.
+    bool avertOnSaveCheck;
+    wxConfigBase::Get()->Read("/Save/WarnOnSaveAs", &avertOnSaveCheck, true);
+    wxString newPath = wxFileName::FileName(file).GetPath();
+    if ( avertOnSaveCheck && newPath != oldPath && oldPath != "" )
     {
-        wxString oldPath = !GetCurrentGame()->GetProjectFile().empty() ? wxFileName::FileName(GetCurrentGame()->GetProjectFile()).GetPath() : "";
+        wxRichMessageDialog dlg(this, _("Project has been saved in a new folder.\nDo you want to also copy its resources into this new folder?"), _("Saving in a new directory"), wxYES_NO|wxICON_INFORMATION );
+        dlg.ShowCheckBox(_("Do not show again"));
 
-        //Warn the user that resources should maybe be also moved.
-        bool avertOnSaveCheck;
-        wxConfigBase::Get()->Read("/Save/AvertOnSaveAs", &avertOnSaveCheck, true);
-        wxString newPath = wxFileName::FileName(file).GetPath();
-        if ( avertOnSaveCheck && newPath != oldPath && oldPath != "" )
+        if ( dlg.ShowModal() == wxID_YES )
         {
-            wxRichMessageDialog dlg(this, _("Project has been saved in a new folder.\nDo you want to also copy its resources into this new folder?"), _("Saving in a new directory"), wxYES_NO|wxICON_INFORMATION );
-            dlg.ShowCheckBox(_("Do not show again"));
-            //dlg.ShowDetailedText(_("Since the last versions of GDevelop, resources filenames are relative\nto the project folder, allowing to copy or move a project simply by moving the directory\nof the project, provided that resources are also in this directory."));
-
-            if ( dlg.ShowModal() == wxID_YES )
-            {
-                wxProgressDialog progressDialog(_("Save progress"), _("Exporting resources..."));
-                gd::ProjectResourcesCopier::CopyAllResourcesTo(*GetCurrentGame(), NativeFileSystem::Get(),
-                    newPath, true, &progressDialog);
-            }
-
-            if ( dlg.IsCheckBoxChecked() )
-                wxConfigBase::Get()->Write("/Save/AvertOnSaveAs", "false");
+            wxProgressDialog progressDialog(_("Save progress"), _("Exporting resources..."));
+            gd::ProjectResourcesCopier::CopyAllResourcesTo(*project, NativeFileSystem::Get(),
+                newPath, true, &progressDialog);
         }
 
-        GetCurrentGame()->SetProjectFile(file);
-
-        if ( !Save(*GetCurrentGame(), GetCurrentGame()->GetProjectFile()) )
-        {
-            gd::LogError( _("The project could not be saved properly!") );
-        }
-
-        SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
-        SetCurrentGame(projectCurrentlyEdited, false);
-        UpdateOpenedProjectsLogFile();
-
-        return;
+        if ( dlg.IsCheckBoxChecked() )
+            wxConfigBase::Get()->Write("/Save/WarnOnSaveAs", "false");
     }
+
+    project->SetProjectFile(file);
+    if (!Save(*project, project->GetProjectFile()))
+    {
+        gd::LogError(_("The project could not be saved properly!"));
+    }
+
+    SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
+    UpdateOpenedProjectsLogFile();
 }
 
 void MainFrame::OnMenuCompilationSelected( wxCommandEvent& event )
@@ -397,36 +369,36 @@ void MainFrame::OnRecentClicked( wxCommandEvent& event )
     switch ( event.GetId() )
     {
     case wxID_FILE1:
-        last = m_recentlist.GetEntry( 0 );
+        last = m_recentlist.GetEntry(0);
         break;
     case wxID_FILE2:
-        last = m_recentlist.GetEntry( 1 );
+        last = m_recentlist.GetEntry(1);
         break;
     case wxID_FILE3:
-        last = m_recentlist.GetEntry( 2 );
+        last = m_recentlist.GetEntry(2);
         break;
     case wxID_FILE4:
-        last = m_recentlist.GetEntry( 3 );
+        last = m_recentlist.GetEntry(3);
         break;
     case wxID_FILE5:
-        last = m_recentlist.GetEntry( 4 );
+        last = m_recentlist.GetEntry(4);
         break;
     case wxID_FILE6:
-        last = m_recentlist.GetEntry( 5 );
+        last = m_recentlist.GetEntry(5);
         break;
     case wxID_FILE7:
-        last = m_recentlist.GetEntry( 6 );
+        last = m_recentlist.GetEntry(6);
         break;
     case wxID_FILE8:
-        last = m_recentlist.GetEntry( 7 );
+        last = m_recentlist.GetEntry(7);
         break;
     case wxID_FILE9:
-        last = m_recentlist.GetEntry( 8 );
+        last = m_recentlist.GetEntry(8);
         break;
 
     default:
         break;
     }
 
-    Open( last );
+    Open(last);
 }

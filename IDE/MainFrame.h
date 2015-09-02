@@ -214,6 +214,7 @@ public:
     void OnMenuSaveAllSelected(wxCommandEvent& event);
     void OnCloseCurrentProjectSelected(wxCommandEvent& event);
     void OnResize(wxSizeEvent& event);
+    void OnMenuSaveAsFolderSelected(wxCommandEvent& event);
     //*)
     void OnRibbonPageChanging(wxRibbonBarEvent& evt);
     void OnRibbonHelpBtClick(wxRibbonBarEvent& evt);
@@ -233,7 +234,7 @@ public:
     void OnRibbonFileBtEnter(wxMouseEvent& event);
     void OnRibbonHelpBtLeave(wxMouseEvent& event);
     void OnRibbonHelpBtEnter(wxMouseEvent& event);
-    void SaveAs();
+    void SaveAs(std::shared_ptr<gd::Project> project = nullptr);
     void OnRecentClicked(wxCommandEvent& event );
     void UpdateNotebook();
     void MakeImagesEditorRibbon();
@@ -261,6 +262,7 @@ private:
     static const long ID_MENUITEM26;
     static const long ID_MENUITEM12;
     static const long ID_MENUITEM13;
+    static const long ID_MENUITEM8;
     static const long ID_MENUITEM16;
     static const long ID_MENUITEM19;
     static const long ID_MENUITEM17;
@@ -296,6 +298,7 @@ private:
     wxMenuItem* MenuItem8;
     wxMenu disabledFileMenu;
     wxMenuItem* MenuItem7;
+    wxMenuItem* MenuItem5;
     wxMenuItem* MenuItem2;
     wxTimer autoSaveTimer;
     wxMenuItem* MenuItem4;

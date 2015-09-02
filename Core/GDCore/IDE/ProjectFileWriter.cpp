@@ -6,6 +6,7 @@
 #if !defined(EMSCRIPTEN)
 #include "ProjectFileWriter.h"
 #include <fstream>
+#include "GDCore/Tools/Localization.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/Splitter.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -15,12 +16,13 @@
 
 #include "GDCore/TinyXml/tinyxml.h"
 #include <SFML/System.hpp>
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
+#endif
 
-
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 namespace {
 
 gd::String MakeFileNameSafe(gd::String str)
@@ -64,6 +66,7 @@ bool ProjectFileWriter::SaveToFile(const gd::Project & project, const gd::String
     gd::SerializerElement rootElement;
     project.SerializeTo(rootElement);
 
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     if (project.IsFolderProject()) //Optionally split the project
     {
         wxString projectPath = wxFileName::FileName(filename).GetPath();
@@ -93,6 +96,7 @@ bool ProjectFileWriter::SaveToFile(const gd::Project & project, const gd::String
             }
         }
     }
+    #endif
 
     //Create the main XML document
     TiXmlDocument doc;
@@ -185,7 +189,7 @@ bool ProjectFileWriter::LoadFromFile(gd::Project & project, const gd::String & f
     gd::Serializer::FromXML(rootElement, rootXmlElement);
 
     //Unsplit the project
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     wxString projectPath = wxFileName::FileName(filename).GetPath();
     gd::Splitter splitter;
     splitter.Unsplit(rootElement, [&projectPath](gd::String path, gd::String name) {

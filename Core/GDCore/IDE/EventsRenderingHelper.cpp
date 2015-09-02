@@ -141,8 +141,10 @@ void EventsRenderingHelper::SetFont(const wxFont & font_)
     wxMemoryDC dc;
     dc.SelectObject(fakeBmp);
     dc.SetFont(font);
+
     fontCharacterWidth = static_cast<float>(dc.GetTextExtent("abcdef").GetWidth())/6.0f;
-    fontCharacterHeight = dc.GetTextExtent("abcdef").GetHeight();
+    //Update height and ensure it's not too small
+    fontCharacterHeight = std::max(dc.GetTextExtent("abcdef").GetHeight(), 16);
 }
 
 int EventsRenderingHelper::DrawConditionsList(gd::InstructionsList & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,

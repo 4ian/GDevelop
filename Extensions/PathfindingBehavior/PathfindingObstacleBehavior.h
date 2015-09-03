@@ -49,7 +49,7 @@ public:
     /**
      * \brief Return the cost of moving on the object.
      */
-    float GetCost() const { return cost; } //TODO
+    float GetCost() const { return cost; }
 
     /**
      * \brief Change the cost of moving on the object.

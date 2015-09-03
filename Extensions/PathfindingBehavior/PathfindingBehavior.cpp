@@ -302,8 +302,8 @@ private:
             int topLeftCellY = floor((obj->GetDrawableY()-bottomBorder)/(float)cellHeight);
             int bottomRightCellX = ceil((obj->GetDrawableX()+obj->GetWidth()+leftBorder)/(float)cellWidth);
             int bottomRightCellY = ceil((obj->GetDrawableY()+obj->GetHeight()+topBorder)/(float)cellHeight);
-            if ( topLeftCellX <= pos.x && pos.x < bottomRightCellX
-                && topLeftCellY <= pos.y && pos.y < bottomRightCellY)
+            if ( topLeftCellX < pos.x && pos.x < bottomRightCellX
+                && topLeftCellY < pos.y && pos.y < bottomRightCellY)
             {
                 objectsOnCell = true;
                 if ( (*it)->IsImpassable() )

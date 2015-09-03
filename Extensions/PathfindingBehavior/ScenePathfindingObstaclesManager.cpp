@@ -6,6 +6,7 @@ This project is released under the MIT License.
 */
 #include "ScenePathfindingObstaclesManager.h"
 #include "PathfindingObstacleBehavior.h"
+#include <iostream>
 
 std::map<RuntimeScene*, ScenePathfindingObstaclesManager> ScenePathfindingObstaclesManager::managers;
 

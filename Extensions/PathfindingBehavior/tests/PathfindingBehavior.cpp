@@ -115,7 +115,7 @@ TEST_CASE( "PathfindingBehavior", "[game-engine][pathfinding]" ) {
 
 		runtimeBehavior->MoveTo(scene, 1200, 1300);
 		REQUIRE(runtimeBehavior->PathFound() == true);
-		REQUIRE(runtimeBehavior->GetNodeCount() == 78);
+		REQUIRE(runtimeBehavior->GetNodeCount() == 77);
 
 		//Enlarge more
 		obstacle->SetX(0);
@@ -124,7 +124,7 @@ TEST_CASE( "PathfindingBehavior", "[game-engine][pathfinding]" ) {
 
 		runtimeBehavior->MoveTo(scene, 1200, 1300);
 		REQUIRE(runtimeBehavior->PathFound() == true);
-		REQUIRE(runtimeBehavior->GetNodeCount() == 93);
+		REQUIRE(runtimeBehavior->GetNodeCount() == 92);
 	}
 	SECTION("Obstacles making a corridor") {
 		//Prepare some objects and the context

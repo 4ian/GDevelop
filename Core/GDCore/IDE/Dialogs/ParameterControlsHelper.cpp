@@ -120,7 +120,8 @@ void ParameterControlsHelper::UpdateParameterContent(std::size_t i, const Parame
     //Add defaults
     if (!metadata.IsOptional() && content.empty())
     {
-        if ( type == "expression" ) paramEdits.at(i)->SetValue("0");
+        if (!metadata.GetDefaultValue().empty()) paramEdits.at(i)->SetValue(metadata.GetDefaultValue());
+        else if ( type == "expression" ) paramEdits.at(i)->SetValue("0");
         else if ( type == "string" ) paramEdits.at(i)->SetValue("\"\"");
         else if ( type == "operator" ) paramEdits.at(i)->SetValue("=");
     }

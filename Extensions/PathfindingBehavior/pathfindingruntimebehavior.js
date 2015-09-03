@@ -549,8 +549,8 @@ gdjs.PathfindingRuntimeBehavior.SearchContext.prototype._getNode = function(xPos
             var topLeftCellY = Math.floor((obj.getDrawableY()-this._bottomBorder)/this._cellHeight);
             var bottomRightCellX = Math.ceil((obj.getDrawableX()+obj.getWidth()+this._leftBorder)/this._cellWidth);
             var bottomRightCellY = Math.ceil((obj.getDrawableY()+obj.getHeight()+this._topBorder)/this._cellHeight);
-            if ( topLeftCellX <= xPos && xPos <= bottomRightCellX
-                && topLeftCellY <= yPos && yPos <= bottomRightCellY) {
+            if ( topLeftCellX <= xPos && xPos < bottomRightCellX
+                && topLeftCellY <= yPos && yPos < bottomRightCellY) {
 
                 objectsOnCell = true;
                 if ( this._closeObstacles[k].isImpassable() ) {

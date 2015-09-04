@@ -681,11 +681,9 @@ void LayoutEditorCanvas::UpdateSize()
         unsigned int height = parentControl->GetSize().GetHeight()- (hScrollbar ? hScrollbar->GetSize().GetHeight() : 0);
 
         double scaleFactor = GUIContentScaleFactor::Get();
-        width *= scaleFactor;
-        height *= scaleFactor;
 
         //Scene takes all the space available in edition mode.
-        Window::setSize(sf::Vector2u(width, height));
+        Window::setSize(sf::Vector2u(width * scaleFactor, height * scaleFactor));
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(width, height);
 
@@ -743,19 +741,19 @@ void LayoutEditorCanvas::UpdateScrollbars()
 
     if ( thumbY <= 0 || static_cast<int>(thumbY+getSize().y) >= vScrollbar->GetRange())
     {
-        int ajout = getSize().y;
-        vScrollbar->SetScrollbar(thumbY+ajout/2, getSize().y, vScrollbar->GetRange()+ajout, getSize().y);
+        int offset = getSize().y;
+        vScrollbar->SetScrollbar(thumbY+offset/2, getSize().y, vScrollbar->GetRange()+offset, getSize().y);
     }
 
     if ( thumbX <= 0 || static_cast<int>(thumbX+getSize().x) >= hScrollbar->GetRange())
     {
-        int ajout = getSize().x;
-        hScrollbar->SetScrollbar(thumbX+ajout/2, getSize().x, hScrollbar->GetRange()+ajout, getSize().x);
+        int offset = getSize().x;
+        hScrollbar->SetScrollbar(thumbX+offset/2, getSize().x, hScrollbar->GetRange()+offset, getSize().x);
     }
 }
 void LayoutEditorCanvas::UpdateViewAccordingToZoomFactor()
 {
-    editionView.setSize(GetClientSize().GetWidth()/options.zoomFactor, GetClientSize().GetHeight()/options.zoomFactor);
+    editionView.setSize(getSize().x/options.zoomFactor, getSize().y/options.zoomFactor);
 }
 
 void LayoutEditorCanvas::OnHelpBtClick( wxCommandEvent & event )

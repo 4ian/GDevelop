@@ -462,7 +462,7 @@ void GDevelopIDEApp::OnUnhandledException()
     try
     {
         for (std::size_t i = 0;i<mainEditor->games.size();++i)
-            gd::ProjectFileWriter::SaveToFile(*mainEditor->games[i], "gameDump"+gd::String::From(i)+".gdg");
+            gd::ProjectFileWriter::SaveToFile(*mainEditor->games[i], "gameDump"+gd::String::From(i)+".gdg", true);
     }
     catch(...)
     {
@@ -485,7 +485,7 @@ bool GDevelopIDEApp::OnExceptionInMainLoop()
     try
     {
         for (std::size_t i = 0;i<mainEditor->games.size();++i)
-            gd::ProjectFileWriter::SaveToFile(*mainEditor->games[i], "gameDump"+gd::String::From(i)+".gdg");
+            gd::ProjectFileWriter::SaveToFile(*mainEditor->games[i], "gameDump"+gd::String::From(i)+".gdg", true);
     }
     catch(...)
     {

@@ -60,14 +60,14 @@ namespace gd
 
 #if defined(GD_IDE_ONLY)
 
-bool ProjectFileWriter::SaveToFile(const gd::Project & project, const gd::String & filename)
+bool ProjectFileWriter::SaveToFile(const gd::Project & project, const gd::String & filename, bool forceSingleFile)
 {
     //Serialize the whole project
     gd::SerializerElement rootElement;
     project.SerializeTo(rootElement);
 
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    if (project.IsFolderProject()) //Optionally split the project
+    if (project.IsFolderProject() && !forceSingleFile) //Optionally split the project
     {
         wxString projectPath = wxFileName::FileName(filename).GetPath();
         gd::Splitter splitter;

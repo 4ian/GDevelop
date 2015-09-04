@@ -32,7 +32,7 @@ public:
      *
      * "Dirty" flag is set to false when save is done.
      */
-    static bool SaveToFile(const gd::Project & project, const gd::String & filename);
+    static bool SaveToFile(const gd::Project & project, const gd::String & filename, bool forceSingleFile = false);
 
     /**
      * \brief Save the project to a JSON file.

@@ -816,7 +816,7 @@ void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
         if (!filename.IsFileWritable()) continue;
 
         wxString autosaveFilename = filename.GetPath() + "/" + filename.GetName()+".gdg.autosave";
-        if (!gd::ProjectFileWriter::SaveToFile(*games[i], autosaveFilename))
+        if (!gd::ProjectFileWriter::SaveToFile(*games[i], autosaveFilename, true))
             gd::LogStatus( _("Autosave failed!") );
     }
 }

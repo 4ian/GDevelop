@@ -20,21 +20,22 @@ This project is released under the MIT License.
 #include "../PathfindingBehavior.h"
 #include "../PathfindingObstacleBehavior.h"
 
- class ResizableRuntimeObject : public RuntimeObject {
- public:
+//Mock objects that can have a specific size
+class ResizableRuntimeObject : public RuntimeObject {
+public:
  	ResizableRuntimeObject(RuntimeScene & scene, const gd::Object & obj) :
  		RuntimeObject(scene, obj)
  	{}
 
- 	virtual float GetWidth() const override { return width; }
- 	virtual float GetHeight() const override { return height; }
- 	void SetWidth(float newWidth) { width = newWidth; }
- 	void SetHeight(float newHeight) { height = newHeight; }
+ 	float GetWidth() const override { return width; }
+ 	float GetHeight() const override { return height; }
+ 	void SetWidth(float newWidth) override { width = newWidth; }
+ 	void SetHeight(float newHeight) override { height = newHeight; }
 
- private:
+private:
  	float width;
  	float height;
- };
+};
 
 TEST_CASE( "PathfindingBehavior", "[game-engine][pathfinding]" ) {
 	SECTION("Basics") {
@@ -163,5 +164,38 @@ TEST_CASE( "PathfindingBehavior", "[game-engine][pathfinding]" ) {
 		runtimeBehavior->MoveTo(scene, 5, -5);
 		REQUIRE(runtimeBehavior->PathFound() == true);
 		REQUIRE(runtimeBehavior->GetNodeCount() == 2);
+	}
+	SECTION("Diagonals") {
+		//Prepare some objects and the context
+		RuntimeGame game;
+
+		gd::Object playerObj("player");
+		auto behavior = new PathfindingBehavior();
+		behavior->SetName("Pathfinding");
+		playerObj.AddBehavior(behavior);
+
+		RuntimeScene scene(NULL, &game);
+		std::shared_ptr<RuntimeObject> player(new RuntimeObject(scene, playerObj));
+		scene.objectsInstances.AddObject(player);
+
+		PathfindingBehavior * runtimeBehavior =
+			static_cast<PathfindingBehavior *>(player->GetBehaviorRawPointer("Pathfinding"));
+
+		//Test a specific path that can lead to false computations
+		//in case the algorithm open nodes list is not implemented properly
+		//and can remove node with same cost.
+		runtimeBehavior->MoveTo(scene, 1*20, 4*20);
+		REQUIRE(runtimeBehavior->PathFound() == true);
+		REQUIRE(runtimeBehavior->GetNodeCount() == 5);
+		REQUIRE(runtimeBehavior->GetNodeX(0) == 0);
+		REQUIRE(runtimeBehavior->GetNodeY(0) == 0);
+		REQUIRE(runtimeBehavior->GetNodeX(1) == 0);
+		REQUIRE(runtimeBehavior->GetNodeY(1) == 20);
+		REQUIRE(runtimeBehavior->GetNodeX(2) == 0);
+		REQUIRE(runtimeBehavior->GetNodeY(2) == 40);
+		REQUIRE(runtimeBehavior->GetNodeX(3) == 0);
+		REQUIRE(runtimeBehavior->GetNodeY(3) == 60);
+		REQUIRE(runtimeBehavior->GetNodeX(4) == 20);
+		REQUIRE(runtimeBehavior->GetNodeY(4) == 80);
 	}
 }

@@ -221,43 +221,6 @@ public:
         return finalNode;
     }
 
-    #if 0
-    static void UnitTest()
-    {
-        {
-            ScenePathfindingObstaclesManager obstacles;
-            SearchContext ctx(obstacles, 0, 0);
-            ctx.ComputePathTo(0,0);
-        }
-        std::cout << "---" << std::endl;
-        {
-            ScenePathfindingObstaclesManager obstacles;
-            SearchContext ctx(obstacles, 0, 0);
-            ctx.ComputePathTo(1,0);
-        }
-        std::cout << "---" << std::endl;
-        {
-            ScenePathfindingObstaclesManager obstacles;
-            SearchContext ctx(obstacles, 0, 0);
-            ctx.ComputePathTo(0,1);
-        }
-        std::cout << "---" << std::endl;
-        {
-            ScenePathfindingObstaclesManager obstacles;
-            SearchContext ctx(obstacles, 0, 0);
-            ctx.ComputePathTo(1,1);
-        }
-        std::cout << "---" << std::endl;
-        {
-            ScenePathfindingObstaclesManager obstacles;
-            SearchContext ctx(obstacles, 3, 4);
-            ctx.ComputePathTo(12,9);
-        }
-        std::cout << "---" << std::endl;
-        std::cout << "End unit tests";
-    }
-    #endif
-
 private:
     /**
      * Insert the neighbors of the current node in the open list
@@ -352,7 +315,12 @@ private:
             || neighbor.smallestCost > currentNode.smallestCost + (currentNode.cost+neighbor.cost)/2.0*factor)
         {
             if (neighbor.smallestCost != -1) //The node is already in the open list:
-                openNodes.erase(&neighbor);   //remove it as its estimate cost will be updated.
+            {
+                //remove it as its estimate cost will be updated.
+                auto it = openNodes.find(&neighbor);
+                if (it != openNodes.end()) // /!\ ALWAYS use an iterator with multiset::erase
+                    openNodes.erase(it);   //otherwise, other nodes which are equivalent get removed too.
+            }
 
             neighbor.smallestCost = currentNode.smallestCost + (currentNode.cost+neighbor.cost)/2.0*factor;
             neighbor.parent = &currentNode;

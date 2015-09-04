@@ -24,6 +24,7 @@
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/ProjectFileWriter.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCpp/Events/CodeCompilationHelpers.h"
 #include "GDCpp/DatFile.h"
@@ -279,7 +280,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     diagnosticManager.OnMessage(_( "Copying resources..." ), _( "Step 1 out of 3" ));
     gd::Project strippedProject = game;
     gd::ProjectStripper::StripProject(strippedProject);
-    strippedProject.SaveToFile( tempDir + "/GDProjectSrcFile.gdg" );
+    gd::ProjectFileWriter::SaveToFile(strippedProject, tempDir + "/GDProjectSrcFile.gdg");
     diagnosticManager.OnPercentUpdate(80);
 
     gd::SafeYield::Do();

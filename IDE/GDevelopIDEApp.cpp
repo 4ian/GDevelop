@@ -41,6 +41,7 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/ProjectFileWriter.h"
 #include "GDCore/IDE/Analytics/AnalyticsSender.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/IDE/Clipboard.h"
@@ -461,7 +462,7 @@ void GDevelopIDEApp::OnUnhandledException()
     try
     {
         for (std::size_t i = 0;i<mainEditor->games.size();++i)
-            mainEditor->games[i]->SaveToFile("gameDump"+gd::String::From(i)+".gdg");
+            gd::ProjectFileWriter::SaveToFile(*mainEditor->games[i], "gameDump"+gd::String::From(i)+".gdg");
     }
     catch(...)
     {
@@ -484,7 +485,7 @@ bool GDevelopIDEApp::OnExceptionInMainLoop()
     try
     {
         for (std::size_t i = 0;i<mainEditor->games.size();++i)
-            mainEditor->games[i]->SaveToFile("gameDump"+gd::String::From(i)+".gdg");
+            gd::ProjectFileWriter::SaveToFile(*mainEditor->games[i], "gameDump"+gd::String::From(i)+".gdg");
     }
     catch(...)
     {

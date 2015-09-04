@@ -40,6 +40,7 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/ProjectFileWriter.h"
 #include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
@@ -79,6 +80,7 @@ const long MainFrame::toBeDeletedMenuItem = wxNewId();
 const long MainFrame::ID_MENUITEM26 = wxNewId();
 const long MainFrame::ID_MENUITEM12 = wxNewId();
 const long MainFrame::ID_MENUITEM13 = wxNewId();
+const long MainFrame::ID_MENUITEM8 = wxNewId();
 const long MainFrame::ID_MENUITEM16 = wxNewId();
 const long MainFrame::ID_MENUITEM19 = wxNewId();
 const long MainFrame::ID_MENUITEM17 = wxNewId();
@@ -200,6 +202,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem7 = new wxMenuItem((&fileMenu), ID_MENUITEM13, _("Save as..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem7->SetBitmap(gd::SkinHelper::GetIcon("saveas", 16));
     fileMenu.Append(MenuItem7);
+    MenuItem5 = new wxMenuItem((&fileMenu), ID_MENUITEM8, _("Save as folder project"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem5->SetBitmap(gd::SkinHelper::GetIcon("open", 16));
+    fileMenu.Append(MenuItem5);
     MenuItem12 = new wxMenuItem((&fileMenu), ID_MENUITEM16, _("Save all\tCtrl+Shift+S"), wxEmptyString, wxITEM_NORMAL);
     MenuItem12->SetBitmap(gd::SkinHelper::GetIcon("save_all", 16));
     fileMenu.Append(MenuItem12);
@@ -255,6 +260,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnOpenExampleSelected);
     Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveSelected);
     Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAsSelected);
+    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAsFolderSelected);
     Connect(ID_MENUITEM16,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAllSelected);
     Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnCloseCurrentProjectSelected);
     Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuPrefSelected);
@@ -299,7 +305,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
         {
             long id = wxNewId();
 
-            fileMenu.Insert(10, id, exporter->GetProjectExportButtonLabel());
+            fileMenu.Insert(11, id, exporter->GetProjectExportButtonLabel());
             Connect( id, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&MainFrame::OnMenuCompilationSelected );
             idToPlatformExportMenuMap[id] = gd::PlatformManager::Get()->GetAllPlatforms()[i].get();
         }
@@ -810,7 +816,7 @@ void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
         if (!filename.IsFileWritable()) continue;
 
         wxString autosaveFilename = filename.GetPath() + "/" + filename.GetName()+".gdg.autosave";
-        if ( !games[i]->SaveToFile(autosaveFilename) )
+        if (!gd::ProjectFileWriter::SaveToFile(*games[i], autosaveFilename))
             gd::LogStatus( _("Autosave failed!") );
     }
 }

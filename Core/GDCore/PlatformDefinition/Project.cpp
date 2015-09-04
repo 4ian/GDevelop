@@ -38,15 +38,13 @@
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Serialization/Serializer.h"
+#include "GDCore/Serialization/Splitter.h"
 #include "Project.h"
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/propgrid/propgrid.h>
 #include <wx/settings.h>
-#include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
-#include <wx/settings.h>
 #include <wx/filename.h>
-#include <wx/stdpaths.h>
 #include <wx/utils.h>
 #endif
 
@@ -61,6 +59,7 @@ Project::Project() :
     #if defined(GD_IDE_ONLY)
     name(_("Project")),
     packageName("com.example.gamename"),
+    folderProject(false),
     #endif
     windowWidth(800),
     windowHeight(600),
@@ -532,6 +531,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #if defined(GD_IDE_ONLY)
     SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
     SetPackageName(propElement.GetStringAttribute("packageName"));
+    SetFolderProject(propElement.GetBoolAttribute("folderProject"));
     SetLastCompilationDirectory(propElement.GetChild("latestCompilationDirectory", 0, "LatestCompilationDirectory").GetValue().GetString());
     winExecutableFilename = propElement.GetStringAttribute("winExecutableFilename");
     winExecutableIconFile = propElement.GetStringAttribute("winExecutableIconFile");
@@ -637,7 +637,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #if defined(GD_IDE_ONLY)
     if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMinorVersion, revision, build, 4,0,85,0) )
     {
-        for(unsigned int i = 0;i < extensionsUsed.size();++i) 
+        for(unsigned int i = 0;i < extensionsUsed.size();++i)
             extensionsUsed[i] = extensionsUsed[i].FindAndReplace("Automatism", "Behavior");
     }
     #endif
@@ -719,148 +719,6 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #endif
 }
 
-#if !defined(EMSCRIPTEN)
-bool Project::LoadFromFile(const gd::String & filename)
-{
-    //Load the XML document structure
-    TiXmlDocument doc;
-    if ( !doc.LoadFile(filename.ToLocale().c_str()) )
-    {
-        gd::String errorTinyXmlDesc = doc.ErrorDesc();
-        gd::String error = _( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
-
-        gd::LogError( error );
-        return false;
-    }
-
-    #if defined(GD_IDE_ONLY)
-    SetProjectFile(filename);
-    dirty = false;
-    #endif
-
-    TiXmlHandle hdl( &doc );
-    gd::SerializerElement rootElement;
-
-    //COMPATIBILITY CODE WITH ANSI GDEVELOP ( <= 3.6.83 )
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI) //There should not be any problem with encoding in compiled games
-    //Get the declaration element
-    TiXmlDeclaration * declXmlElement = hdl.FirstChild().ToNode()->ToDeclaration();
-    if(strcmp(declXmlElement->Encoding(), "UTF-8") != 0)
-    {
-        std::cout << "This is a legacy GDevelop project, checking if it is already encoded in UTF8..." << std::endl;
-
-        //The document has not been converted for/saved by GDevelop UTF8, now, try to determine if the project
-        //was saved on Linux and is already in UTF8 or on Windows and still in the locale encoding.
-        bool isNotInUTF8 = false;
-        std::ifstream docStream;
-        docStream.open(filename.ToLocale(), ios::in);
-
-        while( !docStream.eof() )
-        {
-            std::string docLine;
-            std::getline(docStream, docLine);
-
-            if( !gd::String::FromUTF8(docLine).IsValid() )
-            {
-                //The file contains an invalid character,
-                //the file has been saved by the legacy ANSI Windows version of GDevelop
-                // -> stop reading the file and start converting from the locale to UTF8
-                isNotInUTF8 = true;
-                break;
-            }
-        }
-
-        docStream.close();
-
-        //If the file is not encoded in UTF8, encode it
-        if(isNotInUTF8)
-        {
-            std::cout << "The project file is not encoded in UTF8, conversion started... ";
-
-            //Create a temporary file
-            #if defined(WINDOWS)
-            //Convert using the current locale
-            wxString tmpFileName = wxFileName::CreateTempFileName("");
-            std::ofstream outStream;
-            docStream.open(filename.ToLocale(), ios::in);
-
-            outStream.open(tmpFileName, ios::out | ios::trunc);
-
-            while( !docStream.eof() )
-            {
-                std::string docLine;
-                std::string convLine;
-
-                std::getline(docStream, docLine);
-                sf::Utf8::fromAnsi(docLine.begin(), docLine.end(), std::back_inserter(convLine));
-
-                outStream << convLine << '\n';
-            }
-
-            outStream.close();
-            docStream.close();
-
-            #else
-            //Convert using iconv command tool
-            wxString tmpFileName = wxStandardPaths::Get().GetUserConfigDir() + "/gdevelop_converted_project";
-            gd::String iconvCall = gd::String("iconv -f LATIN1 -t UTF-8 \"") + filename.ToLocale() + "\" ";
-            #if defined(MACOS)
-            iconvCall += "> \"" + tmpFileName + "\"";
-            #else
-            iconvCall += "-o \"" + tmpFileName + "\"";
-            #endif
-
-            std::cout << "Executing " << iconvCall  << std::endl;
-            system(iconvCall.c_str());
-            #endif
-
-            //Reload the converted file, forcing UTF8 encoding as the XML header is false (still written ISO-8859-1)
-            doc.LoadFile(std::string(tmpFileName).c_str(), TIXML_ENCODING_UTF8);
-
-            std::cout << "Finished." << std::endl;
-            gd::LogMessage(_("Your project has been upgraded to be used with GDevelop 4.\nIf you save it, you won't be able to open it with an older version: please do a backup of your project file if you want to go back to GDevelop 3."));
-        }
-    }
-    #endif
-    //END OF COMPATIBILITY CODE
-
-    //Load the root element
-    TiXmlElement * rootXmlElement = hdl.FirstChildElement("project").ToElement();
-    //Compatibility with GD <= 3.3
-    if (!rootXmlElement) rootXmlElement = hdl.FirstChildElement("Project").ToElement();
-    if (!rootXmlElement) rootXmlElement = hdl.FirstChildElement("Game").ToElement();
-    //End of compatibility code
-    gd::Serializer::FromXML(rootElement, rootXmlElement);
-
-    //Unserialize the whole project
-    UnserializeFrom(rootElement);
-
-    return true;
-}
-
-#if defined(GD_IDE_ONLY)
-bool Project::LoadFromJSONFile(const gd::String & filename)
-{
-    std::ifstream ifs(filename.ToLocale().c_str());
-    if (!ifs.is_open())
-    {
-        gd::String error = _( "Unable to open the file") + _("Make sure the file exists and that you have the right to open the file.");
-        gd::LogError( error );
-        return false;
-    }
-
-    SetProjectFile(filename);
-    dirty = false;
-
-    std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-    gd::SerializerElement rootElement = gd::Serializer::FromJSON(str);
-    UnserializeFrom(rootElement);
-
-    return true;
-}
-#endif
-#endif
-
 #if defined(GD_IDE_ONLY)
 void Project::SerializeTo(SerializerElement & element) const
 {
@@ -879,6 +737,7 @@ void Project::SerializeTo(SerializerElement & element) const
     propElement.AddChild("maxFPS").SetValue(GetMaximumFPS());
     propElement.AddChild("minFPS").SetValue(GetMinimumFPS());
     propElement.AddChild("verticalSync").SetValue(IsVerticalSynchronizationEnabledByDefault());
+    propElement.SetAttribute("folderProject", folderProject);
     propElement.SetAttribute("packageName", packageName);
     propElement.SetAttribute("winExecutableFilename", winExecutableFilename);
     propElement.SetAttribute("winExecutableIconFile", winExecutableIconFile);
@@ -936,53 +795,6 @@ void Project::SerializeTo(SerializerElement & element) const
     dirty = false;
     #endif
 }
-
-#if !defined(EMSCRIPTEN)
-bool Project::SaveToFile(const gd::String & filename)
-{
-    //Serialize the whole project
-    gd::SerializerElement rootElement;
-    SerializeTo(rootElement);
-
-    //Create the XML document structure...
-    TiXmlDocument doc;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "UTF-8", "" );
-    doc.LinkEndChild( decl );
-
-    TiXmlElement * root = new TiXmlElement( "project" );
-    doc.LinkEndChild( root );
-    gd::Serializer::ToXML(rootElement, root); //...and put the serialized project in it.
-
-    //Write XML to file
-    if ( !doc.SaveFile( filename.ToLocale().c_str() ) )
-    {
-        gd::LogError( _( "Unable to save file ") + filename + _("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
-        return false;
-    }
-
-    return true;
-}
-
-bool Project::SaveToJSONFile(const gd::String & filename)
-{
-    //Serialize the whole project
-    gd::SerializerElement rootElement;
-    SerializeTo(rootElement);
-
-    //Write JSON to file
-    std::string str = gd::Serializer::ToJSON(rootElement);
-    ofstream ofs(filename.ToLocale().c_str());
-    if (!ofs.is_open())
-    {
-        gd::LogError( _( "Unable to save file ")+ filename + _("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
-        return false;
-    }
-
-    ofs << str;
-    ofs.close();
-    return true;
-}
-#endif
 
 bool Project::ValidateObjectName(const gd::String & name)
 {
@@ -1210,6 +1022,7 @@ void Project::Init(const gd::Project & game)
     #if defined(GD_IDE_ONLY)
     author = game.author;
     packageName = game.packageName;
+    folderProject = game.folderProject;
     latestCompilationDirectory = game.latestCompilationDirectory;
     objectGroups = game.objectGroups;
 

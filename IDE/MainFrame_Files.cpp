@@ -272,6 +272,7 @@ void MainFrame::OnMenuSaveAsSelected(wxCommandEvent&)
 
     GetCurrentGame()->SetFolderProject(false);
     SaveAs();
+    SetCurrentGame(projectCurrentlyEdited);
 }
 
 void MainFrame::OnMenuSaveAsFolderSelected(wxCommandEvent&)
@@ -280,6 +281,7 @@ void MainFrame::OnMenuSaveAsFolderSelected(wxCommandEvent&)
 
     GetCurrentGame()->SetFolderProject();
     SaveAs();
+    SetCurrentGame(projectCurrentlyEdited);
 }
 
 

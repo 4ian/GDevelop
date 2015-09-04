@@ -24,6 +24,8 @@ void DeclareAdMobObjectExtension(gd::PlatformExtension & extension)
                "JsPlatform/Extensions/admobicon.png",
                &CreateAdMobObject);
 
+    obj.SetHelpUrl("/gdevelop/documentation/manual/built_admob");
+
     AdMobObject::LoadEdittimeIcon();
 
     obj.AddAction("ShowBanner",

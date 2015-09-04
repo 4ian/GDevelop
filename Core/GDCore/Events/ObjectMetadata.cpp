@@ -111,6 +111,14 @@ ObjectMetadata & ObjectMetadata::SetFullName(const gd::String & fullname_)
     return *this;
 }
 
+ObjectMetadata & ObjectMetadata::SetHelpUrl(const gd::String & helpUrl_)
+{
+#if defined(GD_IDE_ONLY)
+    helpUrl = helpUrl_;
+#endif
+    return *this;
+}
+
 ObjectMetadata & ObjectMetadata::SetDescription(const gd::String & description_)
 {
 #if defined(GD_IDE_ONLY)

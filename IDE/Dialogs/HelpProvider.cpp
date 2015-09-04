@@ -11,5 +11,8 @@ HelpProvider * HelpProvider::_singleton = NULL;
 
 void HelpProvider::OpenLink(wxString link)
 {
+	if (link.StartsWith("/"))
+		link = _("http://wiki.compilgames.net/doku.php") + link;
+
     wxLaunchDefaultBrowser(link);
 }

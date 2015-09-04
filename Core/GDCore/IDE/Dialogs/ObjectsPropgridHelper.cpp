@@ -9,6 +9,8 @@
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.h"
 #include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -22,6 +24,10 @@
 #include <wx/choicdlg.h>
 #include <wx/textdlg.h>
 
+//Let _ return wxString for convenience in this file.
+#undef _
+#define _(s) wxGetTranslation(wxString::FromUTF8(u8##s))
+
 namespace gd
 {
 
@@ -29,6 +35,8 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
 {
     if ( grid == NULL ) return;
     if ( !object ) return;
+    auto metadata = gd::MetadataProvider::GetObjectMetadata(project.GetCurrentPlatform(),
+        object->GetType());
 
     if ( !displayedAfterInstanceProperties ) grid->Clear();
 
@@ -39,6 +47,13 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
         grid->Append( new wxPropertyCategory(_("General object properties")) );
 
     grid->EnableProperty(grid->Append( new wxStringProperty(_("Object name"), wxPG_LABEL, object->GetName())), false);
+    grid->EnableProperty(grid->Append( new wxStringProperty(_("Kind"), wxPG_LABEL, metadata.GetFullName())), false);
+    if (!metadata.GetHelpUrl().empty())
+    {
+        grid->Append( new wxStringProperty(_("Help"), wxPG_LABEL, _("Click to see help...")) );
+        grid->SetPropertyCell(_("Help"), 1, _("Click to see help..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+        grid->SetPropertyReadOnly(_("Help"));
+    }
 
     auto properties = object->GetProperties(project);
     if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() )
@@ -154,6 +169,13 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
 
             wxSetWorkingDirectory(oldWorkingDir);
         }
+        else if ( event.GetPropertyName() == _("Help"))
+        {
+            auto metadata = gd::MetadataProvider::GetObjectMetadata(project.GetCurrentPlatform(),
+                object->GetType());
+
+            gd::HelpFileAccess::Get()->OpenURL(metadata.GetHelpUrl());
+        }
         else if ( event.GetPropertyName() == _("Variables") )
         {
             gd::ChooseVariableDialog dialog(grid, object->GetVariables(), true);
@@ -262,7 +284,7 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
         if (wxEnumProperty * enumProperty = dynamic_cast<wxEnumProperty*>(event.GetProperty()))
             value = readEnumPropertyString(behavior.GetProperties(project));
 
-        if (!behavior.UpdateProperty(event.GetProperty()->GetLabel(), value, project)) 
+        if (!behavior.UpdateProperty(event.GetProperty()->GetLabel(), value, project))
         {
             event.Veto();
             return false;

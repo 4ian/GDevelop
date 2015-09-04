@@ -2,7 +2,7 @@
 
 [Setup]
 AppName=GDevelop
-AppVersion=3.6
+AppVersion=4.0
 AppPublisher=Florian Rival
 AppPublisherURL=http://www.compilgames.net
 AppSupportURL=http://www.forum.compilgames.net
@@ -13,11 +13,11 @@ AllowNoIcons=yes
 LicenseFile=..\Output\Release_Windows\License-en.rtf
 InfoBeforeFile=..\Output\Release_Windows\Informations-en.rtf
 OutputDir=.\
-OutputBaseFilename=gd3681
+OutputBaseFilename=gd4083
 Compression=lzma
 SolidCompression=yes
 SetupIconFile=..\Output\Release_Windows\res\icon.ico
-VersionInfoVersion=3.6
+VersionInfoVersion=4.0
 WizardImageFile=Setup bitmap\wizbmp.bmp
 WizardSmallImageFile=Setup bitmap/smallicon.bmp
 AppCopyright=2008-2015 Florian Rival
@@ -25,7 +25,7 @@ VersionInfoCompany=Florian Rival
 VersionInfoDescription=GDevelop setup
 VersionInfoCopyright=2008-2015 Florian Rival
 VersionInfoProductName=GDevelop
-VersionInfoProductVersion=3.6
+VersionInfoProductVersion=4.0
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl";

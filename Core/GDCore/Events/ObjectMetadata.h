@@ -104,12 +104,20 @@ public:
     const gd::String & GetName() const { return name; }
 #if defined(GD_IDE_ONLY)
     const gd::String & GetFullName() const { return fullname; }
+    const gd::String & GetHelpUrl() const { return helpUrl; }
     const gd::String & GetDescription() const { return description; }
     const gd::String & GetIconFilename() const { return iconFilename; }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return icon; }
 #endif
 #endif
+
+    /**
+     * \brief Set the URL pointing to the help page about this object
+     * \note If url starts with a slash, it is considered as an URL relative
+     * the the GDevelop wiki.
+     */
+    ObjectMetadata & SetHelpUrl(const gd::String & url);
 
     /**
      * \brief Erase any existing include file and add the specified include.
@@ -138,6 +146,7 @@ private:
     gd::String extensionNamespace;
     gd::String name;
 #if defined(GD_IDE_ONLY)
+    gd::String helpUrl;
     gd::String fullname;
     gd::String description;
     gd::String iconFilename;

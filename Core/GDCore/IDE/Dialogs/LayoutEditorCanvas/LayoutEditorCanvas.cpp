@@ -1089,7 +1089,7 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
         for ( auto & it : selectedInstances)
         {
             float newAngle = atan2(sf::Mouse::getPosition(*this).y-angleButtonCenter.y, sf::Mouse::getPosition(*this).x-angleButtonCenter.x)*180/3.14159;
-            if (shiftPressed) newAngle = gd::Round(newAngle / 45.0) * 45.0;
+            if (shiftPressed) newAngle = gd::Round(newAngle / 15.0) * 15.0;
             it.first->SetAngle(newAngle);
         }
 

@@ -4,6 +4,7 @@ rm -rf GDevelop.app 2>&1 >/dev/null
 cp -r macos-bundle-skeleton GDevelop.app
 cp -r ../Output/Release_Darwin/ GDevelop.app/Contents/Resources/
 cp -R ../../ExtLibs/SFML/extlibs/libs-osx/Frameworks GDevelop.app/Contents/
+mkdir -p GDevelop.app/Contents/MacOS
 mv GDevelop.app/Contents/Resources/GDIDE_launcher GDevelop.app/Contents/MacOS/GDIDE_launcher
 
 type dylibbundler >/dev/null 2>&1 || { echo >&2 "Can't find dylibbundler, required to change libraries install names. Aborting..."; exit 1; }
@@ -18,6 +19,13 @@ cd GDevelop.app/Contents/Resources/
 echo . | dylibbundler -x GDIDE -b -cd -od -of -p '@executable_path/' > /dev/null
 mv libs/* .
 rm -rf libs
+
+#Do the same for wxWidgets libs, to ensure that each wx library has
+#the other local libraries as dependencies instead of the ones in /usr/local/[...].
+for file in `ls libwx*`
+do
+	echo . | dylibbundler -x $file -cd -od -of -p '@executable_path/'
+done
 
 #Do the same for GDCore and GDCpp.
 #We don't need -b flag anymore as all external libs have already being copied.
@@ -45,6 +53,19 @@ CppPlatform/Extensions/
 quit
 EOF
 done
+for file in `ls JsPlatform/Extensions/*.xgde`
+do
+	echo "Updating libraries for $file..."
+	cat <<EOF | dylibbundler -x $file -cd -od -of -p '@executable_path/' > /dev/null
+JsPlatform
+JsPlatform/Extensions/
+.
+JsPlatform
+JsPlatform/Extensions/
+.
+quit
+EOF
+done
 
 
 ###Code signing and pkg building
@@ -61,7 +82,7 @@ rm GDevelop.app/Contents/Resources/7zS.sfx
 
 #Now sign the package:
 function sign {
-    codesign -f -v --deep -s "3rd Party Mac Developer Application: Florian Rival" $1 --entitlements GDevelop.entitlements
+    codesign -f -v --deep -s "Developer ID Application: Florian Rival" $1 --entitlements GDevelop.entitlements
 }
 
 for file in `ls GDevelop.app/Contents/Resources/*.dylib`
@@ -70,6 +91,11 @@ do
 done
 
 for file in `ls GDevelop.app/Contents/Resources/CppPlatform/Extensions/*.{xgde,dylib}`
+do
+	sign $file
+done
+
+for file in `ls GDevelop.app/Contents/Resources/JsPlatform/Extensions/*.{xgde,dylib}`
 do
 	sign $file
 done
@@ -86,9 +112,9 @@ sign "GDevelop.app/Contents/Resources/JsPlatform/libGDJS.dylib"
 
 sign "GDevelop.app/Contents/Resources/GDIDE"
 sign "GDevelop.app/Contents/MacOS/GDIDE_launcher"
-sign "GDevelop.app/Contents/Frameworks/sndfile.framework"
-sign "GDevelop.app/Contents/Frameworks/freetype.framework"
+sign "GDevelop.app/Contents/Frameworks/sndfile.framework/Versions/Current"
+sign "GDevelop.app/Contents/Frameworks/freetype.framework/Versions/Current"
 sign "GDevelop.app"
 
 #And create the pkg:
-productbuild --component "GDevelop.app" /Applications --sign "3rd Party Mac Developer Installer: Florian Rival" --product "GDevelop.app/Contents/Info.plist" GDevelop.pkg
+productbuild --component "GDevelop.app" /Applications --sign "Developer ID Installer: Florian Rival" --product "GDevelop.app/Contents/Info.plist" GDevelop.pkg

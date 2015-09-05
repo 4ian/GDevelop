@@ -22,7 +22,7 @@ namespace gd
  * that are part of a project). This class provides tool functions
  * that write the "real" project file.
  */
-class ProjectFileWriter
+class GD_CORE_API ProjectFileWriter
 {
 public:
 

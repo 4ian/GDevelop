@@ -60,7 +60,7 @@ ENDIF(NO_UPDATE_CHECKER)
 include_directories(.)
 include_directories(wxstedit/include)
 file(GLOB source_files * Dialogs/* wxstedit/src/*)
-file(GLOB exe_source_files Launcher/MainWin.cpp)
+file(GLOB exe_source_files Launcher/MainWin.cpp Launcher/launcherresource.rc)
 file(GLOB osx_launcher_source_files Launcher/MainOSX.cpp)
 
 IF(WIN32)

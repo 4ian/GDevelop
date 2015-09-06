@@ -195,11 +195,15 @@ gdjs.PlatformRuntimeBehavior.prototype.getAABB = function(){
 };
 
 gdjs.PlatformRuntimeBehavior.prototype.onActivate = function() {
+    if (this._registeredInManager) return;
+
     this._manager.addPlatform(this);
     this._registeredInManager = true;
 };
 
 gdjs.PlatformRuntimeBehavior.prototype.onDeActivate = function() {
+    if (!this._registeredInManager) return;
+
     this._manager.removePlatform(this);
     this._registeredInManager = false;
 };

@@ -193,11 +193,15 @@ gdjs.PathfindingObstacleRuntimeBehavior.prototype.getAABB = function(){
 };
 
 gdjs.PathfindingObstacleRuntimeBehavior.prototype.onActivate = function() {
+    if (this._registeredInManager) return;
+
     this._manager.addObstacle(this);
     this._registeredInManager = true;
 };
 
 gdjs.PathfindingObstacleRuntimeBehavior.prototype.onDeActivate = function() {
+    if (!this._registeredInManager) return;
+
     this._manager.removeObstacle(this);
     this._registeredInManager = false;
 };

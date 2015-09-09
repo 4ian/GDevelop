@@ -11,6 +11,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/NewNameGenerator.h"
 
 namespace gd
 {
@@ -24,31 +25,39 @@ void ResourcesMergingHelper::ExposeFile(gd::String & resourceFilename)
     fs.MakeAbsolute(resourceFullFilename, baseDirectory);
 
     if (!preserveDirectoriesStructure)
-    {
-        //Just strip the filename and add the resource, don't take care of resources with same filename.
-        if ( resourcesNewFilename.find(resourceFullFilename) == resourcesNewFilename.end() )
-            resourcesNewFilename[resourceFullFilename] = fs.FileNameFrom(resourceFullFilename);
-
-        std::cout << resourceFullFilename << " to " << resourcesNewFilename[resourceFullFilename] << std::endl;
-    }
+        SetNewFilename(resourceFullFilename, fs.FileNameFrom(resourceFullFilename));
     else
     {
-        if ( resourcesNewFilename.find(resourceFullFilename) == resourcesNewFilename.end() )
+        //We want to preserve the directory structure:
+        //keep paths relative to the base directory
+        gd::String relativeFilename = resourceFullFilename;
+        if ( fs.MakeRelative(relativeFilename, baseDirectory) )
+            SetNewFilename(resourceFullFilename, relativeFilename);
+        else //Unless the filename cannot be made relative. In this case:
         {
-            //We want to preserve the directory structure : Keep paths relative to the base directory
-            gd::String relativeFilename = resourceFullFilename;
-            if ( fs.MakeRelative(relativeFilename, baseDirectory) )
-                resourcesNewFilename[resourceFullFilename] = relativeFilename;
-            else //Unless the filename cannot be made relative. In this case:
-            {
-                if ( !preserveAbsoluteFilenames ) //Just strip the filename to its file part if we do not want to preserve the absolute filenames.
-                    resourcesNewFilename[resourceFullFilename] = fs.FileNameFrom(resourceFullFilename);
-            }
+            //Just strip the filename to its file part
+            //if we do not want to preserve the absolute filenames.
+            if (!preserveAbsoluteFilenames)
+                SetNewFilename(resourceFullFilename, fs.FileNameFrom(resourceFullFilename));
         }
     }
 
-    gd::String newResourceFilename = resourcesNewFilename[resourceFullFilename];
+    gd::String newResourceFilename = oldFilenames[resourceFullFilename];
     resourceFilename = newResourceFilename;
+}
+
+void ResourcesMergingHelper::SetNewFilename(gd::String oldFilename, gd::String newFilename)
+{
+    if (oldFilenames.find(oldFilename) != oldFilenames.end())
+        return;
+
+    //Make sure that the new filename is not already used.
+    gd::String finalFilename = gd::NewNameGenerator::Generate(newFilename, [this](const gd::String & name) {
+        return newFilenames.find(name) != newFilenames.end();
+    });
+
+    oldFilenames[oldFilename] = finalFilename;
+    newFilenames[finalFilename] = oldFilename;
 }
 
 void ResourcesMergingHelper::SetBaseDirectory(const gd::String & baseDirectory_)

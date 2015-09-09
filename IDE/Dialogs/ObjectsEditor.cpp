@@ -32,6 +32,7 @@
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Clipboard.h"
+#include "GDCore/IDE/NewNameGenerator.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/ObjectOrGroupFinder.h"
 #include "GDCore/PlatformDefinition/Platform.h"
@@ -121,16 +122,13 @@ namespace
 
                 std::vector<gd::ObjectGroup> & objectsGroups = layout.GetObjectGroups();
 
-                gd::String name = text + "Group";
-                for (std::size_t i = 2;
-                    std::find_if( objectsGroups.begin(), objectsGroups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
+                gd::String name = gd::NewNameGenerator::Generate(text + "Group", [&objectsGroups](const gd::String & name){
+                    return std::find_if(objectsGroups.begin(), objectsGroups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
                         != objectsGroups.end();
-                    ++i)
-                    name = text + "Group" + gd::String::From(i);
+                });
 
-                newGroup.SetName( name );
-
-                objectsGroups.push_back( newGroup );
+                newGroup.SetName(name);
+                objectsGroups.push_back(newGroup);
 
                 //Add the group item
                 wxTreeItemId itemAdded = treeCtrl->AppendItem( groupsRootItem, name, 1 );
@@ -914,9 +912,9 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     gd::ObjectOrGroupFinder nameChecker(project, &layout);
 
     //Find a new unique name for the object
-    gd::String name = _("NewObject");
-    for (unsigned int i = 2; nameChecker.HasObjectOrGroupNamed(name)!=gd::ObjectOrGroupFinder::No ;++i)
-        name = _("NewObject")+gd::String::From(i);
+    gd::String name = gd::NewNameGenerator::Generate(_("NewObject"), [&nameChecker](const gd::String & name) {
+        return nameChecker.HasObjectOrGroupNamed(name) != gd::ObjectOrGroupFinder::No;
+    });
 
     //Add a new object of selected type to objects list
     gd::Object & object = layout.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(),
@@ -950,14 +948,11 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
 
     gd::ObjectOrGroupFinder nameChecker(project, &layout);
 
-    gd::String name = _("NewGroup");
-    for (unsigned int i = 2;
-        nameChecker.HasObjectOrGroupNamed(name) != gd::ObjectOrGroupFinder::No;
-        ++i)
-        name = _("NewGroup")+gd::String::From(i);
+    gd::String name = gd::NewNameGenerator::Generate(_("NewGroup"), [&nameChecker](const gd::String & name) {
+        return nameChecker.HasObjectOrGroupNamed(name) != gd::ObjectOrGroupFinder::No;
+    });
 
-    newGroup.SetName( name );
-
+    newGroup.SetName(name);
     objectsGroups.push_back( newGroup );
 
     wxTreeItemId itemAdded;
@@ -1283,19 +1278,10 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
 
         //Add a new object of selected type to objects list
         gd::Object * object = clipboard->GetObject()->Clone();
-
-        gd::String name = object->GetName();
-
-        //Add a number to the new name if necessary
-        if ( nameChecker.HasObjectOrGroupNamed(name, globalObject /* Only search other layouts if it's a global object */) != gd::ObjectOrGroupFinder::No )
-        {
-            name =  _( "CopyOf" ) + object->GetName();
-            for (unsigned int i = 2;nameChecker.HasObjectOrGroupNamed(name, globalObject /* Only search other layouts if it's a global object */)!=gd::ObjectOrGroupFinder::No;++i)
-                name = _("CopyOf")+ object->GetName()+gd::String::From(i);
-        }
-
-        //Name the object
-        object->SetName( name );
+        object->SetName(gd::NewNameGenerator::Generate(object->GetName(), _("CopyOf"), [&nameChecker, globalObject](const gd::String & name) {
+            return nameChecker.HasObjectOrGroupNamed(
+                name, globalObject /* Only search other layouts if it's a global object */) != gd::ObjectOrGroupFinder::No;
+        }));
 
         //Add it to the list
         objects.InsertObject(*object, objects.GetObjectsCount());
@@ -1310,16 +1296,9 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
 
         gd::ObjectGroup groupPasted = clipboard->GetObjectGroup();
 
-        gd::String name = groupPasted.GetName();
-
-        //Add a number to the new name if necessary
-        if ( nameChecker.HasObjectOrGroupNamed(name, globalGroup /* Only search other layouts if it's a global object */) != gd::ObjectOrGroupFinder::No )
-        {
-            name =  _( "CopyOf" ) + name;
-            for (unsigned int i = 2;nameChecker.HasObjectOrGroupNamed(name, globalGroup /* Only search other layouts if it's a global object */)!=gd::ObjectOrGroupFinder::No;++i)
-                name = _("CopyOf")+ groupPasted.GetName()+gd::String::From(i);
-        }
-        groupPasted.SetName(name);
+        groupPasted.SetName(gd::NewNameGenerator::Generate(groupPasted.GetName(), _("CopyOf"), [&nameChecker, globalGroup](const gd::String & name) {
+            return nameChecker.HasObjectOrGroupNamed(name, globalGroup /* Only search other layouts if it's a global object */) != gd::ObjectOrGroupFinder::No;
+        }));
         objectsGroups.push_back( groupPasted );
 
         for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)

@@ -51,7 +51,7 @@ public:
      * \brief Return a map containing the resources old absolute filename as key, and the resources new filenames as value.
      * The new filenames are relative to the Base Directory.
      */
-    std::map<gd::String, gd::String> & GetAllResourcesOldAndNewFilename() { return resourcesNewFilename; };
+    std::map<gd::String, gd::String> & GetAllResourcesOldAndNewFilename() { return oldFilenames; };
 
     /**
      * Resources merging helper collects all resources filenames and update these filenames.
@@ -62,7 +62,10 @@ public:
     virtual void ExposeShader(gd::String & shaderName) {};
 
 protected:
-    std::map<gd::String, gd::String> resourcesNewFilename;
+    void SetNewFilename(gd::String oldFilename, gd::String newFilename);
+
+    std::map<gd::String, gd::String> oldFilenames;
+    std::map<gd::String, gd::String> newFilenames;
     gd::String baseDirectory;
     bool preserveDirectoriesStructure; ///< If set to true, the directory structure, starting from baseDirectory, will be preserved in filenames.
     bool preserveAbsoluteFilenames; ///< If set to true, the filenames which are absolute ( C:\MyFile.png ) will not be transformed into their filenames ( MyFile.png ).

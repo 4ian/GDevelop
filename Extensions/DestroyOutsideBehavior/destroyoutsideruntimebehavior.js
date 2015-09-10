@@ -23,7 +23,7 @@ gdjs.DestroyOutsideRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "DestroyO
 gdjs.DestroyOutsideRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 
     var ow = this.owner.getWidth();
-    var oh = this.owner.getWidth();
+    var oh = this.owner.getHeight();
     var ocx = this.owner.getDrawableX()+this.owner.getCenterX();
     var ocy = this.owner.getDrawableY()+this.owner.getCenterY();
     var layer = runtimeScene.getLayer(this.owner.getLayer());

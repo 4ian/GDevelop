@@ -685,7 +685,7 @@ void LayoutEditorCanvas::UpdateSize()
         //Scene takes all the space available in edition mode.
         Window::setSize(sf::Vector2u(width * scaleFactor, height * scaleFactor));
         wxWindowBase::SetPosition(wxPoint(0,0));
-        wxWindowBase::SetSize(width, height);
+        wxWindowBase::SetSize(width * scaleFactor, height * scaleFactor);
 
         UpdateViewAccordingToZoomFactor();
     }

@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-30 18:21+0200\n"
+"POT-Creation-Date: 2015-09-06 11:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -153,7 +153,7 @@ msgid "Thanks for reporting the error!"
 msgstr ""
 
 #: ../IDE/BuildMessagesPnl.cpp:54 ../IDE/CodeEditor.cpp:121
-#: ../IDE/MainFrame.cpp:706 ../IDE/MainFrame.cpp:709
+#: ../IDE/MainFrame.cpp:712 ../IDE/MainFrame.cpp:715
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:266
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:280
 #: ../Core/GDCore/BuiltinExtensions/FileExtension.cpp:40
@@ -208,7 +208,7 @@ msgstr ""
 #: ../IDE/BuildProgressPnl.cpp:95
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:198
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:199
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:504
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:505
 #: ../GDJS/GDJS//Exporter.cpp:557
 msgid "Compilation finished"
 msgstr ""
@@ -267,8 +267,8 @@ msgstr ""
 #: ../IDE/Dialogs/ObjectsEditor.cpp:415 ../IDE/EditObjectGroup.cpp:93
 #: ../IDE/EditPropScene.cpp:141 ../IDE/EventsEditor.cpp:469
 #: ../IDE/EventsEditor.cpp:471 ../IDE/GeneratePassword.cpp:75
-#: ../IDE/InstructionSelectorDialog.cpp:167 ../IDE/MainFrame.cpp:223
-#: ../IDE/MainFrame.cpp:402 ../IDE/MainFrame.cpp:404 ../IDE/MAJ.cpp:114
+#: ../IDE/InstructionSelectorDialog.cpp:167 ../IDE/MainFrame.cpp:228
+#: ../IDE/MainFrame.cpp:408 ../IDE/MainFrame.cpp:410 ../IDE/MAJ.cpp:114
 #: ../IDE/Preferences.cpp:579 ../IDE/ProjectManager.cpp:405
 #: ../IDE/ProjectManager.cpp:407 ../IDE/SearchEvents.cpp:145
 #: ../IDE/SearchEvents.cpp:214 ../IDE/SigneModification.cpp:47
@@ -295,6 +295,10 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:143
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:528
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:530
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:53
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:54
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:55
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:172
 #: ../Core/GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp:190
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:131
 msgid "Help"
@@ -623,7 +627,7 @@ msgid "Go to..."
 msgstr ""
 
 #: ../IDE/CodeEditor.cpp:145 ../IDE/CodeEditor.cpp:147
-#: ../IDE/ExtensionBugReportDlg.cpp:82 ../IDE/MainFrame.cpp:212
+#: ../IDE/ExtensionBugReportDlg.cpp:82 ../IDE/MainFrame.cpp:217
 #: ../IDE/SearchEvents.cpp:119 ../IDE/SearchEvents.cpp:185
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:99
 #: ../Extensions//PathBehavior/Extension.cpp:55
@@ -682,7 +686,7 @@ msgstr ""
 msgid "About GDevelop"
 msgstr ""
 
-#: ../IDE/Credits.cpp:93 ../IDE/MainFrame.cpp:142
+#: ../IDE/Credits.cpp:93 ../IDE/MainFrame.cpp:144
 msgid "GDevelop"
 msgstr ""
 
@@ -888,11 +892,11 @@ msgid "Layers' editor"
 msgstr ""
 
 #: ../IDE/Dialogs/ExternalLayoutEditor.cpp:244 ../IDE/EditorScene.cpp:133
-#: ../IDE/EditorScene.cpp:161 ../IDE/MainFrame.cpp:398
+#: ../IDE/EditorScene.cpp:161 ../IDE/MainFrame.cpp:404
 #: ../Extensions//SoundObject/SoundObjectEditor.cpp:114
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:230
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:158
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1089
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:901
 msgid "Properties"
 msgstr ""
 
@@ -979,6 +983,10 @@ msgstr ""
 msgid "Help to translate GD in your language"
 msgstr ""
 
+#: ../IDE/Dialogs/HelpProvider.cpp:15
+msgid "http://wiki.compilgames.net/doku.php"
+msgstr ""
+
 #: ../IDE/Dialogs/LayoutEditorPropertiesPnl.cpp:164
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:93
 msgid "Custom size?"
@@ -1057,16 +1065,16 @@ msgstr ""
 #: ../IDE/Dialogs/ObjectsEditor.cpp:249 ../IDE/Dialogs/ObjectsEditor.cpp:402
 #: ../IDE/ProjectManager.cpp:202 ../IDE/ProjectManager.cpp:237
 #: ../IDE/ProjectManager.cpp:253
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:47
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:48
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:49
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:82
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:142
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:62
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:63
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:64
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:97
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:157
 msgid "Edit"
 msgstr ""
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:251
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:62
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:77
 msgid "Add a behavior"
 msgstr ""
 
@@ -1154,7 +1162,7 @@ msgstr ""
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:300 ../IDE/Dialogs/ObjectsEditor.cpp:395
 #: ../IDE/EventsEditor.cpp:224 ../IDE/EventsEditor.cpp:434
-#: ../IDE/MainFrame.cpp:386
+#: ../IDE/MainFrame.cpp:392
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:312
 #: ../Core/GDCore/IDE/Dialogs/EditLayerDialog.cpp:96
 msgid "Delete"
@@ -1176,12 +1184,12 @@ msgstr ""
 msgid "Delete the selected object or group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:396 ../IDE/MainFrame.cpp:388
+#: ../IDE/Dialogs/ObjectsEditor.cpp:396 ../IDE/MainFrame.cpp:394
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:151
 msgid "Move up"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:397 ../IDE/MainFrame.cpp:389
+#: ../IDE/Dialogs/ObjectsEditor.cpp:397 ../IDE/MainFrame.cpp:395
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:152
 msgid "Move down"
 msgstr ""
@@ -1331,7 +1339,7 @@ msgid "Audio files (*.wav, *.ogg)|*.wav;*.ogg"
 msgstr ""
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:210
-msgid "Choose True or False to fill the parameter"
+msgid "Choose True or False for this parameter"
 msgstr ""
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:210
@@ -1339,42 +1347,42 @@ msgstr ""
 msgid "True or False"
 msgstr ""
 
-#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:212 ../IDE/TrueOrFalse.cpp:58
+#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:213 ../IDE/TrueOrFalse.cpp:58
 msgid "True"
 msgstr ""
 
-#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:214 ../IDE/TrueOrFalse.cpp:60
+#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:221 ../IDE/TrueOrFalse.cpp:60
 msgid "False"
 msgstr ""
 
-#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:218
-msgid "Choose yes or no to fullfil parent parameter:"
+#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:225
+msgid "Choose yes or no for this parameter:"
 msgstr ""
 
-#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:218
+#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:225
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:125
 msgid "Yes or no"
 msgstr ""
 
-#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:219
+#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:227
 msgid "yes"
 msgstr ""
 
-#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:221
+#: ../IDE/Dialogs/ParameterEditorLauncher.cpp:235
 msgid "no"
 msgstr ""
 
 #: ../IDE/Dialogs/ProjectPropertiesPnl.cpp:80
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1090
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1128
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1129
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:902
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:940
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:941
 msgid "Name of the project"
 msgstr ""
 
 #: ../IDE/Dialogs/ProjectPropertiesPnl.cpp:83
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1123
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1155
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1156
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:935
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:967
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:968
 msgid "Activate the use of C++/JS source files"
 msgstr ""
 
@@ -1518,7 +1526,7 @@ msgid "Edit the events of the scene"
 msgstr ""
 
 #: ../IDE/EditorScene.cpp:90 ../IDE/EditorScene.cpp:185
-#: ../IDE/MainFrame.cpp:409
+#: ../IDE/MainFrame.cpp:415
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:26
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:33
 #: ../Core/GDCore/BuiltinExtensions/SceneExtension.cpp:43
@@ -1531,7 +1539,7 @@ msgid "Scene"
 msgstr ""
 
 #: ../IDE/EditorScene.cpp:91 ../IDE/EditorScene.cpp:192
-#: ../IDE/MainFrame.cpp:413 ../GDCpp/GDCpp//IDE/Dialogs/ProfileDlg.cpp:153
+#: ../IDE/MainFrame.cpp:419 ../GDCpp/GDCpp//IDE/Dialogs/ProfileDlg.cpp:153
 msgid "Events"
 msgstr ""
 
@@ -1581,6 +1589,12 @@ msgid "90"
 msgstr ""
 
 #: ../IDE/EditPropScene.cpp:120
+#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:493
+#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:499
+#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:591
+#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:618
+#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:625
+#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:659
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:228
 msgid "°"
 msgstr ""
@@ -1690,8 +1704,8 @@ msgstr ""
 
 #: ../IDE/EventsEditor.cpp:426
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:162
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:62
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:63
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:77
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:78
 msgid "Add..."
 msgstr ""
 
@@ -1722,7 +1736,7 @@ msgstr ""
 msgid "Search for a specific word in the event and/or replace it by another"
 msgstr ""
 
-#: ../IDE/EventsEditor.cpp:457 ../IDE/MainFrame.cpp:395
+#: ../IDE/EventsEditor.cpp:457 ../IDE/MainFrame.cpp:401
 #: ../IDE/ProjectManager.cpp:393
 msgid "View"
 msgstr ""
@@ -1853,17 +1867,17 @@ msgstr ""
 msgid "Edit as if the events were included to scene :"
 msgstr ""
 
-#: ../IDE/GDevelopIDEApp.cpp:215
+#: ../IDE/GDevelopIDEApp.cpp:216
 msgid ""
 "It seems that GDevelop is busy and can't open the requested file.\n"
 "Please close any open dialogs and retry."
 msgstr ""
 
-#: ../IDE/GDevelopIDEApp.cpp:216
+#: ../IDE/GDevelopIDEApp.cpp:217
 msgid "Sorry! :/"
 msgstr ""
 
-#: ../IDE/GDevelopIDEApp.cpp:363
+#: ../IDE/GDevelopIDEApp.cpp:364
 msgid ""
 "This is a beta version of GDevelop for Mac OS X.\n"
 "\n"
@@ -1918,7 +1932,7 @@ msgid "X.png"
 msgstr ""
 
 #: ../IDE/ImportImage.cpp:138 ../IDE/ImportImage.cpp:172
-#: ../IDE/MainFrame.cpp:397 ../GDCpp/GDCpp//IDE/Dialogs/RenderDialog.cpp:28
+#: ../IDE/MainFrame.cpp:403 ../GDCpp/GDCpp//IDE/Dialogs/RenderDialog.cpp:28
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:183
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:185
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:295
@@ -2145,12 +2159,12 @@ msgid "The vertical spacing is invalid (must be greater than or equal to 0)."
 msgstr ""
 
 #: ../IDE/InitialPositionBrowserDlg.cpp:53
-#: ../Extensions//AdMobObject/Extension.cpp:36
-#: ../Extensions//AdMobObject/Extension.cpp:45
-#: ../Extensions//AdMobObject/Extension.cpp:54
-#: ../Extensions//AdMobObject/Extension.cpp:63
-#: ../Extensions//AdMobObject/Extension.cpp:72
-#: ../Extensions//AdMobObject/Extension.cpp:81
+#: ../Extensions//AdMobObject/Extension.cpp:38
+#: ../Extensions//AdMobObject/Extension.cpp:47
+#: ../Extensions//AdMobObject/Extension.cpp:56
+#: ../Extensions//AdMobObject/Extension.cpp:65
+#: ../Extensions//AdMobObject/Extension.cpp:74
+#: ../Extensions//AdMobObject/Extension.cpp:83
 #: ../Extensions//Box3DObject/Extension.cpp:53
 #: ../Extensions//Box3DObject/Extension.cpp:67
 #: ../Extensions//Box3DObject/Extension.cpp:82
@@ -2841,164 +2855,168 @@ msgstr ""
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:167 ../IDE/MainFrame.cpp:190
-#: ../IDE/MainFrame_Files.cpp:135
+#: ../IDE/MainFrame.cpp:169 ../IDE/MainFrame.cpp:192
+#: ../IDE/MainFrame_Files.cpp:137
 msgid "Open an example"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:169 ../IDE/MainFrame.cpp:200
+#: ../IDE/MainFrame.cpp:171 ../IDE/MainFrame.cpp:202
 msgid "Save as..."
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:172
+#: ../IDE/MainFrame.cpp:174
 msgid "Decompose an animated GIF"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:175
+#: ../IDE/MainFrame.cpp:177
 msgid "Decompose a RPG Maker character"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:178
+#: ../IDE/MainFrame.cpp:180
 msgid "Decompose a spritesheet"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:183
+#: ../IDE/MainFrame.cpp:185
 msgid "New\tCtrl+N"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:187
+#: ../IDE/MainFrame.cpp:189
 msgid "Open\tCtrl+O"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:193
+#: ../IDE/MainFrame.cpp:195
 msgid "useless"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:195
+#: ../IDE/MainFrame.cpp:197
 msgid "Recently opened"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:197
+#: ../IDE/MainFrame.cpp:199
 msgid "Save\tCtrl+S"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:203
+#: ../IDE/MainFrame.cpp:205
+msgid "Save as folder project"
+msgstr ""
+
+#: ../IDE/MainFrame.cpp:208
 msgid "Save all\tCtrl+Shift+S"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:208 ../IDE/ProjectManager.cpp:381
+#: ../IDE/MainFrame.cpp:213 ../IDE/ProjectManager.cpp:381
 msgid "Close the current project"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:216
+#: ../IDE/MainFrame.cpp:221
 msgid "Help\tF1"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:220
+#: ../IDE/MainFrame.cpp:225
 msgid "Quit"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:220
+#: ../IDE/MainFrame.cpp:225
 msgid "Quit GDevelop"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:226
+#: ../IDE/MainFrame.cpp:231
 msgid "Tutorial"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:229 ../IDE/MAJ.cpp:68 ../IDE/Preferences.cpp:229
+#: ../IDE/MainFrame.cpp:234 ../IDE/MAJ.cpp:68 ../IDE/Preferences.cpp:229
 msgid "Check for updates"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:232
+#: ../IDE/MainFrame.cpp:237
 msgid "Official web site"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:235
+#: ../IDE/MainFrame.cpp:240
 msgid "About..."
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:238 ../IDE/MainFrame.cpp:681
+#: ../IDE/MainFrame.cpp:243 ../IDE/MainFrame.cpp:687
 msgid "Please stop the preview before continuing"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:369 ../IDE/ProjectManager.cpp:371
+#: ../IDE/MainFrame.cpp:375 ../IDE/ProjectManager.cpp:371
 #: ../IDE/ProjectManager.cpp:395 ../IDE/ProjectManager.cpp:458
 msgid "Projects"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:373 ../IDE/ProjectManager.cpp:1093
+#: ../IDE/MainFrame.cpp:379 ../IDE/ProjectManager.cpp:1093
 msgid "Images bank"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:376
+#: ../IDE/MainFrame.cpp:382
 msgid "Adding resources"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:378 ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:128
+#: ../IDE/MainFrame.cpp:384 ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:128
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:164
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:179
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:193
 msgid "Add an image"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:378
+#: ../IDE/MainFrame.cpp:384
 msgid "Add an image to the resources"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:379
+#: ../IDE/MainFrame.cpp:385
 msgid "Add from the library"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:379
+#: ../IDE/MainFrame.cpp:385
 msgid "Add an image from a library of images"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:380
+#: ../IDE/MainFrame.cpp:386
 msgid "Add a virtual folder"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:380
+#: ../IDE/MainFrame.cpp:386
 msgid "Add a virtual folder to organize resources"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:384
+#: ../IDE/MainFrame.cpp:390
 msgid "List management"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:386
+#: ../IDE/MainFrame.cpp:392
 msgid "Delete the selected resource"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:387 ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:960
+#: ../IDE/MainFrame.cpp:393 ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:960
 msgid "Remove useless resources"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:387
+#: ../IDE/MainFrame.cpp:393
 msgid "Check if there are useless resources that can be removed"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:390
+#: ../IDE/MainFrame.cpp:396
 msgid "Refresh"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:390
+#: ../IDE/MainFrame.cpp:396
 msgid "Refresh the list, if you've done changes in another window"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:397
+#: ../IDE/MainFrame.cpp:403
 msgid "Show a panel with the image displayed inside"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:398
+#: ../IDE/MainFrame.cpp:404
 msgid "Show the properties of the resource"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:404
+#: ../IDE/MainFrame.cpp:410
 msgid "Open the online help"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:417 ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:80
+#: ../IDE/MainFrame.cpp:423 ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:80
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:78
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:243
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:597
@@ -3015,129 +3033,129 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:421
+#: ../IDE/MainFrame.cpp:427
 msgid "Code"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:444 ../IDE/MainFrame.cpp:587
+#: ../IDE/MainFrame.cpp:450 ../IDE/MainFrame.cpp:593
 #: ../IDE/ProjectManager.cpp:396
 msgid "Start page"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:457 ../IDE/MainFrame.cpp:469
+#: ../IDE/MainFrame.cpp:463 ../IDE/MainFrame.cpp:475
 msgid "Project manager"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:458
+#: ../IDE/MainFrame.cpp:464
 msgid "Main editor"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:459
+#: ../IDE/MainFrame.cpp:465
 msgid "Ribbon"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:460 ../IDE/MainFrame.cpp:470
+#: ../IDE/MainFrame.cpp:466 ../IDE/MainFrame.cpp:476
 msgid "Compilation tools"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:461 ../IDE/MainFrame.cpp:471
+#: ../IDE/MainFrame.cpp:467 ../IDE/MainFrame.cpp:477
 msgid "Project properties"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:613
+#: ../IDE/MainFrame.cpp:619
 #, c-format
 msgid ""
 "Project \"%s\" has been changed.\n"
 "\n"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:614
+#: ../IDE/MainFrame.cpp:620
 #, c-format
 msgid "Do you want to save it in %s?"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:615
+#: ../IDE/MainFrame.cpp:621
 msgid "Project not saved"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:620 ../IDE/MainFrame_Files.cpp:239
-#: ../IDE/MainFrame_Files.cpp:286 ../IDE/MainFrame_Files.cpp:296
+#: ../IDE/MainFrame.cpp:626 ../IDE/MainFrame_Files.cpp:230
+#: ../IDE/MainFrame_Files.cpp:257
 msgid "Save failed!"
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:622
+#: ../IDE/MainFrame.cpp:628
 msgid "Project properly saved."
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:776
+#: ../IDE/MainFrame.cpp:782
 msgid "Please close the preview before closing the editor."
 msgstr ""
 
-#: ../IDE/MainFrame.cpp:814
+#: ../IDE/MainFrame.cpp:820
 msgid "Autosave failed!"
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:69 ../IDE/ProjectManager.cpp:1036
+#: ../IDE/MainFrame_Files.cpp:70 ../IDE/ProjectManager.cpp:1036
 #: ../IDE/ProjectManager.cpp:1040
 msgid "New scene"
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:84
+#: ../IDE/MainFrame_Files.cpp:85
 msgid ""
 "Unable to find the platform associated with the template.\n"
 "\n"
 "Please report this error to GDevelop developer."
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:113
+#: ../IDE/MainFrame_Files.cpp:114
 msgid "Choose the project to open"
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:216
+#: ../IDE/MainFrame_Files.cpp:208
 msgid "One or more extensions are used by the project but are not installed for the platform used by the project :\n"
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:218
+#: ../IDE/MainFrame_Files.cpp:210
 msgid ""
 "\n"
 "Some objects, actions, conditions or expressions can be unavailable or not working."
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:237
+#: ../IDE/MainFrame_Files.cpp:233
 msgid "Save ended."
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:270 ../IDE/MainFrame_Files.cpp:330
-msgid "Choose where to save the project"
-msgstr ""
-
-#: ../IDE/MainFrame_Files.cpp:300
+#: ../IDE/MainFrame_Files.cpp:261
 msgid "Saves ended."
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:349
+#: ../IDE/MainFrame_Files.cpp:310
+msgid "Choose where to save the project"
+msgstr ""
+
+#: ../IDE/MainFrame_Files.cpp:329
 msgid ""
 "Project has been saved in a new folder.\n"
 "Do you want to also copy its resources into this new folder?"
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:349
+#: ../IDE/MainFrame_Files.cpp:329
 msgid "Saving in a new directory"
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:350
+#: ../IDE/MainFrame_Files.cpp:330
 msgid "Do not show again"
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:355
+#: ../IDE/MainFrame_Files.cpp:334
 msgid "Save progress"
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:355
+#: ../IDE/MainFrame_Files.cpp:334
 msgid "Exporting resources..."
 msgstr ""
 
-#: ../IDE/MainFrame_Files.cpp:368
+#: ../IDE/MainFrame_Files.cpp:346
 msgid "The project could not be saved properly!"
 msgstr ""
 
@@ -3657,7 +3675,7 @@ msgstr ""
 #: ../IDE/Preferences.cpp:563 ../IDE/Preferences.cpp:649
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:505
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:62
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:37
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:45
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:639
 msgid "General"
 msgstr ""
@@ -3918,10 +3936,10 @@ msgid "Source files"
 msgstr ""
 
 #: ../IDE/ProjectManager.cpp:520 ../IDE/ProjectManager.cpp:618
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1094
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1105
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1106
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1171
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:906
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:917
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:918
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:983
 msgid "Extensions"
 msgstr ""
 
@@ -4613,10 +4631,10 @@ msgid "(Structure)"
 msgstr ""
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:180
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1093
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1103
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1104
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1176
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:905
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:915
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:916
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:988
 msgid "Globals variables"
 msgstr ""
 
@@ -4672,10 +4690,10 @@ msgstr ""
 #: ../Core/GDCore/BuiltinExtensions/VariablesExtension.cpp:198
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:103
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:126
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:56
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:57
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:58
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:157
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:71
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:72
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:73
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:179
 msgid "Variables"
 msgstr ""
 
@@ -4952,182 +4970,182 @@ msgstr ""
 msgid "Compile to a native executable"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:155
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:156
 msgid "Project compilation launching"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:158
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:159
 msgid "No chosen target system."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:174
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:175
 msgid "Compilation waiting for other task to finish..."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:191
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:197
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:192
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:198
 msgid "Preparing resources..."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:225
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:257
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:226
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:258
 msgid "Compiling scene "
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:225
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:226
 msgid "."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:250
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:251
 msgid "Compilation of scene "
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:250
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:251
 msgid " failed: Please go on our website to report this error, joining this file:\n"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:252
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:394
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:253
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:395
 msgid ""
 "\n"
 "\n"
 "If you think the error is related to an extension, please contact its developer."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:257
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:399
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:258
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:400
 msgid " succeeded"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:263
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:268
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:279
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:286
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:328
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:264
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:269
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:280
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:287
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:329
 msgid "Copying resources..."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:271
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:446
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:272
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:447
 msgid "Unable to copy "
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:271
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:357
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:446
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:461
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:464
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:470
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:473
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:476
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:481
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:484
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:272
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:358
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:447
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:462
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:465
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:471
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:474
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:477
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:482
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:485
 msgid " in compilation directory.\n"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:279
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:280
 msgid "Step 1 out of 3"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:286
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:287
 msgid "Step 2 out of 3"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:328
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:329
 msgid "Step 3 out of 3"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:357
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:358
 msgid "Unable to delete the file"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:366
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:367
 msgid "Linking project files..."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:392
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:393
 msgid "Linking of project failed: Please go on our website to report this error, joining this file:\n"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:399
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:400
 msgid "Linking project "
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:403
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:404
 msgid "Exporting game..."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:421
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:427
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:433
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:422
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:428
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:434
 msgid "Unable to copy extension "
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:421
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:422
 msgid " for Windows in compilation directory.\n"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:427
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:428
 msgid " for Linux in compilation directory.\n"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:433
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:434
 msgid " for Mac OS in compilation directory.\n"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:453
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:454
 msgid "Unable to copy C++ sources ( dynext.dxgd ) in compilation directory.\n"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:461
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:464
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:470
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:473
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:476
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:481
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:484
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:462
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:465
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:471
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:474
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:477
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:482
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:485
 msgid "Unable to create "
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:493
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:494
 msgid "Unable to copy file"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:493
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:494
 msgid " from compilation directory to final directory.\n"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:529
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:530
 msgid ""
 "GDevelop is unable to find a temporary compilation directory.\n"
 "If compilation fail, go in the options and choose a temporary direction where you have read and write permissions."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:529
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:530
 msgid "Compilation may fail!"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:540
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:541
 msgid "Unable to create directory:"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:546
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:547
 msgid "Unable to delete "
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:546
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:547
 msgid "in directory "
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:556
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:557
 msgid "Compilation failed with these errors:"
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:562
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:563
 msgid "Compilation succeeded."
 msgstr ""
 
-#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:575
+#: ../GDCpp/GDCpp//IDE/FullProjectCompiler.cpp:576
 msgid "Progress:"
 msgstr ""
 
@@ -5906,89 +5924,89 @@ msgstr ""
 msgid "Display an ad banner or interstitial screen using AdMob"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:30
+#: ../Extensions//AdMobObject/Extension.cpp:32
 msgid "Show banner ad"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:31
+#: ../Extensions//AdMobObject/Extension.cpp:33
 msgid "Show the banner ad"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:32
+#: ../Extensions//AdMobObject/Extension.cpp:34
 msgid "Show the banner ad of _PARAM0_"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:33
-#: ../Extensions//AdMobObject/Extension.cpp:42
+#: ../Extensions//AdMobObject/Extension.cpp:35
+#: ../Extensions//AdMobObject/Extension.cpp:44
 msgid "Banner"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:39
+#: ../Extensions//AdMobObject/Extension.cpp:41
 msgid "Hide banner ad"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:40
+#: ../Extensions//AdMobObject/Extension.cpp:42
 msgid "Hide the banner ad"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:41
+#: ../Extensions//AdMobObject/Extension.cpp:43
 msgid "Hide the banner ad of _PARAM0_"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:48
+#: ../Extensions//AdMobObject/Extension.cpp:50
 msgid "Banner is displayed"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:49
+#: ../Extensions//AdMobObject/Extension.cpp:51
 msgid "Return true if the object is currently displaying a banner"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:50
+#: ../Extensions//AdMobObject/Extension.cpp:52
 msgid "_PARAM0_ is displaying a banner"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:57
+#: ../Extensions//AdMobObject/Extension.cpp:59
 msgid "Preload interstitial screen"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:58
+#: ../Extensions//AdMobObject/Extension.cpp:60
 msgid ""
 "Preload the interstitial screen in memory, so that it can be shown later.\n"
 "You can use this action at the beginning of a level for example."
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:59
+#: ../Extensions//AdMobObject/Extension.cpp:61
 msgid "Preload an interstitial screen for _PARAM0_"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:60
-#: ../Extensions//AdMobObject/Extension.cpp:69
+#: ../Extensions//AdMobObject/Extension.cpp:62
+#: ../Extensions//AdMobObject/Extension.cpp:71
 msgid "Interstitial screen"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:66
+#: ../Extensions//AdMobObject/Extension.cpp:68
 msgid "Show interstitial screen"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:67
+#: ../Extensions//AdMobObject/Extension.cpp:69
 msgid ""
 "Show the interstitial screen.\n"
 "If the interstitial screen has not been preloaded, it will be loaded and displayed when ready."
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:68
+#: ../Extensions//AdMobObject/Extension.cpp:70
 msgid "Show the interstitial screen of _PARAM0_"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:75
+#: ../Extensions//AdMobObject/Extension.cpp:77
 msgid "Interstitial screen is ready"
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:76
+#: ../Extensions//AdMobObject/Extension.cpp:78
 msgid "Return true if the interstitial screen was loaded and is ready to be shown."
 msgstr ""
 
-#: ../Extensions//AdMobObject/Extension.cpp:77
+#: ../Extensions//AdMobObject/Extension.cpp:79
 msgid "Interstitial screen of _PARAM0_ is ready"
 msgstr ""
 
@@ -6495,9 +6513,9 @@ msgstr ""
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:180
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:54
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:94
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1096
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1134
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1135
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:908
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:946
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:947
 msgid "Width"
 msgstr ""
 
@@ -6519,9 +6537,9 @@ msgstr ""
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:181
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:55
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:95
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1097
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1136
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1137
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:909
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:948
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:949
 msgid "Height"
 msgstr ""
 
@@ -6618,7 +6636,7 @@ msgstr ""
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:252
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:1120
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:182
-#: ../Extensions//TileMapObject/TileSetConfigurationEditor.cpp:90
+#: ../Extensions//TileMapObject/TileSetConfigurationEditor.cpp:97
 msgid "Please display the image bank's editor and select an image before clicking on this button."
 msgstr ""
 
@@ -8252,7 +8270,7 @@ msgstr ""
 #: ../Extensions//SoundObject/Extension.cpp:329
 #: ../Extensions//SoundObject/Extension.cpp:414
 #: ../Extensions//SoundObject/Extension.cpp:498
-#: ../Extensions//TileMapObject/TileEditor.cpp:242
+#: ../Extensions//TileMapObject/TileEditor.cpp:243
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:39
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:95
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:109
@@ -8278,7 +8296,7 @@ msgstr ""
 #: ../Extensions//SoundObject/Extension.cpp:343
 #: ../Extensions//SoundObject/Extension.cpp:427
 #: ../Extensions//SoundObject/Extension.cpp:502
-#: ../Extensions//TileMapObject/TileEditor.cpp:243
+#: ../Extensions//TileMapObject/TileEditor.cpp:244
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:67
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:97
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:110
@@ -9612,15 +9630,6 @@ msgstr ""
 msgid "Display angle"
 msgstr ""
 
-#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:493
-#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:499
-#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:591
-#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:618
-#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:625
-#: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:659
-msgid "�"
-msgstr ""
-
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:505
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:510
 msgid "Ampltiude of the random variation of the value."
@@ -10111,8 +10120,8 @@ msgstr ""
 
 #: ../Extensions//PathBehavior/Extension.cpp:320
 #: ../Extensions//PathBehavior/Extension.cpp:348
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:637
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:668
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:605
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:636
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:194
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:225
 msgid "Angle offset"
@@ -10553,8 +10562,8 @@ msgstr ""
 #: ../Extensions//PathfindingBehavior/Extension.cpp:151
 #: ../Extensions//PathfindingBehavior/Extension.cpp:166
 #: ../Extensions//PathfindingBehavior/Extension.cpp:435
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:633
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:662
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:601
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:630
 #: ../Extensions//PlatformBehavior/Extension.cpp:153
 #: ../Extensions//PlatformBehavior/Extension.cpp:167
 #: ../Extensions//PlatformBehavior/Extension.cpp:381
@@ -10839,8 +10848,8 @@ msgid "Rotation offset applied the object on the path"
 msgstr ""
 
 #: ../Extensions//PathfindingBehavior/Extension.cpp:460
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:640
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:655
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:608
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:623
 msgid "Extra border size"
 msgstr ""
 
@@ -10931,15 +10940,15 @@ msgstr ""
 msgid "Obstacle cost"
 msgstr ""
 
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:632
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:647
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:600
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:615
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:188
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:206
 msgid "Allows diagonals"
 msgstr ""
 
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:634
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:664
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:602
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:632
 #: ../Extensions//PlatformBehavior/PlatformerObjectBehavior.cpp:570
 #: ../Extensions//PlatformBehavior/PlatformerObjectBehavior.cpp:594
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:191
@@ -10947,27 +10956,27 @@ msgstr ""
 msgid "Max. speed"
 msgstr ""
 
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:635
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:666
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:603
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:634
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:192
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:223
 msgid "Rotate speed"
 msgstr ""
 
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:636
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:651
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:604
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:619
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:193
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:210
 msgid "Rotate object"
 msgstr ""
 
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:606
 #: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:638
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:670
 msgid "Virtual cell width"
 msgstr ""
 
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:639
-#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:672
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:607
+#: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:640
 msgid "Virtual cell height"
 msgstr ""
 
@@ -13657,7 +13666,9 @@ msgid "Change the tileset texture"
 msgstr ""
 
 #: ../Extensions//TileMapObject/Extension.cpp:167
-msgid "Change the tileset texture."
+msgid ""
+"Change the tileset texture.\n"
+"Note: if the texture has a different size, it may produce strange results such as texture offset..."
 msgstr ""
 
 #: ../Extensions//TileMapObject/Extension.cpp:168
@@ -13709,19 +13720,19 @@ msgstr ""
 msgid "Half-rectangle (left)"
 msgstr ""
 
-#: ../Extensions//TileMapObject/TileEditor.cpp:70
+#: ../Extensions//TileMapObject/TileEditor.cpp:71
 msgid "Tile ID: "
 msgstr ""
 
-#: ../Extensions//TileMapObject/TileEditor.cpp:147
+#: ../Extensions//TileMapObject/TileEditor.cpp:148
 msgid "This polygon must be convex, it's not the case."
 msgstr ""
 
-#: ../Extensions//TileMapObject/TileEditor.cpp:242
+#: ../Extensions//TileMapObject/TileEditor.cpp:243
 msgid "Enter the X position of the point ( regarding the tile )."
 msgstr ""
 
-#: ../Extensions//TileMapObject/TileEditor.cpp:243
+#: ../Extensions//TileMapObject/TileEditor.cpp:244
 msgid "Enter the Y position of the point ( regarding the tile )."
 msgstr ""
 
@@ -13885,24 +13896,24 @@ msgid "Do you want to cancel all the changes made ?"
 msgstr ""
 
 #: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:117
-#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:200
-#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:206
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:201
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:207
 msgid "Confirm"
 msgstr ""
 
-#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:173
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:174
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap"
 msgstr ""
 
-#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:200
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:201
 msgid "Are you sure you want to clear the whole layer ?"
 msgstr ""
 
-#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:206
+#: ../Extensions//TileMapObject/TileMapObjectEditor.cpp:207
 msgid "Are you sure you want to fill the whole layer with that tile ?"
 msgstr ""
 
-#: ../Extensions//TileMapObject/TileSetConfigurationEditor.cpp:126
+#: ../Extensions//TileMapObject/TileSetConfigurationEditor.cpp:133
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilesetconfig"
 msgstr ""
 
@@ -15185,7 +15196,7 @@ msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:495
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:507
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:61
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:76
 msgid "Behaviors"
 msgstr ""
 
@@ -19418,16 +19429,16 @@ msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:104
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:106
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:47
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:48
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:56
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:57
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:82
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:83
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1093
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1094
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1103
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1105
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:62
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:63
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:71
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:72
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:97
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:98
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:905
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:906
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:915
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:917
 msgid "Click to edit..."
 msgstr ""
 
@@ -19684,16 +19695,16 @@ msgstr ""
 msgid "Put the object(s) on the layer \""
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:1074
+#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:1111
 #, c-format
 msgid "Position %f;%f. SHIFT for multiple selection, right click for more options."
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:1373
+#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:1401
 msgid "Are you sure you want to clear the Undo History?"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:763
+#: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:761
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_layout"
 msgstr ""
 
@@ -19717,38 +19728,47 @@ msgstr ""
 msgid "on the layer :"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:39
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:47
 msgid "General object properties"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:41
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:49
 msgid "Object name"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:55
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:169
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:50
+msgid "Kind"
+msgstr ""
+
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:53
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:54
+msgid "Click to see help..."
+msgstr ""
+
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:70
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:191
 msgid "Object variables"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:68
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:69
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:83
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:84
 msgid "Remove..."
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:86
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:87
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:101
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:102
 msgid "Rename..."
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:187
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:209
 msgid "Choose the behavior to delete"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:206
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:228
 msgid "Enter a new name for the behavior"
 msgstr ""
 
-#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:206
+#: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:228
 msgid "Rename a behavior"
 msgstr ""
 
@@ -20025,11 +20045,11 @@ msgstr ""
 msgid "New folder"
 msgstr ""
 
-#: ../Core/GDCore/IDE/EventsRenderingHelper.cpp:177
+#: ../Core/GDCore/IDE/EventsRenderingHelper.cpp:179
 msgid "No conditions"
 msgstr ""
 
-#: ../Core/GDCore/IDE/EventsRenderingHelper.cpp:278
+#: ../Core/GDCore/IDE/EventsRenderingHelper.cpp:280
 msgid "No actions"
 msgstr ""
 
@@ -20118,6 +20138,41 @@ msgid ""
 "No valid create/destroy functions."
 msgstr ""
 
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:94
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:112
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:130
+msgid "Unable to save file "
+msgstr ""
+
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:94
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:112
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:130
+msgid ""
+"!\n"
+"Check that the drive has enough free space, is not write-protected and that you have read/write permissions."
+msgstr ""
+
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:144
+msgid "Unable to open the file."
+msgstr ""
+
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:144
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:167
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:203
+msgid "Make sure the file exists and that you have the right to open the file."
+msgstr ""
+
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:167
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:203
+msgid "Error while loading :"
+msgstr ""
+
+#: ../Core/GDCore/IDE/ProjectFileWriter.cpp:300
+msgid ""
+"Your project has been upgraded to be used with GDevelop 4.\n"
+"If you save it, you won't be able to open it with an older version: please do a backup of your project file if you want to go back to GDevelop 3."
+msgstr ""
+
 #: ../Core/GDCore/IDE/ProjectResourcesCopier.cpp:43
 msgid ""
 "Some resources are using absolute filenames.\n"
@@ -20150,25 +20205,25 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:62
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:60
 msgid "Project"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:505
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:504
 msgid ""
 "The version of GDevelop used to create this game seems to be a new version.\n"
 "GDevelop may fail to open the game, or data may be missing.\n"
 "You should check if a new version of GDevelop is available."
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:512
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:511
 msgid ""
 "The version of GDevelop used to create this game seems to be greater.\n"
 "GDevelop may fail to open the game, or data may be missing.\n"
 "You should check if a new version of GDevelop is available."
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:519
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:518
 msgid "The game was saved with version of GDevelop which is too old. Please open and save the game with one of the first version of GDevelop 2. You will then be able to open your game with this GDevelop version."
 msgstr ""
 
@@ -20194,117 +20249,86 @@ msgstr ""
 msgid "You must add the new 'Pathfinding' behavior to the objects that need to be moved, and add the 'Pathfinding Obstacle' to the objects that must act as obstacles."
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:730
-msgid "Error while loading :"
-msgstr ""
-
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:730
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:847
-msgid "Make sure the file exists and that you have the right to open the file."
-msgstr ""
-
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:821
-msgid ""
-"Your project has been converted to the new encoding used by GDevelop 4 (UTF8).\n"
-"You can save it to apply the change but it will be incompatible with old GDevelop version."
-msgstr ""
-
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:847
-msgid "Unable to open the file"
-msgstr ""
-
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:959
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:977
-msgid "Unable to save file "
-msgstr ""
-
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:959
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:977
-msgid ""
-"!\n"
-"Check that the drive has enough free space, is not write-protected and that you have read/write permissions."
-msgstr ""
-
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:995
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:807
 msgid ""
 "Please use only letters, digits\n"
 "and underscores ( _ )."
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1091
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1132
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1133
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:903
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:944
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:945
 msgid "Package name"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1092
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1130
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1131
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:904
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:942
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:943
 msgid "Author"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1095
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:907
 msgid "Window"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1098
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1138
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1139
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:910
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:950
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:951
 msgid "Vertical Synchronization"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1099
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1140
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1161
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1162
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:911
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:952
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:973
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:974
 msgid "Limit the framerate"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1100
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1110
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1111
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1114
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1142
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1143
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1162
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:912
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:922
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:923
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:926
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:954
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:955
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:974
 msgid "Maximum FPS"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1101
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1144
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1145
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:913
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:956
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:957
 msgid "Minimum FPS"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1116
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:928
 msgid "Generation"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1117
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1147
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1148
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:929
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:959
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:960
 msgid "Windows executable name"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1118
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1149
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1150
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:930
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:961
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:962
 msgid "Windows executable icon"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1119
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1151
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1152
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:931
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:963
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:964
 msgid "Linux executable name"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1120
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1153
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1154
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:932
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:965
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:966
 msgid "Mac OS executable name"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:1122
+#: ../Core/GDCore/PlatformDefinition/Project.cpp:934
 msgid "C++ features"
 msgstr ""
 

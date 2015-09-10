@@ -49,7 +49,6 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
     this._lBorder = objectData.leftMargin;
     this._tBorder = objectData.topMargin;
     this._bBorder = objectData.bottomMargin;
-    this._runtimeScene = runtimeScene;
     this.setTexture(objectData.texture, runtimeScene);
     this.setWidth(objectData.width);
     this.setHeight(objectData.height);
@@ -68,8 +67,8 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
 gdjs.PanelSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.PanelSpriteRuntimeObject.thisIsARuntimeObjectConstructor = "PanelSpriteObject::PanelSprite";
 
-gdjs.PanelSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._spritesContainer);
+gdjs.PanelSpriteRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+    cb(this._spritesContainer);
 };
 
 /**
@@ -209,13 +208,6 @@ gdjs.PanelSpriteRuntimeObject.prototype.setAngle = function(angle) {
     this._spritesContainer.rotation = gdjs.toRad(angle);
 };
 
-gdjs.PanelSpriteRuntimeObject.prototype.setLayer = function(name) {
-    //We need to move the object from the pixi container of the layer
-    this._runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._spritesContainer);
-    this.layer = name;
-    this._runtimeScene.getLayer(this.layer).addChildToPIXIContainer(this._spritesContainer, this.zOrder);
-};
-
 gdjs.PanelSpriteRuntimeObject.prototype.getWidth = function() {
     return this._width;
 };
@@ -236,11 +228,4 @@ gdjs.PanelSpriteRuntimeObject.prototype.setHeight = function(height) {
     this._spritesContainer.pivot.y = height / 2;
     this._updateSpritesAndTexturesSize();
     this._updateSpritePositions();
-};
-
-gdjs.PanelSpriteRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z !== this.zOrder ) {
-        this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._spritesContainer, z);
-        this.zOrder = z;
-   }
 };

@@ -160,7 +160,6 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     this._blendMode = 0;
     this._flippedX = false;
     this._flippedY = false;
-    this._runtimeScene = runtimeScene;
     this.opacity = 255;
 
     //Animations:
@@ -302,8 +301,8 @@ gdjs.SpriteRuntimeObject.prototype.updateTime = function(elapsedTime) {
     if ( this._spriteDirty ) this._updatePIXISprite();
 };
 
-gdjs.SpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._sprite);
+gdjs.SpriteRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+    cb(this._sprite);
 };
 
 /**
@@ -647,14 +646,6 @@ gdjs.SpriteRuntimeObject.prototype.hide = function(enable) {
     this._sprite.alpha = this._sprite.visible ? this.opacity / 255 : 0;
 };
 
-gdjs.SpriteRuntimeObject.prototype.setLayer = function(name) {
-    //We need to move the object from the pixi container of the layer
-    //TODO: Pass the runtimeScene as parameter ?
-    this._runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._sprite);
-    this.layer = name;
-    this._runtimeScene.getLayer(this.layer).addChildToPIXIContainer(this._sprite, this.zOrder);
-};
-
 /**
  * Change the tint of the sprite object.
  *
@@ -758,20 +749,6 @@ gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
 };
 
 //Other :
-
-/**
- * Set the Z order of the object.
- *
- * @method setZOrder
- * @param z {Number} The new Z order position of the object
- */
-gdjs.SpriteRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z !== this.zOrder ) {
-        //TODO: Pass the runtimeScene as parameter ?
-        this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._sprite, z);
-        this.zOrder = z;
-    }
-};
 
 /**
  * @method turnTowardObject

@@ -33,6 +33,7 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
     this.layer = "";
     this.livingOnScene = true;
     this.id = runtimeScene.createNewUniqueId();
+    this._runtimeScene = runtimeScene; //This could/should be avoided.
 
     //Hit boxes:
     if ( this._defaultHitBoxes === undefined ) {
@@ -138,6 +139,22 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
  * @param runtimeScene The RuntimeScene owning the object.
  */
 gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
+    var theLayer = runtimeScene.getLayer(this.layer);
+    this.exposePIXIDisplayObject(function(displayObject) {
+        theLayer.removePIXIContainerChild(displayObject);
+    });
+};
+
+//Rendering:
+
+/**
+ * Called with a callback function that should be called for
+ * each PIXI.DisplayObject used by the object
+ *
+ * @method exposePIXIDisplayObject
+ * @param cb The callback to be called with a PIXI.DisplayObject
+ */
+gdjs.RuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
 };
 
 //Common properties:
@@ -286,26 +303,6 @@ gdjs.RuntimeObject.prototype.rotate = function(speed, runtimeScene) {
 };
 
 /**
- * Set the Z order of the object.
- *
- * @method setZOrder
- * @param z {Number} The new Z order position of the object
- */
-gdjs.RuntimeObject.prototype.setZOrder = function(z) {
-    this.zOrder = z;
-};
-
-/**
- * Get the Z order of the object.
- *
- * @method getZOrder
- * @return {Number} The Z order of the object
- */
-gdjs.RuntimeObject.prototype.getZOrder = function() {
-    return this.zOrder;
-};
-
-/**
  * Set the angle of the object.
  *
  * @method setAngle
@@ -335,7 +332,15 @@ gdjs.RuntimeObject.prototype.getAngle = function() {
  * @return {String} The new layer of the object
  */
 gdjs.RuntimeObject.prototype.setLayer = function(layer) {
+    if (layer === this.layer) return;
     this.layer = layer;
+
+    var theLayer = this._runtimeScene.getLayer(this.layer);
+    var that = this;
+    this.exposePIXIDisplayObject(function (displayObject) {
+        theLayer.removePIXIContainerChild(displayObject);
+        theLayer.addChildToPIXIContainer(displayObject, that.zOrder);
+    });
 };
 
 /**
@@ -357,6 +362,33 @@ gdjs.RuntimeObject.prototype.getLayer = function() {
  */
 gdjs.RuntimeObject.prototype.isOnLayer = function(layer) {
     return this.layer === layer;
+};
+
+
+/**
+ * Set the Z order of the object.
+ *
+ * @method setZOrder
+ * @param z {Number} The new Z order position of the object
+ */
+gdjs.RuntimeObject.prototype.setZOrder = function(z) {
+    if ( z === this.zOrder ) return;
+    this.zOrder = z;
+
+    var theLayer = this._runtimeScene.getLayer(this.layer);
+    this.exposePIXIDisplayObject(function(displayObject) {
+        theLayer.changePIXIContainerChildZOrder(displayObject, z);
+    });
+};
+
+/**
+ * Get the Z order of the object.
+ *
+ * @method getZOrder
+ * @return {Number} The Z order of the object
+ */
+gdjs.RuntimeObject.prototype.getZOrder = function() {
+    return this.zOrder;
 };
 
 /**

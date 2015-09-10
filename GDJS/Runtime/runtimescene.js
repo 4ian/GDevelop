@@ -35,7 +35,6 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
-    this.layers = this._layers;
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
@@ -201,6 +200,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
 	this._updateObjectsPreEvents();
 	this._eventsFunction(this, this._eventsContext);
 	this._updateObjects();
+	this._updateObjectsVisibility();
 	this.render();
 
 	this._firstFrame = false;
@@ -238,6 +238,47 @@ gdjs.RuntimeScene.prototype._updateTime = function() {
 		timers[i].updateTime(this._elapsedTime);
 	}
 	this._timeFromStart += this._elapsedTime;
+};
+
+gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
+	var allLayers = this._layers.entries();
+	var layersCameraCoordinates = {};
+	for(var i = 0;i < allLayers.length;++i) {
+		var theLayer = allLayers[i][1];
+		layersCameraCoordinates[allLayers[i][0]] =
+			[theLayer.getCameraX() - theLayer.getCameraWidth(),
+			 theLayer.getCameraY() - theLayer.getCameraHeight(),
+			 theLayer.getCameraX() + theLayer.getCameraWidth(),
+			 theLayer.getCameraY() + theLayer.getCameraHeight()];
+	}
+
+	function hide(displayObject) {
+		displayObject.visible = false;
+	}
+
+	function show(displayObject) {
+		displayObject.visible = true;
+	}
+
+	this._constructListOfAllInstances();
+	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
+		var object = this._allInstancesList[i];
+		var cameraCoords = layersCameraCoordinates[object.getLayer()];
+
+		if (!cameraCoords) continue;
+
+		if (object.isHidden()) {
+			object.exposePIXIDisplayObject(hide);
+		} else {
+			var aabb = object.getAABB();
+			if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
+				aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
+				object.exposePIXIDisplayObject(hide);
+			} else {
+				object.exposePIXIDisplayObject(show);
+			}
+		}
+	}
 };
 
 /**

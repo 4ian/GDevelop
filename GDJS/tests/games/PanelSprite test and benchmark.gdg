@@ -95,7 +95,7 @@
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="119.999969" layer="" locked="false" name="NewObject3" width="190.000000" x="601.000061" y="13.999985" zOrder="3">
+                <instance angle="0.000000" customSize="true" height="128.000000" layer="" locked="false" name="NewObject3" width="160.000000" x="612.000000" y="10.000000" zOrder="3">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />

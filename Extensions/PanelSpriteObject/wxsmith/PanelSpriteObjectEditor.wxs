@@ -76,6 +76,22 @@
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
+									<object class="wxStaticBoxSizer" variable="StaticBoxSizer3" member="no">
+										<label>Texture configuration (for HTML5 games only)</label>
+										<object class="sizeritem">
+											<object class="wxCheckBox" name="ID_CHECKBOX1" variable="tileCheck" member="yes">
+												<label>Repeat borders and center textures (instead of stretching them)</label>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
 									<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
 										<cols>1</cols>
 										<growablecols>0</growablecols>
@@ -249,14 +265,6 @@
 														<handler function="OnfrontAddFromBtClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-												<object class="sizeritem">
-													<object class="wxCheckBox" name="ID_CHECKBOX1" variable="smoothCheckBox" member="yes">
-														<label>Smooth texture</label>
-													</object>
-													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>

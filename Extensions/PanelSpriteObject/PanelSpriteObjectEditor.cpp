@@ -28,6 +28,7 @@ const long PanelSpriteObjectEditor::ID_STATICTEXT7 = wxNewId();
 const long PanelSpriteObjectEditor::ID_TEXTCTRL7 = wxNewId();
 const long PanelSpriteObjectEditor::ID_STATICTEXT8 = wxNewId();
 const long PanelSpriteObjectEditor::ID_TEXTCTRL8 = wxNewId();
+const long PanelSpriteObjectEditor::ID_CHECKBOX1 = wxNewId();
 const long PanelSpriteObjectEditor::ID_STATICTEXT2 = wxNewId();
 const long PanelSpriteObjectEditor::ID_TEXTCTRL3 = wxNewId();
 const long PanelSpriteObjectEditor::ID_STATICTEXT1 = wxNewId();
@@ -39,7 +40,6 @@ const long PanelSpriteObjectEditor::ID_STATICTEXT4 = wxNewId();
 const long PanelSpriteObjectEditor::ID_TEXTCTRL5 = wxNewId();
 const long PanelSpriteObjectEditor::ID_TEXTCTRL1 = wxNewId();
 const long PanelSpriteObjectEditor::ID_BITMAPBUTTON1 = wxNewId();
-const long PanelSpriteObjectEditor::ID_CHECKBOX1 = wxNewId();
 const long PanelSpriteObjectEditor::ID_STATICLINE1 = wxNewId();
 const long PanelSpriteObjectEditor::ID_BUTTON3 = wxNewId();
 const long PanelSpriteObjectEditor::ID_BUTTON1 = wxNewId();
@@ -67,6 +67,7 @@ object(object_)
 	wxFlexGridSizer* FlexGridSizer9;
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
+	wxStaticBoxSizer* StaticBoxSizer3;
 	wxGridSizer* GridSizer1;
 	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer12;
@@ -102,6 +103,11 @@ object(object_)
 	StaticBoxSizer2->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Texture configuration (for HTML5 games only)"));
+	tileCheck = new wxCheckBox(Core, ID_CHECKBOX1, _("Repeat borders and center textures (instead of stretching them)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	tileCheck->SetValue(false);
+	StaticBoxSizer3->Add(tileCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer8->AddGrowableCol(0);
 	FlexGridSizer8->AddGrowableRow(0);
@@ -153,9 +159,6 @@ object(object_)
 	FlexGridSizer3->Add(frontTextureEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	frontAddFromBt = new wxBitmapButton(Core, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/addfromimagebanque.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
 	FlexGridSizer3->Add(frontAddFromBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	smoothCheckBox = new wxCheckBox(Core, ID_CHECKBOX1, _("Smooth texture"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
-	smoothCheckBox->SetValue(false);
-	FlexGridSizer3->Add(smoothCheckBox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -191,7 +194,7 @@ object(object_)
 	topMarginTextCtrl->ChangeValue(gd::String::From(object.GetTopMargin()));
 	rightMarginTextCtrl->ChangeValue(gd::String::From(object.GetRightMargin()));
 	bottomMarginTextCtrl->ChangeValue(gd::String::From(object.GetBottomMargin()));
-	smoothCheckBox->SetValue(object.IsSmooth());
+	tileCheck->SetValue(object.IsTiled());
 
     //Init the image bank editor
     resourcesEditor = new ResourcesEditor( this, game, mainFrameWrapper );
@@ -239,7 +242,7 @@ void PanelSpriteObjectEditor::OnokBtClick(wxCommandEvent& event)
 	object.SetTopMargin(gd::String(topMarginTextCtrl->GetValue()).To<float>());
 	object.SetRightMargin(gd::String(rightMarginTextCtrl->GetValue()).To<float>());
 	object.SetBottomMargin(gd::String(bottomMarginTextCtrl->GetValue()).To<float>());
-	object.SetSmooth(smoothCheckBox->GetValue());
+	object.SetTiled(tileCheck->GetValue());
 
     EndModal(1);
 }

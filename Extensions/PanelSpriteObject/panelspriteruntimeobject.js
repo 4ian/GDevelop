@@ -16,16 +16,20 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
 
     if ( this._spritesContainer === undefined ) {
         var texture = runtimeScene.getGame().getImageManager().getPIXITexture(objectData.texture);
+
+        var StretchedSprite = !objectData.tiled ?
+            PIXI.Sprite : PIXI.extras.TilingSprite;
+
         this._spritesContainer = new PIXI.Container();
-        this._centerSprite = new PIXI.Sprite(new PIXI.Texture(texture));
+        this._centerSprite = new StretchedSprite(new PIXI.Texture(texture));
         this._borderSprites = [
-            new PIXI.Sprite(new PIXI.Texture(texture)), //Right
+            new StretchedSprite(new PIXI.Texture(texture)), //Right
             new PIXI.Sprite(texture), //Top-Right
-            new PIXI.Sprite(new PIXI.Texture(texture)), //Top
+            new StretchedSprite(new PIXI.Texture(texture)), //Top
             new PIXI.Sprite(texture), //Top-Left
-            new PIXI.Sprite(new PIXI.Texture(texture)), //Left
+            new StretchedSprite(new PIXI.Texture(texture)), //Left
             new PIXI.Sprite(texture), //Bottom-Left
-            new PIXI.Sprite(new PIXI.Texture(texture)), //Bottom
+            new StretchedSprite(new PIXI.Texture(texture)), //Bottom
             new PIXI.Sprite(texture)  //Bottom-Right
         ];
         this._borderMasks = [
@@ -70,6 +74,14 @@ gdjs.PanelSpriteRuntimeObject.thisIsARuntimeObjectConstructor = "PanelSpriteObje
 gdjs.PanelSpriteRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
     cb(this._spritesContainer);
 };
+
+gdjs.PanelSpriteRuntimeObject.prototype.updateTime = function() {
+    if (this._spritesContainer.visible && this._wasRendered) {
+        this._spritesContainer.cacheAsBitmap = true;
+    }
+
+    this._wasRendered = true;
+}
 
 /**
  * Initialize the extra parameters that could be set for an instance.
@@ -148,6 +160,9 @@ gdjs.PanelSpriteRuntimeObject.prototype._updateSpritesAndTexturesSize = function
     for (var i = 0;i < this._borderMasks.length;++i) {
         this._borderMasks[i].endFill();
     }
+
+    this._wasRendered = true;
+    this._spritesContainer.cacheAsBitmap = false;
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype.setX = function(x) {

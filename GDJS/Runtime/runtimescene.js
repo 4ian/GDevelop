@@ -240,18 +240,16 @@ gdjs.RuntimeScene.prototype._updateTime = function() {
 	this._timeFromStart += this._elapsedTime;
 };
 
+/**
+ * Called to update visilibity of PIXI.DisplayObject of objects
+ * rendered on the scene.
+ *
+ * Visibility is set to false if object is hidden, or if
+ * object is too far from the camera of its layer ("culling").
+ * @method _updateObjectsVisibility
+ * @private
+ */
 gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
-	var allLayers = this._layers.entries();
-	var layersCameraCoordinates = {};
-	for(var i = 0;i < allLayers.length;++i) {
-		var theLayer = allLayers[i][1];
-		layersCameraCoordinates[allLayers[i][0]] =
-			[theLayer.getCameraX() - theLayer.getCameraWidth(),
-			 theLayer.getCameraY() - theLayer.getCameraHeight(),
-			 theLayer.getCameraX() + theLayer.getCameraWidth(),
-			 theLayer.getCameraY() + theLayer.getCameraHeight()];
-	}
-
 	function hide(displayObject) {
 		displayObject.visible = false;
 	}
@@ -260,22 +258,46 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 		displayObject.visible = true;
 	}
 
-	this._constructListOfAllInstances();
-	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-		var object = this._allInstancesList[i];
-		var cameraCoords = layersCameraCoordinates[object.getLayer()];
+	if (this.isFirstFrame()) {
+		this._constructListOfAllInstances();
+		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
+			var object = this._allInstancesList[i];
 
-		if (!cameraCoords) continue;
+			object.exposePIXIDisplayObject(object.isHidden() ? hide : show);
+		}
 
-		if (object.isHidden()) {
-			object.exposePIXIDisplayObject(hide);
-		} else {
-			var aabb = object.getAABB();
-			if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
-				aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
+		return;
+	} else {
+		//After first frame, optimise rendering by setting only objects
+		//near camera as visible.
+		var allLayers = this._layers.entries();
+		var layersCameraCoordinates = {};
+		for(var i = 0;i < allLayers.length;++i) {
+			var theLayer = allLayers[i][1];
+			layersCameraCoordinates[allLayers[i][0]] =
+				[theLayer.getCameraX() - theLayer.getCameraWidth(),
+				 theLayer.getCameraY() - theLayer.getCameraHeight(),
+				 theLayer.getCameraX() + theLayer.getCameraWidth(),
+				 theLayer.getCameraY() + theLayer.getCameraHeight()];
+		}
+
+		this._constructListOfAllInstances();
+		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
+			var object = this._allInstancesList[i];
+			var cameraCoords = layersCameraCoordinates[object.getLayer()];
+
+			if (!cameraCoords) continue;
+
+			if (object.isHidden()) {
 				object.exposePIXIDisplayObject(hide);
 			} else {
-				object.exposePIXIDisplayObject(show);
+				var aabb = object.getAABB();
+				if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
+					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
+					object.exposePIXIDisplayObject(hide);
+				} else {
+					object.exposePIXIDisplayObject(show);
+				}
 			}
 		}
 	}

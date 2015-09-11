@@ -485,6 +485,7 @@ gdjs.RuntimeObject.prototype.hasVariable = function(name) {
  * @param enable {Boolean} Set it to true to hide the object, false to show it.
  */
 gdjs.RuntimeObject.prototype.hide = function(enable) {
+    if (enable === undefined) enable = true;
     this.hidden = enable;
 };
 

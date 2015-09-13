@@ -1050,13 +1050,6 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
     if ( Math.sqrt(x*x+y*y) > obj1BoundingRadius + obj2BoundingRadius )
         return false;
 
-    //Or if in circle are colliding
-    var obj1MinEdge = Math.min(o1w, o1h)/2.0;
-    var obj2MinEdge = Math.min(o2w, o2h)/2.0;
-
-    if ( x*x+y*y < obj1MinEdge*obj1MinEdge+2*obj1MinEdge*obj2MinEdge+obj2MinEdge*obj2MinEdge )
-        return true;
-
     //Do a real check if necessary.
     var hitBoxes1 = obj1.getHitBoxes();
     var hitBoxes2 = obj2.getHitBoxes();

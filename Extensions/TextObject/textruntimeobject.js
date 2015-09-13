@@ -15,7 +15,6 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
 {
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-    this._runtimeScene = runtimeScene;
     this._characterSize = objectData.characterSize;
     this._fontName = "Arial";
     this._bold = objectData.bold;
@@ -42,8 +41,8 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
 gdjs.TextRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.TextRuntimeObject.thisIsARuntimeObjectConstructor = "TextObject::Text";
 
-gdjs.TextRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._text);
+gdjs.TextRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+    cb(this._text);
 };
 
 /**
@@ -206,29 +205,6 @@ gdjs.TextRuntimeObject.prototype.setItalic = function(enable) {
 };
 
 /**
- * Hide or show the object
- * @method hide
- * @param enable {Boolean} Set it to true to hide the object, false to show it.
- */
-gdjs.TextRuntimeObject.prototype.hide = function(enable) {
-    if ( enable === undefined ) enable = true;
-    this._hidden = enable;
-    this._text.visible = !enable;
-};
-
-/**
- * Set the layer of the object.
- * @method setLayer
- * @param {String} The new layer of the object
- */
-gdjs.TextRuntimeObject.prototype.setLayer = function(name) {
-    //We need to move the object from the pixi container of the layer
-    this._runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._text);
-    this.layer = name;
-    this._runtimeScene.getLayer(this.layer).addChildToPIXIContainer(this._text, this.zOrder);
-};
-
-/**
  * Get width for your object text.
  * @method getWidth
  */
@@ -257,16 +233,4 @@ gdjs.TextRuntimeObject.prototype.setColor = function(str) {
     this._color[1] = parseInt(color[1], 10);
     this._color[2] = parseInt(color[2], 10);
     this._updateTextStyle();
-};
-
-/**
- * Set the Z order of the object.
- * @method setZOrder
- * @param z {Number} The new Z order position of the object
- */
-gdjs.TextRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z !== this.zOrder ) {
-        this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._text, z);
-        this.zOrder = z;
-    }
 };

@@ -68,6 +68,8 @@ gdjs.TextEntryRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.protot
 gdjs.TextEntryRuntimeObject.thisIsARuntimeObjectConstructor = "TextEntryObject::TextEntry";
 
 gdjs.TextEntryRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
+    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+
     document.removeEventListener('keypress', this._pressHandler);
     document.removeEventListener('keyup', this._upHandler);
     document.removeEventListener('keydown', this._downHandler);

@@ -61,13 +61,12 @@ public :
     float GetBottomMargin() const { return bottomMargin; };
     void SetBottomMargin(float newMargin) { bottomMargin = newMargin; };
 
-    bool IsSmooth() const { return smooth; };
-    void SetSmooth(bool enable) { smooth = enable; };
+    bool IsTiled() const { return tiled; };
+    void SetTiled(bool enable = true) { tiled = enable; };
 
     gd::String textureName;
 
 private:
-
     virtual void DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element);
     #if defined(GD_IDE_ONLY)
     virtual void DoSerializeTo(gd::SerializerElement & element) const;
@@ -81,7 +80,7 @@ private:
     float rightMargin;
     float bottomMargin;
 
-    bool smooth;
+    bool tiled;
 
     std::shared_ptr<SFMLTextureWrapper> texture;
 };
@@ -138,7 +137,6 @@ private:
     float bottomMargin;
 
     float angle;
-    bool smooth;
 
     std::shared_ptr<SFMLTextureWrapper> texture;
 };

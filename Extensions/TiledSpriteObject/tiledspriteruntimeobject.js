@@ -26,15 +26,14 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
     this._xOffset = 0;
     this._yOffset = 0;
 
-    this._runtimeScene = runtimeScene;
     runtimeScene.getLayer("").addChildToPIXIContainer(this._tiledSprite, this.zOrder);
 };
 
 gdjs.TiledSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.TiledSpriteRuntimeObject.thisIsARuntimeObjectConstructor = "TiledSpriteObject::TiledSprite";
 
-gdjs.TiledSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._tiledSprite);
+gdjs.TiledSpriteRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+    cb(this._tiledSprite);
 };
 
 /**
@@ -73,13 +72,6 @@ gdjs.TiledSpriteRuntimeObject.prototype.setAngle = function(angle) {
     this._tiledSprite.rotation = gdjs.toRad(angle);
 };
 
-gdjs.TiledSpriteRuntimeObject.prototype.setLayer = function(name) {
-    //We need to move the object from the pixi container of the layer
-    this._runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._tiledSprite);
-    this.layer = name;
-    this._runtimeScene.getLayer(this.layer).addChildToPIXIContainer(this._tiledSprite, this.zOrder);
-};
-
 gdjs.TiledSpriteRuntimeObject.prototype.getWidth = function() {
     return this._tiledSprite.width;
 };
@@ -116,11 +108,4 @@ gdjs.TiledSpriteRuntimeObject.prototype.getXOffset = function() {
 
 gdjs.TiledSpriteRuntimeObject.prototype.getYOffset = function() {
     return this._yOffset;
-};
-
-gdjs.TiledSpriteRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z !== this.zOrder ) {
-        this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._tiledSprite, z);
-        this.zOrder = z;
-   }
 };

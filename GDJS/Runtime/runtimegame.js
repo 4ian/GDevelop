@@ -450,11 +450,14 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
 
     //Uncomment to profile the first x frames of the game.
     /*var x = 250;
+    var startTime = Date.now();
     console.profile("Stepping for " + x + " frames")
     for(var i = 0; i < x; ++i) {
-        currentScene.renderAndStep();
+        this._sceneStack.step();
     }
     console.profileEnd();
+    var time = Date.now() - startTime;
+    console.log("Took", time, "ms");
     return;*/
 
     requestAnimationFrame(gameLoop);

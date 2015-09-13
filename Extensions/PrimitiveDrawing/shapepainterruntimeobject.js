@@ -25,15 +25,14 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, objectData)
     this._outlineSize = objectData.outlineSize;
     this._absoluteCoordinates = objectData.absoluteCoordinates;
 
-    this._runtimeScene = runtimeScene;
     runtimeScene.getLayer("").addChildToPIXIContainer(this._graphics, this.zOrder);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.ShapePainterRuntimeObject.thisIsARuntimeObjectConstructor = "PrimitiveDrawing::Drawer";
 
-gdjs.ShapePainterRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
-    runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._graphics);
+gdjs.ShapePainterRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+    cb(this._graphics);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeScene) {
@@ -126,24 +125,10 @@ gdjs.ShapePainterRuntimeObject.prototype.setY = function(y) {
     }
 };
 
-gdjs.ShapePainterRuntimeObject.prototype.setLayer = function(name) {
-    //We need to move the object from the pixi container of the layer
-    this._runtimeScene.getLayer(this.layer).removePIXIContainerChild(this._graphics);
-    this.layer = name;
-    this._runtimeScene.getLayer(this.layer).addChildToPIXIContainer(this._graphics, this.zOrder);
-};
-
 gdjs.ShapePainterRuntimeObject.prototype.getWidth = function() {
     return 32;
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.getHeight = function() {
     return 32;
-};
-
-gdjs.ShapePainterRuntimeObject.prototype.setZOrder = function(z) {
-    if ( z !== this.zOrder ) {
-        this._runtimeScene.getLayer(this.layer).changePIXIContainerChildZOrder(this._graphics, z);
-        this.zOrder = z;
-   }
 };

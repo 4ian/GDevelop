@@ -57,6 +57,7 @@ void PanelSpriteObject::DoUnserializeFrom(gd::Project & project, const gd::Seria
     topMargin = element.GetIntAttribute("topMargin");
     rightMargin = element.GetIntAttribute("rightMargin");
     bottomMargin = element.GetIntAttribute("bottomMargin");
+    tiled = element.GetBoolAttribute("tiled");
 }
 
 #if defined(GD_IDE_ONLY)
@@ -69,6 +70,7 @@ void PanelSpriteObject::DoSerializeTo(gd::SerializerElement & element) const
     element.SetAttribute("topMargin", topMargin);
     element.SetAttribute("rightMargin", rightMargin);
     element.SetAttribute("bottomMargin", bottomMargin);
+    element.SetAttribute("tiled", tiled);
 }
 
 void PanelSpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)

@@ -43,13 +43,13 @@ class PanelSpriteObjectEditor: public wxDialog
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxButton* cancelBt;
+		wxCheckBox* tileCheck;
 		wxButton* imageBankBt;
 		wxTextCtrl* bottomMarginTextCtrl;
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText7;
 		wxStaticLine* StaticLine1;
 		wxTextCtrl* rightMarginTextCtrl;
-		wxCheckBox* smoothCheckBox;
 		wxBitmapButton* frontAddFromBt;
 		wxStaticText* StaticText4;
 		wxTextCtrl* leftMarginTextCtrl;
@@ -65,6 +65,7 @@ class PanelSpriteObjectEditor: public wxDialog
 		static const long ID_TEXTCTRL7;
 		static const long ID_STATICTEXT8;
 		static const long ID_TEXTCTRL8;
+		static const long ID_CHECKBOX1;
 		static const long ID_STATICTEXT2;
 		static const long ID_TEXTCTRL3;
 		static const long ID_STATICTEXT1;
@@ -76,7 +77,6 @@ class PanelSpriteObjectEditor: public wxDialog
 		static const long ID_TEXTCTRL5;
 		static const long ID_TEXTCTRL1;
 		static const long ID_BITMAPBUTTON1;
-		static const long ID_CHECKBOX1;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON3;
 		static const long ID_BUTTON1;

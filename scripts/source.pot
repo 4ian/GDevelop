@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-06 11:56+0200\n"
+"POT-Creation-Date: 2015-09-14 23:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -263,8 +263,8 @@ msgstr ""
 
 #: ../IDE/ChoiceFile.cpp:81 ../IDE/ChoiceJoyAxis.cpp:76
 #: ../IDE/ChoixBouton.cpp:70 ../IDE/ChoixClavier.cpp:62
-#: ../IDE/CodeEditor.cpp:150 ../IDE/Dialogs/ObjectsEditor.cpp:413
-#: ../IDE/Dialogs/ObjectsEditor.cpp:415 ../IDE/EditObjectGroup.cpp:93
+#: ../IDE/CodeEditor.cpp:150 ../IDE/Dialogs/ObjectsEditor.cpp:411
+#: ../IDE/Dialogs/ObjectsEditor.cpp:413 ../IDE/EditObjectGroup.cpp:93
 #: ../IDE/EditPropScene.cpp:141 ../IDE/EventsEditor.cpp:469
 #: ../IDE/EventsEditor.cpp:471 ../IDE/GeneratePassword.cpp:75
 #: ../IDE/InstructionSelectorDialog.cpp:167 ../IDE/MainFrame.cpp:228
@@ -341,7 +341,7 @@ msgstr ""
 #: ../Extensions//Function/FunctionEventEditorDlg.cpp:110
 #: ../Extensions//Light/LightObjectEditor.cpp:106
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:110
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:167
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:170
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:719
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:262
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:188
@@ -382,7 +382,7 @@ msgstr ""
 #: ../Extensions//Function/FunctionEventEditorDlg.cpp:112
 #: ../Extensions//Light/LightObjectEditor.cpp:108
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:112
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:169
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:172
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:721
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:264
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:190
@@ -569,22 +569,22 @@ msgid ""
 msgstr ""
 
 #: ../IDE/CodeEditor.cpp:63 ../IDE/CodeEditor.cpp:128
-#: ../IDE/Dialogs/ObjectsEditor.cpp:304 ../IDE/Dialogs/ObjectsEditor.cpp:408
+#: ../IDE/Dialogs/ObjectsEditor.cpp:302 ../IDE/Dialogs/ObjectsEditor.cpp:406
 #: ../IDE/EventsEditor.cpp:447
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:241
 msgid "Copy"
 msgstr ""
 
 #: ../IDE/CodeEditor.cpp:66 ../IDE/CodeEditor.cpp:129
-#: ../IDE/Dialogs/ObjectsEditor.cpp:307 ../IDE/Dialogs/ObjectsEditor.cpp:409
+#: ../IDE/Dialogs/ObjectsEditor.cpp:305 ../IDE/Dialogs/ObjectsEditor.cpp:407
 #: ../IDE/EventsEditor.cpp:448
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:244
 msgid "Cut"
 msgstr ""
 
 #: ../IDE/CodeEditor.cpp:69 ../IDE/CodeEditor.cpp:130
-#: ../IDE/Dialogs/ObjectsEditor.cpp:310 ../IDE/Dialogs/ObjectsEditor.cpp:319
-#: ../IDE/Dialogs/ObjectsEditor.cpp:410 ../IDE/EventsEditor.cpp:449
+#: ../IDE/Dialogs/ObjectsEditor.cpp:308 ../IDE/Dialogs/ObjectsEditor.cpp:317
+#: ../IDE/Dialogs/ObjectsEditor.cpp:408 ../IDE/EventsEditor.cpp:449
 #: ../Core/GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp:77
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:247
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:263
@@ -602,7 +602,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: ../IDE/CodeEditor.cpp:126 ../IDE/Dialogs/ObjectsEditor.cpp:406
+#: ../IDE/CodeEditor.cpp:126 ../IDE/Dialogs/ObjectsEditor.cpp:404
 #: ../IDE/EventsEditor.cpp:445
 msgid "Clipboard"
 msgstr ""
@@ -1058,11 +1058,11 @@ msgstr ""
 msgid "Choose a file for the project"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:147 ../IDE/Dialogs/ObjectsEditor.cpp:974
+#: ../IDE/Dialogs/ObjectsEditor.cpp:145 ../IDE/Dialogs/ObjectsEditor.cpp:969
 msgid "The group was correctly added."
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:249 ../IDE/Dialogs/ObjectsEditor.cpp:402
+#: ../IDE/Dialogs/ObjectsEditor.cpp:247 ../IDE/Dialogs/ObjectsEditor.cpp:400
 #: ../IDE/ProjectManager.cpp:202 ../IDE/ProjectManager.cpp:237
 #: ../IDE/ProjectManager.cpp:253
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:62
@@ -1073,27 +1073,27 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:251
+#: ../IDE/Dialogs/ObjectsEditor.cpp:249
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:77
 msgid "Add a behavior"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:253
+#: ../IDE/Dialogs/ObjectsEditor.cpp:251
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:692
 msgid "Other properties"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:257 ../IDE/Dialogs/ObjectsEditor.cpp:313
-#: ../IDE/Dialogs/ObjectsEditor.cpp:393 ../IDE/EditObjectGroup.cpp:104
+#: ../IDE/Dialogs/ObjectsEditor.cpp:255 ../IDE/Dialogs/ObjectsEditor.cpp:311
+#: ../IDE/Dialogs/ObjectsEditor.cpp:391 ../IDE/EditObjectGroup.cpp:104
 #: ../IDE/EditObjectGroup.cpp:126
 msgid "Add an object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:260
+#: ../IDE/Dialogs/ObjectsEditor.cpp:258
 msgid "Delete\tDel"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:263 ../IDE/ProjectManager.cpp:153
+#: ../IDE/Dialogs/ObjectsEditor.cpp:261 ../IDE/ProjectManager.cpp:153
 #: ../IDE/ProjectManager.cpp:189 ../IDE/ProjectManager.cpp:205
 #: ../IDE/ProjectManager.cpp:256
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:160
@@ -1101,66 +1101,66 @@ msgstr ""
 msgid "Rename\tF2"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:266
+#: ../IDE/Dialogs/ObjectsEditor.cpp:264
 msgid "Set as global object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:269 ../IDE/ProjectManager.cpp:164
+#: ../IDE/Dialogs/ObjectsEditor.cpp:267 ../IDE/ProjectManager.cpp:164
 #: ../IDE/ProjectManager.cpp:216 ../IDE/ProjectManager.cpp:267
 msgid "Move up\tCtrl-Up"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:272 ../IDE/ProjectManager.cpp:167
+#: ../IDE/Dialogs/ObjectsEditor.cpp:270 ../IDE/ProjectManager.cpp:167
 #: ../IDE/ProjectManager.cpp:219 ../IDE/ProjectManager.cpp:270
 msgid "Move down\tCtrl-Down"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:276 ../IDE/ProjectManager.cpp:171
+#: ../IDE/Dialogs/ObjectsEditor.cpp:274 ../IDE/ProjectManager.cpp:171
 #: ../IDE/ProjectManager.cpp:223 ../IDE/ProjectManager.cpp:274
 msgid "Copy\tCtrl-C"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:279 ../IDE/ProjectManager.cpp:174
+#: ../IDE/Dialogs/ObjectsEditor.cpp:277 ../IDE/ProjectManager.cpp:174
 #: ../IDE/ProjectManager.cpp:226 ../IDE/ProjectManager.cpp:277
 msgid "Cut\tCtrl-X"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:282 ../IDE/ProjectManager.cpp:177
+#: ../IDE/Dialogs/ObjectsEditor.cpp:280 ../IDE/ProjectManager.cpp:177
 #: ../IDE/ProjectManager.cpp:229 ../IDE/ProjectManager.cpp:280
 msgid "Paste\tCtrl-V"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:285 ../IDE/EventsEditor.cpp:202
+#: ../IDE/Dialogs/ObjectsEditor.cpp:283 ../IDE/EventsEditor.cpp:202
 #: ../IDE/ProjectManager.cpp:160 ../IDE/ProjectManager.cpp:212
 #: ../IDE/ProjectManager.cpp:241 ../IDE/ProjectManager.cpp:263
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:189
 msgid "Delete\tDEL"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:285
+#: ../IDE/Dialogs/ObjectsEditor.cpp:283
 msgid "Delete all selected items"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:288
+#: ../IDE/Dialogs/ObjectsEditor.cpp:286
 msgid "Add object(s) to group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:291 ../IDE/Dialogs/ObjectsEditor.cpp:403
+#: ../IDE/Dialogs/ObjectsEditor.cpp:289 ../IDE/Dialogs/ObjectsEditor.cpp:401
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:315
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:110
 msgid "Rename"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:294
+#: ../IDE/Dialogs/ObjectsEditor.cpp:292
 msgid "Set as global group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:297 ../IDE/Dialogs/ObjectsEditor.cpp:316
-#: ../IDE/Dialogs/ObjectsEditor.cpp:394
+#: ../IDE/Dialogs/ObjectsEditor.cpp:295 ../IDE/Dialogs/ObjectsEditor.cpp:314
+#: ../IDE/Dialogs/ObjectsEditor.cpp:392
 msgid "Add a group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:300 ../IDE/Dialogs/ObjectsEditor.cpp:395
+#: ../IDE/Dialogs/ObjectsEditor.cpp:298 ../IDE/Dialogs/ObjectsEditor.cpp:393
 #: ../IDE/EventsEditor.cpp:224 ../IDE/EventsEditor.cpp:434
 #: ../IDE/MainFrame.cpp:392
 #: ../Core/GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:312
@@ -1168,152 +1168,151 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:391
+#: ../IDE/Dialogs/ObjectsEditor.cpp:389
 msgid "Objects and groups"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:393
+#: ../IDE/Dialogs/ObjectsEditor.cpp:391
 msgid "Add a new object to the list of the objects of the scene"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:394
+#: ../IDE/Dialogs/ObjectsEditor.cpp:392
 msgid "Add a new group to the scene"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:395
+#: ../IDE/Dialogs/ObjectsEditor.cpp:393
 msgid "Delete the selected object or group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:396 ../IDE/MainFrame.cpp:394
+#: ../IDE/Dialogs/ObjectsEditor.cpp:394 ../IDE/MainFrame.cpp:394
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:151
 msgid "Move up"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:397 ../IDE/MainFrame.cpp:395
+#: ../IDE/Dialogs/ObjectsEditor.cpp:395 ../IDE/MainFrame.cpp:395
 #: ../Core/GDCore/IDE/Dialogs/ChooseVariableDialog.cpp:152
 msgid "Move down"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:400
+#: ../IDE/Dialogs/ObjectsEditor.cpp:398
 msgid "Selection"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:402
+#: ../IDE/Dialogs/ObjectsEditor.cpp:400
 msgid "Edit the selected object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:403
+#: ../IDE/Dialogs/ObjectsEditor.cpp:401
 msgid "Rename the selected item"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:415
+#: ../IDE/Dialogs/ObjectsEditor.cpp:413
 msgid "Show the online help"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:422
+#: ../IDE/Dialogs/ObjectsEditor.cpp:420
 msgid "http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:623
+#: ../IDE/Dialogs/ObjectsEditor.cpp:621
 msgid "Unable to rename the object : \n"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:632
+#: ../IDE/Dialogs/ObjectsEditor.cpp:630
 msgid "Invalid name"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:709
+#: ../IDE/Dialogs/ObjectsEditor.cpp:707
 msgid "Unable to rename the group : \n"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:789
+#: ../IDE/Dialogs/ObjectsEditor.cpp:787
 msgid "Unfold the group to see the objects inside it."
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:917 ../IDE/Dialogs/ObjectsEditor.cpp:919
+#: ../IDE/Dialogs/ObjectsEditor.cpp:915
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:428
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp:430
 msgid "NewObject"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:941
+#: ../IDE/Dialogs/ObjectsEditor.cpp:939
 msgid "The object was correctly added"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:953 ../IDE/Dialogs/ObjectsEditor.cpp:957
+#: ../IDE/Dialogs/ObjectsEditor.cpp:951
 msgid "NewGroup"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1005
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1000
 msgid "Delete also all references to this item in groups and events ( i.e. Actions and conditions using the object )?"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1006
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1001
 #, c-format
 msgid "Delete also all references to these %i items in groups and events ( i.e. Actions and conditions using the objects )?"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1007
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1002
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:490
 msgid "Confirm deletion"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1292 ../IDE/Dialogs/ObjectsEditor.cpp:1294
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1318 ../IDE/Dialogs/ObjectsEditor.cpp:1320
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1281 ../IDE/Dialogs/ObjectsEditor.cpp:1299
 msgid "CopyOf"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1360 ../IDE/Dialogs/ObjectsEditor.cpp:1403
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1339 ../IDE/Dialogs/ObjectsEditor.cpp:1382
 msgid "Can't set \""
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1360 ../IDE/Dialogs/ObjectsEditor.cpp:1403
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1339 ../IDE/Dialogs/ObjectsEditor.cpp:1382
 msgid "\" global because :\n"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1458
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1437
 msgid "Create a new group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1468
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1447
 #: ../Core/GDCore/IDE/Dialogs/ObjectListDialogsHelper.cpp:98
 msgid "Groups"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1635
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1614
 msgid "an object"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1637
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1616
 msgid "a group"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1639
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1618
 msgid "with the same name exists in the current scene"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1649
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1628
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:228
 msgid "objects"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1652
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1631
 msgid "/ groups"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1653
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1632
 msgid "groups"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1655
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1634
 msgid "with the same name exist in these scenes : "
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1670
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1649
 msgid "a global object with the same name exists"
 msgstr ""
 
-#: ../IDE/Dialogs/ObjectsEditor.cpp:1672
+#: ../IDE/Dialogs/ObjectsEditor.cpp:1651
 msgid "a global group with the same name exists"
 msgstr ""
 
@@ -1977,8 +1976,8 @@ msgstr ""
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:99
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:103
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:107
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:96
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:100
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:97
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:101
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:80
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:84
 msgid "32"
@@ -2003,10 +2002,10 @@ msgstr ""
 #: ../IDE/ImportImage.cpp:215 ../IDE/ImportImage.cpp:229
 #: ../IDE/ImportImage.cpp:233 ../IDE/ImportImage.cpp:244
 #: ../IDE/ImportImage.cpp:248
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:115
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:123
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:134
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:142
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:121
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:129
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:140
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:148
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:504
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:509
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:206
@@ -6501,7 +6500,7 @@ msgstr ""
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:85
 #: ../Extensions//PanelSpriteObject/Extension.cpp:35
 #: ../Extensions//PanelSpriteObject/Extension.cpp:48
-#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:298
+#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:300
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:251
 #: ../Extensions//TiledSpriteObject/Extension.cpp:33
 #: ../Extensions//TiledSpriteObject/Extension.cpp:46
@@ -6525,7 +6524,7 @@ msgstr ""
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:88
 #: ../Extensions//PanelSpriteObject/Extension.cpp:62
 #: ../Extensions//PanelSpriteObject/Extension.cpp:76
-#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:299
+#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:301
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:252
 #: ../Extensions//TiledSpriteObject/Extension.cpp:60
 #: ../Extensions//TiledSpriteObject/Extension.cpp:74
@@ -6565,14 +6564,14 @@ msgid "Settings of the 3D Box object"
 msgstr ""
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:97
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:94
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:95
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:1062
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:78
 msgid "Width :"
 msgstr ""
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:101
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:98
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:99
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:82
 msgid "Height :"
 msgstr ""
@@ -6582,7 +6581,7 @@ msgid "Depth :"
 msgstr ""
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:112
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:149
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:155
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:89
 msgid "Textures"
 msgstr ""
@@ -6592,22 +6591,22 @@ msgid "Front :"
 msgstr ""
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:121
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:113
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:119
 msgid "Top :"
 msgstr ""
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:127
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:140
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:146
 msgid "Bottom :"
 msgstr ""
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:133
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:121
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:127
 msgid "Left :"
 msgstr ""
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:139
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:132
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:138
 msgid "Right :"
 msgstr ""
 
@@ -6616,13 +6615,13 @@ msgid "Back :"
 msgstr ""
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:157
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:165
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:168
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:105
 msgid "Show image bank's editor"
 msgstr ""
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:201
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:204
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:207
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:139
 msgid "Images Bank Editor"
 msgstr ""
@@ -6633,7 +6632,7 @@ msgstr ""
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:282
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:293
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:304
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:252
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:255
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:1120
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:182
 #: ../Extensions//TileMapObject/TileSetConfigurationEditor.cpp:97
@@ -8417,43 +8416,46 @@ msgstr ""
 msgid "Set image _PARAM1_ on _PARAM0_"
 msgstr ""
 
-#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:300
+#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:302
 msgid "Left Margin"
 msgstr ""
 
-#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:301
+#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:303
 msgid "Top Margin"
 msgstr ""
 
-#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:302
+#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:304
 msgid "Right Margin"
 msgstr ""
 
-#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:303
+#: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:305
 msgid "Bottom Margin"
 msgstr ""
 
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:78
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:79
 msgid "Settings of the Panel Sprite Object"
 msgstr ""
 
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:91
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:92
 msgid "Default size"
 msgstr ""
 
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:108
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:106
+msgid "Texture configuration (for HTML5 games only)"
+msgstr ""
+
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:107
+msgid "Repeat borders and center textures (instead of stretching them)"
+msgstr ""
+
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:114
 msgid "Margins"
 msgstr ""
 
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:126
+#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:132
 msgid ""
 "Image center\n"
 "(streched part)"
-msgstr ""
-
-#: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:156
-#: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:96
-msgid "Smooth texture"
 msgstr ""
 
 #: ../Extensions//ParticleSystem/Extension.cpp:24
@@ -13477,6 +13479,10 @@ msgstr ""
 
 #: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:62
 msgid "Settings of the Tiled Sprite Object"
+msgstr ""
+
+#: ../Extensions//TiledSpriteObject/TiledSpriteObjectEditor.cpp:96
+msgid "Smooth texture"
 msgstr ""
 
 #: ../Extensions//TileMapObject/Extension.cpp:22

@@ -277,16 +277,12 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
     if ( windowWidth == scene.renderWindow->getSize().x && windowHeight == scene.renderWindow->getSize().y )
         return;
 
-    if ( scene.RenderWindowIsFullScreen() )
-    {
-        scene.renderWindow->create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );
-        scene.ChangeRenderWindow(scene.renderWindow);
-    }
-    else
-    {
-        scene.renderWindow->create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
-        scene.ChangeRenderWindow(scene.renderWindow);
-    }
+
+    scene.renderWindow->create(
+        sf::VideoMode( windowWidth, windowHeight, 32 ),
+        scene.GetWindowDefaultTitle(),
+        sf::Style::Close | (scene.RenderWindowIsFullScreen() ? sf::Style::Fullscreen : 0) );
+    scene.ChangeRenderWindow(scene.renderWindow);
     #endif
 }
 

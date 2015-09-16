@@ -527,7 +527,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     SetDefaultHeight(propElement.GetChild("windowHeight", 0, "WindowH").GetValue().GetInt());
     SetMaximumFPS(propElement.GetChild("maxFPS", 0, "FPSmax").GetValue().GetInt());
     SetMinimumFPS(propElement.GetChild("minFPS", 0, "FPSmin").GetValue().GetInt());
-    SetVerticalSyncActivatedByDefault(propElement.GetChild("verticalSync").GetValue().GetInt());
+    SetVerticalSyncActivatedByDefault(propElement.GetChild("verticalSync").GetValue().GetBool());
     #if defined(GD_IDE_ONLY)
     SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
     SetPackageName(propElement.GetStringAttribute("packageName"));

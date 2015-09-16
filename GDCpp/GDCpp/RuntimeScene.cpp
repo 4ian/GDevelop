@@ -92,6 +92,12 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
     if (!renderWindow) return;
 
     renderWindow->setTitle(GetWindowDefaultTitle());
+
+    if(game)
+    {
+        renderWindow->setFramerateLimit(game->GetMaximumFPS());
+        renderWindow->setVerticalSyncEnabled(game->IsVerticalSynchronizationEnabledByDefault());
+    }
     SetupOpenGLProjection();
 }
 

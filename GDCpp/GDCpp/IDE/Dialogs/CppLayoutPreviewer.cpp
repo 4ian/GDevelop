@@ -275,7 +275,6 @@ void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
         externalPreviewWindow = std::shared_ptr<RenderDialog>(new RenderDialog(editor.GetParentControl(), this) );
 
     externalPreviewWindow->Show(true);
-    externalPreviewWindow->renderCanvas->setFramerateLimit( previewGame.GetMaximumFPS() );
 
     externalPreviewWindow->SetSizeOfRenderingZone(editor.GetProject().GetMainWindowDefaultWidth(), editor.GetProject().GetMainWindowDefaultHeight());
     previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);

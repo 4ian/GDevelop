@@ -283,8 +283,6 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
         scene.GetWindowDefaultTitle(),
         sf::Style::Close | (scene.RenderWindowIsFullScreen() ? sf::Style::Fullscreen : 0) );
     scene.ChangeRenderWindow(scene.renderWindow);
-    scene.renderWindow->setFramerateLimit(scene.game->GetMaximumFPS());
-    scene.renderWindow->setVerticalSyncEnabled(scene.game->IsVerticalSynchronizationEnabledByDefault());
     #endif
 }
 
@@ -303,8 +301,6 @@ void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen, bool)
         scene.renderWindow->create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
-    scene.renderWindow->setFramerateLimit(scene.game->GetMaximumFPS());
-    scene.renderWindow->setVerticalSyncEnabled(scene.game->IsVerticalSynchronizationEnabledByDefault());
     #endif
 }
 unsigned int GD_API GetSceneWindowWidth(RuntimeScene & scene)

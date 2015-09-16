@@ -174,8 +174,6 @@ int main( int argc, char *p_argv[] )
     window.create(sf::VideoMode(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32),
         "", sf::Style::Close);
     window.setActive(true);
-    window.setFramerateLimit(game.GetMaximumFPS());
-    window.setVerticalSyncEnabled(game.IsVerticalSynchronizationEnabledByDefault());
 
     //Game main loop
     bool abort = false;

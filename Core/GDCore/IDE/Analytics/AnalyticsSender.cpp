@@ -67,7 +67,7 @@ void AnalyticsSender::SendData(gd::String collection, SerializerElement & data)
     request.setMethod(sf::Http::Request::Post);
     request.setField("Content-Type", "application/json");
     request.setUri("/3.0/projects/"+projectId.ToLocale()+"/events/"+collection.ToLocale()+"?api_key="+writeKey.ToLocale());
-    request.setBody(Serializer::ToJSON(data));
+    request.setBody(Serializer::ToJSON(data).ToSfString());
 
     // Send the request
     sf::Http::Response response = Http.sendRequest(request, sf::seconds(2));

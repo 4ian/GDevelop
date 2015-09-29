@@ -123,7 +123,7 @@ bool ProjectFileWriter::SaveToJSONFile(const gd::Project & project, const gd::St
     project.SerializeTo(rootElement);
 
     //Write JSON to file
-    std::string str = gd::Serializer::ToJSON(rootElement);
+    gd::String str = gd::Serializer::ToJSON(rootElement);
     std::ofstream ofs(filename.ToLocale().c_str());
     if (!ofs.is_open())
     {

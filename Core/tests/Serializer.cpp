@@ -25,23 +25,23 @@ using namespace gd;
 TEST_CASE( "Serializer", "[common]" ) {
 
     SECTION("JSON basics") {
-        std::string originalJSON = "{\"ok\": true,\"hello\": \"world\"}";
+        gd::String originalJSON = "{\"ok\": true,\"hello\": \"world\"}";
         SerializerElement element = Serializer::FromJSON(originalJSON);
         REQUIRE(element.GetChild("ok").GetValue().GetBool() == true);
         REQUIRE(element.GetChild("hello").GetValue().GetString() == "world");
 
-        std::string json = Serializer::ToJSON(element);
+        gd::String json = Serializer::ToJSON(element);
         REQUIRE(json == originalJSON);
     }
 
     SECTION("Quotes and special characters") {
-        std::string originalJSON = "{\"\\\"hello\\\"\": \" \\\"quote\\\" \",\"caret-prop\": 1,\"special-\\b\\f\\n\\r\\t\\\"\": \"\\b\\f\\n\\r\\t\"}";
+        gd::String originalJSON = "{\"\\\"hello\\\"\": \" \\\"quote\\\" \",\"caret-prop\": 1,\"special-\\b\\f\\n\\r\\t\\\"\": \"\\b\\f\\n\\r\\t\"}";
         SerializerElement element = Serializer::FromJSON(originalJSON);
         REQUIRE(element.GetChild("caret-prop").GetValue().GetBool() == true);
         REQUIRE(element.GetChild("\"hello\"").GetValue().GetString() == " \"quote\" ");
         REQUIRE(element.GetChild("special-\b\f\n\r\t\"").GetValue().GetString() == "\b\f\n\r\t");
 
-        std::string json = Serializer::ToJSON(element);
+        gd::String json = Serializer::ToJSON(element);
         REQUIRE(json == originalJSON);
     }
 
@@ -79,7 +79,7 @@ TEST_CASE( "Serializer", "[common]" ) {
         }
         SECTION("Unsplit elements") {
             //Get a JSON with elements being reference to split elements
-            std::string originalJSON = "{\"a\": {\"a1\": {\"name\": \"\",\"referenceTo\": \"/a/a1\"}},\"b\": {\"b1\": \"world\"},\"c\": {\"c1\": 3},\"layouts\": [{\"name\": \"layout0\",\"referenceTo\": \"/layouts/layout\"},{\"name\": \"layout1\",\"referenceTo\": \"/layouts/layout\"},{\"name\": \"layout2\",\"referenceTo\": \"/layouts/layout\"},{\"name\": \"layout3\",\"referenceTo\": \"/layouts/layout\"},{\"name\": \"layout4\",\"referenceTo\": \"/layouts/layout\"}]}";
+            gd::String originalJSON = "{\"a\": {\"a1\": {\"name\": \"\",\"referenceTo\": \"/a/a1\"}},\"b\": {\"b1\": \"world\"},\"c\": {\"c1\": 3},\"layouts\": [{\"name\": \"layout0\",\"referenceTo\": \"/layouts/layout\"},{\"name\": \"layout1\",\"referenceTo\": \"/layouts/layout\"},{\"name\": \"layout2\",\"referenceTo\": \"/layouts/layout\"},{\"name\": \"layout3\",\"referenceTo\": \"/layouts/layout\"},{\"name\": \"layout4\",\"referenceTo\": \"/layouts/layout\"}]}";
             SerializerElement root = Serializer::FromJSON(originalJSON);
 
             gd::Splitter splitter;

@@ -131,13 +131,13 @@ namespace
 	 * a JSON file.
 	 * Adapted from public domain library "jsoncpp" (http://sourceforge.net/projects/jsoncpp/).
 	 */
-	std::string StringToQuotedJSONString( const char *value )
+	gd::String StringToQuotedJSONString( const char *value )
 	{
 	   if (value == NULL)
 	      return "";
 	   // Not sure how to handle unicode...
 	   if (strpbrk(value, "\"\\\b\f\n\r\t") == NULL && !containsControlCharacter( value ))
-	      return std::string("\"") + value + "\"";
+	      return gd::String("\"") + value + "\"";
 	   // We have to walk value and escape any special characters.
 	   // Appending to std::string is not efficient, but this should be rare.
 	   // (Note: forward slashes are *not* rare, but I am not escaping them.)
@@ -193,30 +193,30 @@ namespace
 	      }
 	   }
 	   result += "\"";
-	   return result;
+	   return gd::String::FromUTF8(result);
 	}
 
-	std::string ValueToJSON(const SerializerValue & val)
+	gd::String ValueToJSON(const SerializerValue & val)
 	{
 		if (val.IsBoolean())
 			return val.GetBool() ? "true" : "false";
 		else if (val.IsInt())
-			return gd::String::From(val.GetInt()).ToUTF8();
+			return gd::String::From(val.GetInt());
 		else if (val.IsDouble())
-			return gd::String::From(val.GetDouble()).ToUTF8();
+			return gd::String::From(val.GetDouble());
 		else
 			return StringToQuotedJSONString(val.GetString().c_str());
 	}
 }
 
-std::string Serializer::ToJSON(const SerializerElement & element)
+gd::String Serializer::ToJSON(const SerializerElement & element)
 {
 	if (element.IsValueUndefined())
 	{
 		if ( !element.ConsideredAsArrayOf().empty() )
 		{
 			//Store the element as an array in JSON:
-		    std::string str = "[";
+		    gd::String str = "[";
 		    bool firstChild = true;
 
 		    if ( element.GetAllAttributes().size() > 0 )
@@ -248,7 +248,7 @@ std::string Serializer::ToJSON(const SerializerElement & element)
 		}
 		else
 		{
-		    std::string str = "{";
+		    gd::String str = "{";
 		    bool firstChild = true;
 
 			const std::map<gd::String, SerializerValue> & attributes = element.GetAllAttributes();

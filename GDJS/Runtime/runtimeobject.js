@@ -766,8 +766,8 @@ gdjs.RuntimeObject.prototype.getAABB = function() {
 gdjs.RuntimeObject.prototype.updateAABB = function() {
     this.aabb.min[0] = this.getDrawableX();
     this.aabb.min[1] = this.getDrawableY();
-    this.aabb.max[0] = this.getDrawableX()+this.getWidth();
-    this.aabb.max[1] = this.getDrawableY()+this.getHeight();
+    this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
+    this.aabb.max[1] = this.aabb.min[1] + this.getHeight();
 };
 
 //Behaviors:

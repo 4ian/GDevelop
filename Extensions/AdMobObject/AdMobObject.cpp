@@ -45,7 +45,7 @@ std::map<gd::String, gd::PropertyDescriptor> AdMobObject::GetProperties(gd::Proj
     properties[_("Overlap game")].SetValue(overlap ? "true" : "false").SetType("Boolean");
     properties[_("Show banner on startup")].SetValue(showOnStartup ? "true" : "false").SetType("Boolean");
     properties[_("Banner position")].SetValue(
-        position == "Top" ? _("Top of the screen") : _("Bottom of the screen"))
+        position == "Bottom" ? _("Bottom of the screen") : _("Top of the screen"))
         .SetType("Choice")
         .AddExtraInfo(_("Top of the screen"))
         .AddExtraInfo(_("Bottom of the screen"));

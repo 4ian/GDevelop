@@ -87,7 +87,7 @@ void GD_API PlaySoundOnChannel( RuntimeScene & scene, const gd::String & file, u
     soundManager->GetSoundOnChannel(channel)->SetVolume(volume);
     soundManager->GetSoundOnChannel(channel)->SetPitch(pitch);
 
-    scene.NotifyPauseWasMade(latency.getElapsedTime().asMicroseconds());
+    scene.GetTimeManager().NotifyPauseWasMade(latency.getElapsedTime().asMicroseconds());
 }
 
 void GD_API PlaySound( RuntimeScene & scene, const gd::String & file, bool repeat, float volume, float pitch )
@@ -101,7 +101,7 @@ void GD_API PlaySound( RuntimeScene & scene, const gd::String & file, bool repea
     soundManager->sounds.back()->SetVolume(volume);
     soundManager->sounds.back()->SetPitch(pitch);
 
-    scene.NotifyPauseWasMade(latency.getElapsedTime().asMicroseconds());
+    scene.GetTimeManager().NotifyPauseWasMade(latency.getElapsedTime().asMicroseconds());
 }
 
 void GD_API StopSoundOnChannel( RuntimeScene & scene, unsigned int channel )

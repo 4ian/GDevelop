@@ -11,30 +11,27 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <SFML/System.hpp>
 #include <memory>
+#include <SFML/System.hpp>
 #include "GDCpp/ObjInstancesHolder.h"
 #include "GDCpp/RuntimeLayer.h"
+#include "GDCpp/TimeManager.h"
 #include "GDCpp/InputManager.h"
-#include "GDCpp/ManualTimer.h"
 #include "GDCpp/BehaviorsRuntimeSharedDataHolder.h"
 namespace sf { class RenderWindow; }
 namespace sf { class Event; }
 namespace gd { class Project; }
 namespace gd { class Object; }
 namespace gd { class ImageManager; }
-class CppPlatform;
 class RuntimeLayer;
 class RuntimeGame;
 class BehaviorsRuntimeSharedData;
 class ExtensionBase;
-class Text;
 class CodeExecutionEngine;
 #undef GetObject //Disable an annoying macro
 
 #if defined(GD_IDE_ONLY)
 class BaseDebugger;
-class BaseProfiler;
 #endif
 
 /**
@@ -57,7 +54,6 @@ public:
     BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
     #endif
     ObjInstancesHolder                      objectsInstances; ///< Contains all of the objects on the scene
-    std::vector < ManualTimer >             timers; ///<List of the timer currently used.
 
     /**
      * \brief Provide access to the variables container
@@ -84,6 +80,16 @@ public:
      * \brief Get the input manager used to handle mouse, keyboard and touches events.
      */
     InputManager & GetInputManager() { return inputManager; }
+
+    /**
+     * \brief Get the time manager used to handle all time related values and timers.
+     */
+    const TimeManager & GetTimeManager() const { return timeManager; }
+
+    /**
+     * \brief Get the time manager used to handle all time related values and timers.
+     */
+    TimeManager & GetTimeManager() { return timeManager; }
 
     /**
      * Get the layer with specified name.
@@ -150,37 +156,6 @@ public:
      */
     void RenderWithoutStep();
 
-    /**
-     * \brief Change scene time scale.
-     */
-    inline void SetTimeScale(double timeScale_) { timeScale = timeScale_; };
-
-    /**
-     * \brief Get the scene time scale.
-     */
-    inline double GetTimeScale() const { return timeScale; };
-
-    /**
-     * \brief Get elapsed time since last frame, in microseconds.
-     */
-    inline signed long long GetElapsedTime() const { return elapsedTime; };
-
-    /**
-     * \brief Get time elapsed since beginning, in microseconds.
-     */
-    inline signed long long GetTimeFromStart() const { return timeFromStart; };
-
-    /**
-     * \brief Return true if the scene was just rendered once.
-     */
-    inline bool IsFirstLoop() const { return firstLoop; };
-
-    /**
-     * \brief Notify the scene that something (like a file dialog) stopped scene rendering for a certain amount of time.
-     * \param pauseTime_ Pause duration, in microseconds.
-     */
-    void NotifyPauseWasMade(signed long long pauseTime_) { pauseTime += pauseTime_; }
-
     /** \name Code execution engine
      * Functions members giving access to the code execution engine.
      */
@@ -246,25 +221,16 @@ protected:
      */
     void SetupOpenGLProjection();
 
-    bool UpdateTime();
-
-    bool DisplayLegacyTexts(gd::String layer = "");
-
-    bool                                    firstLoop; ///<true if the scene was just rendered once.
     bool                                    isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
     InputManager                            inputManager;
-    signed int                              realElapsedTime; ///< Elapsed time since last frame, in microseconds, without taking time scale in account.
-    signed int                              elapsedTime; ///< Elapsed time since last frame, in microseconds ( elapsedTime = realElapsedTime*timeScale ).
-    double                                  timeScale; ///< Time scale
-    signed long long                        timeFromStart; ///< Time in microseconds elapsed from start.
-    signed long long                        pauseTime; ///< Time to be subtracted to realElapsedTime for the current frame.
+    TimeManager                             timeManager;
     RuntimeVariablesContainer               variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
-    sf::Clock                               clock;
-    BehaviorsRuntimeSharedDataHolder      behaviorsSharedDatas; ///<Contains all behaviors shared datas.
+    BehaviorsRuntimeSharedDataHolder        behaviorsSharedDatas; ///<Contains all behaviors shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
     std::shared_ptr<CodeExecutionEngine>    codeExecutionEngine;
     SceneChange                             requestedChange; ///< What should be done at the end of the frame.
+    sf::Clock                               clock; ///< The clock used to track time.
 
     static RuntimeLayer badRuntimeLayer; ///< Null object return by GetLayer when no appropriate layer could be found.
 };

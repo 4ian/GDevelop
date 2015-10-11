@@ -43,21 +43,25 @@ TimeExtension::TimeExtension()
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 void TimeExtension::GetPropertyForDebugger(RuntimeScene & scene, std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
-    if ( propertyNb < scene.timers.size() )
-    {
-        name = scene.timers[propertyNb].GetName();
-        value = gd::String::From(static_cast<double>(scene.timers[propertyNb].GetTime())/1000000.0)+"s";
+    auto timers = scene.GetTimeManager().GetTimers();
+    size_t i = 0;
+    for(auto it = timers.begin();it != timers.end();++i, ++it) {
+        if (i != propertyNb) continue;
 
-        return;
+        name = it->first;
+        value = gd::String::From(static_cast<double>(it->second.GetTime())/1000000.0)+"s";
     }
+
 }
 
 bool TimeExtension::ChangeProperty(RuntimeScene & scene, std::size_t propertyNb, gd::String newValue)
 {
-    if ( propertyNb < scene.timers.size() )
-    {
-        scene.timers[propertyNb].SetTime(newValue.To<double>()*1000000.0);
+    auto timers = scene.GetTimeManager().GetTimers();
+    size_t i = 0;
+    for(auto it = timers.begin();it != timers.end();++i, ++it) {
+        if (i != propertyNb) continue;
 
+        it->second.SetTime(newValue.To<double>()*1000000.0);
         return true;
     }
 
@@ -66,6 +70,7 @@ bool TimeExtension::ChangeProperty(RuntimeScene & scene, std::size_t propertyNb,
 
 std::size_t TimeExtension::GetNumberOfProperties(RuntimeScene & scene) const
 {
-    return scene.timers.size();
+    auto timers = scene.GetTimeManager().GetTimers();
+    return timers.size();
 }
 #endif

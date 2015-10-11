@@ -52,14 +52,8 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
     #if defined(GD_IDE_ONLY)
     debugger(NULL),
     #endif
-    firstLoop(true),
     isFullScreen(false),
     inputManager(renderWindow_),
-    realElapsedTime(0),
-    elapsedTime(0),
-    timeScale(1),
-    timeFromStart(0),
-    pauseTime(0),
     codeExecutionEngine(new CodeExecutionEngine)
 {
     ChangeRenderWindow(renderWindow);
@@ -124,14 +118,14 @@ bool RuntimeScene::RenderAndStep()
 {
     requestedChange.change = SceneChange::CONTINUE;
     ManageRenderTargetEvents();
-    UpdateTime();
+    timeManager.Update(clock.restart().asMicroseconds(), game->GetMinimumFPS());
     ManageObjectsBeforeEvents();
     SoundManager::Get()->ManageGarbage();
 
     #if defined(GD_IDE_ONLY)
     if( GetProfiler() )
     {
-        if ( firstLoop ) GetProfiler()->Reset();
+        if ( timeManager.IsFirstLoop() ) GetProfiler()->Reset();
         GetProfiler()->eventsClock.reset();
     }
     #endif
@@ -166,7 +160,6 @@ bool RuntimeScene::RenderAndStep()
     }
     #endif
 
-    firstLoop = false; //The first frame was rendered
     return requestedChange.change != SceneChange::CONTINUE;
 }
 
@@ -267,29 +260,6 @@ void RuntimeScene::Render()
     renderWindow->display();
 }
 
-bool RuntimeScene::UpdateTime()
-{
-    //Update time elapsed since last frame
-    realElapsedTime = clock.restart().asMicroseconds();
-    realElapsedTime -= pauseTime;
-
-    //Make sure that the elapsed time is not beyond the limit (slow down the game if necessary)
-    if ( game->GetMinimumFPS() != 0 && realElapsedTime > 1000000.0/static_cast<double>(game->GetMinimumFPS()) )
-        realElapsedTime = 1000000.0/static_cast<double>(game->GetMinimumFPS());
-
-    //Apply time scale
-    elapsedTime = realElapsedTime*timeScale;
-
-    //Update timers
-    timeFromStart += elapsedTime;
-    pauseTime = 0;
-
-    for (std::size_t i =0;i<timers.size();++i)
-        timers[i].UpdateTime(elapsedTime);
-
-    return true;
-}
-
 bool RuntimeScene::OrderObjectsByZOrder(RuntimeObjList & objList)
 {
     if ( StandardSortMethod() )
@@ -332,12 +302,13 @@ void RuntimeScene::ManageObjectsAfterEvents()
 
     //Update objects positions, forces and behaviors
     allObjects = objectsInstances.GetAllObjects();
+    double elapsedTime = static_cast<double>(timeManager.GetElapsedTime())/1000000.0;
     for (std::size_t id = 0;id<allObjects.size();++id)
     {
-        allObjects[id]->SetX( allObjects[id]->GetX() + ( allObjects[id]->TotalForceX() * static_cast<double>(GetElapsedTime())/1000000.0 ));
-        allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * static_cast<double>(GetElapsedTime())/1000000.0 ));
-        allObjects[id]->UpdateTime( static_cast<double>(GetElapsedTime())/1000000.0 );
-        allObjects[id]->UpdateForce( static_cast<double>(GetElapsedTime())/1000000.0 );
+        allObjects[id]->SetX( allObjects[id]->GetX() + (allObjects[id]->TotalForceX() * elapsedTime));
+        allObjects[id]->SetY( allObjects[id]->GetY() + (allObjects[id]->TotalForceY() * elapsedTime));
+        allObjects[id]->UpdateTime(elapsedTime);
+        allObjects[id]->UpdateForce(elapsedTime);
         allObjects[id]->DoBehaviorsPostEvents(*this);
     }
 }
@@ -432,13 +403,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     //Clear RuntimeScene datas
     objectsInstances.Clear();
-    timers.clear();
-    firstLoop = true;
-    elapsedTime = 0;
-    realElapsedTime = 0;
-    pauseTime = 0;
-    timeScale = 1;
-    timeFromStart = 0;
+    timeManager.Reset();
 
     std::cout << ".";
     codeExecutionEngine->runtimeContext.scene = this;

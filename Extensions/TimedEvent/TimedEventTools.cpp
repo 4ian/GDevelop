@@ -17,7 +17,7 @@ namespace TimedEvents
 signed long long GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, gd::String timedEventName)
 {
     TimedEventsManager & manager = TimedEventsManager::managers[&scene];
-    manager.timedEvents[timedEventName].UpdateTime(scene.GetElapsedTime());
+    manager.timedEvents[timedEventName].UpdateTime(scene.GetTimeManager().GetElapsedTime());
     return manager.timedEvents[timedEventName].GetTime();
 }
 

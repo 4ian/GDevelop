@@ -458,7 +458,7 @@ void PathfindingBehavior::DoStepPreEvents(RuntimeScene & scene)
     if (path.empty() || reachedEnd) return;
 
     //Update the speed of the object
-    float timeDelta = static_cast<double>(scene.GetElapsedTime())/1000000.0;
+    float timeDelta = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
     speed += acceleration*timeDelta;
     if ( speed > maxSpeed ) speed = maxSpeed;
     angularSpeed = angularMaxSpeed; //No acceleration for angular speed for now

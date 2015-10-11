@@ -96,10 +96,11 @@ void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, RuntimeObject *
 
     float xOffset = 0;
     float yOffset = 0;
-    if ( anticipateObjectMove )
+    double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
+    if (anticipateObjectMove)
     {
-        xOffset = object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0;
-        yOffset = object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0;
+        xOffset = object->TotalForceX() * elapsedTime;
+        yOffset = object->TotalForceY() * elapsedTime;
     }
 
     RuntimeCamera & cam = scene.GetRuntimeLayer(layer).GetCamera(camera);
@@ -118,10 +119,11 @@ void GD_API CenterCameraOnObject(RuntimeScene & scene, RuntimeObject * object,  
 
     float xOffset = 0;
     float yOffset = 0;
-    if ( anticipateObjectMove )
+    double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
+    if (anticipateObjectMove)
     {
-        xOffset = object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0;
-        yOffset = object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0;
+        xOffset = object->TotalForceX() * elapsedTime;
+        yOffset = object->TotalForceY() * elapsedTime;
     }
 
     scene.GetRuntimeLayer(layer).GetCamera(camera).SetViewCenter(sf::Vector2f(object->GetDrawableX() + object->GetCenterX() + xOffset,

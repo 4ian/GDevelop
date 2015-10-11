@@ -5,8 +5,8 @@
  */
 
 /**
- * Contains timers and times elapsed during last
- * frame, since the beginning of the scene.
+ * Manage the timers and times elapsed during last
+ * frame, since the beginning of the scene and other time related values.
  *
  * @class TimeManager
  * @namespace gdjs
@@ -80,7 +80,6 @@ gdjs.TimeManager.prototype.getTimeFromStart = function() {
 gdjs.TimeManager.prototype.isFirstFrame = function() {
 	return this._firstFrame;
 };
-
 
 /**
  * Return the time elapsed since the last call to update

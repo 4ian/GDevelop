@@ -229,7 +229,7 @@ gdjs.PhysicsRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
 
 	//Simulate the world
 	if ( !this._sharedData.stepped )
-		this._sharedData.step(runtimeScene.getElapsedTime()/1000);
+		this._sharedData.step(runtimeScene.getTimeManager().getElapsedTime()/1000);
 
     //Update object position according to Box2D body
 	this.owner.setX(this._box2DBody.GetPosition().get_x()*this._sharedData.scaleX-

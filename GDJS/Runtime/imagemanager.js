@@ -5,7 +5,7 @@
  */
 
 /**
- * The imageManager stores textures this.can be used by the objects
+ * The imageManager stores textures that can be used by the objects
  *
  * @class ImageManager
  * @namespace gdjs
@@ -55,14 +55,6 @@ gdjs.ImageManager.prototype.getPIXITexture = function(name) {
 	console.warn("Unable to find texture \""+name+"\".");
 	return this._invalidTexture;
 };
-
-function isPowerOfTwo(x) {
-    return (x & (x - 1)) === 0;
-}
-
-function nearestPowerOf2(x) {
-    return Math.pow(2, Math.round(Math.log(x) / Math.LN2));
-}
 
 /**
  * Return a PIXI texture which can be used as a placeholder when no

@@ -45,6 +45,17 @@ TEST_CASE( "Serializer", "[common]" ) {
         REQUIRE(json == originalJSON);
     }
 
+    SECTION("UTF8 characters") {
+        gd::String originalJSON = "{\"Ich heiße GDevelop\": \"Gut!\",\"Bonjour à tout le monde\": 1,\"Hello 官话 world\": \"官话\"}";
+        SerializerElement element = Serializer::FromJSON(originalJSON);
+        REQUIRE(element.GetChild("Bonjour à tout le monde").GetValue().GetBool() == true);
+        REQUIRE(element.GetChild("Ich heiße GDevelop").GetValue().GetString() == "Gut!");
+        REQUIRE(element.GetChild("Hello 官话 world").GetValue().GetString() == "官话");
+
+        gd::String json = Serializer::ToJSON(element);
+        REQUIRE(json == originalJSON);
+    }
+
     SECTION("Splitter") {
         SECTION("Split elements") {
             //Create some elements

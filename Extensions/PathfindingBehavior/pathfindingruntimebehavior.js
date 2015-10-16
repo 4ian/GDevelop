@@ -271,7 +271,7 @@ gdjs.PathfindingRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScen
     if (this._path.length === 0 || this._reachedEnd) return;
 
     //Update the speed of the object
-    var timeDelta = runtimeScene.getElapsedTime()/1000;
+    var timeDelta = runtimeScene.getTimeManager().getElapsedTime()/1000;
     this._speed += this._acceleration*timeDelta;
     if ( this._speed > this._maxSpeed ) this._speed = this._maxSpeed;
     this._angularSpeed = this._angularMaxSpeed;

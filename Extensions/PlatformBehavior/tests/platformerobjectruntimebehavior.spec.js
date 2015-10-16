@@ -10,7 +10,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
 			objects: [],
 			instances: []
 		});
-		runtimeScene.getElapsedTime = function() { return 1 / 60 * 1000; };
+		runtimeScene._timeManager.getElapsedTime = function() { return 1 / 60 * 1000; };
 
 		//Put a platformer object in the air.
 		var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: [{

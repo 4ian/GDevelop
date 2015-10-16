@@ -55,7 +55,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     var SHIFTKEY = 16;
     var SPACEKEY = 32;
     var object = this.owner;
-    var timeDelta = runtimeScene.getElapsedTime()/1000;
+    var timeDelta = runtimeScene.getTimeManager().getElapsedTime()/1000;
 
     //0.1) Get the player input:
     var requestedDeltaX = 0;

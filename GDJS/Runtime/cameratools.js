@@ -84,12 +84,13 @@ gdjs.evtTools.camera.setCameraZoom = function(runtimeScene, newZoom, layer, came
 gdjs.evtTools.camera.centerCamera = function(runtimeScene, object, anticipateMove, layer, cameraId) {
     if ( !runtimeScene.hasLayer(layer) || object == null ) { return; }
 
+    var elapsedTimeInSeconds = runtimeScene.getTimeManager().getElapsedTime() / 1000;
     var layer = runtimeScene.getLayer(layer);
     var xOffset = 0; var yOffset = 0;
     if ( anticipateMove && !object.hasNoForces() ) {
         var objectAverageForce  = object.getAverageForce();
-        xOffset = objectAverageForce.getX()*runtimeScene.getElapsedTime()/1000;
-        yOffset = objectAverageForce.getY()*runtimeScene.getElapsedTime()/1000;
+        xOffset = objectAverageForce.getX() * elapsedTimeInSeconds;
+        yOffset = objectAverageForce.getY() * elapsedTimeInSeconds;
     }
 
     layer.setCameraX(object.getDrawableX()+object.getCenterX(), cameraId);
@@ -99,12 +100,13 @@ gdjs.evtTools.camera.centerCamera = function(runtimeScene, object, anticipateMov
 gdjs.evtTools.camera.centerCameraWithinLimits = function(runtimeScene, object, left, top, right, bottom, anticipateMove, layer, cameraId) {
     if ( !runtimeScene.hasLayer(layer) || object == null ) { return; }
 
+    var elapsedTimeInSeconds = runtimeScene.getTimeManager().getElapsedTime() / 1000;
     var layer = runtimeScene.getLayer(layer);
     var xOffset = 0; var yOffset = 0;
     if ( anticipateMove && !object.hasNoForces() ) {
         var objectAverageForce  = object.getAverageForce();
-        xOffset = objectAverageForce.getX()*runtimeScene.getElapsedTime()/1000;
-        yOffset = objectAverageForce.getY()*runtimeScene.getElapsedTime()/1000;
+        xOffset = objectAverageForce.getX() * elapsedTimeInSeconds;
+        yOffset = objectAverageForce.getY() * elapsedTimeInSeconds;
     }
 
     var newX = object.getDrawableX()+object.getCenterX()+xOffset;

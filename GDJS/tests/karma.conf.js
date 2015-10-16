@@ -13,6 +13,7 @@ module.exports = function(config) {
       '../Runtime/gd.js',
       '../Runtime/libs/hshg.js',
       '../Runtime/commontools.js',
+      '../Runtime/timemanager.js',
       '../Runtime/runtimeobject.js',
       '../Runtime/runtimescene.js',
       '../Runtime/scenestack.js',

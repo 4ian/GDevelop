@@ -106,7 +106,7 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
     ExportIncludesAndLibs(includesFiles, exportDir, false);
 
     //Create the index file
-    if (!ExportIndexFile("./JsPlatform/Runtime/index.html", exportDir, includesFiles)) 
+    if (!ExportIndexFile("./JsPlatform/Runtime/index.html", exportDir, includesFiles))
         return false;
 
     return true;
@@ -121,7 +121,7 @@ gd::String Exporter::ExportToJSON(gd::AbstractFileSystem &fs, const gd::Project 
     gd::SerializerElement rootElement;
     project.SerializeTo(rootElement);
 
-    gd::String output = gd::String::FromUTF8(gd::Serializer::ToJSON(rootElement));
+    gd::String output = gd::Serializer::ToJSON(rootElement);
     if (!wrapIntoVariable.empty()) output = wrapIntoVariable + " = " + output + ";";
 
     if (!fs.WriteToFile(filename, output))
@@ -159,7 +159,7 @@ bool Exporter::ExportCordovaConfigFile(const gd::Project & project, gd::String e
         .FindAndReplace("GDJS_PROJECTNAME", project.GetName())
         .FindAndReplace("GDJS_PACKAGENAME", project.GetPackageName())
         .FindAndReplace("GDJS_ORIENTATION", "default");
-    
+
     if (!fs.WriteToFile(exportDir + "/config.xml", str))
     {
         lastError = "Unable to write configuration file.";
@@ -207,6 +207,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "libs/hshg.js");
     InsertUnique(includesFiles, "commontools.js");
     InsertUnique(includesFiles, "inputmanager.js");
+    InsertUnique(includesFiles, "timemanager.js");
     InsertUnique(includesFiles, "runtimeobject.js");
     InsertUnique(includesFiles, "runtimescene.js");
     InsertUnique(includesFiles, "scenestack.js");
@@ -400,7 +401,7 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
 bool Exporter::ExportWholeProject(gd::Project & project, gd::String exportDir,
     bool minify, bool exportForCocoonJS, bool exportForCordova)
 {
-    auto exportProject = [this, &project, &minify, 
+    auto exportProject = [this, &project, &minify,
         &exportForCocoonJS, &exportForCordova](gd::String exportDir)
     {
         #if !defined(GD_NO_WX_GUI)
@@ -471,11 +472,11 @@ bool Exporter::ExportWholeProject(gd::Project & project, gd::String exportDir,
         //Copy all dependencies and the index (or metadata) file.
         gd::String additionalSpec = exportForCocoonJS ? "{forceFullscreen:true}" : "";
         ExportIncludesAndLibs(includesFiles, exportDir, minify);
-        
-        gd::String source = exportForCordova ? 
+
+        gd::String source = exportForCordova ?
             "./JsPlatform/Runtime/Cordova/www/index.html" :
             "./JsPlatform/Runtime/index.html";
-        
+
         if (!ExportIndexFile(source, exportDir, includesFiles, additionalSpec))
         {
             gd::LogError(_("Error during export:\n") + lastError);
@@ -525,7 +526,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, gd::String exportDir,
         return true;
     };
 
-    if (exportForCordova) 
+    if (exportForCordova)
     {
         //Prepare the export directory
         fs.MkDir(exportDir);

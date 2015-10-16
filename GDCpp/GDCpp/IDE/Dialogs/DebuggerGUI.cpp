@@ -145,13 +145,13 @@ void DebuggerGUI::UpdateGUI()
         return;
 
     //General tab
-    m_generalList->SetItem(0, 1, gd::String::From(1000000.0/static_cast<double>(scene.GetElapsedTime()))+_(" fps"));
-    m_generalList->SetItem(1, 1, gd::String::From(static_cast<double>(scene.GetElapsedTime())/1000.0)+"ms");
+    m_generalList->SetItem(0, 1, gd::String::From(1000000.0/static_cast<double>(scene.GetTimeManager().GetElapsedTime()))+_(" fps"));
+    m_generalList->SetItem(1, 1, gd::String::From(static_cast<double>(scene.GetTimeManager().GetElapsedTime())/1000.0)+"ms");
     m_generalList->SetItem(2, 1, gd::String::From(scene.objectsInstances.GetAllObjects().size()));
     //TODO //m_generalList->SetItem(3, 1, gd::String::From(scene.game->resourcesManager.resources.size()));
     m_generalList->SetItem(4, 1, gd::String::From(scene.game->GetMainWindowDefaultWidth())+"*"+gd::String::From(scene.game->GetMainWindowDefaultHeight()));
     m_generalList->SetItem(5, 1, gd::String::From(scene.GetInputManager().GetMousePosition().x)+";"+gd::String::From(scene.GetInputManager().GetMousePosition().y));
-    m_generalList->SetItem(6, 1, gd::String::From(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
+    m_generalList->SetItem(6, 1, gd::String::From(static_cast<double>(scene.GetTimeManager().GetTimeFromStart())/1000000.0)+"s");
 
     //Suppression des lignes en trop pour les variables
     while(static_cast<std::size_t>(m_generalList->GetItemCount()) > generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)

@@ -14,7 +14,7 @@
 gdjs.evtTools.runtimeScene = gdjs.evtTools.runtimeScene || {};
 
 gdjs.evtTools.runtimeScene.sceneJustBegins = function(runtimeScene) {
-    return runtimeScene.isFirstFrame();
+    return runtimeScene.getTimeManager().isFirstFrame();
 };
 
 gdjs.evtTools.runtimeScene.getSceneName = function(runtimeScene) {
@@ -32,63 +32,70 @@ gdjs.evtTools.runtimeScene.setBackgroundColor = function(runtimeScene, rgbColor)
 };
 
 gdjs.evtTools.runtimeScene.getElapsedTimeInSeconds = function(runtimeScene) {
-    return runtimeScene.getElapsedTime() / 1000;
+    return runtimeScene.getTimeManager().getElapsedTime() / 1000;
 };
 
 gdjs.evtTools.runtimeScene.setTimeScale = function(runtimeScene, timeScale) {
-    return runtimeScene.setTimeScale(timeScale);
+    return runtimeScene.getTimeManager().setTimeScale(timeScale);
 };
 
 gdjs.evtTools.runtimeScene.getTimeScale = function(runtimeScene) {
-    return runtimeScene.getTimeScale();
+    return runtimeScene.getTimeManager().getTimeScale();
 };
 
 gdjs.evtTools.runtimeScene.timerElapsedTime = function(runtimeScene, timeInSeconds, timerName) {
-    if ( !runtimeScene.hasTimer(timerName) ) {
-        runtimeScene.addTimer(timerName);
+    var timeManager = runtimeScene.getTimeManager();
+    if ( !timeManager.hasTimer(timerName) ) {
+        timeManager.addTimer(timerName);
         return false;
     }
 
-    return runtimeScene.getTimer(timerName).getTime() / 1000 >= timeInSeconds;
+    return timeManager.getTimer(timerName).getTime() / 1000 >= timeInSeconds;
 };
 
 gdjs.evtTools.runtimeScene.timerPaused = function(runtimeScene, timerName) {
-    if ( !runtimeScene.hasTimer(timerName) ) return false;
+    var timeManager = runtimeScene.getTimeManager();
+    if ( !timeManager.hasTimer(timerName) ) return false;
 
-    return runtimeScene.getTimer(timerName).isPaused();
+    return timeManager.getTimer(timerName).isPaused();
 };
 
 gdjs.evtTools.runtimeScene.resetTimer = function(runtimeScene, timerName) {
-    if ( !runtimeScene.hasTimer(timerName) )
-        runtimeScene.addTimer(timerName);
+    var timeManager = runtimeScene.getTimeManager();
+    if ( !timeManager.hasTimer(timerName) )
+        timeManager.addTimer(timerName);
     else
-        runtimeScene.getTimer(timerName).reset();
+        timeManager.getTimer(timerName).reset();
 };
 
 gdjs.evtTools.runtimeScene.pauseTimer = function(runtimeScene, timerName) {
-    if ( !runtimeScene.hasTimer(timerName) ) runtimeScene.addTimer(timerName);
+    var timeManager = runtimeScene.getTimeManager();
+    if ( !timeManager.hasTimer(timerName) ) timeManager.addTimer(timerName);
 
-    runtimeScene.getTimer(timerName).setPaused(true);
+    timeManager.getTimer(timerName).setPaused(true);
 };
 
 gdjs.evtTools.runtimeScene.unpauseTimer = function(runtimeScene, timerName) {
-    if ( !runtimeScene.hasTimer(timerName) ) runtimeScene.addTimer(timerName);
+    var timeManager = runtimeScene.getTimeManager();
+    if ( !timeManager.hasTimer(timerName) ) timeManager.addTimer(timerName);
 
-    return runtimeScene.getTimer(timerName).setPaused(false);
+    return timeManager.getTimer(timerName).setPaused(false);
 };
 
 gdjs.evtTools.runtimeScene.removeTimer = function(runtimeScene, timerName) {
-    if ( runtimeScene.hasTimer(timerName) ) runtimeScene.removeTimer(timerName);
+    var timeManager = runtimeScene.getTimeManager();
+    timeManager.removeTimer(timerName);
 };
 
 gdjs.evtTools.runtimeScene.getTimerElapsedTimeInSeconds = function(runtimeScene, timerName) {
-    if ( !runtimeScene.hasTimer(timerName) ) return 0;
+    var timeManager = runtimeScene.getTimeManager();
+    if (!timeManager.hasTimer(timerName)) return 0;
 
-    return runtimeScene.getTimer(timerName).getTime() / 1000;
+    return timeManager.getTimer(timerName).getTime() / 1000;
 };
 
 gdjs.evtTools.runtimeScene.getTimeFromStartInSeconds = function(runtimeScene) {
-    return runtimeScene.getTimeFromStart() / 1000;
+    return runtimeScene.getTimeManager().getTimeFromStart() / 1000;
 };
 
 gdjs.evtTools.runtimeScene.getTime = function(runtimeScene, what) {

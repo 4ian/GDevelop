@@ -94,7 +94,7 @@ void TopDownMovementBehavior::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //Update the speed of the object
-    float timeDelta = static_cast<double>(scene.GetElapsedTime())/1000000.0;
+    float timeDelta = static_cast<double>(scene.GetTimeManager().GetElapsedTime())/1000000.0;
     if (direction != -1)
     {
         directionInRad = static_cast<float>(direction)*gd::Pi()/4.0;

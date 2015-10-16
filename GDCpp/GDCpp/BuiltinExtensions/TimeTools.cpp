@@ -2,160 +2,73 @@
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/ManualTimer.h"
 
-bool GD_API TimerElapsedTime( RuntimeScene & scene, double time, const gd::String & timerName )
+bool GD_API TimerElapsedTime( RuntimeScene & scene, double timeInSeconds, const gd::String & timerName )
 {
-    if ( timerName.empty() ) return false;
+    if (!scene.GetTimeManager().HasTimer(timerName)) 
+        return true; //Inconsistency to keep compatibility with games relying on this behavior.
 
-    //Le timer existe il ? on parcourt la liste.
-    for ( std::size_t i = 0;i < scene.timers.size();i++ )
-    {
-        //On cherche le nom du timer
-        if ( scene.timers[i].GetName() == timerName )
-        {
-            return ( scene.timers[i].GetTime() >= time*1000000.0 );
-        }
-
-    }
-
-    return true;
+    return scene.GetTimeManager().GetTimer(timerName).GetTime() >= timeInSeconds*1000000.0;
 }
 
 double GD_API GetTimerElapsedTimeInSeconds( RuntimeScene & scene, const gd::String & timerName )
 {
-    if ( timerName.empty() ) return 0;
-
-    for ( std::size_t i = 0;i < scene.timers.size();i++ )
-    {
-        if ( scene.timers[i].GetName() == timerName )
-        {
-            return ( static_cast<double>(scene.timers[i].GetTime())/1000000.0 );
-        }
-    }
-
-    return 0;
+    return static_cast<double>(scene.GetTimeManager().GetTimer(timerName).GetTime())/1000000.0;
 }
 
 bool GD_API TimerPaused( RuntimeScene & scene, const gd::String & timerName )
 {
-    if ( timerName.empty() ) return false;
+    if (!scene.GetTimeManager().HasTimer(timerName)) return false;
 
-    //Le timer existe il ? on parcourt la liste.
-    for ( std::size_t i = 0;i < scene.timers.size();i++ )
-    {
-        //On cherche le nom du timer
-        if ( scene.timers[i].GetName() == timerName )
-        {
-            return scene.timers[i].IsPaused();
-        }
-
-    }
-
-    return false;
+    return scene.GetTimeManager().GetTimer(timerName).IsPaused();
 }
 
 double GD_API GetTimeScale( RuntimeScene & scene )
 {
-    return scene.GetTimeScale();
+    return scene.GetTimeManager().GetTimeScale();
 }
 
 void GD_API ResetTimer( RuntimeScene & scene, const gd::String & timerName )
 {
-    if ( timerName.empty() ) return;
+    if (!scene.GetTimeManager().HasTimer(timerName))
+        scene.GetTimeManager().AddTimer(timerName);
 
-    //Le timer existe il ? on parcourt la liste.
-    for ( std::size_t i = 0;i < scene.timers.size();i++ )
-    {
-        //On cherche le nom du timer
-        if ( scene.timers[i].GetName() == timerName )
-        {
-            //On l'a trouv� !
-            scene.timers[i].Reset();
-            return;
-        }
-    }
-
-    //Il n'existe pas, on l'ajoute
-    scene.timers.push_back( ManualTimer(timerName) );
-
-    return;
+    scene.GetTimeManager().GetTimer(timerName).Reset();
 }
 
 void GD_API PauseTimer( RuntimeScene & scene, const gd::String & timerName )
 {
-    if ( timerName.empty() ) return;
+    if (!scene.GetTimeManager().HasTimer(timerName))
+        scene.GetTimeManager().AddTimer(timerName);
 
-    //Le timer existe il ? on parcourt la liste.
-    for ( std::size_t i = 0;i < scene.timers.size();i++ )
-    {
-        //On cherche le nom du timer
-        if ( scene.timers[i].GetName() == timerName )
-        {
-            //On l'a trouv� !
-            scene.timers[i].SetPaused(true);
-            return;
-        }
-    }
-
-    //Il n'existe pas, on l'ajoute
-    scene.timers.push_back( ManualTimer(timerName) );
-    scene.timers.back().SetPaused(true);
-
-    return;
+    scene.GetTimeManager().GetTimer(timerName).SetPaused(true);
 }
 
 void GD_API UnPauseTimer( RuntimeScene & scene, const gd::String & timerName )
 {
-    if ( timerName.empty() ) return;
+    if (!scene.GetTimeManager().HasTimer(timerName))
+        scene.GetTimeManager().AddTimer(timerName);
 
-    //Le timer existe il ? on parcourt la liste.
-    for ( std::size_t i = 0;i < scene.timers.size();i++ )
-    {
-        //On cherche le nom du timer
-        if ( scene.timers[i].GetName() == timerName )
-        {
-            //On l'a trouv� !
-            scene.timers[i].SetPaused(false);
-            return;
-        }
-    }
-
-    //Il n'existe pas, on l'ajoute
-    scene.timers.push_back( ManualTimer(timerName) );
-    scene.timers.back().SetPaused(false);
-
-    return;
+    scene.GetTimeManager().GetTimer(timerName).SetPaused(false);
 }
 
-/**
- * Remove a timer from memory
- */
 void GD_API RemoveTimer( RuntimeScene & scene, const gd::String & timerName )
 {
-    if ( timerName.empty() ) return;
-
-    for ( std::size_t i = 0;i < scene.timers.size();i++ )
-    {
-        if ( scene.timers[i].GetName() == timerName )
-        {
-            scene.timers.erase(scene.timers.begin() + i);
-            return;
-        }
-    }
+    scene.GetTimeManager().RemoveTimer(timerName);
 }
 
 void GD_API SetTimeScale( RuntimeScene & scene, double value )
 {
-    scene.SetTimeScale(value);
+    scene.GetTimeManager().SetTimeScale(value);
 }
 
 double GD_API GetElapsedTimeInSeconds(RuntimeScene & scene)
 {
-    return scene.GetElapsedTime()/1000000.0;
+    return scene.GetTimeManager().GetElapsedTime()/1000000.0;
 }
 
 double GD_API GetTimeFromStartInSeconds(RuntimeScene & scene)
 {
-    return static_cast<double>(scene.GetTimeFromStart())/1000000.0;
+    return static_cast<double>(scene.GetTimeManager().GetTimeFromStart())/1000000.0;
 }
 
 double GD_API GetTime( const RuntimeScene & scene, const gd::String & parameter )

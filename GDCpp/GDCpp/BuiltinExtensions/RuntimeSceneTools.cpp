@@ -77,19 +77,20 @@ void GD_API PopScene(RuntimeScene & scene)
 
 bool GD_API SceneJustBegins(RuntimeScene & scene )
 {
-    return scene.IsFirstLoop();
+    return scene.GetTimeManager().IsFirstLoop();
 }
 
 void GD_API MoveObjects( RuntimeScene & scene )
 {
     RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
 
+    double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
     for (std::size_t id = 0;id < allObjects.size();++id)
     {
-        allObjects[id]->SetX( allObjects[id]->GetX() + allObjects[id]->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
-        allObjects[id]->SetY( allObjects[id]->GetY() + allObjects[id]->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
+        allObjects[id]->SetX(allObjects[id]->GetX() + allObjects[id]->TotalForceX() * elapsedTime);
+        allObjects[id]->SetY(allObjects[id]->GetY() + allObjects[id]->TotalForceY() * elapsedTime);
 
-        allObjects[id]->UpdateForce( static_cast<double>(scene.GetElapsedTime())/1000000.0 );
+        allObjects[id]->UpdateForce(elapsedTime);
     }
 
     return;

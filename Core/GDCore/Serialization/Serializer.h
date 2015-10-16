@@ -47,7 +47,7 @@ public:
      * Serialize a SerializerElement from/to JSON.
      */
     ///@{
-	static std::string ToJSON(const SerializerElement & element);
+	static gd::String ToJSON(const SerializerElement & element);
 	static SerializerElement FromJSON(const std::string & json);
     static SerializerElement FromJSON(const gd::String & json)
     {

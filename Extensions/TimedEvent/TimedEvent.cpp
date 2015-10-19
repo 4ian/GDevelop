@@ -119,7 +119,7 @@ void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsE
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
     gd::String nameTxt;
-    if ( !name.empty() ) nameTxt = _(" (Nom : ")+name + ")";
+    if ( !name.empty() ) nameTxt = _(" (Name:  ")+name + ")";
     dc.DrawText( _("Delayed execution after ")+timeout.GetPlainString()+_(" seconds.")+" "+nameTxt, x + 4, y + 3 );
 
     //Draw conditions rectangle

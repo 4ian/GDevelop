@@ -37,6 +37,7 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl";
 Name: "chinese"; MessagesFile: "..\Packaging\innosetup-languages\ChineseSimplified.isl";
 Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl";
 Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl";
+Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl";
 
 [Tasks]
 Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}; Flags:
@@ -48,7 +49,7 @@ Name: "example"; Description: "Exemples"; Types: full custom; Languages: french
 Name: "example"; Description: "Examples"; Types: full custom; Languages: english russian
 Name: "example"; Description: "Ejemplos"; Types: full custom; Languages: spanish
 Name: "res"; Description: "Ressources (Images, sons...)"; Types: full custom; Languages: french
-Name: "res"; Description: "Resources (images, sounds...)"; Types: full custom; Languages: english russian italian polish chinese
+Name: "res"; Description: "Resources (images, sounds...)"; Types: full custom; Languages: english russian italian polish chinese dutch
 Name: "res"; Description: "Recursos (imágenes, sonidos ...)"; Types: full custom; Languages: spanish
 
 [Files]
@@ -72,6 +73,7 @@ Source: ..\Output\Release_Windows\SelectLanguage-pt.cfg; DestDir: {userdocs}\..\
 Source: ..\Output\Release_Windows\SelectLanguage-pl.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: polish ; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-zh.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: chinese ; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-it.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: italian ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-nl.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: dutch ; Components: main
 
 [Icons]
 Name: {group}\GDevelop; Filename: {app}\GDIDE.exe; WorkingDir: {app}

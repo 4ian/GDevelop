@@ -37,7 +37,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-									<label>Coordinates must be entere with a clockwise wind.</label>
+									<label>Coordinates must be entered clockwise.</label>
 									<font>
 										<style>italic</style>
 									</font>

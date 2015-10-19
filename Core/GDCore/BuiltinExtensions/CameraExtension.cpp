@@ -21,7 +21,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("CameraX",
                    _("Camera center X position"),
-                   _("Compare the X position of a the center of a camera."),
+                   _("Compare the X position of the center of a camera."),
                    _("X position of camera _PARAM4_ is _PARAM1__PARAM2_ (layer: _PARAM3_)"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",

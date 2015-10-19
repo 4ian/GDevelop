@@ -95,7 +95,7 @@ CustomPolygonDialog::CustomPolygonDialog(wxWindow* parent, std::vector<sf::Vecto
 	pointsEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(321,120), wxTE_MULTILINE|wxVSCROLL, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	pointsEdit->SetMaxSize(wxSize(-1,120));
 	FlexGridSizer5->Add(pointsEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Coordinates must be entere with a clockwise wind."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Coordinates must be entered clockwise."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);

@@ -11003,7 +11003,7 @@ msgid ""
 msgstr ""
 
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:98
-msgid "Coordinates must be entere with a clockwise wind."
+msgid "Coordinates must be entered clockwise."
 msgstr ""
 
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:102
@@ -13969,7 +13969,7 @@ msgid "No name"
 msgstr ""
 
 #: ../Extensions//TimedEvent/TimedEvent.cpp:122
-msgid " (Nom : "
+msgid " (Name:  "
 msgstr ""
 
 #: ../Extensions//TimedEvent/TimedEvent.cpp:123
@@ -15575,7 +15575,7 @@ msgid "Camera center X position"
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:24
-msgid "Compare the X position of a the center of a camera."
+msgid "Compare the X position of the center of a camera."
 msgstr ""
 
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:25

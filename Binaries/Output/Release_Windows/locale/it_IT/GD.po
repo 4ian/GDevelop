@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-09-06 11:56+0200\n"
-"PO-Revision-Date: 2015-09-14 18:00-0400\n"
+"PO-Revision-Date: 2015-10-19 16:36-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -773,7 +773,7 @@ msgstr "Contributori: (Nessun ordine speciale)"
 
 #: ../IDE/Credits.cpp:225
 msgid "François Dumortier : GDevelop logo design and website conception."
-msgstr "François Dumortier : GDevelop logo design and website conception."
+msgstr "François Dumortier : GDevelop disegnatore del logo e concezione del sito."
 
 #: ../IDE/Credits.cpp:228
 msgid "Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension."
@@ -805,7 +805,7 @@ msgstr "Thomas Flecy: Estensione Sound object originale"
 
 #: ../IDE/Credits.cpp:245
 msgid "Fernando José Martínez López : Spanish translation of the tutorial"
-msgstr "Fernando José Martínez López : Spanish translation of the tutorial"
+msgstr "Fernando José Martínez López : Traduzione spagnola del tutorial"
 
 #: ../IDE/Credits.cpp:247
 msgid "conceptgame : Indiegogo super contributor. Thanks!"
@@ -1076,7 +1076,7 @@ msgstr "Editare"
 #: ../IDE/Dialogs/ObjectsEditor.cpp:251
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:77
 msgid "Add a behavior"
-msgstr "Add a behavior"
+msgstr "Aggiunta di un comportamento"
 
 #: ../IDE/Dialogs/ObjectsEditor.cpp:253
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:692
@@ -1340,7 +1340,7 @@ msgstr "Documenti audio (*. wav, *.ogg) | * WAV; *.ogg"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:210
 msgid "Choose True or False for this parameter"
-msgstr "Choose True or False for this parameter"
+msgstr "Scegli True o False per questo parametro"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:210
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:128
@@ -1357,7 +1357,7 @@ msgstr "Falso"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:225
 msgid "Choose yes or no for this parameter:"
-msgstr "Choose yes or no for this parameter:"
+msgstr "Scegliere sì o no per questo parametro :"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:225
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:125
@@ -1885,9 +1885,7 @@ msgstr "Mi dispiace! :/"
 msgid "This is a beta version of GDevelop for Mac OS X.\n\n"
 "Bugs may be present and only HTML5 games will work. Please report any feedback on www.forum.compilgames.net.\n"
 "Thanks!"
-msgstr "This is a beta version of GDevelop for Mac OS X.\n\n"
-"Bugs may be present and only HTML5 games will work. Please report any feedback on www.forum.compilgames.net.\n"
-"Thanks!"
+msgstr "Si tratta di una versione beta di GDevelop per Mac OS X. \\ n \\ nBugs può essere presente e solo giochi HTML5 funzioneranno. Si prega di segnalare tutte le risposte su www.forum.compilgames.net . \\ NGrazie !"
 
 #: ../IDE/GeneratePassword.cpp:49
 msgid "Automatic creation of a password"
@@ -2902,7 +2900,7 @@ msgstr "Salvare\tCtrl + S"
 
 #: ../IDE/MainFrame.cpp:205
 msgid "Save as folder project"
-msgstr "Save as folder project"
+msgstr "Salva come progetto cartella"
 
 #: ../IDE/MainFrame.cpp:208
 msgid "Save all\tCtrl+Shift+S"

@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-09-06 11:56+0200\n"
-"PO-Revision-Date: 2015-09-14 18:01-0400\n"
+"PO-Revision-Date: 2015-10-19 16:36-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -13601,15 +13601,15 @@ msgstr "Tile width"
 #: ../Extensions//TileMapObject/Extension.cpp:96
 #: ../Extensions//TileMapObject/Extension.cpp:122
 msgid "Tiles"
-msgstr "Tiles"
+msgstr "Тайлы"
 
 #: ../Extensions//TileMapObject/Extension.cpp:96
 msgid "Tile height"
-msgstr "Tile height"
+msgstr "Высота тайла"
 
 #: ../Extensions//TileMapObject/Extension.cpp:100
 msgid "Map width (tiles)"
-msgstr "Map width (tiles)"
+msgstr "Высота карты (тайла)"
 
 #: ../Extensions//TileMapObject/Extension.cpp:100
 msgid "Map width"
@@ -15250,7 +15250,7 @@ msgstr "Activate behavior _PARAM1_ of _PARAM0_: _PARAM2_"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:513
 msgid "Activate?"
-msgstr "Activate?"
+msgstr "Активировать?"
 
 #: ../Core/GDCore/BuiltinExtensions/BaseObjectExtension.cpp:517
 msgid "Add a force to move toward an object"

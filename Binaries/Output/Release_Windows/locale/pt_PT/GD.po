@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-09-06 11:56+0200\n"
-"PO-Revision-Date: 2015-09-14 18:01-0400\n"
+"PO-Revision-Date: 2015-10-19 16:36-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -1345,7 +1345,7 @@ msgstr "Arquivos de áudio (*. wav, *.ogg) | * WAV; *.ogg"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:210
 msgid "Choose True or False for this parameter"
-msgstr "Escolha Falso ou Verdadeiro para o parâmetro"
+msgstr "Escolha Verdadeiro ou Falso para este parâmetro"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:210
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:128
@@ -1362,7 +1362,7 @@ msgstr "Falso"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:225
 msgid "Choose yes or no for this parameter:"
-msgstr "Escolha Sim ou não para este parâmetro:"
+msgstr "Escolha sim ou não para este parâmetro:"
 
 #: ../IDE/Dialogs/ParameterEditorLauncher.cpp:225
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:125
@@ -7250,12 +7250,12 @@ msgstr "Abra uma caixa de mensagem sim/não e salve o resultado em _PARAM1_"
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:16
 #: ../Extensions//DestroyOutsideBehavior/JsExtension.cpp:29
 msgid "Destroy Outside Screen Behavior"
-msgstr "Destruir o automatismo fora da tela"
+msgstr "Destruir o comportamento fora da tela"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:17
 #: ../Extensions//DestroyOutsideBehavior/JsExtension.cpp:30
 msgid "Behavior destroying object when they go outside the screen"
-msgstr "Automatismo de destruir o objeto, quando vão para fora da tela"
+msgstr "Comportamento de destruir o objeto, quando vão para fora da tela"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:22
 msgid "Destroy when outside the screen"
@@ -7475,7 +7475,7 @@ msgstr "A fronteira adicional de _PARAM0_ é _PARAM2__PARAM3_"
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:223
 #: ../Core/GDCore/IDE/InstructionSentenceFormatter.cpp:119
 msgid "Behavior"
-msgstr "Automatismo"
+msgstr "Comportamento"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:51
 msgid "Change the additional border that the object must cross before being deleted."
@@ -7488,12 +7488,12 @@ msgstr "Fazer _PARAM2__PARAM3_ à fronteira adicional de _PARAM0_"
 #: ../Extensions//DraggableBehavior/Extension.cpp:16
 #: ../Extensions//DraggableBehavior/JsExtension.cpp:29
 msgid "Draggable Behavior"
-msgstr "Automatismo arrastável"
+msgstr "Comportamento arrastável"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:17
 #: ../Extensions//DraggableBehavior/JsExtension.cpp:30
 msgid "Behavior allowing to move objects with the mouse"
-msgstr "Automatismo que permite mover objetos com o mouse"
+msgstr "Comportamento que permite mover objetos com o mouse"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:22
 msgid "Draggable object"
@@ -8269,7 +8269,7 @@ msgstr " Porta: "
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:119
 #: ../Extensions//PhysicsBehavior/PhysicsBehaviorEditor.cpp:97
 msgid "Edit the behavior"
-msgstr "Editar automatismo"
+msgstr "Editar comportamento"
 
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:64
 msgid "Send datas"
@@ -8282,8 +8282,8 @@ msgstr "Comportamento inicial"
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:69
 msgid "Depending on whether the game is \"hosting\" or joining, you wish change this behaviour\n"
 "of the behavior. You can use actions in the sub category \"Network > Behavior Automatic Network Updater\""
-msgstr "Dependendo se o jogo é \"host\" ou ingressante, você pode querer mudar este comportamento/behaviour\n"
-"do automatismo. Você pode usar ações na sub-categoria de \"Rede\" > Automatismo automático de atualização de rede\""
+msgstr "Dependendo se o jogo é \"host\" ou ingressante, você pode querer mudar este comportamento\n"
+"do comportamento. Você pode usar ações na sub-categoria de \"Rede\" > Comportamento automático de atualização de rede\""
 
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:74
 msgid "Sent / Received data"
@@ -9787,11 +9787,11 @@ msgstr "Comprimento :"
 
 #: ../Extensions//PathBehavior/Extension.cpp:31
 msgid "Path Behavior"
-msgstr "Automatismo de caminho"
+msgstr "Comportamento de caminho"
 
 #: ../Extensions//PathBehavior/Extension.cpp:32
 msgid "Behavior allowing to move objects on a predefined path"
-msgstr "Automatismo que permite mover objetos em um caminho predefinido"
+msgstr "Comportamento que permite mover objetos em um caminho predefinido"
 
 #: ../Extensions//PathBehavior/Extension.cpp:38
 #: ../Extensions//PathBehavior/Extension.cpp:39
@@ -10456,7 +10456,7 @@ msgstr "Escolha uma imagem para ser exibida"
 #: ../Extensions//PathfindingBehavior/Extension.cpp:28
 #: ../Extensions//PathfindingBehavior/JsExtension.cpp:26
 msgid "Pathfinding behavior"
-msgstr "Automatismo de pathfinding"
+msgstr "Comportamento de pathfinding"
 
 #: ../Extensions//PathfindingBehavior/Extension.cpp:29
 #: ../Extensions//PathfindingBehavior/JsExtension.cpp:27
@@ -10469,7 +10469,7 @@ msgstr "Encontrar o caminho (pathfinding)"
 
 #: ../Extensions//PathfindingBehavior/Extension.cpp:37
 msgid "Behavior which move objects and avoid objects flagged as obstacles."
-msgstr "Automatismo que move objetos e evita objetos sinalizados como obstáculos."
+msgstr "Comportamento que move objetos e evita objetos sinalizados como obstáculos."
 
 #: ../Extensions//PathfindingBehavior/Extension.cpp:49
 msgid "Move to a position"
@@ -11163,12 +11163,12 @@ msgstr "Precisão (número de dígitos decimais)"
 #: ../Extensions//PhysicsBehavior/Extension.cpp:31
 #: ../Extensions//PhysicsBehavior/JsExtension.cpp:27
 msgid "Physics behavior"
-msgstr "Automatismo de física"
+msgstr "Comportamento de física"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:32
 #: ../Extensions//PhysicsBehavior/JsExtension.cpp:28
 msgid "Behavior allowing to move objects as if they were subject to the laws of physics."
-msgstr "Automatismo que permite mover objetos como se estivessem sujeitas às leis da física."
+msgstr "Comportamento que permite mover objetos como se estivessem sujeitas às leis da física."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:38
 msgid "Physics engine"
@@ -11818,7 +11818,7 @@ msgstr "(Eixo Y)"
 #: ../Extensions//PlatformBehavior/Extension.cpp:18
 #: ../Extensions//PlatformBehavior/JsExtension.cpp:29
 msgid "Platform Behavior"
-msgstr "Automatismo de plataforma"
+msgstr "Comportamento de plataforma"
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:19
 #: ../Extensions//PlatformBehavior/JsExtension.cpp:30
@@ -18743,11 +18743,11 @@ msgstr "Abra um editor de texto"
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp:58
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.cpp:66
 msgid "Choose a behavior"
-msgstr "Escolher um automatismo"
+msgstr "Escolher um comportamento"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp:69
 msgid "Choose a behavior of the object."
-msgstr "Escolha um automatismo do objeto."
+msgstr "Escolha um comportamento do objeto."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp:122
 msgid "This object doesn't have the appropriate behavior attached to it.\n"
@@ -20260,7 +20260,7 @@ msgstr "Projeto"
 msgid "The version of GDevelop used to create this game seems to be a new version.\n"
 "GDevelop may fail to open the game, or data may be missing.\n"
 "You should check if a new version of GDevelop is available."
-msgstr "A versão utilizda para a criação desse jogo parece ser nova.\n"
+msgstr "A versão utilizada para a criação desse jogo parece ser nova.\n"
 "O GDevelop pode falhar ao abrir o jogo, ou dados podem ser perdidos.\n"
 "Você deveria verificar se existe uma nova versão do GDevelop disponível."
 
@@ -20268,9 +20268,9 @@ msgstr "A versão utilizda para a criação desse jogo parece ser nova.\n"
 msgid "The version of GDevelop used to create this game seems to be greater.\n"
 "GDevelop may fail to open the game, or data may be missing.\n"
 "You should check if a new version of GDevelop is available."
-msgstr "A versão do GDevelop usado para criar este jogo parece ser maior. \n"
-"GDevelop pode não conseguir abrir o jogo, ou dados podem estar faltando. \n"
-"Voce deve verificar se uma nova versão do GDevelop está disponível."
+msgstr "A versão utilizda para a criação desse jogo parece ser nova.\n"
+"O GDevelop pode falhar ao abrir o jogo, ou dados podem ser perdidos.\n"
+"Você deveria verificar se existe uma nova versão do GDevelop disponível."
 
 #: ../Core/GDCore/PlatformDefinition/Project.cpp:518
 msgid "The game was saved with version of GDevelop which is too old. Please open and save the game with one of the first version of GDevelop 2. You will then be able to open your game with this GDevelop version."

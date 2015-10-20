@@ -89,13 +89,13 @@ gdjs.evtTools.common.toString = function(num) {
 };
 
 /**
- * Always return false.
- * @method returnFalse
+ * Negate the boolean.
+ * @method logicalNegation
  * @private
  * @static
  */
-gdjs.evtTools.common.returnFalse = function() {
-    return false;
+gdjs.evtTools.common.logicalNegation = function(bool) {
+    return !bool;
 };
 
 gdjs.evtTools.common.acosh = function(arg) {

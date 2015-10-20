@@ -22,7 +22,7 @@ AdvancedExtension::AdvancedExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllConditions()["Toujours"].SetFunctionName("gdjs.evtTools.common.returnFalse").SetIncludeFile("commontools.js");
+    GetAllConditions()["Toujours"].SetFunctionName("gdjs.evtTools.common.logicalNegation").SetIncludeFile("commontools.js");
 }
 
 }

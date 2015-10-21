@@ -564,6 +564,8 @@ gd::String EventsCodeGenerator::GenerateReferenceToUpperScopeBoolean(const gd::S
 {
     if ( context.GetParentContext() == NULL) return "";
 
+    //FIXME: Using context.GetParentContext() generates the wrong boolean name in case a condition with a custom code generator
+    //is used inside another condition (i.e: as a subinstructions).
     return GenerateBooleanFullName(referenceName, context)+" = "+GenerateBooleanFullName(referencedBoolean, *context.GetParentContext())+";\n";
 }
 

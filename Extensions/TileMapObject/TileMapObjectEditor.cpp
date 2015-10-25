@@ -171,7 +171,7 @@ void TileMapObjectEditor::OnChangeMapSizeButtonClicked(wxCommandEvent& event)
 
 void TileMapObjectEditor::OnHelpButtonClicked(wxHyperlinkEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap"));
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/built_tilemap");
 }
 
 void TileMapObjectEditor::OnCloseButtonClicked(wxCloseEvent& event)

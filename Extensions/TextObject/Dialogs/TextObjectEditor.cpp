@@ -167,5 +167,5 @@ void TextObjectEditor::OnChangeFontButton(wxCommandEvent& event)
 
 void TextObjectEditor::OnHelpBtClicked(wxHyperlinkEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/gdevelop/documentation/manual/built_text"));
+    gd::HelpFileAccess::Get()->OpenPage("gdevelop/documentation/manual/built_text");
 }

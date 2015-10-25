@@ -1813,7 +1813,7 @@ void SpriteObjectEditor::OnAddFromImageBankSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnHelpClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
+    gd::HelpFileAccess::Get()->OpenPage("en/game_develop/documentation/manual/built_sprite");
 }
 
 void SpriteObjectEditor::OnyScrollBarScroll(wxScrollEvent& event)

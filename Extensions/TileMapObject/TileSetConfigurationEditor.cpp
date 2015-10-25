@@ -130,7 +130,7 @@ void TileSetConfigurationEditor::OnTileSetParameterUpdated(wxSpinEvent& event)
 
 void TileSetConfigurationEditor::OnHelpButtonClicked(wxHyperlinkEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilesetconfig"));
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/built_tilemap/tilesetconfig");
 }
 
 #endif

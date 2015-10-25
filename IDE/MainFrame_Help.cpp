@@ -17,7 +17,7 @@
  */
 void MainFrame::OnMenuAideSelected( wxCommandEvent& event )
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation"));
+    gd::HelpFileAccess::Get()->OpenPage("gdevelop/documentation");
 }
 
 /**
@@ -25,7 +25,7 @@ void MainFrame::OnMenuAideSelected( wxCommandEvent& event )
  */
 void MainFrame::OnMenuTutoSelected(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials/beginnertutorial"));
+    gd::HelpFileAccess::Get()->OpenPage("gdevelop/tutorials/beginnertutorial");
 }
 
 /**

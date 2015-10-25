@@ -619,7 +619,7 @@ void EditStrExpressionDialog::OnerrorTxtClick(wxCommandEvent& event)
 
 void EditStrExpressionDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_text"));
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/edit_text");
 }
 
 }

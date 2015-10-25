@@ -232,5 +232,5 @@ void EditObjectGroup::OnDelObjetSelected(wxCommandEvent& event)
 
 void EditObjectGroup::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group"));
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/edit_group");
 }

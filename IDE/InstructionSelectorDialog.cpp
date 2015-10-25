@@ -519,9 +519,9 @@ void InstructionSelectorDialog::OnCancelBtClick(wxCommandEvent& event)
 
 void InstructionSelectorDialog::OnHelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(editingAction ?
-        _("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action") :
-        _("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"));
+    gd::HelpFileAccess::Get()->OpenPage(editingAction ?
+        "game_develop/documentation/manual/events_editor/action" :
+        "game_develop/documentation/manual/events_editor/condition");
 }
 
 void InstructionSelectorDialog::OnmoreBtClick(wxCommandEvent& event)

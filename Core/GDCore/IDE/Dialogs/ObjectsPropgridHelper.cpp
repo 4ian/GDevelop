@@ -174,7 +174,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
             auto metadata = gd::MetadataProvider::GetObjectMetadata(project.GetCurrentPlatform(),
                 object->GetType());
 
-            gd::HelpFileAccess::Get()->OpenURL(metadata.GetHelpUrl());
+            gd::HelpFileAccess::Get()->OpenURL(metadata.GetHelpUrl()); //TODO: Use OpenPage and store only the page location in metadata
         }
         else if ( event.GetPropertyName() == _("Variables") )
         {

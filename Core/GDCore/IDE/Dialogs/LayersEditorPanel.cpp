@@ -319,7 +319,7 @@ void LayersEditorPanel::OnEditLayerClicked(wxCommandEvent& event)
 
 void LayersEditorPanel::OnHelpClicked(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/editors/scene_editor/edit_layer");
 }
 
 void LayersEditorPanel::OnLayerDownClicked(wxCommandEvent& event)

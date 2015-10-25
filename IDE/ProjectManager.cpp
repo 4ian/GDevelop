@@ -1976,7 +1976,7 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
  */
 void ProjectManager::OnRibbonHelpSelected(wxRibbonButtonBarEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation"));
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation");
 }
 
 namespace {

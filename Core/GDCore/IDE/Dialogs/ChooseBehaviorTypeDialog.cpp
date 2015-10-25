@@ -275,7 +275,7 @@ void ChooseBehaviorTypeDialog::OnResize(wxSizeEvent& event)
 
 void ChooseBehaviorTypeDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/edit_object")); //TODO: Behavior help page
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/edit_object"); //TODO: Behavior help page
 }
 
 void ChooseBehaviorTypeDialog::OnplatformChoiceSelect(wxCommandEvent& event)

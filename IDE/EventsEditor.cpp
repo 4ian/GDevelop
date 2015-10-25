@@ -1605,7 +1605,7 @@ void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
 
 void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"));
+    gd::HelpFileAccess::Get()->OpenPage("gdevelop/documentation/manual/edit_event");
 }
 
 void EventsEditor::OnEventStoreBtClick( wxCommandEvent& event )

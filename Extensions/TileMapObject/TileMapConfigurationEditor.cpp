@@ -53,6 +53,6 @@ void TileMapConfigurationEditor::OnOkPressed(wxCommandEvent& event)
 
 void TileMapConfigurationEditor::OnHelpButtonClicked(wxHyperlinkEvent& event)
 {
-	gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_tilemap/tilemapconfig"));
+	gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/built_tilemap/tilemapconfig");
 }
 #endif

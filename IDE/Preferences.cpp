@@ -1503,7 +1503,7 @@ void Preferences::OnInactifColor2PnlRightUp( wxMouseEvent& event )
 
 void Preferences::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation")); //TODO
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation"); //TODO
 }
 
 void Preferences::OnBrowseDossierTempBtClick( wxCommandEvent& event )

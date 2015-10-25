@@ -36,6 +36,7 @@ Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl";
 Name: "german"; MessagesFile: "compiler:Languages\German.isl";
 Name: "chinese"; MessagesFile: "..\Packaging\innosetup-languages\ChineseSimplified.isl";
 Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl";
+Name: "finnish"; MessagesFile: "compiler:Languages\Finnish.isl";
 Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl";
 Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl";
 
@@ -46,10 +47,10 @@ Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription
 [Components]
 Name: "main"; Description: "GDevelop"; Types: full compact custom; Flags: fixed
 Name: "example"; Description: "Exemples"; Types: full custom; Languages: french
-Name: "example"; Description: "Examples"; Types: full custom; Languages: english russian
+Name: "example"; Description: "Examples"; Types: full custom; Languages: english russian italian polish chinese dutch finnish
 Name: "example"; Description: "Ejemplos"; Types: full custom; Languages: spanish
 Name: "res"; Description: "Ressources (Images, sons...)"; Types: full custom; Languages: french
-Name: "res"; Description: "Resources (images, sounds...)"; Types: full custom; Languages: english russian italian polish chinese dutch
+Name: "res"; Description: "Resources (images, sounds...)"; Types: full custom; Languages: english russian italian polish chinese dutch finnish
 Name: "res"; Description: "Recursos (imágenes, sonidos ...)"; Types: full custom; Languages: spanish
 
 [Files]
@@ -74,6 +75,7 @@ Source: ..\Output\Release_Windows\SelectLanguage-pl.cfg; DestDir: {userdocs}\..\
 Source: ..\Output\Release_Windows\SelectLanguage-zh.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: chinese ; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-it.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: italian ; Components: main
 Source: ..\Output\Release_Windows\SelectLanguage-nl.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: dutch ; Components: main
+Source: ..\Output\Release_Windows\SelectLanguage-fi.cfg; DestDir: {userdocs}\..\.GDevelop; Flags: ignoreversion createallsubdirs recursesubdirs; DestName: SelectLanguage.cfg; Languages: finnish ; Components: main
 
 [Icons]
 Name: {group}\GDevelop; Filename: {app}\GDIDE.exe; WorkingDir: {app}

@@ -114,8 +114,7 @@ public:
 
     /**
      * \brief Set the URL pointing to the help page about this object
-     * \note If url starts with a slash, it is considered as an URL relative
-     * the the GDevelop wiki.
+     * \note The path to the page must be relative to the wiki url.
      */
     ObjectMetadata & SetHelpUrl(const gd::String & url);
 

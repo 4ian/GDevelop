@@ -7,6 +7,7 @@
 #include <wx/wx.h>
 #include <vector>
 #include "GDCore/String.h"
+#include <algorithm>
 #include <iostream>
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
@@ -36,6 +37,28 @@ void ParameterControlsHelper::UpdateControls(std::size_t count)
     if (!sizer || !window) return;
 
     paramMetadata.resize(count);
+
+    //Erase all parameter widgets
+    sizer->Clear();
+
+    std::function<void(wxWindow*)> destroyAllFunction = [](wxWindow *widget) {
+        widget->Destroy();
+    };
+
+    std::for_each(paramCheckboxes.begin(), paramCheckboxes.end(), destroyAllFunction);
+    std::for_each(paramTexts.begin(), paramTexts.end(), destroyAllFunction);
+    std::for_each(paramSpacers1.begin(), paramSpacers1.end(), destroyAllFunction);
+    std::for_each(paramSpacers2.begin(), paramSpacers2.end(), destroyAllFunction);
+    std::for_each(paramEdits.begin(), paramEdits.end(), destroyAllFunction);
+    std::for_each(paramBmpBts.begin(), paramBmpBts.end(), destroyAllFunction);
+
+    paramCheckboxes.clear();
+    paramTexts.clear();
+    paramSpacers1.clear();
+    paramSpacers2.clear();
+    paramEdits.clear();
+    paramBmpBts.clear();
+
     while ( paramEdits.size() < count )
     {
         const gd::String num = gd::String::From( paramEdits.size() );
@@ -64,21 +87,6 @@ void ParameterControlsHelper::UpdateControls(std::size_t count)
 
         paramSpacers1.back()->Show(false);
         paramSpacers2.back()->Show(false);
-    }
-    while ( paramEdits.size() > count )
-    {
-        paramCheckboxes.back()->Destroy();
-        paramCheckboxes.erase(paramCheckboxes.begin()+paramCheckboxes.size()-1);
-        paramTexts.back()->Destroy();
-        paramTexts.erase(paramTexts.begin()+paramTexts.size()-1);
-        paramSpacers1.back()->Destroy();
-        paramSpacers1.erase(paramSpacers1.begin()+paramSpacers1.size()-1);
-        paramSpacers2.back()->Destroy();
-        paramSpacers2.erase(paramSpacers2.begin()+paramSpacers2.size()-1);
-        paramEdits.back()->Destroy();
-        paramEdits.erase(paramEdits.begin()+paramEdits.size()-1);
-        paramBmpBts.back()->Destroy();
-        paramBmpBts.erase(paramBmpBts.begin()+paramBmpBts.size()-1);
     }
 
     window->Layout(); //Ensure widgets just added are properly rendered.

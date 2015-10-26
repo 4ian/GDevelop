@@ -117,6 +117,20 @@ public:
     bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
     /**
+     * Get the help page of the instruction.
+     */
+    const gd::String & GetHelpPage() const { return helpPage; }
+
+    /**
+     * Set the help page of the instruction.
+     */
+    InstructionMetadata & SetHelpPage(const gd::String &page)
+    {
+        helpPage = page;
+        return *this;
+    }
+
+    /**
      * Notify that the instruction can have sub instructions.
      */
     InstructionMetadata & SetCanHaveSubInstructions()
@@ -339,6 +353,7 @@ public:
 private:
     gd::String fullname;
     gd::String description;
+    gd::String helpPage;
     gd::String sentence;
     gd::String group;
 #if !defined(GD_NO_WX_GUI)

@@ -68,6 +68,7 @@ public:
 	wxNotebook* objectsListsNotebook;
 	wxSearchCtrl* objectsSearchCtrl;
 	wxStaticText* instructionDescriptionTxt;
+	wxHyperlinkCtrl* instructionHelpLinkCtrl;
 	wxCheckBox* objSortCheck;
 	wxTreeCtrl* instructionsTree;
 
@@ -90,6 +91,7 @@ protected:
 	static const long ID_BUTTON1;
 	static const long ID_BUTTON2;
 	static const long ID_CHECKBOX1;
+	static const long ID_INSTRUCTIONHELPLINKCTRL;
 
 private:
 
@@ -109,6 +111,7 @@ private:
 	void OnsearchCtrlText(wxCommandEvent& event);
 	void OninstructionsTreeItemActivated(wxTreeEvent& event);
 	void OnobjectinstructionsTreeItemActivated(wxTreeEvent& event);
+	void OnInstructionHelpLinkCtrlClicked(wxHyperlinkEvent& event);
 	void RefreshObjectsLists();
     bool MatchSearchCriteria(gd::String search, const gd::InstructionMetadata & instrMetadata);
 
@@ -127,4 +130,3 @@ private:
 };
 
 #endif
-

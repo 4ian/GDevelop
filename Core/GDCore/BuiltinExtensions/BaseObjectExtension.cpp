@@ -38,6 +38,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("X position"))
         .MarkAsSimple()
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .SetManipulatedType("number");
 
     obj.AddAction("MettreX",
@@ -52,6 +53,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsSimple()
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .SetManipulatedType("number");
 
     obj.AddCondition("PosY",
@@ -66,6 +68,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Y position"))
         .MarkAsSimple()
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .SetManipulatedType("number");
 
     obj.AddAction("MettreY",
@@ -80,6 +83,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
         .MarkAsSimple()
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .SetManipulatedType("number");
 
     obj.AddAction("MettreXY",
@@ -95,6 +99,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("expression", _("X position"))
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Y position"))
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .MarkAsSimple();
 
     obj.AddAction("MettreAutourPos",
@@ -110,6 +115,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("expression", _("Y position"))
         .AddParameter("expression", _("Distance"))
         .AddParameter("expression", _("Angle, in degrees"))
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .MarkAsAdvanced();
 
     obj.AddAction("SetAngle",
@@ -123,6 +129,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"))
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .SetManipulatedType("number");
 
     obj.AddAction("Rotate",
@@ -136,6 +143,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"))
         .AddParameter("expression", _("Angular speed (in degrees per second)"))
         .AddCodeOnlyParameter("currentScene", "")
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .MarkAsSimple();
 
     obj.AddAction("RotateTowardAngle",
@@ -149,6 +157,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"))
         .AddParameter("expression", _("Angle to rotate towards (in degrees)"))
         .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"))
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .AddCodeOnlyParameter("currentScene", "");
 
     obj.AddAction("RotateTowardPosition",
@@ -164,6 +173,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("expression", _("Y position"))
         .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"))
         .AddCodeOnlyParameter("currentScene", "")
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .MarkAsAdvanced();
 
     obj.AddAction("AddForceXY",
@@ -177,7 +187,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"))
         .AddParameter("expression", _("Speed on X axis (in pixels per second)"))
         .AddParameter("expression", _("Speed on Y axis (in pixels per second)"))
-        .AddParameter("expression", _("Damping (Default: 0)"));
+        .AddParameter("expression", _("Damping (Default: 0)"))
+        .SetHelpPage("gdevelop/documentation/manual/base");
 
     obj.AddAction("AddForceAL",
                    _("Add a force (angle)"),
@@ -191,6 +202,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("expression", _("Angle"))
         .AddParameter("expression", _("Speed (in pixels per second)"))
         .AddParameter("expression", _("Damping (Default: 0)"))
+        .SetHelpPage("gdevelop/documentation/manual/base")
         .MarkAsAdvanced();
 
     obj.AddAction("AddForceVersPos",
@@ -206,6 +218,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("expression", _("Y position"))
         .AddParameter("expression", _("Speed (in pixels per second)"))
         .AddParameter("expression", _("Damping (Default: 0)"))
+        .SetHelpPage("gdevelop/documentation/manual/base#displacement")
         .MarkAsAdvanced();
 
     obj.AddAction("AddForceTournePos",
@@ -234,6 +247,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    "res/actions/arreter.png")
 
         .AddParameter("object", _("Object"))
+        .SetHelpPage("gdevelop/documentation/manual/base#displacement")
         .MarkAsAdvanced();
 
     obj.AddAction("Delete",

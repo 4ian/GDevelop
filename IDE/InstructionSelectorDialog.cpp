@@ -63,6 +63,7 @@ const long InstructionSelectorDialog::ID_HYPERLINKCTRL1 = wxNewId();
 const long InstructionSelectorDialog::ID_BUTTON1 = wxNewId();
 const long InstructionSelectorDialog::ID_BUTTON2 = wxNewId();
 const long InstructionSelectorDialog::ID_CHECKBOX1 = wxNewId();
+const long InstructionSelectorDialog::ID_INSTRUCTIONHELPLINKCTRL = wxNewId();
 
 InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, bool chooseAction) :
     game(game_),
@@ -127,6 +128,8 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     instructionDescriptionTxt = new wxStaticText(this, ID_STATICTEXT2, editingAction ? _("Choose an action in the list") : _("Choose a condition in the list"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     BoxSizer3->Add(instructionDescriptionTxt, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     rightPartSizer->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    instructionHelpLinkCtrl = new wxHyperlinkCtrl(this, ID_INSTRUCTIONHELPLINKCTRL, _("Help on this ") + (editingAction ? _("action") : _("condition")), "");
+    rightPartSizer->Add(instructionHelpLinkCtrl, 0, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
     StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(480,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
     BoxSizer1->Add(StaticLine1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
@@ -191,6 +194,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&InstructionSelectorDialog::OnHelpBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&InstructionSelectorDialog::OnOkBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&InstructionSelectorDialog::OnCancelBtClick);
+    Connect(ID_INSTRUCTIONHELPLINKCTRL, wxEVT_HYPERLINK, (wxObjectEventFunction)&InstructionSelectorDialog::OnInstructionHelpLinkCtrlClicked);
 
     #if defined(__WXMSW__) //Offer nice look to list
     wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
@@ -411,7 +415,11 @@ void InstructionSelectorDialog::OninstructionsTreeSelectionChanged(wxTreeEvent& 
 
 void InstructionSelectorDialog::RefreshFromInstruction()
 {
-    if ( instructionType.empty() ) return;
+    if ( instructionType.empty() )
+    {
+        instructionHelpLinkCtrl->Hide();
+        return;
+    }
 
     const gd::InstructionMetadata & instructionMetadata = editingAction ?
         gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), instructionType) :
@@ -427,6 +435,9 @@ void InstructionSelectorDialog::RefreshFromInstruction()
     instructionDescriptionTxt->Wrap( 450 );
     if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
     else ActionImg->SetBitmap(gd::CommonBitmapManager::Get()->unknownAction24);
+
+    //Show or hide the instructionHelpLinkCtrl
+    instructionHelpLinkCtrl->Show( instructionMetadata.GetHelpPage() != "" );
 
     //Update parameters controls
     parametersHelper.UpdateControls(instructionMetadata.parameters.size());
@@ -519,9 +530,9 @@ void InstructionSelectorDialog::OnCancelBtClick(wxCommandEvent& event)
 
 void InstructionSelectorDialog::OnHelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(editingAction ?
-        _("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action") :
-        _("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"));
+    gd::HelpFileAccess::Get()->OpenPage(editingAction ?
+        "game_develop/documentation/manual/events_editor/action" :
+        "game_develop/documentation/manual/events_editor/condition");
 }
 
 void InstructionSelectorDialog::OnmoreBtClick(wxCommandEvent& event)
@@ -540,4 +551,15 @@ void InstructionSelectorDialog::OnsearchCtrlText(wxCommandEvent& event)
 void InstructionSelectorDialog::OninstructionsTreeItemActivated(wxTreeEvent& event)
 {
     if ( !ParaEdit.empty() ) ParaEdit[0]->SetFocus();
+}
+
+void InstructionSelectorDialog::OnInstructionHelpLinkCtrlClicked(wxHyperlinkEvent& event)
+{
+    if ( instructionType.empty() ) return;
+
+    const gd::InstructionMetadata & instructionMetadata = editingAction ?
+        gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), instructionType) :
+        gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), instructionType);
+
+    gd::HelpFileAccess::Get()->OpenPage( instructionMetadata.GetHelpPage() );
 }

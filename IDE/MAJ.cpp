@@ -263,7 +263,7 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
 
 void MAJ::OnHelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/update"));
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/update");
 }
 
 #endif

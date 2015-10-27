@@ -283,7 +283,7 @@ void ChooseObjectTypeDialog::OnmoreObjectsBtClick(wxCommandEvent& event)
 
 void ChooseObjectTypeDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"));
+    gd::HelpFileAccess::Get()->OpenPage("en/game_develop/documentation/manual/edit_object");
 }
 
 void ChooseObjectTypeDialog::UpdateListColumnsWidth()

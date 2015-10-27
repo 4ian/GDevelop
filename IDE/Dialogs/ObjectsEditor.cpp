@@ -417,7 +417,7 @@ void ObjectsEditor::CreateRibbonPage(wxRibbonPage * page)
 
 void ObjectsEditor::OnHelpSelected( wxCommandEvent& event )
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"));
+    gd::HelpFileAccess::Get()->OpenPage("gdevelop/documentation/manual/edit_object");
 }
 
 void ObjectsEditor::ConnectEvents()

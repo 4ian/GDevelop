@@ -240,7 +240,7 @@ void ProjectExportDialog::OnCompilBtClick( wxCommandEvent& event )
 
 void ProjectExportDialog::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/distribution/compilation"));
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/distribution/compilation");
 }
 
 void ProjectExportDialog::OnbrowseBtClick(wxCommandEvent& event)

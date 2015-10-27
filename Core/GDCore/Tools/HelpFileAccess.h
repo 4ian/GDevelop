@@ -7,6 +7,7 @@
 #ifndef HELPFILEACCESS_H
 #define HELPFILEACCESS_H
 #include "GDCore/Tools/Locale/LocaleManager.h"
+#include "GDCore/CommonTools.h"
 #include <wx/string.h>
 
 namespace gd
@@ -58,9 +59,22 @@ public:
     /**
      * Ask the IDE to display the specified URL as help.
      */
-    inline void OpenURL(wxString url)
+    inline void OpenURL(wxString url) GD_DEPRECATED
     {
         helpProvider->OpenURL(url);
+    }
+
+    /**
+     * Ask the IDE to display the specified page as help.
+     * This assumes that the page is hosted on the GDevelop's wiki : http://wiki.compilgames.net/doku.php/language/the_page_name
+     * The "language" from the URL is deduced from the user language. For the languages that are not available on the wiki,
+     * the user is redirected to the english page.
+     *
+     * \param page the address to the page relative to the wiki (http://wiki.compilgames.net/doku.php/language/)
+     */
+    inline void OpenPage(wxString page)
+    {
+        helpProvider->OpenURL(GetHelpURL(page));
     }
 
     static HelpFileAccess *Get()
@@ -83,6 +97,8 @@ public:
 private:
     HelpFileAccess() : helpProvider(NULL) {};
     virtual ~HelpFileAccess() {  };
+
+    wxString GetHelpURL(wxString page) const;
 
     static HelpFileAccess *_singleton;
     HelpProvider * helpProvider;

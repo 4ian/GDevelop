@@ -971,7 +971,7 @@ void EditExpressionDialog::OnButton17Click(wxCommandEvent& event)
 
 void EditExpressionDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_expr"));
+    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/edit_expr");
 }
 
 }

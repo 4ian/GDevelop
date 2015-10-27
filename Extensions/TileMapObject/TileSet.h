@@ -104,7 +104,10 @@ public:
      * Returns true if the tileset hasn't been loaded (texture not loaded) or have an invalid tile size.
      * \warning Can return true even if the loaded texture doesn't correspond to the TileSet::textureName
      */
-    bool IsDirty() const {return (!m_tilesetTexture || tileSize.x == 0.f || tileSize.y == 0.f);}
+    bool IsDirty() const
+    {
+        return (!m_tilesetTexture || m_tilesetTexture->texture.getSize().x == 0.f || m_tilesetTexture->texture.getSize().y == 0.f || tileSize.x == 0.f || tileSize.y == 0.f);
+    }
 
     /**
      * Load the image for the tilemap. Need to be called when using the TileSet for the first or after a texture change.

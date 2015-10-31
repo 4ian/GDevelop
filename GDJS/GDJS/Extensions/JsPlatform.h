@@ -9,7 +9,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
-#include "HttpServer.h"
+#include "GDJS/IDE/HttpServer.h"
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif

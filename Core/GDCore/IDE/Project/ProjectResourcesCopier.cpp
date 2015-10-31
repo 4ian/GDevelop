@@ -12,8 +12,8 @@
 #include <wx/msgdlg.h>
 #endif
 #include "GDCore/Project/Project.h"
-#include "GDCore/IDE/ResourcesMergingHelper.h"
-#include "GDCore/IDE/ResourcesAbsolutePathChecker.h"
+#include "GDCore/IDE/Project/ResourcesMergingHelper.h"
+#include "GDCore/IDE/Project/ResourcesAbsolutePathChecker.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/CommonTools.h"

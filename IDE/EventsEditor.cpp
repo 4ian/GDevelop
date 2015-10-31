@@ -24,7 +24,7 @@
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/EventStoreDialog.h"

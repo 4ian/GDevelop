@@ -5,7 +5,7 @@
  */
 #include "GDJS/Extensions/Builtin/VariablesExtension.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
-#include "GDJS/VariableParserCallbacks.h"
+#include "GDJS/Events/CodeGeneration/VariableParserCallbacks.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"

@@ -9,7 +9,7 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include "GDCore/IDE/ArbitraryEventsWorker.h"
+#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 namespace gd {class BaseEvent;}
 namespace gd {class Project;}
 namespace gd {class EventsList;}

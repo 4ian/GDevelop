@@ -9,7 +9,7 @@
 #include "EventStoreDialog.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCore/CommonTools.h"
 #include "SFML/Network.hpp"

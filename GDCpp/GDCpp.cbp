@@ -722,8 +722,8 @@
 		<Unit filename="GDCpp/Collisions.h" />
 		<Unit filename="GDCpp/CommonTools.cpp" />
 		<Unit filename="GDCpp/CommonTools.h" />
-		<Unit filename="GDCpp/CppCodeEvent.cpp" />
-		<Unit filename="GDCpp/CppCodeEvent.h" />
+		<Unit filename="GDCpp/Events/Builtin/CppCodeEvent.cpp" />
+		<Unit filename="GDCpp/Events/Builtin/CppCodeEvent.h" />
 		<Unit filename="Extensions/CppPlatform.cpp" />
 		<Unit filename="Extensions/CppPlatform.h" />
 		<Unit filename="GDCpp/DatFile.cpp" />
@@ -738,8 +738,8 @@
 		<Unit filename="GDCpp/EventsPrecompiledHeader.h" />
 		<Unit filename="GDCpp/Events/CodeCompilationHelpers.cpp" />
 		<Unit filename="GDCpp/Events/CodeCompilationHelpers.h" />
-		<Unit filename="GDCpp/Events/EventsCodeGenerator.cpp" />
-		<Unit filename="GDCpp/Events/EventsCodeGenerator.h" />
+		<Unit filename="GDCpp/Events/CodeGeneration/EventsCodeGenerator.cpp" />
+		<Unit filename="GDCpp/Events/CodeGeneration/EventsCodeGenerator.h" />
 		<Unit filename="GDCpp/Extensions/ExtensionBase.cpp" />
 		<Unit filename="GDCpp/Extensions/ExtensionBase.h" />
 		<Unit filename="GDCpp/ExtensionsLoader.cpp" />

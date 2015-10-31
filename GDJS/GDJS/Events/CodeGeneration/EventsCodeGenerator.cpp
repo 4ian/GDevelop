@@ -19,9 +19,9 @@
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/CommonTools.h"
-#include "GDJS/JsPlatform.h"
-#include "GDJS/EventsCodeGenerator.h"
-#include "GDJS/VariableParserCallbacks.h"
+#include "GDJS/Extensions/JsPlatform.h"
+#include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
+#include "GDJS/Events/CodeGeneration/VariableParserCallbacks.h"
 
 using namespace std;
 

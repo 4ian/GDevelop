@@ -9,8 +9,8 @@
 #include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/CommonTools.h"
-#include "GDJS/JsPlatform.h"
-#include "GDJS/Exporter.h"
+#include "GDJS/Extensions/JsPlatform.h"
+#include "GDJS/IDE/Exporter.h"
 #include "GDCore/Tools/Log.h"
 #if !defined(GD_NO_WX_GUI)
 #include <wx/filename.h>

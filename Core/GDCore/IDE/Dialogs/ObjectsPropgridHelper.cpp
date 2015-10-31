@@ -8,7 +8,7 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.h"
-#include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Project/Object.h"

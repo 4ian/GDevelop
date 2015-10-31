@@ -7,7 +7,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
-#include "GDCpp/CppCodeEvent.h"
+#include "GDCpp/Events/Builtin/CppCodeEvent.h"
 #include "DependenciesAnalyzer.h"
 
 DependenciesAnalyzer::DependenciesAnalyzer(gd::Project & project_, gd::Layout & layout_) :

@@ -17,7 +17,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
-#include "GDCore/IDE/InstructionSentenceFormatter.h"
+#include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #if !defined(GD_NO_WX_GUI)
 #include <wx/config.h>
 #include <wx/bitmap.h>

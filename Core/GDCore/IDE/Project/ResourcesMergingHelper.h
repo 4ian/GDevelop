@@ -10,7 +10,7 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 namespace gd { class AbstractFileSystem; }
 
 namespace gd

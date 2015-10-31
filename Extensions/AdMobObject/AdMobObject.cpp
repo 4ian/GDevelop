@@ -15,7 +15,7 @@ This project is released under the MIT License.
 #include "AdMobObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #endif
 

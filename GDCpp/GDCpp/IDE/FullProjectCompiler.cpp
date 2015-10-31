@@ -40,7 +40,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/ProjectStripper.h"
-#include "GDCore/IDE/ResourcesMergingHelper.h"
+#include "GDCore/IDE/Project/ResourcesMergingHelper.h"
 #include "GDCpp/IDE/ExecutableIconChanger.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"

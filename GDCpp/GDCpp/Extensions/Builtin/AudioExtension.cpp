@@ -10,7 +10,7 @@
 #include "GDCpp/SoundManager.h"
 #include "GDCpp/CommonTools.h"
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Events/Instruction.h"
 #endif
 #if !defined(GD_IDE_ONLY)

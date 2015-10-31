@@ -5,7 +5,7 @@
  */
 #include "ProjectResourcesAdder.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/IDE/ImagesUsedInventorizer.h"
+#include "GDCore/IDE/Project/ImagesUsedInventorizer.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"

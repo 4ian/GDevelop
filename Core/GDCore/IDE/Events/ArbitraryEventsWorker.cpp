@@ -7,7 +7,7 @@
 #include <map>
 #include <memory>
 #include "GDCore/String.h"
-#include "GDCore/IDE/ArbitraryEventsWorker.h"
+#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"

@@ -17,11 +17,11 @@
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/CommonTools.h"
-#include "GDCpp/Events/EventsCodeGenerator.h"
+#include "GDCpp/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/SceneNameMangler.h"
 #include "GDCpp/ProfileEvent.h"
-#include "GDCpp/Events/VariableParserCallbacks.h"
+#include "GDCpp/Events/CodeGeneration/VariableParserCallbacks.h"
 
 using namespace std;
 

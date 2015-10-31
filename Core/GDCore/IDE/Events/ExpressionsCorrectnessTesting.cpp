@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
+#include "GDCore/IDE/Events/ExpressionsCorrectnessTesting.h"
 #include "GDCore/Events/Parsers/ExpressionParser.h"
 #include "GDCore/Events/Expression.h"
 #include "GDCore/CommonTools.h"

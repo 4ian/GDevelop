@@ -20,7 +20,7 @@
 #include "GDCpp/Extensions/Builtin/CommonInstructionsExtension.h"
 #include "GDCpp/Extensions/Builtin/CommonInstructionsTools.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
-#include "GDCpp/CppCodeEvent.h"
+#include "GDCpp/Events/Builtin/CppCodeEvent.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/Project.h"

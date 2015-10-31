@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <set>
 #include "GDCore/Tools/Localization.h"
-#include "GDJS/JsCodeEvent.h"
+#include "GDJS/Events/Builtin/JsCodeEvent.h"
 
 using namespace std;
 using namespace gd;

@@ -11,7 +11,7 @@
 #include <iostream>
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
-#include "GDCore/IDE/InstructionSentenceFormatter.h"
+#include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #include "ParameterControlsHelper.h"
 class wxCheckBox;
 class wxPanel;

@@ -12,7 +12,6 @@
 #include "GDCore/Events/InstructionsList.h"
 namespace gd {class Instruction;}
 namespace gd {class BaseEvent;}
-namespace gd {class Project;}
 namespace gd {class EventsList;}
 
 namespace gd

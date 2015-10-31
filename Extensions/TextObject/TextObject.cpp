@@ -23,7 +23,7 @@ This project is released under the MIT License.
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/AbstractFileSystem.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 namespace gd { class MainFrameWrapper; }
 #endif
 

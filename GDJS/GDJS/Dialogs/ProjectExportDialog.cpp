@@ -13,7 +13,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/CommonTools.h"
-#include "GDJS/Exporter.h"
+#include "GDJS/IDE/Exporter.h"
 #include "GDCore/IDE/SkinHelper.h"
 
 namespace gdjs

@@ -13,7 +13,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
-#include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/Events/EventsRefactorer.h"
 
 using namespace std;
 

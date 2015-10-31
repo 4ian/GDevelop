@@ -14,7 +14,7 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
-#include "GDCore/IDE/InstructionSentenceFormatter.h"
+#include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"

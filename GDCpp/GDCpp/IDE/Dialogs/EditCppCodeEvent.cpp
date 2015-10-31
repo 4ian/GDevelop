@@ -20,7 +20,7 @@
 #include "GDCpp/Project.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCpp/Scene.h"
-#include "GDCpp/CppCodeEvent.h"
+#include "GDCpp/Events/Builtin/CppCodeEvent.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"

@@ -33,7 +33,7 @@
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/IDE/NewNameGenerator.h"
-#include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/ObjectOrGroupFinder.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Object.h"

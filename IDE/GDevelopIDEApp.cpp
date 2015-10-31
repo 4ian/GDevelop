@@ -34,7 +34,7 @@
 #include <SFML/Graphics.hpp>
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/InstructionSentenceFormatter.h"
+#include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Dialogs/ParameterControlsHelper.h"
 #include "GDCore/IDE/PlatformLoader.h"

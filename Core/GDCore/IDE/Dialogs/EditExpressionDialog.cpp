@@ -29,7 +29,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
-#include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
+#include "GDCore/IDE/Events/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"

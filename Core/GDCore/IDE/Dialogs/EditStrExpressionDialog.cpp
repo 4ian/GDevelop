@@ -24,7 +24,7 @@
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseBehaviorDialog.h"
-#include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
+#include "GDCore/IDE/Events/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/IDE/Dialogs/AdvancedEntryDialog.h"
 #include "GDCore/IDE/wxTools/TreeItemExpressionMetadata.h"

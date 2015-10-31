@@ -18,7 +18,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "EventsEditor.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"

@@ -55,7 +55,7 @@ ENDIF(WIN32)
 ###
 include_directories(.)
 file(GLOB f1 GDJS/*)
-file(GLOB_RECURSE f2 GDJS/Extensions/* GDJS/mongoose/*)
+file(GLOB_RECURSE f2 GDJS/Extensions/* GDJS/IDE/* GDJS/Events/*)
 set(source_files ${f1} ${f2})
 IF(NOT EMSCRIPTEN)
 file(GLOB_RECURSE f3 GDJS/Dialogs/*)

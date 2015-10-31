@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include "GDCore/IDE/EventsParametersLister.h"
+#include "GDCore/IDE/Events/EventsParametersLister.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"

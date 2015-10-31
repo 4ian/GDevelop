@@ -6,7 +6,7 @@
 
 #include "GDCpp/Extensions/Builtin/WindowExtension.h"
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Events/Instruction.h"
 #endif
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"

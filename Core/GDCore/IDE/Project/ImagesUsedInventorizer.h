@@ -11,7 +11,7 @@
 #include "GDCore/String.h"
 #include <vector>
 #include <set>
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 
 namespace gd {
 

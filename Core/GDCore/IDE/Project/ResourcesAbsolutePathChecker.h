@@ -6,7 +6,7 @@
 #ifndef RESOURCESABSOLUTEPATHCHECKER_H
 #define RESOURCESABSOLUTEPATHCHECKER_H
 
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/String.h"
 

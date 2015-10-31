@@ -13,7 +13,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Variable.h"
-#include "GDCore/IDE/ResourcesMergingHelper.h"
+#include "GDCore/IDE/Project/ResourcesMergingHelper.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 

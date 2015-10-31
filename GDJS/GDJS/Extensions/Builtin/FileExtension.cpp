@@ -5,7 +5,7 @@
  */
 #include "FileExtension.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"

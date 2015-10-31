@@ -20,7 +20,7 @@
 #include <wx/choicdlg.h>
 #include <wx/msgdlg.h>
 #include "GDCore/IDE/SkinHelper.h"
-#include "GDCore/IDE/EventsVariablesFinder.h"
+#include "GDCore/IDE/Events/EventsVariablesFinder.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"

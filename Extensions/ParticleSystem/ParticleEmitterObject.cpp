@@ -29,7 +29,7 @@ This project is released under the MIT License.
 
 #if defined(GD_IDE_ONLY)
 #include "GDCpp/CommonTools.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "ParticleEmitterObjectEditor.h"
 #endif

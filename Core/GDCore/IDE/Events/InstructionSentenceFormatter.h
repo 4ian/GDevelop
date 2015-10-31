@@ -13,7 +13,7 @@
 #include <utility>
 class wxBitmap;
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/IDE/TextFormatting.h"
+#include "GDCore/IDE/Events/TextFormatting.h"
 namespace gd { class InstructionMetadata;}
 
 namespace gd

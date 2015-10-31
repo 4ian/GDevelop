@@ -16,7 +16,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/CommonTools.h"
-#include "GDJS/VariableParserCallbacks.h"
+#include "GDJS/Events/CodeGeneration/VariableParserCallbacks.h"
 
 using namespace std;
 

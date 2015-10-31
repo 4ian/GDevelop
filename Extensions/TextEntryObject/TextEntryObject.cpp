@@ -20,7 +20,7 @@ This project is released under the MIT License.
 #include "GDCore/Utf8/utf8.h"
 #include "TextEntryObject.h"
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #endif

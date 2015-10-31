@@ -33,6 +33,7 @@
 #include "EventsEditor.h"
 #include "Dialogs/LayersEditorPanel.h"
 #include "Dialogs/LayoutEditorPropertiesPnl.h"
+#include "ExternalEditorManager.h"
 
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Project.h"
@@ -46,7 +47,6 @@ const long EditorScene::ID_CUSTOM2 = wxNewId();
 const long EditorScene::ID_PANEL6 = wxNewId();
 const long EditorScene::ID_AUINOTEBOOK1 = wxNewId();
 //*)
-
 
 BEGIN_EVENT_TABLE(EditorScene,wxPanel)
 	//(*EventTable(EditorScene)
@@ -163,6 +163,8 @@ mainFrameWrapper(mainFrameWrapper_)
     m_mgr.GetPane(initialInstancesBrowser.get()).Caption(_( "Instances list" ));
 
     m_mgr.Update();
+
+    LaunchExternalEventsEditor(project, layout);
 }
 
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)

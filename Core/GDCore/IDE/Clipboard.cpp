@@ -6,11 +6,11 @@
 
 #include <memory>
 #include "GDCore/IDE/Clipboard.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
-#include "GDCore/PlatformDefinition/ExternalLayout.h"
-#include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/PlatformDefinition/InitialInstance.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/ExternalEvents.h"
+#include "GDCore/Project/ExternalLayout.h"
+#include "GDCore/Project/Object.h"
+#include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
 

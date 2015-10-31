@@ -3,8 +3,8 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
@@ -19,25 +19,25 @@
 #endif
 
 //Built-in extensions
-#include "GDJS/BuiltinExtensions/SpriteExtension.h"
-#include "GDJS/BuiltinExtensions/CommonInstructionsExtension.h"
-#include "GDJS/BuiltinExtensions/MathematicalToolsExtension.h"
-#include "GDJS/BuiltinExtensions/BaseObjectExtension.h"
-#include "GDJS/BuiltinExtensions/VariablesExtension.h"
-#include "GDJS/BuiltinExtensions/KeyboardExtension.h"
-#include "GDJS/BuiltinExtensions/MouseExtension.h"
-#include "GDJS/BuiltinExtensions/SceneExtension.h"
-#include "GDJS/BuiltinExtensions/CameraExtension.h"
-#include "GDJS/BuiltinExtensions/TimeExtension.h"
-#include "GDJS/BuiltinExtensions/AudioExtension.h"
-#include "GDJS/BuiltinExtensions/NetworkExtension.h"
-#include "GDJS/BuiltinExtensions/WindowExtension.h"
-#include "GDJS/BuiltinExtensions/CommonConversionsExtension.h"
-#include "GDJS/BuiltinExtensions/StringInstructionsExtension.h"
-#include "GDJS/BuiltinExtensions/JoystickExtension.h"
-#include "GDJS/BuiltinExtensions/ExternalLayoutsExtension.h"
-#include "GDJS/BuiltinExtensions/AdvancedExtension.h"
-#include "GDJS/BuiltinExtensions/FileExtension.h"
+#include "GDJS/Extensions/Builtin/SpriteExtension.h"
+#include "GDJS/Extensions/Builtin/CommonInstructionsExtension.h"
+#include "GDJS/Extensions/Builtin/MathematicalToolsExtension.h"
+#include "GDJS/Extensions/Builtin/BaseObjectExtension.h"
+#include "GDJS/Extensions/Builtin/VariablesExtension.h"
+#include "GDJS/Extensions/Builtin/KeyboardExtension.h"
+#include "GDJS/Extensions/Builtin/MouseExtension.h"
+#include "GDJS/Extensions/Builtin/SceneExtension.h"
+#include "GDJS/Extensions/Builtin/CameraExtension.h"
+#include "GDJS/Extensions/Builtin/TimeExtension.h"
+#include "GDJS/Extensions/Builtin/AudioExtension.h"
+#include "GDJS/Extensions/Builtin/NetworkExtension.h"
+#include "GDJS/Extensions/Builtin/WindowExtension.h"
+#include "GDJS/Extensions/Builtin/CommonConversionsExtension.h"
+#include "GDJS/Extensions/Builtin/StringInstructionsExtension.h"
+#include "GDJS/Extensions/Builtin/JoystickExtension.h"
+#include "GDJS/Extensions/Builtin/ExternalLayoutsExtension.h"
+#include "GDJS/Extensions/Builtin/AdvancedExtension.h"
+#include "GDJS/Extensions/Builtin/FileExtension.h"
 
 namespace gdjs
 {

@@ -7,12 +7,12 @@
 #include <memory>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Event.h"
-#include "GDCore/Events/ExpressionParser.h"
-#include "GDCore/Events/ExpressionMetadata.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/Events/Parsers/ExpressionParser.h"
+#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 
 using namespace std;

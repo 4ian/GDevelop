@@ -11,7 +11,7 @@
  #include <wx/dir.h>
  #include <wx/msgdlg.h>
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/CommonTools.h"
 #include "GDJS/Exporter.h"
 #include "GDCore/IDE/SkinHelper.h"

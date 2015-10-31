@@ -7,7 +7,7 @@
 #include "JsCodeEventDialog.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDJS/JsCodeEvent.h"
 
 enum

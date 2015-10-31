@@ -4,4 +4,4 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/Project/Object.h"

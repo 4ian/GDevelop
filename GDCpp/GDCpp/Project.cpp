@@ -5,6 +5,6 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "CppPlatform.h"
-#include "GDCore/PlatformDefinition/Project.cpp"
+#include "GDCpp/Extensions/CppPlatform.h"
+#include "GDCore/Project/Project.cpp"
 #endif

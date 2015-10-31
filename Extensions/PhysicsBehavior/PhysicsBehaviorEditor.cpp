@@ -21,7 +21,7 @@ This project is released under the MIT License.
 #endif
 #include "GDCpp/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/Extensions/Platform.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/Scene.h"
 #include "PhysicsBehavior.h"

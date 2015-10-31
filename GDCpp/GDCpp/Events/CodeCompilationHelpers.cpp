@@ -16,22 +16,22 @@
 #include <wx/filename.h>
 #include <wx/datetime.h>
 
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Project.h"
 #include "GDCpp/Scene.h"
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
-#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCpp/Events/EventsCodeGenerator.h"
 #include "GDCpp/CodeExecutionEngine.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/IDE/BaseProfiler.h"
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/SceneNameMangler.h"
-#include "GDCpp/CppPlatform.h"
-#include "GDCore/PlatformDefinition/SourceFile.h"
+#include "GDCpp/Extensions/CppPlatform.h"
+#include "GDCore/Project/SourceFile.h"
 
 using namespace std;
 using namespace gd;

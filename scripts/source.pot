@@ -896,7 +896,7 @@ msgstr ""
 #: ../Extensions//SoundObject/SoundObjectEditor.cpp:114
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:230
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:158
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:901
+#: ../Core/GDCore/Project/Project.cpp:901
 msgid "Properties"
 msgstr ""
 
@@ -1372,16 +1372,16 @@ msgid "no"
 msgstr ""
 
 #: ../IDE/Dialogs/ProjectPropertiesPnl.cpp:80
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:902
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:940
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:941
+#: ../Core/GDCore/Project/Project.cpp:902
+#: ../Core/GDCore/Project/Project.cpp:940
+#: ../Core/GDCore/Project/Project.cpp:941
 msgid "Name of the project"
 msgstr ""
 
 #: ../IDE/Dialogs/ProjectPropertiesPnl.cpp:83
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:935
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:967
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:968
+#: ../Core/GDCore/Project/Project.cpp:935
+#: ../Core/GDCore/Project/Project.cpp:967
+#: ../Core/GDCore/Project/Project.cpp:968
 msgid "Activate the use of C++/JS source files"
 msgstr ""
 
@@ -3935,10 +3935,10 @@ msgid "Source files"
 msgstr ""
 
 #: ../IDE/ProjectManager.cpp:520 ../IDE/ProjectManager.cpp:618
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:906
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:917
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:918
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:983
+#: ../Core/GDCore/Project/Project.cpp:906
+#: ../Core/GDCore/Project/Project.cpp:917
+#: ../Core/GDCore/Project/Project.cpp:918
+#: ../Core/GDCore/Project/Project.cpp:983
 msgid "Extensions"
 msgstr ""
 
@@ -4630,10 +4630,10 @@ msgid "(Structure)"
 msgstr ""
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/DebuggerGUI.cpp:180
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:905
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:915
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:916
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:988
+#: ../Core/GDCore/Project/Project.cpp:905
+#: ../Core/GDCore/Project/Project.cpp:915
+#: ../Core/GDCore/Project/Project.cpp:916
+#: ../Core/GDCore/Project/Project.cpp:988
 msgid "Globals variables"
 msgstr ""
 
@@ -6512,9 +6512,9 @@ msgstr ""
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:180
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:54
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:94
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:908
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:946
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:947
+#: ../Core/GDCore/Project/Project.cpp:908
+#: ../Core/GDCore/Project/Project.cpp:946
+#: ../Core/GDCore/Project/Project.cpp:947
 msgid "Width"
 msgstr ""
 
@@ -6536,9 +6536,9 @@ msgstr ""
 #: ../Core/GDCore/BuiltinExtensions/CameraExtension.cpp:181
 #: ../Core/GDCore/BuiltinExtensions/WindowExtension.cpp:55
 #: ../Core/GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.cpp:95
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:909
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:948
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:949
+#: ../Core/GDCore/Project/Project.cpp:909
+#: ../Core/GDCore/Project/Project.cpp:948
+#: ../Core/GDCore/Project/Project.cpp:949
 msgid "Height"
 msgstr ""
 
@@ -12976,10 +12976,10 @@ msgstr ""
 #: ../Extensions//SoundObject/SoundObject.cpp:197
 #: ../Extensions//TextEntryObject/TextEntryObject.cpp:102
 #: ../Extensions//TextObject/TextObject.cpp:353
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:166
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:168
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:191
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:195
+#: ../Core/GDCore/Project/ResourcesManager.cpp:166
+#: ../Core/GDCore/Project/ResourcesManager.cpp:168
+#: ../Core/GDCore/Project/ResourcesManager.cpp:191
+#: ../Core/GDCore/Project/ResourcesManager.cpp:195
 msgid "Yes"
 msgstr ""
 
@@ -12989,8 +12989,8 @@ msgstr ""
 #: ../Extensions//TextEntryObject/TextEntryObject.cpp:108
 #: ../Extensions//TextObject/TextObject.cpp:353
 #: ../Extensions//TextObject/TextObject.cpp:387
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:191
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:195
+#: ../Core/GDCore/Project/ResourcesManager.cpp:191
+#: ../Core/GDCore/Project/ResourcesManager.cpp:195
 msgid "No"
 msgstr ""
 
@@ -18585,106 +18585,106 @@ msgstr ""
 msgid "Deactivate"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:103
-#: ../Core/GDCore/Events/ExpressionParser.cpp:168
-#: ../Core/GDCore/Events/ExpressionParser.cpp:209
-#: ../Core/GDCore/Events/ExpressionParser.cpp:244
-#: ../Core/GDCore/Events/ExpressionParser.cpp:286
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:103
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:168
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:209
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:244
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:286
 msgid "Number excepted"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:126
-#: ../Core/GDCore/Events/ExpressionParser.cpp:270
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:126
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:270
 msgid "Syntax error"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:133
-#: ../Core/GDCore/Events/ExpressionParser.cpp:145
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:133
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:145
 msgid "Syntax error in a number."
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:156
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:156
 msgid "Operator missing before a number"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:184
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:184
 msgid "Superfluous operator before a paranthesis"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:192
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:192
 msgid "Bad closing paranthesis"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:200
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:200
 msgid "Empty paranthesis"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:225
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:225
 msgid "Operator missing before a paranthesis"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:260
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:260
 msgid "Operators without any number between them"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:293
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:293
 msgid "Paranthesis mismatch"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:300
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:300
 msgid "Alone operator at the end of the expression"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:443
-#: ../Core/GDCore/Events/ExpressionParser.cpp:637
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:443
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:637
 msgid "Paranthesis not closed"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:453
-#: ../Core/GDCore/Events/ExpressionParser.cpp:660
-#: ../Core/GDCore/Events/ExpressionParser.cpp:685
-#: ../Core/GDCore/Events/ExpressionParser.cpp:736
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:453
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:660
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:685
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:736
 msgid "Incorrect number of parameters"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:455
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:455
 msgid "Excepted ( maximum ) :"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:472
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:472
 msgid "Parameters' parenthesis missing"
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:536
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:536
 msgid "The expression is invalid or empty. Enter a text ( surrounded by quotes ) or a function."
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:555
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:555
 msgid "Quotes not closed."
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:760
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:760
 msgid "Function not recognized."
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:784
-#: ../Core/GDCore/Events/ExpressionParser.cpp:791
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:784
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:791
 msgid "Symbol missing between two +."
 msgstr ""
 
-#: ../Core/GDCore/Events/ExpressionParser.cpp:801
+#: ../Core/GDCore/Events/Parsers/ExpressionParser.cpp:801
 msgid "Bad symbol at the end of the expression."
 msgstr ""
 
-#: ../Core/GDCore/Events/InstructionMetadata.cpp:18
+#: ../Core/GDCore/Extensions/Metadata/InstructionMetadata.cpp:18
 msgid "Unknown or unsupported instruction"
 msgstr ""
 
-#: ../Core/GDCore/Events/VariableParser.cpp:83
+#: ../Core/GDCore/Events/Parsers/VariableParser.cpp:83
 msgid "Expecting a variable name."
 msgstr ""
 
-#: ../Core/GDCore/Events/VariableParser.cpp:113
+#: ../Core/GDCore/Events/Parsers/VariableParser.cpp:113
 msgid "Expecting ]"
 msgstr ""
 
@@ -19441,10 +19441,10 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:72
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:97
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:98
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:905
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:906
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:915
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:917
+#: ../Core/GDCore/Project/Project.cpp:905
+#: ../Core/GDCore/Project/Project.cpp:906
+#: ../Core/GDCore/Project/Project.cpp:915
+#: ../Core/GDCore/Project/Project.cpp:917
 msgid "Click to edit..."
 msgstr ""
 
@@ -20051,11 +20051,11 @@ msgstr ""
 msgid "New folder"
 msgstr ""
 
-#: ../Core/GDCore/IDE/EventsRenderingHelper.cpp:179
+#: ../Core/GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.cpp:179
 msgid "No conditions"
 msgstr ""
 
-#: ../Core/GDCore/IDE/EventsRenderingHelper.cpp:280
+#: ../Core/GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.cpp:280
 msgid "No actions"
 msgstr ""
 
@@ -20211,146 +20211,146 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:60
+#: ../Core/GDCore/Project/Project.cpp:60
 msgid "Project"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:504
+#: ../Core/GDCore/Project/Project.cpp:504
 msgid ""
 "The version of GDevelop used to create this game seems to be a new version.\n"
 "GDevelop may fail to open the game, or data may be missing.\n"
 "You should check if a new version of GDevelop is available."
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:511
+#: ../Core/GDCore/Project/Project.cpp:511
 msgid ""
 "The version of GDevelop used to create this game seems to be greater.\n"
 "GDevelop may fail to open the game, or data may be missing.\n"
 "You should check if a new version of GDevelop is available."
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:518
+#: ../Core/GDCore/Project/Project.cpp:518
 msgid "The game was saved with version of GDevelop which is too old. Please open and save the game with one of the first version of GDevelop 2. You will then be able to open your game with this GDevelop version."
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:605
+#: ../Core/GDCore/Project/Project.cpp:605
 msgid "Sprite scaling has changed since GD 2: The resizing is made so that the origin point of the object won't move whatever the scale of the object.\n"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:606
+#: ../Core/GDCore/Project/Project.cpp:606
 msgid ""
 "You may have to slightly change the position of some objects if you have changed their size.\n"
 "\n"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:607
+#: ../Core/GDCore/Project/Project.cpp:607
 msgid "Thank you for your understanding.\n"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:630
+#: ../Core/GDCore/Project/Project.cpp:630
 msgid "The project is using the pathfinding behavior. This behavior has been replaced by a new one:\n"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:631
+#: ../Core/GDCore/Project/Project.cpp:631
 msgid "You must add the new 'Pathfinding' behavior to the objects that need to be moved, and add the 'Pathfinding Obstacle' to the objects that must act as obstacles."
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:807
+#: ../Core/GDCore/Project/Project.cpp:807
 msgid ""
 "Please use only letters, digits\n"
 "and underscores ( _ )."
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:903
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:944
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:945
+#: ../Core/GDCore/Project/Project.cpp:903
+#: ../Core/GDCore/Project/Project.cpp:944
+#: ../Core/GDCore/Project/Project.cpp:945
 msgid "Package name"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:904
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:942
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:943
+#: ../Core/GDCore/Project/Project.cpp:904
+#: ../Core/GDCore/Project/Project.cpp:942
+#: ../Core/GDCore/Project/Project.cpp:943
 msgid "Author"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:907
+#: ../Core/GDCore/Project/Project.cpp:907
 msgid "Window"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:910
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:950
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:951
+#: ../Core/GDCore/Project/Project.cpp:910
+#: ../Core/GDCore/Project/Project.cpp:950
+#: ../Core/GDCore/Project/Project.cpp:951
 msgid "Vertical Synchronization"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:911
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:952
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:973
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:974
+#: ../Core/GDCore/Project/Project.cpp:911
+#: ../Core/GDCore/Project/Project.cpp:952
+#: ../Core/GDCore/Project/Project.cpp:973
+#: ../Core/GDCore/Project/Project.cpp:974
 msgid "Limit the framerate"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:912
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:922
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:923
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:926
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:954
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:955
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:974
+#: ../Core/GDCore/Project/Project.cpp:912
+#: ../Core/GDCore/Project/Project.cpp:922
+#: ../Core/GDCore/Project/Project.cpp:923
+#: ../Core/GDCore/Project/Project.cpp:926
+#: ../Core/GDCore/Project/Project.cpp:954
+#: ../Core/GDCore/Project/Project.cpp:955
+#: ../Core/GDCore/Project/Project.cpp:974
 msgid "Maximum FPS"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:913
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:956
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:957
+#: ../Core/GDCore/Project/Project.cpp:913
+#: ../Core/GDCore/Project/Project.cpp:956
+#: ../Core/GDCore/Project/Project.cpp:957
 msgid "Minimum FPS"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:928
+#: ../Core/GDCore/Project/Project.cpp:928
 msgid "Generation"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:929
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:959
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:960
+#: ../Core/GDCore/Project/Project.cpp:929
+#: ../Core/GDCore/Project/Project.cpp:959
+#: ../Core/GDCore/Project/Project.cpp:960
 msgid "Windows executable name"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:930
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:961
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:962
+#: ../Core/GDCore/Project/Project.cpp:930
+#: ../Core/GDCore/Project/Project.cpp:961
+#: ../Core/GDCore/Project/Project.cpp:962
 msgid "Windows executable icon"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:931
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:963
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:964
+#: ../Core/GDCore/Project/Project.cpp:931
+#: ../Core/GDCore/Project/Project.cpp:963
+#: ../Core/GDCore/Project/Project.cpp:964
 msgid "Linux executable name"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:932
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:965
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:966
+#: ../Core/GDCore/Project/Project.cpp:932
+#: ../Core/GDCore/Project/Project.cpp:965
+#: ../Core/GDCore/Project/Project.cpp:966
 msgid "Mac OS executable name"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/Project.cpp:934
+#: ../Core/GDCore/Project/Project.cpp:934
 msgid "C++ features"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:177
+#: ../Core/GDCore/Project/ResourcesManager.cpp:177
 msgid "Smooth the image"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:178
+#: ../Core/GDCore/Project/ResourcesManager.cpp:178
 msgid "Set this to \"Yes\" to set a smooth filter on the image"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:182
+#: ../Core/GDCore/Project/ResourcesManager.cpp:182
 msgid "Always loaded in memory"
 msgstr ""
 
-#: ../Core/GDCore/PlatformDefinition/ResourcesManager.cpp:183
+#: ../Core/GDCore/Project/ResourcesManager.cpp:183
 msgid ""
 "Set this to \"Yes\" to let the image always loaded in memory.\n"
 "Useful when the image is used by actions."

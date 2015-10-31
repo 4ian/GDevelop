@@ -11,7 +11,7 @@
 #include <vector>
 #include <string>
 #include "GDCore/Events/Event.h"
-#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 namespace gd { class ObjectMetadata; }
 namespace gd { class BehaviorMetadata; }
 namespace gd { class InstructionMetadata; }

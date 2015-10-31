@@ -8,7 +8,7 @@
  */
 #include "catch.hpp"
 #include "GDCore/String.h"
-#include "GDCore/Events/VariableParser.h"
+#include "GDCore/Events/Parsers/VariableParser.h"
 
 namespace
 {

@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include "PlatformManager.h"
-#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/Extensions/Platform.h"
 
 namespace gd
 {

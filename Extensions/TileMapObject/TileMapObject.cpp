@@ -25,7 +25,7 @@ This project is released under the MIT License.
 #include "GDCpp/Position.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/PolygonCollision.h"
-#include "GDCpp/BuiltinExtensions/ObjectTools.h"
+#include "GDCpp/Extensions/Builtin/ObjectTools.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/CommonTools.h"
 

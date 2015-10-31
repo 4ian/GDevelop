@@ -5,7 +5,6 @@
  */
 #ifndef GDCORE_EVENTS_SERIALIZATION_H
 #define GDCORE_EVENTS_SERIALIZATION_H
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Serialization/Serializer.h"
 #include <vector>

@@ -5,5 +5,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/ImageManager.cpp"
+#include "GDCore/Project/ImageManager.cpp"
 #endif

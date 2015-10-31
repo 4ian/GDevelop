@@ -4,4 +4,4 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/BuiltinExtensions/SpriteExtension/Polygon2d.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Polygon2d.h"

@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_TreeItemExpressionMetadata_H
 #define GDCORE_TreeItemExpressionMetadata_H
-#include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/String.h"
 #include <wx/treectrl.h>
 

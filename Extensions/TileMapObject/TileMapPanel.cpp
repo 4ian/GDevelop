@@ -11,7 +11,7 @@ This project is released under the MIT License.
 #include <iostream>
 #include <algorithm>
 #include <wx/dcbuffer.h>
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "TileMapObjectEditorCommands.h"
 
 TileMapPanel::TileMapPanel(wxWindow* parent, wxWindowID id, const wxPoint &pos, const wxSize &size, long style) :
@@ -120,7 +120,7 @@ void TileMapPanel::OnPaint(wxPaintEvent& event)
     GetClientSize(&width, &height);
     wxPoint maxPos = minPos + wxPoint(width, height);
 
-    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
+    dc.SetBrush(gd::CommonBitmapProvider::Get()->transparentBg);
     dc.DrawRectangle(minPos.x, minPos.y, width, height);
 
     if(!m_tilemap || !m_tileset || m_tileset->IsDirty())

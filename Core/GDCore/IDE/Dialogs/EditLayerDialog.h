@@ -20,7 +20,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDCore/PlatformDefinition/Layer.h"
+#include "GDCore/Project/Layer.h"
 
 namespace gd
 {

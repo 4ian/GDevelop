@@ -10,8 +10,8 @@
 #include <assert.h>
 
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 
 namespace gd

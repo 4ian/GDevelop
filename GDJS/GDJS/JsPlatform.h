@@ -5,8 +5,8 @@
  */
 #ifndef JSPLATFORM_H
 #define JSPLATFORM_H
-#include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
 #include "HttpServer.h"

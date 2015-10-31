@@ -5,5 +5,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/Object.cpp"
+#include "GDCore/Project/Object.cpp"
 #endif

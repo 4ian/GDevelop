@@ -3,12 +3,10 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include "GDCore/String.h"
 #include <vector>
 #include <map>
 #include <memory>
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/String.h"
 #include "GDCore/IDE/ArbitraryEventsWorker.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"

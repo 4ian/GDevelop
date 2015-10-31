@@ -5,5 +5,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/Variable.cpp"
+#include "GDCore/Project/Variable.cpp"
 #endif

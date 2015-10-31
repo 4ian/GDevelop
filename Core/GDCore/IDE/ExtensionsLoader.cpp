@@ -4,8 +4,8 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/PlatformDefinition/PlatformExtension.h"
-#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/Tools/Version.h"
 #include "GDCore/Tools/DynamicLibrariesTools.h"
@@ -61,7 +61,7 @@ void ExtensionsLoader::LoadAllExtensions(const gd::String & directory, gd::Platf
     {
         gd::String lec = lecture->d_name;
         //Load all extensions, except the legacy ones finishing by *Automatism.xgd* from GD3.x
-        if ( lec != "." && lec != ".." && 
+        if ( lec != "." && lec != ".." &&
             lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos &&
             lec.find("Automatism.xgd"+suffix) == string::npos)
         {

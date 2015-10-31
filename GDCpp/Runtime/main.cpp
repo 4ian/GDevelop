@@ -23,7 +23,7 @@
 #include "GDCpp/Project.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/CodeExecutionEngine.h"
-#include "GDCpp/CppPlatform.h"
+#include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCpp/ExtensionsLoader.h"
 #include "GDCpp/Log.h"
 #include "GDCpp/SceneStack.h"

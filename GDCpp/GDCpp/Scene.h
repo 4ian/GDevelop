@@ -4,4 +4,4 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Layout.h"

@@ -16,7 +16,7 @@
 #include <wx/dialog.h>
 #include <wx/gauge.h>
 //*)
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Project.h"
 #include <string>
 #include <vector>
 #include <wx/process.h>

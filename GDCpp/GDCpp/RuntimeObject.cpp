@@ -5,7 +5,7 @@
  */
 #include <cstring>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/BuiltinExtensions/MathematicalTools.h"
+#include "GDCpp/Extensions/Builtin/MathematicalTools.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/Behavior.h"

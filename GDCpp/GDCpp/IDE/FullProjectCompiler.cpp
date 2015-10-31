@@ -21,7 +21,7 @@
 #include <wx/msgdlg.h>
 #include <cstdio>
 #include <wx/filename.h>
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/ProjectFileWriter.h"
@@ -31,21 +31,21 @@
 #include "GDCpp/Project.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Object.h"
-#include "GDCore/PlatformDefinition/SourceFile.h"
+#include "GDCore/Project/SourceFile.h"
 #include "GDCpp/SceneNameMangler.h"
 #include "GDCpp/Tools/AES.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/ExtensionBase.h"
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCpp/IDE/ExecutableIconChanger.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"
-#include "GDCpp/CppPlatform.h"
+#include "GDCpp/Extensions/CppPlatform.h"
 
 using namespace std;
 using namespace gd;

@@ -31,9 +31,9 @@
 
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/ShowFolder.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
 #include "GDCpp/IDE/FullProjectCompiler.h"

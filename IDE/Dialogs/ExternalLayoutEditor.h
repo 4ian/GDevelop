@@ -15,8 +15,8 @@
 #include <wx/combobox.h>
 //*)
 #include <wx/aui/aui.h>
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/String.h"
 namespace gd { class Project; }

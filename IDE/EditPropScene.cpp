@@ -20,8 +20,8 @@
 #include <wx/config.h>
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCore/CommonTools.h"
 
 using namespace gd;

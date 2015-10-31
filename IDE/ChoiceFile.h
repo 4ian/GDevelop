@@ -19,7 +19,7 @@
 //*)
 namespace gd { class Project; }
 namespace gd { class Layout; }
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Layout.h"
 #include <string>
 #include <vector>
 #include "GDCore/String.h"

@@ -4,4 +4,4 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/PlatformDefinition/BehaviorsSharedData.h"
+#include "GDCore/Project/BehaviorsSharedData.h"

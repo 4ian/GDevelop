@@ -13,7 +13,7 @@ This project is released under the MIT License.
 #include "PathfindingObstacleBehavior.h"
 #include "ScenePathfindingObstaclesManager.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/BuiltinExtensions/MathematicalTools.h"
+#include "GDCpp/Extensions/Builtin/MathematicalTools.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/RuntimeScene.h"

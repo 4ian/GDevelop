@@ -20,7 +20,7 @@
 //*)
 #include "GDCore/String.h"
 #include <vector>
-#include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class ParameterMetadata; }

@@ -4,5 +4,5 @@
  * This project is released under the MIT License.
  */
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/ResourcesManager.cpp"
+#include "GDCore/Project/ResourcesManager.cpp"
 #endif

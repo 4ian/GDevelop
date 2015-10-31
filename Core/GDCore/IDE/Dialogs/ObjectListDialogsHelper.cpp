@@ -5,9 +5,9 @@
  */
 #if defined(GD_IDE_ONLY)
 #include "ObjectListDialogsHelper.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Object.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"

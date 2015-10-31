@@ -6,16 +6,16 @@
 #if defined(GD_IDE_ONLY)
 #include <string>
 #include <vector>
-#include "GDCore/Events/VariableParser.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/Events/ExpressionsCodeGeneration.h"
-#include "GDCore/Events/EventsCodeGenerator.h"
-#include "GDCore/Events/ObjectMetadata.h"
-#include "GDCore/IDE/MetadataProvider.h"
-#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/Parsers/VariableParser.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Project/Object.h"
+#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
+#include "GDCore/Extensions/Metadata/ObjectMetadata.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCpp/Events/VariableParserCallbacks.h"
 #include "GDCpp/CommonTools.h"
 

@@ -30,7 +30,7 @@
 #include "GDCpp/RuntimeContext.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/ManualTimer.h"
-#include "GDCpp/CppPlatform.h"
+#include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 
@@ -39,9 +39,9 @@
 #include "GDCpp/ProfileEvent.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/IDE/BaseDebugger.h"
-#include "GDCpp/BuiltinExtensions/ProfileTools.h"
+#include "GDCpp/Extensions/Builtin/ProfileTools.h"
 #endif
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #undef GetObject //Disable an annoying macro
 
 RuntimeLayer RuntimeScene::badRuntimeLayer;

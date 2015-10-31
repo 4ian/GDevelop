@@ -5,5 +5,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/ExternalLayout.cpp"
+#include "GDCore/Project/ExternalLayout.cpp"
 #endif

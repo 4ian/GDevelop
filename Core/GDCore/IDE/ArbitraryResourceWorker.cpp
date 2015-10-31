@@ -8,11 +8,11 @@
 #include "ArbitraryResourceWorker.h"
 #include <memory>
 #include <vector>
-#include "GDCore/Events/InstructionMetadata.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/PlatformDefinition/PlatformExtension.h"
-#include "GDCore/PlatformDefinition/ResourcesManager.h"
+#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 

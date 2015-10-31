@@ -4,4 +4,4 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/PlatformDefinition/ExternalLayout.h"
+#include "GDCore/Project/ExternalLayout.h"

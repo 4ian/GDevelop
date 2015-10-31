@@ -724,8 +724,8 @@
 		<Unit filename="GDCpp/CommonTools.h" />
 		<Unit filename="GDCpp/CppCodeEvent.cpp" />
 		<Unit filename="GDCpp/CppCodeEvent.h" />
-		<Unit filename="GDCpp/CppPlatform.cpp" />
-		<Unit filename="GDCpp/CppPlatform.h" />
+		<Unit filename="Extensions/CppPlatform.cpp" />
+		<Unit filename="Extensions/CppPlatform.h" />
 		<Unit filename="GDCpp/DatFile.cpp" />
 		<Unit filename="GDCpp/DatFile.h" />
 		<Unit filename="GDCpp/Direction.cpp" />
@@ -740,8 +740,8 @@
 		<Unit filename="GDCpp/Events/CodeCompilationHelpers.h" />
 		<Unit filename="GDCpp/Events/EventsCodeGenerator.cpp" />
 		<Unit filename="GDCpp/Events/EventsCodeGenerator.h" />
-		<Unit filename="GDCpp/ExtensionBase.cpp" />
-		<Unit filename="GDCpp/ExtensionBase.h" />
+		<Unit filename="GDCpp/Extensions/ExtensionBase.cpp" />
+		<Unit filename="GDCpp/Extensions/ExtensionBase.h" />
 		<Unit filename="GDCpp/ExtensionsLoader.cpp" />
 		<Unit filename="GDCpp/ExtensionsLoader.h" />
 		<Unit filename="GDCpp/ExternalEvents.cpp" />
@@ -808,7 +808,7 @@
 		<Unit filename="GDCpp/Object.cpp" />
 		<Unit filename="GDCpp/Object.h" />
 		<Unit filename="GDCpp/ObjectHelpers.h" />
-		<Unit filename="GDCpp/PlatformDefinition/ClassWithObjects.cpp" />
+		<Unit filename="GDCpp/Project/ClassWithObjects.cpp" />
 		<Unit filename="GDCpp/Point.cpp" />
 		<Unit filename="GDCpp/Point.h" />
 		<Unit filename="GDCpp/Polygon.cpp" />

@@ -16,8 +16,8 @@ This project is released under the MIT License.
 #include <string>
 #include <vector>
 #include <SFML/System/Vector2.hpp>
-#include "GDCore/PlatformDefinition/ImageManager.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/ImageManager.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/RuntimeGame.h"

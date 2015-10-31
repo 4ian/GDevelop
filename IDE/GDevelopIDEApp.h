@@ -12,7 +12,7 @@
 #include "GDCore/Tools/Log.h"
 #include <wx/ipc.h>
 #include <wx/snglinst.h>
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 class STServer;

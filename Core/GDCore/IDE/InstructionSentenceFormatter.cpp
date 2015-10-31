@@ -15,8 +15,8 @@
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Events/InstructionMetadata.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
 #if !defined(GD_NO_WX_GUI)
 #include <wx/config.h>
@@ -179,32 +179,32 @@ void InstructionSentenceFormatter::SaveTypesFormattingToConfig()
 
 wxBitmap InstructionSentenceFormatter::BitmapFromType(const gd::String & type)
 {
-    gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::Get();
+    gd::CommonBitmapProvider * CommonBitmapProvider = gd::CommonBitmapProvider::Get();
 
-    if ( type == "" ) return CommonBitmapManager->unknownBt;
-    else if ( type == "expression" ) return CommonBitmapManager->expressionBt;
-    else if ( gd::ParameterMetadata::IsObject(type) ) return CommonBitmapManager->objectBt;
-    else if ( type == "behavior" ) return CommonBitmapManager->behaviorBt;
-    else if ( type == "operator" ) return CommonBitmapManager->signeBt;
-    else if ( type == "relationalOperator" ) return CommonBitmapManager->signeBt;
-    else if ( type == "file" ) return CommonBitmapManager->fileBt;
-    else if ( type == "key" ) return CommonBitmapManager->keyBt;
-    else if ( type == "mouse" ) return CommonBitmapManager->mouseBt;
-    else if ( type == "yesorno" ) return CommonBitmapManager->yesnoBt;
-    else if ( type == "police" ) return CommonBitmapManager->policeBt;
-    else if ( type == "color" ) return CommonBitmapManager->colorBt;
-    else if ( type == "trueorfalse" ) return CommonBitmapManager->trueOrFalseBt;
-    else if ( type == "string" ) return CommonBitmapManager->texteBt;
-    else if ( type == "musicfile" ) return CommonBitmapManager->musicBt;
-    else if ( type == "soundfile" ) return CommonBitmapManager->soundBt;
-    else if ( type == "password" ) return CommonBitmapManager->passwordBt;
-    else if ( type == "layer" ) return CommonBitmapManager->layerBt;
-    else if ( type == "joyaxis" ) return CommonBitmapManager->joyaxisBt;
-    else if ( type == "objectvar" ) return CommonBitmapManager->varBt;
-    else if ( type == "scenevar" ) return CommonBitmapManager->varBt;
-    else if ( type == "globalvar" ) return CommonBitmapManager->varBt;
+    if ( type == "" ) return CommonBitmapProvider->unknownBt;
+    else if ( type == "expression" ) return CommonBitmapProvider->expressionBt;
+    else if ( gd::ParameterMetadata::IsObject(type) ) return CommonBitmapProvider->objectBt;
+    else if ( type == "behavior" ) return CommonBitmapProvider->behaviorBt;
+    else if ( type == "operator" ) return CommonBitmapProvider->signeBt;
+    else if ( type == "relationalOperator" ) return CommonBitmapProvider->signeBt;
+    else if ( type == "file" ) return CommonBitmapProvider->fileBt;
+    else if ( type == "key" ) return CommonBitmapProvider->keyBt;
+    else if ( type == "mouse" ) return CommonBitmapProvider->mouseBt;
+    else if ( type == "yesorno" ) return CommonBitmapProvider->yesnoBt;
+    else if ( type == "police" ) return CommonBitmapProvider->policeBt;
+    else if ( type == "color" ) return CommonBitmapProvider->colorBt;
+    else if ( type == "trueorfalse" ) return CommonBitmapProvider->trueOrFalseBt;
+    else if ( type == "string" ) return CommonBitmapProvider->texteBt;
+    else if ( type == "musicfile" ) return CommonBitmapProvider->musicBt;
+    else if ( type == "soundfile" ) return CommonBitmapProvider->soundBt;
+    else if ( type == "password" ) return CommonBitmapProvider->passwordBt;
+    else if ( type == "layer" ) return CommonBitmapProvider->layerBt;
+    else if ( type == "joyaxis" ) return CommonBitmapProvider->joyaxisBt;
+    else if ( type == "objectvar" ) return CommonBitmapProvider->varBt;
+    else if ( type == "scenevar" ) return CommonBitmapProvider->varBt;
+    else if ( type == "globalvar" ) return CommonBitmapProvider->varBt;
 
-    return CommonBitmapManager->unknownBt;
+    return CommonBitmapProvider->unknownBt;
 }
 #endif
 

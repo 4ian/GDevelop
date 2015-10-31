@@ -5,5 +5,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/Layer.cpp"
+#include "GDCore/Project/Layer.cpp"
 #endif

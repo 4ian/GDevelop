@@ -10,7 +10,7 @@
 #include <string>
 #include "GDCpp/String.h"
 #include <vector>
-#include "GDCore/Events/VariableParser.h"
+#include "GDCore/Events/Parsers/VariableParser.h"
 
 /**
  * \brief Callbacks called to generate the code for getting a variable.

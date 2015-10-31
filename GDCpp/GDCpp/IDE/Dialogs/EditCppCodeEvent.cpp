@@ -18,12 +18,12 @@
 #include <wx/filename.h>
 #include <fstream>
 #include "GDCpp/Project.h"
-#include "GDCore/PlatformDefinition/SourceFile.h"
+#include "GDCore/Project/SourceFile.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/CppCodeEvent.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/IDE/CodeCompiler.h"
-#include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 
 //(*IdInit(EditCppCodeEvent)

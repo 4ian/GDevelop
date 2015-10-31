@@ -5,11 +5,11 @@
  */
 
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
-#include "GDCore/Events/ExpressionParser.h"
+#include "GDCore/Events/Parsers/ExpressionParser.h"
 #include "GDCore/Events/Expression.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Project.h"
 
 namespace gd
 {

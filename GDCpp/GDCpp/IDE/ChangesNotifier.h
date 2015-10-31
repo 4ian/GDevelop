@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY)
 #ifndef CHANGESNOTIFIER_H
 #define CHANGESNOTIFIER_H
-#include "GDCore/PlatformDefinition/ChangesNotifier.h"
+#include "GDCore/Project/ChangesNotifier.h"
 
 /**
  * \brief Internal class used to trigger some custom works after changes have been made.

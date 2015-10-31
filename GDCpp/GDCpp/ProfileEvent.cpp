@@ -7,11 +7,11 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "ProfileEvent.h"
-#include "GDCpp/BuiltinExtensions/ProfileTools.h"
+#include "GDCpp/Extensions/Builtin/ProfileTools.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/Scene.h"
-#include "GDCore/Events/EventsCodeGenerationContext.h"
-#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include <iostream>
 
@@ -28,7 +28,7 @@ ProfileEvent::~ProfileEvent()
 gd::String ProfileEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
     const gd::Layout & scene = codeGenerator.GetLayout();
-    codeGenerator.AddIncludeFile("GDCpp/BuiltinExtensions/ProfileTools.h");
+    codeGenerator.AddIncludeFile("GDCpp/Extensions/Builtin/ProfileTools.h");
 
     ProfileLink profileLink;
     profileLink.originalEvent = originalEvent;

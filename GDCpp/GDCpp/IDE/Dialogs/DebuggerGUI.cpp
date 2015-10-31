@@ -10,12 +10,12 @@
 #include <string>
 #include <set>
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/ObjectHelpers.h"
-#include "GDCpp/CppPlatform.h"
+#include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/SkinHelper.h"

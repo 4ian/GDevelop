@@ -14,7 +14,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCore/String.h"
 #include <vector>
 

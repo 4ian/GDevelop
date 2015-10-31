@@ -7,14 +7,14 @@
 #include "EventsVariablesFinder.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/Events/InstructionMetadata.h"
-#include "GDCore/Events/ExpressionMetadata.h"
-#include "GDCore/Events/ExpressionParser.h"
-#include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
+#include "GDCore/Events/Parsers/ExpressionParser.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Object.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 
 using namespace std;
 

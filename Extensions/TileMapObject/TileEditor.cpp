@@ -12,7 +12,7 @@ This project is released under the MIT License.
 #include <wx/dcbuffer.h>
 #include <wx/event.h>
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 
 TileEditor::TileEditor(wxWindow* parent) :
     TileEditorBase(parent),
@@ -117,7 +117,7 @@ void TileEditor::OnPreviewPaint(wxPaintEvent& event)
     wxPoint maxPos = minPos + wxPoint(width, height);
 
     //Draw the background
-    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
+    dc.SetBrush(gd::CommonBitmapProvider::Get()->transparentBg);
     dc.DrawRectangle(minPos.x, minPos.y, width, height);
 
     if(!m_tileset || m_tileset->IsDirty()) //If no tileset, stop rendering here

@@ -5,5 +5,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/BuiltinExtensions/SpriteExtension/Point.cpp"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Point.cpp"
 #endif

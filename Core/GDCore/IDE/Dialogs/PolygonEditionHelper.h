@@ -15,7 +15,7 @@
 #include <wx/dcmemory.h>
 #include <wx/dcbuffer.h>
 #include <wx/event.h>
-#include "GDCore/BuiltinExtensions/SpriteExtension/Polygon2d.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Polygon2d.h"
 
 namespace gd
 {

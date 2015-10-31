@@ -5,5 +5,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/BuiltinExtensions/SpriteExtension/Polygon2d.cpp"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Polygon2d.cpp"
 #endif

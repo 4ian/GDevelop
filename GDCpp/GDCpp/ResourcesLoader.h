@@ -5,7 +5,7 @@
  */
 
 #if defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/ResourcesLoader.h"
+#include "GDCore/Project/ResourcesLoader.h"
 #else
 //Use a custom implementation at Runtime.
 

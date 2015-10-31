@@ -8,11 +8,11 @@
 #include <wx/dcmemory.h>
 #endif
 #include "CommentEvent.h"
-#include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/IDE/Dialogs/EditComment.h"
-#include "GDCore/IDE/EventsEditorItemsAreas.h"
-#include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
 #include "GDCore/CommonTools.h"
 
 using namespace std;

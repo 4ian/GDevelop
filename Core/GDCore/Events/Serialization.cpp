@@ -3,17 +3,16 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/Events/InstructionMetadata.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/TinyXml/tinyxml.h"
-#include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"
 

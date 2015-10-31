@@ -23,7 +23,7 @@
 #include <wx/stc/stc.h>
 //*)
 #include <wx/imaglist.h>
-#include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class ParameterMetadata; }

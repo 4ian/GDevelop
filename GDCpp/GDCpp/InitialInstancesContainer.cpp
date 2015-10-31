@@ -5,5 +5,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/InitialInstancesContainer.cpp"
+#include "GDCore/Project/InitialInstancesContainer.cpp"
 #endif

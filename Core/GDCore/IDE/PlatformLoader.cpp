@@ -8,7 +8,7 @@
 #include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/IDE/PlatformLoader.h"
 #include "GDCore/IDE/PlatformManager.h"
-#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/Extensions/Platform.h"
 #include "GDCore/Tools/DynamicLibrariesTools.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/CommonTools.h"

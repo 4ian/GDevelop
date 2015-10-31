@@ -4,4 +4,4 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
+#include "GDCore/Project/InitialInstancesContainer.h"

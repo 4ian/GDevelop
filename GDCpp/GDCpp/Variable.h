@@ -6,7 +6,7 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 
-#include "GDCore/PlatformDefinition/Variable.h"
+#include "GDCore/Project/Variable.h"
 
 #endif // VARIABLE_H
 

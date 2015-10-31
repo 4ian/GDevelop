@@ -5,5 +5,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/BehaviorsSharedData.cpp"
+#include "GDCore/Project/BehaviorsSharedData.cpp"
 #endif

@@ -7,7 +7,7 @@
 #include "EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Tools/Log.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Project.h"
 #include "Serialization.h"
 
 namespace gd

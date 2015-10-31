@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-#include "GDCore/Events/VariableParser.h"
+#include "GDCore/Events/Parsers/VariableParser.h"
 
 namespace gdjs {
 

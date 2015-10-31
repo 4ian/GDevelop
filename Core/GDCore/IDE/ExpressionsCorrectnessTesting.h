@@ -9,7 +9,7 @@
 
 #include <vector>
 #include "GDCore/String.h"
-#include "GDCore/Events/ExpressionParser.h"
+#include "GDCore/Events/Parsers/ExpressionParser.h"
 namespace gd { class ExpressionMetadata; }
 namespace gd { class Expression; }
 namespace gd { class Project; }

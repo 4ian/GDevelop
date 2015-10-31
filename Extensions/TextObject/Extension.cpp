@@ -9,8 +9,8 @@ This project is released under the MIT License.
  * Victor Levasseur ( Bold/Italic/Underlined styles )
  */
 
-#include "GDCpp/ExtensionBase.h"
-#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Version.h"
 #include "TextObject.h"
 

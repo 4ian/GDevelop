@@ -4,5 +4,5 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/PlatformDefinition/Behavior.h"
+#include "GDCore/Project/Behavior.h"
 typedef gd::Behavior Behavior;

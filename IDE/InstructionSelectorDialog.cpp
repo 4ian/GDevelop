@@ -21,20 +21,20 @@
 #include <wx/msgdlg.h>
 #include <wx/config.h>
 #include "GDCore/IDE/SkinHelper.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/IDE/InstructionSentenceFormatter.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Object.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 
 #ifdef __WXMSW__
@@ -434,7 +434,7 @@ void InstructionSelectorDialog::RefreshFromInstruction()
     instructionDescriptionTxt->SetLabel( instructionMetadata.GetDescription() );
     instructionDescriptionTxt->Wrap( 450 );
     if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
-    else ActionImg->SetBitmap(gd::CommonBitmapManager::Get()->unknownAction24);
+    else ActionImg->SetBitmap(gd::CommonBitmapProvider::Get()->unknownAction24);
 
     //Show or hide the instructionHelpLinkCtrl
     instructionHelpLinkCtrl->Show( instructionMetadata.GetHelpPage() != "" );

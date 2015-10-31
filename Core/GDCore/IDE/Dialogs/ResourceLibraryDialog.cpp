@@ -18,7 +18,7 @@
 #include <wx/filename.h>
 #include <wx/dnd.h>
 #include <iostream>
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "GDCore/CommonTools.h"
 
 namespace gd
@@ -153,7 +153,7 @@ void ResourceLibraryDialog::ConstructList()
     listCtrl->ClearAll();
 
     wxImageList * imageList = new wxImageList(40,40);
-    imageList->Add(gd::CommonBitmapManager::Get()->parentFolder40);
+    imageList->Add(gd::CommonBitmapProvider::Get()->parentFolder40);
 
     //If we are in the root path, do not display Parent folder item
     wxFileName currentDirPath(currentDir);
@@ -174,7 +174,7 @@ void ResourceLibraryDialog::ConstructList()
             //Only add a directory if there is a GDLibrary.txt file inside it.
             if ( wxFileExists(currentDir+"/"+filename+"/GDLibrary.txt") )
             {
-                wxBitmap folderBmp = gd::CommonBitmapManager::Get()->folder40;
+                wxBitmap folderBmp = gd::CommonBitmapProvider::Get()->folder40;
                 if ( wxFileExists(currentDir+"/"+filename+"/GDLibraryIcon.png") )
                     PasteBitmap(folderBmp, wxBitmap(currentDir+"/"+filename+"/GDLibraryIcon.png", wxBITMAP_TYPE_ANY), 20,20 );
 

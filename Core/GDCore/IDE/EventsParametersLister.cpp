@@ -8,10 +8,10 @@
 #include <map>
 #include <memory>
 #include "GDCore/IDE/EventsParametersLister.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/Events/InstructionMetadata.h"
-#include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 

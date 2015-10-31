@@ -34,7 +34,7 @@
 
 #include "MainFrame.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"

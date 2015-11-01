@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "AdvancedXMLTools.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/TinyXml/tinyxml.h"
 #include "AdvancedXMLRefManager.h"
 
 #include <iostream>

@@ -77,7 +77,7 @@ file(GLOB source_gdcpp_ide GDCpp/IDE/*)
 file(GLOB_RECURSE source_gdcpp_ide_dialogs GDCpp/IDE/Dialogs/*)
 file(GLOB_RECURSE source_gdcpp_platfdef GDCpp/Project/*)
 file(GLOB_RECURSE source_gdcpp_serialization GDCpp/Serialization/*)
-file(GLOB_RECURSE source_gdcpp_tinyxml GDCpp/tinyxml/*)
+file(GLOB_RECURSE source_gdcpp_tinyxml GDCpp/TinyXml/*)
 file(GLOB_RECURSE source_gdcpp_tools GDCpp/Tools/*)
 file(GLOB_RECURSE source_gdcpp_utf8 GDCpp/Utf8/*)
 

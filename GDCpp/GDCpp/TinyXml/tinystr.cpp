@@ -36,7 +36,7 @@ distribution.
 
 #ifndef TIXML_USE_STL
 
-#include "GDCpp/tinyxml/tinystr.h"
+#include "GDCpp/TinyXml/tinystr.h"
 
 // Error value for find primitive
 const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_type >(-1);

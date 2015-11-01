@@ -17,7 +17,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCore/Events/Serialization.h"
-#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/TinyXml/tinyxml.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"

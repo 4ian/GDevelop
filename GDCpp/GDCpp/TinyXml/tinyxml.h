@@ -58,7 +58,7 @@ distribution.
 	#include <sstream>
 	#define TIXML_STRING		std::string
 #else
-	#include "GDCpp/tinyxml/tinystr.h"
+	#include "GDCpp/TinyXml/tinystr.h"
 	#define TIXML_STRING		TiXmlString
 #endif
 

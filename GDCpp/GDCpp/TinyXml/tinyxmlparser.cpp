@@ -33,7 +33,7 @@ distribution.
 #include <ctype.h>
 #include <stddef.h>
 
-#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/TinyXml/tinyxml.h"
 
 //#define DEBUG_PARSER
 #if defined( DEBUG_PARSER )

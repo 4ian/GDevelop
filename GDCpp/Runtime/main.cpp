@@ -30,7 +30,7 @@
 #include "GDCpp/Tools/AES.h"
 #include "GDCpp/Serialization/Serializer.h"
 #include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/TinyXml/tinyxml.h"
 #include "GDCpp/RuntimeGame.h"
 #include "CompilationChecker.h"
 

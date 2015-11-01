@@ -6,11 +6,11 @@ This project is released under the MIT License.
 */
 
 #include <SFML/Graphics.hpp>
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/Position.h"
+#include "GDCpp/Project/InitialInstance.h"
 #include "GDCpp/CommonTools.h"
 #include "AdMobObject.h"
 

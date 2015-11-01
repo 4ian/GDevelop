@@ -11,10 +11,10 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/IDE/Exporter.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCpp/SoundManager.h"
-#include "GDCpp/Behavior.h"
+#include "GDCpp/Project/Behavior.h"
 #include "GDCpp/FontManager.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCpp/IDE/ChangesNotifier.h"
@@ -41,7 +41,7 @@
 #include "GDCpp/Extensions/Builtin/WindowExtension.h"
 #include "GDCpp/Extensions/Builtin/ExternalLayoutsExtension.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/CommonTools.h"
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)

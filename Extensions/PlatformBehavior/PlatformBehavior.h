@@ -8,8 +8,8 @@ This project is released under the MIT License.
 #ifndef PLATFORMBEHAVIOR_H
 #define PLATFORMBEHAVIOR_H
 
-#include "GDCpp/Behavior.h"
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Behavior.h"
+#include "GDCpp/Project/Object.h"
 #include <SFML/System/Vector2.hpp>
 class ScenePlatformObjectsManager;
 class RuntimeScene;

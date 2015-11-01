@@ -14,7 +14,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 
 TileSetConfigurationEditor::TileSetConfigurationEditor(wxWindow* parent, TileSet &tileSet_, gd::Project & game_, gd::MainFrameWrapper & mainFrameWrapper) :
     TileSetConfigurationEditorBase(parent),

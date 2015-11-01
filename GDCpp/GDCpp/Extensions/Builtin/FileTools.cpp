@@ -8,7 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Variable.h"
+#include "GDCpp/Project/Variable.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/XmlFilesHelper.h"
 #include "FileTools.h"

@@ -12,7 +12,7 @@ This project is released under the MIT License.
 #include <memory>
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/ObjectsListsTools.h"
+#include "GDCpp/RuntimeObjectsListsTools.h"
 #include "ObjectsLinksManager.h"
 
 using namespace std;

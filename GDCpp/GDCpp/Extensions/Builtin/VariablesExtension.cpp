@@ -9,8 +9,8 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Project.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Project.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #if !defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/Builtin/VariablesExtension.cpp"

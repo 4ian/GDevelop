@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef PATHFINDINGOBSTACLEBEHAVIOR_H
 #define PATHFINDINGOBSTACLEBEHAVIOR_H
 
-#include "GDCpp/Behavior.h"
+#include "GDCpp/Project/Behavior.h"
 #include "GDCpp/RuntimeObject.h"
 class ScenePathfindingObstaclesManager;
 class RuntimeScene;

@@ -10,7 +10,7 @@ This project is released under the MIT License.
 
 #include <string>
 
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Polygon2d.h"
 #include <memory>

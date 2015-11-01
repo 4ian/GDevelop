@@ -12,8 +12,8 @@ This project is released under the MIT License.
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCpp/Extensions/CppPlatform.h"
-#include "GDCpp/Project.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Project.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCpp/CommonTools.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Parsers/ExpressionParser.h"

@@ -6,7 +6,7 @@
 #ifndef RUNTIMEGAME_H
 #define RUNTIMEGAME_H
 
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/RuntimeVariablesContainer.h"
 #include <vector>
 #include <string>

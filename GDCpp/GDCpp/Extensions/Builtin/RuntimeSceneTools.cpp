@@ -15,12 +15,12 @@
 #include "GDCpp/RuntimeLayer.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/Extensions/CppPlatform.h"
-#include "GDCpp/ObjectHelpers.h"
-#include "GDCpp/ObjectsListsTools.h"
+#include "GDCpp/RuntimeObjectHelpers.h"
+#include "GDCpp/RuntimeObjectsListsTools.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/profile.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Variable.h"
+#include "GDCpp/Project/Variable.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 
 gd::String GD_API GetSceneName(RuntimeScene & scene)

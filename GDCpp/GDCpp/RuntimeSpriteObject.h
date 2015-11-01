@@ -6,7 +6,7 @@
 
 #ifndef SPRITEOBJECT_H
 #define SPRITEOBJECT_H
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeObject.h"
 namespace gd { class InitialInstance; }
 namespace gd { class Object; }

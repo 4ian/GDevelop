@@ -10,8 +10,8 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
-#include "GDCpp/Scene.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Layout.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #if !defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/Builtin/SceneExtension.cpp"

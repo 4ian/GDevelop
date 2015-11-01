@@ -10,12 +10,12 @@ This project is released under the MIT License.
 #endif
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/FontManager.h"
-#include "GDCpp/Position.h"
+#include "GDCpp/Project/InitialInstance.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCore/Tools/Localization.h"

@@ -11,7 +11,7 @@ This project is released under the MIT License.
 #include "TopDownMovementBehavior.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Extensions/Builtin/MathematicalTools.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeObject.h"

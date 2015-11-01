@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include "LightObstacleBehavior.h"
 #include "LightObstacleBehaviorEditor.h"
 #include "LightObject.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>

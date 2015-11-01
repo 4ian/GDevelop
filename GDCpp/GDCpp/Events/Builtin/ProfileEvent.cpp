@@ -9,7 +9,7 @@
 #include "ProfileEvent.h"
 #include "GDCpp/Extensions/Builtin/ProfileTools.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCpp/IDE/BaseProfiler.h"

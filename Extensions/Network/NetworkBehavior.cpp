@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #include <vector>
 #include <SFML/Network.hpp>
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/CommonTools.h"
 #include "ReceivedDataManager.h"

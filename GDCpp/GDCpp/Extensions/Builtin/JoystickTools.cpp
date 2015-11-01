@@ -5,7 +5,7 @@
  */
 #include "JoystickTools.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Variable.h"
+#include "GDCpp/Project/Variable.h"
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 

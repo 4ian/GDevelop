@@ -8,7 +8,7 @@
 #include <vector>
 #include "GDCpp/RuntimeSpriteObject.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/ObjectsListsTools.h"
+#include "GDCpp/RuntimeObjectsListsTools.h"
 #include "GDCpp/Collisions.h"
 #include "GDCpp/profile.h"
 #include "GDCpp/Extensions/Builtin/ObjectTools.h"

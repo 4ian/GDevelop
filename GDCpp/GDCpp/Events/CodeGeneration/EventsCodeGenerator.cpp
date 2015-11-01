@@ -20,7 +20,7 @@
 #include "GDCpp/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/SceneNameMangler.h"
-#include "GDCpp/ProfileEvent.h"
+#include "GDCpp/Events/Builtin/ProfileEvent.h"
 #include "GDCpp/Events/CodeGeneration/VariableParserCallbacks.h"
 
 using namespace std;

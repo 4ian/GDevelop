@@ -8,8 +8,8 @@
 #include <string>
 #include <iostream>
 #include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCpp/Behavior.h"
-#include "GDCpp/BehaviorsSharedData.h"
+#include "GDCpp/Project/Behavior.h"
+#include "GDCpp/Project/BehaviorsSharedData.h"
 #include "GDCpp/CommonTools.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Event.h"

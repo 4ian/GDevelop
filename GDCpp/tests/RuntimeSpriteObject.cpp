@@ -16,7 +16,7 @@
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/ObjectsListsTools.h"
+#include "GDCpp/RuntimeObjectsListsTools.h"
 #include "GDCpp/RuntimeSpriteObject.h"
 
 TEST_CASE( "RuntimeSpriteObject", "[game-engine]" ) {

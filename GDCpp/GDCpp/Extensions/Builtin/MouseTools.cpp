@@ -1,7 +1,7 @@
 #include "GDCpp/Extensions/Builtin/MouseTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeLayer.h"
-#include "GDCpp/ObjectsListsTools.h"
+#include "GDCpp/RuntimeObjectsListsTools.h"
 #include <SFML/Graphics.hpp>
 
 void GD_API CenterCursor( RuntimeScene & scene )

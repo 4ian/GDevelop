@@ -14,7 +14,7 @@
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/ObjectsListsTools.h"
+#include "GDCpp/RuntimeObjectsListsTools.h"
 #include "GDCpp/Extensions/Builtin/RuntimeSceneTools.h"
 
 TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {

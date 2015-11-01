@@ -1,7 +1,7 @@
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCpp/Extensions/Builtin/BaseObjectExtension.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #if !defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/Builtin/BaseObjectExtension.cpp"

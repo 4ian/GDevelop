@@ -9,7 +9,7 @@
 
 #ifndef OBJECTHELPERS_H
 #define OBJECTHELPERS_H
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #include <memory>
 #include <vector>

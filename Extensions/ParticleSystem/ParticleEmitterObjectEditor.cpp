@@ -20,7 +20,7 @@ This project is released under the MIT License.
 #include <wx/colordlg.h>
 #include <wx/filedlg.h>
 
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/CommonTools.h"
 #include "ParticleEmitterObject.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"

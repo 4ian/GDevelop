@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef BOX3DOBJECT_H
 #define BOX3DOBJECT_H
 
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #include <memory>
 class SFMLTextureWrapper;

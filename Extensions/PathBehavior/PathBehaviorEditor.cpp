@@ -30,10 +30,10 @@ This project is released under the MIT License.
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "ScenePathDatas.h"
 #include "PathBehavior.h"
 

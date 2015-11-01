@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "ProfileTools.h"
-#include "GDCpp/ProfileEvent.h"
+#include "GDCpp/Events/Builtin/ProfileEvent.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include <iostream>

@@ -14,7 +14,7 @@
 #include <wx/filefn.h>
 #include <wx/txtstrm.h>
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 

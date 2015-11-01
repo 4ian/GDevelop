@@ -17,8 +17,8 @@ This project is released under the MIT License.
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include "GDCpp/Project.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Project.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCpp/CommonTools.h"
 
 //(*IdInit(TimedEventEditorDlg)

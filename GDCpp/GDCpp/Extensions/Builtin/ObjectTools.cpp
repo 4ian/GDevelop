@@ -7,7 +7,7 @@
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/PolygonCollision.h"
-#include "GDCpp/ObjectsListsTools.h"
+#include "GDCpp/RuntimeObjectsListsTools.h"
 #include "MathematicalTools.h"
 #include <cmath>
 #include <iostream>

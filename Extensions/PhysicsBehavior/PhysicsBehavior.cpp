@@ -14,8 +14,8 @@ This project is released under the MIT License.
 #include "PhysicsBehaviorEditor.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Project.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Project.h"
+#include "GDCpp/Project/Layout.h"
 #include "RuntimeScenePhysicsDatas.h"
 
 #undef GetObject

@@ -10,7 +10,7 @@
 #include <SFML/Network.hpp>
 #include "GDCpp/Extensions/Builtin/NetworkTools.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Variable.h"
+#include "GDCpp/Project/Variable.h"
 #include "GDCpp/Tools/md5.h"
 #include "GDCpp/CommonTools.h"
 

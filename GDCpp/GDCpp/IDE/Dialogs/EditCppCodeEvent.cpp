@@ -17,9 +17,9 @@
 #include <wx/textfile.h>
 #include <wx/filename.h>
 #include <fstream>
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCpp/Events/Builtin/CppCodeEvent.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/IDE/CodeCompiler.h"

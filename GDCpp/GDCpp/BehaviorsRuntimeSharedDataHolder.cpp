@@ -5,7 +5,7 @@
  */
 #include "BehaviorsRuntimeSharedDataHolder.h"
 #include "GDCpp/BehaviorsRuntimeSharedData.h"
-#include "GDCpp/BehaviorsSharedData.h"
+#include "GDCpp/Project/BehaviorsSharedData.h"
 #include <iostream>
 
 const std::shared_ptr<BehaviorsRuntimeSharedData> & BehaviorsRuntimeSharedDataHolder::GetBehaviorSharedData(const gd::String & behaviorName) const

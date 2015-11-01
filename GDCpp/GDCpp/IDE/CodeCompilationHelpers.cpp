@@ -18,7 +18,7 @@
 
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"

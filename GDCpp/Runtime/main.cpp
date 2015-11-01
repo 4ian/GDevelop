@@ -20,7 +20,7 @@
 #include "GDCpp/FontManager.h"
 #include "GDCpp/SoundManager.h"
 #include "GDCpp/SceneNameMangler.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/CodeExecutionEngine.h"
 #include "GDCpp/Extensions/CppPlatform.h"

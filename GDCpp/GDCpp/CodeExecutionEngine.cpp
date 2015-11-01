@@ -7,7 +7,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "CodeExecutionEngine.h"
 #include "GDCpp/RuntimeContext.h"
-#include "GDCpp/DynamicLibrariesTools.h"
+#include "GDCpp/Tools/DynamicLibrariesTools.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Tools/Log.h"
 #endif

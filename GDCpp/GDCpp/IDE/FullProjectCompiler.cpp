@@ -26,7 +26,7 @@
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/ProjectFileWriter.h"
 #include "GDCpp/IDE/CodeCompiler.h"
-#include "GDCpp/Events/CodeCompilationHelpers.h"
+#include "GDCpp/IDE/CodeCompilationHelpers.h"
 #include "GDCpp/DatFile.h"
 #include "GDCpp/Project.h"
 #include "GDCpp/Scene.h"

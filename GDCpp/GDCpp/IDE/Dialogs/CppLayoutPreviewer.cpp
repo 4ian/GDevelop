@@ -30,7 +30,7 @@
 #include "GDCpp/FontManager.h"
 #include "GDCpp/Object.h"
 #include "GDCpp/RuntimeSpriteObject.h"
-#include "GDCpp/Events/CodeCompilationHelpers.h"
+#include "GDCpp/IDE/CodeCompilationHelpers.h"
 #include "GDCpp/IDE/Dialogs/DebuggerGUI.h"
 #include "GDCpp/IDE/Dialogs/ProfileDlg.h"
 #include "GDCpp/IDE/Dialogs/RenderDialog.h"

@@ -271,8 +271,8 @@
 		<Unit filename="GDJS/BuiltinExtensions/VariablesExtension.h" />
 		<Unit filename="GDJS/BuiltinExtensions/WindowExtension.cpp" />
 		<Unit filename="GDJS/BuiltinExtensions/WindowExtension.h" />
-		<Unit filename="GDJS/Dialogs/ProjectExportDialog.cpp" />
-		<Unit filename="GDJS/Dialogs/ProjectExportDialog.h" />
+		<Unit filename="GDJS/IDE/Dialogs/ProjectExportDialog.cpp" />
+		<Unit filename="GDJS/IDE/Dialogs/ProjectExportDialog.h" />
 		<Unit filename="GDJS/DocMainPage.h" />
 		<Unit filename="GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp" />
 		<Unit filename="GDJS/Events/CodeGeneration/EventsCodeGenerator.h" />

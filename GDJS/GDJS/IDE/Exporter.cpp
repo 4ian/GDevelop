@@ -33,9 +33,9 @@
 #include "GDCore/CommonTools.h"
 #include "GDJS/IDE/Exporter.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDJS/Dialogs/ProjectExportDialog.h"
-#include "GDJS/Dialogs/CocoonJSUploadDialog.h"
-#include "GDJS/Dialogs/CordovaPackageDialog.h"
+#include "GDJS/IDE/Dialogs/ProjectExportDialog.h"
+#include "GDJS/IDE/Dialogs/CocoonJSUploadDialog.h"
+#include "GDJS/IDE/Dialogs/CordovaPackageDialog.h"
 #undef CopyFile //Disable an annoying macro
 
 namespace gdjs

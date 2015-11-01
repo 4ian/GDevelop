@@ -25,7 +25,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/CommonTools.h"
-#include "GDJS/Dialogs/JsCodeEventDialog.h"
+#include "GDJS/IDE/Dialogs/JsCodeEventDialog.h"
 
 using namespace std;
 

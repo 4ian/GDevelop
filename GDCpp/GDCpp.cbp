@@ -731,13 +731,13 @@
 		<Unit filename="GDCpp/Direction.cpp" />
 		<Unit filename="GDCpp/Direction.h" />
 		<Unit filename="GDCpp/DocMainPage.h" />
-		<Unit filename="GDCpp/DynamicLibrariesTools.cpp" />
-		<Unit filename="GDCpp/DynamicLibrariesTools.h" />
+		<Unit filename="GDCpp/Tools/DynamicLibrariesTools.cpp" />
+		<Unit filename="GDCpp/Tools/DynamicLibrariesTools.h" />
 		<Unit filename="GDCpp/EmptyEvent.cpp" />
 		<Unit filename="GDCpp/EmptyEvent.h" />
 		<Unit filename="GDCpp/EventsPrecompiledHeader.h" />
-		<Unit filename="GDCpp/Events/CodeCompilationHelpers.cpp" />
-		<Unit filename="GDCpp/Events/CodeCompilationHelpers.h" />
+		<Unit filename="GDCpp/IDE/CodeCompilationHelpers.cpp" />
+		<Unit filename="GDCpp/IDE/CodeCompilationHelpers.h" />
 		<Unit filename="GDCpp/Events/CodeGeneration/EventsCodeGenerator.cpp" />
 		<Unit filename="GDCpp/Events/CodeGeneration/EventsCodeGenerator.h" />
 		<Unit filename="GDCpp/Extensions/ExtensionBase.cpp" />

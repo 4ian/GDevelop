@@ -19,7 +19,7 @@
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/Scene.h"
 #include "GDCpp/Project.h"
-#include "GDCpp/Events/CodeCompilationHelpers.h"
+#include "GDCpp/IDE/CodeCompilationHelpers.h"
 
 void ChangesNotifier::OnObjectEdited(gd::Project & game, gd::Layout * scene, gd::Object & object) const
 {

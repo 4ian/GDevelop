@@ -8,8 +8,8 @@ This project is released under the MIT License.
 #ifndef NETWORKBEHAVIOR_H
 #define NETWORKBEHAVIOR_H
 
-#include "GDCpp/Behavior.h"
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Behavior.h"
+#include "GDCpp/Project/Object.h"
 #include "SceneNetworkDatas.h"
 #include <map>
 namespace gd { class SerializerElement; }

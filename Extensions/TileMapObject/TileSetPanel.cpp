@@ -10,7 +10,7 @@ This project is released under the MIT License.
 
 #include <iostream>
 #include <wx/dcbuffer.h>
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 
 wxDEFINE_EVENT(TILE_SELECTION_CHANGED, TileSelectionEvent);
 
@@ -72,7 +72,7 @@ void TileSetPanel::OnPaint(wxPaintEvent& event)
         int lastRow = std::min((int)(maxPos.y / (m_tileset->tileSize.y + m_tileset->tileSpacing.y) + 1), m_tileset->GetRowsCount());
 
         //Draw the background
-        dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
+        dc.SetBrush(gd::CommonBitmapProvider::Get()->transparentBg);
         dc.DrawRectangle(minPos.x, minPos.y, width, height);
 
         //Draw the bitmap

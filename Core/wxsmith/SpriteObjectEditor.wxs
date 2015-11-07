@@ -26,7 +26,7 @@
 												<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes">
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_MASKITEM" variable="maskItem_" member="yes">
-															<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;maskEdit16" />
+															<bitmap code="gd::CommonBitmapProvider::GetInstance()-&gt;maskEdit16" />
 															<shorthelp>Edit the collision masks (hitbox)</shorthelp>
 															<itemkind>Check</itemkind>
 															<handler function="OnMaskEditClick" entry="EVT_TOOL" />
@@ -35,7 +35,7 @@
 													</object>
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_POINTSITEM" variable="pointsItem_" member="yes">
-															<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;pointEdit16" />
+															<bitmap code="gd::CommonBitmapProvider::GetInstance()-&gt;pointEdit16" />
 															<shorthelp>Edit the image&apos;s point</shorthelp>
 															<itemkind>Check</itemkind>
 															<handler function="OnPointEditClick" entry="EVT_TOOL" />
@@ -348,7 +348,7 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="AuiToolBarItem1" member="yes">
-													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;defaultMask16" />
+													<bitmap code="gd::CommonBitmapProvider::GetInstance()-&gt;defaultMask16" />
 													<shorthelp>Go back to default mask</shorthelp>
 													<handler function="OnDefaultMaskClick" entry="EVT_TOOL" />
 												</object>

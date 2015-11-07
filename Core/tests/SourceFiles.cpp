@@ -8,8 +8,8 @@
  */
 #include "catch.hpp"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/SourceFile.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/SourceFile.h"
 
 TEST_CASE( "SourceFile", "[common]" ) {
     SECTION("Basics") {

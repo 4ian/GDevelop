@@ -60,11 +60,6 @@ void Instruction::SetParametersCount(std::size_t size)
         parameters.push_back(gd::Expression(""));
 }
 
-Instruction::~Instruction()
-{
-    //dtor
-}
-
 void Instruction::SetParameter(std::size_t nb, const gd::Expression & val)
 {
     if ( nb >= parameters.size() )

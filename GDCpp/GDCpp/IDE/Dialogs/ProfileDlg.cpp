@@ -15,11 +15,11 @@
 #include <iostream>
 #include <wx/textdlg.h>
 #include <wx/dcbuffer.h>
-#include "GDCpp/Events/CodeCompilationHelpers.h"
-#include "GDCpp/ProfileEvent.h"
+#include "GDCpp/IDE/CodeCompilationHelpers.h"
+#include "GDCpp/Events/Builtin/ProfileEvent.h"
 #include "GDCpp/IDE/Dialogs/CppLayoutPreviewer.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/CppPlatform.h"
+#include "GDCpp/Extensions/CppPlatform.h"
 
 using namespace std;
 

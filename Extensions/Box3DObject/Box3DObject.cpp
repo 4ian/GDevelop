@@ -13,13 +13,13 @@ This project is released under the MIT License.
 #include "Box3DObject.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/FontManager.h"
-#include "GDCpp/Position.h"
+#include "GDCpp/Project/InitialInstance.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
@@ -29,7 +29,7 @@ This project is released under the MIT License.
 #include "Box3DObjectEditor.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #endif
 
 using namespace std;

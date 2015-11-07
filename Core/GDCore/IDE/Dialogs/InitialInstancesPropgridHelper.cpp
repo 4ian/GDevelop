@@ -7,7 +7,7 @@
 #include "InitialInstancesPropgridHelper.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/PlatformDefinition/InitialInstance.h"
+#include "GDCore/Project/InitialInstance.h"
 #include "GDCore/CommonTools.h"
 #include <wx/propgrid/propgrid.h>
 #include <wx/settings.h>

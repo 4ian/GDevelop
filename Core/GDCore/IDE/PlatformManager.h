@@ -9,7 +9,7 @@
 #define PLATFORMMANAGER_H
 #include <vector>
 #include <memory>
-#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/Extensions/Platform.h"
 
 namespace gd
 {

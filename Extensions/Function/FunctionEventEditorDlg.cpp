@@ -11,8 +11,8 @@
 //*)
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Project.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Project.h"
+#include "GDCpp/Project/Layout.h"
 #include "FunctionEvent.h"
 
 //(*IdInit(FunctionEventEditorDlg)

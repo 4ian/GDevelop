@@ -8,11 +8,11 @@
  */
 #include "catch.hpp"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/ClassWithObjects.h"
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
-#include "GDCpp/BuiltinExtensions/NetworkTools.h"
+#include "GDCpp/Extensions/Builtin/NetworkTools.h"
 
 TEST_CASE( "NetworkTools", "[game-engine]" ) {
 

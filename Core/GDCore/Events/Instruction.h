@@ -48,7 +48,7 @@ public:
      */
     Instruction(gd::String type_, const std::vector <gd::Expression> & parameters_, bool inverted = false);
 
-    virtual ~Instruction();
+    virtual ~Instruction() {};
 
     /**
      * \brief Return the type of the instruction.

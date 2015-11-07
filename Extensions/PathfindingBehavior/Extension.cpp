@@ -5,8 +5,8 @@ Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/ExtensionBase.h"
-#include "GDCpp/BehaviorsSharedData.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCpp/Project/BehaviorsSharedData.h"
 #include "GDCore/Tools/Version.h"
 #include "PathfindingBehavior.h"
 #include "PathfindingObstacleBehavior.h"

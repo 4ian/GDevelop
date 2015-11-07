@@ -19,9 +19,9 @@
 #include <wx/settings.h>
 #include <algorithm>
 #include <memory>
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/PlatformExtension.h"
-#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"

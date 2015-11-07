@@ -13,20 +13,20 @@ This project is released under the MIT License.
 #include "TiledSpriteObject.h"
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Object.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Object.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/FontManager.h"
-#include "GDCpp/Position.h"
+#include "GDCpp/Project/InitialInstance.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/CommonTools.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "TiledSpriteObjectEditor.h"
 #endif
 

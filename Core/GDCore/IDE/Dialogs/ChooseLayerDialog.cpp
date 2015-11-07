@@ -9,8 +9,8 @@
 #include "GDCore/Tools/Localization.h"
 #include <wx/string.h>
 //*)
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Layer.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Layer.h"
 #include "GDCore/CommonTools.h"
 #include "ChooseLayerDialog.h"
 

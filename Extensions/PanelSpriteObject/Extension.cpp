@@ -9,7 +9,7 @@ This project is released under the MIT License.
  * Florian Rival ( Minor changes and adaptations )
  */
 
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "PanelSpriteObject.h"
 

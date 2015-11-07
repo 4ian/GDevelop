@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef TEXTENTRYOBJECT_H
 #define TEXTENTRYOBJECT_H
 
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeObject.h"
 class RuntimeScene;
 class ImageManager;

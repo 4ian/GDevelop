@@ -17,7 +17,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/SkinHelper.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #include "PanelSpriteObjectEditor.h"

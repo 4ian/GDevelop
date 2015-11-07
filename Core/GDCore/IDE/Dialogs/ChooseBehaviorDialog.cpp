@@ -19,10 +19,10 @@
 
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/Events/BehaviorMetadata.h"
-#include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 
 namespace gd
 {

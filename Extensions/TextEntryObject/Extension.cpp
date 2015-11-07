@@ -5,7 +5,7 @@ Copyright (c) 2011-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "TextEntryObject.h"
 

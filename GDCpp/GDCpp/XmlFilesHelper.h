@@ -7,7 +7,7 @@
 #ifndef XMLFILESHELPER_H
 #define XMLFILESHELPER_H
 
-#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/TinyXml/tinyxml.h"
 #include <string>
 #include <memory>
 #include <map>

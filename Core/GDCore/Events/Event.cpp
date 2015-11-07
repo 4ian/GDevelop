@@ -6,9 +6,9 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/PlatformDefinition/Platform.h"
-#include "GDCore/PlatformDefinition/PlatformExtension.h"
-#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 
 namespace gd
 {

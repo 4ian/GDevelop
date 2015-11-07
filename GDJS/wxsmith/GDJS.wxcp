@@ -1,6 +1,6 @@
 {
 	"metadata":	{
-		"m_generatedFilesDir":	"../GDJS/Dialogs/",
+		"m_generatedFilesDir":	"../GDJS/IDE/Dialogs/",
 		"m_objCounter":	190,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxCB65InitBitmapResources",

@@ -4,4 +4,4 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/PlatformDefinition/ImageManager.h"
+#include "GDCore/Project/ImageManager.h"

@@ -13,7 +13,7 @@ This project is released under the MIT License.
 #include "PhysicsBehavior.h"
 #include "ScenePhysicsDatas.h"
 
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 
 /**
  * \brief This class declares information about the extension.

@@ -19,11 +19,11 @@ This project is released under the MIT License.
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/Extensions/Platform.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "PhysicsBehavior.h"
 #include "ScenePhysicsDatas.h"
 #include "GDCore/Tools/Localization.h"

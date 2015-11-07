@@ -8,7 +8,7 @@
 #define GDCore_ParameterControlsHelper_H
 #include <vector>
 #include <wx/event.h>
-#include "GDCore/Events/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 namespace gd { class Project; }
 namespace gd { class Layout; }
 class wxCommandEvent;

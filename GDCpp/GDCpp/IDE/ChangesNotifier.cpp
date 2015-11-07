@@ -12,14 +12,14 @@
 #endif
 #include "ChangesNotifier.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
-#include "GDCpp/CppPlatform.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/ExternalEvents.h"
+#include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
-#include "GDCpp/Scene.h"
-#include "GDCpp/Project.h"
-#include "GDCpp/Events/CodeCompilationHelpers.h"
+#include "GDCpp/Project/Layout.h"
+#include "GDCpp/Project/Project.h"
+#include "GDCpp/IDE/CodeCompilationHelpers.h"
 
 void ChangesNotifier::OnObjectEdited(gd::Project & game, gd::Layout * scene, gd::Object & object) const
 {

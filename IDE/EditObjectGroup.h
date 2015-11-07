@@ -21,7 +21,7 @@
 //*)
 namespace gd { class Project; }
 namespace gd { class Layout; }
-#include "GDCore/PlatformDefinition/ObjectGroup.h"
+#include "GDCore/Project/ObjectGroup.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif

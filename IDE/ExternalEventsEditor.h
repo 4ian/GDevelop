@@ -15,7 +15,7 @@
 namespace gd { class ExternalEvents; };
 namespace gd { class Project; }
 class EventsEditor;
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/String.h"
 

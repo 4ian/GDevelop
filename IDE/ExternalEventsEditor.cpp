@@ -13,9 +13,9 @@
 #include "GDCore/Tools/Log.h"
 #include <wx/ribbon/bar.h>
 #include "GDCore/Tools/Localization.h"
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "EventsEditor.h"
 

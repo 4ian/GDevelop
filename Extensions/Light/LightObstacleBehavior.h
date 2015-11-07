@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #ifndef LIGHTOBSTACLEBEHAVIOR_H
 #define LIGHTOBSTACLEBEHAVIOR_H
 
-#include "GDCpp/Behavior.h"
+#include "GDCpp/Project/Behavior.h"
 #include "GDCpp/RuntimeObject.h"
 #include "Light.h"
 #include "LightManager.h"

@@ -9,7 +9,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "GDCore/PlatformDefinition/Variable.h"
+#include "GDCore/Project/Variable.h"
 namespace gd { class VariablesContainer; };
 class BadRuntimeVariablesContainer;
 class BadVariable;

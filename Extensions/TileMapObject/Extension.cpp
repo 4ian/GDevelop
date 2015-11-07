@@ -9,7 +9,7 @@ This project is released under the MIT License.
  * Florian Rival (Minor changes)
  */
 
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "TileMapObject.h"
 #include "RuntimeTileMapObject.h"

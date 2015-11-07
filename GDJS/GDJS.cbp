@@ -271,17 +271,17 @@
 		<Unit filename="GDJS/BuiltinExtensions/VariablesExtension.h" />
 		<Unit filename="GDJS/BuiltinExtensions/WindowExtension.cpp" />
 		<Unit filename="GDJS/BuiltinExtensions/WindowExtension.h" />
-		<Unit filename="GDJS/Dialogs/ProjectExportDialog.cpp" />
-		<Unit filename="GDJS/Dialogs/ProjectExportDialog.h" />
+		<Unit filename="GDJS/IDE/Dialogs/ProjectExportDialog.cpp" />
+		<Unit filename="GDJS/IDE/Dialogs/ProjectExportDialog.h" />
 		<Unit filename="GDJS/DocMainPage.h" />
-		<Unit filename="GDJS/EventsCodeGenerator.cpp" />
-		<Unit filename="GDJS/EventsCodeGenerator.h" />
-		<Unit filename="GDJS/Exporter.cpp" />
-		<Unit filename="GDJS/Exporter.h" />
-		<Unit filename="GDJS/HttpServer.cpp" />
-		<Unit filename="GDJS/HttpServer.h" />
-		<Unit filename="GDJS/JsPlatform.cpp" />
-		<Unit filename="GDJS/JsPlatform.h" />
+		<Unit filename="GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp" />
+		<Unit filename="GDJS/Events/CodeGeneration/EventsCodeGenerator.h" />
+		<Unit filename="GDJS/IDE/Exporter.cpp" />
+		<Unit filename="GDJS/IDE/Exporter.h" />
+		<Unit filename="GDJS/IDE/HttpServer.cpp" />
+		<Unit filename="GDJS/IDE/HttpServer.h" />
+		<Unit filename="GDJS/Extensions/JsPlatform.cpp" />
+		<Unit filename="GDJS/Extensions/JsPlatform.h" />
 		<Unit filename="GDJS/mongoose/mongoose.c">
 			<Option compilerVar="CC" />
 		</Unit>

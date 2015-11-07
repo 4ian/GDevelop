@@ -7,15 +7,15 @@
 #include "ForEachEvent.h"
 #include <iostream>
 #include "GDCore/TinyXml/tinyxml.h"
-#include "GDCore/IDE/EventsRenderingHelper.h"
-#include "GDCore/IDE/EventsEditorItemsAreas.h"
-#include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Events/Serialization.h"
-#include "GDCore/Events/EventsCodeGenerator.h"
-#include "GDCore/Events/ExpressionsCodeGeneration.h"
-#include "GDCore/Events/EventsCodeNameMangler.h"
-#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
+#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/Tools/EventsCodeNameMangler.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/IDE/Dialogs/EditForEachEvent.h"
 
 using namespace std;

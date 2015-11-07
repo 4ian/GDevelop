@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef LightObject_H
 #define LightObject_H
 
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeObject.h"
 
 #include <memory>

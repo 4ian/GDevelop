@@ -12,13 +12,13 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Localization.h"
 #include "PanelSpriteObject.h"
 #include <SFML/Graphics.hpp>
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/FontManager.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
-#include "GDCpp/Project.h"
-#include "GDCpp/Position.h"
+#include "GDCpp/Project/Project.h"
+#include "GDCpp/Project/InitialInstance.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/CommonTools.h"
@@ -26,7 +26,7 @@ This project is released under the MIT License.
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "PanelSpriteObjectEditor.h"
 #endif
 

@@ -12,7 +12,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/config.h>
-#include "GDCore/PlatformDefinition/ExternalLayout.h"
+#include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "../InitialPositionBrowserDlg.h"

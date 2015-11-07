@@ -2,12 +2,12 @@
 #include <algorithm>
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/SourceFile.h"
+#include "GDCore/Project/ExternalEvents.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/SourceFile.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
-#include "GDCpp/CppCodeEvent.h"
+#include "GDCpp/Events/Builtin/CppCodeEvent.h"
 #include "DependenciesAnalyzer.h"
 
 DependenciesAnalyzer::DependenciesAnalyzer(gd::Project & project_, gd::Layout & layout_) :

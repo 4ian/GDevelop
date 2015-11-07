@@ -8,9 +8,9 @@
  */
 #include "catch.hpp"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/PlatformDefinition/ClassWithObjects.h"
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Object.h"
+#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/ObjInstancesHolder.h"

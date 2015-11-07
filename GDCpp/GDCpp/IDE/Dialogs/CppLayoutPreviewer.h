@@ -8,8 +8,8 @@
 #define SCENEEDITORCANVAS_H
 #include <memory>
 #include <SFML/Graphics.hpp>
-#include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/LayoutEditorPreviewer.h"
+#include "GDCore/Project/Project.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
 namespace gd { class InitialInstancesContainer; }

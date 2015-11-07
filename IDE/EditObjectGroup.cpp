@@ -16,10 +16,10 @@
 #include "GDCore/Tools/Log.h"
 #include <wx/help.h>
 #include <wx/msgdlg.h>
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/PlatformDefinition/ObjectGroup.h"
+#include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "GDCore/CommonTools.h"

@@ -12,9 +12,9 @@ namespace gd { class ExternalLayout; }
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/PlatformDefinition/ObjectGroup.h"
-#include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/PlatformDefinition/InitialInstance.h"
+#include "GDCore/Project/ObjectGroup.h"
+#include "GDCore/Project/Object.h"
+#include "GDCore/Project/InitialInstance.h"
 #undef GetObject //Undefining an annoying macro changing GetObject in GetObjectA or GetObjectW
 
 namespace gd

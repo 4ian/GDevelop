@@ -10,7 +10,7 @@ This project is released under the MIT License.
  * Florian Rival ( Adaptations to the latest versions of GD )
  */
 
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "SoundObject.h"
 

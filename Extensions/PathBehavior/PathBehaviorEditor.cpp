@@ -28,12 +28,12 @@ This project is released under the MIT License.
 #include <wx/numdlg.h>
 #include <wx/filedlg.h>
 #include "GDCore/IDE/SkinHelper.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "ScenePathDatas.h"
 #include "PathBehavior.h"
 
@@ -573,7 +573,7 @@ void PathBehaviorEditor::OnPanel1Paint(wxPaintEvent& event)
     wxSize panelSize = previewPnl->GetSize();
 
     //Draw background
-    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
+    dc.SetBrush(gd::CommonBitmapProvider::Get()->transparentBg);
     dc.DrawRectangle(0,0, panelSize.GetWidth(), panelSize.GetHeight());
 
     //Draw the image
@@ -595,7 +595,7 @@ void PathBehaviorEditor::OnPanel1Paint(wxPaintEvent& event)
     dc.SetPen(wxPen(wxColor(50, 57, 122)));
     dc.DrawLines(points.size(), &points[0]);
 
-    wxBitmap point(gd::CommonBitmapManager::Get()->point);
+    wxBitmap point(gd::CommonBitmapProvider::Get()->point);
 
     //Draw points
     for(std::size_t a = 0; a < path->size(); a++)

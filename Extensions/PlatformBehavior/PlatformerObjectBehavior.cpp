@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include "PlatformBehavior.h"
 #include "ScenePlatformObjectsManager.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeObject.h"

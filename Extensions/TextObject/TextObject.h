@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #define TEXTOBJECT_H
 
 #include <SFML/Graphics/Text.hpp>
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/String.h"
 class ImageManager;

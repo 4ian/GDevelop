@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #include <memory>
 #include "PlatformBehavior.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeObject.h"

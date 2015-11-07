@@ -18,7 +18,7 @@ This project is released under the MIT License.
 #include <wx/filename.h>
 #include <wx/filedlg.h>
 
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "SoundObject.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCpp/CommonTools.h"

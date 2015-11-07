@@ -8,14 +8,14 @@
  */
 #include "catch.hpp"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/ClassWithObjects.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Object.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/ObjectsListsTools.h"
-#include "GDCpp/BuiltinExtensions/RuntimeSceneTools.h"
+#include "GDCpp/RuntimeObjectsListsTools.h"
+#include "GDCpp/Extensions/Builtin/RuntimeSceneTools.h"
 
 TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {
 	gd::Object obj1("1");

@@ -5,7 +5,7 @@ Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "LightObstacleBehavior.h"
 #include "LightObject.h"
@@ -173,7 +173,7 @@ public:
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", _("Object"), "Light")
-            
+
             .SetFunctionName("IsGlobalLight").SetIncludeFile("Light/LightObject.h");
 
         obj.AddExpression("Intensity", _("Intensity"), _("Intensity"), _("Setup"), "CppPlatform/Extensions/lightIcon16.png")

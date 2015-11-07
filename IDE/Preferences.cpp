@@ -22,8 +22,8 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
-#include "GDCore/IDE/InstructionSentenceFormatter.h"
-#include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "LogFileManager.h"
 #include <wx/listctrl.h>
 #include "GDCpp/IDE/CodeCompiler.h"

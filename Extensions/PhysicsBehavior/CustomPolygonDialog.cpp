@@ -24,7 +24,7 @@ This project is released under the MIT License.*/
 #include <wx/numdlg.h>
 
 #include "GDCpp/CommonTools.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include <string>
 #include <cmath>
 
@@ -273,7 +273,7 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
     float yOffset = (previewPnlVerticalScroll->GetThumbPosition() - previewPnlVerticalScroll->GetRange()/2);
 
     //Draw background
-    dc.SetBrush(gd::CommonBitmapManager::Get()->transparentBg);
+    dc.SetBrush(gd::CommonBitmapProvider::Get()->transparentBg);
     dc.DrawRectangle(0,0, panelSize.GetWidth(), panelSize.GetHeight());
 
     //Draw Collision Polygon
@@ -325,7 +325,7 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
     }
 
     //Draw origin
-    wxBitmap point(gd::CommonBitmapManager::Get()->point);
+    wxBitmap point(gd::CommonBitmapProvider::Get()->point);
     dc.DrawBitmap(point,
                   (0-point.GetWidth()/2)    -xOffset,
                   (0-point.GetHeight()/2)   -yOffset,

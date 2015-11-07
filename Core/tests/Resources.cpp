@@ -11,10 +11,10 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/SystemStats.h"
 #include "GDCore/Tools/VersionWrapper.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/SpriteObject.h"
-#include "GDCore/IDE/ProjectResourcesAdder.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
+#include "GDCore/IDE/Project/ProjectResourcesAdder.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Serialization/Serializer.h"
 
 class ArbitraryResourceWorkerTest : public gd::ArbitraryResourceWorker

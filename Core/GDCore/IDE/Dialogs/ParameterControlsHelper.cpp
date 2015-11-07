@@ -10,8 +10,8 @@
 #include <algorithm>
 #include <iostream>
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
-#include "GDCore/IDE/InstructionSentenceFormatter.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
+#include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #include "ParameterControlsHelper.h"
 class wxCheckBox;
 class wxPanel;
@@ -70,7 +70,7 @@ void ParameterControlsHelper::UpdateControls(std::size_t count)
         paramSpacers1.push_back(new wxPanel(window));
         paramSpacers2.push_back(new wxPanel(window));
         paramEdits.push_back(new wxTextCtrl( window, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "EditPara" + num ));
-        paramBmpBts.push_back(new wxBitmapButton( window, id, gd::CommonBitmapManager::Get()->expressionBt, wxDefaultPosition, wxSize(32,-1), wxBU_AUTODRAW, wxDefaultValidator, num));
+        paramBmpBts.push_back(new wxBitmapButton( window, id, gd::CommonBitmapProvider::Get()->expressionBt, wxDefaultPosition, wxSize(32,-1), wxBU_AUTODRAW, wxDefaultValidator, num));
         paramBmpBts.back()->SetMinSize(wxSize(32, 32));
 
         //Connecting events

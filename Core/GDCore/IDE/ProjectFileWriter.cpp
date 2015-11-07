@@ -9,7 +9,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/Splitter.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/String.h"

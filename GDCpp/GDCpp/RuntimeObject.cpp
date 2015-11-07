@@ -5,10 +5,10 @@
  */
 #include <cstring>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/BuiltinExtensions/MathematicalTools.h"
+#include "GDCpp/Extensions/Builtin/MathematicalTools.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Object.h"
-#include "GDCpp/Behavior.h"
+#include "GDCpp/Project/Object.h"
+#include "GDCpp/Project/Behavior.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/PolygonCollision.h"

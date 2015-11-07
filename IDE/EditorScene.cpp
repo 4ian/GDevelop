@@ -22,7 +22,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
 
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "GDCore/IDE/SkinHelper.h"
@@ -34,8 +34,8 @@
 #include "EventsEditor.h"
 #include "Dialogs/LayoutEditorPropertiesPnl.h"
 
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Project.h"
 
 //(*IdInit(EditorScene)
 const long EditorScene::ID_SCROLLBAR3 = wxNewId();

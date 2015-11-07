@@ -8,15 +8,15 @@
  */
 #include "catch.hpp"
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/ClassWithObjects.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/SpriteObject.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/Animation.h"
+#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Object.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Animation.h"
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/RuntimeObject.h"
-#include "GDCpp/ObjectsListsTools.h"
+#include "GDCpp/RuntimeObjectsListsTools.h"
 #include "GDCpp/RuntimeSpriteObject.h"
 
 TEST_CASE( "RuntimeSpriteObject", "[game-engine]" ) {

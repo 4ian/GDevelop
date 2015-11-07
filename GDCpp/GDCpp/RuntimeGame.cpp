@@ -3,7 +3,7 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/RuntimeVariablesContainer.h"
 #include <vector>

@@ -11,7 +11,7 @@
 //*)
 #include <wx/settings.h>
 #include <wx/treectrl.h>
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/IDE/SkinHelper.h"
 #include "../ProjectManager.h"
 

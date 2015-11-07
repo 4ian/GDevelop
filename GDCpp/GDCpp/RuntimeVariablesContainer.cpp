@@ -5,9 +5,9 @@
  */
 #include <iostream>
 #include <string>
-#include "GDCore/PlatformDefinition/Variable.h"
+#include "GDCore/Project/Variable.h"
 #include "GDCore/TinyXml/tinyxml.h"
-#include "GDCore/PlatformDefinition/VariablesContainer.h"
+#include "GDCore/Project/VariablesContainer.h"
 #include "GDCpp/RuntimeVariablesContainer.h"
 
 BadVariable RuntimeVariablesContainer::badVariable;

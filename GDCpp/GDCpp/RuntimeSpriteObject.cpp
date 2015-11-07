@@ -9,29 +9,29 @@
 #endif
 #include "RuntimeSpriteObject.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/SpriteObject.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/Animation.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/Direction.h"
-#include "GDCpp/Project.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Animation.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Direction.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/RuntimeLayer.h"
 #include "GDCpp/ImageManager.h"
-#include "GDCpp/tinyxml/tinyxml.h"
-#include "GDCpp/Position.h"
+#include "GDCpp/TinyXml/tinyxml.h"
+#include "GDCpp/Project/InitialInstance.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/RuntimeScene.h"
 #include <SFML/Graphics.hpp>
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/Dialogs/SpriteObjectEditor.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.h"
 #endif
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/BuiltinExtensions/SpriteExtension/SpriteObject.cpp"
-#include "GDCore/BuiltinExtensions/SpriteExtension/Animation.cpp"
-#include "GDCore/BuiltinExtensions/SpriteExtension/Direction.cpp"
-#include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.cpp"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.cpp"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Animation.cpp"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Direction.cpp"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.cpp"
 #endif
 
 gd::Animation RuntimeSpriteObject::badAnimation;

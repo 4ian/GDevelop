@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef SCENEPATHDATAS_H
 #define SCENEPATHDATAS_H
 
-#include "GDCpp/BehaviorsSharedData.h"
+#include "GDCpp/Project/BehaviorsSharedData.h"
 #include "GDCpp/String.h"
 #include "RuntimeScenePathDatas.h"
 #include <SFML/System/Vector2.hpp>

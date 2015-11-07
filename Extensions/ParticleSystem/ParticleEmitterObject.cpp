@@ -11,15 +11,15 @@ This project is released under the MIT License.
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/RuntimeGame.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/FontManager.h"
-#include "GDCpp/Position.h"
+#include "GDCpp/Project/InitialInstance.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/CommonTools.h"
 #include "ParticleEmitterObject.h"
@@ -29,7 +29,7 @@ This project is released under the MIT License.
 
 #if defined(GD_IDE_ONLY)
 #include "GDCpp/CommonTools.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "ParticleEmitterObjectEditor.h"
 #endif

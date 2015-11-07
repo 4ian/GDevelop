@@ -17,9 +17,9 @@
 #include <wx/msgdlg.h>
 #include <wx/config.h>
 #include "GDCore/CommonTools.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Object.h"
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Object.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCore/IDE/Dialogs/ParameterControlsHelper.h"
 
 //Editors:

@@ -12,9 +12,9 @@ This project is released under the MIT License.
 #include <vector>
 #include <algorithm>
 
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Variable.h"
+#include "GDCpp/Project/Variable.h"
 
 //Windows build uses native windows-dialogs
 #if defined(WINDOWS)

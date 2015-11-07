@@ -7,7 +7,7 @@ This project is released under the MIT License.
 #include <SFML/Graphics.hpp>
 #include "GDCpp/RuntimeScene.h"
 #include "GDCpp/RuntimeGame.h"
-#include "GDCpp/Project.h"
+#include "GDCpp/Project/Project.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/CommonTools.h"
 #include "PrimitiveDrawingTools.h"

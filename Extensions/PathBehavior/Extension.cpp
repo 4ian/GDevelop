@@ -9,7 +9,7 @@ This project is released under the MIT License.
  * Victor Levasseur ( Created Path behavior editor and enhanced extension )
  */
 
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "PathBehavior.h"
 #include "ScenePathDatas.h"

@@ -11,7 +11,7 @@ This project is released under the MIT License.
 #include <vector>
 
 #include "GDCpp/CommonTools.h"
-#include "GDCpp/tinyxml/tinyxml.h"
+#include "GDCpp/TinyXml/tinyxml.h"
 
 namespace AdvancedXML
 {

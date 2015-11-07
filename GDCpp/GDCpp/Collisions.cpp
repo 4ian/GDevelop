@@ -4,8 +4,8 @@
  * This project is released under the MIT License.
  */
 #include <SFML/Graphics.hpp>
-#include "GDCore/BuiltinExtensions/SpriteExtension/Sprite.h"
-#include "GDCore/PlatformDefinition/ImageManager.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.h"
+#include "GDCore/Project/ImageManager.h"
 #include "GDCpp/RuntimeSpriteObject.h"
 #include "GDCpp/Collisions.h"
 

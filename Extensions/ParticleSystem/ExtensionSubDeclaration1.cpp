@@ -5,7 +5,7 @@ Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/ExtensionBase.h"
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
 #include "Extension.h"
 #include "ParticleEmitterObject.h"
@@ -259,7 +259,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-        
+
         .SetFunctionName("GetFriction").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
 

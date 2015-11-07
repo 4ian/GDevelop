@@ -8,8 +8,8 @@ This project is released under the MIT License.
 #ifndef PHYSICBEHAVIOR_H
 #define PHYSICBEHAVIOR_H
 
-#include "GDCpp/Behavior.h"
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Behavior.h"
+#include "GDCpp/Project/Object.h"
 #include "SFML/Config.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <map>

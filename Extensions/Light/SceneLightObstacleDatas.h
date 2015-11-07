@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef SCENELIGHTOBSTACLEPHYSICSDATAS_H
 #define SCENELIGHTOBSTACLEPHYSICSDATAS_H
 
-#include "GDCpp/BehaviorsSharedData.h"
+#include "GDCpp/Project/BehaviorsSharedData.h"
 #include "RuntimeSceneLightObstacleDatas.h"
 
 /**

@@ -10,12 +10,12 @@ This project is released under the MIT License.
 #include "Dialogs/TextObjectEditor.h" //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/FontManager.h"
-#include "GDCpp/Position.h"
+#include "GDCpp/Project/InitialInstance.h"
 #include "GDCpp/Polygon2d.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/Serialization/SerializerElement.h"
@@ -23,7 +23,7 @@ This project is released under the MIT License.
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/AbstractFileSystem.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 namespace gd { class MainFrameWrapper; }
 #endif
 

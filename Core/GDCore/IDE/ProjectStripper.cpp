@@ -3,9 +3,9 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/ExternalEvents.h"
-#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/ExternalEvents.h"
+#include "GDCore/Project/Layout.h"
 #include "ProjectStripper.h"
 
 namespace gd

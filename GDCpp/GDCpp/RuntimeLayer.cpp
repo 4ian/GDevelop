@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include "RuntimeLayer.h"
-#include "GDCpp/Layer.h"
+#include "GDCpp/Project/Layer.h"
 #include <SFML/Graphics.hpp>
 
 RuntimeLayer::RuntimeLayer(gd::Layer & layer, const sf::View & defaultView) :

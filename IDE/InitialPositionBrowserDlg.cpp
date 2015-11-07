@@ -10,8 +10,8 @@
 #include <wx/string.h>
 //*)
 #include <wx/imaglist.h>
-#include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
-#include "GDCore/PlatformDefinition/InitialInstance.h"
+#include "GDCore/Project/InitialInstancesContainer.h"
+#include "GDCore/Project/InitialInstance.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/CommonTools.h"
 

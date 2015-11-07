@@ -10,12 +10,12 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/SystemStats.h"
 #include "GDCore/Tools/VersionWrapper.h"
-#include "GDCore/PlatformDefinition/Project.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Variable.h"
-#include "GDCore/IDE/ResourcesMergingHelper.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Variable.h"
+#include "GDCore/IDE/Project/ResourcesMergingHelper.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
-#include "GDCore/BuiltinExtensions/SpriteExtension/SpriteObject.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 
 class MockFileSystem : public gd::AbstractFileSystem
 {

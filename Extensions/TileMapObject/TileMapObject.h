@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #ifndef TILEMAPOBJECT_H
 #define TILEMAPOBJECT_H
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/RuntimeObject.h"
 #include "GDCpp/Polygon2d.h"
 #include <memory>

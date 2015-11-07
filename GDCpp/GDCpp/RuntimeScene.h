@@ -6,7 +6,7 @@
 #ifndef RUNTIMESCENE_H
 #define RUNTIMESCENE_H
 
-#include "GDCpp/Scene.h" //This include must be placed first
+#include "GDCpp/Project/Layout.h" //This include must be placed first
 #include "GDCpp/RuntimeVariablesContainer.h"
 #include <vector>
 #include <string>

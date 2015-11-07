@@ -15,8 +15,8 @@
 #include <wx/mimetype.h>
 #include <wx/config.h>
 #include "GDCore/IDE/SkinHelper.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include <wx/fontdlg.h>
 

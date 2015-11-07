@@ -8,17 +8,17 @@
 #include "WhileEvent.h"
 #if !defined(GD_NO_WX_GUI)
 #include <wx/msgdlg.h>
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #endif
 #include "GDCore/TinyXml/tinyxml.h"
-#include "GDCore/Events/EventsCodeGenerator.h"
-#include "GDCore/Events/ExpressionsCodeGeneration.h"
-#include "GDCore/IDE/EventsRenderingHelper.h"
-#include "GDCore/IDE/EventsEditorItemsAreas.h"
-#include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
+#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Events/Serialization.h"
-#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 
 using namespace std;
 
@@ -102,8 +102,8 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsE
     //Draw icon if infinite loop warning is deactivated.
     if (!infiniteLoopWarning)
     {
-        if ( gd::CommonBitmapManager::Get()->noProtection.IsOk() )
-            dc.DrawBitmap(gd::CommonBitmapManager::Get()->noProtection, wxPoint(x+5,y+5+18), /*useMask=*/true);
+        if ( gd::CommonBitmapProvider::Get()->noProtection.IsOk() )
+            dc.DrawBitmap(gd::CommonBitmapProvider::Get()->noProtection, wxPoint(x+5,y+5+18), /*useMask=*/true);
     }
 
     //Draw "while conditions"

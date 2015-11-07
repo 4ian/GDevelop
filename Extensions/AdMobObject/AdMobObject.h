@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef ADMOBOBJECT_H
 #define ADMOBOBJECT_H
 
-#include "GDCpp/Object.h"
+#include "GDCpp/Project/Object.h"
 #include "GDCpp/String.h"
 namespace gd { class InitialInstance; }
 namespace gd { class Project; }

@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "DestroyOutsideBehavior.h"
-#include "GDCpp/Scene.h"
+#include "GDCpp/Project/Layout.h"
 #include "GDCpp/RuntimeLayer.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/RuntimeScene.h"

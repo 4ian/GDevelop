@@ -10,7 +10,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/CommonTools.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCpp/IDE/CompilerMessagesParser.h"

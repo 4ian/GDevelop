@@ -33,7 +33,8 @@
 #include "EventsEditor.h"
 #include "Dialogs/LayersEditorPanel.h"
 #include "Dialogs/LayoutEditorPropertiesPnl.h"
-#include "ExternalEditorManager.h"
+
+#include "GDCore/IDE/Dialogs/ExternalEditor/ExternalEditor.h"
 
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Project.h"
@@ -164,7 +165,21 @@ mainFrameWrapper(mainFrameWrapper_)
 
     m_mgr.Update();
 
-    LaunchExternalEventsEditor(project, layout);
+    //TODO: Temporary test
+    externalEventsEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
+    externalEventsEditor->Launch();
+
+    gd::SerializerElement serializedProject;
+    project.SerializeTo(serializedProject);
+
+    gd::SerializerElement serializedLayout;
+    layout.SerializeTo(serializedLayout);
+
+    externalEventsEditor->Send(serializedProject);
+    externalEventsEditor->OnReceive([this](gd::SerializerElement object) {
+        std::cout << "Updating events from the external editor." << std::endl;
+        this->layout.GetEvents().UnserializeFrom(this->project, object);
+    });
 }
 
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)

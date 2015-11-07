@@ -27,6 +27,7 @@ namespace gd {class Project;}
 namespace gd {class LayoutEditorCanvas;}
 namespace gd {class ObjectsEditor;}
 class LayersEditorPanel;
+namespace gd {class ExternalEditor;}
 class CppLayoutPreviewer;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;
@@ -114,6 +115,8 @@ private:
     gd::Project & project;
     gd::Layout & layout;
     gd::MainFrameWrapper mainFrameWrapper;
+
+    std::shared_ptr<gd::ExternalEditor> externalEventsEditor;
 
     wxAuiManager m_mgr;
 

@@ -72,6 +72,10 @@
      "m_label": "Style:",
      "m_value": ""
     }, {
+     "type": "bool",
+     "m_label": "Enable Window Persistency:",
+     "m_value": true
+    }, {
      "type": "string",
      "m_label": "Title:",
      "m_value": "TileMap Object Editor"
@@ -278,6 +282,10 @@
          "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
          "m_properties": [{
            "type": "string",
+           "m_label": "Minimum Size:",
+           "m_value": "-1,-1"
+          }, {
+           "type": "string",
            "m_label": "Name:",
            "m_value": "flexGridSizer5"
           }, {
@@ -383,7 +391,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/options16.png"
+               "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/options16.png"
               }, {
                "type": "filePicker",
                "m_label": "Disabled-Bitmap File",
@@ -438,7 +446,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "../../Binaries/Output/Release_Windows/res/maskEdit16.png"
+               "m_path": "../../../../Binaries/Output/Release_Windows/res/maskEdit16.png"
               }, {
                "type": "filePicker",
                "m_label": "Disabled-Bitmap File",
@@ -634,6 +642,10 @@
          "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
          "m_properties": [{
            "type": "string",
+           "m_label": "Minimum Size:",
+           "m_value": "-1,-1"
+          }, {
+           "type": "string",
            "m_label": "Name:",
            "m_value": "flexGridSizer200"
           }, {
@@ -675,6 +687,10 @@
            "m_styles": [],
            "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
            "m_properties": [{
+             "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
              "type": "string",
              "m_label": "Name:",
              "m_value": "flexGridSizer490"
@@ -781,7 +797,7 @@
                 }, {
                  "type": "bitmapPicker",
                  "m_label": "Bitmap File:",
-                 "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/edit16.png"
+                 "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/edit16.png"
                 }, {
                  "type": "filePicker",
                  "m_label": "Disabled-Bitmap File",
@@ -836,7 +852,7 @@
                 }, {
                  "type": "bitmapPicker",
                  "m_label": "Bitmap File:",
-                 "m_path": "../../Binaries/Output/Release_Windows/res/conditions/rectangle.png"
+                 "m_path": "../../../../Binaries/Output/Release_Windows/res/conditions/rectangle.png"
                 }, {
                  "type": "filePicker",
                  "m_label": "Disabled-Bitmap File",
@@ -891,7 +907,7 @@
                 }, {
                  "type": "bitmapPicker",
                  "m_label": "Bitmap File:",
-                 "m_path": "../../Binaries/Output/Release_Windows/res/fill16.png"
+                 "m_path": "../../../../Binaries/Output/Release_Windows/res/fill16.png"
                 }, {
                  "type": "filePicker",
                  "m_label": "Disabled-Bitmap File",
@@ -946,7 +962,7 @@
                 }, {
                  "type": "bitmapPicker",
                  "m_label": "Bitmap File:",
-                 "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/delete16.png"
+                 "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/delete16.png"
                 }, {
                  "type": "filePicker",
                  "m_label": "Disabled-Bitmap File",
@@ -1021,7 +1037,7 @@
                 }, {
                  "type": "bitmapPicker",
                  "m_label": "Bitmap File:",
-                 "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/undo16.png"
+                 "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/undo16.png"
                 }, {
                  "type": "filePicker",
                  "m_label": "Disabled-Bitmap File",
@@ -1076,7 +1092,7 @@
                 }, {
                  "type": "bitmapPicker",
                  "m_label": "Bitmap File:",
-                 "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/redo16.png"
+                 "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/redo16.png"
                 }, {
                  "type": "filePicker",
                  "m_label": "Disabled-Bitmap File",
@@ -1194,7 +1210,7 @@
                 }, {
                  "type": "bitmapPicker",
                  "m_label": "Bitmap File:",
-                 "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/options16.png"
+                 "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/options16.png"
                 }, {
                  "type": "filePicker",
                  "m_label": "Disabled-Bitmap File",
@@ -1469,7 +1485,7 @@
                 }, {
                  "type": "bitmapPicker",
                  "m_label": "Bitmap File:",
-                 "m_path": "../../Binaries/Output/Release_Windows/res/eye.png"
+                 "m_path": "../../../../Binaries/Output/Release_Windows/res/eye.png"
                 }, {
                  "type": "filePicker",
                  "m_label": "Disabled-Bitmap File",
@@ -1504,6 +1520,10 @@
            "m_styles": [],
            "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
            "m_properties": [{
+             "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
              "type": "string",
              "m_label": "Name:",
              "m_value": "flexGridSizer7"
@@ -1698,6 +1718,10 @@
            "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
            "m_properties": [{
              "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
              "m_label": "Name:",
              "m_value": "flexGridSizer452"
             }, {
@@ -1797,7 +1821,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/help16.png"
+               "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/help16.png"
               }],
              "m_events": [],
              "m_children": []
@@ -2098,6 +2122,10 @@
      "m_label": "Style:",
      "m_value": ""
     }, {
+     "type": "bool",
+     "m_label": "Enable Window Persistency:",
+     "m_value": true
+    }, {
      "type": "string",
      "m_label": "Title:",
      "m_value": "Tileset configuration"
@@ -2297,6 +2325,10 @@
          "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
          "m_properties": [{
            "type": "string",
+           "m_label": "Minimum Size:",
+           "m_value": "-1,-1"
+          }, {
+           "type": "string",
            "m_label": "Name:",
            "m_value": "flexGridSizer2671"
           }, {
@@ -2489,6 +2521,10 @@
            "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
            "m_properties": [{
              "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
              "m_label": "Name:",
              "m_value": "flexGridSizer2692"
             }, {
@@ -2605,6 +2641,10 @@
              "m_styles": [],
              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
              "m_properties": [{
+               "type": "string",
+               "m_label": "Minimum Size:",
+               "m_value": "-1,-1"
+              }, {
                "type": "string",
                "m_label": "Name:",
                "m_value": "flexGridSizer295"
@@ -2799,7 +2839,7 @@
                 }, {
                  "type": "bitmapPicker",
                  "m_label": "Bitmap File:",
-                 "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/image16.png"
+                 "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/image16.png"
                 }, {
                  "type": "bool",
                  "m_label": "Default Button",
@@ -2899,6 +2939,10 @@
              "m_styles": [],
              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
              "m_properties": [{
+               "type": "string",
+               "m_label": "Minimum Size:",
+               "m_value": "-1,-1"
+              }, {
                "type": "string",
                "m_label": "Name:",
                "m_value": "flexGridSizer303"
@@ -3339,6 +3383,10 @@
              "m_styles": [],
              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
              "m_properties": [{
+               "type": "string",
+               "m_label": "Minimum Size:",
+               "m_value": "-1,-1"
+              }, {
                "type": "string",
                "m_label": "Name:",
                "m_value": "flexGridSizer317"
@@ -3856,6 +3904,10 @@
            "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
            "m_properties": [{
              "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
              "m_label": "Name:",
              "m_value": "flexGridSizer468"
             }, {
@@ -3955,7 +4007,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/help16.png"
+               "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/help16.png"
               }],
              "m_events": [],
              "m_children": []
@@ -4256,6 +4308,10 @@
      "m_label": "Style:",
      "m_value": ""
     }, {
+     "type": "bool",
+     "m_label": "Enable Window Persistency:",
+     "m_value": true
+    }, {
      "type": "string",
      "m_label": "Title:",
      "m_value": "Tilemap size configuration"
@@ -4312,6 +4368,10 @@
      "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
      "m_properties": [{
        "type": "string",
+       "m_label": "Minimum Size:",
+       "m_value": "-1,-1"
+      }, {
+       "type": "string",
        "m_label": "Name:",
        "m_value": "flexGridSizer367"
       }, {
@@ -4353,6 +4413,10 @@
        "m_styles": [],
        "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
        "m_properties": [{
+         "type": "string",
+         "m_label": "Minimum Size:",
+         "m_value": "-1,-1"
+        }, {
          "type": "string",
          "m_label": "Name:",
          "m_value": "flexGridSizer369"
@@ -4470,6 +4534,10 @@
          "m_styles": [],
          "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
          "m_properties": [{
+           "type": "string",
+           "m_label": "Minimum Size:",
+           "m_value": "-1,-1"
+          }, {
            "type": "string",
            "m_label": "Name:",
            "m_value": "flexGridSizer380"
@@ -4823,6 +4891,10 @@
        "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
        "m_properties": [{
          "type": "string",
+         "m_label": "Minimum Size:",
+         "m_value": "-1,-1"
+        }, {
+         "type": "string",
          "m_label": "Name:",
          "m_value": "flexGridSizer474"
         }, {
@@ -4922,7 +4994,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/help16.png"
+           "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/help16.png"
           }],
          "m_events": [],
          "m_children": []
@@ -5257,6 +5329,10 @@
      "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
      "m_properties": [{
        "type": "string",
+       "m_label": "Minimum Size:",
+       "m_value": "-1,-1"
+      }, {
+       "type": "string",
        "m_label": "Name:",
        "m_value": "flexGridSizer398"
       }, {
@@ -5298,6 +5374,10 @@
        "m_styles": [],
        "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
        "m_properties": [{
+         "type": "string",
+         "m_label": "Minimum Size:",
+         "m_value": "-1,-1"
+        }, {
          "type": "string",
          "m_label": "Name:",
          "m_value": "flexGridSizer416"
@@ -5404,7 +5484,7 @@
             }, {
              "type": "bitmapPicker",
              "m_label": "Bitmap File:",
-             "m_path": "../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png"
+             "m_path": "../../../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png"
             }, {
              "type": "filePicker",
              "m_label": "Disabled-Bitmap File",
@@ -5459,7 +5539,7 @@
             }, {
              "type": "bitmapPicker",
              "m_label": "Bitmap File:",
-             "m_path": "../../Binaries/Output/Release_Windows/res/tilemasktrianglebr16.png"
+             "m_path": "../../../../Binaries/Output/Release_Windows/res/tilemasktrianglebr16.png"
             }, {
              "type": "filePicker",
              "m_label": "Disabled-Bitmap File",
@@ -5577,7 +5657,7 @@
             }, {
              "type": "bitmapPicker",
              "m_label": "Bitmap File:",
-             "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/add16.png"
+             "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/add16.png"
             }, {
              "type": "filePicker",
              "m_label": "Disabled-Bitmap File",
@@ -5632,7 +5712,7 @@
             }, {
              "type": "bitmapPicker",
              "m_label": "Bitmap File:",
-             "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/edit16.png"
+             "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/edit16.png"
             }, {
              "type": "filePicker",
              "m_label": "Disabled-Bitmap File",
@@ -5687,7 +5767,7 @@
             }, {
              "type": "bitmapPicker",
              "m_label": "Bitmap File:",
-             "m_path": "../../Binaries/Output/Release_Windows/res/icons_default/remove16.png"
+             "m_path": "../../../../Binaries/Output/Release_Windows/res/icons_default/remove16.png"
             }, {
              "type": "filePicker",
              "m_label": "Disabled-Bitmap File",

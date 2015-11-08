@@ -31,9 +31,9 @@ void TileMapImporterDialog::OnImportButtonClicked(wxCommandEvent& event)
 
         //TODO: Check the checkboxes :) !
         if(!importer.ImportTileMap(m_tilemap))
+        {
             m_okBt->Disable();
-
-        //TODO: Add a boolean to see if an error happened and prohibit the user from using the "Ok" button in this case !
+        }
 
         m_problemsTextCtrl->SetValue(errorStr);
     }

@@ -32,6 +32,7 @@ This project is released under the MIT License.
 #include "TileMapConfigurationEditor.h"
 #include "TileEditor.h"
 #include "TileMapObjectEditorCommands.h"
+#include "TileMapImporterDialog.h"
 
 TileMapObjectEditor::TileMapObjectEditor( wxWindow* parent, gd::Project & game_, TileMapObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 TileMapObjectEditorBase(parent),
@@ -215,6 +216,19 @@ void TileMapObjectEditor::OnRedoToolClicked(wxCommandEvent& event)
 void TileMapObjectEditor::OnUndoToolClicked(wxCommandEvent& event)
 {
     m_tileMapPanel->Undo();
+}
+
+void TileMapObjectEditor::OnTmxImportButtonClicked(wxCommandEvent& event)
+{
+    TileMapImporterDialog dialog(this, tileSet, tileMap);
+
+    if(dialog.ShowModal() == 1)
+    {
+        tileSet = dialog.GetTileSet();
+        tileMap = dialog.GetTileMap();
+
+        m_tileMapPanel->Update();
+    }
 }
 
 #endif

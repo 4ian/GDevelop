@@ -34,6 +34,7 @@ else()
 		IDE/Dialogs/TileMapObjectEditorCommands.cpp
 		IDE/Dialogs/TileSetConfigurationEditor.cpp
 		IDE/Dialogs/TileMapConfigurationEditor.cpp
+		IDE/Dialogs/TileMapImporterDialog.cpp
 		IDE/Dialogs/TileEditor.cpp
 		IDE/Dialogs/TileSetPanel.cpp
 		IDE/Dialogs/TileMapPanel.cpp

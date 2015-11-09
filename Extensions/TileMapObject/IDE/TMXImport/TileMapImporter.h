@@ -7,13 +7,16 @@
 #include "tmx-parser/TmxMap.h"
 
 class TileMap;
+class TileSet;
 
 class TileMapImporter
 {
 public:
     TileMapImporter(const wxString &filePath, wxString &errorOutput);
 
-    bool ImportTileMap(TileMap &tileMap);
+    bool ImportTileMap(TileSet &tileSet, TileMap &tileMap,
+        bool importTileMap, bool importTileSetConf, bool importTileSetImage,
+        bool importHitboxes);
 
 private:
     std::unique_ptr<Tmx::Map> m_map;

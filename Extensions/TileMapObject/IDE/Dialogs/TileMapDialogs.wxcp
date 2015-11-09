@@ -6724,7 +6724,7 @@
           }, {
            "type": "multi-string",
            "m_label": "Choices:",
-           "m_value": "Import the tileset;Import the tilemap;Import the collision masks"
+           "m_value": "Import the tilemap;Import the tileset configuration;Import the tileset image;Import the collision masks"
           }],
          "m_events": [],
          "m_children": []

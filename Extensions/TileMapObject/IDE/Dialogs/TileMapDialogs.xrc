@@ -965,8 +965,9 @@
             <object class="wxCheckListBox" name="m_importOptionsCheckList">
               <style>wxLB_SINGLE</style>
               <content>
-                <item checked="0">Import the tileset</item>
                 <item checked="0">Import the tilemap</item>
+                <item checked="0">Import the tileset configuration</item>
+                <item checked="0">Import the tileset image</item>
                 <item checked="0">Import the collision masks</item>
               </content>
             </object>

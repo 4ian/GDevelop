@@ -731,8 +731,9 @@ TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowI
     flexGridSizer531->Add(m_staticText553, 0, wxALL, 5);
     
     wxArrayString m_importOptionsCheckListArr;
-    m_importOptionsCheckListArr.Add(_("Import the tileset"));
     m_importOptionsCheckListArr.Add(_("Import the tilemap"));
+    m_importOptionsCheckListArr.Add(_("Import the tileset configuration"));
+    m_importOptionsCheckListArr.Add(_("Import the tileset image"));
     m_importOptionsCheckListArr.Add(_("Import the collision masks"));
     m_importOptionsCheckList = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), m_importOptionsCheckListArr, wxLB_SINGLE);
     

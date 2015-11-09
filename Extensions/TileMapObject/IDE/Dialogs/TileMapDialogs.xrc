@@ -1008,6 +1008,12 @@
             <border>5</border>
             <object class="wxTextCtrl" name="m_problemsTextCtrl">
               <style>wxTE_READONLY|wxTE_MULTILINE</style>
+              <font>
+                <sysfont>wxSYS_ANSI_FIXED_FONT</sysfont>
+                <style>normal</style>
+                <weight>normal</weight>
+                <underlined>0</underlined>
+              </font>
             </object>
           </object>
         </object>

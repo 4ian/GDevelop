@@ -754,6 +754,15 @@ TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowI
     flexGridSizer531->Add(m_staticText567, 0, wxALL, 5);
     
     m_problemsTextCtrl = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), wxTE_READONLY|wxTE_MULTILINE);
+    #ifdef __WXMSW__
+    // To get the newer version of the font on MSW, we use font wxSYS_DEFAULT_GUI_FONT with family set to wxFONTFAMILY_TELETYPE
+    wxFont m_problemsTextCtrlFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_problemsTextCtrlFont.SetFamily(wxFONTFAMILY_TELETYPE);
+    #else
+    wxFont m_problemsTextCtrlFont = wxSystemSettings::GetFont(wxSYS_ANSI_FIXED_FONT);
+    m_problemsTextCtrlFont.SetFamily(wxFONTFAMILY_TELETYPE);
+    #endif
+    m_problemsTextCtrl->SetFont(m_problemsTextCtrlFont);
     
     flexGridSizer531->Add(m_problemsTextCtrl, 0, wxALL|wxEXPAND, 5);
     

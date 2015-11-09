@@ -7012,7 +7012,7 @@
           }, {
            "type": "font",
            "m_label": "Font:",
-           "m_value": ""
+           "m_value": "wxSYS_ANSI_FIXED_FONT,normal,normal,normal"
           }, {
            "type": "bool",
            "m_label": "Hidden",

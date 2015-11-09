@@ -18,7 +18,11 @@ TileMapImporterDialog::~TileMapImporterDialog()
 
 void TileMapImporterDialog::OnBrowserBtClicked(wxCommandEvent& event)
 {
+    wxFileDialog openFileDialog(this, _("Import .tmx file"), "", "", "Tiled file (*.tmx)|*.tmx", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+    if (openFileDialog.ShowModal() == wxID_CANCEL)
+        return;
 
+    m_fileTextCtrl->SetValue(openFileDialog.GetPath());
 }
 
 void TileMapImporterDialog::OnImportButtonClicked(wxCommandEvent& event)
@@ -30,7 +34,7 @@ void TileMapImporterDialog::OnImportButtonClicked(wxCommandEvent& event)
         TileMapImporter importer(m_fileTextCtrl->GetValue(), errorStr);
 
         //TODO: Check the checkboxes :) !
-        if(!importer.ImportTileMap(m_tilemap))
+        if(m_importOptionsCheckList->IsChecked(1) && !importer.ImportTileMap(m_tilemap))
         {
             m_okBt->Disable();
         }

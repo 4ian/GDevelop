@@ -62,7 +62,7 @@ bool TileMapImporter::ImportTileMap(TileMap &tileMap)
         }
     }
 
-    WriteToErrOutput(_("-> No fatal errors in tilemap importation"));
+    WriteToErrOutput(_("> No fatal errors in tilemap importation"));
     return true;
 }
 

@@ -1986,7 +1986,7 @@
               }, {
                "type": "string",
                "m_label": "Label:",
-               "m_value": "Import from .tmx files (Tiled) ..."
+               "m_value": "Import .tmx files (experimental)..."
               }, {
                "type": "bool",
                "m_label": "Default Button",

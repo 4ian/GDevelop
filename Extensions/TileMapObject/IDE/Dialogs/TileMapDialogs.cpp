@@ -162,7 +162,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer452->Add(m_hyperLink454, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     
-    m_button524 = new wxButton(m_mainPanel, wxID_ANY, _("Import from .tmx files (Tiled) ..."), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_button524 = new wxButton(m_mainPanel, wxID_ANY, _("Import .tmx files (experimental)..."), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer452->Add(m_button524, 0, wxALL, 5);
     

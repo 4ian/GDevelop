@@ -296,7 +296,7 @@
                   <flag>wxALL</flag>
                   <border>5</border>
                   <object class="wxButton" name="m_button524">
-                    <label>Import from .tmx files (Tiled) ...</label>
+                    <label>Import .tmx files (experimental)...</label>
                     <style/>
                     <bitmapposition>wxLEFT</bitmapposition>
                     <default>0</default>

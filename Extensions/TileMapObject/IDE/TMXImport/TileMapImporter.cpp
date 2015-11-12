@@ -186,31 +186,35 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
                         hasMoreThanOneObjectPerTile = true;
 
                     const Tmx::Object *importedObj = importedTile->GetObject(0);
-                    if(importedObj->GetPolygon() == nullptr &&
-                        importedObj->GetPolyline() == nullptr &&
-                        importedObj->GetEllipse() == nullptr)
+                    if(!importedObj->GetPolyline() && !importedObj->GetEllipse())
                     {
-                        //This is a rectangle
-                        tileHitbox.hitbox = Polygon2d::CreateRectangle(importedObj->GetWidth(), importedObj->GetHeight());
-                        tileHitbox.hitbox.Move(
-                            importedObj->GetX() + importedObj->GetWidth()/2.f,
-                            importedObj->GetY() + importedObj->GetHeight()/2.f
-                        );
-                    }
-                    else if(importedObj->GetPolygon())
-                    {
-                        //This is a polygon
-                        const Tmx::Polygon *importedPolygon = importedObj->GetPolygon();
                         Polygon2d polygonHitbox;
 
-                        for(int i = 0; i < importedPolygon->GetNumPoints(); i++)
+                        if(!importedObj->GetPolygon())
                         {
-                            polygonHitbox.vertices.push_back(sf::Vector2f(
-                                importedPolygon->GetPoint(i).x,
-                                importedPolygon->GetPoint(i).y
-                            ));
+                            //This is a rectangle
+                            polygonHitbox = Polygon2d::CreateRectangle(importedObj->GetWidth(), importedObj->GetHeight());
+                            polygonHitbox.Move(
+                                importedObj->GetWidth() / 2.f,
+                                importedObj->GetHeight() / 2.f
+                            );
                         }
+                        else
+                        {
+                            //This is a polygon
+                            const Tmx::Polygon *importedPolygon = importedObj->GetPolygon();
+
+                            for(int i = 0; i < importedPolygon->GetNumPoints(); i++)
+                            {
+                                polygonHitbox.vertices.push_back(sf::Vector2f(
+                                    importedPolygon->GetPoint(i).x,
+                                    importedPolygon->GetPoint(i).y
+                                ));
+                            }
+                        }
+
                         polygonHitbox.Move(importedObj->GetX(), importedObj->GetY());
+                        polygonHitbox.Rotate(importedObj->GetRot());
 
                         if(polygonHitbox.IsConvex())
                             tileHitbox.hitbox = polygonHitbox;
@@ -231,7 +235,7 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
         if(hasNotPolygoneObject)
             WriteToErrOutput(_("WARNING: Some tiles have a polyline or a ellipsis hitbox. Only rectangle and polygon hitboxes are supported."));
         if(hasNotConvexPolygon)
-            WriteToErrOutput(_("WARNING: Some tiles have a concave polygon. It has been ignored and set to a rectangular hitbox."));
+            WriteToErrOutput(_("WARNING: Some tiles have a concave polygon. It has been ignored and set to a rectangular hitbox as this object only supports convex hitboxes for tiles."));
     }
 
     WriteToErrOutput(_("> No fatal errors in importation"));

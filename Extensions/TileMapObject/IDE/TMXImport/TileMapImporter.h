@@ -22,6 +22,8 @@ private:
     std::unique_ptr<Tmx::Map> m_map;
     wxString &m_errorOutput;
 
+    void CheckTilesCount(const TileSet &tileSet);
+
     void WriteToErrOutput(const wxString &msg);
 };
 

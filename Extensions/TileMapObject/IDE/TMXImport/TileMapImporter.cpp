@@ -77,7 +77,7 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
 
         if(importedTileset->GetMargin() > 0)
         {
-            WriteToErrOutput(_("WARNING: Tilemap objects don't handle tileset with margins around the images. Consider cutting the picture."));
+            WriteToErrOutput(_("WARNING: Tilemap objects don't handle tilesets with margins around the images. Consider cutting the picture."));
         }
     }
 
@@ -92,21 +92,8 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
         tileMap.SetSize(0, 0);
         tileMap.SetSize(m_map->GetWidth(), m_map->GetHeight());
 
-        //Warn the user if there are not same amount of tiles in the current tileset and the imported file
-        //note: if the tileset has been imported too, the number of tiles should already be equal.
-        if(!importTileSetConf)
-        {
-            const Tmx::Tileset *importedTileset = m_map->GetTileset(0);
-            const Tmx::Image *importedImage = importedTileset->GetImage();
-            const int importedTilesCount =
-                (importedImage->GetWidth() - importedTileset->GetMargin() * 2 + importedTileset->GetSpacing()) / (importedTileset->GetTileWidth() + importedTileset->GetSpacing()) *
-                (importedImage->GetHeight() - importedTileset->GetMargin() * 2 + importedTileset->GetSpacing()) / (importedTileset->GetTileHeight() + importedTileset->GetSpacing());
-
-            if(importedTilesCount != tileSet.GetTilesCount())
-            {
-                WriteToErrOutput(_("WARNING: There are not the same amount of tiles in the object's tileset than in the file. The result may not be correct."));
-            }
-        }
+        if(!importTileSetConf && !importTileSetImage)
+            CheckTilesCount(tileSet);
 
         //Import layers and tiles
         if(m_map->GetNumTileLayers() > 3)
@@ -148,30 +135,17 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
             tileSet.SetTileCollidable(i, false);
         tileSet.ResetHitboxes();
 
-        //Warn the user if there are not same amount of tiles in the current tileset and the imported file
-        //note: if the tileset has been imported too, the number of tiles should already be equal.
-        {
-            if(!importTileSetConf)
-            {
-                const Tmx::Tileset *importedTileset = m_map->GetTileset(0);
-                const Tmx::Image *importedImage = importedTileset->GetImage();
-                const int importedTilesCount =
-                    (importedImage->GetWidth() - importedTileset->GetMargin() * 2 + importedTileset->GetSpacing()) / (importedTileset->GetTileWidth() + importedTileset->GetSpacing()) *
-                    (importedImage->GetHeight() - importedTileset->GetMargin() * 2 + importedTileset->GetSpacing()) / (importedTileset->GetTileHeight() + importedTileset->GetSpacing());
-
-                if(importedTilesCount != tileSet.GetTilesCount())
-                {
-                    WriteToErrOutput(_("WARNING: There are not the same amount of tiles in the object's tileset than in the file. The result may not be correct."));
-                }
-            }
-        }
+        if(!importTileSetConf && !importTileSetImage)
+            CheckTilesCount(tileSet);
 
         bool hasMoreThanOneObjectPerTile = false;
         bool hasNotPolygoneObject = false;
         bool hasNotConvexPolygon = false;
-        for(std::size_t i = 0; i < importedTileset->GetTiles().size(); i++)
+        for(auto it = importedTileset->GetTiles().cbegin();
+            it != importedTileset->GetTiles().cend();
+            ++it)
         {
-            const Tmx::Tile *importedTile = importedTileset->GetTiles().at(i);
+            const Tmx::Tile *importedTile = *it;
 
             if(importedTile->GetId() < tileSet.GetTilesCount()) //Check if the tileset has enough tiles to receive the imported hitboxes
             {
@@ -206,10 +180,10 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
 
                             for(int i = 0; i < importedPolygon->GetNumPoints(); i++)
                             {
-                                polygonHitbox.vertices.push_back(sf::Vector2f(
+                                polygonHitbox.vertices.emplace_back(
                                     importedPolygon->GetPoint(i).x,
                                     importedPolygon->GetPoint(i).y
-                                ));
+                                );
                             }
                         }
 
@@ -240,6 +214,22 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
 
     WriteToErrOutput(_("> No fatal errors in importation"));
     return true;
+}
+
+void TileMapImporter::CheckTilesCount(const TileSet &tileSet)
+{
+    //Warn the user if there are not same amount of tiles in the current tileset and the imported file
+    //note: if the tileset has been imported too, the number of tiles should already be equal.
+    const Tmx::Tileset *importedTileset = m_map->GetTileset(0);
+    const Tmx::Image *importedImage = importedTileset->GetImage();
+    const int importedTilesCount =
+        (importedImage->GetWidth() - importedTileset->GetMargin() * 2 + importedTileset->GetSpacing()) / (importedTileset->GetTileWidth() + importedTileset->GetSpacing()) *
+        (importedImage->GetHeight() - importedTileset->GetMargin() * 2 + importedTileset->GetSpacing()) / (importedTileset->GetTileHeight() + importedTileset->GetSpacing());
+
+    if(importedTilesCount != tileSet.GetTilesCount())
+    {
+        WriteToErrOutput(_("WARNING: There are not as many tiles in the object's tileset as in the file. The result may not be correct."));
+    }
 }
 
 void TileMapImporter::WriteToErrOutput(const wxString &msg)

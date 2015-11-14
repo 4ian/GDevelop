@@ -22,6 +22,16 @@ public:
 	ExternalEditor() :
 		externalEditorPid(0)
 	{
+		editorBridge.OnReceive([this](gd::String cmd, gd::SerializerElement object) {
+			if (cmd == "update")
+			{
+				if (onUpdateReceivedCb) onUpdateReceivedCb(object);
+			}
+			else if (cmd == "requestUpdate")
+				SendUpdate();
+			else
+				std::cout << "Received message with unknown command: \"" << cmd << "\"" << std::endl;
+		});
 	}
 
 	~ExternalEditor()
@@ -30,21 +40,31 @@ public:
 			wxProcess::Kill(externalEditorPid);
 	}
 
+	void OnUpdateReceived(std::function<void(SerializerElement object)> cb)
+	{
+		onUpdateReceivedCb = cb;
+	}
+
+	void OnSendUpdate(std::function<SerializerElement()> cb)
+	{
+		onSendUpdate = cb;
+	}
+
 	bool Launch();
 
-	bool Send(const SerializerElement & object)
-	{
-		return editorBridge.Send(object);
-	}
-
-	void OnReceive(std::function<void(SerializerElement object)> cb)
-	{
-		editorBridge.OnReceive(cb);
-	}
-
 private:
+
+	bool SendUpdate()
+	{
+		if (!onSendUpdate) return false;
+
+		return editorBridge.Send("update", onSendUpdate());
+	}
+
 	ExternalEditorBridge editorBridge;
 	int externalEditorPid;
+	std::function<void(SerializerElement object)> onUpdateReceivedCb;
+	std::function<SerializerElement()> onSendUpdate;
 };
 
 }

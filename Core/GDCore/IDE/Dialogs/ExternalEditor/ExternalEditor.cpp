@@ -36,6 +36,7 @@ bool ExternalEditor::Launch()
         return false;
     }
 
+    SendUpdate();
     return true;
 }
 

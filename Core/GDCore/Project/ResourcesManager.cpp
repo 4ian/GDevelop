@@ -520,6 +520,7 @@ void ResourceFolder::UnserializeFrom(const SerializerElement & element, gd::Reso
 {
     name = element.GetStringAttribute("name");
 
+    resources.clear();
     SerializerElement & resourcesElement = element.GetChild("resources", 0, "Resources");
     resourcesElement.ConsiderAsArrayOf("resource", "Resource");
     for(std::size_t i = 0;i<resourcesElement.GetChildrenCount();++i)
@@ -542,6 +543,7 @@ void ResourceFolder::SerializeTo(SerializerElement & element) const
 
 void ResourcesManager::UnserializeFrom(const SerializerElement & element)
 {
+    resources.clear();
     const SerializerElement & resourcesElement = element.GetChild("resources", 0, "Resources");
     resourcesElement.ConsiderAsArrayOf("resource", "Resource");
     for(std::size_t i = 0;i<resourcesElement.GetChildrenCount();++i)
@@ -558,6 +560,7 @@ void ResourcesManager::UnserializeFrom(const SerializerElement & element)
     }
 
     #if defined(GD_IDE_ONLY)
+    folders.clear();
     const SerializerElement & resourcesFoldersElement = element.GetChild("resourceFolders", 0, "ResourceFolders");
     resourcesFoldersElement.ConsiderAsArrayOf("folder", "Folder");
     for(std::size_t i = 0;i<resourcesFoldersElement.GetChildrenCount();++i)

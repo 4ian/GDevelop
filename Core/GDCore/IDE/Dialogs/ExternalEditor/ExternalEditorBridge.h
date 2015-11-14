@@ -53,9 +53,13 @@ public:
 		return port;
 	}
 
-	bool Send(const gd::SerializerElement & object)
+	bool Send(const gd::String & cmd, const gd::SerializerElement & payloadObject)
 	{
 		sf::Lock lock(outMessagesMutex);
+
+		gd::SerializerElement object;
+		object.AddChild("command").SetValue(cmd);
+		object.AddChild("payload") = payloadObject;
 
 	    std::string message = gd::Serializer::ToJSON(object).ToLocale(); //TODO: UTF8?
 	    outMessages.push(message);
@@ -63,7 +67,7 @@ public:
 		return true;
 	}
 
-	void OnReceive(std::function<void(gd::SerializerElement object)> cb)
+	void OnReceive(std::function<void(gd::String cmd, gd::SerializerElement object)> cb)
 	{
 		onReceiveCb = cb;
 	}
@@ -80,7 +84,11 @@ private:
 			std::cout << "Message passed to the main thread." << message << std::endl;
 		    gd::SerializerElement object =
 		    	gd::Serializer::FromJSON(message);
-			if (onReceiveCb) onReceiveCb(object);
+			if (onReceiveCb)
+			{
+				onReceiveCb(object.GetChild("command").GetValue().GetString(),
+					object.GetChild("payload"));
+			}
 	    }
 	}
 
@@ -133,7 +141,11 @@ private:
 				    sf::Socket::Status status = client.receive(buffer, sizeof(buffer), received);
 				    if (status == sf::Socket::Done)
 				    {
-				    	data += buffer;
+				    	std::string str = "";
+				    	str.append(buffer, received);
+					    std::cout << "RECEIVED: " << str << std::endl << "END RECEIVED" << std::endl;
+
+				    	data.append(buffer, received);
 				    	if (received == 0 || buffer[received - 1] == '\0') {
 							sf::Lock lock(inMessagesMutex);
 					    	std::cout << "Server received a message from " << client.getRemotePort() << std::endl;
@@ -190,7 +202,7 @@ private:
 	bool connected;
 	sf::TcpListener serverListener;
 	std::shared_ptr<sf::Thread> serverThread;
-	std::function<void(gd::SerializerElement object)> onReceiveCb;
+	std::function<void(gd::String cmd, gd::SerializerElement object)> onReceiveCb;
 };
 
 }

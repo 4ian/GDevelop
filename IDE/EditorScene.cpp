@@ -167,19 +167,24 @@ mainFrameWrapper(mainFrameWrapper_)
 
     //TODO: Temporary test
     externalEventsEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
-    externalEventsEditor->Launch();
+    externalEventsEditor->OnSendUpdate([this]() {
+        gd::SerializerElement serializedProject;
+        project.SerializeTo(serializedProject);
 
-    gd::SerializerElement serializedProject;
-    project.SerializeTo(serializedProject);
+        /*gd::SerializerElement serializedEvents;
+        layout->GetEvents().SerializeTo(serializedEvents);
 
-    gd::SerializerElement serializedLayout;
-    layout.SerializeTo(serializedLayout);
+        gd::SerializerElement element;
+        element.AddChild("project") = serializedProject;
+        element.AddChild("events") = serializedEvents;*/
 
-    externalEventsEditor->Send(serializedProject);
-    externalEventsEditor->OnReceive([this](gd::SerializerElement object) {
+        return serializedProject;
+    });
+    externalEventsEditor->OnUpdateReceived([this](gd::SerializerElement object) {
         std::cout << "Updating events from the external editor." << std::endl;
         this->layout.GetEvents().UnserializeFrom(this->project, object);
     });
+    externalEventsEditor->Launch();
 }
 
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)

@@ -648,6 +648,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
     GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
+    scenes.clear();
     const SerializerElement & layoutsElement = element.GetChild("layouts", 0, "Scenes");
     layoutsElement.ConsiderAsArrayOf("layout", "Scene");
     for(std::size_t i = 0;i<layoutsElement.GetChildrenCount();++i)
@@ -670,6 +671,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     }
 
     #if defined(GD_IDE_ONLY)
+    externalEvents.clear();
     const SerializerElement & externalEventsElement = element.GetChild("externalEvents", 0, "ExternalEvents");
     externalEventsElement.ConsiderAsArrayOf("externalEvents", "ExternalEvents");
     for(std::size_t i = 0;i<externalEventsElement.GetChildrenCount();++i)
@@ -682,6 +684,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     }
     #endif
 
+    externalLayouts.clear();
     const SerializerElement & externalLayoutsElement = element.GetChild("externalLayouts", 0, "ExternalLayouts");
     externalLayoutsElement.ConsiderAsArrayOf("externalLayout", "ExternalLayout");
     for(std::size_t i = 0;i<externalLayoutsElement.GetChildrenCount();++i)
@@ -693,6 +696,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     }
 
     #if defined(GD_IDE_ONLY)
+    externalSourceFiles.clear();
     const SerializerElement & externalSourceFilesElement = element.GetChild("externalSourceFiles", 0, "ExternalSourceFiles");
     externalSourceFilesElement.ConsiderAsArrayOf("sourceFile", "SourceFile");
     for(std::size_t i = 0;i<externalSourceFilesElement.GetChildrenCount();++i)

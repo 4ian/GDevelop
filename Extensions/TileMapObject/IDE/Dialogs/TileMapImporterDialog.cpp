@@ -1,13 +1,15 @@
 #include "TileMapImporterDialog.h"
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "IDE/TMXImport/TileMapImporter.h"
 #include "TileSet.h"
 #include "TileMap.h"
 
-TileMapImporterDialog::TileMapImporterDialog(wxWindow* parent, TileSet tileset, TileMap tilemap)
+TileMapImporterDialog::TileMapImporterDialog(wxWindow* parent, TileSet tileset, TileMap tilemap, gd::ResourcesManager &resManager)
     : TileMapImporterDialogBase(parent),
     m_tileset(tileset),
-    m_tilemap(tilemap)
+    m_tilemap(tilemap),
+    m_resManager(resManager)
 {
     m_okBt->Disable();
 }
@@ -38,7 +40,8 @@ void TileMapImporterDialog::OnImportButtonClicked(wxCommandEvent& event)
             m_importOptionsCheckList->IsChecked(0),
             m_importOptionsCheckList->IsChecked(1),
             m_importOptionsCheckList->IsChecked(2),
-            m_importOptionsCheckList->IsChecked(3)))
+            m_importOptionsCheckList->IsChecked(3),
+            m_resManager))
         {
             m_okBt->Disable();
         }
@@ -61,3 +64,5 @@ void TileMapImporterDialog::OnCancelBtClicked(wxCommandEvent& event)
 {
     EndModal(0);
 }
+
+#endif

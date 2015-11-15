@@ -1,6 +1,8 @@
 #ifndef TILEMAPIMPORTER_H
 #define TILEMAPIMPORTER_H
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
 #include <memory>
 #include <wx/string.h>
 
@@ -8,6 +10,10 @@
 
 class TileMap;
 class TileSet;
+namespace gd
+{
+    class ResourcesManager;
+}
 
 class TileMapImporter
 {
@@ -16,9 +22,10 @@ public:
 
     bool ImportTileMap(TileSet &tileSet, TileMap &tileMap,
         bool importTileMap, bool importTileSetConf, bool importTileSetImage,
-        bool importHitboxes);
+        bool importHitboxes, gd::ResourcesManager &resManager);
 
 private:
+    wxString m_filePath;
     std::unique_ptr<Tmx::Map> m_map;
     wxString &m_errorOutput;
 
@@ -27,4 +34,5 @@ private:
     void WriteToErrOutput(const wxString &msg);
 };
 
+#endif
 #endif

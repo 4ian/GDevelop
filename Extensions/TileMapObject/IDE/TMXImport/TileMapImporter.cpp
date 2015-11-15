@@ -1,7 +1,10 @@
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
 #include "TileMapImporter.h"
 
 #include <stdexcept>
 
+#include <wx/filename.h>
 #include "GDCore/Tools/Localization.h"
 #include "TileSet.h"
 #include "TileMap.h"
@@ -15,7 +18,8 @@
 #include "tmx-parser/TmxTile.h"
 
 TileMapImporter::TileMapImporter(const wxString &filePath, wxString &errorOutput)
- : m_map(new Tmx::Map()),
+ : m_filePath(filePath),
+   m_map(new Tmx::Map()),
    m_errorOutput(errorOutput)
 {
     errorOutput = "";
@@ -29,7 +33,7 @@ TileMapImporter::TileMapImporter(const wxString &filePath, wxString &errorOutput
 
 bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
     bool importTileMap, bool importTileSetConf, bool importTileSetImage,
-    bool importHitboxes)
+    bool importHitboxes, gd::ResourcesManager &resManager)
 {
 
     //Checks the map type
@@ -54,7 +58,28 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
     if(importTileSetImage)
     {
         WriteToErrOutput(_("\nTileset image importation report : \n=================================="));
-        //TODO: Write it!
+
+        const Tmx::Image *importedImage = m_map->GetTileset(0)->GetImage();
+        wxFileName imageFileName(importedImage->GetSource());
+        imageFileName.MakeAbsolute(wxFileName(m_filePath).GetPath());
+
+        if(!imageFileName.FileExists())
+        {
+            WriteToErrOutput(_("ERROR: The image can't be found !"));
+            return false;
+        }
+
+        gd::String newResourceName = u8"imported_" + imageFileName.GetFullName();
+        std::size_t increment = 0;
+        while(resManager.HasResource(newResourceName))
+        {
+            increment++;
+            newResourceName = u8"imported" + gd::String::From(increment) + "_" + imageFileName.GetName() + u8"." + imageFileName.GetExt();
+        }
+
+        resManager.AddResource(newResourceName, imageFileName.GetFullPath(wxPATH_UNIX));
+
+        tileSet.textureName = newResourceName;
     }
 
     //Import the tileset configuration if wanted
@@ -236,3 +261,5 @@ void TileMapImporter::WriteToErrOutput(const wxString &msg)
 {
     m_errorOutput += msg + "\n";
 }
+
+#endif

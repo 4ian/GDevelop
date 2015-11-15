@@ -8,6 +8,7 @@ gd_add_extension_includes()
 #Defines
 ###
 gd_add_extension_definitions(TileMapObject)
+add_definitions(-DUSE_MINIZ)
 
 #The targets
 ###

@@ -220,7 +220,7 @@ void TileMapObjectEditor::OnUndoToolClicked(wxCommandEvent& event)
 
 void TileMapObjectEditor::OnTmxImportButtonClicked(wxCommandEvent& event)
 {
-    TileMapImporterDialog dialog(this, tileSet, tileMap);
+    TileMapImporterDialog dialog(this, tileSet, tileMap, game.GetResourcesManager());
 
     if(dialog.ShowModal() == 1)
     {

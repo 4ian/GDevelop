@@ -89,7 +89,7 @@ gdjs.evtTools.storage.elementExistsInJSONFile = function(filename, element) {
 	for (var i =0;i<elemArray.length;++i) {
 
 		if ( !currentElem[elemArray[i]] ) {
-			if ( !notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
+			if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
 			return false;
 		}
 
@@ -112,7 +112,7 @@ gdjs.evtTools.storage.deleteElementFromJSONFile = function(filename, element) {
 	for (var i =0;i<elemArray.length;++i) {
 
 		if ( !currentElem[elemArray[i]] ) {
-			if ( !notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
+			if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
 			return false;
 		}
 
@@ -184,7 +184,7 @@ gdjs.evtTools.storage.readNumberFromJSONFile = function(filename, element, runti
 	for (var i =0;i<elemArray.length;++i) {
 
 		if ( !currentElem[elemArray[i]] ) {
-			if ( !notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
+			if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
 			return false;
 		}
 
@@ -210,7 +210,7 @@ gdjs.evtTools.storage.readStringFromJSONFile = function(filename, element, runti
 	for (var i =0;i<elemArray.length;++i) {
 
 		if ( !currentElem[elemArray[i]] ) {
-			if ( !notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
+			if ( notPermanentlyLoaded ) gdjs.evtTools.storage.unloadJSONFile(filename);
 			return false;
 		}
 

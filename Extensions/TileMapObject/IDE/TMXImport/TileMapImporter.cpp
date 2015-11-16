@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include <wx/filename.h>
+#include "GDCore/IDE/NewNameGenerator.h"
 #include "GDCore/Tools/Localization.h"
 #include "TileSet.h"
 #include "TileMap.h"
@@ -69,13 +70,12 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
             return false;
         }
 
-        gd::String newResourceName = u8"imported_" + imageFileName.GetFullName();
-        std::size_t increment = 0;
-        while(resManager.HasResource(newResourceName))
-        {
-            increment++;
-            newResourceName = u8"imported" + gd::String::From(increment) + "_" + imageFileName.GetName() + u8"." + imageFileName.GetExt();
-        }
+        gd::String newResourceName = gd::NewNameGenerator::Generate(
+            u8"imported_" + imageFileName.GetFullName(),
+            [&resManager](const gd::String &name) -> bool { return resManager.HasResource(name); }
+            );
+
+        WriteToErrOutput(_("NOTE: The image is imported as ") + "\"" + newResourceName + "\".");
 
         resManager.AddResource(newResourceName, imageFileName.GetFullPath(wxPATH_UNIX));
 

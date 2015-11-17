@@ -32,19 +32,6 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
             new StretchedSprite(new PIXI.Texture(texture)), //Bottom
             new PIXI.Sprite(texture)  //Bottom-Right
         ];
-        this._borderMasks = [
-            new PIXI.Graphics(), //Top-Right
-            new PIXI.Graphics(), //Top-Left
-            new PIXI.Graphics(), //Bottom-Left
-            new PIXI.Graphics()  //Bottom-Right
-        ];
-    }
-
-    for (var i = 0;i < this._borderSprites.length;++i) {
-
-        if (i % 2 !== 0) {
-            this._borderSprites[i].mask = this._borderMasks[(i - 1) / 2];
-        }
     }
 
     this._rBorder = objectData.rightMargin;
@@ -60,9 +47,6 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
     this._spritesContainer.addChild(this._centerSprite);
     for (var i = 0;i < this._borderSprites.length;++i) {
         this._spritesContainer.addChild(this._borderSprites[i]);
-    }
-    for (var i = 0;i < this._borderMasks.length;++i) {
-        this._spritesContainer.addChild(this._borderMasks[i]);
     }
     runtimeScene.getLayer("").addChildToPIXIContainer(this._spritesContainer, this.zOrder);
 };
@@ -105,28 +89,24 @@ gdjs.PanelSpriteRuntimeObject.prototype._updateSpritePositions = function() {
 
     this._borderSprites[1].position.x = this._width - this._borderSprites[1].width  - extraPixels * 2;
     this._borderSprites[1].position.y = 0;
-    this._borderMasks[0].position = this._borderSprites[1].position;
 
     this._borderSprites[2].position.x = this._lBorder;
     this._borderSprites[2].position.y = 0;
 
     this._borderSprites[3].position.x = 0;
     this._borderSprites[3].position.y = 0;
-    this._borderMasks[1].position = this._borderSprites[3].position;
 
     this._borderSprites[4].position.x = 0;
     this._borderSprites[4].position.y = this._tBorder;
 
     this._borderSprites[5].position.x = 0;
     this._borderSprites[5].position.y = this._height - this._borderSprites[5].height  - extraPixels * 2;
-    this._borderMasks[2].position = this._borderSprites[5].position;
 
     this._borderSprites[6].position.x = this._lBorder;
     this._borderSprites[6].position.y = this._height - this._bBorder  - extraPixels * 2;
 
     this._borderSprites[7].position.x = this._width - this._borderSprites[7].width  - extraPixels * 2;
     this._borderSprites[7].position.y = this._height - this._borderSprites[7].height - extraPixels * 2;
-    this._borderMasks[3].position = this._borderSprites[7].position;
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype._updateSpritesAndTexturesSize = function() {
@@ -146,21 +126,6 @@ gdjs.PanelSpriteRuntimeObject.prototype._updateSpritesAndTexturesSize = function
 
     this._borderSprites[6].height = this._bBorder;
     this._borderSprites[6].width = Math.max(this._width - this._rBorder - this._lBorder, 0);
-
-    //Corners masks:
-    for (var i = 0;i < this._borderMasks.length;++i) {
-        this._borderMasks[i].clear();
-        this._borderMasks[i].beginFill(0xFFFFFF,0);
-    }
-
-    this._borderMasks[0].drawRect(this._borderSprites[1].width - this._rBorder, 0, this._rBorder, this._tBorder);
-    this._borderMasks[1].drawRect(0, 0, this._lBorder, this._tBorder);
-    this._borderMasks[2].drawRect(0, this._borderSprites[5].height - this._bBorder, this._lBorder, this._bBorder);
-    this._borderMasks[3].drawRect(this._borderSprites[7].width - this._rBorder, this._borderSprites[7].height - this._bBorder, this._rBorder, this._bBorder);
-
-    for (var i = 0;i < this._borderMasks.length;++i) {
-        this._borderMasks[i].endFill();
-    }
 
     this._wasRendered = true;
     this._spritesContainer.cacheAsBitmap = false;
@@ -209,11 +174,15 @@ gdjs.PanelSpriteRuntimeObject.prototype.setTexture = function(textureName, runti
         makeInsideTexture(new PIXI.Rectangle(this._lBorder, texture.height - this._bBorder - 1,
         texture.width - this._lBorder - this._rBorder, this._bBorder + 1)));
 
-    //Corners:
-    this._borderSprites[1].texture = texture;
-    this._borderSprites[3].texture = texture;
-    this._borderSprites[5].texture = texture;
-    this._borderSprites[7].texture = texture;
+
+    this._borderSprites[1].texture = new PIXI.Texture(texture,
+        makeInsideTexture(new PIXI.Rectangle(this._borderSprites[1].width - this._rBorder, 0, this._rBorder, this._tBorder)));
+    this._borderSprites[3].texture = new PIXI.Texture(texture,
+        makeInsideTexture(new PIXI.Rectangle(0, 0, this._lBorder, this._tBorder)));
+    this._borderSprites[5].texture = new PIXI.Texture(texture,
+        makeInsideTexture(new PIXI.Rectangle(0, this._borderSprites[5].height - this._bBorder, this._lBorder, this._bBorder)));
+    this._borderSprites[7].texture = new PIXI.Texture(texture,
+        makeInsideTexture(new PIXI.Rectangle(this._borderSprites[7].width - this._rBorder, this._borderSprites[7].height - this._bBorder, this._rBorder, this._bBorder)));
 
     this._updateSpritesAndTexturesSize();
     this._updateSpritePositions();

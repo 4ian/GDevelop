@@ -44,7 +44,7 @@ public:
      * Ask the resources editor to add the resources contained into \a filenames.
      * \return A vector containing the name of the added resources.
      */
-    std::vector<gd::String> AddResources(const std::vector<gd::String> & filenames);
+    std::vector<gd::String> AddResources(const std::vector<gd::String> & filenames, const gd::String & kind);
 
     /**
      * Ask the resources editor to add the resources contained into \a filenames.
@@ -52,7 +52,7 @@ public:
      * (which is relative to the project directory) before being added to the project.
      * \return A vector containing the name of the added resources.
      */
-    std::vector<gd::String> CopyAndAddResources(std::vector<gd::String> filenames, const gd::String & destinationDir);
+    std::vector<gd::String> CopyAndAddResources(std::vector<gd::String> filenames, const gd::String & destinationDir, const gd::String & kind);
 
     /**
      * \brief Called by DndTextResourcesEditor when one or more resources from the editor has been dropped

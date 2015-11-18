@@ -363,14 +363,15 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
         for ( std::size_t i = 0; i < files.GetCount();++i )
             filenames.push_back(files[i]);
 
-        AddResources(filenames);
+        AddResources(filenames, "image");
 
         gd::LogStatus( _( "Resources successfully added" ) );
     }
 
 }
 
-std::vector<gd::String> ResourcesEditor::CopyAndAddResources(std::vector<gd::String> filenames, const gd::String & destinationDirStr)
+std::vector<gd::String> ResourcesEditor::CopyAndAddResources(std::vector<gd::String> filenames,
+    const gd::String & destinationDirStr, const gd::String & kind)
 {
     if ( !project.GetProjectFile().empty() ) //If game is not saved, we keep absolute filenames and do not copy resources.
     {
@@ -392,10 +393,10 @@ std::vector<gd::String> ResourcesEditor::CopyAndAddResources(std::vector<gd::Str
         }
     }
 
-    return AddResources(filenames);
+    return AddResources(filenames, kind);
 }
 
-std::vector<gd::String> ResourcesEditor::AddResources(const std::vector<gd::String> & filenames)
+std::vector<gd::String> ResourcesEditor::AddResources(const std::vector<gd::String> & filenames, const gd::String & kind)
 {
     std::vector<gd::String> resourceNames;
     gd::String alreadyExistingResources;
@@ -423,7 +424,7 @@ std::vector<gd::String> ResourcesEditor::AddResources(const std::vector<gd::Stri
         gd::LogStatus( _( "Adding " ) + name );
 
         //Add to all images
-        if ( project.GetResourcesManager().AddResource(name, file.GetFullPath()) )
+        if ( project.GetResourcesManager().AddResource(name, file.GetFullPath(), kind) )
         {
             for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, name);
@@ -945,7 +946,7 @@ void ResourcesEditor::Refresh()
 void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
     std::vector<gd::String> unusedImages =
-        gd::ProjectResourcesAdder::GetAllUselessResources(project);
+        gd::ProjectResourcesAdder::GetAllUselessImages(project);
 
     //Construct corresponding wxArrayString with unused images
     wxArrayString imagesNotUsed;

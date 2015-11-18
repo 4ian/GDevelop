@@ -121,7 +121,7 @@ void TileSet::LoadResources(RuntimeGame &game)
 
 void TileSet::LoadResources(gd::Project &game)
 {
-    if(game.GetResourcesManager().HasResource(textureName))
+    try
     {
         gd::ImageResource & image = dynamic_cast<gd::ImageResource&>(game.GetResourcesManager().GetResource(textureName));
         //Load the resource into a wxBitmap (IDE only) and also get its SFMLTextureWrapper
@@ -144,7 +144,7 @@ void TileSet::LoadResources(gd::Project &game)
         //Readjust the m_collidable std::vector according to the number of tiles
         m_collidable.resize(GetTilesCount(), true);
     }
-    else
+    catch(...)
     {
         m_tilesetTexture = std::shared_ptr<SFMLTextureWrapper>();
     }

@@ -48,14 +48,16 @@ TEST_CASE( "Resources", "[common][resources]" ) {
     }
     SECTION("ArbitraryResourceWorker") {
         gd::Project project;
-        project.GetResourcesManager().AddResource("res1", "path/to/file1.png");
-        project.GetResourcesManager().AddResource("res2", "path/to/file2.png");
-        project.GetResourcesManager().AddResource("res3", "path/to/file3.png");
+        project.GetResourcesManager().AddResource("res1", "path/to/file1.png", "image");
+        project.GetResourcesManager().AddResource("res2", "path/to/file2.png", "image");
+        project.GetResourcesManager().AddResource("res3", "path/to/file3.png", "image");
+        project.GetResourcesManager().AddResource("res4", "path/to/file4.png", "audio");
         ArbitraryResourceWorkerTest worker;
 
         project.ExposeResources(worker);
-        REQUIRE(worker.files.size() == 3);
+        REQUIRE(worker.files.size() == 4);
         REQUIRE(std::find(worker.files.begin(), worker.files.end(), "path/to/file2.png") != worker.files.end());
+        REQUIRE(std::find(worker.files.begin(), worker.files.end(), "path/to/file4.png") != worker.files.end());
 
         SECTION("Object using a resource") {
             gd::SpriteObject obj("myObject");
@@ -71,21 +73,22 @@ TEST_CASE( "Resources", "[common][resources]" ) {
             worker.files.clear();
             worker.images.clear();
             project.ExposeResources(worker);
-            REQUIRE(worker.files.size() == 3);
+            REQUIRE(worker.files.size() == 4);
             REQUIRE(worker.images.size() == 1);
             REQUIRE(worker.images[0] == "res1");
 
             SECTION("ProjectResourcesAdder") {
                 std::vector<gd::String> uselessResources =
-                    gd::ProjectResourcesAdder::GetAllUselessResources(project);
+                    gd::ProjectResourcesAdder::GetAllUselessImages(project);
 
                 REQUIRE(uselessResources.size() == 2);
 
-                gd::ProjectResourcesAdder::RemoveAllUselessResources(project);
+                gd::ProjectResourcesAdder::RemoveAllUselessImages(project);
                 std::vector<gd::String> remainingResources =
                     project.GetResourcesManager().GetAllResourcesList();
-                REQUIRE(remainingResources.size() == 1);
+                REQUIRE(remainingResources.size() == 2);
                 REQUIRE(remainingResources[0] == "res1");
+                REQUIRE(remainingResources[1] == "res4");
             }
         }
     }

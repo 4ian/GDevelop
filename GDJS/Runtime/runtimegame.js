@@ -392,6 +392,8 @@ gdjs.RuntimeGame.prototype._resizeCanvas = function() {
 
 /**
  * Load all assets, displaying progress in renderer.
+ * TODO: This should be moved to ImageManager and take advantage of the load callback
+ * to store resources, and use it to load textures instead of fromImage.
  * @method loadAllAssets
  */
 gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {

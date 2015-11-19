@@ -187,7 +187,7 @@ int main( int argc, char *p_argv[] )
     while (sceneStack.Step() && !abort)
         ;
 
-    SoundManager::Get()->DestroySingleton();
+    runtimeGame.GetSoundManager().ClearAllSoundsAndMusics();
     FontManager::Get()->DestroySingleton();
 
     gd::CloseLibrary(codeLibrary);

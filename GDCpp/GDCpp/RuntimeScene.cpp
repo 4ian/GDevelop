@@ -120,7 +120,7 @@ bool RuntimeScene::RenderAndStep()
     ManageRenderTargetEvents();
     timeManager.Update(clock.restart().asMicroseconds(), game->GetMinimumFPS());
     ManageObjectsBeforeEvents();
-    SoundManager::Get()->ManageGarbage();
+    if (game) game->GetSoundManager().ManageGarbage();
 
     #if defined(GD_IDE_ONLY)
     if( GetProfiler() )
@@ -442,7 +442,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     }
 
     std::cout << ".";
-    if ( StopSoundsOnStartup() ) {SoundManager::Get()->ClearAllSoundsAndMusics(); }
+    if ( StopSoundsOnStartup() ) {game->GetSoundManager().ClearAllSoundsAndMusics(); }
     if ( renderWindow ) renderWindow->setTitle(GetWindowDefaultTitle());
 
     std::cout << " Done." << std::endl;

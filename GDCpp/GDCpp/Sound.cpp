@@ -27,10 +27,6 @@ volume(100)
     sound.setBuffer(buffer);
 }
 
-Sound::~Sound()
-{
-}
-
 Sound::Sound(const Sound & copy) :
     file(copy.file)
 {
@@ -38,18 +34,16 @@ Sound::Sound(const Sound & copy) :
     sound.setBuffer(buffer);
 }
 
-void Sound::SetVolume(float volume_)
+void Sound::SetVolume(float volume_, float globalVolume)
 {
     volume = volume_;
     if ( volume < 0 ) volume = 0;
     if ( volume > 100 ) volume = 100;
 
-    UpdateVolume();
+    UpdateVolume(globalVolume);
 }
 
-void Sound::UpdateVolume()
+void Sound::UpdateVolume(float globalVolume)
 {
-    SoundManager * soundManager = SoundManager::Get();
-
-    sound.setVolume(volume*soundManager->GetGlobalVolume()/100.f);
+    sound.setVolume(volume * globalVolume / 100.f);
 }

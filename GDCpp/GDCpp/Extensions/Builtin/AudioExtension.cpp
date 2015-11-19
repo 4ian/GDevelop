@@ -7,6 +7,8 @@
 #include <iostream>
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCpp/Extensions/Builtin/AudioExtension.h"
+#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/RuntimeGame.h"
 #include "GDCpp/SoundManager.h"
 #include "GDCpp/CommonTools.h"
 #if defined(GD_IDE_ONLY)
@@ -77,19 +79,21 @@ void AudioExtension::ExposeActionsResources(gd::Instruction & action, gd::Arbitr
 
 void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
+    SoundManager & manager = scene.game->GetSoundManager();
+
     if ( propertyNb == 0 )
     {
         name = _("Global volume:");
-        value = gd::String::From(SoundManager::Get()->GetGlobalVolume());
+        value = gd::String::From(manager.GetGlobalVolume());
     }
-    else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3 )
+    else if ( propertyNb < 1+manager.sounds.size()*3 )
     {
         std::size_t soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
-        if (soundNb >= SoundManager::Get()->sounds.size()) return;
+        if (soundNb >= manager.sounds.size()) return;
 
         if ( propertyNb % 3 == 1)
         {
-            sf::Sound::Status soundStatus = SoundManager::Get()->sounds[soundNb]->GetStatus();
+            sf::Sound::Status soundStatus = manager.sounds[soundNb]->GetStatus();
 
             if ( soundStatus == sf::Sound::Playing)
                 name = _("Sound played:");
@@ -98,29 +102,29 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, std::size_t pr
             else if ( soundStatus == sf::Sound::Paused)
                 name = _("Paused sound:");
 
-            value = SoundManager::Get()->sounds[soundNb]->file;
+            value = manager.sounds[soundNb]->file;
         }
         else if ( propertyNb % 3 == 2)
         {
             name = _(" -Volume/Pitch:");
-            value = gd::String::From(SoundManager::Get()->sounds[soundNb]->GetVolume())
-                    +"/"+gd::String::From(SoundManager::Get()->sounds[soundNb]->GetPitch());
+            value = gd::String::From(manager.sounds[soundNb]->GetVolume())
+                    +"/"+gd::String::From(manager.sounds[soundNb]->GetPitch());
         }
         else
         {
             name = _(" -Progress (seconds) :");
-            value = gd::String::From(SoundManager::Get()->sounds[soundNb]->GetPlayingOffset());
+            value = gd::String::From(manager.sounds[soundNb]->GetPlayingOffset());
         }
 
     }
-    else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3+SoundManager::Get()->musics.size()*3 )
+    else if ( propertyNb < 1+manager.sounds.size()*3+manager.musics.size()*3 )
     {
-        std::size_t musicNb = ((propertyNb-1-SoundManager::Get()->sounds.size()*3)-(propertyNb-1-SoundManager::Get()->sounds.size()*3)%3)/3;
-        if (musicNb >= SoundManager::Get()->musics.size()) return;
+        std::size_t musicNb = ((propertyNb-1-manager.sounds.size()*3)-(propertyNb-1-manager.sounds.size()*3)%3)/3;
+        if (musicNb >= manager.musics.size()) return;
 
         if ( propertyNb % 3 == 1)
         {
-            sf::Sound::Status soundStatus = SoundManager::Get()->musics[musicNb]->GetStatus();
+            sf::Sound::Status soundStatus = manager.musics[musicNb]->GetStatus();
 
             if ( soundStatus == sf::Sound::Playing)
                 name = _("Played music:");
@@ -129,33 +133,35 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, std::size_t pr
             else if ( soundStatus == sf::Sound::Paused)
                 name = _("Paused music:");
 
-            value = SoundManager::Get()->musics[musicNb]->file;
+            value = manager.musics[musicNb]->file;
         }
         else if ( propertyNb % 3 == 2)
         {
             name = _(" -Volume/Pitch:");
-            value = gd::String::From(SoundManager::Get()->musics[musicNb]->GetVolume())
-                    +"/"+gd::String::From(SoundManager::Get()->musics[musicNb]->GetPitch());
+            value = gd::String::From(manager.musics[musicNb]->GetVolume())
+                    +"/"+gd::String::From(manager.musics[musicNb]->GetPitch());
         }
         else
         {
             name = _(" -Progress (seconds) :");
-            value = gd::String::From(SoundManager::Get()->musics[musicNb]->GetPlayingOffset());
+            value = gd::String::From(manager.musics[musicNb]->GetPlayingOffset());
         }
     }
 }
 
 bool AudioExtension::ChangeProperty(RuntimeScene & scene, std::size_t propertyNb, gd::String newValue)
 {
+    SoundManager & manager = scene.game->GetSoundManager();
+
     if ( propertyNb == 0 )
     {
-        SoundManager::Get()->SetGlobalVolume(newValue.To<float>());
+        manager.SetGlobalVolume(newValue.To<float>());
         return true;
     }
-    else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3 )
+    else if ( propertyNb < 1+manager.sounds.size()*3 )
     {
         std::size_t soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
-        if (soundNb >= SoundManager::Get()->sounds.size()) return false;
+        if (soundNb >= manager.sounds.size()) return false;
 
         if ( propertyNb % 3 == 1)
         {
@@ -166,21 +172,21 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, std::size_t propertyNb
             std::vector<gd::String> values = newValue.Split(U'/');
             if ( values.size() < 2 ) return false;
 
-            SoundManager::Get()->sounds[soundNb]->SetVolume(values[0].To<int>());
-            SoundManager::Get()->sounds[soundNb]->SetPitch(values[1].To<float>());
+            manager.sounds[soundNb]->SetVolume(values[0].To<float>(), manager.GetGlobalVolume());
+            manager.sounds[soundNb]->SetPitch(values[1].To<float>());
             return true;
         }
         else
         {
-            SoundManager::Get()->sounds[soundNb]->SetPlayingOffset(newValue.To<float>());
+            manager.sounds[soundNb]->SetPlayingOffset(newValue.To<float>());
             return true;
         }
 
     }
-    else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3+SoundManager::Get()->musics.size()*3 )
+    else if ( propertyNb < 1+manager.sounds.size()*3+manager.musics.size()*3 )
     {
-        std::size_t musicNb = ((propertyNb-1-SoundManager::Get()->sounds.size()*3)-(propertyNb-1-SoundManager::Get()->sounds.size()*3)%3)/3;
-        if (musicNb >= SoundManager::Get()->musics.size()) return false;
+        std::size_t musicNb = ((propertyNb-1-manager.sounds.size()*3)-(propertyNb-1-manager.sounds.size()*3)%3)/3;
+        if (musicNb >= manager.musics.size()) return false;
 
         if ( propertyNb % 3 == 1)
         {
@@ -191,13 +197,13 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, std::size_t propertyNb
             std::vector<gd::String> values = newValue.Split(U'/');
             if ( values.size() < 2 ) return false;
 
-            SoundManager::Get()->musics[musicNb]->SetVolume(values[0].To<float>());
-            SoundManager::Get()->musics[musicNb]->SetPitch(values[1].To<float>());
+            manager.musics[musicNb]->SetVolume(values[0].To<float>(), manager.GetGlobalVolume());
+            manager.musics[musicNb]->SetPitch(values[1].To<float>());
             return true;
         }
         else
         {
-            SoundManager::Get()->musics[musicNb]->SetPlayingOffset(newValue.To<float>());
+            manager.musics[musicNb]->SetPlayingOffset(newValue.To<float>());
             return true;
         }
     }
@@ -208,7 +214,9 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, std::size_t propertyNb
 
 std::size_t AudioExtension::GetNumberOfProperties(RuntimeScene & scene) const
 {
-    return 1+SoundManager::Get()->musics.size()*3+SoundManager::Get()->sounds.size()*3;
+    SoundManager & manager = scene.game->GetSoundManager();
+
+    return 1+manager.musics.size()*3+manager.sounds.size()*3;
 }
 
 #endif

@@ -75,7 +75,7 @@ Project::Project() :
     dirty(false)
     #endif
 {
-    imageManager->SetGame(this);
+    imageManager->SetResourcesManager(&resourcesManager);
     #if defined(GD_IDE_ONLY)
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
@@ -1037,7 +1037,7 @@ void Project::Init(const gd::Project & game)
     //Resources
     resourcesManager = game.resourcesManager;
     imageManager = std::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
-    imageManager->SetGame(this);
+    imageManager->SetResourcesManager(&resourcesManager);
 
     GetObjects().clear();
     for (std::size_t i =0;i<game.GetObjects().size();++i)

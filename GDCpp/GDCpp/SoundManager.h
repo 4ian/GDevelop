@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#undef PlaySound //Avoid a nasty macro from polluting everything
 
 using namespace std;
 
@@ -27,8 +28,19 @@ using namespace std;
 class GD_API SoundManager
 {
 public:
+    SoundManager();
+    ~SoundManager() {};
+
     vector < std::shared_ptr<Music> >  musics;
     vector < std::shared_ptr<Sound> >  sounds;
+
+    void PlaySound(const gd::String & file, bool repeat, float volume, float pitch);
+
+    void PlayMusic(const gd::String & file, bool repeat, float volume, float pitch);
+
+    void PlaySoundOnChannel(const gd::String & file, unsigned int channel, bool repeat, float volume, float pitch);
+
+    void PlayMusicOnChannel(const gd::String & file, unsigned int channel, bool repeat, float volume, float pitch);
 
     /**
      * Return pointer to a music on a channel
@@ -54,17 +66,13 @@ public:
      * Get global game sound volume.
      * Example :
      * \code
-     * float currentVolume = SoundManager::Get()->GetGlobalVolume();
+     * float currentVolume = game.GetSoundManager().GetGlobalVolume();
      * \endcode
      */
     inline float GetGlobalVolume() const { return globalVolume; }
 
     /**
      * Change global game sound volume.
-     * Example :
-     * \code
-     * SoundManager::Get()->SetGlobalVolume(50);
-     * \endcode
      */
     void SetGlobalVolume(float volume);
 
@@ -84,35 +92,11 @@ public:
      */
     void ManageGarbage();
 
-    static SoundManager *Get()
-    {
-        if ( NULL == _singleton )
-        {
-            _singleton = new SoundManager;
-        }
-
-        return ( static_cast<SoundManager*>( _singleton ) );
-    }
-
-    static void DestroySingleton()
-    {
-        if ( NULL != _singleton )
-        {
-            delete _singleton;
-            _singleton = NULL;
-        }
-    }
-
 private:
-
     std::map<std::size_t, std::shared_ptr<Sound> >  soundsChannel;
     std::map<std::size_t, std::shared_ptr<Music> >  musicsChannel;
 
     float globalVolume;
-
-    SoundManager();
-    ~SoundManager();
-    static SoundManager *_singleton;
 };
 
 

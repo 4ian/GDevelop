@@ -135,7 +135,7 @@ void CppLayoutPreviewer::StopPreview()
     if ( profiler ) previewScene.SetProfiler(profiler.get());
     if ( profiler ) editor.GetLayout().SetProfiler(profiler.get());
     if ( debugger ) debugger->Pause();
-    SoundManager::Get()->ClearAllSoundsAndMusics();
+    previewGame.GetSoundManager().ClearAllSoundsAndMusics();
 }
 
 void CppLayoutPreviewer::OnUpdate()
@@ -181,7 +181,7 @@ void CppLayoutPreviewer::RefreshFromLayout()
     cout << "Scene Editor canvas reloading... (step 1/2)" << endl;
     isReloading = true;
 
-    SoundManager::Get()->ClearAllSoundsAndMusics();
+    previewGame.GetSoundManager().ClearAllSoundsAndMusics();
     if ( editor.GetProject().GetImageManager() ) editor.GetProject().GetImageManager()->PreventImagesUnloading(); //Images are normally unloaded and loaded again when reloading the scene. We can prevent this to happen as it is time wasting.
 
     //Reset game

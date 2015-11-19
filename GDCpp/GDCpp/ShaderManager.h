@@ -26,14 +26,11 @@ class ShaderManager
 public:
     ShaderManager();
     virtual ~ShaderManager() {};
-    void SetGame(gd::Project * game_) { game = game_; }
 
     std::shared_ptr<sf::Shader> GetSFMLShader(const std::vector<gd::String> & shaders);
 
 private:
     mutable std::map < std::vector<gd::String>, std::weak_ptr<sf::Shader> > alreadyLoadedShader;
-
-    gd::Project * game;
 };
 
 #endif // SHADERMANAGER_H

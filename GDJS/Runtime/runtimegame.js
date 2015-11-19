@@ -30,6 +30,7 @@ gdjs.RuntimeGame = function(data, spec)
     this._variables = new gdjs.VariablesContainer(data.variables);
     this._data = data;
     this._imageManager = new gdjs.ImageManager(this);
+    this._soundManager = new gdjs.SoundManager();
     this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
     //Rendering (see createStandardCanvas method)
@@ -63,7 +64,7 @@ gdjs.RuntimeGame = function(data, spec)
 };
 
 /**
- * Get the variables of the runtimeGame.
+ * Get the variables of the RuntimeGame.
  * @method getVariables
  * @return a variablesContainer object.
  */
@@ -71,6 +72,20 @@ gdjs.RuntimeGame.prototype.getVariables = function() {
 	return this._variables;
 };
 
+/**
+ * Get the gdjs.SoundManager of the RuntimeGame.
+ * @method getSoundManager
+ * @return {gdjs.SoundManager} The sound manager.
+ */
+gdjs.RuntimeGame.prototype.getSoundManager = function() {
+    return this._soundManager;
+};
+
+/**
+ * Get the gdjs.ImageManager of the RuntimeGame.
+ * @method getImageManager
+ * @return {gdjs.ImageManager} The image manager.
+ */
 gdjs.RuntimeGame.prototype.getImageManager = function() {
 	return this._imageManager;
 };

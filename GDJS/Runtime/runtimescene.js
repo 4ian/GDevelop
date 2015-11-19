@@ -8,7 +8,8 @@
  * The runtimeScene object represents a scene being played and rendered in the browser in a canvas.
  *
  * @class RuntimeScene
- * @param PixiRenderer The PIXI.Renderer to be used
+ * @param {gdjs.RuntimeGame} runtimeGame The game associated to this scene.
+ * @param {PIXI.WebGLRenderer|PIXI.CanvasRenderer} pixiRenderer The renderer to be used
  */
 gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
 {
@@ -26,7 +27,6 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._lastId = 0;
 	this._name = "";
     this._timeManager = new gdjs.TimeManager();
-    this._soundManager = new gdjs.SoundManager();
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
@@ -129,6 +129,9 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 	for(var i = 0;i<gdjs.callbacksRuntimeSceneLoaded.length;++i) {
 		gdjs.callbacksRuntimeSceneLoaded[i](this);
 	}
+
+	if (sceneData.stopSoundsOnStartup && this._runtimeGame)
+		this._runtimeGame.getSoundManager().clearAll();
 
     this._isLoaded = true;
 	this._timeManager.reset();
@@ -571,11 +574,11 @@ gdjs.RuntimeScene.prototype.getTimeManager = function() {
 };
 
 /**
- * Get the SoundManager of the scene.
- * @return The gdjs.SoundManager of the scene.
+ * Shortcut to get the SoundManager of the game.
+ * @return The gdjs.SoundManager of the game.
  */
 gdjs.RuntimeScene.prototype.getSoundManager = function() {
-	return this._soundManager;
+	return this._runtimeGame.getSoundManager();
 };
 
 //The flags to describe the change request by a scene:

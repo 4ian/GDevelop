@@ -186,3 +186,27 @@ gdjs.SoundManager.prototype.setGlobalVolume = function(volume) {
 gdjs.SoundManager.prototype.getGlobalVolume = function() {
 	return Howler.volume()*100;
 };
+
+gdjs.SoundManager.prototype.clearAll = function() {
+	for (var i = 0;i<this._freeSounds.length;++i)  {
+		if (this._freeSounds[i]) this._freeSounds[i].stop();
+	}
+	for (var i = 0;i<this._freeMusics.length;++i)  {
+		if (this._freeMusics[i]) this._freeMusics[i].stop();
+	}
+	this._freeSounds.length = 0;
+	this._freeMusics.length = 0;
+
+	for (var p in this._sounds) {
+		if (this._sounds.hasOwnProperty(p) && this._sounds[p]) {
+			this._sounds[p].stop();
+			delete this._sounds[p];
+		}
+	}
+	for (var p in this._musics) {
+		if (this._musics.hasOwnProperty(p) && this._musics[p]) {
+			this._musics[p].stop();
+			delete this._musics[p];
+		}
+	}
+}

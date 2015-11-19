@@ -16,7 +16,6 @@ gdjs.ImageManager = function(runtimeGame)
     this._game = runtimeGame;
     this._invalidTexture = PIXI.Texture.fromImage("bunny.png"); //TODO
     this._loadedTextures = new Hashtable();
-    this._loadedPow2ConvertedTextures = new Hashtable();
 };
 
 /**

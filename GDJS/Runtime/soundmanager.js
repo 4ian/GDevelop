@@ -210,3 +210,37 @@ gdjs.SoundManager.prototype.clearAll = function() {
 		}
 	}
 }
+
+gdjs.SoundManager.prototype.preloadAudio = function(resources, onProgress, onComplete) {
+    var assets = [];
+    gdjs.iterateOverArray(resources, function(res) {
+        if ( res.file && assets.indexOf(res.file) === -1 && res.kind === "audio" )
+            assets.push(res.file);
+    });
+
+    var loaded = 0;
+    function onLoad(audioFile) {
+        console.log("loaded", audioFile);
+        loaded++;
+        if (loaded === assets.length) {
+            console.log("All audio loaded");
+            return onComplete();
+        }
+
+        onProgress(loaded, assets.length);
+    }
+
+    if (assets.length === 0) return onComplete();
+
+    var that = this;
+    for(var i = 0;i<assets.length;++i) {
+        (function(audioFile) {
+            console.log("Loading", audioFile)
+            var sound = new Howl({
+              src: [audioFile], //TODO: ogg, mp3...
+              onload: onLoad,
+              onloaderror: onLoad.bind(that, audioFile)
+            });
+        })(assets[i]);
+    }
+}

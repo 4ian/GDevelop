@@ -29,7 +29,7 @@ gdjs.RuntimeGame = function(data, spec)
 
     this._variables = new gdjs.VariablesContainer(data.variables);
     this._data = data;
-    this._imageManager = new gdjs.ImageManager(this);
+    this._imageManager = new gdjs.ImageManager(data.resources.resources);
     this._soundManager = new gdjs.SoundManager();
     this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
@@ -407,48 +407,29 @@ gdjs.RuntimeGame.prototype._resizeCanvas = function() {
 
 /**
  * Load all assets, displaying progress in renderer.
- * TODO: This should be moved to ImageManager and take advantage of the load callback
- * to store resources, and use it to load textures instead of fromImage.
  * @method loadAllAssets
  */
 gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
-
     //Prepare the progress text
     var loadingScreen = new PIXI.Container();
     var text = new PIXI.Text(" ", {font: "bold 60px Arial", fill: "#FFFFFF", align: "center"});
     loadingScreen.addChild(text);
-    text.position.x = this._renderer.width/2-50;
     text.position.y = this._renderer.height/2;
-    var loadingCount = 0;
 
-    //Load all assets
-    var assets = [];
-    gdjs.iterateOverArray(gdjs.projectData.resources.resources, function(res) {
-        if ( res.file && assets.indexOf(res.file) === -1 )
-            assets.push(res.file);
+    var that = this;
+    this._imageManager.loadTextures(function (count, total) {
+        text.text = Math.floor(count/total*100) + "%";
+        text.position.x = that._renderer.width/2-text.width/2;
+        that._renderer.render(loadingScreen);
+    }, function() {
+        that._soundManager.preloadAudio(gdjs.projectData.resources.resources, function (count, total) {
+            text.text = Math.floor(count/total*100) + "%";
+            text.position.x = that._renderer.width/2-text.width/2;
+            that._renderer.render(loadingScreen);
+        }, function() {
+            callback();
+        });
     });
-
-    var game = this;
-    if ( assets.length !== 0 ) {
-        var loader = PIXI.loader;
-        loader.once('complete', callback);
-        loader.on('progress', onAssetsLoadingProgress);
-
-        for(var i = 0;i < assets.length; ++i) {
-            loader.add(assets[i], assets[i]);
-        }
-
-        loader.load();
-    }
-    else {
-        callback();
-    }
-
-    function onAssetsLoadingProgress() {
-        game._renderer.render(loadingScreen);
-        loadingCount++;
-        text.text = Math.floor(loadingCount/assets.length*100) + "%";
-    }
 };
 
 /**

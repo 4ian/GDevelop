@@ -58,9 +58,6 @@ public:
      */
     virtual void ExposeFile(gd::String & resource);
 
-    virtual void ExposeImage(gd::String & imageName) {};
-    virtual void ExposeShader(gd::String & shaderName) {};
-
 protected:
     void SetNewFilename(gd::String oldFilename, gd::String newFilename);
 

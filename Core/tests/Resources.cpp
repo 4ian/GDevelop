@@ -22,7 +22,6 @@ class ArbitraryResourceWorkerTest : public gd::ArbitraryResourceWorker
 public:
     virtual void ExposeFile(gd::String & file) { files.push_back(file); };
     virtual void ExposeImage(gd::String & imageName) {images.push_back(imageName); };
-    virtual void ExposeShader(gd::String & shaderName) {}
 
     std::vector<gd::String> files;
     std::vector<gd::String> images;

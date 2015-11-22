@@ -38,9 +38,8 @@ public:
 
     std::set<gd::String> & GetAllUsedImages() { return allUsedImages; };
 
-    virtual void ExposeFile(gd::String & resource) {};
+    virtual void ExposeFile(gd::String & resource) { /*Don't care, we just list images*/ };
     virtual void ExposeImage(gd::String & imageName) {allUsedImages.insert(imageName);};
-    virtual void ExposeShader(gd::String & shaderName) {};
 
 protected:
     std::set<gd::String> allUsedImages;

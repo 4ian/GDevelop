@@ -36,9 +36,6 @@ public:
      */
     virtual void ExposeFile(gd::String & resource);
 
-    virtual void ExposeImage(gd::String & imageName) {};
-    virtual void ExposeShader(gd::String & shaderName) {};
-
 private:
     bool hasAbsoluteFilenames;
     AbstractFileSystem & fs;

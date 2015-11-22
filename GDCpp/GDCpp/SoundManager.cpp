@@ -5,6 +5,7 @@
  */
 #include "GDCpp/SoundManager.h"
 #include "GDCpp/ResourcesLoader.h"
+#include "GDCpp/Project/ResourcesManager.h"
 #include "GDCpp/Music.h"
 #include "GDCpp/Sound.h"
 #include "GDCpp/String.h"
@@ -13,13 +14,22 @@
 #include <vector>
 
 SoundManager::SoundManager() :
-    globalVolume(100)
+    globalVolume(100),
+    resourcesManager(nullptr)
 {
 }
 
-void SoundManager::PlaySoundOnChannel(const gd::String & file, unsigned int channel, bool repeat, float volume, float pitch)
+const gd::String & SoundManager::GetFileFromSoundName(const gd::String & name) const
 {
-    std::shared_ptr<Sound> sound = std::shared_ptr<Sound>(new Sound(file));
+    if (!resourcesManager || !resourcesManager->HasResource(name))
+        return name;
+
+    return resourcesManager->GetResource(name).GetFile();
+}
+
+void SoundManager::PlaySoundOnChannel(const gd::String & name, unsigned int channel, bool repeat, float volume, float pitch)
+{
+    std::shared_ptr<Sound> sound = std::shared_ptr<Sound>(new Sound(GetFileFromSoundName(name)));
     sound->sound.play();
 
     SetSoundOnChannel(channel, sound);
@@ -28,9 +38,9 @@ void SoundManager::PlaySoundOnChannel(const gd::String & file, unsigned int chan
     GetSoundOnChannel(channel)->SetPitch(pitch);
 }
 
-void SoundManager::PlaySound(const gd::String & file, bool repeat, float volume, float pitch)
+void SoundManager::PlaySound(const gd::String & name, bool repeat, float volume, float pitch)
 {
-    sounds.push_back(std::shared_ptr<Sound>(new Sound(file)));
+    sounds.push_back(std::shared_ptr<Sound>(new Sound(GetFileFromSoundName(name))));
     sounds.back()->sound.play();
 
     sounds.back()->sound.setLoop(repeat);
@@ -38,8 +48,9 @@ void SoundManager::PlaySound(const gd::String & file, bool repeat, float volume,
     sounds.back()->SetPitch(pitch);
 }
 
-void SoundManager::PlayMusic(const gd::String & file, bool repeat, float volume, float pitch)
+void SoundManager::PlayMusic(const gd::String & name, bool repeat, float volume, float pitch)
 {
+    const gd::String & file = GetFileFromSoundName(name);
     std::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
     gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();
@@ -63,8 +74,9 @@ void SoundManager::PlayMusic(const gd::String & file, bool repeat, float volume,
     music->SetPitch(pitch);
 }
 
-void SoundManager::PlayMusicOnChannel(const gd::String & file, unsigned int channel , bool repeat, float volume, float pitch)
+void SoundManager::PlayMusicOnChannel(const gd::String & name, unsigned int channel , bool repeat, float volume, float pitch)
 {
+    const gd::String & file = GetFileFromSoundName(name);
     std::shared_ptr<Music> music(new Music);
     #if !defined(GD_IDE_ONLY)
     gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();

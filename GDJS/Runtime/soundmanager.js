@@ -70,8 +70,11 @@ gdjs.Sound.prototype.rate = function() {
  * @class SoundManager
  * @constructor
  */
-gdjs.SoundManager = function()
+gdjs.SoundManager = function(resources)
 {
+    this._resources = resources;
+    this._availableResources = {}; //Map storing "audio" resources for faster access.
+
     this._sounds = {};
     this._musics = {};
     this._freeSounds = []; //Sounds without an assigned channel.
@@ -89,6 +92,25 @@ gdjs.SoundManager.clampRate = function(rate) {
 
 	return rate;
 };
+
+/**
+ * Return the file associated to the given sound name.
+ *
+ * Names and files are loaded from resources when preloadAudio is called. If no
+ * file is associated to the given name, then the name will be considered as a
+ * filename and will be returned.
+ * @method _getFileFromSoundName
+ * @private
+ * @return The associated filename
+ */
+gdjs.SoundManager.prototype._getFileFromSoundName = function(soundName) {
+	if (this._availableResources.hasOwnProperty(soundName) &&
+		this._availableResources[soundName].file) {
+		return this._availableResources[soundName].file;
+	}
+
+	return soundName;
+}
 
 /**
  * Store the sound in the specified array, put it at the first index that
@@ -115,7 +137,9 @@ gdjs.SoundManager.prototype._storeSoundInArray = function(arr, sound) {
 	return sound;
 };
 
-gdjs.SoundManager.prototype.playSound = function(soundFile, loop, volume, pitch) {
+gdjs.SoundManager.prototype.playSound = function(soundName, loop, volume, pitch) {
+	var soundFile = this._getFileFromSoundName(soundName);
+
 	var sound = new gdjs.Sound({
 	  src: [soundFile], //TODO: ogg, mp3...
 	  loop: loop,
@@ -126,11 +150,13 @@ gdjs.SoundManager.prototype.playSound = function(soundFile, loop, volume, pitch)
 	this._storeSoundInArray(this._freeSounds, sound).play();
 };
 
-gdjs.SoundManager.prototype.playSoundOnChannel = function(soundFile, channel, loop, volume, pitch) {
+gdjs.SoundManager.prototype.playSoundOnChannel = function(soundName, channel, loop, volume, pitch) {
 	var	oldSound = this._sounds[channel];
 	if (oldSound) {
 		oldSound.stop();
 	}
+
+	var soundFile = this._getFileFromSoundName(soundName);
 
 	var sound = new gdjs.Sound({
 		src: [soundFile], //TODO: ogg, mp3...
@@ -147,7 +173,9 @@ gdjs.SoundManager.prototype.getSoundOnChannel = function(channel) {
 	return this._sounds[channel];
 };
 
-gdjs.SoundManager.prototype.playMusic = function(soundFile, loop, volume, pitch) {
+gdjs.SoundManager.prototype.playMusic = function(soundName, loop, volume, pitch) {
+	var soundFile = this._getFileFromSoundName(soundName);
+
 	var sound = new gdjs.Sound({
 	  src: [soundFile], //TODO: ogg, mp3...
 	  loop: loop,
@@ -158,11 +186,13 @@ gdjs.SoundManager.prototype.playMusic = function(soundFile, loop, volume, pitch)
 	this._storeSoundInArray(this._freeMusics, sound).play();
 };
 
-gdjs.SoundManager.prototype.playMusicOnChannel = function(soundFile, channel, loop, volume, pitch) {
+gdjs.SoundManager.prototype.playMusicOnChannel = function(soundName, channel, loop, volume, pitch) {
 	var	oldMusic = this._musics[channel];
 	if (oldMusic) {
 		oldMusic.stop();
 	}
+
+	var soundFile = this._getFileFromSoundName(soundName);
 
 	var music = new gdjs.Sound({
 		src: [soundFile], //TODO: ogg, mp3...
@@ -211,36 +241,45 @@ gdjs.SoundManager.prototype.clearAll = function() {
 	}
 }
 
-gdjs.SoundManager.prototype.preloadAudio = function(resources, onProgress, onComplete) {
-    var assets = [];
+gdjs.SoundManager.prototype.preloadAudio = function(onProgress, onComplete, resources) {
+	resources = resources || this._resources;
+
+    var files = [];
+    var that = this;
     gdjs.iterateOverArray(resources, function(res) {
-        if ( res.file && assets.indexOf(res.file) === -1 && res.kind === "audio" )
-            assets.push(res.file);
+        if ( res.file && res.kind === "audio" ) {
+        	that._availableResources[res.name] = res;
+
+            if (files.indexOf(res.file) === -1) {
+	            files.push(res.file);
+	        }
+        }
     });
+
+    if (files.length === 0) return onComplete();
 
     var loaded = 0;
     function onLoad(audioFile) {
         console.log("loaded", audioFile);
         loaded++;
-        if (loaded === assets.length) {
+        if (loaded === files.length) {
             console.log("All audio loaded");
             return onComplete();
         }
 
-        onProgress(loaded, assets.length);
+        onProgress(loaded, files.length);
     }
 
-    if (assets.length === 0) return onComplete();
 
-    var that = this;
-    for(var i = 0;i<assets.length;++i) {
+    for(var i = 0;i<files.length;++i) {
         (function(audioFile) {
             console.log("Loading", audioFile)
             var sound = new Howl({
               src: [audioFile], //TODO: ogg, mp3...
-              onload: onLoad,
+              preload: true,
+              onload: onLoad.bind(that, audioFile),
               onloaderror: onLoad.bind(that, audioFile)
             });
-        })(assets[i]);
+        })(files[i]);
     }
 }

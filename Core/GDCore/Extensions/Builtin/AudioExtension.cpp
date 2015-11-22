@@ -27,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("soundfile", _("Audio file"))
+        .AddParameter("soundfile", _("Audio file (or audio resource name)"))
         .AddParameter("expression", _("Channel identifier"))
         .AddParameter("yesorno", _("Repeat the sound"), "",true).SetDefaultValue("no")
         .AddParameter("expression", _("Volume (from 0 to 100, 100 by default)"), "",true).SetDefaultValue("100")
@@ -75,7 +75,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("musicfile", _("Audio file"))
+        .AddParameter("musicfile", _("Audio file (or audio resource name)"))
         .AddParameter("expression", _("Channel identifier"))
         .AddParameter("yesorno", _("Repeat the sound"), "",true).SetDefaultValue("no")
         .AddParameter("expression", _("Volume (from 0 to 100, 100 by default)"), "",true).SetDefaultValue("100")
@@ -220,7 +220,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/son24.png",
                    "res/actions/son.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("soundfile", _("Audio file"))
+        .AddParameter("soundfile", _("Audio file (or audio resource name)"))
         .AddParameter("yesorno", _("Repeat the sound"), "",true).SetDefaultValue("no")
         .AddParameter("expression", _("Volume (from 0 to 100, 100 by default)"), "",true).SetDefaultValue("100")
         .AddParameter("expression", _("Pitch (speed) (1 by default)"), "",true).SetDefaultValue("1")
@@ -234,7 +234,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("musicfile", _("Audio file"))
+        .AddParameter("musicfile", _("Audio file (or audio resource name)"))
         .AddParameter("yesorno", _("Repeat the sound"), "",true).SetDefaultValue("no")
         .AddParameter("expression", _("Volume (from 0 to 100, 100 by default)"), "",true).SetDefaultValue("100")
         .AddParameter("expression", _("Pitch (speed) (1 by default)"), "",true).SetDefaultValue("1")

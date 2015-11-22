@@ -810,12 +810,7 @@ gd::String Project::GetBadObjectNameWarning()
 void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     //Add project resources
-    std::vector<gd::String> resources = GetResourcesManager().GetAllResourcesList();
-    for ( std::size_t i = 0;i < resources.size() ;i++ )
-    {
-        if ( GetResourcesManager().GetResource(resources[i]).UseFile() )
-            worker.ExposeResource(GetResourcesManager().GetResource(resources[i]));
-    }
+    worker.ExposeResources(&GetResourcesManager());
     #if !defined(GD_NO_WX_GUI)
     gd::SafeYield::Do();
     #endif

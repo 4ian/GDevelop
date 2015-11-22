@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <map>
+namespace gd { class ResourcesManager; }
 #undef PlaySound //Avoid a nasty macro from polluting everything
 
 using namespace std;
@@ -31,16 +32,51 @@ public:
     SoundManager();
     ~SoundManager() {};
 
+    /**
+     * \brief Set the gd::ResourcesManager used by the SoundManager.
+     */
+    void SetResourcesManager(gd::ResourcesManager * resourcesManager_) { resourcesManager = resourcesManager_; }
+
     vector < std::shared_ptr<Music> >  musics;
     vector < std::shared_ptr<Sound> >  sounds;
 
-    void PlaySound(const gd::String & file, bool repeat, float volume, float pitch);
+    /**
+     * \brief Play a sound (wav files).
+     * \param file The resource name, or filename to load.
+     * \param repeat true to loop the sound
+     * \param volume The volume, between 0 and 100.
+     * \param pitch The pithc, 1 by default
+     */
+    void PlaySound(const gd::String & name, bool repeat, float volume, float pitch);
 
-    void PlayMusic(const gd::String & file, bool repeat, float volume, float pitch);
+    /**
+     * \brief Play a music (ogg files).
+     * \param file The resource name, or filename to load.
+     * \param repeat true to loop the music
+     * \param volume The volume, between 0 and 100.
+     * \param pitch The pithc, 1 by default
+     */
+    void PlayMusic(const gd::String & name, bool repeat, float volume, float pitch);
 
-    void PlaySoundOnChannel(const gd::String & file, unsigned int channel, bool repeat, float volume, float pitch);
+    /**
+     * \brief Play a sound (wav files) on a channel.
+     * \param file The resource name, or filename to load.
+     * \param channel The channel to use. The previous sound, if any, will be stopped.
+     * \param repeat true to loop the sound
+     * \param volume The volume, between 0 and 100.
+     * \param pitch The pithc, 1 by default
+     */
+    void PlaySoundOnChannel(const gd::String & name, unsigned int channel, bool repeat, float volume, float pitch);
 
-    void PlayMusicOnChannel(const gd::String & file, unsigned int channel, bool repeat, float volume, float pitch);
+    /**
+     * \brief Play a music (wav files) on a channel.
+     * \param file The resource name, or filename to load.
+     * \param channel The channel to use. The previous music, if any, will be stopped.
+     * \param repeat true to loop the music
+     * \param volume The volume, between 0 and 100.
+     * \param pitch The pithc, 1 by default
+     */
+    void PlayMusicOnChannel(const gd::String & name, unsigned int channel, bool repeat, float volume, float pitch);
 
     /**
      * Return pointer to a music on a channel
@@ -93,10 +129,13 @@ public:
     void ManageGarbage();
 
 private:
+    const gd::String &  GetFileFromSoundName(const gd::String & name) const;
+
     std::map<std::size_t, std::shared_ptr<Sound> >  soundsChannel;
     std::map<std::size_t, std::shared_ptr<Music> >  musicsChannel;
 
     float globalVolume;
+    gd::ResourcesManager * resourcesManager;
 };
 
 

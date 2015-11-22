@@ -30,7 +30,7 @@ gdjs.RuntimeGame = function(data, spec)
     this._variables = new gdjs.VariablesContainer(data.variables);
     this._data = data;
     this._imageManager = new gdjs.ImageManager(data.resources.resources);
-    this._soundManager = new gdjs.SoundManager();
+    this._soundManager = new gdjs.SoundManager(data.resources.resources);
     this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
     //Rendering (see createStandardCanvas method)
@@ -416,14 +416,16 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
     loadingScreen.addChild(text);
     text.position.y = this._renderer.height/2;
 
+    var allAssetsTotal = this._data.resources.resources.length;
+
     var that = this;
     this._imageManager.loadTextures(function (count, total) {
-        text.text = Math.floor(count/total*100) + "%";
+        text.text = Math.floor(count / allAssetsTotal * 100) + "%";
         text.position.x = that._renderer.width/2-text.width/2;
         that._renderer.render(loadingScreen);
     }, function() {
-        that._soundManager.preloadAudio(gdjs.projectData.resources.resources, function (count, total) {
-            text.text = Math.floor(count/total*100) + "%";
+        that._soundManager.preloadAudio(function (count, total) {
+            text.text = Math.floor((allAssetsTotal - total + count) / allAssetsTotal * 100) + "%";
             text.position.x = that._renderer.width/2-text.width/2;
             that._renderer.render(loadingScreen);
         }, function() {

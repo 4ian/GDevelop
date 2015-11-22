@@ -74,7 +74,7 @@ void AudioExtension::ExposeActionsResources(gd::Instruction & action, gd::Arbitr
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
     {
         gd::String parameter = action.GetParameter(1).GetPlainString();
-        worker.ExposeFile(parameter);
+        worker.ExposeAudio(parameter);
         action.SetParameter(1, parameter);
     }
 }

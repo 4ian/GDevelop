@@ -88,6 +88,7 @@ int main( int argc, char *p_argv[] )
     //Load extensions
     gd::ExtensionsLoader::LoadAllExtensions(".", CppPlatform::Get());
     gd::ExtensionsLoader::ExtensionsLoadingDone(".");
+
     //Load resource file
     gd::ResourcesLoader * resLoader = gd::ResourcesLoader::Get();
     if (!resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )

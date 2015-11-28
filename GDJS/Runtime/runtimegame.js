@@ -29,8 +29,8 @@ gdjs.RuntimeGame = function(data, spec)
 
     this._variables = new gdjs.VariablesContainer(data.variables);
     this._data = data;
-    this._imageManager = new gdjs.ImageManager(data.resources.resources);
-    this._soundManager = new gdjs.SoundManager(data.resources.resources);
+    this._imageManager = new gdjs.ImageManager(data.resources ? data.resources.resources : undefined);
+    this._soundManager = new gdjs.SoundManager(data.resources ? data.resources.resources : undefined);
     this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
     //Rendering (see createStandardCanvas method)

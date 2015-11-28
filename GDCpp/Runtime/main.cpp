@@ -88,6 +88,7 @@ int main( int argc, char *p_argv[] )
     //Load extensions
     gd::ExtensionsLoader::LoadAllExtensions(".", CppPlatform::Get());
     gd::ExtensionsLoader::ExtensionsLoadingDone(".");
+
     //Load resource file
     gd::ResourcesLoader * resLoader = gd::ResourcesLoader::Get();
     if (!resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )
@@ -140,16 +141,21 @@ int main( int argc, char *p_argv[] )
         return DisplayMessage("No scene to be loaded. Aborting.");
 
     //Loading the code
-    gd::String codeLibraryName = executablePath+"/"+executableNameOnly+"."+codeFileExtension;
-    Handle codeLibrary = gd::OpenLibrary(codeLibraryName.ToLocale().c_str());
-    if ( codeLibrary == NULL )
+    Handle codeLibrary = NULL;
+    gd::String codeLibraryName;
+    auto loadLibrary = [&codeLibraryName, &codeLibrary](gd::String path) {
+        codeLibraryName = path;
+        codeLibrary = gd::OpenLibrary(codeLibraryName.ToLocale().c_str());
+
+        return codeLibrary != NULL;
+    };
+
+    if (!loadLibrary(executablePath+"/"+executableNameOnly+"."+codeFileExtension) &&
+        !loadLibrary(executableNameOnly+"."+codeFileExtension) &&
+        !loadLibrary(executablePath+"/Code."+codeFileExtension) &&
+        !loadLibrary("Code."+codeFileExtension))
     {
-        codeLibraryName = executablePath+"/Code."+codeFileExtension;
-        Handle codeLibrary = gd::OpenLibrary(codeLibraryName.ToLocale().c_str());
-        if ( codeLibrary == NULL )
-        {
-            return DisplayMessage("Unable to load the execution engine for game. Aborting.");
-        }
+        return DisplayMessage("Unable to load the execution engine for game. Aborting.");
     }
 
     #if defined(WINDOWS)
@@ -200,10 +206,19 @@ int main( int argc, char *p_argv[] )
  */
 gd::String GetCurrentWorkingDirectory()
 {
-    char path[2048];
-    getcwd(path, 2048);
+    #if defined(WINDOWS)
+    //getcwd on Windows do not work properly with accented characters (non ASCII) characters.
+    char buffer[MAX_PATH];
+    GetModuleFileName( NULL, buffer, MAX_PATH );
+    std::string::size_type pos = std::string( buffer ).find_last_of( "\\/" );
+    return gd::String::FromLocale(std::string( buffer ).substr( 0, pos));
+    #else
+    const auto MAX_LENGTH = 32767;
+    char path[MAX_LENGTH];
+    getcwd(path, MAX_LENGTH);
 
     return path;
+    #endif
 }
 
 #if defined(WINDOWS)

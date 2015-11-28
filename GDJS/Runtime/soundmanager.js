@@ -179,6 +179,7 @@ gdjs.SoundManager.prototype.playMusic = function(soundName, loop, volume, pitch)
 	var sound = new gdjs.Sound({
 	  src: [soundFile], //TODO: ogg, mp3...
 	  loop: loop,
+	  html5: true, //Force HTML5 audio so we don't wait for the full file to be loaded on Android.
 	  volume: volume/100,
 	  rate: gdjs.SoundManager.clampRate(pitch)
 	});
@@ -197,6 +198,7 @@ gdjs.SoundManager.prototype.playMusicOnChannel = function(soundName, channel, lo
 	var music = new gdjs.Sound({
 		src: [soundFile], //TODO: ogg, mp3...
 		loop: loop,
+		html5: true, //Force HTML5 audio so we don't wait for the full file to be loaded on Android.
 		volume: volume/100,
 		rate: gdjs.SoundManager.clampRate(pitch)
 	});

@@ -167,7 +167,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     wxLogNull noLogPlease;
     wxString tempDir = GetTempDir();
-    ClearDirectory(tempDir); //Pr�paration du r�pertoire
+    ClearDirectory(tempDir);
 
     //Wait current compilations to end
     if ( CodeCompiler::Get()->CompilationInProcess() )
@@ -191,32 +191,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
     //Prepare resources to copy
     diagnosticManager.OnMessage( _("Preparing resources...") );
 
-    //Add images
-    std::vector<gd::String> allResources = game.GetResourcesManager().GetAllResourcesList();
-    for ( unsigned int i = 0;i < allResources.size() ;i++ )
-    {
-        diagnosticManager.OnMessage( _("Preparing resources..."), allResources[i] );
-
-        if ( game.GetResourcesManager().GetResource(allResources[i]).UseFile() )
-            resourcesMergingHelper.ExposeResource(game.GetResourcesManager().GetResource(allResources[i]));
-    }
-
-    //Add scenes resources
-    for ( unsigned int i = 0;i < game.GetLayoutsCount();i++ )
-    {
-        for (unsigned int j = 0;j<game.GetLayout(i).GetObjects().size();++j) //Add objects resources
-        	game.GetLayout(i).GetObjects()[j]->ExposeResources(resourcesMergingHelper);
-
-        LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), resourcesMergingHelper);
-    }
-    //Add external events resources
-    for ( unsigned int i = 0;i < game.GetExternalEventsCount();i++ )
-    {
-        LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(i).GetEvents(), resourcesMergingHelper);
-    }
-    //Add global objects resources
-    for (unsigned int j = 0;j<game.GetObjects().size();++j) //Add global objects resources
-        game.GetObjects()[j]->ExposeResources(resourcesMergingHelper);
+    //Add resources
+    game.ExposeResources(resourcesMergingHelper);
 
     //Compile all scene events to object files
     for (unsigned int i = 0;i<game.GetLayoutsCount();++i)

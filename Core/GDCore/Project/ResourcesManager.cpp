@@ -86,11 +86,11 @@ const Resource & ResourcesManager::GetResource(const gd::String & name) const
 std::shared_ptr<Resource> ResourcesManager::CreateResource(const gd::String & kind)
 {
     if (kind == "image")
-    {
         return std::shared_ptr<Resource>(new ImageResource);
-    }
+    else if (kind == "audio")
+        return std::shared_ptr<Resource>(new AudioResource);
 
-    std::cout << "Bad resource created ( type: " << kind << ")" << std::endl;
+    std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
     return std::shared_ptr<Resource>(new Resource);
 }
 
@@ -133,15 +133,15 @@ bool ResourcesManager::AddResource(const gd::Resource & resource)
     return true;
 }
 
-bool ResourcesManager::AddResource(const gd::String & name, const gd::String & filename)
+bool ResourcesManager::AddResource(const gd::String & name, const gd::String & filename, const gd::String & kind)
 {
     if ( HasResource(name) ) return false;
 
-    std::shared_ptr<ImageResource> image(new ImageResource);
-    image->SetFile(filename);
-    image->SetName(name);
+    std::shared_ptr<Resource> res = CreateResource(kind);
+    res->SetFile(filename);
+    res->SetName(name);
 
-    resources.push_back(image);
+    resources.push_back(res);
 
     return true;
 }
@@ -615,6 +615,29 @@ void ImageResource::SerializeTo(SerializerElement & element) const
 {
     element.SetAttribute("alwaysLoaded", alwaysLoaded);
     element.SetAttribute("smoothed", smooth);
+    element.SetAttribute("userAdded", IsUserAdded());
+    element.SetAttribute("file", GetFile()); //Keep the resource path in the current locale (but save it in UTF8 for compatibility on other OSes)
+}
+#endif
+
+void AudioResource::SetFile(const gd::String & newFile)
+{
+    file = newFile;
+
+    //Convert all backslash to slashs.
+    while (file.find('\\') != gd::String::npos)
+        file.replace(file.find('\\'), 1, "/");
+}
+
+void AudioResource::UnserializeFrom(const SerializerElement & element)
+{
+    SetUserAdded( element.GetBoolAttribute("userAdded") );
+    SetFile(element.GetStringAttribute("file"));
+}
+
+#if defined(GD_IDE_ONLY)
+void AudioResource::SerializeTo(SerializerElement & element) const
+{
     element.SetAttribute("userAdded", IsUserAdded());
     element.SetAttribute("file", GetFile()); //Keep the resource path in the current locale (but save it in UTF8 for compatibility on other OSes)
 }

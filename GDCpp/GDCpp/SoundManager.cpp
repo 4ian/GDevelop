@@ -4,23 +4,100 @@
  * This project is released under the MIT License.
  */
 #include "GDCpp/SoundManager.h"
+#include "GDCpp/ResourcesLoader.h"
+#include "GDCpp/Project/ResourcesManager.h"
 #include "GDCpp/Music.h"
 #include "GDCpp/Sound.h"
+#include "GDCpp/String.h"
 #include <iostream>
 #include <string>
 #include <vector>
 
-using namespace std;
-
-SoundManager *SoundManager::_singleton = NULL;
-
 SoundManager::SoundManager() :
-globalVolume(100)
+    globalVolume(100),
+    resourcesManager(nullptr)
 {
 }
 
-SoundManager::~SoundManager()
+const gd::String & SoundManager::GetFileFromSoundName(const gd::String & name) const
 {
+    if (!resourcesManager || !resourcesManager->HasResource(name))
+        return name;
+
+    return resourcesManager->GetResource(name).GetFile();
+}
+
+void SoundManager::PlaySoundOnChannel(const gd::String & name, unsigned int channel, bool repeat, float volume, float pitch)
+{
+    std::shared_ptr<Sound> sound = std::shared_ptr<Sound>(new Sound(GetFileFromSoundName(name)));
+    sound->sound.play();
+
+    SetSoundOnChannel(channel, sound);
+    GetSoundOnChannel(channel)->sound.setLoop(repeat);
+    GetSoundOnChannel(channel)->SetVolume(volume, globalVolume);
+    GetSoundOnChannel(channel)->SetPitch(pitch);
+}
+
+void SoundManager::PlaySound(const gd::String & name, bool repeat, float volume, float pitch)
+{
+    sounds.push_back(std::shared_ptr<Sound>(new Sound(GetFileFromSoundName(name))));
+    sounds.back()->sound.play();
+
+    sounds.back()->sound.setLoop(repeat);
+    sounds.back()->SetVolume(volume, globalVolume);
+    sounds.back()->SetPitch(pitch);
+}
+
+void SoundManager::PlayMusic(const gd::String & name, bool repeat, float volume, float pitch)
+{
+    const gd::String & file = GetFileFromSoundName(name);
+    std::shared_ptr<Music> music(new Music);
+    #if !defined(GD_IDE_ONLY)
+    gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();
+    if(ressourcesLoader->HasFile(file))
+    {
+        std::size_t size = ressourcesLoader->GetBinaryFileSize(file);
+        music->SetBuffer(ressourcesLoader->LoadBinaryFile(file), size);
+        music->OpenFromMemory(size);
+    }
+    else
+    #endif
+    {
+        music->OpenFromFile(file);
+    }
+
+    musics.push_back(music);
+    musics.back()->Play();
+
+    music->SetLoop(repeat);
+    music->SetVolume(volume, globalVolume);
+    music->SetPitch(pitch);
+}
+
+void SoundManager::PlayMusicOnChannel(const gd::String & name, unsigned int channel , bool repeat, float volume, float pitch)
+{
+    const gd::String & file = GetFileFromSoundName(name);
+    std::shared_ptr<Music> music(new Music);
+    #if !defined(GD_IDE_ONLY)
+    gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();
+    if(ressourcesLoader->HasFile(file))
+    {
+        std::size_t size = ressourcesLoader->GetBinaryFileSize(file);
+        music->SetBuffer(ressourcesLoader->LoadBinaryFile(file), size);
+        music->OpenFromMemory(size);
+    }
+    else
+    #endif
+    {
+        music->OpenFromFile(file);
+    }
+
+    SetMusicOnChannel(channel, music);
+    music->Play();
+
+    music->SetLoop(repeat);
+    music->SetVolume(volume, globalVolume);
+    music->SetPitch(pitch);
 }
 
 void SoundManager::ManageGarbage()
@@ -69,21 +146,20 @@ void SoundManager::SetGlobalVolume(float volume)
     if ( globalVolume > 100.0 )
         globalVolume = 100.0;
 
-    //Mise � jour des volumes des sons
     for (std::map<std::size_t, std::shared_ptr<Sound> >::iterator it = soundsChannel.begin();it != soundsChannel.end();++it)
     {
-        if ( it->second != std::shared_ptr<Sound>() ) (it->second)->UpdateVolume();
+        if ( it->second != std::shared_ptr<Sound>() ) (it->second)->UpdateVolume(globalVolume);
     }
     for (std::map<std::size_t, std::shared_ptr<Music> >::iterator it = musicsChannel.begin();it != musicsChannel.end();++it)
     {
-        if ( it->second != std::shared_ptr<Music>() ) it->second->UpdateVolume();
+        if ( it->second != std::shared_ptr<Music>() ) it->second->UpdateVolume(globalVolume);
     }
     for (std::size_t i =0;i<sounds.size();++i)
     {
-        if ( sounds[i] != std::shared_ptr<Sound>() ) sounds[i]->UpdateVolume();
+        if ( sounds[i] != std::shared_ptr<Sound>() ) sounds[i]->UpdateVolume(globalVolume);
     }
     for (std::size_t i =0;i<musics.size();++i)
     {
-        if ( musics[i] != std::shared_ptr<Music>() ) musics[i]->UpdateVolume();
+        if ( musics[i] != std::shared_ptr<Music>() ) musics[i]->UpdateVolume(globalVolume);
     }
 }

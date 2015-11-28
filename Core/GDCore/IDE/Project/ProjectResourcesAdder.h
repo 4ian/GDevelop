@@ -41,7 +41,7 @@ public:
      *
      * \return A vector containing the name of all unused resources
      */
-    static std::vector<gd::String> GetAllUselessResources(gd::Project & project);
+    static std::vector<gd::String> GetAllUselessImages(gd::Project & project);
 
     /**
      * \brief Remove all resources that are not used
@@ -52,7 +52,7 @@ public:
      *
      * \param project The project to be crawled.
      */
-    static void RemoveAllUselessResources(gd::Project & project);
+    static void RemoveAllUselessImages(gd::Project & project);
 };
 
 }

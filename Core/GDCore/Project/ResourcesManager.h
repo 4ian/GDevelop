@@ -220,6 +220,34 @@ private:
     gd::String file;
 };
 
+
+/**
+ * \brief Describe an audio file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API AudioResource : public Resource
+{
+public:
+    AudioResource() : Resource() { SetKind("audio"); };
+    virtual ~AudioResource() {};
+    virtual AudioResource* Clone() const { return new AudioResource(*this);}
+
+    virtual const gd::String & GetFile() const {return file;};
+    virtual void SetFile(const gd::String & newFile);
+
+    #if defined(GD_IDE_ONLY)
+    virtual bool UseFile() { return true; }
+    void SerializeTo(SerializerElement & element) const;
+    #endif
+
+    void UnserializeFrom(const SerializerElement & element);
+
+private:
+    gd::String file;
+};
+
 /**
  * \brief Inventory all resources used by a project
  *
@@ -273,7 +301,8 @@ public:
     /**
      * \brief Add a resource created from a file.
      */
-    bool AddResource(const gd::String & name, const gd::String & filename);
+    bool AddResource(const gd::String & name, const gd::String & filename,
+        const gd::String & kind);
 
     /**
      * \brief Remove a resource

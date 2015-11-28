@@ -1029,7 +1029,7 @@ bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString&
     	//Add ressources dragged from the library dialog to the project.
         std::vector<gd::String> files;
         for (std::size_t i = 2;i<command.size();++i) files.push_back(command[i]);
-        std::vector<gd::String> names = editor.resourcesEditorPnl->CopyAndAddResources(files, command[1]);
+        std::vector<gd::String> names = editor.resourcesEditorPnl->CopyAndAddResources(files, command[1], "image");
 
     	//And add them as usual to the animation.
         for (std::size_t i = 0;i<names.size();++i)

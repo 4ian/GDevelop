@@ -21,6 +21,44 @@ using namespace std;
 namespace gd
 {
 
+void ArbitraryResourceWorker::ExposeImage(gd::String & imageName)
+{
+    //Nothing to do, the image is a referece to a resource that
+    //is already exposed.
+};
+
+void ArbitraryResourceWorker::ExposeAudio(gd::String & audioName)
+{
+    for(auto resources : GetResources())
+    {
+        if (!resources) continue;
+
+        if (resources->HasResource(audioName) &&
+            resources->GetResource(audioName).GetKind() == "audio")
+        {
+            //Nothing to do, the audio is a reference to a resource that
+            //is already exposed.
+            return;
+        }
+    }
+
+    ExposeFile(audioName);
+};
+
+void ArbitraryResourceWorker::ExposeResources(gd::ResourcesManager * resourcesManager)
+{
+    if (!resourcesManager) return;
+
+    resourcesManagers.push_back(resourcesManager);
+
+    std::vector<gd::String> resources = resourcesManager->GetAllResourcesList();
+    for ( std::size_t i = 0;i < resources.size() ;i++ )
+    {
+        if ( resourcesManager->GetResource(resources[i]).UseFile() )
+            ExposeResource(resourcesManager->GetResource(resources[i]));
+    }
+}
+
 void ArbitraryResourceWorker::ExposeResource(gd::Resource & resource)
 {
     if (!resource.UseFile()) return;

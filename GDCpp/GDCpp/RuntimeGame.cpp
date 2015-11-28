@@ -13,6 +13,7 @@
 
 RuntimeGame::RuntimeGame()
 {
+    soundManager.SetResourcesManager(&GetResourcesManager());
 }
 
 void RuntimeGame::LoadFromProject(const gd::Project & project)
@@ -20,6 +21,6 @@ void RuntimeGame::LoadFromProject(const gd::Project & project)
     //Copy inherited project
     gd::Project::operator=(project);
 
-    //Initialize variables
     variables.Merge(project.GetVariables());
+    soundManager.SetResourcesManager(&GetResourcesManager());
 }

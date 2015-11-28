@@ -30,7 +30,7 @@ bool DndTextResourcesEditor::OnDropText(wxCoord x, wxCoord y, const wxString& te
         for (std::size_t i = 2;i<command.size();++i)
             files.push_back(command[i]);
 
-        editor.CopyAndAddResources(files, command[1]);
+        editor.CopyAndAddResources(files, command[1], "image");
     }
     else
         std::cout << "Drop was triggered but the command was not understood" << std::endl;

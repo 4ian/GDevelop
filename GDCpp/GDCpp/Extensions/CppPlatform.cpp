@@ -169,7 +169,6 @@ void CppPlatform::OnIDEClosed()
         CodeCompiler::Get()->ClearOutputDirectory();
 #endif
 
-    SoundManager::Get()->DestroySingleton();
     FontManager::Get()->DestroySingleton();
 }
 #endif

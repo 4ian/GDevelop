@@ -8,20 +8,14 @@
 using namespace std;
 
 Music::Music() :
-buffer(NULL),
-volume(100)
+    buffer(NULL),
+    volume(100)
 {
-    //ctor
-}
-
-Music::~Music()
-{
-    //dtor
 }
 
 bool Music::OpenFromFile(const gd::String & filename)
 {
-    #if defined(GDE)
+    #if defined(GD_IDE_ONLY)
     file = filename;
     #endif
     return music.openFromFile(filename.ToLocale());
@@ -69,16 +63,16 @@ void Music::SetLoop(bool loop)
     music.setLoop(loop);
 }
 
-void Music::SetVolume(float volume_)
+void Music::SetVolume(float volume_, float globalVolume)
 {
     volume = volume_;
     if ( volume < 0 ) volume = 0;
     if ( volume > 100 ) volume = 100;
 
-    UpdateVolume(); //Mise � jour du volume r�el
+    UpdateVolume(globalVolume);
 }
 
-void Music::UpdateVolume()
+void Music::UpdateVolume(float globalVolume)
 {
-    music.setVolume(volume * SoundManager::Get()->GetGlobalVolume()/100.f);
+    music.setVolume(volume * globalVolume / 100.f);
 }

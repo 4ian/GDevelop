@@ -168,8 +168,13 @@
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddImageBtClick" entry="EVT_MENU" />
 			</object>
+			<object class="wxMenuItem" name="idMenuAddAudio" variable="MenuItem4" member="yes">
+				<label>Add a sound/music</label>
+				<handler function="OnAddAudioSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuDel" variable="deleteImageItem" member="no">
-				<label>Delete the image</label>
+				<label>Delete</label>
 				<accel>DEL</accel>
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
 				<handler function="OnDelImageBtClick" entry="EVT_MENU" />
@@ -200,6 +205,10 @@
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddImageBtClick" entry="EVT_MENU" />
 			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem15" member="yes">
+				<label>Add a sound/music</label>
+				<handler function="OnAddAudioSelected" entry="EVT_MENU" />
+			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem6" member="yes">
 				<label>Add a folder</label>
@@ -214,17 +223,22 @@
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;rename&quot;, 16)' />
 				<handler function="OnModNameImageBtClick" entry="EVT_MENU" />
 			</object>
-			<object class="wxMenuItem" name="ID_MENUITEM5" variable="MenuItem13" member="yes">
-				<label>Delete</label>
-				<accel>DEL</accel>
-				<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
-				<handler function="OnDelImageBtClick" entry="EVT_MENU" />
-			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM6" variable="MenuItem10" member="yes">
 				<label>Add an image</label>
 				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddImageBtClick" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem16" member="yes">
+				<label>Add a sound/music</label>
+				<handler function="OnAddAudioSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM5" variable="MenuItem13" member="yes">
+				<label>Delete</label>
+				<accel>DEL</accel>
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;delete&quot;, 16)' />
+				<handler function="OnDelImageBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem5" member="yes">

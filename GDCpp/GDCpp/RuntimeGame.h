@@ -7,18 +7,19 @@
 #define RUNTIMEGAME_H
 
 #include "GDCpp/Project/Project.h"
+#include "GDCpp/SoundManager.h"
 #include "GDCpp/RuntimeVariablesContainer.h"
 #include <vector>
 #include <string>
 #include <map>
 #include <memory>
+class SoundManager;
 
 /**
  * \brief Represents a game being played.
  *
- * A RuntimeGame is used when a game is played.<be>
- * It contains everything a project provide, but also specific
- * functions and members for runtime ( variables... )
+ * It contains everything a project provides, but also specific
+ * functions and members for runtime (variables...)
  *
  * \ingroup GameEngine
  */
@@ -30,10 +31,18 @@ public:
 
     /**
      * \brief Set up the RuntimeGame using a gd::Project.
-     *
-     * Typically called automatically by the IDE or by the game executable.
      */
     void LoadFromProject( const gd::Project & project );
+
+    /**
+     * Return the sound manager of the game.
+     */
+    SoundManager & GetSoundManager() { return soundManager; };
+
+    /**
+     * Return the sound manager of the game.
+     */
+    const SoundManager & GetSoundManager() const { return soundManager; };
 
     /**
      * \brief Provide access to the global variables container
@@ -47,6 +56,7 @@ public:
 
 private:
     RuntimeVariablesContainer variables; ///<List of the global variables
+    SoundManager soundManager;
 };
 
 #endif // RUNTIMEGAME_H

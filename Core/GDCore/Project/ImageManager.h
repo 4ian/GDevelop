@@ -15,7 +15,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-namespace gd { class Project; }
+namespace gd { class ResourcesManager; }
 class OpenGLTextureWrapper;
 class SFMLTextureWrapper;
 #undef LoadImage //thx windows.h
@@ -26,7 +26,8 @@ namespace gd
 /**
  * \brief Manage images for the IDE as well as at runtime for GD C++ Platform, providing an easy way to get SFML images or OpenGL textures.
  *
- * Image manager is used by objects to obtain their images from the image name.<br>
+ * Image manager is used by objects to obtain their images from the image name.
+ *
  * Images are loaded dynamically when necessary, and are unloaded if there is no
  * more shared_ptr pointing on an image.
  *
@@ -57,9 +58,9 @@ public:
     std::shared_ptr<SFMLTextureWrapper> GetSFMLTexture(const gd::String & name) const;
 
     /**
-     * \brief Set the project associated with the image manager.
+     * \brief Set the gd::ResourcesManager used by the ImageManager.
      */
-    void SetGame(gd::Project * game_) { game = game_; }
+    void SetResourcesManager(gd::ResourcesManager * resourcesManager_) { resourcesManager = resourcesManager_; }
 
     /**
      * \brief Load all images of the project which are flagged as alwaysLoaded.
@@ -119,7 +120,7 @@ private:
     mutable std::shared_ptr<SFMLTextureWrapper> badTexture;
     mutable std::shared_ptr<OpenGLTextureWrapper> badOpenGLTexture;
 
-    gd::Project * game;
+    gd::ResourcesManager * resourcesManager;
 };
 
 }
@@ -132,7 +133,7 @@ private:
  */
 class GD_CORE_API SFMLTextureWrapper
 {
-public :
+public:
     SFMLTextureWrapper(const sf::Texture & texture);
     SFMLTextureWrapper();
     ~SFMLTextureWrapper();
@@ -149,13 +150,13 @@ public :
  */
 class GD_CORE_API OpenGLTextureWrapper
 {
-public :
+public:
     OpenGLTextureWrapper(std::shared_ptr<SFMLTextureWrapper> sfmlTexture_);
     OpenGLTextureWrapper() : texture(0) {};
     ~OpenGLTextureWrapper();
     inline GLuint GetOpenGLTexture() const { return texture; }
 
-private :
+private:
     std::shared_ptr<SFMLTextureWrapper> sfmlTexture;
     GLuint texture;
 };

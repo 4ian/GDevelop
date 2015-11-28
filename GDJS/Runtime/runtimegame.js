@@ -29,7 +29,8 @@ gdjs.RuntimeGame = function(data, spec)
 
     this._variables = new gdjs.VariablesContainer(data.variables);
     this._data = data;
-    this._imageManager = new gdjs.ImageManager(this);
+    this._imageManager = new gdjs.ImageManager(data.resources ? data.resources.resources : undefined);
+    this._soundManager = new gdjs.SoundManager(data.resources ? data.resources.resources : undefined);
     this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
     //Rendering (see createStandardCanvas method)
@@ -63,7 +64,7 @@ gdjs.RuntimeGame = function(data, spec)
 };
 
 /**
- * Get the variables of the runtimeGame.
+ * Get the variables of the RuntimeGame.
  * @method getVariables
  * @return a variablesContainer object.
  */
@@ -71,6 +72,20 @@ gdjs.RuntimeGame.prototype.getVariables = function() {
 	return this._variables;
 };
 
+/**
+ * Get the gdjs.SoundManager of the RuntimeGame.
+ * @method getSoundManager
+ * @return {gdjs.SoundManager} The sound manager.
+ */
+gdjs.RuntimeGame.prototype.getSoundManager = function() {
+    return this._soundManager;
+};
+
+/**
+ * Get the gdjs.ImageManager of the RuntimeGame.
+ * @method getImageManager
+ * @return {gdjs.ImageManager} The image manager.
+ */
 gdjs.RuntimeGame.prototype.getImageManager = function() {
 	return this._imageManager;
 };
@@ -392,48 +407,31 @@ gdjs.RuntimeGame.prototype._resizeCanvas = function() {
 
 /**
  * Load all assets, displaying progress in renderer.
- * TODO: This should be moved to ImageManager and take advantage of the load callback
- * to store resources, and use it to load textures instead of fromImage.
  * @method loadAllAssets
  */
 gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
-
     //Prepare the progress text
     var loadingScreen = new PIXI.Container();
     var text = new PIXI.Text(" ", {font: "bold 60px Arial", fill: "#FFFFFF", align: "center"});
     loadingScreen.addChild(text);
-    text.position.x = this._renderer.width/2-50;
     text.position.y = this._renderer.height/2;
-    var loadingCount = 0;
 
-    //Load all assets
-    var assets = [];
-    gdjs.iterateOverArray(gdjs.projectData.resources.resources, function(res) {
-        if ( res.file && assets.indexOf(res.file) === -1 )
-            assets.push(res.file);
+    var allAssetsTotal = this._data.resources.resources.length;
+
+    var that = this;
+    this._imageManager.loadTextures(function (count, total) {
+        text.text = Math.floor(count / allAssetsTotal * 100) + "%";
+        text.position.x = that._renderer.width/2-text.width/2;
+        that._renderer.render(loadingScreen);
+    }, function() {
+        that._soundManager.preloadAudio(function (count, total) {
+            text.text = Math.floor((allAssetsTotal - total + count) / allAssetsTotal * 100) + "%";
+            text.position.x = that._renderer.width/2-text.width/2;
+            that._renderer.render(loadingScreen);
+        }, function() {
+            callback();
+        });
     });
-
-    var game = this;
-    if ( assets.length !== 0 ) {
-        var loader = PIXI.loader;
-        loader.once('complete', callback);
-        loader.on('progress', onAssetsLoadingProgress);
-
-        for(var i = 0;i < assets.length; ++i) {
-            loader.add(assets[i], assets[i]);
-        }
-
-        loader.load();
-    }
-    else {
-        callback();
-    }
-
-    function onAssetsLoadingProgress() {
-        game._renderer.render(loadingScreen);
-        loadingCount++;
-        text.text = Math.floor(loadingCount/assets.length*100) + "%";
-    }
 };
 
 /**

@@ -20,7 +20,7 @@ public:
     Sound();
     Sound(gd::String file);
     Sound(const Sound & copy);
-    virtual ~Sound();
+    virtual ~Sound() {};
 
     /**
      * \brief Get the sound status
@@ -32,7 +32,7 @@ public:
      * \brief Change the music volume.
      * \param volume The new volume, between 0 and 100.
      */
-    void SetVolume(float volume_);
+    void SetVolume(float volume_, float globalVolume);
 
     /**
      * \brief Get the sound volume.
@@ -71,7 +71,7 @@ public:
      *
      * Called by the sound manager when the global volume is updated.
      */
-    void UpdateVolume();
+    void UpdateVolume(float globalVolume);
 
 private:
     float volume; ///< Volume is not directly stored in the sf::Sound as GD allows to change global volume.

@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include "GDCore/Project/ImageManager.h"
-#include "GDCore/Project/Project.h"
+#include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/ResourcesLoader.h"
 #include "GDCore/Tools/InvalidImage.h"
 #include "GDCore/Project/ResourcesManager.h"
@@ -14,7 +14,7 @@ namespace gd
 {
 
 ImageManager::ImageManager() :
-    game(NULL)
+    resourcesManager(NULL)
 {
     #if !defined(EMSCRIPTEN)
     badTexture = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
@@ -26,9 +26,9 @@ ImageManager::ImageManager() :
 
 std::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const gd::String & name) const
 {
-    if ( !game )
+    if ( !resourcesManager )
     {
-        std::cout << "Image manager has no game associated with.";
+        std::cout << "ImageManager has no ResourcesManager associated with.";
         return badTexture;
     }
 
@@ -40,7 +40,7 @@ std::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const gd::Strin
     //Load only an image when necessary
     try
     {
-        ImageResource & image = dynamic_cast<ImageResource&>(game->GetResourcesManager().GetResource(name));
+        ImageResource & image = dynamic_cast<ImageResource&>(resourcesManager->GetResource(name));
 
         std::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper(ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile() )));
         texture->texture.setSmooth(image.smooth);
@@ -80,9 +80,9 @@ void ImageManager::SetSFMLTextureAsPermanentlyLoaded(const gd::String & name, st
 
 void ImageManager::ReloadImage(const gd::String & name) const
 {
-    if ( !game )
+    if ( !resourcesManager )
     {
-        std::cout << "Image manager has no game associated with.";
+        std::cout << "ImageManager has no ResourcesManager associated with.";
         return;
     }
 
@@ -94,7 +94,7 @@ void ImageManager::ReloadImage(const gd::String & name) const
 
     try
     {
-        ImageResource & image = dynamic_cast<ImageResource&>(game->GetResourcesManager().GetResource(name));
+        ImageResource & image = dynamic_cast<ImageResource&>(resourcesManager->GetResource(name));
 
         std::cout << "ImageManager: Reload " << name << std::endl;
 
@@ -113,12 +113,6 @@ void ImageManager::ReloadImage(const gd::String & name) const
 
 std::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const gd::String & name) const
 {
-    if ( !game )
-    {
-        std::cout << "Image manager has no game associated with.";
-        return badOpenGLTexture;
-    }
-
     if ( alreadyLoadedOpenGLTextures.find(name) != alreadyLoadedOpenGLTextures.end() && !alreadyLoadedOpenGLTextures.find(name)->second.expired() )
         return alreadyLoadedOpenGLTextures.find(name)->second.lock();
 
@@ -131,9 +125,9 @@ std::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const gd::S
 
 void ImageManager::LoadPermanentImages()
 {
-    if ( !game )
+    if ( !resourcesManager )
     {
-        std::cout << "Image manager has no game associated with.";
+        std::cout << "ImageManager has no ResourcesManager associated with.";
         return;
     }
 
@@ -141,12 +135,12 @@ void ImageManager::LoadPermanentImages()
     //so as not to unload images that could be still present.
     std::map < gd::String, std::shared_ptr<SFMLTextureWrapper> > newPermanentlyLoadedImages;
 
-    std::vector<gd::String> resources = game->GetResourcesManager().GetAllResourcesList();
+    std::vector<gd::String> resources = resourcesManager->GetAllResourcesList();
     for ( std::size_t i = 0;i <resources.size();i++ )
     {
         try
         {
-            ImageResource & image = dynamic_cast<ImageResource&>(game->GetResourcesManager().GetResource(resources[i]));
+            ImageResource & image = dynamic_cast<ImageResource&>(resourcesManager->GetResource(resources[i]));
 
             if ( image.alwaysLoaded )
                 newPermanentlyLoadedImages[image.GetName()] = GetSFMLTexture(image.GetName());
@@ -171,7 +165,7 @@ void ImageManager::PreventImagesUnloading()
 void ImageManager::EnableImagesUnloading()
 {
     preventUnloading = false;
-    unloadingPreventer.clear(); //Images which are not used anymore will thus be destroyed ( As no shared pointer will be pointing to them ).
+    unloadingPreventer.clear(); //Images which are not used anymore will thus be destroyed (As no shared pointer will be pointing to them).
 }
 #endif
 

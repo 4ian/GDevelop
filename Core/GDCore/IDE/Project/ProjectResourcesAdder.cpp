@@ -27,14 +27,14 @@ bool ProjectResourcesAdder::AddAllMissingImages(gd::Project & project)
         if (!resourcesManager.HasResource(*it))
         {
             std::cout << "Adding missing resource \""<<*it<<"\"to the project.";
-            resourcesManager.AddResource(*it, /*filename=*/*it); //Note that AddResource add a image resource by default.
+            resourcesManager.AddResource(*it, /*filename=*/*it, "image");
         }
     }
 
     return true;
 }
 
-std::vector<gd::String> ProjectResourcesAdder::GetAllUselessResources(gd::Project & project)
+std::vector<gd::String> ProjectResourcesAdder::GetAllUselessImages(gd::Project & project)
 {
     std::vector<gd::String> unusedResources;
 
@@ -58,9 +58,9 @@ std::vector<gd::String> ProjectResourcesAdder::GetAllUselessResources(gd::Projec
     return unusedResources;
 }
 
-void ProjectResourcesAdder::RemoveAllUselessResources(gd::Project & project)
+void ProjectResourcesAdder::RemoveAllUselessImages(gd::Project & project)
 {
-    std::vector<gd::String> unusedResources = GetAllUselessResources(project);
+    std::vector<gd::String> unusedResources = GetAllUselessImages(project);
 
     for(std::size_t i = 0;i < unusedResources.size();++i) {
         project.GetResourcesManager().RemoveResource(unusedResources[i]);

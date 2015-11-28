@@ -19,7 +19,7 @@ class GD_API Music
 {
 public:
     Music();
-    virtual ~Music();
+    virtual ~Music() {};
 
     /**
      * \brief Open the music from a file.
@@ -80,7 +80,7 @@ public:
      * \brief Change the music volume.
      * \param volume The new volume, between 0 and 100.
      */
-    void SetVolume(float volume_);
+    void SetVolume(float volume_, float globalVolume);
 
     /**
      * \brief Get the music volume.
@@ -113,7 +113,7 @@ public:
      *
      * Called by the sound manager when the global volume is updated.
      */
-    void UpdateVolume();
+    void UpdateVolume(float globalVolume);
 
     #if defined(GD_IDE_ONLY)
     gd::String file; ///< Only useful for GD debugger

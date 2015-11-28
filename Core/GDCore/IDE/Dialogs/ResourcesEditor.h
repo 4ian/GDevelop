@@ -44,7 +44,7 @@ public:
      * Ask the resources editor to add the resources contained into \a filenames.
      * \return A vector containing the name of the added resources.
      */
-    std::vector<gd::String> AddResources(const std::vector<gd::String> & filenames);
+    std::vector<gd::String> AddResources(const std::vector<gd::String> & filenames, const gd::String & kind);
 
     /**
      * Ask the resources editor to add the resources contained into \a filenames.
@@ -52,7 +52,7 @@ public:
      * (which is relative to the project directory) before being added to the project.
      * \return A vector containing the name of the added resources.
      */
-    std::vector<gd::String> CopyAndAddResources(std::vector<gd::String> filenames, const gd::String & destinationDir);
+    std::vector<gd::String> CopyAndAddResources(std::vector<gd::String> filenames, const gd::String & destinationDir, const gd::String & kind);
 
     /**
      * \brief Called by DndTextResourcesEditor when one or more resources from the editor has been dropped
@@ -76,8 +76,10 @@ public:
     wxMenuItem* MenuItem5;
     wxMenuItem* MenuItem2;
     wxTreeCtrl* resourcesTree;
+    wxMenuItem* MenuItem4;
     wxMenuItem* MenuItem14;
     wxMenuItem* MenuItem11;
+    wxMenuItem* MenuItem15;
     wxMenuItem* MenuItem13;
     wxMenu ContextMenu;
     wxMenuItem* MenuItem10;
@@ -86,6 +88,7 @@ public:
     wxMenuItem* MenuItem6;
     wxPanel* previewPanel;
     wxPanel* propertiesPanel;
+    wxMenuItem* MenuItem16;
     wxMenuItem* MenuItem9;
     wxMenu folderMenu;
     //*)
@@ -126,15 +129,18 @@ protected:
     static const long ID_PANEL2;
     static const long idMenuMod;
     static const long idMenuAjouter;
+    static const long idMenuAddAudio;
     static const long idMenuDel;
     static const long ID_MENUITEM9;
     static const long idMoveUp;
     static const long idMoveDown;
     static const long ID_MENUITEM1;
+    static const long ID_MENUITEM10;
     static const long ID_MENUITEM2;
     static const long ID_MENUITEM3;
-    static const long ID_MENUITEM5;
     static const long ID_MENUITEM6;
+    static const long ID_MENUITEM11;
+    static const long ID_MENUITEM5;
     static const long ID_MENUITEM4;
     static const long ID_MENUITEM7;
     static const long ID_MENUITEM8;
@@ -193,6 +199,7 @@ private:
     void OnresourcesTreeKeyDown(wxTreeEvent& event);
     void OnresourcesTreeEndDrag(wxTreeEvent& event);
     void OnAddFromLibraryToolbarBtClick(wxCommandEvent& event);
+    void OnAddAudioSelected(wxCommandEvent& event);
     //*)
     void OnMoreOptions( wxCommandEvent& event );
     void OnAddFromLibraryBtClick(wxCommandEvent& event);

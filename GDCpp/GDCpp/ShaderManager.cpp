@@ -6,10 +6,8 @@
 
 using namespace std;
 
-ShaderManager::ShaderManager() :
-    game(NULL)
+ShaderManager::ShaderManager()
 {
-    //ctor
 }
 
 std::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<gd::String> & shaders)

@@ -489,29 +489,29 @@
 			<debugger />
 			<wxsmith version="1">
 				<resources>
-					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDCore\IDE\Dialogs\ChooseVariableDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseVariableDialog.h" fwddecl="0" i18n="1" name="ChooseVariableDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ResourceLibraryDialog.wxs" src="GDCore\IDE\Dialogs\ResourceLibraryDialog.cpp" hdr="GDCore\IDE\Dialogs\ResourceLibraryDialog.h" fwddecl="0" i18n="1" name="ResourceLibraryDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ProjectExtensionsDialog.wxs" src="GDCore\IDE\Dialogs\ProjectExtensionsDialog.cpp" hdr="GDCore\IDE\Dialogs\ProjectExtensionsDialog.h" fwddecl="0" i18n="1" name="ProjectExtensionsDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseObjectDialog.wxs" src="GDCore\IDE\Dialogs\ChooseObjectDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseObjectDialog.h" fwddecl="0" i18n="1" name="ChooseObjectDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseBehaviorDialog.wxs" src="GDCore\IDE\Dialogs\ChooseBehaviorDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseBehaviorDialog.h" fwddecl="0" i18n="1" name="ChooseBehaviorDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseLayerDialog.wxs" src="GDCore\IDE\Dialogs\ChooseLayerDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseLayerDialog.h" fwddecl="0" i18n="1" name="ChooseLayerDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/EditExpressionDialog.wxs" src="GDCore\IDE\Dialogs\EditExpressionDialog.cpp" hdr="GDCore\IDE\Dialogs\EditExpressionDialog.h" fwddecl="0" i18n="1" name="EditExpressionDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/EditStrExpressionDialog.wxs" src="GDCore\IDE\Dialogs\EditStrExpressionDialog.cpp" hdr="GDCore\IDE\Dialogs\EditStrExpressionDialog.h" fwddecl="0" i18n="1" name="EditStrExpressionDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/AdvancedEntryDialog.wxs" src="GDCore\IDE\Dialogs\AdvancedEntryDialog.cpp" hdr="GDCore\IDE\Dialogs\AdvancedEntryDialog.h" fwddecl="0" i18n="1" name="AdvancedEntryDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseObjectTypeDialog.wxs" src="GDCore\IDE\Dialogs\ChooseObjectTypeDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseObjectTypeDialog.h" fwddecl="0" i18n="1" name="ChooseObjectTypeDialog" language="CPP" />
-					<wxPanel wxs="wxsmith/LayoutEditorCanvas.wxs" src="GDCore\IDE\Dialogs\LayoutEditorCanvas.cpp" hdr="GDCore\IDE\Dialogs\LayoutEditorCanvas.h" fwddecl="0" i18n="1" name="LayoutEditorCanvas" language="CPP" />
-					<wxDialog wxs="wxsmith/GridSetupDialog.wxs" src="GDCore\IDE\Dialogs\GridSetupDialog.cpp" hdr="GDCore\IDE\Dialogs\GridSetupDialog.h" fwddecl="0" i18n="1" name="GridSetupDialog" language="CPP" />
-					<wxPanel wxs="wxsmith/LayersEditorPanel.wxs" src="GDCore\IDE\Dialogs\LayersEditorPanel.cpp" hdr="GDCore\IDE\Dialogs\LayersEditorPanel.h" fwddecl="0" i18n="1" name="LayersEditorPanel" language="CPP" />
-					<wxDialog wxs="wxsmith/InstancesAdvancedPasteDialog.wxs" src="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.cpp" hdr="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.h" fwddecl="0" i18n="1" name="InstancesAdvancedPasteDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseBehaviorTypeDialog.wxs" src="GDCore\IDE\Dialogs\ChooseBehaviorTypeDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseBehaviorTypeDialog.h" fwddecl="0" i18n="1" name="ChooseBehaviorTypeDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/EditLayerDialog.wxs" src="GDCore\IDE\Dialogs\EditLayerDialog.cpp" hdr="GDCore\IDE\Dialogs\EditLayerDialog.h" fwddecl="0" i18n="1" name="EditLayerDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDCore\IDE\Dialogs\EditLink.cpp" hdr="GDCore\IDE\Dialogs\EditLink.h" fwddecl="0" i18n="1" name="EditLink" language="CPP" />
-					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDCore\IDE\Dialogs\EditComment.cpp" hdr="GDCore\IDE\Dialogs\EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />
-					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDCore\IDE\Dialogs\EditForEachEvent.cpp" hdr="GDCore\IDE\Dialogs\EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDCore\IDE\Dialogs\EditRepeatEvent.cpp" hdr="GDCore\IDE\Dialogs\EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/ProjectUpdateDialog.wxs" src="GDCore\IDE\Dialogs\ProjectUpdateDialog.cpp" hdr="GDCore\IDE\Dialogs\ProjectUpdateDialog.h" fwddecl="0" i18n="1" name="ProjectUpdateDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDCore/IDE/Dialogs/ChooseVariableDialog.cpp" hdr="GDCore/IDE/Dialogs/ChooseVariableDialog.h" fwddecl="0" i18n="1" name="ChooseVariableDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ResourceLibraryDialog.wxs" src="GDCore/IDE/Dialogs/ResourceLibraryDialog.cpp" hdr="GDCore/IDE/Dialogs/ResourceLibraryDialog.h" fwddecl="0" i18n="1" name="ResourceLibraryDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ProjectExtensionsDialog.wxs" src="GDCore/IDE/Dialogs/ProjectExtensionsDialog.cpp" hdr="GDCore/IDE/Dialogs/ProjectExtensionsDialog.h" fwddecl="0" i18n="1" name="ProjectExtensionsDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseObjectDialog.wxs" src="GDCore/IDE/Dialogs/ChooseObjectDialog.cpp" hdr="GDCore/IDE/Dialogs/ChooseObjectDialog.h" fwddecl="0" i18n="1" name="ChooseObjectDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseBehaviorDialog.wxs" src="GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp" hdr="GDCore/IDE/Dialogs/ChooseBehaviorDialog.h" fwddecl="0" i18n="1" name="ChooseBehaviorDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseLayerDialog.wxs" src="GDCore/IDE/Dialogs/ChooseLayerDialog.cpp" hdr="GDCore/IDE/Dialogs/ChooseLayerDialog.h" fwddecl="0" i18n="1" name="ChooseLayerDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditExpressionDialog.wxs" src="GDCore/IDE/Dialogs/EditExpressionDialog.cpp" hdr="GDCore/IDE/Dialogs/EditExpressionDialog.h" fwddecl="0" i18n="1" name="EditExpressionDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditStrExpressionDialog.wxs" src="GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp" hdr="GDCore/IDE/Dialogs/EditStrExpressionDialog.h" fwddecl="0" i18n="1" name="EditStrExpressionDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/AdvancedEntryDialog.wxs" src="GDCore/IDE/Dialogs/AdvancedEntryDialog.cpp" hdr="GDCore/IDE/Dialogs/AdvancedEntryDialog.h" fwddecl="0" i18n="1" name="AdvancedEntryDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseObjectTypeDialog.wxs" src="GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp" hdr="GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h" fwddecl="0" i18n="1" name="ChooseObjectTypeDialog" language="CPP" />
+					<wxPanel wxs="wxsmith/LayoutEditorCanvas.wxs" src="GDCore/IDE/Dialogs/LayoutEditorCanvas.cpp" hdr="GDCore/IDE/Dialogs/LayoutEditorCanvas.h" fwddecl="0" i18n="1" name="LayoutEditorCanvas" language="CPP" />
+					<wxDialog wxs="wxsmith/GridSetupDialog.wxs" src="GDCore/IDE/Dialogs/GridSetupDialog.cpp" hdr="GDCore/IDE/Dialogs/GridSetupDialog.h" fwddecl="0" i18n="1" name="GridSetupDialog" language="CPP" />
+					<wxPanel wxs="wxsmith/LayersEditorPanel.wxs" src="GDCore/IDE/Dialogs/LayersEditorPanel.cpp" hdr="GDCore/IDE/Dialogs/LayersEditorPanel.h" fwddecl="0" i18n="1" name="LayersEditorPanel" language="CPP" />
+					<wxDialog wxs="wxsmith/InstancesAdvancedPasteDialog.wxs" src="GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.cpp" hdr="GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.h" fwddecl="0" i18n="1" name="InstancesAdvancedPasteDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseBehaviorTypeDialog.wxs" src="GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.cpp" hdr="GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.h" fwddecl="0" i18n="1" name="ChooseBehaviorTypeDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLayerDialog.wxs" src="GDCore/IDE/Dialogs/EditLayerDialog.cpp" hdr="GDCore/IDE/Dialogs/EditLayerDialog.h" fwddecl="0" i18n="1" name="EditLayerDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDCore/IDE/Dialogs/EditLink.cpp" hdr="GDCore/IDE/Dialogs/EditLink.h" fwddecl="0" i18n="1" name="EditLink" language="CPP" />
+					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDCore/IDE/Dialogs/EditComment.cpp" hdr="GDCore/IDE/Dialogs/EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />
+					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDCore/IDE/Dialogs/EditForEachEvent.cpp" hdr="GDCore/IDE/Dialogs/EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDCore/IDE/Dialogs/EditRepeatEvent.cpp" hdr="GDCore/IDE/Dialogs/EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/ProjectUpdateDialog.wxs" src="GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp" hdr="GDCore/IDE/Dialogs/ProjectUpdateDialog.h" fwddecl="0" i18n="1" name="ProjectUpdateDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/SpriteObjectEditor.wxs" src="GDCore\Extensions\BuiltinExtensions\SpriteExtension\Dialogs\SpriteObjectEditor.cpp" hdr="GDCore\Extensions\BuiltinExtensions\SpriteExtension\Dialogs\SpriteObjectEditor.h" fwddecl="0" i18n="1" name="SpriteObjectEditor" language="CPP" />
-					<wxPanel wxs="wxsmith/ResourcesEditor.wxs" src="GDCore\IDE\Dialogs\ResourcesEditor.cpp" hdr="GDCore\IDE\Dialogs\ResourcesEditor.h" fwddecl="0" i18n="1" name="ResourcesEditor" language="CPP" />
+					<wxPanel wxs="wxsmith/ResourcesEditor.wxs" src="GDCore/IDE/Dialogs/ResourcesEditor.cpp" hdr="GDCore/IDE/Dialogs/ResourcesEditor.h" fwddecl="0" i18n="1" name="ResourcesEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

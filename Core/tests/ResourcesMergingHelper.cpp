@@ -51,14 +51,16 @@ TEST_CASE( "ResourcesMergingHelper", "[common]" ) {
         resourcesMerger.SetBaseDirectory("/game/base/folder/");
 
         gd::Project project;
-        project.GetResourcesManager().AddResource("Image1", "/image1.png");
-        project.GetResourcesManager().AddResource("Image2", "image2.png");
-        project.GetResourcesManager().AddResource("Image3", "subfolder/image3.png");
+        project.GetResourcesManager().AddResource("Image1", "/image1.png", "image");
+        project.GetResourcesManager().AddResource("Image2", "image2.png", "image");
+        project.GetResourcesManager().AddResource("Audio1", "audio1.png", "audio");
+        project.GetResourcesManager().AddResource("Image3", "subfolder/image3.png", "image");
 
         project.ExposeResources(resourcesMerger);
 
         auto resourcesFilenames = resourcesMerger.GetAllResourcesOldAndNewFilename();
         REQUIRE(resourcesFilenames["MakeAbsolute(/image1.png)"] == "FileNameFrom(MakeAbsolute(/image1.png))");
+        REQUIRE(resourcesFilenames["MakeAbsolute(audio1.png)"] == "FileNameFrom(MakeAbsolute(audio1.png))");
         REQUIRE(resourcesFilenames["MakeAbsolute(image2.png)"] == "FileNameFrom(MakeAbsolute(image2.png))");
         REQUIRE(resourcesFilenames["MakeAbsolute(subfolder/image3.png)"] == "FileNameFrom(MakeAbsolute(subfolder/image3.png))");
     }
@@ -69,15 +71,17 @@ TEST_CASE( "ResourcesMergingHelper", "[common]" ) {
         resourcesMerger.PreserveDirectoriesStructure(true);
 
         gd::Project project;
-        project.GetResourcesManager().AddResource("Image1", "/image1.png");
-        project.GetResourcesManager().AddResource("Image2", "image2.png");
-        project.GetResourcesManager().AddResource("Image3", "subfolder/image3.png");
+        project.GetResourcesManager().AddResource("Image1", "/image1.png", "image");
+        project.GetResourcesManager().AddResource("Image2", "image2.png", "image");
+        project.GetResourcesManager().AddResource("Audio1", "audio1.png", "audio");
+        project.GetResourcesManager().AddResource("Image3", "subfolder/image3.png", "image");
 
         project.ExposeResources(resourcesMerger);
 
         auto resourcesFilenames = resourcesMerger.GetAllResourcesOldAndNewFilename();
         REQUIRE(resourcesFilenames["MakeAbsolute(/image1.png)"] == "MakeRelative(MakeAbsolute(/image1.png))");
         REQUIRE(resourcesFilenames["MakeAbsolute(image2.png)"] == "MakeRelative(MakeAbsolute(image2.png))");
+        REQUIRE(resourcesFilenames["MakeAbsolute(audio1.png)"] == "MakeRelative(MakeAbsolute(audio1.png))");
         REQUIRE(resourcesFilenames["MakeAbsolute(subfolder/image3.png)"] == "MakeRelative(MakeAbsolute(subfolder/image3.png))");
     }
 }

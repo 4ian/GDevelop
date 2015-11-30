@@ -7,12 +7,12 @@
 
 class TileSet;
 class TileMap;
-namespace gd{ class ResourcesManager; }
+namespace gd{ class Project; }
 
 class TileMapImporterDialog : public TileMapImporterDialogBase
 {
 public:
-    TileMapImporterDialog(wxWindow* parent, TileSet tileset, TileMap tilemap, gd::ResourcesManager &resManager);
+    TileMapImporterDialog(wxWindow* parent, TileSet tileset, TileMap tilemap, gd::Project &project);
     virtual ~TileMapImporterDialog();
 
     const TileSet& GetTileSet() const { return m_tileset; }
@@ -27,7 +27,7 @@ protected:
 private:
     TileSet m_tileset;
     TileMap m_tilemap;
-    gd::ResourcesManager &m_resManager;
+    gd::Project &m_project;
 };
 
 #endif

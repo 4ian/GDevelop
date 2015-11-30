@@ -6,11 +6,11 @@
 #include "TileSet.h"
 #include "TileMap.h"
 
-TileMapImporterDialog::TileMapImporterDialog(wxWindow* parent, TileSet tileset, TileMap tilemap, gd::ResourcesManager &resManager)
+TileMapImporterDialog::TileMapImporterDialog(wxWindow* parent, TileSet tileset, TileMap tilemap, gd::Project &project)
     : TileMapImporterDialogBase(parent),
     m_tileset(tileset),
     m_tilemap(tilemap),
-    m_resManager(resManager)
+    m_project(project)
 {
     m_okBt->Disable();
 }
@@ -41,7 +41,7 @@ void TileMapImporterDialog::OnImportButtonClicked(wxCommandEvent& event)
             m_importOptionsCheckList->IsChecked(1),
             m_importOptionsCheckList->IsChecked(2),
             m_importOptionsCheckList->IsChecked(3),
-            m_resManager))
+            m_project))
         {
             m_okBt->Disable();
         }

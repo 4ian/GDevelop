@@ -5,6 +5,8 @@
 #include <stdexcept>
 
 #include <wx/filename.h>
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/IDE/NewNameGenerator.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
@@ -33,7 +35,7 @@ TileMapImporter::TileMapImporter(const wxString &filePath)
 
 bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
     bool importTileMap, bool importTileSetConf, bool importTileSetImage,
-    bool importHitboxes, gd::ResourcesManager &resManager)
+    bool importHitboxes, gd::Project &project)
 {
     //Checks the map type
     if(m_map->GetOrientation() != Tmx::TMX_MO_ORTHOGONAL)
@@ -68,14 +70,17 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
 
         gd::String newResourceName = gd::NewNameGenerator::Generate(
             u8"imported_" + imageFileName.GetFullName(),
-            [&resManager](const gd::String &name) -> bool { return resManager.HasResource(name); }
+            [&project](const gd::String &name) -> bool { return project.GetResourcesManager().HasResource(name); }
             );
 
         gd::LogMessage(_("The image is imported as ") + "\"" + newResourceName + "\".");
 
-        resManager.AddResource(newResourceName, imageFileName.GetFullPath(wxPATH_UNIX));
+        project.GetResourcesManager().AddResource(newResourceName, imageFileName.GetFullPath(wxPATH_UNIX));
 
         tileSet.textureName = newResourceName;
+
+        //Reload the texture
+        tileSet.LoadResources(project);
 
         gd::LogStatus(_("Tileset image importation completed."));
     }
@@ -85,9 +90,8 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
     {
         const Tmx::Tileset *importedTileset = m_map->GetTileset(0);
 
-        if(!importTileSetImage && ( //If the tileset image was imported, it should be ok.
-            importedTileset->GetImage()->GetWidth() != tileSet.GetWxBitmap().GetWidth() ||
-            importedTileset->GetImage()->GetHeight() != tileSet.GetWxBitmap().GetHeight()))
+        if(importedTileset->GetImage()->GetWidth() != tileSet.GetWxBitmap().GetWidth() ||
+           importedTileset->GetImage()->GetHeight() != tileSet.GetWxBitmap().GetHeight())
         {
             gd::LogWarning(_("Tileset image size is not the same. Some tiles may not be rendered correctly."));
         }
@@ -152,9 +156,9 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
         const Tmx::Tileset *importedTileset = m_map->GetTileset(0);
 
         //Set all tiles not collidable in the tileset
+        tileSet.ResetHitboxes();
         for(std::size_t i = 0; i < tileSet.GetTilesCount(); i++)
             tileSet.SetTileCollidable(i, false);
-        tileSet.ResetHitboxes();
 
         if(!importTileSetConf && !importTileSetImage)
             CheckTilesCount(tileSet);

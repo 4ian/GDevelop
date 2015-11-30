@@ -12,7 +12,7 @@ class TileMap;
 class TileSet;
 namespace gd
 {
-    class ResourcesManager;
+    class Project;
 }
 
 class TileMapImporter
@@ -22,7 +22,7 @@ public:
 
     bool ImportTileMap(TileSet &tileSet, TileMap &tileMap,
         bool importTileMap, bool importTileSetConf, bool importTileSetImage,
-        bool importHitboxes, gd::ResourcesManager &resManager);
+        bool importHitboxes, gd::Project &project);
 
 private:
     wxString m_filePath;

@@ -229,6 +229,7 @@ void TileMapObjectEditor::OnTmxImportButtonClicked(wxCommandEvent& event)
         tileSet = dialog.GetTileSet();
         tileMap = dialog.GetTileMap();
 
+        m_tileSetPanel->Update();
         m_tileMapPanel->Update();
     }
 }

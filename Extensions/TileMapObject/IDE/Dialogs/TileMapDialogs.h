@@ -233,8 +233,6 @@ protected:
     wxCheckListBox* m_importOptionsCheckList;
     wxStaticText* m_staticText555;
     wxButton* m_importButton;
-    wxStaticText* m_staticText567;
-    wxTextCtrl* m_problemsTextCtrl;
     wxStdDialogButtonSizer* m_stdBtnSizer533;
     wxButton* m_okBt;
     wxButton* m_button537;
@@ -253,9 +251,7 @@ public:
     wxCheckListBox* GetImportOptionsCheckList() { return m_importOptionsCheckList; }
     wxStaticText* GetStaticText555() { return m_staticText555; }
     wxButton* GetImportButton() { return m_importButton; }
-    wxStaticText* GetStaticText567() { return m_staticText567; }
-    wxTextCtrl* GetProblemsTextCtrl() { return m_problemsTextCtrl; }
-    TileMapImporterDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Import a .tmx file (Tiled)"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,500), long style = wxDEFAULT_DIALOG_STYLE);
+    TileMapImporterDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Import a .tmx file (Tiled)"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,400), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~TileMapImporterDialogBase();
 };
 

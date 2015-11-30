@@ -1,6 +1,7 @@
 #include "TileMapImporterDialog.h"
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include "GDCore/Tools/Log.h"
 #include "IDE/TMXImport/TileMapImporter.h"
 #include "TileSet.h"
 #include "TileMap.h"
@@ -32,8 +33,7 @@ void TileMapImporterDialog::OnImportButtonClicked(wxCommandEvent& event)
     try
     {
         m_okBt->Enable();
-        wxString errorStr;
-        TileMapImporter importer(m_fileTextCtrl->GetValue(), errorStr);
+        TileMapImporter importer(m_fileTextCtrl->GetValue());
 
         //TODO: Check the checkboxes :) !
         if(!importer.ImportTileMap(m_tileset, m_tilemap,
@@ -45,12 +45,10 @@ void TileMapImporterDialog::OnImportButtonClicked(wxCommandEvent& event)
         {
             m_okBt->Disable();
         }
-
-        m_problemsTextCtrl->SetValue(errorStr);
     }
     catch (const std::runtime_error &exc)
     {
-        m_problemsTextCtrl->SetValue(_("ERROR: Unable to read the file"));
+        gd::LogError(_("Unable to read the file !"));
         m_okBt->Disable();
     }
 }

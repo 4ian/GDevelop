@@ -699,7 +699,7 @@ TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowI
     flexGridSizer531->SetFlexibleDirection( wxBOTH );
     flexGridSizer531->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer531->AddGrowableCol(0);
-    flexGridSizer531->AddGrowableRow(7);
+    flexGridSizer531->AddGrowableRow(3);
     
     flexGridSizer529->Add(flexGridSizer531, 1, wxALL|wxEXPAND, 5);
     
@@ -750,23 +750,6 @@ TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowI
     
     flexGridSizer531->Add(m_importButton, 0, wxALL|wxEXPAND, 5);
     
-    m_staticText567 = new wxStaticText(this, wxID_ANY, _("Problèmes et avertissements :"), wxDefaultPosition, wxSize(-1,-1), 0);
-    
-    flexGridSizer531->Add(m_staticText567, 0, wxALL, 5);
-    
-    m_problemsTextCtrl = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), wxTE_READONLY|wxTE_MULTILINE);
-    #ifdef __WXMSW__
-    // To get the newer version of the font on MSW, we use font wxSYS_DEFAULT_GUI_FONT with family set to wxFONTFAMILY_TELETYPE
-    wxFont m_problemsTextCtrlFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_problemsTextCtrlFont.SetFamily(wxFONTFAMILY_TELETYPE);
-    #else
-    wxFont m_problemsTextCtrlFont = wxSystemSettings::GetFont(wxSYS_ANSI_FIXED_FONT);
-    m_problemsTextCtrlFont.SetFamily(wxFONTFAMILY_TELETYPE);
-    #endif
-    m_problemsTextCtrl->SetFont(m_problemsTextCtrlFont);
-    
-    flexGridSizer531->Add(m_problemsTextCtrl, 0, wxALL|wxEXPAND, 5);
-    
     m_stdBtnSizer533 = new wxStdDialogButtonSizer();
     
     flexGridSizer529->Add(m_stdBtnSizer533, 0, wxALL|wxEXPAND, 5);
@@ -779,7 +762,7 @@ TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowI
     m_stdBtnSizer533->Realize();
     
     SetName(wxT("TileMapImporterDialogBase"));
-    SetSizeHints(500,500);
+    SetSizeHints(500,400);
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

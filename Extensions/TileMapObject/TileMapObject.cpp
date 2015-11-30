@@ -146,7 +146,6 @@ bool TileMapObject::GenerateThumbnail(const gd::Project & project, wxBitmap & th
 void TileMapObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
 #if !defined(GD_NO_WX_GUI)
-    wxLogNull logNo;
     TileMapObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 #endif

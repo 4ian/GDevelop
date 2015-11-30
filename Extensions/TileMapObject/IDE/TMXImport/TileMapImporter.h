@@ -18,7 +18,7 @@ namespace gd
 class TileMapImporter
 {
 public:
-    TileMapImporter(const wxString &filePath, wxString &errorOutput);
+    TileMapImporter(const wxString &filePath);
 
     bool ImportTileMap(TileSet &tileSet, TileMap &tileMap,
         bool importTileMap, bool importTileSetConf, bool importTileSetImage,
@@ -27,11 +27,8 @@ public:
 private:
     wxString m_filePath;
     std::unique_ptr<Tmx::Map> m_map;
-    wxString &m_errorOutput;
 
     void CheckTilesCount(const TileSet &tileSet);
-
-    void WriteToErrOutput(const wxString &msg);
 };
 
 #endif

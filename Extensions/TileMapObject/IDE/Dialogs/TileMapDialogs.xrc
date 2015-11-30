@@ -895,7 +895,7 @@
     <title>Import a .tmx file (Tiled)</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE</style>
-    <size>500,500</size>
+    <size>500,400</size>
     <object class="wxFlexGridSizer">
       <cols>1</cols>
       <rows>0</rows>
@@ -913,7 +913,7 @@
           <vgap>0</vgap>
           <hgap>0</hgap>
           <growablecols>0</growablecols>
-          <growablerows>7</growablerows>
+          <growablerows>3</growablerows>
           <object class="sizeritem">
             <flag>wxALL</flag>
             <border>5</border>
@@ -994,27 +994,6 @@
               <style/>
               <bitmapposition>wxLEFT</bitmapposition>
               <default>0</default>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL</flag>
-            <border>5</border>
-            <object class="wxStaticText" name="m_staticText567">
-              <label>Problèmes et avertissements :</label>
-              <style/>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-            <object class="wxTextCtrl" name="m_problemsTextCtrl">
-              <style>wxTE_READONLY|wxTE_MULTILINE</style>
-              <font>
-                <sysfont>wxSYS_ANSI_FIXED_FONT</sysfont>
-                <style>normal</style>
-                <weight>normal</weight>
-                <underlined>0</underlined>
-              </font>
             </object>
           </object>
         </object>

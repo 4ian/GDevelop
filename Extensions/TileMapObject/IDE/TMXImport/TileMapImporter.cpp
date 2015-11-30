@@ -7,6 +7,7 @@
 #include <wx/filename.h>
 #include "GDCore/IDE/NewNameGenerator.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/Log.h"
 #include "TileSet.h"
 #include "TileMap.h"
 #include "tmx-parser/TmxImage.h"
@@ -18,12 +19,10 @@
 #include "tmx-parser/TmxTileset.h"
 #include "tmx-parser/TmxTile.h"
 
-TileMapImporter::TileMapImporter(const wxString &filePath, wxString &errorOutput)
+TileMapImporter::TileMapImporter(const wxString &filePath)
  : m_filePath(filePath),
-   m_map(new Tmx::Map()),
-   m_errorOutput(errorOutput)
+   m_map(new Tmx::Map())
 {
-    errorOutput = "";
     m_map->ParseFile(filePath.ToStdString());
 
     if(m_map->HasError())
@@ -36,37 +35,34 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
     bool importTileMap, bool importTileSetConf, bool importTileSetImage,
     bool importHitboxes, gd::ResourcesManager &resManager)
 {
-
     //Checks the map type
     if(m_map->GetOrientation() != Tmx::TMX_MO_ORTHOGONAL)
     {
-        WriteToErrOutput(_("ERROR: Only orthogonal maps are supported !"));
+        gd::LogError(_("Only orthogonal maps are supported !"));
         return false;
     }
 
     //Get the tileset list
     if(m_map->GetNumTilesets() < 1)
     {
-        WriteToErrOutput(_("ERROR: There are no tilesets in this file !"));
+        gd::LogError(_("There are no tilesets in this file !"));
         return false;
     }
     else if(m_map->GetNumTilesets() > 1)
     {
-        WriteToErrOutput(_("WARNING: Only the first tileset will be taken into account. Tiles from supplementary tilesets may be lost."));
+        gd::LogWarning(_("Only the first tileset will be taken into account. Tiles from supplementary tilesets may be lost."));
     }
 
     //Import the tileset image if needed
     if(importTileSetImage)
     {
-        WriteToErrOutput(_("\nTileset image importation report : \n=================================="));
-
         const Tmx::Image *importedImage = m_map->GetTileset(0)->GetImage();
         wxFileName imageFileName(importedImage->GetSource());
         imageFileName.MakeAbsolute(wxFileName(m_filePath).GetPath());
 
         if(!imageFileName.FileExists())
         {
-            WriteToErrOutput(_("ERROR: The image can't be found !"));
+            gd::LogError(_("The image can't be found !"));
             return false;
         }
 
@@ -75,25 +71,25 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
             [&resManager](const gd::String &name) -> bool { return resManager.HasResource(name); }
             );
 
-        WriteToErrOutput(_("NOTE: The image is imported as ") + "\"" + newResourceName + "\".");
+        gd::LogMessage(_("The image is imported as ") + "\"" + newResourceName + "\".");
 
         resManager.AddResource(newResourceName, imageFileName.GetFullPath(wxPATH_UNIX));
 
         tileSet.textureName = newResourceName;
+
+        gd::LogStatus(_("Tileset image importation completed."));
     }
 
     //Import the tileset configuration if wanted
     if(importTileSetConf)
     {
-        WriteToErrOutput(_("\nTileset config importation report : \n==================================="));
-
         const Tmx::Tileset *importedTileset = m_map->GetTileset(0);
 
         if(!importTileSetImage && ( //If the tileset image was imported, it should be ok.
             importedTileset->GetImage()->GetWidth() != tileSet.GetWxBitmap().GetWidth() ||
             importedTileset->GetImage()->GetHeight() != tileSet.GetWxBitmap().GetHeight()))
         {
-            WriteToErrOutput(_("WARNING: Tileset image size is not the same. Some tiles may not be rendered correctly."));
+            gd::LogWarning(_("Tileset image size is not the same. Some tiles may not be rendered correctly."));
         }
 
         tileSet.tileSize.x = importedTileset->GetTileWidth();
@@ -102,18 +98,18 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
 
         if(importedTileset->GetMargin() > 0)
         {
-            WriteToErrOutput(_("WARNING: Tilemap objects don't handle tilesets with margins around the images. Consider cutting the picture."));
+            gd::LogWarning(_("Tilemap objects don't handle tilesets with margins around the images. Consider cutting the picture."));
         }
+
+        gd::LogStatus(_("Tileset configuration importation completed."));
     }
 
     //Import the tilemap tiles if wanted
     if(importTileMap)
     {
-        WriteToErrOutput(_("\nTilemap importation report : \n============================"));
-
         //Tilemap size
         if(tileMap.GetColumnsCount() != m_map->GetWidth() || tileMap.GetRowsCount() != m_map->GetHeight())
-            WriteToErrOutput(_("NOTE: Tilemap size is different."));
+            gd::LogMessage(_("Tilemap size is different."));
         tileMap.SetSize(0, 0);
         tileMap.SetSize(m_map->GetWidth(), m_map->GetHeight());
 
@@ -123,11 +119,11 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
         //Import layers and tiles
         if(m_map->GetNumTileLayers() > 3)
         {
-            WriteToErrOutput(_("WARNING: There are more than 3 tiles layers. Only the 3 firsts will be imported."));
+            gd::LogWarning(_("There are more than 3 tiles layers. Only the 3 firsts will be imported."));
         }
         else if(m_map->GetNumTileLayers() < 3)
         {
-            WriteToErrOutput(_("NOTE: There are less than 3 tiles layers. Upper layer(s) will be empty."));
+            gd::LogMessage(_("There are less than 3 tiles layers. Upper layer(s) will be empty."));
         }
 
         for(std::size_t i = 0; i < std::min(3, m_map->GetNumTileLayers()); i++)
@@ -146,13 +142,13 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
                 }
             }
         }
+
+        gd::LogStatus(_("Tilemap content importation completed."));
     }
 
     //Import the hitboxes
     if(importHitboxes)
     {
-        WriteToErrOutput(_("\nTiles hitboxes importation report : \n================================="));
-
         const Tmx::Tileset *importedTileset = m_map->GetTileset(0);
 
         //Set all tiles not collidable in the tileset
@@ -230,14 +226,15 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
         }
 
         if(hasMoreThanOneObjectPerTile)
-            WriteToErrOutput(_("WARNING: Some tiles have more than 1 hitbox. Only the first one is imported."));
+            gd::LogWarning(_("Some tiles have more than 1 hitbox. Only the first one is imported."));
         if(hasNotPolygoneObject)
-            WriteToErrOutput(_("WARNING: Some tiles have a polyline or a ellipsis hitbox. Only rectangle and polygon hitboxes are supported."));
+            gd::LogWarning(_("Some tiles have a polyline or a ellipsis hitbox. Only rectangle and polygon hitboxes are supported."));
         if(hasNotConvexPolygon)
-            WriteToErrOutput(_("WARNING: Some tiles have a concave polygon. It has been ignored and set to a rectangular hitbox as this object only supports convex hitboxes for tiles."));
+            gd::LogWarning(_("Some tiles have a concave polygon. It has been ignored and set to a rectangular hitbox as this object only supports convex hitboxes for tiles."));
+
+        gd::LogStatus(_("Tiles hitboxes importation completed."));
     }
 
-    WriteToErrOutput(_("> No fatal errors in importation"));
     return true;
 }
 
@@ -253,13 +250,8 @@ void TileMapImporter::CheckTilesCount(const TileSet &tileSet)
 
     if(importedTilesCount != tileSet.GetTilesCount())
     {
-        WriteToErrOutput(_("WARNING: There are not as many tiles in the object's tileset as in the file. The result may not be correct."));
+        gd::LogWarning(_("There are not as many tiles in the object's tileset as in the file. The result may not be correct."));
     }
-}
-
-void TileMapImporter::WriteToErrOutput(const wxString &msg)
-{
-    m_errorOutput += msg + "\n";
 }
 
 #endif

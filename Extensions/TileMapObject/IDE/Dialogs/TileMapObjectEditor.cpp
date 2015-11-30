@@ -43,6 +43,8 @@ tileSet(object.tileSet.Get()),
 tileMap(object.tileMap.Get()),
 m_tileEditorPanel(new TileEditor(this))
 {
+    wxLogNull logNo;
+
     m_tileSetPanel->SetTileSet(&tileSet);
     m_tileEditorPanel->SetTileSet(&tileSet);
     m_tileMapPanel->SetTileSet(&tileSet);

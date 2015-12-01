@@ -37,10 +37,10 @@ void TileMapImporterDialog::OnImportButtonClicked(wxCommandEvent& event)
 
         //TODO: Check the checkboxes :) !
         if(!importer.ImportTileMap(m_tileset, m_tilemap,
-            m_importOptionsCheckList->IsChecked(0),
-            m_importOptionsCheckList->IsChecked(1),
-            m_importOptionsCheckList->IsChecked(2),
-            m_importOptionsCheckList->IsChecked(3),
+            m_tilemapCheckBox->GetValue(),
+            m_tilesetConfCheckBox->GetValue(),
+            m_tilesetImageCheckBox->GetValue(),
+            m_hitboxesCheckBox->GetValue(),
             m_project))
         {
             m_okBt->Disable();

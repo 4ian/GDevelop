@@ -162,7 +162,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer452->Add(m_hyperLink454, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     
-    m_button524 = new wxButton(m_mainPanel, wxID_ANY, _("Import .tmx files (experimental)..."), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_button524 = new wxButton(m_mainPanel, wxID_ANY, _("Import .tmx files (Tiled)..."), wxDefaultPosition, wxSize(-1,-1), 0);
     
     flexGridSizer452->Add(m_button524, 0, wxALL, 5);
     
@@ -178,16 +178,12 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_stdBtnSizer60->Realize();
     
     SetName(wxT("TileMapObjectEditorBase"));
-    SetMinSize(wxSize(1100,550));
+    SetMinSize( wxSize(1100,550) );
     SetSizeHints(1100,550);
-    if (GetSizer()) {
+    if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    if(GetParent()) {
-        CentreOnParent(wxBOTH);
-    } else {
-        CentreOnScreen(wxBOTH);
-    }
+    CentreOnParent(wxBOTH);
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);
@@ -418,14 +414,10 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     
     SetName(wxT("TileSetConfigurationEditorBase"));
     SetSizeHints(750,500);
-    if (GetSizer()) {
+    if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    if(GetParent()) {
-        CentreOnParent(wxBOTH);
-    } else {
-        CentreOnScreen(wxBOTH);
-    }
+    CentreOnParent(wxBOTH);
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);
@@ -551,14 +543,10 @@ TileMapConfigurationEditorBase::TileMapConfigurationEditorBase(wxWindow* parent,
     
     SetName(wxT("TileMapConfigurationEditorBase"));
     SetSizeHints(500,300);
-    if (GetSizer()) {
+    if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    if(GetParent()) {
-        CentreOnParent(wxBOTH);
-    } else {
-        CentreOnScreen(wxBOTH);
-    }
+    CentreOnParent(wxBOTH);
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);
@@ -644,11 +632,12 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     flexGridSizer398->Add(m_tileIdLabel, 0, wxALL, 5);
     
     SetName(wxT("TileEditorBase"));
-    SetMinSize(wxSize(200,200));
+    SetMinSize( wxSize(200,200) );
     SetSizeHints(400,300);
-    if (GetSizer()) {
+    if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
+    CentreOnParent(wxBOTH);
     // Connect events
     this->Connect(COLLIDABLE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnCollidableToolToggled), NULL, this);
     this->Connect(PREDEFINED_SHAPE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnPredefinedShapeToolClicked), NULL, this);
@@ -699,7 +688,7 @@ TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowI
     flexGridSizer531->SetFlexibleDirection( wxBOTH );
     flexGridSizer531->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer531->AddGrowableCol(0);
-    flexGridSizer531->AddGrowableRow(3);
+    flexGridSizer531->AddGrowableRow(2);
     
     flexGridSizer529->Add(flexGridSizer531, 1, wxALL|wxEXPAND, 5);
     
@@ -717,8 +706,9 @@ TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowI
     
     m_fileTextCtrl = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
     #if wxVERSION_NUMBER >= 3000
-    m_fileTextCtrl->SetHint(wxT(""));
+    m_fileTextCtrl->SetHint(_("The tmx file saved with Tiled"));
     #endif
+    m_fileTextCtrl->AutoCompleteFileNames();
     
     flexGridSizer561->Add(m_fileTextCtrl, 0, wxALL|wxEXPAND, 5);
     
@@ -726,25 +716,41 @@ TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowI
     
     flexGridSizer561->Add(m_browserBt, 0, wxALL, 5);
     
-    m_staticText553 = new wxStaticText(this, wxID_ANY, _("Choose what you want to import :"), wxDefaultPosition, wxSize(-1,-1), 0);
+    wxStaticBoxSizer* staticBoxSizer577 = new wxStaticBoxSizer( new wxStaticBox(this, wxID_ANY, _("Import settings")), wxVERTICAL);
     
-    flexGridSizer531->Add(m_staticText553, 0, wxALL, 5);
+    flexGridSizer531->Add(staticBoxSizer577, 1, wxALL|wxEXPAND, 5);
     
-    wxArrayString m_importOptionsCheckListArr;
-    m_importOptionsCheckListArr.Add(_("Import the tilemap"));
-    m_importOptionsCheckListArr.Add(_("Import the tileset configuration"));
-    m_importOptionsCheckListArr.Add(_("Import the tileset image"));
-    m_importOptionsCheckListArr.Add(_("Import the collision masks"));
-    m_importOptionsCheckList = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), m_importOptionsCheckListArr, wxLB_SINGLE);
+    wxBoxSizer* boxSizer579 = new wxBoxSizer(wxHORIZONTAL);
     
-    flexGridSizer531->Add(m_importOptionsCheckList, 0, wxALL|wxEXPAND, 5);
+    staticBoxSizer577->Add(boxSizer579, 1, wxALL|wxEXPAND, 5);
     
-    m_staticText555 = new wxStaticText(this, wxID_ANY, _("Warning : imported data replaces the tilemap object content."), wxDefaultPosition, wxSize(-1,-1), 0);
-    wxFont m_staticText555Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_staticText555Font.SetStyle(wxFONTSTYLE_ITALIC);
-    m_staticText555->SetFont(m_staticText555Font);
+    wxStaticBoxSizer* staticBoxSizer585 = new wxStaticBoxSizer( new wxStaticBox(this, wxID_ANY, _("Tileset")), wxVERTICAL);
     
-    flexGridSizer531->Add(m_staticText555, 0, wxALL, 5);
+    boxSizer579->Add(staticBoxSizer585, 1, wxALL|wxEXPAND, 5);
+    
+    m_tilesetConfCheckBox = new wxCheckBox(this, wxID_ANY, _("Import the tileset configuration"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_tilesetConfCheckBox->SetValue(true);
+    
+    staticBoxSizer585->Add(m_tilesetConfCheckBox, 0, wxALL, 5);
+    
+    m_tilesetImageCheckBox = new wxCheckBox(this, wxID_ANY, _("Import the tileset image"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_tilesetImageCheckBox->SetValue(true);
+    
+    staticBoxSizer585->Add(m_tilesetImageCheckBox, 0, wxALL, 5);
+    
+    m_hitboxesCheckBox = new wxCheckBox(this, wxID_ANY, _("Import the tiles hitboxes"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_hitboxesCheckBox->SetValue(true);
+    
+    staticBoxSizer585->Add(m_hitboxesCheckBox, 0, wxALL, 5);
+    
+    wxStaticBoxSizer* staticBoxSizer587 = new wxStaticBoxSizer( new wxStaticBox(this, wxID_ANY, _("Tilemap")), wxVERTICAL);
+    
+    boxSizer579->Add(staticBoxSizer587, 1, wxALL|wxEXPAND, 5);
+    
+    m_tilemapCheckBox = new wxCheckBox(this, wxID_ANY, _("Import the tilemap"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_tilemapCheckBox->SetValue(true);
+    
+    staticBoxSizer587->Add(m_tilemapCheckBox, 0, wxALL, 5);
     
     m_importButton = new wxButton(this, wxID_ANY, _("Importer..."), wxDefaultPosition, wxSize(-1,-1), 0);
     
@@ -762,15 +768,11 @@ TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowI
     m_stdBtnSizer533->Realize();
     
     SetName(wxT("TileMapImporterDialogBase"));
-    SetSizeHints(500,400);
-    if (GetSizer()) {
+    SetSizeHints(500,-1);
+    if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    if(GetParent()) {
-        CentreOnParent(wxBOTH);
-    } else {
-        CentreOnScreen(wxBOTH);
-    }
+    CentreOnParent(wxBOTH);
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);

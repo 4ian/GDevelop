@@ -296,7 +296,7 @@
                   <flag>wxALL</flag>
                   <border>5</border>
                   <object class="wxButton" name="m_button524">
-                    <label>Import .tmx files (experimental)...</label>
+                    <label>Import .tmx files (Tiled)...</label>
                     <style/>
                     <bitmapposition>wxLEFT</bitmapposition>
                     <default>0</default>
@@ -895,7 +895,7 @@
     <title>Import a .tmx file (Tiled)</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE</style>
-    <size>500,400</size>
+    <size>500,-1</size>
     <object class="wxFlexGridSizer">
       <cols>1</cols>
       <rows>0</rows>
@@ -913,7 +913,7 @@
           <vgap>0</vgap>
           <hgap>0</hgap>
           <growablecols>0</growablecols>
-          <growablerows>3</growablerows>
+          <growablerows>2</growablerows>
           <object class="sizeritem">
             <flag>wxALL</flag>
             <border>5</border>
@@ -937,6 +937,9 @@
                 <border>5</border>
                 <object class="wxTextCtrl" name="m_fileTextCtrl">
                   <style/>
+                  <hint>
+                    <![CDATA[The tmx file saved with Tiled]]>
+                  </hint>
                 </object>
               </object>
               <object class="sizeritem">
@@ -951,39 +954,84 @@
               </object>
             </object>
           </object>
-          <object class="sizeritem">
-            <flag>wxALL</flag>
-            <border>5</border>
-            <object class="wxStaticText" name="m_staticText553">
-              <label>Choose what you want to import :</label>
-              <style/>
-            </object>
-          </object>
-          <object class="sizeritem">
+          <object class="sizeritem" name="staticBoxSizer577">
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
-            <object class="wxCheckListBox" name="m_importOptionsCheckList">
-              <style>wxLB_SINGLE</style>
-              <content>
-                <item checked="0">Import the tilemap</item>
-                <item checked="0">Import the tileset configuration</item>
-                <item checked="0">Import the tileset image</item>
-                <item checked="0">Import the collision masks</item>
-              </content>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL</flag>
-            <border>5</border>
-            <object class="wxStaticText" name="m_staticText555">
-              <label>Warning : imported data replaces the tilemap object content.</label>
-              <style/>
-              <font>
-                <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                <style>italic</style>
-                <weight>normal</weight>
-                <underlined>0</underlined>
-              </font>
+            <option>1</option>
+            <object class="wxStaticBoxSizer" name="staticBoxSizer577">
+              <sizeritem>
+                <object class="spacer"/>
+              </sizeritem>
+              <orient>wxVERTICAL</orient>
+              <label>Import settings</label>
+              <object class="sizeritem" name="boxSizer579">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <option>1</option>
+                <object class="wxBoxSizer">
+                  <orient>wxHORIZONTAL</orient>
+                  <object class="sizeritem" name="staticBoxSizer585">
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                    <option>1</option>
+                    <object class="wxStaticBoxSizer" name="staticBoxSizer585">
+                      <sizeritem>
+                        <object class="spacer"/>
+                      </sizeritem>
+                      <orient>wxVERTICAL</orient>
+                      <label>Tileset</label>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>5</border>
+                        <object class="wxCheckBox" name="m_tilesetConfCheckBox">
+                          <style/>
+                          <label>Import the tileset configuration</label>
+                          <checked>1</checked>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>5</border>
+                        <object class="wxCheckBox" name="m_tilesetImageCheckBox">
+                          <style/>
+                          <label>Import the tileset image</label>
+                          <checked>1</checked>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>5</border>
+                        <object class="wxCheckBox" name="m_hitboxesCheckBox">
+                          <style/>
+                          <label>Import the tiles hitboxes</label>
+                          <checked>1</checked>
+                        </object>
+                      </object>
+                    </object>
+                  </object>
+                  <object class="sizeritem" name="staticBoxSizer587">
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                    <option>1</option>
+                    <object class="wxStaticBoxSizer" name="staticBoxSizer587">
+                      <sizeritem>
+                        <object class="spacer"/>
+                      </sizeritem>
+                      <orient>wxVERTICAL</orient>
+                      <label>Tilemap</label>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>5</border>
+                        <object class="wxCheckBox" name="m_tilemapCheckBox">
+                          <style/>
+                          <label>Import the tilemap</label>
+                          <checked>1</checked>
+                        </object>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
             </object>
           </object>
           <object class="sizeritem">

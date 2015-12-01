@@ -30,7 +30,8 @@
 #include <wx/textctrl.h>
 #include <wx/bmpbuttn.h>
 #include <wx/spinctrl.h>
-#include <wx/checklst.h>
+#include <wx/statbox.h>
+#include <wx/checkbox.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -229,9 +230,10 @@ protected:
     wxStaticText* m_staticText559;
     wxTextCtrl* m_fileTextCtrl;
     wxButton* m_browserBt;
-    wxStaticText* m_staticText553;
-    wxCheckListBox* m_importOptionsCheckList;
-    wxStaticText* m_staticText555;
+    wxCheckBox* m_tilesetConfCheckBox;
+    wxCheckBox* m_tilesetImageCheckBox;
+    wxCheckBox* m_hitboxesCheckBox;
+    wxCheckBox* m_tilemapCheckBox;
     wxButton* m_importButton;
     wxStdDialogButtonSizer* m_stdBtnSizer533;
     wxButton* m_okBt;
@@ -247,11 +249,12 @@ public:
     wxStaticText* GetStaticText559() { return m_staticText559; }
     wxTextCtrl* GetFileTextCtrl() { return m_fileTextCtrl; }
     wxButton* GetBrowserBt() { return m_browserBt; }
-    wxStaticText* GetStaticText553() { return m_staticText553; }
-    wxCheckListBox* GetImportOptionsCheckList() { return m_importOptionsCheckList; }
-    wxStaticText* GetStaticText555() { return m_staticText555; }
+    wxCheckBox* GetTilesetConfCheckBox() { return m_tilesetConfCheckBox; }
+    wxCheckBox* GetTilesetImageCheckBox() { return m_tilesetImageCheckBox; }
+    wxCheckBox* GetHitboxesCheckBox() { return m_hitboxesCheckBox; }
+    wxCheckBox* GetTilemapCheckBox() { return m_tilemapCheckBox; }
     wxButton* GetImportButton() { return m_importButton; }
-    TileMapImporterDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Import a .tmx file (Tiled)"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,400), long style = wxDEFAULT_DIALOG_STYLE);
+    TileMapImporterDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Import a .tmx file (Tiled)"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~TileMapImporterDialogBase();
 };
 

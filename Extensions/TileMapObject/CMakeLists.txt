@@ -8,6 +8,7 @@ gd_add_extension_includes()
 #Defines
 ###
 gd_add_extension_definitions(TileMapObject)
+add_definitions(-DUSE_MINIZ)
 
 #The targets
 ###
@@ -26,18 +27,21 @@ if (NO_GUI)
 	set(gdide_source_files
 		${source_files})
 else()
+	file(GLOB_RECURSE gdide_tmx_source_files IDE/TMXImport/*)
 	set(gdide_source_files
 		${source_files}
-		TileMapObjectEditor.cpp
-		TileMapObjectEditorCommands.cpp
-		TileSetConfigurationEditor.cpp
-		TileMapConfigurationEditor.cpp
-		TileEditor.cpp
-		TileSetPanel.cpp
-		TileMapPanel.cpp
-		TileMapDialogs.cpp
-		TileMapDialogs.xrc
-		TileMapDialogs_wxsmith_bitmaps.cpp)
+		${gdide_tmx_source_files}
+		IDE/Dialogs/TileMapObjectEditor.cpp
+		IDE/Dialogs/TileMapObjectEditorCommands.cpp
+		IDE/Dialogs/TileSetConfigurationEditor.cpp
+		IDE/Dialogs/TileMapConfigurationEditor.cpp
+		IDE/Dialogs/TileMapImporterDialog.cpp
+		IDE/Dialogs/TileEditor.cpp
+		IDE/Dialogs/TileSetPanel.cpp
+		IDE/Dialogs/TileMapPanel.cpp
+		IDE/Dialogs/TileMapDialogs.cpp
+		IDE/Dialogs/TileMapDialogs.xrc
+		IDE/Dialogs/TileMapDialogs_wxsmith_bitmaps.cpp)
 endif()
 
 gd_add_extension_target(TileMapObject "${gdide_source_files}")

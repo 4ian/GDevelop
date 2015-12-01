@@ -46,6 +46,7 @@ class TileMapObjectEditor: public TileMapObjectEditorBase
         virtual void OnCancelButtonPressed(wxCommandEvent& event);
         virtual void OnOkButtonPressed(wxCommandEvent& event);
         void OnTileSetSelectionChanged(TileSelectionEvent &event);
+        virtual void OnTmxImportButtonClicked(wxCommandEvent& event);
 
     private:
         void UpdateLayerChoice();

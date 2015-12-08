@@ -76,7 +76,7 @@ void MainFrame::CreateNewProject()
             games.push_back(newProject);
             SetCurrentGame(games.size()-1);
             UpdateOpenedProjectsLogFile();
-            if ( startPage ) startPage->Refresh();
+            if (GetStartPage()) GetStartPage()->Refresh();
 
             //Ensure working directory is set to the IDE one.
             wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
@@ -174,7 +174,7 @@ void MainFrame::Open( gd::String file )
 
         SetLastUsedFile( file );
         SetCurrentGame(games.size()-1);
-        if ( startPage ) startPage->Refresh();
+        if (GetStartPage()) GetStartPage()->Refresh();
 
         //Update the file logging the opened project
         UpdateOpenedProjectsLogFile();

@@ -129,7 +129,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     ribbonSceneEditorButtonBar(NULL),
     buildToolsPnl(NULL),
     mainFrameWrapper(NULL, NULL, this, NULL, NULL, NULL, &scenesLockingShortcuts, wxGetCwd()),
-    startPage(NULL),
     projectManager(NULL)
 {
 
@@ -446,8 +445,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     RealizeRibbonCustomButtons();
 
     //Create start page
-    startPage = new StartHerePage(editorsNotebook, *this);
-    editorsNotebook->AddPage(startPage, _("Start page"));
+    editorsNotebook->AddPage(new StartHerePage(editorsNotebook, *this), _("Start page"));
 
     //Create project manager
     projectManager = new ProjectManager(this, *this);
@@ -589,8 +587,7 @@ void MainFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt)
     	}
     }
 
-    startPage = new StartHerePage(this, *this);
-    editorsNotebook->AddPage(startPage, _("Start page"), true);
+    editorsNotebook->AddPage(new StartHerePage(this, *this), _("Start page"), true);
 }
 
 void MainFrame::UpdateOpenedProjectsLogFile()
@@ -767,9 +764,7 @@ void MainFrame::RealizeRibbonCustomButtons()
 
 void MainFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)
 {
-    if ( dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(event.GetSelection())) != NULL )
-        startPage = NULL;
-    else if ( CodeEditor * editor = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
+    if ( CodeEditor * editor = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
     {
         if ( !editor->QueryClose() )
             event.Veto();
@@ -978,13 +973,20 @@ void MainFrame::OnMenuPrefSelected( wxCommandEvent& event )
 
 void MainFrame::RefreshNews()
 {
+    if (GetStartPage()) GetStartPage()->RefreshNewsUsingUpdateChecker();
+}
+
+StartHerePage* MainFrame::GetStartPage()
+{
     for (std::size_t i = 0;i<editorsNotebook->GetPageCount();++i)
     {
         if (StartHerePage* startPage = dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(i)))
         {
-            startPage->RefreshNewsUsingUpdateChecker();
+            return startPage;
         }
     }
+
+    return NULL;
 }
 
 void MainFrame::OnMenuItem23Selected(wxCommandEvent& event)

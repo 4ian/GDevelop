@@ -242,6 +242,7 @@ public:
     void RealizeRibbonCustomButtons();
     void SetLastUsedFile(wxString file);
     bool Save(gd::Project & project, wxString file);
+    StartHerePage* GetStartPage();
 
 private:
 
@@ -335,7 +336,6 @@ private:
     std::vector<wxWindow*> scenesLockingShortcuts;
     gd::MainFrameWrapper mainFrameWrapper;
 
-    StartHerePage * startPage;
     ProjectManager * projectManager;
     ProjectPropertiesPnl * projectPropertiesPnl;
 

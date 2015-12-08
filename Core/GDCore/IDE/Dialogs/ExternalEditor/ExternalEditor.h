@@ -50,7 +50,7 @@ public:
 		onSendUpdate = cb;
 	}
 
-	bool Launch();
+	bool Launch(const gd::String & editorName);
 
 private:
 

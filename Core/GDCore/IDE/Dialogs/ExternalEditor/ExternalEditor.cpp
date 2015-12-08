@@ -18,7 +18,7 @@
 
 namespace gd {
 
-bool ExternalEditor::Launch()
+bool ExternalEditor::Launch(const gd::String & editorName)
 {
 	unsigned int port = editorBridge.Start();
 	if (port == 0)
@@ -28,7 +28,8 @@ bool ExternalEditor::Launch()
 	}
 
 	String cmd = "/Users/florian/Projects/F/gdwebapp/deployment/electron-app/node_modules/electron-prebuilt/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/gdwebapp/deployment/electron-app/app";
-	//cmd += " --hide-icon";
+    //cmd += " --hide-icon";
+	if (editorName != "") cmd += " --editor " + editorName;
 	externalEditorPid = wxExecute(cmd + " --server-port " + String::From(port), wxEXEC_ASYNC);
     if (externalEditorPid == 0)
     {

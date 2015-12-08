@@ -117,6 +117,7 @@ private:
     gd::MainFrameWrapper mainFrameWrapper;
 
     std::shared_ptr<gd::ExternalEditor> externalEventsEditor;
+    std::shared_ptr<gd::ExternalEditor> externalLayoutEditor;
 
     wxAuiManager m_mgr;
 

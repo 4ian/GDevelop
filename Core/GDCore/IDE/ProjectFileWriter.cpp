@@ -148,12 +148,12 @@ bool ProjectFileWriter::LoadFromJSONFile(gd::Project & project, const gd::String
         return false;
     }
 
-    project.SetProjectFile(filename);
-    project.SetDirty(false);
-
     std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
     gd::SerializerElement rootElement = gd::Serializer::FromJSON(str);
     project.UnserializeFrom(rootElement);
+
+    project.SetProjectFile(filename);
+    project.SetDirty(false);
 
     return true;
 }
@@ -171,11 +171,6 @@ bool ProjectFileWriter::LoadFromFile(gd::Project & project, const gd::String & f
         gd::LogError( error );
         return false;
     }
-
-    #if defined(GD_IDE_ONLY)
-    project.SetProjectFile(filename);
-    project.SetDirty(false);
-    #endif
 
     TiXmlHandle hdl( &doc );
     gd::SerializerElement rootElement;
@@ -216,6 +211,11 @@ bool ProjectFileWriter::LoadFromFile(gd::Project & project, const gd::String & f
 
     //Unserialize the whole project
     project.UnserializeFrom(rootElement);
+
+    #if defined(GD_IDE_ONLY)
+    project.SetProjectFile(filename);
+    project.SetDirty(false);
+    #endif
 
     return true;
 }

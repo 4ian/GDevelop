@@ -531,6 +531,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
     SetPackageName(propElement.GetStringAttribute("packageName"));
     SetFolderProject(propElement.GetBoolAttribute("folderProject"));
+    SetProjectFile(propElement.GetStringAttribute("projectFile"));
     SetLastCompilationDirectory(propElement.GetChild("latestCompilationDirectory", 0, "LatestCompilationDirectory").GetValue().GetString());
     winExecutableFilename = propElement.GetStringAttribute("winExecutableFilename");
     winExecutableIconFile = propElement.GetStringAttribute("winExecutableIconFile");
@@ -738,6 +739,7 @@ void Project::SerializeTo(SerializerElement & element) const
     propElement.AddChild("maxFPS").SetValue(GetMaximumFPS());
     propElement.AddChild("minFPS").SetValue(GetMinimumFPS());
     propElement.AddChild("verticalSync").SetValue(IsVerticalSynchronizationEnabledByDefault());
+    propElement.SetAttribute("projectFile", gameFile);
     propElement.SetAttribute("folderProject", folderProject);
     propElement.SetAttribute("packageName", packageName);
     propElement.SetAttribute("winExecutableFilename", winExecutableFilename);

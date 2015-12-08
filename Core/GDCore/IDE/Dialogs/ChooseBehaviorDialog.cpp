@@ -17,7 +17,7 @@
 #include <algorithm>
 #include "GDCore/Tools/Log.h"
 
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"

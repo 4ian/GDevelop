@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <wx/msgdlg.h>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 
 using namespace std;

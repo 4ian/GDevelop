@@ -8,7 +8,7 @@
 #if !defined(GD_NO_WX_GUI)
 #include <wx/dcmemory.h>
 #endif
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/Project/Object.h"

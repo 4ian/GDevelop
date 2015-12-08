@@ -18,7 +18,7 @@
 #include <wx/cmndata.h>
 #include <wx/help.h>
 #include <wx/config.h>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Layout.h"

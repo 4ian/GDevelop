@@ -9,7 +9,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 
 #if !defined(GD_NO_WX_GUI)

@@ -20,7 +20,7 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCpp/Project/Project.h"

@@ -15,7 +15,7 @@
 #include <wx/filedlg.h>
 #include <wx/filename.h>
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/HelpFileAccess.h"

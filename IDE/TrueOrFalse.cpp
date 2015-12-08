@@ -8,7 +8,7 @@
 #include <wx/string.h>
 //*)
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 
 //(*IdInit(TrueOrFalse)
 const long TrueOrFalse::ID_STATICBITMAP1 = wxNewId();

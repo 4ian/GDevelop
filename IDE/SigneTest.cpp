@@ -12,7 +12,7 @@
 #include <wx/string.h>
 //*)
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 
 //(*IdInit(SigneTest)
 const long SigneTest::ID_RADIOBOX1 = wxNewId();

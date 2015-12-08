@@ -20,7 +20,7 @@
 #include <wx/help.h>
 #include <wx/msgdlg.h>
 #include <wx/config.h>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"

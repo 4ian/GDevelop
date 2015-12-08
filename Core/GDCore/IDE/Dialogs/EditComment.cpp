@@ -8,7 +8,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/colordlg.h>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 

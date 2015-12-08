@@ -13,7 +13,7 @@
 //*)
 #include <string>
 #include <vector>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"

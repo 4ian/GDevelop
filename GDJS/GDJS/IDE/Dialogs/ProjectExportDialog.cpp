@@ -14,7 +14,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/CommonTools.h"
 #include "GDJS/IDE/Exporter.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 
 namespace gdjs
 {

@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <iostream>
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include <wx/file.h>
 #include <wx/bitmap.h>
 #endif

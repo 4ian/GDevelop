@@ -16,7 +16,7 @@
 #include <wx/settings.h>
 #include <wx/stc/stc.h>
 #include <wx/textdlg.h>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Dialogs/EditExpressionDialog.h"

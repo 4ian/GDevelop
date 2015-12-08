@@ -28,7 +28,7 @@
 #include <wx/imaglist.h>
 #include "GDCore/Tools/Log.h"
 
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Extensions/Platform.h"

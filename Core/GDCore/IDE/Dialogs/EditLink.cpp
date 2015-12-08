@@ -11,7 +11,7 @@
 #include <wx/settings.h>
 //*)
 #include <sstream>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Project/ExternalEvents.h"

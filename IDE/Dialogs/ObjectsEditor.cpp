@@ -30,7 +30,7 @@
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "GDCore/IDE/NewNameGenerator.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"

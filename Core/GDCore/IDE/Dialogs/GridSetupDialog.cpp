@@ -11,7 +11,7 @@
 #include <wx/colordlg.h>
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
 

@@ -25,7 +25,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/Project.h"

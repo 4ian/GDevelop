@@ -14,7 +14,7 @@
 #include <wx/bitmap.h>
 #include <wx/imaglist.h>
 #include <wx/config.h>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"

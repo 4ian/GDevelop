@@ -39,7 +39,7 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/ProjectFileWriter.h"
 #include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/IDE/PlatformManager.h"
@@ -978,7 +978,13 @@ void MainFrame::OnMenuPrefSelected( wxCommandEvent& event )
 
 void MainFrame::RefreshNews()
 {
-    startPage->RefreshNewsUsingUpdateChecker();
+    for (std::size_t i = 0;i<editorsNotebook->GetPageCount();++i)
+    {
+        if (StartHerePage* startPage = dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(i)))
+        {
+            startPage->RefreshNewsUsingUpdateChecker();
+        }
+    }
 }
 
 void MainFrame::OnMenuItem23Selected(wxCommandEvent& event)

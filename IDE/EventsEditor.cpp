@@ -34,7 +34,7 @@
 #include "GDCpp/IDE/Dialogs/CppLayoutPreviewer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/CommonTools.h"
 #include "LogFileManager.h"

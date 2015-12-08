@@ -46,7 +46,7 @@
 #include "GDCore/IDE/Project/ImagesUsedInventorizer.h"
 #include "GDCore/IDE/Dialogs/ResourceLibraryDialog.h"
 #include "GDCore/IDE/wxTools/FileProperty.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Log.h"

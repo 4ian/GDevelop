@@ -27,7 +27,7 @@ This project is released under the MIT License.
 #include <wx/textdlg.h>
 #include <wx/numdlg.h>
 #include <wx/filedlg.h>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "GDCpp/CommonTools.h"
 #include "GDCpp/Project/Project.h"

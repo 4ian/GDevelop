@@ -21,7 +21,7 @@
 #include <fstream>
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/wxTools/ShowFolder.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/SourceFile.h"

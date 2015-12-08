@@ -19,7 +19,7 @@
 #include "LayoutEditorPropertiesPnl.h"
 #include "ObjectsEditor.h"
 #include "../MainFrame.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
 

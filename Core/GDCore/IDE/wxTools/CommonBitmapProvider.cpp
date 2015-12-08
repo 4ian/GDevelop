@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 #include "CommonBitmapProvider.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include <wx/bitmap.h>
 #include <wx/wx.h>
 #include <wx/gdicmn.h>

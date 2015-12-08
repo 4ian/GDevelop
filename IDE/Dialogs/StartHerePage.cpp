@@ -7,7 +7,7 @@
 #include <wx/config.h>
 #include "StartHerePage.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "../UpdateChecker.h"
 #include "../MainFrame.h"
 

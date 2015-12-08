@@ -21,7 +21,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>

@@ -18,7 +18,7 @@
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
 

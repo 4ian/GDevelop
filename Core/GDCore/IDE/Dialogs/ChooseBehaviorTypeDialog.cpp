@@ -15,7 +15,7 @@
 #include <wx/config.h>
 #include <wx/msgdlg.h>
 #include <wx/settings.h>
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include <algorithm>
 #include <memory>
 #include "GDCore/Project/Project.h"

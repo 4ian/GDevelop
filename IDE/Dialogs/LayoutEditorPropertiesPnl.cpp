@@ -9,7 +9,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"

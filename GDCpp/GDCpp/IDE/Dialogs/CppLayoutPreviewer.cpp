@@ -17,7 +17,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Project/ImageManager.h"
 #include "GDCore/Project/LayoutEditorPreviewer.h"
 #include "GDCpp/Project/Project.h"

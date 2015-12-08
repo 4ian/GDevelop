@@ -40,7 +40,7 @@
 #include "GDCore/IDE/PlatformLoader.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
-#include "GDCore/IDE/SkinHelper.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/ProjectFileWriter.h"
 #include "GDCore/IDE/Analytics/AnalyticsSender.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"

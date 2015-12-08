@@ -42,6 +42,7 @@ IF(APPLE)
 	set(CMAKE_INSTALL_RPATH ".")
 	set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-potentially-evaluated-expression")
 ENDIF()
 
 #Sanity checks
@@ -57,10 +58,6 @@ ENDIF()
 
 IF("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
 	SET(CMAKE_SHARED_LINKER_FLAGS "-s") #Force stripping to avoid errors when packaging for linux.
-ENDIF()
-
-if(EMSCRIPTEN) #When compiling for the web, ensure we get no warning when using our own external libraries.
-	SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths" )
 ENDIF()
 
 #Activate C++11

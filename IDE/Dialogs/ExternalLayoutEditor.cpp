@@ -185,13 +185,13 @@ void ExternalLayoutEditor::OnscrollBar1Scroll(wxScrollEvent& event)
 
 void ExternalLayoutEditor::ForceRefreshRibbonAndConnect()
 {
-    mainFrameWrapper.GetRibbon()->SetActivePage(2);
+    mainFrameWrapper.SetRibbonPage(_("Scene"));
     layoutEditorCanvas->ConnectEvents();
 }
 
 void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
-    mainFrameWrapper.GetRibbon()->SetActivePage(2);
+    mainFrameWrapper.SetRibbonPage(_("Scene"));
     layoutEditorCanvas->ConnectEvents();
 }
 

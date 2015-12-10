@@ -486,7 +486,7 @@ void ObjectsEditor::UpdateGroup(wxTreeItemId groupItem)
 
 void ObjectsEditor::OnobjectsListItemActivated(wxTreeEvent& event)
 {
-    mainFrameWrapper.GetRibbon()->SetActivePage(4);
+    mainFrameWrapper.SetRibbonPage(_("Objects"));
     ConnectEvents();
 
     lastSelectedItem = event.GetItem();
@@ -496,7 +496,7 @@ void ObjectsEditor::OnobjectsListItemActivated(wxTreeEvent& event)
 
 void ObjectsEditor::OnobjectsListItemRightClick(wxTreeEvent& event)
 {
-    mainFrameWrapper.GetRibbon()->SetActivePage(4);
+    mainFrameWrapper.SetRibbonPage(_("Objects"));
     ConnectEvents();
 
     lastSelectedItem = event.GetItem();
@@ -528,7 +528,7 @@ void ObjectsEditor::OnobjectsListItemMenu(wxTreeEvent& event)
 
 void ObjectsEditor::OnobjectsListKeyDown(wxTreeEvent& event)
 {
-    mainFrameWrapper.GetRibbon()->SetActivePage(4);
+    mainFrameWrapper.SetRibbonPage(_("Objects"));
     ConnectEvents();
 
     if ( event.GetKeyCode() == WXK_DELETE || event.GetKeyCode() == WXK_BACK )
@@ -756,7 +756,7 @@ void ObjectsEditor::OnobjectsListSelectionChanged(wxTreeEvent& event)
     lastSelectedItem = event.GetItem();
     renamedItemOldName = objectsList->GetItemText(lastSelectedItem);
 
-    mainFrameWrapper.GetRibbon()->SetActivePage(4);
+    mainFrameWrapper.SetRibbonPage(_("Objects"));
     ConnectEvents();
 
     //Get the selected item and update the ribbon
@@ -1417,7 +1417,7 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
 
 void ObjectsEditor::OnSetFocus(wxFocusEvent& event)
 {
-    mainFrameWrapper.GetRibbon()->SetActivePage(4);
+    mainFrameWrapper.SetRibbonPage(_("Objects"));
     ConnectEvents();
 
     if ( objectsList->GetFocusedItem().IsOk() )

@@ -149,7 +149,7 @@ mainFrameWrapper(mainFrameWrapper_)
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
     gd::SkinHelper::ApplyCurrentSkin(*notebook, true);
 
-    mainFrameWrapper.GetRibbon()->SetActivePage(2);
+    mainFrameWrapper.SetRibbonPage(_("Scene"));
     layoutEditorCanvas->ConnectEvents();
 
     //Load the saved perspective and make sure titles are translated
@@ -186,12 +186,12 @@ void EditorScene::ForceRefreshRibbonAndConnect()
     {
         layoutEditorCanvas->RecreateRibbonToolbar();
         layoutEditorCanvas->EnableIdleEvents();
-        mainFrameWrapper.GetRibbon()->SetActivePage(2);
+        mainFrameWrapper.SetRibbonPage(_("Scene"));
         layoutEditorCanvas->ConnectEvents();
     }
     else if ( notebook->GetPageText(notebook->GetSelection()) == _("Events") )
     {
-        mainFrameWrapper.GetRibbon()->SetActivePage(3);
+        mainFrameWrapper.SetRibbonPage(_("Events"));
         layoutEditorCanvas->EnableIdleEvents(false);
         eventsEditor->ConnectEvents();
     }
@@ -223,7 +223,7 @@ void EditorScene::OnnotebookPageChanging(wxAuiNotebookEvent& event)
 
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
-    mainFrameWrapper.GetRibbon()->SetActivePage(2);
+    mainFrameWrapper.SetRibbonPage(_("Scene"));
     layoutEditorCanvas->ConnectEvents();
 }
 

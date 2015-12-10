@@ -1248,7 +1248,7 @@ void ResourcesEditor::ForceRefreshRibbonAndConnect()
 {
     if ( useRibbon )
     {
-        mainFrameWrapper.GetRibbon()->SetActivePage(1);
+        mainFrameWrapper.SetRibbonPage(_("Images bank"));
         ConnectEvents();
     }
 }

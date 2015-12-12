@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxDialog" name="TileMapObjectEditorBase">
     <title>TileMap Object Editor</title>
     <centered>1</centered>
@@ -53,26 +53,22 @@
                 <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
                 <bitmapsize>16,16</bitmapsize>
                 <object class="tool" name="m_configureTileSetTool">
-                  <label>
-                    <![CDATA[Configure the tileset]]>
-                  </label>
+                  <label>Configure the tileset</label>
                   <longhelp>
                     <![CDATA[]]>
                   </longhelp>
-                  <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/options16.png</bitmap>
+                  <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/options16.png</bitmap>
                 </object>
                 <object class="tool" name="m_editTileTool">
                   <toggle>1</toggle>
-                  <label>
-                    <![CDATA[Edit the selected tile]]>
-                  </label>
+                  <label>Edit the selected tile</label>
                   <tooltip>
                     <![CDATA[Opens the tile editor to edit the tile collision mask.]]>
                   </tooltip>
                   <longhelp>
                     <![CDATA[]]>
                   </longhelp>
-                  <bitmap>../../Binaries/Output/Release_Windows/res/maskEdit16.png</bitmap>
+                  <bitmap>../../../../Binaries/Output/Release_Windows/res/maskEdit16.png</bitmap>
                 </object>
               </object>
             </object>
@@ -134,73 +130,61 @@
                     <bitmapsize>16,16</bitmapsize>
                     <object class="tool" name="m_toolbarItem494">
                       <radio>1</radio>
-                      <label>
-                        <![CDATA[Pencil mode]]>
-                      </label>
+                      <label>Pencil mode</label>
                       <tooltip>
                         <![CDATA[Pencil mode\nAdd tiles only where the mouse goes.]]>
                       </tooltip>
                       <longhelp>
                         <![CDATA[]]>
                       </longhelp>
-                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/edit16.png</bitmap>
+                      <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/edit16.png</bitmap>
                     </object>
                     <object class="tool" name="m_toolbarItem500">
                       <radio>1</radio>
-                      <label>
-                        <![CDATA[Rectangle mode]]>
-                      </label>
+                      <label>Rectangle mode</label>
                       <tooltip>
                         <![CDATA[Rectangle mode\nAdd tile in a rectangle from the position where the mouse was pressed to the position the mouse was released.]]>
                       </tooltip>
                       <longhelp>
                         <![CDATA[]]>
                       </longhelp>
-                      <bitmap>../../Binaries/Output/Release_Windows/res/conditions/rectangle.png</bitmap>
+                      <bitmap>../../../../Binaries/Output/Release_Windows/res/conditions/rectangle.png</bitmap>
                     </object>
                     <object class="tool" name="m_toolbarItem502">
                       <radio>1</radio>
-                      <label>
-                        <![CDATA[Fill this space]]>
-                      </label>
+                      <label>Fill this space</label>
                       <tooltip>
                         <![CDATA[Fill the space with the selected tile]]>
                       </tooltip>
                       <longhelp>
                         <![CDATA[]]>
                       </longhelp>
-                      <bitmap>../../Binaries/Output/Release_Windows/res/fill16.png</bitmap>
+                      <bitmap>../../../../Binaries/Output/Release_Windows/res/fill16.png</bitmap>
                     </object>
                     <object class="tool" name="m_toolbarItem504">
-                      <label>
-                        <![CDATA[Erase all the layer]]>
-                      </label>
+                      <label>Erase all the layer</label>
                       <tooltip>
                         <![CDATA[Delete all the tiles from the current layer.]]>
                       </tooltip>
                       <longhelp>
                         <![CDATA[]]>
                       </longhelp>
-                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/delete16.png</bitmap>
+                      <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/delete16.png</bitmap>
                     </object>
                     <object class="separator"/>
                     <object class="tool" name="m_toolbarItem520">
-                      <label>
-                        <![CDATA[Undo]]>
-                      </label>
+                      <label>Undo</label>
                       <longhelp>
                         <![CDATA[]]>
                       </longhelp>
-                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/undo16.png</bitmap>
+                      <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/undo16.png</bitmap>
                     </object>
                     <object class="tool" name="m_toolbarItem522">
-                      <label>
-                        <![CDATA[Redo]]>
-                      </label>
+                      <label>Redo</label>
                       <longhelp>
                         <![CDATA[]]>
                       </longhelp>
-                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/redo16.png</bitmap>
+                      <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/redo16.png</bitmap>
                     </object>
                     <object class="separator"/>
                   </object>
@@ -211,37 +195,25 @@
                     <style>wxTB_HORZ_TEXT|wxTB_NODIVIDER|wxTB_FLAT</style>
                     <bitmapsize>16,16</bitmapsize>
                     <object class="tool" name="m_changeMapSizeTool">
-                      <label>
-                        <![CDATA[Change map size]]>
-                      </label>
+                      <label>Change map size</label>
                       <longhelp>
                         <![CDATA[]]>
                       </longhelp>
-                      <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/options16.png</bitmap>
+                      <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/options16.png</bitmap>
                     </object>
                     <object class="separator"/>
                     <object class="wxStaticText" name="m_staticText355">
-                      <label>
-                        <![CDATA[Current layer:]]>
-                      </label>
+                      <label>Current layer:</label>
                       <style/>
                     </object>
                     <object class="wxChoice" name="m_layerChoice">
                       <style/>
                       <content>
-                        <item>
-                          <![CDATA[Back]]>
-                        </item>
-                        <item>
-                          <![CDATA[Middle]]>
-                        </item>
-                        <item>
-                          <![CDATA[Top]]>
-                        </item>
+                        <item>Back</item>
+                        <item>Middle</item>
+                        <item>Top</item>
                       </content>
-                      <selection>
-                        <![CDATA[0]]>
-                      </selection>
+                      <selection>0</selection>
                     </object>
                   </object>
                 </object>
@@ -252,16 +224,14 @@
                     <bitmapsize>16,16</bitmapsize>
                     <object class="tool" name="m_hideUpperLayerCheck">
                       <toggle>1</toggle>
-                      <label>
-                        <![CDATA[Hide upper layers]]>
-                      </label>
+                      <label>Hide upper layers</label>
                       <tooltip>
                         <![CDATA[Hide upper layers]]>
                       </tooltip>
                       <longhelp>
                         <![CDATA[Hide upper layers]]>
                       </longhelp>
-                      <bitmap>../../Binaries/Output/Release_Windows/res/eye.png</bitmap>
+                      <bitmap>../../../../Binaries/Output/Release_Windows/res/eye.png</bitmap>
                     </object>
                   </object>
                 </object>
@@ -290,9 +260,7 @@
                   <flag>wxALL</flag>
                   <border>5</border>
                   <object class="wxStaticText" name="m_staticText448">
-                    <label>
-                      <![CDATA[Use left mouse click to add the current tile and right click to remove it.]]>
-                    </label>
+                    <label>Use left mouse click to add the current tile and right click to remove it.</label>
                     <style/>
                   </object>
                 </object>
@@ -302,8 +270,8 @@
               <flag>wxALL|wxEXPAND</flag>
               <option>1</option>
               <object class="wxFlexGridSizer">
-                <cols>3</cols>
-                <rows>0</rows>
+                <cols>0</cols>
+                <rows>1</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
                 <growablecols>1</growablecols>
@@ -312,7 +280,7 @@
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
                   <object class="wxStaticBitmap" name="m_staticBitmap456">
-                    <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
+                    <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
                   </object>
                 </object>
                 <object class="sizeritem">
@@ -320,10 +288,18 @@
                   <border>5</border>
                   <object class="wxHyperlinkCtrl" name="m_hyperLink454">
                     <style>wxHL_DEFAULT_STYLE</style>
-                    <label>
-                      <![CDATA[Help about this object]]>
-                    </label>
+                    <label>Help about this object</label>
                     <url/>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <object class="wxButton" name="m_button524">
+                    <label>Import .tmx files (Tiled)...</label>
+                    <style/>
+                    <bitmapposition>wxLEFT</bitmapposition>
+                    <default>0</default>
                   </object>
                 </object>
                 <object class="sizeritem">
@@ -332,9 +308,7 @@
                   <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer60">
                     <object class="button">
                       <object class="wxButton" name="wxID_OK">
-                        <label>
-                          <![CDATA[]]>
-                        </label>
+                        <label/>
                         <style/>
                         <bg/>
                         <fg/>
@@ -343,9 +317,7 @@
                     </object>
                     <object class="button">
                       <object class="wxButton" name="wxID_CANCEL">
-                        <label>
-                          <![CDATA[]]>
-                        </label>
+                        <label/>
                         <style/>
                         <bg/>
                         <fg/>
@@ -412,9 +384,7 @@
               <flag>wxALL</flag>
               <border>5</border>
               <object class="wxStaticText" name="m_staticText335">
-                <label>
-                  <![CDATA[The tileset is the texture containing all the tiles which will be used in your tilemap object.]]>
-                </label>
+                <label>The tileset is the texture containing all the tiles which will be used in your tilemap object.</label>
                 <style/>
                 <font>
                   <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
@@ -428,9 +398,7 @@
               <flag>wxALL</flag>
               <border>5</border>
               <object class="wxStaticText" name="m_staticText337">
-                <label>
-                  <![CDATA[Note: the tilemap object needs to have all the tiles in a single texture.]]>
-                </label>
+                <label>Note: the tilemap object needs to have all the tiles in a single texture.</label>
                 <style/>
                 <font>
                   <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
@@ -455,9 +423,7 @@
                   <flag>wxALL|wxALIGN_CENTER|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
                   <border>5</border>
                   <object class="wxStaticText" name="m_staticText287">
-                    <label>
-                      <![CDATA[Tileset texture:]]>
-                    </label>
+                    <label>Tileset texture:</label>
                     <style/>
                   </object>
                 </object>
@@ -477,16 +443,13 @@
                       <border>5</border>
                       <object class="wxTextCtrl" name="m_textureNameTextCtrl">
                         <style/>
-                        <hint>
-                          <![CDATA[]]>
-                        </hint>
                       </object>
                     </object>
                     <object class="sizeritem">
                       <flag>wxALL</flag>
                       <border>5</border>
                       <object class="wxBitmapButton" name="m_setTextureButton">
-                        <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/image16.png</bitmap>
+                        <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/image16.png</bitmap>
                         <style>wxBU_AUTODRAW</style>
                         <default>0</default>
                       </object>
@@ -497,9 +460,7 @@
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
                   <border>5</border>
                   <object class="wxStaticText" name="m_staticText301">
-                    <label>
-                      <![CDATA[Tile size:]]>
-                    </label>
+                    <label>Tile size:</label>
                     <style/>
                   </object>
                 </object>
@@ -528,9 +489,7 @@
                       <flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
                       <border>5</border>
                       <object class="wxStaticText" name="m_staticText307">
-                        <label>
-                          <![CDATA[x]]>
-                        </label>
+                        <label>x</label>
                         <style/>
                       </object>
                     </object>
@@ -548,9 +507,7 @@
                       <flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
                       <border>5</border>
                       <object class="wxStaticText" name="m_staticText311">
-                        <label>
-                          <![CDATA[pixels]]>
-                        </label>
+                        <label>pixels</label>
                         <style/>
                       </object>
                     </object>
@@ -560,9 +517,7 @@
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
                   <border>5</border>
                   <object class="wxStaticText" name="m_staticText313">
-                    <label>
-                      <![CDATA[Tile spacing:]]>
-                    </label>
+                    <label>Tile spacing:</label>
                     <style/>
                   </object>
                 </object>
@@ -591,9 +546,7 @@
                       <flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
                       <border>5</border>
                       <object class="wxStaticText" name="m_staticText325">
-                        <label>
-                          <![CDATA[x]]>
-                        </label>
+                        <label>x</label>
                         <style/>
                       </object>
                     </object>
@@ -611,9 +564,7 @@
                       <flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
                       <border>5</border>
                       <object class="wxStaticText" name="m_staticText329">
-                        <label>
-                          <![CDATA[pixels]]>
-                        </label>
+                        <label>pixels</label>
                         <style/>
                       </object>
                     </object>
@@ -623,9 +574,7 @@
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
                   <border>5</border>
                   <object class="wxStaticText" name="m_staticText462">
-                    <label>
-                      <![CDATA[Preview:]]>
-                    </label>
+                    <label>Preview:</label>
                     <style/>
                   </object>
                 </object>
@@ -653,7 +602,7 @@
                   <flag>wxALL</flag>
                   <border>5</border>
                   <object class="wxStaticBitmap" name="m_staticBitmap470">
-                    <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
+                    <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
                   </object>
                 </object>
                 <object class="sizeritem">
@@ -661,9 +610,7 @@
                   <border>5</border>
                   <object class="wxHyperlinkCtrl" name="m_hyperLink472">
                     <style>wxHL_DEFAULT_STYLE</style>
-                    <label>
-                      <![CDATA[Help on this dialog]]>
-                    </label>
+                    <label>Help on this dialog</label>
                     <url/>
                   </object>
                 </object>
@@ -673,9 +620,7 @@
                   <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer2713">
                     <object class="button">
                       <object class="wxButton" name="wxID_OK">
-                        <label>
-                          <![CDATA[]]>
-                        </label>
+                        <label/>
                         <style/>
                         <bg/>
                         <fg/>
@@ -684,9 +629,7 @@
                     </object>
                     <object class="button">
                       <object class="wxButton" name="wxID_CANCEL">
-                        <label>
-                          <![CDATA[]]>
-                        </label>
+                        <label/>
                         <style/>
                         <bg/>
                         <fg/>
@@ -729,9 +672,7 @@
             <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
             <border>5</border>
             <object class="wxStaticText" name="m_staticText378">
-              <label>
-                <![CDATA[Map size:]]>
-              </label>
+              <label>Map size:</label>
               <style/>
             </object>
           </object>
@@ -760,9 +701,7 @@
                 <flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
                 <border>5</border>
                 <object class="wxStaticText" name="m_staticText384">
-                  <label>
-                    <![CDATA[x]]>
-                  </label>
+                  <label>x</label>
                   <style/>
                 </object>
               </object>
@@ -780,9 +719,7 @@
                 <flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
                 <border>5</border>
                 <object class="wxStaticText" name="m_staticText388">
-                  <label>
-                    <![CDATA[tiles]]>
-                  </label>
+                  <label>tiles</label>
                   <style/>
                 </object>
               </object>
@@ -804,7 +741,7 @@
             <flag>wxALL</flag>
             <border>5</border>
             <object class="wxStaticBitmap" name="m_staticBitmap476">
-              <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
+              <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/help16.png</bitmap>
             </object>
           </object>
           <object class="sizeritem">
@@ -812,9 +749,7 @@
             <border>5</border>
             <object class="wxHyperlinkCtrl" name="m_hyperLink478">
               <style>wxHL_DEFAULT_STYLE</style>
-              <label>
-                <![CDATA[Help on this dialog]]>
-              </label>
+              <label>Help on this dialog</label>
               <url/>
             </object>
           </object>
@@ -824,9 +759,7 @@
             <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer371">
               <object class="button">
                 <object class="wxButton" name="wxID_OK">
-                  <label>
-                    <![CDATA[]]>
-                  </label>
+                  <label/>
                   <style/>
                   <bg/>
                   <fg/>
@@ -835,9 +768,7 @@
               </object>
               <object class="button">
                 <object class="wxButton" name="wxID_CANCEL">
-                  <label>
-                    <![CDATA[]]>
-                  </label>
+                  <label/>
                   <style/>
                   <bg/>
                   <fg/>
@@ -877,25 +808,21 @@
               <bitmapsize>16,16</bitmapsize>
               <object class="tool" name="m_toolbarItem406">
                 <toggle>1</toggle>
-                <label>
-                  <![CDATA[Collidable]]>
-                </label>
+                <label>Collidable</label>
                 <tooltip>
                   <![CDATA[Activates the collision mask for collision detection]]>
                 </tooltip>
                 <longhelp>
                   <![CDATA[]]>
                 </longhelp>
-                <bitmap>../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png</bitmap>
+                <bitmap>../../../../Binaries/Output/Release_Windows/CppPlatform/Extensions/pathfindingobstacleicon16.png</bitmap>
               </object>
               <object class="tool" name="m_toolbarItem444">
-                <label>
-                  <![CDATA[Predefined shape]]>
-                </label>
+                <label>Predefined shape</label>
                 <longhelp>
                   <![CDATA[]]>
                 </longhelp>
-                <bitmap>../../Binaries/Output/Release_Windows/res/tilemasktrianglebr16.png</bitmap>
+                <bitmap>../../../../Binaries/Output/Release_Windows/res/tilemasktrianglebr16.png</bitmap>
               </object>
               <object class="separator"/>
             </object>
@@ -906,40 +833,34 @@
               <style>wxTB_NODIVIDER|wxTB_FLAT</style>
               <bitmapsize>16,16</bitmapsize>
               <object class="tool" name="m_toolbarItem420">
-                <label>
-                  <![CDATA[Add a point]]>
-                </label>
+                <label>Add a point</label>
                 <tooltip>
                   <![CDATA[Add a point to the collision mask]]>
                 </tooltip>
                 <longhelp>
                   <![CDATA[]]>
                 </longhelp>
-                <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/add16.png</bitmap>
+                <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/add16.png</bitmap>
               </object>
               <object class="tool" name="m_toolbarItem422">
-                <label>
-                  <![CDATA[Edit point position...]]>
-                </label>
+                <label>Edit point position...</label>
                 <tooltip>
                   <![CDATA[Edit the selected point position...]]>
                 </tooltip>
                 <longhelp>
                   <![CDATA[]]>
                 </longhelp>
-                <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/edit16.png</bitmap>
+                <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/edit16.png</bitmap>
               </object>
               <object class="tool" name="m_toolbarItem426">
-                <label>
-                  <![CDATA[Remove selected point]]>
-                </label>
+                <label>Remove selected point</label>
                 <tooltip>
                   <![CDATA[Removes the selected point]]>
                 </tooltip>
                 <longhelp>
                   <![CDATA[]]>
                 </longhelp>
-                <bitmap>../../Binaries/Output/Release_Windows/res/icons_default/remove16.png</bitmap>
+                <bitmap>../../../../Binaries/Output/Release_Windows/res/icons_default/remove16.png</bitmap>
               </object>
             </object>
           </object>
@@ -958,9 +879,7 @@
         <flag>wxALL</flag>
         <border>5</border>
         <object class="wxStaticText" name="m_tileIdLabel">
-          <label>
-            <![CDATA[]]>
-          </label>
+          <label/>
           <style/>
           <font>
             <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
@@ -968,6 +887,187 @@
             <weight>normal</weight>
             <underlined>0</underlined>
           </font>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxDialog" name="TileMapImporterDialogBase">
+    <title>Import a .tmx file (Tiled)</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE</style>
+    <size>500,-1</size>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>0</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+      <object class="sizeritem" name="flexGridSizer531">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>1</cols>
+          <rows>0</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>2</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxStaticText" name="m_staticText559">
+              <label>.tmx file :</label>
+              <style/>
+            </object>
+          </object>
+          <object class="sizeritem" name="flexGridSizer561">
+            <flag>wxALL|wxEXPAND</flag>
+            <option>1</option>
+            <object class="wxFlexGridSizer">
+              <cols>2</cols>
+              <rows>0</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols>0</growablecols>
+              <growablerows>0</growablerows>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <object class="wxTextCtrl" name="m_fileTextCtrl">
+                  <style/>
+                  <hint>
+                    <![CDATA[The tmx file saved with Tiled]]>
+                  </hint>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
+                <object class="wxButton" name="m_browserBt">
+                  <label>Browse...</label>
+                  <style/>
+                  <bitmapposition>wxLEFT</bitmapposition>
+                  <default>0</default>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem" name="staticBoxSizer577">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <option>1</option>
+            <object class="wxStaticBoxSizer" name="staticBoxSizer577">
+              <sizeritem>
+                <object class="spacer"/>
+              </sizeritem>
+              <orient>wxVERTICAL</orient>
+              <label>Import settings</label>
+              <object class="sizeritem" name="boxSizer579">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <option>1</option>
+                <object class="wxBoxSizer">
+                  <orient>wxHORIZONTAL</orient>
+                  <object class="sizeritem" name="staticBoxSizer585">
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                    <option>1</option>
+                    <object class="wxStaticBoxSizer" name="staticBoxSizer585">
+                      <sizeritem>
+                        <object class="spacer"/>
+                      </sizeritem>
+                      <orient>wxVERTICAL</orient>
+                      <label>Tileset</label>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>5</border>
+                        <object class="wxCheckBox" name="m_tilesetConfCheckBox">
+                          <style/>
+                          <label>Import the tileset configuration</label>
+                          <checked>1</checked>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>5</border>
+                        <object class="wxCheckBox" name="m_tilesetImageCheckBox">
+                          <style/>
+                          <label>Import the tileset image</label>
+                          <checked>1</checked>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>5</border>
+                        <object class="wxCheckBox" name="m_hitboxesCheckBox">
+                          <style/>
+                          <label>Import the tiles hitboxes</label>
+                          <checked>1</checked>
+                        </object>
+                      </object>
+                    </object>
+                  </object>
+                  <object class="sizeritem" name="staticBoxSizer587">
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                    <option>1</option>
+                    <object class="wxStaticBoxSizer" name="staticBoxSizer587">
+                      <sizeritem>
+                        <object class="spacer"/>
+                      </sizeritem>
+                      <orient>wxVERTICAL</orient>
+                      <label>Tilemap</label>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>5</border>
+                        <object class="wxCheckBox" name="m_tilemapCheckBox">
+                          <style/>
+                          <label>Import the tilemap</label>
+                          <checked>1</checked>
+                        </object>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxButton" name="m_importButton">
+              <label>Importer...</label>
+              <style/>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>0</default>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer533">
+          <object class="button">
+            <object class="wxButton" name="wxID_OK">
+              <label/>
+              <style/>
+              <bg/>
+              <fg/>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="button">
+            <object class="wxButton" name="wxID_CANCEL">
+              <label/>
+              <style/>
+              <bg/>
+              <fg/>
+              <default>0</default>
+            </object>
+          </object>
         </object>
       </object>
     </object>

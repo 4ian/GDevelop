@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef TILEMAPDIALOGS_BASE_CLASSES_H
-#define TILEMAPDIALOGS_BASE_CLASSES_H
+#ifndef IDE_DIALOGS_TILEMAPDIALOGS_BASE_CLASSES_H
+#define IDE_DIALOGS_TILEMAPDIALOGS_BASE_CLASSES_H
 
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
@@ -30,6 +30,14 @@
 #include <wx/textctrl.h>
 #include <wx/bmpbuttn.h>
 #include <wx/spinctrl.h>
+#include <wx/statbox.h>
+#include <wx/checkbox.h>
+#if wxVERSION_NUMBER >= 2900
+#include <wx/persist.h>
+#include <wx/persist/toplevel.h>
+#include <wx/persist/bookctrl.h>
+#include <wx/persist/treebook.h>
+#endif
 #include "TileMapDialogsIds.h"
 
 class TileMapObjectEditorBase : public wxDialog
@@ -49,6 +57,7 @@ protected:
     wxStaticText* m_staticText448;
     wxStaticBitmap* m_staticBitmap456;
     wxHyperlinkCtrl* m_hyperLink454;
+    wxButton* m_button524;
     wxStdDialogButtonSizer* m_stdBtnSizer60;
     wxButton* m_button62;
     wxButton* m_button64;
@@ -65,10 +74,26 @@ protected:
     virtual void OnLayerChoiceChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHideUpperLayerChecked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnHelpButtonClicked(wxHyperlinkEvent& event) { event.Skip(); }
+    virtual void OnTmxImportButtonClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnOkButtonPressed(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCancelButtonPressed(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxToolBar* GetTileSetToolBar() { return m_tileSetToolBar; }
+    TileSetPanel* GetTileSetPanel() { return m_tileSetPanel; }
+    wxPanel* GetTileSetPropertiesPanel() { return m_tileSetPropertiesPanel; }
+    wxToolBar* GetToolbar492() { return m_toolbar492; }
+    wxStaticText* GetStaticText355() { return m_staticText355; }
+    wxChoice* GetLayerChoice() { return m_layerChoice; }
+    wxToolBar* GetMainPanelToolbar() { return m_mainPanelToolbar; }
+    wxToolBar* GetToolbar516() { return m_toolbar516; }
+    TileMapPanel* GetTileMapPanel() { return m_tileMapPanel; }
+    wxStaticText* GetStaticText448() { return m_staticText448; }
+    wxStaticBitmap* GetStaticBitmap456() { return m_staticBitmap456; }
+    wxHyperlinkCtrl* GetHyperLink454() { return m_hyperLink454; }
+    wxButton* GetButton524() { return m_button524; }
+    wxPanel* GetMainPanel() { return m_mainPanel; }
+    wxAuiManager* GetAuimgr178() { return m_auimgr178; }
     TileMapObjectEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("TileMap Object Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1100,550), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~TileMapObjectEditorBase();
 };
@@ -111,6 +136,27 @@ protected:
     virtual void OnCancelButtonClicked(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticText* GetStaticText335() { return m_staticText335; }
+    wxStaticText* GetStaticText337() { return m_staticText337; }
+    wxStaticText* GetStaticText287() { return m_staticText287; }
+    wxTextCtrl* GetTextureNameTextCtrl() { return m_textureNameTextCtrl; }
+    wxBitmapButton* GetSetTextureButton() { return m_setTextureButton; }
+    wxStaticText* GetStaticText301() { return m_staticText301; }
+    wxSpinCtrl* GetTileWidthSpin() { return m_tileWidthSpin; }
+    wxStaticText* GetStaticText307() { return m_staticText307; }
+    wxSpinCtrl* GetTileHeightSpin() { return m_tileHeightSpin; }
+    wxStaticText* GetStaticText311() { return m_staticText311; }
+    wxStaticText* GetStaticText313() { return m_staticText313; }
+    wxSpinCtrl* GetSpacingWidthSpin() { return m_spacingWidthSpin; }
+    wxStaticText* GetStaticText325() { return m_staticText325; }
+    wxSpinCtrl* GetSpacingHeightSpin() { return m_spacingHeightSpin; }
+    wxStaticText* GetStaticText329() { return m_staticText329; }
+    wxStaticText* GetStaticText462() { return m_staticText462; }
+    TileSetPanel* GetTileSetPreviewPanel() { return m_tileSetPreviewPanel; }
+    wxStaticBitmap* GetStaticBitmap470() { return m_staticBitmap470; }
+    wxHyperlinkCtrl* GetHyperLink472() { return m_hyperLink472; }
+    wxPanel* GetMainPanel() { return m_mainPanel; }
+    wxAuiManager* GetAuimgr() { return m_auimgr; }
     TileSetConfigurationEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Tileset configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(750,500), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     virtual ~TileSetConfigurationEditorBase();
 };
@@ -136,6 +182,13 @@ protected:
     virtual void OnCancelPressed(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticText* GetStaticText378() { return m_staticText378; }
+    wxSpinCtrl* GetMapWidthSpin() { return m_mapWidthSpin; }
+    wxStaticText* GetStaticText384() { return m_staticText384; }
+    wxSpinCtrl* GetMapHeightSpin() { return m_mapHeightSpin; }
+    wxStaticText* GetStaticText388() { return m_staticText388; }
+    wxStaticBitmap* GetStaticBitmap476() { return m_staticBitmap476; }
+    wxHyperlinkCtrl* GetHyperLink478() { return m_hyperLink478; }
     TileMapConfigurationEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Tilemap size configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~TileMapConfigurationEditorBase();
 };
@@ -162,8 +215,47 @@ protected:
     virtual void OnPreviewMotion(wxMouseEvent& event) { event.Skip(); }
 
 public:
+    wxToolBar* GetMainToolbar() { return m_mainToolbar; }
+    wxToolBar* GetToolbar418() { return m_toolbar418; }
+    wxScrolledWindow* GetTilePreviewPanel() { return m_tilePreviewPanel; }
+    wxStaticText* GetTileIdLabel() { return m_tileIdLabel; }
     TileEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL);
     virtual ~TileEditorBase();
+};
+
+
+class TileMapImporterDialogBase : public wxDialog
+{
+protected:
+    wxStaticText* m_staticText559;
+    wxTextCtrl* m_fileTextCtrl;
+    wxButton* m_browserBt;
+    wxCheckBox* m_tilesetConfCheckBox;
+    wxCheckBox* m_tilesetImageCheckBox;
+    wxCheckBox* m_hitboxesCheckBox;
+    wxCheckBox* m_tilemapCheckBox;
+    wxButton* m_importButton;
+    wxStdDialogButtonSizer* m_stdBtnSizer533;
+    wxButton* m_okBt;
+    wxButton* m_button537;
+
+protected:
+    virtual void OnBrowserBtClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnImportButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnOkBtClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCancelBtClicked(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText559() { return m_staticText559; }
+    wxTextCtrl* GetFileTextCtrl() { return m_fileTextCtrl; }
+    wxButton* GetBrowserBt() { return m_browserBt; }
+    wxCheckBox* GetTilesetConfCheckBox() { return m_tilesetConfCheckBox; }
+    wxCheckBox* GetTilesetImageCheckBox() { return m_tilesetImageCheckBox; }
+    wxCheckBox* GetHitboxesCheckBox() { return m_hitboxesCheckBox; }
+    wxCheckBox* GetTilemapCheckBox() { return m_tilemapCheckBox; }
+    wxButton* GetImportButton() { return m_importButton; }
+    TileMapImporterDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Import a .tmx file (Tiled)"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,-1), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~TileMapImporterDialogBase();
 };
 
 #endif

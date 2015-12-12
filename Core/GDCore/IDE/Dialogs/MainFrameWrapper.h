@@ -88,11 +88,6 @@ public:
     wxInfoBar * GetInfoBar() const { return infoBar; };
 
     /**
-     * Return a pointer to the notebook holding editors
-     */
-    wxAuiNotebook * GetEditorsNotebook() { return editorsNotebook; }
-
-    /**
      * Return the working directory of the IDE. ( i.e. IDE executable directory )
      */
     wxString GetIDEWorkingDirectory() const { return workingDirectory; }

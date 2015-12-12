@@ -616,10 +616,6 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
 
         std::size_t extensionsCount = game->GetUsedExtensions().size()-gd::PlatformExtension::GetBuiltinExtensionsNames().size();
         projectsTree->SetItemText(selectedItem, _("Extensions") + (extensionsCount > 0 ? " (" + gd::String::From(extensionsCount) + ")" : ""));
-        for (std::size_t i = 0;i<game->GetUsedExtensions().size();++i)
-        {
-            std::cout << game->GetUsedExtensions()[i] << std::endl;
-        }
     }
     else if ( data->GetString() == "SourceFile")
     {
@@ -699,7 +695,7 @@ void ProjectManager::EditSourceFile(gd::Project * game, gd::String filename, siz
     //As we're opening a "real" file, first check if it exists
     if ( !wxFileExists(filename) )
     {
-        gd::LogWarning(_("Unable to open ")+filename+_(", the file does not exists"));
+        gd::LogWarning(_("Unable to open ")+filename+_(", the file does not exist"));
         return;
     }
 
@@ -714,28 +710,13 @@ void ProjectManager::EditSourceFile(gd::Project * game, gd::String filename, siz
         wxExecute(program+" \""+filename+"\"");
         return;
     }
-    //Launch an internal code editor else
 
-
-    //Verify if the editor is not already opened
-    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
-    {
-        CodeEditor * editorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
-
-        if ( editorPtr != NULL && editorPtr->filename == filename )
-        {
-            //Change notebook page to scene page
-            mainEditor.GetEditorsNotebook()->SetSelection(j);
-            if ( line != gd::String::npos ) editorPtr->SelectLine(line);
-            return;
-        }
-    }
+    //Launch an internal code editor otherwise
+    if (mainEditor.GetEditorsManager().SelectCodeEditorFor(filename, line))
+    	return;
 
     CodeEditor * editorScene = new CodeEditor(mainEditor.GetEditorsNotebook(), filename, associatedGame, mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, wxFileName(filename).GetFullName(), true, gd::SkinHelper::GetIcon("source_cpp", 16)) )
-    {
-        gd::LogError(_("Unable to add a new tab !"));
-    }
+    mainEditor.GetEditorsManager().AddPage(editorScene, wxFileName(filename).GetFullName(), true);
     if ( line != gd::String::npos ) editorScene->SelectLine(line);
 }
 
@@ -763,36 +744,13 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
 
 void ProjectManager::EditLayout(gd::Project & project, gd::Layout & layout)
 {
-    //Verify if the scene editor is not already opened
-    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
-    {
-        EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(j));
+    if (mainEditor.GetEditorsManager().SelectEditorFor(layout))
+    	return;
 
-        if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout )
-        {
-            //Change notebook page to the layout page
-            mainEditor.GetEditorsNotebook()->SetSelection(j);
-            return;
-        }
-    }
-
-    //Save the event to log file
     LogFileManager::Get()->WriteToLogFile("Opened layout "+layout.GetName());
 
-    //Open a new editor if necessary
-    gd::String prefix = "";
-    if ( mainEditor.games.size() > 1 )
-    {
-        prefix = "["+project.GetName()+"] ";
-        if ( project.GetName().length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+project.GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
-    }
-
     EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), project, layout, mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+layout.GetName(), true, gd::SkinHelper::GetIcon("scene", 16)) )
-    {
-        gd::LogError(_("Unable to add a new tab !"));
-    }
+    mainEditor.GetEditorsManager().AddPage(editorScene, layout.GetName(), true);
 }
 
 /**
@@ -922,13 +880,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
         layout.SetName(newName);
 
         //Updating editors
-        for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-        {
-            EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-            if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout)
-                mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
-        }
+        int page = mainEditor.GetEditorsManager().GetPageOfEditorFor(layout);
+        if (page != -1) mainEditor.GetEditorsManager().UpdatePageLabel(page, event.GetLabel());
 
         for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
             game->GetUsedPlatforms()[j]->GetChangesNotifier().OnLayoutRenamed(*game, layout, data->GetSecondString());
@@ -955,13 +908,9 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
         events.SetName(newName);
 
         //Updating editors
-        for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-        {
-            ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+        int page = mainEditor.GetEditorsManager().GetPageOfEditorFor(game->GetExternalEvents(newName));
+        if (page != -1) mainEditor.GetEditorsManager().UpdatePageLabel(page, event.GetLabel());
 
-            if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(newName))
-                mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
-        }
         for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
             game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalEventsRenamed(*game, events, data->GetSecondString());
     }
@@ -986,14 +935,9 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
         gd::ExternalLayout & layout = game->GetExternalLayout(itemTextBeforeEditing);
         layout.SetName(newName);
 
-        //Updating editors
-        for (std::size_t k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-        {
-            ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+        int page = mainEditor.GetEditorsManager().GetPageOfEditorFor(game->GetExternalLayout(newName));
+        if (page != -1) mainEditor.GetEditorsManager().UpdatePageLabel(page, event.GetLabel());
 
-            if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(newName))
-                mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
-        }
         for ( std::size_t j = 0; j < game->GetUsedPlatforms().size();++j)
             game->GetUsedPlatforms()[j]->GetChangesNotifier().OnExternalLayoutRenamed(*game, layout, data->GetSecondString());
     }
@@ -1067,30 +1011,11 @@ void ProjectManager::OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event)
  */
 void ProjectManager::EditResourcesOfProject(gd::Project * project)
 {
-    //Verify if the image editor is not already opened
-    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
-    {
-        ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
-
-        if ( imagesEditorPtr != NULL && &imagesEditorPtr->project == project )
-        {
-            //Change notebook page to editor page
-            mainEditor.GetEditorsNotebook()->SetSelection(j);
-            return;
-        }
-    }
-
-    //Open a new editor if necessary
-    gd::String prefix = "";
-    if ( mainEditor.games.size() > 1 )
-    {
-        prefix = "["+project->GetName()+"] ";
-        if ( project->GetName().length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+project->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
-    }
+    if (mainEditor.GetEditorsManager().SelectResourceEditorFor(*project))
+    	return;
 
     ResourcesEditor * editorImages = new ResourcesEditor(&mainEditor, *project, mainEditor.GetMainFrameWrapper(), true);
-    mainEditor.GetEditorsNotebook()->AddPage(editorImages, prefix+_("Images bank"), true, gd::SkinHelper::GetIcon("image", 16));
+    mainEditor.GetEditorsManager().AddPage(editorImages, "", true);
 }
 
 /**
@@ -1112,20 +1037,7 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     gd::Layout & layout = game->GetLayout(sceneName);
 
     //Updating editors
-    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-    {
-        EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-        ExternalLayoutEditor * externalLayoutEditPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-        if ( (sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout) ||
-             (externalLayoutEditPtr != NULL && &externalLayoutEditPtr->GetAssociatedLayout() == &layout) )
-        {
-            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-
-            k--;
-        }
-    }
+    mainEditor.GetEditorsManager().CloseAllPagesFor(layout);
 
     //Updating tree
     projectsTree->Delete(selectedItem);
@@ -1182,18 +1094,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     gd::Clipboard::Get()->SetLayout(&layout);
 
     //Updating editors
-    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-    {
-        EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-        if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout)
-        {
-            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-
-            k--;
-        }
-    }
+    mainEditor.GetEditorsManager().CloseAllPagesFor(layout);
 
     //Updating tree
     projectsTree->Delete(selectedItem);
@@ -1318,69 +1219,10 @@ void ProjectManager::OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event)
  */
 void ProjectManager::CloseGame(gd::Project * project)
 {
+	if (!project) return;
+
     //Closing all editors related to game
-    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-    {
-        EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-        ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-        ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-        CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-        ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-
-        if ( sceneEditorPtr != NULL )
-        {
-            bool sceneBelongToGame = false;
-            for (std::size_t i = 0;i<project->GetLayoutsCount();++i)
-            {
-            	if ( &project->GetLayout(i) == &sceneEditorPtr->GetLayout() )
-                    sceneBelongToGame = true;
-            }
-
-            if ( sceneBelongToGame )
-            {
-                if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                    wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-                k--;
-            }
-        }
-        else if ( imagesEditorPtr != NULL )
-        {
-            if ( &imagesEditorPtr->project == project)
-            {
-                if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                    wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-                k--;
-            }
-        }
-        else if ( externalEventsEditorPtr != NULL )
-        {
-            if ( &externalEventsEditorPtr->game == project)
-            {
-                if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                    wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-                k--;
-            }
-        }
-        else if ( codeEditorPtr != NULL )
-        {
-            if ( codeEditorPtr->game == project)
-            {
-                if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                    wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-                k--;
-            }
-        }
-        else if ( externalLayoutEditorPtr != NULL )
-        {
-            if ( &externalLayoutEditorPtr->GetProject() == project)
-            {
-                if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                    wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-                k--;
-            }
-        }
-    }
+    mainEditor.GetEditorsManager().CloseAllPagesFor(*project);
     if ( mainEditor.GetProjectPropertiesPanel()->GetProject() == project ) mainEditor.GetProjectPropertiesPanel()->SetProject(NULL);
 
     //Ensure we're not destroying a scene with events being built
@@ -1466,33 +1308,11 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    //Verify if the scene editor is not already opened
-    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
-    {
-        ExternalEventsEditor * eventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
-
-        if ( eventsEditorPtr != NULL && &eventsEditorPtr->events == &game->GetExternalEvents(data->GetSecondString()) )
-        {
-            //Change notebook page to scene page
-            mainEditor.GetEditorsNotebook()->SetSelection(j);
-            return;
-        }
-    }
-
-    //Open a new editor if necessary
-    gd::String prefix = "";
-    if ( mainEditor.games.size() > 1 )
-    {
-        prefix = "["+game->GetName()+"] ";
-        if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
-    }
+    if (mainEditor.GetEditorsManager().SelectEditorFor(game->GetExternalEvents(data->GetSecondString())))
+    	return;
 
     ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalEvents(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, gd::SkinHelper::GetIcon("events", 16)) )
-    {
-        gd::LogError(_("Unable to add a new tab !"));
-    }
+    mainEditor.GetEditorsManager().AddPage(editor, data->GetSecondString(), true);
 }
 
 /**
@@ -1560,18 +1380,7 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     }
 
     //Updating editors
-    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-    {
-        ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-        if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(data->GetSecondString()))
-        {
-            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-
-            k--;
-        }
-    }
+    mainEditor.GetEditorsManager().CloseAllPagesFor(game->GetExternalEvents(data->GetSecondString()));
 
     //Updating tree
     projectsTree->Delete(selectedItem);
@@ -1612,18 +1421,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
     gd::Clipboard::Get()->SetExternalEvents(game->GetExternalEvents(data->GetSecondString()));
 
     //Updating editors
-    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-    {
-        ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-        if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(data->GetSecondString()))
-        {
-            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-
-            k--;
-        }
-    }
+    mainEditor.GetEditorsManager().CloseAllPagesFor(game->GetExternalEvents(data->GetSecondString()));
 
     //Updating tree
     projectsTree->Delete(selectedItem);
@@ -1718,33 +1516,11 @@ void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
         return;
     }
 
-    //Verify if the scene editor is not already opened
-    for (std::size_t j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
-    {
-        ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
-
-        if ( externalLayoutEditorPtr != NULL && &externalLayoutEditorPtr->GetExternalLayout() == &game->GetExternalLayout(data->GetSecondString()) )
-        {
-            //Change notebook page to scene page
-            mainEditor.GetEditorsNotebook()->SetSelection(j);
-            return;
-        }
-    }
-
-    //Open a new editor if necessary
-    gd::String prefix = "";
-    if ( mainEditor.games.size() > 1 )
-    {
-        prefix = "["+game->GetName()+"] ";
-        if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
-    }
+    if (mainEditor.GetEditorsManager().SelectEditorFor(game->GetExternalLayout(data->GetSecondString())))
+    	return;
 
     ExternalLayoutEditor * editor = new ExternalLayoutEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalLayout(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, gd::SkinHelper::GetIcon("scene", 16)) )
-    {
-        gd::LogError(_("Unable to add a new tab !"));
-    }
+    mainEditor.GetEditorsManager().AddPage(editor, data->GetSecondString(), true);
 }
 
 void ProjectManager::OnRenameExternalLayoutSelected(wxCommandEvent& event)
@@ -1766,18 +1542,7 @@ void ProjectManager::OnDeleteExternalLayoutSelected(wxCommandEvent& event)
     }
 
     //Updating editors
-    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-    {
-        ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-        if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(data->GetSecondString()))
-        {
-            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-
-            k--;
-        }
-    }
+    mainEditor.GetEditorsManager().CloseAllPagesFor(game->GetExternalLayout(data->GetSecondString()));
 
     //Updating tree
     projectsTree->Delete(selectedItem);
@@ -1818,18 +1583,7 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
     gd::Clipboard::Get()->SetExternalLayout(game->GetExternalLayout(data->GetSecondString()));
 
     //Updating editors
-    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-    {
-        ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-        if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(data->GetSecondString()))
-        {
-            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-
-            k--;
-        }
-    }
+    mainEditor.GetEditorsManager().CloseAllPagesFor(game->GetExternalLayout(data->GetSecondString()));
 
     //Updating tree
     projectsTree->Delete(selectedItem);
@@ -1910,19 +1664,7 @@ void ProjectManager::OnDeleteSourceFileSelected(wxCommandEvent& event)
     }
 
     //Updating editors
-    gd::SourceFile & sourceFile = game->GetSourceFile(name);
-    for (std::size_t k =0;k<static_cast<std::size_t>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-    {
-        CodeEditor * editorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-        if ( editorPtr != NULL && editorPtr->filename == sourceFile.GetFileName())
-        {
-            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
-
-            k--;
-        }
-    }
+    mainEditor.GetEditorsManager().CloseAllPagesFor(game->GetSourceFile(name));
 
     game->RemoveSourceFile(name);
 

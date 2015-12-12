@@ -48,6 +48,11 @@ public:
     gd::Layout & GetLayout() { return layout; };
 
     /**
+     * Return the project edited by the editor
+     */
+    gd::Project & GetProject() { return project; };
+
+    /**
      * Can be called by parent so as to refresh ribbon for this editor.
      */
     void ForceRefreshRibbonAndConnect();

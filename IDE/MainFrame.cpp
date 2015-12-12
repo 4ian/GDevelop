@@ -131,7 +131,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     mainFrameWrapper(NULL, NULL, this, NULL, NULL, NULL, &scenesLockingShortcuts, wxGetCwd()),
     projectManager(NULL)
 {
-
     //(*Initialize(MainFrame)
     wxBoxSizer* ribbonSizer;
     wxMenuItem* MenuItem1;
@@ -295,6 +294,11 @@ MainFrame::MainFrame( wxWindow* parent ) :
     helpMenu.Delete(MenuItem21); //(useful when GD is distributed on a system managing updates by itself).
     #endif
 
+    editorsManager.SetNotebook(editorsNotebook);
+    editorsManager.ShouldDisplayPrefix([this]() {
+        return games.size() > 1;
+    });
+
     //Update the file menu with exporting items
     for (std::size_t i = 0;i<gd::PlatformManager::Get()->GetAllPlatforms().size();++i)
     {
@@ -445,7 +449,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     RealizeRibbonCustomButtons();
 
     //Create start page
-    editorsNotebook->AddPage(new StartHerePage(editorsNotebook, *this), _("Start page"));
+    editorsManager.AddPage(new StartHerePage(editorsNotebook, *this));
 
     //Create project manager
     projectManager = new ProjectManager(this, *this);

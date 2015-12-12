@@ -38,6 +38,7 @@
 #include <wx/msw/winundef.h>
 #endif
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
+#include "Dialogs/EditorsNotebookManager.h"
 #include "GDCore/String.h"
 #include "EditorScene.h"
 #include "RecentList.h"
@@ -89,7 +90,7 @@ public:
     }
 
     /**
-     *  \briefChange the current game
+     *  \brief Change the current game
      */
     void SetCurrentGame(std::size_t i, bool refreshProjectManager = true);
 
@@ -117,6 +118,11 @@ public:
      * Get a pointer to the notebook containing editors
      */
     inline wxAuiNotebook * GetEditorsNotebook() { return editorsNotebook; };
+
+    /**
+     * Get a reference to the manager containing editors
+     */
+    EditorsNotebookManager & GetEditorsManager() { return editorsManager; }
 
     /**
      * Get a lightweight interface to this class.
@@ -335,6 +341,7 @@ private:
     BuildToolsPnl * buildToolsPnl;
     std::vector<wxWindow*> scenesLockingShortcuts;
     gd::MainFrameWrapper mainFrameWrapper;
+    EditorsNotebookManager editorsManager;
 
     ProjectManager * projectManager;
     ProjectPropertiesPnl * projectPropertiesPnl;

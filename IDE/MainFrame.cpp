@@ -582,16 +582,10 @@ void MainFrame::OnRibbonCppToolsClicked(wxRibbonButtonBarEvent& evt)
  */
 void MainFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt)
 {
-    for (std::size_t i = 0;i<editorsNotebook->GetPageCount();++i)
-    {
-    	if ( dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(i)) != NULL )
-    	{
-    	    editorsNotebook->SetSelection(i);
-    	    return;
-    	}
-    }
+    if (editorsManager.SelectStartHerePage())
+        return;
 
-    editorsNotebook->AddPage(new StartHerePage(this, *this), _("Start page"), true);
+    editorsManager.AddPage(new StartHerePage(this, *this), "", true);
 }
 
 void MainFrame::UpdateOpenedProjectsLogFile()
@@ -982,9 +976,10 @@ void MainFrame::RefreshNews()
 
 StartHerePage* MainFrame::GetStartPage()
 {
-    for (std::size_t i = 0;i<editorsNotebook->GetPageCount();++i)
+    int page = editorsManager.GetPageOfStartHerePage();
+    if (page != -1)
     {
-        if (StartHerePage* startPage = dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(i)))
+        if (StartHerePage* startPage = dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(page)))
         {
             return startPage;
         }

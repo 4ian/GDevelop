@@ -41,12 +41,14 @@ public:
 	int GetPageOfEditorFor(const gd::ExternalLayout & externalLayout);
 	int GetPageOfEditorFor(const gd::Layout & layout);
 	int GetPageOfCodeEditorFor(gd::String filename);
+	int GetPageOfStartHerePage();
 
 	bool SelectResourceEditorFor(const gd::Project & project);
 	bool SelectEditorFor(const gd::ExternalEvents & events);
 	bool SelectEditorFor(const gd::ExternalLayout & externalLayout);
 	bool SelectEditorFor(const gd::Layout & layout);
 	bool SelectCodeEditorFor(gd::String filename, int line);
+	bool SelectStartHerePage();
 
 	wxString GetLabelFor(wxWindow * page, wxString name = "");
 private:

@@ -219,10 +219,21 @@ bool EditorsNotebookManager::SelectCodeEditorFor(gd::String filename, int line)
     return false;
 }
 
-
 bool EditorsNotebookManager::SelectEditorFor(const gd::Layout & layout)
 {
-	int page = GetPageOfEditorFor(layout);
+    int page = GetPageOfEditorFor(layout);
+    if (page != -1)
+    {
+        notebook->SetSelection(page);
+        return true;
+    }
+
+    return false;
+}
+
+bool EditorsNotebookManager::SelectStartHerePage()
+{
+	int page = GetPageOfStartHerePage();
 	if (page != -1)
 	{
 		notebook->SetSelection(page);
@@ -232,6 +243,18 @@ bool EditorsNotebookManager::SelectEditorFor(const gd::Layout & layout)
 	return false;
 }
 
+int EditorsNotebookManager::GetPageOfStartHerePage()
+{
+    for (std::size_t i = 0;i<notebook->GetPageCount();++i)
+    {
+        if ( dynamic_cast<StartHerePage*>(notebook->GetPage(i)) != NULL )
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
 
 int EditorsNotebookManager::GetPageOfResourceEditorFor(const gd::Project & project)
 {
@@ -280,7 +303,6 @@ int EditorsNotebookManager::GetPageOfCodeEditorFor(gd::String filename)
 
     return -1;
 }
-
 
 int EditorsNotebookManager::GetPageOfEditorFor(const gd::Layout & layout)
 {

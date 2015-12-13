@@ -186,7 +186,7 @@ void ExternalLayoutEditor::OnscrollBar1Scroll(wxScrollEvent& event)
 void ExternalLayoutEditor::ForceRefreshRibbonAndConnect()
 {
     mainFrameWrapper.SetRibbonPage(_("Scene"));
-    layoutEditorCanvas->ConnectEvents();
+    if (layoutEditorCanvas) layoutEditorCanvas->ConnectEvents();
 }
 
 void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
@@ -207,12 +207,17 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         layoutPanel->Show();
         helpPanel->Hide();
 
-        gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+        gd::InitialInstancesContainer & instanceContainer = externalLayout.GetInitialInstances();
 
-        //Check if external editors already have been created
-        bool creatingEditorsForFirsttime = (objectsEditor == std::shared_ptr<ObjectsEditor>() ||
-                                            layersEditor == std::shared_ptr<gd::LayersEditorPanel>() ||
-                                            propertiesPnl == std::shared_ptr<LayoutEditorPropertiesPnl>());
+        //Destroy any existing editor
+        if (objectsEditor != std::shared_ptr<ObjectsEditor>())
+            m_mgr.DetachPane(objectsEditor.get());
+        if (layersEditor != std::shared_ptr<LayersEditorPanel>())
+            m_mgr.DetachPane(layersEditor.get());
+        if (propertiesPnl != std::shared_ptr<LayoutEditorPropertiesPnl>())
+            m_mgr.DetachPane(propertiesPnl.get());
+        if (initialInstancesBrowser != std::shared_ptr<InitialPositionBrowserDlg>())
+            m_mgr.DetachPane(initialInstancesBrowser.get());
 
         //(Re)create layout canvas
         if ( layoutEditorCanvas ) delete layoutEditorCanvas;
@@ -234,28 +239,14 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         objectsEditor->SetAssociatedPropertiesPanel(propertiesPnl.get(), &m_mgr);
 
         //Display editors in panes
-        if ( creatingEditorsForFirsttime )
-        {
-            if ( !m_mgr.GetPane("EO").IsOk() )
-                m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-            if ( !m_mgr.GetPane("EL").IsOk() )
-                m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-            if ( !m_mgr.GetPane("PROPERTIES").IsOk() )
-                m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
-            if ( !m_mgr.GetPane("InstancesBrowser").IsOk() )
-                m_mgr.AddPane( initialInstancesBrowser.get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Instances list" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
+        m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+        m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+        m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
+        m_mgr.AddPane( initialInstancesBrowser.get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Instances list" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
 
-            wxString perspective;
-            wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
-            m_mgr.LoadPerspective(perspective);
-        }
-        else
-        {
-            m_mgr.GetPane("EO").Window(objectsEditor.get());
-            m_mgr.GetPane("EL").Window(layersEditor.get());
-            m_mgr.GetPane("PROPERTIES").Window(propertiesPnl.get());
-            m_mgr.GetPane("InstancesBrowser").Window(initialInstancesBrowser.get());
-        }
+        wxString perspective;
+        wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
+        m_mgr.LoadPerspective(perspective);
 
         m_mgr.Update();
         ForceRefreshRibbonAndConnect();

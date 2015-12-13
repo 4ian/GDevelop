@@ -35,6 +35,7 @@
 #include "MainFrame.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Project/ExternalEvents.h"
+#include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/IDE/wxTools/GUIContentScaleFactor.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
@@ -58,6 +59,7 @@
 #include "BuildToolsPnl.h"
 #include "Preferences.h"
 #include "ExternalEventsEditor.h"
+#include "Dialogs/ExternalLayoutEditor.h"
 #include "mp3ogg.h"
 #include "ImportImage.h"
 #include "Dialogs/StartHerePage.h"
@@ -671,6 +673,11 @@ void MainFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
     {
         externalEventsEditorPtr->ForceRefreshRibbonAndConnect();
         LogFileManager::Get()->WriteToLogFile("Switched to the editor of external events \""+externalEventsEditorPtr->events.GetName()+"\"");
+    }
+    else if ( ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
+    {
+        externalLayoutEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::Get()->WriteToLogFile("Switched to the editor of external layout \""+externalLayoutEditorPtr->GetExternalLayout().GetName()+"\"");
     }
 }
 

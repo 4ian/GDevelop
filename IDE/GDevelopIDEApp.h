@@ -13,6 +13,7 @@
 #include <wx/ipc.h>
 #include <wx/snglinst.h>
 #include "GDCore/Project/Project.h"
+#include "Dialogs/Rebrander.h"
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 class STServer;
@@ -34,6 +35,7 @@ public:
     MainFrame * mainEditor;
     wxSingleInstanceChecker * singleInstanceChecker;
     STServer * server;
+    Rebrander rebrander;
 };
 
 /** \brief Tool class used when dealing with interprocess communications.
@@ -83,4 +85,3 @@ public:
 };
 
 #endif // GAME_DEVELOP_EDITORAPP_H
-

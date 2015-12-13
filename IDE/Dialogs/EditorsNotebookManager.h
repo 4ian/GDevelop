@@ -27,6 +27,7 @@ public:
 	void ShouldDisplayPrefix(std::function<bool()> predicat) { shouldDisplayPrefix = predicat; };
 
 	void AddPage(wxWindow * page, wxString name = "", bool select = false);
+	void OnPageAdded(std::function<void(wxWindow*)> cb) { onPageAddedCb = cb; }
 
 	void UpdatePageLabel(int pageIndex, wxString name);
 
@@ -57,6 +58,7 @@ private:
 
 	wxAuiNotebook * notebook;
 	std::function<bool()> shouldDisplayPrefix;
+	std::function<void(wxWindow*)> onPageAddedCb;
     static const std::size_t gameMaxCharDisplayedInEditor = 15;
 };
 

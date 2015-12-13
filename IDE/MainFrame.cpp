@@ -126,6 +126,7 @@ END_EVENT_TABLE()
  */
 MainFrame::MainFrame( wxWindow* parent ) :
     projectCurrentlyEdited(0),
+    baseTitle("GDevelop"),
     ribbon(NULL),
     ribbonFileBt(NULL),
     ribbonSceneEditorButtonBar(NULL),
@@ -521,26 +522,28 @@ MainFrame::~MainFrame()
     m_mgr.UnInit();
 }
 
-/** Change current project
-  */
+void MainFrame::UpdateTitle()
+{
+    std::shared_ptr<gd::Project> project = GetCurrentGame();
+    if (project == std::shared_ptr<gd::Project>())
+    {
+        SetTitle(baseTitle);
+        return;
+    }
+
+    SetTitle(baseTitle + " - [" + project->GetName() + "] "+project->GetProjectFile());
+}
+
 void MainFrame::SetCurrentGame(std::size_t i, bool refreshProjectManager)
 {
     projectCurrentlyEdited = i;
     if ( i >= games.size())
-    {
-        wxString GD = "GDevelop";
-        SetTitle( GD );
         projectPropertiesPnl->SetProject(NULL); //Update editors displaying current project properties
-    }
     else
-    {
-        wxString GD = "GDevelop";
-        SetTitle( GD + " - [" + games[i]->GetName() + "] "+games[i]->GetProjectFile() );
         projectPropertiesPnl->SetProject(games[i].get()); //Update editors displaying current project properties
-    }
 
     if ( refreshProjectManager ) projectManager->Refresh();
-
+    UpdateTitle();
     return;
 }
 

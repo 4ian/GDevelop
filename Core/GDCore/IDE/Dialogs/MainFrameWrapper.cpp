@@ -17,7 +17,7 @@ void gd::MainFrameWrapper::SetRibbonPage(wxString pageName)
         wxRibbonPage * page = ribbon->GetPage(pageIndex);
         if (!page) continue;
 
-        if (page->GetLabel() == pageName)
+        if (page->GetLabel() == pageName && ribbon->IsPageShown(pageIndex))
         {
             ribbon->SetActivePage(pageIndex);
             return;

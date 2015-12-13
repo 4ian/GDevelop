@@ -12,6 +12,8 @@
 #include <wx/menu.h>
 #include <wx/panel.h>
 //*)
+#include <vector>
+#include <functional>
 #include <string>
 #include "GDCore/String.h"
 #include <wx/ribbon/bar.h>
@@ -49,6 +51,11 @@ public:
 	 * Refresh project tree
 	 */
     void Refresh();
+
+    /**
+     * Add a callback function called when the project manager is refreshed.
+     */
+    void OnRefreshed(std::function<void()> cb);
 
     static void CreateRibbonPage(wxRibbonPage * page);
     void ConnectEvents();
@@ -253,6 +260,7 @@ private:
 
     wxTreeItemId selectedItem;
     gd::String itemTextBeforeEditing;
+    std::vector<std::function<void()>> refreshCallbacks;
 
     static wxRibbonButtonBar * projectRibbonBar;
     static wxRibbonButtonBar * operationsRibbonBar;

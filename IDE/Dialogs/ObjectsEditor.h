@@ -15,6 +15,7 @@
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
 #include <wx/srchctrl.h>
+#include <functional>
 #include <string>
 #include <vector>
 #include "GDCore/Project/Object.h"
@@ -54,6 +55,11 @@ public:
     void Refresh();
 
     /**
+     * \brief Set a function to call each time the list is refreshed.
+     */
+    void OnRefreshed(std::function<void()> cb) { onRefreshedCb = cb; }
+
+    /**
      * \brief Create the ribbon buttons for this editor
      */
     static void CreateRibbonPage(wxRibbonPage * page);
@@ -74,12 +80,20 @@ public:
      */
     virtual void ObjectsUpdated() { Refresh(); };
 
-
     /**
      * \brief Can be used to associate a LayoutEditorPropertiesPnl, and the wxAuiManager used to display it,
      * to the editor.
      */
     void SetAssociatedPropertiesPanel(LayoutEditorPropertiesPnl * propPnl, wxAuiManager * manager);
+
+    /**
+     * \brief Get the wxTreeCtrl used to render the objects and groups list.
+     */
+    wxTreeCtrl * GetObjectsList() { return objectsList; }
+
+    wxMenu & GetContextMenu() { return contextMenu; }
+    wxMenu & GetEmptyContextMenu() { return emptyContextMenu; }
+    wxMenu & GetMultipleContextMenu() { return multipleContextMenu; }
 
 protected:
 
@@ -216,6 +230,7 @@ private:
 
     gd::String renamedItemOldName;
     wxTreeItemId lastSelectedItem;
+    std::function<void()> onRefreshedCb;
 
     DECLARE_EVENT_TABLE()
 };

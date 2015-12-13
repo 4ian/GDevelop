@@ -12,6 +12,7 @@
 #include <set>
 #include <map>
 #include <vector>
+#include <functional>
 #include <memory>
 #include <SFML/Graphics.hpp>
 #include <wx/menu.h>
@@ -178,6 +179,22 @@ public:
      * \see CreateEditionRibbonTools
      */
     void RecreateRibbonToolbar();
+
+    /**
+     * Set a function to be called when the ribbon button bar containing the layout editor tools
+     * is updated.
+     */
+    void OnRibbonButtonBarUpdated(std::function<void(wxRibbonButtonBar *)> cb) { onRibbonButtonBarUpdatedCb = cb; };
+
+    /**
+     * Get the context menu used for objects.
+     */
+    wxMenu & GetContextMenu() { return contextMenu; };
+
+    /**
+     * Get the context menu used when no object is selected.
+     */
+    wxMenu & GetNoObjectContextMenu() { return noObjectContextMenu; };
 
     /**
      * The editors' parent panel can forward the event of the scrollbars to these methods.
@@ -535,6 +552,8 @@ protected:
     wxMenu zoomMenu;
     wxMenu platformsMenu;
     static wxRibbonButtonBar * modeRibbonBar;
+
+    std::function<void(wxRibbonButtonBar *)> onRibbonButtonBarUpdatedCb;
 
     DECLARE_EVENT_TABLE()
     friend class InstancesInAreaPicker;

@@ -35,14 +35,25 @@ public:
     virtual ~ExternalLayoutEditor();
 
     /**
-     * Return the layout being used for editing the external layout
+     * Recreates the editors for the currently selected layout.
      */
-    gd::Layout & GetAssociatedLayout();
+    void Refresh();
 
     /**
      * Can be called by parent so as to refresh ribbon for this editor.
      */
     void ForceRefreshRibbonAndConnect();
+
+    /**
+     * \brief Set a function that is called when the layout used for editing the external layout
+     * is changed.
+     */
+    void OnAssociatedLayoutChanged(std::function<void()> cb) { onAssociatedLayoutChangedCb = cb; }
+
+    /**
+     * Return the layout being used for editing the external layout
+     */
+    gd::Layout & GetAssociatedLayout();
 
     /**
      * Return the external layout being edited.
@@ -53,6 +64,21 @@ public:
      * Return the project owning the external layout
      */
     gd::Project & GetProject() const { return project; }
+
+    /**
+     * Get the objects editor owned by this editor.
+     */
+    std::shared_ptr<gd::ObjectsEditor> GetObjectsEditor() const { return objectsEditor; }
+
+    /**
+     * Get the properties panel owned by this editor.
+     */
+    std::shared_ptr<LayoutEditorPropertiesPnl> GetPropertiesPanel() const { return propertiesPnl; }
+
+    /**
+     * Get the layout editor owned by this editor.
+     */
+    gd::LayoutEditorCanvas * GetLayoutEditorCanvas() const { return layoutEditorCanvas; }
 
 protected:
 
@@ -106,8 +132,8 @@ private:
     gd::MainFrameWrapper mainFrameWrapper;
     Scene emptyLayout;
 
+    std::function<void()> onAssociatedLayoutChangedCb;
     wxAuiManager m_mgr;
-
 
     DECLARE_EVENT_TABLE()
 };

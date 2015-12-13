@@ -144,6 +144,9 @@ bool GDevelopIDEApp::OnInit()
     wxConfigBase::Set( config );
     cout << "* Config file set." << endl;
 
+    rebrander.LoadRebrandingConfigFromFile("branding/branding.json");
+    cout << "* Custom branding configuration loaded." << endl;
+
     //Set language
     {
         wxString wantedLanguage;
@@ -277,7 +280,7 @@ bool GDevelopIDEApp::OnInit()
 
     //Splash screen
     wxBitmap bitmap;
-    bitmap.LoadFile( wxString("res/GD-Splashscreen.png"), wxBITMAP_TYPE_PNG );
+    bitmap.LoadFile(rebrander.ApplyBranding(wxString("res/GD-Splashscreen.png"), "Logo"), wxBITMAP_TYPE_PNG);
     SplashScreen * splash = new SplashScreen(bitmap, 2, 0, -1, wxNO_BORDER | wxFRAME_SHAPED);
     cout << "* Splash Screen created" << endl;
 
@@ -352,6 +355,10 @@ bool GDevelopIDEApp::OnInit()
     LogFileManager::Get()->InitalizeFromConfig();
     LogFileManager::Get()->WriteToLogFile("GDevelop initialization ended"),
 
+    //Branding rules
+    cout << "* Applying custom branding..." << endl;
+    rebrander.ApplyBranding(mainEditor);
+
     splash->Destroy();
     mainEditor->Show();
     cout << "* Initializing platforms..." << endl;
@@ -361,7 +368,8 @@ bool GDevelopIDEApp::OnInit()
     cout << "* Initialization ended." << endl;
 
     #if defined(MACOS)
-    gd::LogWarning(_("This is a beta version of GDevelop for Mac OS X.\n\nBugs may be present and only HTML5 games will work. Please report any feedback on www.forum.compilgames.net.\nThanks!"));
+    if (!rebrander.HasBranding())
+        gd::LogWarning(_("This is a beta version of GDevelop for Mac OS X.\n\nBugs may be present and only HTML5 games will work. Please report any feedback on www.forum.compilgames.net.\nThanks!"));
     #endif
 
     //Checking for updates

@@ -76,7 +76,7 @@ bool TileMapImporter::ImportTileMap(TileSet &tileSet, TileMap &tileMap,
         gd::LogMessage(_("The image is imported as ") + "\"" + newResourceName + "\".");
 
         imageFileName.MakeRelativeTo(wxFileName(project.GetProjectFile()).GetPath());
-        project.GetResourcesManager().AddResource(newResourceName, imageFileName.GetFullPath());
+        project.GetResourcesManager().AddResource(newResourceName, imageFileName.GetFullPath(), "image");
 
         tileSet.textureName = newResourceName;
 

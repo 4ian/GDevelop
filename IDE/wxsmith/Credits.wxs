@@ -105,39 +105,6 @@
 											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<option>1</option>
 										</object>
-										<object class="sizeritem">
-											<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
-												<growablerows>0</growablerows>
-												<object class="sizeritem">
-													<object class="wxStaticBitmap" name="ID_STATICBITMAP8" variable="StaticBitmap8" member="yes">
-														<bitmap>res/donateicon.png</bitmap>
-														<style>wxNO_BORDER</style>
-													</object>
-													<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-													<option>1</option>
-												</object>
-												<object class="sizeritem">
-													<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-														<label>You like GDevelop?</label>
-													</object>
-													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-												<object class="sizeritem">
-													<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL16" variable="HyperlinkCtrl5" member="yes">
-														<label>You can make a donation to the author.</label>
-														<url>http://www.compilgames.net/donate.php?utm&amp;source=GDutm&amp;medium=CreditsLinkutm&amp;campaign=paywhatyouwant</url>
-														<style>wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER</style>
-													</object>
-													<flag>wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-											</object>
-											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<option>1</option>
-										</object>
 									</object>
 								</object>
 								<label>About</label>
@@ -188,7 +155,7 @@
 										<growablecols>0</growablecols>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-												<label>Programmed in C++, compiled with TDM-GCC, written with Sublime Text</label>
+												<label>Programmed in C++, compiled with GCC, written with Sublime Text</label>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -196,21 +163,11 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxGridSizer" variable="GridSizer2" member="no">
-												<cols>4</cols>
+												<cols>3</cols>
 												<object class="sizeritem">
 													<object class="wxBitmapButton" name="ID_BITMAPBUTTON8" variable="BitmapButton1" member="yes">
 														<bitmap>res/powered-cpp.png</bitmap>
 														<handler function="OnCppBtClick" entry="EVT_BUTTON" />
-													</object>
-													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-												<object class="sizeritem">
-													<object class="wxBitmapButton" name="ID_BITMAPBUTTON2" variable="BitmapButton6" member="yes">
-														<bitmap>res/powered-boost.png</bitmap>
-														<default>1</default>
-														<handler function="OnBoostBtClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -242,7 +199,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
-												<label>Use SFML, Boost, wxWidgets and TinyXml libraries.</label>
+												<label>Use SFML, wxWidgets and TinyXml libraries.</label>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>

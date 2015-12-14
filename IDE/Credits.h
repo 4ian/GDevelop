@@ -7,16 +7,16 @@
 #define CREDITS_H
 
 //(*Headers(Credits)
-#include <wx/notebook.h>
+#include <wx/bmpbuttn.h>
+#include <wx/dialog.h>
 #include <wx/sizer.h>
+#include <wx/notebook.h>
+#include <wx/button.h>
+#include <wx/hyperlink.h>
+#include <wx/panel.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
-#include <wx/panel.h>
-#include <wx/hyperlink.h>
-#include <wx/bmpbuttn.h>
 #include <wx/statbmp.h>
-#include <wx/button.h>
-#include <wx/dialog.h>
 #include <wx/html/htmlwin.h>
 //*)
 
@@ -50,36 +50,32 @@ public:
 	virtual ~Credits();
 
 	//(*Declarations(Credits)
-	wxButton* OkBt;
-	wxStaticBitmap* StaticBitmap2;
-	wxStaticBitmap* StaticBitmap8;
-	wxBitmapButton* BitmapButton5;
-	wxNotebook* Notebook1;
-	wxStaticText* StaticText2;
-	wxPanel* Panel4;
-	wxStaticText* StaticText6;
-	wxStaticBitmap* StaticBitmap1;
-	wxBitmapButton* BitmapButton10;
-	wxHyperlinkCtrl* HyperlinkCtrl5;
-	wxStaticText* StaticText8;
 	wxBitmapButton* BitmapButton2;
-	wxPanel* Panel1;
-	wxStaticText* StaticText1;
 	wxBitmapButton* BitmapButton8;
-	wxStaticText* StaticText3;
-	wxHyperlinkCtrl* HyperlinkCtrl1;
-	wxBitmapButton* BitmapButton1;
-	wxHyperlinkCtrl* florianRival;
-	wxPanel* Panel3;
-	wxStaticText* StaticText5;
-	wxBitmapButton* BitmapButton6;
-	wxBitmapButton* BitmapButton7;
-	wxBitmapButton* BitmapButton4;
-	CustomHtmlWindow* HtmlWindow1;
-	wxTextCtrl* TextCtrl1;
+	wxPanel* Panel1;
 	wxBitmapButton* BitmapButton3;
+	wxHyperlinkCtrl* florianRival;
+	wxBitmapButton* BitmapButton10;
+	wxStaticText* StaticText1;
+	wxHyperlinkCtrl* HyperlinkCtrl1;
 	wxPanel* Panel2;
+	wxStaticText* StaticText3;
+	wxPanel* Panel4;
+	CustomHtmlWindow* HtmlWindow1;
+	wxStaticText* StaticText8;
+	wxBitmapButton* BitmapButton5;
+	wxBitmapButton* BitmapButton4;
+	wxPanel* Panel3;
+	wxTextCtrl* TextCtrl1;
 	wxStaticText* StaticText4;
+	wxStaticText* StaticText5;
+	wxNotebook* Notebook1;
+	wxStaticBitmap* StaticBitmap1;
+	wxBitmapButton* BitmapButton7;
+	wxButton* OkBt;
+	wxStaticText* StaticText6;
+	wxBitmapButton* BitmapButton1;
+	wxStaticBitmap* StaticBitmap2;
 	//*)
 
 protected:
@@ -92,9 +88,6 @@ protected:
 	static const long ID_STATICBITMAP2;
 	static const long ID_STATICTEXT5;
 	static const long ID_HYPERLINKCTRL2;
-	static const long ID_STATICBITMAP8;
-	static const long ID_STATICTEXT2;
-	static const long ID_HYPERLINKCTRL16;
 	static const long ID_PANEL1;
 	static const long ID_TEXTCTRL1;
 	static const long ID_PANEL2;
@@ -102,7 +95,6 @@ protected:
 	static const long ID_PANEL3;
 	static const long ID_STATICTEXT3;
 	static const long ID_BITMAPBUTTON8;
-	static const long ID_BITMAPBUTTON2;
 	static const long ID_BITMAPBUTTON9;
 	static const long ID_BITMAPBUTTON10;
 	static const long ID_STATICTEXT8;

@@ -7,11 +7,11 @@
 #include "Credits.h"
 
 //(*InternalHeaders(Credits)
-#include <wx/bitmap.h>
-#include <wx/font.h>
-#include <wx/intl.h>
-#include <wx/image.h>
 #include <wx/string.h>
+#include <wx/intl.h>
+#include <wx/font.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
 //*)
 #include <wx/mimetype.h> // mimetype support
 #include "GDCore/Tools/Localization.h"
@@ -30,9 +30,6 @@ const long Credits::ID_HYPERLINKCTRL1 = wxNewId();
 const long Credits::ID_STATICBITMAP2 = wxNewId();
 const long Credits::ID_STATICTEXT5 = wxNewId();
 const long Credits::ID_HYPERLINKCTRL2 = wxNewId();
-const long Credits::ID_STATICBITMAP8 = wxNewId();
-const long Credits::ID_STATICTEXT2 = wxNewId();
-const long Credits::ID_HYPERLINKCTRL16 = wxNewId();
 const long Credits::ID_PANEL1 = wxNewId();
 const long Credits::ID_TEXTCTRL1 = wxNewId();
 const long Credits::ID_PANEL2 = wxNewId();
@@ -40,7 +37,6 @@ const long Credits::ID_HTMLWINDOW1 = wxNewId();
 const long Credits::ID_PANEL3 = wxNewId();
 const long Credits::ID_STATICTEXT3 = wxNewId();
 const long Credits::ID_BITMAPBUTTON8 = wxNewId();
-const long Credits::ID_BITMAPBUTTON2 = wxNewId();
 const long Credits::ID_BITMAPBUTTON9 = wxNewId();
 const long Credits::ID_BITMAPBUTTON10 = wxNewId();
 const long Credits::ID_STATICTEXT8 = wxNewId();
@@ -63,19 +59,18 @@ END_EVENT_TABLE()
 Credits::Credits(wxWindow* parent)
 {
 	//(*Initialize(Credits)
-	wxFlexGridSizer* FlexGridSizer4;
-	wxFlexGridSizer* FlexGridSizer10;
-	wxFlexGridSizer* FlexGridSizer3;
-	wxFlexGridSizer* FlexGridSizer5;
-	wxFlexGridSizer* FlexGridSizer2;
-	wxFlexGridSizer* FlexGridSizer7;
 	wxGridSizer* GridSizer1;
-	wxGridSizer* GridSizer3;
-	wxFlexGridSizer* FlexGridSizer12;
-	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer2;
+	wxGridSizer* GridSizer3;
 	wxFlexGridSizer* FlexGridSizer11;
 	wxGridSizer* GridSizer2;
+	wxFlexGridSizer* FlexGridSizer7;
+	wxFlexGridSizer* FlexGridSizer4;
+	wxFlexGridSizer* FlexGridSizer6;
+	wxFlexGridSizer* FlexGridSizer3;
+	wxFlexGridSizer* FlexGridSizer10;
+	wxFlexGridSizer* FlexGridSizer12;
 
 	Create(parent, wxID_ANY, _("About GDevelop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -111,15 +106,6 @@ Credits::Credits(wxWindow* parent)
 	HyperlinkCtrl1 = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL2, _("www.compilgames.net"), _("http://www.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	FlexGridSizer7->Add(HyperlinkCtrl1, 1, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer5 = new wxFlexGridSizer(0, 0, 0, 0);
-	FlexGridSizer5->AddGrowableRow(0);
-	StaticBitmap8 = new wxStaticBitmap(Panel1, ID_STATICBITMAP8, wxBitmap(wxImage(_T("res/donateicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP8"));
-	FlexGridSizer5->Add(StaticBitmap8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("You like GDevelop\?"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl5 = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL16, _("You can make a donation to the author."), _("http://www.compilgames.net/donate.php\?utm&source=GDutm&medium=CreditsLinkutm&campaign=paywhatyouwant"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
-	FlexGridSizer5->Add(HyperlinkCtrl5, 1, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
-	FlexGridSizer10->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel1->SetSizer(FlexGridSizer10);
 	FlexGridSizer10->Fit(Panel1);
 	FlexGridSizer10->SetSizeHints(Panel1);
@@ -145,14 +131,11 @@ Credits::Credits(wxWindow* parent)
 	Panel4 = new wxPanel(Notebook1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer12->AddGrowableCol(0);
-	StaticText3 = new wxStaticText(Panel4, ID_STATICTEXT3, _("Programmed in C++, compiled with TDM-GCC, written with Sublime Text"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel4, ID_STATICTEXT3, _("Programmed in C++, compiled with GCC, written with Sublime Text"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer12->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	GridSizer2 = new wxGridSizer(0, 4, 0, 0);
+	GridSizer2 = new wxGridSizer(0, 3, 0, 0);
 	BitmapButton1 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON8, wxBitmap(wxImage(_T("res/powered-cpp.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON8"));
 	GridSizer2->Add(BitmapButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BitmapButton6 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON2, wxBitmap(wxImage(_T("res/powered-boost.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON2"));
-	BitmapButton6->SetDefault();
-	GridSizer2->Add(BitmapButton6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BitmapButton2 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON9, wxBitmap(wxImage(_T("res/powered-gcc.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON9"));
 	BitmapButton2->SetDefault();
 	GridSizer2->Add(BitmapButton2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -160,7 +143,7 @@ Credits::Credits(wxWindow* parent)
 	BitmapButton3->SetDefault();
 	GridSizer2->Add(BitmapButton3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(GridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText8 = new wxStaticText(Panel4, ID_STATICTEXT8, _("Use SFML, Boost, wxWidgets and TinyXml libraries."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	StaticText8 = new wxStaticText(Panel4, ID_STATICTEXT8, _("Use SFML, wxWidgets and TinyXml libraries."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	FlexGridSizer12->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer1 = new wxGridSizer(0, 3, 0, 0);
 	BitmapButton4 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON11, wxBitmap(wxImage(_T("res/powered-sfml.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON11"));
@@ -200,7 +183,6 @@ Credits::Credits(wxWindow* parent)
 	Center();
 
 	Connect(ID_BITMAPBUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCppBtClick);
-	Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnBoostBtClick);
 	Connect(ID_BITMAPBUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnGccBtClick);
 	Connect(ID_BITMAPBUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCBBtClick);
 	Connect(ID_BITMAPBUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnSFMLBtClick);
@@ -225,8 +207,8 @@ Credits::Credits(wxWindow* parent)
                       +_("Fran\303\247ois Dumortier : GDevelop logo design and website conception.")+"<br>"
                       +"( <a href=\"http://www.fdumortier.com\">http://www.fdumortier.com</a> )"+"<br>"
                       +"<br>"
-                      +_("Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension.")+"<br>"
-                      +"( <a href=\"http://www.levasseursoftware.net/\">http://www.levasseursoftware.net</a> )"+"<br>"
+                      +_("Victor Levasseur: Advanced XML, Tiled Sprite and Tile Map extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension.")+"<br>"
+                      +"( <a href=\"http://www.victorlevasseur.com/\">http://www.victorlevasseur.com</a> )"+"<br>"
                       +"<br>"
                       +_("Constantine Shvetsov: Awesome design of icons")+"<br>"
                       +"<br>"

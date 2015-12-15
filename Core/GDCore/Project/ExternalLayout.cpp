@@ -17,7 +17,7 @@ void ExternalLayout::UnserializeFrom(const SerializerElement & element)
 {
 	name = element.GetStringAttribute("name", "", "Name");
 	instances.UnserializeFrom(element.GetChild("instances", 0, "Instances"));
-	#if defined(GD_IDE_ONLY)
+	#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 	editionSettings.UnserializeFrom(element.GetChild("editionSettings"));
 	associatedLayout = element.GetStringAttribute("associatedLayout");
 	#endif
@@ -28,8 +28,10 @@ void ExternalLayout::SerializeTo(SerializerElement & element) const
 {
 	element.SetAttribute("name", name);
 	instances.SerializeTo(element.AddChild("instances"));
+	#if !defined(GD_NO_WX_GUI)
 	editionSettings.SerializeTo(element.AddChild("editionSettings"));
 	element.SetAttribute("associatedLayout", associatedLayout);
+	#endif
 }
 #endif
 

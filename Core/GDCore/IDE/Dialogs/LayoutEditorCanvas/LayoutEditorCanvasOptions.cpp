@@ -40,7 +40,6 @@ void LayoutEditorCanvasOptions::SerializeTo(SerializerElement & element) const
     element.SetAttribute( "gridB", gridB );
     element.SetAttribute( "zoomFactor", zoomFactor );
     element.SetAttribute( "windowMask", windowMask);
-    element.SetAttribute( "associatedLayout", associatedLayout);
 }
 
 void LayoutEditorCanvasOptions::UnserializeFrom(const SerializerElement & element)
@@ -56,7 +55,6 @@ void LayoutEditorCanvasOptions::UnserializeFrom(const SerializerElement & elemen
     gridG = element.GetIntAttribute("gridG", 180);
     gridB = element.GetIntAttribute("gridB", 255);
     zoomFactor = element.GetDoubleAttribute("zoomFactor", 1.0);
-    associatedLayout = element.GetStringAttribute("associatedLayout");
 }
 
 }

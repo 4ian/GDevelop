@@ -11,6 +11,7 @@
 #include "GDCore/IDE/ProjectExporter.h"
 namespace gd { class Project; }
 namespace gd { class Layout; }
+namespace gd { class ExternalLayout; }
 namespace gd { class AbstractFileSystem; }
 class wxProgressDialog;
 
@@ -46,6 +47,18 @@ public:
      * \return true if export was successful.
      */
     bool ExportLayoutForPreview(gd::Project & project, gd::Layout & layout, gd::String exportDir);
+
+    /**
+     * \brief Create a preview for the specified external layout and layout.
+     * \note The preview is not launched, it is the caller responsibility to open a browser pointing to the preview.
+     *
+     * \param layout The layout to be previewed.
+     * \param externalLayout The external layout with objects to be created at scene startup.
+     * \param exportDir The directory where the preview must be created.
+     * \return true if export was successful.
+     */
+    bool ExportExternalLayoutForPreview(gd::Project & project, gd::Layout & layout,
+        gd::ExternalLayout & externalLayout, gd::String exportDir);
 
     /**
      * \brief Export the specified project.
@@ -162,6 +175,16 @@ private:
      * \param exportDir The directory where the config.xml must be created.
      */
     bool ExportCordovaConfigFile(const gd::Project & project, gd::String exportDir);
+
+    /**
+     * \brief Launch all export methods to generate a complete, stand-alone game for previewing.
+     *
+     * \param layout The layout to be previewed.
+     * \param exportDir The directory where the preview must be created.
+     * \param additionalSpec Any additional parameters to be passed to the gdjs.RuntimeGame.
+     * \return true if export was successful.
+     */
+    bool ExportLayoutForPreview(gd::Project & project, gd::Layout & layout, gd::String exportDir, gd::String additionalSpec);
 
     gd::AbstractFileSystem & fs; ///< The abstract file system to be used for exportation.
     gd::String lastError; ///< The last error that occurred.

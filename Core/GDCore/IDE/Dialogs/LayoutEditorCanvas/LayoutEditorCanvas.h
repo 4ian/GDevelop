@@ -23,6 +23,7 @@
 namespace gd { class MainFrameWrapper; }
 namespace gd { class InitialInstancesContainer; }
 namespace gd { class InitialInstance; }
+namespace gd { class ExternalLayout; }
 namespace gd { class LayoutEditorCanvasAssociatedEditor; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -70,12 +71,25 @@ class GD_CORE_API LayoutEditorCanvas: public wxPanel, public sf::RenderWindow
     friend class InstancesRenderer;
 public:
 
+    /**
+     * \brief Construct a new layout editor.
+     *
+     * \param parent The wxWidgets parent window
+     * \param project The project owning the layout
+     * \param layout The layout being edited
+     * \param instances The instances to edit: most of the time, they are either the
+     * layout instances or the external layout instances.
+     * \param options The options of the editor
+     * \param mainFrameWrapper Wrapper to let the editor access to the main frame.
+     * \param externalLayout The external layout being edited, or NULL.
+     */
     LayoutEditorCanvas(wxWindow* parent,
                        gd::Project & project,
                        gd::Layout & layout,
                        gd::InitialInstancesContainer & instances,
                        LayoutEditorCanvasOptions & options,
-                       gd::MainFrameWrapper & mainFrameWrapper);
+                       gd::MainFrameWrapper & mainFrameWrapper,
+                       gd::ExternalLayout * externalLayout = NULL);
     virtual ~LayoutEditorCanvas();
 
     /**
@@ -92,6 +106,12 @@ public:
      * \brief Return a reference to the scene being edited inside the editor.
      */
     gd::Layout & GetLayout() { return layout; }
+
+    /**
+     * \brief Return a pointer to the external layout being edited, if any, or
+     * NULL otherwise.
+     */
+    gd::ExternalLayout * GetExternalLayout() { return externalLayout; }
 
     /**
      * \brief Provide an access to the main frame wrapper that can be needed by some previewers.
@@ -459,6 +479,7 @@ protected:
 
     gd::Project & project; ///< The project owning the layout
     gd::Layout & layout; ///< The layout being edited or used to edit the instances
+    gd::ExternalLayout * externalLayout; ///< The external layout being edited, if any.
     gd::InitialInstancesContainer & instances; ///< The initial instances of objects being edited
     LayoutEditorCanvasOptions & options;
     gd::MainFrameWrapper & mainFrameWrapper;

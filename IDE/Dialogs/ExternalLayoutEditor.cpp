@@ -135,7 +135,7 @@ mainFrameWrapper(mainFrameWrapper_)
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
 
-    gd::String name = externalLayout.GetAssociatedSettings().associatedLayout;
+    gd::String name = externalLayout.GetAssociatedLayout();
     gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
     if ( scene != NULL )
@@ -221,7 +221,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 
         //(Re)create layout canvas
         if ( layoutEditorCanvas ) delete layoutEditorCanvas;
-        layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
+        layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper, &externalLayout);
         layoutEditorCanvas->SetParentAuiManager( &m_mgr );
         layoutEditorCanvas->SetScrollbars(scrollBar1, scrollBar2);
 
@@ -253,7 +253,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
     }
 
     //Save the choice
-    externalLayout.GetAssociatedSettings().associatedLayout = layout.GetName();
+    externalLayout.SetAssociatedLayout(layout.GetName());
     if(parentSceneComboBox->GetValue() != layout.GetName()) parentSceneComboBox->SetValue(layout.GetName());
 }
 

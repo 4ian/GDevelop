@@ -49,7 +49,6 @@ public:
     int gridB; ///< Grid blue color in editor
     float zoomFactor; ///< Stores the zoom factor
     bool windowMask; ///< True if window mask displayed in editor
-    gd::String associatedLayout; ///< Only used for external layout: Contains the name of the layout used ( for loading objects ) when editing the external layout.
 };
 
 }

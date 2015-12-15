@@ -97,9 +97,12 @@ const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM10 = wxNewId();
 const long LayoutEditorCanvas::ID_CUSTOMZOOMMENUITEM5 = wxNewId();
 wxRibbonButtonBar * LayoutEditorCanvas::modeRibbonBar = NULL;
 
-LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::InitialInstancesContainer & instances_, LayoutEditorCanvasOptions & options_, gd::MainFrameWrapper & mainFrameWrapper_) :
+LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
+    gd::Layout & layout_, gd::InitialInstancesContainer & instances_,
+    LayoutEditorCanvasOptions & options_, gd::MainFrameWrapper & mainFrameWrapper_, gd::ExternalLayout * externalLayout_) :
     project(project_),
     layout(layout_),
+    externalLayout(externalLayout_),
     instances(instances_),
     options(options_),
     mainFrameWrapper(mainFrameWrapper_),

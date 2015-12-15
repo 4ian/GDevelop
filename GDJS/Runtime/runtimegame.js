@@ -61,6 +61,9 @@ gdjs.RuntimeGame = function(data, spec)
 
     //Inputs :
     this._inputManager = new gdjs.InputManager();
+
+    //Allow to specify an external layout to insert in the first scene:
+    this._injectExternalLayout = spec.injectExternalLayout || "";
 };
 
 /**
@@ -446,7 +449,8 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
 
     //Load the first scene
     var firstSceneName = gdjs.projectData.firstLayout;
-    this._sceneStack.push(this.hasScene(firstSceneName) ? firstSceneName : this.getSceneData().name);
+    this._sceneStack.push(this.hasScene(firstSceneName) ? firstSceneName : this.getSceneData().name,
+        this._injectExternalLayout);
 
     //Uncomment to profile the first x frames of the game.
     /*var x = 250;

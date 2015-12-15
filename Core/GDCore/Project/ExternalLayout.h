@@ -55,12 +55,22 @@ public:
     /**
      * \brief Get the user settings for the IDE.
      */
-    const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const {return editionSettings;}
+    const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const { return editionSettings; }
 
     /**
      * \brief Get the user settings for the IDE.
      */
-    gd::LayoutEditorCanvasOptions & GetAssociatedSettings() {return editionSettings;}
+    gd::LayoutEditorCanvasOptions & GetAssociatedSettings() { return editionSettings; }
+
+    /**
+     * \brief Get the name of the layout last used to edit the external layout.
+     */
+    const gd::String & GetAssociatedLayout() { return associatedLayout; }
+
+    /**
+     * \brief Set the name of the layout used to edit the external layout.
+     */
+    void SetAssociatedLayout(const gd::String & name) { associatedLayout = name; }
     #endif
 
     /** \name Serialization
@@ -85,6 +95,7 @@ private:
     gd::InitialInstancesContainer instances;
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     gd::LayoutEditorCanvasOptions editionSettings;
+    gd::String associatedLayout;
     #endif
 };
 

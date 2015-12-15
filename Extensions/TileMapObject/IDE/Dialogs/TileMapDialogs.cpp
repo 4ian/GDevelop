@@ -143,7 +143,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer7->Add(m_staticText448, 0, wxALL, 5);
     
-    wxFlexGridSizer* flexGridSizer452 = new wxFlexGridSizer(0, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer452 = new wxFlexGridSizer(1, 0, 0, 0);
     flexGridSizer452->SetFlexibleDirection( wxBOTH );
     flexGridSizer452->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer452->AddGrowableCol(1);
@@ -162,6 +162,10 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer452->Add(m_hyperLink454, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
     
+    m_button524 = new wxButton(m_mainPanel, wxID_ANY, _("Import .tmx files (Tiled)..."), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer452->Add(m_button524, 0, wxALL, 5);
+    
     m_stdBtnSizer60 = new wxStdDialogButtonSizer();
     
     flexGridSizer452->Add(m_stdBtnSizer60, 0, wxALL|wxEXPAND, 5);
@@ -173,12 +177,20 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_stdBtnSizer60->AddButton(m_button64);
     m_stdBtnSizer60->Realize();
     
+    SetName(wxT("TileMapObjectEditorBase"));
     SetMinSize( wxSize(1100,550) );
     SetSizeHints(1100,550);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    Centre(wxBOTH);
+    CentreOnParent(wxBOTH);
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
     // Connect events
     this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(TileMapObjectEditorBase::OnCloseButtonClicked), NULL, this);
     this->Connect(CONFIGURE_TILESET_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTileSetConfigureButtonClicked), NULL, this);
@@ -193,6 +205,7 @@ TileMapObjectEditorBase::TileMapObjectEditorBase(wxWindow* parent, wxWindowID id
     m_layerChoice->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Connect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
     m_hyperLink454->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TileMapObjectEditorBase::OnHelpButtonClicked), NULL, this);
+    m_button524->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTmxImportButtonClicked), NULL, this);
     m_button62->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnOkButtonPressed), NULL, this);
     m_button64->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnCancelButtonPressed), NULL, this);
     
@@ -213,6 +226,7 @@ TileMapObjectEditorBase::~TileMapObjectEditorBase()
     m_layerChoice->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(TileMapObjectEditorBase::OnLayerChoiceChanged), NULL, this);
     this->Disconnect(HIDE_UPPER_LAYERS_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnHideUpperLayerChecked), NULL, this);
     m_hyperLink454->Disconnect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TileMapObjectEditorBase::OnHelpButtonClicked), NULL, this);
+    m_button524->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnTmxImportButtonClicked), NULL, this);
     m_button62->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnOkButtonPressed), NULL, this);
     m_button64->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapObjectEditorBase::OnCancelButtonPressed), NULL, this);
     
@@ -398,11 +412,19 @@ TileSetConfigurationEditorBase::TileSetConfigurationEditorBase(wxWindow* parent,
     m_stdBtnSizer2713->AddButton(m_cancelButton);
     m_stdBtnSizer2713->Realize();
     
+    SetName(wxT("TileSetConfigurationEditorBase"));
     SetSizeHints(750,500);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    Centre(wxBOTH);
+    CentreOnParent(wxBOTH);
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
     // Connect events
     m_textureNameTextCtrl->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnTileSetTextureUpdated), NULL, this);
     m_setTextureButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileSetConfigurationEditorBase::OnSetTextureButtonClicked), NULL, this);
@@ -519,11 +541,19 @@ TileMapConfigurationEditorBase::TileMapConfigurationEditorBase(wxWindow* parent,
     m_stdBtnSizer371->AddButton(m_cancelButton);
     m_stdBtnSizer371->Realize();
     
+    SetName(wxT("TileMapConfigurationEditorBase"));
     SetSizeHints(500,300);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    Centre(wxBOTH);
+    CentreOnParent(wxBOTH);
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
     // Connect events
     m_hyperLink478->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(TileMapConfigurationEditorBase::OnHelpButtonClicked), NULL, this);
     m_okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapConfigurationEditorBase::OnOkPressed), NULL, this);
@@ -601,12 +631,13 @@ TileEditorBase::TileEditorBase(wxWindow* parent, wxWindowID id, const wxPoint& p
     
     flexGridSizer398->Add(m_tileIdLabel, 0, wxALL, 5);
     
+    SetName(wxT("TileEditorBase"));
     SetMinSize( wxSize(200,200) );
     SetSizeHints(400,300);
     if ( GetSizer() ) {
          GetSizer()->Fit(this);
     }
-    Centre(wxBOTH);
+    CentreOnParent(wxBOTH);
     // Connect events
     this->Connect(COLLIDABLE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnCollidableToolToggled), NULL, this);
     this->Connect(PREDEFINED_SHAPE_TOOL_ID, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(TileEditorBase::OnPredefinedShapeToolClicked), NULL, this);
@@ -633,5 +664,135 @@ TileEditorBase::~TileEditorBase()
     m_tilePreviewPanel->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(TileEditorBase::OnPreviewLeftDown), NULL, this);
     m_tilePreviewPanel->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(TileEditorBase::OnPreviewLeftUp), NULL, this);
     m_tilePreviewPanel->Disconnect(wxEVT_MOTION, wxMouseEventHandler(TileEditorBase::OnPreviewMotion), NULL, this);
+    
+}
+
+TileMapImporterDialogBase::TileMapImporterDialogBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxCF6DCInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer529 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer529->SetFlexibleDirection( wxBOTH );
+    flexGridSizer529->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer529->AddGrowableCol(0);
+    flexGridSizer529->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer529);
+    
+    wxFlexGridSizer* flexGridSizer531 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer531->SetFlexibleDirection( wxBOTH );
+    flexGridSizer531->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer531->AddGrowableCol(0);
+    flexGridSizer531->AddGrowableRow(2);
+    
+    flexGridSizer529->Add(flexGridSizer531, 1, wxALL|wxEXPAND, 5);
+    
+    m_staticText559 = new wxStaticText(this, wxID_ANY, _(".tmx file :"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer531->Add(m_staticText559, 0, wxALL, 5);
+    
+    wxFlexGridSizer* flexGridSizer561 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer561->SetFlexibleDirection( wxBOTH );
+    flexGridSizer561->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer561->AddGrowableCol(0);
+    flexGridSizer561->AddGrowableRow(0);
+    
+    flexGridSizer531->Add(flexGridSizer561, 1, wxALL|wxEXPAND, 0);
+    
+    m_fileTextCtrl = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_fileTextCtrl->SetHint(_("The tmx file saved with Tiled"));
+    #endif
+    m_fileTextCtrl->AutoCompleteFileNames();
+    
+    flexGridSizer561->Add(m_fileTextCtrl, 0, wxALL|wxEXPAND, 5);
+    
+    m_browserBt = new wxButton(this, wxID_ANY, _("Browse..."), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer561->Add(m_browserBt, 0, wxALL, 5);
+    
+    wxStaticBoxSizer* staticBoxSizer577 = new wxStaticBoxSizer( new wxStaticBox(this, wxID_ANY, _("Import settings")), wxVERTICAL);
+    
+    flexGridSizer531->Add(staticBoxSizer577, 1, wxALL|wxEXPAND, 5);
+    
+    wxBoxSizer* boxSizer579 = new wxBoxSizer(wxHORIZONTAL);
+    
+    staticBoxSizer577->Add(boxSizer579, 1, wxALL|wxEXPAND, 5);
+    
+    wxStaticBoxSizer* staticBoxSizer585 = new wxStaticBoxSizer( new wxStaticBox(this, wxID_ANY, _("Tileset")), wxVERTICAL);
+    
+    boxSizer579->Add(staticBoxSizer585, 1, wxALL|wxEXPAND, 5);
+    
+    m_tilesetConfCheckBox = new wxCheckBox(this, wxID_ANY, _("Import the tileset configuration"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_tilesetConfCheckBox->SetValue(true);
+    
+    staticBoxSizer585->Add(m_tilesetConfCheckBox, 0, wxALL, 5);
+    
+    m_tilesetImageCheckBox = new wxCheckBox(this, wxID_ANY, _("Import the tileset image"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_tilesetImageCheckBox->SetValue(true);
+    
+    staticBoxSizer585->Add(m_tilesetImageCheckBox, 0, wxALL, 5);
+    
+    m_hitboxesCheckBox = new wxCheckBox(this, wxID_ANY, _("Import the tiles hitboxes"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_hitboxesCheckBox->SetValue(true);
+    
+    staticBoxSizer585->Add(m_hitboxesCheckBox, 0, wxALL, 5);
+    
+    wxStaticBoxSizer* staticBoxSizer587 = new wxStaticBoxSizer( new wxStaticBox(this, wxID_ANY, _("Tilemap")), wxVERTICAL);
+    
+    boxSizer579->Add(staticBoxSizer587, 1, wxALL|wxEXPAND, 5);
+    
+    m_tilemapCheckBox = new wxCheckBox(this, wxID_ANY, _("Import the tilemap"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_tilemapCheckBox->SetValue(true);
+    
+    staticBoxSizer587->Add(m_tilemapCheckBox, 0, wxALL, 5);
+    
+    m_importButton = new wxButton(this, wxID_ANY, _("Importer..."), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer531->Add(m_importButton, 0, wxALL|wxEXPAND, 5);
+    
+    m_stdBtnSizer533 = new wxStdDialogButtonSizer();
+    
+    flexGridSizer529->Add(m_stdBtnSizer533, 0, wxALL|wxEXPAND, 5);
+    
+    m_okBt = new wxButton(this, wxID_OK, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
+    m_stdBtnSizer533->AddButton(m_okBt);
+    
+    m_button537 = new wxButton(this, wxID_CANCEL, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
+    m_stdBtnSizer533->AddButton(m_button537);
+    m_stdBtnSizer533->Realize();
+    
+    SetName(wxT("TileMapImporterDialogBase"));
+    SetSizeHints(500,-1);
+    if ( GetSizer() ) {
+         GetSizer()->Fit(this);
+    }
+    CentreOnParent(wxBOTH);
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    m_browserBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapImporterDialogBase::OnBrowserBtClicked), NULL, this);
+    m_importButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapImporterDialogBase::OnImportButtonClicked), NULL, this);
+    m_okBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapImporterDialogBase::OnOkBtClicked), NULL, this);
+    m_button537->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapImporterDialogBase::OnCancelBtClicked), NULL, this);
+    
+}
+
+TileMapImporterDialogBase::~TileMapImporterDialogBase()
+{
+    m_browserBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapImporterDialogBase::OnBrowserBtClicked), NULL, this);
+    m_importButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapImporterDialogBase::OnImportButtonClicked), NULL, this);
+    m_okBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapImporterDialogBase::OnOkBtClicked), NULL, this);
+    m_button537->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(TileMapImporterDialogBase::OnCancelBtClicked), NULL, this);
     
 }

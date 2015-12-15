@@ -36,7 +36,7 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "TileMapObjectEditor.h"
+#include "IDE/Dialogs/TileMapObjectEditor.h"
 #endif
 
 using namespace std;
@@ -146,7 +146,6 @@ bool TileMapObject::GenerateThumbnail(const gd::Project & project, wxBitmap & th
 void TileMapObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
 #if !defined(GD_NO_WX_GUI)
-    wxLogNull logNo;
     TileMapObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 #endif

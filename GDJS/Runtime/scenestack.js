@@ -50,9 +50,16 @@ gdjs.SceneStack.prototype.pop = function() {
 	return this._stack.pop();
 };
 
-gdjs.SceneStack.prototype.push = function(newSceneName) {
+gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
     var newScene = new gdjs.RuntimeScene(this._runtimeGame, this._pixiRenderer);
     newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));
+
+    //Optionally create the objects from an external layout.
+    if (externalLayoutName) {
+        var externalLayoutData = this._runtimeGame.getExternalLayoutData(externalLayoutName);
+        if (externalLayoutData)
+            newScene.createObjectsFrom(externalLayoutData.instances, 0, 0);
+    }
 
     this._stack.push(newScene);
     return newScene;

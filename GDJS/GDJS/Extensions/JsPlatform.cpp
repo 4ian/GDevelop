@@ -58,9 +58,10 @@ JsPlatform *JsPlatform::singleton = NULL;
 class Previewer : public gd::LayoutEditorPreviewer
 {
 public:
-    Previewer(gd::Project & project_, gd::Layout & layout_) :
+    Previewer(gd::Project & project_, gd::Layout & layout_, gd::ExternalLayout * externalLayout_ = NULL) :
         project(project_),
-        layout(layout_)
+        layout(layout_),
+        externalLayout(externalLayout_)
     {
     }
 
@@ -69,7 +70,11 @@ public:
         gd::String exportDir = wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/";
 
         Exporter exporter(gd::NativeFileSystem::Get());
-        if ( !exporter.ExportLayoutForPreview(project, layout, exportDir) )
+        bool exportSuccessed = externalLayout ?
+            exporter.ExportExternalLayoutForPreview(project, layout, *externalLayout, exportDir) :
+            exporter.ExportLayoutForPreview(project, layout, exportDir);
+
+        if (!exportSuccessed)
         {
             gd::LogError(_("An error occurred when launching the preview:\n\n")+exporter.GetLastError()
                        +_("\n\nPlease report this error on the GDevelop website, or contact the extension developer if it seems related to a third party extension."));
@@ -87,6 +92,7 @@ public:
 private:
     gd::Project & project;
     gd::Layout & layout;
+    gd::ExternalLayout * externalLayout;
 };
 #endif
 
@@ -103,7 +109,8 @@ void JsPlatform::OnIDEInitialized()
 #if !defined(GD_NO_WX_GUI)
 std::shared_ptr<gd::LayoutEditorPreviewer> JsPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
 {
-    return std::shared_ptr<gd::LayoutEditorPreviewer>(new Previewer(editor.GetProject(), editor.GetLayout()));
+    return std::shared_ptr<gd::LayoutEditorPreviewer>(new Previewer(
+        editor.GetProject(), editor.GetLayout(), editor.GetExternalLayout()));
 }
 
 std::shared_ptr<gd::ProjectExporter> JsPlatform::GetProjectExporter() const

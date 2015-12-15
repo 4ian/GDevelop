@@ -22,6 +22,7 @@
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -72,6 +73,22 @@ Exporter::~Exporter()
 
 bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout, gd::String exportDir)
 {
+    return ExportLayoutForPreview(project, layout, exportDir, "");
+}
+
+bool Exporter::ExportExternalLayoutForPreview(gd::Project & project, gd::Layout & layout,
+   gd::ExternalLayout & externalLayout, gd::String exportDir)
+{
+    gd::SerializerElement options;
+    options.AddChild("injectExternalLayout").SetValue(externalLayout.GetName());
+
+    return ExportLayoutForPreview(project, layout, exportDir,
+        gd::Serializer::ToJSON(options)
+    );
+}
+
+bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout, gd::String exportDir, gd::String additionalSpec)
+{
     fs.MkDir(exportDir);
     fs.ClearDir(exportDir);
     fs.MkDir(exportDir+"/libs");
@@ -106,7 +123,7 @@ bool Exporter::ExportLayoutForPreview(gd::Project & project, gd::Layout & layout
     ExportIncludesAndLibs(includesFiles, exportDir, false);
 
     //Create the index file
-    if (!ExportIndexFile("./JsPlatform/Runtime/index.html", exportDir, includesFiles))
+    if (!ExportIndexFile("./JsPlatform/Runtime/index.html", exportDir, includesFiles, additionalSpec))
         return false;
 
     return true;

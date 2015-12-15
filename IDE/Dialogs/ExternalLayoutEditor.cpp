@@ -221,7 +221,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 
         //(Re)create layout canvas
         if ( layoutEditorCanvas ) delete layoutEditorCanvas;
-        layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
+        layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper, &externalLayout);
         layoutEditorCanvas->SetParentAuiManager( &m_mgr );
         layoutEditorCanvas->SetScrollbars(scrollBar1, scrollBar2);
 

@@ -75,11 +75,11 @@ public:
                        +_("\n\nPlease report this error on the GDevelop website, or contact the extension developer if it seems related to a third party extension."));
         }
 
-        //Without "http://", the function fails ( on Windows at least ).
+        //Without "http://", the function fails (on Windows at least).
         //The timestamp is here to prevent browsers caching contents.
         if ( !wxLaunchDefaultBrowser("http://localhost:2828?"+gd::String::From(wxGetLocalTime())) )
         {
-            gd::LogError(_("Unable to launch your browser :(\nOpen manually your browser and type \"localhost:2828\" in\nthe address bar ( without the quotes ) to launch the preview!"));
+            gd::LogError(_("Unable to launch your browser :(\nManually open your browser and type \"localhost:2828\" in\nthe address bar (without the quotes) to launch the preview!"));
         }
 
         return false;

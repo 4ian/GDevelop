@@ -538,16 +538,18 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
 
 void LayoutEditorCanvas::RecreateRibbonToolbar()
 {
-    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->ClearButtons();
+    wxRibbonButtonBar * toolsBar = mainFrameWrapper.GetRibbonSceneEditorButtonBar();
+    toolsBar->ClearButtons();
 
     if ( editing )
         CreateEditionRibbonTools();
     else
     {
-        if (currentPreviewer) currentPreviewer->CreatePreviewRibbonTools(*mainFrameWrapper.GetRibbonSceneEditorButtonBar());
+        if (currentPreviewer) currentPreviewer->CreatePreviewRibbonTools(*toolsBar);
     }
 
-    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->Realize();
+    toolsBar->Realize();
+    if (onRibbonButtonBarUpdatedCb) onRibbonButtonBarUpdatedCb(toolsBar);
 }
 
 void LayoutEditorCanvas::CreateEditionRibbonTools()
@@ -580,13 +582,16 @@ void LayoutEditorCanvas::UpdateContextMenu()
         lowestLayer = std::min(lowestLayer, layout.GetLayerPosition(it.first->GetLayer()));
     }
 
-    contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
-    if ( lowestLayer+1 < layout.GetLayersCount() )
+    if (wxMenuItem * layerUpItem = contextMenu.FindItem(ID_LAYERUPMENU))
     {
-        gd::String name = layout.GetLayer(lowestLayer+1).GetName();
-        if ( name == "" ) name = _("Base layer");
-        contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
+        layerUpItem->Enable(false);
+        if ( lowestLayer+1 < layout.GetLayersCount() )
+        {
+            gd::String name = layout.GetLayer(lowestLayer+1).GetName();
+            if ( name == "" ) name = _("Base layer");
+            layerUpItem->Enable(true);
+            layerUpItem->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
+        }
     }
 
     //Can we send the objects on a lower layer ?
@@ -597,14 +602,17 @@ void LayoutEditorCanvas::UpdateContextMenu()
         highestLayer = std::max(highestLayer, layout.GetLayerPosition(it.first->GetLayer()));
     }
 
-    contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(false);
-    if ( highestLayer >= 1 )
+    if (wxMenuItem * layerDownItem = contextMenu.FindItem(ID_LAYERUPMENU))
     {
-        gd::String name = layout.GetLayer(highestLayer-1).GetName();
-        if ( name == "" ) name = _("Base layer");
+        layerDownItem->Enable(false);
+        if ( highestLayer >= 1 )
+        {
+            gd::String name = layout.GetLayer(highestLayer-1).GetName();
+            if ( name == "" ) name = _("Base layer");
 
-        contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
+            layerDownItem->Enable(true);
+            layerDownItem->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
+        }
     }
 }
 

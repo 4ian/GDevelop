@@ -160,9 +160,35 @@ public:
     inline ProjectPropertiesPnl * GetProjectPropertiesPanel() const { return projectPropertiesPnl; }
 
     /**
+     * Get a pointer to the project manager
+     */
+    inline ProjectManager * GetProjectManager() const { return projectManager; }
+
+    /**
      * Get a pointer to windows locking shortcuts list.
      */
     inline std::vector<wxWindow*> * GetScenesLockingShortcutsList() { return &scenesLockingShortcuts; };
+
+    /**
+     * \brief Get the file menu.
+     */
+    wxMenu & GetFileMenu() { return fileMenu; }
+
+    /**
+     * \brief Get the help menu.
+     */
+    wxMenu & GetHelpMenu() { return helpMenu; }
+
+    /**
+     * Set a function that will be called when the about box of the editor should be shown.
+     * \param cb A callback that return true if the default about box should still be shown.
+     */
+    void OnAboutBox(std::function<bool()> cb) { onAboutCb = cb; };
+
+    /**
+     * Change the base title of the frame.
+     */
+    void SetBaseTitle(wxString title) { baseTitle = title; UpdateTitle(); }
 
     /**
      * \brief Update the file logging the opened projects.
@@ -334,6 +360,7 @@ private:
     wxMenuItem* MenuItem19;
     wxMenu fileMenu;
     //*)
+    wxString baseTitle;
     wxAuiManager m_mgr;
     wxRibbonBar * ribbon; ///< Pointer to the ribbon
     wxStaticBitmap * ribbonFileBt; ///< Pointer to the ribbon file custom button
@@ -342,6 +369,7 @@ private:
     std::vector<wxWindow*> scenesLockingShortcuts;
     gd::MainFrameWrapper mainFrameWrapper;
     EditorsNotebookManager editorsManager;
+    std::function<bool()> onAboutCb;
 
     ProjectManager * projectManager;
     ProjectPropertiesPnl * projectPropertiesPnl;
@@ -353,6 +381,8 @@ private:
     wxBitmap ribbonFileHoveredBitmap;
     wxBitmap ribbonHelpNormalBitmap;
     wxBitmap ribbonHelpHoveredBitmap;
+
+    void UpdateTitle();
 
     DECLARE_EVENT_TABLE()
 };

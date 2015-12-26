@@ -33,6 +33,9 @@ void MainFrame::OnMenuTutoSelected(wxCommandEvent& event)
  */
 void MainFrame::OnAbout( wxCommandEvent& event )
 {
+    //Check if the about box was overriden.
+    if (onAboutCb && onAboutCb()) return;
+
     Credits Dialog( this );
     Dialog.ShowModal();
 }

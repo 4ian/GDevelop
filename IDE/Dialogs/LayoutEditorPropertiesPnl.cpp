@@ -108,6 +108,7 @@ void LayoutEditorPropertiesPnl::Refresh()
 
     grid->Refresh();
     grid->Update();
+    if (onRefreshedCb) onRefreshedCb();
 }
 
 void LayoutEditorPropertiesPnl::SelectedInitialInstance(const gd::InitialInstance &)

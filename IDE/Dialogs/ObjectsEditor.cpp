@@ -444,6 +444,7 @@ void ObjectsEditor::Refresh()
     listsHelper.SetSearchText(searchCtrl->GetValue());
     listsHelper.RefreshList(objectsList, &objectsRootItem, &groupsRootItem);
     objectsList->SetDropTarget(new ObjectsListDnd(objectsList, groupsRootItem, project, layout));
+    if (onRefreshedCb) onRefreshedCb();
 }
 
 void ObjectsEditor::UpdateGroup(wxTreeItemId groupItem)

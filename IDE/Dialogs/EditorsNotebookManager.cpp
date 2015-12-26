@@ -16,6 +16,7 @@
 void EditorsNotebookManager::AddPage(wxWindow * page, wxString name, bool select)
 {
 	notebook->AddPage(page, GetLabelFor(page, name), select, GetIconFor(page));
+	if (onPageAddedCb) onPageAddedCb(page);
 }
 
 void EditorsNotebookManager::UpdatePageLabel(int pageIndex, wxString name)
@@ -25,7 +26,6 @@ void EditorsNotebookManager::UpdatePageLabel(int pageIndex, wxString name)
 
 	notebook->SetPageText(pageIndex, GetLabelFor(notebook->GetPage(pageIndex), name));
 }
-
 
 wxBitmap EditorsNotebookManager::GetIconFor(wxWindow * page)
 {

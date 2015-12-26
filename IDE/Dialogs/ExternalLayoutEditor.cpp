@@ -135,13 +135,7 @@ mainFrameWrapper(mainFrameWrapper_)
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
 
-    gd::String name = externalLayout.GetAssociatedLayout();
-    gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
-
-    if ( scene != NULL )
-        SetupForScene(*scene);
-    else
-        SetupForScene(emptyLayout);
+    Refresh();
 }
 
 ExternalLayoutEditor::~ExternalLayoutEditor()
@@ -152,6 +146,17 @@ ExternalLayoutEditor::~ExternalLayoutEditor()
     //Save the configuration
     if ( &layoutEditorCanvas->GetLayout() != &emptyLayout ) wxConfigBase::Get()->Write("/ExternalLayoutEditor/LastWorkspace", m_mgr.SavePerspective());
 	m_mgr.UnInit();
+}
+
+void ExternalLayoutEditor::Refresh()
+{
+    gd::String name = externalLayout.GetAssociatedLayout();
+    gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
+
+    if ( scene != NULL )
+        SetupForScene(*scene);
+    else
+        SetupForScene(emptyLayout);
 }
 
 void ExternalLayoutEditor::OnResize(wxSizeEvent& event)
@@ -240,7 +245,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 
         //Display editors in panes
         m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-        m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+        m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100).Show(false) );
         m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
         m_mgr.AddPane( initialInstancesBrowser.get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Instances list" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
 
@@ -255,6 +260,8 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
     //Save the choice
     externalLayout.SetAssociatedLayout(layout.GetName());
     if(parentSceneComboBox->GetValue() != layout.GetName()) parentSceneComboBox->SetValue(layout.GetName());
+
+    if (onAssociatedLayoutChangedCb) onAssociatedLayoutChangedCb();
 }
 
 void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)

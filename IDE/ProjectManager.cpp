@@ -529,6 +529,12 @@ void ProjectManager::Refresh()
         projectsTree->SetToolTip(_("Create or open a project using the ribbon."));
 
     UpdateRibbonButtonsState();
+    for (auto cb : refreshCallbacks) cb();
+}
+
+void ProjectManager::OnRefreshed(std::function<void()> cb)
+{
+	refreshCallbacks.push_back(cb);
 }
 
 /**

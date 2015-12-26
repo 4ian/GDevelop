@@ -11,6 +11,7 @@
 #include <wx/propgrid/propgrid.h>
 #include <wx/panel.h>
 //*)
+#include <functional>
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.h"
 #include "GDCore/IDE/Dialogs/ObjectsPropgridHelper.h"
@@ -35,6 +36,11 @@ public:
      * Refresh the editor.
      */
     virtual void Refresh();
+
+    /**
+     * Set the function to be called when the grid is refreshed.
+     */
+    void OnRefreshed(std::function<void()> cb) { onRefreshedCb = cb; };
 
     /** \name Initial instances properties
      * Members functions related to displaying the properties of the instances selected in the layout editor canvas.
@@ -86,6 +92,7 @@ private:
     bool displayInstancesProperties; ///< True if displaying the properties of a gd::InitialInstance, false for the properties of a gd::Object.
 
     static const wxEventType refreshEventType; ///< The internal wxWidgets event used to ask the grid to be refreshed.
+    std::function<void()> onRefreshedCb;
 
     DECLARE_EVENT_TABLE()
 };

@@ -39,9 +39,9 @@ SigneTest::SigneTest(wxWindow* parent)
 	{
 		_("= ( equal to )"),
 		_("> ( greater than )"),
-		_("< ( lesser than )"),
+		_("< ( less than )"),
 		_(">= ( greater than or equal to )"),
-		_("<= ( lesser than or equal to )"),
+		_("<= ( less than or equal to )"),
 		_("!= ( different of )")
 	};
 	SigneRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Choose the comparison operator"), wxDefaultPosition, wxDefaultSize, 6, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));

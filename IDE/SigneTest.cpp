@@ -39,10 +39,10 @@ SigneTest::SigneTest(wxWindow* parent)
 	{
 		_("= ( equal to )"),
 		_("> ( greater than )"),
-		_("< ( lesser than )"),
+		_("< ( less than )"),
 		_(">= ( greater than or equal to )"),
-		_("<= ( lesser than or equal to )"),
-		_("!= ( different of )")
+		_("<= ( less than or equal to )"),
+		_("!= ( not equal to )")
 	};
 	SigneRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Choose the comparison operator"), wxDefaultPosition, wxDefaultSize, 6, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
 	FlexGridSizer1->Add(SigneRadio, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

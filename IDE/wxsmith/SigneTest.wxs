@@ -11,9 +11,9 @@
 					<content>
 						<item>= ( equal to )</item>
 						<item>&gt; ( greater than )</item>
-						<item>&lt; ( lesser than )</item>
+						<item>&lt; ( less than )</item>
 						<item>&gt;= ( greater than or equal to )</item>
-						<item>&lt;= ( lesser than or equal to )</item>
+						<item>&lt;= ( less than or equal to )</item>
 						<item>!= ( different of )</item>
 					</content>
 					<default>-1</default>

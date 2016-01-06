@@ -1079,7 +1079,7 @@ bool wxSTEditorMenuManager::DoSetTextItem(wxMenu *menu, wxMenuBar *menuBar,
         wxMenuItem *menuItem = menu->FindItem(menu_id);
         if (menuItem)
         {
-            menuItem->SetText(val);
+            menuItem->SetItemLabel(val);
             ret = true;
         }
     }
@@ -1088,7 +1088,7 @@ bool wxSTEditorMenuManager::DoSetTextItem(wxMenu *menu, wxMenuBar *menuBar,
         wxMenuItem *menuItem = menuBar->FindItem(menu_id);
         if (menuItem)
         {
-            menuItem->SetText(val);
+            menuItem->SetItemLabel(val);
             ret = true;
         }
     }

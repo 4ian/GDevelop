@@ -120,7 +120,7 @@
 								<object class="sizeritem">
 									<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="UserReportEdit" member="yes">
 										<size>408,100</size>
-										<style>wxTE_AUTO_SCROLL|wxTE_MULTILINE</style>
+										<style>wxTE_MULTILINE</style>
 										<handler function="OnUserReportEditText" entry="EVT_TEXT" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -208,7 +208,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="openedFilesEdit" member="yes">
-												<style>wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY</style>
+												<style>wxTE_MULTILINE|wxTE_READONLY</style>
 											</object>
 											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>

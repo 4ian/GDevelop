@@ -77,7 +77,7 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
 	FlexGridSizer10 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer10->AddGrowableCol(0);
 	StaticText9 = new wxStaticText(this, ID_STATICTEXT4, _("Basic properties"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
-	wxFont StaticText9Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont StaticText9Font(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText9->SetFont(StaticText9Font);
 	FlexGridSizer10->Add(StaticText9, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(20,8,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -107,7 +107,7 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
 	stableSortCheck = new wxRadioButton(this, ID_RADIOBUTTON2, _("Stable sort (slower but less \"flickering\")"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
 	FlexGridSizer10->Add(stableSortCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Advanced"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	wxFont StaticText3Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont StaticText3Font(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText3->SetFont(StaticText3Font);
 	FlexGridSizer10->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(20,8,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

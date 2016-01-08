@@ -139,7 +139,7 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	authorTxt = new wxStaticText(this, ID_STATICTEXT3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	wxFont authorTxtFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
 	if ( !authorTxtFont.Ok() ) authorTxtFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-	authorTxtFont.SetWeight(wxBOLD);
+	authorTxtFont.SetWeight(wxFONTWEIGHT_BOLD);
 	authorTxt->SetFont(authorTxtFont);
 	FlexGridSizer8->Add(authorTxt, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -151,7 +151,7 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	licenseTxt = new wxStaticText(this, ID_STATICTEXT4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	wxFont licenseTxtFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
 	if ( !licenseTxtFont.Ok() ) licenseTxtFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-	licenseTxtFont.SetWeight(wxBOLD);
+	licenseTxtFont.SetWeight(wxFONTWEIGHT_BOLD);
 	licenseTxt->SetFont(licenseTxtFont);
 	FlexGridSizer9->Add(licenseTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

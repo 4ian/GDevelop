@@ -149,7 +149,7 @@ void SkinHelper::ApplyCurrentSkin(wxAuiManager & auiManager)
     //DockArt skin
     wxAuiDefaultDockArt *dockArt = new wxAuiDefaultDockArt();
     pConfig->Read( _T( "/Skin/Defined" ), &result );
-    dockArt->SetFont(wxAUI_DOCKART_CAPTION_FONT, wxFont(10, wxDEFAULT, wxNORMAL, wxNORMAL, FALSE));
+    dockArt->SetFont(wxAUI_DOCKART_CAPTION_FONT, wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, FALSE));
     if ( result == "true" )
     {
         int r = 120, v = 120, b = 120;

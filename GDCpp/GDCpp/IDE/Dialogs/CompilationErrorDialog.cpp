@@ -70,7 +70,7 @@ CompilationErrorDialog::CompilationErrorDialog(wxWindow* parent, gd::String repo
 	FlexGridSizer2->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("How solve the problem \?"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont StaticText2Font(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("A problem when copying a known file:\n  -Check that your file (image, sound ...) exists.\n  -Check you have read/write permission. \n\nA problem when copying a file unknown:\n  -Check that the file in question exists. \n    If not, try reinstalling GDevelop\n  -Check you have read/write permission.\n\nA problem when creating a file:\n  -Make sure you have read/write\n   permission."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
@@ -82,7 +82,7 @@ CompilationErrorDialog::CompilationErrorDialog(wxWindow* parent, gd::String repo
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("If you can not solve the problem, do not hesitate to contact us"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
-	wxFont StaticText4Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont StaticText4Font(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_ITALIC,wxFONTWEIGHT_NORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText4->SetFont(StaticText4Font);
 	FlexGridSizer4->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FermerBt = new wxButton(this, ID_BUTTON2, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));

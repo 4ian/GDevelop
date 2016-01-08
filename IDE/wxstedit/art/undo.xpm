@@ -1,5 +1,5 @@
 /* XPM */
-static char *undo_xpm[] = {
+static const char *undo_xpm[] = {
 /* width height num_colors chars_per_pixel */
 "    16    15        3            1",
 /* colors */

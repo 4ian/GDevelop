@@ -226,7 +226,7 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
                                      static_cast<double>(ratioGraphics->GetSize().y)-static_cast<double>(totalTimeData[i])/static_cast<double>(maximumTime)*static_cast<double>(ratioGraphics->GetSize().y)));
         points.push_back(wxPoint(points.back().x, ratioGraphics->GetSize().y));
 
-        dc.SetBrush( wxBrush( wxColour(255, 209, 12), wxSOLID ) );
+        dc.SetBrush( wxBrush( wxColour(255, 209, 12), wxBRUSHSTYLE_SOLID ) );
         dc.SetPen(wxPen(wxColour( 255, 137, 12 )));
         if ( !points.empty() ) dc.DrawPolygon(points.size(), &points[0]);
     }
@@ -243,7 +243,7 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
                                      static_cast<double>(ratioGraphics->GetSize().y)-static_cast<double>(eventsData[i])/static_cast<double>(maximumTime)*static_cast<double>(ratioGraphics->GetSize().y)));
         points.push_back(wxPoint(points.back().x, ratioGraphics->GetSize().y));
 
-        dc.SetBrush( wxBrush( wxColour(116, 132, 255), wxSOLID ) );
+        dc.SetBrush( wxBrush( wxColour(116, 132, 255), wxBRUSHSTYLE_SOLID ) );
         dc.SetPen(wxPen(wxColour( 77, 88, 168 )));
         if ( !points.empty() ) dc.DrawPolygon(points.size(), &points[0]);
     }

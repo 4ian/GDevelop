@@ -87,7 +87,7 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
     unsigned int text2Height = renderingHelper->GetHTMLRenderer().GetTotalHeight();
 
     //Prepare background
-    dc.SetBrush(wxBrush(wxColour(r, v, b), wxTRANSPARENT));
+    dc.SetBrush(wxBrush(wxColour(r, v, b), wxBRUSHSTYLE_TRANSPARENT));
     dc.SetPen(wxPen(wxColour(r/2, v/2, b/2), 1));
 
     //Draw the background

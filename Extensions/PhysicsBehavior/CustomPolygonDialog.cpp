@@ -290,7 +290,7 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
     }
 
     //Draw polygon
-    dc.SetBrush(wxBrush(wxColor(50, 57, 122), wxFDIAGONAL_HATCH));
+    dc.SetBrush(wxBrush(wxColor(50, 57, 122), wxBRUSHSTYLE_FDIAGONAL_HATCH));
     dc.SetPen(wxPen(wxColor(50, 57, 122)));
     dc.DrawPolygon(points.size(), &points[0]);
 
@@ -298,7 +298,7 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
 
     if(autoResizingCheckBox->GetValue() && !OnOriginRadioBt->GetValue())
     {
-        dc.SetBrush(wxBrush(wxColor(48, 137, 255), wxTRANSPARENT));
+        dc.SetBrush(wxBrush(wxColor(48, 137, 255), wxBRUSHSTYLE_TRANSPARENT));
         dc.SetPen(wxPen(wxColor(48, 137, 255)));
 
         std::vector<wxPoint> polygonSizePoints;

@@ -15,7 +15,7 @@ StartHerePage::StartHerePage(wxWindow* parent, MainFrame & mainEditor_)
     : BaseStartHerePage(parent),
     mainEditor(mainEditor_)
 {
-	wxFont titleFont(13,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont titleFont(13,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_NORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	gettingStartedTxt->SetFont(titleFont);
 	communityTxt->SetFont(titleFont);
 	newsTxt->SetFont(titleFont);

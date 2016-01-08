@@ -71,7 +71,7 @@
 		<object class="wxMenu" variable="Menu1" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="editMenuItem" member="yes">
 				<label>Choose this object</label>
-				<extra_code>#ifdef ____WXMSW____&#x0A;    Menu1.Remove(editMenuItem);&#x0A;    wxFont boldFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE__NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING__DEFAULT);&#x0A;    editMenuItem-&gt;SetFont(boldFont);&#x0A;    Menu1.Append(editMenuItem);&#x0A;#endif</extra_code>
+				<extra_code>#ifdef ____WXMSW____&#x0A;    Menu1.Remove(editMenuItem);&#x0A;    wxFont boldFont(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE__NORMAL,wxFONTWEIGHT_BOLD,false,wxEmptyString,wxFONTENCODING__DEFAULT);&#x0A;    editMenuItem-&gt;SetFont(boldFont);&#x0A;    Menu1.Append(editMenuItem);&#x0A;#endif</extra_code>
 				<handler function="OnChoisirBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
@@ -82,7 +82,7 @@
 		<object class="wxMenu" variable="Menu2" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM3" variable="editGroupMenuItem" member="yes">
 				<label>Choose this group</label>
-				<extra_code>#ifdef ____WXMSW____&#x0A;    Menu2.Remove(editGroupMenuItem);&#x0A;    wxFont boldFont2(wxDEFAULT,wxDEFAULT,wxFONTSTYLE__NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING__DEFAULT);&#x0A;    editGroupMenuItem-&gt;SetFont(boldFont2);&#x0A;    Menu2.Append(editGroupMenuItem);&#x0A;#endif</extra_code>
+				<extra_code>#ifdef ____WXMSW____&#x0A;    Menu2.Remove(editGroupMenuItem);&#x0A;    wxFont boldFont2(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE__NORMAL,wxFONTWEIGHT_BOLD,false,wxEmptyString,wxFONTENCODING__DEFAULT);&#x0A;    editGroupMenuItem-&gt;SetFont(boldFont2);&#x0A;    Menu2.Append(editGroupMenuItem);&#x0A;#endif</extra_code>
 				<handler function="OnChoisirBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />

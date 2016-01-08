@@ -309,31 +309,31 @@ int wxSTEditorStyles::GetBackgroundColourInt(int style_n, bool use_default) cons
 }
 wxFont wxSTEditorStyles::GetFont(int style_n, bool use_default) const
 {
-    wxCHECK_MSG(Ok(), wxFont(STE_DEF_FONTSIZE, wxMODERN, wxNORMAL, wxNORMAL), wxT("Styles not created"));
+    wxCHECK_MSG(Ok(), wxFont(STE_DEF_FONTSIZE, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL), wxT("Styles not created"));
 /*
     wxFont *f = wxTheFontList->FindOrCreateFont(
                 GetSize(style_n, use_default),
-                wxMODERN, // unused using facename
-                GetItalic(style_n, use_default) ? wxITALIC : wxNORMAL,
-                GetBold(style_n, use_default) ? wxBOLD : wxNORMAL,
+                wxFONTFAMILY_MODERN, // unused using facename
+                GetItalic(style_n, use_default) ? wxFONTSTYLE_ITALIC : wxFONTSTYLE_NORMAL,
+                GetBold(style_n, use_default) ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL,
                 GetUnderlined(style_n, use_default),
                 GetFaceName(style_n, use_default));
 
     if (!f || !f->Ok())
-        return wxFont(STE_DEF_FONTSIZE, wxMODERN, wxNORMAL, wxNORMAL);
+        return wxFont(STE_DEF_FONTSIZE, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 
     return wxFont(*f);
 */
 
     wxFont font(GetSize(style_n, use_default),
-                wxMODERN, // unused using facename
-                GetItalic(style_n, use_default) ? wxITALIC : wxNORMAL,
-                GetBold(style_n, use_default) ? wxBOLD : wxNORMAL,
+                wxFONTFAMILY_MODERN, // unused using facename
+                GetItalic(style_n, use_default) ? wxFONTSTYLE_ITALIC : wxFONTSTYLE_NORMAL,
+                GetBold(style_n, use_default) ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL,
                 GetUnderlined(style_n, use_default),
                 GetFaceName(style_n, use_default));
 
     if (!font.Ok())  // oops this font works though
-        return wxFont(STE_DEF_FONTSIZE, wxMODERN, wxNORMAL, wxNORMAL);
+        return wxFont(STE_DEF_FONTSIZE, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 
     return font;
 }
@@ -442,9 +442,9 @@ void wxSTEditorStyles::SetFont(int style_n, const wxFont &font)
     SetFaceName(style_n, font.GetFaceName());
     SetSize(style_n, font.GetPointSize());
 
-    int ste_font_attr  = font.GetWeight() == wxBOLD   ? STE_STYLE_FONT_BOLD       : 0;
-        ste_font_attr |= font.GetStyle()  != wxNORMAL ? STE_STYLE_FONT_ITALIC     : 0;
-        ste_font_attr |= font.GetUnderlined()         ? STE_STYLE_FONT_UNDERLINED : 0;
+    int ste_font_attr  = font.GetWeight() == wxFONTWEIGHT_BOLD  ? STE_STYLE_FONT_BOLD       : 0;
+        ste_font_attr |= font.GetStyle()  != wxFONTSTYLE_NORMAL ? STE_STYLE_FONT_ITALIC     : 0;
+        ste_font_attr |= font.GetUnderlined()                   ? STE_STYLE_FONT_UNDERLINED : 0;
 
     SetFontAttr(style_n, ste_font_attr);
 }

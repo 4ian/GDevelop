@@ -195,7 +195,7 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
     dc.SetBackgroundMode( wxBG_STYLE_COLOUR );
     wxColour backgroundColor( wxColour( 250, 250, 250 ) );
     dc.SetBackground( backgroundColor );
-    dc.SetFont( wxFont( 8, wxDEFAULT, wxNORMAL, wxNORMAL ) );
+    dc.SetFont( wxFont( 8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL ) );
     dc.SetTextForeground( wxColour( 0, 0, 0 ) );
 
     //Background

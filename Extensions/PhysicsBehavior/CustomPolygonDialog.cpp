@@ -96,7 +96,7 @@ CustomPolygonDialog::CustomPolygonDialog(wxWindow* parent, std::vector<sf::Vecto
 	pointsEdit->SetMaxSize(wxSize(-1,120));
 	FlexGridSizer5->Add(pointsEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Coordinates must be entered clockwise."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont StaticText2Font(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_ITALIC,wxFONTWEIGHT_NORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Positioning"));
@@ -116,7 +116,7 @@ CustomPolygonDialog::CustomPolygonDialog(wxWindow* parent, std::vector<sf::Vecto
 	FlexGridSizer9->Add(autoResizingCheckBox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT5, _("So as to let the polygon resize itself according to the object size, you must define the initial size of the object."), wxDefaultPosition, wxSize(291,47), wxST_NO_AUTORESIZE, _T("ID_STATICTEXT5"));
 	StaticText3->Disable();
-	wxFont StaticText3Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont StaticText3Font(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_ITALIC,wxFONTWEIGHT_NORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText3->SetFont(StaticText3Font);
 	FlexGridSizer9->Add(StaticText3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10 = new wxFlexGridSizer(0, 4, 0, 0);
@@ -172,11 +172,11 @@ CustomPolygonDialog::CustomPolygonDialog(wxWindow* parent, std::vector<sf::Vecto
 	FlexGridSizer6->Add(FlexGridSizer8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 2, 0, 0);
 	pointLabelTxt = new wxStaticText(this, ID_STATICTEXT4, _("The point indicates the origin of the object."), wxDefaultPosition, wxSize(277,13), 0, _T("ID_STATICTEXT4"));
-	wxFont pointLabelTxtFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont pointLabelTxtFont(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_ITALIC,wxFONTWEIGHT_NORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	pointLabelTxt->SetFont(pointLabelTxtFont);
 	FlexGridSizer7->Add(pointLabelTxt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	cursorPosTxt = new wxStaticText(this, ID_STATICTEXT3, _("Cursor position:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	wxFont cursorPosTxtFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont cursorPosTxtFont(wxDEFAULT,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_ITALIC,wxFONTWEIGHT_NORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	cursorPosTxt->SetFont(cursorPosTxtFont);
 	FlexGridSizer7->Add(cursorPosTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

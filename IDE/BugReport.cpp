@@ -115,7 +115,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<gd::String> & openedFi
     FlexGridSizer4->AddGrowableRow(3);
     StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("To help us solve the problem, try to describe the error as precisely as\nyou can. Indicate if possible:\n-How did the error happened (Click on a button ...)\n-In which part of program (Scene editor, events editor...)"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     FlexGridSizer4->Add(StaticText3, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    UserReportEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(408,100), wxTE_AUTO_SCROLL|wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    UserReportEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(408,100), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     FlexGridSizer4->Add(UserReportEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
     StaticText1 = new wxStaticText(Panel3, ID_STATICTEXT1, _("You can enter your email: (optional, so as to contact you if we need more information)"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
@@ -145,7 +145,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<gd::String> & openedFi
     FlexGridSizer10->AddGrowableRow(1);
     StaticText7 = new wxStaticText(Panel4, ID_STATICTEXT7, _("Here is a list of the projects opened during the last session:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
     FlexGridSizer10->Add(StaticText7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    openedFilesEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    openedFilesEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL2"));
     FlexGridSizer10->Add(openedFilesEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     StaticText4 = new wxStaticText(Panel4, ID_STATICTEXT4, _("GDevelop may have made automatic backups of these projects. When you\'ll\nclose this window, the backups will be opened. If these backup are not corrupted,\nyou can save them over the original project files."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));

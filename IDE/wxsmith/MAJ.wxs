@@ -70,7 +70,7 @@
 				<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="infoEdit" member="yes">
 					<value>No informations about the new version</value>
 					<size>400,227</size>
-					<style>wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY</style>
+					<style>wxTE_MULTILINE|wxTE_READONLY</style>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>

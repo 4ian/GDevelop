@@ -96,11 +96,11 @@ object(object_)
 	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Note"));
 	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticText6 = new wxStaticText(Panel1, ID_STATICTEXT6, _("\"Music\" mode is more appropriate for long sound file, during more than 10 seconds:\nThe sound file is only partially loaded in memory when it is played.\n\"Sound\" mode is to be used with smaller sound file, as the sound files are in this case\ntotally loaded into the memory."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
-	wxFont StaticText6Font(8,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont StaticText6Font(8,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_NORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText6->SetFont(StaticText6Font);
 	FlexGridSizer8->Add(StaticText6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText7 = new wxStaticText(Panel1, ID_STATICTEXT7, _("Sound spatialisation is only available for \"mono\" sound ( and not stereo ones )."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
-	wxFont StaticText7Font(8,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	wxFont StaticText7Font(8,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_NORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText7->SetFont(StaticText7Font);
 	FlexGridSizer8->Add(StaticText7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer3->Add(FlexGridSizer8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

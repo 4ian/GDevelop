@@ -227,9 +227,9 @@ private:
 // Styles used for the language, maps enum STE_StyleType to Scintilla styles
 typedef struct STE_LexerStyles
 {
-    int   ste_style;        // STE style to use
-    int   sci_style;        // Scintilla style to map to
-    char* description;      // readable description of it's use in scintilla
+    int         ste_style;        // STE style to use
+    int         sci_style;        // Scintilla style to map to
+    const char* description;      // readable description of it's use in scintilla
 } STE_LexerStyles;
 
 // ---------------------------------------------------------------------------
@@ -244,42 +244,42 @@ typedef struct STE_LexerWords
 // Block start and end (ie. {}) and the styles for the start/end blocks
 typedef struct STE_LexerBlock
 {
-    int   sci_start_style;  // Scintilla style to use for block start
-    char* start;            // for cpp "{"
-    int   sci_end_style;    // Scintilla style to use for block end
-    char* end;              // for cpp "}"
+    int         sci_start_style;  // Scintilla style to use for block start
+    const char* start;            // for cpp "{"
+    int         sci_end_style;    // Scintilla style to use for block end
+    const char* end;              // for cpp "}"
 } STE_LexerBlock;
 
 // ---------------------------------------------------------------------------
 // Comments for the lexers or NULL for none
 typedef struct STE_LexerComments
 {
-    int   blockAtLineStart;
-    char* block;            // for cpp "//"
-    char* boxStart;         // for cpp "/*"
-    char* boxMiddle;        // for cpp "*"
-    char* boxEnd;           // for cpp "*/"
-    char* streamStart;      // for cpp "/*"
-    char* streamEnd;        // for cpp "*/"
+    int         blockAtLineStart;
+    const char* block;            // for cpp "//"
+    const char* boxStart;         // for cpp "/*"
+    const char* boxMiddle;        // for cpp "*"
+    const char* boxEnd;           // for cpp "*/"
+    const char* streamStart;      // for cpp "/*"
+    const char* streamEnd;        // for cpp "*/"
 } STE_LexerComments;
 
 // ---------------------------------------------------------------------------
 // Preprocessor symbols used for the lexers or NULL for none
 typedef struct STE_LexerPreproc
 {
-    char* symbol;           // for cpp "#"
-    char* boxStart;         // for cpp "if ifdef ifndef"
-    char* boxMiddle;        // for cpp "else elif"
-    char* boxEnd;           // for cpp "endif"
+    const char* symbol;           // for cpp "#"
+    const char* boxStart;         // for cpp "if ifdef ifndef"
+    const char* boxMiddle;        // for cpp "else elif"
+    const char* boxEnd;           // for cpp "endif"
 } STE_LexerPreproc;
 
 // ---------------------------------------------------------------------------
 // A complete description for the lexer languages
 typedef struct STE_Language
 {
-    char* name;                 // readable name of the language
+    const char* name;           // readable name of the language
     int lexer;                  // Scintilla lexer number eg. wxSTC_LEX_CPP
-    char* filePattern;          // file extensions, "*.c;*.cc;*.cpp..."
+    const char* filePattern;    // file extensions, "*.c;*.cc;*.cpp..."
     STE_LexerStyles* styles;    // maps Scintilla styles to STE, always have 1
     size_t  styles_count;       // number of styles mapped
     STE_LexerWords* words;      // may be NULL for no words

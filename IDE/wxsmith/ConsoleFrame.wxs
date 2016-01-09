@@ -41,7 +41,7 @@
 						<object class="sizeritem">
 							<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="consoleTextCtrl" member="yes">
 								<size>239,140</size>
-								<style>wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_RICH</style>
+								<style>wxTE_MULTILINE|wxTE_RICH</style>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>

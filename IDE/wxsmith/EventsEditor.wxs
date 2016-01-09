@@ -33,7 +33,7 @@
 							<object class="sizeritem">
 								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="liveEdit" member="yes">
 									<size>280,21</size>
-									<style>wxTE_AUTO_SCROLL|wxTE_PROCESS_ENTER</style>
+									<style>wxTE_PROCESS_ENTER</style>
 									<handler function="OnliveEditText" entry="EVT_TEXT" />
 									<handler function="OnliveEditTextEnter" entry="EVT_TEXT_ENTER" />
 								</object>

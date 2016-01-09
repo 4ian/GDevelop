@@ -504,7 +504,7 @@ void wxSTEditorSplitter::DoPaint(wxDC& dc)
         wxRect rect(left-1, top, clientSize.x-left+1, clientSize.y-top+1);
         if (!rect.IsEmpty())
         {
-            dc.SetBrush(wxBrush(GetBackgroundColour(), wxSOLID));
+            dc.SetBrush(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
             dc.SetPen(*wxTRANSPARENT_PEN);
             dc.DrawRectangle(rect);
         }

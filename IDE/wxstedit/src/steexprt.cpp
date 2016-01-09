@@ -954,7 +954,7 @@ struct PDFStyle {
     int font;
 };
 
-static char *PDFfontNames[] = {
+static const char *PDFfontNames[] = {
     "Courier", "Courier-Bold", "Courier-Oblique", "Courier-BoldOblique",
     "Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique",
     "Times-Roman", "Times-Bold", "Times-Italic", "Times-BoldItalic"

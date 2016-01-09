@@ -216,7 +216,7 @@ bool wxSTEditor::Create( wxWindow *WXUNUSED(parent), wxWindowID WXUNUSED(id),
 #endif // wxCHECK_VERSION(2,5,0)
 
     if ((size.x > 0) && (size.y > 0))
-        SetBestSize(size);
+        SetInitialSize(size);
 
     if (CanPaste())
         m_state |= STE_CANPASTE;

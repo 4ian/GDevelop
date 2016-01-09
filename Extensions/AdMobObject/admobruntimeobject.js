@@ -76,7 +76,7 @@ gdjs.AdMobRuntimeObject.prototype.createBanner = function() {
 
     var that = this;
     AdMob.createBanner({
-        adId: adId,
+        adId: adId || 'not-specified-xxx', //Avoid a crash by never letting the id empty.
         position: position,
         autoShow: true,
         overlap: this._overlap,
@@ -127,7 +127,7 @@ gdjs.AdMobRuntimeObject.prototype.prepareInterstitial = function(cb) {
 
     var that = this;
     AdMob.prepareInterstitial({
-        adId: adId,
+        adId: adId || 'not-specified-xxx', //Avoid a crash by never letting the id empty.
         autoShow: false
     }, function() {
         that._interstitialReady = true;

@@ -23,9 +23,11 @@ public:
     virtual ~AdMobObject() {};
     virtual gd::Object * Clone() const { return new AdMobObject(*this); }
 
+    #if !defined(GD_NO_WX_GUI)
     void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout) override;
     bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const override;
     static void LoadEdittimeIcon();
+    #endif
 
     std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const override;
     bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project) override;
@@ -43,8 +45,10 @@ private:
     bool overlap;
     bool showOnStartup;
 
+    #if !defined(GD_NO_WX_GUI)
     static sf::Texture edittimeIconImage;
     static sf::Sprite edittimeIcon;
+    #endif
 };
 
 gd::Object * CreateAdMobObject(gd::String name);

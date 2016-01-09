@@ -26,7 +26,9 @@ void DeclareAdMobObjectExtension(gd::PlatformExtension & extension)
 
     obj.SetHelpUrl("/gdevelop/documentation/manual/built_admob");
 
+    #if !defined(GD_NO_WX_GUI)
     AdMobObject::LoadEdittimeIcon();
+    #endif
 
     obj.AddAction("ShowBanner",
         _("Show banner ad"),

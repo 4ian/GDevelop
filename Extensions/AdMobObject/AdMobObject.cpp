@@ -8,23 +8,20 @@ This project is released under the MIT License.
 #include <SFML/Graphics.hpp>
 #include "GDCpp/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCpp/ImageManager.h"
 #include "GDCpp/Serialization/SerializerElement.h"
 #include "GDCpp/Project/InitialInstance.h"
 #include "GDCpp/CommonTools.h"
 #include "AdMobObject.h"
 
-#if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
-#endif
-
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
-#endif
 
 sf::Texture AdMobObject::edittimeIconImage;
 sf::Sprite AdMobObject::edittimeIcon;
+#endif
 
 AdMobObject::AdMobObject(gd::String name_) :
     Object(name_),
@@ -79,7 +76,6 @@ void AdMobObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerE
     showOnStartup = element.GetBoolAttribute("showOnStartup");
 }
 
-#if defined(GD_IDE_ONLY)
 void AdMobObject::DoSerializeTo(gd::SerializerElement & element) const
 {
     element.SetAttribute("androidBannerId", androidBannerId);
@@ -92,6 +88,7 @@ void AdMobObject::DoSerializeTo(gd::SerializerElement & element) const
     element.SetAttribute("showOnStartup", showOnStartup);
 }
 
+#if !defined(GD_NO_WX_GUI)
 void AdMobObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
     edittimeIcon.setPosition(instance.GetX(), instance.GetY());
@@ -106,9 +103,7 @@ void AdMobObject::LoadEdittimeIcon()
 
 bool AdMobObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
-#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("JsPlatform/Extensions/admobicon24.png", wxBITMAP_TYPE_ANY);
-#endif
 
     return true;
 }

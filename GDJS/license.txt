@@ -27,5 +27,5 @@ External libraries used by GDevelop JS Platform
 ---------------------------------------------------
 
 * Pixi.js is distributed under the MIT license
-* mongoose is distributed under the MIT license
+* civetweb is distributed under the MIT license
 * wxWidgets is distributed under wxWindows License (similar to GNU LGPL)

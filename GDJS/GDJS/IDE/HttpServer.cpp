@@ -7,7 +7,7 @@
 #include "HttpServer.h"
 #include <stdio.h>
 #include <string.h>
-#include "mongoose/mongoose.h"
+#include "civetweb/civetweb.h"
 
 namespace gdjs
 {

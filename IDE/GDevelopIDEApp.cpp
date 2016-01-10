@@ -192,7 +192,7 @@ bool GDevelopIDEApp::OnInit()
     }
     cout << "* Language loaded" << endl;
 
-    #ifdef RELEASE
+    #if defined(RELEASE)
     {
         wxLogNull noLogPlease;
         singleInstanceChecker = new wxSingleInstanceChecker;
@@ -246,7 +246,7 @@ bool GDevelopIDEApp::OnInit()
     //Check if the last session terminated not normally.
     bool recoveringFromBug = false;
     #if defined(RELEASE)
-    if ( !parser.Found( wxT("noCrashCheck") )
+    if ( !parser.Found( wxT("noCrashCheck") ) && !rebrander.HasBranding()
         && wxFileExists(wxFileName::GetTempDir()+"/GameDevelopRunning.log")
         && !wxFileExists(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log") )
     {
@@ -301,7 +301,6 @@ bool GDevelopIDEApp::OnInit()
     cout << "* Loading platforms and extensions:" << endl;
     bool loadExtensions = true;
 
-    #if defined(RELEASE)
     if ( !parser.Found( wxT("noCrashCheck") ) && wxFileExists(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log") )
     {
         int whattodo = 0;
@@ -317,7 +316,6 @@ bool GDevelopIDEApp::OnInit()
         if ( whattodo == 0 ) return false;
         else if ( whattodo == 1 ) loadExtensions = false;
     }
-    #endif
 
     if ( loadExtensions ) gd::PlatformLoader::LoadAllPlatformsInManager(".");
 
@@ -373,6 +371,7 @@ bool GDevelopIDEApp::OnInit()
     #endif
 
     //Checking for updates
+    if (!rebrander.HasBranding())
     {
 
         wxString result;
@@ -401,7 +400,7 @@ bool GDevelopIDEApp::OnInit()
     gd::AnalyticsSender::Get()->SendProgramOpening();
 
     //Feedback reminder
-    if (!recoveringFromBug)
+    if (!recoveringFromBug && !rebrander.HasBranding())
     {
         int result = 3;
         config->Read( "Startup/Reminder", &result );

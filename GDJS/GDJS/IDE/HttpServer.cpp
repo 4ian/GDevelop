@@ -15,7 +15,8 @@ namespace gdjs
 void HttpServer::Run(gd::String indexDirectory)
 {
     //Some options ( Last option must be NULL )
-    const char *options[] = {"listening_ports", "2828", "document_root", indexDirectory.ToLocale().c_str(), NULL};
+    std::string indexDirectoryLocale = indexDirectory.ToLocale();
+    const char *options[] = {"listening_ports", "2828", "document_root", indexDirectoryLocale.c_str(), NULL};
 
     //Setup callbacks, i.e. nothing to do :)
     struct mg_callbacks callbacks;

@@ -20,10 +20,10 @@ SetupIconFile=..\Output\Release_Windows\res\icon.ico
 VersionInfoVersion=4.0
 WizardImageFile=Setup bitmap\wizbmp.bmp
 WizardSmallImageFile=Setup bitmap/smallicon.bmp
-AppCopyright=2008-2015 Florian Rival
+AppCopyright=2008-2016 Florian Rival
 VersionInfoCompany=Florian Rival
 VersionInfoDescription=GDevelop setup
-VersionInfoCopyright=2008-2015 Florian Rival
+VersionInfoCopyright=2008-2016 Florian Rival
 VersionInfoProductName=GDevelop
 VersionInfoProductVersion=4.0
 
@@ -51,7 +51,7 @@ Name: "example"; Description: "Examples"; Types: full custom; Languages: english
 Name: "example"; Description: "Ejemplos"; Types: full custom; Languages: spanish
 Name: "res"; Description: "Ressources (Images, sons...)"; Types: full custom; Languages: french
 Name: "res"; Description: "Resources (images, sounds...)"; Types: full custom; Languages: english russian italian polish chinese dutch finnish
-Name: "res"; Description: "Recursos (imágenes, sonidos ...)"; Types: full custom; Languages: spanish
+Name: "res"; Description: "Recursos (imï¿½genes, sonidos ...)"; Types: full custom; Languages: spanish
 
 [Files]
 Source: ..\Output\Release_Windows\GDIDE.exe; DestDir: {app}; Flags: ignoreversion

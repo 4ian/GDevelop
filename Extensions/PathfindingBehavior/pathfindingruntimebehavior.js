@@ -1,6 +1,6 @@
 /**
 GDevelop - Pathfinding Behavior Extension
-Copyright (c) 2010-2015 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**

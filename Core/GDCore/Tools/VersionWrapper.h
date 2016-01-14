@@ -1,6 +1,6 @@
 /** \file
  *  GDevelop
- *  2008-2015 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef GDCORE_VERSIONWRAPPER_H

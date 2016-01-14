@@ -1,6 +1,6 @@
 /*
  * GDevelop Core
- * Copyright 2015 Victor Levasseur (victorlevasseur52@gmail.com)
+ * Copyright 2015-2016 Victor Levasseur (victorlevasseur52@gmail.com)
  * This project is released under the MIT License.
  */
 /**

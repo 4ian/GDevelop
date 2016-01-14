@@ -1,7 +1,7 @@
 /**
 
 GDevelop - Primitive Drawing Extension
-Copyright (c) 2008-2015 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 #ifndef PRIMITIVEDRAWINGTOOLS_H

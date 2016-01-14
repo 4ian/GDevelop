@@ -1,8 +1,8 @@
 /**
 
 GDevelop - Tiled Sprite Extension
-Copyright (c) 2012-2015 Victor Levasseur (victorlevasseur01@orange.fr)
-Copyright (c) 2013-2015 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2012-2016 Victor Levasseur (victorlevasseur01@orange.fr)
+Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 

@@ -18,7 +18,7 @@ BEGIN
             VALUE "FileDescription",  "GDevelop Integrated Development Environment"
             VALUE "FileVersion",      "3, 0, 0, 0\0"
             VALUE "InternalName",     "GDevelop IDE"
-            VALUE "LegalCopyright",   "2008-2015 Florian Rival"
+            VALUE "LegalCopyright",   "2008-2016 Florian Rival"
             VALUE "LegalTrademarks1", ""
             VALUE "LegalTrademarks2", ""
             VALUE "OriginalFilename", "GDIDE.exe"

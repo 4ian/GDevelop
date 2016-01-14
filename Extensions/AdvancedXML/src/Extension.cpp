@@ -1,7 +1,7 @@
 /*
 
 GDevelop - AdvancedXML Extension
-Copyright (c) 2012-2015 Victor Levasseur
+Copyright (c) 2012-2016 Victor Levasseur
 This project is released under the MIT License.
 */
 /**

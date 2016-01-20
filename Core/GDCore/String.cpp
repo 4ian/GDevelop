@@ -140,7 +140,10 @@ String String::FromLocale( const std::string &localizedString )
 #elif defined(EMSCRIPTEN)
     return FromUTF8(localizedString); //Assume UTF8 is the current locale
 #else
-    if(std::locale("").name().find("UTF-8") != std::string::npos)
+    if(std::locale("").name().find("utf-8") != std::string::npos ||
+       std::locale("").name().find("UTF-8") != std::string::npos ||
+       std::locale("").name().find("utf8") != std::string::npos ||
+       std::locale("").name().find("UTF8") != std::string::npos)
         return FromUTF8(localizedString); //UTF8 is already the current locale
     else
         return FromSfString(sf::String(localizedString, std::locale(""))); //Use the current locale (std::locale("")) for conversion
@@ -189,7 +192,10 @@ std::string String::ToLocale() const
 #elif defined(EMSCRIPTEN)
     return m_string;
 #else
-    if(std::locale("").name().find("UTF-8") != std::string::npos)
+    if(std::locale("").name().find("utf-8") != std::string::npos ||
+       std::locale("").name().find("UTF-8") != std::string::npos ||
+       std::locale("").name().find("utf8") != std::string::npos ||
+       std::locale("").name().find("UTF8") != std::string::npos)
         return m_string; //UTF8 is already the current locale on Linux
     else
         return ToSfString().toAnsiString(std::locale("")); //Use the current locale for conversion
@@ -440,7 +446,7 @@ String String::FindAndReplace(String search, String replacement, bool all) const
     do {
         pos = result.find(search, lastPos);
         lastPos = pos;
-        if (pos != npos) 
+        if (pos != npos)
         {
             result.replace(pos, search.size(), replacement);
             lastPos += replacement.size();

@@ -40,9 +40,9 @@ IF "%SKIPINSTALLER%"=="1" echo (Skipped)
 
 echo.
 echo --Creating archive...
-if exist Releases\gd3xxxx.zip (del Releases\gd3xxxx.zip)
+if exist Releases\gd4xxxx.7z (del Releases\gd4xxxx.7z)
 cd Output\Release_Windows\
-IF NOT "%SKIPINSTALLERANDARCHIVE%"=="1" "..\..\..\ExtLibs\7za.exe" a ..\..\Releases\gd3xxxx.zip * > ..\..\Packaging\logs\zipArchiveLog.txt
+IF NOT "%SKIPINSTALLERANDARCHIVE%"=="1" "..\..\..\ExtLibs\7za.exe" a ..\..\Releases\gd4xxxx.7z * > ..\..\Packaging\logs\7zArchiveLog.txt
 IF "%SKIPINSTALLERANDARCHIVE%"=="1" echo (Skipped)
 cd ..\..\..
 

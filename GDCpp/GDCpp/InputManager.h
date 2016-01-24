@@ -33,6 +33,7 @@ public:
         lastPressedKey(0),
         mouseWheelDelta(0),
         keyWasPressed(false),
+        touchSimulateMouse(true),
         windowHasFocus(true),
         disableInputWhenNotFocused(true)
     {
@@ -138,8 +139,13 @@ private:
     std::vector<sf::Uint32> charactersEntered; ///< The characters entered for this frame.
 
     int mouseWheelDelta;
+    sf::Vector2i mousePosition; ///< The mouse position for this frame.
     std::map<gd::String, bool> buttonsPressed; ///< The buttons pressed for this frame.
     std::map<gd::String, bool> oldButtonsPressed; ///< The buttons pressed during the last frame.
+
+    void SimulateMousePressed(sf::Vector2i pos);
+    bool touchSimulateMouse;
+    std::map<int, sf::Vector2i> touches;
 
     bool windowHasFocus; ///< True if the render target has the focus.
     bool disableInputWhenNotFocused; ///< True if input should be ignored when focus is lost.

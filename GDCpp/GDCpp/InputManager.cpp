@@ -15,6 +15,12 @@ InputManager::InputManager(sf::Window * win) :
 {
 }
 
+void InputManager::SimulateMousePressed(sf::Vector2i pos)
+{
+    mousePosition = pos;
+    buttonsPressed["Left"] = true;
+}
+
 void InputManager::NextFrame()
 {
     keyWasPressed = false;
@@ -36,6 +42,9 @@ void InputManager::NextFrame()
         buttonsPressed[it->first] =
             sf::Mouse::isButtonPressed(static_cast<sf::Mouse::Button>(it->second));
     }
+
+    if (window) mousePosition = sf::Mouse::getPosition(*window);
+    if (touchSimulateMouse && !touches.empty()) SimulateMousePressed(touches.begin()->second);
 }
 
 void InputManager::HandleEvent(sf::Event & event)
@@ -57,6 +66,16 @@ void InputManager::HandleEvent(sf::Event & event)
     }
     else if (event.type == sf::Event::MouseWheelMoved)
         mouseWheelDelta = event.mouseWheel.delta;
+    else if (event.type == sf::Event::TouchBegan ||
+        event.type == sf::Event::TouchMoved)
+    {
+        touches[event.touch.finger] = sf::Vector2i(event.touch.x, event.touch.y);
+        if (touchSimulateMouse) SimulateMousePressed(touches[event.touch.finger]);
+    }
+    else if (event.type == sf::Event::TouchEnded)
+    {
+        touches.erase(event.touch.finger);
+    }
     else if ( event.type == sf::Event::GainedFocus)
         windowHasFocus = true;
     else if ( event.type == sf::Event::LostFocus)
@@ -100,9 +119,7 @@ bool InputManager::AnyKeyIsPressed() const
 
 sf::Vector2i InputManager::GetMousePosition() const
 {
-    if (!window) return sf::Vector2i(0, 0);
-
-    return sf::Mouse::getPosition(*window);
+    return mousePosition;
 }
 
 bool InputManager::IsMouseButtonPressed(const gd::String & button) const

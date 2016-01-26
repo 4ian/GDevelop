@@ -129,6 +129,15 @@ public:
     static const std::map<int, gd::String> & GetSfButtonToButtonNameMap();
     ///@}
 
+    /** \name Touches
+     */
+    ///@{
+    /**
+     * @brief Get all touches being made on the screen, along with their coordinates.
+     */
+    const std::map<int, sf::Vector2i> & GetAllTouches() { return touches; }
+    ///@}
+
 private:
     sf::Window * window;
 

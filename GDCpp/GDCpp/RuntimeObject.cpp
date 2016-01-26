@@ -528,18 +528,27 @@ std::vector<Polygon2d> RuntimeObject::GetHitBoxes() const
 bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)
 {
     RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
+    auto insideObject = [this](const sf::Vector2f & pos) {
+        return GetDrawableX() <= pos.x
+            && GetDrawableX() + GetWidth()  >= pos.x
+            && GetDrawableY() <= pos.y
+            && GetDrawableY() + GetHeight() >= pos.y;
+    };
 
     for (std::size_t cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
     {
-        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
-            scene.GetInputManager().GetMousePosition(), theLayer.GetCamera(cameraIndex).GetSFMLView());
+        const auto & view = theLayer.GetCamera(cameraIndex).GetSFMLView();
 
-        if (GetDrawableX() <= mousePos.x
-            && GetDrawableX() + GetWidth()  >= mousePos.x
-            && GetDrawableY() <= mousePos.y
-            && GetDrawableY() + GetHeight() >= mousePos.y)
+        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
+            scene.GetInputManager().GetMousePosition(), view);
+
+        if (insideObject(mousePos)) return true;
+
+        auto & touches = scene.GetInputManager().GetAllTouches();
+        for(auto & it : touches)
         {
-            return true;
+            sf::Vector2f touchPos = scene.renderWindow->mapPixelToCoords(it.second, view);
+            if (insideObject(touchPos)) return true;
         }
     }
 

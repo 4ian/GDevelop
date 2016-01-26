@@ -97,6 +97,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
 
 void RuntimeScene::SetupOpenGLProjection()
 {
+    #if !defined(ANDROID) //TODO: OpenGL
     glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_TRUE);
@@ -107,6 +108,7 @@ void RuntimeScene::SetupOpenGLProjection()
 
     double windowRatio = static_cast<double>(renderWindow->getSize().x)/static_cast<double>(renderWindow->getSize().y);
     gluPerspective(GetOpenGLFOV(), windowRatio, GetOpenGLZNear(), GetOpenGLZFar());
+    #endif
 }
 
 void RuntimeScene::RequestChange(SceneChange::Change change, gd::String sceneName) {
@@ -130,8 +132,7 @@ bool RuntimeScene::RenderAndStep()
     }
     #endif
 
-    if (GetCodeExecutionEngine()->Ready())
-        GetCodeExecutionEngine()->Execute();
+    GetCodeExecutionEngine()->Execute();
 
     #if defined(GD_IDE_ONLY)
     if( GetProfiler() && GetProfiler()->profilingActivated )
@@ -213,9 +214,11 @@ void RuntimeScene::Render()
     RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     OrderObjectsByZOrder(allObjects);
 
+    #if !defined(ANDROID) //TODO: OpenGL
     //To allow using OpenGL to draw:
     glClear(GL_DEPTH_BUFFER_BIT); // Clear the depth buffer
     renderWindow->pushGLStates();
+    #endif
     renderWindow->setActive();
 
     //Draw layer by layer
@@ -230,17 +233,22 @@ void RuntimeScene::Render()
                 //Prepare OpenGL rendering
                 renderWindow->popGLStates();
 
+                #if !defined(ANDROID) //TODO: OpenGL
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
                 gluPerspective(GetOpenGLFOV(), camera.GetWidth()/camera.GetHeight(), GetOpenGLZNear(), GetOpenGLZFar());
+                #endif
 
                 const sf::FloatRect & viewport = camera.GetSFMLView().getViewport();
+
+                #if !defined(ANDROID) //TODO: OpenGL
                 glViewport(viewport.left*renderWindow->getSize().x,
                            renderWindow->getSize().y-(viewport.top+viewport.height)*renderWindow->getSize().y, //Y start from bottom
                            viewport.width*renderWindow->getSize().x,
                            viewport.height*renderWindow->getSize().y);
 
                 renderWindow->pushGLStates();
+                #endif
 
                 //Prepare SFML rendering
                 renderWindow->setView(camera.GetSFMLView());
@@ -256,7 +264,10 @@ void RuntimeScene::Render()
     }
 
     // Display window contents on screen
+    //TODO: If nothing is displayed, double check popGLStates.
+    #if !defined(ANDROID) //TODO: OpenGL
     renderWindow->popGLStates();
+    #endif
     renderWindow->display();
 }
 

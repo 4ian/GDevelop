@@ -102,7 +102,11 @@ double GD_API log(double expression)
 }
 double GD_API log2(double expression)
 {
+    #if defined(ANDROID)
+    return log(expression) / log(2);  
+    #else
     return ::log2(expression);
+    #endif
 }
 double GD_API log10(double expression)
 {

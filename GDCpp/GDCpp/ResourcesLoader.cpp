@@ -14,6 +14,9 @@
 #include <cstring>
 #include "GDCpp/Music.h"
 #undef LoadImage //Undef a macro from windows.h
+#if defined(ANDROID)
+#include <SFML/System/FileInputStream.hpp>
+#endif
 
 using namespace std;
 
@@ -125,18 +128,14 @@ gd::String ResourcesLoader::LoadPlainText( const gd::String & filename )
     }
     else
     {
-        ifstream file(filename.ToLocale().c_str(), ios::in);
-
-        if(!file.fail())
-        {
-            string ligne;
-            while(getline(file, ligne))
-                text += gd::String::FromUTF8(ligne)+"\n";
-
-            file.close();
-        }
+        char* buffer = LoadBinaryFile(filename);
+        if (!buffer)
+            cout << "Failed to read plain text from a file: " << filename << endl;
         else
-            cout << "Failed to read a file: " << filename << endl;
+        {
+            text = gd::String::FromUTF8(std::string(buffer));
+            delete[] buffer;
+        }
     }
 
     return text;
@@ -158,6 +157,17 @@ char* ResourcesLoader::LoadBinaryFile( const gd::String & filename )
     }
     else
     {
+        #if defined(ANDROID)
+        sf::FileInputStream file;
+        if (file.open(filename.ToLocale()))
+        {
+            sf::Int64 size = file.getSize();
+            char * memblock = new char [size];
+
+            file.read(memblock, size);
+            return memblock;
+        }
+        #else //TODO: filesystem, use implementation with SFML?
         ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
         if (file.is_open()) {
             ifstream::pos_type size = file.tellg();
@@ -168,6 +178,7 @@ char* ResourcesLoader::LoadBinaryFile( const gd::String & filename )
 
             return memblock;
         }
+        #endif
     }
 
     cout << "Binary file " << filename << " can't be loaded into memory " << endl;
@@ -180,10 +191,16 @@ long int ResourcesLoader::GetBinaryFileSize( const gd::String & filename)
         return resFile.GetFileSize(filename);
     else
     {
+        #if defined(ANDROID)
+        sf::FileInputStream file;
+        if (file.open(filename.ToLocale()))
+            return file.getSize();
+        #else //TODO: filesystem, use implementation with SFML?
         ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
         if (file.is_open()) {
             return file.tellg();
         }
+        #endif
     }
 
     std::cout << "Binary file " << filename << " cannot be read. " << std::endl;

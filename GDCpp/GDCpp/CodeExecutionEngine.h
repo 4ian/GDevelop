@@ -19,6 +19,7 @@
 void functionName(RuntimeContext *);
  \endcode
  *
+ * \TODO: This class is unecessarily complicated.
  * \see CodeCompilationHelpers
  * \see CodeCompiler
  *
@@ -27,6 +28,7 @@ void functionName(RuntimeContext *);
 class GD_API CodeExecutionEngine
 {
 public:
+    typedef int(*functionType)(RuntimeContext *);
 
     /**
      * Construct an empty engine.
@@ -49,11 +51,9 @@ public:
     virtual ~CodeExecutionEngine();
 
     /**
-     * Execute the function specified during the call to LoadFromDynamicLibrary
-     *
-     * \warning Beware, there is no protection against calling Execute on an CodeExecutionEngine that is not (or badly) initialized.
+     * Execute the loaded function.
      */
-    void Execute() { ((void(*)(RuntimeContext *))function)(&runtimeContext); };
+    void Execute() { if (Ready()) ((functionType)function)(&runtimeContext); };
 
     /**
      * Return true if an initialization from a dynamic library has been made successfully and if Execute can be called.
@@ -76,6 +76,8 @@ public:
      * \return true if the CodeExecutionEngine is successfully initialized and Execute() can be called.
      */
     bool LoadFromDynamicLibrary(const gd::String & filename, const gd::String & mainFunctionName);
+
+    bool LoadFunction(functionType fn);
 
     RuntimeContext runtimeContext; ///< The object passed as parameter to the function of the dynamic library.
 

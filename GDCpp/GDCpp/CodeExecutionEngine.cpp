@@ -69,6 +69,22 @@ bool CodeExecutionEngine::LoadFromDynamicLibrary(const gd::String & filename, co
     return true;
 }
 
+bool CodeExecutionEngine::LoadFunction(functionType fn)
+{
+    if ( loaded ) Unload();
+
+    function = (void *)fn;
+    if (!function)
+    {
+        std::cout << "ERROR: Unable to use the specified function for a code execution engine." << std::endl;
+        return false;
+    }
+    std::cout << "Loaded function" << function << std::endl;
+
+    loaded = true;
+    return true;
+}
+
 void CodeExecutionEngine::Init(const CodeExecutionEngine & other)
 {
     runtimeContext = other.runtimeContext;

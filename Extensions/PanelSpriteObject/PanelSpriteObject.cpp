@@ -110,63 +110,59 @@ bool RuntimePanelSpriteObject::Draw( sf::RenderTarget& window )
     float imageWidth = texture->texture.getSize().x;
     float imageHeight = texture->texture.getSize().y;
 
-    sf::Vertex vertices[] =
-    {
-        //Center part (streched)
+    sf::Vertex centerVertices[] = {
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2 + topMargin   ), sf::Vector2f(leftMargin              ,topMargin            )),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2 + topMargin   ), sf::Vector2f(imageWidth - rightMargin,topMargin            )),
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin)),
+        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
+    };
 
+    sf::Vertex topVertices[] = {
         //Top-left
         sf::Vertex( sf::Vector2f(-width/2              ,-height/2               ), sf::Vector2f(0                       ,0                    )),
+        sf::Vertex( sf::Vector2f(-width/2              ,-height/2 + topMargin   ), sf::Vector2f(0                       ,topMargin            )),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2               ), sf::Vector2f(leftMargin              ,0                    )),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2 + topMargin   ), sf::Vector2f(leftMargin              ,topMargin            )),
-        sf::Vertex( sf::Vector2f(-width/2              ,-height/2 + topMargin   ), sf::Vector2f(0                       ,topMargin            )),
 
         //Top
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2               ), sf::Vector2f(leftMargin              ,0                    )),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2               ), sf::Vector2f(imageWidth - rightMargin,0                    )),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2 + topMargin   ), sf::Vector2f(imageWidth - rightMargin,topMargin            )),
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2 + topMargin   ), sf::Vector2f(leftMargin              ,topMargin            )),
 
         //Top-right
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2               ), sf::Vector2f(imageWidth - rightMargin,0                    )),
         sf::Vertex( sf::Vector2f(+width/2              ,-height/2               ), sf::Vector2f(imageWidth              ,0                    )),
         sf::Vertex( sf::Vector2f(+width/2              ,-height/2 + topMargin   ), sf::Vector2f(imageWidth              ,topMargin            )),
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2 + topMargin   ), sf::Vector2f(imageWidth - rightMargin,topMargin            )),
+    };
 
-        //Right
+    sf::Vertex rightVertices[] = {
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2 + topMargin   ), sf::Vector2f(imageWidth - rightMargin,topMargin                 )),
         sf::Vertex( sf::Vector2f(+width/2              ,-height/2 + topMargin   ), sf::Vector2f(imageWidth              ,topMargin                 )),
-        sf::Vertex( sf::Vector2f(+width/2              ,+height/2 - bottomMargin), sf::Vector2f(imageWidth              ,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
+        sf::Vertex( sf::Vector2f(+width/2              ,+height/2 - bottomMargin), sf::Vector2f(imageWidth              ,imageHeight - bottomMargin))
+    };
 
+    sf::Vertex bottomVertices[] = {
         //Bottom-left
         sf::Vertex( sf::Vector2f(-width/2              ,+height/2 - bottomMargin), sf::Vector2f(0                       ,imageHeight - bottomMargin)),
+        sf::Vertex( sf::Vector2f(-width/2              ,+height/2               ), sf::Vector2f(0                       ,imageHeight               )),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2               ), sf::Vector2f(leftMargin              ,imageHeight               )),
-        sf::Vertex( sf::Vector2f(-width/2              ,+height/2               ), sf::Vector2f(0                       ,imageHeight               )),
 
         //Bottom
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2               ), sf::Vector2f(imageWidth - rightMargin,imageHeight               )),
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2               ), sf::Vector2f(leftMargin              ,imageHeight               )),
 
         //Bottom-right
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(+width/2              ,+height/2 - bottomMargin), sf::Vector2f(imageWidth              ,imageHeight - bottomMargin)),
-        sf::Vertex( sf::Vector2f(+width/2              ,+height/2               ), sf::Vector2f(imageWidth              ,imageHeight               )),
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2               ), sf::Vector2f(imageWidth - rightMargin,imageHeight               )),
+        sf::Vertex( sf::Vector2f(+width/2              ,+height/2               ), sf::Vector2f(imageWidth              ,imageHeight               ))
+    };
 
-        //Left
+    sf::Vertex leftVertices[] = {
         sf::Vertex( sf::Vector2f(-width/2              ,-height/2 + topMargin   ), sf::Vector2f(0                       ,topMargin                 )),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2 + topMargin   ), sf::Vector2f(leftMargin              ,topMargin                 )),
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(-width/2              ,+height/2 - bottomMargin), sf::Vector2f(0                       ,imageHeight - bottomMargin)),
-
+        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin))
     };
+
 
     sf::Transform matrix;
     matrix.translate(centerPosition);
@@ -176,7 +172,11 @@ bool RuntimePanelSpriteObject::Draw( sf::RenderTarget& window )
     states.transform = matrix;
     states.texture = &texture->texture;
 
-    window.draw(vertices, 36, sf::Quads, states);
+    window.draw(centerVertices, 4, sf::TrianglesStrip, states);
+    window.draw(leftVertices, 4, sf::TrianglesStrip, states);
+    window.draw(rightVertices, 4, sf::TrianglesStrip, states);
+    window.draw(topVertices, 8, sf::TrianglesStrip, states);
+    window.draw(bottomVertices, 8, sf::TrianglesStrip, states);
 
     return true;
 }
@@ -199,66 +199,61 @@ void PanelSpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::
     float width = instance.HasCustomSize() ? instance.GetCustomWidth() : GetInitialInstanceDefaultSize(instance, project, layout).x;
     float height = instance.HasCustomSize() ? instance.GetCustomHeight() : GetInitialInstanceDefaultSize(instance, project, layout).y;
 
-    sf::Vertex vertices[] =
-    {
-        //Center part (streched)
+    sf::Vertex centerVertices[] = {
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2 + topMargin   ), sf::Vector2f(leftMargin              ,topMargin            )),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2 + topMargin   ), sf::Vector2f(imageWidth - rightMargin,topMargin            )),
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin)),
+        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
+    };
 
+    sf::Vertex topVertices[] = {
         //Top-left
         sf::Vertex( sf::Vector2f(-width/2              ,-height/2               ), sf::Vector2f(0                       ,0                    )),
+        sf::Vertex( sf::Vector2f(-width/2              ,-height/2 + topMargin   ), sf::Vector2f(0                       ,topMargin            )),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2               ), sf::Vector2f(leftMargin              ,0                    )),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2 + topMargin   ), sf::Vector2f(leftMargin              ,topMargin            )),
-        sf::Vertex( sf::Vector2f(-width/2              ,-height/2 + topMargin   ), sf::Vector2f(0                       ,topMargin            )),
 
         //Top
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2               ), sf::Vector2f(leftMargin              ,0                    )),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2               ), sf::Vector2f(imageWidth - rightMargin,0                    )),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2 + topMargin   ), sf::Vector2f(imageWidth - rightMargin,topMargin            )),
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2 + topMargin   ), sf::Vector2f(leftMargin              ,topMargin            )),
 
         //Top-right
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2               ), sf::Vector2f(imageWidth - rightMargin,0                    )),
         sf::Vertex( sf::Vector2f(+width/2              ,-height/2               ), sf::Vector2f(imageWidth              ,0                    )),
         sf::Vertex( sf::Vector2f(+width/2              ,-height/2 + topMargin   ), sf::Vector2f(imageWidth              ,topMargin            )),
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2 + topMargin   ), sf::Vector2f(imageWidth - rightMargin,topMargin            )),
+    };
 
-        //Right
+    sf::Vertex rightVertices[] = {
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,-height/2 + topMargin   ), sf::Vector2f(imageWidth - rightMargin,topMargin                 )),
         sf::Vertex( sf::Vector2f(+width/2              ,-height/2 + topMargin   ), sf::Vector2f(imageWidth              ,topMargin                 )),
-        sf::Vertex( sf::Vector2f(+width/2              ,+height/2 - bottomMargin), sf::Vector2f(imageWidth              ,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
+        sf::Vertex( sf::Vector2f(+width/2              ,+height/2 - bottomMargin), sf::Vector2f(imageWidth              ,imageHeight - bottomMargin))
+    };
 
+    sf::Vertex bottomVertices[] = {
         //Bottom-left
         sf::Vertex( sf::Vector2f(-width/2              ,+height/2 - bottomMargin), sf::Vector2f(0                       ,imageHeight - bottomMargin)),
+        sf::Vertex( sf::Vector2f(-width/2              ,+height/2               ), sf::Vector2f(0                       ,imageHeight               )),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2               ), sf::Vector2f(leftMargin              ,imageHeight               )),
-        sf::Vertex( sf::Vector2f(-width/2              ,+height/2               ), sf::Vector2f(0                       ,imageHeight               )),
 
         //Bottom
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2               ), sf::Vector2f(imageWidth - rightMargin,imageHeight               )),
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2               ), sf::Vector2f(leftMargin              ,imageHeight               )),
 
         //Bottom-right
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2 - bottomMargin), sf::Vector2f(imageWidth - rightMargin,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(+width/2              ,+height/2 - bottomMargin), sf::Vector2f(imageWidth              ,imageHeight - bottomMargin)),
-        sf::Vertex( sf::Vector2f(+width/2              ,+height/2               ), sf::Vector2f(imageWidth              ,imageHeight               )),
-        sf::Vertex( sf::Vector2f(+width/2 - rightMargin,+height/2               ), sf::Vector2f(imageWidth - rightMargin,imageHeight               )),
+        sf::Vertex( sf::Vector2f(+width/2              ,+height/2               ), sf::Vector2f(imageWidth              ,imageHeight               ))
+    };
 
-        //Left
+    sf::Vertex leftVertices[] = {
         sf::Vertex( sf::Vector2f(-width/2              ,-height/2 + topMargin   ), sf::Vector2f(0                       ,topMargin                 )),
         sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,-height/2 + topMargin   ), sf::Vector2f(leftMargin              ,topMargin                 )),
-        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin)),
         sf::Vertex( sf::Vector2f(-width/2              ,+height/2 - bottomMargin), sf::Vector2f(0                       ,imageHeight - bottomMargin)),
-
+        sf::Vertex( sf::Vector2f(-width/2 + leftMargin ,+height/2 - bottomMargin), sf::Vector2f(leftMargin              ,imageHeight - bottomMargin))
     };
-    sf::Vector2f centerPosition = sf::Vector2f(instance.GetX()+width/2, instance.GetY()+height/2);
 
     sf::Transform matrix;
+    sf::Vector2f centerPosition = sf::Vector2f(instance.GetX()+width/2, instance.GetY()+height/2);
     matrix.translate(centerPosition);
     matrix.rotate(instance.GetAngle());
 
@@ -266,9 +261,11 @@ void PanelSpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::
     states.transform = matrix;
     states.texture = &texture->texture;
 
-    renderTarget.draw(vertices, 36, sf::Quads, states);
-
-    return;
+    renderTarget.draw(centerVertices, 4, sf::TrianglesStrip, states);
+    renderTarget.draw(leftVertices, 4, sf::TrianglesStrip, states);
+    renderTarget.draw(rightVertices, 4, sf::TrianglesStrip, states);
+    renderTarget.draw(topVertices, 8, sf::TrianglesStrip, states);
+    renderTarget.draw(bottomVertices, 8, sf::TrianglesStrip, states);
 }
 
 void PanelSpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)

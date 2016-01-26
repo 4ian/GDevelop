@@ -183,11 +183,22 @@ int main( int argc, char *p_argv[] )
 
     //Game main loop
     bool abort = false;
-    SceneStack sceneStack(runtimeGame, &window, codeLibraryName);
+    SceneStack sceneStack(runtimeGame, &window);
     sceneStack.OnError([&abort](gd::String error) {
         DisplayMessage(error);
         abort = true;
     });
+    sceneStack.OnLoadScene([&codeLibraryName](std::shared_ptr<RuntimeScene> scene) {
+        if (!codeLibraryName.empty() &&
+            !scene->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
+            "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scene->GetName())))
+        {
+            return false;
+        }
+
+        return true;
+    });
+
 
     sceneStack.Push(game.GetLayout(0).GetName());
     while (sceneStack.Step() && !abort)

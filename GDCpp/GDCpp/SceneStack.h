@@ -23,10 +23,9 @@ public:
 	 * \param window The sf::RenderWindow to be used to render the scenes.
 	 * \param codeLibraryName Filename to a shared library containing the code to execute for scenes.
 	 */
-	SceneStack(RuntimeGame & game_, sf::RenderWindow * window_, gd::String codeLibraryName_) :
+	SceneStack(RuntimeGame & game_, sf::RenderWindow * window_) :
 		game(game_),
-		window(window_),
-		codeLibraryName(codeLibraryName_)
+		window(window_)
 	{
 	};
 
@@ -70,10 +69,15 @@ public:
 	 */
 	void OnError(std::function<void(gd::String)> cb) { errorCallback = cb; };
 
+	/**
+	 * \brief Set a custom function to call when a scene is pushed on the stack.
+	 */
+	void OnLoadScene(std::function<bool(std::shared_ptr<RuntimeScene>)> cb) { loadCallback = cb; }
+
 private:
 	RuntimeGame & game;
 	sf::RenderWindow * window;
-	gd::String codeLibraryName;
 	std::vector<std::shared_ptr<RuntimeScene>> stack;
 	std::function<void(gd::String)> errorCallback;
+	std::function<bool(std::shared_ptr<RuntimeScene>)> loadCallback;
 };

@@ -104,15 +104,18 @@ std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties(gd::Project &
 
 gd::Behavior * Object::AddNewBehavior(gd::Project & project, const gd::String & type, const gd::String & name)
 {
-    Behavior * behavior = project.GetCurrentPlatform().CreateBehavior(type);
+    std::unique_ptr<gd::Behavior> behavior = project.GetCurrentPlatform().CreateBehavior(type);
 
     if ( behavior )
     {
         behavior->SetName(name);
-        behaviors[behavior->GetName()] = std::unique_ptr<Behavior>(behavior);
+        behaviors[name] = std::move(behavior);
+        return behaviors[name].get();
     }
-
-    return behavior;
+    else
+    {
+        return nullptr;
+    }
 }
 
 sf::Vector2f Object::GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
@@ -163,12 +166,12 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
                 .FindAndReplace("Automatism", "Behavior");
             gd::String autoName = behaviorElement.GetStringAttribute("name", "", "Name");
 
-            Behavior* behavior = project.CreateBehavior(autoType);
-            if ( behavior != NULL )
+            std::unique_ptr<Behavior> behavior = project.CreateBehavior(autoType);
+            if ( behavior )
             {
                 behavior->SetName(autoName);
                 behavior->UnserializeFrom(behaviorElement);
-                behaviors[behavior->GetName()] = std::unique_ptr<Behavior>(behavior);
+                behaviors[autoName] = std::move(behavior);
             }
             else
                 std::cout << "WARNING: Unknown behavior " << autoType << std::endl;
@@ -187,12 +190,12 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
                 .FindAndReplace("Automatism", "Behavior"); //Compatibility with GD <= 4
             gd::String autoName = behaviorElement.GetStringAttribute("name");
 
-            Behavior* behavior = project.CreateBehavior(autoType);
-            if ( behavior != NULL )
+            std::unique_ptr<Behavior> behavior = project.CreateBehavior(autoType);
+            if ( behavior )
             {
                 behavior->SetName(autoName);
                 behavior->UnserializeFrom(behaviorElement);
-                behaviors[behavior->GetName()] = std::unique_ptr<Behavior>(behavior);
+                behaviors[autoName] = std::move(behavior);
             }
             else
                 std::cout << "WARNING: Unknown behavior " << autoType << std::endl;

@@ -259,7 +259,7 @@ public:
      *
      * Return NULL if \a behaviorType is not provided by the extension.
      */
-    gd::Behavior* CreateBehavior(gd::String behaviorType) const;
+    std::unique_ptr<gd::Behavior> CreateBehavior(gd::String behaviorType) const;
 
     /**
      * \brief Create shared data for a behavior

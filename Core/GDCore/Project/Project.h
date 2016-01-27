@@ -6,8 +6,9 @@
 
 #ifndef GDCORE_PROJECT_H
 #define GDCORE_PROJECT_H
-#include "GDCore/String.h"
+#include <memory>
 #include <vector>
+#include "GDCore/String.h"
 class wxPropertyGrid;
 class wxPropertyGridEvent;
 class TiXmlElement;
@@ -243,7 +244,7 @@ public:
      * \param type The type of the behavior
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    gd::Behavior* CreateBehavior(const gd::String & type, const gd::String & platformName = "");
+    std::unique_ptr<gd::Behavior> CreateBehavior(const gd::String & type, const gd::String & platformName = "");
 
     /**
      * Create behavior shared data of the given type.

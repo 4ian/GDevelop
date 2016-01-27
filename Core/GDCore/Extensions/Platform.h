@@ -6,10 +6,10 @@
 
 #ifndef GDCORE_PLATFORM_H
 #define GDCORE_PLATFORM_H
+#include <map>
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"
-#include <map>
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/LayoutEditorPreviewer.h"
 namespace gd { class InstructionsMetadataHolder; }
@@ -123,7 +123,7 @@ public:
     /**
      * \brief Create a behavior
      */
-    gd::Behavior* CreateBehavior(const gd::String & type) const;
+    std::unique_ptr<gd::Behavior> CreateBehavior(const gd::String & type) const;
 
     /**
      * \brief Create a behavior shared data object.

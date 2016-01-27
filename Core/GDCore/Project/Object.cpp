@@ -21,9 +21,7 @@ namespace gd
 
 Object::~Object()
 {
-    //Do not forget to delete behaviors which are managed using raw pointers.
-    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
-    	delete it->second;
+
 }
 
 Object::Object(const gd::String & name_) :
@@ -37,13 +35,9 @@ void Object::Init(const gd::Object & object)
     type = object.type;
     objectVariables = object.objectVariables;
 
-    //Do not forget to delete behaviors which are managed using raw pointers.
-    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
-    	delete it->second;
-
     behaviors.clear();
-    for (std::map<gd::String, Behavior* >::const_iterator it = object.behaviors.begin() ; it != object.behaviors.end(); ++it )
-    	behaviors[it->first] = it->second->Clone();
+    for (auto it = object.behaviors.cbegin() ; it != object.behaviors.cend(); ++it )
+    	behaviors[it->first] = std::unique_ptr<Behavior>(it->second->Clone());
 }
 
 
@@ -51,7 +45,7 @@ std::vector < gd::String > Object::GetAllBehaviorNames() const
 {
     std::vector < gd::String > allNameIdentifiers;
 
-    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
+    for (std::map<gd::String, std::unique_ptr<gd::Behavior> >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
     	allNameIdentifiers.push_back(it->first);
 
     return allNameIdentifiers;
@@ -59,9 +53,6 @@ std::vector < gd::String > Object::GetAllBehaviorNames() const
 
 void Object::RemoveBehavior(const gd::String & name)
 {
-    //Do not forget to delete behaviors which are managed using raw pointers.
-    delete(behaviors[name]);
-
     behaviors.erase(name);
 }
 
@@ -70,10 +61,10 @@ bool Object::RenameBehavior(const gd::String & name, const gd::String & newName)
     if ( behaviors.find(name) == behaviors.end()
       || behaviors.find(newName) != behaviors.end() ) return false;
 
-    Behavior * aut = behaviors.find(name)->second;
+    std::unique_ptr<Behavior> aut = std::move(behaviors.find(name)->second);
     behaviors.erase(name);
-    behaviors[newName] = aut;
-    aut->SetName(newName);
+    behaviors[newName] = std::move(aut);
+    behaviors[newName]->SetName(newName);
 
     return true;
 }
@@ -95,8 +86,9 @@ bool Object::HasBehaviorNamed(const gd::String & name) const
 
 bool Object::AddBehavior(Behavior * behavior)
 {
-    if (behavior && !HasBehaviorNamed(behavior->GetName())) {
-        behaviors[behavior->GetName()] = behavior;
+    if (behavior && !HasBehaviorNamed(behavior->GetName()))
+    {
+        behaviors[behavior->GetName()] = std::unique_ptr<Behavior>(behavior);
         return true;
     }
 
@@ -114,9 +106,10 @@ gd::Behavior * Object::AddNewBehavior(gd::Project & project, const gd::String & 
 {
     Behavior * behavior = project.GetCurrentPlatform().CreateBehavior(type);
 
-    if ( behavior != NULL ) {
+    if ( behavior )
+    {
         behavior->SetName(name);
-        behaviors[behavior->GetName()] = behavior;
+        behaviors[behavior->GetName()] = std::unique_ptr<Behavior>(behavior);
     }
 
     return behavior;
@@ -175,7 +168,7 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
             {
                 behavior->SetName(autoName);
                 behavior->UnserializeFrom(behaviorElement);
-                behaviors[behavior->GetName()] = behavior;
+                behaviors[behavior->GetName()] = std::unique_ptr<Behavior>(behavior);
             }
             else
                 std::cout << "WARNING: Unknown behavior " << autoType << std::endl;
@@ -199,7 +192,7 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
             {
                 behavior->SetName(autoName);
                 behavior->UnserializeFrom(behaviorElement);
-                behaviors[behavior->GetName()] = behavior;
+                behaviors[behavior->GetName()] = std::unique_ptr<Behavior>(behavior);
             }
             else
                 std::cout << "WARNING: Unknown behavior " << autoType << std::endl;

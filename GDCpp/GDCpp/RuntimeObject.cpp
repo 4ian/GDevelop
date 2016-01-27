@@ -37,7 +37,7 @@ RuntimeObject::RuntimeObject(RuntimeScene & scene, const gd::Object & object) :
     behaviors.clear();
 
     //And insert the new ones.
-    for (std::map<gd::String, Behavior* >::const_iterator it = object.GetAllBehaviors().begin() ; it != object.GetAllBehaviors().end(); ++it )
+    for (auto it = object.GetAllBehaviors().cbegin() ; it != object.GetAllBehaviors().cend(); ++it )
     {
     	behaviors[it->first] = it->second->Clone();
     	behaviors[it->first]->SetOwner(this);

@@ -9,10 +9,10 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "GDCpp/RuntimeVariablesContainer.h"
+#include "GDCpp/Project/Behavior.h"
 #include "GDCpp/Force.h"
+#include "GDCpp/RuntimeVariablesContainer.h"
 #include "GDCpp/String.h"
-namespace gd { class Behavior; }
 namespace gd { class InitialInstance; }
 namespace gd { class Object; }
 namespace sf { class RenderTarget; }
@@ -438,14 +438,14 @@ protected:
 
     gd::String                                             name; ///< The full name of the object
     gd::String                                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
-    float                                                   X; ///<X position on the scene
-    float                                                   Y; ///<Y position on the scene
-    int                                                     zOrder; ///<Z order on the scene, to choose if an object is displayed before another object.
-    bool                                                    hidden; ///<True to prevent the object from being rendered.
+    float                                                  X; ///<X position on the scene
+    float                                                  Y; ///<Y position on the scene
+    int                                                    zOrder; ///<Z order on the scene, to choose if an object is displayed before another object.
+    bool                                                   hidden; ///<True to prevent the object from being rendered.
     gd::String                                             layer; ///<Name of the layer on which the object is.
-    std::map<gd::String, gd::Behavior* >                 behaviors; ///<Contains all behaviors of the object. Behaviors are the ownership of the object
-    RuntimeVariablesContainer                               objectVariables; ///<List of the variables of the object
-    std::vector < Force >                                   forces; ///< Forces applied to the object
+    std::map<gd::String, std::unique_ptr<gd::Behavior>>    behaviors; ///<Contains all behaviors of the object. Behaviors are the ownership of the object
+    RuntimeVariablesContainer                              objectVariables; ///<List of the variables of the object
+    std::vector < Force >                                  forces; ///< Forces applied to the object
 
     /**
      * \brief Initialize object using another object. Used by copy-ctor and assign-op.

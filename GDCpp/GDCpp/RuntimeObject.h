@@ -6,9 +6,10 @@
 #ifndef RUNTIMEOBJECT_H
 #define RUNTIMEOBJECT_H
 
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <map>
 #include "GDCpp/Project/Behavior.h"
 #include "GDCpp/Force.h"
 #include "GDCpp/RuntimeVariablesContainer.h"

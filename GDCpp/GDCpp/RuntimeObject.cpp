@@ -221,12 +221,16 @@ bool RuntimeObject::TestAngleOfDisplacement(float angle, float tolerance)
 
 void RuntimeObject::ActivateBehavior( const gd::String & behaviorName, bool activate )
 {
-    GetBehaviorRawPointer(behaviorName)->Activate(activate);
+    if(GetBehaviorRawPointer(behaviorName))
+        GetBehaviorRawPointer(behaviorName)->Activate(activate);
 }
 
 bool RuntimeObject::BehaviorActivated( const gd::String & behaviorName )
 {
-    return GetBehaviorRawPointer(behaviorName)->Activated();
+    if(GetBehaviorRawPointer(behaviorName))
+        return GetBehaviorRawPointer(behaviorName)->Activated();
+    else
+        return false;
 }
 
 double RuntimeObject::GetSqDistanceTo(double pointX, double pointY)

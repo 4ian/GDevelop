@@ -7,16 +7,18 @@
 #ifndef EXTENSIONBASE_H
 #define EXTENSIONBASE_H
 
-#include <string>
-#include <vector>
+#include <iostream>
 #include <map>
 #include <memory>
+#include <vector>
+#include <string>
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/CommonTools.h"
 namespace gd { class Instruction; }
 namespace gd { class Layout; }
 namespace gd { class Object; }
@@ -59,7 +61,15 @@ public :
      * \param createFun A function taking a reference to a RuntimeScene and to a const reference to a gd::Object and returning a pointer
      * to the RuntimeObject created.
      */
-    void AddRuntimeObject(gd::ObjectMetadata & object, gd::String className, CreateRuntimeObjectFunPtr createFun);
+    void AddRuntimeObject(gd::ObjectMetadata & object, gd::String className, CreateRuntimeObjectFunPtr createFun) GD_DEPRECATED;
+
+    /**
+     * \brief To be called so as to declare the creation and destruction function of a RuntimeObject associated to a gd::Object.
+     * \param object The object associated to the RuntimeObject being declared.
+     * \param className The C++ class name associated to the RuntimeObject.
+     */
+    template<class T, class U>
+    void AddRuntimeObject(gd::ObjectMetadata & object, gd::String className);
 
     /**
      * \brief Return a function to create the runtime object if the type is handled by the extension
@@ -130,5 +140,7 @@ protected :
 private:
     std::map < gd::String, CreateRuntimeObjectFunPtr > runtimeObjectCreationFunctionTable;
 };
+
+#include "GDCpp/Extensions/ExtensionBase.inl"
 
 #endif // EXTENSIONBASE_H

@@ -12,6 +12,7 @@
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
+#include "GDCore/CommonTools.h"
 #include "GDCore/String.h"
 namespace gd { class Instruction; }
 namespace gd { class InstructionMetadata; }
@@ -135,6 +136,24 @@ public:
                                            const gd::String & group_,
                                            const gd::String & smallicon_);
 
+   /**
+    * \brief Declare a new object as being part of the extension.
+    * \note This method does nothing when used for GD C++ runtime.
+    * \param name The name of the object
+    * \param fullname The user friendly name of the object
+    * \param description The user friendly description of the object
+    * \param icon The 24x24 icon of the object: res/icons_[SkinName]/[iconName]24.png will be first tried,
+    * and then if it does not exists, the full entered name will be tried.
+    * \deprecated
+    \endcode
+    */
+    gd::ObjectMetadata & AddObject(const gd::String & name_,
+                                   const gd::String & fullname_,
+                                   const gd::String & description_,
+                                   const gd::String & icon24x24_,
+                                   CreateFunPtr createFunPtrP_)
+                                   GD_DEPRECATED;
+
     /**
      * \brief Declare a new object as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
@@ -143,21 +162,13 @@ public:
      * \param description The user friendly description of the object
      * \param icon The 24x24 icon of the object: res/icons_[SkinName]/[iconName]24.png will be first tried,
      * and then if it does not exists, the full entered name will be tried.
-     * \param createFunPtr The name of the function that create the object
-     *
-     * Example of the create function:
-     \code
-    gd::Object * CreateMyObject(gd::String name)
-    {
-        return new MyObject(name);
-    }
      \endcode
      */
+    template<class T>
     gd::ObjectMetadata & AddObject(const gd::String & name_,
                                    const gd::String & fullname_,
                                    const gd::String & description_,
-                                   const gd::String & icon24x24_,
-                                   CreateFunPtr createFunPtrP);
+                                   const gd::String & icon24x24_);
 
     /**
      * \brief Declare a new behavior as being part of the extension.
@@ -460,5 +471,7 @@ private:
     compilationInfo.informationCompleted = true;
 
 #endif
+
+#include "GDCore/Extensions/PlatformExtension.inl"
 
 #endif // GDCORE_PLATFORMEXTENSION_H

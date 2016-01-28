@@ -20,11 +20,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    gd::ObjectMetadata & obj = extension.AddObject("Sprite",
+    gd::ObjectMetadata & obj = extension.AddObject<SpriteObject>(
+               "Sprite",
                _("Sprite"),
                _("Animated object which can be used for most elements of a game"),
-               "CppPlatform/Extensions/spriteicon.png",
-               &CreateSpriteObject);
+               "CppPlatform/Extensions/spriteicon.png");
 
     #if defined(GD_IDE_ONLY)
     obj.AddAction("Opacity",

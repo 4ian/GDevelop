@@ -27,8 +27,8 @@ This project is released under the MIT License.
 #include "TileSet.h"
 #include "TileMapTools.h"
 
-RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object) :
-    RuntimeObject(scene, object),
+RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const TileMapObject & tileMapObject) :
+    RuntimeObject(scene, tileMapObject),
     tileSet(),
     tileMap(),
     vertexArray(sf::Quads),
@@ -36,8 +36,6 @@ RuntimeTileMapObject::RuntimeTileMapObject(RuntimeScene & scene, const gd::Objec
     oldY(0),
     needGeneration(false)
 {
-    const TileMapObject & tileMapObject = static_cast<const TileMapObject&>(object);
-
     tileSet = tileMapObject.tileSet;
     tileMap = tileMapObject.tileMap;
 

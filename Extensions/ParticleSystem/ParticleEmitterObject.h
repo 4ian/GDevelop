@@ -248,7 +248,7 @@ class GD_EXTENSION_API RuntimeParticleEmitterObject : public RuntimeObject, publ
 {
 public :
 
-    RuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeParticleEmitterObject(RuntimeScene & scene, const ParticleEmitterObject & particleEmitterObject);
     virtual ~RuntimeParticleEmitterObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeParticleEmitterObject(*this);}
 

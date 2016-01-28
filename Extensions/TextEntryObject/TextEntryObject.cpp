@@ -37,8 +37,8 @@ TextEntryObject::TextEntryObject(gd::String name_) :
 {
 }
 
-RuntimeTextEntryObject::RuntimeTextEntryObject(RuntimeScene & scene_, const gd::Object & object) :
-    RuntimeObject(scene_, object),
+RuntimeTextEntryObject::RuntimeTextEntryObject(RuntimeScene & scene_, const TextEntryObject & textEntryObject) :
+    RuntimeObject(scene_, textEntryObject),
     text(),
     scene(&scene_),
     activated(true)

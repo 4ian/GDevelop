@@ -104,7 +104,7 @@ class GD_EXTENSION_API RuntimeSoundObject : public RuntimeObject
 {
 public :
 
-    RuntimeSoundObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeSoundObject(RuntimeScene & scene, const SoundObject & soundObject);
     RuntimeSoundObject(const RuntimeSoundObject & other);
     RuntimeSoundObject & operator=(const RuntimeSoundObject & other);
     virtual ~RuntimeSoundObject();

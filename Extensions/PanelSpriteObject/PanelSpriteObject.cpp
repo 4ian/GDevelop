@@ -79,14 +79,12 @@ void PanelSpriteObject::LoadResources(gd::Project & project, gd::Layout & layout
 }
 #endif
 
-RuntimePanelSpriteObject::RuntimePanelSpriteObject(RuntimeScene & scene, const gd::Object & object) :
-    RuntimeObject(scene, object),
+RuntimePanelSpriteObject::RuntimePanelSpriteObject(RuntimeScene & scene, const PanelSpriteObject & panelSpriteObject) :
+    RuntimeObject(scene, panelSpriteObject),
     width(32),
     height(32),
     angle(0)
 {
-    const PanelSpriteObject & panelSpriteObject = static_cast<const PanelSpriteObject&>(object);
-
     SetRightMargin(panelSpriteObject.GetRightMargin());
     SetLeftMargin(panelSpriteObject.GetLeftMargin());
     SetBottomMargin(panelSpriteObject.GetBottomMargin());

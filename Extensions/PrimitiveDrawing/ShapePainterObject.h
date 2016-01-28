@@ -137,7 +137,7 @@ private:
 class GD_EXTENSION_API RuntimeShapePainterObject : public RuntimeObject, public ShapePainterObjectBase
 {
 public:
-    RuntimeShapePainterObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeShapePainterObject(RuntimeScene & scene, const ShapePainterObject & shapePainterObject);
     virtual ~RuntimeShapePainterObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeShapePainterObject(*this);}
 

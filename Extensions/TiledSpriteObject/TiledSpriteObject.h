@@ -72,7 +72,7 @@ class GD_EXTENSION_API RuntimeTiledSpriteObject : public RuntimeObject
 {
 public :
 
-    RuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeTiledSpriteObject(RuntimeScene & scene, const TiledSpriteObject & tiledSpriteObject);
     virtual ~RuntimeTiledSpriteObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeTiledSpriteObject(*this);}
 

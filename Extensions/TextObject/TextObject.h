@@ -108,7 +108,7 @@ class GD_EXTENSION_API RuntimeTextObject : public RuntimeObject
 {
 public :
 
-    RuntimeTextObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeTextObject(RuntimeScene & scene, const TextObject & textObject);
     virtual ~RuntimeTextObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeTextObject(*this);}
 

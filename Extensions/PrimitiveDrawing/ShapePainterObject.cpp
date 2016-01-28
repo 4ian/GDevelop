@@ -53,11 +53,10 @@ ShapePainterObject::ShapePainterObject(gd::String name_) :
 {
 }
 
-RuntimeShapePainterObject::RuntimeShapePainterObject(RuntimeScene & scene, const gd::Object & object) :
-    RuntimeObject(scene, object)
+RuntimeShapePainterObject::RuntimeShapePainterObject(RuntimeScene & scene, const ShapePainterObject & shapePainterObject) :
+    RuntimeObject(scene, shapePainterObject)
 {
-    const ShapePainterObject & drawerObject = static_cast<const ShapePainterObject&>(object);
-    ShapePainterObjectBase::operator=(drawerObject);
+    ShapePainterObjectBase::operator=(shapePainterObject);
 }
 
 void ShapePainterObjectBase::UnserializeFrom(const gd::SerializerElement & element)

@@ -89,12 +89,10 @@ void LightObject::DoSerializeTo(gd::SerializerElement & element) const
 }
 #endif
 
-RuntimeLightObject::RuntimeLightObject(RuntimeScene & scene, const gd::Object & object) :
-    RuntimeObject(scene, object),
+RuntimeLightObject::RuntimeLightObject(RuntimeScene & scene, const LightObject & lightObject) :
+    RuntimeObject(scene, lightObject),
     angle(0)
 {
-    const LightObject & lightObject = static_cast<const LightObject&>(object);
-
     globalLight = lightObject.IsGlobalLight();
     globalLightColor = lightObject.GetGlobalColor();
     light = Light(sf::Vector2f(GetX(),GetY()), lightObject.GetIntensity(), lightObject.GetRadius(), lightObject.GetQuality(), lightObject.GetColor());
@@ -296,14 +294,4 @@ void RuntimeLightObject::SetGlobalColor(const gd::String & colorStr)
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
     SetGlobalColor(sf::Color( colors[0].To<int>(),colors[1].To<int>(),colors[2].To<int>() ));
-}
-
-RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeLightObject(scene, object);
-}
-
-gd::Object * CreateLightObject(gd::String name)
-{
-    return new LightObject(name);
 }

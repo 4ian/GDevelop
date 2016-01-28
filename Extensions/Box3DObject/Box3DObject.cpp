@@ -196,14 +196,13 @@ bool RuntimeBox3DObject::Draw( sf::RenderTarget& window )
     return true;
 }
 
-RuntimeBox3DObject::RuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object) :
-    RuntimeObject(scene, object),
+RuntimeBox3DObject::RuntimeBox3DObject(RuntimeScene & scene, const Box3DObject & box3DObject) :
+    RuntimeObject(scene, box3DObject),
     zPosition(0),
     yaw(0),
     pitch(0),
     roll(0)
 {
-    const Box3DObject & box3DObject = static_cast<const Box3DObject&>(object);
 
     SetWidth(box3DObject.GetWidth());
     SetHeight(box3DObject.GetHeight());

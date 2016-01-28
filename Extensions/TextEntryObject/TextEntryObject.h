@@ -52,7 +52,7 @@ class GD_EXTENSION_API RuntimeTextEntryObject : public RuntimeObject
 {
 public :
 
-    RuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeTextEntryObject(RuntimeScene & scene, const TextEntryObject & textEntryObject);
     virtual ~RuntimeTextEntryObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeTextEntryObject(*this);}
 

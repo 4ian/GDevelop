@@ -77,20 +77,18 @@ namespace
     }
 }
 
-RuntimeTiledSpriteObject::RuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object) :
-    RuntimeObject(scene, object),
+RuntimeTiledSpriteObject::RuntimeTiledSpriteObject(RuntimeScene & scene, const TiledSpriteObject & tiledSpriteObject) :
+    RuntimeObject(scene, tiledSpriteObject),
     width(32),
     height(32),
     xOffset(0),
     yOffset(),
     angle(0)
 {
-    const TiledSpriteObject & panelSpriteObject = static_cast<const TiledSpriteObject&>(object);
+    SetWidth(tiledSpriteObject.GetWidth());
+    SetHeight(tiledSpriteObject.GetHeight());
 
-    SetWidth(panelSpriteObject.GetWidth());
-    SetHeight(panelSpriteObject.GetHeight());
-
-    textureName = panelSpriteObject.textureName;
+    textureName = tiledSpriteObject.textureName;
     ChangeAndReloadImage(textureName, scene);
 }
 

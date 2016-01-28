@@ -154,13 +154,11 @@ void TextObject::SetFontFilename(const gd::String & fontFilename)
 
 /* RuntimeTextObject : */
 
-RuntimeTextObject::RuntimeTextObject(RuntimeScene & scene, const gd::Object & object) :
-    RuntimeObject(scene, object),
+RuntimeTextObject::RuntimeTextObject(RuntimeScene & scene, const TextObject & textObject) :
+    RuntimeObject(scene, textObject),
     opacity(255),
     angle(0)
 {
-    const TextObject & textObject = static_cast<const TextObject&>(object);
-
     ChangeFont(textObject.GetFontFilename());
     SetSmooth(textObject.IsSmoothed());
     SetColor(textObject.GetColorR(), textObject.GetColorG(), textObject.GetColorB());

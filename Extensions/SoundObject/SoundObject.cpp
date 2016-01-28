@@ -46,12 +46,10 @@ SoundObject::SoundObject(gd::String name_) :
 {
 }
 
-RuntimeSoundObject::RuntimeSoundObject(RuntimeScene & scene_, const gd::Object & object) :
-    RuntimeObject(scene_, object),
+RuntimeSoundObject::RuntimeSoundObject(RuntimeScene & scene_, const SoundObject & soundObject) :
+    RuntimeObject(scene_, soundObject),
     m_sound(NULL)
 {
-    const SoundObject & soundObject = static_cast<const SoundObject&>(object);
-
     SetSoundType(soundObject.GetSoundType());
     SetSoundFileName(soundObject.GetSoundFileName());
     SetVolume(soundObject.GetVolume());

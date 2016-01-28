@@ -89,7 +89,7 @@ class GD_EXTENSION_API RuntimePanelSpriteObject : public RuntimeObject
 {
 public :
 
-    RuntimePanelSpriteObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimePanelSpriteObject(RuntimeScene & scene, const PanelSpriteObject & panelSpriteObject);
     virtual ~RuntimePanelSpriteObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimePanelSpriteObject(*this);}
 

@@ -394,14 +394,3 @@ std::size_t RuntimeTextObject::GetNumberOfProperties() const
     return 6;
 }
 #endif
-
-
-RuntimeObject * CreateRuntimeTextObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeTextObject(scene, object);
-}
-
-gd::Object * CreateTextObject(gd::String name)
-{
-    return new TextObject(name);
-}

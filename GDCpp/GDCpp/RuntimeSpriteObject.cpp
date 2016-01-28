@@ -625,8 +625,3 @@ AnimationProxy & AnimationProxy::operator=(const AnimationProxy & rhs)
 
     return *this;
 }
-
-RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeSpriteObject(scene, object);
-}

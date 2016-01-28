@@ -77,7 +77,4 @@ private:
     bool activated;
 };
 
-gd::Object * CreateTextEntryObject(gd::String name);
-RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object);
-
 #endif // TEXTENTRYOBJECT_H

@@ -178,7 +178,4 @@ private:
     float angle;
 };
 
-gd::Object * CreateTextObject(gd::String name);
-RuntimeObject * CreateRuntimeTextObject(RuntimeScene & scene, const gd::Object & object);
-
 #endif // TEXTOBJECT_H

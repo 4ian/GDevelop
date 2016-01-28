@@ -251,8 +251,3 @@ bool GD_EXTENSION_API SingleTileCollision(std::map<gd::String, std::vector<Runti
         return false;
     });
 }
-
-RuntimeObject * CreateRuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeTileMapObject(scene, object);
-}

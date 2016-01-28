@@ -315,6 +315,4 @@ private:
     static gd::Animation    badAnimation;
 };
 
-GD_API RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object);
-
 #endif // SPRITEOBJECT_H

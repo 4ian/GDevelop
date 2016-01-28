@@ -196,13 +196,3 @@ std::size_t RuntimeTiledSpriteObject::GetNumberOfProperties() const
     return 3;
 }
 #endif
-
-RuntimeObject * CreateRuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeTiledSpriteObject(scene, object);
-}
-
-gd::Object * CreateTiledSpriteObject(gd::String name)
-{
-    return new TiledSpriteObject(name);
-}

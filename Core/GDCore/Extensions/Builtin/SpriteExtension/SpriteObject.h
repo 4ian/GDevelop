@@ -128,7 +128,5 @@ private:
     static Animation badAnimation; //< Bad animation when an out of bound animation is requested.
 };
 
-GD_CORE_API gd::Object * CreateSpriteObject(gd::String name);
-
 }
 #endif // GDCORE_SPRITEOBJECT_H

@@ -353,13 +353,3 @@ float RuntimeSoundObject::GetPitch() const
 {
     return m_sound->GetPitch();
 }
-
-RuntimeObject * CreateRuntimeSoundObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeSoundObject(scene, object);
-}
-
-gd::Object * CreateSoundObject(gd::String name)
-{
-    return new SoundObject(name);
-}

@@ -413,13 +413,3 @@ std::size_t RuntimeBox3DObject::GetNumberOfProperties() const
     return 7;
 }
 #endif
-
-RuntimeObject * CreateRuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeBox3DObject(scene, object);
-}
-
-gd::Object * CreateBox3DObject(gd::String name)
-{
-    return new Box3DObject(name);
-}

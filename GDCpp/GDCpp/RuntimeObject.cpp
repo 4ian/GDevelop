@@ -655,8 +655,3 @@ void RuntimeObject::VariableRemoveChild(gd::Variable & variable, const gd::Strin
 {
     variable.RemoveChild(childName);
 }
-
-RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeObject(scene, object);
-}

@@ -114,7 +114,4 @@ private:
     std::shared_ptr<SFMLTextureWrapper> texture;
 };
 
-gd::Object * CreateTiledSpriteObject(gd::String name);
-RuntimeObject * CreateRuntimeTiledSpriteObject(RuntimeScene & scene, const gd::Object & object);
-
 #endif // TILEDSPRITEOBJECT_H

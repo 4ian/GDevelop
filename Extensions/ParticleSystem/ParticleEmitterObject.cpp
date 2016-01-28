@@ -831,13 +831,3 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase & other)
     maxParticleNb = other.maxParticleNb;
     destroyWhenNoParticles = other.destroyWhenNoParticles;
 }
-
-gd::Object * CreateParticleEmitterObject(gd::String name)
-{
-    return new ParticleEmitterObject(name);
-}
-
-RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeParticleEmitterObject(scene, object);
-}

@@ -284,7 +284,4 @@ private:
     const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
 };
 
-gd::Object * CreateParticleEmitterObject(gd::String name);
-RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object);
-
 #endif // PARTICLEEMITTEROBJECT_H

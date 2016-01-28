@@ -136,24 +136,6 @@ public:
                                            const gd::String & group_,
                                            const gd::String & smallicon_);
 
-   /**
-    * \brief Declare a new object as being part of the extension.
-    * \note This method does nothing when used for GD C++ runtime.
-    * \param name The name of the object
-    * \param fullname The user friendly name of the object
-    * \param description The user friendly description of the object
-    * \param icon The 24x24 icon of the object: res/icons_[SkinName]/[iconName]24.png will be first tried,
-    * and then if it does not exists, the full entered name will be tried.
-    * \deprecated
-    \endcode
-    */
-    gd::ObjectMetadata & AddObject(const gd::String & name_,
-                                   const gd::String & fullname_,
-                                   const gd::String & description_,
-                                   const gd::String & icon24x24_,
-                                   CreateFunPtr createFunPtrP_)
-                                   GD_DEPRECATED;
-
     /**
      * \brief Declare a new object as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.

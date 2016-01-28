@@ -454,9 +454,4 @@ protected:
     void Init(const RuntimeObject & object);
 };
 
-/**
- * As extensions, a function used to create an object ("return new RuntimeObject(name);").
- */
-RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object);
-
 #endif // RUNTIMEOBJECT_H

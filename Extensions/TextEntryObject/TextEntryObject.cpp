@@ -115,13 +115,3 @@ std::size_t RuntimeTextEntryObject::GetNumberOfProperties() const
     return 2;
 }
 #endif
-
-RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeTextEntryObject(scene, object);
-}
-
-gd::Object * CreateTextEntryObject(gd::String name)
-{
-    return new TextEntryObject(name);
-}

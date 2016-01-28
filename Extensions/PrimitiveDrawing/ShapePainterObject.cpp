@@ -311,13 +311,3 @@ void RuntimeShapePainterObject::DrawCircle( float x, float y, float radius )
 
     shapesToDraw.push_back(command);
 }
-
-RuntimeObject * CreateRuntimeShapePainterObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeShapePainterObject(scene, object);
-}
-
-gd::Object * CreateShapePainterObject(gd::String name)
-{
-    return new ShapePainterObject(name);
-}

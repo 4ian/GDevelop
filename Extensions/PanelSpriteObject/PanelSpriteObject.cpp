@@ -329,13 +329,3 @@ void RuntimePanelSpriteObject::ChangeAndReloadImage(const gd::String &txtName, c
     textureName = txtName;
     texture = scene.GetImageManager()->GetSFMLTexture(textureName);
 }
-
-RuntimeObject * CreateRuntimePanelSpriteObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimePanelSpriteObject(scene, object);
-}
-
-gd::Object * CreatePanelSpriteObject(gd::String name)
-{
-    return new PanelSpriteObject(name);
-}

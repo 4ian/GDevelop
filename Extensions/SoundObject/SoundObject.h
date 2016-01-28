@@ -163,8 +163,4 @@ private:
     void Init(const RuntimeSoundObject &other);
 };
 
-gd::Object * CreateSoundObject(gd::String name);
-RuntimeObject * CreateRuntimeSoundObject(RuntimeScene & scene, const gd::Object & object);
-
 #endif // SoundObject_H
-

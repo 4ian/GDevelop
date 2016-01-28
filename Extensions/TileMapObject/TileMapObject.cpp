@@ -151,8 +151,3 @@ void TileMapObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFr
 #endif
 }
 #endif
-
-gd::Object * CreateTileMapObject(gd::String name)
-{
-    return new TileMapObject(name);
-}

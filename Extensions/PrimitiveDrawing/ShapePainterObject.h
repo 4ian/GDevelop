@@ -163,7 +163,4 @@ private:
     std::vector < DrawingCommand > shapesToDraw;
 };
 
-RuntimeObject * CreateRuntimeShapePainterObject(RuntimeScene & scene, const gd::Object & object);
-gd::Object * CreateShapePainterObject(gd::String name);
-
 #endif // DRAWEROBJECT_H

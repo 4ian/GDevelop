@@ -23,11 +23,11 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                           "Florian Rival and Victor Levasseur",
                           "Open source (MIT License)");
 
-    gd::ObjectMetadata & obj = extension.AddObject("Text",
+    gd::ObjectMetadata & obj = extension.AddObject<TextObject>(
+               "Text",
                _("Text"),
                _("Displays a text"),
-               "CppPlatform/Extensions/texticon.png",
-               &CreateTextObject);
+               "CppPlatform/Extensions/texticon.png");
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("TextObject/TextObject.h");
@@ -281,8 +281,9 @@ public:
     Extension()
     {
         DeclareTextObjectExtension(*this);
-        AddRuntimeObject(GetObjectMetadata("TextObject::Text"),
-            "RuntimeTextObject", CreateRuntimeTextObject);
+        AddRuntimeObject<TextObject, RuntimeTextObject>(
+            GetObjectMetadata("TextObject::Text"),
+            "RuntimeTextObject");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

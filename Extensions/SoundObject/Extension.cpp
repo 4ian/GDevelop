@@ -36,13 +36,13 @@ public:
 
         //Declaration of all objects available
         {
-            gd::ObjectMetadata & obj = AddObject("Sound",
+            gd::ObjectMetadata & obj = AddObject<SoundObject>("Sound",
                        _("Sound"),
                        _("Invisible object emitting a sound which can be moved in the space."),
-                       "CppPlatform/Extensions/soundicon32.png",
-                       &CreateSoundObject);
+                       "CppPlatform/Extensions/soundicon32.png");
 
-            AddRuntimeObject(obj, "RuntimeSoundObject", CreateRuntimeSoundObject);
+            AddRuntimeObject<SoundObject, RuntimeSoundObject>(
+                obj, "RuntimeSoundObject");
 
             #if defined(GD_IDE_ONLY)
             SoundObject::LoadEdittimeIcon();

@@ -24,11 +24,11 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
                               "Victor Levasseur and Florian Rival",
                               "Open source (MIT License)");
 
-    gd::ObjectMetadata & obj = extension.AddObject("TileMap",
+    gd::ObjectMetadata & obj = extension.AddObject<TileMapObject>(
+               "TileMap",
                _("Tile Map"),
                _("Displays a tile map"),
-               "CppPlatform/Extensions/TileMapIcon.png",
-               &CreateTileMapObject);
+               "CppPlatform/Extensions/TileMapIcon.png");
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
@@ -191,8 +191,9 @@ public:
     Extension()
     {
         DeclareTileMapObjectExtension(*this);
-        AddRuntimeObject(GetObjectMetadata("TileMapObject::TileMap"),
-            "RuntimeTileMapObject", CreateRuntimeTileMapObject);
+        AddRuntimeObject<TileMapObject, RuntimeTileMapObject>(
+            GetObjectMetadata("TileMapObject::TileMap"),
+            "RuntimeTileMapObject");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

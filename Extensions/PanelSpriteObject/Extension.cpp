@@ -22,11 +22,11 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
         "Victor Levasseur and Florian Rival",
         "Open source (MIT License)");
 
-    gd::ObjectMetadata & obj = extension.AddObject("PanelSprite",
+    gd::ObjectMetadata & obj = extension.AddObject<PanelSpriteObject>(
+        "PanelSprite",
         _("Panel Sprite (\"9-patch\")"),
         _("An image with edges and corners that are stretched separately from the fill."),
-        "CppPlatform/Extensions/PanelSpriteIcon.png",
-        &CreatePanelSpriteObject);
+        "CppPlatform/Extensions/PanelSpriteIcon.png");
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
@@ -143,8 +143,9 @@ public:
     Extension()
     {
         DeclarePanelSpriteObjectExtension(*this);
-        AddRuntimeObject(GetObjectMetadata("PanelSpriteObject::PanelSprite"),
-            "RuntimePanelSpriteObject", CreateRuntimePanelSpriteObject);
+        AddRuntimeObject<PanelSpriteObject, RuntimePanelSpriteObject>(
+            GetObjectMetadata("PanelSpriteObject::PanelSprite"),
+            "RuntimePanelSpriteObject");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

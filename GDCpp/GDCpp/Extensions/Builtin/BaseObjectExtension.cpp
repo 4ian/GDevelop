@@ -12,7 +12,7 @@ BaseObjectExtension::BaseObjectExtension()
     gd::BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(*this);
 
     gd::ObjectMetadata & obj = GetObjectMetadata("");
-    AddRuntimeObject(obj, "", &CreateBaseRuntimeObject);
+    AddRuntimeObject<gd::Object, RuntimeObject>(obj, "");
 
     #if defined(GD_IDE_ONLY)
     std::map<gd::String, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");
@@ -107,4 +107,3 @@ BaseObjectExtension::BaseObjectExtension()
     GetAllExpressions()["Count"].SetFunctionName("PickedObjectsCount").SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
     #endif
 }
-

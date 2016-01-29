@@ -406,7 +406,7 @@ str += " world";
 str += " " + gd::String::From(2);
 //str now contains "Hello world 2";
 
-gd::string twopointfiveStr = "2.5";
+gd::String twopointfiveStr = "2.5";
 double twopointfive = twopointfive.To<double>();
 //twopointfive == 2.5
  \endcode
@@ -499,30 +499,22 @@ Actions are declared like this :
  * Adding an object is made using gd::PlatformExtension::AddObject method.
  *
  * \code
-        gd::ObjectMetadata & obj = AddObject("Name",
+        gd::ObjectMetadata & obj = AddObject<MyObject>(
+                           "Name",
                            _("Name displayed to users"),
                            _("Description"),
-                           "path-to-a-32-by-32-icon.png",
-                           &FunctionForCreatingTheObject);
- * \endcode
- *
- * *FunctionForCreatingTheObject* is a function that must just create the object. It should look like this:
- *
- * \code
-gd::Object * CreateTextObject(std::string name)
-{
-    return new TextObject(name);
-}
+                           "path-to-a-32-by-32-icon.png");
  * \endcode
  *
  * The *C++ platform* also requires that you call *AddRuntimeObject* to declare the RuntimeObject class associated to the object being declared:<br>
- * You must pass as parameter the name of the class inheriting from RuntimeObject and a function used to create an instance of the
- * RuntimeObject.
+ * It has two template parameters: the first one is the corresponding object class declared with *AddObject* (class inheriting from *gd::Object*) and the
+ * second one is the *RuntimeObject* class.
+ * You must pass as parameter the metadata from the object previously declared and the name of the class inheriting from RuntimeObject.
  *
  * You will also want to specify the .h file associated to the object using gd::ObjectMetadata::SetIncludeFile. For example:
  * \code
 //obj is the gd::ObjectMetadata returned when you called AddObject.
-AddRuntimeObject(obj, "RuntimeTextObject", CreateRuntimeTextObject);
+AddRuntimeObject<TextObject, RuntimeTextObject>(obj, "RuntimeTextObject");
 obj.SetIncludeFile("TextObject/TextObject.h");
  * \endcode
  *
@@ -785,5 +777,3 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
  * \brief Part of the tinyxml library
  * \ingroup TinyXml
  */
-
-

@@ -20,6 +20,7 @@ This project is released under the MIT License.
 
 class SFMLTextureWrapper;
 class RuntimeScene;
+class TileMapObject;
 namespace gd { class ImageManager; }
 namespace gd { class InitialInstance; }
 #if defined(GD_IDE_ONLY)
@@ -34,7 +35,7 @@ class GD_EXTENSION_API RuntimeTileMapObject : public RuntimeObject
 
 public :
 
-    RuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeTileMapObject(RuntimeScene & scene, const TileMapObject & tileMapObject);
     virtual ~RuntimeTileMapObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeTileMapObject(*this);}
 
@@ -100,7 +101,5 @@ bool GD_EXTENSION_API SingleTileCollision(std::map<gd::String, std::vector<Runti
                          int row,
                          std::map<gd::String, std::vector<RuntimeObject*>*> objectLists,
                          bool conditionInverted);
-
-RuntimeObject * CreateRuntimeTileMapObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif

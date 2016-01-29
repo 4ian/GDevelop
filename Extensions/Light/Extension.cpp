@@ -30,13 +30,14 @@ public:
                               "Florian Rival",
                               "Open source (MIT License)");
 
-        gd::ObjectMetadata & obj = AddObject("Light",
+        gd::ObjectMetadata & obj = AddObject<LightObject>(
+                   "Light",
                    _("Light"),
                    _("Emits light that can be stopped by objects"),
-                   "CppPlatform/Extensions/lightIcon32.png",
-                   &CreateLightObject);
+                   "CppPlatform/Extensions/lightIcon32.png");
 
-        AddRuntimeObject(obj, "RuntimeLightObject", CreateRuntimeLightObject);
+        AddRuntimeObject<LightObject, RuntimeLightObject>(
+            obj, "RuntimeLightObject");
 
         #if defined(GD_IDE_ONLY)
         LightObject::LoadEdittimeIcon();

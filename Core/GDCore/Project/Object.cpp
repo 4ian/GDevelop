@@ -229,8 +229,3 @@ void Object::SerializeTo(SerializerElement & element) const
 #endif
 
 }
-
-gd::Object * CreateBaseObject(gd::String name)
-{
-    return new gd::Object(name);
-}

@@ -18,11 +18,11 @@ void DeclareAdMobObjectExtension(gd::PlatformExtension & extension)
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    gd::ObjectMetadata & obj = extension.AddObject("AdMob",
+    gd::ObjectMetadata & obj = extension.AddObject<AdMobObject>(
+               "AdMob",
                _("AdMob banner"),
                _("Display an ad banner or interstitial screen using AdMob"),
-               "JsPlatform/Extensions/admobicon.png",
-               &CreateAdMobObject);
+               "JsPlatform/Extensions/admobicon.png");
 
     obj.SetHelpUrl("/gdevelop/documentation/manual/built_admob");
 

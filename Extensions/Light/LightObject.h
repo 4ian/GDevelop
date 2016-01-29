@@ -92,7 +92,7 @@ class GD_EXTENSION_API RuntimeLightObject : public RuntimeObject
 {
 public :
 
-    RuntimeLightObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeLightObject(RuntimeScene & scene, const LightObject & lightObject);
     virtual ~RuntimeLightObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeLightObject(*this);}
 
@@ -154,8 +154,4 @@ private:
     sf::Color globalLightColor;
 };
 
-gd::Object * CreateLightObject(gd::String name);
-RuntimeObject * CreateRuntimeLightObject(RuntimeScene & scene, const gd::Object & object);
-
 #endif // LightObject_H
-

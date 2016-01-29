@@ -85,7 +85,7 @@ class GD_EXTENSION_API RuntimeBox3DObject : public RuntimeObject
 {
 public :
 
-    RuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeBox3DObject(RuntimeScene & scene, const Box3DObject & box3DObject);
     virtual ~RuntimeBox3DObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeBox3DObject(*this);}
 
@@ -142,8 +142,4 @@ private:
     std::shared_ptr<SFMLTextureWrapper> backTexture;
 };
 
-RuntimeObject * CreateRuntimeBox3DObject(RuntimeScene & scene, const gd::Object & object);
-gd::Object * CreateBox3DObject(gd::String name);
-
 #endif // BOX3DOBJECT_H
-

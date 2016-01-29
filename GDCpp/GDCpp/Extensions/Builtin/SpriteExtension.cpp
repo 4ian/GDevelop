@@ -5,6 +5,7 @@
  */
 
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCpp/Extensions/Builtin/SpriteExtension.h"
 #include "GDCpp/RuntimeSpriteObject.h"
 #if !defined(GD_IDE_ONLY)
@@ -16,7 +17,7 @@ SpriteExtension::SpriteExtension()
     gd::BuiltinExtensionsImplementer::ImplementsSpriteExtension(*this);
 
     gd::ObjectMetadata & obj = GetObjectMetadata("Sprite");
-    AddRuntimeObject(obj, "RuntimeSpriteObject", &CreateRuntimeSpriteObject);
+    AddRuntimeObject<gd::SpriteObject, RuntimeSpriteObject>(obj, "RuntimeSpriteObject");
 
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("GDCpp/RuntimeSpriteObject.h");

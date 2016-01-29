@@ -292,13 +292,4 @@ void SpriteObject::SwapAnimations(std::size_t firstIndex, std::size_t secondInde
         std::swap(animations[firstIndex], animations[secondIndex]);
 }
 
-/**
- * Function creating an extension Object.
- * GDevelop can not directly create an extension object
- */
-gd::Object * CreateSpriteObject(gd::String name)
-{
-    return new SpriteObject(name);
-}
-
 }

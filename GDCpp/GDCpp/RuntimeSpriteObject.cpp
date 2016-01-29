@@ -37,8 +37,8 @@
 gd::Animation RuntimeSpriteObject::badAnimation;
 gd::Sprite * RuntimeSpriteObject::badSpriteDatas = NULL;
 
-RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object) :
-    RuntimeObject(scene, object),
+RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::SpriteObject & spriteObject) :
+    RuntimeObject(scene, spriteObject),
     currentAnimation( 0 ),
     currentDirection( 0 ),
     currentAngle( 0 ),
@@ -59,9 +59,6 @@ RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object 
     colorB( 255 )
 {
     if (!badSpriteDatas) badSpriteDatas = new gd::Sprite();
-
-    //Initialize the runtime object using the object
-    const gd::SpriteObject & spriteObject = static_cast<const gd::SpriteObject&>(object);
 
     animations.clear();
     for (std::size_t i = 0; i < spriteObject.GetAllAnimations().size(); ++i)
@@ -624,9 +621,4 @@ AnimationProxy & AnimationProxy::operator=(const AnimationProxy & rhs)
     *animation = gd::Animation(rhs.Get());
 
     return *this;
-}
-
-RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeSpriteObject(scene, object);
 }

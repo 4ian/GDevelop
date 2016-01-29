@@ -483,11 +483,10 @@ void ParticleEmitterBase::UpdateLifeTime()
     particleSystem->particleModel->setLifeTime(particleLifeTimeMin,particleLifeTimeMax);
 }
 
-RuntimeParticleEmitterObject::RuntimeParticleEmitterObject(RuntimeScene & scene_, const gd::Object & object):
-    RuntimeObject(scene_, object),
+RuntimeParticleEmitterObject::RuntimeParticleEmitterObject(RuntimeScene & scene_, const ParticleEmitterObject & particleEmitterObject):
+    RuntimeObject(scene_, particleEmitterObject),
     hasSomeParticles(true)
 {
-    const ParticleEmitterObject & particleEmitterObject = static_cast<const ParticleEmitterObject&>(object);
     ParticleEmitterBase::operator=(particleEmitterObject);
 
     //Store a pointer to the scene
@@ -830,14 +829,4 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase & other)
     particleAngleRandomness2 = other.particleAngleRandomness2;
     maxParticleNb = other.maxParticleNb;
     destroyWhenNoParticles = other.destroyWhenNoParticles;
-}
-
-gd::Object * CreateParticleEmitterObject(gd::String name)
-{
-    return new ParticleEmitterObject(name);
-}
-
-RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeParticleEmitterObject(scene, object);
 }

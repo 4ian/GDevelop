@@ -18,11 +18,11 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
                   "Florian Rival",
                   "Open source (MIT License)");
 
-    gd::ObjectMetadata & obj = extension.AddObject("Drawer", //"Drawer" is kept for compatibility with GD<=3.6.76
+    gd::ObjectMetadata & obj = extension.AddObject<ShapePainterObject>(
+               "Drawer", //"Drawer" is kept for compatibility with GD<=3.6.76
                _("Shape painter"),
                _("Allows to draw simple shapes on the screen"),
-               "CppPlatform/Extensions/primitivedrawingicon.png",
-               &CreateShapePainterObject);
+               "CppPlatform/Extensions/primitivedrawingicon.png");
 
     #if defined(GD_IDE_ONLY)
     ShapePainterObject::LoadEdittimeIcon();
@@ -202,8 +202,9 @@ public:
     Extension()
     {
         DeclarePrimitiveDrawingExtension(*this);
-        AddRuntimeObject(GetObjectMetadata("PrimitiveDrawing::Drawer"),
-            "RuntimeShapePainterObject", CreateRuntimeShapePainterObject);
+        AddRuntimeObject<ShapePainterObject, RuntimeShapePainterObject>(
+            GetObjectMetadata("PrimitiveDrawing::Drawer"),
+            "RuntimeShapePainterObject");
 
         #if defined(GD_IDE_ONLY)
         AddAction("CopyImageOnAnother",

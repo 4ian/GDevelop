@@ -29,14 +29,6 @@ CreateRuntimeObjectFunPtr ExtensionBase::GetRuntimeObjectCreationFunctionPtr(gd:
     return NULL;
 }
 
-void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, gd::String className, CreateRuntimeObjectFunPtr createFun)
-{
-#if defined(GD_IDE_ONLY)
-    object.className = className;
-#endif
-    runtimeObjectCreationFunctionTable[object.GetName()] = createFun;
-}
-
 #if !defined(GD_IDE_ONLY)
 //Implementations of some dependencies of ExtensionBase are compiled in this compilation unit
 //when compiling for runtime:

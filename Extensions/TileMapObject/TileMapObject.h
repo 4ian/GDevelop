@@ -67,6 +67,4 @@ private:
     sf::VertexArray vertexArray;
 };
 
-gd::Object * CreateTileMapObject(gd::String name);
-
 #endif // TILEDSPRITEOBJECT_H

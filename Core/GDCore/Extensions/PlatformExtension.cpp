@@ -85,17 +85,6 @@ gd::ExpressionMetadata & PlatformExtension::AddStrExpression(const gd::String & 
 #endif
 }
 
-gd::ObjectMetadata & PlatformExtension::AddObject(const gd::String & name,
-                               const gd::String & fullname,
-                               const gd::String & informations,
-                               const gd::String & icon24x24,
-                               CreateFunPtr createFunPtrP)
-{
-    gd::String nameWithNamespace = GetNameSpace().empty() ? name : GetNameSpace()+name;
-    objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(), nameWithNamespace, fullname, informations, icon24x24, createFunPtrP);
-    return objectsInfos[nameWithNamespace];
-}
-
 gd::BehaviorMetadata & PlatformExtension::AddBehavior(const gd::String & name,
                                                       const gd::String & fullname,
                                                       const gd::String & defaultName,

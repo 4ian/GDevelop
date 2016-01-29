@@ -28,13 +28,14 @@ Extension::Extension()
 
     //Declaration of all objects available
     {
-        gd::ObjectMetadata & obj = AddObject("ParticleEmitter",
+        gd::ObjectMetadata & obj = AddObject<ParticleEmitterObject>(
+                   "ParticleEmitter",
                    _("Particles emitter"),
                    _("Displays a large number of small particles to create visual effects"),
-                   "CppPlatform/Extensions/particleSystemicon.png",
-                   &CreateParticleEmitterObject);
+                   "CppPlatform/Extensions/particleSystemicon.png");
 
-        AddRuntimeObject(obj, "RuntimeParticleEmitterObject", CreateRuntimeParticleEmitterObject);
+        AddRuntimeObject<ParticleEmitterObject, RuntimeParticleEmitterObject>(
+            obj, "RuntimeParticleEmitterObject");
 
         #if defined(GD_IDE_ONLY)
         obj.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");

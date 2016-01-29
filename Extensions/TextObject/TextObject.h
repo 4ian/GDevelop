@@ -108,7 +108,7 @@ class GD_EXTENSION_API RuntimeTextObject : public RuntimeObject
 {
 public :
 
-    RuntimeTextObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeTextObject(RuntimeScene & scene, const TextObject & textObject);
     virtual ~RuntimeTextObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeTextObject(*this);}
 
@@ -177,8 +177,5 @@ private:
     bool smoothed;
     float angle;
 };
-
-gd::Object * CreateTextObject(gd::String name);
-RuntimeObject * CreateRuntimeTextObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // TEXTOBJECT_H

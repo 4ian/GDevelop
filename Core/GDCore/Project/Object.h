@@ -345,6 +345,4 @@ typedef std::vector < std::shared_ptr<gd::Object> > ObjList;
  */
 typedef std::shared_ptr<gd::Object> ObjSPtr;
 
-gd::Object * GD_CORE_API CreateBaseObject(gd::String name);
-
 #endif // GDCORE_OBJECT_H

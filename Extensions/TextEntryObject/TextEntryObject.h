@@ -52,7 +52,7 @@ class GD_EXTENSION_API RuntimeTextEntryObject : public RuntimeObject
 {
 public :
 
-    RuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeTextEntryObject(RuntimeScene & scene, const TextEntryObject & textEntryObject);
     virtual ~RuntimeTextEntryObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeTextEntryObject(*this);}
 
@@ -76,8 +76,5 @@ private:
     const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
     bool activated;
 };
-
-gd::Object * CreateTextEntryObject(gd::String name);
-RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // TEXTENTRYOBJECT_H

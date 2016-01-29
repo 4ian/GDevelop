@@ -13,6 +13,7 @@ namespace gd { class Object; }
 namespace gd { class Layout; }
 namespace sf { class Sprite; }
 namespace gd { class Sprite; }
+namespace gd { class SpriteObject; }
 namespace gd { class Animation; }
 namespace gd { class MainFrameWrapper; }
 namespace gd { class PropertyDescriptor; }
@@ -50,7 +51,7 @@ class GD_API RuntimeSpriteObject : public RuntimeObject
 {
 public:
 
-    RuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeSpriteObject(RuntimeScene & scene, const gd::SpriteObject & spriteObject);
     virtual ~RuntimeSpriteObject();
     virtual RuntimeObject * Clone() const { return new RuntimeSpriteObject(*this);}
 
@@ -314,7 +315,5 @@ private:
     static gd::Sprite     * badSpriteDatas; ///< Used when no valid sprite can be displayed. Created when the first RuntimeSpriteObject is created
     static gd::Animation    badAnimation;
 };
-
-GD_API RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // SPRITEOBJECT_H

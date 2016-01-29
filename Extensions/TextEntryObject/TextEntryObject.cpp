@@ -37,8 +37,8 @@ TextEntryObject::TextEntryObject(gd::String name_) :
 {
 }
 
-RuntimeTextEntryObject::RuntimeTextEntryObject(RuntimeScene & scene_, const gd::Object & object) :
-    RuntimeObject(scene_, object),
+RuntimeTextEntryObject::RuntimeTextEntryObject(RuntimeScene & scene_, const TextEntryObject & textEntryObject) :
+    RuntimeObject(scene_, textEntryObject),
     text(),
     scene(&scene_),
     activated(true)
@@ -115,13 +115,3 @@ std::size_t RuntimeTextEntryObject::GetNumberOfProperties() const
     return 2;
 }
 #endif
-
-RuntimeObject * CreateRuntimeTextEntryObject(RuntimeScene & scene, const gd::Object & object)
-{
-    return new RuntimeTextEntryObject(scene, object);
-}
-
-gd::Object * CreateTextEntryObject(gd::String name)
-{
-    return new TextEntryObject(name);
-}

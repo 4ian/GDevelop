@@ -248,7 +248,7 @@ class GD_EXTENSION_API RuntimeParticleEmitterObject : public RuntimeObject, publ
 {
 public :
 
-    RuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimeParticleEmitterObject(RuntimeScene & scene, const ParticleEmitterObject & particleEmitterObject);
     virtual ~RuntimeParticleEmitterObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeParticleEmitterObject(*this);}
 
@@ -283,8 +283,5 @@ private:
     bool hasSomeParticles;
     const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
 };
-
-gd::Object * CreateParticleEmitterObject(gd::String name);
-RuntimeObject * CreateRuntimeParticleEmitterObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // PARTICLEEMITTEROBJECT_H

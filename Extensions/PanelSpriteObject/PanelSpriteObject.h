@@ -89,7 +89,7 @@ class GD_EXTENSION_API RuntimePanelSpriteObject : public RuntimeObject
 {
 public :
 
-    RuntimePanelSpriteObject(RuntimeScene & scene, const gd::Object & object);
+    RuntimePanelSpriteObject(RuntimeScene & scene, const PanelSpriteObject & panelSpriteObject);
     virtual ~RuntimePanelSpriteObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimePanelSpriteObject(*this);}
 
@@ -141,8 +141,4 @@ private:
     std::shared_ptr<SFMLTextureWrapper> texture;
 };
 
-RuntimeObject * CreateRuntimePanelSpriteObject(RuntimeScene & scene, const gd::Object & object);
-gd::Object * CreatePanelSpriteObject(gd::String name);
-
 #endif // TILEDSPRITEOBJECT_H
-

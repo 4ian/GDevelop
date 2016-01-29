@@ -24,6 +24,7 @@ class RuntimeScene;
  * \brief A RuntimeObject is something displayed on the scene.
  *
  * Games don't directly use this class: Extensions can provide object by deriving from this class, and redefining functions:
+ * - The constructor must have this signature : MyRuntimeObject(RuntimeScene & scene, const MyObject & object) with MyObject the class inheriting from gd::Object.
  * - An important function is RuntimeObject::Draw. It is called to render the object on the scene. This function take in parameter a reference to the target where render the object.
  * - RuntimeObject must be able to return their size, by redefining RuntimeObject::GetWidth and RuntimeObject::GetHeight
  * - RuntimeObject must be able to return the position where they have precisely drawn ( for example, Sprite can draw its image not exactly at the position of the object, if the origin point was moved ). It must also be able to return the position of their center. See RuntimeObject::GetDrawableX, RuntimeObject::GetDrawableY and RuntimeObject::GetCenterX, RuntimeObject::GetCenterY.
@@ -46,12 +47,14 @@ public:
      * The default implementation already takes care of setting common properties
      * ( name, type, behaviors... ). Be sure to call the original constructor if you redefine it:
      * \code
-     * MyRuntimeObject(RuntimeScene & scene, const gd::Object & object) :
+     * MyRuntimeObject(RuntimeScene & scene, const MyObject & object) :
      *     RuntimeObject(scene, object)
      * {
      *     //...
      * }
      * \endcode
+     * \note The constructor can take a specialized gd::Object as its second parameter which is the gd::Object sub-class
+     * declared in ExtensionBase::AddRuntimeObject (the first template parameter)
      */
     RuntimeObject(RuntimeScene & scene, const gd::Object & object);
 
@@ -454,10 +457,5 @@ protected:
      */
     void Init(const RuntimeObject & object);
 };
-
-/**
- * As extensions, a function used to create an object ("return new RuntimeObject(name);").
- */
-RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // RUNTIMEOBJECT_H

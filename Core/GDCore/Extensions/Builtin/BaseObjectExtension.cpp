@@ -19,11 +19,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    gd::ObjectMetadata & obj = extension.AddObject("",
+    gd::ObjectMetadata & obj = extension.AddObject<gd::Object>("",
                _("Base object"),
                _("Base object"),
-               "res/objeticon24.png",
-               &CreateBaseObject);
+               "res/objeticon24.png");
 
     #if defined(GD_IDE_ONLY)
     obj.AddCondition("PosX",

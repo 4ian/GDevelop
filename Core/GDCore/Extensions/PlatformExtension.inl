@@ -1,3 +1,10 @@
+/*
+ * GDevelop Core
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2016 Victor Levasseur (victorlevasseur52@gmail.com)
+ * This project is released under the MIT License.
+ */
+
 #ifndef GDCORE_PLATFORMEXTENSION_INL
 #define GDCORE_PLATFORMEXTENSION_INL
 

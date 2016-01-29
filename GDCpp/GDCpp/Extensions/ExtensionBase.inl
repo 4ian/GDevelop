@@ -1,3 +1,9 @@
+/*
+ * GDevelop C++ Platform
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * Copyright 2016 Victor Levasseur (victorlevasseur52@gmail.com)
+ * This project is released under the MIT License.
+ */
 #ifndef EXTENSIONBASE_INL
 #define EXTENSIONBASE_INL
 

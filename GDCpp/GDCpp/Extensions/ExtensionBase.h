@@ -56,6 +56,8 @@ public :
 
     /**
      * \brief To be called so as to declare the creation and destruction function of a RuntimeObject associated to a gd::Object.
+     * \tparam T the object class (inheriting *gd::Object*) declared with *AddObject*
+     * \tparam U the runtime object class (inheriting *RuntimeObject*)
      * \param object The object associated to the RuntimeObject being declared.
      * \param className The C++ class name associated to the RuntimeObject.
      */

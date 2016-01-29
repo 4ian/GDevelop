@@ -139,6 +139,7 @@ public:
     /**
      * \brief Declare a new object as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
+     * \tparam T the declared class inherited from *gd::Object*
      * \param name The name of the object
      * \param fullname The user friendly name of the object
      * \param description The user friendly description of the object

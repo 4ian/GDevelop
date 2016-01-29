@@ -30,25 +30,18 @@ RuntimeObject::RuntimeObject(RuntimeScene & scene, const gd::Object & object) :
 {
     ClearForce();
 
-    //Do not forget to delete behaviors which are managed using raw pointers.
-    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
-    	delete it->second;
-
     behaviors.clear();
-
-    //And insert the new ones.
-    for (std::map<gd::String, Behavior* >::const_iterator it = object.GetAllBehaviors().begin() ; it != object.GetAllBehaviors().end(); ++it )
+    //Insert the new behaviors.
+    for (auto it = object.GetAllBehaviors().cbegin() ; it != object.GetAllBehaviors().cend(); ++it )
     {
-    	behaviors[it->first] = it->second->Clone();
+    	behaviors[it->first] = std::unique_ptr<gd::Behavior>(it->second->Clone());
     	behaviors[it->first]->SetOwner(this);
     }
 }
 
 RuntimeObject::~RuntimeObject()
 {
-    //Do not forget to delete behaviors and forces which are managed using raw pointers.
-    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
-    	delete it->second;
+
 }
 
 void RuntimeObject::Init(const RuntimeObject & object)
@@ -65,14 +58,10 @@ void RuntimeObject::Init(const RuntimeObject & object)
     force5 = object.force5;
     forces = object.forces;
 
-    //Do not forget to delete behaviors which are managed using raw pointers.
-    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
-    	delete it->second;
-
     behaviors.clear();
-    for (std::map<gd::String, Behavior* >::const_iterator it = object.behaviors.begin() ; it != object.behaviors.end(); ++it )
+    for (auto it = object.behaviors.cbegin() ; it != object.behaviors.cend(); ++it )
     {
-    	behaviors[it->first] = it->second->Clone();
+    	behaviors[it->first] = std::unique_ptr<gd::Behavior>(it->second->Clone());
     	behaviors[it->first]->SetOwner(this);
     }
 }
@@ -232,12 +221,16 @@ bool RuntimeObject::TestAngleOfDisplacement(float angle, float tolerance)
 
 void RuntimeObject::ActivateBehavior( const gd::String & behaviorName, bool activate )
 {
-    GetBehaviorRawPointer(behaviorName)->Activate(activate);
+    if(GetBehaviorRawPointer(behaviorName))
+        GetBehaviorRawPointer(behaviorName)->Activate(activate);
 }
 
 bool RuntimeObject::BehaviorActivated( const gd::String & behaviorName )
 {
-    return GetBehaviorRawPointer(behaviorName)->Activated();
+    if(GetBehaviorRawPointer(behaviorName))
+        return GetBehaviorRawPointer(behaviorName)->Activated();
+    else
+        return false;
 }
 
 double RuntimeObject::GetSqDistanceTo(double pointX, double pointY)
@@ -555,12 +548,12 @@ bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)
 
 Behavior* RuntimeObject::GetBehaviorRawPointer(const gd::String & name)
 {
-    return behaviors.find(name)->second;
+    return behaviors.find(name)->second.get();
 }
 
 Behavior* RuntimeObject::GetBehaviorRawPointer(const gd::String & name) const
 {
-    return behaviors.find(name)->second;
+    return behaviors.find(name)->second.get();
 }
 
 bool RuntimeObject::ClearForce()
@@ -631,13 +624,13 @@ float RuntimeObject::TotalForceLength() const
 
 void RuntimeObject::DoBehaviorsPreEvents(RuntimeScene & scene)
 {
-    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
+    for (auto it = behaviors.cbegin() ; it != behaviors.cend(); ++it )
         it->second->StepPreEvents(scene);
 }
 
 void RuntimeObject::DoBehaviorsPostEvents(RuntimeScene & scene)
 {
-    for (std::map<gd::String, Behavior* >::const_iterator it = behaviors.begin() ; it != behaviors.end(); ++it )
+    for (auto it = behaviors.cbegin() ; it != behaviors.cend(); ++it )
         it->second->StepPostEvents(scene);
 }
 

@@ -95,16 +95,16 @@ std::shared_ptr<gd::Object> Platform::CreateObject(gd::String type, const gd::St
     return std::shared_ptr<gd::Object> (object);
 }
 
-gd::Behavior* Platform::CreateBehavior(const gd::String & behaviorType) const
+std::unique_ptr<gd::Behavior> Platform::CreateBehavior(const gd::String & behaviorType) const
 {
     for (std::size_t i =0;i<extensionsLoaded.size();++i)
     {
-        Behavior* behavior = extensionsLoaded[i]->CreateBehavior(behaviorType);
-        if ( behavior != NULL )
+        std::unique_ptr<gd::Behavior> behavior = extensionsLoaded[i]->CreateBehavior(behaviorType);
+        if ( behavior )
             return behavior;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 std::shared_ptr<gd::BehaviorsSharedData> Platform::CreateBehaviorSharedDatas(const gd::String & behaviorType) const

@@ -294,12 +294,12 @@ CreateFunPtr PlatformExtension::GetObjectCreationFunctionPtr(gd::String objectTy
     return NULL;
 }
 
-Behavior* PlatformExtension::CreateBehavior(gd::String type) const
+std::unique_ptr<gd::Behavior> PlatformExtension::CreateBehavior(gd::String type) const
 {
     if ( behaviorsInfo.find(type) != behaviorsInfo.end())
-        return behaviorsInfo.find(type)->second.Get()->Clone();
+        return std::unique_ptr<gd::Behavior>(behaviorsInfo.find(type)->second.Get()->Clone());
 
-    return NULL;
+    return nullptr;
 }
 
 

@@ -9,10 +9,10 @@
 #include "GDCore/String.h"
 #include <vector>
 #include <map>
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include <SFML/System/Vector2.hpp>
 namespace gd { class PropertyDescriptor; }
-namespace gd { class Behavior; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class MainFrameWrapper; }
@@ -262,7 +262,7 @@ public:
     /**
      * \brief Get a read-only access to the map containing the behaviors.
      */
-    const std::map<gd::String, gd::Behavior* > & GetAllBehaviors() const {return behaviors;};
+    const std::map<gd::String, std::unique_ptr<gd::Behavior> > & GetAllBehaviors() const {return behaviors;};
     ///@}
 
     /** \name Variable management
@@ -302,7 +302,7 @@ public:
 protected:
     gd::String                             name; ///< The full name of the object
     gd::String                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
-    std::map<gd::String, gd::Behavior* > behaviors; ///<Contains all behaviors of the object. Behaviors are the ownership of the object
+    std::map<gd::String, std::unique_ptr<gd::Behavior> > behaviors; ///<Contains all behaviors of the object. Behaviors are the ownership of the object
     gd::VariablesContainer                  objectVariables; ///<List of the variables of the object
 
     /**

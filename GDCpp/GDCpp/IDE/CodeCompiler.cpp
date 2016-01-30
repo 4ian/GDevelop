@@ -68,7 +68,7 @@ gd::String CodeCompilerCall::GetFullCall() const
 
     if ( !link ) //Generate argument for compiling a file
     {
-        if ( !compilationForRuntime ) args.push_back("-include \""+baseDir+"CppPlatform/include/GDCpp/Runtime/GDCpp/Runtime/EventsPrecompiledHeader.h\"");
+        if ( !compilationForRuntime ) args.push_back("-include \""+baseDir+"CppPlatform/include/GDCpp/GDCpp/Runtime/EventsPrecompiledHeader.h\"");
         args.push_back("-c \""+inputFile+"\"");
 
         //Compiler default directories

@@ -89,12 +89,10 @@ gd::String CodeCompilerCall::GetFullCall() const
         #elif defined(MACOS)
         #endif
 
-        standardsIncludeDirs.push_back("CppPlatform/include/GDCpp");
-        standardsIncludeDirs.push_back("CppPlatform/include/Core");
+        standardsIncludeDirs.push_back("CppPlatform/Sources/GDCpp");
+        standardsIncludeDirs.push_back("CppPlatform/Sources/Core");
         standardsIncludeDirs.push_back("CppPlatform/include/SFML/include");
-        standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/include");
-        standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/lib/gcc_dll/msw");
-        standardsIncludeDirs.push_back("CppPlatform/Extensions/include");
+        standardsIncludeDirs.push_back("CppPlatform/Sources/");
 
         for (std::size_t i =0;i<standardsIncludeDirs.size();++i)
             args.push_back("-I\""+baseDir+standardsIncludeDirs[i]+"\"");

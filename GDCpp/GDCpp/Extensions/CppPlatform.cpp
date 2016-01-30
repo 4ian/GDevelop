@@ -10,7 +10,9 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCpp/IDE/Exporter.h"
+#include "GDCpp/IDE/AndroidExporter.h"
 #include "GDCpp/Runtime/Project/Project.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCpp/Runtime/SoundManager.h"
@@ -158,7 +160,8 @@ std::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd::L
 
 std::shared_ptr<gd::ProjectExporter> CppPlatform::GetProjectExporter() const
 {
-    return std::shared_ptr<gd::ProjectExporter>(new Exporter);
+    // return std::shared_ptr<gd::ProjectExporter>(new Exporter);
+    return std::shared_ptr<gd::ProjectExporter>(new AndroidExporter(gd::NativeFileSystem::Get()));
 }
 #endif
 

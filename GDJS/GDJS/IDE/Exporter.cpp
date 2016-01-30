@@ -27,7 +27,6 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/SourceFile.h"
-#include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"

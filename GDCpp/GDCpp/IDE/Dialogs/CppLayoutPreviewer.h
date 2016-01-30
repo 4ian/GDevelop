@@ -10,8 +10,8 @@
 #include <SFML/Graphics.hpp>
 #include "GDCore/Project/LayoutEditorPreviewer.h"
 #include "GDCore/Project/Project.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeGame.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
 namespace gd { class InitialInstancesContainer; }
 namespace gd { class Project; }
 namespace gd { class Layout; }

@@ -2,7 +2,7 @@
 #define TIMETOOLS_H
 
 #include <string>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 class RuntimeScene;
 

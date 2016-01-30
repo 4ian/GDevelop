@@ -13,8 +13,8 @@
 #include <wx/filename.h>
 #include <wx/filefn.h>
 #include <wx/txtstrm.h>
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/Project/Layout.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/Project/Layout.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 
@@ -68,7 +68,7 @@ gd::String CodeCompilerCall::GetFullCall() const
 
     if ( !link ) //Generate argument for compiling a file
     {
-        if ( !compilationForRuntime ) args.push_back("-include \""+baseDir+"CppPlatform/include/GDCpp/GDCpp/EventsPrecompiledHeader.h\"");
+        if ( !compilationForRuntime ) args.push_back("-include \""+baseDir+"CppPlatform/include/GDCpp/Runtime/GDCpp/Runtime/EventsPrecompiledHeader.h\"");
         args.push_back("-c \""+inputFile+"\"");
 
         //Compiler default directories

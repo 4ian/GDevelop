@@ -11,10 +11,10 @@
 #include "GDCore/Project/ClassWithObjects.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeGame.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/SceneStack.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/SceneStack.h"
 
 TEST_CASE( "SceneStack", "[game-engine]" ) {
 	RuntimeGame game;

@@ -10,8 +10,8 @@ This project is released under the MIT License.
 #include <algorithm>
 #include <vector>
 
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/TinyXml/tinyxml.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/TinyXml/tinyxml.h"
 
 namespace AdvancedXML
 {

@@ -7,7 +7,7 @@
 #define NETWORKTOOLS_H
 
 #include <string>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 namespace gd {class Variable;}
 

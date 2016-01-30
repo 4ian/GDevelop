@@ -9,7 +9,7 @@
 #ifndef PROFILEEVENT_H
 #define PROFILEEVENT_H
 #include "GDCore/Events/Event.h"
-#include "GDCpp/profile.h"
+#include "GDCpp/Runtime/profile.h"
 
 /**
  * \brief Event used internally by GD C++ Platform to profile events.

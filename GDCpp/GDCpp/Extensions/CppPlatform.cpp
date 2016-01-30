@@ -11,11 +11,11 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/IDE/Exporter.h"
-#include "GDCpp/Project/Project.h"
+#include "GDCpp/Runtime/Project/Project.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCpp/SoundManager.h"
-#include "GDCpp/Project/Behavior.h"
-#include "GDCpp/FontManager.h"
+#include "GDCpp/Runtime/SoundManager.h"
+#include "GDCpp/Runtime/Project/Behavior.h"
+#include "GDCpp/Runtime/FontManager.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCpp/IDE/ChangesNotifier.h"
 #include "GDCpp/IDE/Dialogs/CppLayoutPreviewer.h"
@@ -40,9 +40,9 @@
 #include "GDCpp/Extensions/Builtin/NetworkExtension.h"
 #include "GDCpp/Extensions/Builtin/WindowExtension.h"
 #include "GDCpp/Extensions/Builtin/ExternalLayoutsExtension.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/CommonTools.h"
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/config.h>

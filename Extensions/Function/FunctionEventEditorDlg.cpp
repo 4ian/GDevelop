@@ -10,9 +10,9 @@
 #include <wx/string.h>
 //*)
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/Project/Project.h"
-#include "GDCpp/Project/Layout.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/Project/Project.h"
+#include "GDCpp/Runtime/Project/Layout.h"
 #include "FunctionEvent.h"
 
 //(*IdInit(FunctionEventEditorDlg)

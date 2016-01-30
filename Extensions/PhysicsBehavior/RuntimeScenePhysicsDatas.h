@@ -10,7 +10,7 @@ This project is released under the MIT License.
 
 class b2World;
 class b2Body;
-#include "GDCpp/BehaviorsRuntimeSharedData.h"
+#include "GDCpp/Runtime/BehaviorsRuntimeSharedData.h"
 class ScenePhysicsDatas;
 class ContactListener;
 

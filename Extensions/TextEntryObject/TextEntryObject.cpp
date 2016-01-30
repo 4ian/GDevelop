@@ -11,17 +11,17 @@ This project is released under the MIT License.
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/ImageManager.h"
-#include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/Project/InitialInstance.h"
-#include "GDCpp/Project/Project.h"
-#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/ImageManager.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/Project/InitialInstance.h"
+#include "GDCpp/Runtime/Project/Project.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCore/Utf8/utf8.h"
 #include "TextEntryObject.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #endif
 

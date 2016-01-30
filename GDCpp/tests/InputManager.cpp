@@ -9,7 +9,7 @@
 #include "catch.hpp"
 #include <SFML/Window.hpp>
 #include "GDCore/CommonTools.h"
-#include "GDCpp/InputManager.h"
+#include "GDCpp/Runtime/InputManager.h"
 #include <SFML/Window.hpp>
 
 TEST_CASE( "InputManager", "[game-engine]" ) {

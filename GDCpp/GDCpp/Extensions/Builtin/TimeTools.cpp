@@ -1,6 +1,6 @@
 #include "TimeTools.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/ManualTimer.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/ManualTimer.h"
 
 bool GD_API TimerElapsedTime( RuntimeScene & scene, double timeInSeconds, const gd::String & timerName )
 {

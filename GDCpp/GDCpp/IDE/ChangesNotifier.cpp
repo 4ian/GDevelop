@@ -17,8 +17,8 @@
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
-#include "GDCpp/Project/Layout.h"
-#include "GDCpp/Project/Project.h"
+#include "GDCpp/Runtime/Project/Layout.h"
+#include "GDCpp/Runtime/Project/Project.h"
 #include "GDCpp/IDE/CodeCompilationHelpers.h"
 
 void ChangesNotifier::OnObjectEdited(gd::Project & game, gd::Layout * scene, gd::Object & object) const

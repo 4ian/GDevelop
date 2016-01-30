@@ -3,7 +3,7 @@
 
 #include <string>
 #include <iostream>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 class GD_EXTENSION_API ErrorManager
 {

@@ -10,7 +10,7 @@
 
 #include <map>
 #include <string>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 #include <iostream>
 #include <vector>
 #include <set>

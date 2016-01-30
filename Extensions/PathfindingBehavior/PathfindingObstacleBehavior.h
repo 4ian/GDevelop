@@ -8,8 +8,8 @@ This project is released under the MIT License.
 #ifndef PATHFINDINGOBSTACLEBEHAVIOR_H
 #define PATHFINDINGOBSTACLEBEHAVIOR_H
 
-#include "GDCpp/Project/Behavior.h"
-#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/Runtime/Project/Behavior.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
 class ScenePathfindingObstaclesManager;
 class RuntimeScene;
 namespace gd { class SerializerElement; }

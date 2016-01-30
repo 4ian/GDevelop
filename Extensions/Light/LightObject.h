@@ -8,8 +8,8 @@ This project is released under the MIT License.
 #ifndef LightObject_H
 #define LightObject_H
 
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
 
 #include <memory>
 #include <SFML/Graphics/Color.hpp>

@@ -4,10 +4,10 @@
  * This project is released under the MIT License.
  */
 #include "ObjectTools.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Polygon2d.h"
-#include "GDCpp/PolygonCollision.h"
-#include "GDCpp/RuntimeObjectsListsTools.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/Polygon2d.h"
+#include "GDCpp/Runtime/PolygonCollision.h"
+#include "GDCpp/Runtime/RuntimeObjectsListsTools.h"
 #include "MathematicalTools.h"
 #include <cmath>
 #include <iostream>

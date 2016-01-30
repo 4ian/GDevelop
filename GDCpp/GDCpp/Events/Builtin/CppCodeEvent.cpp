@@ -15,9 +15,9 @@
 #endif
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCore/Events/Serialization.h"
-#include "GDCpp/TinyXml/tinyxml.h"
+#include "GDCpp/Runtime/TinyXml/tinyxml.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
@@ -31,7 +31,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCpp/IDE/CodeCompiler.h"
 #include "GDCore/Project/SourceFile.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 
 using namespace std;
 
@@ -81,8 +81,8 @@ gd::String CppCodeEvent::GenerateAssociatedFileCode() const
 #if !defined(GD_NO_WX_GUI)
     gd::String functionPrototype = "void "+GetFunctionToCall()+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+ (passObjectListAsParameter ? "std::vector<RuntimeObject*> objectsList" :"") + ")";
     gd::String output;
-    if (passSceneAsParameter ) output += "#include \"GDCpp/RuntimeScene.h\"\n";
-    if (passObjectListAsParameter ) output += "#include \"GDCpp/Project/Object.h\"\n";
+    if (passSceneAsParameter ) output += "#include \"GDCpp/Runtime/RuntimeScene.h\"\n";
+    if (passObjectListAsParameter ) output += "#include \"GDCpp/Runtime/Project/Object.h\"\n";
     for (std::size_t i = 0;i<includeFiles.size();++i) output += "#include "+includeFiles[i]+"\n";
 
     output += functionPrototype+"\n";
@@ -307,7 +307,7 @@ passObjectListAsParameter(false),
 codeDisplayedInEditor(true)
 {
     includeFiles.push_back("<iostream>");
-    includeFiles.push_back("\"GDCpp/CommonTools.h\"");
+    includeFiles.push_back("\"GDCpp/Runtime/CommonTools.h\"");
 }
 
 #endif

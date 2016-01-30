@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #define FUNCTIONTOOLS_H
 #include <string>
 #include <vector>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 namespace GDpriv
 {

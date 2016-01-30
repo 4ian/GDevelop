@@ -13,11 +13,11 @@
 #include "GDCore/Project/Object.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Animation.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeGame.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/RuntimeObjectsListsTools.h"
-#include "GDCpp/RuntimeSpriteObject.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/RuntimeObjectsListsTools.h"
+#include "GDCpp/Runtime/RuntimeSpriteObject.h"
 
 TEST_CASE( "RuntimeSpriteObject", "[game-engine]" ) {
 	RuntimeGame game;

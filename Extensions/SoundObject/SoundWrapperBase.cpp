@@ -6,8 +6,8 @@ This project is released under the MIT License.
 */
 #include "SoundWrapperBase.h"
 
-#include "GDCpp/Project/Project.h"
-#include "GDCpp/ResourcesLoader.h"
+#include "GDCpp/Runtime/Project/Project.h"
+#include "GDCpp/Runtime/ResourcesLoader.h"
 
 ///////////////// SoundWrapperBase /////////////////
 

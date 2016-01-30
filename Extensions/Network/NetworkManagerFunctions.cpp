@@ -5,7 +5,7 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 #include "NetworkManager.h"
 #include "ErrorManager.h"
 #include "ReceivedDataManager.h"

@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include "GDCpp/Extensions/Builtin/MathematicalTools.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include <cmath>
 
 namespace GDpriv

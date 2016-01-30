@@ -10,15 +10,15 @@ This project is released under the MIT License.
 #include "Dialogs/TextObjectEditor.h" //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
 #include <SFML/Graphics.hpp>
-#include "GDCpp/Project/Object.h"
+#include "GDCpp/Runtime/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/ImageManager.h"
-#include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/FontManager.h"
-#include "GDCpp/Project/InitialInstance.h"
-#include "GDCpp/Polygon2d.h"
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/ImageManager.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/FontManager.h"
+#include "GDCpp/Runtime/Project/InitialInstance.h"
+#include "GDCpp/Runtime/Polygon2d.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
 #include "TextObject.h"
 
 #if defined(GD_IDE_ONLY)

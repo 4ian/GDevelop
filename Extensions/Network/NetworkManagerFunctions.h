@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef NetworkACTIONS_H_INCLUDED
 #define NetworkACTIONS_H_INCLUDED
 #include <string>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 namespace GDpriv
 {

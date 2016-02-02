@@ -530,21 +530,33 @@ void RuntimeSpriteObject::FlipY(bool flip)
 bool RuntimeSpriteObject::CursorOnObject(RuntimeScene & scene, bool accurate)
 {
     RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
+    auto insideObject = [this, accurate](const sf::Vector2f & pos) {
+        if (GetDrawableX() <= pos.x
+            && GetDrawableX() + GetWidth()  >= pos.x
+            && GetDrawableY() <= pos.y
+            && GetDrawableY() + GetHeight() >= pos.y)
+        {
+            int localX = static_cast<int>( pos.x - GetDrawableX() );
+            int localY = static_cast<int>( pos.y - GetDrawableY() );
+
+            return ( !accurate || GetCurrentSprite().GetSFMLTexture()->image.getPixel(localX , localY).a != 0);
+        }
+    };
 
     for (std::size_t cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)
     {
+        const auto & view = theLayer.GetCamera(cameraIndex).GetSFMLView();
+
         sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
-            scene.GetInputManager().GetMousePosition(), theLayer.GetCamera(cameraIndex).GetSFMLView());
+            scene.GetInputManager().GetMousePosition(), view);
 
-        if (GetDrawableX() <= mousePos.x
-            && GetDrawableX() + GetWidth()  >= mousePos.x
-            && GetDrawableY() <= mousePos.y
-            && GetDrawableY() + GetHeight() >= mousePos.y)
+        if (insideObject(mousePos)) return true;
+
+        auto & touches = scene.GetInputManager().GetAllTouches();
+        for(auto & it : touches)
         {
-            int localX = static_cast<int>( mousePos.x - GetDrawableX() );
-            int localY = static_cast<int>( mousePos.y - GetDrawableY() );
-
-            return ( !accurate || GetCurrentSprite().GetSFMLTexture()->image.getPixel( localX , localY ).a != 0 );
+            sf::Vector2f touchPos = scene.renderWindow->mapPixelToCoords(it.second, view);
+            if (insideObject(touchPos)) return true;
         }
     }
 

@@ -40,10 +40,6 @@ sf::Texture ResourcesLoader::LoadSFMLTexture(const gd::String & filename)
 {
     sf::Texture texture;
 
-    #if defined(ANDROID) //TODO: filesystem
-    std::cout << "ResourcesLoader::LoadSFMLTexture" << filename << std::endl;
-    #endif
-
     if (resFile.ContainsFile(filename))
     {
         char* buffer = resFile.GetFile(filename);
@@ -61,10 +57,6 @@ sf::Texture ResourcesLoader::LoadSFMLTexture(const gd::String & filename)
 
 std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filename)
 {
-    #if defined(ANDROID) //TODO: filesystem
-    std::cout << "ResourcesLoader::LoadFont" << filename << std::endl;
-    #endif
-
     if (resFile.ContainsFile(filename))
     {
         char* buffer = resFile.GetFile(filename);
@@ -105,9 +97,6 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filen
 sf::SoundBuffer ResourcesLoader::LoadSoundBuffer( const gd::String & filename )
 {
     sf::SoundBuffer sbuffer;
-    #if defined(ANDROID) //TODO: filesystem
-    std::cout << "ResourcesLoader::LoadSoundBuffer" << filename << std::endl;
-    #endif
 
     if (resFile.ContainsFile(filename))
     {
@@ -178,7 +167,7 @@ char* ResourcesLoader::LoadBinaryFile( const gd::String & filename )
             file.read(memblock, size);
             return memblock;
         }
-        #else //TODO: filesystem, use implementation with SFML?
+        #else //TODO: Also use the SFML implementation?
         ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
         if (file.is_open()) {
             ifstream::pos_type size = file.tellg();
@@ -206,7 +195,7 @@ long int ResourcesLoader::GetBinaryFileSize( const gd::String & filename)
         sf::FileInputStream file;
         if (file.open(filename.ToLocale()))
             return file.getSize();
-        #else //TODO: filesystem, use implementation with SFML?
+        #else //TODO: Also use the SFML implementation?
         ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
         if (file.is_open()) {
             return file.tellg();

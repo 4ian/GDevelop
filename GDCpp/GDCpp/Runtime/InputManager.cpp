@@ -9,6 +9,7 @@ InputManager::InputManager(sf::Window * win) :
     window(win),
     lastPressedKey(0),
     keyWasPressed(false),
+    touchSimulateMouse(true),
     mouseWheelDelta(0),
     windowHasFocus(true),
     disableInputWhenNotFocused(true)

@@ -529,6 +529,10 @@ void RuntimeSpriteObject::FlipY(bool flip)
 
 bool RuntimeSpriteObject::CursorOnObject(RuntimeScene & scene, bool accurate)
 {
+    #if defined(ANDROID) //TODO: Accurate test leads to strange result with touches.
+    accurate = false;
+    #endif
+
     RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
     auto insideObject = [this, accurate](const sf::Vector2f & pos) {
         if (GetDrawableX() <= pos.x

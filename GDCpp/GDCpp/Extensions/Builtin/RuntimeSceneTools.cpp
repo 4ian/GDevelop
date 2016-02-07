@@ -278,6 +278,9 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
     if ( windowWidth == scene.renderWindow->getSize().x && windowHeight == scene.renderWindow->getSize().y )
         return;
 
+    #if defined(ANDROID)
+    return; //The size of the window is always the same.
+    #endif
 
     scene.renderWindow->create(
         sf::VideoMode( windowWidth, windowHeight, 32 ),
@@ -306,18 +309,26 @@ void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen, bool)
 }
 unsigned int GD_API GetSceneWindowWidth(RuntimeScene & scene)
 {
+    #if defined(ANDROID)
+    return scene.game->GetMainWindowDefaultWidth();
+    #else
     if ( scene.renderWindow != NULL )
         return scene.renderWindow->getSize().x;
 
     return 0;
+    #endif
 }
 
 unsigned int GD_API GetSceneWindowHeight(RuntimeScene & scene)
 {
+    #if defined(ANDROID)
+    return scene.game->GetMainWindowDefaultHeight();
+    #else
     if ( scene.renderWindow != NULL )
         return scene.renderWindow->getSize().y;
 
     return 0;
+    #endif
 }
 
 unsigned int GD_API GetScreenWidth()

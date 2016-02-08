@@ -107,6 +107,10 @@ gdjs.ImageManager.prototype.loadTextures = function(onProgress, onComplete, reso
 
     			files[file].forEach(function(res) {
     				that._loadedTextures.put(res.name, loadedFiles[file].texture);
+                    if (!res.smoothed) {
+                        loadedFiles[file].texture.baseTexture.scaleMode =
+                            PIXI.SCALE_MODES.NEAREST;
+                    }
     			});
     		}
     	}

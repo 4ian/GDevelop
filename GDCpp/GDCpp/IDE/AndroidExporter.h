@@ -7,6 +7,17 @@ class wxProgressDialog;
 
 /**
  * \brief Allow to export a game for Android
+ * \todo Highly experimental
+ *
+ * To try it, replace the exporter in CppPlatform::GetProjectExporter and
+ * export your game with GDevelop. Be sure to have the Android SDK and NDK
+ * installed. [Build SFML](https://github.com/SFML/SFML/wiki/Tutorial:-Building-SFML-for-Android)
+ * for Android NDK. Finally, go in the exported folder and do:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~
+ * ndk-build && ant debug #To build the APK.
+ * adb install bin/NativeActivity-debug.apk #To run it on simulator/device.
+ * ~~~~~~~~~~~~~~~~~~~~~
  */
 class AndroidExporter : public gd::ProjectExporter
 {

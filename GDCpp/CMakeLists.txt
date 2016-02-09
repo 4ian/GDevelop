@@ -82,7 +82,7 @@ IF (NOT NO_GUI)
 	list(APPEND ide_source_files ${source_gdcpp_ide_dialogs})
 ENDIF()
 
-file(GLOB_RECURSE exe_source_files Runtime/*)
+file(GLOB exe_source_files Runtime/*)
 
 add_library(GDCpp SHARED ${ide_source_files})
 set_target_properties(GDCpp PROPERTIES COMPILE_DEFINITIONS "${GDCpp_extra_definitions}")

@@ -13,7 +13,7 @@
 #include "GDCpp/Runtime/RuntimeVariablesContainer.h"
 #include "GDCpp/Runtime/Force.h"
 #include "GDCpp/Runtime/String.h"
-namespace gd { class Behavior; }
+#include "GDCpp/Runtime/Project/Behavior.h"
 namespace gd { class InitialInstance; }
 namespace gd { class Object; }
 namespace sf { class RenderTarget; }

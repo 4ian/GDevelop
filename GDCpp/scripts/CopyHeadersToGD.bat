@@ -38,7 +38,7 @@ IF EXIST "%MINGW_DIR%" (
 :createPCH
 IF NOT EXIST "%destDir%\MinGW32\bin\g++.exe" goto :end
 echo Precompiling headers: GDCpp/EventsPrecompiledHeader.h.pch
-"%destDir%\MinGW32\bin\g++.exe" -std=c++11 -DGD_API=__declspec(dllimport) -DGD_CORE_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEV -DNDEBUG -I%destDir%\include/TDM-GCC-4.9.2/include  -I%destDir%\include/TDM-GCC-4.9.2/lib/gcc/mingw32/4.9.2/include -I%destDir%\include\TDM-GCC-4.9.2/lib/gcc/mingw32/4.9.2/include/c++ -I%destDir%\include\TDM-GCC-4.9.2/lib/gcc/mingw32/4.9.2/include/c++/mingw32 -I%destDir%\include/llvm/tools/clang/lib/Headers -I%destDir%\include/llvm/include -I%destDir%\include/llvm/build-tdmgcc49-release/include -I%destDir%\include/GDCpp -I%destDir%\include/Core -I%destDir%\include\SFML/include -x c++-header %destDir%\include/GDCpp/GDCpp/EventsPrecompiledHeader.h -o %destDir%\include/GDCpp/GDCpp/EventsPrecompiledHeader.h.pch
+"%destDir%\MinGW32\bin\g++.exe" -std=c++11 -DGD_API=__declspec(dllimport) -DGD_CORE_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEV -DNDEBUG -I%destDir%\include/TDM-GCC-4.9.2/include  -I%destDir%\include/TDM-GCC-4.9.2/lib/gcc/mingw32/4.9.2/include -I%destDir%\include\TDM-GCC-4.9.2/lib/gcc/mingw32/4.9.2/include/c++ -I%destDir%\include\TDM-GCC-4.9.2/lib/gcc/mingw32/4.9.2/include/c++/mingw32 -I%destDir%\include/llvm/tools/clang/lib/Headers -I%destDir%\include/llvm/include -I%destDir%\include/llvm/build-tdmgcc49-release/include -I%destDir%\Sources/GDCpp -I%destDir%\Sources/Core -I%destDir%\include\SFML/include -x c++-header %destDir%\Sources/GDCpp/GDCpp/Runtime/EventsPrecompiledHeader.h -o %destDir%\Sources/GDCpp/GDCpp/Runtime/EventsPrecompiledHeader.h.pch
 
 :end
 echo Done.

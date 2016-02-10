@@ -100,12 +100,12 @@ int main(int argc, char *argv[])
         abort = true;
     });
     sceneStack.OnLoadScene([](std::shared_ptr<RuntimeScene> scene) {
-        void * function = NULL;
+        int (*function)(RuntimeContext*) = nullptr;
         /* GDCPP_EVENTS_ASSIGNMENTS */
 
         if (function)
         {
-            scene->GetCodeExecutionEngine()->LoadFunction(&function);
+            scene->GetCodeExecutionEngine()->LoadFunction(function);
             return true;
         }
 

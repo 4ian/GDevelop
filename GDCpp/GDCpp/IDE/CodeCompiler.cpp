@@ -93,6 +93,7 @@ gd::String CodeCompilerCall::GetFullCall() const
         standardsIncludeDirs.push_back("CppPlatform/Sources/Core");
         standardsIncludeDirs.push_back("CppPlatform/include/SFML/include");
         standardsIncludeDirs.push_back("CppPlatform/Sources/");
+        standardsIncludeDirs.push_back("CppPlatform/Sources/Extensions");
 
         for (std::size_t i =0;i<standardsIncludeDirs.size();++i)
             args.push_back("-I\""+baseDir+standardsIncludeDirs[i]+"\"");

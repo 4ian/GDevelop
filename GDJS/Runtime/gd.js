@@ -54,35 +54,6 @@ gdjs.toDegrees = function(angleInRadians) {
 };
 
 /**
- * Get the height of the document ( or of the viewport ) displayed in browser
- * @method getDocHeight
- * @static
- */
-gdjs.getDocHeight = function() {
-    //Nice snippet from http://james.padolsey.com/javascript/get-document-height-cross-browser/
-    var D = document;
-    return Math.max(
-        D.body.scrollHeight, D.documentElement.scrollHeight,
-        D.body.offsetHeight, D.documentElement.offsetHeight,
-        D.body.clientHeight, D.documentElement.clientHeight
-    );
-};
-
-/**
- * Get the width of the document ( or of the viewport ) displayed in browser
- * @method getDocWidth
- * @static
- */
-gdjs.getDocWidth = function() {
-    var D = document;
-    return Math.max(
-        D.body.scrollWidth, D.documentElement.scrollWidth,
-        D.body.offsetWidth, D.documentElement.offsetWidth,
-        D.body.clientWidth, D.documentElement.clientWidth
-    );
-};
-
-/**
  * Iterate over an array: func is called on each member of the array.<br>
  * <br>
  * Note that func must not remove elements from the array. If func

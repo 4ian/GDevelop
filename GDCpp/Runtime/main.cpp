@@ -178,7 +178,7 @@ int main( int argc, char *p_argv[] )
     runtimeGame.LoadFromProject(game);
 
     window.create(sf::VideoMode(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32),
-        "", sf::Style::Close);
+        "", sf::Style::Close, sf::ContextSettings(24, 8));
     window.setActive(true);
 
     //Game main loop

@@ -149,15 +149,15 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
 
         //...and pass it to the sf::RenderWindow.
         #if GTK_CHECK_VERSION(3, 0, 0)
-        sf::RenderWindow::create(GDK_WINDOW_XID(win));
+        sf::RenderWindow::create(GDK_WINDOW_XID(win), sf::ContextSettings(24, 8));
         #else
-        sf::RenderWindow::create(GDK_WINDOW_XWINDOW(win));
+        sf::RenderWindow::create(GDK_WINDOW_XWINDOW(win), sf::ContextSettings(24, 8));
         #endif
 
     #else
 
         // Tested under Windows XP only (should work with X11 and other Windows versions - no idea about MacOS)
-        sf::RenderWindow::create(static_cast<sf::WindowHandle>(GetHandle()));
+        sf::RenderWindow::create(static_cast<sf::WindowHandle>(GetHandle()), sf::ContextSettings(24, 8));
 
     #endif
 

@@ -48,7 +48,8 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
     for (var i = 0;i < this._borderSprites.length;++i) {
         this._spritesContainer.addChild(this._borderSprites[i]);
     }
-    runtimeScene.getLayer("").addChildToPIXIContainer(this._spritesContainer, this.zOrder);
+
+    runtimeScene.getLayer("").getRenderer().addChildToPIXIContainer(this._spritesContainer, this.zOrder);
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );

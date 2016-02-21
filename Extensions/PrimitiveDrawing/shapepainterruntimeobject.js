@@ -25,7 +25,7 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, objectData)
     this._outlineSize = objectData.outlineSize;
     this._absoluteCoordinates = objectData.absoluteCoordinates;
 
-    runtimeScene.getLayer("").addChildToPIXIContainer(this._graphics, this.zOrder);
+    runtimeScene.getLayer("").getRenderer().addChildToPIXIContainer(this._graphics, this.zOrder);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );

@@ -185,7 +185,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
         this._sprite = new PIXI.Sprite(runtimeScene.getGame().getImageManager().getInvalidPIXITexture());
 
     var layer = runtimeScene.getLayer("");
-    if (layer) layer.addChildToPIXIContainer(this._sprite, this.zOrder);
+    if (layer) layer.getRenderer().addChildToPIXIContainer(this._sprite, this.zOrder);
 
 	this._updatePIXITexture();
 	this._updatePIXISprite();

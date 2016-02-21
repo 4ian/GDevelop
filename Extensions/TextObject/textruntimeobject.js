@@ -41,7 +41,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
 gdjs.TextRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.TextRuntimeObject.thisIsARuntimeObjectConstructor = "TextObject::Text";
 
-gdjs.TextRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+gdjs.TextRuntimeObject.prototype.exposeRendererObject = function(cb) {
     cb(this._text);
 };
 

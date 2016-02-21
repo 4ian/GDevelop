@@ -55,7 +55,7 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
 gdjs.PanelSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.PanelSpriteRuntimeObject.thisIsARuntimeObjectConstructor = "PanelSpriteObject::PanelSprite";
 
-gdjs.PanelSpriteRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+gdjs.PanelSpriteRuntimeObject.prototype.exposeRendererObject = function(cb) {
     cb(this._spritesContainer);
 };
 

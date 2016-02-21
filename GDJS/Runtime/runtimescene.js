@@ -231,7 +231,7 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
 
-			object.exposePIXIDisplayObject(object.isHidden() ? hide : show);
+			object.exposeRendererObject(object.isHidden() ? hide : show);
 		}
 
 		return;
@@ -257,14 +257,14 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 			if (!cameraCoords) continue;
 
 			if (object.isHidden()) {
-				object.exposePIXIDisplayObject(hide);
+				object.exposeRendererObject(hide);
 			} else {
 				var aabb = object.getAABB();
 				if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
 					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
-					object.exposePIXIDisplayObject(hide);
+					object.exposeRendererObject(hide);
 				} else {
-					object.exposePIXIDisplayObject(show);
+					object.exposeRendererObject(show);
 				}
 			}
 		}

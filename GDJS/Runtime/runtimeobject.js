@@ -140,7 +140,7 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
  */
 gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
     var theLayer = runtimeScene.getLayer(this.layer);
-    this.exposePIXIDisplayObject(function(displayObject) {
+    this.exposeRendererObject(function(displayObject) {
         theLayer.getRenderer().removePIXIContainerChild(displayObject);
     });
 };
@@ -148,13 +148,13 @@ gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
 //Rendering:
 
 /**
- * Called with a callback function that should be called for
- * each PIXI.DisplayObject used by the object
+ * Called with a callback function that should be called with the internal
+ * object used for rendering by the object (PIXI.DisplayObject...)
  *
- * @method exposePIXIDisplayObject
- * @param cb The callback to be called with a PIXI.DisplayObject
+ * @method exposeRendererObject
+ * @param cb The callback to be called with the internal rendered object (PIXI.DisplayObject...)
  */
-gdjs.RuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+gdjs.RuntimeObject.prototype.exposeRendererObject = function(cb) {
 };
 
 //Common properties:
@@ -339,7 +339,7 @@ gdjs.RuntimeObject.prototype.setLayer = function(layer) {
 
     var theLayer = this._runtimeScene.getLayer(this.layer);
     var that = this;
-    this.exposePIXIDisplayObject(function (displayObject) {
+    this.exposeRendererObject(function (displayObject) {
         theLayer.getRenderer().removePIXIContainerChild(displayObject);
         theLayer.getRenderer().addChildToPIXIContainer(displayObject, that.zOrder);
     });
@@ -378,7 +378,7 @@ gdjs.RuntimeObject.prototype.setZOrder = function(z) {
     this.zOrder = z;
 
     var theLayer = this._runtimeScene.getLayer(this.layer);
-    this.exposePIXIDisplayObject(function(displayObject) {
+    this.exposeRendererObject(function(displayObject) {
         theLayer.getRenderer().changePIXIContainerChildZOrder(displayObject, z);
     });
 };

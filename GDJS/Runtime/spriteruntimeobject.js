@@ -301,7 +301,7 @@ gdjs.SpriteRuntimeObject.prototype.updateTime = function(elapsedTime) {
     if ( this._spriteDirty ) this._updatePIXISprite();
 };
 
-gdjs.SpriteRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+gdjs.SpriteRuntimeObject.prototype.exposeRendererObject = function(cb) {
     cb(this._sprite);
 };
 

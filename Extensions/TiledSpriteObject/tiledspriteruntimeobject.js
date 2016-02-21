@@ -32,7 +32,7 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
 gdjs.TiledSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.TiledSpriteRuntimeObject.thisIsARuntimeObjectConstructor = "TiledSpriteObject::TiledSprite";
 
-gdjs.TiledSpriteRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+gdjs.TiledSpriteRuntimeObject.prototype.exposeRendererObject = function(cb) {
     cb(this._tiledSprite);
 };
 

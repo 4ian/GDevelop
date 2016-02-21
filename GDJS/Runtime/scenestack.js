@@ -4,12 +4,7 @@ gdjs.SceneStack = function(runtimeGame) {
     }
 
     this._runtimeGame = runtimeGame;
-    this._pixiRenderer = null;
 	this._stack = [];
-};
-
-gdjs.SceneStack.prototype.setPixiRenderer = function(pixiRenderer) {
-    this._pixiRenderer = pixiRenderer;
 };
 
 gdjs.SceneStack.prototype.onRendererResized = function() {
@@ -51,7 +46,7 @@ gdjs.SceneStack.prototype.pop = function() {
 };
 
 gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
-    var newScene = new gdjs.RuntimeScene(this._runtimeGame, this._pixiRenderer);
+    var newScene = new gdjs.RuntimeScene(this._runtimeGame);
     newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));
 
     //Optionally create the objects from an external layout.

@@ -1,5 +1,3 @@
-/* @flow weak */
-
 gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer)
 {
     this._pixiContainer = new PIXI.Container();

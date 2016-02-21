@@ -11,7 +11,7 @@
  * @param {gdjs.RuntimeGame} runtimeGame The game associated to this scene.
  * @param {PIXI.WebGLRenderer|PIXI.CanvasRenderer} pixiRenderer The renderer to be used
  */
-gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
+gdjs.RuntimeScene = function(runtimeGame)
 {
     this._eventsFunction = null;
     this._instances = new Hashtable(); //Contains the instances living on the scene
@@ -20,7 +20,8 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._objectsCtor = new Hashtable();
     this._layers = new Hashtable();
 	this._initialBehaviorSharedData = new Hashtable();
-    this._renderer = new gdjs.RuntimeScenePixiRenderer(this, pixiRenderer);
+    this._renderer = new gdjs.RuntimeScenePixiRenderer(this,
+        runtimeGame ? runtimeGame.getRenderer() : null);
     this._variables = new gdjs.VariablesContainer();
     this._runtimeGame = runtimeGame;
     this._lastId = 0;

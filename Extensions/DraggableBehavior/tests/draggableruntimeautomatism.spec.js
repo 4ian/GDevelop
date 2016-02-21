@@ -1,7 +1,7 @@
 
 describe('gdjs.DraggableRuntimeBehavior', function() {
 	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
-	var runtimeScene = new gdjs.RuntimeScene(runtimeGame, null);
+	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 	runtimeScene.loadFromScene({
 		layers:[{name:"", visibility: true}],
 		variables: [],

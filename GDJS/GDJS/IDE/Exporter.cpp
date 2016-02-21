@@ -221,6 +221,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "libs/howler.min.js");
     InsertUnique(includesFiles, "gd.js");
     InsertUnique(includesFiles, "libs/hshg.js");
+    InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/layer-pixi-renderer.js");
     InsertUnique(includesFiles, "commontools.js");

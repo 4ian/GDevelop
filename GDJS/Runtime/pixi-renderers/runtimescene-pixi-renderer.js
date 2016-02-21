@@ -1,7 +1,8 @@
 
-gdjs.RuntimeScenePixiRenderer = function(runtimeScene, pixiRenderer)
+gdjs.RuntimeScenePixiRenderer = function(runtimeScene, runtimeGameRenderer)
 {
-    this._pixiRenderer = pixiRenderer;
+    this._pixiRenderer = runtimeGameRenderer ?
+        runtimeGameRenderer.getPIXIRenderer() : null;
     this._runtimeScene = runtimeScene;
     this._pixiContainer = new PIXI.Container(); //The Container meant to contains all pixi objects of the scene.
 }

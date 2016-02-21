@@ -20,8 +20,7 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._objectsCtor = new Hashtable();
     this._layers = new Hashtable();
 	this._initialBehaviorSharedData = new Hashtable();
-    this._pixiRenderer = pixiRenderer;
-    this._pixiContainer = new PIXI.Container(); //The Container meant to contains all pixi objects of the scene.
+    this._renderer = new gdjs.RuntimeScenePixiRenderer(this, pixiRenderer);
     this._variables = new gdjs.VariablesContainer();
     this._runtimeGame = runtimeGame;
     this._lastId = 0;
@@ -33,9 +32,7 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
-    if (this._pixiRenderer) {
-    	this.onCanvasResized();
-    }
+    this.onCanvasResized();
 };
 
 /**
@@ -45,8 +42,7 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
  * @method onCanvasResized
  */
 gdjs.RuntimeScene.prototype.onCanvasResized = function() {
-    this._pixiContainer.scale.x = this._pixiRenderer.width / this._runtimeGame.getDefaultWidth();
-    this._pixiContainer.scale.y = this._pixiRenderer.height / this._runtimeGame.getDefaultHeight();
+    this._renderer.onCanvasResized();
 };
 
 /**
@@ -209,11 +205,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
  * @method render
  */
 gdjs.RuntimeScene.prototype.render = function() {
-	if (!this._pixiRenderer) return;
-
-	// render the PIXI container of the scene
-	this._pixiRenderer.backgroundColor = this._backgroundColor;
-	this._pixiRenderer.render(this._pixiContainer);
+	this._renderer.render();
 };
 
 /**
@@ -370,10 +362,12 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
  * @method setBackgroundColor
  */
 gdjs.RuntimeScene.prototype.setBackgroundColor = function(r,g,b) {
-	if (!this._pixiRenderer) return;
-
 	this._backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
 };
+
+gdjs.RuntimeScene.prototype.getBackgroundColor = function() {
+    return this._backgroundColor;
+}
 
 /**
  * Get the name of the scene.
@@ -509,19 +503,11 @@ gdjs.RuntimeScene.prototype.createNewUniqueId = function() {
 };
 
 /**
- * Get the PIXI renderer associated to the RuntimeScene.
- * @method getPIXIRenderer
+ * Get the renderer associated to the RuntimeScene.
+ * @method getRenderer
  */
-gdjs.RuntimeScene.prototype.getPIXIRenderer = function() {
-	return this._pixiRenderer;
-};
-
-/**
- * Get the PIXI Container associated to the RuntimeScene.
- * @method getPIXIContainer
- */
-gdjs.RuntimeScene.prototype.getPIXIContainer = function() {
-	return this._pixiContainer;
+gdjs.RuntimeScene.prototype.getRenderer = function() {
+	return this._renderer;
 };
 
 /**

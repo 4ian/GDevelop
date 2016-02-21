@@ -215,12 +215,13 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
 {
     fs.MkDir(outputDir);
 
-    //First, do not forget common includes ( They must be included before events generated code files ).
+    //First, do not forget common includes (they must be included before events generated code files).
     InsertUnique(includesFiles, "libs/pixi.js");
     InsertUnique(includesFiles, "libs/jshashtable.js");
     InsertUnique(includesFiles, "libs/howler.min.js");
     InsertUnique(includesFiles, "gd.js");
     InsertUnique(includesFiles, "libs/hshg.js");
+    InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
     InsertUnique(includesFiles, "commontools.js");
     InsertUnique(includesFiles, "inputmanager.js");
     InsertUnique(includesFiles, "timemanager.js");
@@ -428,6 +429,7 @@ bool Exporter::ExportWholeProject(gd::Project & project, gd::String exportDir,
         fs.MkDir(exportDir);
         fs.ClearDir(exportDir);
         fs.MkDir(exportDir+"/libs");
+        fs.MkDir(exportDir+"/pixi-renderers");
         fs.MkDir(exportDir+"/Extensions");
         std::vector<gd::String> includesFiles;
 

@@ -26,14 +26,14 @@ gdjs.Layer = function(layerData, runtimeScene)
     this._cameraRotation = 0;
     this._zoomFactor = 1;
     this._hidden = !layerData.visibility;
-    this._pixiRenderer = runtimeScene.getPIXIRenderer();
-    this._pixiContainer = new PIXI.Container(); //The container of the layer
+    this._pixiRenderer = runtimeScene.getRenderer()._pixiRenderer; //TODO: Hardcoded PIXI
+    this._pixiContainer = new PIXI.Container(); //The container of the layer  //TODO: Hardcoded PIXI
     this._cameraX = runtimeScene.getGame().getDefaultWidth()/2;
     this._cameraY = runtimeScene.getGame().getDefaultHeight()/2;
     this._defaultWidth = runtimeScene.getGame().getDefaultWidth();
     this._defaultHeight = runtimeScene.getGame().getDefaultHeight();
 
-    runtimeScene.getPIXIContainer().addChild(this._pixiContainer);
+    runtimeScene.getRenderer()._pixiContainer.addChild(this._pixiContainer); //TODO: Hardcoded PIXI
     this.show(!this._hidden);
 };
 
@@ -256,4 +256,3 @@ gdjs.Layer.prototype.convertCoords = function(x,y, cameraId) {
 
 	return [x+this.getCameraX(cameraId), y+this.getCameraY(cameraId)];
 };
-

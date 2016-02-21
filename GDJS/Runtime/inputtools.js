@@ -186,11 +186,11 @@ gdjs.evtTools.input.isMouseButtonReleased = function(runtimeScene, button) {
 };
 
 gdjs.evtTools.input.hideCursor = function(runtimeScene) {
-    runtimeScene.getPIXIRenderer().view.style.cursor = 'none';
+    runtimeScene.getRenderer().hideCursor();
 };
 
 gdjs.evtTools.input.showCursor = function(runtimeScene) {
-    runtimeScene.getPIXIRenderer().view.style.cursor = '';
+    runtimeScene.getRenderer().showCursor();
 };
 
 gdjs.evtTools.input.getMouseWheelDelta = function(runtimeScene) {

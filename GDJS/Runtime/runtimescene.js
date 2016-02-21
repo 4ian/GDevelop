@@ -38,7 +38,7 @@ gdjs.RuntimeScene = function(runtimeGame)
 
 /**
  * Should be called when the canvas where the scene is rendered has been resized.
- * See gdjs.RuntimeGame.startStandardGameLoop in particular.
+ * See gdjs.RuntimeGame.startGameLoop in particular.
  *
  * @method onCanvasResized
  */

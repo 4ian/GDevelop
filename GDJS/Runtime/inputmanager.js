@@ -287,7 +287,7 @@ gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
  * Notify the input manager that the frame ended, so anything that last
  * only for one frame (started/ended touches) should be reset.
  *
- * This method should be called in the game loop (see gdjs.RuntimeGame.startStandardGameLoop).
+ * This method should be called in the game loop (see gdjs.RuntimeGame.startGameLoop).
  * @method onFrameEnded
  */
 gdjs.InputManager.prototype.onFrameEnded = function() {

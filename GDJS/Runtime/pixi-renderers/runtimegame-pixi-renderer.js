@@ -311,6 +311,14 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, wi
     });
 };
 
+gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function(fn) {
+    requestAnimationFrame(gameLoop);
+
+    function gameLoop() {
+        if (fn()) requestAnimationFrame(gameLoop);
+    }
+}
+
 gdjs.RuntimeGamePixiRenderer.prototype.getPIXIRenderer = function() {
     return this._pixiRenderer;
 }

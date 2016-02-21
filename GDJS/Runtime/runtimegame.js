@@ -39,7 +39,7 @@ gdjs.RuntimeGame = function(data, spec)
         this._defaultWidth, this._defaultHeight,
         spec.forceFullscreen || false);
 
-    //Game loop management (see startStandardGameLoop method)
+    //Game loop management (see startGameLoop method)
     this._sceneStack = new gdjs.SceneStack(this);
     this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
 
@@ -245,7 +245,7 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
     });
 };
 
-gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
+gdjs.RuntimeGame.prototype.startGameLoop = function() {
     if ( !this.hasScene() ) {
         console.log("The game has no scene.");
         return;
@@ -268,11 +268,9 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
     console.log("Took", time, "ms");
     return;*/
 
-    requestAnimationFrame(gameLoop);
-
     //The standard game loop
     var that = this;
-    function gameLoop() {
+    this._renderer.startGameLoop(function() {
         //Manage resize events.
         if (that._notifySceneForResize) {
             that._sceneStack.onRendererResized();
@@ -281,8 +279,10 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
 
         //Render and step the scene.
         if (that._sceneStack.step()) {
-            requestAnimationFrame(gameLoop);
             that.getInputManager().onFrameEnded();
+            return true;
         }
-    }
+
+        return false;
+    });
 };

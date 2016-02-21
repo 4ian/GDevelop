@@ -224,6 +224,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/layer-pixi-renderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/pixi-image-manager.js");
     InsertUnique(includesFiles, "commontools.js");
     InsertUnique(includesFiles, "inputmanager.js");
     InsertUnique(includesFiles, "timemanager.js");
@@ -234,7 +235,6 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "force.js");
     InsertUnique(includesFiles, "layer.js");
     InsertUnique(includesFiles, "timer.js");
-    InsertUnique(includesFiles, "imagemanager.js");
     InsertUnique(includesFiles, "runtimegame.js");
     InsertUnique(includesFiles, "variable.js");
     InsertUnique(includesFiles, "variablescontainer.js");

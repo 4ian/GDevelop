@@ -365,7 +365,7 @@ bool Exporter::ExportIncludesAndLibs(std::vector<gd::String> & includesFiles, gd
         {
             if ( fs.FileExists("./JsPlatform/Runtime/"+*include) )
             {
-                gd::String path = fs.DirNameFrom(exportDir+"/Extensions/"+*include);
+                gd::String path = fs.DirNameFrom(exportDir+"/"+*include);
                 if ( !fs.DirExists(path) ) fs.MkDir(path);
 
                 fs.CopyFile("./JsPlatform/Runtime/"+*include, exportDir+"/"+*include);

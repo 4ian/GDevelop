@@ -26,7 +26,7 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
     this._xOffset = 0;
     this._yOffset = 0;
 
-    runtimeScene.getLayer("").getRenderer().addChildToPIXIContainer(this._tiledSprite, this.zOrder);
+    runtimeScene.getLayer("").getRenderer().addRendererObject(this._tiledSprite, this.zOrder);
 };
 
 gdjs.TiledSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );

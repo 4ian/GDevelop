@@ -30,7 +30,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     if ( this._text === undefined ) this._text = new PIXI.Text(" ", {align:"left"});
     this._text.anchor.x = 0.5;
     this._text.anchor.y = 0.5;
-    runtimeScene.getLayer("").getRenderer().addChildToPIXIContainer(this._text, this.zOrder);
+    runtimeScene.getLayer("").getRenderer().addRendererObject(this._text, this.zOrder);
 
     this._text.text = this._str.length === 0 ? " " : this._str;
     this._justCreated = true; //Work around a PIXI.js bug. See updateTime method.

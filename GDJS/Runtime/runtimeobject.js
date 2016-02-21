@@ -141,7 +141,7 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
 gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
     var theLayer = runtimeScene.getLayer(this.layer);
     this.exposeRendererObject(function(displayObject) {
-        theLayer.getRenderer().removePIXIContainerChild(displayObject);
+        theLayer.getRenderer().removeRendererObject(displayObject);
     });
 };
 
@@ -340,8 +340,8 @@ gdjs.RuntimeObject.prototype.setLayer = function(layer) {
     var theLayer = this._runtimeScene.getLayer(this.layer);
     var that = this;
     this.exposeRendererObject(function (displayObject) {
-        theLayer.getRenderer().removePIXIContainerChild(displayObject);
-        theLayer.getRenderer().addChildToPIXIContainer(displayObject, that.zOrder);
+        theLayer.getRenderer().removeRendererObject(displayObject);
+        theLayer.getRenderer().addRendererObject(displayObject, that.zOrder);
     });
 };
 
@@ -379,7 +379,7 @@ gdjs.RuntimeObject.prototype.setZOrder = function(z) {
 
     var theLayer = this._runtimeScene.getLayer(this.layer);
     this.exposeRendererObject(function(displayObject) {
-        theLayer.getRenderer().changePIXIContainerChildZOrder(displayObject, z);
+        theLayer.getRenderer().changeRendererObjectZOrder(displayObject, z);
     });
 };
 

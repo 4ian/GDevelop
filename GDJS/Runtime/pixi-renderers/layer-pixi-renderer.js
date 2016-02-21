@@ -39,11 +39,11 @@ gdjs.LayerPixiRenderer.prototype.updateVisibility = function(visible) {
  * Add a child to the pixi container associated to the layer.
  * All objects which are on this layer must be children of this container.
  *
- * @method addChildToPIXIContainer
- * @param child The child ( PIXI object ) to be added.
+ * @method addRendererObject
+ * @param child The child (PIXI object) to be added.
  * @param zOrder The z order of the associated object.
  */
-gdjs.LayerPixiRenderer.prototype.addChildToPIXIContainer = function(child, zOrder) {
+gdjs.LayerPixiRenderer.prototype.addRendererObject = function(child, zOrder) {
 	child.zOrder = zOrder; //Extend the pixi object with a z order.
 
 	for( var i = 0, len = this._pixiContainer.children.length; i < len;++i) {
@@ -58,22 +58,22 @@ gdjs.LayerPixiRenderer.prototype.addChildToPIXIContainer = function(child, zOrde
 /**
  * Change the z order of a child associated to an object.
  *
- * @method changePIXIContainerChildZOrder
- * @param child The child ( PIXI object ) to be modified.
+ * @method changeRendererObjectZOrder
+ * @param child The child (PIXI object) to be modified.
  * @param newZOrder The z order of the associated object.
  */
-gdjs.LayerPixiRenderer.prototype.changePIXIContainerChildZOrder = function(child, newZOrder) {
+gdjs.LayerPixiRenderer.prototype.changeRendererObjectZOrder = function(child, newZOrder) {
 	this._pixiContainer.removeChild(child);
-	this.addChildToPIXIContainer(child, newZOrder);
+	this.addRendererObject(child, newZOrder);
 };
 
 /**
  * Remove a child from the internal pixi container.
  * Should be called when an object is deleted or removed from the layer.
  *
- * @method removePIXIContainerChild
- * @param child The child ( PIXI object ) to be removed.
+ * @method removeRendererObject
+ * @param child The child (PIXI object) to be removed.
  */
-gdjs.LayerPixiRenderer.prototype.removePIXIContainerChild = function(child) {
+gdjs.LayerPixiRenderer.prototype.removeRendererObject = function(child) {
 	this._pixiContainer.removeChild(child);
 };

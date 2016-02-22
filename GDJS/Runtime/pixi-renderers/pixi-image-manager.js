@@ -18,6 +18,8 @@ gdjs.PixiImageManager = function(resources)
     this._loadedTextures = new Hashtable();
 };
 
+gdjs.ImageManager = gdjs.PixiImageManager; //Register the class to let the engine use it.
+
 /**
  * Return the PIXI texture associated to the specified name.
  * Returns a placeholder texture if not found.

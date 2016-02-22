@@ -17,25 +17,15 @@ gdjs.RuntimeGame = function(data, spec)
 {
     spec = spec || {};
 
-    //Safety check: Do gdjs initialization if not already done
-    if ( gdjs.objectsTypes.keys.length === 0)
-        gdjs.registerObjects();
-    if ( gdjs.behaviorsTypes.keys.length === 0)
-        gdjs.registerBehaviors();
-    if ( gdjs.callbacksRuntimeSceneLoaded.length === 0 &&
-         gdjs.callbacksRuntimeSceneUnloaded.length === 0 &&
-         gdjs.callbacksObjectDeletedFromScene.length === 0)
-        gdjs.registerGlobalCallbacks();
-
     this._variables = new gdjs.VariablesContainer(data.variables);
     this._data = data;
-    this._imageManager = new gdjs.PixiImageManager(data.resources ? data.resources.resources : undefined);
+    this._imageManager = new gdjs.ImageManager(data.resources ? data.resources.resources : undefined);
     this._soundManager = new gdjs.SoundManager(data.resources ? data.resources.resources : undefined);
     this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
     this._defaultWidth = data.properties.windowWidth; //Default size for scenes cameras
     this._defaultHeight = data.properties.windowHeight;
-    this._renderer = new gdjs.RuntimeGamePixiRenderer(this,
+    this._renderer = new gdjs.RuntimeGameRenderer(this,
         this._defaultWidth, this._defaultHeight,
         spec.forceFullscreen || false);
 
@@ -220,7 +210,7 @@ gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
  * @method loadAllAssets
  */
 gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
-    var loadingScreen = new gdjs.LoadingScreenPixiRenderer(this.getRenderer());
+    var loadingScreen = new gdjs.LoadingScreenRenderer(this.getRenderer());
     var allAssetsTotal = this._data.resources.resources.length;
 
     var that = this;

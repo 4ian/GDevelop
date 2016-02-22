@@ -7,6 +7,8 @@ gdjs.RuntimeScenePixiRenderer = function(runtimeScene, runtimeGameRenderer)
     this._pixiContainer = new PIXI.Container(); //The Container meant to contains all pixi objects of the scene.
 }
 
+gdjs.RuntimeSceneRenderer = gdjs.RuntimeScenePixiRenderer; //Register the class to let the engine use it.
+
 gdjs.RuntimeScenePixiRenderer.prototype.onCanvasResized = function() {
     if (!this._pixiRenderer) return;
 

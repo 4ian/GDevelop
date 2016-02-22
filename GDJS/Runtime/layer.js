@@ -24,7 +24,7 @@ gdjs.Layer = function(layerData, runtimeScene)
     this._width = runtimeScene.getGame().getDefaultWidth();
     this._height = runtimeScene.getGame().getDefaultHeight();
 
-    this._renderer = new gdjs.LayerPixiRenderer(this, runtimeScene.getRenderer());
+    this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
     this.show(!this._hidden);
 };
 

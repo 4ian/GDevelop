@@ -20,7 +20,7 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._objectsCtor = new Hashtable();
     this._layers = new Hashtable();
 	this._initialBehaviorSharedData = new Hashtable();
-    this._renderer = new gdjs.RuntimeScenePixiRenderer(this,
+    this._renderer = new gdjs.RuntimeSceneRenderer(this,
         runtimeGame ? runtimeGame.getRenderer() : null);
     this._variables = new gdjs.VariablesContainer();
     this._runtimeGame = runtimeGame;

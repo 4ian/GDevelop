@@ -180,9 +180,9 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     this._animationFrame = null;
 
     if (this._renderer)
-        gdjs.SpriteRuntimeObjectPixiRenderer.call(this._renderer, this, runtimeScene);
+        gdjs.SpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
     else
-        this._renderer = new gdjs.SpriteRuntimeObjectPixiRenderer(this, runtimeScene);
+        this._renderer = new gdjs.SpriteRuntimeObjectRenderer(this, runtimeScene);
 
     this._updateFrame();
 };

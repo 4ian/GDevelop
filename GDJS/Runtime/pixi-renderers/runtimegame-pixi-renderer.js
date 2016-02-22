@@ -22,6 +22,8 @@ gdjs.RuntimeGamePixiRenderer = function(game, width, height, forceFullscreen)
     }
 }
 
+gdjs.RuntimeGameRenderer = gdjs.RuntimeGamePixiRenderer; //Register the class to let the engine use it.
+
 /**
  * Create a standard canvas inside canvasArea.
  *

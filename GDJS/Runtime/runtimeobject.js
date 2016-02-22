@@ -151,6 +151,8 @@ gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
  * Called with a callback function that should be called with the internal
  * object used for rendering by the object (PIXI.DisplayObject...)
  *
+ * @TODO: This should be removed in favor of getRenderer.
+ *
  * @method exposeRendererObject
  * @param cb The callback to be called with the internal rendered object (PIXI.DisplayObject...)
  */

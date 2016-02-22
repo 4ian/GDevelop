@@ -220,25 +220,16 @@ gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
  * @method loadAllAssets
  */
 gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
-    //Prepare the progress text
-    var pixiRenderer = this.getRenderer().getPIXIRenderer();
-    var loadingScreen = new PIXI.Container();
-    var text = new PIXI.Text(" ", {font: "bold 60px Arial", fill: "#FFFFFF", align: "center"});
-    loadingScreen.addChild(text);
-    text.position.y = pixiRenderer.height/2;
-
+    var loadingScreen = new gdjs.LoadingScreenPixiRenderer(this.getRenderer());
     var allAssetsTotal = this._data.resources.resources.length;
 
     var that = this;
     this._imageManager.loadTextures(function (count, total) {
-        text.text = Math.floor(count / allAssetsTotal * 100) + "%";
-        text.position.x = pixiRenderer.width/2-text.width/2;
-        pixiRenderer.render(loadingScreen);
+        loadingScreen.render(Math.floor(count / allAssetsTotal * 100));
     }, function() {
         that._soundManager.preloadAudio(function (count, total) {
-            text.text = Math.floor((allAssetsTotal - total + count) / allAssetsTotal * 100) + "%";
-            text.position.x = pixiRenderer.width/2-text.width/2;
-            pixiRenderer.render(loadingScreen);
+            loadingScreen.render(Math.floor((allAssetsTotal - total + count)
+                / allAssetsTotal * 100));
         }, function() {
             callback();
         });

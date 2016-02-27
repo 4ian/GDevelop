@@ -337,13 +337,15 @@ gdjs.RuntimeObject.prototype.getAngle = function() {
  */
 gdjs.RuntimeObject.prototype.setLayer = function(layer) {
     if (layer === this.layer) return;
-    this.layer = layer;
+    var oldLayer = this._runtimeScene.getLayer(this.layer);
 
-    var theLayer = this._runtimeScene.getLayer(this.layer);
+    this.layer = layer;
+    var newLayer = this._runtimeScene.getLayer(this.layer);
+
     var that = this;
     this.exposeRendererObject(function (displayObject) {
-        theLayer.getRenderer().removeRendererObject(displayObject);
-        theLayer.getRenderer().addRendererObject(displayObject, that.zOrder);
+        oldLayer.getRenderer().removeRendererObject(displayObject);
+        newLayer.getRenderer().addRendererObject(displayObject, that.zOrder);
     });
 };
 

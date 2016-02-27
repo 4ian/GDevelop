@@ -57,7 +57,7 @@ gdjs.SpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
  */
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.updateFrame = function(animationFrame) {
     this._spriteDirty = true;
-    this._sprite.texture = animationFrame.pixiTexture;
+    this._sprite.texture = animationFrame.texture;
 };
 
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.update = function() {
@@ -115,4 +115,16 @@ gdjs.SpriteRuntimeObjectPixiRenderer.prototype.getUnscaledWidth = function() {
 
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.getUnscaledHeight = function() {
     return this._sprite.texture.frame.height;
+};
+
+gdjs.SpriteRuntimeObjectPixiRenderer.getAnimationFrame = function(imageManager, imageName) {
+    return imageManager.getPIXITexture(imageName);
+};
+
+gdjs.SpriteRuntimeObjectPixiRenderer.getAnimationFrameWidth = function(pixiTexture) {
+    return pixiTexture.width;
+};
+
+gdjs.SpriteRuntimeObjectPixiRenderer.getAnimationFrameHeight = function(pixiTexture) {
+    return pixiTexture.height;
 };

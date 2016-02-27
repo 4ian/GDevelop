@@ -16,8 +16,8 @@
  */
 gdjs.SpriteAnimationFrame = function(imageManager, frameData)
 {
-    this.image = frameData ? frameData.image : "";
-    this.pixiTexture = imageManager.getPIXITexture(this.image);
+    this.image = frameData ? frameData.image : ""; //TODO: Rename in imageName, and do not store it in the object?
+    this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(imageManager, this.image);
 
     if ( this.center === undefined ) this.center = { x:0, y:0 };
     if ( this.origin === undefined ) this.origin = { x:0, y:0 };
@@ -41,9 +41,9 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
         this.center.x = parseFloat(center.x);
         this.center.y = parseFloat(center.y);
     }
-    else  {
-        this.center.x = this.pixiTexture.width/2;
-        this.center.y = this.pixiTexture.height/2;
+    else {
+        this.center.x = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameWidth(this.texture)/2;
+        this.center.y = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameHeight(this.texture)/2;
     }
 
     //Load the custom collision mask, if any:

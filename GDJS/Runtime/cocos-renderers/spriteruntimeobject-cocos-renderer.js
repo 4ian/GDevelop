@@ -69,11 +69,15 @@ gdjs.SpriteRuntimeObjectCocosRenderer.prototype.update = function() {
 }
 
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.updateX = function() {
-    this._sprite.setPositionX(this._object.getX());
+    var xPos = this._object.x + (this._object._animationFrame.center.x - this._object._animationFrame.origin.x)*Math.abs(this._object._scaleX);
+    if ( this._object._flippedX ) xPos += (this._cachedTextureWidth/2-this._object._animationFrame.center.x)*Math.abs(this._object._scaleX)*2;
+    this._sprite.setPositionX(xPos);
 }
 
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.updateY = function() {
-    this._sprite.setPositionY(this._convertYPosition(this._object.getY()));
+    var yPos = this._object.y + (this._object._animationFrame.center.y - this._object._animationFrame.origin.y)*Math.abs(this._object._scaleY);
+    if ( this._object._flippedY ) yPos += (this._cachedTextureHeight/2-this._object._animationFrame.center.y)*Math.abs(this._object._scaleY)*2;
+    this._sprite.setPositionY(this._convertYPosition(yPos));
 }
 
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.updateAngle = function() {

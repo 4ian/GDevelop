@@ -21,18 +21,21 @@ gdjs.RuntimeGameCocosRenderer.prototype.setSize = function(width, height) {
 
 
 gdjs.RuntimeGameCocosRenderer.prototype.resize = function() {
+    //TODO
 };
 
 /**
  * Set if the aspect ratio must be kept when the game rendering area is resized.
  */
 gdjs.RuntimeGameCocosRenderer.prototype.keepAspectRatio = function(enable) {
+    //TODO
 };
 
 /**
  * Change the margin that must be preserved around the game.
  */
 gdjs.RuntimeGameCocosRenderer.prototype.setMargins = function(top, right, bottom, left) {
+    //TODO
 };
 
 /**
@@ -40,7 +43,16 @@ gdjs.RuntimeGameCocosRenderer.prototype.setMargins = function(top, right, bottom
  * @method setFullScreen
  */
 gdjs.RuntimeGameCocosRenderer.prototype.setFullScreen = function(enable) {
+    //TODO
 };
+
+gdjs.RuntimeGameCocosRenderer.prototype.setWindowTitle = function(title) {
+    if (typeof document !== 'undefined') document.title = title;
+}
+
+gdjs.RuntimeGameCocosRenderer.prototype.getWindowTitle = function() {
+    return (typeof document !== 'undefined') ? document.title : '';
+}
 
 gdjs.RuntimeGameCocosRenderer.prototype.startGameLoop = function(fn) {
     this._gameLoopFn = fn;

@@ -313,6 +313,14 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, wi
     });
 };
 
+gdjs.RuntimeGamePixiRenderer.prototype.setWindowTitle = function(title) {
+    if (typeof document !== 'undefined') document.title = title;
+}
+
+gdjs.RuntimeGamePixiRenderer.prototype.getWindowTitle = function() {
+    return (typeof document !== 'undefined') ? document.title : '';
+}
+
 gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function(fn) {
     requestAnimationFrame(gameLoop);
 

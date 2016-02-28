@@ -60,7 +60,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 	if ( this._isLoaded ) this.unloadScene();
 
 	//Setup main properties
-	document.title = sceneData.title;
+    if (this._runtimeGame) this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
 	this._name = sceneData.name;
 	this.setBackgroundColor(parseInt(sceneData.r, 10),
 			parseInt(sceneData.v, 10),

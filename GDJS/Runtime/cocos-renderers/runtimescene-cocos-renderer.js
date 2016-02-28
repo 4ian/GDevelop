@@ -76,6 +76,8 @@ gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {
                 touch.getLocationX(),
                 that.convertYPosition(touch.getLocationY())
             );
+            
+            return true;
 	    },
 	    onTouchMoved: function(touch, event){
             that._runtimeScene.getGame().getInputManager().onTouchMove(

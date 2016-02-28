@@ -31,19 +31,19 @@ gdjs.evtTools.window.setCanvasSize = function(runtimeScene, width, height, chang
 };
 
 gdjs.evtTools.window.setWindowTitle = function(runtimeScene, title) {
-    document.title = title;
+    runtimeScene.getGame().getRenderer().setWindowTitle(title);
 };
 
-gdjs.evtTools.window.getWindowTitle = function() {
-    return document.title;
+gdjs.evtTools.window.getWindowTitle = function(runtimeScene) {
+	runtimeScene.getGame().getRenderer().getWindowTitle();
 };
 
 gdjs.evtTools.window.getWindowWidth = function() {
-    return window.innerWidth;
+    return (typeof window !== "undefined") ? window.innerWidth : 800;
 };
 
 gdjs.evtTools.window.getWindowHeight = function() {
-    return window.innerHeight;
+    return (typeof window !== "undefined") ? window.innerHeight : 800;
 };
 
 gdjs.evtTools.window.getCanvasWidth = function(runtimeScene) {
@@ -59,7 +59,7 @@ gdjs.evtTools.window.openURL = function(url) {
     //way of opening an URL.
     if (typeof Cocoon !== "undefined" && Cocoon.App && Cocoon.App.openURL ) {
         Cocoon.App.openURL(url);
-    } else {
+    } else if (typeof window !== "undefined") {
         var target = window.cordova ? "_system" : "_blank";
         window.open(url, target);
     }

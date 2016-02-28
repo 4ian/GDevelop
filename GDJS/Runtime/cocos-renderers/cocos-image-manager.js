@@ -40,7 +40,6 @@ gdjs.CocosImageManager.prototype.loadTextures = function(onProgress, onComplete)
         return 'src/JSPreview/' + that._resources[name].file;
     });
 
-    console.log(files);
     cc.LoaderScene.preload(files, function () {
         onComplete();
     });

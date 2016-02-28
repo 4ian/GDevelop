@@ -28,7 +28,9 @@ public:
     {
         DeclareTextObjectExtension(*this);
 
-        GetObjectMetadata("TextObject::Text").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetObjectMetadata("TextObject::Text")
+            .SetIncludeFile("TextObject/textruntimeobject.js")
+            .AddIncludeFile("TextObject/textruntimeobject-pixi-renderer.js");
 
         GetAllActionsForObject("TextObject::Text")["TextObject::String"].SetFunctionName("setString").SetGetter("getString").SetIncludeFile("TextObject/textruntimeobject.js");
         GetAllConditionsForObject("TextObject::Text")["TextObject::String"].SetFunctionName("getString").SetIncludeFile("TextObject/textruntimeobject.js");

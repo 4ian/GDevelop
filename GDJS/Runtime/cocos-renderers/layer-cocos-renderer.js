@@ -16,19 +16,19 @@ gdjs.LayerCocosRenderer = function(layer, runtimeSceneRenderer)
 gdjs.LayerRenderer = gdjs.LayerCocosRenderer; //Register the class to let the engine use it.
 
 gdjs.LayerCocosRenderer.prototype.updatePosition = function() {
-    var angle = -gdjs.toRad(this._layer.getCameraRotation());
+    var angle = gdjs.toRad(this._layer.getCameraRotation());
     var zoomFactor = this._layer.getCameraZoom();
 
-	this._cocosLayer.setRotation(this._layer.getCameraRotation());
+	this._cocosLayer.setRotation(-this._layer.getCameraRotation());
 	this._cocosLayer.setScale(zoomFactor, zoomFactor);
 
-	var centerX = (this._layer.getCameraX()*zoomFactor)*Math.cos(angle)
-        - (this._layer.getCameraY()*zoomFactor)*Math.sin(angle);
-	var centerY = (this._layer.getCameraX()*zoomFactor)*Math.sin(angle)
-        + (this._layer.getCameraY()*zoomFactor)*Math.cos(angle);
+	var centerX = (this._layer.getCameraX()-this._layer.getWidth()/2)*Math.cos(-angle)
+        - (this._layer.getCameraY()-this._layer.getHeight()/2)*Math.sin(-angle);
+	var centerY = (this._layer.getCameraX()-this._layer.getWidth()/2)*Math.sin(-angle)
+        + (this._layer.getCameraY()-this._layer.getHeight()/2)*Math.cos(-angle);
 
-	this._cocosLayer.setPositionX(this._layer.getWidth()/2-centerX);
-	this._cocosLayer.setPositionY(-this._layer.getHeight()/2+centerY);
+	this._cocosLayer.setPositionX(-centerX);
+	this._cocosLayer.setPositionY(+centerY);
 };
 
 gdjs.LayerCocosRenderer.prototype.updateVisibility = function(visible) {

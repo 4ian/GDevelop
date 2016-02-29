@@ -51,10 +51,13 @@ gdjs.SpriteRuntimeObjectCocosRenderer.prototype._updateCocosSprite = function() 
         //TODO: Blend mode
         this._sprite.setOpacity(this._object.opacity);
         this._sprite.setScale(this._object.getScaleX(), this._object.getScaleY());
-        this._cachedWidth = Math.abs(this._sprite.width);
-        this._cachedHeight = Math.abs(this._sprite.height);
         this._sprite.setFlippedX(this._object._flippedX);
         this._sprite.setFlippedY(this._object._flippedY);
+
+        // Note that for width/height, there is this._sprite.width/height
+        // but it could be not up-to-date with the scale.
+        this._cachedWidth = this._cachedTextureWidth * Math.abs(this._object._scaleX);
+        this._cachedHeight = this._cachedTextureHeight * Math.abs(this._object._scaleY);
     } else {
         this._sprite.setVisible(false);
         this._cachedWidth = 0;
@@ -100,10 +103,12 @@ gdjs.SpriteRuntimeObjectCocosRenderer.prototype.setColor = function(rgbColor) {
 };
 
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.getWidth = function() {
+    if ( this._spriteDirty ) this._updateCocosSprite();
     return this._cachedWidth || 0;
 };
 
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.getHeight = function() {
+    if ( this._spriteDirty ) this._updateCocosSprite();
     return this._cachedHeight || 0;
 };
 

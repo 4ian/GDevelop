@@ -41,8 +41,11 @@ gdjs.SceneStack.prototype.step = function() {
 };
 
 gdjs.SceneStack.prototype.pop = function() {
-	if (this._stack.length <= 1) return false;
-	return this._stack.pop();
+	if (this._stack.length <= 1) return null;
+
+    var scene = this._stack.pop();
+    scene.unloadScene();
+	return scene;
 };
 
 gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
@@ -62,9 +65,15 @@ gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
 
 gdjs.SceneStack.prototype.replace = function(newSceneName, clear) {
 	if (!!clear) {
-        this._stack.length = 0;
+        while (this._stack.length !== 0) {
+            var scene = this._stack.pop();
+            scene.unloadScene();
+        }
     } else {
-        if (this._stack.length !== 0) this._stack.pop();
+        if (this._stack.length !== 0) {
+            var scene = this._stack.pop();
+            scene.unloadScene();
+        }
     }
 
 	return this.push(newSceneName);

@@ -7,7 +7,8 @@ gdjs.SpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene)
     if ( this._sprite === undefined )
         this._sprite = new PIXI.Sprite(runtimeScene.getGame().getImageManager().getInvalidPIXITexture());
 
-    runtimeScene.getLayer("").getRenderer().addRendererObject(this._sprite, runtimeObject.getZOrder());
+    var layer = runtimeScene.getLayer("");
+    if (layer) layer.getRenderer().addRendererObject(this._sprite, runtimeObject.getZOrder());
 }
 
 gdjs.SpriteRuntimeObjectRenderer = gdjs.SpriteRuntimeObjectPixiRenderer; //Register the class to let the engine use it.

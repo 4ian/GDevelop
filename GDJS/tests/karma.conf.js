@@ -22,7 +22,6 @@ module.exports = function(config) {
       '../Runtime/force.js',
       '../Runtime/layer.js',
       '../Runtime/timer.js',
-      '../Runtime/imagemanager.js',
       '../Runtime/inputmanager.js',
       '../Runtime/runtimegame.js',
       '../Runtime/variable.js',
@@ -49,8 +48,9 @@ module.exports = function(config) {
       '../../Extensions/LinkedObjects/linkedobjects.js',
 
       //All tests files:
+      './tests/init.js',
       '../../Extensions/**/tests/**.spec.js',
-      'tests/**/*.js'
+      './tests/**/*.js'
     ]
   });
 };

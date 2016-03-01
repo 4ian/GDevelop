@@ -21,7 +21,6 @@ gdjs.SceneStack.prototype.step = function() {
     	var request = currentScene.getRequestedChange();
         //Something special was requested by the current scene.
         if (request === gdjs.RuntimeScene.STOP_GAME) {
-            //postGameScreen(); //TODO
             return false;
         } else if (request === gdjs.RuntimeScene.POP_SCENE) {
         	this.pop();

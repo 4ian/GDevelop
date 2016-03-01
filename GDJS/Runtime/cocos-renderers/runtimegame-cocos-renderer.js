@@ -1,5 +1,12 @@
+/*
+ * GDevelop JS Platform
+ * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
+ */
+
 gdjs.RuntimeGameCocosRenderer = function(game, width, height, forceFullscreen)
 {
+    this._directorManager = new gdjs.CocosDirectorManager();
     this._currentWidth = width; //Current size of the canvas
     this._currentHeight = height;
 }
@@ -17,11 +24,8 @@ gdjs.RuntimeGameCocosRenderer.prototype.getCurrentHeight = function() {
 gdjs.RuntimeGameCocosRenderer.prototype.setSize = function(width, height) {
     this._currentWidth = width;
     this._currentHeight = height;
-};
 
-
-gdjs.RuntimeGameCocosRenderer.prototype.resize = function() {
-    //TODO
+    cc.view.setDesignResolutionSize(width, height, cc.view.getDesignResolutionSize());
 };
 
 /**
@@ -59,9 +63,13 @@ gdjs.RuntimeGameCocosRenderer.prototype.startGameLoop = function(fn) {
     this._gameLoopFn(); //TODO
 }
 
+gdjs.RuntimeGameCocosRenderer.prototype.getDirectorManager = function() {
+    return this._directorManager;
+}
+
 gdjs.RuntimeGameCocosRenderer.prototype.onSceneUpdated = function() {
     if (!this._gameLoopFn()) {
-        //TODO
+        this._directorManager.end()
     }
 }
 

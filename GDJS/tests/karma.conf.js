@@ -12,6 +12,7 @@ module.exports = function(config) {
       '../Runtime/libs/howler.min.js',
       '../Runtime/gd.js',
       '../Runtime/libs/hshg.js',
+      '../Runtime/cocos-renderers/cocos-director-manager.js',
       '../Runtime/pixi-renderers/*.js',
       '../Runtime/commontools.js',
       '../Runtime/timemanager.js',

@@ -117,8 +117,10 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     var module = gdjs[sceneData.mangledName+"Code"];
     if ( module && module.func )
     	this._eventsFunction = module.func;
-    else
+    else {
+        console.log("Warning: no function found for running logic of scene " + this._name);
     	this._eventsFunction = (function() {});
+    }
 
     this._eventsContext = new gdjs.EventsContext();
 
@@ -136,6 +138,9 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
 gdjs.RuntimeScene.prototype.unloadScene = function() {
 	if ( !this._isLoaded ) return;
+
+    if (this._renderer && this._renderer.onSceneUnloaded)
+        this._renderer.onSceneUnloaded();
 
     this._eventsContext = new gdjs.EventsContext();
 	for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {

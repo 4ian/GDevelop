@@ -1,7 +1,14 @@
+/*
+ * GDevelop JS Platform
+ * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
+ */
+
 gdjs.RuntimeSceneCocosRenderer = function(runtimeScene, runtimeGameRenderer)
 {
     this._runtimeScene = runtimeScene;
 
+    var that = this;
     var eventListeners = this.makeEventListeners();
     var ContainerScene = cc.Scene.extend({
         ctor: function() {
@@ -24,10 +31,14 @@ gdjs.RuntimeSceneCocosRenderer = function(runtimeScene, runtimeGameRenderer)
     this._cocosScene.addChild(this._cocosBgLayer, 0);
     this.convertYPosition = runtimeGameRenderer.convertYPosition.bind(runtimeGameRenderer);
 
-    cc.director.runScene(this._cocosScene);
+    runtimeGameRenderer.getDirectorManager().onSceneLoaded(this._cocosScene);
 }
 
 gdjs.RuntimeSceneRenderer = gdjs.RuntimeSceneCocosRenderer; //Register the class to let the engine use it.
+
+gdjs.RuntimeSceneCocosRenderer.prototype.onSceneUnloaded = function() {
+    this._runtimeScene.getGame().getRenderer().getDirectorManager().onSceneUnloaded(this._cocosScene);
+};
 
 gdjs.RuntimeSceneCocosRenderer.prototype.onCanvasResized = function() {
     //TODO
@@ -76,7 +87,7 @@ gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {
                 touch.getLocationX(),
                 that.convertYPosition(touch.getLocationY())
             );
-            
+
             return true;
 	    },
 	    onTouchMoved: function(touch, event){

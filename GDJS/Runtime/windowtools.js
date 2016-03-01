@@ -39,10 +39,16 @@ gdjs.evtTools.window.getWindowTitle = function(runtimeScene) {
 };
 
 gdjs.evtTools.window.getWindowWidth = function() {
+	if (gdjs.RuntimeGameRenderer && gdjs.RuntimeGameRenderer.getScreenWidth)
+		return gdjs.RuntimeGameRenderer.getScreenWidth();
+
     return (typeof window !== "undefined") ? window.innerWidth : 800;
 };
 
 gdjs.evtTools.window.getWindowHeight = function() {
+	if (gdjs.RuntimeGameRenderer && gdjs.RuntimeGameRenderer.getScreenHeight)
+		return gdjs.RuntimeGameRenderer.getScreenHeight();
+
     return (typeof window !== "undefined") ? window.innerHeight : 800;
 };
 

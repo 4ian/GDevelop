@@ -67,13 +67,26 @@ gdjs.RuntimeGameCocosRenderer.prototype.getDirectorManager = function() {
     return this._directorManager;
 }
 
+/**
+ * As Cocos2d is managing the game loop, the Cocos scenes need to call this
+ * function to step the game engine. See RuntimeSceneCocosRenderer.
+ * @method onSceneUpdated
+ */
 gdjs.RuntimeGameCocosRenderer.prototype.onSceneUpdated = function() {
     if (!this._gameLoopFn()) {
-        this._directorManager.end()
+        this._directorManager.end();
     }
 }
 
 gdjs.RuntimeGameCocosRenderer.prototype.convertYPosition = function(y) {
     //Cocos2D Y axis is inverted, with origin at the bottom of the window.
     return this._currentHeight - y;
+}
+
+gdjs.RuntimeGameCocosRenderer.getScreenWidth = function() {
+    return cc.view.getFrameSize().width;
+}
+
+gdjs.RuntimeGameCocosRenderer.getScreenHeight = function() {
+    return cc.view.getFrameSize().height;
 }

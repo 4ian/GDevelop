@@ -216,17 +216,18 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     fs.MkDir(outputDir);
 
     //First, do not forget common includes (they must be included before events generated code files).
-    InsertUnique(includesFiles, "libs/pixi.js");
     InsertUnique(includesFiles, "libs/jshashtable.js");
-    InsertUnique(includesFiles, "libs/howler.min.js");
     InsertUnique(includesFiles, "gd.js");
     InsertUnique(includesFiles, "libs/hshg.js");
+    InsertUnique(includesFiles, "pixi-renderers/pixi.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/layer-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-image-manager.js");
     InsertUnique(includesFiles, "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/loadingscreen-pixi-renderer.js");
+    InsertUnique(includesFiles, "howler-sound-manager/howler.min.js");
+    InsertUnique(includesFiles, "howler-sound-manager/howler-sound-manager.js");
     InsertUnique(includesFiles, "commontools.js");
     InsertUnique(includesFiles, "inputmanager.js");
     InsertUnique(includesFiles, "timemanager.js");
@@ -243,7 +244,6 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "eventscontext.js");
     InsertUnique(includesFiles, "runtimebehavior.js");
     InsertUnique(includesFiles, "spriteruntimeobject.js");
-    InsertUnique(includesFiles, "soundmanager.js");
 
     //Common includes for events only.
     InsertUnique(includesFiles, "runtimescenetools.js");

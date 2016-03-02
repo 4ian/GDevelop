@@ -104,7 +104,9 @@ gdjs.SpriteRuntimeObjectCocosRenderer.prototype.setColor = function(rgbColor) {
     var colors = rgbColor.split(";");
     if ( colors.length < 3 ) return;
 
-    this._sprite.setColor(parseInt(colors[0]), parseInt(colors[1]), parseInt(colors[2]));
+    this._sprite.setColor(cc.color(
+        parseInt(colors[0]), parseInt(colors[1]), parseInt(colors[2]))
+    );
 };
 
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.getWidth = function() {

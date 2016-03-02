@@ -262,7 +262,7 @@ gdjs.SoundManager.prototype.preloadAudio = function(onProgress, onComplete, reso
 
     var loaded = 0;
     function onLoad(audioFile) {
-        console.log("loaded", audioFile);
+        console.log("loaded" + audioFile);
         loaded++;
         if (loaded === files.length) {
             console.log("All audio loaded");
@@ -275,7 +275,7 @@ gdjs.SoundManager.prototype.preloadAudio = function(onProgress, onComplete, reso
 
     for(var i = 0;i<files.length;++i) {
         (function(audioFile) {
-            console.log("Loading", audioFile)
+            console.log("Loading" + audioFile)
             var sound = new Howl({
               src: [audioFile], //TODO: ogg, mp3...
               preload: true,

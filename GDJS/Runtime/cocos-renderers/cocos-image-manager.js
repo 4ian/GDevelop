@@ -34,6 +34,12 @@ gdjs.CocosImageManager.prototype.getInvalidTexture = function() {
     return "res/HelloWorld.png"; //TODO
 };
 
+gdjs.CocosImageManager.prototype.isPowerOf2 = function(texture) {
+    if (texture.pixelsWidth !== texture.pixelsHeight) return false;
+
+    var n = texture.pixelsWidth;
+    return (n & (n - 1)) == 0;
+};
 
 gdjs.CocosImageManager.prototype.loadTextures = function(onProgress, onComplete) {
     var that = this;

@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="76" major="3" minor="6" revision="0" />
-    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+    <gdVersion build="89" major="4" minor="0" revision="0" />
+    <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" packageName="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Project</name>
         <author></author>
         <windowWidth>800</windowWidth>
@@ -43,6 +43,8 @@
         <resources>
             <resource alwaysLoaded="false" file="gem2z.png" kind="image" name="gem2z.png" smoothed="true" userAdded="false" />
             <resource alwaysLoaded="false" file="use42338.png" kind="image" name="use42338.png" smoothed="true" userAdded="false" />
+            <resource alwaysLoaded="false" file="gem2z-pow2.png" kind="image" name="gem2z-pow2.png" smoothed="true" userAdded="false" />
+            <resource alwaysLoaded="false" file="use42338-pow2.png" kind="image" name="use42338-pow2.png" smoothed="true" userAdded="true" />
         </resources>
         <resourceFolders />
     </resources>
@@ -51,7 +53,7 @@
     <variables />
     <layouts>
         <layout b="209" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="209" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="209">
-            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <uiSettings grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
             <objectsGroups>
                 <group name="NewGroup">
                     <objects>
@@ -109,7 +111,7 @@
                 </instance>
             </instances>
             <objects>
-                <object height="64.000000" name="NewObject" texture="gem2z.png" type="TiledSpriteObject::TiledSprite" width="64.000000">
+                <object height="64.000000" name="NewObject" texture="gem2z-pow2.png" type="TiledSpriteObject::TiledSprite" width="64.000000">
                     <variables />
                     <behaviors />
                 </object>

@@ -51,7 +51,7 @@ gdjs.SpriteRuntimeObjectCocosRenderer.prototype._updateCocosSprite = function() 
         if ( this._object._flippedY ) yPos += (this._cachedTextureHeight/2-this._object._animationFrame.center.y)*Math.abs(this._object._scaleY)*2;
         this._sprite.setPositionX(xPos);
         this._sprite.setPositionY(this._convertYPosition(yPos));
-        this._sprite.setRotation(this._object.getAngle());
+        this._sprite.setRotation(this._object.angle);
         this._sprite.setVisible(!this._object.hidden);
         //TODO: Blend mode
         this._sprite.setOpacity(this._object.opacity);

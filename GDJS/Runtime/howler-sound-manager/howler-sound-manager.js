@@ -6,15 +6,15 @@
 
 /**
  * A thin wrapper around a Howl object.
- * gdjs.Sound just adds `paused`, `stopped`, `rate` and `canBeDestroyed` methods.
+ * gdjs.HowlerSound just adds `paused`, `stopped`, `rate` and `canBeDestroyed` methods.
  *
  * See https://github.com/goldfire/howler.js/tree/2.0 for the full documentation.
  *
  * @namespace gdjs
- * @class Sound
+ * @class HowlerSound
  * @private
  */
-gdjs.Sound = function(o) {
+gdjs.HowlerSound = function(o) {
     Howl.call(this, o);
     this._paused = false;
     this._stopped = true;
@@ -40,37 +40,37 @@ gdjs.Sound = function(o) {
 		that._stopped = false;
     });
 };
-gdjs.Sound.prototype = Object.create(Howl.prototype);
+gdjs.HowlerSound.prototype = Object.create(Howl.prototype);
 
-gdjs.Sound.prototype.paused = function() {
+gdjs.HowlerSound.prototype.paused = function() {
 	return this._paused;
 };
-gdjs.Sound.prototype.stopped = function() {
+gdjs.HowlerSound.prototype.stopped = function() {
 	return this._stopped;
 };
-gdjs.Sound.prototype.stop = function() {
+gdjs.HowlerSound.prototype.stop = function() {
 	this._paused = false;
 	this._stopped = true;
 	Howl.prototype.stop.call(this);
 };
-gdjs.Sound.prototype.canBeDestroyed = function() {
+gdjs.HowlerSound.prototype.canBeDestroyed = function() {
 	return this._canBeDestroyed;
 };
-gdjs.Sound.prototype.rate = function() {
+gdjs.HowlerSound.prototype.rate = function() {
 	return this._rate;
 };
 
 /**
- * SoundManager is used to manage the sounds and musics of a RuntimeScene.
+ * HowlerSoundManager is used to manage the sounds and musics of a RuntimeScene.
  *
  * It is basically a container to associate channels to sounds and keep a list
  * of all sounds being played.
  *
  * @namespace gdjs
- * @class SoundManager
+ * @class HowlerSoundManager
  * @constructor
  */
-gdjs.SoundManager = function(resources)
+gdjs.HowlerSoundManager = function(resources)
 {
     this._resources = resources;
     this._availableResources = {}; //Map storing "audio" resources for faster access.
@@ -81,12 +81,14 @@ gdjs.SoundManager = function(resources)
     this._freeMusics = []; //Musics without an assigned channel.
 };
 
+gdjs.SoundManager = gdjs.HowlerSoundManager; //Register the class to let the engine use it.
+
 /**
  * Ensure rate is in a range valid for Howler.js
  * @method clampRate
  * @return The clamped rate
  */
-gdjs.SoundManager.clampRate = function(rate) {
+gdjs.HowlerSoundManager.clampRate = function(rate) {
 	if (rate > 4.0) return 4.0;
 	if (rate < 0.5) return 0.5;
 
@@ -103,7 +105,7 @@ gdjs.SoundManager.clampRate = function(rate) {
  * @private
  * @return The associated filename
  */
-gdjs.SoundManager.prototype._getFileFromSoundName = function(soundName) {
+gdjs.HowlerSoundManager.prototype._getFileFromSoundName = function(soundName) {
 	if (this._availableResources.hasOwnProperty(soundName) &&
 		this._availableResources[soundName].file) {
 		return this._availableResources[soundName].file;
@@ -115,15 +117,15 @@ gdjs.SoundManager.prototype._getFileFromSoundName = function(soundName) {
 /**
  * Store the sound in the specified array, put it at the first index that
  * is free, or add it at the end if no element is free
- * ("free" means that the gdjs.Sound can be destroyed).
+ * ("free" means that the gdjs.HowlerSound can be destroyed).
  *
  * @param {Array} arr The array containing the sounds.
- * @param {gdjs.Sound} arr The gdjs.Sound to add.
+ * @param {gdjs.HowlerSound} arr The gdjs.HowlerSound to add.
  * @method _storeSoundInArray
- * @return The gdjs.Sound that have been added (i.e: the second parameter).
+ * @return The gdjs.HowlerSound that have been added (i.e: the second parameter).
  * @private
  */
-gdjs.SoundManager.prototype._storeSoundInArray = function(arr, sound) {
+gdjs.HowlerSoundManager.prototype._storeSoundInArray = function(arr, sound) {
 	//Try to recycle an old sound.
 	var index = null;
 	for(var i = 0, len = arr.length;i<len;++i) {
@@ -137,20 +139,20 @@ gdjs.SoundManager.prototype._storeSoundInArray = function(arr, sound) {
 	return sound;
 };
 
-gdjs.SoundManager.prototype.playSound = function(soundName, loop, volume, pitch) {
+gdjs.HowlerSoundManager.prototype.playSound = function(soundName, loop, volume, pitch) {
 	var soundFile = this._getFileFromSoundName(soundName);
 
-	var sound = new gdjs.Sound({
+	var sound = new gdjs.HowlerSound({
 	  src: [soundFile], //TODO: ogg, mp3...
 	  loop: loop,
 	  volume: volume/100,
-	  rate: gdjs.SoundManager.clampRate(pitch)
+	  rate: gdjs.HowlerSoundManager.clampRate(pitch)
 	});
 
 	this._storeSoundInArray(this._freeSounds, sound).play();
 };
 
-gdjs.SoundManager.prototype.playSoundOnChannel = function(soundName, channel, loop, volume, pitch) {
+gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function(soundName, channel, loop, volume, pitch) {
 	var	oldSound = this._sounds[channel];
 	if (oldSound) {
 		oldSound.stop();
@@ -158,36 +160,36 @@ gdjs.SoundManager.prototype.playSoundOnChannel = function(soundName, channel, lo
 
 	var soundFile = this._getFileFromSoundName(soundName);
 
-	var sound = new gdjs.Sound({
+	var sound = new gdjs.HowlerSound({
 		src: [soundFile], //TODO: ogg, mp3...
 		loop: loop,
 		volume: volume/100,
-		rate: gdjs.SoundManager.clampRate(pitch)
+		rate: gdjs.HowlerSoundManager.clampRate(pitch)
 	});
 
 	sound.play();
 	this._sounds[channel] = sound;
 };
 
-gdjs.SoundManager.prototype.getSoundOnChannel = function(channel) {
+gdjs.HowlerSoundManager.prototype.getSoundOnChannel = function(channel) {
 	return this._sounds[channel];
 };
 
-gdjs.SoundManager.prototype.playMusic = function(soundName, loop, volume, pitch) {
+gdjs.HowlerSoundManager.prototype.playMusic = function(soundName, loop, volume, pitch) {
 	var soundFile = this._getFileFromSoundName(soundName);
 
-	var sound = new gdjs.Sound({
+	var sound = new gdjs.HowlerSound({
 	  src: [soundFile], //TODO: ogg, mp3...
 	  loop: loop,
 	  html5: true, //Force HTML5 audio so we don't wait for the full file to be loaded on Android.
 	  volume: volume/100,
-	  rate: gdjs.SoundManager.clampRate(pitch)
+	  rate: gdjs.HowlerSoundManager.clampRate(pitch)
 	});
 
 	this._storeSoundInArray(this._freeMusics, sound).play();
 };
 
-gdjs.SoundManager.prototype.playMusicOnChannel = function(soundName, channel, loop, volume, pitch) {
+gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function(soundName, channel, loop, volume, pitch) {
 	var	oldMusic = this._musics[channel];
 	if (oldMusic) {
 		oldMusic.stop();
@@ -195,31 +197,31 @@ gdjs.SoundManager.prototype.playMusicOnChannel = function(soundName, channel, lo
 
 	var soundFile = this._getFileFromSoundName(soundName);
 
-	var music = new gdjs.Sound({
+	var music = new gdjs.HowlerSound({
 		src: [soundFile], //TODO: ogg, mp3...
 		loop: loop,
 		html5: true, //Force HTML5 audio so we don't wait for the full file to be loaded on Android.
 		volume: volume/100,
-		rate: gdjs.SoundManager.clampRate(pitch)
+		rate: gdjs.HowlerSoundManager.clampRate(pitch)
 	});
 
 	music.play();
 	this._musics[channel] = music;
 };
 
-gdjs.SoundManager.prototype.getMusicOnChannel = function(channel) {
+gdjs.HowlerSoundManager.prototype.getMusicOnChannel = function(channel) {
 	return this._musics[channel];
 };
 
-gdjs.SoundManager.prototype.setGlobalVolume = function(volume) {
+gdjs.HowlerSoundManager.prototype.setGlobalVolume = function(volume) {
 	Howler.volume(volume/100);
 };
 
-gdjs.SoundManager.prototype.getGlobalVolume = function() {
+gdjs.HowlerSoundManager.prototype.getGlobalVolume = function() {
 	return Howler.volume()*100;
 };
 
-gdjs.SoundManager.prototype.clearAll = function() {
+gdjs.HowlerSoundManager.prototype.clearAll = function() {
 	for (var i = 0;i<this._freeSounds.length;++i)  {
 		if (this._freeSounds[i]) this._freeSounds[i].stop();
 	}
@@ -243,7 +245,7 @@ gdjs.SoundManager.prototype.clearAll = function() {
 	}
 }
 
-gdjs.SoundManager.prototype.preloadAudio = function(onProgress, onComplete, resources) {
+gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete, resources) {
 	resources = resources || this._resources;
 
     var files = [];

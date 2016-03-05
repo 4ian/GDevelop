@@ -25,6 +25,7 @@ gdjs.CocosImageManager.prototype.getTexture = function(imageName) {
         file = this.getInvalidTexture();
     }
 
+    //TODO: path
     var texture = cc.textureCache.addImage('src/JSPreview/' + file);
     return texture;
 };

@@ -16,14 +16,11 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
     this._characterSize = objectData.characterSize;
-    this._fontName = "Arial";
+    this._fontName = objectData.font || 'Arial';
     this._bold = objectData.bold;
     this._italic = objectData.italic;
     this._underlined = objectData.underlined;
     this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
-    if ( objectData.font !== "" ) {
-        this._fontName = "\"gdjs_font_"+objectData.font+"\"";
-    }
 
     this._str = objectData.string;
 

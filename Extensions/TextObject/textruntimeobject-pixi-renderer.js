@@ -28,12 +28,12 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
 };
 
 gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
-    style = {align:"left"};
+    var fontName = "\"gdjs_font_" + this._object._fontName + "\"";
+    var style = { align:"left" };
 	style.font = "";
     if ( this._object._italic ) style.font += "italic ";
     if ( this._object._bold ) style.font += "bold ";
-    //if ( this._object._underlined ) style.font += "underlined "; Not supported :/
-    style.font += this._object._characterSize+"px"+" "+this._object._fontName;
+    style.font += this._object._characterSize + "px " + fontName;
     style.fill = "rgb("+this._object._color[0]+","+this._object._color[1]+","+this._object._color[2]+")";
     this._text.style = style;
 };

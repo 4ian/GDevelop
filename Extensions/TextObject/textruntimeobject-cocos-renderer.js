@@ -4,7 +4,7 @@ gdjs.TextRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScene)
 
     this._text = new cc.LabelTTF(" ", "Arial", 38);
     this._text.disableStroke();
-    
+
     var renderer = runtimeScene.getLayer("").getRenderer();
     renderer.addRendererObject(this._text, runtimeObject.getZOrder());
     this._convertYPosition = renderer.convertYPosition;
@@ -25,7 +25,6 @@ gdjs.TextRuntimeObjectCocosRenderer.prototype.ensureUpToDate = function() {
 
 gdjs.TextRuntimeObjectCocosRenderer.prototype.updateStyle = function() {
     this._text.setFontSize(this._object._characterSize);
-    this._text.setFontName(this._object._fontName);
     this._text.setFontFillColor(cc.color(this._object._color[0],
         this._object._color[1], this._object._color[2]));
     this._text.setFontName(this._object._fontName);

@@ -25,7 +25,7 @@ gdjs.RuntimeGameCocosRenderer.prototype.setSize = function(width, height) {
     this._currentWidth = width;
     this._currentHeight = height;
 
-    cc.view.setDesignResolutionSize(width, height, cc.view.getDesignResolutionSize());
+    cc.view.setDesignResolutionSize(width, height, cc.view.getResolutionPolicy());
 };
 
 /**

@@ -80,29 +80,41 @@ gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {
 		    that._runtimeScene.getGame().getInputManager().onKeyReleased(keyCode);
 	    }
     }), cc.EventListener.create({
-	    event: cc.EventListener.TOUCH_ONE_BY_ONE,
-	    onTouchBegan:  function(touch){
-            that._runtimeScene.getGame().getInputManager().onTouchStart(
-                touch.getID(),
-                touch.getLocationX(),
-                that.convertYPosition(touch.getLocationY())
-            );
+	    event: cc.EventListener.TOUCH_ALL_AT_ONCE,
+	    onTouchesBegan:  function(touches){
+            for (var i = 0;i<touches.length;++i) {
+                var touch = touches[i];
+
+                that._runtimeScene.getGame().getInputManager().onTouchStart(
+                    touch.getID(),
+                    touch.getLocationX(),
+                    that.convertYPosition(touch.getLocationY())
+                );
+            }
 
             return true;
 	    },
-	    onTouchMoved: function(touch, event){
-            that._runtimeScene.getGame().getInputManager().onTouchMove(
-                touch.getID(),
-                touch.getLocationX(),
-                that.convertYPosition(touch.getLocationY())
-            );
+	    onTouchesMoved: function(touches, event){
+            for (var i = 0;i<touches.length;++i) {
+                var touch = touches[i];
+
+                that._runtimeScene.getGame().getInputManager().onTouchMove(
+                    touch.getID(),
+                    touch.getLocationX(),
+                    that.convertYPosition(touch.getLocationY())
+                );
+            }
 	    },
-	    onTouchEnd: function(touch, event){
-            that._runtimeScene.getGame().getInputManager().onTouchMove(
-                touch.getID(),
-                touch.getLocationX(),
-                that.convertYPosition(touch.getLocationY())
-            );
+	    onTouchesEnded: function(touches, event){
+            for (var i = 0;i<touches.length;++i) {
+                var touch = touches[i];
+
+                that._runtimeScene.getGame().getInputManager().onTouchEnd(
+                    touch.getID(),
+                    touch.getLocationX(),
+                    that.convertYPosition(touch.getLocationY())
+                );
+            }
 	    }
     })];
 }

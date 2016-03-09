@@ -33,6 +33,8 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
+    this._profiler = new gdjs.Profiler();
+
     this.onCanvasResized();
 };
 
@@ -195,13 +197,21 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * or a game stop was requested.
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function() {
+    this._profiler.frameStarted();
+    this._profiler.begin("timeManager");
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
 	this._timeManager.update(this._runtimeGame.getMinimalFramerate());
+    this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
+    this._profiler.begin("events");
 	this._eventsFunction(this, this._eventsContext);
+    this._profiler.begin("objects (post-events)");
 	this._updateObjects();
+    this._profiler.begin("objects (visibility)");
 	this._updateObjectsVisibility();
+    this._profiler.begin("render");
 	this.render();
+    this._profiler.end();
 
 	return !!this.getRequestedChange();
 };

@@ -20,9 +20,30 @@ gdjs.RuntimeScenePixiRenderer.prototype.onCanvasResized = function() {
 gdjs.RuntimeScenePixiRenderer.prototype.render = function() {
     if (!this._pixiRenderer) return;
 
+    this._renderProfileText();
+
     // render the PIXI container of the scene
     this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
     this._pixiRenderer.render(this._pixiContainer);
+};
+
+gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function() {
+    if (!this._profilerText) {
+        this._profilerText = new PIXI.Text(' ', {align:"left", stroke: '#FFF', strokeThickness: 1});
+        this._pixiContainer.addChild(this._profilerText);
+    }
+
+    var average = this._runtimeScene._profiler.getAverage();
+    var total = Object.keys(average).reduce(function(sum, key) {
+        return sum + (key !== 'total' ? average[key] : 0);
+    }, 0);
+
+    var text = '';
+    for (var p in average) {
+        text += p + ': ' + average[p].toFixed(2) +'ms' + '('+(average[p]/total*100).toFixed(1)+'%)\n';
+    }
+
+    this._profilerText.text = text;
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype.hideCursor = function() {

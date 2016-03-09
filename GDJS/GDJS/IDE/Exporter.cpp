@@ -232,6 +232,7 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "inputmanager.js");
     InsertUnique(includesFiles, "timemanager.js");
     InsertUnique(includesFiles, "runtimeobject.js");
+    InsertUnique(includesFiles, "profiler.js");
     InsertUnique(includesFiles, "runtimescene.js");
     InsertUnique(includesFiles, "scenestack.js");
     InsertUnique(includesFiles, "polygon.js");

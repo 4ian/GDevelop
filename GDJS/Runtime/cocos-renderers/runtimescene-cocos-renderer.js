@@ -51,6 +51,27 @@ gdjs.RuntimeSceneCocosRenderer.prototype.render = function() {
     var b = intColor & 255;
 
     this._cocosBgLayer.setColor(cc.color(r, g, b));
+    this._renderProfileText();
+};
+
+gdjs.RuntimeSceneCocosRenderer.prototype._renderProfileText = function() {
+    if (!this._profilerText) {
+        this._profilerText = new cc.LabelTTF(" ", "Arial", 30);
+        this._profilerText.setAnchorPoint(cc.p(0, -1.2));
+        this._cocosScene.addChild(this._profilerText, 100);
+    }
+
+    var average = this._runtimeScene._profiler.getAverage();
+    var total = Object.keys(average).reduce(function(sum, key) {
+        return sum + (key !== 'total' ? average[key] : 0);
+    }, 0);
+
+    var text = '';
+    for (var p in average) {
+        text += p + ': ' + average[p].toFixed(2) +'ms' + '('+(average[p]/total*100).toFixed(1)+'%)\n';
+    }
+
+    this._profilerText.setString(text);
 };
 
 gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {

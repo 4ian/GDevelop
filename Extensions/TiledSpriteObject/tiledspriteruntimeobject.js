@@ -32,6 +32,14 @@ gdjs.TiledSpriteRuntimeObject.prototype.exposeRendererObject = function(cb) {
     this._renderer.exposeRendererObject(cb);
 };
 
+gdjs.TiledSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
+    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+
+    if (this._renderer.ownerRemovedFromScene) {
+        this._renderer.ownerRemovedFromScene();
+    }
+};
+
 /**
  * Initialize the extra parameters that could be set for an instance.
  */

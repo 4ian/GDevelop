@@ -5,15 +5,27 @@ gdjs.TiledSpriteRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScen
     this._cachedHeight = 32;
 
     this._sprite = new cc.Sprite(runtimeScene.getGame().getImageManager().getInvalidTexture());
+    this._shader = gdjs.CocosTools.makeTilingShader();
+    if (this._shader) {
+        this._shader.retain();
+        this._pixelSizeUniform = this._shader.getUniformLocationForName('uPixelSize');
+        this._frameUniform = this._shader.getUniformLocationForName('uFrame');
+        this._transformUniform = this._shader.getUniformLocationForName('uTransform');
+    }
 
     var renderer = runtimeScene.getLayer("").getRenderer();
     renderer.addRendererObject(this._sprite, runtimeObject.getZOrder());
     this._convertYPosition = renderer.convertYPosition;
 
     this.setTexture(textureName, runtimeScene);
+    this.updateAngle();
 };
 
 gdjs.TiledSpriteRuntimeObjectRenderer = gdjs.TiledSpriteRuntimeObjectCocosRenderer; //Register the class to let the engine use it.
+
+gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.ownerRemovedFromScene = function() {
+    if (this._shader) this._shader.release();
+}
 
 gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.exposeRendererObject = function(cb) {
     cb(this._sprite);
@@ -25,14 +37,17 @@ gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.updatePosition = function()
 };
 
 gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype._updateTextureRect = function() {
-    if (this._isPowerOf2) {
-        this._sprite.setTextureRect(cc.rect(this._object._xOffset, this._object._yOffset,
-            this._object._xOffset + this._cachedWidth, this._object._yOffset + this._cachedHeight));
-    } else {
-        //TODO: Tiling is not handled for not power-of-2 texture, texture is
-        //just stretched for now to fill the object.
-        this._sprite.setScaleX(this._cachedWidth / this._cachedTextureWidth);
-        this._sprite.setScaleY(this._cachedHeight / this._cachedTextureHeight);
+    this._sprite.setScaleX(this._cachedWidth / this._cachedTextureWidth);
+    this._sprite.setScaleY(this._cachedHeight / this._cachedTextureHeight);
+
+    if (this._shader) {
+        this._shader.use();
+        this._shader.setUniformLocationWith4f(this._transformUniform,
+            -(this._object._xOffset % (this._cachedTextureWidth)) / this._cachedWidth,
+            -(this._object._yOffset % (this._cachedTextureHeight)) / this._cachedHeight,
+            this._cachedTextureWidth / this._cachedWidth,
+            this._cachedTextureHeight / this._cachedHeight
+        );
     }
 };
 
@@ -40,20 +55,26 @@ gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.setTexture = function(textu
     var imageManager = runtimeScene.getGame().getImageManager();
     var texture = imageManager.getTexture(textureName);
 
-    this._isPowerOf2 = imageManager.isPowerOf2(texture);
-    if (this._isPowerOf2) {
-        texture.setTexParameters({minFilter: gl.LINEAR, magFilter: gl.LINEAR, wrapS: gl.REPEAT, wrapT: gl.REPEAT});
-    }
-
     var spriteFrame = cc.SpriteFrame.createWithTexture(texture,
         cc.rect(0, 0, texture.pixelsWidth, texture.pixelsHeight));
     this._cachedTextureWidth = texture.pixelsWidth;
     this._cachedTextureHeight = texture.pixelsHeight;
 
     this._sprite.setSpriteFrame(spriteFrame);
+
+    if (this._shader) {
+        this._sprite.setShaderProgram(this._shader);
+        this._shader.use();
+        this._shader.setUniformLocationWith2f(this._pixelSizeUniform,
+            1.0 / this._cachedTextureWidth, 1.0 / this._cachedTextureHeight);
+        this._shader.setUniformLocationWith4f(this._frameUniform, 0, 0, 1, 1);
+        this._shader.setUniformLocationWith4f(this._transformUniform, 0, 0, 1, 1);
+    }
+
     this.updatePosition();
     this._updateTextureRect();
 };
+
 
 gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.updateAngle = function() {
     this._sprite.setRotation(this._object.angle);

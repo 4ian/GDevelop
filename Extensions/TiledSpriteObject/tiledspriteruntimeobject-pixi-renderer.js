@@ -11,6 +11,10 @@ gdjs.TiledSpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene
     }
 
     runtimeScene.getLayer("").getRenderer().addRendererObject(this._tiledSprite, runtimeObject.getZOrder());
+    this.updatePosition();
+    this.updateAngle();
+    this.updateXOffset();
+    this.updateYOffset();
 };
 
 gdjs.TiledSpriteRuntimeObjectRenderer = gdjs.TiledSpriteRuntimeObjectPixiRenderer; //Register the class to let the engine use it.

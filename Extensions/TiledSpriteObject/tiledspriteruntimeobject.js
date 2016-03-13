@@ -13,6 +13,8 @@
 gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
 {
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
+    this._xOffset = 0;
+    this._yOffset = 0;
 
     if (this._renderer)
         gdjs.TiledSpriteRuntimeObjectRenderer.call(this._renderer, this, runtimeScene, objectData.texture);
@@ -21,8 +23,6 @@ gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
 
     this.setWidth(objectData.width);
     this.setHeight(objectData.height);
-    this._xOffset = 0;
-    this._yOffset = 0;
 };
 
 gdjs.TiledSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );

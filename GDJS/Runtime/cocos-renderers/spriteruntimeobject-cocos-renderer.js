@@ -8,6 +8,7 @@ gdjs.SpriteRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScene)
 {
     this._object = runtimeObject;
     this._sprite = new cc.Sprite(runtimeScene.getGame().getImageManager().getInvalidTexture());
+    this._currentBlendMode = undefined;
 
     var renderer = runtimeScene.getLayer("").getRenderer();
     renderer.addRendererObject(this._sprite, runtimeObject.getZOrder());
@@ -53,11 +54,19 @@ gdjs.SpriteRuntimeObjectCocosRenderer.prototype._updateCocosSprite = function() 
         this._sprite.setPositionY(this._convertYPosition(yPos));
         this._sprite.setRotation(this._object.angle);
         this._sprite.setVisible(!this._object.hidden);
-        //TODO: Blend mode
         this._sprite.setOpacity(this._object.opacity);
         this._sprite.setScale(this._object.getScaleX(), this._object.getScaleY());
         this._sprite.setFlippedX(this._object._flippedX);
         this._sprite.setFlippedY(this._object._flippedY);
+
+        if (this._currentBlendMode !== this._object._blendMode) {
+            this._currentBlendMode = this._object._blendMode;
+            this._sprite.setBlendFunc(
+                this._currentBlendMode === 0 ? cc.BlendFunc.ALPHA_NON_PREMULTIPLIED :
+                (this._currentBlendMode === 1 ? cc.BlendFunc.ADDITIVE :
+                (this._currentBlendMode === 2 ? cc.BlendFunc.ALPHA_PREMULTIPLIED :
+                cc.BlendFunc.DISABLE)));
+        }
 
         // Note that for width/height, there is this._sprite.width/height
         // but it could be not up-to-date with the scale.

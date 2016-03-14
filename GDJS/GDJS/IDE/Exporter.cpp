@@ -228,7 +228,6 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "pixi-renderers/loadingscreen-pixi-renderer.js");
     InsertUnique(includesFiles, "howler-sound-manager/howler.min.js");
     InsertUnique(includesFiles, "howler-sound-manager/howler-sound-manager.js");
-    InsertUnique(includesFiles, "commontools.js");
     InsertUnique(includesFiles, "inputmanager.js");
     InsertUnique(includesFiles, "timemanager.js");
     InsertUnique(includesFiles, "runtimeobject.js");
@@ -247,14 +246,16 @@ bool Exporter::ExportEventsCode(gd::Project & project, gd::String outputDir, std
     InsertUnique(includesFiles, "spriteruntimeobject.js");
 
     //Common includes for events only.
-    InsertUnique(includesFiles, "runtimescenetools.js");
-    InsertUnique(includesFiles, "inputtools.js");
-    InsertUnique(includesFiles, "objecttools.js");
-    InsertUnique(includesFiles, "cameratools.js");
-    InsertUnique(includesFiles, "soundtools.js");
-    InsertUnique(includesFiles, "storagetools.js");
-    InsertUnique(includesFiles, "stringtools.js");
-    InsertUnique(includesFiles, "windowtools.js");
+    InsertUnique(includesFiles, "events-tools/commontools.js");
+    InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
+    InsertUnique(includesFiles, "events-tools/inputtools.js");
+    InsertUnique(includesFiles, "events-tools/objecttools.js");
+    InsertUnique(includesFiles, "events-tools/cameratools.js");
+    InsertUnique(includesFiles, "events-tools/soundtools.js");
+    InsertUnique(includesFiles, "events-tools/storagetools.js");
+    InsertUnique(includesFiles, "events-tools/stringtools.js");
+    InsertUnique(includesFiles, "events-tools/windowtools.js");
+    InsertUnique(includesFiles, "events-tools/networktools.js");
 
     for (std::size_t i = 0;i<project.GetLayoutsCount();++i)
     {

@@ -62,9 +62,9 @@ gdjs.SpriteRuntimeObjectCocosRenderer.prototype._updateCocosSprite = function() 
         if (this._currentBlendMode !== this._object._blendMode) {
             this._currentBlendMode = this._object._blendMode;
             this._sprite.setBlendFunc(
-                this._currentBlendMode === 0 ? cc.BlendFunc.ALPHA_NON_PREMULTIPLIED :
+                this._currentBlendMode === 0 ? cc.BlendFunc.ALPHA_PREMULTIPLIED :
                 (this._currentBlendMode === 1 ? cc.BlendFunc.ADDITIVE :
-                (this._currentBlendMode === 2 ? cc.BlendFunc.ALPHA_PREMULTIPLIED :
+                (this._currentBlendMode === 2 ? cc.BlendFunc.ALPHA_NON_PREMULTIPLIED :
                 cc.BlendFunc.DISABLE)));
         }
 

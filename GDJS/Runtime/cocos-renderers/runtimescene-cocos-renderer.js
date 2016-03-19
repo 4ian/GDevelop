@@ -51,7 +51,7 @@ gdjs.RuntimeSceneCocosRenderer.prototype.render = function() {
     var b = intColor & 255;
 
     this._cocosBgLayer.setColor(cc.color(r, g, b));
-    this._renderProfileText();
+    //this._renderProfileText(); //Uncomment to display profiling times
 };
 
 gdjs.RuntimeSceneCocosRenderer.prototype._renderProfileText = function() {

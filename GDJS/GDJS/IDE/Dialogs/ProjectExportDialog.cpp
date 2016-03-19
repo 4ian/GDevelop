@@ -13,7 +13,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/CommonTools.h"
-#include "GDJS/IDE/Exporter.h"
+#include "GDJS/IDE/ExporterHelper.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 
 namespace gdjs
@@ -23,15 +23,17 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
     BaseProjectExportDialog(parent),
     project(project_)
 {
-    //TODO: Remove when CocoonJS support is fully working.
-    exportChoice->RemovePage(2);
-
     exportFolderEdit->AutoCompleteDirectories();
+    cocosExportFolderEdit->AutoCompleteDirectories();
     if ( wxDirExists(project.GetLastCompilationDirectory()) )
+    {
         exportFolderEdit->SetValue(project.GetLastCompilationDirectory());
+        cocosExportFolderEdit->SetValue(project.GetLastCompilationDirectory());
+    }
     else
     {
         exportFolderEdit->SetValue(wxFileName::GetHomeDir()+wxFileName::GetPathSeparator()+DeleteInvalidCharacters(project.GetName()));
+        cocosExportFolderEdit->SetValue(wxFileName::GetHomeDir()+wxFileName::GetPathSeparator()+DeleteInvalidCharacters(project.GetName()));
     }
 
     //Open the latest used export type.
@@ -39,7 +41,7 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
     wxConfigBase::Get()->Read("Export/JS platform/LatestExportType", &latestPage, 0);
     exportChoice->SetSelection(latestPage);
 
-    hasNode = !Exporter::GetNodeExecutablePath().empty();
+    hasNode = !ExporterHelper::GetNodeExecutablePath().empty();
     nodejsLink->Show(!hasNode);
     if ( !hasNode )
     {
@@ -57,11 +59,11 @@ ProjectExportDialog::ExportType ProjectExportDialog::GetExportType()
     switch(exportChoice->GetSelection())
     {
         case 1:
-            return Cordova;
+            return PixiCordova;
         case 2:
-            return CocoonJS;
+            return Cocos2d;
         default:
-            return Normal;
+            return Pixi;
     }
 }
 
@@ -107,18 +109,27 @@ void ProjectExportDialog::OnBrowseBtClick(wxCommandEvent& event)
         exportFolderEdit->SetValue(dialog.GetPath());
 }
 
+void ProjectExportDialog::OnCocosExportBrowseBtClick(wxCommandEvent& event)
+{
+    wxDirDialog dialog(this, _("Choose a folder, empty if possible, where the game should be exported."));
+    if ( dialog.ShowModal() == wxID_OK )
+        cocosExportFolderEdit->SetValue(dialog.GetPath());
+}
+
 gd::String ProjectExportDialog::GetExportDir()
 {
-    if ( GetExportType() == Normal )
-        return gd::String(exportFolderEdit->GetValue());
-    else
+    if ( GetExportType() == PixiCordova )
         return gd::String(wxFileName::GetHomeDir())+wxString(wxFileName::GetPathSeparator())+gd::String(DeleteInvalidCharacters(project.GetName()));
+    if ( GetExportType() == Cocos2d )
+        return gd::String(cocosExportFolderEdit->GetValue());
+    else
+        return gd::String(exportFolderEdit->GetValue());
 }
 
 bool ProjectExportDialog::RequestMinify()
 {
     if (!hasNode) return false;
-    return GetExportType() != Normal || minifyCheck->GetValue();
+    return GetExportType() == PixiCordova || minifyCheck->GetValue();
 }
 
 }

@@ -77,10 +77,10 @@ gdjs.SoundManager = gdjs.CocosSoundManager; //Register the class to let the engi
 gdjs.CocosSoundManager.prototype._getFileFromSoundName = function(soundName) {
 	if (this._availableResources.hasOwnProperty(soundName) &&
 		this._availableResources[soundName].file) {
-		return 'src/JSPreview/' + this._availableResources[soundName].file;
+		return 'res/' + this._availableResources[soundName].file;
 	}
 
-	return 'src/JSPreview/' + soundName;
+	return 'res/' + soundName;
 }
 
 gdjs.CocosSoundManager.prototype.playSound = function(soundName, loop, volume, pitch) {

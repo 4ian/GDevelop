@@ -25,8 +25,7 @@ gdjs.CocosImageManager.prototype.getTexture = function(imageName) {
         file = this.getInvalidTexture();
     }
 
-    //TODO: path
-    var texture = cc.textureCache.addImage('src/JSPreview/' + file);
+    var texture = cc.textureCache.addImage('res/' + file);
     return texture;
 };
 
@@ -44,7 +43,7 @@ gdjs.CocosImageManager.prototype.isPowerOf2 = function(texture) {
 gdjs.CocosImageManager.prototype.loadTextures = function(onProgress, onComplete) {
     var that = this;
     var files = Object.keys(this._resources).map(function(name) {
-        return 'src/JSPreview/' + that._resources[name].file;
+        return 'res/' + that._resources[name].file;
     });
 
     cc.LoaderScene.preload(files, function () {

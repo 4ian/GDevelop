@@ -20,7 +20,7 @@ gdjs.RuntimeScenePixiRenderer.prototype.onCanvasResized = function() {
 gdjs.RuntimeScenePixiRenderer.prototype.render = function() {
     if (!this._pixiRenderer) return;
 
-    this._renderProfileText();
+    //this._renderProfileText(); //Uncomment to display profiling times
 
     // render the PIXI container of the scene
     this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();

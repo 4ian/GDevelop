@@ -60,7 +60,7 @@ gdjs.RuntimeGameCocosRenderer.prototype.getWindowTitle = function() {
 
 gdjs.RuntimeGameCocosRenderer.prototype.startGameLoop = function(fn) {
     this._gameLoopFn = fn;
-    this._gameLoopFn(); //TODO
+    this._gameLoopFn();
 }
 
 gdjs.RuntimeGameCocosRenderer.prototype.getDirectorManager = function() {

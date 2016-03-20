@@ -1,4 +1,4 @@
-gdjs.ShapePainterRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene, textureName)
+gdjs.ShapePainterRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene)
 {
     this._object = runtimeObject;
 

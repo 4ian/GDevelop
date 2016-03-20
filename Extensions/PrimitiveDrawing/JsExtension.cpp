@@ -28,7 +28,8 @@ public:
         DeclarePrimitiveDrawingExtension(*this);
         GetObjectMetadata("PrimitiveDrawing::Drawer")
             .SetIncludeFile("PrimitiveDrawing/shapepainterruntimeobject.js")
-            .AddIncludeFile("PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js");
+            .AddIncludeFile("PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js")
+            .AddIncludeFile("PrimitiveDrawing/shapepainterruntimeobject-cocos-renderer.js");
 
         GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Rectangle"].SetFunctionName("drawRectangle");
         GetAllActionsForObject("PrimitiveDrawing::Drawer")["PrimitiveDrawing::Circle"].SetFunctionName("drawCircle");

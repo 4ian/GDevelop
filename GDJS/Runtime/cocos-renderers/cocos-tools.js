@@ -6,6 +6,15 @@
 gdjs.CocosTools = function() {
 };
 
+gdjs.CocosTools.hexToCCColor = function(hexColor, opacity) {
+    return cc.color(
+        (hexColor >> 16) & 255,
+        (hexColor >> 8) & 255,
+        (hexColor) & 255,
+        opacity
+    );
+}
+
 gdjs.CocosTools.isHTML5 = function() {
     return (typeof document !== "undefined");
 }

@@ -45,7 +45,8 @@ static void InsertUnique(std::vector<gd::String> & container, gd::String str)
         container.push_back(str);
 }
 
-static void GenerateFontsDeclaration(gd::AbstractFileSystem & fs, const gd::String & outputDir, gd::String & css, gd::String & html)
+static void GenerateFontsDeclaration(gd::AbstractFileSystem & fs, const gd::String & outputDir,
+    gd::String & css, gd::String & html, gd::String urlPrefix = "")
 {
     std::vector<gd::String> ttfFiles = fs.ReadDir(outputDir, ".TTF");
     for(std::size_t i = 0; i<ttfFiles.size();++i) {
@@ -54,7 +55,7 @@ static void GenerateFontsDeclaration(gd::AbstractFileSystem & fs, const gd::Stri
         css += "@font-face{ font-family : \"gdjs_font_";
         css += relativeFile;
         css += "\"; src : url('";
-        css += relativeFile;
+        css += urlPrefix + relativeFile;
         css +="') format('truetype'); }";
 
         html += "<div style=\"font-family: 'gdjs_font_";
@@ -172,39 +173,59 @@ bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String 
         return false;
     }
 
-    if (!fs.CopyFile("./JsPlatform/Runtime/Cocos2d/index.html", exportDir + "/index.html"))
-    {
-        lastError = "Unable to write Cocos2d index.html file.";
-        return false;
-    }
-
     if (!fs.CopyFile("./JsPlatform/Runtime/Cocos2d/cocos2d-js-v3.10.js", exportDir + "/cocos2d-js-v3.10.js"))
     {
         lastError = "Unable to write Cocos2d cocos2d-js-v3.10.js file.";
         return false;
     }
 
-    gd::String includeFilesStr = "";
-    bool first = true;
-    for(auto & file : includesFiles)
     {
-        if ( !fs.FileExists(exportDir + "/src/" + file) )
+        gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cocos2d/index.html");
+
+        //Generate custom declarations for font resources
+        gd::String customCss;
+        gd::String customHtml;
+        GenerateFontsDeclaration(fs, exportDir + "/res", customCss, customHtml, "res/");
+
+        //Generate the file
+        std::vector<gd::String> noIncludesInThisFile;
+        if (!CompleteIndexFile(str, customCss, customHtml, exportDir, noIncludesInThisFile, ""))
         {
-            std::cout << "Warning: Unable to find " << exportDir + "/" + file << "." << std::endl;
-            continue;
+            lastError = "Unable to complete Cocos2d index.html file.";
+            return false;
         }
 
-        includeFilesStr += gd::String(first ? "" : ", ") + "\"src/" + file + "\"\n";
-        first = false;
+        //Write the index.html file
+        if (!fs.WriteToFile(exportDir + "/index.html", str))
+        {
+            lastError = "Unable to write Cocos2d index.html file.";
+            return false;
+        }
     }
 
-    gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cocos2d/project.json")
-        .FindAndReplace("// GDJS_INCLUDE_FILES", includeFilesStr);
-
-    if (!fs.WriteToFile(exportDir + "/project.json", str))
     {
-        lastError = "Unable to write Cocos2d project.json file.";
-        return false;
+        gd::String includeFilesStr = "";
+        bool first = true;
+        for(auto & file : includesFiles)
+        {
+            if ( !fs.FileExists(exportDir + "/src/" + file) )
+            {
+                std::cout << "Warning: Unable to find " << exportDir + "/" + file << "." << std::endl;
+                continue;
+            }
+
+            includeFilesStr += gd::String(first ? "" : ", ") + "\"src/" + file + "\"\n";
+            first = false;
+        }
+
+        gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cocos2d/project.json")
+            .FindAndReplace("// GDJS_INCLUDE_FILES", includeFilesStr);
+
+        if (!fs.WriteToFile(exportDir + "/project.json", str))
+        {
+            lastError = "Unable to write Cocos2d project.json file.";
+            return false;
+        }
     }
 
     return true;

@@ -27,7 +27,7 @@ gdjs.TextRuntimeObjectCocosRenderer.prototype.updateStyle = function() {
     this._text.setFontSize(this._object._characterSize);
     this._text.setFontFillColor(cc.color(this._object._color[0],
         this._object._color[1], this._object._color[2]));
-    this._text.setFontName(this._object._fontName);
+    this._text.setFontName('gdjs_font_' + this._object._fontName);
 };
 
 gdjs.TextRuntimeObjectCocosRenderer.prototype.updatePosition = function() {

@@ -41,7 +41,7 @@ gdjs.RuntimeSceneCocosRenderer.prototype.onSceneUnloaded = function() {
 };
 
 gdjs.RuntimeSceneCocosRenderer.prototype.onCanvasResized = function() {
-    //TODO
+    // Nothing to do here.
 };
 
 gdjs.RuntimeSceneCocosRenderer.prototype.render = function() {

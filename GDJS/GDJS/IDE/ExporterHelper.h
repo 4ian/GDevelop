@@ -144,7 +144,6 @@ public:
      */
     bool ExportCordovaConfigFile(const gd::Project & project, gd::String exportDir);
 
-
     /**
      * \brief Generate the base Cocos2d files.
      *

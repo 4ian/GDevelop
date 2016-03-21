@@ -91,7 +91,11 @@ gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {
         onMouseUp: function(event) {
             that._runtimeScene.getGame().getInputManager().onMouseButtonReleased(
                 event.getButton() === 0 ? 0 : 1);
-        }
+        },
+        onMouseScroll: function(event) {
+            that._runtimeScene.getGame().getInputManager().onMouseWheel(
+                event.getScrollY());
+        },
     }), cc.EventListener.create({
 	    event: cc.EventListener.KEYBOARD,
 	    onKeyPressed:  function(keyCode){

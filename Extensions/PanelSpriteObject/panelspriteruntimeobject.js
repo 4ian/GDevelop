@@ -37,6 +37,14 @@ gdjs.PanelSpriteRuntimeObject.prototype.exposeRendererObject = function(cb) {
     this._renderer.exposeRendererObject(cb);
 };
 
+gdjs.PanelSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
+    gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+
+    if (this._renderer.ownerRemovedFromScene) {
+        this._renderer.ownerRemovedFromScene();
+    }
+};
+
 gdjs.PanelSpriteRuntimeObject.prototype.updateTime = function() {
     this._renderer.ensureUpToDate();
 }

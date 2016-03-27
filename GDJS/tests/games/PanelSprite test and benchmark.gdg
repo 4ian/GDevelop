@@ -44,6 +44,7 @@
             <resource alwaysLoaded="false" file="Block-Gel.png" kind="image" name="Block-Gel.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="panelSprite.png" kind="image" name="panelSprite.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="panelSprite2.png" kind="image" name="panelSprite2.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="Block-Place-with-cross.png" kind="image" name="Block-Place-with-cross.png" smoothed="true" userAdded="true" />
         </resources>
         <resourceFolders />
     </resources>
@@ -108,7 +109,7 @@
                 </instance>
             </instances>
             <objects>
-                <object bottomMargin="10.000000" height="64.000000" leftMargin="50.000000" name="NewObject" rightMargin="7.000000" texture="gem2z.png" tiled="false" topMargin="30.000000" type="PanelSpriteObject::PanelSprite" width="64.000000">
+                <object bottomMargin="10.000000" height="64.000000" leftMargin="50.000000" name="NewObject" rightMargin="7.000000" texture="Block-Place-with-cross.png" tiled="false" topMargin="30.000000" type="PanelSpriteObject::PanelSprite" width="64.000000">
                     <variables />
                     <behaviors />
                 </object>

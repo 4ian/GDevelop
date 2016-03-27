@@ -42,7 +42,8 @@ gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype._updateTextureRect = functi
 
     if (this._shader) {
         this._shader.use();
-        this._shader.setUniformLocationWith4f(this._transformUniform,
+        gdjs.CocosTools.setUniformLocationWith4f(this._sprite, this._shader, this._transformUniform,
+            'uTransform',
             -(this._object._xOffset % (this._cachedTextureWidth)) / this._cachedWidth,
             -(this._object._yOffset % (this._cachedTextureHeight)) / this._cachedHeight,
             this._cachedTextureWidth / this._cachedWidth,
@@ -65,10 +66,12 @@ gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.setTexture = function(textu
     if (this._shader) {
         this._sprite.setShaderProgram(this._shader);
         this._shader.use();
-        this._shader.setUniformLocationWith2f(this._pixelSizeUniform,
-            1.0 / this._cachedTextureWidth, 1.0 / this._cachedTextureHeight);
-        this._shader.setUniformLocationWith4f(this._frameUniform, 0, 0, 1, 1);
-        this._shader.setUniformLocationWith4f(this._transformUniform, 0, 0, 1, 1);
+        gdjs.CocosTools.setUniformLocationWith2f(this._sprite, this._shader, this._pixelSizeUniform,
+            'uPixelSize', 1.0 / this._cachedTextureWidth, 1.0 / this._cachedTextureHeight);
+        gdjs.CocosTools.setUniformLocationWith4f(this._sprite, this._shader, this._frameUniform,
+            'uFrame', 0, 0, 1, 1);
+        gdjs.CocosTools.setUniformLocationWith4f(this._sprite, this._shader, this._transformUniform,
+            'uTransform', 0, 0, 1, 1);
     }
 
     this.updatePosition();

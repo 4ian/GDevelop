@@ -24,20 +24,9 @@ gdjs.CocosTools.isHTML5 = function() {
  * the shaders uniforms: uPixelSize (using texture size), uFrame
  * and uTransform (using texture and object size).
  *
- * TODO: For now, uniforms aren't applied properly in Cocos2d-x, so this will
- * return null.
- *
  * @method makeTilingShader
  */
 gdjs.CocosTools.makeTilingShader = function() {
-    if (!gdjs.CocosTools.isHTML5()) {
-        //There seems to be a bug in Cocos2d-JS/Cocos2d-x making shaders
-        //uniforms always reset to 0 when rendered, so the object is not
-        //properly rendered. Better not apply the shader and have a stretched
-        //object displayed instead.
-        return null;
-    }
-
     var shader = new cc.GLProgram();
 
     var projectionMatrix = gdjs.CocosTools.isHTML5() ?
@@ -96,4 +85,20 @@ gdjs.CocosTools.makeTilingShader = function() {
     shader.updateUniforms();
 
     return shader;
+}
+
+gdjs.CocosTools.setUniformLocationWith2f = function(node, shader, uniform, uniformName, p1, p2) {
+    if (gdjs.CocosTools.isHTML5()) {
+        shader.setUniformLocationWith2f(uniform, p1, p2);
+    } else {
+        node.getGLProgramState().setUniformVec2(uniformName, cc.p(p1, p2));
+    }
+}
+
+gdjs.CocosTools.setUniformLocationWith4f = function(node, shader, uniform, uniformName, p1, p2, p3, p4) {
+    if (gdjs.CocosTools.isHTML5()) {
+        shader.setUniformLocationWith4f(uniform, p1, p2, p3, p4);
+    } else {
+        node.getGLProgramState().setUniformVec4(uniformName, {x: p1, y: p2, z: p3, w: p4});
+    }
 }

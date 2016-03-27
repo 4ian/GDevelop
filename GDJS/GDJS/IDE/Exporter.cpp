@@ -205,7 +205,6 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, gd::String expor
 
     //Prepare the export directory
     fs.MkDir(exportDir);
-    fs.ClearDir(exportDir);
     std::vector<gd::String> includesFiles;
 
     gd::Project exportedProject = project;

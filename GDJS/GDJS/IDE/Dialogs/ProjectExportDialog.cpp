@@ -98,6 +98,7 @@ void ProjectExportDialog::OnExportBtClicked(wxCommandEvent& event)
             return;
     }
 
+    project.SetLastCompilationDirectory(GetExportDir());
     wxConfigBase::Get()->Write("Export/JS platform/LatestExportType", exportChoice->GetSelection());
     EndModal(1);
 }

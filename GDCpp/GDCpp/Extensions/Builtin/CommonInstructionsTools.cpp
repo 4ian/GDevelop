@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include "GDCpp/Extensions/Builtin/CommonInstructionsTools.h"
-#include "GDCpp/profile.h"
+#include "GDCpp/Runtime/profile.h"
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <random>

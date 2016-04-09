@@ -180,48 +180,88 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
     
     flexGridSizer1147->Add(m_staticText6768, 0, wxALL|wxEXPAND|wxALIGN_CENTER|wxALIGN_LEFT, 5);
     
-    m_panel71 = new wxPanel(exportChoice, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
-    exportChoice->AddPage(m_panel71, _("Mobile and web stores using CocoonJS (Experimental)"), false);
+    m_panel611 = new wxPanel(exportChoice, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
+    exportChoice->AddPage(m_panel611, _("Export to a website or native game with Cocos2d (experimental)"), false);
     
-    wxFlexGridSizer* flexGridSizer551 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer551->SetFlexibleDirection( wxBOTH );
-    flexGridSizer551->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer551->AddGrowableCol(0);
-    flexGridSizer551->AddGrowableRow(1);
-    m_panel71->SetSizer(flexGridSizer551);
+    wxFlexGridSizer* flexGridSizer342 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer342->SetFlexibleDirection( wxBOTH );
+    flexGridSizer342->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer342->AddGrowableCol(0);
+    m_panel611->SetSizer(flexGridSizer342);
     
-    cocoonjslogoPanel2 = new wxPanel(m_panel71, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL|wxBORDER_SIMPLE);
-    cocoonjslogoPanel2->SetBackgroundColour(wxColour(wxT("rgb(51,16,69)")));
+    wxFlexGridSizer* flexGridSizer353 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer353->SetFlexibleDirection( wxBOTH );
+    flexGridSizer353->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer353->AddGrowableCol(0);
+    flexGridSizer353->AddGrowableRow(0);
     
-    flexGridSizer551->Add(cocoonjslogoPanel2, 0, wxALL|wxALIGN_CENTER, 0);
+    flexGridSizer342->Add(flexGridSizer353, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     
-    wxFlexGridSizer* flexGridSizer633 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer633->SetFlexibleDirection( wxBOTH );
-    flexGridSizer633->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    cocoonjslogoPanel2->SetSizer(flexGridSizer633);
+    wxFlexGridSizer* flexGridSizer364 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer364->SetFlexibleDirection( wxBOTH );
+    flexGridSizer364->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer364->AddGrowableCol(1);
     
-    m_staticBitmap574 = new wxStaticBitmap(cocoonjslogoPanel2, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("cocoonjslogo")), wxDefaultPosition, wxSize(-1,-1), 0 );
+    flexGridSizer353->Add(flexGridSizer364, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     
-    flexGridSizer633->Add(m_staticBitmap574, 0, wxALL, 0);
+    ID_STATICTEXT45 = new wxStaticText(m_panel611, wxID_ANY, _("Export folder:"), wxDefaultPosition, wxSize(-1,-1), 0);
     
-    m_staticText655 = new wxStaticText(m_panel71, wxID_ANY, _("CocoonJS is a technology that helps HTML5 developers\npublish their web-based games and apps in the most\nimportant mobile and web stores."), wxDefaultPosition, wxSize(-1,-1), wxALIGN_CENTRE);
+    flexGridSizer364->Add(ID_STATICTEXT45, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     
-    flexGridSizer551->Add(m_staticText655, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_TOP, 10);
+    wxFlexGridSizer* flexGridSizer386 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer386->SetFlexibleDirection( wxBOTH );
+    flexGridSizer386->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer386->AddGrowableCol(0);
+    flexGridSizer386->AddGrowableRow(0);
     
-    wxStaticBoxSizer* staticBoxSizer112 = new wxStaticBoxSizer( new wxStaticBox(m_panel71, wxID_ANY, _("Note")), wxVERTICAL);
+    flexGridSizer364->Add(flexGridSizer386, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     
-    flexGridSizer551->Add(staticBoxSizer112, 1, wxALL|wxEXPAND, 5);
+    cocosExportFolderEdit = new wxTextCtrl(m_panel611, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    cocosExportFolderEdit->SetHint(wxT(""));
+    #endif
     
-    wxFlexGridSizer* flexGridSizer114 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer114->SetFlexibleDirection( wxBOTH );
-    flexGridSizer114->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer114->AddGrowableCol(0);
+    flexGridSizer386->Add(cocosExportFolderEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     
-    staticBoxSizer112->Add(flexGridSizer114, 1, wxALL|wxEXPAND, 0);
+    cocosExportBrowseBt = new wxButton(m_panel611, wxID_ANY, _("..."), wxDefaultPosition, wxSize(30,-1), 0);
     
-    m_staticText676 = new wxStaticText(m_panel71, wxID_ANY, _("Just click on the \"Export\" button and GDevelop will\npackage your game in a single zip file.\nYou'll then be able to upload this file on the cloud compiler\nat cloud.ludei.com, which will allows you to compile\nthe game into an iOS/Android app."), wxDefaultPosition, wxSize(-1,-1), wxALIGN_LEFT);
+    flexGridSizer386->Add(cocosExportBrowseBt, 1, wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     
-    flexGridSizer114->Add(m_staticText676, 0, wxALL|wxEXPAND|wxALIGN_CENTER|wxALIGN_LEFT, 5);
+    ID_STATICTEXT213 = new wxStaticText(m_panel611, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer342->Add(ID_STATICTEXT213, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    
+    ID_STATICTEXT114 = new wxStaticText(m_panel611, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer342->Add(ID_STATICTEXT114, 1, wxLEFT|wxRIGHT|wxBOTTOM|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    
+    wxStaticBoxSizer* staticBoxSizer4515 = new wxStaticBoxSizer( new wxStaticBox(m_panel611, wxID_ANY, _("Note")), wxVERTICAL);
+    
+    flexGridSizer342->Add(staticBoxSizer4515, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    wxFlexGridSizer* flexGridSizer4616 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer4616->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4616->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4616->AddGrowableCol(0);
+    
+    staticBoxSizer4515->Add(flexGridSizer4616, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    
+    ID_STATICTEXT31719 = new wxStaticText(m_panel611, wxID_ANY, _("When the exportation is done, send the files to your website (you need a web hosting) and just go to the website to start the game."), wxDefaultPosition, wxSize(-1,-1), 0);
+    ID_STATICTEXT31719->Wrap(450);
+    
+    flexGridSizer4616->Add(ID_STATICTEXT31719, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    ID_STATICTEXT317 = new wxStaticText(m_panel611, wxID_ANY, _("If you install Cocos2d-x, you can also use it to export the game to Android, iOS, Windows, Mac or Linux."), wxDefaultPosition, wxSize(-1,-1), 0);
+    ID_STATICTEXT317->Wrap(450);
+    
+    flexGridSizer4616->Add(ID_STATICTEXT317, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    
+    ID_HYPERLINKCTRL218 = new wxHyperlinkCtrl(m_panel611, wxID_ANY, _("Click here to learn more about Cocos2d export"), wxT("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtoexportwithcocos2dx"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    ID_HYPERLINKCTRL218->SetNormalColour(wxColour(wxT("#0000FF")));
+    ID_HYPERLINKCTRL218->SetHoverColour(wxColour(wxT("#0000FF")));
+    ID_HYPERLINKCTRL218->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer4616->Add(ID_HYPERLINKCTRL218, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     
     wxFlexGridSizer* flexGridSizer50 = new wxFlexGridSizer(0, 3, 0, 0);
     flexGridSizer50->SetFlexibleDirection( wxBOTH );
@@ -281,6 +321,7 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
 #endif
     // Connect events
     browseBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseProjectExportDialog::OnBrowseBtClick), NULL, this);
+    cocosExportBrowseBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseProjectExportDialog::OnCocosExportBrowseBtClick), NULL, this);
     closeBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseProjectExportDialog::OnCloseBtClicked), NULL, this);
     exportBt->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseProjectExportDialog::OnExportBtClicked), NULL, this);
     
@@ -289,6 +330,7 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
 BaseProjectExportDialog::~BaseProjectExportDialog()
 {
     browseBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseProjectExportDialog::OnBrowseBtClick), NULL, this);
+    cocosExportBrowseBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseProjectExportDialog::OnCocosExportBrowseBtClick), NULL, this);
     closeBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseProjectExportDialog::OnCloseBtClicked), NULL, this);
     exportBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseProjectExportDialog::OnExportBtClicked), NULL, this);
     

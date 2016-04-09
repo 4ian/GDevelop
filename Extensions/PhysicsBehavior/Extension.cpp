@@ -18,14 +18,14 @@ This project is released under the MIT License.
 /**
  * \brief This class declares information about the extension.
  */
-class Extension : public ExtensionBase
+class PhysicsBehaviorCppExtension : public ExtensionBase
 {
 public:
 
     /**
      * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    Extension()
+    PhysicsBehaviorCppExtension()
     {
         SetExtensionInformation("PhysicsBehavior",
                               _("Physics behavior"),
@@ -571,10 +571,16 @@ public:
     };
 };
 
+#if defined(ANDROID)
+extern "C" ExtensionBase * CreateGDCppPhysicsBehaviorExtension() {
+    return new PhysicsBehaviorCppExtension;
+}
+#elif !defined(EMSCRIPTEN)
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
-    return new Extension;
+    return new PhysicsBehaviorCppExtension;
 }
+#endif

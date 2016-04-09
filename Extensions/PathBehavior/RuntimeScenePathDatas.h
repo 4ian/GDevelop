@@ -7,8 +7,8 @@ This project is released under the MIT License.
 
 #ifndef RUNTIMESCENEPATHDATAS_H
 #define RUNTIMESCENEPATHDATAS_H
-#include "GDCpp/BehaviorsRuntimeSharedData.h"
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/BehaviorsRuntimeSharedData.h"
+#include "GDCpp/Runtime/String.h"
 #include <map>
 #include <vector>
 #include <SFML/System/Vector2.hpp>

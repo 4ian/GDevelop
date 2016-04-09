@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef COMMONDIALOGS_H_INCLUDED
 #define COMMONDIALOGS_H_INCLUDED
 
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 class RuntimeScene;
 namespace gd { class Variable; }

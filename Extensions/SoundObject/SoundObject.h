@@ -7,8 +7,8 @@ This project is released under the MIT License.
 #ifndef SoundObject_H
 #define SoundObject_H
 
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/Music.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>

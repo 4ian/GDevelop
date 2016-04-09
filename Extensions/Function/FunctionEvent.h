@@ -11,8 +11,8 @@ This project is released under the MIT License.
 #define FUNCTIONEVENT_H
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/SceneNameMangler.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/SceneNameMangler.h"
 class RuntimeScene;
 namespace gd { class Instruction; }
 namespace gd { class SerializerElement; }

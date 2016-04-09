@@ -9,10 +9,10 @@
 #include <iomanip>
 #include <SFML/Network.hpp>
 #include "GDCpp/Extensions/Builtin/NetworkTools.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Project/Variable.h"
-#include "GDCpp/Tools/md5.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/Project/Variable.h"
+#include "GDCpp/Runtime/Tools/md5.h"
+#include "GDCpp/Runtime/CommonTools.h"
 
 using namespace std;
 

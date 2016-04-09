@@ -13,16 +13,16 @@ This project is released under the MIT License.
 #include "TiledSpriteObject.h"
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/Project/Project.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeGame.h"
-#include "GDCpp/ImageManager.h"
-#include "GDCpp/FontManager.h"
-#include "GDCpp/Project/InitialInstance.h"
-#include "GDCpp/Polygon2d.h"
-#include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/Project/Project.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
+#include "GDCpp/Runtime/ImageManager.h"
+#include "GDCpp/Runtime/FontManager.h"
+#include "GDCpp/Runtime/Project/InitialInstance.h"
+#include "GDCpp/Runtime/Polygon2d.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/CommonTools.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
@@ -107,16 +107,74 @@ bool RuntimeTiledSpriteObject::Draw( sf::RenderTarget& window )
     if ( hidden ) return true;
     if(!texture) return true;
 
+#if defined(ANDROID)
+    const unsigned int textureWidth = texture->texture.getSize().x;
+    const unsigned int textureHeight =  texture->texture.getSize().y;
+    std::vector<sf::Vertex> vertices;
+    vertices.resize(
+        (static_cast<std::size_t>(GetWidth() / textureWidth) + 1u) *
+        (static_cast<std::size_t>(GetHeight() / textureHeight) + 1u) *
+        6
+    );
+    for(unsigned int i = 0; i < (static_cast<std::size_t>(GetWidth() / textureWidth) + 1u); i++)
+    {
+        for(unsigned int j = 0; j < (static_cast<std::size_t>(GetHeight() / textureHeight) + 1u); j++)
+        {
+            //Create the four vertices
+            sf::Vector2f textureEndPosition(
+                (i < static_cast<std::size_t>(GetWidth() / textureWidth)) ? textureWidth : (GetWidth() - i * textureWidth),
+                (j < static_cast<std::size_t>(GetHeight() / textureHeight)) ? textureHeight : (GetHeight() - j * textureHeight)
+            );
+
+            sf::Vertex topLeftCorner(
+                sf::Vector2f(i * textureWidth, j * textureHeight),
+                sf::Vector2f(0.f, 0.f)
+            );
+            sf::Vertex topRightCorner(
+                sf::Vector2f(i * textureWidth + textureEndPosition.x, j * textureHeight),
+                sf::Vector2f(textureEndPosition.x, 0.f)
+            );
+            sf::Vertex bottomRightCorner(
+                sf::Vector2f(i * textureWidth + textureEndPosition.x, j * textureHeight + textureEndPosition.y),
+                sf::Vector2f(textureEndPosition.x, textureEndPosition.y)
+            );
+            sf::Vertex bottomLeftCorner(
+                sf::Vector2f(i * textureWidth, j * textureHeight + textureEndPosition.y),
+                sf::Vector2f(0.f, textureEndPosition.y)
+            );
+
+            //Insert them to create two triangles
+            const unsigned int firstVerticePos = (j * (static_cast<std::size_t>(GetWidth() / textureWidth) + 1u) + i) * 6;
+            vertices[firstVerticePos] = topLeftCorner;
+            vertices[firstVerticePos+1u] = topRightCorner;
+            vertices[firstVerticePos+2u] = bottomRightCorner;
+            vertices[firstVerticePos+3u] = topLeftCorner;
+            vertices[firstVerticePos+4u] = bottomRightCorner;
+            vertices[firstVerticePos+5u] = bottomLeftCorner;
+        }
+    }
+
+    sf::Transform transform;
+    transform.translate(-GetWidth()/2.f, -GetHeight()/2.f);
+    transform.rotate(angle);
+    transform.translate(GetX()+GetWidth()/2.f, GetY()+GetHeight()/2.f);
+
+    window.draw(vertices.data(), vertices.size(), sf::Triangles, sf::RenderStates(sf::BlendAlpha, transform, &texture->texture, nullptr));
+#else
     sf::Vector2f centerPosition = sf::Vector2f(GetX()+GetCenterX(),GetY()+GetCenterY());
     float angleInRad = angle*3.14159/180.0;
-    texture->texture.setRepeated(true);
-    sf::Vertex vertices[] = {sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,-height/2), angleInRad), sf::Vector2f(0+xOffset,0+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,-height/2), angleInRad), sf::Vector2f(width+xOffset,0+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,+height/2), angleInRad), sf::Vector2f(width+xOffset, height+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,+height/2), angleInRad), sf::Vector2f(0+xOffset, height+yOffset))};
 
-    window.draw(vertices, 4, sf::Quads, &texture->texture);
+    texture->texture.setRepeated(true);
+    sf::Vertex vertices[] = {
+        sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,-height/2), angleInRad), sf::Vector2f(0+xOffset,0+yOffset)),
+        sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,-height/2), angleInRad), sf::Vector2f(width+xOffset,0+yOffset)),
+        sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,+height/2), angleInRad), sf::Vector2f(0+xOffset, height+yOffset)),
+        sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,+height/2), angleInRad), sf::Vector2f(width+xOffset, height+yOffset))
+    };
+
+    window.draw(vertices, 4, sf::TrianglesStrip, &texture->texture);
     texture->texture.setRepeated(false);
+#endif
 
     return true;
 }
@@ -142,12 +200,14 @@ void TiledSpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::
     sf::Vector2f centerPosition = sf::Vector2f(instance.GetX()+width/2, instance.GetY()+height/2);
     float angleInRad = instance.GetAngle()*3.14159/180.0;
     texture->texture.setRepeated(true);
-    sf::Vertex vertices[] = {sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,-height/2), angleInRad), sf::Vector2f(0+xOffset,0+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,-height/2), angleInRad), sf::Vector2f(width+xOffset,0+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,+height/2), angleInRad), sf::Vector2f(width+xOffset, height+yOffset)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,+height/2), angleInRad), sf::Vector2f(0+xOffset, height+yOffset))};
+    sf::Vertex vertices[] = {
+        sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,-height/2), angleInRad), sf::Vector2f(0+xOffset,0+yOffset)),
+        sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,-height/2), angleInRad), sf::Vector2f(width+xOffset,0+yOffset)),
+        sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,+height/2), angleInRad), sf::Vector2f(0+xOffset, height+yOffset)),
+        sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,+height/2), angleInRad), sf::Vector2f(width+xOffset, height+yOffset))
+    };
 
-    renderTarget.draw(vertices, 4, sf::Quads, &texture->texture);
+    renderTarget.draw(vertices, 4, sf::TrianglesStrip, &texture->texture);
     texture->texture.setRepeated(false);
 }
 

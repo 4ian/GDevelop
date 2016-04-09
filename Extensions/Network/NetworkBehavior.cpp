@@ -8,10 +8,10 @@ This project is released under the MIT License.
 #include <iostream>
 #include <vector>
 #include <SFML/Network.hpp>
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Project/Layout.h"
-#include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/Project/Layout.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "ReceivedDataManager.h"
 #include "NetworkBehaviorEditor.h"
 #include "NetworkBehavior.h"

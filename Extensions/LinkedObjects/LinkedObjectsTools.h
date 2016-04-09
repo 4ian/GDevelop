@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #include <string>
 #include <map>
 #include <vector>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 class RuntimeObject;
 class RuntimeScene;
 

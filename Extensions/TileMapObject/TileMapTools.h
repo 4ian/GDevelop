@@ -10,7 +10,7 @@ This project is released under the MIT License.
 
 #include <vector>
 #include <SFML/Graphics.hpp>
-#include "GDCpp/Polygon2d.h"
+#include "GDCpp/Runtime/Polygon2d.h"
 
 class TileSet;
 class TileMap;

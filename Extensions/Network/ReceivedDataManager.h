@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #define RECEIVEDDATAMANAGER_H
 #include <map>
 #include <string>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 /**
  * Singleton where is stocked receveid data from other peers.

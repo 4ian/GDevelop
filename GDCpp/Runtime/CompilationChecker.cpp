@@ -1,7 +1,7 @@
 #include "CompilationChecker.h"
 #include "GDCore/Tools/Version.h"
 #include "GDCore/Tools/VersionWrapper.h"
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 #include <iostream>
 
 using namespace std;

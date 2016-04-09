@@ -9,7 +9,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/IDE/ChangesNotifier.h"
 namespace gd { class Behavior; }
 namespace gd { class Object; }

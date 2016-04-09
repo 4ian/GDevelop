@@ -189,14 +189,18 @@ OpenGLTextureWrapper::OpenGLTextureWrapper(std::shared_ptr<SFMLTextureWrapper> s
 {
     sfmlTexture = sfmlTexture_;
 
+    #if !defined(ANDROID) //TODO: OpenGL
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, sfmlTexture->image.getSize().x, sfmlTexture->image.getSize().y, GL_RGBA, GL_UNSIGNED_BYTE, sfmlTexture->image.getPixelsPtr());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    #endif
 }
 
 OpenGLTextureWrapper::~OpenGLTextureWrapper()
 {
+    #if !defined(ANDROID) //TODO: OpenGL
     glDeleteTextures(1, &texture);
+    #endif
 };

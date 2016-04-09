@@ -18,7 +18,7 @@
 #include "GDCpp/IDE/CodeCompilationHelpers.h"
 #include "GDCpp/Events/Builtin/ProfileEvent.h"
 #include "GDCpp/IDE/Dialogs/CppLayoutPreviewer.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 
 using namespace std;

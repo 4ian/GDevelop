@@ -14,10 +14,6 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, objectData)
 {
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-    if ( this._graphics === undefined ) {
-        this._graphics = new PIXI.Graphics();
-    }
-
     this._fillColor = parseInt(gdjs.rgbToHex(objectData.fillColor.r, objectData.fillColor.g, objectData.fillColor.b), 16);
     this._outlineColor = parseInt(gdjs.rgbToHex(objectData.outlineColor.r, objectData.outlineColor.g, objectData.outlineColor.b), 16);
     this._fillOpacity = objectData.fillOpacity;
@@ -25,49 +21,36 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, objectData)
     this._outlineSize = objectData.outlineSize;
     this._absoluteCoordinates = objectData.absoluteCoordinates;
 
-    runtimeScene.getLayer("").addChildToPIXIContainer(this._graphics, this.zOrder);
+    if (this._renderer)
+        gdjs.ShapePainterRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
+    else
+        this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(this, runtimeScene);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.ShapePainterRuntimeObject.thisIsARuntimeObjectConstructor = "PrimitiveDrawing::Drawer";
 
-gdjs.ShapePainterRuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
-    cb(this._graphics);
+gdjs.ShapePainterRuntimeObject.prototype.exposeRendererObject = function(cb) {
+    this._renderer.exposeRendererObject(cb);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeScene) {
     //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
-    this._graphics.clear();
-    this._graphics.lineStyle(this._outlineSize, this._outlineColor, this._outlineOpacity/255);
+    this._renderer.clear();
 
     gdjs.RuntimeObject.prototype.stepBehaviorsPreEvents.call(this, runtimeScene);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawRectangle = function(x1, y1, x2, y2) {
-    this._graphics.beginFill(this._fillColor, this._fillOpacity / 255);
-    this._graphics.drawRect(x1, y1, x2 - x1,y2 - y1);
-    this._graphics.endFill();
+    this._renderer.drawRectangle(x1, y1, x2, y2);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawCircle = function(x, y, radius) {
-    this._graphics.beginFill(this._fillColor, this._fillOpacity / 255);
-    this._graphics.drawCircle(x, y, radius);
-    this._graphics.endFill();
+    this._renderer.drawCircle(x, y, radius);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.drawLine = function(x1, y1, x2, y2, thickness) {
-    this._graphics.beginFill(this._fillColor, this._fillOpacity / 255);
-    if (y2 === y1) {
-        this._graphics.drawRect(x1, y1 - thickness / 2, x2 - x1, thickness);
-    } else {
-        var angle = Math.atan2(y2 - y1, x2 - x1);
-        var xIncrement = Math.sin(angle) * thickness;
-        var yIncrement = Math.cos(angle) * thickness;
-
-        this._graphics.drawPolygon(x1 + xIncrement, y1 - yIncrement, x1 - xIncrement, y1 + yIncrement,
-            x2 - xIncrement, y2 + yIncrement, x2 + xIncrement, y2 - yIncrement);
-    }
-    this._graphics.endFill();
+    this._renderer.drawLine(x1, y1, x2, y2, thickness);
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.setFillColor = function(rgbColor) {
@@ -82,12 +65,12 @@ gdjs.ShapePainterRuntimeObject.prototype.setOutlineColor = function(rgbColor) {
     if ( colors.length < 3 ) return;
 
     this._outlineColor = parseInt(gdjs.rgbToHex(parseInt(colors[0], 10), parseInt(colors[1], 10), parseInt(colors[2], 10)), 16);
-    this._graphics.lineStyle(this._outlineSize, this._outlineColor, this._outlineOpacity / 255);
+    this._renderer.updateOutline();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.setOutlineSize = function(size) {
     this._outlineSize = size;
-    this._graphics.lineStyle(this._outlineSize, this._outlineColor, this._outlineOpacity / 255);
+    this._renderer.updateOutline();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.getOutlineSize = function() {
@@ -104,7 +87,7 @@ gdjs.ShapePainterRuntimeObject.prototype.getFillOpacity = function() {
 
 gdjs.ShapePainterRuntimeObject.prototype.setOutlineOpacity = function(opacity) {
     this._outlineOpacity = opacity;
-    this._graphics.lineStyle(this._outlineSize, this._outlineColor, this._outlineOpacity / 255);
+    this._renderer.updateOutline();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.getOutlineOpacity = function() {
@@ -113,16 +96,12 @@ gdjs.ShapePainterRuntimeObject.prototype.getOutlineOpacity = function() {
 
 gdjs.ShapePainterRuntimeObject.prototype.setX = function(x) {
     this.x = x;
-    if (!this._absoluteCoordinates) {
-        this._graphics.position.x = x;
-    }
+    this._renderer.updateXPosition();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.setY = function(y) {
     this.y = y;
-    if (!this._absoluteCoordinates) {
-        this._graphics.position.y = y;
-    }
+    this._renderer.updateYPosition();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.getWidth = function() {

@@ -13,7 +13,7 @@ describe('gdjs.evtTools.object.twoListsTest', function() {
 		var map1 = new Hashtable();
 		var map2 = new Hashtable();
 
-		var runtimeScene = new gdjs.RuntimeScene(null, null);
+		var runtimeScene = new gdjs.RuntimeScene(null);
 		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
@@ -47,7 +47,7 @@ describe('gdjs.evtTools.object.pickObjectsIf', function() {
 	it('should properly pick objects', function(){
 		var map1 = new Hashtable();
 
-		var runtimeScene = new gdjs.RuntimeScene(null, null);
+		var runtimeScene = new gdjs.RuntimeScene(null);
 		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
@@ -72,7 +72,7 @@ describe('gdjs.evtTools.object.pickRandomObject', function() {
 	it('should pick only one object', function(){
 		var map1 = new Hashtable();
 
-		var runtimeScene = new gdjs.RuntimeScene(null, null);
+		var runtimeScene = new gdjs.RuntimeScene(null);
 		var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 		var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 		var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
@@ -93,7 +93,7 @@ describe('gdjs.evtTools.object.pickRandomObject', function() {
 describe('gdjs.evtTools.object.pickNearestObject', function() {
 	var map1 = new Hashtable();
 
-	var runtimeScene = new gdjs.RuntimeScene(null, null);
+	var runtimeScene = new gdjs.RuntimeScene(null);
 	var obj1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 	var obj1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 	var obj1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
@@ -119,4 +119,3 @@ describe('gdjs.evtTools.object.pickNearestObject', function() {
 		expect(list1[0]).to.be(obj1C);
 	});
 });
-

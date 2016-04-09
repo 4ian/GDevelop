@@ -50,6 +50,7 @@ Binaries/Packaging/logs
 !/Binaries/Output/Release_Linux/CppPlatform/
 /Binaries/**/MinGW32
 /Binaries/**/CppPlatform/Runtime
+/Binaries/**/CppPlatform/Sources
 /Binaries/**/CppPlatform/include
 /Binaries/**/CppPlatform/Extensions/include
 /Binaries/**/JsPlatform/Runtime

@@ -10,9 +10,9 @@ This project is released under the MIT License.
 
 #include <string>
 
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Polygon2d.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/Polygon2d.h"
 #include <memory>
 #include <SFML/Graphics/VertexArray.hpp>
 

@@ -6,11 +6,11 @@
 #include "SpriteTools.h"
 #include <string>
 #include <vector>
-#include "GDCpp/RuntimeSpriteObject.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeObjectsListsTools.h"
-#include "GDCpp/Collisions.h"
-#include "GDCpp/profile.h"
+#include "GDCpp/Runtime/RuntimeSpriteObject.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeObjectsListsTools.h"
+#include "GDCpp/Runtime/Collisions.h"
+#include "GDCpp/Runtime/profile.h"
 #include "GDCpp/Extensions/Builtin/ObjectTools.h"
 
 using namespace std;

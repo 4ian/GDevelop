@@ -17,45 +17,19 @@ gdjs.RuntimeGame = function(data, spec)
 {
     spec = spec || {};
 
-    //Safety check: Do gdjs initialization if not already done
-    if ( gdjs.objectsTypes.keys.length === 0)
-        gdjs.registerObjects();
-    if ( gdjs.behaviorsTypes.keys.length === 0)
-        gdjs.registerBehaviors();
-    if ( gdjs.callbacksRuntimeSceneLoaded.length === 0 &&
-         gdjs.callbacksRuntimeSceneUnloaded.length === 0 &&
-         gdjs.callbacksObjectDeletedFromScene.length === 0)
-        gdjs.registerGlobalCallbacks();
-
     this._variables = new gdjs.VariablesContainer(data.variables);
     this._data = data;
     this._imageManager = new gdjs.ImageManager(data.resources ? data.resources.resources : undefined);
     this._soundManager = new gdjs.SoundManager(data.resources ? data.resources.resources : undefined);
     this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
-    //Rendering (see createStandardCanvas method)
-    this._isFullscreen = true; //Used to track if the canvas is displayed as fullscreen (see setFullscreen method).
-    this._forceFullscreen = spec.forceFullscreen || false; //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
-    this._renderer = null;
-    this._canvasArea = null;
     this._defaultWidth = data.properties.windowWidth; //Default size for scenes cameras
     this._defaultHeight = data.properties.windowHeight;
-    this._currentWidth = data.properties.windowWidth; //Current size of the canvas
-    this._currentHeight = data.properties.windowHeight;
-    this._keepRatio = true;
-    this._reduceIfNeed = true;
-    this._marginLeft = this._marginTop = this._marginRight = this._marginBottom = 0;
+    this._renderer = new gdjs.RuntimeGameRenderer(this,
+        this._defaultWidth, this._defaultHeight,
+        spec.forceFullscreen || false);
 
-    if (navigator.isCocoonJS && !this._forceFullscreen) {
-        this._forceFullscreen = true;
-        console.log("Forcing fullscreen for CocoonJS.");
-    }
-    if ( typeof intel != "undefined" ) {
-        this._forceFullscreen = true;
-        console.log("Forcing fullscreen for Intel XDK.");
-    }
-
-    //Game loop management (see startStandardGameLoop method)
+    //Game loop management (see startGameLoop method)
     this._sceneStack = new gdjs.SceneStack(this);
     this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
 
@@ -65,6 +39,10 @@ gdjs.RuntimeGame = function(data, spec)
     //Allow to specify an external layout to insert in the first scene:
     this._injectExternalLayout = spec.injectExternalLayout || "";
 };
+
+gdjs.RuntimeGame.prototype.getRenderer = function() {
+    return this._renderer;
+}
 
 /**
  * Get the variables of the RuntimeGame.
@@ -218,44 +196,9 @@ gdjs.RuntimeGame.prototype.setDefaultHeight = function(height) {
     this._defaultHeight = height;
 };
 
-
 /**
- * Get the current width of the canvas.
- * @method getCurrentWidth
- */
-gdjs.RuntimeGame.prototype.getCurrentWidth = function() {
-    return this._currentWidth;
-};
-
-/**
- * Get the current height of the canvas.
- * @method getCurrentHeight
- */
-gdjs.RuntimeGame.prototype.getCurrentHeight = function() {
-    return this._currentHeight;
-};
-
-/**
- * Change the size of the canvas displaying the game.
- * Note that if the canvas is fullscreen, it won't be resized, but when going back to
- * non fullscreen mode, the requested size will be used.
- *
- * @method setCanvasSize
- * @param width {Number} The new width
- * @param height {Number} The new height
- */
-gdjs.RuntimeGame.prototype.setCanvasSize = function(width, height) {
-    this._currentWidth = width;
-    this._currentHeight = height;
-
-    this._resizeCanvas(this._renderer, this._canvasArea, this._isFullscreen,
-        this._currentWidth, this._currentHeight);
-    this._notifySceneForResize = true;
-};
-
-/**
- * Return the minimal fps that must be guaranteed by the game.
- * ( Otherwise, game is slowed down ).
+ * Return the minimal fps that must be guaranteed by the game
+ * (otherwise, game is slowed down).
  * @method getMinimalFramerate
  */
 gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
@@ -263,185 +206,27 @@ gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
 };
 
 /**
- * Add the standard events handler.
- * Be sure that the game has a renderer (See createStandardRenderer).
- * @method bindStandardEvents
- */
-gdjs.RuntimeGame.prototype.bindStandardEvents = function(window, document) {
-    if (!this._renderer || !this._canvasArea) {
-        console.log("Unable to bind events to the game! Be sure that there is a renderer and a canvas area associated to the game.");
-        return;
-    }
-
-    this._inputManager.bindStandardEvents(window, document, this, this._renderer, this._canvasArea);
-};
-
-/**
- * Set if the aspect ratio must be kept when the game canvas is resized.
- */
-gdjs.RuntimeGame.prototype.keepAspectRatio = function(enable) {
-    if (this._keepRatio === enable) return;
-
-    this._keepRatio = enable;
-    this._resizeCanvas();
-    this._notifySceneForResize = true;
-};
-
-/**
- * Change the margin that must be preserved around the game canvas.
- */
-gdjs.RuntimeGame.prototype.setMargins = function(top, right, bottom, left) {
-    if (this._marginTop === top && this._marginRight === right && this._marginBottom === bottom &&
-        this._marginLeft === left)
-        return;
-
-    this._marginTop = top;
-    this._marginRight = right;
-    this._marginBottom = bottom;
-    this._marginLeft = left;
-    this._resizeCanvas();
-    this._notifySceneForResize = true;
-};
-
-/**
- * De/activate fullscreen for the canvas rendering the game.
- * @method setFullScreen
- */
-gdjs.RuntimeGame.prototype.setFullScreen = function(enable) {
-    if (this._forceFullscreen) return;
-
-    if (this._isFullscreen !== enable) {
-        this._isFullscreen = !!enable;
-        this._resizeCanvas();
-        this._notifySceneForResize = true;
-
-        if (this._isFullscreen) {
-            if(document.documentElement.requestFullScreen) {
-                document.documentElement.requestFullScreen();
-            } else if(document.documentElement.mozRequestFullScreen) {
-                document.documentElement.mozRequestFullScreen();
-            } else if(document.documentElement.webkitRequestFullScreen) {
-                document.documentElement.webkitRequestFullScreen();
-            }
-        }
-        else {
-            if(document.cancelFullScreen) {
-                document.cancelFullScreen();
-            } else if(document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if(document.webkitCancelFullScreen) {
-                document.webkitCancelFullScreen();
-            }
-        }
-    }
-};
-
-/**
- * Create a standard canvas inside canvasArea.
- * The game keep a reference to this canvas and will renderer in it.
- *
- * @method createStandardCanvas
- */
-gdjs.RuntimeGame.prototype.createStandardCanvas = function(canvasArea) {
-    this._canvasArea = canvasArea;
-
-    //Create the renderer and setup the rendering area
-    this._renderer = PIXI.autoDetectRenderer(this._defaultWidth, this._defaultHeight);
-    canvasArea.style["position"] = "absolute";
-    canvasArea.appendChild(this._renderer.view); // add the renderer view element to the DOM
-    canvasArea.tabindex="1"; //Ensure that the canvas has the focus.
-    canvasArea.style.overflow="hidden"; //No scrollbar in any case.
-    this._sceneStack.setPixiRenderer(this._renderer);
-    this._resizeCanvas();
-
-    //Handle resize
-    var game = this;
-    window.addEventListener("resize", function() {
-        game._resizeCanvas();
-        game._notifySceneForResize = true;
-    });
-
-    return this._renderer;
-};
-
-/**
- * Resize the canvas, according to _isFullscreen, _forceFullscreen, _currentWidth,
- * _currentHeight, _marginTop, _marginLeft, _marginRight, _marginBottom, _keepRatio.
- *
- * @method _resizeCanvas
- * @private
- */
-gdjs.RuntimeGame.prototype._resizeCanvas = function() {
-    var keepRatio = this._keepRatio;
-
-    var reduceIfNeed = this._reduceIfNeed;
-    var isFullscreen = this._forceFullscreen || this._isFullscreen;
-    var width = this._currentWidth;
-    var height = this._currentHeight;
-    var marginLeft = this._marginLeft;
-    var marginTop = this._marginTop;
-    var marginRight = this._marginRight;
-    var marginBottom = this._marginBottom;
-    var maxWidth = window.innerWidth-marginLeft-marginRight;
-    var maxHeight = window.innerHeight-marginTop-marginBottom;
-    if (maxWidth < 0) maxWidth = 0;
-    if (maxHeight < 0) maxHeight = 0;
-
-    if (isFullscreen && !keepRatio) {
-        width = maxWidth;
-        height = maxHeight;
-    } else if (isFullscreen && keepRatio ||
-        (reduceIfNeed && (width > maxWidth || height > maxHeight))) {
-        var factor = maxWidth/width;
-        if (height*factor > maxHeight) factor = maxHeight/height;
-
-        width *= factor;
-        height *= factor;
-    }
-
-    if (this._renderer.width !== width || this._renderer.height !== height)
-        this._renderer.resize(width, height);
-
-    this._canvasArea.style["top"] = ((marginTop+(maxHeight-height)/2)+"px");
-    this._canvasArea.style["left"] = ((marginLeft+(maxWidth-width)/2)+"px");
-    this._canvasArea.style.width = width+"px";
-    this._canvasArea.style.height = height+"px";
-};
-
-/**
  * Load all assets, displaying progress in renderer.
  * @method loadAllAssets
  */
 gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
-    //Prepare the progress text
-    var loadingScreen = new PIXI.Container();
-    var text = new PIXI.Text(" ", {font: "bold 60px Arial", fill: "#FFFFFF", align: "center"});
-    loadingScreen.addChild(text);
-    text.position.y = this._renderer.height/2;
-
+    var loadingScreen = new gdjs.LoadingScreenRenderer(this.getRenderer());
     var allAssetsTotal = this._data.resources.resources.length;
 
     var that = this;
     this._imageManager.loadTextures(function (count, total) {
-        text.text = Math.floor(count / allAssetsTotal * 100) + "%";
-        text.position.x = that._renderer.width/2-text.width/2;
-        that._renderer.render(loadingScreen);
+        loadingScreen.render(Math.floor(count / allAssetsTotal * 100));
     }, function() {
         that._soundManager.preloadAudio(function (count, total) {
-            text.text = Math.floor((allAssetsTotal - total + count) / allAssetsTotal * 100) + "%";
-            text.position.x = that._renderer.width/2-text.width/2;
-            that._renderer.render(loadingScreen);
+            loadingScreen.render(Math.floor((allAssetsTotal - total + count)
+                / allAssetsTotal * 100));
         }, function() {
             callback();
         });
     });
 };
 
-/**
- * Launch the game, displayed in the renderer associated to the game (see createStandardCanvas).
- * @method startStandardGameLoop
- */
-gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
+gdjs.RuntimeGame.prototype.startGameLoop = function() {
     if ( !this.hasScene() ) {
         console.log("The game has no scene.");
         return;
@@ -464,11 +249,9 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
     console.log("Took", time, "ms");
     return;*/
 
-    requestAnimationFrame(gameLoop);
-
     //The standard game loop
     var that = this;
-    function gameLoop() {
+    this._renderer.startGameLoop(function() {
         //Manage resize events.
         if (that._notifySceneForResize) {
             that._sceneStack.onRendererResized();
@@ -477,8 +260,10 @@ gdjs.RuntimeGame.prototype.startStandardGameLoop = function() {
 
         //Render and step the scene.
         if (that._sceneStack.step()) {
-            requestAnimationFrame(gameLoop);
             that.getInputManager().onFrameEnded();
+            return true;
         }
-    }
+
+        return false;
+    });
 };

@@ -8,8 +8,8 @@ This project is released under the MIT License.
 
 #ifndef TILEDSPRITEOBJECT_H
 #define TILEDSPRITEOBJECT_H
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
 #include <memory>
 class SFMLTextureWrapper;
 class RuntimeScene;

@@ -5,7 +5,7 @@
 
 describe('gdjs.SpriteRuntimeObject', function() {
 	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
-	var runtimeScene = new gdjs.RuntimeScene(runtimeGame, null);
+	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
 	it('should handle scaling properly', function(){
 		var object = new gdjs.SpriteRuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});

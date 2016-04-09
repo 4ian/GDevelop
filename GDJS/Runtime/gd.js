@@ -208,3 +208,7 @@ Array.prototype.createFrom = function(arr) {
         }
     }
 };
+
+//Make sure console.warn and console.error are available.
+console.warn = console.warn || console.log;
+console.error = console.error || console.log;

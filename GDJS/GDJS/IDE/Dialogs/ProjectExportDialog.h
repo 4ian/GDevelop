@@ -28,9 +28,9 @@ public:
 
     enum ExportType
     {
-        Normal,
-        Cordova,
-        CocoonJS
+        Pixi,
+        PixiCordova,
+        Cocos2d
     };
 
     /**
@@ -49,6 +49,7 @@ public:
     bool RequestMinify();
 
 protected:
+    virtual void OnCocosExportBrowseBtClick(wxCommandEvent& event);
     virtual void OnBrowseBtClick(wxCommandEvent& event);
     virtual void OnCloseBtClicked(wxCommandEvent& event);
     virtual void OnExportBtClicked(wxCommandEvent& event);

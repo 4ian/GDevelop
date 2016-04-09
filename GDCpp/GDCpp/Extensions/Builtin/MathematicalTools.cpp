@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 #include "GDCpp/Extensions/Builtin/MathematicalTools.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include <cmath>
 
 namespace GDpriv
@@ -102,7 +102,11 @@ double GD_API log(double expression)
 }
 double GD_API log2(double expression)
 {
+    #if defined(ANDROID)
+    return log(expression) / log(2);  
+    #else
     return ::log2(expression);
+    #endif
 }
 double GD_API log10(double expression)
 {

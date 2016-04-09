@@ -4,7 +4,7 @@
  */
 
 describe('gdjs.runtimeObject', function() {
-	var runtimeScene = new gdjs.RuntimeScene(null, null);
+	var runtimeScene = new gdjs.RuntimeScene(null);
 
 	it('should compute distances properly', function(){
 		var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});

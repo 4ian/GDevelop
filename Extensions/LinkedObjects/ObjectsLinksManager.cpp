@@ -12,8 +12,8 @@ This project is released under the MIT License.
 #include <string>
 
 #include <memory>
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 
 using namespace std;
 

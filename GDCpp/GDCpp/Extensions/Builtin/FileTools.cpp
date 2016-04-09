@@ -7,10 +7,10 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Project/Variable.h"
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/XmlFilesHelper.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/Project/Variable.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/XmlFilesHelper.h"
 #include "FileTools.h"
 
 using namespace std;

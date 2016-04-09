@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef AESACTIONS_H_INCLUDED
 #define AESACTIONS_H_INCLUDED
 
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 namespace GDpriv
 {

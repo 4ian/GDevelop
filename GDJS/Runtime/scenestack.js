@@ -4,12 +4,7 @@ gdjs.SceneStack = function(runtimeGame) {
     }
 
     this._runtimeGame = runtimeGame;
-    this._pixiRenderer = null;
 	this._stack = [];
-};
-
-gdjs.SceneStack.prototype.setPixiRenderer = function(pixiRenderer) {
-    this._pixiRenderer = pixiRenderer;
 };
 
 gdjs.SceneStack.prototype.onRendererResized = function() {
@@ -26,7 +21,6 @@ gdjs.SceneStack.prototype.step = function() {
     	var request = currentScene.getRequestedChange();
         //Something special was requested by the current scene.
         if (request === gdjs.RuntimeScene.STOP_GAME) {
-            //postGameScreen(); //TODO
             return false;
         } else if (request === gdjs.RuntimeScene.POP_SCENE) {
         	this.pop();
@@ -46,12 +40,15 @@ gdjs.SceneStack.prototype.step = function() {
 };
 
 gdjs.SceneStack.prototype.pop = function() {
-	if (this._stack.length <= 1) return false;
-	return this._stack.pop();
+	if (this._stack.length <= 1) return null;
+
+    var scene = this._stack.pop();
+    scene.unloadScene();
+	return scene;
 };
 
 gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
-    var newScene = new gdjs.RuntimeScene(this._runtimeGame, this._pixiRenderer);
+    var newScene = new gdjs.RuntimeScene(this._runtimeGame);
     newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));
 
     //Optionally create the objects from an external layout.
@@ -67,9 +64,15 @@ gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
 
 gdjs.SceneStack.prototype.replace = function(newSceneName, clear) {
 	if (!!clear) {
-        this._stack.length = 0;
+        while (this._stack.length !== 0) {
+            var scene = this._stack.pop();
+            scene.unloadScene();
+        }
     } else {
-        if (this._stack.length !== 0) this._stack.pop();
+        if (this._stack.length !== 0) {
+            var scene = this._stack.pop();
+            scene.unloadScene();
+        }
     }
 
 	return this.push(newSceneName);

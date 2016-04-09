@@ -5,9 +5,9 @@
  */
 #include "AudioTools.h"
 #include <string>
-#include "GDCpp/RuntimeGame.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/SoundManager.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/SoundManager.h"
 #undef PlaySound //Avoid a nasty macro from polluting everything
 
 /**

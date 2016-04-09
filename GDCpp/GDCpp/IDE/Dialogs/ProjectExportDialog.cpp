@@ -37,7 +37,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/CommonTools.h"
 #include "GDCpp/IDE/FullProjectCompiler.h"
-#include "GDCpp/DatFile.h"
+#include "GDCpp/Runtime/DatFile.h"
 #include "ProjectExportDialog.h"
 #include "CompilationErrorDialog.h"
 

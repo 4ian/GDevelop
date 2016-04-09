@@ -8,7 +8,7 @@
 #define VARIABLEPARSERCALLBACKS_H
 
 #include <string>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 #include <vector>
 #include "GDCore/Events/Parsers/VariableParser.h"
 

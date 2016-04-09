@@ -13,7 +13,7 @@ This project is released under the MIT License.
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Instruction.h"
 #include <map>
-#include "GDCpp/ManualTimer.h"
+#include "GDCpp/Runtime/ManualTimer.h"
 class RuntimeScene;
 namespace gd { class Instruction; }
 namespace gd { class SerializerElement; }

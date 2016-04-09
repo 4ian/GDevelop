@@ -11,7 +11,7 @@
  * @param {gdjs.RuntimeGame} runtimeGame The game associated to this scene.
  * @param {PIXI.WebGLRenderer|PIXI.CanvasRenderer} pixiRenderer The renderer to be used
  */
-gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
+gdjs.RuntimeScene = function(runtimeGame)
 {
     this._eventsFunction = null;
     this._instances = new Hashtable(); //Contains the instances living on the scene
@@ -20,8 +20,8 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._objectsCtor = new Hashtable();
     this._layers = new Hashtable();
 	this._initialBehaviorSharedData = new Hashtable();
-    this._pixiRenderer = pixiRenderer;
-    this._pixiContainer = new PIXI.Container(); //The Container meant to contains all pixi objects of the scene.
+    this._renderer = new gdjs.RuntimeSceneRenderer(this,
+        runtimeGame ? runtimeGame.getRenderer() : null);
     this._variables = new gdjs.VariablesContainer();
     this._runtimeGame = runtimeGame;
     this._lastId = 0;
@@ -33,20 +33,19 @@ gdjs.RuntimeScene = function(runtimeGame, pixiRenderer)
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
-    if (this._pixiRenderer) {
-    	this.onCanvasResized();
-    }
+    this._profiler = new gdjs.Profiler();
+
+    this.onCanvasResized();
 };
 
 /**
  * Should be called when the canvas where the scene is rendered has been resized.
- * See gdjs.RuntimeGame.startStandardGameLoop in particular.
+ * See gdjs.RuntimeGame.startGameLoop in particular.
  *
  * @method onCanvasResized
  */
 gdjs.RuntimeScene.prototype.onCanvasResized = function() {
-    this._pixiContainer.scale.x = this._pixiRenderer.width / this._runtimeGame.getDefaultWidth();
-    this._pixiContainer.scale.y = this._pixiRenderer.height / this._runtimeGame.getDefaultHeight();
+    this._renderer.onCanvasResized();
 };
 
 /**
@@ -63,7 +62,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 	if ( this._isLoaded ) this.unloadScene();
 
 	//Setup main properties
-	document.title = sceneData.title;
+    if (this._runtimeGame) this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
 	this._name = sceneData.name;
 	this.setBackgroundColor(parseInt(sceneData.r, 10),
 			parseInt(sceneData.v, 10),
@@ -120,8 +119,10 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     var module = gdjs[sceneData.mangledName+"Code"];
     if ( module && module.func )
     	this._eventsFunction = module.func;
-    else
+    else {
+        console.log("Warning: no function found for running logic of scene " + this._name);
     	this._eventsFunction = (function() {});
+    }
 
     this._eventsContext = new gdjs.EventsContext();
 
@@ -139,6 +140,9 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
 gdjs.RuntimeScene.prototype.unloadScene = function() {
 	if ( !this._isLoaded ) return;
+
+    if (this._renderer && this._renderer.onSceneUnloaded)
+        this._renderer.onSceneUnloaded();
 
     this._eventsContext = new gdjs.EventsContext();
 	for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
@@ -193,13 +197,21 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * or a game stop was requested.
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function() {
+    this._profiler.frameStarted();
+    this._profiler.begin("timeManager");
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
 	this._timeManager.update(this._runtimeGame.getMinimalFramerate());
+    this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
+    this._profiler.begin("events");
 	this._eventsFunction(this, this._eventsContext);
+    this._profiler.begin("objects (post-events)");
 	this._updateObjects();
+    this._profiler.begin("objects (visibility)");
 	this._updateObjectsVisibility();
+    this._profiler.begin("render");
 	this.render();
+    this._profiler.end();
 
 	return !!this.getRequestedChange();
 };
@@ -209,11 +221,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
  * @method render
  */
 gdjs.RuntimeScene.prototype.render = function() {
-	if (!this._pixiRenderer) return;
-
-	// render the PIXI container of the scene
-	this._pixiRenderer.backgroundColor = this._backgroundColor;
-	this._pixiRenderer.render(this._pixiContainer);
+	this._renderer.render();
 };
 
 /**
@@ -239,7 +247,7 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
 
-			object.exposePIXIDisplayObject(object.isHidden() ? hide : show);
+			object.exposeRendererObject(object.isHidden() ? hide : show);
 		}
 
 		return;
@@ -265,14 +273,14 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 			if (!cameraCoords) continue;
 
 			if (object.isHidden()) {
-				object.exposePIXIDisplayObject(hide);
+				object.exposeRendererObject(hide);
 			} else {
 				var aabb = object.getAABB();
 				if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
 					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
-					object.exposePIXIDisplayObject(hide);
+					object.exposeRendererObject(hide);
 				} else {
-					object.exposePIXIDisplayObject(show);
+					object.exposeRendererObject(show);
 				}
 			}
 		}
@@ -370,10 +378,12 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
  * @method setBackgroundColor
  */
 gdjs.RuntimeScene.prototype.setBackgroundColor = function(r,g,b) {
-	if (!this._pixiRenderer) return;
-
 	this._backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
 };
+
+gdjs.RuntimeScene.prototype.getBackgroundColor = function() {
+    return this._backgroundColor;
+}
 
 /**
  * Get the name of the scene.
@@ -509,19 +519,11 @@ gdjs.RuntimeScene.prototype.createNewUniqueId = function() {
 };
 
 /**
- * Get the PIXI renderer associated to the RuntimeScene.
- * @method getPIXIRenderer
+ * Get the renderer associated to the RuntimeScene.
+ * @method getRenderer
  */
-gdjs.RuntimeScene.prototype.getPIXIRenderer = function() {
-	return this._pixiRenderer;
-};
-
-/**
- * Get the PIXI Container associated to the RuntimeScene.
- * @method getPIXIContainer
- */
-gdjs.RuntimeScene.prototype.getPIXIContainer = function() {
-	return this._pixiContainer;
+gdjs.RuntimeScene.prototype.getRenderer = function() {
+	return this._renderer;
 };
 
 /**

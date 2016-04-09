@@ -8,8 +8,8 @@ This project is released under the MIT License.
 #ifndef PATHBEHAVIOR_H
 #define PATHBEHAVIOR_H
 
-#include "GDCpp/Project/Behavior.h"
-#include "GDCpp/Project/Object.h"
+#include "GDCpp/Runtime/Project/Behavior.h"
+#include "GDCpp/Runtime/Project/Object.h"
 #include <SFML/System/Vector2.hpp>
 #include <map>
 class RuntimeScene;

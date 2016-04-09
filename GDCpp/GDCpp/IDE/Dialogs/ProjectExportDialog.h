@@ -24,7 +24,7 @@
 #include <wx/msw/winundef.h>
 #endif
 
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 using namespace std;
 

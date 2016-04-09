@@ -23,10 +23,10 @@ NetworkExtension::NetworkExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllActions()["SendRequest"].SetFunctionName("gdjs.evtTools.network.sendHttpRequest").SetIncludeFile("networktools.js");
-    GetAllActions()["JSONToVariableStructure"].SetFunctionName("gdjs.evtTools.network.jsonToVariableStructure").SetIncludeFile("networktools.js");
+    GetAllActions()["SendRequest"].SetFunctionName("gdjs.evtTools.network.sendHttpRequest");
+    GetAllActions()["JSONToVariableStructure"].SetFunctionName("gdjs.evtTools.network.jsonToVariableStructure");
 
-    GetAllStrExpressions()["ToJSON"].SetFunctionName("gdjs.evtTools.network.variableStructureToJSON").SetIncludeFile("networktools.js");
+    GetAllStrExpressions()["ToJSON"].SetFunctionName("gdjs.evtTools.network.variableStructureToJSON");
 
     StripUnimplementedInstructionsAndExpressions();
 }

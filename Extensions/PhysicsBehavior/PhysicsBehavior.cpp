@@ -9,13 +9,13 @@ This project is released under the MIT License.
 #include <string>
 #include "Box2D/Box2D.h"
 #include "Triangulation/triangulate.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
 #include "PhysicsBehaviorEditor.h"
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Project/Project.h"
-#include "GDCpp/Project/Layout.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/Project/Project.h"
+#include "GDCpp/Runtime/Project/Layout.h"
 #include "RuntimeScenePhysicsDatas.h"
 
 #undef GetObject

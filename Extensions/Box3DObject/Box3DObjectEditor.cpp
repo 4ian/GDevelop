@@ -15,8 +15,8 @@ This project is released under the MIT License.
 #include <wx/string.h>
 //*)
 #include "GDCore/Tools/Log.h"
-#include "GDCpp/Project/Project.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/Project/Project.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"

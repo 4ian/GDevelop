@@ -51,6 +51,11 @@ namespace gd
     }
 #else
     #warning System not supported for dynamic libraries loading
+        Handle OpenLibrary(const char* path) {return nullptr;}
+        void* GetSymbol(Handle library, const char* name) { return nullptr;}
+        void CloseLibrary(Handle library) {}
+        gd::String DynamicLibraryLastError() {return "";}
+        Handle SetLibraryGlobal(const char* path) { return nullptr; }
 #endif
 
 }

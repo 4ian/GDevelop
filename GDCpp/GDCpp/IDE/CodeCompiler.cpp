@@ -13,8 +13,8 @@
 #include <wx/filename.h>
 #include <wx/filefn.h>
 #include <wx/txtstrm.h>
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/Project/Layout.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/Project/Layout.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
 
@@ -68,7 +68,7 @@ gd::String CodeCompilerCall::GetFullCall() const
 
     if ( !link ) //Generate argument for compiling a file
     {
-        if ( !compilationForRuntime ) args.push_back("-include \""+baseDir+"CppPlatform/include/GDCpp/GDCpp/EventsPrecompiledHeader.h\"");
+        if ( !compilationForRuntime ) args.push_back("-include \""+baseDir+"CppPlatform/Sources/GDCpp/GDCpp/Runtime/EventsPrecompiledHeader.h\"");
         args.push_back("-c \""+inputFile+"\"");
 
         //Compiler default directories
@@ -89,12 +89,11 @@ gd::String CodeCompilerCall::GetFullCall() const
         #elif defined(MACOS)
         #endif
 
-        standardsIncludeDirs.push_back("CppPlatform/include/GDCpp");
-        standardsIncludeDirs.push_back("CppPlatform/include/Core");
+        standardsIncludeDirs.push_back("CppPlatform/Sources/GDCpp");
+        standardsIncludeDirs.push_back("CppPlatform/Sources/Core");
         standardsIncludeDirs.push_back("CppPlatform/include/SFML/include");
-        standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/include");
-        standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/lib/gcc_dll/msw");
-        standardsIncludeDirs.push_back("CppPlatform/Extensions/include");
+        standardsIncludeDirs.push_back("CppPlatform/Sources/");
+        standardsIncludeDirs.push_back("CppPlatform/Sources/Extensions");
 
         for (std::size_t i =0;i<standardsIncludeDirs.size();++i)
             args.push_back("-I\""+baseDir+standardsIncludeDirs[i]+"\"");

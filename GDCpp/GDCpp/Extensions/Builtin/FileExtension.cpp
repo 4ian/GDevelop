@@ -1,6 +1,6 @@
 #include "GDCpp/Extensions/Builtin/FileExtension.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
-#include "GDCpp/XmlFilesHelper.h"
+#include "GDCpp/Runtime/XmlFilesHelper.h"
 #if !defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/Builtin/FileExtension.cpp"
 #endif

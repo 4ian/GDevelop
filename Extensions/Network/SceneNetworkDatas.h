@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef SCENENETWORKDATAS_H
 #define SCENENETWORKDATAS_H
 
-#include "GDCpp/Project/BehaviorsSharedData.h"
+#include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
 #include "RuntimeSceneNetworkDatas.h"
 
 /**

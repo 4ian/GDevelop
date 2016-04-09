@@ -18,10 +18,10 @@ This project is released under the MIT License.
 #include <wx/filename.h>
 #include <wx/filedlg.h>
 
-#include "GDCpp/Project/Project.h"
+#include "GDCpp/Runtime/Project/Project.h"
 #include "SoundObject.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 
 //(*IdInit(SoundObjectEditor)
 const long SoundObjectEditor::ID_RADIOBUTTON2 = wxNewId();

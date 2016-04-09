@@ -12,7 +12,7 @@ This project is released under the MIT License.
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Audio/Music.hpp>
 
-#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 
 class SoundWrapperBase
 {

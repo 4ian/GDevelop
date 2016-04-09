@@ -11,10 +11,10 @@
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ClassWithObjects.h"
 #include "GDCore/Project/Layout.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/ObjInstancesHolder.h"
-#include "GDCpp/RuntimeGame.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/ObjInstancesHolder.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
 
 TEST_CASE( "ObjInstancesHolder", "[common]" ) {
 	SECTION("Basics") {

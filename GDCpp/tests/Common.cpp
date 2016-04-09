@@ -10,8 +10,8 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/ClassWithObjects.h"
 #include "GDCore/Project/Layout.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeGame.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
 
 TEST_CASE( "RuntimeScene", "[common]" ) {
 	SECTION("Basics") {

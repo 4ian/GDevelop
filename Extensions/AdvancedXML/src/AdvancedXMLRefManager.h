@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #define ADVANCEDXMLREFMANAGER_H_INCLUDED
 
 #include <map>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 class TiXmlNode;
 class RuntimeScene;

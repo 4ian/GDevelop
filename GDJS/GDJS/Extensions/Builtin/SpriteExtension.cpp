@@ -91,7 +91,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("expression", _("X position"))
             .AddParameter("expression", _("Y position"))
             .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"))
-            .SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+            .SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
 
 
 
@@ -105,7 +105,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite")
             .AddParameter("color", _("Color to make transparent"))
-            .SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/RuntimeSpriteObject.h");
+            .SetFunctionName("MakeColorTransparent").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     }
 
 */

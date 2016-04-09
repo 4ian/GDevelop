@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 class RuntimeScene;
 class RuntimeObject;

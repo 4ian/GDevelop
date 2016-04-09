@@ -23,7 +23,7 @@ This project is released under the MIT License.*/
 #include <wx/textdlg.h>
 #include <wx/numdlg.h>
 
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include <string>
 #include <cmath>

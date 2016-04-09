@@ -27,13 +27,13 @@ freely, subject to the following restrictions:
 #ifndef LIGHTOBSTACLEBEHAVIOR_H
 #define LIGHTOBSTACLEBEHAVIOR_H
 
-#include "GDCpp/Project/Behavior.h"
-#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/Runtime/Project/Behavior.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
 #include "Light.h"
 #include "LightManager.h"
 #include <map>
 #include <set>
-#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 namespace gd { class SerializerElement; }
 namespace gd { class Layout; }
 class LightObstacleBehaviorEditor;

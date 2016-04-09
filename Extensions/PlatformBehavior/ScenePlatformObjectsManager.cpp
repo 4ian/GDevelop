@@ -1,15 +1,14 @@
 #include "ScenePlatformObjectsManager.h"
 #include "PlatformBehavior.h"
 
-std::map<RuntimeScene*, ScenePlatformObjectsManager> ScenePlatformObjectsManager::managers; 
+std::map<RuntimeScene*, ScenePlatformObjectsManager> ScenePlatformObjectsManager::managers;
 
 ScenePlatformObjectsManager::~ScenePlatformObjectsManager()
 {
 	for (std::set<PlatformBehavior*>::iterator it = allPlatforms.begin();
-		 it != allPlatforms.end();
-		 ++it)
+		 it != allPlatforms.end();)
 	{
-		(*it)->Activate(false);
+		(*it++)->Activate(false);
 	}
 }
 

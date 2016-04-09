@@ -21,7 +21,7 @@
 #include "GDCpp/Extensions/Builtin/CommonInstructionsTools.h"
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/Events/Builtin/CppCodeEvent.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Extensions/Platform.h"

@@ -12,11 +12,11 @@ This project is released under the MIT License.
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDCpp/Project/Project.h"
+#include "GDCpp/Runtime/Project/Project.h"
 #include "LightObstacleBehavior.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/Project/Layout.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/Project/Layout.h"
 
 //(*IdInit(LightObstacleBehaviorEditor)
 //*)

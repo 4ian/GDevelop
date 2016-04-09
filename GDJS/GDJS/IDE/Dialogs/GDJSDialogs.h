@@ -53,11 +53,15 @@ protected:
     wxStaticBitmap* m_staticBitmap5744;
     wxStaticText* m_staticText6555;
     wxStaticText* m_staticText6768;
-    wxPanel* m_panel71;
-    wxPanel* cocoonjslogoPanel2;
-    wxStaticBitmap* m_staticBitmap574;
-    wxStaticText* m_staticText655;
-    wxStaticText* m_staticText676;
+    wxPanel* m_panel611;
+    wxStaticText* ID_STATICTEXT45;
+    wxTextCtrl* cocosExportFolderEdit;
+    wxButton* cocosExportBrowseBt;
+    wxStaticText* ID_STATICTEXT213;
+    wxStaticText* ID_STATICTEXT114;
+    wxStaticText* ID_STATICTEXT31719;
+    wxStaticText* ID_STATICTEXT317;
+    wxHyperlinkCtrl* ID_HYPERLINKCTRL218;
     wxStaticBitmap* ID_STATICBITMAP2;
     wxHyperlinkCtrl* ID_HYPERLINKCTRL1;
     wxButton* closeBt;
@@ -65,6 +69,7 @@ protected:
 
 protected:
     virtual void OnBrowseBtClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCocosExportBrowseBtClick(wxCommandEvent& event) { event.Skip(); }
     virtual void OnCloseBtClicked(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExportBtClicked(wxCommandEvent& event) { event.Skip(); }
 
@@ -85,11 +90,15 @@ public:
     wxStaticText* GetStaticText6555() { return m_staticText6555; }
     wxStaticText* GetStaticText6768() { return m_staticText6768; }
     wxPanel* GetPanel118() { return m_panel118; }
-    wxStaticBitmap* GetStaticBitmap574() { return m_staticBitmap574; }
-    wxPanel* GetCocoonjslogoPanel2() { return cocoonjslogoPanel2; }
-    wxStaticText* GetStaticText655() { return m_staticText655; }
-    wxStaticText* GetStaticText676() { return m_staticText676; }
-    wxPanel* GetPanel71() { return m_panel71; }
+    wxStaticText* GetID_STATICTEXT45() { return ID_STATICTEXT45; }
+    wxTextCtrl* GetCocosExportFolderEdit() { return cocosExportFolderEdit; }
+    wxButton* GetCocosExportBrowseBt() { return cocosExportBrowseBt; }
+    wxStaticText* GetID_STATICTEXT213() { return ID_STATICTEXT213; }
+    wxStaticText* GetID_STATICTEXT114() { return ID_STATICTEXT114; }
+    wxStaticText* GetID_STATICTEXT31719() { return ID_STATICTEXT31719; }
+    wxStaticText* GetID_STATICTEXT317() { return ID_STATICTEXT317; }
+    wxHyperlinkCtrl* GetID_HYPERLINKCTRL218() { return ID_HYPERLINKCTRL218; }
+    wxPanel* GetPanel611() { return m_panel611; }
     wxChoicebook* GetExportChoice() { return exportChoice; }
     wxStaticBitmap* GetID_STATICBITMAP2() { return ID_STATICBITMAP2; }
     wxHyperlinkCtrl* GetID_HYPERLINKCTRL1() { return ID_HYPERLINKCTRL1; }

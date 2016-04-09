@@ -19,8 +19,8 @@ This project is released under the MIT License.
 #include "GDCore/Project/ImageManager.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCpp/Polygon2d.h"
-#include "GDCpp/RuntimeGame.h"
+#include "GDCpp/Runtime/Polygon2d.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
 
 /**
  * \brief Contains the coordinates of the texture sub-rect

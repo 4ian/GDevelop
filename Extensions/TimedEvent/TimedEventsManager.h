@@ -9,8 +9,8 @@ This project is released under the MIT License.
 #define TIMEDEVENTMANAGER_H
 #include <map>
 #include <string>
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/ManualTimer.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/ManualTimer.h"
 
 class TimedEventsManager
 {

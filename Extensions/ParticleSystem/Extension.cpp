@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Tools/Version.h"
-#include "GDCpp/Project/BehaviorsSharedData.h"
+#include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
 #include "ParticleEmitterObject.h"
 #include "ExtensionSubDeclaration1.h"
 #include "ExtensionSubDeclaration2.h"

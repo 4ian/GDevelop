@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #define SCENEPLATFORMOBJECTSMANAGER_H
 #include <map>
 #include <set>
-#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 class PlatformBehavior;
 
 /**

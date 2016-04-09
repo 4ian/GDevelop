@@ -9,12 +9,12 @@ This project is released under the MIT License.
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "DraggableBehavior.h"
-#include "GDCpp/Project/Layout.h"
-#include "GDCpp/RuntimeLayer.h"
-#include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/Project/Layout.h"
+#include "GDCpp/Runtime/RuntimeLayer.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/CommonTools.h"
 
 bool DraggableBehavior::somethingDragged = false;
 bool DraggableBehavior::leftPressedLastFrame = false;

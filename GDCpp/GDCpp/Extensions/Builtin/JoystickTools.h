@@ -7,7 +7,7 @@
 #define JOYSTICKTOOLS_H
 
 #include <string>
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/String.h"
 
 class RuntimeScene;
 namespace gd { class Variable; }

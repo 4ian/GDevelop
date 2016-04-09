@@ -6,7 +6,7 @@
 #include <string>
 #include "GDCpp/Extensions/Builtin/KeyboardTools.h"
 #include <SFML/Graphics.hpp>
-#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 
 using namespace std;
 

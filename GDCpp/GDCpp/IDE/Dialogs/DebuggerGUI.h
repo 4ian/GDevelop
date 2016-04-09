@@ -11,8 +11,8 @@
 #include <functional>
 #include <wx/toolbar.h>
 
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Project/Project.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/Project/Project.h"
 #include "GDCpp/IDE/BaseDebugger.h"
 
 class GD_API DebuggerGUI : public DebuggerGUIBase, public BaseDebugger

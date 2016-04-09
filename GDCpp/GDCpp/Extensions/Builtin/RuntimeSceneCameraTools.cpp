@@ -4,9 +4,9 @@
  * This project is released under the MIT License.
  */
 #include "RuntimeSceneCameraTools.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/RuntimeLayer.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/RuntimeLayer.h"
 
 float GD_API GetCameraX(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {

@@ -11,10 +11,10 @@
 #include "GDCore/Project/ClassWithObjects.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeGame.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/RuntimeObjectsListsTools.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/RuntimeObjectsListsTools.h"
 #include "GDCpp/Extensions/Builtin/RuntimeSceneTools.h"
 
 TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {

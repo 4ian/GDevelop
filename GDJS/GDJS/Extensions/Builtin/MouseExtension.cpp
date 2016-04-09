@@ -25,31 +25,31 @@ MouseExtension::MouseExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    GetAllConditions()["SourisX"].SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");
-    GetAllConditions()["SourisY"].SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js");
-    GetAllConditions()["SourisBouton"].SetFunctionName("gdjs.evtTools.input.isMouseButtonPressed").SetIncludeFile("inputtools.js");
-    GetAllConditions()["MouseButtonReleased"].SetFunctionName("gdjs.evtTools.input.isMouseButtonReleased").SetIncludeFile("inputtools.js");
-    GetAllActions()["CacheSouris"].SetFunctionName("gdjs.evtTools.input.hideCursor").SetIncludeFile("inputtools.js");
-    GetAllActions()["MontreSouris"].SetFunctionName("gdjs.evtTools.input.showCursor").SetIncludeFile("inputtools.js");
-    GetAllActions()["TouchSimulateMouse"].SetFunctionName("gdjs.evtTools.input.touchSimulateMouse").SetIncludeFile("inputtools.js");
+    GetAllConditions()["SourisX"].SetFunctionName("gdjs.evtTools.input.getMouseX");
+    GetAllConditions()["SourisY"].SetFunctionName("gdjs.evtTools.input.getMouseY");
+    GetAllConditions()["SourisBouton"].SetFunctionName("gdjs.evtTools.input.isMouseButtonPressed");
+    GetAllConditions()["MouseButtonReleased"].SetFunctionName("gdjs.evtTools.input.isMouseButtonReleased");
+    GetAllActions()["CacheSouris"].SetFunctionName("gdjs.evtTools.input.hideCursor");
+    GetAllActions()["MontreSouris"].SetFunctionName("gdjs.evtTools.input.showCursor");
+    GetAllActions()["TouchSimulateMouse"].SetFunctionName("gdjs.evtTools.input.touchSimulateMouse");
 
-    GetAllConditions()["SourisSurObjet"].SetFunctionName("gdjs.evtTools.input.cursorOnObject").SetIncludeFile("inputtools.js");
+    GetAllConditions()["SourisSurObjet"].SetFunctionName("gdjs.evtTools.input.cursorOnObject");
 
-    GetAllExpressions()["MouseX"].SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js");
-    GetAllExpressions()["SourisX"].SetFunctionName("gdjs.evtTools.input.getMouseX").SetIncludeFile("inputtools.js"); //Deprecated
-    GetAllExpressions()["MouseY"].SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js");
-    GetAllExpressions()["SourisY"].SetFunctionName("gdjs.evtTools.input.getMouseY").SetIncludeFile("inputtools.js"); //Deprecated
+    GetAllExpressions()["MouseX"].SetFunctionName("gdjs.evtTools.input.getMouseX");
+    GetAllExpressions()["SourisX"].SetFunctionName("gdjs.evtTools.input.getMouseX"); //Deprecated
+    GetAllExpressions()["MouseY"].SetFunctionName("gdjs.evtTools.input.getMouseY");
+    GetAllExpressions()["SourisY"].SetFunctionName("gdjs.evtTools.input.getMouseY"); //Deprecated
 
-    GetAllConditions()["PopStartedTouch"].SetFunctionName("gdjs.evtTools.input.popStartedTouch").SetIncludeFile("inputtools.js");
-    GetAllConditions()["PopEndedTouch"].SetFunctionName("gdjs.evtTools.input.popEndedTouch").SetIncludeFile("inputtools.js");
+    GetAllConditions()["PopStartedTouch"].SetFunctionName("gdjs.evtTools.input.popStartedTouch");
+    GetAllConditions()["PopEndedTouch"].SetFunctionName("gdjs.evtTools.input.popEndedTouch");
 
-    GetAllConditions()["TouchX"].SetFunctionName("gdjs.evtTools.input.getTouchX").SetIncludeFile("inputtools.js");
-    GetAllConditions()["TouchY"].SetFunctionName("gdjs.evtTools.input.getTouchY").SetIncludeFile("inputtools.js");
-    GetAllExpressions()["TouchX"].SetFunctionName("gdjs.evtTools.input.getTouchX").SetIncludeFile("inputtools.js");
-    GetAllExpressions()["TouchY"].SetFunctionName("gdjs.evtTools.input.getTouchY").SetIncludeFile("inputtools.js");
+    GetAllConditions()["TouchX"].SetFunctionName("gdjs.evtTools.input.getTouchX");
+    GetAllConditions()["TouchY"].SetFunctionName("gdjs.evtTools.input.getTouchY");
+    GetAllExpressions()["TouchX"].SetFunctionName("gdjs.evtTools.input.getTouchX");
+    GetAllExpressions()["TouchY"].SetFunctionName("gdjs.evtTools.input.getTouchY");
 
-    GetAllExpressions()["LastTouchId"].SetFunctionName("gdjs.evtTools.input.getLastTouchId").SetIncludeFile("inputtools.js");
-    GetAllExpressions()["LastEndedTouchId"].SetFunctionName("gdjs.evtTools.input.getLastEndedTouchId").SetIncludeFile("inputtools.js");
+    GetAllExpressions()["LastTouchId"].SetFunctionName("gdjs.evtTools.input.getLastTouchId");
+    GetAllExpressions()["LastEndedTouchId"].SetFunctionName("gdjs.evtTools.input.getLastEndedTouchId");
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
 }

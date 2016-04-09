@@ -7,7 +7,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include "CompilerMessagesParser.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include <iostream>
 
 namespace GDpriv

@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 #include <SFML/System.hpp>
-#include "GDCpp/profile.h"
+#include "GDCpp/Runtime/profile.h"
 namespace gd { class BaseEvent; }
 
 /**

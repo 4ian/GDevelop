@@ -10,11 +10,11 @@ This project is released under the MIT License.
 #include "PlatformBehavior.h"
 #include "ScenePlatformObjectsManager.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Project/Layout.h"
-#include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/Project/Layout.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include <SFML/Window.hpp>
 #include <iostream>
 #include <cmath>

@@ -4,8 +4,8 @@
  * This project is released under the MIT License.
  */
 #include <string>
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/String.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/String.h"
 
 using namespace std;
 

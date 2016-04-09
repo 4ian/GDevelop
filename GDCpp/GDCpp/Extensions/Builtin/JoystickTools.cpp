@@ -4,8 +4,8 @@
  * This project is released under the MIT License.
  */
 #include "JoystickTools.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Project/Variable.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/Project/Variable.h"
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 

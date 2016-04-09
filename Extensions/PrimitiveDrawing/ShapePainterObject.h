@@ -8,8 +8,8 @@ This project is released under the MIT License.
 #ifndef DRAWEROBJECT_H
 #define DRAWEROBJECT_H
 
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/RuntimeObject.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
 #include <vector>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/CircleShape.hpp>

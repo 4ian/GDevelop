@@ -17,9 +17,9 @@ This project is released under the MIT License.
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include "GDCpp/Project/Project.h"
-#include "GDCpp/Project/Layout.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/Project/Project.h"
+#include "GDCpp/Runtime/Project/Layout.h"
+#include "GDCpp/Runtime/CommonTools.h"
 
 //(*IdInit(TimedEventEditorDlg)
 const long TimedEventEditorDlg::ID_STATICBITMAP3 = wxNewId();

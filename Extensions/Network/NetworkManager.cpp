@@ -1,7 +1,7 @@
 #include "NetworkManager.h"
 #include "ReceivedDataManager.h"
 #include "ErrorManager.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 
 NetworkManager * NetworkManager::_singleton = NULL;
 

@@ -9,11 +9,11 @@ This project is released under the MIT License.
 #include <cmath>
 #include "PathBehavior.h"
 #include "PathBehaviorEditor.h"
-#include "GDCpp/Project/Layout.h"
-#include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/Project/Layout.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "RuntimeScenePathDatas.h"
 
 PathBehavior::PathBehavior() :

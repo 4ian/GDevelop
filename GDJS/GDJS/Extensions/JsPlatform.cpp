@@ -71,8 +71,8 @@ public:
 
         Exporter exporter(gd::NativeFileSystem::Get());
         bool exportSuccessed = externalLayout ?
-            exporter.ExportExternalLayoutForPreview(project, layout, *externalLayout, exportDir) :
-            exporter.ExportLayoutForPreview(project, layout, exportDir);
+            exporter.ExportExternalLayoutForPixiPreview(project, layout, *externalLayout, exportDir) :
+            exporter.ExportLayoutForPixiPreview(project, layout, exportDir);
 
         if (!exportSuccessed)
         {

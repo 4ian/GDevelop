@@ -14,24 +14,24 @@
 #include <unistd.h>
 #endif
 
-#include "GDCpp/CommonTools.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/ResourcesLoader.h"
-#include "GDCpp/FontManager.h"
-#include "GDCpp/SoundManager.h"
-#include "GDCpp/SceneNameMangler.h"
-#include "GDCpp/Project/Project.h"
-#include "GDCpp/ImageManager.h"
-#include "GDCpp/CodeExecutionEngine.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/ResourcesLoader.h"
+#include "GDCpp/Runtime/FontManager.h"
+#include "GDCpp/Runtime/SoundManager.h"
+#include "GDCpp/Runtime/SceneNameMangler.h"
+#include "GDCpp/Runtime/Project/Project.h"
+#include "GDCpp/Runtime/ImageManager.h"
+#include "GDCpp/Runtime/CodeExecutionEngine.h"
 #include "GDCpp/Extensions/CppPlatform.h"
-#include "GDCpp/ExtensionsLoader.h"
-#include "GDCpp/Log.h"
-#include "GDCpp/SceneStack.h"
-#include "GDCpp/Tools/AES.h"
-#include "GDCpp/Serialization/Serializer.h"
-#include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/TinyXml/tinyxml.h"
-#include "GDCpp/RuntimeGame.h"
+#include "GDCpp/Runtime/ExtensionsLoader.h"
+#include "GDCpp/Runtime/Log.h"
+#include "GDCpp/Runtime/SceneStack.h"
+#include "GDCpp/Runtime/Tools/AES.h"
+#include "GDCpp/Runtime/Serialization/Serializer.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/TinyXml/tinyxml.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
 #include "CompilationChecker.h"
 
 #include <stdlib.h>
@@ -183,11 +183,22 @@ int main( int argc, char *p_argv[] )
 
     //Game main loop
     bool abort = false;
-    SceneStack sceneStack(runtimeGame, &window, codeLibraryName);
+    SceneStack sceneStack(runtimeGame, &window);
     sceneStack.OnError([&abort](gd::String error) {
         DisplayMessage(error);
         abort = true;
     });
+    sceneStack.OnLoadScene([&codeLibraryName](std::shared_ptr<RuntimeScene> scene) {
+        if (!codeLibraryName.empty() &&
+            !scene->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
+            "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scene->GetName())))
+        {
+            return false;
+        }
+
+        return true;
+    });
+
 
     sceneStack.Push(game.GetLayout(0).GetName());
     while (sceneStack.Step() && !abort)

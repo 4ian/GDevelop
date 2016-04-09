@@ -140,21 +140,23 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
  */
 gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
     var theLayer = runtimeScene.getLayer(this.layer);
-    this.exposePIXIDisplayObject(function(displayObject) {
-        theLayer.removePIXIContainerChild(displayObject);
+    this.exposeRendererObject(function(displayObject) {
+        theLayer.getRenderer().removeRendererObject(displayObject);
     });
 };
 
 //Rendering:
 
 /**
- * Called with a callback function that should be called for
- * each PIXI.DisplayObject used by the object
+ * Called with a callback function that should be called with the internal
+ * object used for rendering by the object (PIXI.DisplayObject...)
  *
- * @method exposePIXIDisplayObject
- * @param cb The callback to be called with a PIXI.DisplayObject
+ * @TODO: This should be removed in favor of getRenderer.
+ *
+ * @method exposeRendererObject
+ * @param cb The callback to be called with the internal rendered object (PIXI.DisplayObject...)
  */
-gdjs.RuntimeObject.prototype.exposePIXIDisplayObject = function(cb) {
+gdjs.RuntimeObject.prototype.exposeRendererObject = function(cb) {
 };
 
 //Common properties:
@@ -335,13 +337,15 @@ gdjs.RuntimeObject.prototype.getAngle = function() {
  */
 gdjs.RuntimeObject.prototype.setLayer = function(layer) {
     if (layer === this.layer) return;
-    this.layer = layer;
+    var oldLayer = this._runtimeScene.getLayer(this.layer);
 
-    var theLayer = this._runtimeScene.getLayer(this.layer);
+    this.layer = layer;
+    var newLayer = this._runtimeScene.getLayer(this.layer);
+
     var that = this;
-    this.exposePIXIDisplayObject(function (displayObject) {
-        theLayer.removePIXIContainerChild(displayObject);
-        theLayer.addChildToPIXIContainer(displayObject, that.zOrder);
+    this.exposeRendererObject(function (displayObject) {
+        oldLayer.getRenderer().removeRendererObject(displayObject);
+        newLayer.getRenderer().addRendererObject(displayObject, that.zOrder);
     });
 };
 
@@ -378,8 +382,8 @@ gdjs.RuntimeObject.prototype.setZOrder = function(z) {
     this.zOrder = z;
 
     var theLayer = this._runtimeScene.getLayer(this.layer);
-    this.exposePIXIDisplayObject(function(displayObject) {
-        theLayer.changePIXIContainerChildZOrder(displayObject, z);
+    this.exposeRendererObject(function(displayObject) {
+        theLayer.getRenderer().changeRendererObjectZOrder(displayObject, z);
     });
 };
 

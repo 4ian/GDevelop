@@ -7,9 +7,9 @@ This project is released under the MIT License.
 
 #ifndef TILEMAPOBJECT_H
 #define TILEMAPOBJECT_H
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/Polygon2d.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/Polygon2d.h"
 #include <memory>
 #include <SFML/Graphics/VertexArray.hpp>
 

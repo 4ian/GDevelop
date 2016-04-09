@@ -5,9 +5,9 @@
  */
 
 #include "GDCpp/Extensions/Builtin/TimeExtension.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/ManualTimer.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/ManualTimer.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #if !defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/Builtin/TimeExtension.cpp"

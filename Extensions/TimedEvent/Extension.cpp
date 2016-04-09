@@ -10,12 +10,12 @@ This project is released under the MIT License.
 
 #include "TimedEvent.h"
 #include "TimedEventsManager.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
-#include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 
 /**

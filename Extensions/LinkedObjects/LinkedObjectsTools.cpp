@@ -10,9 +10,9 @@ This project is released under the MIT License.
 #include <string>
 
 #include <memory>
-#include "GDCpp/RuntimeObject.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/RuntimeObjectsListsTools.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeObjectsListsTools.h"
 #include "ObjectsLinksManager.h"
 
 using namespace std;

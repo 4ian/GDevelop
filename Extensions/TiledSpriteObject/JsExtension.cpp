@@ -29,7 +29,10 @@ public:
     {
         DeclareTiledSpriteObjectExtension(*this);
 
-        GetObjectMetadata("TiledSpriteObject::TiledSprite").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetObjectMetadata("TiledSpriteObject::TiledSprite")
+            .SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js")
+            .AddIncludeFile("TiledSpriteObject/tiledspriteruntimeobject-pixi-renderer.js")
+            .AddIncludeFile("TiledSpriteObject/tiledspriteruntimeobject-cocos-renderer.js");
 
         GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Width"].SetFunctionName("setWidth").SetGetter("getWidth").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
         GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Width"].SetFunctionName("getWidth").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");

@@ -10,19 +10,19 @@ This project is released under the MIT License.
 #endif
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Project/Object.h"
-#include "GDCpp/RuntimeScene.h"
-#include "GDCpp/Project/Project.h"
-#include "GDCpp/ImageManager.h"
-#include "GDCpp/Polygon2d.h"
-#include "GDCpp/Serialization/SerializerElement.h"
-#include "GDCpp/FontManager.h"
-#include "GDCpp/Project/InitialInstance.h"
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/Project/Project.h"
+#include "GDCpp/Runtime/ImageManager.h"
+#include "GDCpp/Runtime/Polygon2d.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/FontManager.h"
+#include "GDCpp/Runtime/Project/InitialInstance.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "ShapePainterObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDCpp/CommonTools.h"
+#include "GDCpp/Runtime/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "ShapePainterObjectEditor.h"
 #endif

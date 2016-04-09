@@ -133,14 +133,14 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 /**
  * \brief This class declares information about the extension.
  */
-class Extension : public ExtensionBase
+class PanelSpriteObjectCppExtension : public ExtensionBase
 {
 public:
 
     /**
      * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    Extension()
+    PanelSpriteObjectCppExtension()
     {
         DeclarePanelSpriteObjectExtension(*this);
         AddRuntimeObject<PanelSpriteObject, RuntimePanelSpriteObject>(
@@ -151,12 +151,16 @@ public:
     };
 };
 
-#if !defined(EMSCRIPTEN)
+#if defined(ANDROID)
+extern "C" ExtensionBase * CreateGDCppPanelSpriteObjectExtension() {
+    return new PanelSpriteObjectCppExtension;
+}
+#elif !defined(EMSCRIPTEN)
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
-    return new Extension;
+    return new PanelSpriteObjectCppExtension;
 }
 #endif

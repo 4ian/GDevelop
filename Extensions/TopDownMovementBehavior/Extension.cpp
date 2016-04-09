@@ -6,7 +6,7 @@ This project is released under the MIT License.
 */
 
 #include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCpp/Project/BehaviorsSharedData.h"
+#include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
 #include "GDCore/Tools/Version.h"
 #include "TopDownMovementBehavior.h"
 
@@ -355,26 +355,30 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 /**
  * \brief This class declares information about the extension.
  */
-class Extension : public ExtensionBase
+class TopDownMovementBehaviorCppExtension : public ExtensionBase
 {
 public:
 
     /**
      * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    Extension()
+    TopDownMovementBehaviorCppExtension()
     {
         DeclareTopDownMovementBehaviorExtension(*this);
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 
-#if !defined(EMSCRIPTEN)
+#if defined(ANDROID)
+extern "C" ExtensionBase * CreateGDCppTopDownMovementBehaviorExtension() {
+    return new TopDownMovementBehaviorCppExtension;
+}
+#elif !defined(EMSCRIPTEN)
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
-    return new Extension;
+    return new TopDownMovementBehaviorCppExtension;
 }
 #endif

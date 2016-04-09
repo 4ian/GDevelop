@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "AESTools.h"
 
-#include "GDCpp/Tools/AES.h"
+#include "GDCpp/Runtime/Tools/AES.h"
 #include <iostream>
 #include <fstream>
 #include <string>

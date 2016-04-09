@@ -602,7 +602,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
         highestLayer = std::max(highestLayer, layout.GetLayerPosition(it.first->GetLayer()));
     }
 
-    if (wxMenuItem * layerDownItem = contextMenu.FindItem(ID_LAYERUPMENU))
+    if (wxMenuItem * layerDownItem = contextMenu.FindItem(ID_LAYERDOWNMENU))
     {
         layerDownItem->Enable(false);
         if ( highestLayer >= 1 )

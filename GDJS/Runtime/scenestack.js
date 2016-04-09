@@ -47,6 +47,7 @@ gdjs.SceneStack.prototype.step = function() {
 
 gdjs.SceneStack.prototype.pop = function() {
 	if (this._stack.length <= 1) return false;
+    this._stack[this._stack.length-1].unloadScene();
 	return this._stack.pop();
 };
 
@@ -67,9 +68,15 @@ gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
 
 gdjs.SceneStack.prototype.replace = function(newSceneName, clear) {
 	if (!!clear) {
-        this._stack.length = 0;
+        while(this._stack.length !== 0) {
+            this._stack[this._stack.length-1].unloadScene();
+            this._stack.pop();
+        }
     } else {
-        if (this._stack.length !== 0) this._stack.pop();
+        if (this._stack.length !== 0) {
+            this._stack[this._stack.length-1].unloadScene();
+            this._stack.pop();
+        }
     }
 
 	return this.push(newSceneName);

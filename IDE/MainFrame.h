@@ -375,7 +375,7 @@ private:
     ProjectPropertiesPnl * projectPropertiesPnl;
 
     RecentList m_recentlist; ///<Inventory and manage recent files
-    std::map<long, gd::Platform*> idToPlatformExportMenuMap; ///< Mapping menu items identifier to their associated platform for the export menu.
+    std::map<long, std::pair<gd::Platform*, std::size_t>> idToPlatformExportMenuMap; ///< Mapping menu items identifier to their associated platform and exporter id for the export menu.
 
     wxBitmap ribbonFileNormalBitmap;
     wxBitmap ribbonFileHoveredBitmap;

@@ -169,12 +169,12 @@ public:
     virtual std::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
 
     /**
-     * \brief Must provide a gd::ProjectExporter object that will be used
+     * \brief Must provide at least one gd::ProjectExporter object that will be used
      * by the IDE to export the project so as to be used without the IDE.
      *
-     * The default implementation simply return a gd::ProjectExporter object doing nothing.
+     * The default implementation simply return a vector containing a gd::ProjectExporter object doing nothing.
      */
-    virtual std::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
+    virtual std::vector<std::shared_ptr<gd::ProjectExporter>> GetProjectExporters() const;
     #endif
     ///@}
 

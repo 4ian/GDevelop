@@ -354,11 +354,12 @@ void MainFrame::OnMenuCompilationSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
-    long id =event.GetId();
+    long id = event.GetId();
     if ( idToPlatformExportMenuMap.find(id) == idToPlatformExportMenuMap.end() )
         return;
 
-    std::shared_ptr<gd::ProjectExporter> exporter = idToPlatformExportMenuMap[id]->GetProjectExporter();
+    std::shared_ptr<gd::ProjectExporter> exporter =
+        idToPlatformExportMenuMap[id].first->GetProjectExporters()[idToPlatformExportMenuMap[id].second];
     if ( !exporter ) return;
 
     exporter->ShowProjectExportDialog(*GetCurrentGame());

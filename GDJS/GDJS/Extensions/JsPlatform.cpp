@@ -113,9 +113,9 @@ std::shared_ptr<gd::LayoutEditorPreviewer> JsPlatform::GetLayoutPreviewer(gd::La
         editor.GetProject(), editor.GetLayout(), editor.GetExternalLayout()));
 }
 
-std::shared_ptr<gd::ProjectExporter> JsPlatform::GetProjectExporter() const
+std::vector<std::shared_ptr<gd::ProjectExporter>> JsPlatform::GetProjectExporters() const
 {
-    return std::shared_ptr<gd::ProjectExporter>(new Exporter(gd::NativeFileSystem::Get()));
+    return std::vector<std::shared_ptr<gd::ProjectExporter>>{ std::shared_ptr<gd::ProjectExporter>(new Exporter(gd::NativeFileSystem::Get())) };
 }
 #endif
 

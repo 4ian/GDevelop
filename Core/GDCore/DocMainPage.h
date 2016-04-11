@@ -337,7 +337,7 @@ make -j4
  * \section platformstructure Structure of a platform
  *
  * A platform for GDevelop Core is a class inheriting from gd::Platform.<br>
- * They contains the extensions of the platform (see below) and offer various methods, like gd::Platform::GetProjectExporter which
+ * They contains the extensions of the platform (see below) and offer various methods, like gd::Platform::GetProjectExporters which
  * is called by the IDE to export a gd::Project to a stand-alone game.
  *
  * \subsection platformloading Platforms loading

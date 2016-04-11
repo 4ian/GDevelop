@@ -24,6 +24,7 @@
 #include "GDCpp/IDE/DependenciesAnalyzer.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 
 void AndroidExporter::ShowProjectExportDialog(gd::Project & project)
 {
@@ -34,8 +35,9 @@ void AndroidExporter::ShowProjectExportDialog(gd::Project & project)
 
     ExportWholeProject(project, folderDialog.GetPath());
 
-    wxMessageDialog messageDialog(nullptr, _("The project was exported to \"") + folderDialog.GetPath() + _("\".\nFollow the instructions on the wiki to know how to build the android package from the exported files."), _("Android export"));
-    messageDialog.ShowModal();
+    wxMessageDialog messageDialog(nullptr, _("The project was exported to \"") + folderDialog.GetPath() + _("\".\nFollow the instructions on the wiki to know how to build the android package from the exported files."), _("Android export"), wxOK|wxCENTRE|wxHELP);
+    if(messageDialog.ShowModal() == wxID_HELP)
+        gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/native_android_export");
 #else
     gd::LogError("BAD USE: Tried to call AndroidExporter::ShowProjectExportDialog with support for wxWidgets disabled!");
 #endif

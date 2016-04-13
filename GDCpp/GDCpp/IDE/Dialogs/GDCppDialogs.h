@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef GDCPPDIALOGS_BASE_CLASSES_H
-#define GDCPPDIALOGS_BASE_CLASSES_H
+#ifndef IDE_DIALOGS_GDCPPDIALOGS_BASE_CLASSES_H
+#define IDE_DIALOGS_GDCPPDIALOGS_BASE_CLASSES_H
 
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
@@ -26,6 +26,18 @@
 #include <wx/treectrl.h>
 #include <wx/stattext.h>
 #include <wx/bmpbuttn.h>
+#include <wx/dialog.h>
+#include <wx/iconbndl.h>
+#include <wx/hyperlink.h>
+#include <wx/statline.h>
+#include <wx/textctrl.h>
+#include <wx/button.h>
+#if wxVERSION_NUMBER >= 2900
+#include <wx/persist.h>
+#include <wx/persist/toplevel.h>
+#include <wx/persist/bookctrl.h>
+#include <wx/persist/treebook.h>
+#endif
 
 class DebuggerGUIBase : public wxPanel
 {
@@ -58,8 +70,48 @@ protected:
 protected:
 
 public:
+    wxAuiToolBar* GetToolbar() { return m_toolbar; }
+    wxListCtrl* GetGeneralList() { return m_generalList; }
+    wxPanel* GetPanel31() { return m_panel31; }
+    wxTreeCtrl* GetObjectsTree() { return m_objectsTree; }
+    wxStaticText* GetStaticText45() { return m_staticText45; }
+    wxStaticText* GetObjectName() { return m_objectName; }
+    wxBitmapButton* GetDeleteBt() { return m_deleteBt; }
+    wxListCtrl* GetObjectList() { return m_objectList; }
+    wxPanel* GetPanel33() { return m_panel33; }
+    wxNotebook* GetNotebook() { return m_notebook; }
+    wxAuiManager* GetAuimgr() { return m_auimgr; }
     DebuggerGUIBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~DebuggerGUIBase();
+};
+
+
+class AndroidExportDialogBase : public wxDialog
+{
+protected:
+    wxStaticText* m_staticText55;
+    wxHyperlinkCtrl* m_hyperLink57;
+    wxStaticLine* m_staticLine59;
+    wxStaticText* m_staticText61;
+    wxTextCtrl* m_exportFolderTextCtrl;
+    wxButton* m_browserButton;
+    wxStdDialogButtonSizer* m_stdBtnSizer71;
+    wxButton* m_okButton;
+    wxButton* m_cancelButton;
+
+protected:
+    virtual void OnHelpButtonClicked(wxHyperlinkEvent& event) { event.Skip(); }
+    virtual void OnBrowseButtonClicked(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText55() { return m_staticText55; }
+    wxHyperlinkCtrl* GetHyperLink57() { return m_hyperLink57; }
+    wxStaticLine* GetStaticLine59() { return m_staticLine59; }
+    wxStaticText* GetStaticText61() { return m_staticText61; }
+    wxTextCtrl* GetExportFolderTextCtrl() { return m_exportFolderTextCtrl; }
+    wxButton* GetBrowserButton() { return m_browserButton; }
+    AndroidExportDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Export to native Android"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,300), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~AndroidExportDialogBase();
 };
 
 #endif

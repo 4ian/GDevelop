@@ -71,7 +71,7 @@ public:
     /**
      * \brief Expose to the IDE how to export games.
      */
-    virtual std::shared_ptr<gd::ProjectExporter> GetProjectExporter() const;
+    virtual std::vector<std::shared_ptr<gd::ProjectExporter>> GetProjectExporters() const;
 #endif
 
     /**

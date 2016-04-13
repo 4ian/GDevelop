@@ -303,17 +303,21 @@ MainFrame::MainFrame( wxWindow* parent ) :
     });
 
     //Update the file menu with exporting items
-    for (std::size_t i = 0;i<gd::PlatformManager::Get()->GetAllPlatforms().size();++i)
+    for ( std::size_t i = 0; i < gd::PlatformManager::Get()->GetAllPlatforms().size(); ++i )
     {
-        std::shared_ptr<gd::ProjectExporter> exporter = gd::PlatformManager::Get()->GetAllPlatforms()[i]->GetProjectExporter();
-        if ( exporter != std::shared_ptr<gd::ProjectExporter>()
-             && !exporter->GetProjectExportButtonLabel().empty() )
+        auto exporters = gd::PlatformManager::Get()->GetAllPlatforms()[i]->GetProjectExporters();
+        for( std::size_t j = 0; j < exporters.size(); ++j )
         {
-            long id = wxNewId();
+            auto exporter = exporters[j];
+            if ( exporter != std::shared_ptr<gd::ProjectExporter>()
+                 && !exporter->GetProjectExportButtonLabel().empty() )
+            {
+                long id = wxNewId();
 
-            fileMenu.Insert(11, id, exporter->GetProjectExportButtonLabel());
-            Connect( id, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&MainFrame::OnMenuCompilationSelected );
-            idToPlatformExportMenuMap[id] = gd::PlatformManager::Get()->GetAllPlatforms()[i].get();
+                fileMenu.Insert(11, id, exporter->GetProjectExportButtonLabel());
+                Connect( id, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&MainFrame::OnMenuCompilationSelected );
+                idToPlatformExportMenuMap[id] = std::make_pair(gd::PlatformManager::Get()->GetAllPlatforms()[i].get(), j);
+            }
         }
     }
 
@@ -928,7 +932,7 @@ void MainFrame::OnRibbonFileBtClick(wxMouseEvent& event)
 {
     if ( scenesLockingShortcuts.empty() )
     {
-        for(std::map<long, gd::Platform*>::const_iterator it = idToPlatformExportMenuMap.begin();it != idToPlatformExportMenuMap.end();++it)
+        for ( auto it = idToPlatformExportMenuMap.cbegin(); it != idToPlatformExportMenuMap.cend(); ++it )
         {
             fileMenu.Enable(it->first, false);
         }
@@ -936,9 +940,9 @@ void MainFrame::OnRibbonFileBtClick(wxMouseEvent& event)
         if ( CurrentGameIsValid() )
         {
             const std::vector<gd::Platform*> & usedPlaftorms = GetCurrentGame()->GetUsedPlatforms();
-            for(std::map<long, gd::Platform*>::const_iterator it = idToPlatformExportMenuMap.begin();it != idToPlatformExportMenuMap.end();++it)
+            for ( auto it = idToPlatformExportMenuMap.cbegin(); it != idToPlatformExportMenuMap.end(); ++it )
             {
-                if ( std::find(usedPlaftorms.begin(), usedPlaftorms.end(), it->second) != usedPlaftorms.end() )
+                if ( std::find(usedPlaftorms.begin(), usedPlaftorms.end(), it->second.first) != usedPlaftorms.end() )
                     fileMenu.Enable(it->first, true);
             }
         }

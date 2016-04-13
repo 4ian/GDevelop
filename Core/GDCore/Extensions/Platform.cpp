@@ -138,9 +138,9 @@ std::shared_ptr<gd::LayoutEditorPreviewer> Platform::GetLayoutPreviewer(gd::Layo
     return std::shared_ptr<gd::LayoutEditorPreviewer>(new gd::LayoutEditorPreviewer);
 }
 
-std::shared_ptr<gd::ProjectExporter> Platform::GetProjectExporter() const
+std::vector<std::shared_ptr<gd::ProjectExporter>> Platform::GetProjectExporters() const
 {
-    return std::shared_ptr<gd::ProjectExporter>(new gd::ProjectExporter);
+    return std::vector<std::shared_ptr<gd::ProjectExporter>>{std::shared_ptr<gd::ProjectExporter>(new gd::ProjectExporter)};
 }
 #endif
 

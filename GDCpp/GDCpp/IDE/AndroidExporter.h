@@ -9,9 +9,8 @@ class wxProgressDialog;
  * \brief Allow to export a game for Android
  * \todo Highly experimental
  *
- * To try it, replace the exporter in CppPlatform::GetProjectExporter and
- * export your game with GDevelop. Be sure to have the Android SDK and NDK
- * installed. [Build SFML](https://github.com/SFML/SFML/wiki/Tutorial:-Building-SFML-for-Android)
+ * To export a game for Android:
+ * [Build SFML](https://github.com/SFML/SFML/wiki/Tutorial:-Building-SFML-for-Android)
  * for Android NDK. Finally, go in the exported folder and do:
  *
  * ~~~~~~~~~~~~~~~~~~~~~
@@ -26,7 +25,7 @@ public:
 
     void ShowProjectExportDialog(gd::Project & project);
 
-    gd::String GetProjectExportButtonLabel() { return "Export for Android"; }
+    gd::String GetProjectExportButtonLabel() { return "Export for Android (experimental)"; }
 
     bool ExportWholeProject(gd::Project & project, gd::String exportDir);
 private:

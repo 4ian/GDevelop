@@ -158,12 +158,12 @@ std::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd::L
     return std::shared_ptr<gd::LayoutEditorPreviewer>(new CppLayoutPreviewer(editor));
 }
 
-std::shared_ptr<gd::ProjectExporter> CppPlatform::GetProjectExporter() const
+std::vector<std::shared_ptr<gd::ProjectExporter>> CppPlatform::GetProjectExporters() const
 {
-    return std::shared_ptr<gd::ProjectExporter>(new Exporter);
-
-    //Experimental native Android exporter
-    //return std::shared_ptr<gd::ProjectExporter>(new AndroidExporter(gd::NativeFileSystem::Get()));
+    return std::vector<std::shared_ptr<gd::ProjectExporter>>{
+        std::shared_ptr<gd::ProjectExporter>(new Exporter),
+        std::shared_ptr<gd::ProjectExporter>(new AndroidExporter(gd::NativeFileSystem::Get()))
+    };
 }
 #endif
 

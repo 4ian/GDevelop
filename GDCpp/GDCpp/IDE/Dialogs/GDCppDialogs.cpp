@@ -50,6 +50,7 @@ DebuggerGUIBase::DebuggerGUIBase(wxWindow* parent, wxWindowID id, const wxPoint&
     m_toolbar->Realize();
     
     m_notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxBK_DEFAULT);
+    m_notebook->SetName(wxT("m_notebook"));
     wxImageList* m_notebook_il = new wxImageList(16, 16);
     m_notebook->AssignImageList(m_notebook_il);
     
@@ -121,11 +122,11 @@ DebuggerGUIBase::DebuggerGUIBase(wxWindow* parent, wxWindowID id, const wxPoint&
     flexGridSizer41->Add(m_objectList, 0, wxALL|wxEXPAND, 0);
     m_objectList->SetMinSize(wxSize(150,100));
     
-    SetSizeHints(500,300);
-    if ( GetSizer() ) {
+    SetName(wxT("DebuggerGUIBase"));
+    SetSize(500,300);
+    if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    Centre(wxBOTH);
 }
 
 DebuggerGUIBase::~DebuggerGUIBase()
@@ -133,4 +134,109 @@ DebuggerGUIBase::~DebuggerGUIBase()
     m_auimgr->UnInit();
     delete m_auimgr;
 
+}
+
+AndroidExportDialogBase::AndroidExportDialogBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxCCA21InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer53 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer53->SetFlexibleDirection( wxBOTH );
+    flexGridSizer53->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer53->AddGrowableCol(0);
+    flexGridSizer53->AddGrowableRow(5);
+    this->SetSizer(flexGridSizer53);
+    
+    m_staticText55 = new wxStaticText(this, wxID_ANY, _("Exports the game to a native Android application. This will produce source files ready to be compiled for Android using the Android SDK and NDK."), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText55->Wrap(500);
+    
+    flexGridSizer53->Add(m_staticText55, 0, wxALL, 5);
+    
+    m_hyperLink57 = new wxHyperlinkCtrl(this, wxID_ANY, _("How to compile your game exported files."), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink57->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink57->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink57->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    flexGridSizer53->Add(m_hyperLink57, 0, wxALL, 5);
+    
+    m_staticLine59 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
+    
+    flexGridSizer53->Add(m_staticLine59, 0, wxALL|wxEXPAND, 5);
+    
+    m_staticText61 = new wxStaticText(this, wxID_ANY, _("Export folder:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer53->Add(m_staticText61, 0, wxALL, 5);
+    
+    wxFlexGridSizer* flexGridSizer63 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer63->SetFlexibleDirection( wxBOTH );
+    flexGridSizer63->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer63->AddGrowableCol(0);
+    flexGridSizer63->AddGrowableRow(0);
+    
+    flexGridSizer53->Add(flexGridSizer63, 1, wxALL|wxEXPAND, 0);
+    
+    m_exportFolderTextCtrl = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_exportFolderTextCtrl->SetHint(wxT(""));
+    #endif
+    m_exportFolderTextCtrl->AutoCompleteDirectories();
+    
+    flexGridSizer63->Add(m_exportFolderTextCtrl, 0, wxALL|wxEXPAND, 5);
+    
+    m_browserButton = new wxButton(this, wxID_ANY, _("Browse..."), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer63->Add(m_browserButton, 0, wxALL, 5);
+    
+    wxFlexGridSizer* flexGridSizer79 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer79->SetFlexibleDirection( wxBOTH );
+    flexGridSizer79->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer53->Add(flexGridSizer79, 1, wxALL|wxEXPAND, 5);
+    
+    m_stdBtnSizer71 = new wxStdDialogButtonSizer();
+    
+    flexGridSizer53->Add(m_stdBtnSizer71, 0, wxALL|wxEXPAND, 5);
+    
+    m_okButton = new wxButton(this, wxID_OK, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
+    m_okButton->SetDefault();
+    m_stdBtnSizer71->AddButton(m_okButton);
+    
+    m_cancelButton = new wxButton(this, wxID_CANCEL, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
+    m_stdBtnSizer71->AddButton(m_cancelButton);
+    m_stdBtnSizer71->Realize();
+    
+    SetName(wxT("AndroidExportDialogBase"));
+    SetSize(-1,300);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    m_hyperLink57->Connect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(AndroidExportDialogBase::OnHelpButtonClicked), NULL, this);
+    m_browserButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AndroidExportDialogBase::OnBrowseButtonClicked), NULL, this);
+    
+}
+
+AndroidExportDialogBase::~AndroidExportDialogBase()
+{
+    m_hyperLink57->Disconnect(wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler(AndroidExportDialogBase::OnHelpButtonClicked), NULL, this);
+    m_browserButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AndroidExportDialogBase::OnBrowseButtonClicked), NULL, this);
+    
 }

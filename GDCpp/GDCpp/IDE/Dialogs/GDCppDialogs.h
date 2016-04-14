@@ -28,6 +28,7 @@
 #include <wx/bmpbuttn.h>
 #include <wx/dialog.h>
 #include <wx/iconbndl.h>
+#include <wx/statbox.h>
 #include <wx/hyperlink.h>
 #include <wx/statline.h>
 #include <wx/textctrl.h>
@@ -90,6 +91,7 @@ class AndroidExportDialogBase : public wxDialog
 {
 protected:
     wxStaticText* m_staticText55;
+    wxStaticText* m_staticText85;
     wxHyperlinkCtrl* m_hyperLink57;
     wxStaticLine* m_staticLine59;
     wxStaticText* m_staticText61;
@@ -105,12 +107,13 @@ protected:
 
 public:
     wxStaticText* GetStaticText55() { return m_staticText55; }
+    wxStaticText* GetStaticText85() { return m_staticText85; }
     wxHyperlinkCtrl* GetHyperLink57() { return m_hyperLink57; }
     wxStaticLine* GetStaticLine59() { return m_staticLine59; }
     wxStaticText* GetStaticText61() { return m_staticText61; }
     wxTextCtrl* GetExportFolderTextCtrl() { return m_exportFolderTextCtrl; }
     wxButton* GetBrowserButton() { return m_browserButton; }
-    AndroidExportDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Export to native Android"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,300), long style = wxDEFAULT_DIALOG_STYLE);
+    AndroidExportDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Export to native Android"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~AndroidExportDialogBase();
 };
 

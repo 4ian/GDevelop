@@ -564,6 +564,6 @@ void wxCCA21InitBitmapResources()
     XRC_ADD_FILE(wxT("XRC_resource/GDCppDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_pauseicon.png"), xml_res_file_6, xml_res_size_6, wxT("image/png"));
     XRC_ADD_FILE(wxT("XRC_resource/GDCppDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_starticon.png"), xml_res_file_7, xml_res_size_7, wxT("image/png"));
     XRC_ADD_FILE(wxT("XRC_resource/GDCppDialogs_dialogs_bitmaps.cpp$.._.._.._.._Binaries_Output_Release_Windows_res_stepicon.png"), xml_res_file_8, xml_res_size_8, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/GDCppDialogs_dialogs_bitmaps.cpp$E__Developpement_GD_GDCpp_GDCpp_IDE_Dialogs_GDCppDialogs_dialogs_bitmaps.xrc"), xml_res_file_9, xml_res_size_9, wxT("text/xml"));
-    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDCppDialogs_dialogs_bitmaps.cpp$E__Developpement_GD_GDCpp_GDCpp_IDE_Dialogs_GDCppDialogs_dialogs_bitmaps.xrc"));
+    XRC_ADD_FILE(wxT("XRC_resource/GDCppDialogs_dialogs_bitmaps.cpp$_Users_florian_Projects_F_GD_GDCpp_GDCpp_IDE_Dialogs_GDCppDialogs_dialogs_bitmaps.xrc"), xml_res_file_9, xml_res_size_9, wxT("text/xml"));
+    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/GDCppDialogs_dialogs_bitmaps.cpp$_Users_florian_Projects_F_GD_GDCpp_GDCpp_IDE_Dialogs_GDCppDialogs_dialogs_bitmaps.xrc"));
 }

@@ -158,12 +158,21 @@ AndroidExportDialogBase::AndroidExportDialogBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer53->Add(m_staticText55, 0, wxALL, 5);
     
-    m_hyperLink57 = new wxHyperlinkCtrl(this, wxID_ANY, _("How to compile your game exported files."), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    wxStaticBoxSizer* staticBoxSizer83 = new wxStaticBoxSizer( new wxStaticBox(this, wxID_ANY, _("Note")), wxVERTICAL);
+    
+    flexGridSizer53->Add(staticBoxSizer83, 1, wxALL|wxEXPAND, 5);
+    
+    m_staticText85 = new wxStaticText(this, wxID_ANY, _("This exporter is experimental and requires you to use advanced tools to compile the game for Android. Read this article for more information:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText85->Wrap(450);
+    
+    staticBoxSizer83->Add(m_staticText85, 0, wxALL, 5);
+    
+    m_hyperLink57 = new wxHyperlinkCtrl(this, wxID_ANY, _("How to compile your game exported files"), wxT(""), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     m_hyperLink57->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink57->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink57->SetVisitedColour(wxColour(wxT("#FF0000")));
     
-    flexGridSizer53->Add(m_hyperLink57, 0, wxALL, 5);
+    staticBoxSizer83->Add(m_hyperLink57, 0, wxALL, 5);
     
     m_staticLine59 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxLI_HORIZONTAL);
     
@@ -212,7 +221,7 @@ AndroidExportDialogBase::AndroidExportDialogBase(wxWindow* parent, wxWindowID id
     m_stdBtnSizer71->Realize();
     
     SetName(wxT("AndroidExportDialogBase"));
-    SetSize(-1,300);
+    SetSize(-1,-1);
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

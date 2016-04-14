@@ -10,7 +10,7 @@
 AndroidExportDialog::AndroidExportDialog(wxWindow* parent)
     : AndroidExportDialogBase(parent)
 {
-
+    Fit();
 }
 
 AndroidExportDialog::~AndroidExportDialog()

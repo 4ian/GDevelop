@@ -221,6 +221,7 @@ AndroidExportDialogBase::AndroidExportDialogBase(wxWindow* parent, wxWindowID id
     m_stdBtnSizer71->Realize();
     
     SetName(wxT("AndroidExportDialogBase"));
+    SetMinClientSize(wxSize(300,250));
     SetSize(-1,-1);
     if (GetSizer()) {
          GetSizer()->Fit(this);

@@ -24,6 +24,7 @@ LOCAL_SRC_FILES += $(subst $(LOCAL_PATH)/,,$(wildcard $(LOCAL_PATH)/*.cpp))
 LOCAL_CFLAGS +=  -I$(LOCAL_PATH)/Extensions -DGD_EXTENSION_API=""
 LOCAL_SRC_FILES += $(subst $(LOCAL_PATH)/,,$(wildcard $(LOCAL_PATH)/Extensions/TextObject/*.cpp))
 LOCAL_SRC_FILES += $(subst $(LOCAL_PATH)/,,$(wildcard $(LOCAL_PATH)/Extensions/TiledSpriteObject/*.cpp))
+LOCAL_SRC_FILES += $(subst $(LOCAL_PATH)/,,$(wildcard $(LOCAL_PATH)/Extensions/TileMapObject/*.cpp))
 LOCAL_SRC_FILES += $(subst $(LOCAL_PATH)/,,$(wildcard $(LOCAL_PATH)/Extensions/PlatformBehavior/*.cpp))
 LOCAL_SRC_FILES += $(subst $(LOCAL_PATH)/,,$(wildcard $(LOCAL_PATH)/Extensions/DestroyOutsideBehavior/*.cpp))
 LOCAL_SRC_FILES += $(subst $(LOCAL_PATH)/,,$(wildcard $(LOCAL_PATH)/Extensions/TopDownMovementBehavior/*.cpp))

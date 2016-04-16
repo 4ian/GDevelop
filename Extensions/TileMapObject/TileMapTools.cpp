@@ -15,12 +15,14 @@ namespace TileMapExtension
 
 sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
 {
-    sf::VertexArray vertexArray(sf::Quads);
+    sf::VertexArray vertexArray(sf::Triangles);
     int tileWidth = tileSet.tileSize.x;
     int tileHeight = tileSet.tileSize.y;
 
     if(tileSet.IsDirty())
         return vertexArray;
+
+    vertexArray.resize(3 * tileMap.GetColumnsCount() * tileMap.GetRowsCount() * 6);
 
     for(int layer = 0; layer < 3; layer++)
     {
@@ -28,6 +30,11 @@ sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
         {
             for(int row = 0; row < tileMap.GetRowsCount(); row++)
             {
+                unsigned int firstVertexIndex =
+                    layer * (tileMap.GetColumnsCount() * tileMap.GetRowsCount() * 6) +
+                    col * (tileMap.GetRowsCount() * 6) +
+                    row * 6;
+
                 TileTextureCoords coords;
                 if(tileMap.GetTile(layer, col, row) != -1)
                 {
@@ -38,30 +45,28 @@ sf::VertexArray GenerateVertexArray(TileSet &tileSet, TileMap &tileMap)
                     coords = tileSet.GetTileTextureCoords(0);
                 }
 
-                {
-                    sf::Vertex vertex(sf::Vector2f(col * tileWidth, row * tileHeight), coords.topLeft);
-                    if(tileMap.GetTile(layer, col, row) == -1)
-                        vertex.color.a = 0;
-                    vertexArray.append(vertex);
-                }
-                {
-                    sf::Vertex vertex(sf::Vector2f(col * tileWidth, (row + 1) * tileHeight), coords.bottomLeft);
-                    if(tileMap.GetTile(layer, col, row) == -1)
-                        vertex.color.a = 0;
-                    vertexArray.append(vertex);
-                }
-                {
-                    sf::Vertex vertex(sf::Vector2f((col + 1) * tileWidth, (row + 1) * tileHeight), coords.bottomRight);
-                    if(tileMap.GetTile(layer, col, row) == -1)
-                        vertex.color.a = 0;
-                    vertexArray.append(vertex);
-                }
-                {
-                    sf::Vertex vertex(sf::Vector2f((col + 1) * tileWidth, row * tileHeight), coords.topRight);
-                    if(tileMap.GetTile(layer, col, row) == -1)
-                        vertex.color.a = 0;
-                    vertexArray.append(vertex);
-                }
+                sf::Vertex topLeftVertex(sf::Vector2f(col * tileWidth, row * tileHeight), coords.topLeft);
+                if(tileMap.GetTile(layer, col, row) == -1)
+                    topLeftVertex.color.a = 0;
+
+                sf::Vertex bottomLeftVertex(sf::Vector2f(col * tileWidth, (row + 1) * tileHeight), coords.bottomLeft);
+                if(tileMap.GetTile(layer, col, row) == -1)
+                    bottomLeftVertex.color.a = 0;
+
+                sf::Vertex bottomRightVertex(sf::Vector2f((col + 1) * tileWidth, (row + 1) * tileHeight), coords.bottomRight);
+                if(tileMap.GetTile(layer, col, row) == -1)
+                    bottomRightVertex.color.a = 0;
+
+                sf::Vertex topRightVertex(sf::Vector2f((col + 1) * tileWidth, row * tileHeight), coords.topRight);
+                if(tileMap.GetTile(layer, col, row) == -1)
+                    topRightVertex.color.a = 0;
+
+                vertexArray[firstVertexIndex] = topLeftVertex;
+                vertexArray[firstVertexIndex + 1] = bottomLeftVertex;
+                vertexArray[firstVertexIndex + 2] = bottomRightVertex;
+                vertexArray[firstVertexIndex + 3] = topLeftVertex;
+                vertexArray[firstVertexIndex + 4] = bottomRightVertex;
+                vertexArray[firstVertexIndex + 5] = topRightVertex;
             }
         }
     }
@@ -106,14 +111,16 @@ void UpdateVertexArray(sf::VertexArray &vertexArray, int layer, int col, int row
     if(tileSet.IsDirty())
         return;
 
-    const int vertexPos = 4 * (layer * tileMap.GetColumnsCount() * tileMap.GetRowsCount() + col * tileMap.GetRowsCount() + row);
+    const unsigned int vertexPos = 6 * (layer * tileMap.GetColumnsCount() * tileMap.GetRowsCount() + col * tileMap.GetRowsCount() + row);
 
     TileTextureCoords newCoords = tileMap.GetTile(layer, col, row) != -1 ? tileSet.GetTileTextureCoords(tileMap.GetTile(layer, col, row)) : tileSet.GetTileTextureCoords(0);
     vertexArray[vertexPos].texCoords = newCoords.topLeft;
     vertexArray[vertexPos + 1].texCoords = newCoords.bottomLeft;
     vertexArray[vertexPos + 2].texCoords = newCoords.bottomRight;
-    vertexArray[vertexPos + 3].texCoords = newCoords.topRight;
-    for(int i = 0; i < 4; i++)
+    vertexArray[vertexPos + 3].texCoords = newCoords.topLeft;
+    vertexArray[vertexPos + 4].texCoords = newCoords.bottomRight;
+    vertexArray[vertexPos + 5].texCoords = newCoords.topRight;
+    for(int i = 0; i < 6; i++)
     {
         if(tileMap.GetTile(layer, col, row) == -1)
         {

@@ -26,6 +26,7 @@ extern "C" ExtensionBase * CreateGDCppTextObjectExtension();
 extern "C" ExtensionBase * CreateGDCppTopDownMovementBehaviorExtension();
 extern "C" ExtensionBase * CreateGDCppDestroyOutsideBehaviorExtension();
 extern "C" ExtensionBase * CreateGDCppPhysicsBehaviorExtension();
+extern "C" ExtensionBase * CreateGDCppTileMapObjectExtension();
 extern "C" ExtensionBase * CreateGDCppTiledSpriteObjectExtension();
 extern "C" ExtensionBase * CreateGDCppPlatformBehaviorExtension();
 extern "C" ExtensionBase * CreateGDCppPanelSpriteObjectExtension();
@@ -78,6 +79,7 @@ int main(int argc, char *argv[])
     CppPlatform::Get().AddExtension(std::shared_ptr<ExtensionBase>(CreateGDCppTopDownMovementBehaviorExtension())); std::cout.flush();
     CppPlatform::Get().AddExtension(std::shared_ptr<ExtensionBase>(CreateGDCppDestroyOutsideBehaviorExtension())); std::cout.flush();
     CppPlatform::Get().AddExtension(std::shared_ptr<ExtensionBase>(CreateGDCppPhysicsBehaviorExtension())); std::cout.flush();
+    CppPlatform::Get().AddExtension(std::shared_ptr<ExtensionBase>(CreateGDCppTileMapObjectExtension())); std::cout.flush();
     CppPlatform::Get().AddExtension(std::shared_ptr<ExtensionBase>(CreateGDCppTiledSpriteObjectExtension())); std::cout.flush();
     CppPlatform::Get().AddExtension(std::shared_ptr<ExtensionBase>(CreateGDCppPlatformBehaviorExtension())); std::cout.flush();
     CppPlatform::Get().AddExtension(std::shared_ptr<ExtensionBase>(CreateGDCppPanelSpriteObjectExtension())); std::cout.flush();

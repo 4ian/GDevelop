@@ -181,14 +181,14 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 /**
  * \brief This class declares information about the extension.
  */
-class Extension : public ExtensionBase
+class TileMapObjectCppExtension : public ExtensionBase
 {
 public:
 
     /**
      * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    Extension()
+    TileMapObjectCppExtension()
     {
         DeclareTileMapObjectExtension(*this);
         AddRuntimeObject<TileMapObject, RuntimeTileMapObject>(
@@ -199,12 +199,16 @@ public:
     };
 };
 
-#if !defined(EMSCRIPTEN)
+#if defined(ANDROID)
+extern "C" ExtensionBase * CreateGDCppTileMapObjectExtension() {
+    return new TileMapObjectCppExtension;
+}
+#elif !defined(EMSCRIPTEN)
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
-    return new Extension;
+    return new TileMapObjectCppExtension;
 }
 #endif

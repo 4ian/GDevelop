@@ -230,10 +230,11 @@ void RuntimeScene::Render()
             {
                 RuntimeCamera & camera = layers[layerIndex].GetCamera(cameraIndex);
 
-                //Prepare OpenGL rendering
-                renderWindow->popGLStates();
 
+                //Prepare OpenGL rendering
                 #if !defined(ANDROID) //TODO: OpenGL
+                renderWindow->popGLStates();
+                
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
                 gluPerspective(GetOpenGLFOV(), camera.GetWidth()/camera.GetHeight(), GetOpenGLZNear(), GetOpenGLZFar());

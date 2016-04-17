@@ -575,6 +575,14 @@ void LayoutEditorCanvas::UpdateContextMenu()
     if ( selectedInstances.empty() ) return;
 
     //Can we send the objects on a higher layer ?
+    std::size_t highestLayer = 0;
+    for (auto & it : selectedInstances)
+    {
+        if (it.first == NULL) continue;
+        highestLayer = std::max(highestLayer, layout.GetLayerPosition(it.first->GetLayer()));
+    }
+
+    //Can we send the objects on a lower layer ?
     std::size_t lowestLayer = layout.GetLayersCount()-1;
     for (auto & it : selectedInstances)
     {
@@ -585,29 +593,21 @@ void LayoutEditorCanvas::UpdateContextMenu()
     if (wxMenuItem * layerUpItem = contextMenu.FindItem(ID_LAYERUPMENU))
     {
         layerUpItem->Enable(false);
-        if ( lowestLayer+1 < layout.GetLayersCount() )
+        if ( highestLayer+1 < layout.GetLayersCount() )
         {
-            gd::String name = layout.GetLayer(lowestLayer+1).GetName();
+            gd::String name = layout.GetLayer(highestLayer+1).GetName();
             if ( name == "" ) name = _("Base layer");
             layerUpItem->Enable(true);
             layerUpItem->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
         }
     }
 
-    //Can we send the objects on a lower layer ?
-    std::size_t highestLayer = 0;
-    for (auto & it : selectedInstances)
-    {
-        if (it.first == NULL) continue;
-        highestLayer = std::max(highestLayer, layout.GetLayerPosition(it.first->GetLayer()));
-    }
-
     if (wxMenuItem * layerDownItem = contextMenu.FindItem(ID_LAYERDOWNMENU))
     {
         layerDownItem->Enable(false);
-        if ( highestLayer >= 1 )
+        if ( lowestLayer >= 1 )
         {
-            gd::String name = layout.GetLayer(highestLayer-1).GetName();
+            gd::String name = layout.GetLayer(lowestLayer-1).GetName();
             if ( name == "" ) name = _("Base layer");
 
             layerDownItem->Enable(true);

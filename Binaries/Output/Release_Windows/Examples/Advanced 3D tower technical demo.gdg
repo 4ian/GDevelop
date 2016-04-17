@@ -55,7 +55,7 @@
             <resource alwaysLoaded="false" file="mur 6.png" kind="image" name="mur 6.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="mur 7.png" kind="image" name="mur 7.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="mur 8.png" kind="image" name="mur 8.png" smoothed="true" userAdded="true" />
-            <resource alwaysLoaded="false" file="lumière.png" kind="image" name="lumière.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="lumiere.png" kind="image" name="lumiere.png" smoothed="true" userAdded="true" />
             <resource alwaysLoaded="false" file="towerground.png" kind="image" name="towerground.png" smoothed="true" userAdded="true" />
         </resources>
         <resourceFolders />
@@ -282,7 +282,7 @@
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
-                                        <sprite hasCustomCollisionMask="false" image="lumière.png">
+                                        <sprite hasCustomCollisionMask="false" image="lumiere.png">
                                             <points />
                                             <originPoint name="origine" x="0.000000" y="0.000000" />
                                             <centerPoint automatic="true" name="centre" x="4.000000" y="4.000000" />

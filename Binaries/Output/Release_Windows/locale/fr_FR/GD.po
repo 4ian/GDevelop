@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-04-15 14:30-0400\n"
+"PO-Revision-Date: 2016-04-17 08:56-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -769,7 +769,7 @@ msgstr "François Dumortier : Conception du logo original et du site web de GDev
 
 #: ../IDE/Credits.cpp:210
 msgid "Victor Levasseur: Advanced XML, Tiled Sprite and Tile Map extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension."
-msgstr ""
+msgstr "Victor Levasseur : XML avancé, Arrière-plan répété, objet Carte de Tuiles et contributions aux extensions Comportement Moteur physique, objet Texte, objet Vidéo, comportement Chemin et objet Son."
 
 #: ../IDE/Credits.cpp:213
 msgid "Constantine Shvetsov: Awesome design of icons"
@@ -5605,7 +5605,9 @@ msgstr "\n\n"
 msgid "Unable to launch your browser :(\n"
 "Manually open your browser and type \"localhost:2828\" in\n"
 "the address bar (without the quotes) to launch the preview!"
-msgstr ""
+msgstr "Impossible de lancer votre navigateur :(\n"
+"Ouvrez manuellement votre navigateur et tapez \"localhost:2828\" in\n"
+"dans la barre d'adresse (sans les guillemets) pour lancer l'aperçu !"
 
 #: ../GDJS/GDJS//IDE/Dialogs/CordovaPackageDialog.cpp:13
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtouseintelxdk"
@@ -5658,15 +5660,15 @@ msgstr "Il suffit de cliquer sur le bouton « Exporter » et GDevelop va empaque
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:184
 msgid "Export to a website or native game with Cocos2d (experimental)"
-msgstr ""
+msgstr "Exporter vers un site web ou un jeu natif avec Cocos2d (expérimental)"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:254
 msgid "If you install Cocos2d-x, you can also use it to export the game to Android, iOS, Windows, Mac or Linux."
-msgstr ""
+msgstr "Si vous installez Cocos2d-x, vous pourrez également exporter votre jeu vers Android, iOS, Windows, Mac ou LInux."
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:259
 msgid "Click here to learn more about Cocos2d export"
-msgstr ""
+msgstr "Cliquez ici pour en apprendre plus sur l'export avec Cocos2d"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:296
 msgid "Export"
@@ -8413,11 +8415,11 @@ msgstr "Taille par défaut"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:106
 msgid "Texture configuration (for HTML5 games only)"
-msgstr ""
+msgstr "Paramètres de la texture (pour les jeux HTML5 uniquement)"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:107
 msgid "Repeat borders and center textures (instead of stretching them)"
-msgstr ""
+msgstr "Répéter les textures des bordures et du centre (au lieu de les étendre)"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:114
 msgid "Margins"
@@ -10981,7 +10983,8 @@ msgstr "Entrez les coordonnées du polygone de collision :\n"
 
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:98
 msgid "Coordinates must be entered clockwise."
-msgstr ""
+msgstr "Il faut entrer les coordonnées dans le sens des aiguilles\n"
+"d'une montre."
 
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:102
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1561
@@ -11844,7 +11847,8 @@ msgstr "Est entrain de tomber"
 #: ../Extensions//PlatformBehavior/Extension.cpp:87
 msgid "Check if the object is falling.\n"
 "Note that the object can be flagged as jumping and falling at the same time: at the end of a jump, the fall speed becomes higher that the jump speed."
-msgstr ""
+msgstr "Vérifie si l'objet tombe.\n"
+"Notez que l'objet peut être marqué comme étant entrain de sauter et de tomber simultanément : à la fin d'un saut, la vitesse de chute l'emporte sur la vitesse verticale de saut."
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:88
 msgid "_PARAM0_ is falling"
@@ -13801,7 +13805,7 @@ msgstr "Aide à propos de cet objet"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:165
 msgid "Import .tmx files (Tiled)..."
-msgstr ""
+msgstr "Importer un fichier .tmx (Tiled) ..."
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:265
 msgid "The tileset is the texture containing all the tiles which will be used in your tilemap object."
@@ -13878,43 +13882,43 @@ msgstr "Fichier .tmx :"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:709
 msgid "The tmx file saved with Tiled"
-msgstr ""
+msgstr "Le fichier tmx enregistré avec Tiled"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:719
 msgid "Import settings"
-msgstr ""
+msgstr "Paramètres de l'import"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:731
 msgid "Import the tileset configuration"
-msgstr ""
+msgstr "Importer la configuration du jeu de tuiles (tileset)"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:736
 msgid "Import the tileset image"
-msgstr ""
+msgstr "Importer la texture des tuiles"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:741
 msgid "Import the tiles hitboxes"
-msgstr ""
+msgstr "Importer les masques de collision des tuiles"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:746
 msgid "Tilemap"
-msgstr ""
+msgstr "Carte de tuiles"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:750
 msgid "Import the tilemap"
-msgstr ""
+msgstr "Importer la carte de tuile"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:755
 msgid "Importer..."
-msgstr ""
+msgstr "Importer..."
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapImporterDialog.cpp:24
 msgid "Import .tmx file"
-msgstr ""
+msgstr "Importer un fichier .tmx"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapImporterDialog.cpp:51
 msgid "Unable to read the file !"
-msgstr ""
+msgstr "Impossible d'ouvrir le fichier !"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapObjectEditor.cpp:62
 msgid "Tile editor"
@@ -13944,75 +13948,75 @@ msgstr "Vous n'avez pas sélectionné de jeu de tuile pour le moment."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:43
 msgid "Only orthogonal maps are supported !"
-msgstr ""
+msgstr "Seules les cartes orthogonales sont supportées !"
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:50
 msgid "There are no tilesets in this file !"
-msgstr ""
+msgstr "Il n'y a pas de jeu de tuiles (tileset) dans ce fichier !"
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:55
 msgid "Only the first tileset will be taken into account. Tiles from supplementary tilesets may be lost."
-msgstr ""
+msgstr "Seul le premier jeu de tuiles (tileset) sera pris en compte. Les tuiles des autres jeux de tuiles seront perdues."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:67
 msgid "The image can't be found !"
-msgstr ""
+msgstr "Impossible de trouver l'image."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:76
 msgid "The image is imported as "
-msgstr ""
+msgstr "L'image a été importée sous le nom "
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:86
 msgid "Tileset image importation completed."
-msgstr ""
+msgstr "Importation de la texture des tuiles terminée."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:97
 msgid "Tileset image size is not the same. Some tiles may not be rendered correctly."
-msgstr ""
+msgstr "La taille des tuiles n'est pas identique entre la carte (tilemap) et le jeu de tuiles (tileset). Le rendu peut être incorrect."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:106
 msgid "Tilemap objects don't handle tilesets with margins around the images. Consider cutting the picture."
-msgstr ""
+msgstr "L'objet Carte de tuiles ne supporte pas les jeux de tuiles (tileset) avec des marges autour de la texture."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:109
 msgid "Tileset configuration importation completed."
-msgstr ""
+msgstr "Importation de la configuration du jeu de tuiles (tileset) terminée."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:117
 msgid "Tilemap size is different."
-msgstr ""
+msgstr "La taille de la carte de tuiles est différente."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:127
 msgid "There are more than 3 tiles layers. Only the 3 firsts will be imported."
-msgstr ""
+msgstr "Il y a plus que 3 couches de tuiles. Seules les 3 premières seront importées."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:131
 msgid "There are less than 3 tiles layers. Upper layer(s) will be empty."
-msgstr ""
+msgstr "Il y a moins de 3 couches de tuiles. Les couches supérieures seront vides."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:151
 msgid "Tilemap content importation completed."
-msgstr ""
+msgstr "Importation de la carte de tuiles terminée."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:234
 msgid "Some tiles have more than 1 hitbox. Only the first one is imported."
-msgstr ""
+msgstr "Certaines tuiles ont plus qu'un masque de collision. Seul le premier sera importé."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:236
 msgid "Some tiles have a polyline or a ellipsis hitbox. Only rectangle and polygon hitboxes are supported."
-msgstr ""
+msgstr "Certaines tuiles ont des masques de collision de type \"polyline\" ou ellipse. Seuls les rectangles et les polygones sont supportés."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:238
 msgid "Some tiles have a concave polygon. It has been ignored and set to a rectangular hitbox as this object only supports convex hitboxes for tiles."
-msgstr ""
+msgstr "Certaines tuiles ont des masques de collision concaves. Ils ont été ignorés et remplacés par un masque de collision rectangulaire car les polygones concaves ne sont pas supportés."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:240
 msgid "Tiles hitboxes importation completed."
-msgstr ""
+msgstr "Importation des masques de collision des tuiles terminée."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:258
 msgid "There are not as many tiles in the object's tileset as in the file. The result may not be correct."
-msgstr ""
+msgstr "Il n'y a pas autant de tuiles dans le jeu de tuile (tileset) de l'objet que dans le fichier. Des erreur d'affichage peuvent apparaître."
 
 #: ../Extensions//TimedEvent/Extension.cpp:34
 #: ../Extensions//TimedEvent/Extension.cpp:111
@@ -14057,7 +14061,7 @@ msgstr "Sans nom"
 
 #: ../Extensions//TimedEvent/TimedEvent.cpp:122
 msgid " (Name:  "
-msgstr ""
+msgstr " (Nom :  "
 
 #: ../Extensions//TimedEvent/TimedEvent.cpp:123
 msgid "Delayed execution after "
@@ -14230,7 +14234,7 @@ msgstr "Configuration de la carte de tuile"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.h:257
 msgid "Import a .tmx file (Tiled)"
-msgstr ""
+msgstr "Importer un fichier .tmx (Tiled)"
 
 #: ../Core/GDCore/Events/Builtin/ForEachEvent.cpp:113
 #: ../Core/GDCore/Extensions/Builtin/CommonInstructionsExtension.cpp:95
@@ -14436,7 +14440,7 @@ msgstr "Audio/Sons sur canaux"
 #: ../Core/GDCore/Extensions/Builtin/AudioExtension.cpp:223
 #: ../Core/GDCore/Extensions/Builtin/AudioExtension.cpp:237
 msgid "Audio file (or audio resource name)"
-msgstr ""
+msgstr "Fichier audio (ou nom de la ressource audio)"
 
 #: ../Core/GDCore/Extensions/Builtin/AudioExtension.cpp:31
 #: ../Core/GDCore/Extensions/Builtin/AudioExtension.cpp:45
@@ -15836,7 +15840,7 @@ msgstr "Position X du centre de la caméra"
 
 #: ../Core/GDCore/Extensions/Builtin/CameraExtension.cpp:24
 msgid "Compare the X position of the center of a camera."
-msgstr ""
+msgstr "Teste la valeur de la position X du centre d'une caméra."
 
 #: ../Core/GDCore/Extensions/Builtin/CameraExtension.cpp:25
 msgid "X position of camera _PARAM4_ is _PARAM1__PARAM2_ (layer: _PARAM3_)"
@@ -19997,7 +20001,7 @@ msgstr "Clic droit sur une image pour accéder aux options"
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:189
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:202
 msgid "Add a sound/music"
-msgstr ""
+msgstr "Ajouter un son/musique"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:177
 msgid "Remove from folder only"
@@ -20037,15 +20041,15 @@ msgstr "Ajouts des ressources effectué avec succès"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:385
 msgid "Choose one or more audio files to add"
-msgstr ""
+msgstr "Choisissez un ou plusieurs fichiers audio à ajouter"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:385
 msgid "Supported audio files|*.ogg;*.mp3;*.wav|All files|*.*"
-msgstr ""
+msgstr "Fichiers audios supportés|*.ogg;*.mp3;*.wav|Tous les fichiers|*.*"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:388
 msgid "Adding audio files"
-msgstr ""
+msgstr "Ajout des fichiers audios"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:454
 msgid "Adding "

@@ -28,7 +28,6 @@ gdjs.TopDownMovementRuntimeBehavior = function(runtimeScene, behaviorData, owner
     this._xVelocity = 0;
     this._yVelocity = 0;
     this._angularSpeed = 0;
-    this._ignoreDefaultControls = false; ///< If set to true, do not track the default inputs.
     this._leftKey = false;
     this._rightKey = false;
     this._upKey = false;

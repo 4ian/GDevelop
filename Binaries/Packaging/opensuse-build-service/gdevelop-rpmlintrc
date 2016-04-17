@@ -1,3 +1,4 @@
 #Files needed by the IDE to build games (they are not part of a devel package)
 addFilter("devel-file-in-non-devel-package.*/opt/gdevelop/CppPlatform/include/.*")
 addFilter("devel-file-in-non-devel-package.*/opt/gdevelop/CppPlatform/Extensions/include/.*")
+addFilter("devel-file-in-non-devel-package.*/opt/gdevelop/CppPlatform/Sources/.*")

@@ -510,7 +510,7 @@
 					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDCore/IDE/Dialogs/EditForEachEvent.cpp" hdr="GDCore/IDE/Dialogs/EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDCore/IDE/Dialogs/EditRepeatEvent.cpp" hdr="GDCore/IDE/Dialogs/EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/ProjectUpdateDialog.wxs" src="GDCore/IDE/Dialogs/ProjectUpdateDialog.cpp" hdr="GDCore/IDE/Dialogs/ProjectUpdateDialog.h" fwddecl="0" i18n="1" name="ProjectUpdateDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/SpriteObjectEditor.wxs" src="GDCore\Extensions\BuiltinExtensions\SpriteExtension\Dialogs\SpriteObjectEditor.cpp" hdr="GDCore\Extensions\BuiltinExtensions\SpriteExtension\Dialogs\SpriteObjectEditor.h" fwddecl="0" i18n="1" name="SpriteObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/SpriteObjectEditor.wxs" src="GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp" hdr="GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.h" fwddecl="0" i18n="1" name="SpriteObjectEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/ResourcesEditor.wxs" src="GDCore/IDE/Dialogs/ResourcesEditor.cpp" hdr="GDCore/IDE/Dialogs/ResourcesEditor.h" fwddecl="0" i18n="1" name="ResourcesEditor" language="CPP" />
 				</resources>
 			</wxsmith>

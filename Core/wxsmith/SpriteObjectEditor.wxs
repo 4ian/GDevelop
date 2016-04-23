@@ -5,7 +5,6 @@
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
 		<object class="wxAuiManager" variable="mgr" member="yes">
-			<handler function="OnmgrPaneClose" entry="EVT_AUI_PANE_CLOSE" />
 			<object class="AuiManagerItem">
 				<object class="wxPanel" name="ID_PANEL1" variable="centerPanel" member="yes">
 					<pos>107,155</pos>
@@ -26,7 +25,7 @@
 												<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes">
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_MASKITEM" variable="maskItem_" member="yes">
-															<bitmap code="gd::CommonBitmapProvider::GetInstance()-&gt;maskEdit16" />
+															<bitmap code="gd::CommonBitmapProvider::Get()-&gt;maskEdit16" />
 															<shorthelp>Edit the collision masks (hitbox)</shorthelp>
 															<itemkind>Check</itemkind>
 															<handler function="OnMaskEditClick" entry="EVT_TOOL" />
@@ -35,7 +34,7 @@
 													</object>
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_POINTSITEM" variable="pointsItem_" member="yes">
-															<bitmap code="gd::CommonBitmapProvider::GetInstance()-&gt;pointEdit16" />
+															<bitmap code="gd::CommonBitmapProvider::Get()-&gt;pointEdit16" />
 															<shorthelp>Edit the image&apos;s point</shorthelp>
 															<itemkind>Check</itemkind>
 															<handler function="OnPointEditClick" entry="EVT_TOOL" />
@@ -48,7 +47,7 @@
 													</object>
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM4" variable="AuiToolBarItem9" member="yes">
-															<bitmap code="gd::SkinHelper::GetIcon(&quot;preview&quot;, 16)" />
+															<bitmap code='gd::SkinHelper::GetIcon(&quot;preview&quot;, 16)' />
 															<shorthelp>Preview</shorthelp>
 															<handler function="OnPreviewClick" entry="EVT_TOOL" />
 														</object>
@@ -181,7 +180,7 @@
 										<object class="wxAuiToolBar" name="ID_AUITOOLBAR4" variable="animationToolbar" member="yes">
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM5" variable="AuiToolBarItem10" member="yes">
-													<bitmap code="gd::SkinHelper::GetIcon(&quot;add&quot;, 16)" />
+													<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 													<shorthelp>Add an animation</shorthelp>
 													<handler function="OnAddAnimationSelected" entry="EVT_TOOL" />
 												</object>
@@ -189,7 +188,7 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM8" variable="AuiToolBarItem11" member="yes">
-													<bitmap code="gd::SkinHelper::GetIcon(&quot;remove&quot;, 16)" />
+													<bitmap code='gd::SkinHelper::GetIcon(&quot;remove&quot;, 16)' />
 													<shorthelp>Delete an animation</shorthelp>
 													<handler function="OnDeleteAnimationSelected" entry="EVT_TOOL" />
 												</object>
@@ -337,7 +336,7 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM7" variable="AuiToolBarItem7" member="yes">
-													<bitmap code="gd::SkinHelper::GetIcon(&quot;remove&quot;, 16)" />
+													<bitmap code='gd::SkinHelper::GetIcon(&quot;remove&quot;, 16)' />
 													<handler function="OnDeleteMaskClick" entry="EVT_TOOL" />
 												</object>
 												<label>Item label</label>
@@ -348,7 +347,7 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="AuiToolBarItem1" member="yes">
-													<bitmap code="gd::CommonBitmapProvider::GetInstance()-&gt;defaultMask16" />
+													<bitmap code="gd::CommonBitmapProvider::Get()-&gt;defaultMask16" />
 													<shorthelp>Go back to default mask</shorthelp>
 													<handler function="OnDefaultMaskClick" entry="EVT_TOOL" />
 												</object>
@@ -360,7 +359,7 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_MASKAPPLYWHOLEANIMITEM" variable="AuiToolBarItem8" member="yes">
-													<bitmap code="gd::SkinHelper::GetIcon(&quot;copy&quot;, 16)" />
+													<bitmap code='gd::SkinHelper::GetIcon(&quot;copy&quot;, 16)' />
 													<itemkind>Check</itemkind>
 													<handler function="OnPointEditClick" entry="EVT_TOOL" />
 												</object>
@@ -388,7 +387,7 @@
 						</object>
 						<object class="sizeritem">
 							<object class="Custom" name="ID_TREELISTCTRL1" subclass="wxTreeListCtrl" variable="maskTree" member="yes">
-								<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),$(STYLE),$(NAME));</creating_code>
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),0,$(NAME));</creating_code>
 								<include_file>wx/treelist.h</include_file>
 								<style></style>
 							</object>
@@ -422,14 +421,14 @@
 										<object class="wxAuiToolBar" name="ID_AUITOOLBAR2" variable="pointToolbar" member="yes">
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM3" variable="AuiToolBarItem3" member="yes">
-													<bitmap code="gd::SkinHelper::GetIcon(&quot;add&quot;, 16)" />
+													<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 													<handler function="OnAddPointClick" entry="EVT_TOOL" />
 												</object>
 												<label>Item label</label>
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_DELETEPOINTITEM" variable="AuiToolBarItem5" member="yes">
-													<bitmap code="gd::SkinHelper::GetIcon(&quot;remove&quot;, 16)" />
+													<bitmap code='gd::SkinHelper::GetIcon(&quot;remove&quot;, 16)' />
 													<handler function="OnDeletePointClick" entry="EVT_TOOL" />
 												</object>
 												<label>Item label</label>
@@ -440,7 +439,7 @@
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_POINTAPPLYWHOLEANIMITEM" variable="AuiToolBarItem4" member="yes">
-													<bitmap code="gd::SkinHelper::GetIcon(&quot;copy&quot;, 16)" />
+													<bitmap code='gd::SkinHelper::GetIcon(&quot;copy&quot;, 16)' />
 													<shorthelp>Apply changes to the whole animation</shorthelp>
 													<itemkind>Check</itemkind>
 												</object>
@@ -522,6 +521,38 @@
 					<radio>1</radio>
 				</object>
 			</object>
+			<object class="wxMenu" name="ID_MENUITEM15" variable="MenuItem13" member="yes">
+				<label>Change the name</label>
+				<object class="wxMenuItem" name="ID_MENUIDLENAME" variable="MenuItem15" member="yes">
+					<label>Idle</label>
+					<handler function="OnSetAnimationNameIdleSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENUWALKNAME" variable="MenuItem14" member="yes">
+					<label>Walk</label>
+					<handler function="OnSetAnimationNameWalkSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENURUNNAME" variable="MenuItem16" member="yes">
+					<label>Run</label>
+					<handler function="OnSetAnimationNameRunSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENUJUMPNAME" variable="MenuItem17" member="yes">
+					<label>Jump</label>
+					<handler function="OnSetAnimationNameJumpSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENUSHOOTNAME" variable="MenuItem18" member="yes">
+					<label>Shoot</label>
+					<handler function="OnSetAnimationNameShootSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENUDEADNAME" variable="MenuItem20" member="yes">
+					<label>Dead</label>
+					<handler function="OnSetAnimationNameDeadSelected" entry="EVT_MENU" />
+				</object>
+				<object class="separator" />
+				<object class="wxMenuItem" name="ID_MENUCUSTOMNAME" variable="MenuItem19" member="yes">
+					<label>Custom name...</label>
+					<handler function="OnSetCustomAnimationNameSelected" entry="EVT_MENU" />
+				</object>
+			</object>
 			<object class="wxMenuItem" name="ID_MENUTIMEBETWEENFRAMES" variable="MenuItem7" member="yes">
 				<label>Time between each image :</label>
 				<handler function="OnTimeBetweenFramesSelected" entry="EVT_MENU" />
@@ -534,13 +565,13 @@
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="yes">
 				<label>Add an animation</label>
-				<bitmap code="gd::SkinHelper::GetIcon(&quot;add&quot;, 16)" />
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddAnimationSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="deleteItem" member="yes">
 				<label>Delete</label>
-				<bitmap code="gd::SkinHelper::GetIcon(&quot;remove&quot;, 16)" />
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;remove&quot;, 16)' />
 				<handler function="OnDeleteAnimationSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem3" member="yes">
@@ -550,7 +581,7 @@
 		<object class="wxMenu" variable="imagesMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem4" member="yes">
 				<label>Add an image from a file</label>
-				<bitmap code="gd::SkinHelper::GetIcon(&quot;add&quot;, 16)" />
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddImageFromFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem9" member="yes">
@@ -566,13 +597,13 @@
 			<object class="wxMenuItem" name="ID_MENUITEM9" variable="moveLeftItem" member="yes">
 				<label>Move left</label>
 				<accel>J</accel>
-				<bitmap code="gd::SkinHelper::GetIcon(&quot;left&quot;, 16)" />
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;left&quot;, 16)' />
 				<handler function="OnMoveLeftSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="moveRightItem" member="yes">
 				<label>Move right</label>
 				<accel>K</accel>
-				<bitmap code="gd::SkinHelper::GetIcon(&quot;right&quot;, 16)" />
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;right&quot;, 16)' />
 				<handler function="OnMoveRightSelected" entry="EVT_MENU" />
 			</object>
 		</object>
@@ -598,7 +629,7 @@
 		<object class="wxMenu" variable="emptyImagesMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM12" variable="MenuItem10" member="yes">
 				<label>Add an image from a file</label>
-				<bitmap code="gd::SkinHelper::GetIcon(&quot;add&quot;, 16)" />
+				<bitmap code='gd::SkinHelper::GetIcon(&quot;add&quot;, 16)' />
 				<handler function="OnAddImageFromFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM13" variable="MenuItem11" member="yes">

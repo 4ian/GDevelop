@@ -105,7 +105,7 @@ public :
     bool HasNoAnimations() const { return animations.empty(); }
 
     /**
-     * \brief Swap the position of two sprites
+     * \brief Swap the position of two animations
      */
     void SwapAnimations(std::size_t firstIndex, std::size_t secondIndex);
 

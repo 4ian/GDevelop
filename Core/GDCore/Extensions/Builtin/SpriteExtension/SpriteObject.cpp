@@ -53,6 +53,7 @@ void SpriteObject::DoUnserializeFrom(gd::Project & project, const gd::Serializer
         Animation newAnimation;
 
         newAnimation.useMultipleDirections = animationElement.GetBoolAttribute("useMultipleDirections", false, "typeNormal");
+        newAnimation.SetName(animationElement.GetStringAttribute("name", ""));
 
         //Compatibility with GD <= 3.3
         if (animationElement.HasChild("Direction"))
@@ -96,6 +97,7 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement & element) const
         gd::SerializerElement & animationElement = animationsElement.AddChild("animation");
 
         animationElement.SetAttribute( "useMultipleDirections", GetAnimation(k).useMultipleDirections);
+        animationElement.SetAttribute( "name", GetAnimation(k).GetName());
 
         gd::SerializerElement & directionsElement = animationElement.AddChild("directions");
         directionsElement.ConsiderAsArrayOf("direction");

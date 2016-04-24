@@ -338,7 +338,7 @@ gdjs.SpriteRuntimeObject.prototype.getAnimation = function() {
 
 gdjs.SpriteRuntimeObject.prototype.getAnimationName = function() {
     if ( this._currentAnimation >= this._animations.length ) {
-        return;
+        return '';
     }
 
     return this._animations[this._currentAnimation].name;

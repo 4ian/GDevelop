@@ -401,7 +401,6 @@ bool RuntimeSpriteObject::SetSprite( std::size_t nb )
 bool RuntimeSpriteObject::SetCurrentAnimation( std::size_t nb )
 {
     if ( nb >= GetAnimationsCount() ) return false;
-
     if ( nb == currentAnimation ) return true;
 
     currentAnimation = nb;
@@ -410,6 +409,29 @@ bool RuntimeSpriteObject::SetCurrentAnimation( std::size_t nb )
 
     needUpdateCurrentSprite = true;
     return true;
+}
+
+bool RuntimeSpriteObject::SetCurrentAnimation(const gd::String & newAnimationName)
+{
+    for(size_t i = 0;i<animations.size();++i)
+    {
+        const gd::String & name = animations[i].Get().GetName();
+        if (!name.empty() && name == newAnimationName)
+            return SetCurrentAnimation(i);
+    }
+
+    return false;
+}
+
+const gd::String & RuntimeSpriteObject::GetCurrentAnimationName() const
+{
+    if ( currentAnimation >= GetAnimationsCount() ) return badAnimation.GetName();
+    return animations[currentAnimation].Get().GetName();
+}
+
+bool RuntimeSpriteObject::IsCurrentAnimationName(const gd::String & name) const
+{
+    return GetCurrentAnimationName() == name;
 }
 
 bool RuntimeSpriteObject::SetDirection( float nb )
@@ -545,6 +567,8 @@ bool RuntimeSpriteObject::CursorOnObject(RuntimeScene & scene, bool accurate)
 
             return ( !accurate || GetCurrentSprite().GetSFMLTexture()->image.getPixel(localX , localY).a != 0);
         }
+
+        return false;
     };
 
     for (std::size_t cameraIndex = 0;cameraIndex < theLayer.GetCameraCount();++cameraIndex)

@@ -142,11 +142,29 @@ public:
     inline std::size_t GetCurrentAnimation() const { return currentAnimation; }
 
     /**
-     * \brief Change the animation to play.
+     * \brief Get the name of the animation being played.
+     */
+    const gd::String & GetCurrentAnimationName() const;
+
+    /**
+     * \brief Compare the name of the animation being played.
+     * \return true if the animation being played has the specified name.
+     */
+    bool IsCurrentAnimationName(const gd::String & name) const;
+
+    /**
+     * \brief Change the object animation.
      * \param index The index of the new animation
      * \return true if the animation was successfully changed, false otherwise (index out of bound).
      */
     bool SetCurrentAnimation(std::size_t nb);
+
+    /**
+     * \brief Change the object animation.
+     * \param index The name of the new animation
+     * \return true if the animation was successfully changed, false otherwise (animation not found).
+     */
+    bool SetCurrentAnimation(const gd::String & newAnimationName);
 
     /**
      * \brief Check if the current animation has reached its end.

@@ -33,6 +33,7 @@
         </extensions>
         <platforms>
             <platform name="GDevelop JS platform" />
+            <platform name="GDevelop C++ platform" />
         </platforms>
         <currentPlatform>GDevelop JS platform</currentPlatform>
     </properties>
@@ -212,6 +213,22 @@
                                 <parameter>NewObject</parameter>
                                 <parameter>20</parameter>
                                 <parameter></parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarSceneTxt" />
+                            <parameters>
+                                <parameter>Test</parameter>
+                                <parameter>=</parameter>
+                                <parameter>NewObject.AnimationName()</parameter>
                             </parameters>
                             <subActions />
                         </action>

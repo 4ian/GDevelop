@@ -21,18 +21,21 @@ SpriteExtension::SpriteExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    std::map<gd::String, gd::InstructionMetadata > & spriteActions = GetAllActionsForObject("Sprite");
-    std::map<gd::String, gd::InstructionMetadata > & spriteConditions = GetAllConditionsForObject("Sprite");
-    std::map<gd::String, gd::ExpressionMetadata > & spriteExpressions = GetAllExpressionsForObject("Sprite");
+    auto & spriteActions = GetAllActionsForObject("Sprite");
+    auto & spriteConditions = GetAllConditionsForObject("Sprite");
+    auto & spriteExpressions = GetAllExpressionsForObject("Sprite");
+    auto & spriteStrExpressions = GetAllStrExpressionsForObject("Sprite");
     spriteActions["ChangeBlendMode"].SetFunctionName("setBlendMode").SetIncludeFile("spriteruntimeobject.js");
     spriteActions["Opacity"].SetFunctionName("setOpacity").SetGetter("getOpacity").SetIncludeFile("spriteruntimeobject.js");
     spriteConditions["BlendMode"].SetFunctionName("getBlendMode").SetIncludeFile("spriteruntimeobject.js");
     spriteConditions["Opacity"].SetFunctionName("getOpacity").SetIncludeFile("spriteruntimeobject.js");
 
     spriteActions["ChangeAnimation"].SetFunctionName("setAnimation").SetGetter("getAnimation");
+    spriteActions["SetAnimationName"].SetFunctionName("setAnimationName");
     spriteActions["ChangeDirection"].SetFunctionName("setDirectionOrAngle").SetGetter("getDirectionOrAngle");
     spriteActions["ChangeSprite"].SetFunctionName("setAnimationFrame").SetGetter("getAnimationFrame");
     spriteConditions["Animation"].SetFunctionName("getAnimation");
+    spriteConditions["AnimationName"].SetFunctionName("isCurrentAnimationName");
     spriteConditions["Direction"].SetFunctionName("getDirectionOrAngle");
     spriteConditions["Sprite"].SetFunctionName("getAnimationFrame");
     spriteConditions["AnimationEnded"].SetFunctionName("hasAnimationEnded");
@@ -67,6 +70,7 @@ SpriteExtension::SpriteExtension()
     spriteExpressions["Direction"].SetFunctionName("getDirectionOrAngle");
     spriteExpressions["Anim"].SetFunctionName("getAnimation"); //Deprecated
     spriteExpressions["Animation"].SetFunctionName("getAnimation");
+    spriteStrExpressions["AnimationName"].SetFunctionName("getAnimationName");
     spriteExpressions["Sprite"].SetFunctionName("getAnimationFrame");
     spriteExpressions["AnimationSpeedScale"].SetFunctionName("getAnimationSpeedScale");
     spriteExpressions["ScaleX"].SetFunctionName("getScaleX");

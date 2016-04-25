@@ -122,7 +122,8 @@ gdjs.SpriteAnimation = function(imageManager, animData)
         this.frames.length = i;
     };
 
-    this.hasMultipleDirections = animData.useMultipleDirections;
+    this.hasMultipleDirections = !!animData.useMultipleDirections;
+    this.name = animData.name || '';
 
     var that = this;
     var i = 0;
@@ -321,8 +322,30 @@ gdjs.SpriteRuntimeObject.prototype.setAnimation = function(newAnimation) {
     }
 };
 
+gdjs.SpriteRuntimeObject.prototype.setAnimationName = function(newAnimationName) {
+    if (!newAnimationName) return;
+
+    for(var i = 0;i < this._animations.length;++i) {
+        if (this._animations[i].name === newAnimationName) {
+            return this.setAnimation(i);
+        }
+    }
+};
+
 gdjs.SpriteRuntimeObject.prototype.getAnimation = function() {
     return this._currentAnimation;
+};
+
+gdjs.SpriteRuntimeObject.prototype.getAnimationName = function() {
+    if ( this._currentAnimation >= this._animations.length ) {
+        return '';
+    }
+
+    return this._animations[this._currentAnimation].name;
+};
+
+gdjs.SpriteRuntimeObject.prototype.isCurrentAnimationName = function(name) {
+    return this.getAnimationName() === name;
 };
 
 gdjs.SpriteRuntimeObject.prototype.setDirectionOrAngle = function(newValue) {

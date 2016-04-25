@@ -43,7 +43,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
     obj.AddAction("ChangeAnimation",
                    _("Change the animation"),
-                   _("Modify the current animation of the object."),
+                   _("Change the animation of the object, using the animation number in the animations list."),
                    _("Do _PARAM1__PARAM2_ to the number of current animation of _PARAM0_"),
                    _("Animations and images"),
                    "res/actions/animation24.png",
@@ -54,6 +54,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("expression", _("Value"))
         .MarkAsSimple()
         .SetManipulatedType("number");
+
+    obj.AddAction("SetAnimationName",
+                   _("Change the animation (by name)"),
+                   _("Change the animation of the object, using the name of the animation."),
+                   _("Set animation of _PARAM0_ to _PARAM1_"),
+                   _("Animations and images"),
+                   "res/actions/animation24.png",
+                   "res/actions/animation.png")
+
+        .AddParameter("object", _("Object"), "Sprite")
+        .AddParameter("string", _("Animation name"))
+        .MarkAsAdvanced();
 
     obj.AddAction("ChangeDirection",
                    _("Change the direction"),
@@ -183,7 +195,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
     obj.AddCondition("Animation",
                    _("Current animation"),
-                   _("Test the number of the current animation of the object."),
+                   _("Compare the number of the current animation of the object."),
                    _("The number of the current animation of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",
@@ -194,6 +206,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("expression", _("Number to test"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
+
+    obj.AddCondition("AnimationName",
+                   _("Current animation name"),
+                   _("Check the current animation of the object."),
+                   _("The animation of _PARAM0_ is _PARAM1_"),
+                   _("Animations and images"),
+                   "res/conditions/animation24.png",
+                   "res/conditions/animation.png")
+
+        .AddParameter("object", _("Object"), "Sprite")
+        .AddParameter("string", _("Animation name"))
+        .MarkAsAdvanced();
 
     obj.AddCondition("Direction",
                    _("Current direction"),
@@ -442,6 +466,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("object", _("Object"), "Sprite");
 
     obj.AddExpression("Animation", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
+        .AddParameter("object", _("Object"), "Sprite");
+
+    obj.AddStrExpression("AnimationName", _("Animation name"), _("Name of the animation of the object"), _("Animations and images"), "res/actions/animation.png")
         .AddParameter("object", _("Object"), "Sprite");
 
     obj.AddExpression("Sprite", _("Image"), _("Animation frame of the object"), _("Animations and images"), "res/actions/sprite.png")

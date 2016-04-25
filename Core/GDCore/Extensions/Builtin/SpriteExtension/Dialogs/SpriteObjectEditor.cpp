@@ -7,6 +7,7 @@
 #include "GDCore/Tools/Localization.h"
 //(*InternalHeaders(SpriteObjectEditor)
 #include <wx/bitmap.h>
+#include <wx/intl.h>
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
@@ -116,6 +117,14 @@ const long SpriteObjectEditor::ID_PANEL10 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM5 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM6 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM4 = wxNewId();
+const long SpriteObjectEditor::ID_MENUIDLENAME = wxNewId();
+const long SpriteObjectEditor::ID_MENUWALKNAME = wxNewId();
+const long SpriteObjectEditor::ID_MENURUNNAME = wxNewId();
+const long SpriteObjectEditor::ID_MENUJUMPNAME = wxNewId();
+const long SpriteObjectEditor::ID_MENUSHOOTNAME = wxNewId();
+const long SpriteObjectEditor::ID_MENUDEADNAME = wxNewId();
+const long SpriteObjectEditor::ID_MENUCUSTOMNAME = wxNewId();
+const long SpriteObjectEditor::ID_MENUITEM15 = wxNewId();
 const long SpriteObjectEditor::ID_MENUTIMEBETWEENFRAMES = wxNewId();
 const long SpriteObjectEditor::ID_MENULOOP = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM1 = wxNewId();
@@ -300,6 +309,23 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	multipleDirectionsItem = new wxMenuItem(MenuItem2, ID_MENUITEM6, _("8 Directions"), wxEmptyString, wxITEM_RADIO);
 	MenuItem2->Append(multipleDirectionsItem);
 	animationsMenu.Append(ID_MENUITEM4, _("Type"), MenuItem2, wxEmptyString);
+	MenuItem13 = new wxMenu();
+	MenuItem15 = new wxMenuItem(MenuItem13, ID_MENUIDLENAME, _("Idle"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem13->Append(MenuItem15);
+	MenuItem14 = new wxMenuItem(MenuItem13, ID_MENUWALKNAME, _("Walk"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem13->Append(MenuItem14);
+	MenuItem16 = new wxMenuItem(MenuItem13, ID_MENURUNNAME, _("Run"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem13->Append(MenuItem16);
+	MenuItem17 = new wxMenuItem(MenuItem13, ID_MENUJUMPNAME, _("Jump"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem13->Append(MenuItem17);
+	MenuItem18 = new wxMenuItem(MenuItem13, ID_MENUSHOOTNAME, _("Shoot"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem13->Append(MenuItem18);
+	MenuItem20 = new wxMenuItem(MenuItem13, ID_MENUDEADNAME, _("Dead"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem13->Append(MenuItem20);
+	MenuItem13->AppendSeparator();
+	MenuItem19 = new wxMenuItem(MenuItem13, ID_MENUCUSTOMNAME, _("Custom name..."), wxEmptyString, wxITEM_NORMAL);
+	MenuItem13->Append(MenuItem19);
+	animationsMenu.Append(ID_MENUITEM15, _("Change the name"), MenuItem13, wxEmptyString);
 	MenuItem7 = new wxMenuItem((&animationsMenu), ID_MENUTIMEBETWEENFRAMES, _("Time between each image :"), wxEmptyString, wxITEM_NORMAL);
 	animationsMenu.Append(MenuItem7);
 	MenuItem8 = new wxMenuItem((&animationsMenu), ID_MENULOOP, _("Loop the animation"), wxEmptyString, wxITEM_CHECK);
@@ -380,9 +406,15 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	previewPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewPanelPaint,0,this);
 	previewPanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewPanelEraseBackground,0,this);
 	previewPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewPanelResize,0,this);
-	mgr->Connect(wxEVT_AUI_PANE_CLOSE,(wxObjectEventFunction)&SpriteObjectEditor::OnmgrPaneClose,0,this);
 	Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnautomaticRotationItemSelected);
 	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnmultipleDirectionsItemSelected);
+	Connect(ID_MENUIDLENAME,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnSetAnimationNameIdleSelected);
+	Connect(ID_MENUWALKNAME,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnSetAnimationNameWalkSelected);
+	Connect(ID_MENURUNNAME,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnSetAnimationNameRunSelected);
+	Connect(ID_MENUJUMPNAME,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnSetAnimationNameJumpSelected);
+	Connect(ID_MENUSHOOTNAME,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnSetAnimationNameShootSelected);
+	Connect(ID_MENUDEADNAME,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnSetAnimationNameDeadSelected);
+	Connect(ID_MENUCUSTOMNAME,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnSetCustomAnimationNameSelected);
 	Connect(ID_MENUTIMEBETWEENFRAMES,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnTimeBetweenFramesSelected);
 	Connect(ID_MENULOOP,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMenuLoopSelected);
 	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddAnimationSelected);
@@ -399,6 +431,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
 	Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddImageFromFileSelected);
 	Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddFromImageBankSelected);
 	//*)
+    mgr->Connect(wxEVT_AUI_PANE_CLOSE,(wxObjectEventFunction)&SpriteObjectEditor::OnmgrPaneClose,0,this);
 	imagesList->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListRightClick,0,this);
 	Connect(ID_TREELISTCTRL1,wxEVT_COMMAND_TREELIST_ITEM_ACTIVATED,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskTreeItemActivated);
 	Connect(ID_TREELISTCTRL1,wxEVT_COMMAND_TREELIST_ITEM_CONTEXT_MENU,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskTreeItemRClick);
@@ -526,7 +559,11 @@ void SpriteObjectEditor::RefreshAnimationTree()
     for (std::size_t i = 0;i<object.GetAnimationsCount();++i)
     {
         Animation & animation = object.GetAnimation(i);
-        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ") + gd::String::From(i), 0, -1,
+        gd::String animationLabel = animation.GetName().empty() ?
+            wxString::Format(wxString(_("Animation %d")), i) :
+            wxString::Format(wxString(_("Animation %d \"%s\"")), i, animation.GetName().c_str());
+
+        wxTreeItemId animationItem = animationsTree->AppendItem(root, animationLabel, 0, -1,
         	new gd::TreeItemStringData(gd::String::From(i), ""));
 
         if ( animation.useMultipleDirections )
@@ -1826,6 +1863,65 @@ void SpriteObjectEditor::OnxScrollBarScroll(wxScrollEvent& event)
 {
 	imagePanel->Refresh();
 	imagePanel->Update();
+}
+
+void SpriteObjectEditor::OnSetAnimationNameIdleSelected(wxCommandEvent& event)
+{
+    SetAnimationName(_("Idle"));
+}
+
+void SpriteObjectEditor::OnSetAnimationNameWalkSelected(wxCommandEvent& event)
+{
+    SetAnimationName(_("Walk"));
+}
+
+void SpriteObjectEditor::OnSetAnimationNameRunSelected(wxCommandEvent& event)
+{
+    SetAnimationName(_("Run"));
+}
+
+void SpriteObjectEditor::OnSetAnimationNameJumpSelected(wxCommandEvent& event)
+{
+    SetAnimationName(_("Jump"));
+}
+
+void SpriteObjectEditor::OnSetAnimationNameShootSelected(wxCommandEvent& event)
+{
+    SetAnimationName(_("Shoot"));
+}
+
+void SpriteObjectEditor::OnSetAnimationNameDeadSelected(wxCommandEvent& event)
+{
+    SetAnimationName(_("Dead"));
+}
+
+void SpriteObjectEditor::OnSetCustomAnimationNameSelected(wxCommandEvent& event)
+{
+    if (selectedAnimation >= object.GetAnimationsCount()) return;
+
+    const Animation & animation = object.GetAnimation(selectedAnimation);
+    gd::String name = wxGetTextFromUser(_("Enter the name of the animation:"), _("Custom name"), animation.GetName());
+    SetAnimationName(name);
+}
+
+void SpriteObjectEditor::SetAnimationName(gd::String newName)
+{
+    if (selectedAnimation >= object.GetAnimationsCount()) return;
+
+    for(std::size_t i = 0;i < object.GetAnimationsCount(); ++i)
+    {
+        if (i == selectedAnimation) continue;
+        const gd::String & name = object.GetAnimation(i).GetName();
+        if (!name.empty() && name == newName)
+        {
+            wxString msg = wxString::Format(wxString(_("Animation #%d already has this name: please use a different name for each animation")), i);
+            wxLogWarning(msg);
+            return;
+        }
+    }
+
+    object.GetAnimation(selectedAnimation).SetName(newName);
+    RefreshAnimationTree();
 }
 
 }

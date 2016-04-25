@@ -7,6 +7,7 @@
 #ifndef GDCORE_ANIMATION_H
 #define GDCORE_ANIMATION_H
 #include <vector>
+#include "GDCore/String.h"
 namespace gd { class Direction; }
 
 namespace gd
@@ -24,6 +25,16 @@ class GD_CORE_API Animation
 public:
     Animation();
     virtual ~Animation();
+
+    /**
+     * \brief Set the name of the animation
+     */
+    const gd::String & GetName() const { return name; }
+
+    /**
+     * \brief Change the name of the animation
+     */
+    void SetName(const gd::String & name_) { name = name_; }
 
     /**
      * \brief Return the n-th direction
@@ -59,6 +70,7 @@ public:
 
 private:
     std::vector < Direction > directions;
+    gd::String name;
 
     static Direction badDirection;
 };

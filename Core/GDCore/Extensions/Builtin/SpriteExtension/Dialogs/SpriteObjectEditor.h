@@ -74,9 +74,13 @@ public:
     wxMenuItem* deleteItem;
     wxMenuItem* MenuItem1;
     wxMenuItem* MenuItem4;
+    wxMenuItem* MenuItem14;
     wxMenuItem* MenuItem11;
+    wxMenuItem* MenuItem15;
     wxPanel* Panel1;
     wxMenu animationsMenu;
+    wxMenuItem* MenuItem17;
+    wxMenu* MenuItem13;
     wxMenuItem* MenuItem10;
     wxAuiManager* AuiManager2;
     wxMenuItem* removeImageItem;
@@ -88,6 +92,7 @@ public:
     wxTimer previewTimer;
     wxMenuItem* MenuItem3;
     wxAuiManager* AuiManager3;
+    wxMenuItem* MenuItem20;
     wxPanel* imagePanel;
     wxScrollBar* yScrollBar;
     wxMenu emptyImagesMenu;
@@ -98,14 +103,17 @@ public:
     wxMenuItem* moveRightItem;
     wxPanel* Panel2;
     wxMenuItem* automaticRotationItem;
+    wxMenuItem* MenuItem16;
     wxPanel* pointsPanel;
     wxMenuItem* MenuItem9;
     wxMenuItem* multipleDirectionsItem;
     wxListCtrl* imagesList;
+    wxMenuItem* MenuItem18;
     wxMenu imagesMenu;
     wxMenu maskMenu;
     wxPanel* imagesPanel;
     wxAuiToolBar* animationToolbar;
+    wxMenuItem* MenuItem19;
     //*)
     ResourcesEditor * resourcesEditorPnl;
 
@@ -153,6 +161,14 @@ protected:
     static const long ID_MENUITEM5;
     static const long ID_MENUITEM6;
     static const long ID_MENUITEM4;
+    static const long ID_MENUIDLENAME;
+    static const long ID_MENUWALKNAME;
+    static const long ID_MENURUNNAME;
+    static const long ID_MENUJUMPNAME;
+    static const long ID_MENUSHOOTNAME;
+    static const long ID_MENUDEADNAME;
+    static const long ID_MENUCUSTOMNAME;
+    static const long ID_MENUITEM15;
     static const long ID_MENUTIMEBETWEENFRAMES;
     static const long ID_MENULOOP;
     static const long ID_MENUITEM1;
@@ -224,6 +240,13 @@ private:
     void OnRotatePolygonSelected(wxCommandEvent& event);
     void OnyScrollBarScroll(wxScrollEvent& event);
     void OnxScrollBarScroll(wxScrollEvent& event);
+    void OnSetAnimationNameIdleSelected(wxCommandEvent& event);
+    void OnSetAnimationNameWalkSelected(wxCommandEvent& event);
+    void OnSetAnimationNameRunSelected(wxCommandEvent& event);
+    void OnSetAnimationNameJumpSelected(wxCommandEvent& event);
+    void OnSetAnimationNameShootSelected(wxCommandEvent& event);
+    void OnSetAnimationNameDeadSelected(wxCommandEvent& event);
+    void OnSetCustomAnimationNameSelected(wxCommandEvent& event);
     //*)
     void OnmaskTreeItemRClick(wxTreeListEvent& event);
     void OnmaskTreeItemActivated(wxTreeListEvent& event);
@@ -238,6 +261,7 @@ private:
     void RefreshCollisionMasks();
     void ResetPreview();
     wxBitmap GetwxBitmapFromImageResource(gd::Resource & resource);
+    void SetAnimationName(gd::String newName);
 
     /**
      * Return a vector containing the sprites which must be modified when editing a point

@@ -22,12 +22,14 @@ SpriteExtension::SpriteExtension()
     #if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
 
-    std::map<gd::String, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("Sprite");
-    std::map<gd::String, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("Sprite");
-    std::map<gd::String, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("Sprite");
+    auto & objectActions = GetAllActionsForObject("Sprite");
+    auto & objectConditions = GetAllConditionsForObject("Sprite");
+    auto & objectExpressions = GetAllExpressionsForObject("Sprite");
+    auto & objectStrExpressions = GetAllStrExpressionsForObject("Sprite");
 
     objectActions["Opacity"].SetFunctionName("SetOpacity").SetGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectActions["ChangeAnimation"].SetFunctionName("SetCurrentAnimation").SetGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
+    objectActions["SetAnimationName"].SetFunctionName("SetCurrentAnimation").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectActions["ChangeDirection"].SetFunctionName("SetDirection").SetGetter("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectActions["ChangeSprite"].SetFunctionName("SetSprite").SetGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectActions["PauseAnimation"].SetFunctionName("StopAnimation").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
@@ -39,6 +41,7 @@ SpriteExtension::SpriteExtension()
     objectActions["ChangeScaleHeight"].SetFunctionName("SetScaleY").SetGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
 
     objectConditions["Animation"].SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
+    objectConditions["AnimationName"].SetFunctionName("IsCurrentAnimationName").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectConditions["Direction"].SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectConditions["Sprite"].SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectConditions["AnimStopped"].SetFunctionName("IsAnimationStopped").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
@@ -68,6 +71,7 @@ SpriteExtension::SpriteExtension()
     objectExpressions["Direction"].SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectExpressions["Anim"].SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectExpressions["Animation"].SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
+    objectStrExpressions["AnimationName"].SetFunctionName("GetCurrentAnimationName").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectExpressions["Sprite"].SetFunctionName("GetSpriteNb").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectExpressions["AnimationSpeedScale"].SetFunctionName("GetAnimationSpeedScale").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectExpressions["ScaleX"].SetFunctionName("GetScaleX").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");

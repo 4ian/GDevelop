@@ -1,6 +1,6 @@
 function Hashtable()
 {
-    console.log("New hashtable");
+    // console.log("New hashtable");
     this.items = {};
 }
 

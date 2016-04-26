@@ -224,6 +224,23 @@ gdjs.RuntimeScene.prototype.render = function() {
 	this._renderer.render();
 };
 
+gdjs.RuntimeScene.prototype._updateLayersCameraCoordinates = function() {
+    this._layersCameraCoordinates = this._layersCameraCoordinates || {};
+
+    for(var name in this._layers.items) {
+        if (this._layers.items.hasOwnProperty(name)) {
+            var theLayer = this._layers.items[name];
+
+            this._layersCameraCoordinates[name] = this._layersCameraCoordinates[name] ||
+                [0,0,0,0];
+            this._layersCameraCoordinates[name][0] = theLayer.getCameraX() - theLayer.getCameraWidth();
+            this._layersCameraCoordinates[name][1] = theLayer.getCameraY() - theLayer.getCameraHeight();
+            this._layersCameraCoordinates[name][2] = theLayer.getCameraX() + theLayer.getCameraWidth();
+            this._layersCameraCoordinates[name][3] = theLayer.getCameraY() + theLayer.getCameraHeight();
+        }
+    }
+}
+
 /**
  * Called to update visibility of PIXI.DisplayObject of objects
  * rendered on the scene.
@@ -249,21 +266,11 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 	} else {
 		//After first frame, optimise rendering by setting only objects
 		//near camera as visible.
-		var allLayers = this._layers.entries();
-		var layersCameraCoordinates = {};
-		for(var i = 0;i < allLayers.length;++i) {
-			var theLayer = allLayers[i][1];
-			layersCameraCoordinates[allLayers[i][0]] =
-				[theLayer.getCameraX() - theLayer.getCameraWidth(),
-				 theLayer.getCameraY() - theLayer.getCameraHeight(),
-				 theLayer.getCameraX() + theLayer.getCameraWidth(),
-				 theLayer.getCameraY() + theLayer.getCameraHeight()];
-		}
-
+        this._updateLayersCameraCoordinates();
 		this._constructListOfAllInstances();
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
-			var cameraCoords = layersCameraCoordinates[object.getLayer()];
+			var cameraCoords = this._layersCameraCoordinates[object.getLayer()];
 
 			if (!cameraCoords) continue;
 

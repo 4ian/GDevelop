@@ -85,11 +85,11 @@ gdjs.InputManager.prototype.wasKeyReleased = function(keyCode) {
  * @method anyKeyPressed
  */
 gdjs.InputManager.prototype.anyKeyPressed = function() {
-    var allKeys = this._pressedKeys.entries();
-
-    for(var i = 0, len = allKeys.length;i < len;++i) {
-        if (allKeys[i][1]) {
-            return true;
+    for(var keyCode in this._pressedKeys.items) {
+        if (this._pressedKeys.items.hasOwnProperty(keyCode)) {
+            if (this._pressedKeys.items[keyCode]) {
+                return true;
+            }
         }
     }
 

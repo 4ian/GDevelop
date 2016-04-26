@@ -144,7 +144,10 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
 
     var min_dist = Number.MAX_VALUE;
 
-    var result = {collision:false, move_axis:[0,0] };
+    gdjs.Polygon.collisionTest.result = gdjs.Polygon.collisionTest.result || {collision:false, move_axis:[0,0]};
+		gdjs.Polygon.collisionTest.result.collision = false;
+		gdjs.Polygon.collisionTest.result.move_axis[0] = 0;
+		gdjs.Polygon.collisionTest.result.move_axis[1] = 0;
 
     //Iterate over all the edges composing the polygons
     for (var i = 0, len1 = p1.vertices.length, len2 = p2.vertices.length; i < len1+len2; i++) {
@@ -163,10 +166,10 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
 
         //If the projections on the axis do not overlap, then their is no collision
         if (gdjs.Polygon.distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]) > 0) {
-            result.collision = false;
-            result.move_axis[0] = 0;
-            result.move_axis[1] = 0;
-            return result;
+            gdjs.Polygon.collisionTest.result.collision = false;
+            gdjs.Polygon.collisionTest.result.move_axis[0] = 0;
+            gdjs.Polygon.collisionTest.result.move_axis[1] = 0;
+            return gdjs.Polygon.collisionTest.result;
         }
 
         var dist = Math.abs(gdjs.Polygon.distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]));
@@ -178,7 +181,7 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
         }
     }
 
-    result.collision = true;
+    gdjs.Polygon.collisionTest.result.collision = true;
 
     //Ensure move axis is correctly oriented.
     var p1Center = p1.computeCenter();
@@ -190,10 +193,10 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
     }
 
     //Add the magnitude to the move axis.
-    result.move_axis[0] = move_axis[0] * min_dist;
-    result.move_axis[1] = move_axis[1] * min_dist;
+    gdjs.Polygon.collisionTest.result.move_axis[0] = move_axis[0] * min_dist;
+    gdjs.Polygon.collisionTest.result.move_axis[1] = move_axis[1] * min_dist;
 
-    return result;
+    return gdjs.Polygon.collisionTest.result;
 };
 
 //Tools functions :

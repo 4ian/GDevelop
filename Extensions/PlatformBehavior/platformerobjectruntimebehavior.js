@@ -376,9 +376,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms = function
         objects.push(platform.owner);
     }
 
-    var objectsLists = new Hashtable();
-    objectsLists.put("", objects);
-    return this.owner.separateFromObjects(objectsLists);
+    return this.owner.separateFromObjects(objects);
 };
 
 /**

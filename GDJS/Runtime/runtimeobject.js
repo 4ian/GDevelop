@@ -851,34 +851,66 @@ gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
 /**
  * Separate the object from others objects, using their hitboxes.
  * @method separateFromObjects
+ * @param objects Objects
+ * @return true if the object was moved
+ */
+gdjs.RuntimeObject.prototype.separateFromObjects = function(objects) {
+   var moved = false;
+   var xMove = 0; var yMove = 0;
+   var hitBoxes = this.getHitBoxes();
+
+   //Check if their is a collision with each object
+   for(var i = 0, len = objects.length;i<len;++i) {
+       if ( objects[i].id != this.id ) {
+           var otherHitBoxes = objects[i].getHitBoxes();
+
+           for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
+               for(var l = 0, lenl = otherHitBoxes.length;l<lenl;++l) {
+                   var result = gdjs.Polygon.collisionTest(hitBoxes[k], otherHitBoxes[l]);
+                   if ( result.collision ) {
+                       xMove += result.move_axis[0];
+                       yMove += result.move_axis[1];
+                       moved = true;
+                   }
+               }
+           }
+       }
+   }
+
+   //Move according to the results returned by the collision algorithm.
+   this.setPosition(this.getX()+xMove, this.getY()+yMove);
+   return moved;
+};
+
+/**
+ * Separate the object from others objects, using their hitboxes.
+ * @method separateFromObjectsList
  * @param objectsLists Tables of objects
  * @return true if the object was moved
  */
-gdjs.RuntimeObject.prototype.separateFromObjects = function(objectsLists) {
-
-    //Prepare the list of objects to iterate over.
-    var objects = [];
-    var lists = objectsLists.values();
-    for(var i = 0, len = lists.length;i<len;++i) {
-        objects.push.apply(objects, lists[i]);
-    }
-
+gdjs.RuntimeObject.prototype.separateFromObjectsList = function(objectsLists) {
     var moved = false;
     var xMove = 0; var yMove = 0;
     var hitBoxes = this.getHitBoxes();
 
-    //Check if their is a collision with each object
-    for(var i = 0, len = objects.length;i<len;++i) {
-        if ( objects[i].id != this.id ) {
-            var otherHitBoxes = objects[i].getHitBoxes();
+    for(var name in objectsLists.items) {
+        if (objectsLists.items.hasOwnProperty(name)) {
+            var objects = objectsLists.items[name];
 
-            for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
-                for(var l = 0, lenl = otherHitBoxes.length;l<lenl;++l) {
-                    var result = gdjs.Polygon.collisionTest(hitBoxes[k], otherHitBoxes[l]);
-                    if ( result.collision ) {
-                        xMove += result.move_axis[0];
-                        yMove += result.move_axis[1];
-                        moved = true;
+            //Check if their is a collision with each object
+            for(var i = 0, len = objects.length;i<len;++i) {
+                if ( objects[i].id != this.id ) {
+                    var otherHitBoxes = objects[i].getHitBoxes();
+
+                    for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
+                        for(var l = 0, lenl = otherHitBoxes.length;l<lenl;++l) {
+                            var result = gdjs.Polygon.collisionTest(hitBoxes[k], otherHitBoxes[l]);
+                            if ( result.collision ) {
+                                xMove += result.move_axis[0];
+                                yMove += result.move_axis[1];
+                                moved = true;
+                            }
+                        }
                     }
                 }
             }

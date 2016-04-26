@@ -63,7 +63,7 @@ BaseObjectExtension::BaseObjectExtension()
     objectConditions["Arret"].SetFunctionName("hasNoForces").SetIncludeFile("runtimeobject.js");
     objectConditions["Vitesse"].SetFunctionName("getAverageForce().getLength").SetIncludeFile("runtimeobject.js");
     objectConditions["AngleOfDisplacement"].SetFunctionName("averageForceAngleIs").SetIncludeFile("runtimeobject.js");
-    objectActions["SeparateFromObjects"].SetFunctionName("separateFromObjects").SetIncludeFile("runtimeobject.js");
+    objectActions["SeparateFromObjects"].SetFunctionName("separateFromObjectsList").SetIncludeFile("runtimeobject.js");
     objectActions["Ecarter"].codeExtraInformation //Deprecated
         .SetFunctionName("separateObjectsWithoutForces").SetIncludeFile("runtimeobject.js");
     objectActions["Rebondir"].codeExtraInformation //Deprecated

@@ -234,20 +234,15 @@ gdjs.RuntimeScene.prototype.render = function() {
  * @private
  */
 gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
-	function hide(displayObject) {
-		displayObject.visible = false;
-	}
-
-	function show(displayObject) {
-		displayObject.visible = true;
-	}
-
 	if (this._timeManager.isFirstFrame()) {
 		this._constructListOfAllInstances();
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
 
-			object.exposeRendererObject(object.isHidden() ? hide : show);
+            if (object.isHidden())
+			    object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
+            else
+                object.exposeRendererObject(gdjs.RuntimeScene.showObject);
 		}
 
 		return;
@@ -273,19 +268,27 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 			if (!cameraCoords) continue;
 
 			if (object.isHidden()) {
-				object.exposeRendererObject(hide);
+				object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
 			} else {
 				var aabb = object.getAABB();
 				if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
 					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
-					object.exposeRendererObject(hide);
+					object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
 				} else {
-					object.exposeRendererObject(show);
+					object.exposeRendererObject(gdjs.RuntimeScene.showObject);
 				}
 			}
 		}
 	}
 };
+
+gdjs.RuntimeScene.hideObject = function(displayObject) {
+    displayObject.visible = false;
+}
+
+gdjs.RuntimeScene.showObject = function(displayObject) {
+    displayObject.visible = true;
+}
 
 /**
  * Empty the list of the removed objects:<br>

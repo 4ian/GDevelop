@@ -26,7 +26,7 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._runtimeGame = runtimeGame;
     this._lastId = 0;
 	this._name = "";
-    this._timeManager = new gdjs.TimeManager();
+    this._timeManager = new gdjs.TimeManager(Date.now());
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
@@ -135,7 +135,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 		this._runtimeGame.getSoundManager().clearAll();
 
     this._isLoaded = true;
-	this._timeManager.reset();
+	this._timeManager.reset(Date.now());
 };
 
 gdjs.RuntimeScene.prototype.unloadScene = function() {
@@ -200,7 +200,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
     this._profiler.frameStarted();
     this._profiler.begin("timeManager");
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
-	this._timeManager.update(this._runtimeGame.getMinimalFramerate());
+	this._timeManager.update(Date.now(), this._runtimeGame.getMinimalFramerate());
     this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
     this._profiler.begin("events");

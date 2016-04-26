@@ -12,13 +12,13 @@
  * @namespace gdjs
  * @constructor
  */
-gdjs.TimeManager = function()
+gdjs.TimeManager = function(now)
 {
-    this.reset();
+    this.reset(now);
 }
 
-gdjs.TimeManager.prototype.reset = function() {
-    this._latestFrameDate = new Date();
+gdjs.TimeManager.prototype.reset = function(now) {
+    this._latestFrameDate = now;
     this._elapsedTime = 0;
     this._timeScale = 1;
     this._timeFromStart = 0;
@@ -26,21 +26,23 @@ gdjs.TimeManager.prototype.reset = function() {
     this._timers = new Hashtable();
 }
 
-gdjs.TimeManager.prototype.update = function(minimumFPS) {
+gdjs.TimeManager.prototype.update = function(now, minimumFPS) {
 	if (this._firstUpdateDone) this._firstFrame = false;
 	this._firstUpdateDone = true;
 
 	//Compute the elapsed time since last frame
-	this._elapsedTime = Date.now() - this._latestFrameDate;
-	this._latestFrameDate = Date.now();
+	this._elapsedTime = now - this._latestFrameDate;
+	this._latestFrameDate = now;
 	this._elapsedTime = Math.min(this._elapsedTime, 1000/minimumFPS);
 	this._elapsedTime *= this._timeScale;
 
 	//Update timers and others members
-	var timers = this._timers.values();
-	for ( var i = 0, len = timers.length;i<len;++i) {
-		timers[i].updateTime(this._elapsedTime);
+	for(var name in this._timers.items) {
+		if (this._timers.items.hasOwnProperty(name)) {
+			this._timers.items[name].updateTime(this._elapsedTime);
+		}
 	}
+
 	this._timeFromStart += this._elapsedTime;
 };
 

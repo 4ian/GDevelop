@@ -1138,10 +1138,12 @@ gdjs.RuntimeObject.getNameIdentifier = function(name) {
     if ( gdjs.RuntimeObject.getNameIdentifier.identifiers.containsKey(name) )
         return gdjs.RuntimeObject.getNameIdentifier.identifiers.get(name);
 
-    var newKey = gdjs.RuntimeObject.getNameIdentifier.identifiers.keys().length;
+    gdjs.RuntimeObject.getNameIdentifier.newId =
+        (gdjs.RuntimeObject.getNameIdentifier.newId || 0) + 1;
+    var newIdentifier = gdjs.RuntimeObject.getNameIdentifier.newId;
 
-    gdjs.RuntimeObject.getNameIdentifier.identifiers.put(name, newKey);
-    return newKey;
+    gdjs.RuntimeObject.getNameIdentifier.identifiers.put(name, newIdentifier);
+    return newIdentifier;
 };
 
 //Notify gdjs the RuntimeObject exists.

@@ -34,11 +34,12 @@ gdjs.VariablesContainer = function(initialVariablesData)
  */
 gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
     if ( keepOldVariables == undefined ) keepOldVariables = false;
-    if ( !keepOldVariables ) var deletedVars = this._variables.keys();
+    if ( !keepOldVariables ) var deletedVars = this._variables.keys(); //TODO: avoid using keys()
 
     var that = this;
     var i = 0;
-	gdjs.iterateOverArray(data, function(varData) {
+    for(var j = 0;j<data.length;++j) {
+        var varData = data[j];
 
         //Get the variable:
         var variable = that.get(varData.name);
@@ -57,7 +58,7 @@ gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
             var idx = deletedVars.indexOf(varData.name)
             if (idx !== -1) deletedVars[idx] = undefined;
         }
-	});
+	}
 
     if ( !keepOldVariables ) {
         this._variablesArray.length = i;

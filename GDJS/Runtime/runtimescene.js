@@ -317,24 +317,25 @@ gdjs.RuntimeScene.prototype._cacheOrClearRemovedInstances = function() {
  * @method _constructListOfAllObjects
  * @private
  */
-gdjs.RuntimeScene.prototype._constructListOfAllInstances= function() {
-	var allObjectsLists = this._instances.values();
+gdjs.RuntimeScene.prototype._constructListOfAllInstances = function() {
+    var currentListSize = 0;
+    for (var name in this._instances.items) {
+        if (this._instances.items.hasOwnProperty(name)) {
+            var list = this._instances.items[name];
 
-	var currentListSize = 0;
-	for( var i = 0, len = allObjectsLists.length;i<len;++i) {
-		var oldSize = currentListSize;
-		currentListSize += allObjectsLists[i].length;
+            var oldSize = currentListSize;
+    		currentListSize += list.length;
 
-		if ( this._allInstancesList.length < currentListSize )
-			this._allInstancesList.length = currentListSize;
+    		for(var j = 0, lenj = list.length;j<lenj;++j) {
+                if (oldSize+j < this._allInstancesList.length)
+    			    this._allInstancesList[oldSize+j] = list[j];
+                else
+                    this._allInstancesList.push(list[j]);
+    		}
+        }
+    }
 
-		for(var j = 0, lenj = allObjectsLists[i].length;j<lenj;++j) {
-			this._allInstancesList[oldSize+j] = allObjectsLists[i][j];
-		}
-	}
-
-	if ( this._allInstancesList.length !== currentListSize )
-		this._allInstancesList.length = currentListSize;
+	this._allInstancesList.length = currentListSize;
 };
 
 /**

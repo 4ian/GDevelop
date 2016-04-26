@@ -332,7 +332,7 @@ gdjs.evtTools.object.doCreateObjectOnScene = function(runtimeScene, objectName, 
  * @private
  */
 gdjs.evtTools.object.createObjectOnScene = function(runtimeScene, objectsLists, x, y, layer) {
-    gdjs.evtTools.object.doCreateObjectOnScene(runtimeScene, objectsLists.keys()[0], objectsLists, x, y, layer);
+    gdjs.evtTools.object.doCreateObjectOnScene(runtimeScene, objectsLists.firstKey(), objectsLists, x, y, layer);
 };
 
 /**

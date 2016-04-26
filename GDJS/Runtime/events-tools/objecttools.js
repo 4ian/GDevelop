@@ -244,12 +244,13 @@ gdjs.evtTools.object.turnedTowardTest = function(objectsLists1, objectsLists2, t
 
 gdjs.evtTools.object.pickAllObjects = function(runtimeScene, objectsLists) {
 
-    var entries = objectsLists.entries();
-    for(var i = 0, len = entries.length;i<len;++i) {
-        var allObjects = runtimeScene.getObjects(entries[i][0]);
-        var objectsList = entries[i][1];
-        objectsList.length = 0;
-        objectsList.push.apply(objectsList, allObjects);
+    for (var name in objectsLists.items) {
+        if (objectsLists.items.hasOwnProperty(name)) {
+            var allObjects = runtimeScene.getObjects(name);
+            var objectsList = objectsLists.items[name];
+            objectsList.length = 0;
+            objectsList.push.apply(objectsList, allObjects);
+        }
     }
 
     return true;

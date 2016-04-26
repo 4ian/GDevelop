@@ -409,21 +409,24 @@ gdjs.RuntimeScene.prototype.getName = function() {
  * @method updateObjectsForces
  */
 gdjs.RuntimeScene.prototype.updateObjectsForces = function() {
-	var allObjectsLists = this._instances.entries();
+    var elapsedTimeInSeconds = this._timeManager.getElapsedTime() / 1000;
+    for (var name in this._instances.items) {
+        if (this._instances.items.hasOwnProperty(name)) {
+            var list = this._instances.items[name];
 
-	var elapsedTimeInSeconds = this._timeManager.getElapsedTime() / 1000;
-	for( var i = 0, len = allObjectsLists.length;i<len;++i) {
-		for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {
-			var obj = allObjectsLists[i][1][j];
-			if ( !obj.hasNoForces() ) {
-				var averageForce = obj.getAverageForce();
+        	for(var j = 0, listLen = list.length;j<listLen;++j) {
+        		var obj = list[j];
+        		if (!obj.hasNoForces()) {
+        			var averageForce = obj.getAverageForce();
 
-				obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
-				obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
-				obj.updateForces(elapsedTimeInSeconds);
-			}
-		}
-	}
+        			obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
+        			obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
+        			obj.updateForces(elapsedTimeInSeconds);
+        		}
+        	}
+        }
+    }
+
 };
 
 /**

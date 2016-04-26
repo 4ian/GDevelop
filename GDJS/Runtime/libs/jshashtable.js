@@ -52,17 +52,6 @@ Hashtable.prototype.values = function() {
     return values;
 }
 
-Hashtable.prototype.entries = function() {
-    //TODO: search for functions calling entries() and avoid doing it.
-    var entries = [];
-    for (var k in this.items) {
-        if (this.items.hasOwnProperty(k)) {
-            entries.push([k, this.items[k]]);
-        }
-    }
-    return entries;
-}
-
 Hashtable.prototype.clear = function() {
     for (var k in this.items) {
         if (this.items.hasOwnProperty(k)) {

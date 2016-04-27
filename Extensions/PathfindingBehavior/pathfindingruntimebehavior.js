@@ -384,7 +384,7 @@ gdjs.PathfindingRuntimeBehavior.SearchContext = function()
     this._allNodes = []; //An array of array. Nodes are indexed by their x position, and then by their y position.
     this._openNodes = []; //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
 
-    this._closeObstacles = {}; //Used by getNodes to temporarily store obstacles near a position.
+    this._closeObstacles = []; //Used by getNodes to temporarily store obstacles near a position.
     this._nodeCache = []; //Old nodes constructed in a previous search are stored here to avoid temporary objects (see _freeAllNodes method).
 };
 
@@ -542,24 +542,22 @@ gdjs.PathfindingRuntimeBehavior.SearchContext.prototype._getNode = function(xPos
     this._obstacles.getAllObstaclesAround(xPos*this._cellWidth, yPos*this._cellHeight,
         radius, this._closeObstacles);
 
-    for( var k in this._closeObstacles ) {
-        if ( this._closeObstacles.hasOwnProperty(k) ) {
-            var obj = this._closeObstacles[k].owner;
-            var topLeftCellX = Math.floor((obj.getDrawableX()-this._rightBorder)/this._cellWidth);
-            var topLeftCellY = Math.floor((obj.getDrawableY()-this._bottomBorder)/this._cellHeight);
-            var bottomRightCellX = Math.ceil((obj.getDrawableX()+obj.getWidth()+this._leftBorder)/this._cellWidth);
-            var bottomRightCellY = Math.ceil((obj.getDrawableY()+obj.getHeight()+this._topBorder)/this._cellHeight);
-            if ( topLeftCellX < xPos && xPos < bottomRightCellX
-                && topLeftCellY < yPos && yPos < bottomRightCellY) {
+    for(var k = 0; k < this._closeObstacles.length; ++k ) {
+        var obj = this._closeObstacles[k].owner;
+        var topLeftCellX = Math.floor((obj.getDrawableX()-this._rightBorder)/this._cellWidth);
+        var topLeftCellY = Math.floor((obj.getDrawableY()-this._bottomBorder)/this._cellHeight);
+        var bottomRightCellX = Math.ceil((obj.getDrawableX()+obj.getWidth()+this._leftBorder)/this._cellWidth);
+        var bottomRightCellY = Math.ceil((obj.getDrawableY()+obj.getHeight()+this._topBorder)/this._cellHeight);
+        if ( topLeftCellX < xPos && xPos < bottomRightCellX
+            && topLeftCellY < yPos && yPos < bottomRightCellY) {
 
-                objectsOnCell = true;
-                if ( this._closeObstacles[k].isImpassable() ) {
-                    newNode.cost = -1;
-                    break; //The cell is impassable, stop here.
-                }
-                else //Superimpose obstacles
-                    newNode.cost += this._closeObstacles[k].getCost();
+            objectsOnCell = true;
+            if ( this._closeObstacles[k].isImpassable() ) {
+                newNode.cost = -1;
+                break; //The cell is impassable, stop here.
             }
+            else //Superimpose obstacles
+                newNode.cost += this._closeObstacles[k].getCost();
         }
     }
 

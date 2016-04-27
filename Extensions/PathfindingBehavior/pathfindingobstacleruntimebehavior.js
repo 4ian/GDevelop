@@ -86,25 +86,8 @@ gdjs.PathfindingObstaclesManager.Vertex.prototype.getAABB = function(){
 gdjs.PathfindingObstaclesManager.prototype.getAllObstaclesAround = function(x, y, radius, result) {
     var vertex = new gdjs.PathfindingObstaclesManager.Vertex(x,y, radius);
     this._obstaclesHSHG.addObject(vertex);
-    var obstaclesCollidingWithVertex = this._obstaclesHSHG.queryForCollisionWith(vertex);
+    this._obstaclesHSHG.queryForCollisionWith(vertex, result);
     this._obstaclesHSHG.removeObject(vertex);
-
-    if ( result === undefined )
-        return obstaclesCollidingWithVertex;
-    else {
-        //Clean the result object
-        for(var k in result) {
-            if ( result.hasOwnProperty(k) )
-                delete result[k];
-        }
-
-        //Insert obstacles
-        for(var i = 0; i < obstaclesCollidingWithVertex.length; ++i) {
-            result[obstaclesCollidingWithVertex[i].owner.id] = obstaclesCollidingWithVertex[i];
-        }
-
-        return;
-    }
 };
 
 /**

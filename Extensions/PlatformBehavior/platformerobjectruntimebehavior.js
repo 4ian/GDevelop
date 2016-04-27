@@ -35,8 +35,10 @@ gdjs.PlatformerObjectRuntimeBehavior = function(runtimeScene, behaviorData, owne
     this._upKey = false;
     this._downKey = false;
     this._jumpKey = false;
-    this._potentialCollidingObjects = []; //Platforms near the object, updated with _updatePotentialCollidingObjects.
-    this._overlappedJumpThru =[];
+    this._potentialCollidingObjects = this._potentialCollidingObjects || []; //Platforms near the object, updated with _updatePotentialCollidingObjects.
+    this._potentialCollidingObjects.length = 0;
+    this._overlappedJumpThru = this._overlappedJumpThru || [];
+    this._overlappedJumpThru.length = 0;
     this._oldHeight = 0;//owner.getHeight(); //Be careful, object might not be initialized.
     this._hasReallyMoved = false;
     this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
@@ -470,7 +472,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._isIn = function(platformArray, i
  */
 gdjs.PlatformerObjectRuntimeBehavior.prototype._updatePotentialCollidingObjects = function(maxMovementLength)
 {
-    this._potentialCollidingObjects = this._manager.getAllPlatformsAround(this.owner, maxMovementLength);
+    this._manager.getAllPlatformsAround(this.owner, maxMovementLength, this._potentialCollidingObjects);
 
     //This is the naive implementation when the platforms manager is simply containing a list
     //of all existing platforms:

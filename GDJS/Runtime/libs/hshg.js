@@ -70,7 +70,6 @@ function getLongestAABBEdge(min, max){
 	return Math.max(
 		 Math.abs(max[0] - min[0])
 		,Math.abs(max[1] - min[1])
-		//,Math.abs(max[2] - min[2])
 	);
 }
 
@@ -207,109 +206,11 @@ HSHG.prototype.update = function(){
 };
 
 /**
- * Return an array containing the colliding pairs.
- * @method queryForCollisionPairs
- */
-HSHG.prototype.queryForCollisionPairs = function(broadOverlapTestCallback){
-
-	var i, j, k, l, c
-		,grid
-		,cell
-		,objA
-		,objB
-		,offset
-		,adjacentCell
-		,biggerGrid
-		,objAAABB
-		,objAHashInBiggerGrid
-		,possibleCollisions = []
-
-	// default broad test to internal aabb overlap test
-	broadOverlapTest = broadOverlapTestCallback || testAABBOverlap;
-
-	// for all grids ordered by cell size ASC
-	for(i = 0; i < this._grids.length; i++){
-		grid = this._grids[i];
-
-		// for each cell of the grid that is occupied
-		for(j = 0; j < grid.occupiedCells.length; j++){
-			cell = grid.occupiedCells[j];
-
-			// collide all objects within the occupied cell
-			for(k = 0; k < cell.objectContainer.length; k++){
-				objA = cell.objectContainer[k];
-				for(l = k+1; l < cell.objectContainer.length; l++){
-					objB = cell.objectContainer[l];
-					if(broadOverlapTest(objA, objB) === true){
-						possibleCollisions.push( [ objA, objB ] );
-					}
-				}
-			}
-
-			// for the first half of all adjacent cells (offset 4 is the current cell)
-			for(c = 0; c < 4; c++){
-				offset = cell.neighborOffsetArray[c];
-
-				//if(offset === null) { continue; }
-
-				adjacentCell = grid.allCells[ cell.allCellsIndex + offset ];
-
-				// collide all objects in cell with adjacent cell
-				for(k = 0; k < cell.objectContainer.length; k++){
-					objA = cell.objectContainer[k];
-					for(l = 0; l < adjacentCell.objectContainer.length; l++){
-						objB = adjacentCell.objectContainer[l];
-						if(broadOverlapTest(objA, objB) === true){
-							possibleCollisions.push( [ objA, objB ] );
-						}
-					}
-				}
-			}
-		}
-
-		// forall objects that are stored in this grid
-		for(j = 0; j < grid.allObjects.length; j++){
-			objA = grid.allObjects[j];
-			objAAABB = objA.getAABB();
-
-			// for all grids with cellsize larger than grid
-			for(k = i + 1; k < this._grids.length; k++){
-				biggerGrid = this._grids[k];
-				objAHashInBiggerGrid = biggerGrid.toHash(objAAABB.min[0], objAAABB.min[1]);
-				cell = biggerGrid.allCells[objAHashInBiggerGrid];
-
-				// check objA against every object in all cells in offset array of cell
-				// for all adjacent cells...
-				for(c = 0; c < cell.neighborOffsetArray.length; c++){
-					offset = cell.neighborOffsetArray[c];
-
-					//if(offset === null) { continue; }
-
-					adjacentCell = biggerGrid.allCells[ cell.allCellsIndex + offset ];
-
-					// for all objects in the adjacent cell...
-					for(l = 0; l < adjacentCell.objectContainer.length; l++){
-						objB = adjacentCell.objectContainer[l];
-						// test against object A
-						if(broadOverlapTest(objA, objB) === true){
-							possibleCollisions.push( [ objA, objB ] );
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// return list of object pairs
-	return possibleCollisions;
-};
-
-/**
  * Return a list of objects colliding with theObject.
  * @param theObject The object to be tested against.
  * @method queryForCollisionWith
  */
-HSHG.prototype.queryForCollisionWith = function(theObject, broadOverlapTestCallback){
+HSHG.prototype.queryForCollisionWith = function(theObject, result){
 
 	var i, j, k, l, c
 		,grid
@@ -320,8 +221,9 @@ HSHG.prototype.queryForCollisionWith = function(theObject, broadOverlapTestCallb
 		,adjacentCell
 		,biggerGrid
 		,objAAABB
-		,objAHashInBiggerGrid
-		,possibleCollisions = []
+		,objAHashInBiggerGrid;
+
+	result.length = 0;
 
 	theObject.HSHG.excludeMe = true;
 	var theObjectAABB = theObject.getAABB();
@@ -329,7 +231,7 @@ HSHG.prototype.queryForCollisionWith = function(theObject, broadOverlapTestCallb
 	var theObjectCellInItsGrid = theObject.HSHG.grid.allCells[theObjectHashInItsGrid];
 
 	// default broad test to internal aabb overlap test
-	broadOverlapTest = broadOverlapTestCallback || testAABBOverlap;
+	broadOverlapTest = testAABBOverlap;
 
 	// for all grids ordered by cell size ASC
 	for(i = 0; i < this._grids.length; i++){
@@ -347,7 +249,7 @@ HSHG.prototype.queryForCollisionWith = function(theObject, broadOverlapTestCallb
 				for(l = 0; l < cell.objectContainer.length; l++){
 					objB = cell.objectContainer[l]; //Note that objB could be theObject.
 					if(!objB.HSHG.excludeMe && broadOverlapTest(theObject, objB) === true){
-						possibleCollisions.push( objB );
+						result.push( objB );
 					}
 				}
 
@@ -360,7 +262,7 @@ HSHG.prototype.queryForCollisionWith = function(theObject, broadOverlapTestCallb
 					for(l = 0; l < adjacentCell.objectContainer.length; l++){
 						objB = adjacentCell.objectContainer[l]; //Note that objB could be theObject.
 						if(!objB.HSHG.excludeMe && broadOverlapTest(theObject, objB) === true){
-							possibleCollisions.push( objB );
+							result.push( objB );
 						}
 					}
 				}
@@ -386,7 +288,7 @@ HSHG.prototype.queryForCollisionWith = function(theObject, broadOverlapTestCallb
 
 						// Test against theObject: Note that objB is necessarily different from theObject.
 						if(broadOverlapTest(theObject, objB) === true){
-							possibleCollisions.push( objB );
+							result.push( objB );
 						}
 					}
 				}
@@ -421,7 +323,7 @@ HSHG.prototype.queryForCollisionWith = function(theObject, broadOverlapTestCallb
 				if ( objAIsInAdjacentCellToObject ) {
 					//Note that objA is necessarily different from theObject
 					if(broadOverlapTest(theObject, objA) === true){
-						possibleCollisions.push( objA );
+						result.push( objA );
 					}
 				}
 			}
@@ -429,9 +331,6 @@ HSHG.prototype.queryForCollisionWith = function(theObject, broadOverlapTestCallb
 	}
 
 	delete theObject.HSHG.excludeMe;
-
-	// return list of colliding objects
-	return possibleCollisions;
 };
 
 HSHG.update_RECOMPUTE = update_RECOMPUTE;
@@ -561,16 +460,7 @@ Grid.prototype.toHash = function(x, y, z){
 		yHash = ~~i & this.xyHashMask;
 	}
 
-	//if(z < 0){
-	//	i = (-z) * this.inverseCellSize;
-	//	zHash = this.rowColumnCount - 1 - ( ~~i & this.xyHashMask );
-	//} else {
-	//	i = z * this.inverseCellSize;
-	//	zHash = ~~i & this.xyHashMask;
-	//}
-
-	return xHash + yHash * this.rowColumnCount
-		//+ zHash * this.rowColumnCount * this.rowColumnCount;
+	return xHash + yHash * this.rowColumnCount;
 }
 
 Grid.prototype.addObject = function(obj, hash){

@@ -30,15 +30,13 @@ Hashtable.prototype.firstKey = function() {
     return undefined;
 }
 
-Hashtable.prototype.keys = function() {
-    //TODO: search for functions calling keys() and avoid doing it.
-    var keys = [];
+Hashtable.prototype.keys = function(result) {
+    result.length = 0;
     for (var k in this.items) {
         if (this.items.hasOwnProperty(k)) {
-            keys.push(k);
+            result.push(k);
         }
     }
-    return keys;
 }
 
 Hashtable.prototype.values = function() {

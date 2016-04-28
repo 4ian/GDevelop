@@ -997,8 +997,11 @@ gdjs.RuntimeObject.prototype.putAroundObject = function(obj,distance,angleInDegr
 gdjs.RuntimeObject.prototype.separateObjectsWithoutForces = function(objectsLists) {
 
     //Prepare the list of objects to iterate over.
-    var objects = [];
-    var lists = objectsLists.values();
+    var objects = gdjs.staticArray(gdjs.RuntimeObject.prototype.separateObjectsWithoutForces);
+    objects.length = 0;
+
+    var lists = gdjs.staticArray2(gdjs.RuntimeObject.prototype.separateObjectsWithoutForces);
+    objectsLists.values(lists);
     for(var i = 0, len = lists.length;i<len;++i) {
         objects.push.apply(objects, lists[i]);
     }
@@ -1032,8 +1035,11 @@ gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, 
     if ( len == undefined ) len = 10;
 
     //Prepare the list of objects to iterate over.
-    var objects = [];
-    var lists = objectsLists.values();
+    var objects = gdjs.staticArray(gdjs.RuntimeObject.prototype.separateObjectsWithForces);
+    objects.length = 0;
+
+    var lists = gdjs.staticArray2(gdjs.RuntimeObject.prototype.separateObjectsWithForces);
+    objectsLists.values(lists);
     for(var i = 0, len = lists.length;i<len;++i) {
         objects.push.apply(objects, lists[i]);
     }

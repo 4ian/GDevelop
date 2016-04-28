@@ -39,15 +39,13 @@ Hashtable.prototype.keys = function(result) {
     }
 }
 
-Hashtable.prototype.values = function() {
-    //TODO: search for functions calling values() and avoid doing it.
-    var values = [];
+Hashtable.prototype.values = function(result) {
+    result.length = 0;
     for (var k in this.items) {
         if (this.items.hasOwnProperty(k)) {
-            values.push(this.items[k]);
+            result.push(this.items[k]);
         }
     }
-    return values;
 }
 
 Hashtable.prototype.clear = function() {

@@ -34,11 +34,15 @@ gdjs.VariablesContainer = function(initialVariablesData)
  */
 gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
     if ( keepOldVariables == undefined ) keepOldVariables = false;
-    if ( !keepOldVariables ) var deletedVars = this._variables.keys();
+    if ( !keepOldVariables ) {
+        gdjs.VariablesContainer._deletedVars = gdjs.VariablesContainer._deletedVars || [];
+        this._variables.keys(gdjs.VariablesContainer._deletedVars);
+    }
 
     var that = this;
     var i = 0;
-	gdjs.iterateOverArray(data, function(varData) {
+    for(var j = 0;j<data.length;++j) {
+        var varData = data[j];
 
         //Get the variable:
         var variable = that.get(varData.name);
@@ -54,10 +58,10 @@ gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
             ++i;
 
             //Remove the variable from the list of variables to be deleted.
-            var idx = deletedVars.indexOf(varData.name)
-            if (idx !== -1) deletedVars[idx] = undefined;
+            var idx = gdjs.VariablesContainer._deletedVars.indexOf(varData.name)
+            if (idx !== -1) gdjs.VariablesContainer._deletedVars[idx] = undefined;
         }
-	});
+	}
 
     if ( !keepOldVariables ) {
         this._variablesArray.length = i;
@@ -65,9 +69,10 @@ gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
         //If we do not want to keep the already existing variables,
         //remove all the variables not assigned above.
         //(Here, remove means flag the variable as not existing, to avoid garbage creation ).
-        for(var i =0, len = deletedVars.length;i<len;++i) {
-            if ( deletedVars[i] != undefined )
-                this._variables.get(deletedVars[i]).setUndefinedInContainer();
+        for(var i =0, len = gdjs.VariablesContainer._deletedVars.length;i<len;++i) {
+            var variableName = gdjs.VariablesContainer._deletedVars[i];
+            if ( variableName != undefined )
+                this._variables.get(variableName).setUndefinedInContainer();
         }
     }
 };

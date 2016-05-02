@@ -23,9 +23,11 @@ gdjs.evtTools.object = gdjs.evtTools.object || {};
  * @static
  */
 gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
-    var values = objectsLists.values();
-    for(var i = 0, len = values.length;i<len;++i)
-        values[i].length = 0; //Be sure not to lose the reference to the original array
+    var lists = gdjs.staticArray(gdjs.evtTools.object.pickOnly);
+    objectsLists.values(lists);
+
+    for(var i = 0, len = lists.length;i<len;++i)
+        lists[i].length = 0; //Be sure not to lose the reference to the original array
 
     objectsLists.get(runtimeObject.getName()).push(runtimeObject);
 };
@@ -54,17 +56,19 @@ gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
 gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted) {
 
     var isTrue = false;
-    var objects1Values = objectsLists1.values();
-    var objects2Values = objectsLists2.values();
+    var objects1Lists = gdjs.staticArray(gdjs.evtTools.object.twoListsTest);
+    objectsLists1.values(objects1Lists);
+    var objects2Lists = gdjs.staticArray2(gdjs.evtTools.object.twoListsTest);
+    objectsLists2.values(objects2Lists);
 
-    for(var i = 0, leni = objects1Values.length;i<leni;++i) {
-        var arr = objects1Values[i];
+    for(var i = 0, leni = objects1Lists.length;i<leni;++i) {
+        var arr = objects1Lists[i];
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
             arr[k].pick = false;
         }
     }
-    for(var i = 0, leni = objects2Values.length;i<leni;++i) {
-        var arr = objects2Values[i];
+    for(var i = 0, leni = objects2Lists.length;i<leni;++i) {
+        var arr = objects2Lists[i];
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
             arr[k].pick = false;
         }
@@ -72,14 +76,14 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
 
     //Launch the function for each object of the first list with each object
     //of the second list.
-    for(var i = 0, leni = objects1Values.length;i<leni;++i) {
-        var arr1 = objects1Values[i];
+    for(var i = 0, leni = objects1Lists.length;i<leni;++i) {
+        var arr1 = objects1Lists[i];
 
         for(var k = 0, lenk = arr1.length;k<lenk;++k) {
             var atLeastOneObject = false;
 
-            for(var j = 0, lenj = objects2Values.length;j<lenj;++j) {
-                var arr2 = objects2Values[j];
+            for(var j = 0, lenj = objects2Lists.length;j<lenj;++j) {
+                var arr2 = objects2Lists[j];
 
                 for(var l = 0, lenl = arr2.length;l<lenl;++l) {
                     if (arr1[k].pick && arr2[l].pick) continue; //Avoid unnecessary costly call to predicate.
@@ -107,8 +111,8 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
     }
 
     //Trim not picked objects from lists.
-    for(var i = 0, leni = objects1Values.length;i<leni;++i) {
-        var arr = objects1Values[i];
+    for(var i = 0, leni = objects1Lists.length;i<leni;++i) {
+        var arr = objects1Lists[i];
         var finalSize = 0;
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
@@ -122,8 +126,8 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
     }
 
     if ( !inverted ) {
-        for(var i = 0, leni = objects2Values.length;i<leni;++i) {
-            var arr = objects2Values[i];
+        for(var i = 0, leni = objects2Lists.length;i<leni;++i) {
+            var arr = objects2Lists[i];
             var finalSize = 0;
 
             for(var k = 0, lenk = arr.length;k<lenk;++k) {
@@ -155,19 +159,20 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
  */
 gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate) {
     var isTrue = false;
-    var objectsValues = objectsLists.values();
+    var lists = gdjs.staticArray(gdjs.evtTools.object.pickObjectsIf);
+    objectsLists.values(lists);
 
     //Create a boolean for each object
-    for(var i = 0, leni = objectsValues.length;i<leni;++i) {
-        var arr = objectsValues[i];
+    for(var i = 0, leni = lists.length;i<leni;++i) {
+        var arr = lists[i];
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
             arr[k].pick = false;
         }
     }
 
     //Pick only objects that are fulfilling the predicate
-    for(var i = 0, leni = objectsValues.length;i<leni;++i) {
-        var arr = objectsValues[i];
+    for(var i = 0, leni = lists.length;i<leni;++i) {
+        var arr = lists[i];
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
             if (negatePredicate ^ predicate(arr[k])) {
@@ -178,8 +183,8 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
     }
 
     //Trim not picked objects from lists.
-    for(var i = 0, leni = objectsValues.length;i<leni;++i) {
-        var arr = objectsValues[i];
+    for(var i = 0, leni = lists.length;i<leni;++i) {
+        var arr = lists[i];
         var finalSize = 0;
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
@@ -244,12 +249,13 @@ gdjs.evtTools.object.turnedTowardTest = function(objectsLists1, objectsLists2, t
 
 gdjs.evtTools.object.pickAllObjects = function(runtimeScene, objectsLists) {
 
-    var entries = objectsLists.entries();
-    for(var i = 0, len = entries.length;i<len;++i) {
-        var allObjects = runtimeScene.getObjects(entries[i][0]);
-        var objectsList = entries[i][1];
-        objectsList.length = 0;
-        objectsList.push.apply(objectsList, allObjects);
+    for (var name in objectsLists.items) {
+        if (objectsLists.items.hasOwnProperty(name)) {
+            var allObjects = runtimeScene.getObjects(name);
+            var objectsList = objectsLists.items[name];
+            objectsList.length = 0;
+            objectsList.push.apply(objectsList, allObjects);
+        }
     }
 
     return true;
@@ -259,11 +265,14 @@ gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
 
     //Create a list with all the objects
     //and clear the lists of picked objects.
-    var objects = [];
-    var values = objectsLists.values();
-    for(var i = 0, len = values.length;i<len;++i) {
-        objects.push.apply(objects, values[i]);
-        values[i].length = 0; //Be sure not to lose the reference to the original array
+    var objects = gdjs.staticArray(gdjs.evtTools.object.pickRandomObject);
+    objects.length = 0;
+
+    var lists = gdjs.staticArray2(gdjs.evtTools.object.pickRandomObject);
+    objectsLists.values(lists);
+    for(var i = 0, len = lists.length;i<len;++i) {
+        objects.push.apply(objects, lists[i]);
+        lists[i].length = 0; //Be sure not to lose the reference to the original array
     }
 
     //Pick only one object
@@ -283,9 +292,10 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
     var bestObject = null;
     var best = 0;
     var first = true;
-    var values = objectsLists.values();
-    for(var i = 0, len = values.length;i<len;++i) {
-        var list = values[i];
+    var lists = gdjs.staticArray(gdjs.evtTools.object.pickNearestObject);
+    objectsLists.values(lists);
+    for(var i = 0, len = lists.length;i<len;++i) {
+        var list = lists[i];
 
         for(var j = 0;j < list.length;++j) {
             var object = list[j];
@@ -332,7 +342,7 @@ gdjs.evtTools.object.doCreateObjectOnScene = function(runtimeScene, objectName, 
  * @private
  */
 gdjs.evtTools.object.createObjectOnScene = function(runtimeScene, objectsLists, x, y, layer) {
-    gdjs.evtTools.object.doCreateObjectOnScene(runtimeScene, objectsLists.keys()[0], objectsLists, x, y, layer);
+    gdjs.evtTools.object.doCreateObjectOnScene(runtimeScene, objectsLists.firstKey(), objectsLists, x, y, layer);
 };
 
 /**
@@ -348,11 +358,11 @@ gdjs.evtTools.object.createObjectFromGroupOnScene = function(runtimeScene, objec
  * @private
  */
 gdjs.evtTools.object.pickedObjectsCount = function(objectsLists) {
-
     var size = 0;
-    var values = objectsLists.values();
-    for(var i = 0, len = values.length;i<len;++i) {
-        size += values[i].length;
+    var lists = gdjs.staticArray(gdjs.evtTools.object.pickedObjectsCount);
+    objectsLists.values(lists);
+    for(var i = 0, len = lists.length;i<len;++i) {
+        size += lists[i].length;
     }
 
     return size;

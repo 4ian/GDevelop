@@ -190,6 +190,16 @@ gdjs.getBehaviorConstructor = function(name) {
     return gdjs.behaviorsTypes.get(""); //Create a base empty runtime behavior.
 };
 
+gdjs.staticArray = function(owner) {
+    owner._staticArray = owner._staticArray || [];
+    return owner._staticArray;
+}
+
+gdjs.staticArray2 = function(owner) {
+    owner._staticArray2 = owner._staticArray2 || [];
+    return owner._staticArray2;
+}
+
 Array.prototype.remove = function(from) {
     //Adapted from the nice article available at
     //https://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript

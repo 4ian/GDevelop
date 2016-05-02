@@ -26,7 +26,7 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._runtimeGame = runtimeGame;
     this._lastId = 0;
 	this._name = "";
-    this._timeManager = new gdjs.TimeManager();
+    this._timeManager = new gdjs.TimeManager(Date.now());
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
@@ -135,7 +135,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 		this._runtimeGame.getSoundManager().clearAll();
 
     this._isLoaded = true;
-	this._timeManager.reset();
+	this._timeManager.reset(Date.now());
 };
 
 gdjs.RuntimeScene.prototype.unloadScene = function() {
@@ -200,7 +200,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function() {
     this._profiler.frameStarted();
     this._profiler.begin("timeManager");
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
-	this._timeManager.update(this._runtimeGame.getMinimalFramerate());
+	this._timeManager.update(Date.now(), this._runtimeGame.getMinimalFramerate());
     this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
     this._profiler.begin("events");
@@ -224,6 +224,23 @@ gdjs.RuntimeScene.prototype.render = function() {
 	this._renderer.render();
 };
 
+gdjs.RuntimeScene.prototype._updateLayersCameraCoordinates = function() {
+    this._layersCameraCoordinates = this._layersCameraCoordinates || {};
+
+    for(var name in this._layers.items) {
+        if (this._layers.items.hasOwnProperty(name)) {
+            var theLayer = this._layers.items[name];
+
+            this._layersCameraCoordinates[name] = this._layersCameraCoordinates[name] ||
+                [0,0,0,0];
+            this._layersCameraCoordinates[name][0] = theLayer.getCameraX() - theLayer.getCameraWidth();
+            this._layersCameraCoordinates[name][1] = theLayer.getCameraY() - theLayer.getCameraHeight();
+            this._layersCameraCoordinates[name][2] = theLayer.getCameraX() + theLayer.getCameraWidth();
+            this._layersCameraCoordinates[name][3] = theLayer.getCameraY() + theLayer.getCameraHeight();
+        }
+    }
+}
+
 /**
  * Called to update visibility of PIXI.DisplayObject of objects
  * rendered on the scene.
@@ -234,58 +251,51 @@ gdjs.RuntimeScene.prototype.render = function() {
  * @private
  */
 gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
-	function hide(displayObject) {
-		displayObject.visible = false;
-	}
-
-	function show(displayObject) {
-		displayObject.visible = true;
-	}
-
 	if (this._timeManager.isFirstFrame()) {
 		this._constructListOfAllInstances();
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
 
-			object.exposeRendererObject(object.isHidden() ? hide : show);
+            if (object.isHidden())
+			    object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
+            else
+                object.exposeRendererObject(gdjs.RuntimeScene.showObject);
 		}
 
 		return;
 	} else {
 		//After first frame, optimise rendering by setting only objects
 		//near camera as visible.
-		var allLayers = this._layers.entries();
-		var layersCameraCoordinates = {};
-		for(var i = 0;i < allLayers.length;++i) {
-			var theLayer = allLayers[i][1];
-			layersCameraCoordinates[allLayers[i][0]] =
-				[theLayer.getCameraX() - theLayer.getCameraWidth(),
-				 theLayer.getCameraY() - theLayer.getCameraHeight(),
-				 theLayer.getCameraX() + theLayer.getCameraWidth(),
-				 theLayer.getCameraY() + theLayer.getCameraHeight()];
-		}
-
+        this._updateLayersCameraCoordinates();
 		this._constructListOfAllInstances();
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
-			var cameraCoords = layersCameraCoordinates[object.getLayer()];
+			var cameraCoords = this._layersCameraCoordinates[object.getLayer()];
 
 			if (!cameraCoords) continue;
 
 			if (object.isHidden()) {
-				object.exposeRendererObject(hide);
+				object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
 			} else {
 				var aabb = object.getAABB();
 				if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
 					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
-					object.exposeRendererObject(hide);
+					object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
 				} else {
-					object.exposeRendererObject(show);
+					object.exposeRendererObject(gdjs.RuntimeScene.showObject);
 				}
 			}
 		}
 	}
 };
+
+gdjs.RuntimeScene.hideObject = function(displayObject) {
+    displayObject.visible = false;
+}
+
+gdjs.RuntimeScene.showObject = function(displayObject) {
+    displayObject.visible = true;
+}
 
 /**
  * Empty the list of the removed objects:<br>
@@ -314,24 +324,25 @@ gdjs.RuntimeScene.prototype._cacheOrClearRemovedInstances = function() {
  * @method _constructListOfAllObjects
  * @private
  */
-gdjs.RuntimeScene.prototype._constructListOfAllInstances= function() {
-	var allObjectsLists = this._instances.values();
+gdjs.RuntimeScene.prototype._constructListOfAllInstances = function() {
+    var currentListSize = 0;
+    for (var name in this._instances.items) {
+        if (this._instances.items.hasOwnProperty(name)) {
+            var list = this._instances.items[name];
 
-	var currentListSize = 0;
-	for( var i = 0, len = allObjectsLists.length;i<len;++i) {
-		var oldSize = currentListSize;
-		currentListSize += allObjectsLists[i].length;
+            var oldSize = currentListSize;
+    		currentListSize += list.length;
 
-		if ( this._allInstancesList.length < currentListSize )
-			this._allInstancesList.length = currentListSize;
+    		for(var j = 0, lenj = list.length;j<lenj;++j) {
+                if (oldSize+j < this._allInstancesList.length)
+    			    this._allInstancesList[oldSize+j] = list[j];
+                else
+                    this._allInstancesList.push(list[j]);
+    		}
+        }
+    }
 
-		for(var j = 0, lenj = allObjectsLists[i].length;j<lenj;++j) {
-			this._allInstancesList[oldSize+j] = allObjectsLists[i][j];
-		}
-	}
-
-	if ( this._allInstancesList.length !== currentListSize )
-		this._allInstancesList.length = currentListSize;
+	this._allInstancesList.length = currentListSize;
 };
 
 /**
@@ -398,21 +409,24 @@ gdjs.RuntimeScene.prototype.getName = function() {
  * @method updateObjectsForces
  */
 gdjs.RuntimeScene.prototype.updateObjectsForces = function() {
-	var allObjectsLists = this._instances.entries();
+    var elapsedTimeInSeconds = this._timeManager.getElapsedTime() / 1000;
+    for (var name in this._instances.items) {
+        if (this._instances.items.hasOwnProperty(name)) {
+            var list = this._instances.items[name];
 
-	var elapsedTimeInSeconds = this._timeManager.getElapsedTime() / 1000;
-	for( var i = 0, len = allObjectsLists.length;i<len;++i) {
-		for( var j = 0, listLen = allObjectsLists[i][1].length;j<listLen;++j) {
-			var obj = allObjectsLists[i][1][j];
-			if ( !obj.hasNoForces() ) {
-				var averageForce = obj.getAverageForce();
+        	for(var j = 0, listLen = list.length;j<listLen;++j) {
+        		var obj = list[j];
+        		if (!obj.hasNoForces()) {
+        			var averageForce = obj.getAverageForce();
 
-				obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
-				obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
-				obj.updateForces(elapsedTimeInSeconds);
-			}
-		}
-	}
+        			obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
+        			obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
+        			obj.updateForces(elapsedTimeInSeconds);
+        		}
+        	}
+        }
+    }
+
 };
 
 /**

@@ -85,11 +85,11 @@ gdjs.InputManager.prototype.wasKeyReleased = function(keyCode) {
  * @method anyKeyPressed
  */
 gdjs.InputManager.prototype.anyKeyPressed = function() {
-    var allKeys = this._pressedKeys.entries();
-
-    for(var i = 0, len = allKeys.length;i < len;++i) {
-        if (allKeys[i][1]) {
-            return true;
+    for(var keyCode in this._pressedKeys.items) {
+        if (this._pressedKeys.items.hasOwnProperty(keyCode)) {
+            if (this._pressedKeys.items[keyCode]) {
+                return true;
+            }
         }
     }
 
@@ -211,17 +211,21 @@ gdjs.InputManager.prototype.getTouchY = function(identifier) {
 };
 
 /**
- * Return an array containing the identifiers of all touches.
+ * Update and return the array containing the identifiers of all touches.
  *
  * @method getAllTouchIdentifiers
  */
 gdjs.InputManager.prototype.getAllTouchIdentifiers = function() {
-    var touchIds = this._touches.keys();
-    for(var i = 0;i<touchIds.length;++i) {
-        touchIds[i] = parseInt(touchIds[i], 10);
+    gdjs.InputManager._allTouchIds = gdjs.InputManager._allTouchIds || [];
+    gdjs.InputManager._allTouchIds.length = 0;
+
+    for(var id in this._touches.items) {
+        if (this._touches.items.hasOwnProperty(id)) {
+            gdjs.InputManager._allTouchIds.push(parseInt(id, 10));
+        }
     }
 
-    return touchIds;
+    return gdjs.InputManager._allTouchIds;
 };
 
 gdjs.InputManager.prototype.onTouchStart = function(identifier, x, y) {
@@ -292,11 +296,12 @@ gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
  */
 gdjs.InputManager.prototype.onFrameEnded = function() {
     //Only clear the ended touches at the end of the frame.
-    var identifiers = this._touches.keys();
-    for(var i = 0;i<identifiers.length;++i) {
-        var touch = this._touches.get(identifiers[i]);
-        if(touch.justEnded) {
-            this._touches.remove(identifiers[i]);
+    for(var id in this._touches.items) {
+        if (this._touches.items.hasOwnProperty(id)) {
+            var touch = this._touches.items[id];
+            if(touch.justEnded) {
+                this._touches.remove(id);
+            }
         }
     }
 

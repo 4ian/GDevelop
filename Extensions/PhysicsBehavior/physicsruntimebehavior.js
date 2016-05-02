@@ -538,8 +538,11 @@ gdjs.PhysicsRuntimeBehavior.prototype.collisionWith = function( otherObjectsTabl
     if ( this._box2DBody === null ) this.createBody();
 
     //Getting a list of all objects which are tested
-    var objects = [];
-    var objectsLists = otherObjectsTable.values();
+    var objects = gdjs.staticArray(gdjs.PhysicsRuntimeBehavior.prototype.collisionWith);
+    objects.length = 0;
+
+    var objectsLists = gdjs.staticArray2(gdjs.PhysicsRuntimeBehavior.prototype.collisionWith);
+    otherObjectsTable.values(objectsLists);
 
     for(var i = 0, len = objectsLists.length;i<len;++i) {
         objects.push.apply(objects, objectsLists[i]);

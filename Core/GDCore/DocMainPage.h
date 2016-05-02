@@ -71,7 +71,7 @@
  *
  * Download the current version of the compiler used by GDevelop on Windows here:
  *
- * http://sourceforge.net/projects/tdm-gcc/files/TDM-GCC%20Installer/tdm-gcc-4.9.2.exe/download
+ * https://sourceforge.net/projects/tdm-gcc/files/TDM-GCC%20Installer/Previous/1.1309.0/tdm-gcc-4.9.2.exe/download
  *
  * \section installWinCompiler_install Installation
  *

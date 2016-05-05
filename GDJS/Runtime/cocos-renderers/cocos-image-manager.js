@@ -18,14 +18,16 @@ gdjs.CocosImageManager = function(resources)
 gdjs.ImageManager = gdjs.CocosImageManager; //Register the class to let the engine use it.
 
 gdjs.CocosImageManager.prototype.getTexture = function(imageName) {
-    var file;
+    var texture;
     if (this._resources.hasOwnProperty(imageName)) {
-        file = this._resources[imageName].file;
+        texture = cc.textureCache.addImage('res/' + this._resources[imageName].file);
+        if (!this._resources[imageName].smoothed) {
+            texture.setAliasTexParameters();
+        }
     } else {
-        file = this.getInvalidTexture();
+        texture = cc.textureCache.addImage('res/' + this.getInvalidTexture());
     }
 
-    var texture = cc.textureCache.addImage('res/' + file);
     return texture;
 };
 

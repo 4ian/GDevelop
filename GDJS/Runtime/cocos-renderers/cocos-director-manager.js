@@ -51,7 +51,7 @@ gdjs.CocosDirectorManager.prototype.onSceneUnloaded = function(cocosScene)
         // the next scene that will be launched.
         this._replaceByNextScene = true;
     } else {
-        this._cocosDirector.popScene(cocosScene);
+        this._cocosDirector.popScene();
         this._scenes.pop();
     }
 }

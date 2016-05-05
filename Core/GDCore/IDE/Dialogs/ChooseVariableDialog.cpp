@@ -466,11 +466,18 @@ void ChooseVariableDialog::OnEditValueSelected(wxCommandEvent& event)
     UpdateSelectedAndParentVariable();
     if ( !selectedVariable || selectedVariable->IsStructure() ) return;
 
-    gd::String value = wxGetTextFromUser(_("Enter the initial value of the variable"), _("Initial value"), selectedVariable->GetString());
-    selectedVariable->SetString(value);
-    RefreshVariable(variablesList->GetSelection(), selectedVariableName, *selectedVariable);
+    wxTextEntryDialog editDialog(this,
+    	_("Enter the initial value of the variable"), _("Initial value"),
+    	selectedVariable->GetString(), wxTextEntryDialogStyle | wxTE_MULTILINE);
 
-    modificationCount++;
+    if (editDialog.ShowModal() == wxID_OK)
+    {
+    	gd::String value = editDialog.GetValue();
+    	selectedVariable->SetString(value);
+
+    	RefreshVariable(variablesList->GetSelection(), selectedVariableName, *selectedVariable);
+    	modificationCount++;
+    }
 }
 
 void ChooseVariableDialog::OnRenameSelected(wxCommandEvent& event)

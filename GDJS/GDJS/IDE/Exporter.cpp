@@ -72,7 +72,7 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
 
     if (dialog.GetExportType() == ProjectExportDialog::Cocos2d)
     {
-        ExportWholeCocos2dProject(project, dialog.GetExportDir());
+        ExportWholeCocos2dProject(project, dialog.IsDebugMode(), dialog.GetExportDir());
     }
     else
     {
@@ -193,7 +193,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
     return true;
 }
 
-bool Exporter::ExportWholeCocos2dProject(gd::Project & project, gd::String exportDir)
+bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, gd::String exportDir)
 {
     ExporterHelper helper(fs);
 
@@ -250,7 +250,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, gd::String expor
 
     gd::String source = "./JsPlatform/Runtime/index.html";
 
-    if (!helper.ExportCocos2dFiles(project, exportDir, includesFiles))
+    if (!helper.ExportCocos2dFiles(project, exportDir, debugMode, includesFiles))
     {
         gd::LogError(_("Error during export:\n") + lastError);
         return false;

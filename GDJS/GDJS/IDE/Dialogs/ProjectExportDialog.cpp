@@ -41,6 +41,11 @@ ProjectExportDialog::ProjectExportDialog(wxWindow* parent, gd::Project & project
     wxConfigBase::Get()->Read("Export/JS platform/LatestExportType", &latestPage, 0);
     exportChoice->SetSelection(latestPage);
 
+    //Check if we last used debug mode.
+    bool debugMode = false;
+    wxConfigBase::Get()->Read("Export/JS platform/LatestDebugMode", &debugMode, false);
+    cocosDebugCheck->SetValue(debugMode);
+
     hasNode = !ExporterHelper::GetNodeExecutablePath().empty();
     nodejsLink->Show(!hasNode);
     if ( !hasNode )
@@ -100,6 +105,7 @@ void ProjectExportDialog::OnExportBtClicked(wxCommandEvent& event)
 
     project.SetLastCompilationDirectory(GetExportDir());
     wxConfigBase::Get()->Write("Export/JS platform/LatestExportType", exportChoice->GetSelection());
+    wxConfigBase::Get()->Write("Export/JS platform/LatestDebugMode", IsDebugMode());
     EndModal(1);
 }
 
@@ -131,6 +137,11 @@ bool ProjectExportDialog::RequestMinify()
 {
     if (!hasNode) return false;
     return GetExportType() == PixiCordova || minifyCheck->GetValue();
+}
+
+bool ProjectExportDialog::IsDebugMode()
+{
+    return GetExportType() == Cocos2d && cocosDebugCheck->GetValue();
 }
 
 }

@@ -146,11 +146,8 @@ public:
 
     /**
      * \brief Generate the base Cocos2d files.
-     *
-     * \param project The project to be used to generate the configuration file.
-     * \param exportDir The directory where the config.xml must be created.
      */
-    bool ExportCocos2dFiles(const gd::Project & project, gd::String exportDir, const std::vector<gd::String> & includesFiles);
+    bool ExportCocos2dFiles(const gd::Project & project, gd::String exportDir, bool debugMode, const std::vector<gd::String> & includesFiles);
 
     /**
      * \brief Launch all export methods to generate a complete, stand-alone game for previewing.

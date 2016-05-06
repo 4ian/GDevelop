@@ -57,6 +57,7 @@ protected:
     wxStaticText* ID_STATICTEXT45;
     wxTextCtrl* cocosExportFolderEdit;
     wxButton* cocosExportBrowseBt;
+    wxCheckBox* cocosDebugCheck;
     wxStaticText* ID_STATICTEXT213;
     wxStaticText* ID_STATICTEXT114;
     wxStaticText* ID_STATICTEXT31719;
@@ -93,6 +94,7 @@ public:
     wxStaticText* GetID_STATICTEXT45() { return ID_STATICTEXT45; }
     wxTextCtrl* GetCocosExportFolderEdit() { return cocosExportFolderEdit; }
     wxButton* GetCocosExportBrowseBt() { return cocosExportBrowseBt; }
+    wxCheckBox* GetCocosDebugCheck() { return cocosDebugCheck; }
     wxStaticText* GetID_STATICTEXT213() { return ID_STATICTEXT213; }
     wxStaticText* GetID_STATICTEXT114() { return ID_STATICTEXT114; }
     wxStaticText* GetID_STATICTEXT31719() { return ID_STATICTEXT31719; }

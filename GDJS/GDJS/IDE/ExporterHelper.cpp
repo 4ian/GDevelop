@@ -165,7 +165,7 @@ bool ExporterHelper::ExportCordovaConfigFile(const gd::Project & project, gd::St
     return true;
 }
 
-bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String exportDir, const std::vector<gd::String> & includesFiles)
+bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String exportDir, bool debugMode, const std::vector<gd::String> & includesFiles)
 {
     if (!fs.CopyFile("./JsPlatform/Runtime/Cocos2d/main.js", exportDir + "/main.js"))
     {
@@ -219,7 +219,8 @@ bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String 
         }
 
         gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cocos2d/project.json")
-            .FindAndReplace("// GDJS_INCLUDE_FILES", includeFilesStr);
+            .FindAndReplace("// GDJS_INCLUDE_FILES", includeFilesStr)
+            .FindAndReplace("/*GDJS_SHOW_FPS*/", debugMode ? "true" : "false");
 
         if (!fs.WriteToFile(exportDir + "/project.json", str))
         {

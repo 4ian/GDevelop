@@ -181,7 +181,7 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
     flexGridSizer1147->Add(m_staticText6768, 0, wxALL|wxEXPAND|wxALIGN_CENTER|wxALIGN_LEFT, 5);
     
     m_panel611 = new wxPanel(exportChoice, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
-    exportChoice->AddPage(m_panel611, _("Export to a website or native game with Cocos2d (experimental)"), false);
+    exportChoice->AddPage(m_panel611, _("Export to a website or native game with Cocos2d-JS (experimental)"), false);
     
     wxFlexGridSizer* flexGridSizer342 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer342->SetFlexibleDirection( wxBOTH );
@@ -189,20 +189,12 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
     flexGridSizer342->AddGrowableCol(0);
     m_panel611->SetSizer(flexGridSizer342);
     
-    wxFlexGridSizer* flexGridSizer353 = new wxFlexGridSizer(0, 3, 0, 0);
-    flexGridSizer353->SetFlexibleDirection( wxBOTH );
-    flexGridSizer353->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer353->AddGrowableCol(0);
-    flexGridSizer353->AddGrowableRow(0);
-    
-    flexGridSizer342->Add(flexGridSizer353, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    
     wxFlexGridSizer* flexGridSizer364 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer364->SetFlexibleDirection( wxBOTH );
     flexGridSizer364->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer364->AddGrowableCol(1);
     
-    flexGridSizer353->Add(flexGridSizer364, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    flexGridSizer342->Add(flexGridSizer364, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     
     ID_STATICTEXT45 = new wxStaticText(m_panel611, wxID_ANY, _("Export folder:"), wxDefaultPosition, wxSize(-1,-1), 0);
     
@@ -226,6 +218,11 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
     cocosExportBrowseBt = new wxButton(m_panel611, wxID_ANY, _("..."), wxDefaultPosition, wxSize(30,-1), 0);
     
     flexGridSizer386->Add(cocosExportBrowseBt, 1, wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    cocosDebugCheck = new wxCheckBox(m_panel611, wxID_ANY, _("Debug mode (show FPS counter and stats in the bottom left)"), wxDefaultPosition, wxSize(-1,-1), 0);
+    cocosDebugCheck->SetValue(false);
+    
+    flexGridSizer342->Add(cocosDebugCheck, 0, wxALL, 5);
     
     ID_STATICTEXT213 = new wxStaticText(m_panel611, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), 0);
     
@@ -307,11 +304,15 @@ BaseProjectExportDialog::BaseProjectExportDialog(wxWindow* parent, wxWindowID id
     #endif
     
     SetName(wxT("BaseProjectExportDialog"));
-    SetSizeHints(-1,-1);
-    if ( GetSizer() ) {
+    SetSize(-1,-1);
+    if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    CentreOnParent(wxBOTH);
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);
@@ -409,11 +410,15 @@ BaseCocoonJSUploadDialog::BaseCocoonJSUploadDialog(wxWindow* parent, wxWindowID 
     flexGridSizer87->Add(m_button108, 0, wxALL|wxALIGN_RIGHT, 5);
     
     SetName(wxT("BaseCocoonJSUploadDialog"));
-    SetSizeHints(500,300);
-    if ( GetSizer() ) {
+    SetSize(500,300);
+    if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    CentreOnParent(wxBOTH);
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);
@@ -532,11 +537,15 @@ BaseCordovaPackageDialog::BaseCordovaPackageDialog(wxWindow* parent, wxWindowID 
     flexGridSizer5014->Add(m_button10812, 0, wxALL|wxALIGN_RIGHT, 5);
     
     SetName(wxT("BaseCordovaPackageDialog"));
-    SetSizeHints(500,300);
-    if ( GetSizer() ) {
+    SetSize(500,300);
+    if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    CentreOnParent(wxBOTH);
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);
@@ -688,11 +697,15 @@ BaseJsCodeEventDialog::BaseJsCodeEventDialog(wxWindow* parent, wxWindowID id, co
     flexGridSizer164->Add(okBt, 0, wxALL, 5);
     
     SetName(wxT("BaseJsCodeEventDialog"));
-    SetSizeHints(500,300);
-    if ( GetSizer() ) {
+    SetSize(500,300);
+    if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    CentreOnParent(wxBOTH);
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);

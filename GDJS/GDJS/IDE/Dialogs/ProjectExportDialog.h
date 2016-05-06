@@ -48,6 +48,11 @@ public:
      */
     bool RequestMinify();
 
+    /**
+     * \brief Check if the export must be done with debug mode activated.
+     */
+    bool IsDebugMode();
+
 protected:
     virtual void OnCocosExportBrowseBtClick(wxCommandEvent& event);
     virtual void OnBrowseBtClick(wxCommandEvent& event);

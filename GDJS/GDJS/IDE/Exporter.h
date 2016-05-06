@@ -72,7 +72,7 @@ public:
      *
      * Called by ShowProjectExportDialog if the user clicked on Ok.
      */
-    bool ExportWholeCocos2dProject(gd::Project & project, gd::String exportDir);
+    bool ExportWholeCocos2dProject(gd::Project & project, bool debugMode, gd::String exportDir);
 
     /**
      * \brief Return the error that occurred during the last export.

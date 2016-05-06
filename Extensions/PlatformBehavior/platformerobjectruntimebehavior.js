@@ -20,6 +20,7 @@ gdjs.PlatformerObjectRuntimeBehavior = function(runtimeScene, behaviorData, owne
     this._deceleration = behaviorData.deceleration;
     this._maxSpeed = behaviorData.maxSpeed;
     this._jumpSpeed = behaviorData.jumpSpeed;
+    this._canGrabPlatforms = true; //TODO
     this._isOnFloor = false;
     this._isOnLadder = false;
     this._floorPlatform = null;
@@ -28,6 +29,8 @@ gdjs.PlatformerObjectRuntimeBehavior = function(runtimeScene, behaviorData, owne
     this._jumping = false;
     this._currentJumpSpeed = 0;
     this._canJump = false;
+    this._isGrabbingPlatform = false;
+    this._grabbedPlatform = null;
     this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
     this._leftKey = false;
     this._rightKey = false;
@@ -93,6 +96,12 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
         this._floorPlatform = null;
     }
 
+    //Check that the grabbed platform object still exists and is near the object.
+    if ( this._isGrabbingPlatform && !this._isIn(this._potentialCollidingObjects, this._grabbedPlatform.owner.id) ) {
+        this._isGrabbingPlatform = false;
+        this._grabbedPlatform = null;
+    }
+
     //0.2) Track changes in object size
 
     //Stick the object to the floor if its height has changed.
@@ -107,6 +116,13 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     if ( this._isOnFloor ) {
         requestedDeltaX += this._floorPlatform.owner.getX() - this._floorLastX;
         requestedDeltaY += this._floorPlatform.owner.getY() - this._floorLastY;
+    }
+
+    //Shift the object according to the grabbed platform movement.
+    if ( this._isGrabbingPlatform ) {
+        // This erases any other movement
+        requestedDeltaX = this._grabbedPlatform.owner.getX() - this._grabbedPlatformLastX;
+        requestedDeltaY = this._grabbedPlatform.owner.getY() - this._grabbedPlatformLastY;
     }
 
     //Ensure the object is not stuck
@@ -135,6 +151,30 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
                 if ( !this._isCollidingWith(this._potentialCollidingObjects, floorPlatformId, /*excludeJumpthrus=*/true) )
                     break;
                 object.setY(object.getY()+1);
+            } else if (this._canGrabPlatforms && !this._isOnLadder) {
+                //Check if we can grab the collided platform
+                var collidingPlatform = this._getCollidingPlatform();
+                if (collidingPlatform !== null && this._canGrab(collidingPlatform, this._currentFallSpeed * timeDelta)) {
+                    //Replace the object next to the grabbed platform
+                    var beforeGrabX = object.getX();
+                    var beforeGrabY = object.getY();
+                    object.setX(object.getX() < collidingPlatform.owner.getX() ?
+                        collidingPlatform.owner.getX() - object.getWidth() - 1  :
+                        collidingPlatform.owner.getX() + collidingPlatform.owner.getWidth() + 1);
+                    object.setY(collidingPlatform.owner.getY());
+
+                    if (!this._isCollidingWith(this._potentialCollidingObjects, floorPlatformId, /*excludeJumpthrus=*/true)) {
+                        //No collision: the object successfuly grabbed the platform.
+                        this._isGrabbingPlatform = true;
+                        this._grabbedPlatform = collidingPlatform;
+                        break;
+                    }
+
+                    // Can't grab without colliding with the floor or another platform:
+                    // go back to the previous position.
+                    object.setX(beforeGrabX);
+                    object.setY(beforeGrabY);
+                }
             }
 
             object.setX(Math.floor(object.getX())+(requestedDeltaX > 0 ? -1 : 1));
@@ -170,12 +210,21 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     }
 
     //Fall
-    if (!this._isOnFloor && !this._isOnLadder) {
+    if (!this._isOnFloor && !this._isOnLadder && !this._isGrabbingPlatform) {
         this._currentFallSpeed += this._gravity*timeDelta;
         if ( this._currentFallSpeed > this._maxFallingSpeed ) this._currentFallSpeed = this._maxFallingSpeed;
 
         requestedDeltaY += this._currentFallSpeed*timeDelta;
         requestedDeltaY = Math.min(requestedDeltaY, this._maxFallingSpeed*timeDelta);
+    }
+
+    //Grabbing a platform
+    if (this._isGrabbingPlatform) {
+        this._canJump = true;
+        this._currentJumpSpeed = 0;
+        this._currentFallSpeed = 0;
+        this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
+        this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
     }
 
     //Jumping
@@ -189,6 +238,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
         this._isOnLadder = false;
         this._currentJumpSpeed = this._jumpSpeed;
         this._currentFallSpeed = 0;
+        this._isGrabbingPlatform = false;
         //object.setY(object.getY()-1); //Useless and dangerous
     }
 
@@ -228,8 +278,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
                 object.setY(oldY); //Unable to follow the floor ( too steep ): Go back to the original position.
                 object.setX(oldX); //And also revert the shift on X axis.
             }
-        }
-        else {
+        } else {
             //Floor is flat or get down.
             var oldY = object.getY();
             object.setY(object.getY()+1);
@@ -286,6 +335,9 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
             //Still on the same floor
             this._floorLastX = this._floorPlatform.owner.getX();
             this._floorLastY = this._floorPlatform.owner.getY();
+
+            this._isGrabbingPlatform = false; //Ensure nothing is grabbed.
+            this._grabbedPlatform = null;
         }
         else{
             //Check if landing on a new floor: (Exclude already overlapped jump truh)
@@ -301,6 +353,9 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
                 this._floorPlatform = collidingPlatform;
                 this._floorLastX = this._floorPlatform.owner.getX();
                 this._floorLastY = this._floorPlatform.owner.getY();
+
+                this._isGrabbingPlatform = false; //Ensure nothing is grabbed.
+                this._grabbedPlatform = null;
             } else { //In the air
                 this._canJump = false;
                 this._isOnFloor = false;
@@ -333,6 +388,17 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPostEvents = function(runti
     }
     */
 };
+
+/**
+ * Return true if the object owning the behavior can grab the specified platform. There must be a collision
+ * between the object and the platform.
+ * @param platform The platform the object is in collision with
+ * @param y Grabbing will be allowed if the object is above the platform but the distance is less than this parameter.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype._canGrab = function(platform, y) {
+    return (this.owner.getY() < platform.owner.getY() &&
+        this.owner.getY() >= platform.owner.getY() - Math.max(10, Math.abs(y) * 2));
+}
 
 /**
  * Among the platforms passed in parameter, return true if there is a platform colliding with the object.

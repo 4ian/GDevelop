@@ -143,6 +143,7 @@ private:
     double jumpSpeed; ///< In pixels.seconds^-1
     double slopeMaxAngle; ///< In degrees
     double slopeClimbingFactor; ///< Equals to tan(slopeMaxAngle).
+    bool canGrabPlatforms; ///< True to allow the object to grab platform ledges.
 
     RuntimeScene * parentScene; ///< The scene the object belongs to.
     ScenePlatformObjectsManager * sceneManager; ///< The platform objects manager associated to the scene.
@@ -171,4 +172,3 @@ private:
     bool jumpKey;
 };
 #endif // PLATFORMEROBJECTBEHAVIOR_H
-

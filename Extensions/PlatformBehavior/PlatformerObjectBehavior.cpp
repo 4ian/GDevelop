@@ -32,6 +32,7 @@ PlatformerObjectBehavior::PlatformerObjectBehavior() :
     deceleration(1500),
     maxSpeed(250),
     jumpSpeed(600),
+    canGrabPlatforms(false),
     parentScene(NULL),
     sceneManager(NULL),
     isOnFloor(false),
@@ -542,6 +543,7 @@ void PlatformerObjectBehavior::UnserializeFrom(const gd::SerializerElement & ele
     jumpSpeed = element.GetDoubleAttribute("jumpSpeed");
     ignoreDefaultControls = element.GetBoolAttribute("ignoreDefaultControls");
     SetSlopeMaxAngle(element.GetDoubleAttribute("slopeMaxAngle"));
+    canGrabPlatforms = element.GetBoolAttribute("canGrabPlatforms", false);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -555,6 +557,7 @@ void PlatformerObjectBehavior::SerializeTo(gd::SerializerElement & element) cons
     element.SetAttribute("jumpSpeed", jumpSpeed);
     element.SetAttribute("ignoreDefaultControls", ignoreDefaultControls);
     element.SetAttribute("slopeMaxAngle", slopeMaxAngle);
+    element.SetAttribute("canGrabPlatforms", canGrabPlatforms);
 
 }
 
@@ -570,6 +573,7 @@ std::map<gd::String, gd::PropertyDescriptor> PlatformerObjectBehavior::GetProper
     properties[_("Max. speed")].SetValue(gd::String::From(maxSpeed));
     properties[_("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
     properties[_("Slope max. angle")].SetValue(gd::String::From(slopeMaxAngle));
+    properties[_("Can grab platform ledges")].SetValue(canGrabPlatforms ? "true" : "false").SetType("Boolean");
 
     return properties;
 }
@@ -578,6 +582,9 @@ bool PlatformerObjectBehavior::UpdateProperty(const gd::String & name, const gd:
 {
     if ( name == _("Default controls") ) {
         ignoreDefaultControls = (value == "0");
+        return true;
+    } else if ( name == _("Can grab platform ledges")) {
+        canGrabPlatforms = (value == "1");
         return true;
     }
 

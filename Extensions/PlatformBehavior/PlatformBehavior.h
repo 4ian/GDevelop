@@ -76,7 +76,7 @@ private:
     ScenePlatformObjectsManager * sceneManager; ///< The platform objects manager associated to the scene.
     bool registeredInManager; ///< True if the behavior is registered in the list of platforms of the scene.
     PlatformType platformType;
+    bool canBeGrabbed; ///< True if the platform ledges can be grabbed by platformer objects.
 };
 
 #endif // PLATFORMBEHAVIOR_H
-

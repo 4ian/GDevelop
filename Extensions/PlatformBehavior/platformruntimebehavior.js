@@ -130,6 +130,7 @@ gdjs.PlatformRuntimeBehavior = function(runtimeScene, behaviorData, owner)
         this._platformType = gdjs.PlatformRuntimeBehavior.JUMPTHRU;
     else
         this._platformType = gdjs.PlatformRuntimeBehavior.NORMALPLAFTORM;
+    this._canBeGrabbed = behaviorData.canBeGrabbed;
 
     //Note that we can't use getX(), getWidth()... of owner here: The owner is not fully constructed.
     this._oldX = 0;
@@ -231,4 +232,9 @@ gdjs.PlatformRuntimeBehavior.prototype.changePlatformType = function(platformTyp
 gdjs.PlatformRuntimeBehavior.prototype.getPlatformType = function()
 {
     return this._platformType;
+};
+
+gdjs.PlatformRuntimeBehavior.prototype.canBeGrabbed = function()
+{
+    return this._canBeGrabbed;
 };

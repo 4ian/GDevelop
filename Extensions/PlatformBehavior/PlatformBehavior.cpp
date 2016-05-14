@@ -25,7 +25,8 @@ PlatformBehavior::PlatformBehavior() :
     parentScene(NULL),
     sceneManager(NULL),
     registeredInManager(false),
-    platformType(NormalPlatform)
+    platformType(NormalPlatform),
+    canBeGrabbed(true)
 {
 }
 
@@ -95,6 +96,7 @@ void PlatformBehavior::UnserializeFrom(const gd::SerializerElement & element)
     gd::String platformTypeStr = element.GetStringAttribute("platformType");
     platformType = platformTypeStr == "Ladder" ?  Ladder : (platformTypeStr == "Jumpthru" ?
         Jumpthru : NormalPlatform);
+    canBeGrabbed = element.GetBoolAttribute("canBeGrabbed", true);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -106,6 +108,7 @@ void PlatformBehavior::SerializeTo(gd::SerializerElement & element) const
         element.SetAttribute("platformType", "Jumpthru");
     else
         element.SetAttribute("platformType", "NormalPlatform");
+    element.SetAttribute("canBeGrabbed", canBeGrabbed);
 }
 
 std::map<gd::String, gd::PropertyDescriptor> PlatformBehavior::GetProperties(gd::Project & project) const
@@ -124,12 +127,20 @@ std::map<gd::String, gd::PropertyDescriptor> PlatformBehavior::GetProperties(gd:
         .AddExtraInfo(_("Platform"))
         .AddExtraInfo(_("Jumpthru platform"))
         .AddExtraInfo(_("Ladder"));
+    properties[_("Ledges can be grabbed")]
+        .SetValue(canBeGrabbed ? "true" : "false").SetType("Boolean");
 
     return properties;
 }
 
 bool PlatformBehavior::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
+    if ( name == _("Ledges can be grabbed") )
+    {
+        canBeGrabbed = (value == "1");
+        return true;
+    }
+
     if ( name == _("Type") )
     {
         if ( value == _("Jumpthru platform") )

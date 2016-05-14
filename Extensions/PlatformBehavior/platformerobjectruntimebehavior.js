@@ -20,7 +20,7 @@ gdjs.PlatformerObjectRuntimeBehavior = function(runtimeScene, behaviorData, owne
     this._deceleration = behaviorData.deceleration;
     this._maxSpeed = behaviorData.maxSpeed;
     this._jumpSpeed = behaviorData.jumpSpeed;
-    this._canGrabPlatforms = true; //TODO
+    this._canGrabPlatforms = behaviorData.canGrabPlatforms;
     this._isOnFloor = false;
     this._isOnLadder = false;
     this._floorPlatform = null;
@@ -388,6 +388,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPostEvents = function(runti
  */
 gdjs.PlatformerObjectRuntimeBehavior.prototype._canGrab = function(platform, y) {
     return (
+        platform.canBeGrabbed() &&
         this.owner.getDrawableY() < platform.owner.getDrawableY() &&
         this.owner.getDrawableY() >= platform.owner.getDrawableY() - Math.max(10, Math.abs(y) * 2)
     );
@@ -645,6 +646,13 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.setSlopeMaxAngle = function(slope
 gdjs.PlatformerObjectRuntimeBehavior.prototype.setCanJump = function()
 {
     this._canJump = true;
+};
+gdjs.PlatformerObjectRuntimeBehavior.prototype.setCanGrabPlatforms = function(enable)
+{
+    this._canGrabPlatforms = enable;
+    if (!this._canGrabPlatforms) {
+        this._releaseGrabbedPlatform();
+    }
 };
 
 gdjs.PlatformerObjectRuntimeBehavior.prototype.ignoreDefaultControls = function(ignore)

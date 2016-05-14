@@ -98,8 +98,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
 
     //Check that the grabbed platform object still exists and is near the object.
     if ( this._isGrabbingPlatform && !this._isIn(this._potentialCollidingObjects, this._grabbedPlatform.owner.id) ) {
-        this._isGrabbingPlatform = false;
-        this._grabbedPlatform = null;
+        this._releaseGrabbedPlatform();
     }
 
     //0.2) Track changes in object size
@@ -204,20 +203,21 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     }
 
     //Grabbing a platform
+    this._releaseKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
     if (tryGrabbingPlatform) {
-        //TODO: change y position?
         if (!this._isCollidingWith(this._potentialCollidingObjects, null, /*excludeJumpthrus=*/true)) {
             this._isGrabbingPlatform = true;
             this._grabbedPlatform = potentialGrabbedPlatform;
         }
     }
-    if (this._isGrabbingPlatform) {
+    if (this._isGrabbingPlatform && !this._releaseKey) {
         this._canJump = true;
         this._currentJumpSpeed = 0;
         this._currentFallSpeed = 0;
         this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
         this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
     }
+    if (this._releaseKey) this._releaseGrabbedPlatform();
 
     //Jumping
     this._jumpKey |= !this._ignoreDefaultControls &&
@@ -328,8 +328,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
             this._floorLastX = this._floorPlatform.owner.getX();
             this._floorLastY = this._floorPlatform.owner.getY();
 
-            this._isGrabbingPlatform = false; //Ensure nothing is grabbed.
-            this._grabbedPlatform = null;
+            this._releaseGrabbedPlatform(); //Ensure nothing is grabbed.
         }
         else{
             //Check if landing on a new floor: (Exclude already overlapped jump truh)
@@ -346,8 +345,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
                 this._floorLastX = this._floorPlatform.owner.getX();
                 this._floorLastY = this._floorPlatform.owner.getY();
 
-                this._isGrabbingPlatform = false; //Ensure nothing is grabbed.
-                this._grabbedPlatform = null;
+                this._releaseGrabbedPlatform(); //Ensure nothing is grabbed.
             } else { //In the air
                 this._canJump = false;
                 this._isOnFloor = false;
@@ -363,6 +361,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     this._ladderKey = false;
     this._upKey = false;
     this._downKey = false;
+    this._releaseKey = false;
     this._jumpKey = false;
 
     //5) Track the movement
@@ -393,6 +392,15 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._canGrab = function(platform, y) 
         this.owner.getDrawableY() >= platform.owner.getDrawableY() - Math.max(10, Math.abs(y) * 2)
     );
 }
+
+/**
+ * Mark the platformer object has not being grabbing any platform.
+ */
+gdjs.PlatformerObjectRuntimeBehavior.prototype._releaseGrabbedPlatform = function() {
+    this._isGrabbingPlatform = false; //Ensure nothing is grabbed.
+    this._grabbedPlatform = null;
+}
+
 
 /**
  * Among the platforms passed in parameter, return true if there is a platform colliding with the object.
@@ -668,6 +676,10 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateJumpKey = function()
 {
     this._jumpKey = true;
 };
+gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateReleaseKey = function()
+{
+    this._releaseKey = true;
+};
 
 gdjs.PlatformerObjectRuntimeBehavior.prototype.isOnFloor = function()
 {
@@ -680,6 +692,10 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.isOnLadder = function()
 gdjs.PlatformerObjectRuntimeBehavior.prototype.isJumping = function()
 {
     return this._jumping;
+};
+gdjs.PlatformerObjectRuntimeBehavior.prototype.isGrabbingPlatform = function()
+{
+    return this._isGrabbingPlatform;
 };
 gdjs.PlatformerObjectRuntimeBehavior.prototype.isFalling = function()
 {

@@ -44,6 +44,10 @@ PlatformerObjectBehavior::PlatformerObjectBehavior() :
     currentJumpSpeed(0),
     canJump(false),
     hasReallyMoved(false),
+    isGrabbingPlatform(false),
+    grabbedPlatform(NULL),
+    grabbedPlatformLastX(0),
+    grabbedPlatformLastY(0),
     trackSize(true),
     ignoreDefaultControls(false),
     leftKey(false),
@@ -51,7 +55,8 @@ PlatformerObjectBehavior::PlatformerObjectBehavior() :
     ladderKey(false),
     upKey(false),
     downKey(false),
-    jumpKey(false)
+    jumpKey(false),
+    releaseKey(false)
 {
     SetSlopeMaxAngle(60);
 }
@@ -130,6 +135,11 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
         floorPlatform = NULL;
     }
 
+    //Check that the grabbed platform object still exists and is near the object.
+    if (isGrabbingPlatform && potentialObjects.find(grabbedPlatform) == potentialObjects.end()) {
+        ReleaseGrabbedPlatform();
+    }
+
     //0.2) Track changes in object size
 
     //Stick the object to the floor if its height has changed.
@@ -147,6 +157,13 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
         requestedDeltaY += floorPlatform->GetObject()->GetY() - floorLastY;
     }
 
+    //Shift the object according to the grabbed platform movement.
+    if ( isGrabbingPlatform ) {
+        // This erases any other movement
+        requestedDeltaX = grabbedPlatform->GetObject()->GetX() - grabbedPlatformLastX;
+        requestedDeltaY = grabbedPlatform->GetObject()->GetY() - grabbedPlatformLastY;
+    }
+
     //Ensure the object is not stuck
     if (SeparateFromPlatforms(potentialObjects, true))
     {
@@ -155,6 +172,8 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
 
     //Move the object on x axis.
     double oldX = object->GetX();
+    auto tryGrabbingPlatform = false;
+    PlatformBehavior * potentialGrabbedPlatform = nullptr;
     if ( requestedDeltaX != 0 )
     {
         object->SetX(object->GetX()+requestedDeltaX);
@@ -176,6 +195,15 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
                 if ( !IsCollidingWith(potentialObjects, floorPlatform, /*excludeJumpthrus=*/true) )
                     break;
                 object->SetY(object->GetY()+1);
+            }
+            else if (canGrabPlatforms && !isOnLadder && !tryGrabbingPlatform)
+            {
+                //Check if we can grab the collided platform
+                auto collidingObjects = GetPlatformsCollidingWith(potentialObjects, overlappedJumpThru);
+                if (!collidingObjects.empty() && CanGrab(*collidingObjects.begin(), currentFallSpeed * timeDelta)) {
+                    tryGrabbingPlatform = true;
+                    potentialGrabbedPlatform = *collidingObjects.begin();
+                }
             }
 
             object->SetX(floor(object->GetX())+(requestedDeltaX > 0 ? -1 : 1));
@@ -214,7 +242,7 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //Fall
-    if (!isOnFloor && !isOnLadder)
+    if (!isOnFloor && !isOnLadder && !isGrabbingPlatform)
     {
         currentFallSpeed += gravity*timeDelta;
         if ( currentFallSpeed > maxFallingSpeed ) currentFallSpeed = maxFallingSpeed;
@@ -222,6 +250,24 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
         requestedDeltaY += currentFallSpeed*timeDelta;
         requestedDeltaY = std::min(requestedDeltaY, maxFallingSpeed*timeDelta);
     }
+
+    //Grabbing a platform
+    releaseKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
+    if (tryGrabbingPlatform)
+    {
+        if (!IsCollidingWith(potentialObjects, NULL, /*excludeJumpthrus=*/true)) {
+            isGrabbingPlatform = true;
+            grabbedPlatform = potentialGrabbedPlatform;
+        }
+    }
+    if (isGrabbingPlatform && !releaseKey) {
+        canJump = true;
+        currentJumpSpeed = 0;
+        currentFallSpeed = 0;
+        grabbedPlatformLastX = grabbedPlatform->GetObject()->GetX();
+        grabbedPlatformLastY = grabbedPlatform->GetObject()->GetY();
+    }
+    if (releaseKey) ReleaseGrabbedPlatform();
 
     //Jumping
     jumpKey |= !ignoreDefaultControls &&
@@ -235,6 +281,7 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
         isOnLadder = false;
         currentJumpSpeed = jumpSpeed;
         currentFallSpeed = 0;
+        isGrabbingPlatform = false;
         //object->SetY(object->GetY()-1);
     }
 
@@ -356,10 +403,13 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
                 canJump = true;
                 jumping = false;
                 currentJumpSpeed = 0;
+                currentFallSpeed = 0;
+
                 floorPlatform = *collidingObjects.begin();
                 floorLastX = floorPlatform->GetObject()->GetX();
                 floorLastY = floorPlatform->GetObject()->GetY();
-                currentFallSpeed = 0;
+
+                ReleaseGrabbedPlatform(); //Ensure nothing is grabbed.
             }
             else //In the air
             {
@@ -378,9 +428,30 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
     upKey = false;
     downKey = false;
     jumpKey = false;
+    releaseKey = false;
 
     //5) Track the movement
     hasReallyMoved = std::abs(object->GetX()-oldX) >= 1;
+}
+
+bool PlatformerObjectBehavior::CanGrab(PlatformBehavior * platform, double y) const
+{
+    return (
+        platform->CanBeGrabbed() &&
+        object->GetDrawableY() < platform->GetObject()->GetDrawableY() &&
+        object->GetDrawableY() >= platform->GetObject()->GetDrawableY() - std::max(10.0, std::abs(y) * 2.0)
+    );
+}
+
+void PlatformerObjectBehavior::SetCanGrabPlatforms(bool enable)
+{
+    canGrabPlatforms = enable; if (!enable) ReleaseGrabbedPlatform();
+}
+
+void PlatformerObjectBehavior::ReleaseGrabbedPlatform()
+{
+    isGrabbingPlatform = false; //Ensure nothing is grabbed.
+    grabbedPlatform = nullptr;
 }
 
 bool PlatformerObjectBehavior::SeparateFromPlatforms(const std::set<PlatformBehavior*> & candidates, bool excludeJumpThrus)

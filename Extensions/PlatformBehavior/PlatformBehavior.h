@@ -58,6 +58,11 @@ public:
      */
     void ChangePlatformType(const gd::String & platformType_);
 
+    /**
+     * \brief Return true if the platform can be grabbed by platformer objects.
+     */
+    bool CanBeGrabbed() const { return canBeGrabbed; }
+
     virtual void UnserializeFrom(const gd::SerializerElement & element);
     #if defined(GD_IDE_ONLY)
     virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;

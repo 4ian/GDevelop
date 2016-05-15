@@ -96,12 +96,12 @@ IF(EMSCRIPTEN)
 	#Nothing.
 ELSE()
 	IF(WIN32)
-		add_custom_command(TARGET GDJS
-			POST_BUILD
+		add_custom_target(GDJS_Runtime
+			ALL
 			COMMAND "${GD_base_dir}/GDJS/scripts/CopyRuntimeToGD.bat")
 	ELSE()
-		add_custom_command(TARGET GDJS
-			POST_BUILD
+		add_custom_target(GDJS_Runtime
+			ALL
 			COMMAND sh "CopyRuntimeToGD.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/JsPlatform/Runtime
 			WORKING_DIRECTORY ${GD_base_dir}/GDJS/scripts)
 	ENDIF()

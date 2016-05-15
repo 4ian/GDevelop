@@ -582,6 +582,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.simulateControl = function(input)
     else if ( input === "Down" ) this._downKey = true;
     else if ( input === "Ladder" ) this._ladderKey = true;
     else if ( input === "Jump" ) this._jumpKey = true;
+    else if ( input === "Release" ) this._releaseKey = true;
 };
 
 gdjs.PlatformerObjectRuntimeBehavior.prototype.getGravity = function()

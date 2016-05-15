@@ -602,6 +602,7 @@ void PlatformerObjectBehavior::SimulateControl(const gd::String & input)
     else if ( input == "Down" ) downKey = true;
     else if ( input == "Ladder" ) ladderKey = true;
     else if ( input == "Jump" ) jumpKey = true;
+    else if ( input == "Release" ) releaseKey = true;
 }
 
 void PlatformerObjectBehavior::UnserializeFrom(const gd::SerializerElement & element)

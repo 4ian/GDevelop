@@ -131,6 +131,7 @@ gdjs.PlatformRuntimeBehavior = function(runtimeScene, behaviorData, owner)
     else
         this._platformType = gdjs.PlatformRuntimeBehavior.NORMALPLAFTORM;
     this._canBeGrabbed = behaviorData.canBeGrabbed;
+    this._yGrabOffset = behaviorData.yGrabOffset;
 
     //Note that we can't use getX(), getWidth()... of owner here: The owner is not fully constructed.
     this._oldX = 0;
@@ -237,4 +238,9 @@ gdjs.PlatformRuntimeBehavior.prototype.getPlatformType = function()
 gdjs.PlatformRuntimeBehavior.prototype.canBeGrabbed = function()
 {
     return this._canBeGrabbed;
+};
+
+gdjs.PlatformRuntimeBehavior.prototype.getYGrabOffset = function()
+{
+    return this._yGrabOffset;
 };

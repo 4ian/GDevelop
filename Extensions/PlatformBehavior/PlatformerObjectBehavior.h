@@ -60,7 +60,7 @@ public:
     bool IsOnFloor() const { return isOnFloor; }
     bool IsOnLadder() const { return isOnLadder; }
     bool IsJumping() const { return jumping; }
-    bool IsFalling() const { return !isOnFloor && !isOnLadder && (!jumping || currentJumpSpeed < currentFallSpeed); }
+    bool IsFalling() const { return !isOnFloor && !isGrabbingPlatform && !isOnLadder && (!jumping || currentJumpSpeed < currentFallSpeed); }
     bool IsMoving() const { return (currentSpeed != 0 && hasReallyMoved) || currentJumpSpeed != 0 || currentFallSpeed != 0; }
     bool IsGrabbingPlatform() const { return isGrabbingPlatform; }
 
@@ -160,6 +160,8 @@ private:
     double slopeMaxAngle; ///< In degrees
     double slopeClimbingFactor; ///< Equals to tan(slopeMaxAngle).
     bool canGrabPlatforms; ///< True to allow the object to grab platform ledges.
+    double yGrabOffset;
+    double xGrabTolerance; ///< Maximum distance, in pixels, on X axis that can be used to grab a platform.
 
     RuntimeScene * parentScene; ///< The scene the object belongs to.
     ScenePlatformObjectsManager * sceneManager; ///< The platform objects manager associated to the scene.

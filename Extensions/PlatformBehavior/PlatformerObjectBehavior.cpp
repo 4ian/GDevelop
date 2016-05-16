@@ -33,6 +33,8 @@ PlatformerObjectBehavior::PlatformerObjectBehavior() :
     maxSpeed(250),
     jumpSpeed(600),
     canGrabPlatforms(false),
+    yGrabOffset(0),
+    xGrabTolerance(10),
     parentScene(NULL),
     sceneManager(NULL),
     isOnFloor(false),
@@ -172,8 +174,6 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
 
     //Move the object on x axis.
     double oldX = object->GetX();
-    auto tryGrabbingPlatform = false;
-    PlatformBehavior * potentialGrabbedPlatform = nullptr;
     if ( requestedDeltaX != 0 )
     {
         object->SetX(object->GetX()+requestedDeltaX);
@@ -195,15 +195,6 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
                 if ( !IsCollidingWith(potentialObjects, floorPlatform, /*excludeJumpthrus=*/true) )
                     break;
                 object->SetY(object->GetY()+1);
-            }
-            else if (canGrabPlatforms && !isOnLadder && !tryGrabbingPlatform)
-            {
-                //Check if we can grab the collided platform
-                auto collidingObjects = GetPlatformsCollidingWith(potentialObjects, overlappedJumpThru);
-                if (!collidingObjects.empty() && CanGrab(*collidingObjects.begin(), currentFallSpeed * timeDelta)) {
-                    tryGrabbingPlatform = true;
-                    potentialGrabbedPlatform = *collidingObjects.begin();
-                }
             }
 
             object->SetX(floor(object->GetX())+(requestedDeltaX > 0 ? -1 : 1));
@@ -252,14 +243,37 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //Grabbing a platform
-    releaseKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
-    if (tryGrabbingPlatform)
+    if (canGrabPlatforms && requestedDeltaX != 0 &&
+        !isOnLadder && !isOnFloor)
     {
-        if (!IsCollidingWith(potentialObjects, NULL, /*excludeJumpthrus=*/true)) {
-            isGrabbingPlatform = true;
-            grabbedPlatform = potentialGrabbedPlatform;
+        bool tryGrabbingPlatform = false;
+
+        object->SetX(object->GetX() + (requestedDeltaX > 0 ? xGrabTolerance : -xGrabTolerance));
+        auto collidingObjects = GetPlatformsCollidingWith(potentialObjects, overlappedJumpThru);
+        if (!collidingObjects.empty() && CanGrab(*collidingObjects.begin(), requestedDeltaY)) {
+            tryGrabbingPlatform = true;
+        }
+        object->SetX(object->GetX() + (requestedDeltaX > 0 ? -xGrabTolerance : xGrabTolerance));
+
+        //Check if we can grab the collided platform
+        if (tryGrabbingPlatform)
+        {
+            double oldY = object->GetY();
+            PlatformBehavior * collidingPlatform = *collidingObjects.begin();
+            object->SetY(collidingPlatform->GetObject()->GetY() + collidingPlatform->GetYGrabOffset() - yGrabOffset);
+            if (!IsCollidingWith(potentialObjects, NULL, /*excludeJumpthrus=*/true)) {
+                isGrabbingPlatform = true;
+                grabbedPlatform = collidingPlatform;
+                requestedDeltaY = 0;
+            }
+            else
+            {
+                object->SetY(oldY);
+            }
         }
     }
+
+    releaseKey |= !ignoreDefaultControls && scene.GetInputManager().IsKeyPressed("Down");
     if (isGrabbingPlatform && !releaseKey) {
         canJump = true;
         currentJumpSpeed = 0;
@@ -434,12 +448,15 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
     hasReallyMoved = std::abs(object->GetX()-oldX) >= 1;
 }
 
-bool PlatformerObjectBehavior::CanGrab(PlatformBehavior * platform, double y) const
+bool PlatformerObjectBehavior::CanGrab(PlatformBehavior * platform, double requestedDeltaY) const
 {
+    double y1 = object->GetY() + yGrabOffset;
+    double y2 = object->GetY() + yGrabOffset + requestedDeltaY;
+    double platformY = platform->GetObject()->GetY() + platform->GetYGrabOffset();
+
     return (
         platform->CanBeGrabbed() &&
-        object->GetDrawableY() < platform->GetObject()->GetDrawableY() &&
-        object->GetDrawableY() >= platform->GetObject()->GetDrawableY() - std::max(10.0, std::abs(y) * 2.0)
+        ((y1 < platformY && platformY < y2) || (y2 < platformY && platformY < y1))
     );
 }
 
@@ -616,6 +633,8 @@ void PlatformerObjectBehavior::UnserializeFrom(const gd::SerializerElement & ele
     ignoreDefaultControls = element.GetBoolAttribute("ignoreDefaultControls");
     SetSlopeMaxAngle(element.GetDoubleAttribute("slopeMaxAngle"));
     canGrabPlatforms = element.GetBoolAttribute("canGrabPlatforms", false);
+    yGrabOffset = element.GetDoubleAttribute("yGrabOffset");
+    xGrabTolerance = element.GetDoubleAttribute("xGrabTolerance", 10);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -630,7 +649,8 @@ void PlatformerObjectBehavior::SerializeTo(gd::SerializerElement & element) cons
     element.SetAttribute("ignoreDefaultControls", ignoreDefaultControls);
     element.SetAttribute("slopeMaxAngle", slopeMaxAngle);
     element.SetAttribute("canGrabPlatforms", canGrabPlatforms);
-
+    element.SetAttribute("yGrabOffset", yGrabOffset);
+    element.SetAttribute("xGrabTolerance", xGrabTolerance);
 }
 
 std::map<gd::String, gd::PropertyDescriptor> PlatformerObjectBehavior::GetProperties(gd::Project & project) const
@@ -646,38 +666,43 @@ std::map<gd::String, gd::PropertyDescriptor> PlatformerObjectBehavior::GetProper
     properties[_("Default controls")].SetValue(ignoreDefaultControls ? "false" : "true").SetType("Boolean");
     properties[_("Slope max. angle")].SetValue(gd::String::From(slopeMaxAngle));
     properties[_("Can grab platform ledges")].SetValue(canGrabPlatforms ? "true" : "false").SetType("Boolean");
+    properties[_("Grab offset on Y axis")].SetValue(gd::String::From(yGrabOffset));
+    properties[_("Grab tolerance on X axis")].SetValue(gd::String::From(xGrabTolerance));
 
     return properties;
 }
 
 bool PlatformerObjectBehavior::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
-    if ( name == _("Default controls") ) {
+    if ( name == _("Default controls") )
         ignoreDefaultControls = (value == "0");
-        return true;
-    } else if ( name == _("Can grab platform ledges")) {
+    else if ( name == _("Can grab platform ledges"))
         canGrabPlatforms = (value == "1");
-        return true;
-    }
-
-    if ( value.To<double>() < 0 ) return false;
-
-    if ( name == _("Gravity") )
-        gravity = value.To<double>();
-    else if ( name == _("Max. falling speed") )
-        maxFallingSpeed = value.To<double>();
-    else if ( name == _("Acceleration") )
-        acceleration = value.To<double>();
-    else if ( name == _("Deceleration") )
-        deceleration = value.To<double>();
-    else if ( name == _("Max. speed") )
-        maxSpeed = value.To<double>();
-    else if ( name == _("Jump speed") )
-        jumpSpeed = value.To<double>();
-    else if ( name == _("Slope max. angle") )
-        return SetSlopeMaxAngle(value.To<double>());
+    else if (name == _("Grab offset on Y axis"))
+        yGrabOffset = value.To<double>();
     else
-        return false;
+    {
+        if ( value.To<double>() < 0 ) return false;
+
+        if ( name == _("Gravity") )
+            gravity = value.To<double>();
+        else if ( name == _("Max. falling speed") )
+            maxFallingSpeed = value.To<double>();
+        else if ( name == _("Acceleration") )
+            acceleration = value.To<double>();
+        else if ( name == _("Deceleration") )
+            deceleration = value.To<double>();
+        else if ( name == _("Max. speed") )
+            maxSpeed = value.To<double>();
+        else if ( name == _("Jump speed") )
+            jumpSpeed = value.To<double>();
+        else if ( name == _("Slope max. angle") )
+            return SetSlopeMaxAngle(value.To<double>());
+        else if ( name == _("Grab tolerance on X axis") )
+            xGrabTolerance = value.To<double>();
+        else
+            return false;
+    }
 
     return true;
 }

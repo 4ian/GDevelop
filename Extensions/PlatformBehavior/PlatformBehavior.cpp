@@ -26,7 +26,8 @@ PlatformBehavior::PlatformBehavior() :
     sceneManager(NULL),
     registeredInManager(false),
     platformType(NormalPlatform),
-    canBeGrabbed(true)
+    canBeGrabbed(true),
+    yGrabOffset(0)
 {
 }
 
@@ -97,6 +98,7 @@ void PlatformBehavior::UnserializeFrom(const gd::SerializerElement & element)
     platformType = platformTypeStr == "Ladder" ?  Ladder : (platformTypeStr == "Jumpthru" ?
         Jumpthru : NormalPlatform);
     canBeGrabbed = element.GetBoolAttribute("canBeGrabbed", true);
+    yGrabOffset = element.GetDoubleAttribute("yGrabOffset");
 }
 
 #if defined(GD_IDE_ONLY)
@@ -109,6 +111,7 @@ void PlatformBehavior::SerializeTo(gd::SerializerElement & element) const
     else
         element.SetAttribute("platformType", "NormalPlatform");
     element.SetAttribute("canBeGrabbed", canBeGrabbed);
+    element.SetAttribute("yGrabOffset", yGrabOffset);
 }
 
 std::map<gd::String, gd::PropertyDescriptor> PlatformBehavior::GetProperties(gd::Project & project) const
@@ -129,31 +132,31 @@ std::map<gd::String, gd::PropertyDescriptor> PlatformBehavior::GetProperties(gd:
         .AddExtraInfo(_("Ladder"));
     properties[_("Ledges can be grabbed")]
         .SetValue(canBeGrabbed ? "true" : "false").SetType("Boolean");
+    properties[_("Grab offset on Y axis")]
+        .SetValue(gd::String::From(yGrabOffset));
 
     return properties;
 }
 
 bool PlatformBehavior::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
-    if ( name == _("Ledges can be grabbed") )
-    {
+    if (name == _("Ledges can be grabbed"))
         canBeGrabbed = (value == "1");
-        return true;
-    }
-
-    if ( name == _("Type") )
+    else if (name == _("Type"))
     {
-        if ( value == _("Jumpthru platform") )
+        if (value == _("Jumpthru platform"))
             platformType = Jumpthru;
-        else if ( value == _("Ladder") )
+        else if (value == _("Ladder"))
             platformType = Ladder;
         else
             platformType = NormalPlatform;
-
-        return true;
     }
+    else if (name == _("Grab offset on Y axis"))
+        yGrabOffset = value.To<double>();
+    else
+        return false;
 
-    return false;
+    return true;
 }
 
 #endif

@@ -63,6 +63,12 @@ public:
      */
     bool CanBeGrabbed() const { return canBeGrabbed; }
 
+    /**
+     * \brief Return the offset applied when testing if an object is at the
+     * right position on Y axis to grab the platform ledge.
+     */
+    double GetYGrabOffset() const { return yGrabOffset; }
+
     virtual void UnserializeFrom(const gd::SerializerElement & element);
     #if defined(GD_IDE_ONLY)
     virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
@@ -82,6 +88,7 @@ private:
     bool registeredInManager; ///< True if the behavior is registered in the list of platforms of the scene.
     PlatformType platformType;
     bool canBeGrabbed; ///< True if the platform ledges can be grabbed by platformer objects.
+    double yGrabOffset;
 };
 
 #endif // PLATFORMBEHAVIOR_H

@@ -87,7 +87,7 @@ public:
         editor.initialPositionsList->SetItemColumnImage(i, 1, instance.IsLocked() ? 1 : 0 );
         editor.initialPositionsList->SetItem(i, 2, gd::String::From(instance.GetX()));
         editor.initialPositionsList->SetItem(i, 3, gd::String::From(instance.GetY()));
-        editor.initialPositionsList->SetItem(i, 4, gd::String::From(instance.GetAngle())+"�");
+        editor.initialPositionsList->SetItem(i, 4, gd::String::From(instance.GetAngle())+u"°");
         editor.initialPositionsList->SetItem(i, 5, gd::String::From(instance.GetZOrder()));
         editor.initialPositionsList->SetItemPtrData(i, wxPtrToUInt(&instance));
 

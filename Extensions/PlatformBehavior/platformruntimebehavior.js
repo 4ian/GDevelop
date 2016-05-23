@@ -130,8 +130,8 @@ gdjs.PlatformRuntimeBehavior = function(runtimeScene, behaviorData, owner)
         this._platformType = gdjs.PlatformRuntimeBehavior.JUMPTHRU;
     else
         this._platformType = gdjs.PlatformRuntimeBehavior.NORMALPLAFTORM;
-    this._canBeGrabbed = behaviorData.canBeGrabbed;
-    this._yGrabOffset = behaviorData.yGrabOffset;
+    this._canBeGrabbed = behaviorData.canBeGrabbed || false;
+    this._yGrabOffset = behaviorData.yGrabOffset || 0;
 
     //Note that we can't use getX(), getWidth()... of owner here: The owner is not fully constructed.
     this._oldX = 0;

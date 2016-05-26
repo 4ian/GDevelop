@@ -93,6 +93,17 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
             .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
             .SetFunctionName("IsFalling").SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
 
+        aut.AddCondition("IsGrabbingPlatform",
+                       _("Is grabbing platform ledge"),
+                       _("Check if the object is grabbing a platform ledge."),
+                       _("_PARAM0_ is grabbing a platform ledge"),
+                       _(""),
+                       "CppPlatform/Extensions/platformerobjecticon24.png",
+                       "CppPlatform/Extensions/platformerobjecticon16.png")
+            .AddParameter("object", _("Object"))
+            .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+            .SetFunctionName("IsGrabbingPlatform").SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+
         aut.AddCondition("Gravity",
                        _("Gravity"),
                        _("Compare the gravity applied on the object (in pixels per second per second)."),
@@ -297,7 +308,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateUpKey",
                        _("Simulate up key press"),
-                       _("Simulate a pressing on up key ( Used when on a ladder )."),
+                       _("Simulate a pressing on up key (used when on a ladder)."),
                        _("Simulate pressing Up for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -309,7 +320,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateDownKey",
                        _("Simulate down key press"),
-                       _("Simulate a pressing on down key ( Used when on a ladder )."),
+                       _("Simulate a pressing on down key (used when on a ladder)."),
                        _("Simulate pressing Down for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -321,7 +332,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateLadderKey",
                        _("Simulate ladder key press"),
-                       _("Simulate a pressing on ladder key ( Used to grab a ladder )."),
+                       _("Simulate a pressing on ladder key (used to grab a ladder)."),
                        _("Simulate pressing Ladder key for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -341,6 +352,17 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
             .AddParameter("object", _("Object"))
             .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
             .SetFunctionName("SimulateJumpKey").SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
+
+        aut.AddAction("SimulateReleaseKey",
+                       _("Simulate release key press"),
+                       _("Simulate a pressing on release key (used when grabbing a platform ledge)."),
+                       _("Simulate pressing Release key for _PARAM0_"),
+                       _("Controls"),
+                       "res/conditions/keyboard24.png",
+                       "res/conditions/keyboard.png")
+            .AddParameter("object", _("Object"))
+            .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+            .SetFunctionName("SimulateReleaseKey").SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
 
         aut.AddAction("SimulateControl",
                        _("Simulate control"),

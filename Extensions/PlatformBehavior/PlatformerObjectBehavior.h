@@ -45,6 +45,7 @@ public:
     void SetJumpSpeed(double jumpSpeed_) { jumpSpeed = jumpSpeed_; };
     bool SetSlopeMaxAngle(double slopeMaxAngle_);
     void SetCanJump() { canJump = true; };
+    void SetCanGrabPlatforms(bool enable);
 
     void IgnoreDefaultControls(bool ignore = true) { ignoreDefaultControls = ignore; };
     void SimulateControl(const gd::String & input);
@@ -54,12 +55,14 @@ public:
     void SimulateUpKey() { upKey = true; };
     void SimulateDownKey() { downKey = true; };
     void SimulateJumpKey() { jumpKey = true; };
+    void SimulateReleaseKey() { releaseKey = true; };
 
     bool IsOnFloor() const { return isOnFloor; }
     bool IsOnLadder() const { return isOnLadder; }
     bool IsJumping() const { return jumping; }
-    bool IsFalling() const { return !isOnFloor && !isOnLadder && (!jumping || currentJumpSpeed < currentFallSpeed); }
+    bool IsFalling() const { return !isOnFloor && !isGrabbingPlatform && !isOnLadder && (!jumping || currentJumpSpeed < currentFallSpeed); }
     bool IsMoving() const { return (currentSpeed != 0 && hasReallyMoved) || currentJumpSpeed != 0 || currentFallSpeed != 0; }
+    bool IsGrabbingPlatform() const { return isGrabbingPlatform; }
 
     virtual void OnOwnerChanged();
 
@@ -135,6 +138,19 @@ private:
      */
     std::set<PlatformBehavior*> GetJumpthruCollidingWith(const std::set<PlatformBehavior*> & candidates);
 
+    /**
+     * \brief Return true if the object owning the behavior can grab the specified platform. There must be a collision
+     * between the object and the platform.
+     * \param platform The platform the object is in collision with
+     * \param y Grabbing will be allowed if the object is above the platform but the distance is less than this parameter.
+     */
+    bool CanGrab(PlatformBehavior * platform, double y) const;
+
+    /**
+     * \brief Mark the platformer object has not being grabbing any platform.
+     */
+    void ReleaseGrabbedPlatform();
+
     double gravity; ///< In pixels.seconds^-2
     double maxFallingSpeed; ///< In pixels.seconds^-1
     double acceleration; ///< In pixels.seconds^-2
@@ -143,6 +159,9 @@ private:
     double jumpSpeed; ///< In pixels.seconds^-1
     double slopeMaxAngle; ///< In degrees
     double slopeClimbingFactor; ///< Equals to tan(slopeMaxAngle).
+    bool canGrabPlatforms; ///< True to allow the object to grab platform ledges.
+    double yGrabOffset;
+    double xGrabTolerance; ///< Maximum distance, in pixels, on X axis that can be used to grab a platform.
 
     RuntimeScene * parentScene; ///< The scene the object belongs to.
     ScenePlatformObjectsManager * sceneManager; ///< The platform objects manager associated to the scene.
@@ -157,6 +176,10 @@ private:
     double currentJumpSpeed; ///< The current speed of the jump, when jumping == true.
     bool canJump; ///< True if the object can jump.
     bool hasReallyMoved; ///< Used for IsMoving(): Only set to true when the object has moved from more than 1 pixel horizontally.
+    bool isGrabbingPlatform; ///< True if the object is on a ladder.
+    PlatformBehavior * grabbedPlatform; ///< The platform the object is on, when isGrabbingPlatform == true.
+    double grabbedPlatformLastX; ///< The last X position of the grabbed platform, when isGrabbingPlatform == true.
+    double grabbedPlatformLastY; ///< The last Y position of the grabbed platform, when isGrabbingPlatform == true.
 
     //Object size tracking:
     bool trackSize; ///< If true, the behavior try to change the object position to avoid glitch when size change.
@@ -169,6 +192,6 @@ private:
     bool upKey;
     bool downKey;
     bool jumpKey;
+    bool releaseKey;
 };
 #endif // PLATFORMEROBJECTBEHAVIOR_H
-

@@ -12,7 +12,10 @@
  * @static
  * @private
  */
-gdjs.evtTools.storage = gdjs.evtTools.storage || {loadedFiles:new Hashtable()};
+gdjs.evtTools.storage = gdjs.evtTools.storage || {
+	loadedFiles: new Hashtable(),
+	localStorage: typeof cc !== 'undefined' ? cc.sys.localStorage : localStorage
+};
 
 /**
  * Load into memory a JSON object stored in the local storage object

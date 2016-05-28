@@ -25,8 +25,8 @@
 namespace gd {class Layout;}
 namespace gd {class Project;}
 namespace gd {class LayoutEditorCanvas;}
-namespace gd {class LayersEditorPanel;}
 namespace gd {class ObjectsEditor;}
+class LayersEditorPanel;
 class CppLayoutPreviewer;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;
@@ -107,7 +107,7 @@ private:
     wxScrollBar* vScrollbar;
     //*)
     std::shared_ptr<gd::ObjectsEditor> objectsEditor;
-    std::shared_ptr<gd::LayersEditorPanel> layersEditor;
+    std::shared_ptr<LayersEditorPanel> layersEditor;
     std::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
     std::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;
 
@@ -121,4 +121,3 @@ private:
 };
 
 #endif
-

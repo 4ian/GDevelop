@@ -4,7 +4,6 @@
  * This project is released under the MIT License.
  */
 #include "GDCore/Project/Layer.h"
-#include "GDCore/IDE/Dialogs/EditLayerDialog.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/CommonTools.h"
 
@@ -106,17 +105,6 @@ void Layer::UnserializeFrom(const SerializerElement & element)
         }
     }
 }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-/**
- * Display a window to edit the layer
- */
-void Layer::EditLayer()
-{
-    EditLayerDialog dialog(NULL, *this);
-    dialog.ShowModal();
-}
-#endif
 
 Camera::Camera() :
     defaultSize(true),

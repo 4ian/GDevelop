@@ -5,8 +5,6 @@
  * This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
 #include "LayersEditorPanel.h"
 
 #include <wx/config.h>
@@ -20,9 +18,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/Dialogs/ObjectsOnBadLayerDialog.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
-
-namespace gd
-{
+#include "LayoutEditorPropertiesPnl.h"
 
 const long LayersEditorPanel::idMenuEdit = wxNewId();
 const long LayersEditorPanel::idMenuAdd = wxNewId();
@@ -30,14 +26,18 @@ const long LayersEditorPanel::idMenuDel = wxNewId();
 const long LayersEditorPanel::idMenuUp = wxNewId();
 const long LayersEditorPanel::idMenuDown = wxNewId();
 
+using namespace gd;
+
 LayersEditorPanel::LayersEditorPanel(wxWindow* parent, gd::Project & project, gd::Layout & layout, gd::MainFrameWrapper & mainFrameWrapper) :
-LayersEditorPanelBase(parent),
-gd::LayoutEditorCanvasAssociatedEditor(),
-m_imageList(new wxImageList(16, 16, 1)),
-m_project(project),
-m_layout(layout),
-m_layoutCanvas(NULL),
-m_mainFrameWrapper(mainFrameWrapper)
+    LayersEditorPanelBase(parent),
+    gd::LayoutEditorCanvasAssociatedEditor(),
+    m_imageList(new wxImageList(16, 16, 1)),
+    m_project(project),
+    m_layout(layout),
+    m_layoutCanvas(NULL),
+    m_mainFrameWrapper(mainFrameWrapper),
+    propPnl(NULL),
+    propPnlManager(NULL)
 {
     //Connect the wxListCtrl to events
     Connect(LayersEditorPanelBase::LAYERS_LIST_ID,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&LayersEditorPanel::OnlayersListItemSelect1);
@@ -90,6 +90,12 @@ m_mainFrameWrapper(mainFrameWrapper)
 LayersEditorPanel::~LayersEditorPanel()
 {
 
+}
+
+void LayersEditorPanel::SetAssociatedPropertiesPanel(LayoutEditorPropertiesPnl * propPnl_, wxAuiManager * manager_)
+{
+    propPnl = propPnl_;
+    propPnlManager = manager_;
 }
 
 void LayersEditorPanel::Refresh()
@@ -151,21 +157,13 @@ Layer* LayersEditorPanel::GetSelectedLayer()
 
 void LayersEditorPanel::EditSelectedLayer()
 {
-    //Get selected layer
     gd::Layer * layer = GetSelectedLayer();
     if ( !layer ) return;
 
-    gd::String oldName = layer->GetName();
-    layer->EditLayer();
-
-    //Be sure to update instances if the layer name has changed.
-    if ( layer->GetName() != oldName )
-    {
-        m_layout.GetInitialInstances().MoveInstancesToLayer(oldName, layer->GetName());
-        if ( m_layoutCanvas && m_layoutCanvas->GetCurrentLayer() == oldName ) m_layoutCanvas->SetCurrentLayer(layer->GetName());
+    if ( propPnl && propPnlManager ) {
+        propPnlManager->GetPane("PROPERTIES").Show();
+        propPnlManager->Update();
     }
-
-    Refresh();
 }
 
 /** Item double clicked: Toggle visibility or edit the layer
@@ -217,6 +215,8 @@ void LayersEditorPanel::OnlayersListItemSelect1(wxListEvent& event)
     Layer * layer = GetSelectedLayer();
     if ( !layer ) return;
 
+    if ( propPnl ) propPnl->SelectedLayer(layer);
+
     if ( m_layoutCanvas ) m_layoutCanvas->SetCurrentLayer(layer->GetName());
     UpdateSelectedLayerIcon();
 }
@@ -228,6 +228,8 @@ void LayersEditorPanel::OnlayersListItemFocused(wxListEvent& event)
     //Get selected layer
     Layer * layer = GetSelectedLayer();
     if ( !layer ) return;
+
+    if ( propPnl ) propPnl->SelectedLayer(layer);
 
     if ( m_layoutCanvas ) m_layoutCanvas->SetCurrentLayer(layer->GetName());
     UpdateSelectedLayerIcon();
@@ -301,10 +303,8 @@ void LayersEditorPanel::OnDeleteLayerClicked(wxCommandEvent& event)
 
             //Delete the layer and select base layer
             m_layout.RemoveLayer(name);
-            if ( m_layoutCanvas )
-            {
-                m_layoutCanvas->SetCurrentLayer("");
-            }
+            if ( m_layoutCanvas ) m_layoutCanvas->SetCurrentLayer("");
+            if ( propPnl ) propPnl->SelectedLayer(NULL);
             Refresh();
             return;
         }
@@ -376,7 +376,3 @@ void LayersEditorPanel::OnRefreshClicked(wxCommandEvent& event)
 {
     Refresh();
 }
-
-}
-
-#endif

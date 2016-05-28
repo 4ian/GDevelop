@@ -4,10 +4,9 @@
  * Copyright 2014-2016 Victor Levasseur (victorlevasseur52@gmail.com).
  * This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef LAYERSEDITORPANEL_H
 #define LAYERSEDITORPANEL_H
-#include "GDCoreDialogs.h"
+#include "GDIDEDialogs.h"
 
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 namespace gd { class LayoutEditorCanvas; }
@@ -16,9 +15,7 @@ namespace gd { class Layout; }
 namespace gd { class Layer; }
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/String.h"
-
-namespace gd
-{
+class LayoutEditorPropertiesPnl;
 
 /**
  * \brief Panel showing the layers of a layout and allowing to edit them.
@@ -46,6 +43,12 @@ public:
      * \see LayersEditorPanel::SetAssociatedLayoutEditorCanvas
      */
     gd::LayoutEditorCanvas * GetAssociatedLayoutEditorCanvas() { return m_layoutCanvas; };
+
+    /**
+     * \brief Can be used to associate a LayoutEditorPropertiesPnl, and the wxAuiManager used to display it,
+     * to the editor.
+     */
+    void SetAssociatedPropertiesPanel(LayoutEditorPropertiesPnl * propPnl, wxAuiManager * manager);
 
     /**
      * Enable or disable the editor.
@@ -81,21 +84,21 @@ private:
     wxImageList * m_imageList;
 
     wxMenu contextMenu;
-        wxMenuItem* MenuItem1;
-        wxMenuItem* MenuItem2;
-        wxMenuItem* MenuItem3;
-        wxMenuItem* MenuItem4;
-        wxMenuItem* MenuItem5;
+    wxMenuItem* MenuItem1;
+    wxMenuItem* MenuItem2;
+    wxMenuItem* MenuItem3;
+    wxMenuItem* MenuItem4;
+    wxMenuItem* MenuItem5;
 
     gd::Project & m_project;
     gd::Layout & m_layout;
     gd::LayoutEditorCanvas * m_layoutCanvas;
     gd::MainFrameWrapper & m_mainFrameWrapper;
 
+    LayoutEditorPropertiesPnl * propPnl;
+    wxAuiManager * propPnlManager;
+
     gd::String m_layerSelected;
 };
 
-}
-
 #endif // LAYERSEDITORPANEL_H
-#endif

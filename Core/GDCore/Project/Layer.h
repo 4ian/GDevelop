@@ -77,11 +77,6 @@ public:
 
     #if defined(GD_IDE_ONLY)
     /**
-     * \brief Display a window to edit the layer
-     */
-    void EditLayer();
-
-    /**
      * \brief Serialize layer.
      */
     void SerializeTo(SerializerElement & element) const;
@@ -124,17 +119,21 @@ public:
     ~Camera() {};
 
     /**
-     * Change the viewport, i.e the area of the window where the camera will be displayed
-     * The coordinates must be between 0 and 1.
+     * \brief Change the viewport, i.e the area of the window where the camera will be displayed.
+     * \note The coordinates must be between 0 and 1.
      */
     void SetViewport(float x1_, float y1_, float x2_, float y2_) { x1 = x1_; x2 = x2_; y1 = y1_; y2 = y2_; };
+    void SetViewportX1(float x1_) { x1 = x1_; };
+    void SetViewportY1(float y1_) { y1 = y1_; };
+    void SetViewportX2(float x2_) { x2 = x2_; };
+    void SetViewportY2(float y2_) { y2 = y2_; };
     float GetViewportX1() const { return x1; };
     float GetViewportY1() const { return y1; };
     float GetViewportX2() const { return x2; };
     float GetViewportY2() const { return y2; };
 
     /**
-     * Change the size of the rendered area of the scene.
+     * \brief Change the size of the rendered area of the scene, in pixels.
      */
     void SetSize(float width_, float height_) { width = width_; height = height_; };
     float GetWidth() const { return width; };

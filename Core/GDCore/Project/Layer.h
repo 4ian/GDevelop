@@ -7,6 +7,8 @@
 #define GDCORE_LAYER_H
 #include "GDCore/String.h"
 #include <vector>
+#include <memory>
+namespace gd { class Effect; }
 namespace gd { class Camera; }
 namespace gd { class SerializerElement; }
 
@@ -45,6 +47,10 @@ public:
      */
     bool GetVisibility() const { return isVisible; }
 
+    /** \name Cameras
+     */
+    ///@{
+
     /**
      * \brief Change the number of cameras inside the layer.
      */
@@ -75,6 +81,70 @@ public:
      */
     inline void AddCamera(const Camera & camera) { cameras.push_back(camera); };
 
+    ///@}
+
+    /** \name Effects
+     */
+    ///@{
+	/**
+	 * \brief Return true if the effect called "name" exists.
+	 */
+	bool HasEffectNamed(const gd::String & name) const;
+
+	/**
+	 * \brief Return a reference to the effect called "name".
+	 */
+	Effect & GetEffect(const gd::String & name);
+
+	/**
+	 * \brief Return a reference to the effect called "name".
+	 */
+	const Effect & GetEffect(const gd::String & name) const;
+
+	/**
+	 * Return a reference to the effect at position "index" in the effects list
+	 */
+	Effect & GetEffect(std::size_t index);
+
+	/**
+	 * Return a reference to the effect at position "index" in the effects list
+	 */
+	const Effect & GetEffect (std::size_t index) const;
+
+	/**
+	 * Return the position of the effect called "name" in the effects list
+	 */
+	std::size_t GetEffectPosition(const gd::String & name) const;
+
+	/**
+	 * Return the number of effecst.
+	 */
+	std::size_t GetEffectsCount() const;
+
+	/**
+	 * Add a new effect at the specified position in the effects list.
+	 */
+	void InsertNewEffect(const gd::String & name, std::size_t position);
+
+	/**
+	 * \brief Add the a copy of the specified effect in the effects list.
+	 * \note No pointer or reference must be kept on the layer passed as parameter.
+	 * \param theEffect The effect that must be copied and inserted into the effects list
+	 * \param position Insertion position.
+	 */
+	void InsertEffect(const Effect & theEffect, std::size_t position);
+
+	/**
+	 * Remove the specified effect.
+	 */
+	void RemoveEffect(const gd::String & name);
+
+	/**
+	 * Swap the position of two effects.
+	 */
+	void SwapEffects(std::size_t firstEffectIndex, std::size_t secondEffectIndex);
+    ///@}
+
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Serialize layer.
@@ -91,9 +161,11 @@ private:
 
     gd::String name; ///< The name of the layer
     bool isVisible; ///< True if the layer is visible
-    std::vector < gd::Camera > cameras; ///< The camera displayed by the layer
+    std::vector<gd::Camera> cameras; ///< The camera displayed by the layer
+    std::vector<std::shared_ptr<gd::Effect>> effects; ///< The effects applied to the layer.
 
     static gd::Camera badCamera;
+    static gd::Effect badEffect;
 };
 
 /**

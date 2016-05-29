@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 #include "GDCore/Project/Layer.h"
+#include "GDCore/Project/Effect.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/CommonTools.h"
 
@@ -11,6 +12,7 @@ namespace gd
 {
 
 Camera Layer::badCamera;
+Effect Layer::badEffect;
 
 Layer::Layer() :
 isVisible(true)
@@ -51,6 +53,13 @@ void Layer::SerializeTo(SerializerElement & element) const
         cameraElement.SetAttribute("viewportBottom", GetCamera(c).GetViewportY2());
     }
 
+    SerializerElement & effectsElement = element.AddChild("effects");
+    effectsElement.ConsiderAsArrayOf("effect");
+    for (std::size_t i = 0;i<GetEffectsCount();++i)
+    {
+        SerializerElement & effectElement = effectsElement.AddChild("effect");
+        GetEffect(i).SerializeTo(effectElement);
+    }
 }
 #endif
 
@@ -104,6 +113,108 @@ void Layer::UnserializeFrom(const SerializerElement & element)
                 cameraElement.GetDoubleAttribute("viewportBottom")); // (sf::Rect used Right and Bottom instead of Width and Height before)
         }
     }
+
+    effects.clear();
+    SerializerElement & effectsElement = element.GetChild("effects");
+    effectsElement.ConsiderAsArrayOf("effect");
+    for (std::size_t i = 0; i < effectsElement.GetChildrenCount(); ++i)
+    {
+        const SerializerElement & effectElement = effectsElement.GetChild(i);
+
+        auto effect = std::shared_ptr<gd::Effect>(new Effect);
+        effect->UnserializeFrom(effectElement);
+        effects.push_back(effect);
+    }
+}
+
+
+gd::Effect & Layer::GetEffect(const gd::String & name)
+{
+    auto effect = find_if(effects.begin(), effects.end(), [&name](std::shared_ptr<gd::Effect> & effect) {
+        return effect->GetName() == name;
+    });
+
+    if ( effect != effects.end())
+        return **effect;
+
+    return badEffect;
+}
+const gd::Effect & Layer::GetEffect(const gd::String & name) const
+{
+    auto effect = find_if(effects.begin(), effects.end(), [&name](const std::shared_ptr<gd::Effect> & effect) {
+        return effect->GetName() == name;
+    });
+
+    if ( effect != effects.end())
+        return **effect;
+
+    return badEffect;
+}
+gd::Effect & Layer::GetEffect(std::size_t index)
+{
+    return *effects[index];
+}
+const gd::Effect & Layer::GetEffect (std::size_t index) const
+{
+    return *effects[index];
+}
+std::size_t Layer::GetEffectsCount() const
+{
+    return effects.size();
+}
+
+bool Layer::HasEffectNamed(const gd::String & name) const
+{
+    return ( find_if(effects.begin(), effects.end(), [&name](const std::shared_ptr<gd::Effect> & effect) {
+        return effect->GetName() == name;
+    }) != effects.end() );
+}
+std::size_t Layer::GetEffectPosition(const gd::String & name) const
+{
+    for (std::size_t i = 0;i<effects.size();++i)
+    {
+        if ( effects[i]->GetName() == name ) return i;
+    }
+    return gd::String::npos;
+}
+
+void Layer::InsertNewEffect(const gd::String & name, std::size_t position)
+{
+    auto newEffect = std::shared_ptr<gd::Effect>(new Effect);
+    newEffect->SetName(name);
+    if (position<effects.size())
+        effects.insert(effects.begin()+position, newEffect);
+    else
+        effects.push_back(newEffect);
+}
+
+void Layer::InsertEffect(const gd::Effect & effect, std::size_t position)
+{
+    auto newEffect = std::shared_ptr<gd::Effect>(new Effect(effect));
+    if (position<effects.size())
+        effects.insert(effects.begin()+position, newEffect);
+    else
+        effects.push_back(newEffect);
+}
+
+void Layer::RemoveEffect(const gd::String & name)
+{
+    auto effect = find_if(effects.begin(), effects.end(), [&name](const std::shared_ptr<gd::Effect> & effect) {
+        return effect->GetName() == name;
+    });
+    if ( effect == effects.end() ) return;
+
+    effects.erase(effect);
+}
+
+void Layer::SwapEffects(std::size_t firstEffectIndex, std::size_t secondEffectIndex)
+{
+    if ( firstEffectIndex >= effects.size() || secondEffectIndex >= effects.size() )
+        return;
+
+    auto temp = effects[firstEffectIndex];
+    effects[firstEffectIndex] = effects[secondEffectIndex];
+    effects[secondEffectIndex] = temp;
 }
 
 Camera::Camera() :

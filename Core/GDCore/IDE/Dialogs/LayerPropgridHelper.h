@@ -31,7 +31,7 @@ public:
      * \param project The project edited
      * \param layout The layout being edited
      */
-    LayerPropgridHelper(gd::Project & project_, gd::Layout & layout_) : grid(NULL), project(project_), layout(layout_) {};
+    LayerPropgridHelper(gd::Project & project_, gd::Layout & layout_);
     virtual ~LayerPropgridHelper() {};
 
     void RefreshFrom(const Layer & layer);
@@ -46,6 +46,7 @@ private:
     wxPropertyGrid * grid; ///< The grid used for diplaying and editing properties.
     gd::Project & project;
     gd::Layout & layout;
+    wxArrayString effectNames; ///< Hardcoded names of the available effects
 };
 
 }

@@ -9,6 +9,7 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/Project/Layer.h"
+#include "GDCore/Project/Effect.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Log.h"
 #include <wx/propgrid/propgrid.h>
@@ -16,7 +17,7 @@
 #include <map>
 
 namespace {
-    int GetCameraId(wxString propertyName)
+    int GetIndexFromPropertyName(wxString propertyName)
     {
         if (propertyName.Find(":") == wxNOT_FOUND) return -1;
 
@@ -27,6 +28,15 @@ namespace {
 
 namespace gd
 {
+
+LayerPropgridHelper::LayerPropgridHelper(gd::Project & project_, gd::Layout & layout_) :
+    grid(NULL),
+    project(project_),
+    layout(layout_)
+{
+    effectNames.push_back("Night");
+    effectNames.push_back("Colorize");
+};
 
 void LayerPropgridHelper::RefreshFrom(const Layer & layer)
 {
@@ -44,6 +54,8 @@ void LayerPropgridHelper::RefreshFrom(const Layer & layer)
     grid->Append(new wxStringProperty(_("Help"), "HELP", _("Click to see help...")) );
     grid->SetPropertyCell("HELP", 1, _("Help"), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
     grid->SetPropertyReadOnly("HELP");
+
+    //Cameras
     grid->Append(new wxPropertyCategory(_("Cameras"), "CAMERAS") );
     grid->Append(new wxStringProperty(_("Add a camera"), "CAMERA_ADD", _("Add...")) );
     grid->SetPropertyCell("CAMERA_ADD", 1, _("Add..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
@@ -55,7 +67,7 @@ void LayerPropgridHelper::RefreshFrom(const Layer & layer)
         wxString suffix = ":" + gd::String::From(i);
 
         grid->AppendIn("CAMERAS", new wxPropertyCategory(wxString::Format(
-            wxString(i == 0 ? _("Camera %d") : _("Camera %d (native games only)")), i), suffix)
+            wxString(i == 0 ? _("Camera %d") : _("Camera %d (native games only)")), i), "CAMERA" + suffix)
         );
 
         grid->Append(new wxStringProperty(_(""), "CAMERA_REMOVE" + suffix, _("Remove")) );
@@ -84,6 +96,29 @@ void LayerPropgridHelper::RefreshFrom(const Layer & layer)
             !camera.UseDefaultViewport());
     }
 
+    //Effects
+    grid->Append(new wxPropertyCategory(_("Effects"), "EFFECTS") );
+    grid->Append(new wxStringProperty(_("Add an effect"), "EFFECT_ADD", _("Add...")) );
+    grid->SetPropertyCell("EFFECT_ADD", 1, _("Add..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+    grid->SetPropertyReadOnly("EFFECT_ADD");
+
+    for (std::size_t i = 0;i<layer.GetEffectsCount();++i)
+    {
+        const gd::Effect & effect = layer.GetEffect(i);
+        wxString suffix = ":" + gd::String::From(i);
+
+        grid->AppendIn("EFFECTS", new wxPropertyCategory(wxString::Format(wxString(_("Effect %d")), i), "EFFECT" + suffix));
+
+        grid->Append(new wxStringProperty(_(""), "EFFECT_REMOVE" + suffix, _("Remove")) );
+        grid->SetPropertyCell("EFFECT_REMOVE" + suffix, 1, _("Remove"), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+        grid->SetPropertyReadOnly("EFFECT_REMOVE" + suffix);
+        grid->Append(new wxStringProperty(_("Name"), "EFFECT_NAME" + suffix, effect.GetName()));
+
+        wxEnumProperty * prop = new wxEnumProperty(_("Effect"), "EFFECT_EFFECT" + suffix, effectNames);
+        prop->SetChoiceSelection(effectNames.Index(effect.GetEffectName()));
+        grid->Append(prop);
+    }
+
     grid->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
 }
 
@@ -103,12 +138,29 @@ bool LayerPropgridHelper::OnPropertySelected(Layer & layer, wxPropertyGridEvent&
             return true;
         }},
     };
+    std::map<wxString, std::function<bool(int)>> effectsProperties = {
+        {"EFFECT_REMOVE", [&](int effectIndex) {
+            layer.RemoveEffect(layer.GetEffect(effectIndex).GetName());
+            return true;
+        }},
+    };
 
     if (event.GetColumn() == 1) //Manage button-like properties
     {
         if (event.GetPropertyName() ==  "CAMERA_ADD")
         {
             layer.SetCameraCount(layer.GetCameraCount() + 1);
+            return true;
+        }
+        else if (event.GetPropertyName() ==  "EFFECT_ADD")
+        {
+            if (layer.GetEffectsCount() >= 1)
+            {
+                gd::LogWarning(_("For now, only one effect by layer is supported."));
+                return false;
+            }
+
+            layer.InsertNewEffect("Effect1", 0);
             return true;
         }
         else if (event.GetPropertyName() ==  "HELP")
@@ -122,11 +174,22 @@ bool LayerPropgridHelper::OnPropertySelected(Layer & layer, wxPropertyGridEvent&
             {
                 if (event.GetPropertyName().StartsWith(it.first))
                 {
-                    int cameraId = GetCameraId(event.GetPropertyName());
+                    int cameraId = GetIndexFromPropertyName(event.GetPropertyName());
                     if (cameraId < 0 || cameraId >= layer.GetCameraCount())
                         return false;
 
                     return it.second(cameraId);
+                }
+            }
+            for(auto it : effectsProperties)
+            {
+                if (event.GetPropertyName().StartsWith(it.first))
+                {
+                    int effectId = GetIndexFromPropertyName(event.GetPropertyName());
+                    if (effectId < 0 || effectId >= layer.GetEffectsCount())
+                        return false;
+
+                    return it.second(effectId);
                 }
             }
         }
@@ -217,6 +280,21 @@ bool LayerPropgridHelper::OnPropertyChanged(Layer & layer, wxPropertyGridEvent& 
         }}
     };
 
+    std::map<wxString, std::function<bool(int)>> effectsProperties = {
+        {"EFFECT_NAME", [&](int id) {
+            layer.GetEffect(id).SetName(event.GetValue().GetString());
+            return false;
+        }},
+        {"EFFECT_EFFECT", [&](int id) {
+            unsigned int effectNameId = event.GetPropertyValue().GetLong();
+            if (effectNameId < 0 || effectNameId >= effectNames.size())
+                return false;
+
+            layer.GetEffect(id).SetEffectName(effectNames[effectNameId]);
+            return false;
+        }}
+    };
+
     if (event.GetPropertyName() == "LAYER_VISIBLE")
         layer.SetVisibility(event.GetValue().GetBool());
     else
@@ -225,12 +303,22 @@ bool LayerPropgridHelper::OnPropertyChanged(Layer & layer, wxPropertyGridEvent& 
         {
             if (event.GetPropertyName().StartsWith(it.first))
             {
-                int cameraId = GetCameraId(event.GetPropertyName());
-                std::cout << cameraId << std::endl;
+                int cameraId = GetIndexFromPropertyName(event.GetPropertyName());
                 if (cameraId < 0 || cameraId >= layer.GetCameraCount())
                     return false;
 
                 return it.second(cameraId);
+            }
+        }
+        for(auto it : effectsProperties)
+        {
+            if (event.GetPropertyName().StartsWith(it.first))
+            {
+                int effectId = GetIndexFromPropertyName(event.GetPropertyName());
+                if (effectId < 0 || effectId >= layer.GetEffectsCount())
+                    return false;
+
+                return it.second(effectId);
             }
         }
     }

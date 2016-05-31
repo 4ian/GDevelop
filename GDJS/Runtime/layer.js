@@ -19,6 +19,7 @@ gdjs.Layer = function(layerData, runtimeScene)
     this._cameraRotation = 0;
     this._zoomFactor = 1;
     this._hidden = !layerData.visibility;
+    this._effects = layerData.effects || [];
     this._cameraX = runtimeScene.getGame().getDefaultWidth()/2;
     this._cameraY = runtimeScene.getGame().getDefaultHeight()/2;
     this._width = runtimeScene.getGame().getDefaultWidth();
@@ -26,6 +27,7 @@ gdjs.Layer = function(layerData, runtimeScene)
 
     this._renderer = new gdjs.LayerRenderer(this, runtimeScene.getRenderer());
     this.show(!this._hidden);
+    this.setEffectsDefaultParameters();
 };
 
 gdjs.Layer.prototype.getRenderer = function() {
@@ -185,4 +187,21 @@ gdjs.Layer.prototype.getWidth = function() {
 
 gdjs.Layer.prototype.getHeight = function() {
     return this._height;
+};
+
+gdjs.Layer.prototype.getEffects = function() {
+    return this._effects;
+};
+
+gdjs.Layer.prototype.setEffectParameter = function(name, parameterIndex, value) {
+    return this._renderer.setEffectParameter(name, parameterIndex, value);
+};
+
+gdjs.Layer.prototype.setEffectsDefaultParameters = function() {
+    for (var i = 0; i < this._effects.length; ++i) {
+        var effect = this._effects[i];
+        for (var name in effect.parameters) {
+            this.setEffectParameter(effect.name, name, effect.parameters[name]);
+        }
+    }
 };

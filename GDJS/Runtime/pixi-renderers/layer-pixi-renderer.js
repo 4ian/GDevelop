@@ -3,6 +3,8 @@ gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer)
     this._pixiContainer = new PIXI.Container();
     this._layer = layer;
     runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
+
+    this._addFilters();
 }
 
 gdjs.LayerRenderer = gdjs.LayerPixiRenderer; //Register the class to let the engine use it.
@@ -33,6 +35,30 @@ gdjs.LayerPixiRenderer.prototype.updatePosition = function() {
 
 gdjs.LayerPixiRenderer.prototype.updateVisibility = function(visible) {
     this._pixiContainer.visible = !!visible;
+}
+
+gdjs.LayerPixiRenderer.prototype._addFilters = function() {
+    var effects = this._layer.getEffects();
+    if (effects.length === 0) {
+        return;
+    } else if (effects.length > 1) {
+        console.log('Only a single effect by Layer is supported for now by the Pixi renderer');
+    }
+
+    var filter = gdjs.PixiFiltersTools.getFilter(effects[0].effectName);
+    if (!filter) {
+        console.log('Filter \"' + effects[0].name + '\" not found');
+        return;
+    }
+
+    var theFilter = {
+        filter: filter.makeFilter(),
+        updateParameter: filter.updateParameter
+    };
+
+    this._pixiContainer.filters = [theFilter.filter];
+    this._filters = {};
+    this._filters[effects[0].name] = theFilter;
 }
 
 /**
@@ -76,4 +102,11 @@ gdjs.LayerPixiRenderer.prototype.changeRendererObjectZOrder = function(child, ne
  */
 gdjs.LayerPixiRenderer.prototype.removeRendererObject = function(child) {
 	this._pixiContainer.removeChild(child);
+};
+
+gdjs.LayerPixiRenderer.prototype.setEffectParameter = function (name, parameterName, value) {
+    if (!this._filters.hasOwnProperty(name)) return;
+
+    var theFilter = this._filters[name];
+    theFilter.updateParameter(theFilter.filter, parameterName, value);
 };

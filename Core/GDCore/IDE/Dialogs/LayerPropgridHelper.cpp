@@ -14,9 +14,20 @@
 #include "GDCore/Tools/Log.h"
 #include <wx/propgrid/propgrid.h>
 #include <wx/settings.h>
+#include <wx/choicdlg.h>
 #include <map>
 
 namespace {
+    void SetDefaultParameters(gd::Effect & effect)
+    {
+        //Hardcoded default parameters of the available effects
+        if (effect.GetEffectName() == "Sepia") {
+            effect.SetParameter("intensity", 0.6);
+        } else if (effect.GetEffectName() == "Night") {
+            effect.SetParameter("intensity", 0.3);
+        }
+    }
+
     int GetIndexFromPropertyName(wxString propertyName)
     {
         if (propertyName.Find(":") == wxNOT_FOUND) return -1;
@@ -34,8 +45,9 @@ LayerPropgridHelper::LayerPropgridHelper(gd::Project & project_, gd::Layout & la
     project(project_),
     layout(layout_)
 {
+    // For now, effect names are hardcoded here.
     effectNames.push_back("Night");
-    effectNames.push_back("Colorize");
+    effectNames.push_back("Sepia");
 };
 
 void LayerPropgridHelper::RefreshFrom(const Layer & layer)
@@ -117,6 +129,13 @@ void LayerPropgridHelper::RefreshFrom(const Layer & layer)
         wxEnumProperty * prop = new wxEnumProperty(_("Effect"), "EFFECT_EFFECT" + suffix, effectNames);
         prop->SetChoiceSelection(effectNames.Index(effect.GetEffectName()));
         grid->Append(prop);
+
+        for(auto parameter : effect.GetAllParameters())
+        {
+            auto & name = parameter.first;
+            auto value = parameter.second;
+            grid->Append(new wxStringProperty(name, "EFFECT_PARAMETER_" + name + suffix, gd::String::From(value)));
+        }
     }
 
     grid->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
@@ -147,12 +166,12 @@ bool LayerPropgridHelper::OnPropertySelected(Layer & layer, wxPropertyGridEvent&
 
     if (event.GetColumn() == 1) //Manage button-like properties
     {
-        if (event.GetPropertyName() ==  "CAMERA_ADD")
+        if (event.GetPropertyName() == "CAMERA_ADD")
         {
             layer.SetCameraCount(layer.GetCameraCount() + 1);
             return true;
         }
-        else if (event.GetPropertyName() ==  "EFFECT_ADD")
+        else if (event.GetPropertyName() == "EFFECT_ADD")
         {
             if (layer.GetEffectsCount() >= 1)
             {
@@ -160,10 +179,14 @@ bool LayerPropgridHelper::OnPropertySelected(Layer & layer, wxPropertyGridEvent&
                 return false;
             }
 
-            layer.InsertNewEffect("Effect1", 0);
+            gd::String effectName = wxGetSingleChoice(_("Choose an effect to add to the layer"), _("Effects"), effectNames);
+            if (effectName.empty()) return false;
+
+            //TODO: Effect with an already existing name could be created.
+            SetDefaultParameters(layer.InsertNewEffect(effectName, 0));
             return true;
         }
-        else if (event.GetPropertyName() ==  "HELP")
+        else if (event.GetPropertyName() == "HELP")
         {
             gd::HelpFileAccess::Get()->OpenPage("en/game_develop/documentation/manual/editors/scene_editor/edit_layer");
             return false;
@@ -287,10 +310,20 @@ bool LayerPropgridHelper::OnPropertyChanged(Layer & layer, wxPropertyGridEvent& 
         }},
         {"EFFECT_EFFECT", [&](int id) {
             unsigned int effectNameId = event.GetPropertyValue().GetLong();
-            if (effectNameId < 0 || effectNameId >= effectNames.size())
+            if (effectNameId >= effectNames.size())
                 return false;
 
             layer.GetEffect(id).SetEffectName(effectNames[effectNameId]);
+            return false;
+        }},
+        {"EFFECT_PARAMETER_", [&](int id) {
+            gd::String name = event.GetPropertyName();
+            size_t pos = gd::String("EFFECT_PARAMETER_").length();
+            name = name.substr(pos, name.find(":") - pos);
+
+            layer.GetEffect(id).SetParameter(name,
+                gd::String(event.GetValue().GetString()).To<float>()
+            );
             return false;
         }}
     };

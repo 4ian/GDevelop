@@ -124,7 +124,7 @@ public:
 	/**
 	 * Add a new effect at the specified position in the effects list.
 	 */
-	void InsertNewEffect(const gd::String & name, std::size_t position);
+	gd::Effect & InsertNewEffect(const gd::String & name, std::size_t position);
 
 	/**
 	 * \brief Add the a copy of the specified effect in the effects list.

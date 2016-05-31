@@ -263,6 +263,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers, std
     if (pixiRenderers)
     {
         InsertUnique(includesFiles, "pixi-renderers/pixi.js");
+        InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");
         InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
         InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
         InsertUnique(includesFiles, "pixi-renderers/layer-pixi-renderer.js");

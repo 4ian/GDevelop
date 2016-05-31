@@ -15,6 +15,9 @@ void Effect::SerializeTo(SerializerElement & element) const
 {
     element.SetAttribute("name", GetName());
     element.SetAttribute("effectName", GetEffectName());
+    SerializerElement & parametersElement = element.AddChild("parameters");
+    for (auto & parameter : parameters)
+        parametersElement.AddChild(parameter.first).SetValue(parameter.second);
 }
 #endif
 
@@ -25,6 +28,11 @@ void Effect::UnserializeFrom(const SerializerElement & element)
 {
     SetName(element.GetStringAttribute("name"));
     SetEffectName(element.GetStringAttribute("effectName"));
+
+    parameters.clear();
+    const SerializerElement & parametersElement = element.GetChild("parameters");
+    for (auto & child : parametersElement.GetAllChildren())
+        SetParameter(child.first, child.second->GetValue().GetDouble());
 }
 
 }

@@ -178,14 +178,17 @@ std::size_t Layer::GetEffectPosition(const gd::String & name) const
     return gd::String::npos;
 }
 
-void Layer::InsertNewEffect(const gd::String & name, std::size_t position)
+gd::Effect & Layer::InsertNewEffect(const gd::String & name, std::size_t position)
 {
     auto newEffect = std::shared_ptr<gd::Effect>(new Effect);
     newEffect->SetName(name);
+    newEffect->SetEffectName(name);
     if (position<effects.size())
         effects.insert(effects.begin()+position, newEffect);
     else
         effects.push_back(newEffect);
+
+    return *newEffect;
 }
 
 void Layer::InsertEffect(const gd::Effect & effect, std::size_t position)

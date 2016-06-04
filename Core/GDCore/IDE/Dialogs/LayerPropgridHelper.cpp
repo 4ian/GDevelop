@@ -22,9 +22,12 @@ namespace {
     {
         //Hardcoded default parameters of the available effects
         if (effect.GetEffectName() == "Sepia") {
-            effect.SetParameter("intensity", 0.6);
+            effect.SetParameter("opacity", 0.8);
         } else if (effect.GetEffectName() == "Night") {
             effect.SetParameter("intensity", 0.3);
+            effect.SetParameter("opacity", 1);
+        } else if (effect.GetEffectName() == "LightNight") {
+            effect.SetParameter("opacity", 1);
         }
     }
 
@@ -47,6 +50,7 @@ LayerPropgridHelper::LayerPropgridHelper(gd::Project & project_, gd::Layout & la
 {
     // For now, effect names are hardcoded here.
     effectNames.push_back("Night");
+    effectNames.push_back("LightNight");
     effectNames.push_back("Sepia");
 };
 

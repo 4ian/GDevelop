@@ -20,14 +20,12 @@ gdjs.CocosTools.isHTML5 = function() {
 }
 
 //TODO: move the rest to cocos-shader-tools
-gdjs.CocosTools.makeNightShader = function() {
-    var shader = new cc.GLProgram();
-
+gdjs.CocosTools.getDefaultVertexShader = function() {
     var projectionMatrix = gdjs.CocosTools.isHTML5() ?
         "(CC_PMatrix * CC_MVMatrix)" :
         "CC_PMatrix";
-    shader.initWithString(
-        'attribute vec4 a_position;\n'
+
+    return 'attribute vec4 a_position;\n'
         + 'attribute vec2 a_texCoord;\n'
         + 'attribute vec4 a_color;\n'
         + '\n'
@@ -44,21 +42,56 @@ gdjs.CocosTools.makeNightShader = function() {
         + '    gl_Position = ' + projectionMatrix + ' * a_position;\n'
         + '    v_fragmentColor = a_color;\n'
         + '    v_texCoord = a_texCoord;\n'
-        + '}\n'
-        ,
+        + '}\n';
+}
+
+gdjs.CocosTools.makeNightShader = function() {
+    var shader = new cc.GLProgram();
+
+    shader.initWithString(gdjs.CocosTools.getDefaultVertexShader(),
         "#ifdef GL_ES\n"
         + "precision lowp float;\n"
         + "#endif \n"
         + '\n'
         + "varying vec2 v_texCoord; \n"
         + 'uniform float intensity;\n'
+        + 'uniform float opacity;\n'
         + '\n'
         + '\n'
         + 'void main(void)\n'
         + '{\n'
         + '   mat3 nightMatrix = mat3(-2.0 * intensity, -1.0 * intensity, 0, -1.0 * intensity, 0, 1.0 * intensity, 0, 1.0 * intensity, 2.0 * intensity);\n'
         + '   gl_FragColor = texture2D(CC_Texture0, v_texCoord);\n'
-        + '   gl_FragColor.rgb = nightMatrix * gl_FragColor.rgb;\n'
+        + '   gl_FragColor.rgb = mix(gl_FragColor.rgb, nightMatrix * gl_FragColor.rgb, opacity);\n'
+        + '}\n'
+    );
+
+    shader.addAttribute("a_position", 0);
+    shader.addAttribute("a_color", 1);
+    shader.addAttribute("a_texCoord", 2);
+    shader.link();
+    shader.updateUniforms();
+
+    return shader;
+}
+
+gdjs.CocosTools.makeLightNightShader = function() {
+    var shader = new cc.GLProgram();
+
+    shader.initWithString(gdjs.CocosTools.getDefaultVertexShader(),
+        "#ifdef GL_ES\n"
+        + "precision lowp float;\n"
+        + "#endif \n"
+        + '\n'
+        + "varying vec2 v_texCoord; \n"
+        + 'uniform float opacity;\n'
+        + '\n'
+        + '\n'
+        + 'void main(void)\n'
+        + '{\n'
+        + '   mat3 nightMatrix = mat3(0.6, 0, 0, 0, 0.7, 0, 0, 0, 1.3);\n'
+        + '   gl_FragColor = texture2D(CC_Texture0, v_texCoord);\n'
+        + '   gl_FragColor.rgb = mix(gl_FragColor.rgb, nightMatrix * gl_FragColor.rgb, opacity);\n'
         + '}\n'
     );
 
@@ -74,42 +107,20 @@ gdjs.CocosTools.makeNightShader = function() {
 gdjs.CocosTools.makeSepiaShader = function() {
     var shader = new cc.GLProgram();
 
-    var projectionMatrix = gdjs.CocosTools.isHTML5() ?
-        "(CC_PMatrix * CC_MVMatrix)" :
-        "CC_PMatrix";
-    shader.initWithString(
-        'attribute vec4 a_position;\n'
-        + 'attribute vec2 a_texCoord;\n'
-        + 'attribute vec4 a_color;\n'
-        + '\n'
-        + "\n#ifdef GL_ES\n\n"
-        + "varying lowp vec4 v_fragmentColor;\n"
-        + "varying mediump vec2 v_texCoord;\n"
-        + "\n#else\n\n"
-        + "varying vec4 v_fragmentColor;\n"
-        + "varying vec2 v_texCoord;\n"
-        + "\n#endif\n\n"
-        + '\n'
-        + 'void main()\n'
-        + '{\n'
-        + '    gl_Position = ' + projectionMatrix + ' * a_position;\n'
-        + '    v_fragmentColor = a_color;\n'
-        + '    v_texCoord = a_texCoord;\n'
-        + '}\n'
-        ,
+    shader.initWithString(gdjs.CocosTools.getDefaultVertexShader(),
         "#ifdef GL_ES\n"
         + "precision lowp float;\n"
         + "#endif \n"
         + '\n'
         + "varying vec2 v_texCoord; \n"
-        + 'uniform float intensity;\n'
+        + 'uniform float opacity;\n'
         + '\n'
         + 'const mat3 sepiaMatrix = mat3(0.3588, 0.7044, 0.1368, 0.2990, 0.5870, 0.1140, 0.2392, 0.4696, 0.0912);\n'
         + '\n'
         + 'void main(void)\n'
         + '{\n'
         + '   gl_FragColor = texture2D(CC_Texture0, v_texCoord);\n'
-        + '   gl_FragColor.rgb = mix( gl_FragColor.rgb, gl_FragColor.rgb * sepiaMatrix, intensity);\n'
+        + '   gl_FragColor.rgb = mix( gl_FragColor.rgb, gl_FragColor.rgb * sepiaMatrix, opacity);\n'
         + '}\n'
     );
 
@@ -194,11 +205,15 @@ gdjs.CocosTools.makeTilingShader = function() {
 gdjs.CocosTools._effects = {
     Night: {
         makeShader: gdjs.CocosTools.makeNightShader,
-        uniformNames: ['intensity'],
+        uniformNames: ['opacity', 'intensity'],
+    },
+    LightNight: {
+        makeShader: gdjs.CocosTools.makeLightNightShader,
+        uniformNames: ['opacity'],
     },
     Sepia: {
         makeShader: gdjs.CocosTools.makeSepiaShader,
-        uniformNames: ['intensity'],
+        uniformNames: ['opacity'],
     },
 };
 

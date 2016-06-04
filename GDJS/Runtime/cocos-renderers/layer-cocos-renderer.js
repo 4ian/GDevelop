@@ -140,6 +140,7 @@ gdjs.LayerCocosRenderer.prototype.setEffectParameter = function (name, parameter
             var theShader = this._shaders[i];
 
             if (theShader.uniforms.hasOwnProperty(parameterName)) {
+                theShader.shader.use();
                 gdjs.CocosTools.setUniformLocationWith1f(this._renderTexture.getSprite(),
                     theShader.shader, theShader.uniforms[parameterName],
                     parameterName, value);

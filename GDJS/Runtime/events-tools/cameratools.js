@@ -120,3 +120,9 @@ gdjs.evtTools.camera.centerCameraWithinLimits = function(runtimeScene, object, l
     layer.setCameraX(newX, cameraId);
     layer.setCameraY(newY, cameraId);
 }
+
+gdjs.evtTools.camera.setLayerEffectParameter = function(runtimeScene, layer, effect, parameter, value) {
+    if ( !runtimeScene.hasLayer(layer) ) { return; }
+
+    return runtimeScene.getLayer(layer).setEffectParameter(effect, parameter, value);
+}

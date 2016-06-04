@@ -274,6 +274,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("layer", _("Layer (base layer if empty)")).SetDefaultValue("\"\"")
         .MarkAsAdvanced();
 
+    extension.AddAction("SetLayerEffectParameter",
+                   _("Effect parameter"),
+                   _("Change the parameter of an effect"),
+                   _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of layer _PARAM1_"),
+                   _("Layers and cameras/Effects"),
+                   "res/conditions/camera24.png",
+                   "res/conditions/camera.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("layer", _("Layer (base layer if empty)"), "",true).SetDefaultValue("\"\"")
+        .AddParameter("string", _("Effect"))
+        .AddParameter("string", _("Parameter name"))
+        .AddParameter("expression", _("New value"))
+        .MarkAsAdvanced();
+
     extension.AddExpression("CameraWidth", _("Width of a camera of a layer"), _("Width of a camera of a layer"), _("Camera"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"))

@@ -46,6 +46,8 @@ CameraExtension::CameraExtension()
     GetAllActions()["FixCamera"].SetFunctionName("gdjs.evtTools.camera.centerCameraWithinLimits");
     GetAllActions()["CentreCamera"].SetFunctionName("gdjs.evtTools.camera.centerCamera");
 
+    GetAllActions()["SetLayerEffectParameter"].SetFunctionName("gdjs.evtTools.camera.setLayerEffectParameter");
+
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:
 /*
     AddAction("AddCamera",

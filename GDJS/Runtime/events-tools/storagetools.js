@@ -31,6 +31,7 @@ gdjs.evtTools.storage.loadJSONFileFromStorage = function(filename) {
 	if ( gdjs.evtTools.storage.loadedFiles.containsKey(filename) )
 		return; //Already loaded.
 
+	var localStorage = gdjs.evtTools.storage.localStorage;
 	var rawStr = localStorage.getItem("GDJS_"+filename);
 	if ( rawStr !== null )
 		gdjs.evtTools.storage.loadedFiles.put(filename, JSON.parse(rawStr));
@@ -52,6 +53,7 @@ gdjs.evtTools.storage.unloadJSONFile = function(filename) {
 	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) )
 		return; //Not loaded.
 
+	var localStorage = gdjs.evtTools.storage.localStorage;
 	var JSONobject = gdjs.evtTools.storage.loadedFiles.get(filename);
 	try {
 		localStorage.setItem("GDJS_"+filename, JSON.stringify(JSONobject));

@@ -24,7 +24,6 @@
 
 #include "GDCore/Project/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
@@ -32,6 +31,7 @@
 #include "Dialogs/ObjectsEditor.h"
 #include "InitialPositionBrowserDlg.h"
 #include "EventsEditor.h"
+#include "Dialogs/LayersEditorPanel.h"
 #include "Dialogs/LayoutEditorPropertiesPnl.h"
 
 #include "GDCore/Project/Project.h"
@@ -113,7 +113,7 @@ mainFrameWrapper(mainFrameWrapper_)
 
     //Create all editors linked to scene canvas.
     objectsEditor = std::shared_ptr<gd::ObjectsEditor>(new gd::ObjectsEditor(this, project, layout, mainFrameWrapper) );
-    layersEditor =  std::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
+    layersEditor =  std::shared_ptr<LayersEditorPanel>(new LayersEditorPanel(this, project, layout, mainFrameWrapper) );
     initialInstancesBrowser = std::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, layout.GetInitialInstances(), *layoutEditorCanvas) );
     propertiesPnl = std::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper));
 
@@ -123,6 +123,7 @@ mainFrameWrapper(mainFrameWrapper_)
     layoutEditorCanvas->AddAssociatedEditor(propertiesPnl.get());
     layoutEditorCanvas->AddAssociatedEditor(initialInstancesBrowser.get());
     layersEditor->SetAssociatedLayoutEditorCanvas(layoutEditorCanvas);
+		layersEditor->SetAssociatedPropertiesPanel(propertiesPnl.get(), &m_mgr);
     eventsEditor->SetAssociatedLayoutCanvas(layoutEditorCanvas);
     objectsEditor->SetAssociatedPropertiesPanel(propertiesPnl.get(), &m_mgr);
 

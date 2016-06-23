@@ -581,6 +581,10 @@ gdjs.RuntimeScene.prototype.hasLayer = function(name) {
 	return this._layers.containsKey(name);
 };
 
+gdjs.RuntimeScene.prototype.getAllLayerNames = function(result) {
+	this._layers.keys(result);
+};
+
 /**
  * Get the TimeManager of the scene.
  * @return The gdjs.TimeManager of the scene.

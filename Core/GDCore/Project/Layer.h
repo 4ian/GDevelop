@@ -7,6 +7,8 @@
 #define GDCORE_LAYER_H
 #include "GDCore/String.h"
 #include <vector>
+#include <memory>
+namespace gd { class Effect; }
 namespace gd { class Camera; }
 namespace gd { class SerializerElement; }
 
@@ -45,6 +47,10 @@ public:
      */
     bool GetVisibility() const { return isVisible; }
 
+    /** \name Cameras
+     */
+    ///@{
+
     /**
      * \brief Change the number of cameras inside the layer.
      */
@@ -75,12 +81,71 @@ public:
      */
     inline void AddCamera(const Camera & camera) { cameras.push_back(camera); };
 
-    #if defined(GD_IDE_ONLY)
-    /**
-     * \brief Display a window to edit the layer
-     */
-    void EditLayer();
+    ///@}
 
+    /** \name Effects
+     */
+    ///@{
+	/**
+	 * \brief Return true if the effect called "name" exists.
+	 */
+	bool HasEffectNamed(const gd::String & name) const;
+
+	/**
+	 * \brief Return a reference to the effect called "name".
+	 */
+	Effect & GetEffect(const gd::String & name);
+
+	/**
+	 * \brief Return a reference to the effect called "name".
+	 */
+	const Effect & GetEffect(const gd::String & name) const;
+
+	/**
+	 * Return a reference to the effect at position "index" in the effects list
+	 */
+	Effect & GetEffect(std::size_t index);
+
+	/**
+	 * Return a reference to the effect at position "index" in the effects list
+	 */
+	const Effect & GetEffect (std::size_t index) const;
+
+	/**
+	 * Return the position of the effect called "name" in the effects list
+	 */
+	std::size_t GetEffectPosition(const gd::String & name) const;
+
+	/**
+	 * Return the number of effecst.
+	 */
+	std::size_t GetEffectsCount() const;
+
+	/**
+	 * Add a new effect at the specified position in the effects list.
+	 */
+	gd::Effect & InsertNewEffect(const gd::String & name, std::size_t position);
+
+	/**
+	 * \brief Add the a copy of the specified effect in the effects list.
+	 * \note No pointer or reference must be kept on the layer passed as parameter.
+	 * \param theEffect The effect that must be copied and inserted into the effects list
+	 * \param position Insertion position.
+	 */
+	void InsertEffect(const Effect & theEffect, std::size_t position);
+
+	/**
+	 * Remove the specified effect.
+	 */
+	void RemoveEffect(const gd::String & name);
+
+	/**
+	 * Swap the position of two effects.
+	 */
+	void SwapEffects(std::size_t firstEffectIndex, std::size_t secondEffectIndex);
+    ///@}
+
+    #if defined(GD_IDE_ONLY)
     /**
      * \brief Serialize layer.
      */
@@ -96,9 +161,11 @@ private:
 
     gd::String name; ///< The name of the layer
     bool isVisible; ///< True if the layer is visible
-    std::vector < gd::Camera > cameras; ///< The camera displayed by the layer
+    std::vector<gd::Camera> cameras; ///< The camera displayed by the layer
+    std::vector<std::shared_ptr<gd::Effect>> effects; ///< The effects applied to the layer.
 
     static gd::Camera badCamera;
+    static gd::Effect badEffect;
 };
 
 /**
@@ -124,17 +191,21 @@ public:
     ~Camera() {};
 
     /**
-     * Change the viewport, i.e the area of the window where the camera will be displayed
-     * The coordinates must be between 0 and 1.
+     * \brief Change the viewport, i.e the area of the window where the camera will be displayed.
+     * \note The coordinates must be between 0 and 1.
      */
     void SetViewport(float x1_, float y1_, float x2_, float y2_) { x1 = x1_; x2 = x2_; y1 = y1_; y2 = y2_; };
+    void SetViewportX1(float x1_) { x1 = x1_; };
+    void SetViewportY1(float y1_) { y1 = y1_; };
+    void SetViewportX2(float x2_) { x2 = x2_; };
+    void SetViewportY2(float y2_) { y2 = y2_; };
     float GetViewportX1() const { return x1; };
     float GetViewportY1() const { return y1; };
     float GetViewportX2() const { return x2; };
     float GetViewportY2() const { return y2; };
 
     /**
-     * Change the size of the rendered area of the scene.
+     * \brief Change the size of the rendered area of the scene, in pixels.
      */
     void SetSize(float width_, float height_) { width = width_; height = height_; };
     float GetWidth() const { return width; };

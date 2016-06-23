@@ -15,6 +15,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/InitialInstance.h"
+#include "GDCore/Tools/Log.h"
 #include "GDCore/CommonTools.h"
 
 using namespace gd;
@@ -38,8 +39,10 @@ LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Proje
     layout(layout_),
     layoutEditorCanvas(layoutEditorCanvas_),
     object(NULL),
+    layer(NULL),
     instancesHelper(project, layout),
     objectsHelper(project, mainFrameWrapper),
+    layerHelper(project, layout),
     displayInstancesProperties(true)
 {
 	//(*Initialize(LayoutEditorPropertiesPnl)
@@ -59,6 +62,7 @@ LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Proje
 	//*)
 	instancesHelper.SetGrid(grid);
 	objectsHelper.SetGrid(grid);
+	layerHelper.SetGrid(grid);
     Connect(ID_PROPGRID, wxEVT_PG_SELECTED, (wxObjectEventFunction)&LayoutEditorPropertiesPnl::OnPropertySelected);
     Connect(ID_PROPGRID, wxEVT_PG_CHANGED, (wxObjectEventFunction)&LayoutEditorPropertiesPnl::OnPropertyChanged);
 
@@ -104,7 +108,8 @@ void LayoutEditorPropertiesPnl::Refresh()
         if ( object )
             objectsHelper.RefreshFrom(object, /*has initial instance content=*/true);
     }
-    else if ( !displayInstancesProperties ) objectsHelper.RefreshFrom(object);
+    else if ( object && !displayInstancesProperties ) objectsHelper.RefreshFrom(object);
+    else if ( layer ) layerHelper.RefreshFrom(*layer);
 
     grid->Refresh();
     grid->Update();
@@ -114,11 +119,13 @@ void LayoutEditorPropertiesPnl::Refresh()
 void LayoutEditorPropertiesPnl::SelectedInitialInstance(const gd::InitialInstance &)
 {
     displayInstancesProperties = true;
+    layer = NULL;
     Refresh();
 }
 
 void LayoutEditorPropertiesPnl::DeselectedInitialInstance(const gd::InitialInstance &)
 {
+    layer = NULL;
     Refresh();
 }
 
@@ -137,25 +144,46 @@ void LayoutEditorPropertiesPnl::InitialInstancesUpdated()
 void LayoutEditorPropertiesPnl::SelectedObject(gd::Object * object_)
 {
     displayInstancesProperties = false;
+    layer = NULL;
     object = object_;
+    Refresh();
+}
+
+void LayoutEditorPropertiesPnl::SelectedLayer(gd::Layer * layer_)
+{
+    displayInstancesProperties = false;
+    object = NULL;
+    layer = layer_;
     Refresh();
 }
 
 void LayoutEditorPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)
 {
-    if ( layoutEditorCanvas && displayInstancesProperties ) instancesHelper.OnPropertySelected(layoutEditorCanvas->GetSelection(), event);
-    if ( object )
+    auto launchRefresh = [this]() {
+        wxCommandEvent refreshEvent(refreshEventType);
+        wxPostEvent(grid, refreshEvent);
+        //Refresh(); Can trigger a crash
+    };
+
+    if (layoutEditorCanvas && displayInstancesProperties) instancesHelper.OnPropertySelected(layoutEditorCanvas->GetSelection(), event);
+    if (object)
     {
-        if ( objectsHelper.OnPropertySelected(object, &layout, event) ) {
-            wxCommandEvent refreshEvent(refreshEventType);
-            wxPostEvent(grid, refreshEvent);
-            //Refresh(); Can trigger a crash
-        }
+        if (objectsHelper.OnPropertySelected(object, &layout, event)) launchRefresh();
+    }
+    if (layer)
+    {
+        if (layerHelper.OnPropertySelected(*layer, event)) launchRefresh();
     }
 }
 
 void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
 {
+    auto launchRefresh = [this]() {
+        wxCommandEvent refreshEvent(refreshEventType);
+        wxPostEvent(grid, refreshEvent);
+        //Refresh(); Can trigger a crash
+    };
+
     if ( layoutEditorCanvas && displayInstancesProperties )
     {
         std::vector<InitialInstance*> selectedInitialInstances = layoutEditorCanvas->GetSelection();
@@ -176,10 +204,29 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
     }
     if ( object )
     {
-        if ( objectsHelper.OnPropertyChanged(object, &layout, event) ){
-            wxCommandEvent refreshEvent(refreshEventType);
-            wxPostEvent(grid, refreshEvent);
-            //Refresh(); Can trigger a crash
+        if (objectsHelper.OnPropertyChanged(object, &layout, event)) launchRefresh();
+    }
+    if (layer)
+    {
+        //
+        if ( event.GetPropertyName() == "LAYER_NAME" )
+        {
+            gd::String oldName = layer->GetName();
+            gd::String newName = event.GetValue().GetString();
+            if (layout.HasLayerNamed(newName))
+            {
+                gd::LogWarning(_("Another layer with this name already exists."));
+                return;
+            }
+
+            layer->SetName(newName);
+            layout.GetInitialInstances().MoveInstancesToLayer(oldName, layer->GetName());
+            if ( layoutEditorCanvas && layoutEditorCanvas->GetCurrentLayer() == oldName )
+                layoutEditorCanvas->SetCurrentLayer(layer->GetName());
+        }
+        else
+        {
+            if (layerHelper.OnPropertyChanged(*layer, event)) launchRefresh();
         }
     }
 }

@@ -14,12 +14,93 @@ gdjs.LayerCocosRenderer = function(layer, runtimeSceneRenderer)
     });
 
     this._layer = layer;
-    this._cocosLayer = new CocosLayer();
     this.convertYPosition = runtimeSceneRenderer.convertYPosition;
-    runtimeSceneRenderer.getCocosScene().addChild(this._cocosLayer);
+
+    var effects = this._layer.getEffects();
+    if (effects.length === 0) {
+        this._cocosLayer = new CocosLayer();
+        runtimeSceneRenderer.getCocosScene().addChild(this._cocosLayer);
+    } else {
+        var gameRenderer = runtimeSceneRenderer._runtimeScene.getGame().getRenderer(); //TODO
+        this._renderTexture = new cc.RenderTexture(
+            gameRenderer.getCurrentWidth(), gameRenderer.getCurrentHeight());
+        this._renderTexture.setPosition(cc.p(
+            gameRenderer.getCurrentWidth() / 2, gameRenderer.getCurrentHeight() / 2));
+        this._renderTexture.retain();
+
+        this._cocosLayer = new CocosLayer();
+        this._cocosLayer.retain();
+        runtimeSceneRenderer.getCocosScene().addChild(this._renderTexture);
+
+        this._makeShaders();
+    }
 }
 
 gdjs.LayerRenderer = gdjs.LayerCocosRenderer; //Register the class to let the engine use it.
+
+gdjs.LayerCocosRenderer.prototype.onSceneUnloaded = function() {
+    this._unloaded = true;
+    if (this._shaders) {
+        for(var i = 0;i < this._shaders.length;++i) {
+            this._shaders[i].shader.release();
+        }
+    }
+    if (this._renderTexture) {
+        // this._cocosLayer.release(); //TODO
+        // this._renderTexture.release(); //TODO
+    }
+}
+
+gdjs.LayerCocosRenderer.prototype._makeShaders = function() {
+    if (this._shaders) {
+        console.log('Shaders are already made for this layer');
+        return;
+    } else if (!this._renderTexture) {
+        console.log('You can\'t apply shaders on a layer that is not using a cc.RenderTexture');
+        return;
+    }
+
+    var effects = this._layer.getEffects();
+    if (effects.length === 0) {
+        return;
+    } else if (effects.length > 1) {
+        console.log('Only a single effect by Layer is supported for now by Cocos2d-JS renderer');
+    }
+
+    var effect = gdjs.CocosTools.getEffect(effects[0].effectName);
+    if (!effect) {
+        console.log('Shader \"' + effects[0].name + '\" not found');
+        return;
+    }
+
+    var theShader = {
+        name: effects[0].name,
+        shader: effect.makeShader(),
+        uniforms: {}
+    };
+    theShader.shader.retain();
+    for (var i = 0;i < effect.uniformNames.length;++i) {
+        var name = effect.uniformNames[i];
+        theShader.uniforms[name] =
+            theShader.shader.getUniformLocationForName(name);
+    }
+
+    this._renderTexture.getSprite().setShaderProgram(theShader.shader);
+    this._shaders = [theShader];
+}
+
+gdjs.LayerCocosRenderer.prototype.render = function() {
+    if (this._unloaded) {
+        console.log('Tried to render unloaded layer ' + this._layer._name);
+        return;
+    }
+
+    if (this._renderTexture) {
+        this._renderTexture.beginWithClear(0,0,0,0);
+        this._cocosLayer.visit();
+        this._renderTexture.end();
+    }
+}
 
 gdjs.LayerCocosRenderer.prototype.updatePosition = function() {
     var angle = gdjs.toRad(this._layer.getCameraRotation());
@@ -53,6 +134,17 @@ gdjs.LayerCocosRenderer.prototype.removeRendererObject = function(child) {
     this._cocosLayer.removeChild(child);
 };
 
-gdjs.LayerCocosRenderer.prototype.getCocosLayer = function() {
-    return this._cocosLayer;
+gdjs.LayerCocosRenderer.prototype.setEffectParameter = function (name, parameterName, value) {
+    for (var i = 0;i < this._shaders.length; ++i) {
+        if (this._shaders[i].name === name) {
+            var theShader = this._shaders[i];
+
+            if (theShader.uniforms.hasOwnProperty(parameterName)) {
+                theShader.shader.use();
+                gdjs.CocosTools.setUniformLocationWith1f(this._renderTexture.getSprite(),
+                    theShader.shader, theShader.uniforms[parameterName],
+                    parameterName, value);
+            }
+        }
+    }
 };

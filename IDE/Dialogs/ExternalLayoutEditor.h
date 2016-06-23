@@ -21,9 +21,9 @@
 #include "GDCore/String.h"
 namespace gd { class Project; }
 namespace gd { class ExternalLayout; }
-namespace gd { class LayersEditorPanel; }
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class ObjectsEditor; }
+class LayersEditorPanel;
 class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
 
@@ -123,7 +123,7 @@ private:
     wxPanel* layoutPanel;
     //*)
     std::shared_ptr<gd::ObjectsEditor> objectsEditor;
-    std::shared_ptr<gd::LayersEditorPanel> layersEditor;
+    std::shared_ptr<LayersEditorPanel> layersEditor;
     std::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
     std::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;
 

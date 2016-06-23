@@ -14,10 +14,10 @@
 #include <wx/config.h>
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
-#include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "../InitialPositionBrowserDlg.h"
 #include "LayoutEditorPropertiesPnl.h"
 #include "ObjectsEditor.h"
+#include "LayersEditorPanel.h"
 #include "../MainFrame.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
@@ -232,7 +232,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 
         //Creating external editors and linking them to the layout canvas
         objectsEditor = std::shared_ptr<gd::ObjectsEditor>(new gd::ObjectsEditor(this, project, layout, mainFrameWrapper));
-        layersEditor = std::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
+        layersEditor = std::shared_ptr<LayersEditorPanel>(new LayersEditorPanel(this, project, layout, mainFrameWrapper) );
         propertiesPnl = std::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas, mainFrameWrapper) );
         initialInstancesBrowser = std::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *layoutEditorCanvas) );
 

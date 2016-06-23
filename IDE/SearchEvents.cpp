@@ -22,6 +22,7 @@
 #include "EventsEditor.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/Events/EventsListUnfolder.h"
 #include "GDCore/Tools/Localization.h"
 
 using namespace std;
@@ -319,7 +320,7 @@ void SearchEvents::OnnextBtClick(wxCommandEvent&)
     parent->GetSelection().ClearSelection(/*Refresh=*/false);
     parent->GetSelection().AddEvent(gd::EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
 
-    std::cout << "Scrolling to event " << event.get();
+    EventsListUnfolder::UnfoldWhenContaining(*events, *event);
     parent->ScrollToEvent(*event);
 }
 
@@ -338,7 +339,7 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
     parent->GetSelection().ClearSelection(/*Refresh=*/false);
     parent->GetSelection().AddEvent(gd::EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
 
-    std::cout << "Scrolling to event " << event.get();
+    EventsListUnfolder::UnfoldWhenContaining(*events, *event);
     parent->ScrollToEvent(*event);
 }
 

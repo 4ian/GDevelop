@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	97,
+		"m_objCounter":	115,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxCraftergfm8VaInitBitmapResources",
 		"m_bitmapsFile":	"GDIDE_dialogs_bitmaps.cpp",
@@ -9,7 +9,15 @@
 		"m_outputFileName":	"GDIDEDialogs",
 		"m_firstWindowId":	1000,
 		"m_useEnum":	true,
-		"m_templateClasses":	[]
+		"m_useUnderscoreMacro":	true,
+		"m_addHandlers":	true,
+		"m_templateClasses":	[{
+				"m_includeFile":	"#include <wx/listctrl.h>",
+				"m_allocationLine":	"$name = new wxListCtrl($parent, $id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT)",
+				"m_className":	"wxListCtrl",
+				"m_xrcPreviewClass":	"",
+				"m_events":	[]
+			}]
 	},
 	"windows":	[{
 			"m_type":	4407,
@@ -3192,6 +3200,852 @@
 										}],
 									"m_events":	[],
 									"m_children":	[]
+								}]
+						}]
+				}]
+		}, {
+			"m_type":	4407,
+			"proportion":	0,
+			"border":	5,
+			"gbSpan":	"1,1",
+			"gbPosition":	"0,0",
+			"m_styles":	["wxTAB_TRAVERSAL"],
+			"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+			"m_properties":	[{
+					"type":	"string",
+					"m_label":	"Size:",
+					"m_value":	"500,300"
+				}, {
+					"type":	"string",
+					"m_label":	"Minimum Size:",
+					"m_value":	"-1,-1"
+				}, {
+					"type":	"string",
+					"m_label":	"Name:",
+					"m_value":	"LayersEditorPanelBase"
+				}, {
+					"type":	"multi-string",
+					"m_label":	"Tooltip:",
+					"m_value":	""
+				}, {
+					"type":	"colour",
+					"m_label":	"Bg Colour:",
+					"colour":	"<Default>"
+				}, {
+					"type":	"colour",
+					"m_label":	"Fg Colour:",
+					"colour":	"<Default>"
+				}, {
+					"type":	"font",
+					"m_label":	"Font:",
+					"m_value":	""
+				}, {
+					"type":	"bool",
+					"m_label":	"Hidden",
+					"m_value":	false
+				}, {
+					"type":	"bool",
+					"m_label":	"Disabled",
+					"m_value":	false
+				}, {
+					"type":	"bool",
+					"m_label":	"Focused",
+					"m_value":	false
+				}, {
+					"type":	"string",
+					"m_label":	"Class Name:",
+					"m_value":	""
+				}, {
+					"type":	"string",
+					"m_label":	"Include File:",
+					"m_value":	""
+				}, {
+					"type":	"string",
+					"m_label":	"Style:",
+					"m_value":	""
+				}, {
+					"type":	"string",
+					"m_label":	"Title:",
+					"m_value":	""
+				}, {
+					"type":	"virtualFolderPicker",
+					"m_label":	"Virtual Folder:",
+					"m_path":	""
+				}, {
+					"type":	"choice",
+					"m_label":	"Centre:",
+					"m_selection":	1,
+					"m_options":	["", "wxBOTH", "wxVERTICAL", "wxHORIZONTAL"]
+				}, {
+					"type":	"string",
+					"m_label":	"Inherited Class",
+					"m_value":	"LayersEditorPanel"
+				}, {
+					"type":	"string",
+					"m_label":	"File:",
+					"m_value":	"LayersEditorPanel"
+				}, {
+					"type":	"string",
+					"m_label":	"Class Decorator",
+					"m_value":	""
+				}],
+			"m_events":	[],
+			"m_children":	[{
+					"m_type":	4480,
+					"proportion":	0,
+					"border":	5,
+					"gbSpan":	"1,1",
+					"gbPosition":	"0,0",
+					"m_styles":	["wxAUI_MGR_LIVE_RESIZE", "wxAUI_MGR_TRANSPARENT_HINT", "wxAUI_MGR_TRANSPARENT_DRAG", "wxAUI_MGR_ALLOW_ACTIVE_PANE", "wxAUI_MGR_ALLOW_FLOATING"],
+					"m_sizerFlags":	[],
+					"m_properties":	[{
+							"type":	"string",
+							"m_label":	"Name:",
+							"m_value":	"m_auimgr"
+						}, {
+							"type":	"colour",
+							"m_label":	"Bg Colour:",
+							"colour":	"<Default>"
+						}, {
+							"type":	"integer",
+							"m_label":	"Pane Border Size",
+							"m_value":	0
+						}, {
+							"type":	"colour",
+							"m_label":	"Sash Colour",
+							"colour":	"<Default>"
+						}, {
+							"type":	"integer",
+							"m_label":	"Sash Size",
+							"m_value":	-1
+						}, {
+							"type":	"choice",
+							"m_label":	"Gradient Type",
+							"m_selection":	0,
+							"m_options":	["wxAUI_GRADIENT_NONE", "wxAUI_GRADIENT_VERTICAL", "wxAUI_GRADIENT_HORIZONTAL"]
+						}, {
+							"type":	"colour",
+							"m_label":	"Caption Colour",
+							"colour":	"<Default>"
+						}, {
+							"type":	"colour",
+							"m_label":	"Caption Gradient Colour",
+							"colour":	"<Default>"
+						}, {
+							"type":	"colour",
+							"m_label":	"Inactive Caption Colour",
+							"colour":	"<Default>"
+						}, {
+							"type":	"colour",
+							"m_label":	"Inactive Caption Gradient Colour",
+							"colour":	"<Default>"
+						}, {
+							"type":	"colour",
+							"m_label":	"Active Caption Text Colour",
+							"colour":	"<Default>"
+						}, {
+							"type":	"colour",
+							"m_label":	"Inactive Caption Text Colour",
+							"colour":	"<Default>"
+						}],
+					"m_events":	[],
+					"m_children":	[{
+							"m_type":	4463,
+							"proportion":	0,
+							"border":	5,
+							"gbSpan":	"1,1",
+							"gbPosition":	"0,0",
+							"m_styles":	["wxAUI_TB_PLAIN_BACKGROUND", "wxAUI_TB_DEFAULT_STYLE"],
+							"wxAuiPaneInfo":	{
+								"m_name":	"",
+								"m_caption":	"Layers editor",
+								"m_dockDirection":	"wxAUI_DOCK_TOP",
+								"m_layer":	0,
+								"m_row":	0,
+								"m_position":	0,
+								"m_bestSize":	"-1,-1",
+								"m_minSize":	"-1,-1",
+								"m_maxSize":	"-1,-1",
+								"m_resizable":	false,
+								"m_captionVisible":	false,
+								"m_closeButton":	false,
+								"m_minButton":	false,
+								"m_maxButton":	false,
+								"m_pinButton":	false,
+								"m_toolbarPane":	false
+							},
+							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+							"m_properties":	[{
+									"type":	"winid",
+									"m_label":	"ID:",
+									"m_winid":	"wxID_ANY"
+								}, {
+									"type":	"string",
+									"m_label":	"Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Name:",
+									"m_value":	"m_toolbar"
+								}, {
+									"type":	"string",
+									"m_label":	"Tooltip:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Bitmap Size:",
+									"m_value":	"16,16"
+								}, {
+									"type":	"string",
+									"m_label":	"Margins:",
+									"m_value":	"-1,-1"
+								}],
+							"m_events":	[],
+							"m_children":	[{
+									"m_type":	4462,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"ADD_LAYER_TOOL"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_toolbarItem95"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Add a layer"
+										}, {
+											"type":	"multi-string",
+											"m_label":	"Tooltip:",
+											"m_value":	"Add a new layer"
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/add16.png"
+										}, {
+											"type":	"filePicker",
+											"m_label":	"Disabled-Bitmap File",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Construct the Dropdown Menu:",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnAddLayerClicked(wxCommandEvent& event)",
+											"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}, {
+									"m_type":	4462,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"DELETE_LAYER_TOOL"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_toolbarItem156"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Delete the selected layer"
+										}, {
+											"type":	"multi-string",
+											"m_label":	"Tooltip:",
+											"m_value":	"Delete the selected layer"
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/delete16.png"
+										}, {
+											"type":	"filePicker",
+											"m_label":	"Disabled-Bitmap File",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Construct the Dropdown Menu:",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnDeleteLayerClicked(wxCommandEvent& event)",
+											"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}, {
+									"m_type":	4504,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_tbSeparator197"
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["separator"]
+										}],
+									"m_events":	[],
+									"m_children":	[]
+								}, {
+									"m_type":	4462,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"EDIT_LAYER_TOOL"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_toolbarItem218"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Edit the properties of the layer"
+										}, {
+											"type":	"multi-string",
+											"m_label":	"Tooltip:",
+											"m_value":	"Edit the properties of the layer"
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/properties16.png"
+										}, {
+											"type":	"filePicker",
+											"m_label":	"Disabled-Bitmap File",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Construct the Dropdown Menu:",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnEditLayerClicked(wxCommandEvent& event)",
+											"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}, {
+									"m_type":	4462,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"LAYER_UP_TOOL"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_layerUpTool9"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Move the layer over"
+										}, {
+											"type":	"multi-string",
+											"m_label":	"Tooltip:",
+											"m_value":	"Move the layer over"
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/up16.png"
+										}, {
+											"type":	"filePicker",
+											"m_label":	"Disabled-Bitmap File",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Construct the Dropdown Menu:",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnLayerUpClicked(wxCommandEvent& event)",
+											"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}, {
+									"m_type":	4462,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"LAYER_DOWN_TOOL"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_layerDownTool10"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Move the layer below"
+										}, {
+											"type":	"multi-string",
+											"m_label":	"Tooltip:",
+											"m_value":	"Move the layer below"
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/down16.png"
+										}, {
+											"type":	"filePicker",
+											"m_label":	"Disabled-Bitmap File",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Construct the Dropdown Menu:",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnLayerDownClicked(wxCommandEvent& event)",
+											"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}, {
+									"m_type":	4504,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_tbSeparator2911"
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["separator"]
+										}],
+									"m_events":	[],
+									"m_children":	[]
+								}, {
+									"m_type":	4462,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"REFRESH_TOOL"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_toolbarItem3112"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Refresh the list"
+										}, {
+											"type":	"multi-string",
+											"m_label":	"Tooltip:",
+											"m_value":	"Refresh the list"
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	"../../Binaries/Output/Release_Windows/res/refreshicon.png"
+										}, {
+											"type":	"filePicker",
+											"m_label":	"Disabled-Bitmap File",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Construct the Dropdown Menu:",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnRefreshClicked(wxCommandEvent& event)",
+											"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}, {
+									"m_type":	4504,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_tbSeparator3513"
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["separator"]
+										}],
+									"m_events":	[],
+									"m_children":	[]
+								}, {
+									"m_type":	4462,
+									"proportion":	0,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	[],
+									"m_properties":	[{
+											"type":	"winid",
+											"m_label":	"ID:",
+											"m_winid":	"HELP_TOOL"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"m_toolbarItem3714"
+										}, {
+											"type":	"string",
+											"m_label":	"Label:",
+											"m_value":	"Help"
+										}, {
+											"type":	"multi-string",
+											"m_label":	"Tooltip:",
+											"m_value":	"Display help about the layers editor"
+										}, {
+											"type":	"string",
+											"m_label":	"Help String:",
+											"m_value":	""
+										}, {
+											"type":	"bitmapPicker",
+											"m_label":	"Bitmap File:",
+											"m_path":	"../../Binaries/Output/Release_Windows/res/icons_default/help16.png"
+										}, {
+											"type":	"filePicker",
+											"m_label":	"Disabled-Bitmap File",
+											"m_path":	""
+										}, {
+											"type":	"choice",
+											"m_label":	"Kind:",
+											"m_selection":	0,
+											"m_options":	["normal", "checkable", "radio", "separator", "dropdown"]
+										}, {
+											"type":	"bool",
+											"m_label":	"Construct the Dropdown Menu:",
+											"m_value":	true
+										}],
+									"m_events":	[{
+											"m_eventName":	"wxEVT_COMMAND_TOOL_CLICKED",
+											"m_eventClass":	"wxCommandEvent",
+											"m_eventHandler":	"wxCommandEventHandler",
+											"m_functionNameAndSignature":	"OnHelpClicked(wxCommandEvent& event)",
+											"m_description":	"Process a wxEVT_COMMAND_TOOL_CLICKED event (a synonym for wxEVT_COMMAND_MENU_SELECTED). Pass the id of the tool",
+											"m_noBody":	false
+										}],
+									"m_children":	[]
+								}]
+						}, {
+							"m_type":	4408,
+							"proportion":	0,
+							"border":	5,
+							"gbSpan":	"1,1",
+							"gbPosition":	"0,0",
+							"m_styles":	["wxTAB_TRAVERSAL"],
+							"wxAuiPaneInfo":	{
+								"m_name":	"",
+								"m_caption":	"",
+								"m_dockDirection":	"wxAUI_DOCK_CENTER",
+								"m_layer":	0,
+								"m_row":	0,
+								"m_position":	0,
+								"m_bestSize":	"100,100",
+								"m_minSize":	"100,100",
+								"m_maxSize":	"100,100",
+								"m_resizable":	true,
+								"m_captionVisible":	false,
+								"m_closeButton":	false,
+								"m_minButton":	false,
+								"m_maxButton":	false,
+								"m_pinButton":	false,
+								"m_toolbarPane":	false
+							},
+							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+							"m_properties":	[{
+									"type":	"winid",
+									"m_label":	"ID:",
+									"m_winid":	"wxID_ANY"
+								}, {
+									"type":	"string",
+									"m_label":	"Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Name:",
+									"m_value":	"m_panel715"
+								}, {
+									"type":	"multi-string",
+									"m_label":	"Tooltip:",
+									"m_value":	""
+								}, {
+									"type":	"colour",
+									"m_label":	"Bg Colour:",
+									"colour":	"<Default>"
+								}, {
+									"type":	"colour",
+									"m_label":	"Fg Colour:",
+									"colour":	"<Default>"
+								}, {
+									"type":	"font",
+									"m_label":	"Font:",
+									"m_value":	""
+								}, {
+									"type":	"bool",
+									"m_label":	"Hidden",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Disabled",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Focused",
+									"m_value":	false
+								}, {
+									"type":	"string",
+									"m_label":	"Class Name:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Include File:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Style:",
+									"m_value":	""
+								}],
+							"m_events":	[],
+							"m_children":	[{
+									"m_type":	4403,
+									"proportion":	1,
+									"border":	5,
+									"gbSpan":	"1,1",
+									"gbPosition":	"0,0",
+									"m_styles":	[],
+									"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+									"m_properties":	[{
+											"type":	"string",
+											"m_label":	"Minimum Size:",
+											"m_value":	"-1,-1"
+										}, {
+											"type":	"string",
+											"m_label":	"Name:",
+											"m_value":	"flexGridSizer1316"
+										}, {
+											"type":	"string",
+											"m_label":	"Style:",
+											"m_value":	""
+										}, {
+											"type":	"string",
+											"m_label":	"# Columns:",
+											"m_value":	"1"
+										}, {
+											"type":	"string",
+											"m_label":	"# Rows:",
+											"m_value":	"1"
+										}, {
+											"type":	"string",
+											"m_label":	"Growable columns:",
+											"m_value":	"0"
+										}, {
+											"type":	"string",
+											"m_label":	"Growable rows:",
+											"m_value":	"0"
+										}, {
+											"type":	"string",
+											"m_label":	"Horizontal gap:",
+											"m_value":	"0"
+										}, {
+											"type":	"string",
+											"m_label":	"Vertical gap:",
+											"m_value":	"0"
+										}],
+									"m_events":	[],
+									"m_children":	[{
+											"m_type":	4465,
+											"proportion":	0,
+											"border":	0,
+											"gbSpan":	"1,1",
+											"gbPosition":	"0,0",
+											"m_styles":	[],
+											"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+											"m_properties":	[{
+													"type":	"winid",
+													"m_label":	"ID:",
+													"m_winid":	"LAYERS_LIST_ID"
+												}, {
+													"type":	"string",
+													"m_label":	"Size:",
+													"m_value":	"-1,-1"
+												}, {
+													"type":	"string",
+													"m_label":	"Minimum Size:",
+													"m_value":	"-1,-1"
+												}, {
+													"type":	"string",
+													"m_label":	"Name:",
+													"m_value":	"m_layersList"
+												}, {
+													"type":	"multi-string",
+													"m_label":	"Tooltip:",
+													"m_value":	""
+												}, {
+													"type":	"colour",
+													"m_label":	"Bg Colour:",
+													"colour":	"<Default>"
+												}, {
+													"type":	"colour",
+													"m_label":	"Fg Colour:",
+													"colour":	"<Default>"
+												}, {
+													"type":	"font",
+													"m_label":	"Font:",
+													"m_value":	""
+												}, {
+													"type":	"bool",
+													"m_label":	"Hidden",
+													"m_value":	false
+												}, {
+													"type":	"bool",
+													"m_label":	"Disabled",
+													"m_value":	false
+												}, {
+													"type":	"bool",
+													"m_label":	"Focused",
+													"m_value":	false
+												}, {
+													"type":	"string",
+													"m_label":	"Class Name:",
+													"m_value":	""
+												}, {
+													"type":	"string",
+													"m_label":	"Include File:",
+													"m_value":	""
+												}, {
+													"type":	"string",
+													"m_label":	"Style:",
+													"m_value":	""
+												}],
+											"m_events":	[],
+											"m_children":	[],
+											"m_templInfoName":	"wxListCtrl"
+										}]
 								}]
 						}]
 				}]

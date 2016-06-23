@@ -1,2 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resource xmlns="http://www.wxwidgets.org/wxxrc"/>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="add16">../../Binaries/Output/Release_Windows/res/icons_default/add16.png</object>
+  <object class="wxBitmap" name="delete16">../../Binaries/Output/Release_Windows/res/icons_default/delete16.png</object>
+  <object class="wxBitmap" name="down16">../../Binaries/Output/Release_Windows/res/icons_default/down16.png</object>
+  <object class="wxBitmap" name="help16">../../Binaries/Output/Release_Windows/res/icons_default/help16.png</object>
+  <object class="wxBitmap" name="properties16">../../Binaries/Output/Release_Windows/res/icons_default/properties16.png</object>
+  <object class="wxBitmap" name="refreshicon">../../Binaries/Output/Release_Windows/res/refreshicon.png</object>
+  <object class="wxBitmap" name="up16">../../Binaries/Output/Release_Windows/res/icons_default/up16.png</object>
+</resource>

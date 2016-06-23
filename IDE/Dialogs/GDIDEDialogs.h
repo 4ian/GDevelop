@@ -17,6 +17,14 @@
 #include <wx/stattext.h>
 #include <wx/hyperlink.h>
 #include <wx/textctrl.h>
+#include <wx/aui/framemanager.h>
+#include <wx/aui/dockart.h>
+#include <wx/pen.h>
+#include <wx/aui/auibar.h>
+#include <map>
+#include <wx/menu.h>
+#include <wx/toolbar.h>
+#include <wx/listctrl.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -94,6 +102,44 @@ public:
     wxHyperlinkCtrl* GetHyperLink572() { return m_hyperLink572; }
     BaseStartHerePage(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(700,500), long style = wxTAB_TRAVERSAL);
     virtual ~BaseStartHerePage();
+};
+
+
+class LayersEditorPanelBase : public wxPanel
+{
+public:
+    enum {
+        ADD_LAYER_TOOL = 1001,
+        DELETE_LAYER_TOOL = 1002,
+        EDIT_LAYER_TOOL = 1003,
+        HELP_TOOL = 1004,
+        LAYERS_LIST_ID = 1005,
+        LAYER_DOWN_TOOL = 1006,
+        LAYER_UP_TOOL = 1007,
+        REFRESH_TOOL = 1008,
+    };
+protected:
+    wxAuiManager* m_auimgr;
+    wxAuiToolBar* m_toolbar;
+    wxPanel* m_panel715;
+    wxListCtrl* m_layersList;
+
+protected:
+    virtual void OnAddLayerClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnDeleteLayerClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnEditLayerClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnLayerUpClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnLayerDownClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnRefreshClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnHelpClicked(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxAuiToolBar* GetToolbar() { return m_toolbar; }
+    wxListCtrl* GetLayersList() { return m_layersList; }
+    wxPanel* GetPanel715() { return m_panel715; }
+    wxAuiManager* GetAuimgr() { return m_auimgr; }
+    LayersEditorPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    virtual ~LayersEditorPanelBase();
 };
 
 #endif

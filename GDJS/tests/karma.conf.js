@@ -11,6 +11,7 @@ module.exports = function(config) {
       '../Runtime/gd.js',
       '../Runtime/libs/hshg.js',
       '../Runtime/cocos-renderers/cocos-director-manager.js',
+      '../Runtime/pixi-renderers/pixi.js',
       '../Runtime/pixi-renderers/*.js',
       '../Runtime/howler-sound-manager/howler.min.js',
       '../Runtime/howler-sound-manager/howler-sound-manager.js',

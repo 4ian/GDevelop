@@ -33,7 +33,7 @@ namespace gd
  *
  * \ingroup IDEdialogs
  */
-class ObjectsOnBadLayerDialog: public wxDialog
+class GD_CORE_API ObjectsOnBadLayerDialog: public wxDialog
 {
 public:
 

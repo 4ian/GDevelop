@@ -22,7 +22,7 @@ class LayoutEditorPropertiesPnl;
  *
  * \ingroup IDEdialogs
  */
-class GD_CORE_API LayersEditorPanel : public LayersEditorPanelBase, public gd::LayoutEditorCanvasAssociatedEditor
+class LayersEditorPanel : public LayersEditorPanelBase, public gd::LayoutEditorCanvasAssociatedEditor
 {
 public:
     LayersEditorPanel(wxWindow* parent, gd::Project & project, gd::Layout & layout, gd::MainFrameWrapper & mainFrameWrapper);

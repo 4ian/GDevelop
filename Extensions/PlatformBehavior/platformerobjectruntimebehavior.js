@@ -106,8 +106,13 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     //0.2) Track changes in object size
 
     //Stick the object to the floor if its height has changed.
-    if ( this._isOnFloor && this._oldHeight !== object.getHeight() )
-        object.setY(object.getY()+this._oldHeight-object.getHeight());
+    if ( this._isOnFloor && this._oldHeight !== object.getHeight() ) {
+        object.setY(this._floorLastY
+            - object.getHeight()
+            + (object.getY() - object.getDrawableY())
+            - 1
+        );
+    }
 
     this._oldHeight = object.getHeight();
 

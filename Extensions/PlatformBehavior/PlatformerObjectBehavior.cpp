@@ -146,7 +146,13 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
 
     //Stick the object to the floor if its height has changed.
     if ( trackSize && isOnFloor && oldHeight != object->GetHeight() && !scene.GetTimeManager().IsFirstLoop() )
-        object->SetY(object->GetY()+oldHeight-object->GetHeight());
+    {
+        object->SetY(floorLastY
+            - object->GetHeight()
+            + (object->GetY() - object->GetDrawableY())
+            - 1
+        );
+    }
 
     oldHeight = object->GetHeight();
 

@@ -87,4 +87,34 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function() {
 		//Check that the object is falling
 		expect(object.getY()).to.be(1.25);
 	});
+
+	it('can track object height changes', function() {
+		//Put the object near the right ledge of the platform.
+		object.setPosition(platform.getX() + 10, platform.getY() - object.getHeight() - 1);
+
+		for(var i = 0; i<15; ++i) {
+			runtimeScene.renderAndStep();
+		}
+
+		expect(object.getBehavior("auto1").isFalling()).to.be(false);
+		expect(object.getX()).to.be(10);
+		expect(object.getY()).to.be(-31); // -31 = -10 (platform y) + -20 (object height) + -1 (1 pixel distance between object and platforms).
+
+		object.getHeight = function() { return 9; }
+		runtimeScene.renderAndStep();
+		expect(object.getBehavior("auto1").isFalling()).to.be(false);
+		expect(object.getY()).to.be(-20); // -20 = -10 (platform y) + -9 (object height) + -1 (1 pixel distance between object and platforms).
+
+		for(var i = 0; i<10; ++i) {
+			object.getBehavior("auto1").simulateRightKey();
+			runtimeScene.renderAndStep();
+			expect(object.getBehavior("auto1").isFalling()).to.be(false);
+		}
+		expect(object.getY()).to.be(-20);
+		expect(object.getX()).to.be.within(17.638, 17.639);
+
+		object.getHeight = function() { return 20; }
+		runtimeScene.renderAndStep();
+		expect(object.getY()).to.be(-31); // -31 = -10 (platform y) + -20 (object height) + -1 (1 pixel distance between object and platforms).
+	});
 });

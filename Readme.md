@@ -6,6 +6,15 @@ intuitive and powerful event based system.
 
 ![GDevelop in action, used to add a trigger in a platformer game](https://raw.githubusercontent.com/4ian/GD/master/Core/docs/images/demo.gif "GDevelop in action, used to add a trigger in a platformer game")
 
+Powered by GDevelop: *Lil BUB's Hello Earth*
+--------------------------------------------
+
+![GDevelop logo](http://compilgames.net/assets/bub/screenshots-background.jpg "GDevelop logo")
+
+> *BUB* is a very special, one of a kind critter. More specifically, she is the most amazing cat on the planet... and her game is made with *GDevelop*!
+
+Help BUB and GDevelop by **[backing the project on Kickstarter](http://lilbub.com/game)**! You can download the demo for [iOS](https://itunes.apple.com/us/app/lil-bubs-hello-earth/id1123383033?mt=8) and [Android](https://play.google.com/store/apps/details?id=com.lilbub.game).
+
 About directory structure
 -------------------------
 
@@ -57,6 +66,7 @@ Links
 
 * [GDevelop.js](https://github.com/4ian/GDevelop.js) is a binding to use GDevelop engine in Javascript. 
 * [GDevApp.com](https://gdevapp.com) is a radically innovative online game creator, compatible with GDevelop. It is based on GDevelop.js and can be used on any browser, including iOS and Android.
+* [Lil BUB's HELLO EARTH](http://lilbub.com/game) is a retro 8-bit mobile video game featuring [Lil BUB](http://lilbub.com). It's created with GDevelop and made up of equal parts science, magic, and heart.
 
 License
 -------

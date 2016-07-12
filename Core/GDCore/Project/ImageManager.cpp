@@ -8,6 +8,10 @@
 #include "GDCore/Project/ResourcesLoader.h"
 #include "GDCore/Tools/InvalidImage.h"
 #include "GDCore/Project/ResourcesManager.h"
+#include <SFML/OpenGL.hpp>
+#if !defined(ANDROID)
+#include <GL/glu.h>
+#endif
 #undef LoadImage //thx windows.h
 
 namespace gd

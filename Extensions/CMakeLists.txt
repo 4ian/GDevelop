@@ -10,6 +10,7 @@ include(CMakeUtils.txt) #Functions to factor common tasks done in CMakeLists.txt
 #Add all the CMakeLists:
 ADD_SUBDIRECTORY(AdMobObject)
 IF (NOT EMSCRIPTEN) #Only add some extensions when compiling with emscripten.
+	ADD_SUBDIRECTORY(AnchorBehavior)
 	ADD_SUBDIRECTORY(AdvancedXML)
 	ADD_SUBDIRECTORY(AES)
 	ADD_SUBDIRECTORY(Box3DObject)

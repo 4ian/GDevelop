@@ -139,6 +139,8 @@ gd::String CodeCompilerCall::GetFullCall() const
     }
     else //Generate argument for linking files
     {
+        if(!compilationForRuntime)
+            args.push_back("-Wl,-rpath," + baseDir);
         args.push_back("-shared");
         if ( !inputFile.empty() ) args.push_back("\""+inputFile+"\"");
         for (std::size_t i = 0;i<extraObjectFiles.size();++i)

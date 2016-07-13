@@ -67,9 +67,6 @@ private:
 
     virtual void DoStepPostEvents(RuntimeScene & scene) override;
 
-    sf::Vector2f mapFloatPixelToCoords(const sf::Vector2f & point, const sf::RenderTarget & target, const sf::View& view) const;
-    sf::Vector2f mapCoordsToFloatPixel(const sf::Vector2f & point, const sf::RenderTarget & target, const sf::View & view) const;
-
     HorizontalAnchor m_leftEdgeAnchor;
     HorizontalAnchor m_rightEdgeAnchor;
     VerticalAnchor m_topEdgeAnchor;

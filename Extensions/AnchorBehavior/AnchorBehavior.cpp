@@ -45,6 +45,37 @@ void AnchorBehavior::OnActivate()
     m_invalidDistances = true;
 }
 
+namespace
+{
+    sf::Vector2f mapFloatPixelToCoords(const sf::Vector2f& point, const sf::RenderTarget & target, const sf::View& view)
+    {
+        // First, convert from viewport coordinates to homogeneous coordinates
+        sf::Vector2f normalized;
+        sf::IntRect viewport = target.getViewport(view);
+        normalized.x = -1.f + 2.f * (point.x - static_cast<float>(viewport.left)) / static_cast<float>(viewport.width);
+        normalized.y =  1.f - 2.f * (point.y - static_cast<float>(viewport.top))  /  static_cast<float>(viewport.height);
+
+        // Then transform by the inverse of the view matrix
+        return view.getInverseTransform().transformPoint(normalized);
+    }
+
+    sf::Vector2f mapCoordsToFloatPixel(const sf::Vector2f & point, const sf::RenderTarget & target, const sf::View & view)
+    {
+        //Note: almost the same as RenderTarget::mapCoordsToPixel except that the result is sf::Vector2f
+
+        //First, transform the point by the view matrix
+        sf::Vector2f normalized = view.getTransform().transformPoint(point);
+
+        //Then convert to viewport coordinates
+        sf::Vector2f pixel;
+        sf::IntRect viewport = target.getViewport(view);
+        pixel.x = ( normalized.x + 1.f) / 2.f * static_cast<float>(viewport.width) + static_cast<float>(viewport.left);
+        pixel.y = (-normalized.y + 1.f) / 2.f * static_cast<float>(viewport.height) + static_cast<float>(viewport.top);
+
+        return pixel;
+    }
+}
+
 void AnchorBehavior::DoStepPreEvents(RuntimeScene & scene)
 {
 
@@ -72,28 +103,36 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
             firstCamera.GetSFMLView());
 
         //Left edge
-        if(m_leftEdgeAnchor != ANCHOR_HORIZONTAL_PROPORTIONAL)
-            m_leftEdgeDistance = (m_leftEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_LEFT ? topLeftPixel.x : static_cast<float>(windowSize.x) - topLeftPixel.x);
-        else
+        if(m_leftEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_LEFT)
+            m_leftEdgeDistance = topLeftPixel.x;
+        else if(m_leftEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_RIGHT)
+            m_leftEdgeDistance = static_cast<float>(windowSize.x) - topLeftPixel.x;
+        else if(m_leftEdgeAnchor == ANCHOR_HORIZONTAL_PROPORTIONAL)
             m_leftEdgeDistance = topLeftPixel.x / windowSize.x;
 
         //Right edge
-        if(m_rightEdgeAnchor != ANCHOR_HORIZONTAL_PROPORTIONAL)
-            m_rightEdgeDistance = (m_rightEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_LEFT ? bottomRightPixel.x : static_cast<float>(windowSize.x) - bottomRightPixel.x);
-        else
+        if(m_rightEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_LEFT)
+            m_leftEdgeDistance = bottomRightPixel.x;
+        else if(m_rightEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_RIGHT)
+            m_rightEdgeDistance = static_cast<float>(windowSize.x) - bottomRightPixel.x;
+        else if(m_rightEdgeAnchor == ANCHOR_HORIZONTAL_PROPORTIONAL)
             m_rightEdgeDistance = bottomRightPixel.x / windowSize.x;
 
         //Top edge
-        if(m_topEdgeAnchor != ANCHOR_VERTICAL_PROPORTIONAL)
-            m_topEdgeDistance = (m_topEdgeAnchor == ANCHOR_VERTICAL_WINDOW_TOP ? topLeftPixel.y : static_cast<float>(windowSize.y) - topLeftPixel.y);
-        else
-            m_topEdgeDistance = topLeftPixel.y / windowSize.y;
+        if(m_topEdgeAnchor == ANCHOR_VERTICAL_WINDOW_TOP)
+            m_topEdgeDistance = topLeftPixel.y;
+        else if(m_topEdgeAnchor == ANCHOR_VERTICAL_WINDOW_BOTTOM)
+            m_topEdgeDistance = static_cast<float>(windowSize.y) - topLeftPixel.y;
+        else if(m_topEdgeAnchor = ANCHOR_VERTICAL_PROPORTIONAL)
+            m_topEdgeDistance = topLeftPixel.y / static_cast<float>(windowSize.y);
 
         //Bottom edge
-        if(m_bottomEdgeAnchor != ANCHOR_VERTICAL_PROPORTIONAL)
-            m_bottomEdgeDistance = (m_bottomEdgeAnchor == ANCHOR_VERTICAL_WINDOW_TOP ? bottomRightPixel.y : static_cast<float>(windowSize.y) - bottomRightPixel.y);
-        else
-            m_bottomEdgeDistance = bottomRightPixel.y / windowSize.y;
+        if(m_bottomEdgeAnchor == ANCHOR_VERTICAL_WINDOW_TOP)
+            m_bottomEdgeDistance = bottomRightPixel.y;
+        else if(m_bottomEdgeAnchor == ANCHOR_VERTICAL_WINDOW_BOTTOM)
+            m_bottomEdgeDistance = static_cast<float>(windowSize.y) - bottomRightPixel.y;
+        else if(m_bottomEdgeAnchor = ANCHOR_VERTICAL_PROPORTIONAL)
+            m_bottomEdgeDistance = bottomRightPixel.y / static_cast<float>(windowSize.y);
 
         m_invalidDistances = false;
     }
@@ -105,59 +144,35 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
 
         //Left edge
         if(m_leftEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_LEFT)
-        {
             topLeftPixel.x = m_leftEdgeDistance;
-        }
         else if(m_leftEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_RIGHT)
-        {
-            topLeftPixel.x = windowSize.x - m_leftEdgeDistance;
-        }
+            topLeftPixel.x = static_cast<float>(windowSize.x) - m_leftEdgeDistance;
         else if(m_leftEdgeAnchor == ANCHOR_HORIZONTAL_PROPORTIONAL)
-        {
-            topLeftPixel.x = m_leftEdgeDistance * windowSize.x;
-        }
+            topLeftPixel.x = m_leftEdgeDistance * static_cast<float>(windowSize.x);
 
         //Top edge
         if(m_topEdgeAnchor == ANCHOR_VERTICAL_WINDOW_TOP)
-        {
             topLeftPixel.y = m_topEdgeDistance;
-        }
         else if(m_topEdgeAnchor == ANCHOR_VERTICAL_WINDOW_BOTTOM)
-        {
-            topLeftPixel.y = windowSize.y - m_topEdgeDistance;
-        }
+            topLeftPixel.y = static_cast<float>(windowSize.y) - m_topEdgeDistance;
         else if(m_topEdgeAnchor == ANCHOR_VERTICAL_PROPORTIONAL)
-        {
-            topLeftPixel.y = m_topEdgeDistance * windowSize.y;
-        }
+            topLeftPixel.y = m_topEdgeDistance * static_cast<float>(windowSize.y);
 
         //Right edge
         if(m_rightEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_LEFT)
-        {
             bottomRightPixel.x = m_rightEdgeDistance;
-        }
         else if(m_rightEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_RIGHT)
-        {
-            bottomRightPixel.x = windowSize.x - m_rightEdgeDistance;
-        }
+            bottomRightPixel.x = static_cast<float>(windowSize.x) - m_rightEdgeDistance;
         else if(m_rightEdgeAnchor == ANCHOR_HORIZONTAL_PROPORTIONAL)
-        {
-            bottomRightPixel.x = m_rightEdgeDistance * windowSize.x;
-        }
+            bottomRightPixel.x = m_rightEdgeDistance * static_cast<float>(windowSize.x);
 
         //Bottom edge
         if(m_bottomEdgeAnchor == ANCHOR_VERTICAL_WINDOW_TOP)
-        {
             bottomRightPixel.y = m_bottomEdgeDistance;
-        }
         else if(m_bottomEdgeAnchor == ANCHOR_VERTICAL_WINDOW_BOTTOM)
-        {
-            bottomRightPixel.y = windowSize.y - m_bottomEdgeDistance;
-        }
+            bottomRightPixel.y = static_cast<float>(windowSize.y) - m_bottomEdgeDistance;
         else if(m_bottomEdgeAnchor == ANCHOR_VERTICAL_PROPORTIONAL)
-        {
-            bottomRightPixel.y = m_bottomEdgeDistance * windowSize.y;
-        }
+            bottomRightPixel.y = m_bottomEdgeDistance * static_cast<float>(windowSize.y);
 
         sf::Vector2f topLeftCoord = mapFloatPixelToCoords(topLeftPixel, (*scene.renderWindow), firstCamera.GetSFMLView());
         sf::Vector2f bottomRightCoord = mapFloatPixelToCoords(bottomRightPixel, (*scene.renderWindow), firstCamera.GetSFMLView());
@@ -310,31 +325,3 @@ bool AnchorBehavior::UpdateProperty(const gd::String & name, const gd::String & 
     return true;
 }
 #endif
-
-sf::Vector2f AnchorBehavior::mapFloatPixelToCoords(const sf::Vector2f& point, const sf::RenderTarget & target, const sf::View& view) const
-{
-    // First, convert from viewport coordinates to homogeneous coordinates
-    sf::Vector2f normalized;
-    sf::IntRect viewport = target.getViewport(view);
-    normalized.x = -1.f + 2.f * (point.x - static_cast<float>(viewport.left)) / static_cast<float>(viewport.width);
-    normalized.y =  1.f - 2.f * (point.y - static_cast<float>(viewport.top))  /  static_cast<float>(viewport.height);
-
-    // Then transform by the inverse of the view matrix
-    return view.getInverseTransform().transformPoint(normalized);
-}
-
-sf::Vector2f AnchorBehavior::mapCoordsToFloatPixel(const sf::Vector2f & point, const sf::RenderTarget & target, const sf::View & view) const
-{
-    //Note: almost the same as RenderTarget::mapCoordsToPixel except that the result is sf::Vector2f
-
-    //First, transform the point by the view matrix
-    sf::Vector2f normalized = view.getTransform().transformPoint(point);
-
-    //Then convert to viewport coordinates
-    sf::Vector2f pixel;
-    sf::IntRect viewport = target.getViewport(view);
-    pixel.x = ( normalized.x + 1.f) / 2.f * static_cast<float>(viewport.width) + static_cast<float>(viewport.left);
-    pixel.y = (-normalized.y + 1.f) / 2.f * static_cast<float>(viewport.height) + static_cast<float>(viewport.top);
-
-    return pixel;
-}

@@ -24,7 +24,7 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension & extension)
           "Anchor",
           _("Behavior that anchors objects to the window's bounds."),
           "",
-          "CppPlatform/Extensions/AnchorIcon24.png",
+          "CppPlatform/Extensions/AnchorIcon.png",
           "AnchorBehavior",
           std::shared_ptr<gd::Behavior>(new AnchorBehavior),
           std::shared_ptr<gd::BehaviorsSharedData>(new gd::BehaviorsSharedData));

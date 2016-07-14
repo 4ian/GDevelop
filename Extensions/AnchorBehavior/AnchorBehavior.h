@@ -1,5 +1,4 @@
 /**
-
 GDevelop - Anchor Behavior Extension
 Copyright (c) 2016 Victor Levasseur (victorlevasseur52@gmail.com)
 This project is released under the MIT License.
@@ -7,6 +6,7 @@ This project is released under the MIT License.
 
 #ifndef ANCHORBEHAVIOR_H
 #define ANCHORBEHAVIOR_H
+
 #include "GDCpp/Runtime/Project/Behavior.h"
 #include "GDCpp/Runtime/Project/Object.h"
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -63,7 +63,6 @@ public:
 
 private:
     virtual void DoStepPreEvents(RuntimeScene & scene) override;
-
     virtual void DoStepPostEvents(RuntimeScene & scene) override;
 
     HorizontalAnchor m_leftEdgeAnchor;
@@ -72,8 +71,8 @@ private:
     VerticalAnchor m_bottomEdgeAnchor;
 
     bool m_invalidDistances;
-    //Distances (in window's units) from the XXX side of the object to side of the window the side is anchored on.
-    //Note: If the edge anchor is set to RELATIVE, then it contains the ratio of the distance to the window size.
+    //Distances (in window's units) from the XXX edge of the object to side of the window the edge is anchored on.
+    //Note: If the edge anchor is set to PROPORTIONAL, then it contains the ratio of the distance to the window size.
     float m_leftEdgeDistance;
     float m_rightEdgeDistance;
     float m_topEdgeDistance;

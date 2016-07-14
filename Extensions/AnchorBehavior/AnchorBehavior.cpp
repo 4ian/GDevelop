@@ -235,32 +235,32 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(gd::P
 {
     std::map<gd::String, gd::PropertyDescriptor> properties;
 
-    properties[_("Left edge anchor")].SetValue(
-        GetAnchorAsString(m_leftEdgeAnchor))
+    properties[_("Left edge anchor")]
+        .SetValue(GetAnchorAsString(m_leftEdgeAnchor))
         .SetType("Choice")
         .AddExtraInfo(_("No anchor"))
         .AddExtraInfo(_("Window left"))
         .AddExtraInfo(_("Window right"))
         .AddExtraInfo(_("Proportional"));
 
-    properties[_("Right edge anchor")].SetValue(
-        GetAnchorAsString(m_rightEdgeAnchor))
+    properties[_("Right edge anchor")]
+        .SetValue(GetAnchorAsString(m_rightEdgeAnchor))
         .SetType("Choice")
         .AddExtraInfo(_("No anchor"))
         .AddExtraInfo(_("Window left"))
         .AddExtraInfo(_("Window right"))
         .AddExtraInfo(_("Proportional"));
 
-    properties[_("Top edge anchor")].SetValue(
-        GetAnchorAsString(m_topEdgeAnchor))
+    properties[_("Top edge anchor")]
+        .SetValue(GetAnchorAsString(m_topEdgeAnchor))
         .SetType("Choice")
         .AddExtraInfo(_("No anchor"))
         .AddExtraInfo(_("Window top"))
         .AddExtraInfo(_("Window bottom"))
         .AddExtraInfo(_("Proportional"));
 
-    properties[_("Bottom edge anchor")].SetValue(
-        GetAnchorAsString(m_bottomEdgeAnchor))
+    properties[_("Bottom edge anchor")]
+        .SetValue(GetAnchorAsString(m_bottomEdgeAnchor))
         .SetType("Choice")
         .AddExtraInfo(_("No anchor"))
         .AddExtraInfo(_("Window top"))
@@ -300,25 +300,15 @@ namespace
 bool AnchorBehavior::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
     if ( name == _("Left edge anchor") )
-    {
         m_leftEdgeAnchor = GetHorizontalAnchorFromString(value);
-    }
     else if ( name == _("Right edge anchor") )
-    {
         m_rightEdgeAnchor = GetHorizontalAnchorFromString(value);
-    }
     else if ( name == _("Top edge anchor") )
-    {
         m_topEdgeAnchor = GetVerticalAnchorFromString(value);
-    }
     else if ( name == _("Bottom edge anchor") )
-    {
         m_bottomEdgeAnchor = GetVerticalAnchorFromString(value);
-    }
     else
-    {
         return false;
-    }
 
     return true;
 }

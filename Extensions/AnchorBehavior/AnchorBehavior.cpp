@@ -83,8 +83,6 @@ void AnchorBehavior::DoStepPreEvents(RuntimeScene & scene)
 
 void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
 {
-    //TODO: If invalid distances -> calculate the distance **relative to the window** (in px)
-    //      If not, make sure the object still follow those distances.
     sf::Vector2u windowSize = scene.renderWindow->getSize();
     const RuntimeLayer & layer = scene.GetRuntimeLayer(object->GetLayer());
     const RuntimeCamera & firstCamera = layer.GetCamera(0);

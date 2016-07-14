@@ -21,7 +21,6 @@ class RuntimeScenePlatformData;
 /**
  * \brief Allow to anchor objects to the window's bounds.
  */
- // TODO: OnActivate -> set m_invalidDistances to false !
 class GD_EXTENSION_API AnchorBehavior : public Behavior
 {
 public:

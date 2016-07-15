@@ -15,6 +15,12 @@ namespace gd
 
 ResourcesLoader * ResourcesLoader::_singleton = NULL;
 
+void ResourcesLoader::LoadSFMLImage( const gd::String & filename, sf::Image & image )
+{
+    if (!image.loadFromFile(filename.ToLocale()))
+        cout << "Failed to load a SFML image: " << filename << endl;
+}
+
 sf::Texture ResourcesLoader::LoadSFMLTexture(const gd::String & filename)
 {
     sf::Texture texture;

@@ -25,6 +25,8 @@ class GD_CORE_API ResourcesLoader
 {
 public:
 
+    void LoadSFMLImage( const gd::String & filename, sf::Image & image );
+
     /**
      * Load a SFML texture.
      */

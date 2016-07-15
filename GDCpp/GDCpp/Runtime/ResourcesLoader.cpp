@@ -36,6 +36,21 @@ bool ResourcesLoader::SetResourceFile(const gd::String & filename)
     return false;
 }
 
+void ResourcesLoader::LoadSFMLImage( const gd::String & filename, sf::Image & image )
+{
+    if (resFile.ContainsFile(filename))
+    {
+        char* buffer = resFile.GetFile(filename);
+        if (buffer==NULL)
+            cout << "Failed to get the file of a SFML image from resource file: " << filename << endl;
+
+        if (!image.loadFromMemory(buffer, resFile.GetFileSize(filename)))
+            cout << "Failed to load a SFML image from resource file: " << filename << endl;
+    }
+    else if (!image.loadFromFile(filename.ToLocale()))
+        cout << "Failed to load a SFML texture: " << filename << endl;
+}
+
 sf::Texture ResourcesLoader::LoadSFMLTexture(const gd::String & filename)
 {
     sf::Texture texture;

@@ -29,6 +29,7 @@ public:
      * Load a SFML texture.
      */
     sf::Texture LoadSFMLTexture( const gd::String & filename );
+    void LoadSFMLTexture( const gd::String & filename, sf::Texture & texture );
 
     /**
      * Load a SFML Font.

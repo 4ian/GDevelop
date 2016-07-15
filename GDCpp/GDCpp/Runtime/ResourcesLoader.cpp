@@ -40,6 +40,13 @@ sf::Texture ResourcesLoader::LoadSFMLTexture(const gd::String & filename)
 {
     sf::Texture texture;
 
+    LoadSFMLTexture(filename, texture);
+
+    return texture;
+}
+
+void ResourcesLoader::LoadSFMLTexture( const gd::String & filename, sf::Texture & texture )
+{
     if (resFile.ContainsFile(filename))
     {
         char* buffer = resFile.GetFile(filename);
@@ -51,8 +58,6 @@ sf::Texture ResourcesLoader::LoadSFMLTexture(const gd::String & filename)
     }
     else if (!texture.loadFromFile(filename.ToLocale()))
         cout << "Failed to load a SFML texture: " << filename << endl;
-
-    return texture;
 }
 
 std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filename)

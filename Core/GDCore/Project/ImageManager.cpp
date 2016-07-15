@@ -46,8 +46,10 @@ std::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const gd::Strin
     {
         ImageResource & image = dynamic_cast<ImageResource&>(resourcesManager->GetResource(name));
 
-        std::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper(ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile() )));
+        std::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper());
+        ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile(), texture->texture );
         texture->texture.setSmooth(image.smooth);
+        texture->image = texture->texture.copyToImage();
 
         alreadyLoadedImages[name] = texture;
         #if defined(GD_IDE_ONLY)
@@ -102,7 +104,7 @@ void ImageManager::ReloadImage(const gd::String & name) const
 
         std::cout << "ImageManager: Reload " << name << std::endl;
 
-        oldTexture->texture = ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile() );
+        ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile(), oldTexture->texture );
         oldTexture->texture.setSmooth(image.smooth);
         oldTexture->image = oldTexture->texture.copyToImage();
 

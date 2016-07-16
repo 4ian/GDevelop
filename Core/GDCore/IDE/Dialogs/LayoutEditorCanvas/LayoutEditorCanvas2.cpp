@@ -31,6 +31,8 @@
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/CommonTools.h"
+#include <SFML/OpenGL.hpp>
+#include <GL/glu.h>
 
 using namespace std;
 

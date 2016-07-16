@@ -33,6 +33,9 @@
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
+#if !defined(ANDROID)
+#include <GL/glu.h>
+#endif
 
 #include "GDCpp/Runtime/CodeExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
@@ -234,7 +237,7 @@ void RuntimeScene::Render()
                 //Prepare OpenGL rendering
                 #if !defined(ANDROID) //TODO: OpenGL
                 renderWindow->popGLStates();
-                
+
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
                 gluPerspective(GetOpenGLFOV(), camera.GetWidth()/camera.GetHeight(), GetOpenGLZNear(), GetOpenGLZFar());

@@ -224,7 +224,7 @@ gdjs.evtTools.storage.readNumberFromJSONFile = function(filename, element, runti
 			return false;
 		}
 
-		if ( i == elemArray.length-1 && currentElem[elemArray[i]].value)
+		if ( i == elemArray.length-1 && typeof currentElem[elemArray[i]].value !== "undefined")
 			variable.setNumber(currentElem[elemArray[i]].value);
 		else
 			currentElem = currentElem[elemArray[i]];
@@ -250,7 +250,7 @@ gdjs.evtTools.storage.readStringFromJSONFile = function(filename, element, runti
 			return false;
 		}
 
-		if ( i == elemArray.length-1 && currentElem[elemArray[i]].str)
+		if ( i == elemArray.length-1 && typeof currentElem[elemArray[i]].str !== "undefined")
 			variable.setString(currentElem[elemArray[i]].str);
 		else
 			currentElem = currentElem[elemArray[i]];

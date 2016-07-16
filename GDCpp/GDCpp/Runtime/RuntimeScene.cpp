@@ -33,7 +33,7 @@
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#if !defined(ANDROID)
+#if !defined(ANDROID) && !defined(MACOS)
 #include <GL/glu.h>
 #endif
 

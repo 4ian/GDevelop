@@ -9,7 +9,7 @@
 #include "GDCore/Tools/InvalidImage.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include <SFML/OpenGL.hpp>
-#if !defined(ANDROID)
+#if !defined(ANDROID) && !defined(MACOS)
 #include <GL/glu.h>
 #endif
 #undef LoadImage //thx windows.h

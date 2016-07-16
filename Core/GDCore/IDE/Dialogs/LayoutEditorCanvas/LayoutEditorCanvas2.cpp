@@ -32,7 +32,9 @@
 #include "GDCore/Project/Object.h"
 #include "GDCore/CommonTools.h"
 #include <SFML/OpenGL.hpp>
+#if !defined(ANDROID) && !defined(MACOS)
 #include <GL/glu.h>
+#endif
 
 using namespace std;
 

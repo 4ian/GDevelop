@@ -39,7 +39,10 @@ public:
      */
     bool SetResourceFile( const gd::String & filename );
 
+    void LoadSFMLImage( const gd::String & filename, sf::Image & image );
+
     sf::Texture LoadSFMLTexture( const gd::String & filename );
+    void LoadSFMLTexture( const gd::String & filename, sf::Texture & texture );
 
     std::pair<sf::Font *, char *> LoadFont( const gd::String & filename );
 

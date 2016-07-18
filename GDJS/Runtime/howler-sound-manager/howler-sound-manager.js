@@ -51,7 +51,7 @@ gdjs.HowlerSound.prototype.stopped = function() {
 gdjs.HowlerSound.prototype.stop = function() {
 	this._paused = false;
 	this._stopped = true;
-	Howl.prototype.stop.call(this);
+	return Howl.prototype.stop.call(this);
 };
 gdjs.HowlerSound.prototype.canBeDestroyed = function() {
 	return this._canBeDestroyed;

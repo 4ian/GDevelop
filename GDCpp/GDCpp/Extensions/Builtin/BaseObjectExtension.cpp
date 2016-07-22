@@ -88,6 +88,7 @@ BaseObjectExtension::BaseObjectExtension()
     objectExpressions["SqDistance"].SetFunctionName("GetSqDistanceWithObject");
     objectExpressions["Variable"].SetFunctionName("GetVariableValue").SetStatic();
     objectStrExpressions["VariableString"].SetFunctionName("GetVariableString").SetStatic();
+    objectExpressions["VariableChildCount"].SetFunctionName("GetVariableChildCount");
 
     GetAllActions()["Create"].SetFunctionName("CreateObjectOnScene").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
     GetAllActions()["CreateByName"].SetFunctionName("CreateObjectFromGroupOnScene").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");

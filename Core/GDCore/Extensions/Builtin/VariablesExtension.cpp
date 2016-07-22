@@ -186,6 +186,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .AddParameter("string", _("Child's name"))
         .MarkAsAdvanced();
 
+    extension.AddExpression("GlobalVariableChildCount", _("Global variable number of children"), _("Get the number of children from global variable"), _("Variables"), "res/actions/var.png")
+	.AddParameter("globalvar", _("Variable"));
+
+    extension.AddExpression("VariableChildCount", _("Scene variable number of children"), _("Get the number of children from scene variable"), _("Variables"), "res/actions/var.png")
+	.AddParameter("scenevar", _("Variable"));
+
     extension.AddExpression("Variable", _("Scene variables"), _("Scene variables"), _("Variables"), "res/actions/var.png")
         .AddParameter("scenevar", _("Variable"));
 

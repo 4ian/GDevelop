@@ -83,6 +83,7 @@ BaseObjectExtension::BaseObjectExtension()
     objectExpressions["Hauteur"].SetFunctionName("getHeight"); //Deprecated
     objectExpressions["Variable"].SetFunctionName("gdjs.RuntimeObject.getVariableNumber").SetStatic();
     objectStrExpressions["VariableString"].SetFunctionName("gdjs.RuntimeObject.getVariableString").SetStatic();
+    objectExpressions["VariableChildCount"].SetFunctionName("gdjs.RuntimeObject.getVariableChildCount").SetStatic();
     objectExpressions["ForceX"].SetFunctionName("getAverageForce().getX");
     objectExpressions["ForceY"].SetFunctionName("getAverageForce().getY");
     objectExpressions["ForceAngle"].SetFunctionName("getAverageForce().getAngle");

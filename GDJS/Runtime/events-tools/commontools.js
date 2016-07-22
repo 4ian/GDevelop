@@ -12,6 +12,8 @@
  */
 gdjs.evtTools.common = gdjs.evtTools.common || {};
 
+
+
 /**
  * Get the value of a variable. Equivalent of variable.getAsNumber().
  * @method getVariableValue
@@ -66,6 +68,16 @@ gdjs.evtTools.common.variableChildExists = function(variable, childName) {
  */
 gdjs.evtTools.common.variableRemoveChild = function(variable, childName) {
     return variable.removeChild(childName);
+};
+
+/**
+ * @method getVariableChildCount
+ * @private
+ * @static
+ */
+gdjs.evtTools.common.getVariableChildCount = function(variable) {
+    if (variable.isStructure() == false) return 0;
+    return Object.keys(variable.getAllChildren()).length;
 };
 
 /**

@@ -428,6 +428,19 @@ gdjs.RuntimeObject.prototype.getVariableNumber = gdjs.RuntimeObject.getVariableN
 gdjs.RuntimeObject.getVariableString = function(variable) {
     return variable.getAsString();
 };
+
+/**
+ * Get the number of children from a variable
+ * @method getVariableChildCount
+ * @param variable The variable to be accessed
+ * @return The number of children
+ * @static
+ */
+gdjs.RuntimeObject.getVariableChildCount = function(variable) {
+    if (variable.isStructure() == false) return 0;
+    return Object.keys(variable.getAllChildren()).length;
+};
+
 gdjs.RuntimeObject.prototype.getVariableString = gdjs.RuntimeObject.getVariableString;
 
 /**

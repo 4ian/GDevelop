@@ -36,6 +36,8 @@ VariablesExtension::VariablesExtension()
     GetAllConditions()["VarGlobalTxt"].SetFunctionName("gdjs.evtTools.common.getVariableString");
     GetAllExpressions()["Variable"].SetFunctionName("gdjs.evtTools.common.getVariableNumber");
     GetAllStrExpressions()["VariableString"].SetFunctionName("gdjs.evtTools.common.getVariableString");
+    GetAllExpressions()["VariableChildCount"].SetFunctionName("gdjs.evtTools.common.getVariableChildCount");
+    GetAllExpressions()["GlobalVariableChildCount"].SetFunctionName("gdjs.evtTools.common.getVariableChildCount");
     GetAllExpressions()["GlobalVariable"].SetFunctionName("gdjs.evtTools.common.getVariableNumber");
     GetAllStrExpressions()["GlobalVariableString"].SetFunctionName("gdjs.evtTools.common.getVariableString");
 

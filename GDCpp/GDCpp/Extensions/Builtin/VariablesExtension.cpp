@@ -47,6 +47,10 @@ VariablesExtension::VariablesExtension()
 
     GetAllExpressions()["GlobalVariable"].SetFunctionName("GetVariableValue").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
     GetAllStrExpressions()["GlobalVariableString"].SetFunctionName("GetVariableString").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
-    #endif
+ 
+    GetAllExpressions()["VariableChildCount"].SetFunctionName("GetVariableChildCount").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h"); 
+    GetAllExpressions()["GlobalVariableChildCount"].SetFunctionName("GetVariableChildCount").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");   
+
+#endif
 }
 

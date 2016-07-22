@@ -669,6 +669,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("object", _("Object"))
         .AddParameter("objectvar", _("Variable"));
 
+    obj.AddExpression("VariableChildCount", _("Object's variable number of children"), _("Get the number of children from an object"), _("Variables"), "res/actions/var.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"));
+
     obj.AddStrExpression("VariableString", _("Object's variable"), _("Text of variable of an object"), _("Variables"), "res/actions/var.png")
         .AddParameter("object", _("Object"))
         .AddParameter("objectvar", _("Variable"));

@@ -121,6 +121,11 @@ void GD_API VariableRemoveChild(gd::Variable & variable, const gd::String & chil
 /**
  * Only used internally by GD events generated code.
  */
+unsigned int GD_API GetVariableChildCount(gd::Variable & variable);
+
+/**
+ * Only used internally by GD events generated code.
+ */
 gd::Variable & GD_API ReturnVariable(gd::Variable & variable);
 
 /**

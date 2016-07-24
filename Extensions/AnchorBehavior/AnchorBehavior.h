@@ -42,24 +42,24 @@ public:
 
     AnchorBehavior();
     virtual ~AnchorBehavior() {};
-    virtual Behavior* Clone() const { return new AnchorBehavior(*this); }
+    virtual Behavior* Clone() const override { return new AnchorBehavior(*this); }
 
     /**
      * \brief Unserialize the behavior
      */
-    virtual void UnserializeFrom(const gd::SerializerElement & element);
+    virtual void UnserializeFrom(const gd::SerializerElement & element) override;
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Serialize the behavior
      */
-    virtual void SerializeTo(gd::SerializerElement & element) const;
+    virtual void SerializeTo(gd::SerializerElement & element) const override;
 
-    virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
-    virtual bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project);
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const override;
+    virtual bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project) override;
     #endif
 
-    virtual void OnActivate();
+    virtual void OnActivate() override;
 
 private:
     virtual void DoStepPreEvents(RuntimeScene & scene) override;

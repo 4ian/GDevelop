@@ -121,7 +121,7 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
             m_topEdgeDistance = topLeftPixel.y;
         else if(m_topEdgeAnchor == ANCHOR_VERTICAL_WINDOW_BOTTOM)
             m_topEdgeDistance = static_cast<float>(windowSize.y) - topLeftPixel.y;
-        else if(m_topEdgeAnchor = ANCHOR_VERTICAL_PROPORTIONAL)
+        else if(m_topEdgeAnchor == ANCHOR_VERTICAL_PROPORTIONAL)
             m_topEdgeDistance = topLeftPixel.y / static_cast<float>(windowSize.y);
 
         //Bottom edge
@@ -129,7 +129,7 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
             m_bottomEdgeDistance = bottomRightPixel.y;
         else if(m_bottomEdgeAnchor == ANCHOR_VERTICAL_WINDOW_BOTTOM)
             m_bottomEdgeDistance = static_cast<float>(windowSize.y) - bottomRightPixel.y;
-        else if(m_bottomEdgeAnchor = ANCHOR_VERTICAL_PROPORTIONAL)
+        else if(m_bottomEdgeAnchor == ANCHOR_VERTICAL_PROPORTIONAL)
             m_bottomEdgeDistance = bottomRightPixel.y / static_cast<float>(windowSize.y);
 
         m_invalidDistances = false;

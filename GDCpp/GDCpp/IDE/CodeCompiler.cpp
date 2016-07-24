@@ -139,7 +139,7 @@ gd::String CodeCompilerCall::GetFullCall() const
     }
     else //Generate argument for linking files
     {
-    	if(!compilationForRuntime)
+        if(!compilationForRuntime)
             args.push_back("-Wl,-rpath," + baseDir);
         args.push_back("-shared");
         if ( !inputFile.empty() ) args.push_back("\""+inputFile+"\"");

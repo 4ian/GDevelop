@@ -77,8 +77,6 @@ private:
     float m_rightEdgeDistance;
     float m_topEdgeDistance;
     float m_bottomEdgeDistance;
-
-    sf::Vector2u m_oldWindowSize;
 };
 
 #endif // ANCHORBEHAVIOR_H

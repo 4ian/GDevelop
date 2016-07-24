@@ -35,8 +35,7 @@ AnchorBehavior::AnchorBehavior() :
     m_leftEdgeDistance(0.f),
     m_rightEdgeDistance(0.f),
     m_topEdgeDistance(0.f),
-    m_bottomEdgeDistance(0.f),
-    m_oldWindowSize(-1, -1)
+    m_bottomEdgeDistance(0.f)
 {
 }
 
@@ -110,7 +109,7 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
 
         //Right edge
         if(m_rightEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_LEFT)
-            m_leftEdgeDistance = bottomRightPixel.x;
+            m_rightEdgeDistance = bottomRightPixel.x;
         else if(m_rightEdgeAnchor == ANCHOR_HORIZONTAL_WINDOW_RIGHT)
             m_rightEdgeDistance = static_cast<float>(windowSize.x) - bottomRightPixel.x;
         else if(m_rightEdgeAnchor == ANCHOR_HORIZONTAL_PROPORTIONAL)
@@ -175,7 +174,7 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
         sf::Vector2f topLeftCoord = mapFloatPixelToCoords(topLeftPixel, (*scene.renderWindow), firstCamera.GetSFMLView());
         sf::Vector2f bottomRightCoord = mapFloatPixelToCoords(bottomRightPixel, (*scene.renderWindow), firstCamera.GetSFMLView());
 
-        //Move and resize the object accordingly to the anchors
+        //Move and resize the object according to the anchors
         if(m_rightEdgeAnchor != ANCHOR_HORIZONTAL_NONE)
             object->SetWidth(bottomRightCoord.x - topLeftCoord.x);
         if(m_bottomEdgeAnchor != ANCHOR_VERTICAL_NONE)

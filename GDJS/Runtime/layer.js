@@ -163,12 +163,14 @@ gdjs.Layer.prototype.setCameraRotation = function(rotation, cameraId) {
  * Convert a point from the canvas coordinates (For example, the mouse position) to the
  * "world" coordinates.
  *
+ * TODO: Update this method to store the result in a static array
+ *
  * @method convertCoords
  * @param x {Number} The x position, in canvas coordinates.
  * @param y {Number} The y position, in canvas coordinates.
  * @param cameraId The camera number. Currently ignored.
  */
-gdjs.Layer.prototype.convertCoords = function(x,y, cameraId) {
+gdjs.Layer.prototype.convertCoords = function(x, y, cameraId) {
 	x -= this._width/2;
 	y -= this._height/2;
 	x /= Math.abs(this._zoomFactor);
@@ -178,7 +180,21 @@ gdjs.Layer.prototype.convertCoords = function(x,y, cameraId) {
 	x = Math.cos(this._cameraRotation/180*3.14159)*x - Math.sin(this._cameraRotation/180*3.14159)*y;
 	y = Math.sin(this._cameraRotation/180*3.14159)*tmp + Math.cos(this._cameraRotation/180*3.14159)*y;
 
-	return [x+this.getCameraX(cameraId), y+this.getCameraY(cameraId)];
+	return [x + this.getCameraX(cameraId), y + this.getCameraY(cameraId)];
+};
+
+gdjs.Layer.prototype.convertInverseCoords = function(x, y, cameraId) {
+   x -= this.getCameraX(cameraId);
+   y -= this.getCameraY(cameraId);
+
+	var tmp = x;
+	x = Math.cos(-this._cameraRotation/180*3.14159)*x - Math.sin(-this._cameraRotation/180*3.14159)*y;
+	y = Math.sin(-this._cameraRotation/180*3.14159)*tmp + Math.cos(-this._cameraRotation/180*3.14159)*y;
+
+   x *= Math.abs(this._zoomFactor);
+   y *= Math.abs(this._zoomFactor);
+
+	return [x + this._width/2, y + this._height/2];
 };
 
 gdjs.Layer.prototype.getWidth = function() {

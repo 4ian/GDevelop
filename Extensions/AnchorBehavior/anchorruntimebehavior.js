@@ -11,6 +11,7 @@ gdjs.AnchorRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {
     gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
 
+    this._relativeToOriginalWindowSize = !!behaviorData.relativeToOriginalWindowSize;
     this._leftEdgeAnchor = behaviorData.leftEdgeAnchor;
     this._rightEdgeAnchor = behaviorData.rightEdgeAnchor;
     this._topEdgeAnchor = behaviorData.topEdgeAnchor;
@@ -47,12 +48,18 @@ gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
 };
 
 gdjs.AnchorRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
-    var rendererWidth = runtimeScene.getGame().getRenderer().getCurrentWidth();
-    var rendererHeight = runtimeScene.getGame().getRenderer().getCurrentHeight();
+    var game = runtimeScene.getGame();
+    var rendererWidth = game.getRenderer().getCurrentWidth();
+    var rendererHeight = game.getRenderer().getCurrentHeight();
     var layer = runtimeScene.getLayer(this.owner.getLayer());
 
     if(this._invalidDistances)
     {
+        if (this._relativeToOriginalWindowSize) {
+            rendererWidth = game.getOriginalWidth();
+            rendererHeight = game.getOriginalHeight();
+        }
+
         //Calculate the distances from the window's bounds.
         var topLeftPixel = layer.convertCoords(
             this.owner.getDrawableX(),

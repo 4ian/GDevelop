@@ -15,6 +15,7 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/Serialization/SerializerElement.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCpp/Runtime/RuntimeObject.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include <SFML/Window.hpp>
 #include "GDCore/CommonTools.h"
@@ -27,6 +28,7 @@ This project is released under the MIT License.
 #endif
 
 AnchorBehavior::AnchorBehavior() :
+    m_relativeToOriginalWindowSize(true),
     m_leftEdgeAnchor(ANCHOR_HORIZONTAL_NONE),
     m_rightEdgeAnchor(ANCHOR_HORIZONTAL_NONE),
     m_topEdgeAnchor(ANCHOR_VERTICAL_NONE),
@@ -82,12 +84,15 @@ void AnchorBehavior::DoStepPreEvents(RuntimeScene & scene)
 
 void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
 {
-    sf::Vector2u windowSize = scene.renderWindow->getSize();
     const RuntimeLayer & layer = scene.GetRuntimeLayer(object->GetLayer());
     const RuntimeCamera & firstCamera = layer.GetCamera(0);
 
     if(m_invalidDistances)
     {
+        sf::Vector2u windowSize = m_relativeToOriginalWindowSize ?
+            sf::Vector2u(scene.game->getWindowOriginalWidth(), scene.game->getWindowOriginalHeight()) :
+            scene.renderWindow->getSize();
+
         //Calculate the distances from the window's bounds.
         sf::Vector2f topLeftPixel = mapCoordsToFloatPixel(
             sf::Vector2f(object->GetDrawableX(), object->GetDrawableY()),
@@ -135,6 +140,8 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
     }
     else
     {
+        sf::Vector2u windowSize = scene.renderWindow->getSize();
+
         //Move and resize the object if needed
         sf::Vector2f topLeftPixel;
         sf::Vector2f bottomRightPixel;
@@ -188,6 +195,7 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
 
 void AnchorBehavior::UnserializeFrom(const gd::SerializerElement & element)
 {
+    m_relativeToOriginalWindowSize = element.GetBoolAttribute("relativeToOriginalWindowSize");
     m_leftEdgeAnchor = static_cast<HorizontalAnchor>(element.GetIntAttribute("leftEdgeAnchor"));
     m_rightEdgeAnchor = static_cast<HorizontalAnchor>(element.GetIntAttribute("rightEdgeAnchor"));
     m_topEdgeAnchor = static_cast<VerticalAnchor>(element.GetIntAttribute("topEdgeAnchor"));
@@ -197,6 +205,7 @@ void AnchorBehavior::UnserializeFrom(const gd::SerializerElement & element)
 #if defined(GD_IDE_ONLY)
 void AnchorBehavior::SerializeTo(gd::SerializerElement & element) const
 {
+    element.SetAttribute("relativeToOriginalWindowSize", m_relativeToOriginalWindowSize);
     element.SetAttribute("leftEdgeAnchor", static_cast<int>(m_leftEdgeAnchor));
     element.SetAttribute("rightEdgeAnchor", static_cast<int>(m_rightEdgeAnchor));
     element.SetAttribute("topEdgeAnchor", static_cast<int>(m_topEdgeAnchor));
@@ -233,6 +242,10 @@ namespace
 std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(gd::Project & project) const
 {
     std::map<gd::String, gd::PropertyDescriptor> properties;
+
+    properties[_("Relative to original window size")]
+        .SetValue(m_relativeToOriginalWindowSize ? "true" : "false")
+        .SetType("Boolean");
 
     properties[_("Left edge anchor")]
         .SetValue(GetAnchorAsString(m_leftEdgeAnchor))
@@ -298,7 +311,9 @@ namespace
 
 bool AnchorBehavior::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
-    if ( name == _("Left edge anchor") )
+    if ( name == _("Relative to original window size") )
+        m_relativeToOriginalWindowSize = (value == "1");
+    else if ( name == _("Left edge anchor") )
         m_leftEdgeAnchor = GetHorizontalAnchorFromString(value);
     else if ( name == _("Right edge anchor") )
         m_rightEdgeAnchor = GetHorizontalAnchorFromString(value);

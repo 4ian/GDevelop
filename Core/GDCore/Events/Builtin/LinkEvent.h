@@ -18,9 +18,16 @@ namespace gd
 class GD_CORE_API LinkEvent : public gd::BaseEvent
 {
 public:
-    LinkEvent() : BaseEvent(), includeAll(true), includeStart(gd::String::npos), includeEnd(gd::String::npos), linkWasInvalid(false) {};
+    enum IncludeConfig
+    {
+        INCLUDE_ALL = 0,
+        INCLUDE_EVENTS_GROUP = 1,
+        INCLUDE_BY_INDEX = 2 // Deprecated
+    };
+
+    LinkEvent() : BaseEvent(), includeConfig(INCLUDE_ALL), eventsGroupName(), includeStart(gd::String::npos), includeEnd(gd::String::npos), linkWasInvalid(false) {};
     virtual ~LinkEvent();
-    virtual gd::LinkEvent * Clone() const { return new LinkEvent(*this);}
+    virtual gd::LinkEvent * Clone() const { return new LinkEvent(*this); }
 
     /**
      * Get the link target (i.e. the scene or external events the link refers to).
@@ -33,19 +40,23 @@ public:
     void SetTarget(const gd::String & target_) { target = target_; };
 
     /**
-     * Return true if the link event must include all the events of the target.
+     * Return the include config.
      */
-    bool IncludeAllEvents() const { return includeAll; };
+    IncludeConfig GetIncludeConfig() const { return includeConfig; }
 
     /**
      * Return true if the link event must include all the events of the target.
      */
-    void SetIncludeAllEvents(bool includeAllEvents) { includeAll = includeAllEvents; };
+    void SetIncludeAllEvents() { includeConfig = INCLUDE_ALL; }
+
+    void SetIncludeEventsGroup(const gd::String& name) { includeConfig = INCLUDE_EVENTS_GROUP; eventsGroupName = name; }
 
     /**
      * Set the number of the first and last event to be included ( Meaningful only if includeAll was set to false, see SetIncludeAllEvents )
      */
-    void SetIncludeStartAndEnd(std::size_t includeStart_, std::size_t includeEnd_) { includeStart = includeStart_; includeEnd = includeEnd_;  };
+    void SetIncludeStartAndEnd(std::size_t includeStart_, std::size_t includeEnd_) { includeConfig = INCLUDE_BY_INDEX; includeStart = includeStart_; includeEnd = includeEnd_;  }
+
+    gd::String GetEventsGroupName() const { return eventsGroupName; }
 
     /**
      * Get the number of the first event to be included. (Meaningful only if includeAll was set to false, see SetIncludeAllEvents)
@@ -96,9 +107,14 @@ public:
 
 private:
     gd::String target; ///< The name of the external events (or scene) to be included
-    bool includeAll; ///< If set to true, all the events of the target should be included
-    std::size_t includeStart; ///< If includeAll is set to false, represents the number of the first event of the target to included.
-    std::size_t includeEnd; ///< If includeAll is set to false, represents the number of the last event of the target to included.
+
+    IncludeConfig includeConfig; ///< Defines which events are included by this link
+
+    gd::String eventsGroupName; ///< If includeConfig is set to INCLUDE_EVENTS_GROUP, represents the name of the events group to be included.
+
+    std::size_t includeStart; ///< If includeConfig is set to INCLUDE_BY_INDEX, represents the number of the first event of the target to included.
+    std::size_t includeEnd; ///< If includeConfig is set to INCLUDE_BY_INDEX, represents the number of the last event of the target to included.
+
     bool linkWasInvalid; ///< Set to true by Preprocess if the links was invalid the last time is was processed. Used to display a warning in the events editor.
 };
 

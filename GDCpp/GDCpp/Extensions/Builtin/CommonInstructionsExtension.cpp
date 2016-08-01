@@ -218,7 +218,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             const gd::Layout & scene = codeGenerator.GetLayout();
 
             //Find if the link refers to externals events...
-            if ( project.HasExternalEventsNamed(event.GetTarget()) )
+            if ( project.HasExternalEventsNamed(event.GetTarget()) && event.GetIncludeConfig() == gd::LinkEvent::INCLUDE_ALL )
             {
                 gd::ExternalEvents & linkedExternalEvents = project.GetExternalEvents(event.GetTarget());
 

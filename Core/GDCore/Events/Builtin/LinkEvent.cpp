@@ -19,7 +19,8 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
-#include "GDCore/IDE/Dialogs/EditLink.h"
+#include "GDCore/Events/Builtin/GroupEvent.h"
+#include "GDCore/IDE/Dialogs/LinkEventEditor.h"
 #include "GDCore/CommonTools.h"
 
 using namespace std;
@@ -29,8 +30,8 @@ namespace gd
 
 const EventsList * LinkEvent::GetLinkedEvents(const gd::Project & project) const
 {
-    const EventsList * events = NULL;
-    const gd::ExternalEvents * linkedExternalEvents = NULL;
+    const EventsList * events = nullptr;
+    const gd::ExternalEvents * linkedExternalEvents = nullptr;
     if ( project.HasExternalEventsNamed(GetTarget()) )
     {
         linkedExternalEvents = &project.GetExternalEvents(GetTarget());
@@ -38,6 +39,25 @@ const EventsList * LinkEvent::GetLinkedEvents(const gd::Project & project) const
     }
     else if ( project.HasLayoutNamed(GetTarget()) )
         events = &project.GetLayout(GetTarget()).GetEvents();
+
+    //If the link only includes an events group, search it inside the layout/external events
+    if( includeConfig == INCLUDE_EVENTS_GROUP )
+    {
+        std::size_t i = 0;
+        for( ; i < events->GetEventsCount(); ++i )
+        {
+            std::shared_ptr<const GroupEvent> groupEvent = std::dynamic_pointer_cast<const GroupEvent>(events->GetEventSmartPtr(i));
+            if(groupEvent && groupEvent->GetName() == eventsGroupName)
+            {
+                //Get its sub-events
+                events = &groupEvent->GetSubEvents();
+                break;
+            }
+        }
+
+        if(i >= events->GetEventsCount()) //We didn't find the events group, return nullptr
+            events = nullptr;
+    }
 
     return events;
 }
@@ -48,8 +68,8 @@ void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & ev
     const EventsList * eventsToInclude = GetLinkedEvents(project);
     if ( eventsToInclude != NULL )
     {
-        std::size_t firstEvent = IncludeAllEvents() ? 0 : GetIncludeStart();
-        std::size_t lastEvent = IncludeAllEvents() ? eventsToInclude->size() - 1 : GetIncludeEnd();
+        std::size_t firstEvent = includeConfig == INCLUDE_BY_INDEX ? GetIncludeStart() : 0;
+        std::size_t lastEvent = includeConfig == INCLUDE_BY_INDEX ? GetIncludeEnd() : eventsToInclude->size() - 1;
 
         //Check bounds
         if ( firstEvent >= eventsToInclude->size() )
@@ -100,10 +120,18 @@ LinkEvent::~LinkEvent()
 
 void LinkEvent::SerializeTo(SerializerElement & element) const
 {
-    element.AddChild("include")
-        .SetAttribute("includeAll", IncludeAllEvents())
-        .SetAttribute("start", (int)GetIncludeStart())
-        .SetAttribute("end", (int)GetIncludeEnd());
+    SerializerElement & includeElement = element.AddChild("include")
+        .SetAttribute("includeConfig", static_cast<int>(GetIncludeConfig()));
+
+    if(GetIncludeConfig() == INCLUDE_EVENTS_GROUP)
+    {
+        includeElement.SetAttribute("eventsGroup", GetEventsGroupName());
+    }
+    else if(GetIncludeConfig() == INCLUDE_BY_INDEX)
+    {
+        includeElement.SetAttribute("start", static_cast<int>(GetIncludeStart()));
+        includeElement.SetAttribute("end", static_cast<int>(GetIncludeEnd()));
+    }
 
     element.AddChild("target").SetValue(GetTarget());
 }
@@ -111,17 +139,40 @@ void LinkEvent::SerializeTo(SerializerElement & element) const
 void LinkEvent::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
     SerializerElement & includeElement = element.GetChild("include", 0, "Limites");
-    SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
-        includeElement.GetIntAttribute("end"));
-    SetIncludeAllEvents(includeElement.GetBoolAttribute("includeAll", true));
 
     SetTarget(element.GetChild("target", 0, "Scene").GetValue().GetString());
+
+    if(includeElement.HasAttribute("includeAll"))
+    {
+        //Compatibility with GDevelop <= 4.0.92
+        if(includeElement.GetBoolAttribute("includeAll", true))
+        {
+            SetIncludeAllEvents();
+        }
+        else
+        {
+            SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
+                includeElement.GetIntAttribute("end"));
+        }
+    }
+    else
+    {
+        //GDevelop > 4.0.92
+        IncludeConfig config = static_cast<IncludeConfig>(includeElement.GetIntAttribute("includeConfig", 0));
+        if(config == INCLUDE_ALL)
+            SetIncludeAllEvents();
+        else if(config == INCLUDE_EVENTS_GROUP)
+            SetIncludeEventsGroup(includeElement.GetStringAttribute("eventsGroup"));
+        else if(config == INCLUDE_BY_INDEX)
+            SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"), includeElement.GetIntAttribute("end"));
+    }
+
 }
 
 gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, gd::Project & project, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
 #if !defined(GD_NO_WX_GUI)
-    EditLink dialog(parent_, *this, project);
+    LinkEventEditor dialog(parent_, *this, project);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
 #endif
 
@@ -152,11 +203,11 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
     dc.SetFont(renderingHelper->GetNiceFont());
     dc.DrawText( _("Link to ")+GetTarget(), x+32, y + 3 );
 
-    if ( !IncludeAllEvents() )
+    /*if ( !IncludeAllEvents() ) TODO: Update !
     {
         wxRect textRect = dc.GetTextExtent(_("Link to ")+GetTarget());
         dc.DrawText( _("Include only events ")+gd::String::From(GetIncludeStart()+1)+_(" to ")+gd::String::From(GetIncludeEnd()+1), x+textRect.GetWidth()+32+10, y + 5 );
-    }
+    }*/
 #endif
 }
 

@@ -54,25 +54,6 @@ gdjs.toDegrees = function(angleInRadians) {
 };
 
 /**
- * Iterate over an array: func is called on each member of the array.<br>
- * <br>
- * Note that func must not remove elements from the array. If func
- * return false, the iteration will stop.
- * @method iterateOverArray
- * @static
- */
-gdjs.iterateOverArray = function(array, func) {
-    if ( array === undefined || array.length === undefined || array.length === null ) {
-        console.error("gdjs.iterateOverArray called with something which is not an array.");
-        return;
-    }
-
-    for(var i = 0, len = array.length;i<len;++i) {
-        if (func(array[i]) === false) return;
-    }
-};
-
-/**
  * Register the runtime objects that can be used in runtimeScene.<br>
  * Objects must be part of gdjs and have their property "thisIsARuntimeObjectConstructor"
  * defined and set to the name of the type of the object so as to be recognized.

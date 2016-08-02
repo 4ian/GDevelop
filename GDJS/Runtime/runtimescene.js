@@ -69,48 +69,46 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 			parseInt(sceneData.b, 10));
 
 	//Load layers
-    var that = this;
-	gdjs.iterateOverArray(sceneData.layers, function(layerData) {
-		that._layers.put(layerData.name, new gdjs.Layer(layerData, that));
+	for(var i = 0, len = sceneData.layers.length;i<len;++i) {
+		var layerData = sceneData.layers[i];
+
+		this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
 		//console.log("Created layer : \""+name+"\".");
-	});
+	}
 
     //Load variables
     this._variables = new gdjs.VariablesContainer(sceneData.variables);
 
 	//Cache the initial shared data of the behaviors
-    gdjs.iterateOverArray(sceneData.behaviorsSharedData, function(data) {
+	for(var i = 0, len = sceneData.behaviorsSharedData.length;i<len;++i) {
+		var data = sceneData.behaviorsSharedData[i];
+
 		//console.log("Initializing shared data for "+data.name);
-		that._initialBehaviorSharedData.put(data.name, data);
-	});
+		this._initialBehaviorSharedData.put(data.name, data);
+	}
+
+    var that = this;
+    function loadObject(objData) {
+        var objectName = objData.name;
+        var objectType = objData.type;
+
+        that._objects.put(objectName, objData);
+        that._instances.put(objectName, []); //Also reserve an array for the instances
+        that._instancesCache.put(objectName, []); //and for cached instances
+		//And cache the constructor for the performance sake:
+		that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
+    }
 
     //Load objects: Global objects first...
-	gdjs.iterateOverArray(this.getGame().getInitialObjectsData(), function(objData){
-        var objectName = objData.name;
-        var objectType = objData.type;
-
-        that._objects.put(objectName, objData);
-        that._instances.put(objectName, []); //Also reserve an array for the instances
-        that._instancesCache.put(objectName, []); //and for cached instances
-		//And cache the constructor for the performance sake:
-		that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
-
-        //console.log("Loaded "+objectName+" in memory (Global object)");
-	});
+    var initialGlobalObjectsData = this.getGame().getInitialObjectsData();
+	for(var i = 0, len = initialGlobalObjectsData.length;i<len;++i) {
+		loadObject(initialGlobalObjectsData[i]);
+	}
 	//...then the scene objects
     this._initialObjectsData = sceneData.objects;
-    gdjs.iterateOverArray(this._initialObjectsData, function(objData) {
-        var objectName = objData.name;
-        var objectType = objData.type;
-
-        that._objects.put(objectName, objData);
-        that._instances.put(objectName, []); //Also reserve an array for the instances
-        that._instancesCache.put(objectName, []); //and for cached instances
-		//And cache the constructor for the performance sake:
-		that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
-
-        //console.log("Loaded "+objectName+" in memory");
-    });
+	for(var i = 0, len = this._initialObjectsData.length;i<len;++i) {
+		loadObject(this._initialObjectsData[i]);
+    }
 
     //Create initial instances of objects
     this.createObjectsFrom(sceneData.instances, 0, 0);
@@ -160,10 +158,10 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
  * @param yPos The offset on Y axis
  */
 gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
-	var that = this;
-    gdjs.iterateOverArray(data, function(instanceData) {
+    for(var i = 0, len = data.length;i<len;++i) {
+        var instanceData = data[i];
         var objectName = instanceData.name;
-		var newObject = that.createObject(objectName);
+		var newObject = this.createObject(objectName);
 
 		if ( newObject !== null ) {
             newObject.setPosition(parseFloat(instanceData.x) + xPos, parseFloat(instanceData.y) + yPos);
@@ -173,7 +171,7 @@ gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
             newObject.getVariables().initFrom(instanceData.initialVariables, true);
             newObject.extraInitializationFromInitialInstance(instanceData);
 		}
-    });
+    }
 };
 
 /**

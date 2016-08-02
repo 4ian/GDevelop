@@ -73,24 +73,21 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
     else
         this._behaviorsTable.clear();
 
-    var that = this;
-    var i = 0;
-    gdjs.iterateOverArray(objectData.behaviors, function(autoData) {
+	for(var i = 0, len = objectData.behaviors.length;i<len;++i) {
+		var autoData = objectData.behaviors[i];
         var Ctor = gdjs.getBehaviorConstructor(autoData.type);
 
         //Try to reuse already existing behaviors.
-        if ( i < that._behaviors.length ) {
-            if ( that._behaviors[i] instanceof Ctor )
-                Ctor.call(that._behaviors[i], runtimeScene, autoData, that);
+        if ( i < this._behaviors.length ) {
+            if ( this._behaviors[i] instanceof Ctor )
+                Ctor.call(this._behaviors[i], runtimeScene, autoData, this);
             else
-                that._behaviors[i] = new Ctor(runtimeScene, autoData, that);
+                this._behaviors[i] = new Ctor(runtimeScene, autoData, this);
         }
-        else that._behaviors.push(new Ctor(runtimeScene, autoData, that));
+        else this._behaviors.push(new Ctor(runtimeScene, autoData, this));
 
-        that._behaviorsTable.put(autoData.name, that._behaviors[i]);
-
-        i++;
-    });
+        this._behaviorsTable.put(autoData.name, this._behaviors[i]);
+    }
     this._behaviors.length = i;//Make sure to delete already existing behaviors which are not used anymore.
 };
 

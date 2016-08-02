@@ -100,12 +100,14 @@ gdjs.RuntimeGame.prototype.getGameData = function() {
  */
 gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
 	var scene = undefined;
-	gdjs.iterateOverArray(this._data.layouts, function(sceneData) {
+	for(var i = 0, len = this._data.layouts.length;i<len;++i) {
+		var sceneData = this._data.layouts[i];
+
 		if ( sceneName === undefined || sceneData.name === sceneName ) {
 			scene = sceneData;
-			return false;
+			break;
 		}
-	});
+	}
 
 	if ( scene === undefined )
 		console.warn("The game has no scene called \""+sceneName+"\"");
@@ -122,12 +124,14 @@ gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
  */
 gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
 	var isTrue = false;
-	gdjs.iterateOverArray(this._data.layouts, function(sceneData) {
+	for(var i = 0, len = this._data.layouts.length;i<len;++i) {
+		var sceneData = this._data.layouts[i];
+
 		if ( sceneName === undefined || sceneData.name == sceneName ) {
 			isTrue = true;
-			return false;
+			break;
 		}
-	});
+	}
 
 	return isTrue;
 };
@@ -141,12 +145,14 @@ gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
  */
 gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
     var externalLayout = null;
-    gdjs.iterateOverArray(this._data.externalLayouts, function(layoutData) {
+	for(var i = 0, len = this._data.externalLayouts.length;i<len;++i) {
+		var layoutData = this._data.externalLayouts[i];
+
         if ( layoutData.name === name ) {
             externalLayout = layoutData;
-            return false;
+            break;
         }
-    });
+    }
 
     return externalLayout;
 };

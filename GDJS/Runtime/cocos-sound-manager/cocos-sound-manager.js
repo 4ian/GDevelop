@@ -143,11 +143,12 @@ gdjs.CocosSoundManager.prototype.preloadAudio = function(onProgress, onComplete,
 
     var files = [];
     var that = this;
-    gdjs.iterateOverArray(resources, function(res) {
+	for(var i = 0, len = resources.length;i<len;++i) {
+		var res = resources[i];
         if ( res.file && res.kind === "audio" ) {
         	that._availableResources[res.name] = res;
         }
-    });
+	}
 
     //TODO: sound preloading
     onComplete();

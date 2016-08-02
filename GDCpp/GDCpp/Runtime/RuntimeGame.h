@@ -54,9 +54,26 @@ public:
      */
     inline RuntimeVariablesContainer & GetVariables() { return variables; }
 
+    /**
+     * \brief Get the width of the window at the startup of the game.
+     * \note This won't changed after the game startup, even if the window
+     * is resized.
+     */
+    unsigned int getWindowOriginalWidth() const { return windowOriginalWidth; }
+
+    /**
+     * \brief Get the height of the window at the startup of the game.
+     * \note This won't changed after the game startup, even if the window
+     * is resized.
+     */
+    unsigned int getWindowOriginalHeight() const { return windowOriginalHeight; }
+
 private:
     RuntimeVariablesContainer variables; ///<List of the global variables
     SoundManager soundManager;
+
+    unsigned int windowOriginalWidth; ///< Game window width at the start of the game
+    unsigned int windowOriginalHeight; ///< Game window height at the start of the game
 };
 
 #endif // RUNTIMEGAME_H

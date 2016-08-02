@@ -25,6 +25,8 @@ gdjs.RuntimeGame = function(data, spec)
 
     this._defaultWidth = data.properties.windowWidth; //Default size for scenes cameras
     this._defaultHeight = data.properties.windowHeight;
+    this._originalWidth = data.properties.windowWidth; //Original size of the game, won't be changed.
+    this._originalHeight = data.properties.windowHeight;
     this._renderer = new gdjs.RuntimeGameRenderer(this,
         this._defaultWidth, this._defaultHeight,
         spec.forceFullscreen || false);
@@ -159,8 +161,28 @@ gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
 };
 
 /**
+ * Get the original width of the game, as set on the startup of the game.
+ *
+ * This is guaranteed to never change, even if the size of the game is changed afterwards.
+ * @method getOriginalWidth
+ */
+gdjs.RuntimeGame.prototype.getOriginalWidth = function() {
+    return this._originalWidth;
+};
+
+/**
+ * Get the original height of the game, as set on the startup of the game.
+ *
+ * This is guaranteed to never change, even if the size of the game is changed afterwards.
+ * @method getOriginalHeight
+ */
+gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
+    return this._originalHeight;
+};
+
+/**
  * Get the default width of the game: canvas is created with this width,
- * and cameras are created using this width.
+ * and cameras of layers are created using this width when a scene is started.
  * @method getDefaultWidth
  */
 gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
@@ -169,7 +191,7 @@ gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
 
 /**
  * Get the default height of the game: canvas is created with this height,
- * and cameras are created using this height.
+ * and cameras of layers are created using this height when a scene is started.
  * @method getDefaultHeight
  */
 gdjs.RuntimeGame.prototype.getDefaultHeight = function() {

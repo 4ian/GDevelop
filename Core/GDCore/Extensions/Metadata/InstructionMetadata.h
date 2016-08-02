@@ -285,13 +285,19 @@ public:
         }
 
         /**
-         * Set that the function is located in a specific include file
+         * \brief Erase any existing include file and add the specified include.
          */
-        ExtraInformation & SetIncludeFile(const gd::String & optionalIncludeFile_)
-        {
-            optionalIncludeFile = optionalIncludeFile_;
-            return *this;
-        }
+        ExtraInformation & SetIncludeFile(const gd::String & includeFile);
+
+        /**
+         * \brief Add a file to the already existing include files.
+         */
+        ExtraInformation & AddIncludeFile(const gd::String & includeFile);
+
+        /**
+         * \brief Get the files that must be included to use the instruction.
+         */
+        const std::vector<gd::String> & GetIncludeFiles() const { return includeFiles; };
 
         ExtraInformation & SetCustomCodeGenerator(std::function<gd::String(Instruction & instruction,
             gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> codeGenerator)
@@ -316,10 +322,12 @@ public:
         gd::String type;
         AccessType accessType;
         gd::String optionalAssociatedInstruction;
-        gd::String optionalIncludeFile;
         bool hasCustomCodeGenerator;
         std::function<gd::String(Instruction & instruction,
             gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> customCodeGenerator;
+
+    private:
+        std::vector<gd::String> includeFiles;
     };
     ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
 

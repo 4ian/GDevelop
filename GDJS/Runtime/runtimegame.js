@@ -270,7 +270,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
     var startTime = Date.now();
     console.profile("Stepping for " + x + " frames")
     for(var i = 0; i < x; ++i) {
-        this._sceneStack.step();
+        this._sceneStack.step(16);
     }
     console.profileEnd();
     var time = Date.now() - startTime;
@@ -279,7 +279,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
 
     //The standard game loop
     var that = this;
-    this._renderer.startGameLoop(function() {
+    this._renderer.startGameLoop(function(elapsedTime) {
         //Manage resize events.
         if (that._notifySceneForResize) {
             that._sceneStack.onRendererResized();
@@ -287,7 +287,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
         }
 
         //Render and step the scene.
-        if (that._sceneStack.step()) {
+        if (that._sceneStack.step(elapsedTime)) {
             that.getInputManager().onFrameEnded();
             return true;
         }

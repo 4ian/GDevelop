@@ -133,7 +133,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 		this._runtimeGame.getSoundManager().clearAll();
 
     this._isLoaded = true;
-	this._timeManager.reset(Date.now());
+	this._timeManager.reset();
 };
 
 gdjs.RuntimeScene.prototype.unloadScene = function() {
@@ -194,11 +194,11 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * @return true if the game loop should continue, false if a scene change/push/pop
  * or a game stop was requested.
  */
-gdjs.RuntimeScene.prototype.renderAndStep = function() {
+gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
     this._profiler.frameStarted();
     this._profiler.begin("timeManager");
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
-	this._timeManager.update(Date.now(), this._runtimeGame.getMinimalFramerate());
+	this._timeManager.update(elapsedTime, this._runtimeGame.getMinimalFramerate());
     this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
     this._profiler.begin("events");

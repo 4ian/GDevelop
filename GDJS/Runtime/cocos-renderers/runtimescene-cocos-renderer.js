@@ -21,8 +21,8 @@ gdjs.RuntimeSceneCocosRenderer = function(runtimeScene, runtimeGameRenderer)
             this._super();
             this.scheduleUpdate();
         },
-        update: function() {
-            runtimeGameRenderer.onSceneUpdated();
+        update: function(dt) {
+            runtimeGameRenderer.onSceneUpdated(dt*1000);
         }
     });
     this._cocosScene = new ContainerScene();

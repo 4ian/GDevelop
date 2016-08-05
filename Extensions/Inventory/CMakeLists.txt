@@ -27,5 +27,5 @@ gdcpp_runtime_extension_link_libraries(Inventory_Runtime)
 
 #Tests for the GD C++ Runtime extension
 ###
-# file(GLOB_RECURSE test_source_files tests/*)
-# gdcpp_add_tests_extension_target(Inventory_Runtime_tests "${test_source_files}")
+file(GLOB_RECURSE test_source_files tests/*)
+gdcpp_add_tests_extension_target(Inventory_Runtime_tests "${test_source_files}")

@@ -6,7 +6,7 @@ This project is released under the MIT License.
 */
 
 #include "GDCpp/Extensions/ExtensionBase.h"
-// #include "InventoryManager.h"
+#include "InventoryTools.h"
 #include "GDCore/Tools/Version.h"
 
 #include <iostream>
@@ -157,12 +157,19 @@ public:
             .AddCodeOnlyParameter("currentScene", _(""))
             .AddParameter("string", _("Inventory name"))
             .AddParameter("string", _("Item name"))
-            .SetFunctionName("Count").SetIncludeFile("Inventory/InventoryTools.h");
+            .SetFunctionName("InventoryTools::Count").SetIncludeFile("Inventory/InventoryTools.h");
 
         #endif
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
+
+    virtual void SceneLoaded(RuntimeScene & scene) override
+    {
+        #if defined(GD_IDE_ONLY)
+        InventoryTools::ClearAll(scene);
+        #endif
+    }
 };
 
 /**

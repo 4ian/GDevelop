@@ -83,22 +83,4 @@ InstructionMetadata & InstructionMetadata::AddCodeOnlyParameter(const gd::String
     return *this;
 }
 
-InstructionMetadata::ExtraInformation & InstructionMetadata::ExtraInformation::SetIncludeFile(const gd::String & includeFile)
-{
-    includeFiles.clear();
-    includeFiles.push_back(includeFile);
-    return *this;
-}
-
-/**
-* \brief Add a file to the already existing include files.
-*/
-InstructionMetadata::ExtraInformation & InstructionMetadata::ExtraInformation::AddIncludeFile(const gd::String & includeFile)
-{
-    if ( std::find(includeFiles.begin(), includeFiles.end(), includeFile) == includeFiles.end())
-        includeFiles.push_back(includeFile);
-
-    return *this;
-}
-
 }

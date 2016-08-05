@@ -65,22 +65,4 @@ gd::ExpressionMetadata & ExpressionMetadata::AddCodeOnlyParameter(const gd::Stri
     return *this;
 }
 
-ExpressionCodeGenerationInformation & ExpressionCodeGenerationInformation::SetIncludeFile(const gd::String & includeFile)
-{
-    includeFiles.clear();
-    includeFiles.push_back(includeFile);
-    return *this;
-}
-
-/**
-* \brief Add a file to the already existing include files.
-*/
-ExpressionCodeGenerationInformation & ExpressionCodeGenerationInformation::AddIncludeFile(const gd::String & includeFile)
-{
-    if ( std::find(includeFiles.begin(), includeFiles.end(), includeFile) == includeFiles.end())
-        includeFiles.push_back(includeFile);
-
-    return *this;
-}
-
 }

@@ -287,12 +287,23 @@ public:
         /**
          * \brief Erase any existing include file and add the specified include.
          */
-        ExtraInformation & SetIncludeFile(const gd::String & includeFile);
+        ExtraInformation & SetIncludeFile(const gd::String & includeFile)
+        {
+            includeFiles.clear();
+            includeFiles.push_back(includeFile);
+            return *this;
+        }
 
         /**
          * \brief Add a file to the already existing include files.
          */
-        ExtraInformation & AddIncludeFile(const gd::String & includeFile);
+        ExtraInformation & AddIncludeFile(const gd::String & includeFile)
+        {
+            if ( std::find(includeFiles.begin(), includeFiles.end(), includeFile) == includeFiles.end())
+                includeFiles.push_back(includeFile);
+
+            return *this;
+        }
 
         /**
          * \brief Get the files that must be included to use the instruction.

@@ -51,12 +51,23 @@ public:
     /**
      * \brief Erase any existing include file and add the specified include.
      */
-    ExpressionCodeGenerationInformation & SetIncludeFile(const gd::String & includeFile);
+    ExpressionCodeGenerationInformation & SetIncludeFile(const gd::String & includeFile)
+    {
+        includeFiles.clear();
+        includeFiles.push_back(includeFile);
+        return *this;
+    }
 
     /**
      * \brief Add a file to the already existing include files.
      */
-    ExpressionCodeGenerationInformation & AddIncludeFile(const gd::String & includeFile);
+    ExpressionCodeGenerationInformation & AddIncludeFile(const gd::String & includeFile)
+    {
+        if ( std::find(includeFiles.begin(), includeFiles.end(), includeFile) == includeFiles.end())
+            includeFiles.push_back(includeFile);
+
+        return *this;
+    }
 
     /**
      * \brief Get the files that must be included to use the instruction.

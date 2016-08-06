@@ -165,6 +165,7 @@ protected:
     wxRadioButton* m_includeAllEventsRadio;
     wxRadioButton* m_includeEventsGroupRadio;
     wxComboBox* m_eventsGroupComboBox;
+    wxStaticText* m_eventsGroupsNames;
     wxRadioButton* m_includeEventsByIndexRadio;
     wxPanel* m_deprecatedPanel;
     wxStaticText* m_staticText182;
@@ -193,6 +194,7 @@ public:
     wxRadioButton* GetIncludeAllEventsRadio() { return m_includeAllEventsRadio; }
     wxRadioButton* GetIncludeEventsGroupRadio() { return m_includeEventsGroupRadio; }
     wxComboBox* GetEventsGroupComboBox() { return m_eventsGroupComboBox; }
+    wxStaticText* GetEventsGroupsNames() { return m_eventsGroupsNames; }
     wxRadioButton* GetIncludeEventsByIndexRadio() { return m_includeEventsByIndexRadio; }
     wxStaticText* GetStaticText182() { return m_staticText182; }
     wxTextCtrl* GetStartTextCtrl() { return m_startTextCtrl; }

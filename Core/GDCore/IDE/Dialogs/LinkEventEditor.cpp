@@ -1,9 +1,12 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "LinkEventEditor.h"
 
+#include <set>
 #include <sstream>
+
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Project.h"
@@ -17,13 +20,13 @@ namespace gd
 LinkEventEditor::LinkEventEditor(wxWindow* parent, LinkEvent & event, const gd::Project & game)
     : LinkEventEditorBase(parent),
     editedEvent(event),
-    game(game)
+    project(project)
 {
     //Add all the scenes and external events into the combobox.
-    for ( std::size_t i = 0; i < game.GetExternalEventsCount(); ++i )
-        m_eventsComboBox->Append( game.GetExternalEvents(i).GetName() );
-    for ( std::size_t i = 0; i < game.GetLayoutsCount(); ++i )
-    	m_eventsComboBox->Append( game.GetLayout(i).GetName() );
+    for ( std::size_t i = 0; i < project.GetExternalEventsCount(); ++i )
+        m_eventsComboBox->Append( project.GetExternalEvents(i).GetName() );
+    for ( std::size_t i = 0; i < project.GetLayoutsCount(); ++i )
+    	m_eventsComboBox->Append( project.GetLayout(i).GetName() );
 
     m_includeAllEventsRadio->SetValue( editedEvent.GetIncludeConfig() == LinkEvent::INCLUDE_ALL );
     m_includeEventsGroupRadio->SetValue( editedEvent.GetIncludeConfig() == LinkEvent::INCLUDE_EVENTS_GROUP );
@@ -46,6 +49,7 @@ LinkEventEditor::LinkEventEditor(wxWindow* parent, LinkEvent & event, const gd::
     GetSizer()->Fit(this);
 
     EnableControls();
+    UpdateEventsGroupsList();
 }
 
 LinkEventEditor::~LinkEventEditor()
@@ -115,7 +119,31 @@ void LinkEventEditor::EnableControls()
 
 void LinkEventEditor::UpdateEventsGroupsList()
 {
+    m_eventsGroupComboBox->Clear();
 
+    const EventsList * events = nullptr;
+    if ( project.HasExternalEventsNamed(m_eventsComboBox->GetValue()) )
+        events = &project.GetExternalEvents(m_eventsComboBox->GetValue()).GetEvents();
+    else if ( project.HasLayoutNamed(m_eventsComboBox->GetValue()) )
+        events = &project.GetLayout(m_eventsComboBox->GetValue()).GetEvents();
+
+    if(!events)
+        return;
+
+    std::set<gd::String> groupsNames;
+    bool displayNameWarning = false;
+    for( std::size_t i = 0 ; i < events->GetEventsCount(); ++i )
+    {
+        std::shared_ptr<const GroupEvent> groupEvent = std::dynamic_pointer_cast<const GroupEvent>(events->GetEventSmartPtr(i));
+        if( groupEvent && !groupsNames.insert( groupEvent->GetName() ).second ) //Insert the name in the list. If already in, display the warning label.
+            displayNameWarning = true;
+    }
+
+    for(auto &groupName : groupsNames)
+        m_eventsGroupComboBox->Append( groupName );
+
+    m_eventsGroupsNames->Show(displayNameWarning);
+    GetSizer()->Fit(this);
 }
 
 }

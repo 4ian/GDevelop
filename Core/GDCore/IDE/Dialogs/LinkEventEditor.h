@@ -13,7 +13,7 @@ namespace gd
 class LinkEventEditor : public LinkEventEditorBase
 {
 public:
-    LinkEventEditor(wxWindow* parent, LinkEvent & event, const gd::Project & game);
+    LinkEventEditor(wxWindow* parent, LinkEvent & event, const gd::Project & project);
     virtual ~LinkEventEditor();
 
 protected:
@@ -31,7 +31,7 @@ private:
     void UpdateEventsGroupsList();
 
     LinkEvent & editedEvent;
-    const gd::Project & game;
+    const gd::Project & project;
 };
 
 }

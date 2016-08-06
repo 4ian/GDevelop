@@ -407,6 +407,14 @@ LinkEventEditorBase::LinkEventEditorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer158->Add(m_eventsGroupComboBox, 0, wxALL|wxEXPAND, 5);
     
+    m_eventsGroupsNames = new wxStaticText(this, wxID_ANY, _("Warning: Multiple groups have the same name. Only the first one will be included !"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_eventsGroupsNames->Wrap(285);
+    wxFont m_eventsGroupsNamesFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_eventsGroupsNamesFont.SetWeight(wxFONTWEIGHT_BOLD);
+    m_eventsGroupsNames->SetFont(m_eventsGroupsNamesFont);
+    
+    flexGridSizer158->Add(m_eventsGroupsNames, 0, wxALL|wxEXPAND|wxALIGN_LEFT, 5);
+    
     m_includeEventsByIndexRadio = new wxRadioButton(this, wxID_ANY, _("Only include the events: (deprecated)"), wxDefaultPosition, wxSize(-1,-1), 0);
     m_includeEventsByIndexRadio->SetValue(0);
     

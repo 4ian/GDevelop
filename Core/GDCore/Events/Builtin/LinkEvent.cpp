@@ -44,7 +44,8 @@ const EventsList * LinkEvent::GetLinkedEvents(const gd::Project & project) const
     if( includeConfig == INCLUDE_EVENTS_GROUP )
     {
         std::size_t i = 0;
-        for( ; i < events->GetEventsCount(); ++i )
+        std::size_t eventsCount = events->GetEventsCount();
+        for( ; i < eventsCount; ++i )
         {
             std::shared_ptr<const GroupEvent> groupEvent = std::dynamic_pointer_cast<const GroupEvent>(events->GetEventSmartPtr(i));
             if(groupEvent && groupEvent->GetName() == eventsGroupName)
@@ -55,7 +56,7 @@ const EventsList * LinkEvent::GetLinkedEvents(const gd::Project & project) const
             }
         }
 
-        if(i >= events->GetEventsCount()) //We didn't find the events group, return nullptr
+        if(i >= eventsCount) //We didn't find the events group, return nullptr
             events = nullptr;
     }
 
@@ -203,11 +204,16 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
     dc.SetFont(renderingHelper->GetNiceFont());
     dc.DrawText( _("Link to ")+GetTarget(), x+32, y + 3 );
 
-    /*if ( !IncludeAllEvents() ) TODO: Update !
+    if ( GetIncludeConfig() == INCLUDE_BY_INDEX )
     {
         wxRect textRect = dc.GetTextExtent(_("Link to ")+GetTarget());
         dc.DrawText( _("Include only events ")+gd::String::From(GetIncludeStart()+1)+_(" to ")+gd::String::From(GetIncludeEnd()+1), x+textRect.GetWidth()+32+10, y + 5 );
-    }*/
+    }
+    else if ( GetIncludeConfig() == INCLUDE_EVENTS_GROUP )
+    {
+        wxRect textRect = dc.GetTextExtent(_("Link to ")+GetTarget());
+        dc.DrawText( _("Include only the events group named \"")+gd::String::From(GetEventsGroupName())+_("\""), x+textRect.GetWidth()+32+10, y + 5 );
+    }
 #endif
 }
 

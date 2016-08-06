@@ -28,6 +28,8 @@ protected:
 private:
     void EnableControls();
 
+    void UpdateEventsGroupsList();
+
     LinkEvent & editedEvent;
     const gd::Project & game;
 };

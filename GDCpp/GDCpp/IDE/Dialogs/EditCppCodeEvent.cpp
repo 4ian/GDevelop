@@ -238,7 +238,9 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::
     codeEdit->SetText(editedEvent.GetInlineCode());
     for (std::size_t i = 0;i<editedEvent.GetIncludeFiles().size();++i)
     {
-        includeTextCtrl->AppendText(editedEvent.GetIncludeFiles()[i]+"\n");
+        includeTextCtrl->AppendText(editedEvent.GetIncludeFiles()[i]);
+        if(i != editedEvent.GetIncludeFiles().size() - 1)
+            includeTextCtrl->AppendText("\n");
     }
     sceneRefCheck->SetValue(editedEvent.GetPassSceneAsParameter());
     objectsListCheck->SetValue(editedEvent.GetPassObjectListAsParameter());

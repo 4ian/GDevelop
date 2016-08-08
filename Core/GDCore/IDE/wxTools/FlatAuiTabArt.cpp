@@ -578,8 +578,8 @@ void FlatAuiTabArt::DrawTab(wxDC& dc,
 
         dc.DrawLine(border_points[0].x+1,
                     border_points[0].y,
-                    border_points[5].x,
-                    border_points[5].y);
+                    border_points[3].x,
+                    border_points[3].y);
     }
 
 

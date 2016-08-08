@@ -153,6 +153,32 @@ public:
             .AddParameter("string", _("Item name"))
             .SetFunctionName("InventoryTools::IsEquipped").SetIncludeFile("Inventory/InventoryTools.h");
 
+        AddAction("SerializeToVariable",
+                       _("Save an inventory in a variable"),
+                       _("Save all the items of the inventory in a variable, so that it can be restored later."),
+                       _("Save inventory _PARAM1_ in variable _PARAM2_"),
+                       _("Inventories/Variables"),
+                       "CppPlatform/Extensions/Inventoryicon24.png",
+                       "CppPlatform/Extensions/Inventoryicon16.png")
+
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("string", _("Inventory name"))
+            .AddParameter("scenevariable", _("Scene variable"))
+            .SetFunctionName("InventoryTools::SerializeToVariable").SetIncludeFile("Inventory/InventoryTools.h");
+
+        AddAction("UnserializeFromVariable",
+                       _("Load an inventory from a variable"),
+                       _("Load the content of the inventory from a variable."),
+                       _("Load inventory _PARAM1_ from variable _PARAM2_"),
+                       _("Inventories/Variables"),
+                       "CppPlatform/Extensions/Inventoryicon24.png",
+                       "CppPlatform/Extensions/Inventoryicon16.png")
+
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("string", _("Inventory name"))
+            .AddParameter("scenevariable", _("Scene variable"))
+            .SetFunctionName("InventoryTools::UnserializeFromVariable").SetIncludeFile("Inventory/InventoryTools.h");
+
         AddExpression("Count", _("Item count"), _("Get the number of an item in the inventory"), _("Inventory"), "CppPlatform/Extensions/Inventoryicon16.png")
             .AddCodeOnlyParameter("currentScene", _(""))
             .AddParameter("string", _("Inventory name"))

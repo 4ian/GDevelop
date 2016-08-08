@@ -7,19 +7,6 @@ public:
 	Inventory() {};
 	virtual ~Inventory() {};
 
-	bool Has(const gd::String & itemName);
-	size_t Count(const gd::String & itemName);
-	bool Add(const gd::String & itemName);
-	bool IsFull(const gd::String & itemName);
-	bool Remove(const gd::String & itemName);
-	void SetMaximum(const gd::String & itemName, size_t maxCount);
-	void SetUnlimited(const gd::String & itemName, bool enable = true);
-	bool Equip(const gd::String & itemName, bool equip = true);
-	bool IsEquipped(const gd::String & itemName);
-
-private:
-	void MakeItemEntry(const gd::String & itemName);
-	
 	class Item {
 	public:
 		bool unlimited = true;
@@ -27,6 +14,23 @@ private:
 		size_t maxCount = 0;
 		bool equipped = false;
 	};
+
+	bool Has(const gd::String & itemName);
+	size_t Count(const gd::String & itemName);
+	bool Add(const gd::String & itemName);
+	bool SetCount(const gd::String & itemName, size_t count);
+	bool IsFull(const gd::String & itemName);
+	bool Remove(const gd::String & itemName);
+	void SetMaximum(const gd::String & itemName, size_t maxCount);
+	void SetUnlimited(const gd::String & itemName, bool enable = true);
+	bool Equip(const gd::String & itemName, bool equip = true);
+	bool IsEquipped(const gd::String & itemName);
+	void Clear();
+
+	const std::map<gd::String, Item> & GetAllItems() { return items; };
+
+private:
+	void MakeItemEntry(const gd::String & itemName);
 
 	std::map<gd::String, Item> items;
 };

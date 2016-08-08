@@ -44,7 +44,37 @@ public:
 		return Get(scene, inventoryName).IsEquipped(itemName);
 	}
 
-	static bool ClearAll(RuntimeScene & scene) {
+	static void SerializeToVariable(RuntimeScene & scene, const gd::String & inventoryName,
+		gd::Variable & variable) {
+		auto & allItems = Get(scene, inventoryName).GetAllItems();
+		for(auto & it : allItems)
+		{
+			Inventory::Item item = it.second;
+			gd::Variable & serializedItem = variable.GetChild(it.first);
+			serializedItem.GetChild("count").SetValue(item.count);
+			serializedItem.GetChild("maxCount").SetValue(item.maxCount);
+			serializedItem.GetChild("unlimited").SetString(item.unlimited ? "true" : "false");
+			serializedItem.GetChild("equipped").SetString(item.equipped ? "true" : "false");
+		}
+	}
+
+	static void UnserializeFromVariable(RuntimeScene & scene, const gd::String & inventoryName,
+		const gd::Variable & variable) {
+		Inventory & inventory = Get(scene, inventoryName);
+		inventory.Clear();
+
+		for(auto & child : variable.GetAllChildren())
+		{
+			const gd::String & name = child.first;
+			const gd::Variable & serializedItem = child.second;
+			inventory.SetMaximum(name, serializedItem.GetChild("maxCount").GetValue());
+			inventory.SetUnlimited(name, serializedItem.GetChild("unlimited") == "true");
+			inventory.SetCount(name, serializedItem.GetChild("count").GetValue());
+			inventory.Equip(name, serializedItem.GetChild("equipped") == "true");
+		}
+	}
+
+	static void ClearAll(RuntimeScene & scene) {
 		std::map<gd::String, Inventory> clearedInventories;
 		inventories[scene.game] = clearedInventories;
 	}

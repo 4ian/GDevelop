@@ -19,12 +19,23 @@ bool Inventory::Add(const gd::String & itemName) {
 	auto & item = items[itemName];
 	if (item.unlimited || item.count < item.maxCount) {
 		item.count++;
-		std::cout << "Count for " << itemName << items[itemName].count << std::endl;
 
 		return true;
 	}
 
 	return false;
+}
+
+bool Inventory::SetCount(const gd::String & itemName, size_t count) {
+	if (items.find(itemName) == items.end()) {
+		MakeItemEntry(itemName);
+	}
+
+	auto & item = items[itemName];
+	size_t newCount = item.unlimited ? count : std::min(count, item.maxCount);
+	item.count = newCount;
+
+	return item.unlimited || count <= item.maxCount;
 }
 
 bool Inventory::IsFull(const gd::String & itemName) {
@@ -95,4 +106,8 @@ bool Inventory::IsEquipped(const gd::String & itemName) {
 	}
 
 	return items[itemName].equipped;
+}
+
+void Inventory::Clear() {
+	items.clear();
 }

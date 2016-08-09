@@ -49,6 +49,7 @@ module.exports = function(config) {
       '../../Extensions/PlatformBehavior/platformruntimebehavior.js',
       '../../Extensions/LinkedObjects/linkedobjects.js',
       '../../Extensions/Inventory/inventory.js',
+      '../../Extensions/Inventory/inventorytools.js',
 
       //All tests files:
       './tests/init.js',

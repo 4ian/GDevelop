@@ -54,6 +54,33 @@ gdjs.evtTools.inventory.isFull = function(runtimeScene, inventoryName, name) {
 gdjs.evtTools.inventory.equip = function(runtimeScene, inventoryName, name, equip) {
 	return gdjs.InventoryManager.get(runtimeScene, inventoryName).equip(name, equip);
 };
+
 gdjs.evtTools.inventory.isEquipped = function(runtimeScene, inventoryName, name) {
 	return gdjs.InventoryManager.get(runtimeScene, inventoryName).isEquipped(name);
+};
+
+gdjs.evtTools.inventory.serializeToVariable = function(runtimeScene, inventoryName, variable) {
+	var allItems = gdjs.InventoryManager.get(runtimeScene, inventoryName).getAllItems();
+	for(var name in allItems) {
+		var item = allItems[name];
+		var serializedItem = variable.getChild(name);
+		serializedItem.getChild("count").setNumber(item.count);
+		serializedItem.getChild("maxCount").setNumber(item.maxCount);
+		serializedItem.getChild("unlimited").setNumber(item.unlimited ? "true" : "false");
+		serializedItem.getChild("equipped").setNumber(item.equipped ? "true" : "false");
+	}
+};
+
+gdjs.evtTools.inventory.unserializeFromVariable = function(runtimeScene, inventoryName, variable) {
+	var inventory = gdjs.InventoryManager.get(runtimeScene, inventoryName);
+	inventory.clear();
+
+	var children = variable.getAllChildren();
+	for(var name in children) {
+		var serializedItem = children[name];
+		inventory.setMaximum(name, serializedItem.getChild('maxCount').getAsNumber());
+		inventory.setUnlimited(name, serializedItem.getChild('unlimited').getAsString() == "true");
+		inventory.setCount(name, serializedItem.getChild('count').getAsNumber()); //TODO
+		inventory.equip(name, serializedItem.getChild('equipped').getAsString() == "true");
+	}
 };

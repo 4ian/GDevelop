@@ -34,23 +34,32 @@ public:
 		GetAllActions()["Inventory::Add"].codeExtraInformation
 			.SetIncludeFile("Inventory/inventory.js")
 			.AddIncludeFile("Inventory/inventorytools.js")
-			.SetFunctionName("gdjs.evtTools.inventory.add"),
+			.SetFunctionName("gdjs.evtTools.inventory.add");
 		GetAllActions()["Inventory::Remove"].codeExtraInformation
 			.SetIncludeFile("Inventory/inventory.js")
 			.AddIncludeFile("Inventory/inventorytools.js")
-			.SetFunctionName("gdjs.evtTools.inventory.remove"),
+			.SetFunctionName("gdjs.evtTools.inventory.remove");
 		GetAllActions()["Inventory::SetMaximum"].codeExtraInformation
 			.SetIncludeFile("Inventory/inventory.js")
 			.AddIncludeFile("Inventory/inventorytools.js")
-			.SetFunctionName("gdjs.evtTools.inventory.setMaximum"),
+			.SetFunctionName("gdjs.evtTools.inventory.setMaximum");
 		GetAllActions()["Inventory::SetUnlimited"].codeExtraInformation
 			.SetIncludeFile("Inventory/inventory.js")
 			.AddIncludeFile("Inventory/inventorytools.js")
-			.SetFunctionName("gdjs.evtTools.inventory.setUnlimited"),
+			.SetFunctionName("gdjs.evtTools.inventory.setUnlimited");
 		GetAllActions()["Inventory::Equip"].codeExtraInformation
 			.SetIncludeFile("Inventory/inventory.js")
 			.AddIncludeFile("Inventory/inventorytools.js")
-			.SetFunctionName("gdjs.evtTools.inventory.equip"),
+			.SetFunctionName("gdjs.evtTools.inventory.equip");
+
+		GetAllActions()["Inventory::SerializeToVariable"].codeExtraInformation
+			.SetIncludeFile("Inventory/inventory.js")
+			.AddIncludeFile("Inventory/inventorytools.js")
+			.SetFunctionName("gdjs.evtTools.inventory.serializeToVariable");
+		GetAllActions()["Inventory::UnserializeFromVariable"].codeExtraInformation
+			.SetIncludeFile("Inventory/inventory.js")
+			.AddIncludeFile("Inventory/inventorytools.js")
+			.SetFunctionName("gdjs.evtTools.inventory.unserializeFromVariable");
 
 		GetAllConditions()["Inventory::Count"].codeExtraInformation
 			.SetIncludeFile("Inventory/inventory.js")

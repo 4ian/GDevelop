@@ -4,6 +4,10 @@ function Inventory() {
 	return this;
 }
 
+Inventory.prototype.clear = function() {
+	this._items = {};
+}
+
 Inventory.prototype.has = function(itemName) {
 	return this._items.hasOwnProperty(itemName) && this._items[itemName].count > 0;
 }
@@ -26,6 +30,18 @@ Inventory.prototype.add = function(itemName) {
 	}
 
 	return false;
+}
+
+Inventory.prototype.setCount = function(itemName, count) {
+	if (!this._items.hasOwnProperty(itemName)) {
+		this._makeItemEntry(itemName);
+	}
+
+	var item = this._items[itemName];
+	var newCount = item.unlimited ? count : Math.min(count, item.maxCount);
+	item.count = newCount;
+
+	return item.unlimited || count <= item.maxCount;
 }
 
 Inventory.prototype.isFull = function(itemName) {
@@ -100,4 +116,8 @@ Inventory.prototype.isEquipped = function(itemName) {
 	}
 
 	return this._items[itemName].equipped;
+}
+
+Inventory.prototype.getAllItems = function() {
+	return this._items;
 }

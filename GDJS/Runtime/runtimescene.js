@@ -195,21 +195,21 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * or a game stop was requested.
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
-    this._profiler.frameStarted();
-    this._profiler.begin("timeManager");
+    // this._profiler.frameStarted();
+    // this._profiler.begin("timeManager");
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
 	this._timeManager.update(elapsedTime, this._runtimeGame.getMinimalFramerate());
-    this._profiler.begin("objects (pre-events)");
+    // this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
-    this._profiler.begin("events");
+    // this._profiler.begin("events");
 	this._eventsFunction(this, this._eventsContext);
-    this._profiler.begin("objects (post-events)");
+    // this._profiler.begin("objects (post-events)");
 	this._updateObjects();
-    this._profiler.begin("objects (visibility)");
+    // this._profiler.begin("objects (visibility)");
 	this._updateObjectsVisibility();
-    this._profiler.begin("render");
+    // this._profiler.begin("render");
 	this.render();
-    this._profiler.end();
+    // this._profiler.end();
 
 	return !!this.getRequestedChange();
 };

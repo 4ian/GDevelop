@@ -451,14 +451,20 @@ gdjs.SpriteRuntimeObject.prototype.getPointX = function(name) {
     if ( name.length === 0 || this._animationFrame === null ) return this.getX();
 
     var pt = this._animationFrame.getPoint(name);
-    return this._transformToGlobal(pt.x, pt.y)[0];
+    var pos = gdjs.staticArray(gdjs.SpriteRuntimeObject.prototype.getPointX);
+    this._transformToGlobal(pt.x, pt.y, pos);
+
+    return pos[0];
 };
 
 gdjs.SpriteRuntimeObject.prototype.getPointY = function(name) {
     if ( name.length === 0 || this._animationFrame === null ) return this.getY();
 
     var pt = this._animationFrame.getPoint(name);
-    return this._transformToGlobal(pt.x, pt.y)[1];
+    var pos = gdjs.staticArray(gdjs.SpriteRuntimeObject.prototype.getPointY);
+    this._transformToGlobal(pt.x, pt.y, pos);
+
+    return pos[1];
 };
 
 /**
@@ -503,13 +509,9 @@ gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
     x = cx + Math.cos(this.angle/180*3.14159)*(x-cx) - Math.sin(this.angle/180*3.14159)*(y-cy);
     y = cy + Math.sin(this.angle/180*3.14159)*(oldX-cx) + Math.cos(this.angle/180*3.14159)*(y-cy);
 
-    if (result !== undefined) {
-        result.length = 2;
-        result[0] = x + this.getDrawableX();
-        result[1] = y + this.getDrawableY();
-    }
-    else
-        return [x + this.getDrawableX(), y + this.getDrawableY()];
+    result.length = 2;
+    result[0] = x + this.getDrawableX();
+    result[1] = y + this.getDrawableY();
 };
 
 gdjs.SpriteRuntimeObject.prototype.getDrawableX = function() {

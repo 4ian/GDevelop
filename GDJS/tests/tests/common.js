@@ -28,6 +28,7 @@ describe('gdjs.evtTools.object.twoListsTest', function() {
 
 		expect(gdjs.evtTools.object.twoListsTest(function() {return true;}, map1, map2, false)).to.be.ok();
 		expect(gdjs.evtTools.object.twoListsTest(function() {return false;}, map1, map2, true)).to.be.ok();
+		expect(gdjs.evtTools.object.twoListsTest(function(obj1, obj2, value) {return value;}, map1, map2, false, true)).to.be.ok();
 		expect(list1).to.have.length(3);
 		expect(list2).to.have.length(3);
 

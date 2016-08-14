@@ -192,12 +192,10 @@ Array.prototype.remove = function(from) {
 
 Array.prototype.createFrom = function(arr) {
     var len = arr.length;
-    if ( len !== undefined ) {
-        this.length = len;
-        for (var i = 0; i < len;++i) {
-            this[i] = arr[i];
-        }
+    for (var i = 0;i < len;++i) {
+        this[i] = arr[i];
     }
+    this.length = len;
 };
 
 //Make sure console.warn and console.error are available.

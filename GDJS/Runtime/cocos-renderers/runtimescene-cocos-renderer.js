@@ -111,7 +111,7 @@ gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {
         },
     }), cc.EventListener.create({
 	    event: cc.EventListener.KEYBOARD,
-	    onKeyPressed:  function(keyCode){
+	    onKeyPressed: function(keyCode){
 		    that._runtimeScene.getGame().getInputManager().onKeyPressed(keyCode);
 	    },
 	    onKeyReleased: function(keyCode){
@@ -119,7 +119,7 @@ gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {
 	    }
     }), cc.EventListener.create({
 	    event: cc.EventListener.TOUCH_ALL_AT_ONCE,
-	    onTouchesBegan:  function(touches){
+	    onTouchesBegan: function(touches){
             for (var i = 0;i<touches.length;++i) {
                 var touch = touches[i];
 

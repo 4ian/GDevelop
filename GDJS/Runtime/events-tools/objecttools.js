@@ -53,7 +53,7 @@ gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
  * @method TwoListsTest
  * @static
  */
-gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted) {
+gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted/*, extraArg TODO*/) {
 
     var isTrue = false;
     var objects1Lists = gdjs.staticArray(gdjs.evtTools.object.twoListsTest);
@@ -157,7 +157,7 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
  * @method PickObjectsIf
  * @static
  */
-gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate) {
+gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate/*, extraArg TODO*/) {
     var isTrue = false;
     var lists = gdjs.staticArray(gdjs.evtTools.object.pickObjectsIf);
     objectsLists.values(lists);
@@ -208,7 +208,7 @@ gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsList
 gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, distance, inverted) {
     distance *= distance;
 
-    var distanceTestInner = function(obj1, obj2) {
+    var distanceTestInner = function(obj1, obj2) { //TODO
         return obj1.getSqDistanceToObject(obj2) <= distance;
     };
 
@@ -219,7 +219,7 @@ gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, dista
 
 gdjs.evtTools.object.movesTowardTest = function(objectsLists1, objectsLists2, tolerance, inverted) {
 
-    var movesTowardTestInner = function(obj1, obj2) {
+    var movesTowardTestInner = function(obj1, obj2) { //TODO
 
         if ( obj1.hasNoForces() ) return false;
 
@@ -235,7 +235,7 @@ gdjs.evtTools.object.movesTowardTest = function(objectsLists1, objectsLists2, to
 
 gdjs.evtTools.object.turnedTowardTest = function(objectsLists1, objectsLists2, tolerance, inverted) {
 
-    var turnedTowardTestInner = function(obj1, obj2) {
+    var turnedTowardTestInner = function(obj1, obj2) { //TODO
 
         var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
                                   obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));

@@ -138,9 +138,9 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
     p1.computeEdges();
     p2.computeEdges();
 
-    var edge = [0, 0];
-    var move_axis = [0, 0];
-    var mtd = [0, 0];
+    var edge = [0, 0]; //TODO
+    var move_axis = [0, 0]; //TODO
+    var mtd = [0, 0]; //TODO
 
     var min_dist = Number.MAX_VALUE;
 
@@ -158,7 +158,7 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
             edge = p2.edges[i - len1];
         }
 
-        var axis = [-edge[1], edge[0]]; //Get the axis to which polygons will be projected
+        var axis = [-edge[1], edge[0]]; //Get the axis to which polygons will be projected //TODO
         gdjs.Polygon.normalise(axis);
 
         var minMaxA = gdjs.Polygon.project(axis, p1); //Do projection on the axis.
@@ -217,7 +217,7 @@ gdjs.Polygon.dotProduct = function(a, b)
     return dp;
 }
 
-gdjs.Polygon.project = function(axis, p)
+gdjs.Polygon.project = function(axis, p) //TODO
 {
     var dp = gdjs.Polygon.dotProduct(axis, p.vertices[0]);
     var minMax = [dp, dp];

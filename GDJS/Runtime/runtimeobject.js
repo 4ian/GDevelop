@@ -137,7 +137,7 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
  */
 gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
     var theLayer = runtimeScene.getLayer(this.layer);
-    this.exposeRendererObject(function(displayObject) {
+    this.exposeRendererObject(function(displayObject) { //TODO
         theLayer.getRenderer().removeRendererObject(displayObject);
     });
 };
@@ -340,7 +340,7 @@ gdjs.RuntimeObject.prototype.setLayer = function(layer) {
     var newLayer = this._runtimeScene.getLayer(this.layer);
 
     var that = this;
-    this.exposeRendererObject(function (displayObject) {
+    this.exposeRendererObject(function (displayObject) { //TODO
         oldLayer.getRenderer().removeRendererObject(displayObject);
         newLayer.getRenderer().addRendererObject(displayObject, that.zOrder);
     });
@@ -379,7 +379,7 @@ gdjs.RuntimeObject.prototype.setZOrder = function(z) {
     this.zOrder = z;
 
     var theLayer = this._runtimeScene.getLayer(this.layer);
-    this.exposeRendererObject(function(displayObject) {
+    this.exposeRendererObject(function(displayObject) { //TODO
         theLayer.getRenderer().changeRendererObjectZOrder(displayObject, z);
     });
 };

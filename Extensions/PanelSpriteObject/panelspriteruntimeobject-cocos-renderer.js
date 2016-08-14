@@ -165,7 +165,7 @@ gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.setTexture = function(textu
     var that = this;
     var texture = runtimeScene.getGame().getImageManager().getTexture(textureName);
 
-    function makeInsideTexture(rect) {
+    function makeInsideTexture(rect) { //TODO
         if (rect.width < 0) rect.width = 0;
         if (rect.height < 0) rect.height = 0;
         if (rect.x < 0) rect.x = 0;
@@ -178,7 +178,7 @@ gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.setTexture = function(textu
         return rect;
     }
 
-    function setSpriteRect(sprite, shader, rect) {
+    function setSpriteRect(sprite, shader, rect) { //TODO
         makeInsideTexture(rect);
 
         if (!shader) {

@@ -80,7 +80,7 @@ gdjs.evtTools.inventory.unserializeFromVariable = function(runtimeScene, invento
 		var serializedItem = children[name];
 		inventory.setMaximum(name, serializedItem.getChild('maxCount').getAsNumber());
 		inventory.setUnlimited(name, serializedItem.getChild('unlimited').getAsString() == "true");
-		inventory.setCount(name, serializedItem.getChild('count').getAsNumber()); //TODO
+		inventory.setCount(name, serializedItem.getChild('count').getAsNumber());
 		inventory.equip(name, serializedItem.getChild('equipped').getAsString() == "true");
 	}
 };

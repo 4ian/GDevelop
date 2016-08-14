@@ -113,7 +113,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setTexture = function(textur
     var obj = this._object;
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(textureName);
 
-    function makeInsideTexture(rect) {
+    function makeInsideTexture(rect) { //TODO
         if (rect.width < 0) rect.width = 0;
         if (rect.height < 0) rect.height = 0;
         if (rect.x < 0) rect.x = 0;

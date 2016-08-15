@@ -34,8 +34,8 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene
 
 gdjs.PanelSpriteRuntimeObjectRenderer = gdjs.PanelSpriteRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
-gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._spritesContainer);
+gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
+    return this._spritesContainer;
 };
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {

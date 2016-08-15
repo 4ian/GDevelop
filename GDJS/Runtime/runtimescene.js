@@ -253,11 +253,10 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 		this._constructListOfAllInstances();
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
+            var rendererObject = object.getRendererObject();
 
-            if (object.isHidden())
-			    object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
-            else
-                object.exposeRendererObject(gdjs.RuntimeScene.showObject);
+            if (rendererObject)
+                object.getRendererObject().visible = !object.isHidden();
 		}
 
 		return;
@@ -269,31 +268,24 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
 			var cameraCoords = this._layersCameraCoordinates[object.getLayer()];
+            var rendererObject = object.getRendererObject();
 
-			if (!cameraCoords) continue;
+			if (!cameraCoords || !rendererObject) continue;
 
 			if (object.isHidden()) {
-				object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
+				rendererObject.visible = false;
 			} else {
 				var aabb = object.getAABB();
 				if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
 					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
-					object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
+        			rendererObject.visible = false;
 				} else {
-					object.exposeRendererObject(gdjs.RuntimeScene.showObject);
+                    rendererObject.visible = true;
 				}
 			}
 		}
 	}
 };
-
-gdjs.RuntimeScene.hideObject = function(displayObject) {
-    displayObject.visible = false;
-}
-
-gdjs.RuntimeScene.showObject = function(displayObject) {
-    displayObject.visible = true;
-}
 
 /**
  * Empty the list of the removed objects:<br>

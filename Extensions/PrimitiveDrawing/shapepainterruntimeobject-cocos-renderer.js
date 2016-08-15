@@ -11,8 +11,8 @@ gdjs.ShapePainterRuntimeObjectCocosRenderer = function(runtimeObject, runtimeSce
 
 gdjs.ShapePainterRuntimeObjectRenderer = gdjs.ShapePainterRuntimeObjectCocosRenderer; //Register the class to let the engine use it.
 
-gdjs.ShapePainterRuntimeObjectCocosRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._drawNode);
+gdjs.ShapePainterRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {
+    return this._drawNode;
 };
 
 gdjs.ShapePainterRuntimeObjectCocosRenderer.prototype.clear = function() {

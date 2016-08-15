@@ -325,7 +325,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function(fn) {
     requestAnimationFrame(gameLoop);
 
     var oldTime = null;
-    function gameLoop(time) { //TODO?
+    function gameLoop(time) {
         var dt = oldTime ? time - oldTime : 0;
         oldTime = time;
 

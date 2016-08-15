@@ -30,8 +30,8 @@ gdjs.ShapePainterRuntimeObject = function(runtimeScene, objectData)
 gdjs.ShapePainterRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.ShapePainterRuntimeObject.thisIsARuntimeObjectConstructor = "PrimitiveDrawing::Drawer";
 
-gdjs.ShapePainterRuntimeObject.prototype.exposeRendererObject = function(cb) {
-    this._renderer.exposeRendererObject(cb);
+gdjs.ShapePainterRuntimeObject.prototype.getRendererObject = function() {
+    return this._renderer.getRendererObject();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeScene) {

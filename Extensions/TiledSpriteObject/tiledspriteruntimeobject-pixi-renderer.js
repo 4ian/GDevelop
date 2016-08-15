@@ -19,8 +19,8 @@ gdjs.TiledSpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene
 
 gdjs.TiledSpriteRuntimeObjectRenderer = gdjs.TiledSpriteRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
-gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._tiledSprite);
+gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
+    return this._tiledSprite;
 };
 
 gdjs.TiledSpriteRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

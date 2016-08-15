@@ -137,9 +137,7 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
  */
 gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
     var theLayer = runtimeScene.getLayer(this.layer);
-    this.exposeRendererObject(function(displayObject) { //TODO
-        theLayer.getRenderer().removeRendererObject(displayObject);
-    });
+    theLayer.getRenderer().removeRendererObject(this.getRendererObject());
 };
 
 //Rendering:
@@ -148,12 +146,10 @@ gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
  * Called with a callback function that should be called with the internal
  * object used for rendering by the object (PIXI.DisplayObject...)
  *
- * @TODO: This should be removed in favor of getRenderer.
- *
- * @method exposeRendererObject
- * @param cb The callback to be called with the internal rendered object (PIXI.DisplayObject...)
+ * @method getRendererObject
+ * @return {Object} The internal rendered object (PIXI.DisplayObject...)
  */
-gdjs.RuntimeObject.prototype.exposeRendererObject = function(cb) {
+gdjs.RuntimeObject.prototype.getRendererObject = function() {
 };
 
 //Common properties:
@@ -339,11 +335,9 @@ gdjs.RuntimeObject.prototype.setLayer = function(layer) {
     this.layer = layer;
     var newLayer = this._runtimeScene.getLayer(this.layer);
 
-    var that = this;
-    this.exposeRendererObject(function (displayObject) { //TODO
-        oldLayer.getRenderer().removeRendererObject(displayObject);
-        newLayer.getRenderer().addRendererObject(displayObject, that.zOrder);
-    });
+    var rendererObject = this.getRendererObject();
+    oldLayer.getRenderer().removeRendererObject(rendererObject);
+    newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
 };
 
 /**
@@ -379,9 +373,7 @@ gdjs.RuntimeObject.prototype.setZOrder = function(z) {
     this.zOrder = z;
 
     var theLayer = this._runtimeScene.getLayer(this.layer);
-    this.exposeRendererObject(function(displayObject) { //TODO
-        theLayer.getRenderer().changeRendererObjectZOrder(displayObject, z);
-    });
+    theLayer.getRenderer().changeRendererObjectZOrder(this.getRendererObject(), z);
 };
 
 /**

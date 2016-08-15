@@ -16,8 +16,8 @@ gdjs.TextEntryRuntimeObjectCocosRenderer.prototype.ownerRemovedFromScene = funct
     this.activate(false);
 };
 
-gdjs.TextEntryRuntimeObjectCocosRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._textField);
+gdjs.TextEntryRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {
+    return this._textField;
 };
 
 gdjs.TextEntryRuntimeObjectCocosRenderer.prototype.getString = function() {

@@ -42,8 +42,8 @@ gdjs.PanelSpriteRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScen
 
 gdjs.PanelSpriteRuntimeObjectRenderer = gdjs.PanelSpriteRuntimeObjectCocosRenderer; //Register the class to let the engine use it.
 
-gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._spritesContainer);
+gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {
+    return this._spritesContainer;
 };
 
 gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype._createTilingShaderAndUniforms = function() {

@@ -58,6 +58,7 @@ describe('gdjs.evtTools.object.pickObjectsIf', function() {
 
 		expect(gdjs.evtTools.object.pickObjectsIf(function() {return true;}, map1, false)).to.be.ok();
 		expect(gdjs.evtTools.object.pickObjectsIf(function() {return false;}, map1, true)).to.be.ok();
+		expect(gdjs.evtTools.object.pickObjectsIf(function(obj, value) {return value;}, map1, false, true)).to.be.ok();
 		expect(list1).to.have.length(3);
 
 		expect(gdjs.evtTools.object.pickObjectsIf(function(obj) {return obj == obj1A || obj == obj1C;}, map1, false)).to.be.ok();

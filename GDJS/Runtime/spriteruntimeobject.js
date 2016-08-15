@@ -257,8 +257,8 @@ gdjs.SpriteRuntimeObject.prototype._updateFrame = function() {
    this._animationFrame = null;
 };
 
-gdjs.SpriteRuntimeObject.prototype.exposeRendererObject = function(cb) {
-    this._renderer.exposeRendererObject(cb);
+gdjs.SpriteRuntimeObject.prototype.getRendererObject = function() {
+    return this._renderer.getRendererObject();
 };
 
 /**

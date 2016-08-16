@@ -17,7 +17,7 @@
 namespace gd
 {
 
-LinkEventEditor::LinkEventEditor(wxWindow* parent, LinkEvent & event, const gd::Project & game)
+LinkEventEditor::LinkEventEditor(wxWindow* parent, LinkEvent & event, const gd::Project & project)
     : LinkEventEditorBase(parent),
     editedEvent(event),
     project(project)
@@ -35,7 +35,7 @@ LinkEventEditor::LinkEventEditor(wxWindow* parent, LinkEvent & event, const gd::
     m_eventsComboBox->SetValue( editedEvent.GetTarget() );
     if ( editedEvent.GetIncludeConfig() == LinkEvent::INCLUDE_EVENTS_GROUP )
     {
-        m_eventsGroupComboBox->SetValue(editedEvent.GetEventsGroupName());
+        m_eventsGroupComboBox->SetValue( editedEvent.GetEventsGroupName() );
     }
     else if ( editedEvent.GetIncludeConfig() == LinkEvent::INCLUDE_BY_INDEX )
     {
@@ -119,15 +119,18 @@ void LinkEventEditor::EnableControls()
 
 void LinkEventEditor::UpdateEventsGroupsList()
 {
+    wxString oldText = m_eventsGroupComboBox->GetValue();
     m_eventsGroupComboBox->Clear();
+
+    m_eventsGroupsNames->Show(false);
+    GetSizer()->Fit(this);
 
     const EventsList * events = nullptr;
     if ( project.HasExternalEventsNamed(m_eventsComboBox->GetValue()) )
         events = &project.GetExternalEvents(m_eventsComboBox->GetValue()).GetEvents();
     else if ( project.HasLayoutNamed(m_eventsComboBox->GetValue()) )
         events = &project.GetLayout(m_eventsComboBox->GetValue()).GetEvents();
-
-    if(!events)
+    else
         return;
 
     std::set<gd::String> groupsNames;
@@ -143,6 +146,7 @@ void LinkEventEditor::UpdateEventsGroupsList()
         m_eventsGroupComboBox->Append( groupName );
 
     m_eventsGroupsNames->Show(displayNameWarning);
+    m_eventsGroupComboBox->SetValue(oldText);
     GetSizer()->Fit(this);
 }
 

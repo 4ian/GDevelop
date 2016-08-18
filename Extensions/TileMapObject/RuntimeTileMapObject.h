@@ -59,6 +59,7 @@ public :
     #endif
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
+    virtual std::vector<Polygon2d> GetHitBoxes(sf::FloatRect hint) const;
 
     float GetTileWidth() const;
     float GetTileHeight() const;

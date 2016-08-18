@@ -355,8 +355,24 @@ bool RuntimeObject::IsCollidingWith(RuntimeObject * obj2)
         return false;
 
     //Do a real check if necessary.
-    vector<Polygon2d> objHitboxes = obj1->GetHitBoxes();
-    vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes();
+
+    //Get the bounding rect of the two objects to use them
+    //as a hint to get the other's hitboxes
+    sf::FloatRect objRect(
+        obj1->GetDrawableX(),
+        obj1->GetDrawableY(),
+        obj1->GetWidth(),
+        obj1->GetHeight()
+    );
+    sf::FloatRect obj2Rect(
+        obj2->GetDrawableX(),
+        obj2->GetDrawableY(),
+        obj2->GetWidth(),
+        obj2->GetHeight()
+    );
+
+    vector<Polygon2d> objHitboxes = obj1->GetHitBoxes(obj2Rect);
+    vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes(objRect);
     for (std::size_t k = 0;k<objHitboxes.size();++k)
     {
         for (std::size_t l = 0;l<obj2Hitboxes.size();++l)
@@ -523,6 +539,11 @@ std::vector<Polygon2d> RuntimeObject::GetHitBoxes() const
 
     mask.push_back(rectangle);
     return mask;
+}
+
+std::vector<Polygon2d> RuntimeObject::GetHitBoxes(sf::FloatRect hint) const
+{
+    return GetHitBoxes();
 }
 
 bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)

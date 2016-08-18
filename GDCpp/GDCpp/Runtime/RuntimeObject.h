@@ -14,6 +14,7 @@
 #include "GDCpp/Runtime/Force.h"
 #include "GDCpp/Runtime/String.h"
 #include "GDCpp/Runtime/Project/Behavior.h"
+#include <SFML/Graphics/Rect.hpp>
 namespace gd { class InitialInstance; }
 namespace gd { class Object; }
 namespace sf { class RenderTarget; }
@@ -199,6 +200,12 @@ public:
      * \note Default implementation returns a basic bounding box, according to the object width/height and angle.
      */
     virtual std::vector<Polygon2d> GetHitBoxes() const;
+
+    /**
+     * \brief Get the object hitbox(es) preferably intersecting with hint
+     * \note The default implementation returns all the hitbox given by GetHitBoxes()
+     */
+    virtual std::vector<Polygon2d> GetHitBoxes(sf::FloatRect hint) const;
 
     /**
      * \brief Check collision between two objects using their hitboxes.

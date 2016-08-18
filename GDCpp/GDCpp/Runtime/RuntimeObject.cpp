@@ -358,18 +358,8 @@ bool RuntimeObject::IsCollidingWith(RuntimeObject * obj2)
 
     //Get the bounding rect of the two objects to use them
     //as a hint to get the other's hitboxes
-    sf::FloatRect objRect(
-        obj1->GetDrawableX(),
-        obj1->GetDrawableY(),
-        obj1->GetWidth(),
-        obj1->GetHeight()
-    );
-    sf::FloatRect obj2Rect(
-        obj2->GetDrawableX(),
-        obj2->GetDrawableY(),
-        obj2->GetWidth(),
-        obj2->GetHeight()
-    );
+    sf::FloatRect objRect = obj1->GetAABB();
+    sf::FloatRect obj2Rect = obj2->GetAABB();
 
     vector<Polygon2d> objHitboxes = obj1->GetHitBoxes(obj2Rect);
     vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes(objRect);
@@ -528,6 +518,28 @@ void RuntimeObject::SetXY( const char* xOperator, float xValue, const char* yOpe
         SetY( GetY() * yValue );
     else if ( strcmp(yOperator, "/") == 0 )
         SetY( GetY() / yValue );
+}
+
+sf::FloatRect RuntimeObject::GetAABB() const
+{
+    sf::FloatRect notTransformedAABB(
+        -GetCenterX(),
+        -GetCenterY(),
+        GetWidth(),
+        GetHeight()
+    );
+
+    sf::Transform rotationTransform;
+    rotationTransform.rotate(GetAngle());
+
+    sf::Vector2f translationVec = sf::Vector2f(GetDrawableX() + GetCenterX(), GetDrawableY() + GetCenterY());
+    sf::Transform translationTransform;
+    translationTransform.translate(translationVec.x, translationVec.y);
+
+    sf::Transform resultTransform;
+    resultTransform = translationTransform * rotationTransform;
+
+    return resultTransform.transformRect(notTransformedAABB);
 }
 
 std::vector<Polygon2d> RuntimeObject::GetHitBoxes() const

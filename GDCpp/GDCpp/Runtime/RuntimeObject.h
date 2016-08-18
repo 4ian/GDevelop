@@ -196,6 +196,11 @@ public:
     inline bool IsOnLayer(const gd::String & layer_) const { return layer == layer_; }
 
     /**
+     * \brief Get the object AABB
+     */
+    sf::FloatRect GetAABB() const;
+
+    /**
      * \brief Get the object hitbox(es)
      * \note Default implementation returns a basic bounding box, according to the object width/height and angle.
      */

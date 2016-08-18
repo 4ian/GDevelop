@@ -274,12 +274,12 @@ bool RuntimeObject::SeparateFromObjects(const std::vector<RuntimeObject*> & obje
 {
     bool moved = false;
     sf::Vector2f moveVector;
-    vector<Polygon2d> hitBoxes = GetHitBoxes();
     for (std::size_t j = 0;j<objects.size(); ++j)
     {
         if ( objects[j] != this )
         {
-            vector<Polygon2d> otherHitBoxes = objects[j]->GetHitBoxes();
+            std::vector<Polygon2d> hitBoxes = GetHitBoxes(objects[j]->GetAABB());
+            vector<Polygon2d> otherHitBoxes = objects[j]->GetHitBoxes(GetAABB());
             for (std::size_t k = 0;k<hitBoxes.size();++k)
             {
                 for (std::size_t l = 0;l<otherHitBoxes.size();++l)

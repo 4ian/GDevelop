@@ -27,11 +27,12 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
     else this.points.clear();
 
     //Initialize points:
-    var that = this;
-    gdjs.iterateOverArray(frameData.points, function(ptData) {
+	for(var i = 0, len = frameData.points.length;i<len;++i) {
+		var ptData = frameData.points[i];
+
         var point = {x:parseFloat(ptData.x), y:parseFloat(ptData.y)};
-        that.points.put(ptData.name, point);
-    });
+        this.points.put(ptData.name, point);
+    }
     var origin = frameData.originPoint;
     this.origin.x = parseFloat(origin.x);
     this.origin.y = parseFloat(origin.y);
@@ -49,30 +50,27 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
     //Load the custom collision mask, if any:
     if ( frameData.hasCustomCollisionMask ) {
         this.hasCustomHitBoxes = true;
-        var polygonIndex = 0;
-        gdjs.iterateOverArray(frameData.customCollisionMask, function(polygonData) {
+    	for(var i = 0, len = frameData.customCollisionMask.length;i<len;++i) {
+    		var polygonData = frameData.customCollisionMask[i];
 
             //Add a polygon, if necessary (Avoid recreating a polygon if it already exists).
-            if ( polygonIndex >= that.customHitBoxes.length ) that.customHitBoxes.push(new gdjs.Polygon());
+            if ( i >= this.customHitBoxes.length ) this.customHitBoxes.push(new gdjs.Polygon());
 
-            var vertIndex = 0;
-            gdjs.iterateOverArray(polygonData, function(pointData) {
+        	for(var j = 0, len2 = polygonData.length;j<len2;++j) {
+        		var pointData = polygonData[j];
 
                 //Add a point, if necessary (Avoid recreating a point if it already exists).
-                if ( vertIndex >= that.customHitBoxes[polygonIndex].vertices.length )
-                    that.customHitBoxes[polygonIndex].vertices.push([0,0]);
+                if ( j >= this.customHitBoxes[i].vertices.length )
+                    this.customHitBoxes[i].vertices.push([0,0]);
 
-                that.customHitBoxes[polygonIndex].vertices[vertIndex][0] = parseFloat(pointData.x, 10);
-                that.customHitBoxes[polygonIndex].vertices[vertIndex][1] = parseFloat(pointData.y, 10);
+                this.customHitBoxes[i].vertices[j][0] = parseFloat(pointData.x, 10);
+                this.customHitBoxes[i].vertices[j][1] = parseFloat(pointData.y, 10);
+            }
 
-                vertIndex++;
-            });
+            this.customHitBoxes[i].vertices.length = j;
+        }
 
-            that.customHitBoxes[polygonIndex].vertices.length = vertIndex;
-            polygonIndex++;
-        });
-
-        this.customHitBoxes.length = polygonIndex;
+        this.customHitBoxes.length = i;
     }
     else {
         this.customHitBoxes.length = 0;
@@ -108,34 +106,30 @@ gdjs.SpriteAnimation = function(imageManager, animData)
                                  1.0;
         this.loop = !!directionData.looping;
 
-        var that = this;
-        var i = 0;
         if ( this.frames === undefined ) this.frames = [];
-        gdjs.iterateOverArray(directionData.sprites, function(frameData) {
-            if ( i < that.frames.length )
-                gdjs.SpriteAnimationFrame.call(that.frames[i], imageManager, frameData);
-            else
-                that.frames.push(new gdjs.SpriteAnimationFrame(imageManager, frameData));
+        for(var i = 0, len = directionData.sprites.length;i<len;++i) {
+            var frameData = directionData.sprites[i];
 
-            i++;
-        });
+            if ( i < this.frames.length )
+                gdjs.SpriteAnimationFrame.call(this.frames[i], imageManager, frameData);
+            else
+                this.frames.push(new gdjs.SpriteAnimationFrame(imageManager, frameData));
+        }
         this.frames.length = i;
     };
 
     this.hasMultipleDirections = !!animData.useMultipleDirections;
     this.name = animData.name || '';
 
-    var that = this;
-    var i = 0;
     if ( this.directions === undefined ) this.directions = [];
-    gdjs.iterateOverArray(animData.directions, function(directionData) {
-        if ( i < that.directions.length )
-            Direction.call(that.directions[i], imageManager, directionData);
-        else
-            that.directions.push(new Direction(imageManager, directionData));
+    for(var i = 0, len = animData.directions.length;i<len;++i) {
+        var directionData = animData.directions[i];
 
-        i++;
-    });
+        if ( i < this.directions.length )
+            Direction.call(this.directions[i], imageManager, directionData);
+        else
+            this.directions.push(new Direction(imageManager, directionData));
+    }
     this.directions.length = i; //Make sure to delete already existing directions which are not used anymore.
 };
 
@@ -164,17 +158,15 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     this.opacity = 255;
 
     //Animations:
-    var that = this;
-    var i = 0;
     if ( this._animations === undefined ) this._animations = [];
-    gdjs.iterateOverArray(objectData.animations, function(animData) {
-        if ( i < that._animations.length )
-            gdjs.SpriteAnimation.call(that._animations[i], runtimeScene.getGame().getImageManager(), animData);
-        else
-            that._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), animData));
+    for(var i = 0, len = objectData.animations.length;i<len;++i) {
+        var animData = objectData.animations[i];
 
-        i++;
-    });
+        if ( i < this._animations.length )
+            gdjs.SpriteAnimation.call(this._animations[i], runtimeScene.getGame().getImageManager(), animData);
+        else
+            this._animations.push(new gdjs.SpriteAnimation(runtimeScene.getGame().getImageManager(), animData));
+    }
     this._animations.length = i; //Make sure to delete already existing animations which are not used anymore.
 
     //Reference to the current SpriteAnimationFrame that is displayd. Can be null, so ensure that this case is handled properly.
@@ -198,11 +190,12 @@ gdjs.SpriteRuntimeObject.thisIsARuntimeObjectConstructor = "Sprite"; //Notify gd
  */
 gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
     if ( initialInstanceData.numberProperties ) {
-        var that = this;
-        gdjs.iterateOverArray(initialInstanceData.numberProperties, function(extraData) {
+        for(var i = 0, len = initialInstanceData.numberProperties.length;i<len;++i) {
+            var extraData = initialInstanceData.numberProperties[i];
+
             if ( extraData.name === "animation" )
-                that.setAnimation(extraData.value);
-        });
+                this.setAnimation(extraData.value);
+        }
     }
     if ( initialInstanceData.customSize ) {
         this.setWidth(initialInstanceData.width);
@@ -264,8 +257,8 @@ gdjs.SpriteRuntimeObject.prototype._updateFrame = function() {
    this._animationFrame = null;
 };
 
-gdjs.SpriteRuntimeObject.prototype.exposeRendererObject = function(cb) {
-    this._renderer.exposeRendererObject(cb);
+gdjs.SpriteRuntimeObject.prototype.getRendererObject = function() {
+    return this._renderer.getRendererObject();
 };
 
 /**
@@ -458,14 +451,20 @@ gdjs.SpriteRuntimeObject.prototype.getPointX = function(name) {
     if ( name.length === 0 || this._animationFrame === null ) return this.getX();
 
     var pt = this._animationFrame.getPoint(name);
-    return this._transformToGlobal(pt.x, pt.y)[0];
+    var pos = gdjs.staticArray(gdjs.SpriteRuntimeObject.prototype.getPointX);
+    this._transformToGlobal(pt.x, pt.y, pos);
+
+    return pos[0];
 };
 
 gdjs.SpriteRuntimeObject.prototype.getPointY = function(name) {
     if ( name.length === 0 || this._animationFrame === null ) return this.getY();
 
     var pt = this._animationFrame.getPoint(name);
-    return this._transformToGlobal(pt.x, pt.y)[1];
+    var pos = gdjs.staticArray(gdjs.SpriteRuntimeObject.prototype.getPointY);
+    this._transformToGlobal(pt.x, pt.y, pos);
+
+    return pos[1];
 };
 
 /**
@@ -510,13 +509,9 @@ gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
     x = cx + Math.cos(this.angle/180*3.14159)*(x-cx) - Math.sin(this.angle/180*3.14159)*(y-cy);
     y = cy + Math.sin(this.angle/180*3.14159)*(oldX-cx) + Math.cos(this.angle/180*3.14159)*(y-cy);
 
-    if (result !== undefined) {
-        result.length = 2;
-        result[0] = x + this.getDrawableX();
-        result[1] = y + this.getDrawableY();
-    }
-    else
-        return [x + this.getDrawableX(), y + this.getDrawableY()];
+    result.length = 2;
+    result[0] = x + this.getDrawableX();
+    result[1] = y + this.getDrawableY();
 };
 
 gdjs.SpriteRuntimeObject.prototype.getDrawableX = function() {

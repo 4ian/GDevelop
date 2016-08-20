@@ -13,11 +13,11 @@ gdjs.SceneStack.prototype.onRendererResized = function() {
 	}
 };
 
-gdjs.SceneStack.prototype.step = function() {
+gdjs.SceneStack.prototype.step = function(elapsedTime) {
 	if (this._stack.length === 0) return false;
 
 	var currentScene = this._stack[this._stack.length - 1];
-    if (currentScene.renderAndStep()) {
+    if (currentScene.renderAndStep(elapsedTime)) {
     	var request = currentScene.getRequestedChange();
         //Something special was requested by the current scene.
         if (request === gdjs.RuntimeScene.STOP_GAME) {

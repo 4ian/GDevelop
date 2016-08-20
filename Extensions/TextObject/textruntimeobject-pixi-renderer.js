@@ -15,8 +15,8 @@ gdjs.TextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene)
 
 gdjs.TextRuntimeObjectRenderer = gdjs.TextRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
-gdjs.TextRuntimeObjectPixiRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._text);
+gdjs.TextRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
+    return this._text;
 };
 
 gdjs.TextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {

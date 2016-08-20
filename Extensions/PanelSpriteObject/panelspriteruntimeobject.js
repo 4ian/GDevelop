@@ -33,8 +33,8 @@ gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
 gdjs.PanelSpriteRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.PanelSpriteRuntimeObject.thisIsARuntimeObjectConstructor = "PanelSpriteObject::PanelSprite";
 
-gdjs.PanelSpriteRuntimeObject.prototype.exposeRendererObject = function(cb) {
-    this._renderer.exposeRendererObject(cb);
+gdjs.PanelSpriteRuntimeObject.prototype.getRendererObject = function() {
+    return this._renderer.getRendererObject();
 };
 
 gdjs.PanelSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {

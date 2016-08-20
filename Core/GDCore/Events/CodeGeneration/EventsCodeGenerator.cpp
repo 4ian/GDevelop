@@ -185,7 +185,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditio
 
     gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(platform, condition.GetType());
 
-    AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
+    AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
     maxConditionsListsSize = std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
     if ( instrInfos.codeExtraInformation.HasCustomCodeGenerator())
@@ -339,7 +339,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
 
     gd::InstructionMetadata instrInfos = MetadataProvider::GetActionMetadata(platform, action.GetType());
 
-    AddIncludeFile(instrInfos.codeExtraInformation.optionalIncludeFile);
+    AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
 
     if ( instrInfos.codeExtraInformation.HasCustomCodeGenerator() )
     {

@@ -33,8 +33,8 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
 gdjs.TextRuntimeObject.prototype = Object.create( gdjs.RuntimeObject.prototype );
 gdjs.TextRuntimeObject.thisIsARuntimeObjectConstructor = "TextObject::Text";
 
-gdjs.TextRuntimeObject.prototype.exposeRendererObject = function(cb) {
-    this._renderer.exposeRendererObject(cb);
+gdjs.TextRuntimeObject.prototype.getRendererObject = function() {
+    return this._renderer.getRendererObject();
 };
 
 gdjs.TextRuntimeObject.prototype.updateTime = function() {

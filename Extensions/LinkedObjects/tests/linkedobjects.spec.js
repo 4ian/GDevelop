@@ -12,13 +12,13 @@ describe('gdjs.LinksManager', function() {
 
 	var manager = gdjs.LinksManager.getManager(runtimeScene);
 
-	var object1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: ""});
-	var object1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: ""});
-	var object1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: ""});
+	var object1A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+	var object1B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+	var object1C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 
-	var object2A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: ""});
-	var object2B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: ""});
-	var object2C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: ""});
+	var object2A = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+	var object2B = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
+	var object2C = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 
 	runtimeScene.addObject(object1A);
 	runtimeScene.addObject(object1B);

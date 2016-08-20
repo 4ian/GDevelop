@@ -111,12 +111,15 @@ gdjs.evtTools.linkedObjects.removeAllLinksOf = function(runtimeScene, objA) {
 	gdjs.LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
 };
 
+gdjs.evtTools.linkedObjects._objectIsInList = function(obj, linkedObjects) {
+	return linkedObjects.indexOf(obj) !== -1;
+}
+
 gdjs.evtTools.linkedObjects.pickObjectsLinkedTo = function(runtimeScene, objectsLists, obj) {
 	if (obj === null) return false;
     var linkedObjects =
 		gdjs.LinksManager.getManager(runtimeScene).getObjectsLinkedWith(obj);
 
-	return gdjs.evtTools.object.pickObjectsIf(function(obj) {
-		return linkedObjects.indexOf(obj) !== -1;
-	}, objectsLists, false);
+	return gdjs.evtTools.object.pickObjectsIf(gdjs.evtTools.linkedObjects._objectIsInList,
+		objectsLists, false, linkedObjects);
 };

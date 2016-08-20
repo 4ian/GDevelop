@@ -50,10 +50,14 @@ gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
  *  + Cost(predicate)*(NbObjList1+NbObjList2)
  *  + Cost(Testing NbObjList1+NbObjList2 booleans)
  *
+ * Note: predicate is called with the two objects to compare, and an optional argument `extraArg`.
+ * This should be used to avoid declaring the predicate as a closure that would be created and destroyed
+ * at each call to twoListsTest (potentially multiple time per frame).
+ *
  * @method TwoListsTest
  * @static
  */
-gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted) {
+gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted, extraArg) {
 
     var isTrue = false;
     var objects1Lists = gdjs.staticArray(gdjs.evtTools.object.twoListsTest);
@@ -88,7 +92,7 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
                 for(var l = 0, lenl = arr2.length;l<lenl;++l) {
                     if (arr1[k].pick && arr2[l].pick) continue; //Avoid unnecessary costly call to predicate.
 
-                    if (arr1[k].id !== arr2[l].id && predicate(arr1[k], arr2[l])) {
+                    if (arr1[k].id !== arr2[l].id && predicate(arr1[k], arr2[l], extraArg)) {
                         if ( !inverted ) {
                             isTrue = true;
 
@@ -152,12 +156,13 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
  * @param predicate The function applied to each object: must return true if the object fulfill the predicate.
  * @param objectsLists The lists of objects to trim
  * @param negatePredicate If set to true, the result of the predicate is negated.
+ * @param extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
  * @return true if at least one object fulfill the predicate.
  *
  * @method PickObjectsIf
  * @static
  */
-gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate) {
+gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate, extraArg) {
     var isTrue = false;
     var lists = gdjs.staticArray(gdjs.evtTools.object.pickObjectsIf);
     objectsLists.values(lists);
@@ -175,7 +180,7 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
         var arr = lists[i];
 
         for(var k = 0, lenk = arr.length;k<lenk;++k) {
-            if (negatePredicate ^ predicate(arr[k])) {
+            if (negatePredicate ^ predicate(arr[k], extraArg)) {
                 isTrue = true;
                 arr[k].pick = true; //Pick the objects
             }
@@ -205,46 +210,41 @@ gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsList
         objectsLists1, objectsLists2, inverted);
 };
 
-gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, distance, inverted) {
-    distance *= distance;
-
-    var distanceTestInner = function(obj1, obj2) {
-        return obj1.getSqDistanceToObject(obj2) <= distance;
-    };
-
-    return gdjs.evtTools.object.twoListsTest(distanceTestInner, objectsLists1,
-        objectsLists2, inverted);
+gdjs.evtTools.object._distanceBetweenObjects = function(obj1, obj2, distance) {
+    return obj1.getSqDistanceToObject(obj2) <= distance;
 };
 
+gdjs.evtTools.object.distanceTest = function(objectsLists1, objectsLists2, distance, inverted) {
+    return gdjs.evtTools.object.twoListsTest(gdjs.evtTools.object._distanceBetweenObjects,
+        objectsLists1, objectsLists2, inverted, distance*distance);
+};
+
+gdjs.evtTools.object._movesToward = function(obj1, obj2, tolerance) {
+    if ( obj1.hasNoForces() ) return false;
+
+    var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
+                              obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
+    objAngle *= 180/3.14159;
+
+    return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAverageForce().getAngle(), objAngle)) <= tolerance/2;
+};
 
 gdjs.evtTools.object.movesTowardTest = function(objectsLists1, objectsLists2, tolerance, inverted) {
+    return gdjs.evtTools.object.twoListsTest(gdjs.evtTools.object._movesToward,
+        objectsLists1, objectsLists2, inverted, tolerance);
+};
 
-    var movesTowardTestInner = function(obj1, obj2) {
+gdjs.evtTools.object._turnedToward = function(obj1, obj2, tolerance) {
+    var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
+                              obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
+    objAngle *= 180/3.14159;
 
-        if ( obj1.hasNoForces() ) return false;
-
-        var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
-                                  obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
-        objAngle *= 180/3.14159;
-
-        return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAverageForce().getAngle(), objAngle)) <= tolerance/2;
-    };
-
-    return gdjs.evtTools.object.twoListsTest(movesTowardTestInner, objectsLists1, objectsLists2, inverted);
+    return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAngle(), objAngle)) <= tolerance/2;
 };
 
 gdjs.evtTools.object.turnedTowardTest = function(objectsLists1, objectsLists2, tolerance, inverted) {
-
-    var turnedTowardTestInner = function(obj1, obj2) {
-
-        var objAngle = Math.atan2(obj2.getY()+obj2.getCenterY() - (obj1.getY()+obj1.getCenterY()),
-                                  obj2.getX()+obj2.getCenterX() - (obj1.getX()+obj1.getCenterX()));
-        objAngle *= 180/3.14159;
-
-        return Math.abs(gdjs.evtTools.common.angleDifference(obj1.getAngle(), objAngle)) <= tolerance/2;
-    };
-
-    return gdjs.evtTools.object.twoListsTest(turnedTowardTestInner, objectsLists1, objectsLists2, inverted);
+    return gdjs.evtTools.object.twoListsTest(gdjs.evtTools.object._turnedToward,
+        objectsLists1, objectsLists2, inverted, tolerance);
 };
 
 gdjs.evtTools.object.pickAllObjects = function(runtimeScene, objectsLists) {

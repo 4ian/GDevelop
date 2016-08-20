@@ -457,7 +457,9 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms = function
 {
     excludeJumpThrus = !!excludeJumpThrus;
 
-    var objects = [];
+    var objects = gdjs.staticArray(gdjs.PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms);
+    objects.length = 0;
+
     for (var i = 0;i<candidates.length;++i) {
         var platform = candidates[i];
 

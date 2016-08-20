@@ -31,7 +31,7 @@
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/CommonTools.h"
-#include <SFML/OpenGL.hpp>
+#include "GDCore/Tools/OpenGLTools.h"
 #if !defined(ANDROID) && !defined(MACOS)
 #include <GL/glu.h>
 #endif
@@ -266,7 +266,7 @@ void LayoutEditorCanvas::RenderEdittime()
 
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            gluPerspective(layout.GetOpenGLFOV(), static_cast<double>(getSize().x)/static_cast<double>(getSize().y), layout.GetOpenGLZNear(), layout.GetOpenGLZFar());
+            OpenGLTools::PerspectiveGL(layout.GetOpenGLFOV(), static_cast<double>(getSize().x)/static_cast<double>(getSize().y), layout.GetOpenGLZNear(), layout.GetOpenGLZFar());
 
             glViewport(0,0, getSize().x, getSize().y);
 

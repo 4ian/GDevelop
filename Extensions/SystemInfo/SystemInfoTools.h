@@ -11,14 +11,7 @@ This project is released under the MIT License.
 namespace SystemInfo
 {
 
-bool GD_EXTENSION_API IsMobile()
-{
-    #if defined(ANDROID)
-    return true;
-    #else
-    return false;
-    #endif
-}
+bool GD_EXTENSION_API IsMobile();
 
 }
 

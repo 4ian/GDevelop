@@ -167,9 +167,6 @@ std::vector<Polygon2d> RuntimeTileMapObject::GetHitBoxes(sf::FloatRect hint) con
     else
         bottomRight.y = (hint.top + hint.height - GetY()) / GetTileHeight();
 
-    std::cout << "Getting hitboxes from " << topLeft.x << ";" << topLeft.y << " to ";
-    std::cout << bottomRight.x << ";" << bottomRight.y << std::endl;
-
     //Add the polygons
     for( std::size_t i = topLeft.x; i <= bottomRight.x; ++i ) //Columns
     {

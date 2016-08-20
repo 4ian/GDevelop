@@ -30,21 +30,25 @@ namespace gdjs
 
 gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & project,
                                                                  gd::Layout & scene,
-                                                                 gd::EventsList & events,
+                                                                 const gd::EventsList & events,
                                                                  std::set < gd::String > & includeFiles,
                                                                  bool compilationForRuntime)
 {
+    // Preprocessing then code generation can make changes to the events, so we need to do
+    // the work on a copy of the events.
+    gd::EventsList generatedEvents = events;
+
     gd::String output = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code = {};\n";
 
     //Prepare the global context
     unsigned int maxDepthLevelReached = 0;
     gd::EventsCodeGenerationContext context(&maxDepthLevelReached);
     EventsCodeGenerator codeGenerator(project, scene);
-    codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
-    codeGenerator.PreprocessEventList(events);
 
     //Generate whole events code
-    gd::String wholeEventsCode = codeGenerator.GenerateEventsListCode(events, context);
+    codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+    codeGenerator.PreprocessEventList(generatedEvents);
+    gd::String wholeEventsCode = codeGenerator.GenerateEventsListCode(generatedEvents, context);
 
     //Extra declarations needed by events
     for ( set<gd::String>::iterator declaration = codeGenerator.GetCustomGlobalDeclaration().begin() ;

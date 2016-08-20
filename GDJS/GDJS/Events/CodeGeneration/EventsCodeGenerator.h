@@ -40,7 +40,7 @@ public:
      */
     static gd::String GenerateSceneEventsCompleteCode(gd::Project & project,
                                                        gd::Layout & scene,
-                                                       gd::EventsList & events,
+                                                       const gd::EventsList & events,
                                                        std::set < gd::String > & includeFiles,
                                                        bool compilationForRuntime = false);
 

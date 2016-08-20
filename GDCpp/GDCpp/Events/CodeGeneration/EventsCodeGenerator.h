@@ -31,7 +31,7 @@ public:
      * \param compilationForRuntime Set this to true if the code is generated for runtime.
      * \return C++ code
      */
-    static gd::String GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, gd::EventsList & events, bool compilationForRuntime = false);
+    static gd::String GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, const gd::EventsList & events, bool compilationForRuntime = false);
 
     /**
      * Generate complete C++ file for compiling external events.

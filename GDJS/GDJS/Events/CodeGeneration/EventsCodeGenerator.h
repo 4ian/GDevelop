@@ -39,10 +39,8 @@ public:
      * \return JS code
      */
     static gd::String GenerateSceneEventsCompleteCode(gd::Project & project,
-                                                       gd::Layout & scene,
-                                                       gd::EventsList & events,
-                                                       std::set < gd::String > & includeFiles,
-                                                       bool compilationForRuntime = false);
+        const gd::Layout & scene, const gd::EventsList & events,
+        std::set < gd::String > & includeFiles, bool compilationForRuntime = false);
 
     /**
      * Generate code for executing a condition list

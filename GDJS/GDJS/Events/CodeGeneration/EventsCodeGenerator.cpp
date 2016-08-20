@@ -29,10 +29,8 @@ namespace gdjs
 {
 
 gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & project,
-                                                                 gd::Layout & scene,
-                                                                 const gd::EventsList & events,
-                                                                 std::set < gd::String > & includeFiles,
-                                                                 bool compilationForRuntime)
+    const gd::Layout & scene, const gd::EventsList & events, std::set < gd::String > & includeFiles,
+    bool compilationForRuntime)
 {
     // Preprocessing then code generation can make changes to the events, so we need to do
     // the work on a copy of the events.
@@ -56,7 +54,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
         output += *declaration+"\n";
 
     //Global objects lists
-    auto generateDeclarations = [&project, &scene, &codeGenerator](gd::Object & object, unsigned int maxDepth,
+    auto generateDeclarations = [&project, &scene, &codeGenerator](const gd::Object & object, unsigned int maxDepth,
         gd::String & globalObjectLists, gd::String & globalObjectListsReset) {
 
         gd::String type = gd::GetTypeOfObject(project, scene, object.GetName());

@@ -209,10 +209,13 @@ gdjs.evtTools.input.getMouseY = function(runtimeScene, layer, camera) {
         runtimeScene.getGame().getInputManager().getMouseY())[1];
 };
 
+gdjs.evtTools.input._cursorIsOnObject = function(obj, runtimeScene) {
+    return obj.cursorOnObject(runtimeScene);
+};
+
 gdjs.evtTools.input.cursorOnObject = function(objectsLists, runtimeScene, accurate, inverted) {
-    return gdjs.evtTools.object.pickObjectsIf(function(obj) {
-        return obj.cursorOnObject(runtimeScene);
-    }, objectsLists, inverted);
+    return gdjs.evtTools.object.pickObjectsIf(gdjs.evtTools.input._cursorIsOnObject,
+        objectsLists, inverted, runtimeScene);
 };
 
 gdjs.evtTools.input.getTouchX = function(runtimeScene, identifier, layer, camera) {

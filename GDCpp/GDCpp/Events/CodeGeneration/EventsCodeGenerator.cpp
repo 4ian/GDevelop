@@ -409,18 +409,22 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
     return argOutput;
 }
 
-gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, gd::EventsList & events, bool compilationForRuntime)
+gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & project, gd::Layout & scene, const gd::EventsList & events, bool compilationForRuntime)
 {
+    // Preprocessing then code generation can make changes to the events, so we need to do
+    // the work on a copy of the events.
+    gd::EventsList generatedEvents = events;
+
     gd::String output;
 
     //Prepare the global context ( Used to get needed header files )
     gd::EventsCodeGenerationContext context;
     EventsCodeGenerator codeGenerator(project, scene);
-    codeGenerator.PreprocessEventList(scene.GetEvents());
-    codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
     //Generate whole events code
-    gd::String wholeEventsCode = codeGenerator.GenerateEventsListCode(events, context);
+    codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+    codeGenerator.PreprocessEventList(generatedEvents);
+    gd::String wholeEventsCode = codeGenerator.GenerateEventsListCode(generatedEvents, context);
 
     //Generate default code around events:
     //Includes

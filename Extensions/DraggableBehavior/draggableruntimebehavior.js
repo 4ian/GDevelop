@@ -4,7 +4,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * The draggableRuntimeBehavior represents a behavior allowing objects to be
+ * The DraggableRuntimeBehavior represents a behavior allowing objects to be
  * moved using the mouse.
  *
  * @class DraggableRuntimeBehavior

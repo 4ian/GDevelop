@@ -112,7 +112,7 @@ HSHG.prototype.addObject = function(obj){
 	// for HSHG metadata
 	obj.HSHG = {
 		globalObjectsIndex: this._globalObjects.length
-	};
+	}; //TODO: recycle existing object if necessary.
 
 	// add to global object array
 	this._globalObjects.push(obj);

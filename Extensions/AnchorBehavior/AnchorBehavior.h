@@ -65,6 +65,7 @@ private:
     virtual void DoStepPreEvents(RuntimeScene & scene) override;
     virtual void DoStepPostEvents(RuntimeScene & scene) override;
 
+    bool m_relativeToOriginalWindowSize; ///< True if the original size of the game window must be used.
     HorizontalAnchor m_leftEdgeAnchor;
     HorizontalAnchor m_rightEdgeAnchor;
     VerticalAnchor m_topEdgeAnchor;

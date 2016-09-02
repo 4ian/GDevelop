@@ -69,48 +69,46 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 			parseInt(sceneData.b, 10));
 
 	//Load layers
-    var that = this;
-	gdjs.iterateOverArray(sceneData.layers, function(layerData) {
-		that._layers.put(layerData.name, new gdjs.Layer(layerData, that));
+	for(var i = 0, len = sceneData.layers.length;i<len;++i) {
+		var layerData = sceneData.layers[i];
+
+		this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
 		//console.log("Created layer : \""+name+"\".");
-	});
+	}
 
     //Load variables
     this._variables = new gdjs.VariablesContainer(sceneData.variables);
 
 	//Cache the initial shared data of the behaviors
-    gdjs.iterateOverArray(sceneData.behaviorsSharedData, function(data) {
+	for(var i = 0, len = sceneData.behaviorsSharedData.length;i<len;++i) {
+		var data = sceneData.behaviorsSharedData[i];
+
 		//console.log("Initializing shared data for "+data.name);
-		that._initialBehaviorSharedData.put(data.name, data);
-	});
+		this._initialBehaviorSharedData.put(data.name, data);
+	}
+
+    var that = this;
+    function loadObject(objData) {
+        var objectName = objData.name;
+        var objectType = objData.type;
+
+        that._objects.put(objectName, objData);
+        that._instances.put(objectName, []); //Also reserve an array for the instances
+        that._instancesCache.put(objectName, []); //and for cached instances
+		//And cache the constructor for the performance sake:
+		that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
+    }
 
     //Load objects: Global objects first...
-	gdjs.iterateOverArray(this.getGame().getInitialObjectsData(), function(objData){
-        var objectName = objData.name;
-        var objectType = objData.type;
-
-        that._objects.put(objectName, objData);
-        that._instances.put(objectName, []); //Also reserve an array for the instances
-        that._instancesCache.put(objectName, []); //and for cached instances
-		//And cache the constructor for the performance sake:
-		that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
-
-        //console.log("Loaded "+objectName+" in memory (Global object)");
-	});
+    var initialGlobalObjectsData = this.getGame().getInitialObjectsData();
+	for(var i = 0, len = initialGlobalObjectsData.length;i<len;++i) {
+		loadObject(initialGlobalObjectsData[i]);
+	}
 	//...then the scene objects
     this._initialObjectsData = sceneData.objects;
-    gdjs.iterateOverArray(this._initialObjectsData, function(objData) {
-        var objectName = objData.name;
-        var objectType = objData.type;
-
-        that._objects.put(objectName, objData);
-        that._instances.put(objectName, []); //Also reserve an array for the instances
-        that._instancesCache.put(objectName, []); //and for cached instances
-		//And cache the constructor for the performance sake:
-		that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
-
-        //console.log("Loaded "+objectName+" in memory");
-    });
+	for(var i = 0, len = this._initialObjectsData.length;i<len;++i) {
+		loadObject(this._initialObjectsData[i]);
+    }
 
     //Create initial instances of objects
     this.createObjectsFrom(sceneData.instances, 0, 0);
@@ -135,7 +133,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 		this._runtimeGame.getSoundManager().clearAll();
 
     this._isLoaded = true;
-	this._timeManager.reset(Date.now());
+	this._timeManager.reset();
 };
 
 gdjs.RuntimeScene.prototype.unloadScene = function() {
@@ -160,10 +158,10 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
  * @param yPos The offset on Y axis
  */
 gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
-	var that = this;
-    gdjs.iterateOverArray(data, function(instanceData) {
+    for(var i = 0, len = data.length;i<len;++i) {
+        var instanceData = data[i];
         var objectName = instanceData.name;
-		var newObject = that.createObject(objectName);
+		var newObject = this.createObject(objectName);
 
 		if ( newObject !== null ) {
             newObject.setPosition(parseFloat(instanceData.x) + xPos, parseFloat(instanceData.y) + yPos);
@@ -173,7 +171,7 @@ gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
             newObject.getVariables().initFrom(instanceData.initialVariables, true);
             newObject.extraInitializationFromInitialInstance(instanceData);
 		}
-    });
+    }
 };
 
 /**
@@ -196,22 +194,22 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * @return true if the game loop should continue, false if a scene change/push/pop
  * or a game stop was requested.
  */
-gdjs.RuntimeScene.prototype.renderAndStep = function() {
-    this._profiler.frameStarted();
-    this._profiler.begin("timeManager");
+gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
+    // this._profiler.frameStarted();
+    // this._profiler.begin("timeManager");
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
-	this._timeManager.update(Date.now(), this._runtimeGame.getMinimalFramerate());
-    this._profiler.begin("objects (pre-events)");
+	this._timeManager.update(elapsedTime, this._runtimeGame.getMinimalFramerate());
+    // this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
-    this._profiler.begin("events");
+    // this._profiler.begin("events");
 	this._eventsFunction(this, this._eventsContext);
-    this._profiler.begin("objects (post-events)");
+    // this._profiler.begin("objects (post-events)");
 	this._updateObjects();
-    this._profiler.begin("objects (visibility)");
+    // this._profiler.begin("objects (visibility)");
 	this._updateObjectsVisibility();
-    this._profiler.begin("render");
+    // this._profiler.begin("render");
 	this.render();
-    this._profiler.end();
+    // this._profiler.end();
 
 	return !!this.getRequestedChange();
 };
@@ -255,11 +253,10 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 		this._constructListOfAllInstances();
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
+            var rendererObject = object.getRendererObject();
 
-            if (object.isHidden())
-			    object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
-            else
-                object.exposeRendererObject(gdjs.RuntimeScene.showObject);
+            if (rendererObject)
+                object.getRendererObject().visible = !object.isHidden();
 		}
 
 		return;
@@ -271,31 +268,24 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
 			var object = this._allInstancesList[i];
 			var cameraCoords = this._layersCameraCoordinates[object.getLayer()];
+            var rendererObject = object.getRendererObject();
 
-			if (!cameraCoords) continue;
+			if (!cameraCoords || !rendererObject) continue;
 
 			if (object.isHidden()) {
-				object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
+				rendererObject.visible = false;
 			} else {
 				var aabb = object.getAABB();
 				if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
 					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
-					object.exposeRendererObject(gdjs.RuntimeScene.hideObject);
+        			rendererObject.visible = false;
 				} else {
-					object.exposeRendererObject(gdjs.RuntimeScene.showObject);
+                    rendererObject.visible = true;
 				}
 			}
 		}
 	}
 };
-
-gdjs.RuntimeScene.hideObject = function(displayObject) {
-    displayObject.visible = false;
-}
-
-gdjs.RuntimeScene.showObject = function(displayObject) {
-    displayObject.visible = true;
-}
 
 /**
  * Empty the list of the removed objects:<br>

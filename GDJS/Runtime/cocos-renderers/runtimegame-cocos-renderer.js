@@ -60,7 +60,7 @@ gdjs.RuntimeGameCocosRenderer.prototype.getWindowTitle = function() {
 
 gdjs.RuntimeGameCocosRenderer.prototype.startGameLoop = function(fn) {
     this._gameLoopFn = fn;
-    this._gameLoopFn();
+    this._gameLoopFn(0);
 }
 
 gdjs.RuntimeGameCocosRenderer.prototype.getDirectorManager = function() {
@@ -72,8 +72,8 @@ gdjs.RuntimeGameCocosRenderer.prototype.getDirectorManager = function() {
  * function to step the game engine. See RuntimeSceneCocosRenderer.
  * @method onSceneUpdated
  */
-gdjs.RuntimeGameCocosRenderer.prototype.onSceneUpdated = function() {
-    if (!this._gameLoopFn()) {
+gdjs.RuntimeGameCocosRenderer.prototype.onSceneUpdated = function(dt) {
+    if (!this._gameLoopFn(dt)) {
         this._directorManager.end();
     }
 }

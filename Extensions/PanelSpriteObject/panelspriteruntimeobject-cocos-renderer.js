@@ -42,8 +42,8 @@ gdjs.PanelSpriteRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScen
 
 gdjs.PanelSpriteRuntimeObjectRenderer = gdjs.PanelSpriteRuntimeObjectCocosRenderer; //Register the class to let the engine use it.
 
-gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._spritesContainer);
+gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {
+    return this._spritesContainer;
 };
 
 gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype._createTilingShaderAndUniforms = function() {
@@ -165,7 +165,7 @@ gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.setTexture = function(textu
     var that = this;
     var texture = runtimeScene.getGame().getImageManager().getTexture(textureName);
 
-    function makeInsideTexture(rect) {
+    function makeInsideTexture(rect) { //TODO
         if (rect.width < 0) rect.width = 0;
         if (rect.height < 0) rect.height = 0;
         if (rect.x < 0) rect.x = 0;
@@ -178,7 +178,7 @@ gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype.setTexture = function(textu
         return rect;
     }
 
-    function setSpriteRect(sprite, shader, rect) {
+    function setSpriteRect(sprite, shader, rect) { //TODO
         makeInsideTexture(rect);
 
         if (!shader) {

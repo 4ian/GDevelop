@@ -73,24 +73,21 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
     else
         this._behaviorsTable.clear();
 
-    var that = this;
-    var i = 0;
-    gdjs.iterateOverArray(objectData.behaviors, function(autoData) {
+	for(var i = 0, len = objectData.behaviors.length;i<len;++i) {
+		var autoData = objectData.behaviors[i];
         var Ctor = gdjs.getBehaviorConstructor(autoData.type);
 
         //Try to reuse already existing behaviors.
-        if ( i < that._behaviors.length ) {
-            if ( that._behaviors[i] instanceof Ctor )
-                Ctor.call(that._behaviors[i], runtimeScene, autoData, that);
+        if ( i < this._behaviors.length ) {
+            if ( this._behaviors[i] instanceof Ctor )
+                Ctor.call(this._behaviors[i], runtimeScene, autoData, this);
             else
-                that._behaviors[i] = new Ctor(runtimeScene, autoData, that);
+                this._behaviors[i] = new Ctor(runtimeScene, autoData, this);
         }
-        else that._behaviors.push(new Ctor(runtimeScene, autoData, that));
+        else this._behaviors.push(new Ctor(runtimeScene, autoData, this));
 
-        that._behaviorsTable.put(autoData.name, that._behaviors[i]);
-
-        i++;
-    });
+        this._behaviorsTable.put(autoData.name, this._behaviors[i]);
+    }
     this._behaviors.length = i;//Make sure to delete already existing behaviors which are not used anymore.
 };
 
@@ -140,9 +137,7 @@ gdjs.RuntimeObject.prototype.deleteFromScene = function(runtimeScene) {
  */
 gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
     var theLayer = runtimeScene.getLayer(this.layer);
-    this.exposeRendererObject(function(displayObject) {
-        theLayer.getRenderer().removeRendererObject(displayObject);
-    });
+    theLayer.getRenderer().removeRendererObject(this.getRendererObject());
 };
 
 //Rendering:
@@ -151,12 +146,10 @@ gdjs.RuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
  * Called with a callback function that should be called with the internal
  * object used for rendering by the object (PIXI.DisplayObject...)
  *
- * @TODO: This should be removed in favor of getRenderer.
- *
- * @method exposeRendererObject
- * @param cb The callback to be called with the internal rendered object (PIXI.DisplayObject...)
+ * @method getRendererObject
+ * @return {Object} The internal rendered object (PIXI.DisplayObject...)
  */
-gdjs.RuntimeObject.prototype.exposeRendererObject = function(cb) {
+gdjs.RuntimeObject.prototype.getRendererObject = function() {
 };
 
 //Common properties:
@@ -342,11 +335,9 @@ gdjs.RuntimeObject.prototype.setLayer = function(layer) {
     this.layer = layer;
     var newLayer = this._runtimeScene.getLayer(this.layer);
 
-    var that = this;
-    this.exposeRendererObject(function (displayObject) {
-        oldLayer.getRenderer().removeRendererObject(displayObject);
-        newLayer.getRenderer().addRendererObject(displayObject, that.zOrder);
-    });
+    var rendererObject = this.getRendererObject();
+    oldLayer.getRenderer().removeRendererObject(rendererObject);
+    newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
 };
 
 /**
@@ -382,9 +373,7 @@ gdjs.RuntimeObject.prototype.setZOrder = function(z) {
     this.zOrder = z;
 
     var theLayer = this._runtimeScene.getLayer(this.layer);
-    this.exposeRendererObject(function(displayObject) {
-        theLayer.getRenderer().changeRendererObjectZOrder(displayObject, z);
-    });
+    theLayer.getRenderer().changeRendererObjectZOrder(this.getRendererObject(), z);
 };
 
 /**

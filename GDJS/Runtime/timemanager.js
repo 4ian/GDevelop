@@ -12,13 +12,12 @@
  * @namespace gdjs
  * @constructor
  */
-gdjs.TimeManager = function(now)
+gdjs.TimeManager = function()
 {
-    this.reset(now);
+    this.reset();
 }
 
-gdjs.TimeManager.prototype.reset = function(now) {
-    this._latestFrameDate = now;
+gdjs.TimeManager.prototype.reset = function() {
     this._elapsedTime = 0;
     this._timeScale = 1;
     this._timeFromStart = 0;
@@ -26,14 +25,12 @@ gdjs.TimeManager.prototype.reset = function(now) {
     this._timers = new Hashtable();
 }
 
-gdjs.TimeManager.prototype.update = function(now, minimumFPS) {
+gdjs.TimeManager.prototype.update = function(elapsedTime, minimumFPS) {
 	if (this._firstUpdateDone) this._firstFrame = false;
 	this._firstUpdateDone = true;
 
 	//Compute the elapsed time since last frame
-	this._elapsedTime = now - this._latestFrameDate;
-	this._latestFrameDate = now;
-	this._elapsedTime = Math.min(this._elapsedTime, 1000/minimumFPS);
+	this._elapsedTime = Math.min(elapsedTime, 1000/minimumFPS);
 	this._elapsedTime *= this._timeScale;
 
 	//Update timers and others members

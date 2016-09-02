@@ -222,6 +222,7 @@ brew install cmake
 brew install p7zip
 brew install pkgconfig
 brew install wxwidgets
+brew install freetype
 \endcode
  * If you want to generate the documentation and translations, install Doxygen and Gettext:
 \code

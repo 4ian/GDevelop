@@ -138,50 +138,56 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
     p1.computeEdges();
     p2.computeEdges();
 
-    var edge = [0, 0];
-    var move_axis = [0, 0];
-    var mtd = [0, 0];
+    var edge = gdjs.Polygon.collisionTest._statics.edge;
+    var move_axis = gdjs.Polygon.collisionTest._statics.move_axis;
+		var result = gdjs.Polygon.collisionTest._statics.result;
+		var minDist = Number.MAX_VALUE;
 
-    var min_dist = Number.MAX_VALUE;
+		edge[0] = 0;
+		edge[1] = 0;
+		edge[0] = 0;
+		edge[1] = 0;
 
-    gdjs.Polygon.collisionTest.result = gdjs.Polygon.collisionTest.result || {collision:false, move_axis:[0,0]};
-		gdjs.Polygon.collisionTest.result.collision = false;
-		gdjs.Polygon.collisionTest.result.move_axis[0] = 0;
-		gdjs.Polygon.collisionTest.result.move_axis[1] = 0;
+		result.collision = false;
+		result.move_axis[0] = 0;
+		result.move_axis[1] = 0;
 
     //Iterate over all the edges composing the polygons
     for (var i = 0, len1 = p1.vertices.length, len2 = p2.vertices.length; i < len1+len2; i++) {
         if (i < len1) { // or <=
             edge = p1.edges[i];
-        }
-        else {
+        } else {
             edge = p2.edges[i - len1];
         }
 
-        var axis = [-edge[1], edge[0]]; //Get the axis to which polygons will be projected
+        var axis = gdjs.Polygon.collisionTest._statics.axis; //Get the axis to which polygons will be projected
+				axis[0] = -edge[1];
+				axis[1] = edge[0];
         gdjs.Polygon.normalise(axis);
 
-        var minMaxA = gdjs.Polygon.project(axis, p1); //Do projection on the axis.
-        var minMaxB = gdjs.Polygon.project(axis, p2);
+				var minMaxA = gdjs.Polygon.collisionTest._statics.minMaxA;
+				var minMaxB = gdjs.Polygon.collisionTest._statics.minMaxB;
+        gdjs.Polygon.project(axis, p1, minMaxA); //Do projection on the axis.
+        gdjs.Polygon.project(axis, p2, minMaxB);
 
         //If the projections on the axis do not overlap, then their is no collision
         if (gdjs.Polygon.distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]) > 0) {
-            gdjs.Polygon.collisionTest.result.collision = false;
-            gdjs.Polygon.collisionTest.result.move_axis[0] = 0;
-            gdjs.Polygon.collisionTest.result.move_axis[1] = 0;
-            return gdjs.Polygon.collisionTest.result;
+            result.collision = false;
+            result.move_axis[0] = 0;
+            result.move_axis[1] = 0;
+            return result;
         }
 
         var dist = Math.abs(gdjs.Polygon.distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]));
 
-        if (dist < min_dist) {
-            min_dist = dist;
+        if (dist < minDist) {
+            minDist = dist;
             move_axis[0] = axis[0];
             move_axis[1] = axis[1];
         }
     }
 
-    gdjs.Polygon.collisionTest.result.collision = true;
+    result.collision = true;
 
     //Ensure move axis is correctly oriented.
     var p1Center = p1.computeCenter();
@@ -193,10 +199,24 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
     }
 
     //Add the magnitude to the move axis.
-    gdjs.Polygon.collisionTest.result.move_axis[0] = move_axis[0] * min_dist;
-    gdjs.Polygon.collisionTest.result.move_axis[1] = move_axis[1] * min_dist;
+    result.move_axis[0] = move_axis[0] * minDist;
+    result.move_axis[1] = move_axis[1] * minDist;
 
-    return gdjs.Polygon.collisionTest.result;
+    return result;
+};
+
+//Arrays and data structure that are (re)used by gdjs.Polygon.collisionTest to
+//avoid any allocation.
+gdjs.Polygon.collisionTest._statics = {
+	minMaxA: [0,0],
+	minMaxB: [0,0],
+	edge: [0,0],
+	axis: [0,0],
+	move_axis: [0,0],
+	result: {
+		collision:false,
+		move_axis:[0,0]
+	}
 };
 
 //Tools functions :
@@ -217,21 +237,20 @@ gdjs.Polygon.dotProduct = function(a, b)
     return dp;
 }
 
-gdjs.Polygon.project = function(axis, p)
+gdjs.Polygon.project = function(axis, p, result)
 {
     var dp = gdjs.Polygon.dotProduct(axis, p.vertices[0]);
-    var minMax = [dp, dp];
+		result[0] = dp;
+		result[1] = dp;
 
     for (var i = 1, len = p.vertices.length; i < len; ++i) {
         dp = gdjs.Polygon.dotProduct(axis, p.vertices[i]);
 
-        if (dp < minMax[0])
-            minMax[0] = dp;
-        else if (dp > minMax[1])
-            minMax[1] = dp;
+        if (dp < result[0])
+            result[0] = dp;
+        else if (dp > result[1])
+            result[1] = dp;
     }
-
-    return minMax;
 }
 
 gdjs.Polygon.distance = function(minA, maxA, minB, maxB)

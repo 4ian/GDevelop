@@ -34,8 +34,8 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene
 
 gdjs.PanelSpriteRuntimeObjectRenderer = gdjs.PanelSpriteRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
-gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._spritesContainer);
+gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
+    return this._spritesContainer;
 };
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
@@ -113,7 +113,7 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setTexture = function(textur
     var obj = this._object;
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(textureName);
 
-    function makeInsideTexture(rect) {
+    function makeInsideTexture(rect) { //TODO
         if (rect.width < 0) rect.width = 0;
         if (rect.height < 0) rect.height = 0;
         if (rect.x < 0) rect.x = 0;

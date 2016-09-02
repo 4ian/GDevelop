@@ -25,6 +25,8 @@ gdjs.RuntimeGame = function(data, spec)
 
     this._defaultWidth = data.properties.windowWidth; //Default size for scenes cameras
     this._defaultHeight = data.properties.windowHeight;
+    this._originalWidth = data.properties.windowWidth; //Original size of the game, won't be changed.
+    this._originalHeight = data.properties.windowHeight;
     this._renderer = new gdjs.RuntimeGameRenderer(this,
         this._defaultWidth, this._defaultHeight,
         spec.forceFullscreen || false);
@@ -98,12 +100,14 @@ gdjs.RuntimeGame.prototype.getGameData = function() {
  */
 gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
 	var scene = undefined;
-	gdjs.iterateOverArray(this._data.layouts, function(sceneData) {
+	for(var i = 0, len = this._data.layouts.length;i<len;++i) {
+		var sceneData = this._data.layouts[i];
+
 		if ( sceneName === undefined || sceneData.name === sceneName ) {
 			scene = sceneData;
-			return false;
+			break;
 		}
-	});
+	}
 
 	if ( scene === undefined )
 		console.warn("The game has no scene called \""+sceneName+"\"");
@@ -120,12 +124,14 @@ gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
  */
 gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
 	var isTrue = false;
-	gdjs.iterateOverArray(this._data.layouts, function(sceneData) {
+	for(var i = 0, len = this._data.layouts.length;i<len;++i) {
+		var sceneData = this._data.layouts[i];
+
 		if ( sceneName === undefined || sceneData.name == sceneName ) {
 			isTrue = true;
-			return false;
+			break;
 		}
-	});
+	}
 
 	return isTrue;
 };
@@ -139,12 +145,14 @@ gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
  */
 gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
     var externalLayout = null;
-    gdjs.iterateOverArray(this._data.externalLayouts, function(layoutData) {
+	for(var i = 0, len = this._data.externalLayouts.length;i<len;++i) {
+		var layoutData = this._data.externalLayouts[i];
+
         if ( layoutData.name === name ) {
             externalLayout = layoutData;
-            return false;
+            break;
         }
-    });
+    }
 
     return externalLayout;
 };
@@ -159,8 +167,28 @@ gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
 };
 
 /**
+ * Get the original width of the game, as set on the startup of the game.
+ *
+ * This is guaranteed to never change, even if the size of the game is changed afterwards.
+ * @method getOriginalWidth
+ */
+gdjs.RuntimeGame.prototype.getOriginalWidth = function() {
+    return this._originalWidth;
+};
+
+/**
+ * Get the original height of the game, as set on the startup of the game.
+ *
+ * This is guaranteed to never change, even if the size of the game is changed afterwards.
+ * @method getOriginalHeight
+ */
+gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
+    return this._originalHeight;
+};
+
+/**
  * Get the default width of the game: canvas is created with this width,
- * and cameras are created using this width.
+ * and cameras of layers are created using this width when a scene is started.
  * @method getDefaultWidth
  */
 gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
@@ -169,7 +197,7 @@ gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
 
 /**
  * Get the default height of the game: canvas is created with this height,
- * and cameras are created using this height.
+ * and cameras of layers are created using this height when a scene is started.
  * @method getDefaultHeight
  */
 gdjs.RuntimeGame.prototype.getDefaultHeight = function() {
@@ -242,7 +270,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
     var startTime = Date.now();
     console.profile("Stepping for " + x + " frames")
     for(var i = 0; i < x; ++i) {
-        this._sceneStack.step();
+        this._sceneStack.step(16);
     }
     console.profileEnd();
     var time = Date.now() - startTime;
@@ -251,7 +279,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
 
     //The standard game loop
     var that = this;
-    this._renderer.startGameLoop(function() {
+    this._renderer.startGameLoop(function(elapsedTime) {
         //Manage resize events.
         if (that._notifySceneForResize) {
             that._sceneStack.onRendererResized();
@@ -259,7 +287,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
         }
 
         //Render and step the scene.
-        if (that._sceneStack.step()) {
+        if (that._sceneStack.step(elapsedTime)) {
             that.getInputManager().onFrameEnded();
             return true;
         }

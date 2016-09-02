@@ -49,13 +49,30 @@ public:
     }
 
     /**
-     * \brief Set that the function is located in a specific include file
+     * \brief Erase any existing include file and add the specified include.
      */
-    ExpressionCodeGenerationInformation & SetIncludeFile(const gd::String & optionalIncludeFile_)
+    ExpressionCodeGenerationInformation & SetIncludeFile(const gd::String & includeFile)
     {
-        optionalIncludeFile = optionalIncludeFile_;
+        includeFiles.clear();
+        includeFiles.push_back(includeFile);
         return *this;
     }
+
+    /**
+     * \brief Add a file to the already existing include files.
+     */
+    ExpressionCodeGenerationInformation & AddIncludeFile(const gd::String & includeFile)
+    {
+        if ( std::find(includeFiles.begin(), includeFiles.end(), includeFile) == includeFiles.end())
+            includeFiles.push_back(includeFile);
+
+        return *this;
+    }
+
+    /**
+     * \brief Get the files that must be included to use the instruction.
+     */
+    const std::vector<gd::String> & GetIncludeFiles() const { return includeFiles; };
 
     /**
      * \brief Set that the function must be generated using a custom code generator.
@@ -81,12 +98,14 @@ public:
 
     bool staticFunction;
     gd::String functionCallName;
-    gd::String optionalIncludeFile;
     bool hasCustomCodeGenerator;
     std::function<gd::String(
         const std::vector<gd::Expression> & parameters,
         gd::EventsCodeGenerator & codeGenerator,
         gd::EventsCodeGenerationContext & context)> customCodeGenerator;
+
+private:
+    std::vector<gd::String> includeFiles;
 };
 
 /**

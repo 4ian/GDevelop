@@ -274,12 +274,12 @@ bool RuntimeObject::SeparateFromObjects(const std::vector<RuntimeObject*> & obje
 {
     bool moved = false;
     sf::Vector2f moveVector;
-    vector<Polygon2d> hitBoxes = GetHitBoxes();
     for (std::size_t j = 0;j<objects.size(); ++j)
     {
         if ( objects[j] != this )
         {
-            vector<Polygon2d> otherHitBoxes = objects[j]->GetHitBoxes();
+            std::vector<Polygon2d> hitBoxes = GetHitBoxes(objects[j]->GetAABB());
+            vector<Polygon2d> otherHitBoxes = objects[j]->GetHitBoxes(GetAABB());
             for (std::size_t k = 0;k<hitBoxes.size();++k)
             {
                 for (std::size_t l = 0;l<otherHitBoxes.size();++l)
@@ -355,8 +355,14 @@ bool RuntimeObject::IsCollidingWith(RuntimeObject * obj2)
         return false;
 
     //Do a real check if necessary.
-    vector<Polygon2d> objHitboxes = obj1->GetHitBoxes();
-    vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes();
+
+    //Get the bounding rect of the two objects to use them
+    //as a hint to get the other's hitboxes
+    sf::FloatRect objRect = obj1->GetAABB();
+    sf::FloatRect obj2Rect = obj2->GetAABB();
+
+    vector<Polygon2d> objHitboxes = obj1->GetHitBoxes(obj2Rect);
+    vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes(objRect);
     for (std::size_t k = 0;k<objHitboxes.size();++k)
     {
         for (std::size_t l = 0;l<obj2Hitboxes.size();++l)
@@ -514,6 +520,28 @@ void RuntimeObject::SetXY( const char* xOperator, float xValue, const char* yOpe
         SetY( GetY() / yValue );
 }
 
+sf::FloatRect RuntimeObject::GetAABB() const
+{
+    sf::FloatRect notTransformedAABB(
+        -GetCenterX(),
+        -GetCenterY(),
+        GetWidth(),
+        GetHeight()
+    );
+
+    sf::Transform rotationTransform;
+    rotationTransform.rotate(GetAngle());
+
+    sf::Vector2f translationVec = sf::Vector2f(GetDrawableX() + GetCenterX(), GetDrawableY() + GetCenterY());
+    sf::Transform translationTransform;
+    translationTransform.translate(translationVec.x, translationVec.y);
+
+    sf::Transform resultTransform;
+    resultTransform = translationTransform * rotationTransform;
+
+    return resultTransform.transformRect(notTransformedAABB);
+}
+
 std::vector<Polygon2d> RuntimeObject::GetHitBoxes() const
 {
     std::vector<Polygon2d> mask;
@@ -523,6 +551,11 @@ std::vector<Polygon2d> RuntimeObject::GetHitBoxes() const
 
     mask.push_back(rectangle);
     return mask;
+}
+
+std::vector<Polygon2d> RuntimeObject::GetHitBoxes(sf::FloatRect hint) const
+{
+    return GetHitBoxes();
 }
 
 bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)

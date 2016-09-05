@@ -137,6 +137,56 @@ std::vector<Polygon2d> RuntimeTileMapObject::GetHitBoxes() const
     return hitboxes;
 }
 
+std::vector<Polygon2d> RuntimeTileMapObject::GetHitBoxes(sf::FloatRect hint) const
+{
+    std::vector<Polygon2d> polygons;
+
+    if( !hint.intersects( sf::FloatRect(GetX(), GetY(), GetWidth(), GetHeight()) ) )
+        return polygons;
+
+    //Get the tiles coords according to the hint
+    sf::Vector2u topLeft, bottomRight;
+
+    if(hint.left < GetX())
+        topLeft.x = 0;
+    else
+        topLeft.x = (hint.left - GetX()) / GetTileWidth();
+
+    if(hint.top < GetY())
+        topLeft.y = 0;
+    else
+        topLeft.y = (hint.top - GetY()) / GetTileHeight();
+
+    if(hint.left + hint.width > GetX() + GetWidth())
+        bottomRight.x = GetMapWidth() - 1;
+    else
+        bottomRight.x = (hint.left + hint.width - GetX()) / GetTileWidth();
+
+    if(hint.top + hint.height > GetY() + GetHeight())
+        bottomRight.y = GetMapHeight() - 1;
+    else
+        bottomRight.y = (hint.top + hint.height - GetY()) / GetTileHeight();
+
+    //Add the polygons
+    for( std::size_t i = topLeft.x; i <= bottomRight.x; ++i ) //Columns
+    {
+        for( std::size_t j = topLeft.y; j <= bottomRight.y; ++j ) //Rows
+        {
+            for(std::size_t k = 0; k < 3; ++k) //Layers
+            {
+                std::size_t tileIndex =
+                    k * GetMapHeight() * GetMapWidth() +
+                    i * GetMapHeight() +
+                    j;
+
+                polygons.push_back(hitboxes[tileIndex]);
+            }
+        }
+    }
+
+    return polygons;
+}
+
 float RuntimeTileMapObject::GetTileWidth() const
 {
     return tileSet.Get().tileSize.x;

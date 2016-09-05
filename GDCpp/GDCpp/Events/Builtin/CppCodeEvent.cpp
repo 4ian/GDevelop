@@ -83,7 +83,11 @@ gd::String CppCodeEvent::GenerateAssociatedFileCode() const
     gd::String output;
     if (passSceneAsParameter ) output += "#include \"GDCpp/Runtime/RuntimeScene.h\"\n";
     if (passObjectListAsParameter ) output += "#include \"GDCpp/Runtime/Project/Object.h\"\n";
-    for (std::size_t i = 0;i<includeFiles.size();++i) output += "#include "+includeFiles[i]+"\n";
+    for (const auto& includeFile : includeFiles)
+    {
+        if(!includeFile.empty())
+            output += "#include "+includeFile+"\n";
+    }
 
     output += functionPrototype+"\n";
     output += "{\n";

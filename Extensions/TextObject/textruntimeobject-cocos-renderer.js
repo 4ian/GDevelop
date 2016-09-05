@@ -16,8 +16,8 @@ gdjs.TextRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScene)
 
 gdjs.TextRuntimeObjectRenderer = gdjs.TextRuntimeObjectCocosRenderer; //Register the class to let the engine use it.
 
-gdjs.TextRuntimeObjectCocosRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._text);
+gdjs.TextRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {
+    return this._text;
 };
 
 gdjs.TextRuntimeObjectCocosRenderer.prototype.ensureUpToDate = function() {

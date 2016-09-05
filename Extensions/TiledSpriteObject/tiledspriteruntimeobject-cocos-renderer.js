@@ -27,8 +27,8 @@ gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.ownerRemovedFromScene = fun
     if (this._shader) this._shader.release();
 }
 
-gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._sprite);
+gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {
+    return this._sprite;
 };
 
 gdjs.TiledSpriteRuntimeObjectCocosRenderer.prototype.updatePosition = function() {

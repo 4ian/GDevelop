@@ -12,6 +12,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Variable.h"
+#include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
@@ -20,6 +21,29 @@
 #include <memory>
 
 TEST_CASE( "Events", "[common][events]" ) {
+    SECTION("InstructionsList") {
+        gd::InstructionsList list;
+        gd::Instruction instr("InstructionType");
+        list.Insert(instr);
+        list.Insert(instr);
+        list.Insert(instr);
+
+        REQUIRE( list.size() == 3 );
+        list[1].SetType("ChangedInstructionType");
+
+        REQUIRE( list[0].GetType() == "InstructionType" );
+        REQUIRE( list[1].GetType() == "ChangedInstructionType" );
+
+        gd::InstructionsList list2 = list;
+        REQUIRE( list2.size() == 3 );
+        list2[0].SetType("YetAnotherInstructionType");
+
+        REQUIRE( list2[0].GetType() == "YetAnotherInstructionType" );
+        REQUIRE( list2[1].GetType() == "ChangedInstructionType" );
+        REQUIRE( list[0].GetType() == "InstructionType" );
+        REQUIRE( list[1].GetType() == "ChangedInstructionType" );
+    }
+
     SECTION("StandardEvent") {
         gd::Instruction instr("InstructionType");
         gd::StandardEvent event;
@@ -29,6 +53,10 @@ TEST_CASE( "Events", "[common][events]" ) {
         std::shared_ptr<gd::StandardEvent> cloned(event.Clone());
         REQUIRE( cloned->GetActions().size() == 1 );
         REQUIRE( cloned->GetActions()[0].GetType() == "InstructionType" );
+
+        cloned->GetActions()[0].SetType("ChangedInstructionType");
+        REQUIRE( cloned->GetActions()[0].GetType() == "ChangedInstructionType" );
+        REQUIRE( event.GetActions()[0].GetType() == "InstructionType" );
     }
 
     SECTION("ForEachEvent") {

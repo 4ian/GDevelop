@@ -11,8 +11,8 @@ gdjs.ShapePainterRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScen
 
 gdjs.ShapePainterRuntimeObjectRenderer = gdjs.ShapePainterRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
 
-gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._graphics);
+gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
+    return this._graphics;
 };
 
 gdjs.ShapePainterRuntimeObjectPixiRenderer.prototype.clear = function() {

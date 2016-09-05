@@ -37,14 +37,15 @@ gdjs.PixiImageManager.prototype.getPIXITexture = function(name) {
 	//Texture is not loaded, load it now from the resources list.
 	if ( this._resources ) {
 		var texture = null;
-		gdjs.iterateOverArray(this._resources, function(res) {
-			if ( res.name === name &&
-				res.kind === "image" ) {
 
+		for(var i = 0, len = this._resources.length;i<len;++i) {
+			var res = this._resources[i];
+
+			if (res.name === name && res.kind === "image") {
 				texture = PIXI.Texture.fromImage(res.file);
-				return false;
+				break;
 			}
-		});
+		}
 
 		if ( texture !== null ) {
 			console.log("Loaded texture \""+name+"\".");
@@ -82,18 +83,19 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, 
 	//Construct the list of files to be loaded.
 	//For one loaded file, it can have one or more resources
 	//that use it.
-    var that = this;
     var files = {};
-    gdjs.iterateOverArray(resources, function(res) {
+	for(var i = 0, len = resources.length;i<len;++i) {
+		var res = resources[i];
+
         if ( res.file && res.kind === "image" ) {
-        	if (that._loadedTextures.containsKey(res.name)) {
+        	if (this._loadedTextures.containsKey(res.name)) {
 				console.log("Texture \"" + res.name + "\" is already loaded.");
-        		return true;
+        		continue;
         	}
 
             files[res.file] = files[res.file] ? files[res.file].concat(res) : [res];
         }
-    });
+    }
 
     var totalCount = Object.keys(files).length;
     if (totalCount === 0)
@@ -101,6 +103,7 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, 
 
     var loadingCount = 0;
     var loader = PIXI.loader;
+	var that = this;
     loader.once('complete', function(loader, loadedFiles) {
     	//Store the loaded textures so that they are ready to use.
     	for (var file in loadedFiles) {

@@ -42,8 +42,9 @@ const EventsList * LinkEvent::GetLinkedEvents(const gd::Project & project) const
     return events;
 }
 
-void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & eventList, std::size_t indexOfTheEventInThisList)
+void LinkEvent::ReplaceLinkByLinkedEvents(const gd::Project & project, EventsList & eventList, std::size_t indexOfTheEventInThisList)
 {
+    linkWasInvalid = false;
     //Finding what to link to.
     const EventsList * eventsToInclude = GetLinkedEvents(project);
     if ( eventsToInclude != NULL )
@@ -90,8 +91,6 @@ void LinkEvent::ReplaceLinkByLinkedEvents(gd::Project & project, EventsList & ev
         eventList.RemoveEvent(indexOfTheEventInThisList);
         return;
     }
-
-    linkWasInvalid = false;
 }
 
 LinkEvent::~LinkEvent()

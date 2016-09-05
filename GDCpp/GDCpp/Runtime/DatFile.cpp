@@ -11,7 +11,7 @@ DatFile::DatFile (void)
 DatFile::~DatFile (void)
 {
     if (m_buffer!=NULL)
-        delete (m_buffer);
+        delete[] m_buffer;
 }
 bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::String destination)
 {
@@ -171,7 +171,7 @@ char* DatFile::GetFile (gd::String filename)
     //Cleaning properly an ancient file loaded
     if (m_buffer != NULL)
     {
-        delete (m_buffer);
+        delete[] m_buffer;
         m_buffer = NULL;
     }
 

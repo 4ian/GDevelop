@@ -17,8 +17,8 @@ gdjs.SpriteRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScene)
 
 gdjs.SpriteRuntimeObjectRenderer = gdjs.SpriteRuntimeObjectCocosRenderer; //Register the class to let the engine use it.
 
-gdjs.SpriteRuntimeObjectCocosRenderer.prototype.exposeRendererObject = function(cb) {
-    cb(this._sprite);
+gdjs.SpriteRuntimeObjectCocosRenderer.prototype.getRendererObject = function() {
+    return this._sprite;
 };
 
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.ensureUpToDate = function() {

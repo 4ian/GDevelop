@@ -19,7 +19,7 @@ gdjs.Variable = function(varData)
     this._numberDirty = false;
     this._stringDirty = true;
     this._isStructure = false;
-    this._children = {};
+    this._children = {}; //TODO: Use a hashtable and avoid de/allocations.
     this._undefinedInContainer = false;
 
 	if ( varData !== undefined ) {
@@ -41,15 +41,14 @@ gdjs.Variable = function(varData)
 					this._stringDirty = false;
 				}
 			}
-		}
-		else { //Variable is a structure
+		} else { //Variable is a structure
 			this._isStructure = true;
 
 			if (varData.children !== undefined) {
-				var that = this;
-				gdjs.iterateOverArray(varData.children, function(childData) {
-					that._children[childData.name] = new gdjs.Variable(childData);
-				});
+	        	for(var i = 0, len = varData.children.length;i<len;++i) {
+			    	var childData = varData.children[i];
+					this._children[childData.name] = new gdjs.Variable(childData);
+				}
 			}
 		}
 	}

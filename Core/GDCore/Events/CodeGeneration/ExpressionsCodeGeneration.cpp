@@ -40,7 +40,7 @@ void CallbacksForGeneratingExpressionCode::OnConstantToken(gd::String text)
 
 void CallbacksForGeneratingExpressionCode::OnStaticFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
 {
-    codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
+    codeGenerator.AddIncludeFiles(expressionInfo.codeExtraInformation.GetIncludeFiles());
 
     //Launch custom code generator if needed
     if (expressionInfo.codeExtraInformation.HasCustomCodeGenerator())
@@ -76,7 +76,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(gd::String functionN
     const gd::Project & project = codeGenerator.GetProject();
     const gd::Layout & scene = codeGenerator.GetLayout();
 
-    codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
+    codeGenerator.AddIncludeFiles(expressionInfo.codeExtraInformation.GetIncludeFiles());
     if ( parameters.empty() ) return;
 
     //Launch custom code generator if needed
@@ -119,7 +119,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(gd::String f
     const gd::Project & project = codeGenerator.GetProject();
     const gd::Layout & scene = codeGenerator.GetLayout();
 
-    codeGenerator.AddIncludeFile(expressionInfo.codeExtraInformation.optionalIncludeFile);
+    codeGenerator.AddIncludeFiles(expressionInfo.codeExtraInformation.GetIncludeFiles());
     if ( parameters.size() < 2 ) return;
 
     //Launch custom code generator if needed

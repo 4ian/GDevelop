@@ -324,8 +324,12 @@ gdjs.RuntimeGamePixiRenderer.prototype.getWindowTitle = function() {
 gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function(fn) {
     requestAnimationFrame(gameLoop);
 
-    function gameLoop() {
-        if (fn()) requestAnimationFrame(gameLoop);
+    var oldTime = null;
+    function gameLoop(time) {
+        var dt = oldTime ? time - oldTime : 0;
+        oldTime = time;
+
+        if (fn(dt)) requestAnimationFrame(gameLoop);
     }
 }
 

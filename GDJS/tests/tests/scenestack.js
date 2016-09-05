@@ -6,9 +6,17 @@ describe('gdjs.SceneStack', function() {
 		variables: [],
 		properties: {windowWidth: 800, windowHeight: 600},
 		layouts: [{
-			name: "Scene 1"
+			name: "Scene 1",
+			objects: [],
+			layers: [],
+			instances: [],
+			behaviorsSharedData: [],
 		}, {
-			name: "Scene 2"
+			name: "Scene 2",
+			objects: [],
+			layers: [],
+			instances: [],
+			behaviorsSharedData: [],
 		}]});
 	var sceneStack = new gdjs.SceneStack(runtimeGame);
 

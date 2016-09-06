@@ -74,6 +74,11 @@ public:
      */
     std::shared_ptr<BaseEvent> GetEventSmartPtr(size_t index) { return events[index]; };
 
+	/**
+     * \brief Return the smart pointer to the event at position \a index in the events list.
+     */
+    std::shared_ptr<const BaseEvent> GetEventSmartPtr(size_t index) const { return events[index]; };
+
     /**
      * \brief Return a reference to the event at position \a index in the events list.
      */

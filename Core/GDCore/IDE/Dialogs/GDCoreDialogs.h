@@ -33,6 +33,9 @@
 #include <wx/htmllbox.h>
 #include "wx/srchctrl.h"
 #include <wx/scrolwin.h>
+#include <wx/combobox.h>
+#include <wx/arrstr.h>
+#include <wx/radiobut.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -151,6 +154,58 @@ public:
     wxButton* GetCancelBt() { return cancelBt; }
     BaseEventStoreDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add a template from the event store"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(750,450), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX);
     virtual ~BaseEventStoreDialog();
+};
+
+
+class LinkEventEditorBase : public wxDialog
+{
+protected:
+    wxStaticText* m_staticText160;
+    wxComboBox* m_eventsComboBox;
+    wxRadioButton* m_includeAllEventsRadio;
+    wxRadioButton* m_includeEventsGroupRadio;
+    wxComboBox* m_eventsGroupComboBox;
+    wxStaticText* m_eventsGroupsNames;
+    wxRadioButton* m_includeEventsByIndexRadio;
+    wxPanel* m_deprecatedPanel;
+    wxStaticText* m_staticText182;
+    wxTextCtrl* m_startTextCtrl;
+    wxStaticText* m_staticText186;
+    wxTextCtrl* m_endTextCtrl;
+    wxStaticText* m_staticText194;
+    wxStaticText* m_staticText196;
+    wxStaticText* m_staticText198;
+    wxStdDialogButtonSizer* m_stdBtnSizer172;
+    wxButton* m_okButton;
+    wxButton* m_cancelButton;
+
+protected:
+    virtual void OnEventsComboBoxTextChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnIncludeAllEventsRadioButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnIncludeEventsGroupRadioButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnEventsGroupComboBoxTextChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnIncludeByIndexRadioButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnOkButtonClicked(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnCancelButtonClicked(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText160() { return m_staticText160; }
+    wxComboBox* GetEventsComboBox() { return m_eventsComboBox; }
+    wxRadioButton* GetIncludeAllEventsRadio() { return m_includeAllEventsRadio; }
+    wxRadioButton* GetIncludeEventsGroupRadio() { return m_includeEventsGroupRadio; }
+    wxComboBox* GetEventsGroupComboBox() { return m_eventsGroupComboBox; }
+    wxStaticText* GetEventsGroupsNames() { return m_eventsGroupsNames; }
+    wxRadioButton* GetIncludeEventsByIndexRadio() { return m_includeEventsByIndexRadio; }
+    wxStaticText* GetStaticText182() { return m_staticText182; }
+    wxTextCtrl* GetStartTextCtrl() { return m_startTextCtrl; }
+    wxStaticText* GetStaticText186() { return m_staticText186; }
+    wxTextCtrl* GetEndTextCtrl() { return m_endTextCtrl; }
+    wxStaticText* GetStaticText194() { return m_staticText194; }
+    wxStaticText* GetStaticText196() { return m_staticText196; }
+    wxStaticText* GetStaticText198() { return m_staticText198; }
+    wxPanel* GetDeprecatedPanel() { return m_deprecatedPanel; }
+    LinkEventEditorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit the link event"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~LinkEventEditorBase();
 };
 
 #endif

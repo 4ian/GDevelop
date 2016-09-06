@@ -71,11 +71,10 @@ LayersEditorPanelBase::LayersEditorPanelBase(wxWindow* parent, wxWindowID id, co
     flexGridSizer13->Add(m_layersList, 0, wxALL|wxEXPAND, 0);
     
     SetName(wxT("LayersEditorPanelBase"));
-    SetSizeHints(500,300);
-    if ( GetSizer() ) {
+    SetSize(500,300);
+    if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    CentreOnParent(wxBOTH);
     // Connect events
     this->Connect(ADD_LAYER_TOOL, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(LayersEditorPanelBase::OnAddLayerClicked), NULL, this);
     this->Connect(DELETE_LAYER_TOOL, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(LayersEditorPanelBase::OnDeleteLayerClicked), NULL, this);
@@ -181,11 +180,15 @@ BaseGroupEventDialog::BaseGroupEventDialog(wxWindow* parent, wxWindowID id, cons
     flexGridSizer45->Add(cancelBt, 0, wxALL, 5);
     
     SetName(wxT("BaseGroupEventDialog"));
-    SetSizeHints(400,200);
-    if ( GetSizer() ) {
+    SetSize(400,200);
+    if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    CentreOnParent(wxBOTH);
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);
@@ -326,12 +329,16 @@ BaseEventStoreDialog::BaseEventStoreDialog(wxWindow* parent, wxWindowID id, cons
     flexGridSizer7712->Add(cancelBt, 0, wxALL, 5);
     
     SetName(wxT("BaseEventStoreDialog"));
-    SetMinSize( wxSize(500,300) );
-    SetSizeHints(750,450);
-    if ( GetSizer() ) {
+    SetMinClientSize(wxSize(500,300));
+    SetSize(750,450);
+    if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    CentreOnParent(wxBOTH);
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
 #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
         wxPersistenceManager::Get().RegisterAndRestore(this);
@@ -351,5 +358,163 @@ BaseEventStoreDialog::~BaseEventStoreDialog()
     searchCtrl->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(BaseEventStoreDialog::OnSearchCtrlText), NULL, this);
     okBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnOkBtClick), NULL, this);
     cancelBt->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BaseEventStoreDialog::OnCancelBtClick), NULL, this);
+    
+}
+
+LinkEventEditorBase::LinkEventEditorBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC629BInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer158 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer158->SetFlexibleDirection( wxBOTH );
+    flexGridSizer158->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer158->AddGrowableCol(0);
+    this->SetSizer(flexGridSizer158);
+    
+    m_staticText160 = new wxStaticText(this, wxID_ANY, _("Link to scene/external events:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer158->Add(m_staticText160, 0, wxALL|wxEXPAND, 5);
+    
+    wxArrayString m_eventsComboBoxArr;
+    m_eventsComboBox = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), m_eventsComboBoxArr, 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_eventsComboBox->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer158->Add(m_eventsComboBox, 0, wxALL|wxEXPAND, 5);
+    
+    m_includeAllEventsRadio = new wxRadioButton(this, wxID_ANY, _("Include all events"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_includeAllEventsRadio->SetValue(1);
+    
+    flexGridSizer158->Add(m_includeAllEventsRadio, 0, wxALL, 5);
+    
+    m_includeEventsGroupRadio = new wxRadioButton(this, wxID_ANY, _("Only include an events group:"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_includeEventsGroupRadio->SetValue(0);
+    
+    flexGridSizer158->Add(m_includeEventsGroupRadio, 0, wxALL, 5);
+    
+    wxArrayString m_eventsGroupComboBoxArr;
+    m_eventsGroupComboBox = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(-1,-1), m_eventsGroupComboBoxArr, 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_eventsGroupComboBox->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer158->Add(m_eventsGroupComboBox, 0, wxALL|wxEXPAND, 5);
+    
+    m_eventsGroupsNames = new wxStaticText(this, wxID_ANY, _("Warning: Multiple groups have the same name. Only the first one will be included !"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_eventsGroupsNames->Wrap(285);
+    wxFont m_eventsGroupsNamesFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_eventsGroupsNamesFont.SetWeight(wxFONTWEIGHT_BOLD);
+    m_eventsGroupsNames->SetFont(m_eventsGroupsNamesFont);
+    
+    flexGridSizer158->Add(m_eventsGroupsNames, 0, wxALL|wxEXPAND|wxALIGN_LEFT, 5);
+    
+    m_includeEventsByIndexRadio = new wxRadioButton(this, wxID_ANY, _("Only include the events: (deprecated)"), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_includeEventsByIndexRadio->SetValue(0);
+    
+    flexGridSizer158->Add(m_includeEventsByIndexRadio, 0, wxALL, 5);
+    
+    m_deprecatedPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1,-1), wxTAB_TRAVERSAL);
+    
+    flexGridSizer158->Add(m_deprecatedPanel, 0, wxALL|wxEXPAND, 0);
+    
+    wxFlexGridSizer* flexGridSizer192 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer192->SetFlexibleDirection( wxBOTH );
+    flexGridSizer192->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer192->AddGrowableCol(0);
+    m_deprecatedPanel->SetSizer(flexGridSizer192);
+    
+    wxFlexGridSizer* flexGridSizer180 = new wxFlexGridSizer(0, 5, 0, 0);
+    flexGridSizer180->SetFlexibleDirection( wxBOTH );
+    flexGridSizer180->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer192->Add(flexGridSizer180, 1, wxALL|wxEXPAND, 0);
+    
+    m_staticText182 = new wxStaticText(m_deprecatedPanel, wxID_ANY, _("From"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer180->Add(m_staticText182, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    m_startTextCtrl = new wxTextCtrl(m_deprecatedPanel, wxID_ANY, wxT("10"), wxDefaultPosition, wxSize(40,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_startTextCtrl->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer180->Add(m_startTextCtrl, 0, wxALL, 5);
+    
+    m_staticText186 = new wxStaticText(m_deprecatedPanel, wxID_ANY, _("to"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer180->Add(m_staticText186, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    m_endTextCtrl = new wxTextCtrl(m_deprecatedPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(40,-1), 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_endTextCtrl->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer180->Add(m_endTextCtrl, 0, wxALL, 5);
+    
+    m_staticText194 = new wxStaticText(m_deprecatedPanel, wxID_ANY, _("(included)"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer180->Add(m_staticText194, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    
+    m_staticText196 = new wxStaticText(m_deprecatedPanel, wxID_ANY, _("This feature is only provided to keep compatibility with older projects."), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText196->Wrap(285);
+    
+    flexGridSizer192->Add(m_staticText196, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5);
+    
+    m_staticText198 = new wxStaticText(m_deprecatedPanel, wxID_ANY, _("Not available for newly created link events."), wxDefaultPosition, wxSize(-1,-1), 0);
+    m_staticText198->Wrap(285);
+    wxFont m_staticText198Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_staticText198Font.SetWeight(wxFONTWEIGHT_BOLD);
+    m_staticText198->SetFont(m_staticText198Font);
+    
+    flexGridSizer192->Add(m_staticText198, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    
+    m_stdBtnSizer172 = new wxStdDialogButtonSizer();
+    
+    flexGridSizer158->Add(m_stdBtnSizer172, 0, wxALL|wxALIGN_RIGHT, 5);
+    
+    m_okButton = new wxButton(this, wxID_OK, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
+    m_stdBtnSizer172->AddButton(m_okButton);
+    
+    m_cancelButton = new wxButton(this, wxID_CANCEL, wxT(""), wxDefaultPosition, wxSize(-1, -1), 0);
+    m_stdBtnSizer172->AddButton(m_cancelButton);
+    m_stdBtnSizer172->Realize();
+    
+    SetName(wxT("LinkEventEditorBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+    // Connect events
+    m_eventsComboBox->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(LinkEventEditorBase::OnEventsComboBoxTextChanged), NULL, this);
+    m_includeAllEventsRadio->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(LinkEventEditorBase::OnIncludeAllEventsRadioButtonClicked), NULL, this);
+    m_includeEventsGroupRadio->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(LinkEventEditorBase::OnIncludeEventsGroupRadioButtonClicked), NULL, this);
+    m_eventsGroupComboBox->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(LinkEventEditorBase::OnEventsGroupComboBoxTextChanged), NULL, this);
+    m_includeEventsByIndexRadio->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(LinkEventEditorBase::OnIncludeByIndexRadioButtonClicked), NULL, this);
+    m_okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(LinkEventEditorBase::OnOkButtonClicked), NULL, this);
+    m_cancelButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(LinkEventEditorBase::OnCancelButtonClicked), NULL, this);
+    
+}
+
+LinkEventEditorBase::~LinkEventEditorBase()
+{
+    m_eventsComboBox->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(LinkEventEditorBase::OnEventsComboBoxTextChanged), NULL, this);
+    m_includeAllEventsRadio->Disconnect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(LinkEventEditorBase::OnIncludeAllEventsRadioButtonClicked), NULL, this);
+    m_includeEventsGroupRadio->Disconnect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(LinkEventEditorBase::OnIncludeEventsGroupRadioButtonClicked), NULL, this);
+    m_eventsGroupComboBox->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(LinkEventEditorBase::OnEventsGroupComboBoxTextChanged), NULL, this);
+    m_includeEventsByIndexRadio->Disconnect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(LinkEventEditorBase::OnIncludeByIndexRadioButtonClicked), NULL, this);
+    m_okButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(LinkEventEditorBase::OnOkButtonClicked), NULL, this);
+    m_cancelButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(LinkEventEditorBase::OnCancelButtonClicked), NULL, this);
     
 }

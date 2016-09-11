@@ -189,6 +189,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
         .SetProjectAndLayout(game, scene);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeItemActivated);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeSelectionChanged);
+    instructionsTree->Bind(wxEVT_LEFT_DOWN, &InstructionSelectorDialog::OnInstructionsTreeClicked, this);
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&InstructionSelectorDialog::OnsearchCtrlText);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&InstructionSelectorDialog::OnmoreBtClick);
     Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&InstructionSelectorDialog::OnHelpBtClick);
@@ -450,6 +451,22 @@ void InstructionSelectorDialog::RefreshFromInstruction()
 
     if (!editingAction)
         invertedCheck->SetValue(isInverted);
+}
+
+void InstructionSelectorDialog::OnInstructionsTreeClicked(wxMouseEvent& event)
+{
+    wxPoint mousePosition = event.GetPosition();
+    int tempNum = wxTREE_HITTEST_ONITEMLABEL;
+
+    wxTreeItemId id = instructionsTree->HitTest(mousePosition, tempNum);
+
+    if(id)
+    {
+        if(instructionsTree->ItemHasChildren(id))
+            instructionsTree->Toggle(id);
+        if(!instructionsTree->IsSelected(id))
+            instructionsTree->SelectItem(id,true);
+    }
 }
 
 void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)

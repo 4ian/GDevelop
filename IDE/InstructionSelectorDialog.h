@@ -107,6 +107,7 @@ private:
 	void OnCancelBtClick(wxCommandEvent& event);
 	void OnHelpBtClick(wxCommandEvent& event);
 	void OninstructionsTreeSelectionChanged(wxTreeEvent& event);
+	void OnInstructionsTreeClicked(wxMouseEvent& event);
 	void OnmoreBtClick(wxCommandEvent& event);
 	void OnsearchCtrlText(wxCommandEvent& event);
 	void OninstructionsTreeItemActivated(wxTreeEvent& event);

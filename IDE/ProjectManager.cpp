@@ -32,6 +32,7 @@
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Clipboard.h"
+#include "GDCore/IDE/NewNameGenerator.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCore/CommonTools.h"
 #include "Dialogs/ExternalLayoutEditor.h"
@@ -1130,13 +1131,9 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     gd::Layout & newLayout = *clipboard->GetLayout();
 
     //Finding a new, unique name for the layout
-    gd::String newLayoutName = newLayout.GetName();
-    int i = 1;
-    while(game->HasLayoutNamed(newLayoutName))
-    {
-        newLayoutName = _("Copy of") + " " + newLayout.GetName() + (i == 1 ? "" : " "+gd::String::From(i));
-        ++i;
-    }
+	gd::String newLayoutName = gd::NewNameGenerator::Generate(newLayout.GetName(), _("Copy of "), [&game](const gd::String & name) {
+		return game->HasLayoutNamed(name);
+	});
 
     newLayout.SetName(newLayoutName);
     game->InsertLayout(newLayout, game->GetLayoutPosition(data->GetSecondString()));
@@ -1447,13 +1444,9 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
     gd::ExternalEvents newEvents = Clipboard::Get()->GetExternalEvents();
 
     //Finding a new, unique name for the events
-    gd::String newName = newEvents.GetName();
-    int i = 1;
-    while(game->HasExternalEventsNamed(newName))
-    {
-        newName = _("Copy of") + " " + newEvents.GetName() + " " + ( i==1 ? "" : gd::String::From(i));
-        ++i;
-    }
+	gd::String newName = gd::NewNameGenerator::Generate(newEvents.GetName(), _("Copy of "), [&game](const gd::String & name) {
+		return game->HasExternalEventsNamed(name);
+	});
 
     newEvents.SetName(newName);
     game->InsertExternalEvents(newEvents, game->GetExternalEventsPosition(data->GetSecondString()));
@@ -1609,13 +1602,9 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
     gd::ExternalLayout newExternalLayout = Clipboard::Get()->GetExternalLayout();
 
     //Finding a new, unique name for the events
-    gd::String newName = newExternalLayout.GetName();
-    int i = 1;
-    while(game->HasExternalLayoutNamed(newName))
-    {
-        newName = _("Copy of") + " " + newExternalLayout.GetName() + " " + (i==1 ? "" : gd::String::From(i));
-        ++i;
-    }
+	gd::String newName = gd::NewNameGenerator::Generate(newExternalLayout.GetName(), _("Copy of "), [&game](const gd::String & name) {
+		return game->HasExternalLayoutNamed(name);
+	});
 
     newExternalLayout.SetName(newName);
     game->InsertExternalLayout(newExternalLayout, game->GetExternalLayoutPosition(data->GetSecondString()));

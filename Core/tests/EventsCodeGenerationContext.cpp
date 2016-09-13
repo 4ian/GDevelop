@@ -15,7 +15,7 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include <memory>
 
-TEST_CASE( "EventsCodeGeneratorContext", "[common][events]" ) {
+TEST_CASE( "EventsCodeGenerationContext", "[common][events]" ) {
     /**
      * Generate a tree of contexts with declared objects as below:
      *                   c1 -> c1.object1, c1.object2, c1.empty1 (empty list request)

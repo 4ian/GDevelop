@@ -459,9 +459,8 @@ public:
     {};
     virtual ~SpriteObjectsPositionUpdater() {};
 
-    virtual void operator()(gd::InitialInstance * instancePtr)
+    virtual void operator()(gd::InitialInstance & instance)
     {
-        gd::InitialInstance & instance = *instancePtr;
         gd::Object * object = NULL;
         if ( layout.HasObjectNamed(instance.GetObjectName()))
             object = &layout.GetObject(instance.GetObjectName());

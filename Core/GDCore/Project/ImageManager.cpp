@@ -46,7 +46,7 @@ std::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const gd::Strin
     {
         ImageResource & image = dynamic_cast<ImageResource&>(resourcesManager->GetResource(name));
 
-        std::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper());
+        auto texture = std::make_shared<SFMLTextureWrapper>();
         ResourcesLoader::Get()->LoadSFMLImage( image.GetFile(), texture->image );
         texture->texture.loadFromImage(texture->image);
         texture->texture.setSmooth(image.smooth);

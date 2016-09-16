@@ -143,12 +143,12 @@ public:
     /**
      * Return a reference to a camera
      */
-    inline const RuntimeCamera & GetCamera(std::size_t n) const { return cameras[n]; }
+    inline const RuntimeCamera & GetCamera(std::size_t n) const { return cameras.at(n); }
 
     /**
      * Return a reference to a camera
      */
-    inline RuntimeCamera & GetCamera(std::size_t n) { return cameras[n]; }
+    inline RuntimeCamera & GetCamera(std::size_t n) { return cameras.at(n); }
 
     /**
      * Delete a specific camera.

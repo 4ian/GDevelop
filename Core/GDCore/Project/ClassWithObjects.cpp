@@ -112,9 +112,10 @@ void ClassWithObjects::SwapObjects(std::size_t firstObjectIndex, std::size_t sec
     if ( firstObjectIndex >= initialObjects.size() || secondObjectIndex >= initialObjects.size() )
         return;
 
-    std::shared_ptr<gd::Object> temp = initialObjects[firstObjectIndex];
-    initialObjects[firstObjectIndex] = initialObjects[secondObjectIndex];
-    initialObjects[secondObjectIndex] = temp;
+    std::iter_swap(
+        initialObjects.begin() + firstObjectIndex,
+        initialObjects.begin() + secondObjectIndex
+    );
 }
 
 void ClassWithObjects::RemoveObject(const gd::String & name)

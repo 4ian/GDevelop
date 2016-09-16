@@ -148,9 +148,10 @@ void Layout::SwapLayers(std::size_t firstLayerIndex, std::size_t secondLayerInde
     if ( firstLayerIndex >= initialLayers.size() || secondLayerIndex >= initialLayers.size() )
         return;
 
-    gd::Layer temp = initialLayers[firstLayerIndex];
-    initialLayers[firstLayerIndex] = initialLayers[secondLayerIndex];
-    initialLayers[secondLayerIndex] = temp;
+    std::iter_swap(
+        initialLayers.begin() + firstLayerIndex,
+        initialLayers.begin() + secondLayerIndex
+    );
 }
 
 void Layout::UpdateBehaviorsSharedData(gd::Project & project)

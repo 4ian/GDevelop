@@ -664,7 +664,7 @@ public:
      * \brief Return a const reference to the vector containing all the source files used by
      * the game.
      */
-    const std::vector < std::shared_ptr<gd::SourceFile> > & GetAllSourceFiles() const { return externalSourceFiles; }
+    const std::vector < std::unique_ptr<gd::SourceFile> > & GetAllSourceFiles() const { return externalSourceFiles; }
 
     /**
      * \brief Return true if the source file with the specified name is used by the game.
@@ -733,7 +733,7 @@ private:
     gd::String                                         firstLayout;
     #if defined(GD_IDE_ONLY)
     bool                                                useExternalSourceFiles; ///< True if game used external source files.
-    std::vector < std::shared_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
+    std::vector < std::unique_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
     std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
     gd::String                                         author; ///< Game author name
     gd::String                                         packageName; ///< Game package name

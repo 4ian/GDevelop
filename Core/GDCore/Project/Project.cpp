@@ -699,9 +699,8 @@ void Project::UnserializeFrom(const SerializerElement & element)
     {
         const SerializerElement & sourceFileElement = externalSourceFilesElement.GetChild(i);
 
-        std::shared_ptr<gd::SourceFile> newSourceFile(new gd::SourceFile);
-        newSourceFile->UnserializeFrom(sourceFileElement);
-        externalSourceFiles.push_back(newSourceFile);
+        gd::SourceFile & newSourceFile = InsertNewSourceFile("", "");
+        newSourceFile.UnserializeFrom(sourceFileElement);
     }
 
     #if !defined(GD_NO_WX_GUI)
@@ -842,7 +841,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const
 {
-    vector< std::shared_ptr<SourceFile> >::const_iterator sourceFile =
+    vector< std::unique_ptr<SourceFile> >::const_iterator sourceFile =
         find_if(externalSourceFiles.begin(), externalSourceFiles.end(),
         bind2nd(gd::ExternalSourceFileHasName(), name));
 
@@ -864,7 +863,7 @@ const gd::SourceFile & Project::GetSourceFile(const gd::String & name) const
 
 void Project::RemoveSourceFile(const gd::String & name)
 {
-    std::vector< std::shared_ptr<gd::SourceFile> >::iterator sourceFile =
+    std::vector< std::unique_ptr<gd::SourceFile> >::iterator sourceFile =
         find_if(externalSourceFiles.begin(), externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), name));
     if ( sourceFile == externalSourceFiles.end() ) return;
 
@@ -876,16 +875,14 @@ gd::SourceFile & Project::InsertNewSourceFile(const gd::String & name, const gd:
     if (HasSourceFile(name, language))
         return GetSourceFile(name);
 
-    std::shared_ptr<SourceFile> newSourceFile(new SourceFile);
-    newSourceFile->SetLanguage(language);
-    newSourceFile->SetFileName(name);
+    gd::SourceFile & newlyInsertedSourceFile = *(*(externalSourceFiles.emplace(
+        position < externalSourceFiles.size() ? externalSourceFiles.begin() + position : externalSourceFiles.end(),
+        new SourceFile()
+    )));
+    newlyInsertedSourceFile.SetLanguage(language);
+    newlyInsertedSourceFile.SetFileName(name);
 
-    if (position<externalSourceFiles.size())
-        externalSourceFiles.insert(externalSourceFiles.begin()+position, newSourceFile);
-    else
-        externalSourceFiles.push_back(newSourceFile);
-
-    return *newSourceFile;
+    return newlyInsertedSourceFile;
 }
 
 #if !defined(GD_NO_WX_GUI)
@@ -1047,9 +1044,7 @@ void Project::Init(const gd::Project & game)
     #if defined(GD_IDE_ONLY)
     useExternalSourceFiles = game.useExternalSourceFiles;
 
-    externalSourceFiles.clear();
-    for (std::size_t i =0;i<game.externalSourceFiles.size();++i)
-    	externalSourceFiles.push_back( std::shared_ptr<gd::SourceFile>(new gd::SourceFile(*game.externalSourceFiles[i])) );
+    externalSourceFiles = gd::Clone(game.externalSourceFiles);
     #endif
 
     variables = game.GetVariables();

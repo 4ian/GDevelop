@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-04-15 14:32-0400\n"
+"PO-Revision-Date: 2016-09-18 10:01-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -67,11 +67,11 @@ msgstr "Bugs conhecidos para esta versão do GDevelop"
 msgid "You can visit a page on our website which can\n"
 "contain known bugs for this version of GDevelop:"
 msgstr "Você pode visitar uma página em nosso site que pode\n"
-"conter bugs conhecidos para esta versão do GDevelop:"
+"conter erros conhecidos para esta versão do GDevelop:"
 
 #: ../IDE/BugReport.cpp:102
 msgid "View the known bugs for this version"
-msgstr "Exibir os bugs conhecidos para esta versão"
+msgstr "Exibir os erros conhecidos para esta versão"
 
 #: ../IDE/BugReport.cpp:107 ../IDE/BugReport.cpp:134
 #: ../IDE/SearchEvents.cpp:151
@@ -768,7 +768,7 @@ msgstr "François Dumortier: Designer da logo do GDevelop e concepção do Web s
 
 #: ../IDE/Credits.cpp:210
 msgid "Victor Levasseur: Advanced XML, Tiled Sprite and Tile Map extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension."
-msgstr ""
+msgstr "Victor Levasseur: Extensões XML avançado, Sprite Tiled e Mapa Tiled e contribuições para o Physics Engine, extensão de objeto Texto, objeto Vídeo, objeto Caminho e objeto Som."
 
 #: ../IDE/Credits.cpp:213
 msgid "Constantine Shvetsov: Awesome design of icons"
@@ -11836,8 +11836,8 @@ msgstr "Está caindo"
 #: ../Extensions//PlatformBehavior/Extension.cpp:87
 msgid "Check if the object is falling.\n"
 "Note that the object can be flagged as jumping and falling at the same time: at the end of a jump, the fall speed becomes higher that the jump speed."
-msgstr "Checa se o objeto está caindo.\n"
-"Note que o objeto pode ser marcado como \"pulando\" e \"caindo\" ao mesmo tempo: no fim de um pulo, a velocidade de queda se torna maior que a de pulo."
+msgstr "Verifica se o objeto está caindo.\n"
+"Observe que o objeto pode ser marcado como \"pulando\" e \"caindo\" ao mesmo tempo: no final de um pulo, a velocidade de queda se torna maior que a de pulo."
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:88
 msgid "_PARAM0_ is falling"
@@ -13967,7 +13967,7 @@ msgstr "Obejetos Tilemap não controlam tilesets com margens ao redor das imagen
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:109
 msgid "Tileset configuration importation completed."
-msgstr "Importação da configuração Tileset completada."
+msgstr "Importação da configuração do Tileset está completa."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:117
 msgid "Tilemap size is different."
@@ -13987,19 +13987,19 @@ msgstr "Importação do conteúdo da Tilemap concluída."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:234
 msgid "Some tiles have more than 1 hitbox. Only the first one is imported."
-msgstr "Algumas tiles tem mais que 1 hitbox. Apenas a primeira é importada."
+msgstr "Algumas tiles tem mais que 1 caixa de colisão. Apenas a primeira é importada."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:236
 msgid "Some tiles have a polyline or a ellipsis hitbox. Only rectangle and polygon hitboxes are supported."
-msgstr "Algumas tiles tem uma hitbox polilinha ou elipse. Apenas hitboxes em retângulos e polígonos são suporadas."
+msgstr "Algumas tiles tem caixas de colisões polilinha ou elíptica. Apenas as caixas de colisões em retângulos e polígonos são suportadas."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:238
 msgid "Some tiles have a concave polygon. It has been ignored and set to a rectangular hitbox as this object only supports convex hitboxes for tiles."
-msgstr "Algumas tiles tem um polígono côncavo. Ele foi ignorado e mudado para uma hitbox retângular já que esse objeto apenas suporta hitboxes convexas para tiles."
+msgstr "Algumas tiles tem um polígono côncavo. Ele foi ignorado e mudado para uma caixa de colisão retangular já que esse objeto suporta apenas caixas de colisões convexas para tiles."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:240
 msgid "Tiles hitboxes importation completed."
-msgstr "Importação de hitboxes de tiles completa."
+msgstr "Importação de caixa de colisões de tiles está completa."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:258
 msgid "There are not as many tiles in the object's tileset as in the file. The result may not be correct."
@@ -14389,7 +14389,7 @@ msgstr "Sempre"
 
 #: ../Core/GDCore/Extensions/Builtin/AdvancedExtension.cpp:24
 msgid "This condition returns always true (or always false if condition is inverted)."
-msgstr "Esta condição sempre retorna em verdadeiro (ou sempre em falso se a condição é invertida)."
+msgstr "Esta condição sempre retorna verdadeiro (ou sempre falso se a condição é invertida)."
 
 #: ../Core/GDCore/Extensions/Builtin/AudioExtension.cpp:23
 msgid "Play a sound on a channel"
@@ -18301,7 +18301,7 @@ msgstr "Valor de um temporizador"
 
 #: ../Core/GDCore/Extensions/Builtin/TimeExtension.cpp:25
 msgid "Test the elapsed time of a timer."
-msgstr "Teste o tempo decorrido de um timer."
+msgstr "Teste o tempo decorrido de um Temporizador."
 
 #: ../Core/GDCore/Extensions/Builtin/TimeExtension.cpp:26
 msgid "The timer _PARAM2_ is greater than _PARAM1_ seconds"
@@ -18807,25 +18807,25 @@ msgstr "Escolha um comportamento do objeto."
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp:122
 msgid "This object doesn't have the appropriate behavior attached to it.\n"
 "Check that you selected the right object or add the behavior in the object properties."
-msgstr "Este objeto não possui o automatismo apropriado anexado a ele.\n"
-"Verifique se você selecionou o objeto certo ou adicione este o automatismo nas propriedades do objeto."
+msgstr "Este objeto não possui o comportamento apropriado anexado a ele.\n"
+"Verifique se você selecionou o objeto certo ou adicione este o comportamento nas propriedades do objeto."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorDialog.cpp:126
 #, c-format
 msgid "This object doesn't have behavior \"%s\" attached to it.\n"
 "Check that you selected the right object or add this behavior in the object properties."
-msgstr "Este objeto não possui o automatismo \"%s\" anexado a ele.\n"
-"Verifique se você selecionou o objeto certo ou adicione este o automatismo nas propriedades do objeto."
+msgstr "Este objeto não possui o comportamento \"%s\" anexado a ele.\n"
+"Verifique se você selecionou o objeto certo ou adicione este comportamento nas propriedades do objeto."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.cpp:70
 msgid "Choose the behavior to add to the object:"
-msgstr "Escolha o automatismo para adicionar ao objeto:"
+msgstr "Escolha o comportamento para adicionar ao objeto:"
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.cpp:74
 msgid "You can also use the grayed behaviors:\n"
 "their associated extension will be automatically enabled."
-msgstr "Você também pode usar os objetos acizentados:\n"
-"As suas extensões associadas serão ativadas autmaticamente."
+msgstr "Você também pode usar os comportamentos acinzentados:\n"
+"As suas extensões associadas serão ativadas automaticamente."
 
 #: ../Core/GDCore/IDE/Dialogs/ChooseBehaviorTypeDialog.cpp:241
 #: ../Core/GDCore/IDE/Dialogs/ChooseObjectTypeDialog.cpp:253
@@ -19818,7 +19818,7 @@ msgstr "Renomear..."
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:209
 msgid "Choose the behavior to delete"
-msgstr "Escolha o automatismo para excluir"
+msgstr "Escolha o comportamento para excluir"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:228
 msgid "Enter a new name for the behavior"
@@ -20235,7 +20235,7 @@ msgstr "!\n"
 
 #: ../Core/GDCore/IDE/ProjectFileWriter.cpp:144
 msgid "Unable to open the file."
-msgstr "Não é possível abrir o arquivo."
+msgstr "Impossibilitado de abrir o arquivo."
 
 #: ../Core/GDCore/IDE/ProjectFileWriter.cpp:144
 #: ../Core/GDCore/IDE/ProjectFileWriter.cpp:167
@@ -20252,7 +20252,7 @@ msgstr "Erro ao carregar:"
 msgid "Your project has been upgraded to be used with GDevelop 4.\n"
 "If you save it, you won't be able to open it with an older version: please do a backup of your project file if you want to go back to GDevelop 3."
 msgstr "Seu projeto foi atualizado para ser usado com GDevelop 4.\n"
-"se você salvá-lo, você não será capaz de abri-lo com uma versão mais antiga: por favor, faça um backup do arquivo de projeto, se você quiser voltar a usar GDevelop 3."
+"Se você salvá-lo, você não será capaz de abri-lo com uma versão mais antiga: por favor, faça um backup do arquivo de projeto se você quiser voltar a usar GDevelop 3."
 
 #: ../Core/GDCore/IDE/wxTools/ShowFolder.cpp:32
 msgid "Oops, it seems that the folder couldn't be displayed. Open your file explorer and go to:\n\n"
@@ -20296,11 +20296,11 @@ msgstr "Obrigado pela sua compreensão.\n"
 
 #: ../Core/GDCore/Project/Project.cpp:630
 msgid "The project is using the pathfinding behavior. This behavior has been replaced by a new one:\n"
-msgstr "O projeto usando o automatismo de pathfinding. Esse automatismo foi substituído por um novo: \n"
+msgstr "O projeto está usando o comportamento de \"Encontrando Caminhos\". Esse comportamento foi substituído por um novo: \n"
 
 #: ../Core/GDCore/Project/Project.cpp:631
 msgid "You must add the new 'Pathfinding' behavior to the objects that need to be moved, and add the 'Pathfinding Obstacle' to the objects that must act as obstacles."
-msgstr "Você deve adicionar o novo automatismo ' Pathfinding ' para os objetos que precisam ser movidos, e adicionar o 'Obstáculo de Pathfinding' para os objetos que devem atuar como obstáculos."
+msgstr "Você deve adicionar o novo comportamento de ' Encontrando Caminhos ' para os objetos que precisam ser movidos, e adicionar o 'Obstáculo de Encontrando Caminhos' para os objetos que devem atuar como obstáculos."
 
 #: ../Core/GDCore/Project/Project.cpp:807
 msgid "Please use only letters, digits\n"

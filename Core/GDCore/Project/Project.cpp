@@ -264,33 +264,31 @@ void Project::SwapLayouts(std::size_t first, std::size_t second)
 
 gd::Layout & Project::InsertNewLayout(const gd::String & name, std::size_t position)
 {
-    std::unique_ptr<gd::Layout> newScene = std::unique_ptr<gd::Layout>(new Layout);
-    if (position<scenes.size())
-        scenes.insert(scenes.begin()+position, std::move(newScene));
-    else
-        scenes.push_back(std::move(newScene));
+    gd::Layout & newlyInsertedLayout = *(*(scenes.emplace(
+        position < scenes.size() ? scenes.begin() + position : scenes.end(),
+        new Layout()
+    )));
 
-    newScene->SetName(name);
+    newlyInsertedLayout.SetName(name);
     #if defined(GD_IDE_ONLY)
-    newScene->UpdateBehaviorsSharedData(*this);
+    newlyInsertedLayout.UpdateBehaviorsSharedData(*this);
     #endif
 
-    return *newScene;
+    return newlyInsertedLayout;
 }
 
 gd::Layout & Project::InsertLayout(const gd::Layout & layout, std::size_t position)
 {
-    std::unique_ptr<gd::Layout> newScene = std::unique_ptr<gd::Layout>(new Layout(layout));
-    if (position<scenes.size())
-        scenes.insert(scenes.begin()+position, std::move(newScene));
-    else
-        scenes.push_back(std::move(newScene));
+    gd::Layout & newlyInsertedLayout = *(*(scenes.emplace(
+        position < scenes.size() ? scenes.begin() + position : scenes.end(),
+        new Layout(layout)
+    )));
 
     #if defined(GD_IDE_ONLY)
-    newScene->UpdateBehaviorsSharedData(*this);
+    newlyInsertedLayout.UpdateBehaviorsSharedData(*this);
     #endif
 
-    return *newScene;
+    return newlyInsertedLayout;
 }
 
 void Project::RemoveLayout(const gd::String & name)

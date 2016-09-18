@@ -10,65 +10,100 @@
 
 float GD_API GetCameraX(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return 0.f;
+
     const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
     return view.getCenter().x;
 }
 
 float GD_API GetCameraY(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return 0.f;
     const sf::View & view = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView();
     return view.getCenter().y;
 }
 
 void GD_API SetCameraX(RuntimeScene & scene, float x, const gd::String & layer, std::size_t cameraId)
 {
+    if(cameraId >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return;
+
     RuntimeCamera & camera = scene.GetRuntimeLayer(layer).GetCamera(cameraId);
     camera.SetViewCenter(sf::Vector2f(x, camera.GetViewCenter().y));
 }
 
 void GD_API SetCameraY(RuntimeScene & scene, float y, const gd::String & layer, std::size_t cameraId)
 {
+    if(cameraId >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return;
+
     RuntimeCamera & camera = scene.GetRuntimeLayer(layer).GetCamera(cameraId);
     camera.SetViewCenter(sf::Vector2f(camera.GetViewCenter().x, y));
 }
 
 double GD_API GetCameraAngle(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return 0.f;
+
     return scene.GetRuntimeLayer(layer).GetCamera(camera).GetRotation();
 }
 
 void GD_API SetCameraAngle(RuntimeScene & scene, float newValue, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return;
+
     return scene.GetRuntimeLayer(layer).GetCamera(camera).SetRotation(newValue);
 }
 
 void GD_API SetCameraZoom(RuntimeScene & scene, float newZoom, const gd::String & layer, std::size_t cameraNb)
 {
+    if(cameraNb >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return;
+
     scene.GetRuntimeLayer(layer).GetCamera(cameraNb).SetZoom(newZoom);
 }
 
 double GD_API GetCameraWidth(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return 0.f;
+
     return scene.GetRuntimeLayer(layer).GetCamera(camera).GetWidth();
 }
 
 double GD_API GetCameraHeight(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return 0.f;
+
     return scene.GetRuntimeLayer(layer).GetCamera(camera).GetHeight();
 }
 
 double GD_API GetCameraViewportLeft(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return 0.f;
+
     return scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView().getViewport().left;
 }
 
 double GD_API GetCameraViewportTop(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return 0.f;
+
     return scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView().getViewport().top;
 }
 
 double GD_API GetCameraViewportRight(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return 0.f;
+
     const sf::FloatRect & sfmlViewport = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView().getViewport();
 
     return sfmlViewport.left+sfmlViewport.width;
@@ -76,6 +111,9 @@ double GD_API GetCameraViewportRight(RuntimeScene & scene, const gd::String & la
 
 double GD_API GetCameraViewportBottom(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return 0.f;
+
     const sf::FloatRect & sfmlViewport = scene.GetRuntimeLayer(layer).GetCamera(camera).GetSFMLView().getViewport();
 
     return sfmlViewport.top+sfmlViewport.height;
@@ -86,6 +124,9 @@ double GD_API GetCameraViewportBottom(RuntimeScene & scene, const gd::String & l
  */
 void GD_API SetCameraSize( RuntimeScene & scene, const gd::String & layer, std::size_t cameraNb, float width, float height)
 {
+    if(cameraNb >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return;
+
     scene.GetRuntimeLayer(layer).GetCamera(cameraNb).SetZoom(1);
     scene.GetRuntimeLayer(layer).GetCamera(cameraNb).SetSize(width, height);
 }
@@ -93,6 +134,9 @@ void GD_API SetCameraSize( RuntimeScene & scene, const gd::String & layer, std::
 void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, RuntimeObject * object, float left, float top, float right, float bottom, bool anticipateObjectMove, const gd::String & layer, std::size_t camera)
 {
     if ( object == NULL ) return;
+
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return;
 
     float xOffset = 0;
     float yOffset = 0;
@@ -117,6 +161,9 @@ void GD_API CenterCameraOnObject(RuntimeScene & scene, RuntimeObject * object,  
 {
     if ( object == NULL ) return;
 
+    if(camera >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return;
+
     float xOffset = 0;
     float yOffset = 0;
     double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
@@ -137,6 +184,9 @@ void GD_API CenterCameraOnObject(RuntimeScene & scene, RuntimeObject * object,  
  */
 void GD_API ActDeleteCamera(RuntimeScene & scene, const gd::String & layerName, std::size_t camera)
 {
+    if(camera >= scene.GetRuntimeLayer(layerName).GetCameraCount())
+        return;
+
     scene.GetRuntimeLayer(layerName).DeleteCamera(camera);
 }
 
@@ -165,6 +215,9 @@ void GD_API AddCamera( RuntimeScene & scene, const gd::String & layerName, float
 
 void GD_API SetCameraViewport( RuntimeScene & scene,  const gd::String & layer, std::size_t cameraNb, float viewportLeft, float viewportTop, float viewportRight, float viewportBottom )
 {
+    if(cameraNb >= scene.GetRuntimeLayer(layer).GetCameraCount())
+        return;
+
     RuntimeCamera & camera = scene.GetRuntimeLayer(layer).GetCamera(cameraNb);
     camera.SetViewport(viewportLeft, viewportTop, viewportRight, viewportBottom);
 }

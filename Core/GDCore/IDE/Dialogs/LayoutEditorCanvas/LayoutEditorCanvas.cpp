@@ -884,9 +884,8 @@ public:
     InstancesInAreaPicker(const LayoutEditorCanvas & editor_) : editor(editor_), ignoreLockedInstances(false) {};
     virtual ~InstancesInAreaPicker() {};
 
-    virtual void operator()(gd::InitialInstance * instancePtr)
+    virtual void operator()(gd::InitialInstance & instance)
     {
-        gd::InitialInstance & instance = *instancePtr;
         if ( ignoreLockedInstances && instance.IsLocked() ) return;
         if ( excludedLayers.find(instance.GetLayer()) != excludedLayers.end() ) return;
 
@@ -1292,9 +1291,8 @@ public:
     };
     virtual ~SmallestInstanceUnderCursorPicker() {};
 
-    virtual void operator()(gd::InitialInstance * instancePtr)
+    virtual void operator()(gd::InitialInstance & instance)
     {
-        gd::InitialInstance & instance = *instancePtr;
         if ( pickLockedOnly != instance.IsLocked() ) return;
         if ( excludedLayers.find(instance.GetLayer()) != excludedLayers.end() ) return;
 

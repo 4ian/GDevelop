@@ -172,7 +172,7 @@ public:
     InitialInstanceFunctor() {};
     virtual ~InitialInstanceFunctor();
 
-    virtual void operator()(InitialInstance * instance) = 0;
+    virtual void operator()(InitialInstance & instance) = 0;
 };
 
 /** \brief Tool class picking returning the highest Z order of instances on a layer.
@@ -186,7 +186,7 @@ public:
     HighestZOrderFinder() : highestZOrder(0), lowestZOrder(0), firstCall(true), layerRestricted(false) {};
     virtual ~HighestZOrderFinder() {};
 
-    virtual void operator()(gd::InitialInstance * instance);
+    virtual void operator()(gd::InitialInstance & instance);
 
     /**
      * \brief Restrict to instances on the specified layer.

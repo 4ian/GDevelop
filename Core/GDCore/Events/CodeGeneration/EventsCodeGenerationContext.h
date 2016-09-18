@@ -32,7 +32,7 @@ public:
      * Default constructor. You may want to call InheritsFrom just after.
      * \param maxDepthLevel Optional pointer to an unsigned integer that will be updated to contain the maximal scope depth reached.
      */
-    EventsCodeGenerationContext(unsigned int * maxDepthLevel_ = NULL) : contextDepth(0), customConditionDepth(0), maxDepthLevel(maxDepthLevel_), parent(NULL) {};
+    EventsCodeGenerationContext(unsigned int * maxDepthLevel_ = nullptr) : contextDepth(0), customConditionDepth(0), maxDepthLevel(maxDepthLevel_), parent(NULL) {};
     virtual ~EventsCodeGenerationContext() {};
 
     /**

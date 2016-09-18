@@ -20,10 +20,8 @@ void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext
 
     //Objects lists declared by parent became "already declared" in the child context.
     alreadyDeclaredObjectsLists = parent_.alreadyDeclaredObjectsLists;
-    for ( std::set<gd::String>::iterator it = parent_.objectsListsToBeDeclared.begin() ; it != parent_.objectsListsToBeDeclared.end(); ++it )
-        alreadyDeclaredObjectsLists.insert(*it);
-    for ( std::set<gd::String>::iterator it = parent_.emptyObjectsListsToBeDeclared.begin() ; it != parent_.emptyObjectsListsToBeDeclared.end(); ++it )
-        alreadyDeclaredObjectsLists.insert(*it);
+    std::copy( parent_.objectsListsToBeDeclared.begin(), parent_.objectsListsToBeDeclared.end(), std::inserter( alreadyDeclaredObjectsLists, alreadyDeclaredObjectsLists.begin() ) );
+    std::copy( parent_.emptyObjectsListsToBeDeclared.begin(), parent_.emptyObjectsListsToBeDeclared.end(), std::inserter( alreadyDeclaredObjectsLists, alreadyDeclaredObjectsLists.begin() ) );
 
     depthOfLastUse = parent_.depthOfLastUse;
     customConditionDepth = parent_.customConditionDepth;

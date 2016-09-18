@@ -254,10 +254,10 @@ void Project::SwapLayouts(std::size_t first, std::size_t second)
     if ( first >= scenes.size() || second >= scenes.size() )
         return;
 
-    std::shared_ptr<gd::Layout> firstItem = scenes[first];
-    std::shared_ptr<gd::Layout> secondItem = scenes[second];
-    scenes[first] = secondItem;
-    scenes[second] = firstItem;
+    std::iter_swap(
+        scenes.begin() + first,
+        scenes.begin() + second
+    );
 }
 #endif
 
@@ -367,10 +367,10 @@ void Project::SwapExternalEvents(std::size_t first, std::size_t second)
     if ( first >= externalEvents.size() || second >= externalEvents.size() )
         return;
 
-    std::shared_ptr<gd::ExternalEvents> firstItem = externalEvents[first];
-    std::shared_ptr<gd::ExternalEvents> secondItem = externalEvents[second];
-    externalEvents[first] = secondItem;
-    externalEvents[second] = firstItem;
+    std::iter_swap(
+        externalEvents.begin() + first,
+        externalEvents.begin() + second
+    );
 }
 
 void Project::SwapExternalLayouts(std::size_t first, std::size_t second)
@@ -378,10 +378,10 @@ void Project::SwapExternalLayouts(std::size_t first, std::size_t second)
     if ( first >= externalLayouts.size() || second >= externalLayouts.size() )
         return;
 
-    std::shared_ptr<gd::ExternalLayout> firstItem = externalLayouts[first];
-    std::shared_ptr<gd::ExternalLayout> secondItem = externalLayouts[second];
-    externalLayouts[first] = secondItem;
-    externalLayouts[second] = firstItem;
+    std::iter_swap(
+        externalLayouts.begin() + first,
+        externalLayouts.begin() + second
+    );
 }
 #endif
 bool Project::HasExternalLayoutNamed(const gd::String & name) const
@@ -459,9 +459,8 @@ public:
     {};
     virtual ~SpriteObjectsPositionUpdater() {};
 
-    virtual void operator()(gd::InitialInstance * instancePtr)
+    virtual void operator()(gd::InitialInstance & instance)
     {
-        gd::InitialInstance & instance = *instancePtr;
         gd::Object * object = NULL;
         if ( layout.HasObjectNamed(instance.GetObjectName()))
             object = &layout.GetObject(instance.GetObjectName());

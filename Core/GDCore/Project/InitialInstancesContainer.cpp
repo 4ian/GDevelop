@@ -3,9 +3,10 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <map>
+
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -74,36 +75,26 @@ void InitialInstancesContainer::UnserializeFrom(const SerializerElement & elemen
 
 void InitialInstancesContainer::IterateOverInstances(gd::InitialInstanceFunctor & func)
 {
-    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
-        func(&(*it));
-}
-
-namespace
-{
-
-struct InstancesZOrderSort
-{
-   bool operator ()(gd::InitialInstance * a, gd::InitialInstance * b) const
-   {
-      return a->GetZOrder() < b->GetZOrder();
-   }
-};
-
+    for(auto& instance : initialInstances)
+        func(instance);
 }
 
 void InitialInstancesContainer::IterateOverInstancesWithZOrdering(gd::InitialInstanceFunctor & func, const gd::String & layerName)
 {
-    std::vector<gd::InitialInstance*> sortedInstances;
-    sortedInstances.reserve(initialInstances.size());
-    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
-    {
-        if (it->GetLayer() == layerName )
-            sortedInstances.push_back(&(*it));
-    }
+    std::vector<std::reference_wrapper<gd::InitialInstance>> sortedInstances;
+    std::copy_if(
+        initialInstances.begin(),
+        initialInstances.end(),
+        std::inserter(sortedInstances, sortedInstances.begin()),
+        [&layerName](InitialInstance & instance) { return instance.GetLayer() == layerName; });
 
-    std::sort(sortedInstances.begin(), sortedInstances.end(), gd::InstancesZOrderSort());
-    for (std::size_t i = 0;i<sortedInstances.size();++i)
-        func(sortedInstances[i]);
+    std::sort(
+        sortedInstances.begin(),
+        sortedInstances.end(),
+        [](gd::InitialInstance & a, gd::InitialInstance & b) { return a.GetZOrder() < b.GetZOrder(); });
+
+    for(auto& instance : sortedInstances)
+        func(instance);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -117,13 +108,14 @@ gd::InitialInstance & InitialInstancesContainer::InsertNewInitialInstance()
 
 void InitialInstancesContainer::RemoveInstance(const gd::InitialInstance & instance)
 {
-    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end;)
-    {
-        if ( &(*it) == &instance )
-            it = initialInstances.erase(it);
-        else
-            ++it;
-    }
+    initialInstances.erase(
+        std::remove_if(
+            initialInstances.begin(),
+            initialInstances.end(),
+            [&instance](const InitialInstance & currentInstance) { return &instance == &currentInstance; }
+        ),
+        initialInstances.end()
+    );
 }
 
 gd::InitialInstance & InitialInstancesContainer::InsertInitialInstance(const gd::InitialInstance & instance)
@@ -142,52 +134,53 @@ gd::InitialInstance & InitialInstancesContainer::InsertInitialInstance(const gd:
 
 void InitialInstancesContainer::RenameInstancesOfObject(const gd::String & oldName, const gd::String & newName)
 {
-    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
+    for (gd::InitialInstance & instance : initialInstances)
     {
-        if ( (*it).GetObjectName() == oldName )
-            (*it).SetObjectName(newName);
+        if ( instance.GetObjectName() == oldName )
+            instance.SetObjectName(newName);
     }
 }
 
 void InitialInstancesContainer::RemoveInitialInstancesOfObject(const gd::String & objectName)
 {
-    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end;)
-    {
-        if ( (*it).GetObjectName() == objectName )
-            it = initialInstances.erase(it);
-        else
-            ++it;
-    }
+    initialInstances.erase(
+        std::remove_if(
+            initialInstances.begin(),
+            initialInstances.end(),
+            [&objectName](const InitialInstance & currentInstance) { return currentInstance.GetObjectName() == objectName; }
+        ),
+        initialInstances.end()
+    );
 }
 
 void InitialInstancesContainer::RemoveAllInstancesOnLayer(const gd::String & layerName)
 {
-    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end;)
-    {
-        if ( (*it).GetLayer() == layerName )
-            it = initialInstances.erase(it);
-        else
-            ++it;
-    }
+    initialInstances.erase(
+        std::remove_if(
+            initialInstances.begin(),
+            initialInstances.end(),
+            [&layerName](const InitialInstance & currentInstance) { return currentInstance.GetLayer() == layerName; }
+        ),
+        initialInstances.end()
+    );
 }
 
 void InitialInstancesContainer::MoveInstancesToLayer(const gd::String & fromLayer, const gd::String & toLayer)
 {
-    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
+    for (gd::InitialInstance & instance : initialInstances)
     {
-        if ( (*it).GetLayer() == fromLayer )
-            (*it).SetLayer(toLayer);
+        if ( instance.GetLayer() == fromLayer )
+            instance.SetLayer(toLayer);
     }
 }
 
 bool InitialInstancesContainer::SomeInstancesAreOnLayer(const gd::String & layerName)
 {
-    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
-    {
-        if ( (*it).GetLayer() == layerName )
-            return true;
-    }
-    return false;
+    return std::any_of(
+        initialInstances.begin(),
+        initialInstances.end(),
+        [&layerName](const InitialInstance & currentInstance) { return currentInstance.GetLayer() == layerName; }
+    );
 }
 
 void InitialInstancesContainer::Create(const InitialInstancesContainer & source)
@@ -245,9 +238,8 @@ InitialInstanceFunctor::~InitialInstanceFunctor()
 };
 
 
-void HighestZOrderFinder::operator()(gd::InitialInstance * instancePtr)
+void HighestZOrderFinder::operator()(gd::InitialInstance & instance)
 {
-    gd::InitialInstance & instance = *instancePtr;
     if ( !layerRestricted || instance.GetLayer() == layerName)
     {
         if ( firstCall )

@@ -79,9 +79,8 @@ public:
     InitialPositionBrowserDlgRefresher(const InitialPositionBrowserDlg & editor_, const std::vector<InitialInstance*> & selectedInstance_) : editor(editor_), selectedInstance(selectedInstance_), i(0) {};
     virtual ~InitialPositionBrowserDlgRefresher() {};
 
-    virtual void operator()(gd::InitialInstance * instancePtr)
+    virtual void operator()(gd::InitialInstance & instance)
     {
-        gd::InitialInstance & instance = *instancePtr;
         if ( i >= editor.initialPositionsList->GetItemCount() ) editor.initialPositionsList->InsertItem(i, "");
         editor.initialPositionsList->SetItem(i, 0, instance.GetObjectName());
         editor.initialPositionsList->SetItemColumnImage(i, 1, instance.IsLocked() ? 1 : 0 );

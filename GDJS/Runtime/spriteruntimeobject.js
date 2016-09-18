@@ -92,6 +92,31 @@ gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
 };
 
 /**
+ * Represents a direction of an animation of a SpriteRuntimeObject.
+ *
+ * @class SpriteAnimationDirection
+ * @namespace gdjs
+ * @constructor
+ */
+gdjs.SpriteAnimationDirection = function(imageManager, directionData)
+{
+    this.timeBetweenFrames = directionData ? parseFloat(directionData.timeBetweenFrames) :
+        1.0;
+    this.loop = !!directionData.looping;
+
+    if ( this.frames === undefined ) this.frames = [];
+    for(var i = 0, len = directionData.sprites.length;i<len;++i) {
+        var frameData = directionData.sprites[i];
+
+        if ( i < this.frames.length )
+            gdjs.SpriteAnimationFrame.call(this.frames[i], imageManager, frameData);
+        else
+            this.frames.push(new gdjs.SpriteAnimationFrame(imageManager, frameData));
+    }
+    this.frames.length = i;
+};
+
+/**
  * Represents an animation of a SpriteRuntimeObject.
  *
  * @class SpriteAnimation
@@ -100,24 +125,6 @@ gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
  */
 gdjs.SpriteAnimation = function(imageManager, animData)
 {
-	//Constructor of internal object representing a direction of an animation.
-    var Direction = function(imageManager, directionData) {
-        this.timeBetweenFrames = directionData ? parseFloat(directionData.timeBetweenFrames) :
-                                 1.0;
-        this.loop = !!directionData.looping;
-
-        if ( this.frames === undefined ) this.frames = [];
-        for(var i = 0, len = directionData.sprites.length;i<len;++i) {
-            var frameData = directionData.sprites[i];
-
-            if ( i < this.frames.length )
-                gdjs.SpriteAnimationFrame.call(this.frames[i], imageManager, frameData);
-            else
-                this.frames.push(new gdjs.SpriteAnimationFrame(imageManager, frameData));
-        }
-        this.frames.length = i;
-    };
-
     this.hasMultipleDirections = !!animData.useMultipleDirections;
     this.name = animData.name || '';
 
@@ -126,9 +133,9 @@ gdjs.SpriteAnimation = function(imageManager, animData)
         var directionData = animData.directions[i];
 
         if ( i < this.directions.length )
-            Direction.call(this.directions[i], imageManager, directionData);
+            gdjs.SpriteAnimationDirection.call(this.directions[i], imageManager, directionData);
         else
-            this.directions.push(new Direction(imageManager, directionData));
+            this.directions.push(new gdjs.SpriteAnimationDirection(imageManager, directionData));
     }
     this.directions.length = i; //Make sure to delete already existing directions which are not used anymore.
 };

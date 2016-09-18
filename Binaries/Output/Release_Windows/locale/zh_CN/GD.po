@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-04-15 14:30-0400\n"
+"PO-Revision-Date: 2016-09-18 09:59-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -725,7 +725,7 @@ msgstr "GDevelop 是开放源码软件： \n\n"
 
 #: ../IDE/Credits.cpp:134
 msgid "Programmed in C++, compiled with GCC, written with Sublime Text"
-msgstr ""
+msgstr "程序使用 C++编写，编辑器使用 GCC，文本编辑器使用 Sublime Text"
 
 #: ../IDE/Credits.cpp:146
 msgid "Use SFML, wxWidgets and TinyXml libraries."
@@ -2802,15 +2802,15 @@ msgstr "在列表中选择一个条件"
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "Help on this "
-msgstr ""
+msgstr "帮助这个 "
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "action"
-msgstr ""
+msgstr "行为"
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "condition"
-msgstr ""
+msgstr "条件"
 
 #: ../IDE/InstructionSelectorDialog.cpp:145
 msgid "Inversion"
@@ -4242,20 +4242,21 @@ msgstr "允许创建可在 Windows 或 Linux 上编译及游玩的 2D 游戏。"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "The project was exported to \""
-msgstr ""
+msgstr "项目导出为"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "\".\n"
 "Follow the instructions on the wiki to know how to build the android package from the exported files."
-msgstr ""
+msgstr "\n"
+"根据wiki上的指示，去了解如何通过将导出的文件构建安卓应用包"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "Android export"
-msgstr ""
+msgstr "导出为安卓"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:51
 msgid "Export in progress"
-msgstr ""
+msgstr "正在导出"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:51 ../GDJS/GDJS//IDE/Exporter.cpp:99
 #: ../GDJS/GDJS//IDE/Exporter.cpp:202
@@ -4808,11 +4809,11 @@ msgstr "aaa"
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:156
 msgid "Exports the game to a native Android application. This will produce source files ready to be compiled for Android using the Android SDK and NDK."
-msgstr ""
+msgstr "导出游戏为安卓应用。这将会产生用于Android SDK和NDK编译Android的源代码。"
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:161
 msgid "How to compile your game exported files."
-msgstr ""
+msgstr "如何编译你的游戏导出的文件。"
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:172
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:102
@@ -5324,7 +5325,7 @@ msgstr "基於 C + + 和 OpenGL 的 Windows 或 Linux 的游戏。"
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.h:113
 msgid "Export to native Android"
-msgstr ""
+msgstr "导出到原生 Android"
 
 #: ../GDJS/GDJS//Events/Builtin/JsCodeEvent.cpp:51
 msgid "Javascript code"
@@ -5643,15 +5644,15 @@ msgstr "只需单击\"导出\"按钮然后GDevelop 会打包你的游戏。 \n"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:184
 msgid "Export to a website or native game with Cocos2d (experimental)"
-msgstr ""
+msgstr "导出到网站或与Cocos2d兼容的本地游戏(测试)"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:254
 msgid "If you install Cocos2d-x, you can also use it to export the game to Android, iOS, Windows, Mac or Linux."
-msgstr ""
+msgstr "如果你安装了cocos2d，你也可以导出游戏到 Android、 iOS，Windows、 Mac 或 Linux。"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:259
 msgid "Click here to learn more about Cocos2d export"
-msgstr ""
+msgstr "单击此处以了解更多关于cocos2d的导出"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:296
 msgid "Export"
@@ -5955,7 +5956,7 @@ msgstr "插屏已准备好"
 
 #: ../Extensions//AdMobObject/Extension.cpp:80
 msgid "Return true if the interstitial screen was loaded and is ready to be shown."
-msgstr ""
+msgstr "如果 interstitial screen 已经载入，并且可以显示了，则返回 true。"
 
 #: ../Extensions//AdMobObject/Extension.cpp:81
 msgid "Interstitial screen of _PARAM0_ is ready"
@@ -6093,7 +6094,7 @@ msgstr "引用是无效的"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:106
 msgid "Is valid only when the reference is pointing to an existing and valid element."
-msgstr ""
+msgstr "只有当引用现有的和有效的元素的时候有效。"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:107
 msgid "_PARAM0_ exists and is valid"
@@ -6181,7 +6182,7 @@ msgstr ""
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:154
 msgid "Reference which will be used to access to the element"
-msgstr ""
+msgstr "将用来访问对象的引用"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:155
 msgid "Tye of the element to be created\n"
@@ -6210,15 +6211,15 @@ msgstr "删除元素 _PARAM0_"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:168
 msgid "Reference to the element to be deleted"
-msgstr ""
+msgstr "指向要删除的对象"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:173
 msgid "Add an element inside another"
-msgstr ""
+msgstr "把对象添加到另一个对象"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:174
 msgid "Add an element into another: The element will be a \"child\" of its \"parent\"."
-msgstr ""
+msgstr "把一个对象添加到另一个对象︰这个对象将会是另一个对象的子对象。"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:175
 msgid "Add _PARAM0_ as a child of _PARAM1_ (before _PARAM2_)"
@@ -6237,15 +6238,15 @@ msgstr "高级 XML: 标记"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:180
 msgid "Reference to the element to be added"
-msgstr ""
+msgstr "指向被添加的对象"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:181
 msgid "Reference to the parent element (must be a Tag element)"
-msgstr ""
+msgstr "指向父对象(必需是被标记的对象)"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:182
 msgid "The element will be added before this element (if not defined, the element will be added at the end)"
-msgstr ""
+msgstr "添加到指定对象之前(如果没有指定对象，将会添加到最后)"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:187
 #: ../Extensions//AdvancedXML/src/Extension.cpp:188
@@ -6284,7 +6285,7 @@ msgstr "获取标记的名称"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:213
 msgid "Change the content of the element"
-msgstr ""
+msgstr "更改对象的内容"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:214
 msgid "Change the content (text) of the element ( For text and comments elements only )."
@@ -9294,7 +9295,7 @@ msgstr "颗粒"
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:169
 #: ../Extensions//ParticleSystem/ParticleEmitterObject.cpp:599
 msgid "Particles number"
-msgstr ""
+msgstr "粒子数"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:209
 msgid "Emission angle A"
@@ -9322,7 +9323,7 @@ msgstr ""
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:230
 msgid "Gravity value"
-msgstr ""
+msgstr "重力值"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:233
 msgid "Particles friction"
@@ -9893,11 +9894,11 @@ msgstr ""
 
 #: ../Extensions//PathBehavior/Extension.cpp:147
 msgid "Current segment"
-msgstr ""
+msgstr "当前阶段"
 
 #: ../Extensions//PathBehavior/Extension.cpp:147
 msgid "Number of the current segment"
-msgstr ""
+msgstr "当前阶段的数量"
 
 #: ../Extensions//PathBehavior/Extension.cpp:154
 msgid "Position of the object on the segment"
@@ -10077,7 +10078,7 @@ msgstr ""
 #: ../Extensions//PathBehavior/Extension.cpp:335
 #: ../Extensions//PathBehavior/Extension.cpp:336
 msgid "Change the angle offset"
-msgstr ""
+msgstr "改变角度偏移量"
 
 #: ../Extensions//PathBehavior/Extension.cpp:337
 msgid "Do _PARAM2__PARAM3_ to angle offset of _PARAM0_"
@@ -10616,7 +10617,7 @@ msgstr ""
 #: ../Extensions//TopDownMovementBehavior/Extension.cpp:260
 #: ../Extensions//TopDownMovementBehavior/Extension.cpp:348
 msgid "Rotation offset"
-msgstr ""
+msgstr "旋转偏移量"
 
 #: ../Extensions//PathfindingBehavior/Extension.cpp:272
 #: ../Extensions//TopDownMovementBehavior/Extension.cpp:247
@@ -11005,7 +11006,7 @@ msgstr "图形重置大小"
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:477
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:478
 msgid "Rotation..."
-msgstr ""
+msgstr "旋转..."
 
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:151
 msgid "Turn the polygon around a point"

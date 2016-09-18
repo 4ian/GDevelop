@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-04-15 14:31-0400\n"
+"PO-Revision-Date: 2016-09-18 10:00-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -727,11 +727,11 @@ msgstr "GDevelop è un software opensource: \n\n"
 
 #: ../IDE/Credits.cpp:134
 msgid "Programmed in C++, compiled with GCC, written with Sublime Text"
-msgstr ""
+msgstr "Programmato in C++, compilato con TDM-GCC, scritto con Sublime Text"
 
 #: ../IDE/Credits.cpp:146
 msgid "Use SFML, wxWidgets and TinyXml libraries."
-msgstr ""
+msgstr "Utilizza librerie SFML, wxWidgets e TinyXml."
 
 #: ../IDE/Credits.cpp:159
 msgid "The Web platform is written in Javascript and uses Pixi.js"
@@ -763,7 +763,7 @@ msgstr "François Dumortier : GDevelop disegnatore del logo e concezione del sit
 
 #: ../IDE/Credits.cpp:210
 msgid "Victor Levasseur: Advanced XML, Tiled Sprite and Tile Map extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension."
-msgstr ""
+msgstr "Victor Levasseur: XML Avanzato, estensioni Tiled Sprite e Tile Map e contributi alle estensioni del Motore Fisico, oggetto Testo, oggetto Video, comportamento del percorso e oggetto Sonoro."
 
 #: ../IDE/Credits.cpp:213
 msgid "Constantine Shvetsov: Awesome design of icons"
@@ -2802,15 +2802,15 @@ msgstr "Scegliere una condizione nell'elenco"
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "Help on this "
-msgstr ""
+msgstr "Aiutaci "
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "action"
-msgstr ""
+msgstr "azione"
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "condition"
-msgstr ""
+msgstr "condizione"
 
 #: ../IDE/InstructionSelectorDialog.cpp:145
 msgid "Inversion"
@@ -3932,7 +3932,7 @@ msgstr "Impossibile aprire "
 
 #: ../IDE/ProjectManager.cpp:704
 msgid ", the file does not exist"
-msgstr ""
+msgstr ", il file non esiste"
 
 #: ../IDE/ProjectManager.cpp:738 ../IDE/ProjectManager.cpp:771
 #: ../IDE/ProjectManager.cpp:796
@@ -4110,7 +4110,7 @@ msgstr "> (maggiore di)"
 
 #: ../IDE/SigneTest.cpp:42
 msgid "< ( less than )"
-msgstr ""
+msgstr "< ( inferiore a )"
 
 #: ../IDE/SigneTest.cpp:43
 msgid ">= ( greater than or equal to )"
@@ -4118,11 +4118,11 @@ msgstr "> = (maggiore o uguale a)"
 
 #: ../IDE/SigneTest.cpp:44
 msgid "<= ( less than or equal to )"
-msgstr ""
+msgstr "<= ( inferiore o uguale a )"
 
 #: ../IDE/SigneTest.cpp:45
 msgid "!= ( not equal to )"
-msgstr ""
+msgstr "!= ( diverso da )"
 
 #: ../IDE/SigneTest.cpp:47
 msgid "Choose the comparison operator"
@@ -4243,20 +4243,21 @@ msgstr "Permette di creare giochi 2D che possono essere compilati e giocati su W
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "The project was exported to \""
-msgstr ""
+msgstr "Il progetto è stato esportato in \""
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "\".\n"
 "Follow the instructions on the wiki to know how to build the android package from the exported files."
-msgstr ""
+msgstr "\".\n"
+"Segui le istruzioni della wiki per sapere come compilare il pacchetto Android dai files esportati."
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "Android export"
-msgstr ""
+msgstr "Esporta per Android"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:51
 msgid "Export in progress"
-msgstr ""
+msgstr "Esportazione in corso"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:51 ../GDJS/GDJS//IDE/Exporter.cpp:99
 #: ../GDJS/GDJS//IDE/Exporter.cpp:202
@@ -4809,11 +4810,11 @@ msgstr "AAA"
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:156
 msgid "Exports the game to a native Android application. This will produce source files ready to be compiled for Android using the Android SDK and NDK."
-msgstr ""
+msgstr "Esporta il gioco in un applicazione android nativa. Questo produrrà dei file sorgente pronti per la compilazione utilizzando l'SDK e l'NDK Android."
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:161
 msgid "How to compile your game exported files."
-msgstr ""
+msgstr "Come compilare i tuoi files di gioco esportati."
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:172
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:102
@@ -5325,7 +5326,7 @@ msgstr "Giochi per Windows e Linux basati su C++ e OpenGL."
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.h:113
 msgid "Export to native Android"
-msgstr ""
+msgstr "Esportare ad Android nativo"
 
 #: ../GDJS/GDJS//Events/Builtin/JsCodeEvent.cpp:51
 msgid "Javascript code"
@@ -5591,7 +5592,9 @@ msgstr "Per favore segnalare questo errore nel sito Web GDevelop o contattare lo
 msgid "Unable to launch your browser :(\n"
 "Manually open your browser and type \"localhost:2828\" in\n"
 "the address bar (without the quotes) to launch the preview!"
-msgstr ""
+msgstr "Impossibile avviare il browser :(\n"
+"Aprire manualmente il browser e digitare \"localhost:2828\" nella \n"
+"barra degli indirizzi (senza le virgolette) per lanciare l'anteprima!"
 
 #: ../GDJS/GDJS//IDE/Dialogs/CordovaPackageDialog.cpp:13
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtouseintelxdk"
@@ -5640,15 +5643,15 @@ msgstr "Basta cliccare sul pulsante \"Esporta \" e GDevelop sarà confezionare i
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:184
 msgid "Export to a website or native game with Cocos2d (experimental)"
-msgstr ""
+msgstr "Esportare a un sito web o ad un gioco nativo con Cocos2d (sperimentale)"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:254
 msgid "If you install Cocos2d-x, you can also use it to export the game to Android, iOS, Windows, Mac or Linux."
-msgstr ""
+msgstr "Se si installa Cocos2d-x, sarà possibile utilizzarlo per esportare il gioco su Android, iOS, Windows, Mac o Linux."
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:259
 msgid "Click here to learn more about Cocos2d export"
-msgstr ""
+msgstr "Clicca qui per ulteriori informazioni riguardo l'esportazione con Cocos2d"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:296
 msgid "Export"
@@ -5812,7 +5815,7 @@ msgstr "ID del banner (Android)"
 #: ../Extensions//AdMobObject/AdMobObject.cpp:38
 #: ../Extensions//AdMobObject/AdMobObject.cpp:56
 msgid "Interstitial ID (Android)"
-msgstr ""
+msgstr "ID interstiziale (Android)"
 
 #: ../Extensions//AdMobObject/AdMobObject.cpp:39
 #: ../Extensions//AdMobObject/AdMobObject.cpp:57
@@ -5822,7 +5825,7 @@ msgstr "ID del banner (iOS)"
 #: ../Extensions//AdMobObject/AdMobObject.cpp:40
 #: ../Extensions//AdMobObject/AdMobObject.cpp:58
 msgid "Interstitial ID (iOS)"
-msgstr ""
+msgstr "ID interstiziale (iOS)"
 
 #: ../Extensions//AdMobObject/AdMobObject.cpp:41
 #: ../Extensions//AdMobObject/AdMobObject.cpp:59
@@ -5857,15 +5860,15 @@ msgstr "In cima allo schermo"
 
 #: ../Extensions//AdMobObject/Extension.cpp:16
 msgid "AdMob banners and interstitial screens"
-msgstr ""
+msgstr "Banner AdMob e schermi interstiziali"
 
 #: ../Extensions//AdMobObject/Extension.cpp:17
 msgid "Display ads banner and interstitial screens powered by AdMob."
-msgstr ""
+msgstr "Display annunci pubblicitari e schermi interstiziali alimentati da AdMob."
 
 #: ../Extensions//AdMobObject/Extension.cpp:23
 msgid "AdMob banner"
-msgstr ""
+msgstr "Banner AdMob"
 
 #: ../Extensions//AdMobObject/Extension.cpp:24
 msgid "Display an ad banner or interstitial screen using AdMob"
@@ -6536,7 +6539,7 @@ msgstr "Textures"
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:115
 msgid "Front :"
-msgstr ""
+msgstr "Fronte :"
 
 #: ../Extensions//Box3DObject/Box3DObjectEditor.cpp:121
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:119
@@ -6611,7 +6614,7 @@ msgstr "Modifica la larghezza di una finestra 3D."
 #: ../Extensions//PanelSpriteObject/Extension.cpp:37
 #: ../Extensions//TiledSpriteObject/Extension.cpp:35
 msgid "Do _PARAM1__PARAM2_ to the width of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per la larghezza di _PARAM0_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:55
 #: ../Extensions//Box3DObject/Extension.cpp:84
@@ -6734,7 +6737,7 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/VariablesExtension.cpp:149
 #: ../Core/GDCore/Extensions/Builtin/VariablesExtension.cpp:162
 msgid "Modification's sign"
-msgstr ""
+msgstr "Segno di modifica"
 
 #: ../Extensions//Box3DObject/Extension.cpp:62
 msgid "Compare the width of a 3D Box."
@@ -6870,7 +6873,7 @@ msgstr "larghezza di _PARAM0_ è _PARAM1__PARAM2_"
 #: ../Core/GDCore/Extensions/Builtin/VariablesExtension.cpp:87
 #: ../Core/GDCore/Extensions/Builtin/VariablesExtension.cpp:100
 msgid "Sign of the test"
-msgstr ""
+msgstr "Segno del test"
 
 #: ../Extensions//Box3DObject/Extension.cpp:70
 #: ../Extensions//Box3DObject/Extension.cpp:100
@@ -6976,7 +6979,7 @@ msgstr "Modificare l'altezza di una finestra 3D."
 #: ../Extensions//PanelSpriteObject/Extension.cpp:64
 #: ../Extensions//TiledSpriteObject/Extension.cpp:62
 msgid "Do _PARAM1__PARAM2_ to the height of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ all'altezza del _PARAM0_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:92
 msgid "Compare the height of a 3D Box."
@@ -6984,7 +6987,7 @@ msgstr "Confronta la larghezza di una finestra 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:93
 msgid "height of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "altezza del _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:107
 msgid "Modify the depth of a 3D Box."
@@ -6992,7 +6995,7 @@ msgstr "Modifica la profondità di una finestra 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:108
 msgid "Do _PARAM1__PARAM2_ to the depth of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per la profondità di _PARAM0_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:122
 msgid "Compare the depth of a 3D Box."
@@ -7000,7 +7003,7 @@ msgstr "Confronta la profondità di una finestra 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:123
 msgid "depth of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "profondità di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:136
 #: ../Extensions//Box3DObject/Extension.cpp:151
@@ -7018,7 +7021,7 @@ msgstr "Modifica la posizione Z di un parallelepipedo in 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:138
 msgid "Do _PARAM1__PARAM2_ to the Z position of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per la posizione Z di _PARAM0_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:152
 msgid "Compare Z position of a 3D Box."
@@ -7026,40 +7029,40 @@ msgstr "Confrontare la posizione Z di un box 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:153
 msgid "Z position of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Posizione Z di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:167
 msgid "Modify Yaw of a 3D Box object."
-msgstr ""
+msgstr "Modificare Yaw di una casella oggetto 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:168
 msgid "Do _PARAM1__PARAM2_ to yaw of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per imbardata di _PARAM0_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:182
 msgid "Compare Yaw of a 3D Box object."
-msgstr ""
+msgstr "Confronta Yaw di un oggetto casella 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:183
 msgid "Yaw of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Yaw di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:197
 msgid "Modify Pitch of a 3D Box object."
-msgstr ""
+msgstr "Modificare il Pitch di un oggetto casella 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:198
 msgid "Do _PARAM1__PARAM2_ to pitch of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ al passo di _PARAM0_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:212
 msgid "Compare Pitch of a 3D Box object."
-msgstr ""
+msgstr "Confrontare il Pitch di un oggetto casella 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:213
 #: ../Extensions//SoundObject/Extension.cpp:186
 msgid "Pitch of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Passo del _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:227
 msgid "Modify Roll of a 3D Box object."
@@ -7137,7 +7140,7 @@ msgstr "Salva il risultato nella variabile della scena"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:56
 msgid "Wildcard filter ( \"FileType|*.ext;*.ext2|2ndFileType|*.ext3\" ) ( Windows only ) "
-msgstr ""
+msgstr "Filtro con caratteri jolly ( \"FileType|*.ext;*.ext2|2ndFileType|*.ext3\" ) (solo Windows) "
 
 #: ../Extensions//CommonDialogs/Extension.cpp:61
 msgid "Show a window to enter a text"
@@ -7146,7 +7149,8 @@ msgstr "Mostra una finestra per inserire un testo"
 #: ../Extensions//CommonDialogs/Extension.cpp:62
 msgid "Show a window allowing to enter a text.\n"
 "The text will be saved in the specified scene variable."
-msgstr ""
+msgstr "Visualizza una finestra che permette di inserire un testo testo. \n"
+"The verrà salvata nella variabile specificata scena."
 
 #: ../Extensions//CommonDialogs/Extension.cpp:63
 msgid "Open a text input dialog, and save the result in _PARAM1_"
@@ -7159,21 +7163,21 @@ msgstr "Visualizzare un box con messaggio Sì/No"
 #: ../Extensions//CommonDialogs/Extension.cpp:77
 msgid "Open a message box allowing to choose Yes or No.\n"
 "The answer ( \"yes\"/\"no\" ) will be saved in the specified variable."
-msgstr ""
+msgstr "Aprire una finestra di messaggio che consente di scegliere Sì o No. E la risposta (\"Sì\" / \"No\") verrà salvato nella variabile specificata."
 
 #: ../Extensions//CommonDialogs/Extension.cpp:78
 msgid "Open a Yes/No message box, and save the result in _PARAM1_"
-msgstr ""
+msgstr "Aprire una finestra di messaggio Sì/No e salvare il risultato in _PARAM1_"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:16
 #: ../Extensions//DestroyOutsideBehavior/JsExtension.cpp:29
 msgid "Destroy Outside Screen Behavior"
-msgstr ""
+msgstr "Distruggere il comportamento fuori dello schermo"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:17
 #: ../Extensions//DestroyOutsideBehavior/JsExtension.cpp:30
 msgid "Behavior destroying object when they go outside the screen"
-msgstr ""
+msgstr "Comportamento di eliminazione oggetto quando vanno fuori dallo schermo"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:22
 msgid "Destroy when outside the screen"
@@ -7181,11 +7185,11 @@ msgstr "Distruggere quando fuori dallo schermo"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:23
 msgid "DestroyOutside"
-msgstr ""
+msgstr "DestroyOutside"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:24
 msgid "Automatically destroy the object when it goes outside the screen"
-msgstr ""
+msgstr "Eliminare automaticamente l'oggetto quando si va fuori dallo schermo"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:35
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:50
@@ -7194,11 +7198,11 @@ msgstr "Bordo aggiuntivo"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:36
 msgid "Compare the additional border that the object must cross before being deleted."
-msgstr ""
+msgstr "Confrontare il bordo aggiuntivo che l'oggetto deve attraversare prima di essere eliminati."
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:37
 msgid "The additional border of _PARAM0_ is _PARAM2__PARAM3_"
-msgstr ""
+msgstr "Il bordo aggiuntivo di _PARAM0_ è _PARAM2__PARAM3_"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:42
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:57
@@ -7393,25 +7397,25 @@ msgstr ""
 #: ../Core/GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp:223
 #: ../Core/GDCore/IDE/Events/InstructionSentenceFormatter.cpp:119
 msgid "Behavior"
-msgstr ""
+msgstr "Comportamento"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:51
 msgid "Change the additional border that the object must cross before being deleted."
-msgstr ""
+msgstr "Confrontare il bordo aggiuntivo che l'oggetto deve attraversare prima di essere eliminati."
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:52
 msgid "Do _PARAM2__PARAM3_ to the additional border of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM2__PARAM3_ al bordo supplementare di _PARAM0_"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:16
 #: ../Extensions//DraggableBehavior/JsExtension.cpp:29
 msgid "Draggable Behavior"
-msgstr ""
+msgstr "Comportamento su trascinamento"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:17
 #: ../Extensions//DraggableBehavior/JsExtension.cpp:30
 msgid "Behavior allowing to move objects with the mouse"
-msgstr ""
+msgstr "Comportamento che permette di spostare gli oggetti con il mouse"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:22
 msgid "Draggable object"
@@ -7423,11 +7427,11 @@ msgstr "Trascinabile"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:24
 msgid "Allows objects to be moved using the mouse."
-msgstr ""
+msgstr "Consente agli oggetti di essere spostati utilizzando il mouse."
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:35
 msgid "Being dragged"
-msgstr ""
+msgstr "Trascinamento"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:36
 msgid "Check if the object is being dragged"
@@ -7443,24 +7447,24 @@ msgstr "Eventi relativi a funzioni"
 
 #: ../Extensions//Function/Extension.cpp:39
 msgid "Extension allowing to use events behaving as functions."
-msgstr ""
+msgstr "Estensione che permette di utilizzare gli eventi si comportano come funzioni."
 
 #: ../Extensions//Function/Extension.cpp:46
 #: ../Extensions//Function/Extension.cpp:47
 msgid "Launch a function"
-msgstr ""
+msgstr "Avvia una funzione"
 
 #: ../Extensions//Function/Extension.cpp:48
 msgid "Launch _PARAM0_ (_PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"
-msgstr ""
+msgstr "Lancio _PARAM0_ (_PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"
 
 #: ../Extensions//Function/Extension.cpp:49
 msgid "Functions"
-msgstr ""
+msgstr "Funzioni"
 
 #: ../Extensions//Function/Extension.cpp:52
 msgid "Name of the function"
-msgstr ""
+msgstr "Nome della funzione"
 
 #: ../Extensions//Function/Extension.cpp:53
 msgid "Parameter 1"
@@ -7498,37 +7502,38 @@ msgstr "Funzione"
 
 #: ../Extensions//Function/Extension.cpp:107
 msgid "Function event : An event which is launched only thanks to action \"Launch a function\""
-msgstr ""
+msgstr "Evento di funzione: una funzione di un evento che viene lanciato solo grazie all'azione \"Lancio di funzione\""
 
 #: ../Extensions//Function/Extension.cpp:168
 msgid "Parameter of the current function"
-msgstr ""
+msgstr "Parametro della funzione corrente"
 
 #: ../Extensions//Function/Extension.cpp:169
 msgid "Return the text contained in a parameter of the currently launched function"
-msgstr ""
+msgstr "Restituire il testo contenuto in un parametro della funzione attualmente lanciato"
 
 #: ../Extensions//Function/Extension.cpp:172
 msgid "Index of the parameter (Parameters start at 0!)"
-msgstr ""
+msgstr "Indice del parametro (parametri partono da 0!)"
 
 #: ../Extensions//Function/FunctionEvent.cpp:103
 msgid "( Objects passed as parameters : "
-msgstr ""
+msgstr "(Gli oggetti passati come parametri: "
 
 #: ../Extensions//Function/FunctionEvent.cpp:103
 #: ../Core/GDCore/IDE/Dialogs/EditExpressionDialog.cpp:177
 msgid ")"
-msgstr ""
+msgstr ")"
 
 #: ../Extensions//Function/FunctionEventEditorDlg.cpp:66
 msgid "The function and its sub events will be executed\n"
 "only when it is launched by an action or expression."
-msgstr ""
+msgstr "La funzione ed i suoi eventi sub sarà executed\n"
+"only quando viene avviato da un'azione o un'espressione."
 
 #: ../Extensions//Function/FunctionEventEditorDlg.cpp:77
 msgid "Name of the function ( Must be unique ) :"
-msgstr ""
+msgstr "Nome della funzione (deve essere unico):"
 
 #: ../Extensions//Function/FunctionEventEditorDlg.cpp:87
 msgid "Arguments"
@@ -7536,20 +7541,25 @@ msgstr "Argomenti"
 
 #: ../Extensions//Function/FunctionEventEditorDlg.cpp:90
 msgid "(Optional) Pass the objects of this group to the function:"
-msgstr ""
+msgstr "(Opzionale) Passare gli oggetti di questo gruppo alla funzione:"
 
 #: ../Extensions//Function/FunctionEventEditorDlg.cpp:100
 msgid "Objects of this group which are concerned by previous\n"
 "actions/conditions will be passed to the function when it is\n"
 "called by an action, and so they will be used by actions and\n"
 "conditions refering to them."
-msgstr ""
+msgstr "Oggetti di questo gruppo che sono interessati da previous\n"
+"actions/condizioni verranno passati alla funzione quando si is\n"
+"called da un'azione, e così essi saranno utilizzati da azioni and\n"
+"conditions riferendosi a loro."
 
 #: ../Extensions//Function/FunctionEventEditorDlg.cpp:102
 msgid "Others arguments can be passed as text\n"
 "when the function is called. ( And they can\n"
 "be used in function using Function::GetParameter(x) )."
-msgstr ""
+msgstr "Altri argomenti possono essere passati come text\n"
+"when viene chiamata la funzione. (E hanno utilizzato nella funzione utilizzando Function: GetParameter(x) can\n"
+"be)."
 
 #: ../Extensions//Light/Extension.cpp:28 ../Extensions//Light/Extension.cpp:35
 msgid "Light"
@@ -7557,11 +7567,11 @@ msgstr "Luce"
 
 #: ../Extensions//Light/Extension.cpp:29
 msgid "Allow to display lights and use light obstacles."
-msgstr ""
+msgstr "Permettono di visualizzare luci e utilizzare luce ostacoli."
 
 #: ../Extensions//Light/Extension.cpp:36
 msgid "Emits light that can be stopped by objects"
-msgstr ""
+msgstr "Emette una luce che può essere fermato da oggetti"
 
 #: ../Extensions//Light/Extension.cpp:48
 msgid "Change light color."
@@ -7571,7 +7581,7 @@ msgstr "Cambia colore della luce."
 #: ../Extensions//TextObject/Extension.cpp:102
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/SpriteExtension.cpp:333
 msgid "Change color of _PARAM0_ to _PARAM1_"
-msgstr ""
+msgstr "Cambiare colore dei _PARAM0_ per _PARAM1_"
 
 #: ../Extensions//Light/Extension.cpp:50 ../Extensions//Light/Extension.cpp:63
 #: ../Extensions//Light/Extension.cpp:77 ../Extensions//Light/Extension.cpp:91
@@ -7620,7 +7630,7 @@ msgstr ""
 #: ../Extensions//TextEntryObject/Extension.cpp:61
 #: ../Extensions//TextEntryObject/Extension.cpp:74
 msgid "Setup"
-msgstr ""
+msgstr "Installazione"
 
 #: ../Extensions//Light/Extension.cpp:60 ../Extensions//Light/Extension.cpp:74
 #: ../Extensions//Light/Extension.cpp:180
@@ -7630,19 +7640,19 @@ msgstr "Intensità"
 
 #: ../Extensions//Light/Extension.cpp:61
 msgid "Modify the intensity of a light"
-msgstr ""
+msgstr "Modificare l'intensità di una luce"
 
 #: ../Extensions//Light/Extension.cpp:62
 msgid "Do _PARAM1__PARAM2_ to the intensity of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ all'intensità di _PARAM0_"
 
 #: ../Extensions//Light/Extension.cpp:75
 msgid "Test the intensity of a light."
-msgstr ""
+msgstr "Prova l'intensità di una luce."
 
 #: ../Extensions//Light/Extension.cpp:76
 msgid "Intensity of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Intensità di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//Light/Extension.cpp:88 ../Extensions//Light/Extension.cpp:102
 #: ../Extensions//Light/Extension.cpp:184
@@ -7652,19 +7662,19 @@ msgstr "Raggio"
 
 #: ../Extensions//Light/Extension.cpp:89
 msgid "Modify the radius of a light"
-msgstr ""
+msgstr "Modificare il raggio di luce"
 
 #: ../Extensions//Light/Extension.cpp:90
 msgid "Do _PARAM1__PARAM2_ to radius of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ al raggio di _PARAM0_"
 
 #: ../Extensions//Light/Extension.cpp:103
 msgid "Test the radius of a light."
-msgstr ""
+msgstr "Testare il raggio di luce."
 
 #: ../Extensions//Light/Extension.cpp:104
 msgid "The radius of _PARAM0_ is _PARAM2_ _PARAM1_"
-msgstr ""
+msgstr "Il raggio di _PARAM0_ è _PARAM2_ _PARAM1_"
 
 #: ../Extensions//Light/Extension.cpp:116
 #: ../Extensions//Light/Extension.cpp:130
@@ -7675,19 +7685,19 @@ msgstr "Qualità"
 
 #: ../Extensions//Light/Extension.cpp:117
 msgid "Modify the quality of a light"
-msgstr ""
+msgstr "Modificare la qualità di una luce"
 
 #: ../Extensions//Light/Extension.cpp:118
 msgid "Do _PARAM1__PARAM2_ to the quality of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per la qualità del _PARAM0_"
 
 #: ../Extensions//Light/Extension.cpp:131
 msgid "Test the quality of a light"
-msgstr ""
+msgstr "Testare la qualità di una luce"
 
 #: ../Extensions//Light/Extension.cpp:132
 msgid "The quality of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "La qualità del _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//Light/Extension.cpp:144
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/SpriteExtension.cpp:331
@@ -7696,23 +7706,23 @@ msgstr "Colore globale"
 
 #: ../Extensions//Light/Extension.cpp:145
 msgid "Change scene color for a global light."
-msgstr ""
+msgstr "Modificare il colore di scena per una luce globale."
 
 #: ../Extensions//Light/Extension.cpp:146
 msgid "Change scene global color of _PARAM0_ to _PARAM1_"
-msgstr ""
+msgstr "Modificare il colore globale scena del _PARAM0_ in _PARAM1_"
 
 #: ../Extensions//Light/Extension.cpp:157
 msgid "Make a light global"
-msgstr ""
+msgstr "Fare una luce globale"
 
 #: ../Extensions//Light/Extension.cpp:158
 msgid "Make a light global or simple."
-msgstr ""
+msgstr "Fare una luce globale o semplice."
 
 #: ../Extensions//Light/Extension.cpp:159
 msgid "Make _PARAM0_ global : _PARAM1_"
-msgstr ""
+msgstr "Rendere _PARAM0_ globale: _PARAM1_"
 
 #: ../Extensions//Light/Extension.cpp:160
 #: ../Extensions//Light/Extension.cpp:173
@@ -7721,7 +7731,7 @@ msgstr "Tipo di luce"
 
 #: ../Extensions//Light/Extension.cpp:164
 msgid "Make light global"
-msgstr ""
+msgstr "Rendere la luce globale"
 
 #: ../Extensions//Light/Extension.cpp:170
 msgid "A light is global"
@@ -7729,23 +7739,23 @@ msgstr "Una luce è globale"
 
 #: ../Extensions//Light/Extension.cpp:171
 msgid "Return true if light is global"
-msgstr ""
+msgstr "Restituisce true se la luce è globale"
 
 #: ../Extensions//Light/Extension.cpp:172
 msgid "_PARAM0_ is a global light"
-msgstr ""
+msgstr "_PARAM0_ è una luce globale"
 
 #: ../Extensions//Light/Extension.cpp:194
 msgid "Light obstacle"
-msgstr ""
+msgstr "Ostacolo di luce"
 
 #: ../Extensions//Light/Extension.cpp:195
 msgid "LightObstacle"
-msgstr ""
+msgstr "LightObstacle"
 
 #: ../Extensions//Light/Extension.cpp:196
 msgid "Mark the objects as obstacles for Light objects."
-msgstr ""
+msgstr "Contrassegnare gli oggetti come ostacoli per oggetti di luce."
 
 #: ../Extensions//Light/LightObjectEditor.cpp:66
 msgid "Light color:"
@@ -7769,7 +7779,7 @@ msgstr "Luce globale"
 
 #: ../Extensions//Light/LightObjectEditor.cpp:91
 msgid "Set the light as the global light"
-msgstr ""
+msgstr "Impostare la luce come la luce globale"
 
 #: ../Extensions//Light/LightObjectEditor.cpp:96
 msgid "Color of the scene:"
@@ -7788,7 +7798,7 @@ msgstr "Oggetti collegati"
 #: ../Extensions//LinkedObjects/Extension.cpp:28
 #: ../Extensions//LinkedObjects/JsExtension.cpp:28
 msgid "Extension allowing to virtually link two objects."
-msgstr ""
+msgstr "Estensione che permette di collegare virtualmente due oggetti."
 
 #: ../Extensions//LinkedObjects/Extension.cpp:35
 msgid "Link two objects"
@@ -7796,11 +7806,11 @@ msgstr "Collega due oggetti"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:36
 msgid "Link two objects together, so as to be able to get one from the other."
-msgstr ""
+msgstr "Collegare due oggetti insieme, in modo da essere in grado di ottenere uno da altro."
 
 #: ../Extensions//LinkedObjects/Extension.cpp:37
 msgid "Link _PARAM1_ and _PARAM2_"
-msgstr ""
+msgstr "Link _PARAM1_ e _PARAM2_"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:43
 #: ../Extensions//LinkedObjects/Extension.cpp:57
@@ -7818,112 +7828,113 @@ msgstr "Oggetto 2"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:49
 msgid "Unlink two objects"
-msgstr ""
+msgstr "Scollegare i due oggetti"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:50
 msgid "Unlink two objects."
-msgstr ""
+msgstr "Scollegare i due oggetti."
 
 #: ../Extensions//LinkedObjects/Extension.cpp:51
 msgid "Unlink _PARAM1_ and _PARAM2_"
-msgstr ""
+msgstr "Scollegare _PARAM1_ e _PARAM2_"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:63
 msgid "Unlink all objects from an object"
-msgstr ""
+msgstr "Scollega tutti gli oggetti da un oggetto"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:64
 msgid "Unlink all objects from an object."
-msgstr ""
+msgstr "Scollega tutti gli oggetti da un oggetto."
 
 #: ../Extensions//LinkedObjects/Extension.cpp:65
 msgid "Unlink all objects from _PARAM1_"
-msgstr ""
+msgstr "Scollega tutti gli oggetti da _PARAM1_"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:76
 #: ../Extensions//LinkedObjects/Extension.cpp:91
 msgid "Take into account linked objects"
-msgstr ""
+msgstr "Prendere in considerazione gli oggetti collegati"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:77
 msgid "Take some objects linked to the object into account for next conditions and actions.\n"
 "The condition will return false if no object was taken into account."
-msgstr ""
+msgstr "Prendete alcuni oggetti legati all'oggetto in considerazione per i prossimi condizioni e azioni. La condizione restituisce falso se nessun oggetto è stato preso in considerazione.\n"
+" ."
 
 #: ../Extensions//LinkedObjects/Extension.cpp:78
 #: ../Extensions//LinkedObjects/Extension.cpp:93
 msgid "Take into account all \"_PARAM1_\" linked to _PARAM2_"
-msgstr ""
+msgstr "Prendere in considerazione tutti i \"_PARAM1_\" collegato a _PARAM2_"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:84
 #: ../Extensions//LinkedObjects/Extension.cpp:99
 msgid "Pick these objects..."
-msgstr ""
+msgstr "Scegliere questi oggetti..."
 
 #: ../Extensions//LinkedObjects/Extension.cpp:85
 #: ../Extensions//LinkedObjects/Extension.cpp:100
 msgid "...if they are linked to this object"
-msgstr ""
+msgstr "... se sono collegati a questo oggetto"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:92
 msgid "Take objects linked to the object into account for next actions."
-msgstr ""
+msgstr "Prendere gli oggetti collegati all'oggetto in considerazione per le prossime azioni."
 
 #: ../Extensions//Network/Extension.cpp:29
 msgid "Network features"
-msgstr ""
+msgstr "Funzionalità di rete"
 
 #: ../Extensions//Network/Extension.cpp:30
 msgid "Built-in extension allowing to exchange data on the network between games."
-msgstr ""
+msgstr "Built-in estensione che permette di scambiare dati sulla rete tra giochi."
 
 #: ../Extensions//Network/Extension.cpp:39
 msgid "Add a recipient"
-msgstr ""
+msgstr "Aggiungere un destinatario"
 
 #: ../Extensions//Network/Extension.cpp:40
 msgid "Add the computer with the corresponding IP Adress as a recipient of sent data."
-msgstr ""
+msgstr "Aggiungere il computer con l'indirizzo IP corrispondente come destinatario dei dati inviati."
 
 #: ../Extensions//Network/Extension.cpp:41
 msgid "Add _PARAM0_ to recipients"
-msgstr ""
+msgstr "Aggiungi _PARAM0_ ai destinatari"
 
 #: ../Extensions//Network/Extension.cpp:42
 #: ../Extensions//Network/Extension.cpp:55
 #: ../Extensions//Network/Extension.cpp:87
 #: ../Extensions//Network/Extension.cpp:100
 msgid "Network: Sending"
-msgstr ""
+msgstr "Rete: l'invio"
 
 #: ../Extensions//Network/Extension.cpp:46
 msgid "Recipient IP address."
-msgstr ""
+msgstr "Indirizzo IP del destinatario."
 
 #: ../Extensions//Network/Extension.cpp:47
 msgid "Recipient port (Default : 50001)"
-msgstr ""
+msgstr "Porto destinatario (Default: 50001)"
 
 #: ../Extensions//Network/Extension.cpp:52
 msgid "Delete all recipients"
-msgstr ""
+msgstr "Eliminare tutti i destinatari"
 
 #: ../Extensions//Network/Extension.cpp:53
 msgid "Clear the list of the recipients of sent data"
-msgstr ""
+msgstr "Cancellare l'elenco dei destinatari dei dati inviati"
 
 #: ../Extensions//Network/Extension.cpp:54
 msgid "Clear the list of recipients"
-msgstr ""
+msgstr "Cancellare l'elenco dei destinatari"
 
 #: ../Extensions//Network/Extension.cpp:63
 #: ../Extensions//Network/Extension.cpp:65
 msgid "Initialize data reception"
-msgstr ""
+msgstr "Inizializzare la ricezione dei dati"
 
 #: ../Extensions//Network/Extension.cpp:64
 msgid "Initialize the network so as to be able te receive data from other computers."
-msgstr ""
+msgstr "Inizializzare la rete in modo da poter ricevere dati da altri computer."
 
 #: ../Extensions//Network/Extension.cpp:66
 #: ../Extensions//Network/Extension.cpp:77
@@ -7932,20 +7943,20 @@ msgstr ""
 #: ../Extensions//Network/Extension.cpp:129
 #: ../Extensions//Network/Extension.cpp:135
 msgid "Network: Reception"
-msgstr ""
+msgstr "Rete: Ricezione"
 
 #: ../Extensions//Network/Extension.cpp:70
 msgid "Listening port (Default : 50001)"
-msgstr ""
+msgstr "Porta di ascolto (Default: 50001)"
 
 #: ../Extensions//Network/Extension.cpp:74
 #: ../Extensions//Network/Extension.cpp:76
 msgid "Stop data reception"
-msgstr ""
+msgstr "Fine ricezione dati"
 
 #: ../Extensions//Network/Extension.cpp:75
 msgid "Stop data reception."
-msgstr ""
+msgstr "Fine ricezione dati."
 
 #: ../Extensions//Network/Extension.cpp:84
 msgid "Send a value"
@@ -7953,11 +7964,11 @@ msgstr "Invia un valore"
 
 #: ../Extensions//Network/Extension.cpp:85
 msgid "Send a value to recipients"
-msgstr ""
+msgstr "Inviare valore a destinatari"
 
 #: ../Extensions//Network/Extension.cpp:86
 msgid "Send value _PARAM1_ with title _PARAM0_ to recipients"
-msgstr ""
+msgstr "Invia il valore _PARAM1_ con titolo _PARAM0_ ai destinatari"
 
 #: ../Extensions//Network/Extension.cpp:91
 #: ../Extensions//Network/Extension.cpp:104
@@ -7973,15 +7984,15 @@ msgstr "Gruppo"
 
 #: ../Extensions//Network/Extension.cpp:97
 msgid "Send a text"
-msgstr ""
+msgstr "Invia un testo"
 
 #: ../Extensions//Network/Extension.cpp:98
 msgid "Send a text to recipients"
-msgstr ""
+msgstr "Invia testo a destinatari"
 
 #: ../Extensions//Network/Extension.cpp:99
 msgid "Send text _PARAM1_ with title _PARAM0_ to recipients"
-msgstr ""
+msgstr "Invia il valore _PARAM1_ con titolo _PARAM0_ ai destinatari"
 
 #: ../Extensions//Network/Extension.cpp:105
 #: ../Extensions//TextEntryObject/Extension.cpp:41
@@ -8007,43 +8018,44 @@ msgstr "Testo"
 
 #: ../Extensions//Network/Extension.cpp:110
 msgid "Receive waiting data"
-msgstr ""
+msgstr "Attesa ricezione dati"
 
 #: ../Extensions//Network/Extension.cpp:111
 msgid "Receive data sent by other computers.\n"
 "You can then access to them with the appropriate expressions."
-msgstr ""
+msgstr "Ricevi dati inviati da altri computer.\n"
+"Puoi accedere poi ai dati con le opportune espressioni."
 
 #: ../Extensions//Network/Extension.cpp:112
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:65
 msgid "Receive data"
-msgstr ""
+msgstr "Ricevi dati"
 
 #: ../Extensions//Network/Extension.cpp:120
 msgid "Delete all received data stored in memory"
-msgstr ""
+msgstr "Cancella tutti i dati ricevuti e memorizzati"
 
 #: ../Extensions//Network/Extension.cpp:121
 #: ../Extensions//Network/Extension.cpp:122
 msgid "Delete every received data stored in memory"
-msgstr ""
+msgstr "Cancella tutti i dati ricevuti e memorizzati"
 
 #: ../Extensions//Network/Extension.cpp:129
 msgid "Get the text of a data"
-msgstr ""
+msgstr "Ottenere il testo da un dato"
 
 #: ../Extensions//Network/Extension.cpp:129
 msgid "Get the text contained in a data"
-msgstr ""
+msgstr "Ottenere il testo contenuto in un dato"
 
 #: ../Extensions//Network/Extension.cpp:130
 #: ../Extensions//Network/Extension.cpp:136
 msgid "Name of the data containing the text to get"
-msgstr ""
+msgstr "Nome del dato che contiene il testo da leggere"
 
 #: ../Extensions//Network/Extension.cpp:135
 msgid "Get the value of a data"
-msgstr ""
+msgstr "Ottenere il valore di un dato"
 
 #: ../Extensions//Network/Extension.cpp:135
 msgid "Get the value contained in a data"
@@ -8051,7 +8063,7 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:141
 msgid "Last error occured"
-msgstr ""
+msgstr "Ultimo errore verificatosi"
 
 #: ../Extensions//Network/Extension.cpp:141
 msgid "Get the text describing the last error which occured."
@@ -8059,7 +8071,7 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:141
 msgid "Network: Errors"
-msgstr ""
+msgstr "Rete: Errori"
 
 #: ../Extensions//Network/Extension.cpp:146
 msgid "IP address"
@@ -8068,7 +8080,7 @@ msgstr "Indirizzo IP"
 #: ../Extensions//Network/Extension.cpp:146
 #: ../Extensions//Network/Extension.cpp:152
 msgid "Allow to get the public IP Address of the computer."
-msgstr ""
+msgstr "Permetti la lettura dell'indirizzo IP pubblico del computer."
 
 #: ../Extensions//Network/Extension.cpp:146
 #: ../Extensions//Network/Extension.cpp:152
@@ -8081,15 +8093,15 @@ msgstr "Rete"
 
 #: ../Extensions//Network/Extension.cpp:147
 msgid "Maximum time to wait before getting the address ( in seconds ) ( 0 = no timeout )"
-msgstr ""
+msgstr "Tempo massimo di attesa per ottenere l'indirizzo (in secondi) (0 non = nessun timeout)"
 
 #: ../Extensions//Network/Extension.cpp:152
 msgid "Local IP address ( local/LAN )"
-msgstr ""
+msgstr "Indirizzo IP locale (locale/LAN)"
 
 #: ../Extensions//Network/Extension.cpp:158
 msgid "Generate objects' identifiers"
-msgstr ""
+msgstr "Genera gli identificatori degli oggetti"
 
 #: ../Extensions//Network/Extension.cpp:159
 msgid "Generate automatically identifiers for these objects.\n"
@@ -8111,7 +8123,7 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:173
 msgid "Automatic network update"
-msgstr ""
+msgstr "Aggiornamento automatico della rete"
 
 #: ../Extensions//Network/Extension.cpp:174
 msgid "NetworkUpdater"
@@ -8123,7 +8135,7 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:186
 msgid "Set to send data"
-msgstr ""
+msgstr "Imposta per inviare dati"
 
 #: ../Extensions//Network/Extension.cpp:187
 msgid "The behavior will send the data of the objects.\n"
@@ -8136,7 +8148,7 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:198
 msgid "Set to receive data"
-msgstr ""
+msgstr "Imposta per ricevere dati"
 
 #: ../Extensions//Network/Extension.cpp:199
 msgid "The behavior will receive the data and will update the objects.\n"
@@ -8149,11 +8161,11 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:210
 msgid "Change object's identifier"
-msgstr ""
+msgstr "Modifica l'identificatore dell'oggetto"
 
 #: ../Extensions//Network/Extension.cpp:211
 msgid "Each object need a unique identifier, the same on all computers, so as to be identified and updated"
-msgstr ""
+msgstr "Ogni oggetto richiede un identificatore univoco, lo stesso su tutti i computer, in modo da poter essere identificato e aggiornato"
 
 #: ../Extensions//Network/Extension.cpp:212
 msgid "Set identifier of _PARAM0_ to _PARAM2_"
@@ -8161,15 +8173,15 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:219
 msgid "Identifier"
-msgstr ""
+msgstr "Identificatore"
 
 #: ../Extensions//Network/Extension.cpp:222
 msgid "Get the identifier of the object"
-msgstr ""
+msgstr "Ottieni l'identificatore di un oggetto"
 
 #: ../Extensions//Network/Extension.cpp:240
 msgid "List of recipients"
-msgstr ""
+msgstr "Elenco dei destinatari"
 
 #: ../Extensions//Network/Extension.cpp:243
 msgid " Port: "
@@ -8179,7 +8191,7 @@ msgstr " Porta: "
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:119
 #: ../Extensions//PhysicsBehavior/PhysicsBehaviorEditor.cpp:97
 msgid "Edit the behavior"
-msgstr ""
+msgstr "Modifica il comportamento"
 
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:64
 msgid "Send datas"
@@ -8196,7 +8208,7 @@ msgstr ""
 
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:74
 msgid "Sent / Received data"
-msgstr ""
+msgstr "Dati Inviati / Ricevuti"
 
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:76
 #: ../Extensions//PhysicsBehavior/Extension.cpp:238
@@ -8250,7 +8262,7 @@ msgstr "Posizione Y"
 
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:93
 msgid "Data format"
-msgstr ""
+msgstr "Formato dati"
 
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:100
 msgid "X/Data"
@@ -8258,27 +8270,27 @@ msgstr ""
 
 #: ../Extensions//Network/NetworkBehaviorEditor.cpp:103
 msgid "X represent identifier number and Data the data title."
-msgstr ""
+msgstr "X rappresentano dati il titolo dati e numero di identificazione."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:20
 msgid "Panel Sprite (9-patch) Object"
-msgstr ""
+msgstr "Oggetto di pannello Sprite (patch-9)"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:21
 msgid "Extension allowing to use panel sprite (\"9-patch\") objects."
-msgstr ""
+msgstr "Estensione che permette di utilizzare gli oggetti pannello sprite (\"patch-9\")."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:27
 msgid "Panel Sprite (\"9-patch\")"
-msgstr ""
+msgstr "Pannello Sprite (\"patch-9\")"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:28
 msgid "An image with edges and corners that are stretched separately from the fill."
-msgstr ""
+msgstr "Un'immagine con bordi e gli angoli che sono allungati separatamente dal riempimento."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:36
 msgid "Modify the width of a Panel Sprite."
-msgstr ""
+msgstr "Modificare la larghezza di uno Sprite di pannello."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:38
 #: ../Extensions//PanelSpriteObject/Extension.cpp:51
@@ -8297,47 +8309,47 @@ msgstr "Dimensioni e angolo"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:49
 msgid "Test the width of a Panel Sprite."
-msgstr ""
+msgstr "Verificare la larghezza di uno Sprite di pannello."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:50
 #: ../Extensions//TiledSpriteObject/Extension.cpp:48
 #: ../Extensions//TileMapObject/Extension.cpp:39
 msgid "The width of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Larghezza di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:63
 msgid "Modify the height of a Panel Sprite."
-msgstr ""
+msgstr "Modificare l'altezza di uno Sprite di pannello."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:77
 msgid "Test the height of a Panel Sprite."
-msgstr ""
+msgstr "Verificare l'altezza di uno Sprite di pannello."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:78
 #: ../Extensions//TiledSpriteObject/Extension.cpp:76
 #: ../Extensions//TileMapObject/Extension.cpp:52
 msgid "The height of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "L'altezza del _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:91
 msgid "Modify the angle of a Panel Sprite."
-msgstr ""
+msgstr "Modificare l'angolo di uno Sprite di pannello."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:92
 #: ../Extensions//TextObject/Extension.cpp:234
 #: ../Extensions//TiledSpriteObject/Extension.cpp:90
 msgid "Do _PARAM1__PARAM2_ to the angle of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ all'angolo di _PARAM0_"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:106
 msgid "Test the angle of a Panel Sprite."
-msgstr ""
+msgstr "Verificare l'angolo di uno Sprite di pannello."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:107
 #: ../Extensions//TextObject/Extension.cpp:247
 #: ../Extensions//TiledSpriteObject/Extension.cpp:105
 msgid "The angle of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "L'angolo del _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:120
 #: ../Extensions//PanelSpriteObject/Extension.cpp:127
@@ -8346,11 +8358,11 @@ msgstr "Nome immagine"
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:121
 msgid "Change the image of a Panel Sprite."
-msgstr ""
+msgstr "Cambiare l'immagine di uno Sprite di pannello."
 
 #: ../Extensions//PanelSpriteObject/Extension.cpp:122
 msgid "Set image _PARAM1_ on _PARAM0_"
-msgstr ""
+msgstr "Immagine _PARAM1_ su _PARAM0_"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObject.cpp:297
 msgid "Left Margin"
@@ -8370,7 +8382,7 @@ msgstr "Margine inferiore"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:79
 msgid "Settings of the Panel Sprite Object"
-msgstr ""
+msgstr "Impostazioni dell'oggetto Sprite pannello"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:92
 msgid "Default size"
@@ -8378,11 +8390,11 @@ msgstr "Dimensione predefinita"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:106
 msgid "Texture configuration (for HTML5 games only)"
-msgstr ""
+msgstr "Configurazione di texture (per solo i giochi HTML5)"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:107
 msgid "Repeat borders and center textures (instead of stretching them)"
-msgstr ""
+msgstr "Ripetere i bordi e texture di centro (invece di stretching)"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:114
 msgid "Margins"
@@ -8391,15 +8403,16 @@ msgstr "Margini"
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:132
 msgid "Image center\n"
 "(streched part)"
-msgstr ""
+msgstr "Immagine center\n"
+"(streched part)"
 
 #: ../Extensions//ParticleSystem/Extension.cpp:24
 msgid "Particle system"
-msgstr ""
+msgstr "Sistema di particelle"
 
 #: ../Extensions//ParticleSystem/Extension.cpp:25
 msgid "Extension allowing to display a large number of small particles."
-msgstr ""
+msgstr "Estensione che permette di visualizzare un gran numero di piccole particelle."
 
 #: ../Extensions//ParticleSystem/Extension.cpp:33
 msgid "Particles emitter"
@@ -8407,20 +8420,20 @@ msgstr "Emettitore di particelle"
 
 #: ../Extensions//ParticleSystem/Extension.cpp:34
 msgid "Displays a large number of small particles to create visual effects"
-msgstr ""
+msgstr "Consente di visualizzare un gran numero di piccole particelle per creare effetti visivi"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:21
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:189
 msgid "Emission minimal force"
-msgstr ""
+msgstr "Forza minima emissione"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:22
 msgid "Modify minimal emission force of particles."
-msgstr ""
+msgstr "Modificare la forza minima emissione di particelle."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:23
 msgid "Do _PARAM1__PARAM2_ to minimal emission force of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ a forza di emissione minima di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:24
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:37
@@ -8471,105 +8484,105 @@ msgstr ""
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:230
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:233
 msgid "Common"
-msgstr ""
+msgstr "Comune"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:34
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:193
 msgid "Emission maximal force"
-msgstr ""
+msgstr "Forza minima emissione"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:35
 msgid "Modify maximal emission force of particles."
-msgstr ""
+msgstr "Modificare la forza minima emissione di particelle."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:36
 msgid "Do _PARAM1__PARAM2_ to maximal emission force of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ a forza di emissione minima di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:47
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:60
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:197
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:606
 msgid "Emission X direction"
-msgstr ""
+msgstr "Direzione di emissione X"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:48
 msgid "Modify emission X direction."
-msgstr ""
+msgstr "Modificare la direzione di emissione X."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:49
 msgid "Do _PARAM1__PARAM2_ to the emission X direction of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per la direzione di emissione X di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:61
 msgid "Test emission X direction."
-msgstr ""
+msgstr "Direzione di emissione X di prova."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:62
 msgid "The emission X direction of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "La direzione di emissione X di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:74
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:87
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:200
 msgid "Emission Y direction"
-msgstr ""
+msgstr "Direzione di emissione X"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:75
 msgid "Modify emission Y direction."
-msgstr ""
+msgstr "Modificare la direzione di emissione X."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:76
 msgid "Do _PARAM1__PARAM2_ to the emission Y direction of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per la direzione di emissione X di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:88
 msgid "Test emission Y direction."
-msgstr ""
+msgstr "Direzione di emissione X di prova."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:89
 msgid "Emission Y direction of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Direzione di emissione Y di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:101
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:115
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:203
 msgid "Emission Z direction"
-msgstr ""
+msgstr "Direzione di emissione X"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:102
 msgid "Modify emission Z direction."
-msgstr ""
+msgstr "Modificare la direzione di emissione X."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:103
 msgid "Do _PARAM1__PARAM2_ to the emission Z direction of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per la direzione di emissione X di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:116
 msgid "Test emission Z direction."
-msgstr ""
+msgstr "Direzione di emissione X di prova."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:117
 msgid "Emission Z direction of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Direzione di emissione Y di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:129
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:143
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:206
 msgid "Emission angle"
-msgstr ""
+msgstr "Angolo di emissione"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:130
 msgid "Modify emission angle."
-msgstr ""
+msgstr "Modificare l'angolo di emissione."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:131
 msgid "Do _PARAM1__PARAM2_ to the emission angle of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per l'angolo di emissione di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:144
 msgid "Test the value of emission angle of the emitter."
-msgstr ""
+msgstr "Verificare il valore di angolo di emissione dell'emettitore."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:145
 msgid "Emission angle of _PARAM0_ is _PARAM1__PARAM2_"
@@ -8707,7 +8720,7 @@ msgstr ""
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:335
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:310
 msgid "Maximum lifetime"
-msgstr ""
+msgstr "Durata massima"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:322
 msgid "Modify particles maximum lifetime.\n"
@@ -8720,7 +8733,7 @@ msgstr ""
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:336
 msgid "Test maximum lifetime of particles."
-msgstr ""
+msgstr "Durata massima di vita delle particelle."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:337
 msgid "Maximum lifetime of particles of _PARAM0_ is _PARAM1__PARAM2_"
@@ -8740,15 +8753,15 @@ msgstr ""
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:363
 msgid "Direction of gravity on X axis"
-msgstr ""
+msgstr "Direzione della gravità sull'asse X"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:364
 msgid "Direction of the gravity on X axis."
-msgstr ""
+msgstr "Direzione della gravità sull'asse X."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:365
 msgid "Direction of gravity on X axis of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "La direzione della gravità sull'asse Z di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:377
 msgid "Y Gravity"
@@ -8756,7 +8769,7 @@ msgstr "Gravità  Y"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:378
 msgid "Change value of the gravity on Y axis."
-msgstr ""
+msgstr "Modificare il valore della gravità sull'asse Y."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:379
 msgid "Do _PARAM1__PARAM2_ to the direction of gravity on Y axis of_PARAM0_"
@@ -8764,7 +8777,7 @@ msgstr ""
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:391
 msgid "Direction of the gravity on Y axis"
-msgstr ""
+msgstr "Direzione della gravità sull'asse X"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:392
 msgid "Test direction of gravity on Y axis"
@@ -8793,33 +8806,33 @@ msgstr ""
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:420
 msgid "Test the direction of gravity on Z axis"
-msgstr ""
+msgstr "Testare la direzione della gravità sull'asse Z"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:421
 msgid "Direction of gravity on Z axis of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Direzione della gravità sull'asse Z di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:432
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:445
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:227
 msgid "Gravity angle"
-msgstr ""
+msgstr "Angolo di gravità"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:433
 msgid "Change gravity angle"
-msgstr ""
+msgstr "Cambia l'angolo di gravità"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:434
 msgid "Do _PARAM1__PARAM2_ to the gravity angle of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per l'angolo di gravità della _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:446
 msgid "Test the gravity angle the emitter"
-msgstr ""
+msgstr "Verificare l'angolo di gravità l'emettitore"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:447
 msgid "Gravity angle of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Angolo di gravità della _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:458
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:471
@@ -8836,33 +8849,33 @@ msgstr "Gravità"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:459
 msgid "Change the gravity of the emitter."
-msgstr ""
+msgstr "Cambiare la gravità dell'emettitore."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:460
 msgid "Do _PARAM1__PARAM2_ to the gravity of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ per la qualità del _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:472
 msgid "Test the gravity of the emitter."
-msgstr ""
+msgstr "Testare la gravità dell'emettitore."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration1.cpp:473
 msgid "The gravity of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "La qualità del _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:20
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:27
 #: ../Extensions//PrimitiveDrawing/Extension.cpp:254
 msgid "Initial color"
-msgstr ""
+msgstr "Colore iniziale"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:21
 msgid "Modify initial color of particles."
-msgstr ""
+msgstr "Modificare colore iniziale delle particelle."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:22
 msgid "Put initial color of particles of _PARAM0_ to _PARAM1_"
-msgstr ""
+msgstr "Mettere il colore iniziale di particelle di _PARAM0_ a _PARAM1_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:32
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:39
@@ -8871,154 +8884,154 @@ msgstr "Colore finale"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:33
 msgid "Modify final color of particles."
-msgstr ""
+msgstr "Modificare il colore finale di particelle."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:34
 msgid "Put final color of particles of _PARAM0_ to _PARAM1_"
-msgstr ""
+msgstr "Mettere il colore iniziale di particelle di _PARAM0_ a _PARAM1_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:44
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:57
 msgid "Red color, parameter 1"
-msgstr ""
+msgstr "Colore rosso, parametro 1"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:45
 msgid "Modify parameter 1 of the red color."
-msgstr ""
+msgstr "Modificare il parametro 1 del colore rosso."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:46
 msgid "Do _PARAM1__PARAM2_ to parameter 1 of red color of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ al parametro 1 di colore rosso di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:58
 msgid "Test parameter 1 of the red color"
-msgstr ""
+msgstr "Verificare il parametro 1 del colore rosso"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:59
 msgid "Parameter 1 of red color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Parametro 1 di colore rosso di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:70
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:83
 msgid "Red color, parameter 2"
-msgstr ""
+msgstr "Colore rosso, parametro 1"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:71
 msgid "Modify parameter 2 of the red color"
-msgstr ""
+msgstr "Modificare il parametro 1 del colore rosso"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:72
 msgid "Do _PARAM1__PARAM2_ to parameter 2 of red color of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ al parametro 1 di colore rosso di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:84
 msgid "Test parameter 2 of the red color"
-msgstr ""
+msgstr "Verificare parametro 2 del colore rosso"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:85
 msgid "Parameter 2 of red color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Parametro 2 di colore rosso di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:96
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:109
 msgid "Blue color, parameter 1"
-msgstr ""
+msgstr "Colore blu, parametro 1"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:97
 msgid "Modify parameter 1 of blue color"
-msgstr ""
+msgstr "Modificare il parametro 1 di colore blu"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:98
 msgid "Do _PARAM1__PARAM2_ to the parameter 1 of blue color of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ al parametro 1 di colore blu di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:110
 msgid "Test parameter 1 of blue color"
-msgstr ""
+msgstr "Verificare il parametro 1 di colore blu"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:111
 msgid "Parameter 1 of blue color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Parametro 1 di colore blu di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:122
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:135
 msgid "Blue color, parameter 2"
-msgstr ""
+msgstr "Colore blu, parametro 2"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:123
 msgid "Modify parameter 2 of blue color"
-msgstr ""
+msgstr "Modificare il parametro 2 di colore blu"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:124
 msgid "Do _PARAM1__PARAM2_ to the parameter 2 of blue color of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ al parametro 2 di colore blu di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:136
 msgid "Test parameter 2 of blue color"
-msgstr ""
+msgstr "Verificare parametro 2 di colore blu"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:137
 msgid "Parameter 2 of blue color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Parametro 2 di colore blu di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:148
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:161
 msgid "Green color, parameter 1"
-msgstr ""
+msgstr "Colore verde, parametro 1"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:149
 msgid "Modify parameter 1 of green color"
-msgstr ""
+msgstr "Modificare il parametro 1 di colore verde"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:150
 msgid "Do _PARAM1__PARAM2_ to the parameter 1 of green color of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ al parametro 1 di colore verde di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:162
 msgid "Test parameter 1 of green color"
-msgstr ""
+msgstr "Verificare il parametro 1 di colore verde"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:163
 msgid "Parameter 1 of green color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Parametro 1 di colore verde di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:175
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:188
 msgid "Green color, parameter 2"
-msgstr ""
+msgstr "Colore verde, parametro 2"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:176
 msgid "Modify the parameter 2 of the green color"
-msgstr ""
+msgstr "Modificare il parametro 2 del colore verde"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:177
 msgid "Do _PARAM1__PARAM2_ to the parameter 2 of green color of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ al parametro 2 di colore verde di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:189
 msgid "Test the parameter 2 of the green color"
-msgstr ""
+msgstr "Verificare il parametro 2 del colore verde"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:190
 msgid "Parameter 2 of green color of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Parametro 2 di colore verde di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:202
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:215
 msgid "SIze, parameter 1"
-msgstr ""
+msgstr "Dimensioni, parametro 1"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:203
 msgid "Modify parameter 1 of the size of particles"
-msgstr ""
+msgstr "Modificare il parametro 1 di dimensione delle particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:204
 msgid "Do _PARAM1__PARAM2_ to the parameter 1 of size of _PARAM0_"
-msgstr ""
+msgstr "Fare _PARAM1__PARAM2_ al parametro 1 delle dimensioni di _PARAM0_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:216
 msgid "Test parameter 1 of the size of particles"
-msgstr ""
+msgstr "Parametro 1 delle dimensioni delle particelle di prova"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration2.cpp:217
 msgid "Parameter 1 of the size of _PARAM0_ is _PARAM1__PARAM2_"
@@ -9244,73 +9257,73 @@ msgstr ""
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:141
 msgid "Change the image of particles ( if displayed )."
-msgstr ""
+msgstr "Cambiare l'immagine di particelle (se visualizzato)."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:142
 msgid "Change the image of particles of _PARAM0_ to _PARAM1_"
-msgstr ""
+msgstr "Cambiare l'immagine di particelle di _PARAM0_ a _PARAM1_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:147
 msgid "New image"
-msgstr ""
+msgstr "Nuova immagine"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:153
 msgid "Test the name of the image displayed by particles."
-msgstr ""
+msgstr "Verificare il nome dell'immagine visualizzata da particelle."
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:154
 msgid "Image displayed by particles of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "Immagine visualizzata da particelle di _PARAM0_ è _PARAM1__PARAM2_"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:160
 #: ../Extensions//TextEntryObject/Extension.cpp:54
 #: ../Extensions//TextObject/Extension.cpp:58
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:489
 msgid "Text to test"
-msgstr ""
+msgstr "Testo di prova"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:165
 msgid "Particles image"
-msgstr ""
+msgstr "Immagine di particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:165
 msgid "Name of the image displayed by particles"
-msgstr ""
+msgstr "Nome dell'immagine visualizzata da particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:165
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:169
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:298
 msgid "Particles"
-msgstr ""
+msgstr "Particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:169
 #: ../Extensions//ParticleSystem/ParticleEmitterObject.cpp:599
 msgid "Particles number"
-msgstr ""
+msgstr "Numero di particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:209
 msgid "Emission angle A"
-msgstr ""
+msgstr "Angolo di emissione A"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:212
 msgid "Emission angle B"
-msgstr ""
+msgstr "Angolo di emissione B"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:215
 msgid "Radius of the emission zone"
-msgstr ""
+msgstr "Raggio della zona di emissione"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:218
 msgid "X Gravity of particles"
-msgstr ""
+msgstr "X gravità delle particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:221
 msgid "Y Gravity of particles"
-msgstr ""
+msgstr "Y gravità delle particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:224
 msgid "Z Gravity of particles"
-msgstr ""
+msgstr "Z gravità delle particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:230
 msgid "Gravity value"
@@ -9318,75 +9331,75 @@ msgstr "Valore della gravità"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:233
 msgid "Particles friction"
-msgstr ""
+msgstr "Attrito di particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:236
 msgid "Minimum lifetime of particles"
-msgstr ""
+msgstr "Durata minima delle particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:239
 msgid "Maximum lifetime of particles"
-msgstr ""
+msgstr "Durata massima delle particelle"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:242
 msgid "Parameter 1 of red color"
-msgstr ""
+msgstr "Parametro 1 di colore rosso"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:245
 msgid "Parameter 2 of red color"
-msgstr ""
+msgstr "Parametro 2 di colore rosso"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:248
 msgid "Parameter 1 of blue color"
-msgstr ""
+msgstr "Parametro 1 di colore blu"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:251
 msgid "Parameter 2 of blue color"
-msgstr ""
+msgstr "Parametro 2 di colore blu"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:254
 msgid "Parameter 1 of green color"
-msgstr ""
+msgstr "Parametro 1 di colore verde"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:257
 msgid "Parameter 2 of green color"
-msgstr ""
+msgstr "Parametro 2 di colore verde"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:260
 msgid "Parameter 1 of transparency"
-msgstr ""
+msgstr "Parametro 1 di trasparenza"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:263
 msgid "Parameter 2 of transparency"
-msgstr ""
+msgstr "Parametro 2 di trasparenza"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:266
 msgid "Parameter 1 of size"
-msgstr ""
+msgstr "Parametro 1 delle dimensioni"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:269
 msgid "Parameter 2 of size"
-msgstr ""
+msgstr "Parametro 2 di dimensioni"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:272
 msgid "Parameter 1 of angle"
-msgstr ""
+msgstr "Parametro 1 dell'angolo"
 
 #: ../Extensions//ParticleSystem/ExtensionSubDeclaration3.cpp:275
 msgid "Parameter 2 of angle"
-msgstr ""
+msgstr "Parametro 2 dell'angolo"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:247
 msgid "Edit the particle emitter"
-msgstr ""
+msgstr "Modificare l'emettitore di particelle"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:257
 msgid "Rendering"
-msgstr ""
+msgstr "Rendering"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:261
 msgid "Renderering mode :"
-msgstr ""
+msgstr "Renderering modalità:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:263
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:293
@@ -9396,27 +9409,27 @@ msgstr "Punti"
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:267
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:804
 msgid "Quad"
-msgstr ""
+msgstr "Quad"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:271
 msgid "rendererParam1 :"
-msgstr ""
+msgstr "rendererParam1:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:275
 msgid "rendererParam2 :"
-msgstr ""
+msgstr "rendererParam2:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:287
 msgid "Standard rendering"
-msgstr ""
+msgstr "Rendering standard"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:289
 msgid "Additive rendering"
-msgstr ""
+msgstr "Additivo rendering"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:302
 msgid "Lifetime : Between"
-msgstr ""
+msgstr "Durata: tra"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:307
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:464
@@ -9432,43 +9445,43 @@ msgstr "secondi"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:317
 msgid "Unlimited capacity"
-msgstr ""
+msgstr "Capacità illimitata"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:319
 msgid "If this box is checked, the emitter will keep emit particles."
-msgstr ""
+msgstr "Se questa casella è selezionata, l'emettitore manterrà emettono particelle."
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:321
 msgid "Capacity :"
-msgstr ""
+msgstr "Capacità:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:324
 msgid "Available particles number."
-msgstr ""
+msgstr "Numero di particelle disponibili."
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:329
 msgid "Flow :"
-msgstr ""
+msgstr "Flusso:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:332
 msgid "Number of particles emitted ( by seconds ). -1 to emit everything in a single shot."
-msgstr ""
+msgstr "Numero di particelle emesse (in secondi). -1 per emettere tutto in un solo colpo."
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:337
 msgid "Maximum particles number:"
-msgstr ""
+msgstr "Numero massimo di particelle:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:339
 msgid "5000"
-msgstr ""
+msgstr "5000"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:353
 msgid "Initial particles color :"
-msgstr ""
+msgstr "Colore di particelle iniziali:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:357
 msgid "Final particles color :"
-msgstr ""
+msgstr "Colore di particelle finali:"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:371
 msgid "Red"
@@ -9795,7 +9808,7 @@ msgstr ""
 
 #: ../Extensions//PathBehavior/Extension.cpp:95
 msgid "_PARAM0_ stops at the end of the path"
-msgstr ""
+msgstr "_PARAM0_ si ferma alla fine del percorso"
 
 #: ../Extensions//PathBehavior/Extension.cpp:106
 msgid "Invert the movement on the path"

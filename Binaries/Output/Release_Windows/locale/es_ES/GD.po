@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-04-15 14:33-0400\n"
+"PO-Revision-Date: 2016-09-18 10:01-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -1894,7 +1894,7 @@ msgid "This is a beta version of GDevelop for Mac OS X.\n\n"
 "Bugs may be present and only HTML5 games will work. Please report any feedback on www.forum.compilgames.net.\n"
 "Thanks!"
 msgstr "Ésta es una versión beta de GDevelop para Mac OS X.\n\n"
-"Pueden presentarse errores y sólo funcionarán los juegos HTML5. Por favor reporta cualquier información que creas conveniente en www.forum.compilgames.net.\n"
+"Pueden presentarse errores y sólo funcionarán los juegos HTML5. Por favor reporta cualquier comentario en www.forum.compilgames.net.\n"
 "¡Gracias!"
 
 #: ../IDE/GeneratePassword.cpp:49
@@ -5914,7 +5914,7 @@ msgstr "Ocultar anuncio banner"
 
 #: ../Extensions//AdMobObject/Extension.cpp:44
 msgid "Hide the banner ad"
-msgstr "Oculta el anuncio banner"
+msgstr "Ocultar el banner publicitario"
 
 #: ../Extensions//AdMobObject/Extension.cpp:45
 msgid "Hide the banner ad of _PARAM0_"
@@ -13803,7 +13803,7 @@ msgstr "Ayuda acerca de este objeto"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:165
 msgid "Import .tmx files (Tiled)..."
-msgstr ""
+msgstr "Importar archivos .tmx (Tiled)..."
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:265
 msgid "The tileset is the texture containing all the tiles which will be used in your tilemap object."
@@ -13876,47 +13876,47 @@ msgstr "Remueve el punto seleccionado"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:695
 msgid ".tmx file :"
-msgstr ""
+msgstr "archivo .tmx :"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:709
 msgid "The tmx file saved with Tiled"
-msgstr ""
+msgstr "El archivo tmx guardado desde Tiled"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:719
 msgid "Import settings"
-msgstr ""
+msgstr "Ajustes de importación"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:731
 msgid "Import the tileset configuration"
-msgstr ""
+msgstr "Importar la configuración del juego de baldosas"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:736
 msgid "Import the tileset image"
-msgstr ""
+msgstr "Importar la imagen del juego de baldosas"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:741
 msgid "Import the tiles hitboxes"
-msgstr ""
+msgstr "Importar las máscaras de colisión del juego de azulejos"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:746
 msgid "Tilemap"
-msgstr ""
+msgstr "Mapa de baldosas"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:750
 msgid "Import the tilemap"
-msgstr ""
+msgstr "Importar el mapa de baldosas"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:755
 msgid "Importer..."
-msgstr ""
+msgstr "Importar..."
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapImporterDialog.cpp:24
 msgid "Import .tmx file"
-msgstr ""
+msgstr "Importar archivo .tmx"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapImporterDialog.cpp:51
 msgid "Unable to read the file !"
-msgstr ""
+msgstr "¡Imposible leer el archivo!"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapObjectEditor.cpp:62
 msgid "Tile editor"
@@ -13946,75 +13946,75 @@ msgstr "Aún no has seleccionado un juego de baldosas."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:43
 msgid "Only orthogonal maps are supported !"
-msgstr ""
+msgstr "¡Sólo están soportados mapas ortogonales!"
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:50
 msgid "There are no tilesets in this file !"
-msgstr ""
+msgstr "¡No hay juegos de baldosas en este archivo!"
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:55
 msgid "Only the first tileset will be taken into account. Tiles from supplementary tilesets may be lost."
-msgstr ""
+msgstr "Sólo el primer juego de baldosas será tomado en cuenta. Baldosas de juegos de baldosas suplementarios podrían perderse."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:67
 msgid "The image can't be found !"
-msgstr ""
+msgstr "¡No se pudo encontrar la imagen!"
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:76
 msgid "The image is imported as "
-msgstr ""
+msgstr "La imagen se importa como "
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:86
 msgid "Tileset image importation completed."
-msgstr ""
+msgstr "Importación de imagen del juego de baldosas completada."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:97
 msgid "Tileset image size is not the same. Some tiles may not be rendered correctly."
-msgstr ""
+msgstr "El tamaño de la imagen del juego de baldosas no en el mismo. Algunas baldosas podrían renderizarse incorrectamente."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:106
 msgid "Tilemap objects don't handle tilesets with margins around the images. Consider cutting the picture."
-msgstr ""
+msgstr "Los objetos mapa de baldosas no contemplan juegos de baldosas con márgenes alrededor de las texturas. Considera recortar la imagen."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:109
 msgid "Tileset configuration importation completed."
-msgstr ""
+msgstr "Importación de configuración del juego de baldosas completada."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:117
 msgid "Tilemap size is different."
-msgstr ""
+msgstr "El tamaño del mapa de baldosas es diferente."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:127
 msgid "There are more than 3 tiles layers. Only the 3 firsts will be imported."
-msgstr ""
+msgstr "Hay más de 3 capas de baldosas. Sólo las 3 primeras serán importadas."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:131
 msgid "There are less than 3 tiles layers. Upper layer(s) will be empty."
-msgstr ""
+msgstr "Hay menos de 3 capas de baldosas. La(s) capa(s) superior(es) estará(n) vacía(s)."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:151
 msgid "Tilemap content importation completed."
-msgstr ""
+msgstr "Importación del contenido del mapa de baldosas completada."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:234
 msgid "Some tiles have more than 1 hitbox. Only the first one is imported."
-msgstr ""
+msgstr "Algunas baldosas tienen más de 1 máscara de colisión. Sólo la primera será importada."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:236
 msgid "Some tiles have a polyline or a ellipsis hitbox. Only rectangle and polygon hitboxes are supported."
-msgstr ""
+msgstr "Algunas baldosas tienen una máscara de colisión polilineal o elíptica. Sólo están soportadas máscaras de colisión rectangulares o poligonales."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:238
 msgid "Some tiles have a concave polygon. It has been ignored and set to a rectangular hitbox as this object only supports convex hitboxes for tiles."
-msgstr ""
+msgstr "Algunas baldosas tienen un polígono cóncavo. Éste ha sido ignorado y establecido como una máscara de colisión rectangular, ya que sólo están soportadas máscaras de colisión convexas."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:240
 msgid "Tiles hitboxes importation completed."
-msgstr ""
+msgstr "Importación de máscaras de colisión de baldosas completada."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:258
 msgid "There are not as many tiles in the object's tileset as in the file. The result may not be correct."
-msgstr ""
+msgstr "No hay tantas baldosas en el juego de baldosas del objeto como hay en el archivo. El resultado podría ser incorrecto."
 
 #: ../Extensions//TimedEvent/Extension.cpp:34
 #: ../Extensions//TimedEvent/Extension.cpp:111
@@ -14059,7 +14059,7 @@ msgstr "Sin nombre"
 
 #: ../Extensions//TimedEvent/TimedEvent.cpp:122
 msgid " (Name:  "
-msgstr ""
+msgstr " (Nombre:  "
 
 #: ../Extensions//TimedEvent/TimedEvent.cpp:123
 msgid "Delayed execution after "
@@ -14232,7 +14232,7 @@ msgstr "Configuración del mapa de baldosas"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.h:257
 msgid "Import a .tmx file (Tiled)"
-msgstr ""
+msgstr "Importar un archivo .tmx (Tiled)"
 
 #: ../Core/GDCore/Events/Builtin/ForEachEvent.cpp:113
 #: ../Core/GDCore/Extensions/Builtin/CommonInstructionsExtension.cpp:95
@@ -14438,7 +14438,7 @@ msgstr "Audio/Sonidos en canales"
 #: ../Core/GDCore/Extensions/Builtin/AudioExtension.cpp:223
 #: ../Core/GDCore/Extensions/Builtin/AudioExtension.cpp:237
 msgid "Audio file (or audio resource name)"
-msgstr ""
+msgstr "Archivo de audio (o nombre del recurso de audio)"
 
 #: ../Core/GDCore/Extensions/Builtin/AudioExtension.cpp:31
 #: ../Core/GDCore/Extensions/Builtin/AudioExtension.cpp:45
@@ -15837,7 +15837,7 @@ msgstr "Posición X del centro de la cámara"
 
 #: ../Core/GDCore/Extensions/Builtin/CameraExtension.cpp:24
 msgid "Compare the X position of the center of a camera."
-msgstr ""
+msgstr "Evalúa la posición X del centro de la cámara."
 
 #: ../Core/GDCore/Extensions/Builtin/CameraExtension.cpp:25
 msgid "X position of camera _PARAM4_ is _PARAM1__PARAM2_ (layer: _PARAM3_)"
@@ -19998,7 +19998,7 @@ msgstr "Clic derecho en una imagen para acceder a más opciones"
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:189
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:202
 msgid "Add a sound/music"
-msgstr ""
+msgstr "Agregar una música/sonido"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:177
 msgid "Remove from folder only"
@@ -20038,15 +20038,15 @@ msgstr "Recursos agregados exitosamente"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:385
 msgid "Choose one or more audio files to add"
-msgstr ""
+msgstr "Selecciona uno o más archivos de audio a agregar"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:385
 msgid "Supported audio files|*.ogg;*.mp3;*.wav|All files|*.*"
-msgstr ""
+msgstr "Archivos de audio soportados|*.ogg;*.mp3;*.wav|Todos los archivos|*.*"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:388
 msgid "Adding audio files"
-msgstr ""
+msgstr "Agregando archivos de audio"
 
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:454
 msgid "Adding "

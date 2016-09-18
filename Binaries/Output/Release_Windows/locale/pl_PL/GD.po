@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-04-15 14:32-0400\n"
+"PO-Revision-Date: 2016-09-18 10:00-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -732,11 +732,11 @@ msgstr "GDevelop jest oprogramowaniem open source:\n\n"
 
 #: ../IDE/Credits.cpp:134
 msgid "Programmed in C++, compiled with GCC, written with Sublime Text"
-msgstr ""
+msgstr "Napisane w języku C++, skompilowane z GCC, kodowane w Sublime Text"
 
 #: ../IDE/Credits.cpp:146
 msgid "Use SFML, wxWidgets and TinyXml libraries."
-msgstr ""
+msgstr "Używa bibliotek SFML, wxWidgets i TinyXml."
 
 #: ../IDE/Credits.cpp:159
 msgid "The Web platform is written in Javascript and uses Pixi.js"
@@ -768,7 +768,7 @@ msgstr "François Dumortier: Projekt logo GDevelop i strony internetowej."
 
 #: ../IDE/Credits.cpp:210
 msgid "Victor Levasseur: Advanced XML, Tiled Sprite and Tile Map extensions and contributions to Physics Engine, Text object, Video object, Path behavior and Sound object extension."
-msgstr ""
+msgstr "Victor Levasseur: Rozszerzenia: Widgets, Advanced XML i Tiled Sprite oraz wkład w rozszerzenia: Physics Engine, Text object, Video object, Path behavior i Sound object."
 
 #: ../IDE/Credits.cpp:213
 msgid "Constantine Shvetsov: Awesome design of icons"
@@ -2809,7 +2809,7 @@ msgstr "Wybrać warunek z listy"
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "Help on this "
-msgstr ""
+msgstr "Pomoc na ten temat "
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "action"
@@ -4254,15 +4254,16 @@ msgstr "Projekt został wyeksportowany do \""
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "\".\n"
 "Follow the instructions on the wiki to know how to build the android package from the exported files."
-msgstr ""
+msgstr "\".\n"
+"Postępuj zgodnie z instrukcjami wyświetlanymi na wiki do wiedzieć, jak zbudować pakiet Android z eksportowanych plików."
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "Android export"
-msgstr ""
+msgstr "Android eksport"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:51
 msgid "Export in progress"
-msgstr ""
+msgstr "Eksport w toku"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:51 ../GDJS/GDJS//IDE/Exporter.cpp:99
 #: ../GDJS/GDJS//IDE/Exporter.cpp:202
@@ -4815,11 +4816,11 @@ msgstr "aaa"
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:156
 msgid "Exports the game to a native Android application. This will produce source files ready to be compiled for Android using the Android SDK and NDK."
-msgstr ""
+msgstr "Eksportuje grę do natywnej aplikacji Android . To będzie produkować źródło pliki gotowe mają być opracowywane dla Androida za pomocą SDK Androida i NDK."
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:161
 msgid "How to compile your game exported files."
-msgstr ""
+msgstr "Jak skompilować wyeksportowane pliki twojej gry."
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:172
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:102
@@ -5331,7 +5332,7 @@ msgstr "Gry dla platform Windows i Linux oparte na C++ oraz OpenGL."
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.h:113
 msgid "Export to native Android"
-msgstr ""
+msgstr "Eksport do natywnego Androida"
 
 #: ../GDJS/GDJS//Events/Builtin/JsCodeEvent.cpp:51
 msgid "Javascript code"
@@ -5598,7 +5599,9 @@ msgstr "\n\n"
 msgid "Unable to launch your browser :(\n"
 "Manually open your browser and type \"localhost:2828\" in\n"
 "the address bar (without the quotes) to launch the preview!"
-msgstr ""
+msgstr "Nie można uruchomić przeglądarki :( \n"
+"Otwórz przeglądarkę ręcznie i wpisz \"localhost:2828\" w \n"
+" pasku adresów (bez cudzysłowów) aby uruchomić podgląd!"
 
 #: ../GDJS/GDJS//IDE/Dialogs/CordovaPackageDialog.cpp:13
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtouseintelxdk"
@@ -5655,15 +5658,16 @@ msgstr "Wystarczy kliknąć w przycisk \"Eksportuj\" a GDevelop zapakuje twoją 
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:184
 msgid "Export to a website or native game with Cocos2d (experimental)"
-msgstr ""
+msgstr "\n"
+"Eksport do strony internetowej lub natywnej grze z Cocos2d (eksperymentalny)"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:254
 msgid "If you install Cocos2d-x, you can also use it to export the game to Android, iOS, Windows, Mac or Linux."
-msgstr ""
+msgstr "Jeśli zainstalujesz cocos2d -x , można również użyć go do eksportu gry na Android, iOS, Windows, Mac lub Linux."
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:259
 msgid "Click here to learn more about Cocos2d export"
-msgstr ""
+msgstr "Kliknij tutaj, aby dowiedzieć się więcej o eksporcie Cocos2d"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:296
 msgid "Export"
@@ -5893,7 +5897,7 @@ msgstr "Pokaż banner reklamowy"
 
 #: ../Extensions//AdMobObject/Extension.cpp:36
 msgid "Show the banner ad of _PARAM0_"
-msgstr ""
+msgstr "Pokaż reklamę banner _PARAM0_"
 
 #: ../Extensions//AdMobObject/Extension.cpp:37
 #: ../Extensions//AdMobObject/Extension.cpp:46
@@ -5910,7 +5914,7 @@ msgstr "Ukryj ten transparent reklamowy"
 
 #: ../Extensions//AdMobObject/Extension.cpp:45
 msgid "Hide the banner ad of _PARAM0_"
-msgstr ""
+msgstr "Pokaż reklamę banner _PARAM0_"
 
 #: ../Extensions//AdMobObject/Extension.cpp:52
 msgid "Banner is displayed"
@@ -5922,7 +5926,7 @@ msgstr "Zwróć true jeżeli obiekt właśnie wyświetla banner"
 
 #: ../Extensions//AdMobObject/Extension.cpp:54
 msgid "_PARAM0_ is displaying a banner"
-msgstr ""
+msgstr "_PARAM0_ Yest wyświetlania banner"
 
 #: ../Extensions//AdMobObject/Extension.cpp:61
 msgid "Preload interstitial screen"
@@ -5963,11 +5967,12 @@ msgstr "Ekran interstitial jest gotowy"
 
 #: ../Extensions//AdMobObject/Extension.cpp:80
 msgid "Return true if the interstitial screen was loaded and is ready to be shown."
-msgstr ""
+msgstr "\n"
+"Zwraca true, jeśli ekran śródmiąższowe został załadowany i jest gotowy być pokazane."
 
 #: ../Extensions//AdMobObject/Extension.cpp:81
 msgid "Interstitial screen of _PARAM0_ is ready"
-msgstr ""
+msgstr "Śródmiąższowy kran _PARAM0_ jest gotowy"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:31
 msgid "Advanced XML 1.0"
@@ -6007,7 +6012,9 @@ msgstr "Załaduj plik XML."
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:53
 msgid "Load XML File _PARAM0_ into reference _PARAM1_"
-msgstr ""
+msgstr "\n"
+"Załaduj XML _PARAM0_ File w odniesieniu _PARAM1_\n"
+""
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:58
 #: ../Extensions//AES/Extension.cpp:40 ../Extensions//AES/Extension.cpp:55
@@ -6024,7 +6031,8 @@ msgstr "Zapisz plik XML."
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:66
 msgid "Save XML file _PARAM1_ into _PARAM0_"
-msgstr ""
+msgstr "\n"
+"Zapisz plik XML _PARAM1_ pod _PARAM0_"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:71
 msgid "File where to save the document"
@@ -6041,11 +6049,12 @@ msgstr "Załadowanie elementu do odnośnika"
 #: ../Extensions//AdvancedXML/src/Extension.cpp:78
 msgid "Load an element (relative to another) in a reference.\n"
 "Note: References allows to access to an element using the name of the reference pointing to it."
-msgstr ""
+msgstr "\n"
+"Załaduj element (względem siebie) w odniesieniu \\ N Uwaga : . Odniesienia pozwala uzyskać dostęp do elementu przy użyciu nazwy wskazując odniesienie do niej."
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:79
 msgid "Load path _PARAM2_ (relative to the element _PARAM0_) into reference _PARAM1_"
-msgstr ""
+msgstr "załadować ścieżka_PARAM2_ (w stosunku do elementu_PARAM0_) pod referencyjnej _PARAM1_"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:80
 #: ../Extensions//AdvancedXML/src/Extension.cpp:94
@@ -6059,7 +6068,7 @@ msgstr "Zaawansowane XML: ogólne"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:84
 msgid "Reference of an existing element ( The path of the element will be relative to this element )"
-msgstr ""
+msgstr "referencyjny do istniejącego elementu (Ścieżka elementu będzie w stosunku do tego elementu)"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:85
 msgid "Name of the reference to the newly created element"
@@ -6084,7 +6093,7 @@ msgstr ""
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:98
 msgid "Reference to create"
-msgstr ""
+msgstr "referencyjny do tworzenia"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:99
 msgid "Reference to the element preceeding the element to be accessed"
@@ -6748,7 +6757,7 @@ msgstr "Porównaj szerokość kostki 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:63
 msgid "width of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "szerokość _PARAM0_ wynosi _PARAM1__PARAM2_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:69
 #: ../Extensions//Box3DObject/Extension.cpp:99
@@ -6990,7 +6999,7 @@ msgstr "Porównanie wysokości kostki 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:93
 msgid "height of _PARAM0_ is _PARAM1__PARAM2_"
-msgstr ""
+msgstr "wysokość _PARAM0_ wynosi _PARAM1__PARAM2_"
 
 #: ../Extensions//Box3DObject/Extension.cpp:107
 msgid "Modify the depth of a 3D Box."
@@ -7052,7 +7061,7 @@ msgstr ""
 
 #: ../Extensions//Box3DObject/Extension.cpp:197
 msgid "Modify Pitch of a 3D Box object."
-msgstr ""
+msgstr "Modyfikowanie nachylenia kostki 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:198
 msgid "Do _PARAM1__PARAM2_ to pitch of _PARAM0_"
@@ -7069,7 +7078,7 @@ msgstr ""
 
 #: ../Extensions//Box3DObject/Extension.cpp:227
 msgid "Modify Roll of a 3D Box object."
-msgstr ""
+msgstr "Modyfikowanie obrotu kostki 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:228
 msgid "Do _PARAM1__PARAM2_ to roll of _PARAM0_"
@@ -7077,7 +7086,7 @@ msgstr ""
 
 #: ../Extensions//Box3DObject/Extension.cpp:241
 msgid "Compare Roll of a 3D Box object."
-msgstr ""
+msgstr "Porównanie obrotu kostki 3D."
 
 #: ../Extensions//Box3DObject/Extension.cpp:242
 msgid "Roll of _PARAM0_ is _PARAM1__PARAM2_"
@@ -7089,7 +7098,7 @@ msgstr "Głębokość kostki 3D"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:25
 msgid "Common dialogs"
-msgstr ""
+msgstr "Podstawowe dialogi"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:26
 msgid "Extension allowing to display common dialogs ( Message box, open file dialog... )"
@@ -7123,7 +7132,7 @@ msgstr "Tytuł"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:46
 msgid "Show a window to choose a file"
-msgstr ""
+msgstr "Pokaż okno wyboru pliku"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:47
 msgid "Display a window allowing to choose a file.\n"
@@ -7139,7 +7148,7 @@ msgstr ""
 #: ../Extensions//CommonDialogs/Extension.cpp:84
 #: ../Core/GDCore/Extensions/Builtin/JoystickExtension.cpp:57
 msgid "Save result to scene variable"
-msgstr ""
+msgstr "Zapisz rezultat do zmiennej sceny"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:56
 msgid "Wildcard filter ( \"FileType|*.ext;*.ext2|2ndFileType|*.ext3\" ) ( Windows only ) "
@@ -7446,7 +7455,7 @@ msgstr ""
 
 #: ../Extensions//Function/Extension.cpp:38
 msgid "Function events"
-msgstr ""
+msgstr "Funkcja zdarzenia"
 
 #: ../Extensions//Function/Extension.cpp:39
 msgid "Extension allowing to use events behaving as functions."
@@ -7568,7 +7577,7 @@ msgstr ""
 
 #: ../Extensions//Light/Extension.cpp:36
 msgid "Emits light that can be stopped by objects"
-msgstr ""
+msgstr "Emituje światło, które może być zatrzymane przez obiekty"
 
 #: ../Extensions//Light/Extension.cpp:48
 msgid "Change light color."
@@ -7637,7 +7646,7 @@ msgstr "Intensywność"
 
 #: ../Extensions//Light/Extension.cpp:61
 msgid "Modify the intensity of a light"
-msgstr ""
+msgstr "Zmodyfikuj natężenie światła"
 
 #: ../Extensions//Light/Extension.cpp:62
 msgid "Do _PARAM1__PARAM2_ to the intensity of _PARAM0_"
@@ -7667,7 +7676,7 @@ msgstr ""
 
 #: ../Extensions//Light/Extension.cpp:103
 msgid "Test the radius of a light."
-msgstr ""
+msgstr "Testuj promień światła."
 
 #: ../Extensions//Light/Extension.cpp:104
 msgid "The radius of _PARAM0_ is _PARAM2_ _PARAM1_"
@@ -7682,7 +7691,7 @@ msgstr "Jakość"
 
 #: ../Extensions//Light/Extension.cpp:117
 msgid "Modify the quality of a light"
-msgstr ""
+msgstr "Zmień jakość światła"
 
 #: ../Extensions//Light/Extension.cpp:118
 msgid "Do _PARAM1__PARAM2_ to the quality of _PARAM0_"
@@ -7690,7 +7699,7 @@ msgstr ""
 
 #: ../Extensions//Light/Extension.cpp:131
 msgid "Test the quality of a light"
-msgstr ""
+msgstr "Testuj jakość światła"
 
 #: ../Extensions//Light/Extension.cpp:132
 msgid "The quality of _PARAM0_ is _PARAM1__PARAM2_"
@@ -7699,7 +7708,7 @@ msgstr ""
 #: ../Extensions//Light/Extension.cpp:144
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/SpriteExtension.cpp:331
 msgid "Global color"
-msgstr ""
+msgstr "Kolor globalny"
 
 #: ../Extensions//Light/Extension.cpp:145
 msgid "Change scene color for a global light."
@@ -7772,7 +7781,7 @@ msgstr "Jakość:"
 
 #: ../Extensions//Light/LightObjectEditor.cpp:89
 msgid "Global light"
-msgstr ""
+msgstr "Globalne oświetlenie"
 
 #: ../Extensions//Light/LightObjectEditor.cpp:91
 msgid "Set the light as the global light"
@@ -7878,7 +7887,7 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:29
 msgid "Network features"
-msgstr ""
+msgstr "Funkcje sieciowe"
 
 #: ../Extensions//Network/Extension.cpp:30
 msgid "Built-in extension allowing to exchange data on the network between games."
@@ -7901,7 +7910,7 @@ msgstr ""
 #: ../Extensions//Network/Extension.cpp:87
 #: ../Extensions//Network/Extension.cpp:100
 msgid "Network: Sending"
-msgstr ""
+msgstr "Sieć: Przesyłanie"
 
 #: ../Extensions//Network/Extension.cpp:46
 msgid "Recipient IP address."
@@ -8092,7 +8101,7 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:152
 msgid "Local IP address ( local/LAN )"
-msgstr ""
+msgstr "Lokalny adres IP (lokalne/LAN)"
 
 #: ../Extensions//Network/Extension.cpp:158
 msgid "Generate objects' identifiers"
@@ -8122,7 +8131,7 @@ msgstr ""
 
 #: ../Extensions//Network/Extension.cpp:174
 msgid "NetworkUpdater"
-msgstr ""
+msgstr "NetworkUpdater"
 
 #: ../Extensions//Network/Extension.cpp:175
 msgid "Allows to automatically synchronize the objects of a game on the network."
@@ -9435,7 +9444,7 @@ msgstr "oraz"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:312
 msgid "seconds"
-msgstr ""
+msgstr "sekundy"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:317
 msgid "Unlimited capacity"
@@ -9550,7 +9559,7 @@ msgstr ""
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:525
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:564
 msgid "Between"
-msgstr ""
+msgstr "Pomiędzy"
 
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:468
 #: ../Extensions//ParticleSystem/ParticleEmitterObjectEditor.cpp:501
@@ -9949,7 +9958,7 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:412
 #: ../Core/GDCore/IDE/Dialogs/ResourcesEditor.cpp:671
 msgid "Name"
-msgstr ""
+msgstr "Nazwa"
 
 #: ../Extensions//PathBehavior/Extension.cpp:204
 msgid "Change the path"
@@ -10185,11 +10194,11 @@ msgstr ""
 
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:234
 msgid "Movement and speed"
-msgstr ""
+msgstr "Ruch i prędkość"
 
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:237
 msgid "Speed:"
-msgstr ""
+msgstr "Prędkość:"
 
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:239
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:126
@@ -10268,7 +10277,7 @@ msgstr ""
 
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:464
 msgid "New path"
-msgstr ""
+msgstr "Nowa ścieżka"
 
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:468
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:519
@@ -10303,11 +10312,11 @@ msgstr ""
 
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:515
 msgid "Rename a path"
-msgstr ""
+msgstr "Zmień nazwę ścieżki"
 
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:519
 msgid "Unable to rename the path"
-msgstr ""
+msgstr "Nie można zmienić nazwy ścieżki"
 
 #: ../Extensions//PathBehavior/PathBehaviorEditor.cpp:565
 msgid "You have deleted a global path. Be sure that no other object was using it."
@@ -10412,7 +10421,7 @@ msgstr ""
 
 #: ../Extensions//PathfindingBehavior/Extension.cpp:66
 msgid "Return true if a path has been found."
-msgstr ""
+msgstr "Zwróć prawdę jeżeli ścieżka została znaleziona."
 
 #: ../Extensions//PathfindingBehavior/Extension.cpp:67
 msgid "A path has been found for _PARAM0_"
@@ -10544,7 +10553,7 @@ msgstr ""
 #: ../Extensions//TopDownMovementBehavior/Extension.cpp:191
 #: ../Extensions//TopDownMovementBehavior/Extension.cpp:333
 msgid "Maximum speed"
-msgstr ""
+msgstr "Maksymalna prędkość"
 
 #: ../Extensions//PathfindingBehavior/Extension.cpp:182
 msgid "Change the maximum speed when moving the object"
@@ -10894,7 +10903,7 @@ msgstr ""
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:191
 #: ../Extensions//TopDownMovementBehavior/TopDownMovementBehavior.cpp:221
 msgid "Max. speed"
-msgstr ""
+msgstr "Maksymalna prędkość"
 
 #: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:603
 #: ../Extensions//PathfindingBehavior/PathfindingBehavior.cpp:634
@@ -11028,7 +11037,7 @@ msgstr ""
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:178
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:356
 msgid "Cursor position:"
-msgstr ""
+msgstr "Pozycja kursora:"
 
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:420
 msgid "X offset"
@@ -11083,11 +11092,11 @@ msgstr ""
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:38
 msgid "Physics engine"
-msgstr ""
+msgstr "Silnik fizyki"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:39
 msgid "Physics"
-msgstr ""
+msgstr "Fizyka"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:40
 msgid "Make objects move as if they were subject to the laws of physics."
@@ -11494,7 +11503,7 @@ msgstr ""
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:365
 msgid "New value"
-msgstr ""
+msgstr "Nowa wartość"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:371
 msgid "Compare the angular speed of the object."
@@ -11601,7 +11610,7 @@ msgstr ""
 #: ../Extensions//PhysicsBehavior/Extension.cpp:486
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/SpriteExtension.cpp:141
 msgid "Scale"
-msgstr ""
+msgstr "Skala"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:478
 msgid "Change collision polygon Y scale"
@@ -11770,7 +11779,7 @@ msgstr ""
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:62
 msgid "Is on ladder"
-msgstr ""
+msgstr "Jest na drabinie"
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:63
 msgid "Check if the object is on a ladder."
@@ -11782,7 +11791,7 @@ msgstr ""
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:74
 msgid "Is jumping"
-msgstr ""
+msgstr "Skacze"
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:75
 msgid "Check if the object is jumping."
@@ -11794,7 +11803,7 @@ msgstr ""
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:86
 msgid "Is falling"
-msgstr ""
+msgstr "Spada"
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:87
 msgid "Check if the object is falling.\n"
@@ -11825,7 +11834,7 @@ msgstr ""
 #: ../Extensions//PlatformBehavior/Extension.cpp:139
 #: ../Extensions//PlatformBehavior/Extension.cpp:376
 msgid "Maximum falling speed"
-msgstr ""
+msgstr "Maksymalna prędkość spadania"
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:126
 msgid "Compare the maximum falling speed of the object (in pixels per second)."
@@ -11912,7 +11921,7 @@ msgstr ""
 #: ../Extensions//PlatformBehavior/PlatformerObjectBehavior.cpp:566
 #: ../Extensions//PlatformBehavior/PlatformerObjectBehavior.cpp:596
 msgid "Jump speed"
-msgstr ""
+msgstr "Szybkość skoku"
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:237
 msgid "Compare the jump speed of the object (in pixels per second)."
@@ -12064,7 +12073,7 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:40
 #: ../Core/GDCore/IDE/Events/InstructionSentenceFormatter.cpp:123
 msgid "Key"
-msgstr ""
+msgstr "Klawisz"
 
 #: ../Extensions//PlatformBehavior/Extension.cpp:359
 #: ../Extensions//TopDownMovementBehavior/Extension.cpp:98
@@ -12977,7 +12986,7 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/FileExtension.cpp:117
 #: ../Core/GDCore/Extensions/Builtin/FileExtension.cpp:126
 msgid "Filename"
-msgstr ""
+msgstr "Nazwa pliku"
 
 #: ../Extensions//SoundObject/SoundObjectEditor.cpp:144
 msgid "Name of the sound file:"
@@ -13057,7 +13066,7 @@ msgstr ""
 
 #: ../Extensions//TextEntryObject/Extension.cpp:81
 msgid "Text entered with keyboard"
-msgstr ""
+msgstr "Tekst wprowadzony z klawiatury"
 
 #: ../Extensions//TextEntryObject/TextEntryObject.cpp:102
 msgid "Activated ?"
@@ -16538,7 +16547,7 @@ msgstr ""
 
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:23
 msgid "Key pressed"
-msgstr ""
+msgstr "Klawisz jest naciśnięty"
 
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:24
 msgid "Test if a key is pressed"
@@ -16556,11 +16565,11 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:68
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:76
 msgid "Keyboard"
-msgstr ""
+msgstr "Klawiatura"
 
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:33
 msgid "Key released"
-msgstr ""
+msgstr "Klawisz został puszczony"
 
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:34
 msgid "Test if a key was just released"
@@ -16594,7 +16603,7 @@ msgstr ""
 
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:65
 msgid "Any key pressed"
-msgstr ""
+msgstr "Dowolny klawisz został naciśnięty"
 
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:66
 msgid "Test if any key is pressed"
@@ -16602,11 +16611,11 @@ msgstr ""
 
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:67
 msgid "Any key is pressed"
-msgstr ""
+msgstr "Dowolny klawisz jest naciśnięty"
 
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:74
 msgid "Last pressed key"
-msgstr ""
+msgstr "Ostatni naciśnięty klawisz"
 
 #: ../Core/GDCore/Extensions/Builtin/KeyboardExtension.cpp:75
 msgid "Get the name of the latest key pressed on the keyboard"
@@ -16910,7 +16919,7 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/MouseExtension.cpp:147
 #: ../Core/GDCore/Extensions/Builtin/MouseExtension.cpp:158
 msgid "Mouse and touch"
-msgstr ""
+msgstr "Mysz i dotyk"
 
 #: ../Core/GDCore/Extensions/Builtin/MouseExtension.cpp:32
 msgid "Accurate test (yes by default)"
@@ -17037,7 +17046,7 @@ msgstr ""
 
 #: ../Core/GDCore/Extensions/Builtin/MouseExtension.cpp:155
 msgid "Mouse button released"
-msgstr ""
+msgstr "Guzik myszy został puszczony"
 
 #: ../Core/GDCore/Extensions/Builtin/MouseExtension.cpp:156
 msgid "Return true if the specified button of the mouse was released."
@@ -17113,7 +17122,7 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/MouseExtension.cpp:230
 #: ../Core/GDCore/Extensions/Builtin/MouseExtension.cpp:236
 msgid "Mouse cursor"
-msgstr ""
+msgstr "Kursor myszy"
 
 #: ../Core/GDCore/Extensions/Builtin/MouseExtension.cpp:236
 msgid "Mouse wheel: Displacement"
@@ -17443,7 +17452,7 @@ msgstr ""
 
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:235
 msgid "Animations"
-msgstr ""
+msgstr "Animacje"
 
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:260
 msgid "Go back to default mask"
@@ -17513,7 +17522,7 @@ msgstr "Przeciągnij obraz z banku obrazów do pola poniżej, aby dodać go do a
 
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:525
 msgid "All animations"
-msgstr ""
+msgstr "Wszystkie animacje"
 
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:529
 msgid "Animation "
@@ -17695,7 +17704,7 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/SpriteExtension.cpp:447
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/SpriteExtension.cpp:450
 msgid "Animations and images"
-msgstr ""
+msgstr "Animacje i obrazy"
 
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/SpriteExtension.cpp:59
 msgid "Change the direction"
@@ -18084,7 +18093,7 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/StringInstructionsExtension.cpp:23
 #: ../Core/GDCore/Extensions/Builtin/StringInstructionsExtension.cpp:24
 msgid "Insert a new line"
-msgstr ""
+msgstr "Wstaw nowy wiersz"
 
 #: ../Core/GDCore/Extensions/Builtin/StringInstructionsExtension.cpp:25
 #: ../Core/GDCore/Extensions/Builtin/StringInstructionsExtension.cpp:31
@@ -19522,12 +19531,12 @@ msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:234
 msgid "Add a behavior to the object"
-msgstr ""
+msgstr "Dodaj zachowanie do obiektu"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:236
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:264
 msgid "Insert a new object"
-msgstr ""
+msgstr "Wstaw nowy obiekt"
 
 #: ../Core/GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp:257
 msgid "Lock the object(s)"
@@ -19673,11 +19682,11 @@ msgstr ""
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:49
 msgid "Object name"
-msgstr ""
+msgstr "Nazwa obiektu"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:50
 msgid "Kind"
-msgstr ""
+msgstr "Rodzaj"
 
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:53
 #: ../Core/GDCore/IDE/Dialogs/ObjectsPropgridHelper.cpp:54

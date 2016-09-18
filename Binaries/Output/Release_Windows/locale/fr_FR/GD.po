@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-04-17 08:56-0400\n"
+"PO-Revision-Date: 2016-09-18 09:59-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -2810,7 +2810,7 @@ msgstr "Choisissez une condition dans la liste"
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "Help on this "
-msgstr "Aide sur cette "
+msgstr "Aide dessus "
 
 #: ../IDE/InstructionSelectorDialog.cpp:131
 msgid "action"
@@ -4254,13 +4254,13 @@ msgstr "Permet la création de jeux en 2D qui peuvent être compilés et joués 
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "The project was exported to \""
-msgstr "Le projet a été exporté dans \""
+msgstr "Le projet a été exporté vers \""
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "\".\n"
 "Follow the instructions on the wiki to know how to build the android package from the exported files."
 msgstr "\".\n"
-"Suivez les instructions sur le wiki pour savoir comment compiler le paquet Android à partir des fichiers exportés."
+"Suivez les instructions sur le wiki pour savoir comment compiler le paquet pour Android depuis les fichiers exportés."
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:39
 msgid "Android export"
@@ -4268,7 +4268,7 @@ msgstr "Export Android"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:51
 msgid "Export in progress"
-msgstr "Export en cours"
+msgstr "Exportation en cours"
 
 #: ../GDCpp/GDCpp//IDE/AndroidExporter.cpp:51 ../GDJS/GDJS//IDE/Exporter.cpp:99
 #: ../GDJS/GDJS//IDE/Exporter.cpp:202
@@ -4822,11 +4822,11 @@ msgstr "aaa"
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:156
 msgid "Exports the game to a native Android application. This will produce source files ready to be compiled for Android using the Android SDK and NDK."
-msgstr "Exporte le jeu en application native Android. Cela va produire des fichiers source pouvant être compilés pour Android avec le SDK Android et le NDK."
+msgstr "Exporte le jeu en application native Android. Cela produira des fichiers source prêt à être compilés pour Android avec le SDK Android et le NDK."
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:161
 msgid "How to compile your game exported files."
-msgstr "Comment compiler les fichiers exportés."
+msgstr "Comment compiler les fichiers d'export du jeu."
 
 #: ../GDCpp/GDCpp//IDE/Dialogs/GDCppDialogs.cpp:172
 #: ../GDCpp/GDCpp//IDE/Dialogs/ProjectExportDialog.cpp:102
@@ -5606,8 +5606,8 @@ msgid "Unable to launch your browser :(\n"
 "Manually open your browser and type \"localhost:2828\" in\n"
 "the address bar (without the quotes) to launch the preview!"
 msgstr "Impossible de lancer votre navigateur :(\n"
-"Ouvrez manuellement votre navigateur et tapez \"localhost:2828\" in\n"
-"dans la barre d'adresse (sans les guillemets) pour lancer l'aperçu !"
+"Ouvrez manuellement votre navigateur et tapez \"localhost:2828\" dans\n"
+"la barre d'adresse (sans les guillemets) pour lancer l'aperçu !"
 
 #: ../GDJS/GDJS//IDE/Dialogs/CordovaPackageDialog.cpp:13
 msgid "http://wiki.compilgames.net/doku.php/en/game_develop/tutorials/howtouseintelxdk"
@@ -5664,7 +5664,7 @@ msgstr "Exporter vers un site web ou un jeu natif avec Cocos2d (expérimental)"
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:254
 msgid "If you install Cocos2d-x, you can also use it to export the game to Android, iOS, Windows, Mac or Linux."
-msgstr "Si vous installez Cocos2d-x, vous pourrez également exporter votre jeu vers Android, iOS, Windows, Mac ou LInux."
+msgstr "Si vous installez Cocos2d-x, vous pourrez également exporter votre jeu vers Android, iOS, Windows, Mac ou Linux."
 
 #: ../GDJS/GDJS//IDE/Dialogs/GDJSDialogs.cpp:259
 msgid "Click here to learn more about Cocos2d export"
@@ -8415,11 +8415,11 @@ msgstr "Taille par défaut"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:106
 msgid "Texture configuration (for HTML5 games only)"
-msgstr "Paramètres de la texture (pour les jeux HTML5 uniquement)"
+msgstr "Configuration de texture (pour les jeux HTML5 uniquement)"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:107
 msgid "Repeat borders and center textures (instead of stretching them)"
-msgstr "Répéter les textures des bordures et du centre (au lieu de les étendre)"
+msgstr "Répéter les textures des bords et du centre (au lieu de les étendre)"
 
 #: ../Extensions//PanelSpriteObject/PanelSpriteObjectEditor.cpp:114
 msgid "Margins"
@@ -10983,8 +10983,7 @@ msgstr "Entrez les coordonnées du polygone de collision :\n"
 
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:98
 msgid "Coordinates must be entered clockwise."
-msgstr "Il faut entrer les coordonnées dans le sens des aiguilles\n"
-"d'une montre."
+msgstr "Les coordonnées doivent être dans le sens horaire."
 
 #: ../Extensions//PhysicsBehavior/CustomPolygonDialog.cpp:102
 #: ../Core/GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.cpp:1561
@@ -13805,7 +13804,7 @@ msgstr "Aide à propos de cet objet"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:165
 msgid "Import .tmx files (Tiled)..."
-msgstr "Importer un fichier .tmx (Tiled) ..."
+msgstr "Importer un fichier .tmx (motifs) ..."
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:265
 msgid "The tileset is the texture containing all the tiles which will be used in your tilemap object."
@@ -13882,31 +13881,31 @@ msgstr "Fichier .tmx :"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:709
 msgid "The tmx file saved with Tiled"
-msgstr "Le fichier tmx enregistré avec Tiled"
+msgstr "Le fichier tmx enregistré avec les motifs"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:719
 msgid "Import settings"
-msgstr "Paramètres de l'import"
+msgstr "Paramètres d'import"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:731
 msgid "Import the tileset configuration"
-msgstr "Importer la configuration du jeu de tuiles (tileset)"
+msgstr "Importer la configuration des motifs"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:736
 msgid "Import the tileset image"
-msgstr "Importer la texture des tuiles"
+msgstr "Importer l'image des motifs"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:741
 msgid "Import the tiles hitboxes"
-msgstr "Importer les masques de collision des tuiles"
+msgstr "Importer les masques de collision des motifs"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:746
 msgid "Tilemap"
-msgstr "Carte de tuiles"
+msgstr "Carte des motifs"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:750
 msgid "Import the tilemap"
-msgstr "Importer la carte de tuile"
+msgstr "Importer la carte des motifs"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:755
 msgid "Importer..."
@@ -13918,7 +13917,7 @@ msgstr "Importer un fichier .tmx"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapImporterDialog.cpp:51
 msgid "Unable to read the file !"
-msgstr "Impossible d'ouvrir le fichier !"
+msgstr "Lecture Impossible du fichier !"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapObjectEditor.cpp:62
 msgid "Tile editor"
@@ -13952,11 +13951,11 @@ msgstr "Seules les cartes orthogonales sont supportées !"
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:50
 msgid "There are no tilesets in this file !"
-msgstr "Il n'y a pas de jeu de tuiles (tileset) dans ce fichier !"
+msgstr "Il n'y a pas de carte à motif dans ce fichier !"
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:55
 msgid "Only the first tileset will be taken into account. Tiles from supplementary tilesets may be lost."
-msgstr "Seul le premier jeu de tuiles (tileset) sera pris en compte. Les tuiles des autres jeux de tuiles seront perdues."
+msgstr "Seul le premier jeu de motif sera pris en compte. Les motifs des autres jeux seront perdues."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:67
 msgid "The image can't be found !"
@@ -13968,55 +13967,55 @@ msgstr "L'image a été importée sous le nom "
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:86
 msgid "Tileset image importation completed."
-msgstr "Importation de la texture des tuiles terminée."
+msgstr "Importation des motifs terminée."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:97
 msgid "Tileset image size is not the same. Some tiles may not be rendered correctly."
-msgstr "La taille des tuiles n'est pas identique entre la carte (tilemap) et le jeu de tuiles (tileset). Le rendu peut être incorrect."
+msgstr "La taille des motifs n'est pas identique. Le rendu peut être incorrect pour certains motifs."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:106
 msgid "Tilemap objects don't handle tilesets with margins around the images. Consider cutting the picture."
-msgstr "L'objet Carte de tuiles ne supporte pas les jeux de tuiles (tileset) avec des marges autour de la texture."
+msgstr "L'objet Carte des motifs ne supporte pas les motifs avec des marges autour de l'image. Envisager des découpes de l'image."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:109
 msgid "Tileset configuration importation completed."
-msgstr "Importation de la configuration du jeu de tuiles (tileset) terminée."
+msgstr "Import de la configuration des motifs terminé."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:117
 msgid "Tilemap size is different."
-msgstr "La taille de la carte de tuiles est différente."
+msgstr "La taille de la carte des motifs est différente."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:127
 msgid "There are more than 3 tiles layers. Only the 3 firsts will be imported."
-msgstr "Il y a plus que 3 couches de tuiles. Seules les 3 premières seront importées."
+msgstr "Il y a plus de 3 calques de motifs. Seules les 3 premiers seront importés."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:131
 msgid "There are less than 3 tiles layers. Upper layer(s) will be empty."
-msgstr "Il y a moins de 3 couches de tuiles. Les couches supérieures seront vides."
+msgstr "Il y a moins de 3 claques de motifs. Calque(s) supérieur(s) vide(s)."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:151
 msgid "Tilemap content importation completed."
-msgstr "Importation de la carte de tuiles terminée."
+msgstr "Import de la carte de tuiles terminé."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:234
 msgid "Some tiles have more than 1 hitbox. Only the first one is imported."
-msgstr "Certaines tuiles ont plus qu'un masque de collision. Seul le premier sera importé."
+msgstr "Certains motifs ont plus de 1 masque de collision. Seul le premier sera importé."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:236
 msgid "Some tiles have a polyline or a ellipsis hitbox. Only rectangle and polygon hitboxes are supported."
-msgstr "Certaines tuiles ont des masques de collision de type \"polyline\" ou ellipse. Seuls les rectangles et les polygones sont supportés."
+msgstr "Certains motifs ont des masques de collision de type \"polyline\" ou ellipse. Seuls les rectangles et les polygones sont supportés."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:238
 msgid "Some tiles have a concave polygon. It has been ignored and set to a rectangular hitbox as this object only supports convex hitboxes for tiles."
-msgstr "Certaines tuiles ont des masques de collision concaves. Ils ont été ignorés et remplacés par un masque de collision rectangulaire car les polygones concaves ne sont pas supportés."
+msgstr "Certains motifs ont des polygones concaves. Ils ont été ignorés et remplacés par un masque de collision rectangulaire car cet objet ne supporte que les polygones convexes."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:240
 msgid "Tiles hitboxes importation completed."
-msgstr "Importation des masques de collision des tuiles terminée."
+msgstr "Import des masques de collision des motifs terminé."
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:258
 msgid "There are not as many tiles in the object's tileset as in the file. The result may not be correct."
-msgstr "Il n'y a pas autant de tuiles dans le jeu de tuile (tileset) de l'objet que dans le fichier. Des erreur d'affichage peuvent apparaître."
+msgstr "Il n'y a pas autant de motifs dans l'objet des motif que dans le fichier. Le résultat peut être incorrect."
 
 #: ../Extensions//TimedEvent/Extension.cpp:34
 #: ../Extensions//TimedEvent/Extension.cpp:111
@@ -14234,7 +14233,7 @@ msgstr "Configuration de la carte de tuile"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.h:257
 msgid "Import a .tmx file (Tiled)"
-msgstr "Importer un fichier .tmx (Tiled)"
+msgstr "Importer un fichier .tmx (motifs)"
 
 #: ../Core/GDCore/Events/Builtin/ForEachEvent.cpp:113
 #: ../Core/GDCore/Extensions/Builtin/CommonInstructionsExtension.cpp:95
@@ -15840,7 +15839,7 @@ msgstr "Position X du centre de la caméra"
 
 #: ../Core/GDCore/Extensions/Builtin/CameraExtension.cpp:24
 msgid "Compare the X position of the center of a camera."
-msgstr "Teste la valeur de la position X du centre d'une caméra."
+msgstr "Compare la valeur de la position X du centre d'une caméra."
 
 #: ../Core/GDCore/Extensions/Builtin/CameraExtension.cpp:25
 msgid "X position of camera _PARAM4_ is _PARAM1__PARAM2_ (layer: _PARAM3_)"

@@ -723,7 +723,7 @@ private:
     int                                                 maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
     unsigned int                                        minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
     bool                                                verticalSync; ///< If true, must activate vertical synchronization.
-    std::vector < std::shared_ptr<gd::Layout> >       scenes; ///< List of all scenes
+    std::vector < std::unique_ptr<gd::Layout> >       scenes; ///< List of all scenes
     gd::VariablesContainer                              variables; ///< Initial global variables
     std::vector < std::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     gd::ResourcesManager                                resourcesManager; ///< Contains all resources used by the project

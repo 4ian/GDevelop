@@ -37,6 +37,7 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/PolymorphicClone.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/Splitter.h"
 #include "Project.h"
@@ -263,11 +264,11 @@ void Project::SwapLayouts(std::size_t first, std::size_t second)
 
 gd::Layout & Project::InsertNewLayout(const gd::String & name, std::size_t position)
 {
-    std::shared_ptr<gd::Layout> newScene = std::shared_ptr<gd::Layout>(new Layout);
+    std::unique_ptr<gd::Layout> newScene = std::unique_ptr<gd::Layout>(new Layout);
     if (position<scenes.size())
-        scenes.insert(scenes.begin()+position, newScene);
+        scenes.insert(scenes.begin()+position, std::move(newScene));
     else
-        scenes.push_back(newScene);
+        scenes.push_back(std::move(newScene));
 
     newScene->SetName(name);
     #if defined(GD_IDE_ONLY)
@@ -279,11 +280,11 @@ gd::Layout & Project::InsertNewLayout(const gd::String & name, std::size_t posit
 
 gd::Layout & Project::InsertLayout(const gd::Layout & layout, std::size_t position)
 {
-    std::shared_ptr<gd::Layout> newScene = std::shared_ptr<gd::Layout>(new Layout(layout));
+    std::unique_ptr<gd::Layout> newScene = std::unique_ptr<gd::Layout>(new Layout(layout));
     if (position<scenes.size())
-        scenes.insert(scenes.begin()+position, newScene);
+        scenes.insert(scenes.begin()+position, std::move(newScene));
     else
-        scenes.push_back(newScene);
+        scenes.push_back(std::move(newScene));
 
     #if defined(GD_IDE_ONLY)
     newScene->UpdateBehaviorsSharedData(*this);
@@ -294,7 +295,7 @@ gd::Layout & Project::InsertLayout(const gd::Layout & layout, std::size_t positi
 
 void Project::RemoveLayout(const gd::String & name)
 {
-    std::vector< std::shared_ptr<gd::Layout> >::iterator scene = find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name));
+    std::vector< std::unique_ptr<gd::Layout> >::iterator scene = find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name));
     if ( scene == scenes.end() ) return;
 
     scenes.erase(scene);
@@ -1037,9 +1038,7 @@ void Project::Init(const gd::Project & game)
     for (std::size_t i =0;i<game.GetObjects().size();++i)
     	GetObjects().push_back( std::shared_ptr<gd::Object>(game.GetObjects()[i]->Clone()) );
 
-    scenes.clear();
-    for (std::size_t i =0;i<game.scenes.size();++i)
-    	scenes.push_back( std::shared_ptr<gd::Layout>(new gd::Layout(*game.scenes[i])) );
+    scenes = gd::Clone(game.scenes);
 
     #if defined(GD_IDE_ONLY)
     externalEvents.clear();

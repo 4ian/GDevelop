@@ -335,27 +335,29 @@ std::size_t Project::GetExternalEventsCount() const
 
 gd::ExternalEvents & Project::InsertNewExternalEvents(const gd::String & name, std::size_t position)
 {
-    std::shared_ptr<gd::ExternalEvents> newExternalEvents(new gd::ExternalEvents);
-    if (position<externalEvents.size())
-        externalEvents.insert(externalEvents.begin()+position, newExternalEvents);
-    else
-        externalEvents.push_back(newExternalEvents);
+    gd::ExternalEvents & newlyInsertedExternalEvents = *(*(externalEvents.emplace(
+        position < externalEvents.size() ? externalEvents.begin() + position : externalEvents.end(),
+        new gd::ExternalEvents()
+    )));
 
-    newExternalEvents->SetName(name);
-    return *newExternalEvents;
+    newlyInsertedExternalEvents.SetName(name);
+
+    return newlyInsertedExternalEvents;
 }
 
-void Project::InsertExternalEvents(const gd::ExternalEvents & events, std::size_t position)
+gd::ExternalEvents & Project::InsertExternalEvents(const gd::ExternalEvents & events, std::size_t position)
 {
-    if (position<externalEvents.size())
-        externalEvents.insert(externalEvents.begin()+position, std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
-    else
-        externalEvents.push_back(std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
+    gd::ExternalEvents & newlyInsertedExternalEvents = *(*(externalEvents.emplace(
+        position < externalEvents.size() ? externalEvents.begin() + position : externalEvents.end(),
+        new gd::ExternalEvents(events)
+    )));
+
+    return newlyInsertedExternalEvents;
 }
 
 void Project::RemoveExternalEvents(const gd::String & name)
 {
-    std::vector< std::shared_ptr<gd::ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name));
+    std::vector< std::unique_ptr<gd::ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name));
     if ( events == externalEvents.end() ) return;
 
     externalEvents.erase(events);
@@ -419,29 +421,28 @@ std::size_t Project::GetExternalLayoutsCount() const
 
 gd::ExternalLayout & Project::InsertNewExternalLayout(const gd::String & name, std::size_t position)
 {
-    std::shared_ptr<gd::ExternalLayout> newExternalLayout = std::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout);
-    if (position<externalLayouts.size())
-        externalLayouts.insert(externalLayouts.begin()+position, newExternalLayout);
-    else
-        externalLayouts.push_back(newExternalLayout);
+    gd::ExternalLayout & newlyInsertedExternalLayout = *(*(externalLayouts.emplace(
+        position < externalLayouts.size() ? externalLayouts.begin() + position : externalLayouts.end(),
+        new gd::ExternalLayout()
+    )));
 
-    newExternalLayout->SetName(name);
-    return *newExternalLayout;
+    newlyInsertedExternalLayout.SetName(name);
+    return newlyInsertedExternalLayout;
 }
 
-void Project::InsertExternalLayout(const gd::ExternalLayout & layout, std::size_t position)
+gd::ExternalLayout & Project::InsertExternalLayout(const gd::ExternalLayout & layout, std::size_t position)
 {
-    std::shared_ptr<gd::ExternalLayout> newLayout(new gd::ExternalLayout(layout));
+    gd::ExternalLayout & newlyInsertedExternalLayout = *(*(externalLayouts.emplace(
+        position < externalLayouts.size() ? externalLayouts.begin() + position : externalLayouts.end(),
+        new gd::ExternalLayout(layout)
+    )));
 
-    if (position<externalLayouts.size())
-        externalLayouts.insert(externalLayouts.begin()+position, newLayout);
-    else
-        externalLayouts.push_back(newLayout);
+    return newlyInsertedExternalLayout;
 }
 
 void Project::RemoveExternalLayout(const gd::String & name)
 {
-    std::vector< std::shared_ptr<gd::ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name));
+    std::vector< std::unique_ptr<gd::ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name));
     if ( externalLayout == externalLayouts.end() ) return;
 
     externalLayouts.erase(externalLayout);
@@ -687,9 +688,8 @@ void Project::UnserializeFrom(const SerializerElement & element)
     {
         const SerializerElement & externalLayoutElement = externalLayoutsElement.GetChild(i);
 
-        std::shared_ptr<gd::ExternalLayout> newExternalLayout(new gd::ExternalLayout);
-        newExternalLayout->UnserializeFrom(externalLayoutElement);
-        externalLayouts.push_back(newExternalLayout);
+        gd::ExternalLayout & newExternalLayout = InsertNewExternalLayout("", GetExternalLayoutsCount());
+        newExternalLayout.UnserializeFrom(externalLayoutElement);
     }
 
     #if defined(GD_IDE_ONLY)
@@ -1039,14 +1039,10 @@ void Project::Init(const gd::Project & game)
     scenes = gd::Clone(game.scenes);
 
     #if defined(GD_IDE_ONLY)
-    externalEvents.clear();
-    for (std::size_t i =0;i<game.externalEvents.size();++i)
-    	externalEvents.push_back( std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(*game.externalEvents[i])) );
+    externalEvents = gd::Clone(game.externalEvents);
     #endif
 
-    externalLayouts.clear();
-    for (std::size_t i =0;i<game.externalLayouts.size();++i)
-    	externalLayouts.push_back( std::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout(*game.externalLayouts[i])) );
+    externalLayouts = gd::Clone(game.externalLayouts);
 
     #if defined(GD_IDE_ONLY)
     useExternalSourceFiles = game.useExternalSourceFiles;

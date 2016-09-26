@@ -187,12 +187,10 @@ void RuntimeObject::AddForceToMoveAround( float positionX, float positionY, floa
 
 void RuntimeObject::Duplicate(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
-    std::shared_ptr<RuntimeObject> newObject = std::shared_ptr<RuntimeObject>(Clone());
+    RuntimeObject * newObject = scene.objectsInstances.AddObject( std::unique_ptr<RuntimeObject>( Clone() ) );
 
-    scene.objectsInstances.AddObject(newObject);
-
-    if ( pickedObjectLists[name] != NULL && find(pickedObjectLists[name]->begin(), pickedObjectLists[name]->end(), newObject.get()) == pickedObjectLists[name]->end() )
-        pickedObjectLists[name]->push_back( newObject.get() );
+    if ( pickedObjectLists[name] != NULL && find(pickedObjectLists[name]->begin(), pickedObjectLists[name]->end(), newObject) == pickedObjectLists[name]->end() )
+        pickedObjectLists[name]->push_back( newObject );
 }
 
 bool RuntimeObject::IsStopped()

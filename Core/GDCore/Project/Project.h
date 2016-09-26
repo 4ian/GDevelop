@@ -231,7 +231,7 @@ public:
      * \param name The name of the object
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    std::shared_ptr<gd::Object> CreateObject(const gd::String & type, const gd::String & name, const gd::String & platformName = "");
+    std::unique_ptr<gd::Object> CreateObject(const gd::String & type, const gd::String & name, const gd::String & platformName = "");
 
     /**
      * Create a behavior of the given type.

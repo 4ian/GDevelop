@@ -131,19 +131,19 @@ bool CppPlatform::AddExtension(std::shared_ptr<gd::PlatformExtension> platformEx
     return true;
 }
 
-std::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene & scene, gd::Object & object)
+std::unique_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene & scene, gd::Object & object)
 {
     const gd::String & type = object.GetType();
 
     if ( runtimeObjCreationFunctionTable.find(type) == runtimeObjCreationFunctionTable.end() )
     {
         std::cout << "Tried to create an object with an unknown type: " << type << std::endl;
-        return std::shared_ptr<RuntimeObject>();
+        return std::unique_ptr<RuntimeObject>();
     }
 
     //Create a new object with the type we want.
     RuntimeObject * newObject = runtimeObjCreationFunctionTable[type](scene, object);
-    return std::shared_ptr<RuntimeObject>(newObject);
+    return std::unique_ptr<RuntimeObject>(newObject);
 }
 
 #if defined(GD_IDE_ONLY)

@@ -82,7 +82,7 @@ bool GD_API SceneJustBegins(RuntimeScene & scene )
 
 void GD_API MoveObjects( RuntimeScene & scene )
 {
-    RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
+    RuntimeObjNonOwningPtrList allObjects = scene.objectsInstances.GetAllObjects();
 
     double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
     for (std::size_t id = 0;id < allObjects.size();++id)
@@ -106,14 +106,14 @@ void DoCreateObjectOnScene(RuntimeScene & scene, gd::String objectName, std::map
     std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectName));
     std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectName));
 
-    RuntimeObjSPtr newObject = std::shared_ptr<RuntimeObject> ();
+    RuntimeObjSPtr newObject = std::unique_ptr<RuntimeObject> ();
 
     if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
         newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
     else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
         newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-    if ( newObject == std::shared_ptr<RuntimeObject> () )
+    if ( newObject == std::unique_ptr<RuntimeObject> () )
         return; //Unable to create the object
 
     //Set up the object
@@ -122,8 +122,7 @@ void DoCreateObjectOnScene(RuntimeScene & scene, gd::String objectName, std::map
     newObject->SetLayer( layer );
 
     //Add object to scene and let it be concerned by futures actions
-    scene.objectsInstances.AddObject(newObject);
-    pickedObjectLists[objectName]->push_back( newObject.get() );
+    pickedObjectLists[objectName]->push_back( scene.objectsInstances.AddObject( std::move(newObject) ) );
 }
 
 
@@ -138,7 +137,7 @@ void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <gd::String, std:
 
 void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, const gd::String & objectWanted, float positionX, float positionY, const gd::String & layer)
 {
-    if ( pickedObjectLists[objectWanted] == NULL ) return; //Bail out if the object is not present in the specified group
+    if ( pickedObjectLists[objectWanted] == nullptr ) return; //Bail out if the object is not present in the specified group
 
     ::DoCreateObjectOnScene(scene, objectWanted, pickedObjectLists, positionX, positionY, layer);
 }
@@ -147,7 +146,7 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <gd::String, std::vect
 {
     for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
-        if ( it->second != NULL )
+        if ( it->second != nullptr )
         {
             std::vector<RuntimeObject*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(it->first);
 
@@ -168,7 +167,7 @@ bool GD_API PickRandomObject(RuntimeScene &, std::map <gd::String, std::vector<R
     std::vector<RuntimeObject*> allObjects;
     for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
-        if ( it->second != NULL )
+        if ( it->second != nullptr )
             std::copy(it->second->begin(), it->second->end(), std::back_inserter(allObjects));
     }
 

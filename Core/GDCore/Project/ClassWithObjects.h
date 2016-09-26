@@ -35,7 +35,7 @@ public:
      * \brief Default constructor creating a container without any objects.
      */
     ClassWithObjects();
-    virtual ~ClassWithObjects() {};
+    virtual ~ClassWithObjects();
 
     /** \name Objects management
      * Members functions related to objects management.
@@ -113,12 +113,12 @@ public:
     /**
      * Provide a raw access to the vector containing the objects
      */
-    std::vector < std::shared_ptr<gd::Object> > & GetObjects() { return initialObjects; }
+    std::vector < std::unique_ptr<gd::Object> > & GetObjects() { return initialObjects; }
 
     /**
      * Provide a raw access to the vector containing the objects
      */
-    const std::vector < std::shared_ptr<gd::Object> > & GetObjects() const  { return initialObjects; }
+    const std::vector < std::unique_ptr<gd::Object> > & GetObjects() const  { return initialObjects; }
     ///@}
 
     /** \name Saving and loading
@@ -137,7 +137,7 @@ public:
     ///@}
 
 protected:
-    std::vector < std::shared_ptr<gd::Object> > initialObjects; ///< Objects contained.
+    std::vector < std::unique_ptr<gd::Object> > initialObjects; ///< Objects contained.
 };
 
 }

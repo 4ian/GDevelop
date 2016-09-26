@@ -118,7 +118,7 @@ public:
     /**
      * \brief Create an object of given type with the specified name.
      */
-    std::shared_ptr<gd::Object> CreateObject(gd::String type, const gd::String & name) const;
+    std::unique_ptr<gd::Object> CreateObject(gd::String type, const gd::String & name) const;
 
     /**
      * \brief Create a behavior

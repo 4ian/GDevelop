@@ -329,8 +329,8 @@ protected:
  *
  * \see gd::Object
  */
-struct ObjectHasName : public std::binary_function<std::shared_ptr<gd::Object>, gd::String, bool> {
-    bool operator()(const std::shared_ptr<gd::Object> & object, const gd::String & name) const { return object->GetName() == name; }
+struct ObjectHasName : public std::binary_function<std::unique_ptr<gd::Object>, gd::String, bool> {
+    bool operator()(const std::unique_ptr<gd::Object> & object, const gd::String & name) const { return object->GetName() == name; }
 };
 
 }
@@ -338,11 +338,11 @@ struct ObjectHasName : public std::binary_function<std::shared_ptr<gd::Object>, 
 /**
  * An object list is a vector containing (smart) pointers to objects.
  */
-typedef std::vector < std::shared_ptr<gd::Object> > ObjList;
+using ObjList = std::vector<std::unique_ptr<gd::Object>>;
 
 /**
  * Objects are usually managed thanks to (smart) pointers.
  */
-typedef std::shared_ptr<gd::Object> ObjSPtr;
+using ObjSPtr = std::unique_ptr<gd::Object>;
 
 #endif // GDCORE_OBJECT_H

@@ -7,60 +7,90 @@
 #include "GDCpp/Runtime/RuntimeObject.h"
 #include "GDCpp/Runtime/profile.h"
 
-void ObjInstancesHolder::AddObject(const RuntimeObjSPtr & object)
+RuntimeObject * ObjInstancesHolder::AddObject(RuntimeObjSPtr && object)
 {
-    objectsInstances[object->GetName()].push_back(object);
-    objectsRawPointersInstances[object->GetName()].push_back(object.get());
+    auto it = objectsInstances[object->GetName()].insert(
+        objectsInstances[object->GetName()].end(),
+        std::move(object));
+    objectsInstancesRefs[(*it)->GetName()].push_back(
+        it->get()
+    );
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    if(!debugger.expired())
+        debugger.lock()->OnRuntimeObjectAdded(it->get());
+#endif
+
+    return it->get();
 }
 
-std::vector<RuntimeObject*> ObjInstancesHolder::GetObjectsRawPointers(const gd::String & name)
+RuntimeObjNonOwningPtrList ObjInstancesHolder::GetObjectsRawPointers(const gd::String & name)
 {
-    return objectsRawPointersInstances[name];
+    return objectsInstancesRefs[name];
 }
 
-void ObjInstancesHolder::ObjectNameHasChanged(RuntimeObject * object)
+void ObjInstancesHolder::ObjectNameHasChanged(const RuntimeObject * object)
 {
-    std::shared_ptr<RuntimeObject> theObject; //We need the object to keep alive.
+    std::unique_ptr<RuntimeObject> theObject; //We need the object to keep alive.
 
     //Find and erase the object from the object lists.
-    for (std::unordered_map<gd::String, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+    for (auto it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
     {
         RuntimeObjList & list = it->second;
         for (std::size_t i = 0;i<list.size();++i)
         {
             if ( list[i].get() == object )
             {
-                theObject = list[i];
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+                if(!debugger.expired())
+                    debugger.lock()->OnRuntimeObjectAboutToBeRemoved(list[i].get());
+#endif
+                theObject = std::move(list[i]);
                 list.erase(list.begin()+i);
                 break;
             }
         }
     }
     //Find and erase the object from the object raw pointers lists.
-    for (std::unordered_map<gd::String, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
+    for (auto it = objectsInstancesRefs.begin() ; it != objectsInstancesRefs.end(); ++it )
     {
-        std::vector<RuntimeObject*> & associatedList = it->second;
-        associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
+        RuntimeObjNonOwningPtrList & associatedList = it->second;
+        associatedList.erase(
+            std::remove(
+                associatedList.begin(),
+                associatedList.end(),
+                object),
+            associatedList.end());
     }
 
-    AddObject(theObject);
+    AddObject(std::move(theObject));
 }
 
 void ObjInstancesHolder::Init(const ObjInstancesHolder & other)
 {
     objectsInstances.clear();
-    objectsRawPointersInstances.clear();
-    for (std::unordered_map<gd::String, RuntimeObjList>::const_iterator it = other.objectsInstances.begin() ;
-        it != other.objectsInstances.end(); ++it )
+    objectsInstancesRefs.clear();
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    debugger = std::weak_ptr<BaseDebugger>(); //Do not affect the other's debugger
+#endif
+
+    for (auto it = other.objectsInstances.cbegin() ;
+        it != other.objectsInstances.cend(); ++it )
     {
         for (std::size_t i = 0;i<it->second.size();++i) //We need to really copy the objects
-            AddObject( std::shared_ptr<RuntimeObject>(it->second[i]->Clone()) );
+            AddObject( std::unique_ptr<RuntimeObject>(it->second[i]->Clone()) );
     }
 }
 
 ObjInstancesHolder::ObjInstancesHolder(const ObjInstancesHolder & other)
 {
     Init(other);
+}
+
+ObjInstancesHolder::~ObjInstancesHolder()
+{
+
 }
 
 ObjInstancesHolder& ObjInstancesHolder::operator=(const ObjInstancesHolder & other)

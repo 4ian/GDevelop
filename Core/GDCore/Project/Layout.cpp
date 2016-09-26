@@ -20,6 +20,7 @@
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Tools/PolymorphicClone.h"
 
 using namespace std;
 
@@ -338,9 +339,7 @@ void Layout::Init(const Layout & other)
     initialLayers = other.initialLayers;
     variables = other.GetVariables();
 
-    initialObjects.clear();
-    for (std::size_t i =0;i<other.initialObjects.size();++i)
-    	initialObjects.push_back( std::shared_ptr<gd::Object>(other.initialObjects[i]->Clone()) );
+    initialObjects = gd::Clone(other.initialObjects);
 
     behaviorsInitialSharedDatas.clear();
     for (std::map< gd::String, std::shared_ptr<gd::BehaviorsSharedData> >::const_iterator it = other.behaviorsInitialSharedDatas.begin();

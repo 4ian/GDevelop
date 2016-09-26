@@ -109,17 +109,17 @@ Project::~Project()
 {
 }
 
-std::shared_ptr<gd::Object> Project::CreateObject(const gd::String & type, const gd::String & name, const gd::String & platformName)
+std::unique_ptr<gd::Object> Project::CreateObject(const gd::String & type, const gd::String & name, const gd::String & platformName)
 {
     for (std::size_t i = 0;i<platforms.size();++i)
     {
         if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
 
-        std::shared_ptr<gd::Object> object = platforms[i]->CreateObject(type, name); //Create a base object if the type can't be found in the platform
+        std::unique_ptr<gd::Object> object = platforms[i]->CreateObject(type, name); //Create a base object if the type can't be found in the platform
         if ( object && object->GetType() == type ) return object; //If the object is valid and has the good type (not a base object), return it
     }
 
-    return std::shared_ptr<gd::Object>();
+    return nullptr;
 }
 
 std::unique_ptr<gd::Behavior> Project::CreateBehavior(const gd::String & type, const gd::String & platformName)
@@ -1029,9 +1029,7 @@ void Project::Init(const gd::Project & game)
     imageManager = std::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
     imageManager->SetResourcesManager(&resourcesManager);
 
-    GetObjects().clear();
-    for (std::size_t i =0;i<game.GetObjects().size();++i)
-    	GetObjects().push_back( std::shared_ptr<gd::Object>(game.GetObjects()[i]->Clone()) );
+    initialObjects = gd::Clone(game.initialObjects);
 
     scenes = gd::Clone(game.scenes);
 

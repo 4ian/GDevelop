@@ -198,7 +198,7 @@ protected:
     /**
      * \brief Order an object list according to object's Z coordinate.
      */
-    bool OrderObjectsByZOrder( RuntimeObjList & objList );
+    bool OrderObjectsByZOrder( RuntimeObjNonOwningPtrList & objList );
 
     /**
      * \brief Render a frame in the window

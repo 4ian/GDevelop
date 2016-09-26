@@ -8,11 +8,17 @@
 #include <memory>
 #include <unordered_map>
 #include "GDCpp/Runtime/String.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include "GDCpp/IDE/BaseDebugger.h"
+#endif
 
 class RuntimeObject;
 
-typedef std::vector < std::shared_ptr<RuntimeObject> > RuntimeObjList;
-typedef std::shared_ptr<RuntimeObject> RuntimeObjSPtr;
+using RuntimeObjList = std::vector<std::unique_ptr<RuntimeObject>>;
+using RuntimeObjNonOwningPtrList = std::vector<RuntimeObject*>;
+
+using RuntimeObjSPtr = std::unique_ptr<RuntimeObject>;
 
 /**
  * \brief Contains lists of objects classified by the name of the objects.
@@ -35,6 +41,8 @@ public:
      */
     ObjInstancesHolder(const ObjInstancesHolder & other);
 
+    ~ObjInstancesHolder();
+
     /**
      * \brief Assignment operator
      * \note All objects contained inside the container copied are also copied.
@@ -47,7 +55,7 @@ public:
      * \note The object is then hold in the container and you can
      * forget the shared pointer to it.
      */
-    void AddObject(const RuntimeObjSPtr & object);
+    RuntimeObject * AddObject(RuntimeObjSPtr && object);
 
     /**
      * \brief Get all objects with the specified name
@@ -60,17 +68,22 @@ public:
     /**
      * \brief Get a "raw pointers" list to objects with the specified name
      */
-    std::vector<RuntimeObject*> GetObjectsRawPointers(const gd::String & name);
+    RuntimeObjNonOwningPtrList GetObjectsRawPointers(const gd::String & name);
 
     /**
      * \brief Get a list of all objects contained.
      */
-    inline RuntimeObjList GetAllObjects()
+    inline RuntimeObjNonOwningPtrList GetAllObjects()
     {
-        RuntimeObjList objList;
+        RuntimeObjNonOwningPtrList objList;
 
-        for (std::unordered_map<gd::String, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
-            copy(it->second.begin(), it->second.end(), back_inserter(objList));
+        for (auto it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        {
+            for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+            {
+                objList.push_back(it2->get());
+            }
+        }
 
         return objList;
     }
@@ -84,17 +97,32 @@ public:
      * scene.objectsInstances.ObjectNameHasChanged(myObject);
      * \endcode
      */
-    inline void RemoveObject(const RuntimeObjSPtr & object)
+    inline void RemoveObject(RuntimeObject * object)
     {
-        for (std::unordered_map<gd::String, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+        if(!debugger.expired())
+            debugger.lock()->OnRuntimeObjectAboutToBeRemoved(object);
+#endif
+
+        for (auto it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
         {
             RuntimeObjList & associatedList = it->second;
-            associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
+            associatedList.erase(
+                std::remove_if(
+                    associatedList.begin(),
+                    associatedList.end(),
+                    [&object](const std::unique_ptr<RuntimeObject> & objectPtr) { return objectPtr.get() == object; }),
+                associatedList.end());
         }
-        for (std::unordered_map<gd::String, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
+        for (auto it = objectsInstancesRefs.begin() ; it != objectsInstancesRefs.end(); ++it )
         {
-            std::vector<RuntimeObject*> & associatedList = it->second;
-            associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object.get()), associatedList.end());
+            RuntimeObjNonOwningPtrList & associatedList = it->second;
+            associatedList.erase(
+                std::remove(
+                    associatedList.begin(),
+                    associatedList.end(),
+                    object),
+                associatedList.end());
         }
     }
 
@@ -103,14 +131,21 @@ public:
      */
     inline void RemoveObjects(const gd::String & name)
     {
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+        if(!debugger.expired())
+        {
+            for(auto & objectPtr : objectsInstances[name])
+                debugger.lock()->OnRuntimeObjectAboutToBeRemoved(objectPtr.get());
+        }
+#endif
         objectsInstances[name].clear();
-        objectsRawPointersInstances[name].clear();
+        objectsInstancesRefs[name].clear();
     }
 
     /**
      * \brief To be called when an object has changed its name.
      */
-    void ObjectNameHasChanged(RuntimeObject * object);
+    void ObjectNameHasChanged(const RuntimeObject * object);
 
     /**
      * \brief Clear the container.
@@ -118,15 +153,27 @@ public:
      */
     inline void Clear()
     {
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+        if(!debugger.expired())
+            debugger.lock()->OnRuntimeObjectListFullRefresh();
+#endif
         objectsInstances.clear();
-        objectsRawPointersInstances.clear();
+        objectsInstancesRefs.clear();
     }
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    void SetDebugger(std::shared_ptr<BaseDebugger> newDebugger) { debugger = newDebugger; if(newDebugger) newDebugger->OnRuntimeObjectListFullRefresh(); }
+#endif
 
 private:
     void Init(const ObjInstancesHolder & other);
 
     std::unordered_map<gd::String, RuntimeObjList > objectsInstances; ///< The list of all objects, classified by name
-    std::unordered_map<gd::String, std::vector<RuntimeObject*> > objectsRawPointersInstances; ///< Clones of the objectsInstances lists, but with raw pointers instead.
+    std::unordered_map<gd::String, RuntimeObjNonOwningPtrList > objectsInstancesRefs; ///< Clones of the objectsInstances lists, but with references instead.
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    std::weak_ptr<BaseDebugger> debugger;
+#endif
 };
 
 #endif // OBJINSTANCESHOLDER_H

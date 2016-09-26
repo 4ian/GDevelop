@@ -62,14 +62,14 @@ TEST_CASE( "PathfindingBehavior", "[game-engine][pathfinding]" ) {
 		//Add an obstacle
 		gd::Object obstacleObj("obstacle");
 		obstacleObj.AddBehavior(new PathfindingObstacleBehavior());
-		std::shared_ptr<ResizableRuntimeObject> obstacle(new ResizableRuntimeObject(scene, obstacleObj));
-
-		scene.objectsInstances.AddObject(obstacle);
-
-		obstacle->SetX(1100);
+		std::unique_ptr<ResizableRuntimeObject> obstacle(new ResizableRuntimeObject(scene, obstacleObj));
+        obstacle->SetX(1100);
 		obstacle->SetY(1200);
 		obstacle->SetWidth(200);
 		obstacle->SetHeight(200);
+
+		scene.objectsInstances.AddObject(std::move(obstacle));
+
 		scene.RenderAndStep();
 
 		runtimeBehavior->MoveTo(scene, 1200, 1300);
@@ -89,10 +89,8 @@ TEST_CASE( "PathfindingBehavior", "[game-engine][pathfinding]" ) {
 		obstacleObj.AddBehavior(new PathfindingObstacleBehavior());
 
 		RuntimeScene scene(NULL, &game);
-		std::shared_ptr<RuntimeObject> player(new RuntimeObject(scene, playerObj));
-		std::shared_ptr<ResizableRuntimeObject> obstacle(new ResizableRuntimeObject(scene, obstacleObj));
-		scene.objectsInstances.AddObject(player);
-		scene.objectsInstances.AddObject(obstacle);
+		auto * player = scene.objectsInstances.AddObject(std::unique_ptr<RuntimeObject>(new RuntimeObject(scene, playerObj)));
+		auto * obstacle = scene.objectsInstances.AddObject(std::unique_ptr<RuntimeObject>(new ResizableRuntimeObject(scene, obstacleObj)));
 
 		obstacle->SetX(300);
 		obstacle->SetY(600);
@@ -140,12 +138,10 @@ TEST_CASE( "PathfindingBehavior", "[game-engine][pathfinding]" ) {
 		obstacleObj.AddBehavior(new PathfindingObstacleBehavior());
 
 		RuntimeScene scene(NULL, &game);
-		std::shared_ptr<RuntimeObject> player(new RuntimeObject(scene, playerObj));
-		std::shared_ptr<ResizableRuntimeObject> obstacle1(new ResizableRuntimeObject(scene, obstacleObj));
-		std::shared_ptr<ResizableRuntimeObject> obstacle2(new ResizableRuntimeObject(scene, obstacleObj));
-		scene.objectsInstances.AddObject(player);
-		scene.objectsInstances.AddObject(obstacle1);
-		scene.objectsInstances.AddObject(obstacle2);
+
+		auto * player = scene.objectsInstances.AddObject(std::unique_ptr<RuntimeObject>(new RuntimeObject(scene, playerObj)));
+		auto * obstacle1 = scene.objectsInstances.AddObject(std::unique_ptr<RuntimeObject>(new ResizableRuntimeObject(scene, obstacleObj)));
+		auto * obstacle2 = scene.objectsInstances.AddObject(std::unique_ptr<RuntimeObject>(new ResizableRuntimeObject(scene, obstacleObj)));
 
 		obstacle1->SetX(-20);
 		obstacle2->SetX(20);
@@ -175,8 +171,7 @@ TEST_CASE( "PathfindingBehavior", "[game-engine][pathfinding]" ) {
 		playerObj.AddBehavior(behavior);
 
 		RuntimeScene scene(NULL, &game);
-		std::shared_ptr<RuntimeObject> player(new RuntimeObject(scene, playerObj));
-		scene.objectsInstances.AddObject(player);
+		auto * player = scene.objectsInstances.AddObject(std::unique_ptr<RuntimeObject>(new RuntimeObject(scene, playerObj)));
 
 		PathfindingBehavior * runtimeBehavior =
 			static_cast<PathfindingBehavior *>(player->GetBehaviorRawPointer("Pathfinding"));

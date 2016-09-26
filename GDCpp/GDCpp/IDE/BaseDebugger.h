@@ -9,6 +9,8 @@
 #define BASEDEBUGGER_H
 #include <SFML/System.hpp>
 
+class RuntimeObject;
+
 /**
  * \brief Internal base class to implement a debugger.
  * Derive from this class and implement
@@ -25,6 +27,11 @@ class GD_API BaseDebugger
          * Called at each frame by RuntimeScene
          */
         void Update();
+
+        virtual void OnRuntimeObjectAdded(RuntimeObject * object) {};
+        virtual void OnRuntimeObjectAboutToBeRemoved(RuntimeObject * object) {};
+
+        virtual void OnRuntimeObjectListFullRefresh() {};
 
     protected:
     private:

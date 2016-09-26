@@ -24,22 +24,22 @@ TEST_CASE( "ObjInstancesHolder", "[common]" ) {
 		RuntimeGame game;
 		RuntimeScene scene(NULL, &game);
 
-		std::shared_ptr<RuntimeObject> obj1A(new RuntimeObject(scene, obj1));
-		std::shared_ptr<RuntimeObject> obj1B(new RuntimeObject(scene, obj1));
-		std::shared_ptr<RuntimeObject> obj1C(new RuntimeObject(scene, obj1));
+		std::unique_ptr<RuntimeObject> obj1A(new RuntimeObject(scene, obj1));
+		std::unique_ptr<RuntimeObject> obj1B(new RuntimeObject(scene, obj1));
+		std::unique_ptr<RuntimeObject> obj1C(new RuntimeObject(scene, obj1));
 
-		std::shared_ptr<RuntimeObject> obj2A(new RuntimeObject(scene, obj2));
-		std::shared_ptr<RuntimeObject> obj2B(new RuntimeObject(scene, obj2));
-		std::shared_ptr<RuntimeObject> obj2C(new RuntimeObject(scene, obj2));
+		std::unique_ptr<RuntimeObject> obj2A(new RuntimeObject(scene, obj2));
+		std::unique_ptr<RuntimeObject> obj2B(new RuntimeObject(scene, obj2));
+		std::unique_ptr<RuntimeObject> obj2C(new RuntimeObject(scene, obj2));
 
 		//Adding objects
 		ObjInstancesHolder container;
-		container.AddObject(obj1A);
-		container.AddObject(obj1B);
-		container.AddObject(obj1C);
-		container.AddObject(obj2A);
-		container.AddObject(obj2B);
-		container.AddObject(obj2C);
+		container.AddObject(std::move(obj1A));
+		container.AddObject(std::move(obj1B));
+		container.AddObject(std::move(obj1C));
+		RuntimeObject * obj2APtr = container.AddObject(std::move(obj2A));
+		container.AddObject(std::move(obj2B));
+		container.AddObject(std::move(obj2C));
 
 		REQUIRE(container.GetAllObjects().size() == 6);
 		REQUIRE(container.GetObjects("1").size() == 3);
@@ -49,7 +49,7 @@ TEST_CASE( "ObjInstancesHolder", "[common]" ) {
 		ObjInstancesHolder copy = container;
 
 		//Removing objects
-		container.RemoveObject(obj2A);
+		container.RemoveObject(obj2APtr);
 		REQUIRE(container.GetObjects("2").size() == 2);
 
 		container.RemoveObjects("2");

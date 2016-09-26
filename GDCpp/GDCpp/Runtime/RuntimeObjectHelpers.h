@@ -17,21 +17,20 @@
 /**
  * An object list is a vector containing (smart) pointers to objects.
  */
-typedef std::vector < std::shared_ptr<RuntimeObject> > RuntimeObjList;
+using RuntimeObjList = std::vector<std::unique_ptr<RuntimeObject>>;
 
 /**
  * Objects are usually managed thanks to (smart) pointers.
  */
-typedef std::shared_ptr<RuntimeObject> RuntimeObjSPtr;
+using RuntimeObjSPtr = std::unique_ptr<RuntimeObject>;
 
 /**
  * \brief Functor testing object name
  *
  * \see Object
  */
-struct ObjectHasName : public std::binary_function<std::shared_ptr<gd::Object>, gd::String, bool> {
-    bool operator()(const std::shared_ptr<gd::Object> & object, const gd::String & name) const { return object->GetName() == name; }
+struct ObjectHasName : public std::binary_function<std::unique_ptr<gd::Object>, gd::String, bool> {
+    bool operator()(const std::unique_ptr<gd::Object> & object, const gd::String & name) const { return object->GetName() == name; }
 };
 
 #endif // OBJECTHELPERS_H
-

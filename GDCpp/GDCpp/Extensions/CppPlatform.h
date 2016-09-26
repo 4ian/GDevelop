@@ -42,7 +42,7 @@ public:
      * \param scene The scene the object is going to be used on.
      * \param scene The gd::Object the RuntimeObject must be based on.
      */
-    std::shared_ptr<RuntimeObject> CreateRuntimeObject(RuntimeScene & scene, gd::Object & object);
+    std::unique_ptr<RuntimeObject> CreateRuntimeObject(RuntimeScene & scene, gd::Object & object);
 
     /**
      * \brief Our platform need to do a bit of extra work when adding an extension

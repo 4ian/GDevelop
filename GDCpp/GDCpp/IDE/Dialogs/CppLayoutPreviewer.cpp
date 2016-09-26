@@ -132,6 +132,7 @@ void CppLayoutPreviewer::StopPreview()
     RuntimeScene newScene(&editor, &previewGame);
     previewScene = newScene;
     if ( debugger ) previewScene.debugger = debugger.get();
+    if ( debugger ) previewScene.objectsInstances.SetDebugger(debugger);
     if ( profiler ) previewScene.SetProfiler(profiler.get());
     if ( profiler ) editor.GetLayout().SetProfiler(profiler.get());
     if ( debugger ) debugger->Pause();
@@ -196,6 +197,7 @@ void CppLayoutPreviewer::RefreshFromLayout()
     playing = false;
 
     if ( debugger ) previewScene.debugger = debugger.get();
+    if ( debugger ) previewScene.objectsInstances.SetDebugger(debugger);
     if ( profiler ) previewScene.SetProfiler(profiler.get());
     if ( profiler ) editor.GetLayout().SetProfiler(profiler.get());
 

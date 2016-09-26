@@ -76,7 +76,7 @@ std::shared_ptr<gd::PlatformExtension> Platform::GetExtension(const gd::String &
     return std::shared_ptr<gd::PlatformExtension> ();
 }
 
-std::shared_ptr<gd::Object> Platform::CreateObject(gd::String type, const gd::String & name) const
+std::unique_ptr<gd::Object> Platform::CreateObject(gd::String type, const gd::String & name) const
 {
     if ( creationFunctionTable.find(type) == creationFunctionTable.end() )
     {
@@ -84,7 +84,7 @@ std::shared_ptr<gd::Object> Platform::CreateObject(gd::String type, const gd::St
         type = "";
         if ( creationFunctionTable.find("") == creationFunctionTable.end() ) {
             std::cout << "Unable to create a Base object!" << std::endl;
-            return std::shared_ptr<gd::Object>();
+            return nullptr;
         }
     }
 
@@ -92,7 +92,7 @@ std::shared_ptr<gd::Object> Platform::CreateObject(gd::String type, const gd::St
     gd::Object * object = (creationFunctionTable.find(type)->second)(name);
     object->SetType(type);
 
-    return std::shared_ptr<gd::Object> (object);
+    return std::unique_ptr<gd::Object> (object);
 }
 
 std::unique_ptr<gd::Behavior> Platform::CreateBehavior(const gd::String & behaviorType) const

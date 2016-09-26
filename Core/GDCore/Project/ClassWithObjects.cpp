@@ -15,6 +15,12 @@ namespace gd
 
 ClassWithObjects::ClassWithObjects()
 {
+
+}
+
+ClassWithObjects::~ClassWithObjects()
+{
+
 }
 
 #if defined(GD_IDE_ONLY)
@@ -38,13 +44,13 @@ void ClassWithObjects::UnserializeObjectsFrom(gd::Project & project, const Seria
         const SerializerElement & objectElement = element.GetChild(i);
 
         gd::String type = objectElement.GetStringAttribute("type");
-        std::shared_ptr<gd::Object> newObject =
+        std::unique_ptr<gd::Object> newObject =
             project.CreateObject(type, objectElement.GetStringAttribute("name", "", "nom"));
 
-        if ( newObject != std::shared_ptr<gd::Object>() )
+        if ( newObject )
         {
             newObject->UnserializeFrom(project, objectElement);
-            initialObjects.push_back( newObject );
+            initialObjects.push_back( std::move(newObject) );
         }
         else
             std::cout << "WARNING: Unknown object type \"" << type << "\"" << std::endl;
@@ -86,25 +92,23 @@ std::size_t ClassWithObjects::GetObjectsCount() const
 #if defined(GD_IDE_ONLY)
 gd::Object & ClassWithObjects::InsertNewObject(gd::Project & project, const gd::String & objectType, const gd::String & name, std::size_t position)
 {
-    std::shared_ptr<gd::Object> newObject = project.GetCurrentPlatform().CreateObject(objectType, name);
-    if (position<initialObjects.size())
-        initialObjects.insert(initialObjects.begin()+position, newObject);
-    else
-        initialObjects.push_back(newObject);
+    gd::Object & newlyCreatedObject = *(*(initialObjects.insert(
+        position < initialObjects.size() ? initialObjects.begin() + position : initialObjects.end(),
+        project.GetCurrentPlatform().CreateObject(objectType, name)
+    )));
 
-    return *newObject;
+    return newlyCreatedObject;
 }
 #endif
 
 gd::Object & ClassWithObjects::InsertObject(const gd::Object & object, std::size_t position)
 {
-    std::shared_ptr<gd::Object> newObject = std::shared_ptr<gd::Object>(object.Clone());
-    if (position<initialObjects.size())
-        initialObjects.insert(initialObjects.begin()+position, newObject);
-    else
-        initialObjects.push_back(newObject);
+    gd::Object & newlyCreatedObject = *(*(initialObjects.insert(
+        position < initialObjects.size() ? initialObjects.begin() + position : initialObjects.end(),
+        std::unique_ptr<gd::Object>(object.Clone())
+    )));
 
-    return *newObject;
+    return newlyCreatedObject;
 }
 
 void ClassWithObjects::SwapObjects(std::size_t firstObjectIndex, std::size_t secondObjectIndex)
@@ -120,7 +124,7 @@ void ClassWithObjects::SwapObjects(std::size_t firstObjectIndex, std::size_t sec
 
 void ClassWithObjects::RemoveObject(const gd::String & name)
 {
-    std::vector< std::shared_ptr<gd::Object> >::iterator object = find_if(initialObjects.begin(), initialObjects.end(), bind2nd(ObjectHasName(), name));
+    std::vector< std::unique_ptr<gd::Object> >::iterator object = find_if(initialObjects.begin(), initialObjects.end(), bind2nd(ObjectHasName(), name));
     if ( object == initialObjects.end() ) return;
 
     initialObjects.erase(object);

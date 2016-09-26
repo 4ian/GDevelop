@@ -166,7 +166,7 @@ bool TwoObjectListsTest(RuntimeObjectsLists objectsLists1,
                 for(std::size_t l = 0;l<arr2.size();++l) {
                     if ( pickedList1[i][k] && pickedList2[j][l]) continue; //Avoid unnecessary costly call to functor.
 
-                    if ( arr1[k] != arr2[l] && predicate(arr1[k], arr2[l]) ) {
+                    if ( std::addressof(arr1[k]) != std::addressof(arr2[l]) && predicate(arr1[k], arr2[l]) ) {
                         if ( !negatePredicate ) {
                             isTrue = true;
 

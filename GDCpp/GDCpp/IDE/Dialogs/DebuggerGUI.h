@@ -31,6 +31,11 @@ public:
      */
     void Play();
 
+    virtual void OnRuntimeObjectAdded(RuntimeObject * object);
+    virtual void OnRuntimeObjectAboutToBeRemoved(RuntimeObject * object);
+
+    virtual void OnRuntimeObjectListFullRefresh();
+
 protected:
     static const long ID_EXTLIST;
 
@@ -54,12 +59,12 @@ private:
     void OnExtensionListItemActivated(wxListEvent& event);
     void UpdateListCtrlColumnsWidth();
 
-    void RecreateListForObject(const RuntimeObjSPtr & object);
+    void RecreateListForObject(const RuntimeObject * object);
 
     RuntimeScene & scene;
     std::function<void(bool)> playCallback; //Function called to play/pause the scene.
 
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId>, std::owner_less<std::weak_ptr<RuntimeObject>>> objectsInTree;
+    std::map < RuntimeObject*, std::pair<gd::String, wxTreeItemId>> objectsInTree;
     //(Use std::owner_less to allow comparison between weak_ptr)
     std::map < gd::String, wxTreeItemId > initialObjects;
     bool mustRecreateTree;

@@ -139,6 +139,55 @@ void DebuggerGUI::Play()
     m_deleteBt->Enable(true);
 }
 
+void DebuggerGUI::OnRuntimeObjectAdded(RuntimeObject * object)
+{
+    if(objectsInTree.count(object) == 0)
+    {
+        char str[24];
+        snprintf(str, 24, "%p", object);
+
+        wxTreeItemId objectItem = m_objectsTree->AppendItem(initialObjects[object->GetName()], str);
+        objectsInTree[object] = std::pair<gd::String, wxTreeItemId>(object->GetName(), objectItem);
+    }
+}
+
+void DebuggerGUI::OnRuntimeObjectAboutToBeRemoved(RuntimeObject * object)
+{
+    if(objectsInTree.count(object) > 0)
+    {
+        if(objectsInTree[object].second.IsOk())
+            m_objectsTree->Delete(objectsInTree[object].second); //Delete from the tree
+        objectsInTree.erase(object);
+    }
+}
+
+void DebuggerGUI::OnRuntimeObjectListFullRefresh()
+{
+    m_objectsTree->DeleteAllItems();
+    m_objectsTree->AddRoot(_("objects"));
+    objectsInTree.clear();
+    initialObjects.clear();
+
+    //Scene's objects
+    for(std::size_t i = 0;i<scene.GetObjects().size();++i)
+    {
+        wxTreeItemId objectItem = m_objectsTree->AppendItem(m_objectsTree->GetRootItem(), scene.GetObjects()[i]->GetName());
+        initialObjects[scene.GetObjects()[i]->GetName()] = objectItem;
+    }
+    //Globals objects
+    for(std::size_t i = 0;i<scene.game->GetObjects().size();++i)
+    {
+        wxTreeItemId objectItem = m_objectsTree->AppendItem(m_objectsTree->GetRootItem(), scene.game->GetObjects()[i]->GetName());
+        initialObjects[scene.game->GetObjects()[i]->GetName()] = objectItem;
+    }
+
+    m_objectsTree->ExpandAll();
+
+    //Add the runtime objects
+    for(auto runtimeObjectPtr : scene.objectsInstances.GetAllObjects())
+        OnRuntimeObjectAdded(runtimeObjectPtr);
+}
+
 void DebuggerGUI::UpdateGUI()
 {
     if ( !doUpdate || !IsShown())
@@ -221,90 +270,23 @@ void DebuggerGUI::UpdateGUI()
         }
     }
 
-    //Arbre des objets : Création des objets
-    if ( mustRecreateTree )
-    {
-        m_objectsTree->DeleteAllItems();
-        m_objectsTree->AddRoot(_("objects"));
-        objectsInTree.clear();
-        initialObjects.clear();
-        mustRecreateTree = false;
-
-        //Scene's objects
-        for(std::size_t i = 0;i<scene.GetObjects().size();++i)
-        {
-            wxTreeItemId objectItem = m_objectsTree->AppendItem(m_objectsTree->GetRootItem(), scene.GetObjects()[i]->GetName());
-            initialObjects[scene.GetObjects()[i]->GetName()] = objectItem;
-        }
-        //Globals objects
-        for(std::size_t i = 0;i<scene.game->GetObjects().size();++i)
-        {
-            wxTreeItemId objectItem = m_objectsTree->AppendItem(m_objectsTree->GetRootItem(), scene.game->GetObjects()[i]->GetName());
-            initialObjects[scene.game->GetObjects()[i]->GetName()] = objectItem;
-        }
-
-        m_objectsTree->ExpandAll();
-    }
-
-    //Ajout des objets
-    RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
-    for(std::size_t i = 0;i<allObjects.size();++i)
-    {
-        std::weak_ptr<RuntimeObject> weakPtrToObject = allObjects[i];
-
-        //L'objet n'est pas dans l'arbre : on l'ajoute
-        if ( objectsInTree.find(weakPtrToObject) == objectsInTree.end() )
-        {
-            char str[24];
-            snprintf(str, 24, "%p", allObjects[i].get());
-
-            wxTreeItemId objectItem = m_objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], str);
-            objectsInTree[weakPtrToObject] = std::pair<gd::String, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
-        }
-        else
-        {
-            //Si l'objet qui est dans l'arbre n'est pas le même, on le supprime et le reajoute au bon endroit
-            if ( objectsInTree[weakPtrToObject].first != allObjects[i]->GetName() && initialObjects.find(allObjects[i]->GetName()) != initialObjects.end() )
-            {
-                m_objectsTree->Delete(objectsInTree[weakPtrToObject].second);
-                wxTreeItemId objectItem = m_objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], gd::String::From(i));
-                objectsInTree[weakPtrToObject] = std::pair<gd::String, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
-            }
-        }
-    }
-
-    //Suppression des éléments en trop
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
-
-    while(objectsInTreeIter != objectsInTreeEnd)
-    {
-        if ( (*objectsInTreeIter).first.expired() )
-        {
-            m_objectsTree->Delete((*objectsInTreeIter).second.second); //Delete from the tree
-            objectsInTree.erase(objectsInTreeIter++); //Post increment is important. It increment the iterator and then return the *original* iterator.
-            //( Erasing an value does not invalidate any iterator except the deleted one )
-        }
-        else
-            ++objectsInTreeIter;
-    }
-
+    //Display the currently selected object properties
     //Obtain the shared_ptr to the selected object
     if ( !m_objectsTree->GetSelection().IsOk() )
         return;
 
-    RuntimeObjSPtr object = std::shared_ptr<RuntimeObject>();
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    RuntimeObject * object = nullptr;
+    auto end = objectsInTree.cend();
+    for (auto i = objectsInTree.begin(); i != end; ++i)
     {
-        if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
+        if ( i->second.second == m_objectsTree->GetSelection() && i->first)
         {
-            object = i->first.lock();
+            object = i->first;
             continue;
         }
     }
 
-    if ( object == std::shared_ptr<RuntimeObject>() )
+    if ( !object )
         return;
 
     m_objectName->SetLabel(object->GetName());
@@ -374,18 +356,18 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
         return;
 
     //Obtain the shared_ptr to the object
-    RuntimeObjSPtr object = std::shared_ptr<RuntimeObject>();
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    RuntimeObject * object = nullptr;
+    auto end = objectsInTree.cend();
+    for (auto i = objectsInTree.begin(); i != end; ++i)
     {
-        if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
+        if ( i->second.second == m_objectsTree->GetSelection() && i->first)
         {
-            object = i->first.lock();
+            object = i->first;
             continue;
         }
     }
 
-    if ( object == std::shared_ptr<RuntimeObject>() )
+    if ( !object )
         return;
 
     //Check if we are trying to modify a "general" property
@@ -496,7 +478,7 @@ void DebuggerGUI::UpdateListCtrlColumnsWidth()
 /**
  * Create the list of properties for an object
  */
-void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
+void DebuggerGUI::RecreateListForObject(const RuntimeObject * object)
 {
     m_objectList->DeleteAllItems();
     std::size_t currentLine = 0;
@@ -504,15 +486,15 @@ void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
 
     m_objectList->InsertItem(0, _("General"));
     m_objectList->SetItemFont(0, font);
-    currentLine++;
+    ++currentLine;
 
     //Create base properties.
-    for (std::size_t i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
+    for (std::size_t i = 0; i< object->RuntimeObject::GetNumberOfProperties(); ++i)
     {
         object->RuntimeObject::GetPropertyForDebugger(i, name, uselessValue);
         m_objectList->InsertItem(currentLine, name);
 
-        currentLine++;
+        ++currentLine;
     }
 
     m_objectList->InsertItem(m_objectList->GetItemCount(), "");
@@ -521,12 +503,12 @@ void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
     currentLine += 2;
 
     //Create object specific properties.
-    for (std::size_t i = 0;i<object->GetNumberOfProperties();++i)
+    for (std::size_t i = 0; i<object->GetNumberOfProperties(); ++i)
     {
         object->GetPropertyForDebugger(i, name, uselessValue);
         m_objectList->InsertItem(currentLine, name);
 
-        currentLine++;
+        ++currentLine;
     }
 
     m_objectList->InsertItem(m_objectList->GetItemCount(), "");
@@ -549,18 +531,18 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
         return;
 
     //Obtain the shared_ptr to the object
-    RuntimeObjSPtr object = std::shared_ptr<RuntimeObject>();
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    RuntimeObject * object = nullptr;
+    auto end = objectsInTree.cend();
+    for (auto i = objectsInTree.begin(); i != end; ++i)
     {
-        if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
+        if ( i->second.second == m_objectsTree->GetSelection() && i->first)
         {
-            object = i->first.lock();
+            object = i->first;
             continue;
         }
     }
 
-    if ( object != std::shared_ptr<RuntimeObject>() ) object->DeleteFromScene(scene);
+    if ( object ) object->DeleteFromScene(scene);
 }
 
 /**
@@ -610,7 +592,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
     std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
-    RuntimeObjSPtr newObject = std::shared_ptr<RuntimeObject> ();
+    RuntimeObjSPtr newObject = std::unique_ptr<RuntimeObject> ();
 
     //Creation of the object
     if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
@@ -618,7 +600,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
         newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-    if ( newObject == std::shared_ptr<RuntimeObject> () )
+    if ( !newObject )
     {
         gd::LogWarning(_("Unable to create object."));
         return;
@@ -633,9 +615,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     layerDialog.ShowModal();
     newObject->SetLayer( layerDialog.GetChosenLayer() );
 
-    scene.objectsInstances.AddObject(newObject);
-
-    return;
+    scene.objectsInstances.AddObject(std::move(newObject));
 }
 
 #endif

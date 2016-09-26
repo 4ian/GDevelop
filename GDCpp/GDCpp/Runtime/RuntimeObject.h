@@ -42,6 +42,9 @@ class RuntimeScene;
 class GD_API RuntimeObject
 {
 public:
+    using Ref = RuntimeObject*;
+    using OwningPtr = RuntimeObject*;
+
     /**
      * \brief Construct a RuntimeObject from an object.
      *

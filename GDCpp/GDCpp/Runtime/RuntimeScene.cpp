@@ -214,7 +214,7 @@ void RuntimeScene::Render()
     renderWindow->clear( sf::Color( GetBackgroundColorRed(), GetBackgroundColorGreen(), GetBackgroundColorBlue() ) );
 
     //Sort object by order to render them
-    RuntimeObjList allObjects = objectsInstances.GetAllObjects();
+    RuntimeObjNonOwningPtrList allObjects = objectsInstances.GetAllObjects();
     OrderObjectsByZOrder(allObjects);
 
     #if !defined(ANDROID) //TODO: OpenGL
@@ -232,7 +232,6 @@ void RuntimeScene::Render()
             for (std::size_t cameraIndex = 0;cameraIndex < layers[layerIndex].GetCameraCount();++cameraIndex)
             {
                 RuntimeCamera & camera = layers[layerIndex].GetCamera(cameraIndex);
-
 
                 //Prepare OpenGL rendering
                 #if !defined(ANDROID) //TODO: OpenGL
@@ -275,14 +274,14 @@ void RuntimeScene::Render()
     renderWindow->display();
 }
 
-bool RuntimeScene::OrderObjectsByZOrder(RuntimeObjList & objList)
+bool RuntimeScene::OrderObjectsByZOrder(RuntimeObjNonOwningPtrList & objList)
 {
     if ( StandardSortMethod() )
-        std::sort( objList.begin(), objList.end(), [](const RuntimeObjSPtr & o1, const RuntimeObjSPtr & o2) {
+        std::sort( objList.begin(), objList.end(), [](const RuntimeObject * o1, const RuntimeObject * o2) {
             return o1->GetZOrder() < o2->GetZOrder();
         });
     else
-        std::stable_sort( objList.begin(), objList.end(), [](const RuntimeObjSPtr & o1, const RuntimeObjSPtr & o2) {
+        std::stable_sort( objList.begin(), objList.end(), [](const RuntimeObject * o1, const RuntimeObject * o2) {
             return o1->GetZOrder() < o2->GetZOrder();
         });
 
@@ -303,13 +302,13 @@ RuntimeLayer & RuntimeScene::GetRuntimeLayer(const gd::String & name)
 void RuntimeScene::ManageObjectsAfterEvents()
 {
     //Delete objects that were removed.
-    RuntimeObjList allObjects = objectsInstances.GetAllObjects();
+    RuntimeObjNonOwningPtrList allObjects = objectsInstances.GetAllObjects();
     for (std::size_t id = 0;id<allObjects.size();++id)
     {
     	if ( allObjects[id]->GetName().empty() )
         {
             for (std::size_t i = 0;i<extensionsToBeNotifiedOnObjectDeletion.size();++i)
-                extensionsToBeNotifiedOnObjectDeletion[i]->ObjectDeletedFromScene(*this, allObjects[id].get());
+                extensionsToBeNotifiedOnObjectDeletion[i]->ObjectDeletedFromScene(*this, allObjects[id]);
 
             objectsInstances.RemoveObject(allObjects[id]); //Remove from objects instances, not from the temporary list!
         }
@@ -330,7 +329,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
 
 void RuntimeScene::ManageObjectsBeforeEvents()
 {
-    RuntimeObjList allObjects = objectsInstances.GetAllObjects();
+    RuntimeObjNonOwningPtrList allObjects = objectsInstances.GetAllObjects();
     for (std::size_t id = 0;id<allObjects.size();++id)
         allObjects[id]->DoBehaviorsPreEvents(*this);
 }
@@ -354,14 +353,14 @@ public:
         std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
 
-        RuntimeObjSPtr newObject = std::shared_ptr<RuntimeObject> ();
+        RuntimeObjSPtr newObject;
 
         if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
             newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
         else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
             newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
-        if ( newObject != std::shared_ptr<RuntimeObject> () )
+        if ( newObject != std::unique_ptr<RuntimeObject> () )
         {
             newObject->SetX( instance.GetX() + xOffset );
             newObject->SetY( instance.GetY() + yOffset );
@@ -379,7 +378,7 @@ public:
             //Substitute initial variables specific to that object instance.
             newObject->GetVariables().Merge(instance.GetVariables());
 
-            scene.objectsInstances.AddObject(newObject);
+            scene.objectsInstances.AddObject(std::move(newObject));
         }
         else
             std::cout << "Could not find and put object " << instance.GetObjectName() << std::endl;

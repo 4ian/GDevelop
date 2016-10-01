@@ -188,10 +188,10 @@ int main( int argc, char *p_argv[] )
         DisplayMessage(error);
         abort = true;
     });
-    sceneStack.OnLoadScene([&codeLibraryName](std::shared_ptr<RuntimeScene> scene) {
+    sceneStack.OnLoadScene([&codeLibraryName](RuntimeScene & scene) {
         if (!codeLibraryName.empty() &&
-            !scene->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
-            "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scene->GetName())))
+            !scene.GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
+            "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())))
         {
             return false;
         }

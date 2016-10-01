@@ -43,26 +43,26 @@ public:
 	/**
 	 * \brief Stop and remove the current scene from the stack, unless there is
 	 * only one or zero scene in the stack.
-	 * \return A shared pointer to the scene removed, or a null pointer if nothing was removed.
+	 * \return A pointer to the scene removed, or a null pointer if nothing was removed.
 	 */
-	std::shared_ptr<RuntimeScene> Pop();
+	std::unique_ptr<RuntimeScene> Pop();
 
 	/**
 	 * \brief Load a new scene on the top of the stack. This scene becomes the current
 	 * scene and is the one played when you call Step.
 	 * \param newSceneName The name of the scene to launch, as found in the RuntimeGame.
-	 * \return A shared pointer to the scene added (or null pointer if loading failed).
+	 * \return A non owning pointer to the RuntimeScene added or nullptr if loading failed.
 	 */
-	std::shared_ptr<RuntimeScene> Push(gd::String newSceneName);
+	RuntimeScene * Push(gd::String newSceneName);
 
 	/**
 	 * \brief Replace the current scene by a new one. This new scene becomes the current
 	 * scene and is the one played when you call Step.
 	 * \param newSceneName The name of the scene to launch, as found in the RuntimeGame.
 	 * \param clear If set to true, all other scenes will be removed from stack.
-	 * \return A shared pointer to the scene added (or null pointer if loading failed).
+	 * \return A non owning pointer to the RuntimeScene added or nullptr if loading failed.
 	 */
-	std::shared_ptr<RuntimeScene> Replace(gd::String newSceneName, bool clear = false);
+	RuntimeScene * Replace(gd::String newSceneName, bool clear = false);
 
 	/**
 	 * \brief Set the callback called when an error occurs (loading failed...)
@@ -72,12 +72,12 @@ public:
 	/**
 	 * \brief Set a custom function to call when a scene is pushed on the stack.
 	 */
-	void OnLoadScene(std::function<bool(std::shared_ptr<RuntimeScene>)> cb) { loadCallback = cb; }
+	void OnLoadScene(std::function<bool(RuntimeScene &)> cb) { loadCallback = cb; }
 
 private:
 	RuntimeGame & game;
 	sf::RenderWindow * window;
-	std::vector<std::shared_ptr<RuntimeScene>> stack;
+	std::vector<std::unique_ptr<RuntimeScene>> stack;
 	std::function<void(gd::String)> errorCallback;
-	std::function<bool(std::shared_ptr<RuntimeScene>)> loadCallback;
+	std::function<bool(RuntimeScene &)> loadCallback;
 };

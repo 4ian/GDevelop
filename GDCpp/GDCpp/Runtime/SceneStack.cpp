@@ -13,7 +13,7 @@ bool SceneStack::Step()
 {
 	if (stack.empty()) return false;
 
-	auto scene = stack.back();
+	auto & scene = stack.back();
 	if (scene->RenderAndStep())
 	{
 		auto request = scene->GetRequestedChange();
@@ -36,42 +36,42 @@ bool SceneStack::Step()
 	return true;
 }
 
-std::shared_ptr<RuntimeScene> SceneStack::Pop()
+std::unique_ptr<RuntimeScene> SceneStack::Pop()
 {
-	if (stack.size() <= 1) return std::shared_ptr<RuntimeScene>();
+	if (stack.size() <= 1) return nullptr;
 
-	auto scene = stack.back();
+	std::unique_ptr<RuntimeScene> scene = std::move(stack.back());
 	stack.pop_back();
 	return scene;
 }
 
-std::shared_ptr<RuntimeScene> SceneStack::Push(gd::String newSceneName)
+RuntimeScene * SceneStack::Push(gd::String newSceneName)
 {
     if (!game.HasLayoutNamed(newSceneName))
     {
         if (errorCallback) errorCallback("Scene \"" + newSceneName + "\" does not exist.");
-        return std::shared_ptr<RuntimeScene>();
+        return nullptr;
     }
 
-	auto newScene = std::make_shared<RuntimeScene>(window, &game);
+	std::unique_ptr<RuntimeScene> newScene(new RuntimeScene(window, &game));
     if (!newScene->LoadFromScene(game.GetLayout(newSceneName)))
     {
         if (errorCallback) errorCallback("Unable to load scene \"" + newSceneName + "\".");
-        return std::shared_ptr<RuntimeScene>();
+        return nullptr;
     }
 
-	if (loadCallback && !loadCallback(newScene))
+	if (loadCallback && !loadCallback(*newScene))
 	{
 		if (errorCallback) errorCallback("Unable to setup execution engine for scene \"" + newScene->GetName() + "\".");
-		return std::shared_ptr<RuntimeScene>();
+		return nullptr;
 	}
 
     newScene->ChangeRenderWindow(window);
-	stack.push_back(newScene);
-	return newScene;
+	stack.push_back(std::move(newScene));
+	return stack.back().get();
 }
 
-std::shared_ptr<RuntimeScene> SceneStack::Replace(gd::String newSceneName, bool clear)
+RuntimeScene * SceneStack::Replace(gd::String newSceneName, bool clear)
 {
     if (clear)
     {

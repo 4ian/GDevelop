@@ -23,11 +23,11 @@ TEST_CASE( "SceneStack", "[game-engine]" ) {
 	SceneStack stack(game,  NULL);
 
 	SECTION("Pop on an empty stack") {
-		REQUIRE(stack.Pop() == std::shared_ptr<RuntimeScene>());
+		REQUIRE(stack.Pop() == nullptr);
 	}
 
 	SECTION("Push a not existing scene") {
-		REQUIRE(stack.Push("test") == std::shared_ptr<RuntimeScene>());
+		REQUIRE(stack.Push("test") == nullptr);
 	}
 
 	SECTION("Push, Pop, Replace") {
@@ -36,11 +36,11 @@ TEST_CASE( "SceneStack", "[game-engine]" ) {
 		auto scene3 = stack.Push("Scene 1");
 		auto scene4 = stack.Replace("Scene 2");
 
-		REQUIRE(stack.Pop() == scene4);
-		REQUIRE(stack.Pop() == scene2);
+		REQUIRE(stack.Pop().get() == scene4);
+		REQUIRE(stack.Pop().get() == scene2);
 
 		auto scene5 = stack.Replace("Scene 1", true);
-		REQUIRE(stack.Pop() == std::shared_ptr<RuntimeScene>());
+		REQUIRE(stack.Pop() == nullptr);
 	}
 
 	SECTION("Step") {
@@ -49,14 +49,14 @@ TEST_CASE( "SceneStack", "[game-engine]" ) {
 	}
 
 	SECTION("OnLoadScene") {
-		stack.OnLoadScene([](std::shared_ptr<RuntimeScene> scene) {
-			REQUIRE(scene->GetName() == "Scene 2");
+		stack.OnLoadScene([](RuntimeScene & scene) {
+			REQUIRE(scene.GetName() == "Scene 2");
 			return true;
 		});
 		stack.Push("Scene 2");
 
-		stack.OnLoadScene([](std::shared_ptr<RuntimeScene> scene) {
-			REQUIRE(scene->GetName() == "Scene 1");
+		stack.OnLoadScene([](RuntimeScene & scene) {
+			REQUIRE(scene.GetName() == "Scene 1");
 			return true;
 		});
 		stack.Replace("Scene 1", true);

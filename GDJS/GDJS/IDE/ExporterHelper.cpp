@@ -376,10 +376,10 @@ bool ExporterHelper::ExportEventsCode(gd::Project & project, gd::String outputDi
 
 bool ExporterHelper::ExportExternalSourceFiles(gd::Project & project, gd::String outputDir, std::vector<gd::String> & includesFiles)
 {
-    const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = project.GetAllSourceFiles();
+    const auto & allFiles = project.GetAllSourceFiles();
     for (std::size_t i = 0;i<allFiles.size();++i)
     {
-        if (allFiles[i] == std::shared_ptr<gd::SourceFile>() ) continue;
+        if (!allFiles[i]) continue;
         if (allFiles[i]->GetLanguage() != "Javascript" ) continue;
 
         gd::SourceFile & file = *allFiles[i];

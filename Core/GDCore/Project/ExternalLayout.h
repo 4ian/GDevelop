@@ -102,8 +102,8 @@ private:
 /**
  * \brief Functor testing ExternalLayout' name
  */
-struct ExternalLayoutHasName : public std::binary_function<std::shared_ptr<gd::ExternalLayout>, gd::String, bool> {
-    bool operator()(const std::shared_ptr<gd::ExternalLayout> & externalLayout, gd::String name) const { return externalLayout->GetName() == name; }
+struct ExternalLayoutHasName : public std::binary_function<std::unique_ptr<gd::ExternalLayout>, gd::String, bool> {
+    bool operator()(const std::unique_ptr<gd::ExternalLayout> & externalLayout, gd::String name) const { return externalLayout->GetName() == name; }
 };
 
 }

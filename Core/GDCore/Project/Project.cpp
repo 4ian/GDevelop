@@ -37,6 +37,7 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/PolymorphicClone.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/Splitter.h"
 #include "Project.h"
@@ -263,38 +264,36 @@ void Project::SwapLayouts(std::size_t first, std::size_t second)
 
 gd::Layout & Project::InsertNewLayout(const gd::String & name, std::size_t position)
 {
-    std::shared_ptr<gd::Layout> newScene = std::shared_ptr<gd::Layout>(new Layout);
-    if (position<scenes.size())
-        scenes.insert(scenes.begin()+position, newScene);
-    else
-        scenes.push_back(newScene);
+    gd::Layout & newlyInsertedLayout = *(*(scenes.emplace(
+        position < scenes.size() ? scenes.begin() + position : scenes.end(),
+        new Layout()
+    )));
 
-    newScene->SetName(name);
+    newlyInsertedLayout.SetName(name);
     #if defined(GD_IDE_ONLY)
-    newScene->UpdateBehaviorsSharedData(*this);
+    newlyInsertedLayout.UpdateBehaviorsSharedData(*this);
     #endif
 
-    return *newScene;
+    return newlyInsertedLayout;
 }
 
 gd::Layout & Project::InsertLayout(const gd::Layout & layout, std::size_t position)
 {
-    std::shared_ptr<gd::Layout> newScene = std::shared_ptr<gd::Layout>(new Layout(layout));
-    if (position<scenes.size())
-        scenes.insert(scenes.begin()+position, newScene);
-    else
-        scenes.push_back(newScene);
+    gd::Layout & newlyInsertedLayout = *(*(scenes.emplace(
+        position < scenes.size() ? scenes.begin() + position : scenes.end(),
+        new Layout(layout)
+    )));
 
     #if defined(GD_IDE_ONLY)
-    newScene->UpdateBehaviorsSharedData(*this);
+    newlyInsertedLayout.UpdateBehaviorsSharedData(*this);
     #endif
 
-    return *newScene;
+    return newlyInsertedLayout;
 }
 
 void Project::RemoveLayout(const gd::String & name)
 {
-    std::vector< std::shared_ptr<gd::Layout> >::iterator scene = find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name));
+    std::vector< std::unique_ptr<gd::Layout> >::iterator scene = find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name));
     if ( scene == scenes.end() ) return;
 
     scenes.erase(scene);
@@ -336,27 +335,29 @@ std::size_t Project::GetExternalEventsCount() const
 
 gd::ExternalEvents & Project::InsertNewExternalEvents(const gd::String & name, std::size_t position)
 {
-    std::shared_ptr<gd::ExternalEvents> newExternalEvents(new gd::ExternalEvents);
-    if (position<externalEvents.size())
-        externalEvents.insert(externalEvents.begin()+position, newExternalEvents);
-    else
-        externalEvents.push_back(newExternalEvents);
+    gd::ExternalEvents & newlyInsertedExternalEvents = *(*(externalEvents.emplace(
+        position < externalEvents.size() ? externalEvents.begin() + position : externalEvents.end(),
+        new gd::ExternalEvents()
+    )));
 
-    newExternalEvents->SetName(name);
-    return *newExternalEvents;
+    newlyInsertedExternalEvents.SetName(name);
+
+    return newlyInsertedExternalEvents;
 }
 
-void Project::InsertExternalEvents(const gd::ExternalEvents & events, std::size_t position)
+gd::ExternalEvents & Project::InsertExternalEvents(const gd::ExternalEvents & events, std::size_t position)
 {
-    if (position<externalEvents.size())
-        externalEvents.insert(externalEvents.begin()+position, std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
-    else
-        externalEvents.push_back(std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
+    gd::ExternalEvents & newlyInsertedExternalEvents = *(*(externalEvents.emplace(
+        position < externalEvents.size() ? externalEvents.begin() + position : externalEvents.end(),
+        new gd::ExternalEvents(events)
+    )));
+
+    return newlyInsertedExternalEvents;
 }
 
 void Project::RemoveExternalEvents(const gd::String & name)
 {
-    std::vector< std::shared_ptr<gd::ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name));
+    std::vector< std::unique_ptr<gd::ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name));
     if ( events == externalEvents.end() ) return;
 
     externalEvents.erase(events);
@@ -420,29 +421,28 @@ std::size_t Project::GetExternalLayoutsCount() const
 
 gd::ExternalLayout & Project::InsertNewExternalLayout(const gd::String & name, std::size_t position)
 {
-    std::shared_ptr<gd::ExternalLayout> newExternalLayout = std::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout);
-    if (position<externalLayouts.size())
-        externalLayouts.insert(externalLayouts.begin()+position, newExternalLayout);
-    else
-        externalLayouts.push_back(newExternalLayout);
+    gd::ExternalLayout & newlyInsertedExternalLayout = *(*(externalLayouts.emplace(
+        position < externalLayouts.size() ? externalLayouts.begin() + position : externalLayouts.end(),
+        new gd::ExternalLayout()
+    )));
 
-    newExternalLayout->SetName(name);
-    return *newExternalLayout;
+    newlyInsertedExternalLayout.SetName(name);
+    return newlyInsertedExternalLayout;
 }
 
-void Project::InsertExternalLayout(const gd::ExternalLayout & layout, std::size_t position)
+gd::ExternalLayout & Project::InsertExternalLayout(const gd::ExternalLayout & layout, std::size_t position)
 {
-    std::shared_ptr<gd::ExternalLayout> newLayout(new gd::ExternalLayout(layout));
+    gd::ExternalLayout & newlyInsertedExternalLayout = *(*(externalLayouts.emplace(
+        position < externalLayouts.size() ? externalLayouts.begin() + position : externalLayouts.end(),
+        new gd::ExternalLayout(layout)
+    )));
 
-    if (position<externalLayouts.size())
-        externalLayouts.insert(externalLayouts.begin()+position, newLayout);
-    else
-        externalLayouts.push_back(newLayout);
+    return newlyInsertedExternalLayout;
 }
 
 void Project::RemoveExternalLayout(const gd::String & name)
 {
-    std::vector< std::shared_ptr<gd::ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name));
+    std::vector< std::unique_ptr<gd::ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name));
     if ( externalLayout == externalLayouts.end() ) return;
 
     externalLayouts.erase(externalLayout);
@@ -688,9 +688,8 @@ void Project::UnserializeFrom(const SerializerElement & element)
     {
         const SerializerElement & externalLayoutElement = externalLayoutsElement.GetChild(i);
 
-        std::shared_ptr<gd::ExternalLayout> newExternalLayout(new gd::ExternalLayout);
-        newExternalLayout->UnserializeFrom(externalLayoutElement);
-        externalLayouts.push_back(newExternalLayout);
+        gd::ExternalLayout & newExternalLayout = InsertNewExternalLayout("", GetExternalLayoutsCount());
+        newExternalLayout.UnserializeFrom(externalLayoutElement);
     }
 
     #if defined(GD_IDE_ONLY)
@@ -700,9 +699,8 @@ void Project::UnserializeFrom(const SerializerElement & element)
     {
         const SerializerElement & sourceFileElement = externalSourceFilesElement.GetChild(i);
 
-        std::shared_ptr<gd::SourceFile> newSourceFile(new gd::SourceFile);
-        newSourceFile->UnserializeFrom(sourceFileElement);
-        externalSourceFiles.push_back(newSourceFile);
+        gd::SourceFile & newSourceFile = InsertNewSourceFile("", "");
+        newSourceFile.UnserializeFrom(sourceFileElement);
     }
 
     #if !defined(GD_NO_WX_GUI)
@@ -843,7 +841,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const
 {
-    vector< std::shared_ptr<SourceFile> >::const_iterator sourceFile =
+    vector< std::unique_ptr<SourceFile> >::const_iterator sourceFile =
         find_if(externalSourceFiles.begin(), externalSourceFiles.end(),
         bind2nd(gd::ExternalSourceFileHasName(), name));
 
@@ -865,7 +863,7 @@ const gd::SourceFile & Project::GetSourceFile(const gd::String & name) const
 
 void Project::RemoveSourceFile(const gd::String & name)
 {
-    std::vector< std::shared_ptr<gd::SourceFile> >::iterator sourceFile =
+    std::vector< std::unique_ptr<gd::SourceFile> >::iterator sourceFile =
         find_if(externalSourceFiles.begin(), externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), name));
     if ( sourceFile == externalSourceFiles.end() ) return;
 
@@ -877,16 +875,14 @@ gd::SourceFile & Project::InsertNewSourceFile(const gd::String & name, const gd:
     if (HasSourceFile(name, language))
         return GetSourceFile(name);
 
-    std::shared_ptr<SourceFile> newSourceFile(new SourceFile);
-    newSourceFile->SetLanguage(language);
-    newSourceFile->SetFileName(name);
+    gd::SourceFile & newlyInsertedSourceFile = *(*(externalSourceFiles.emplace(
+        position < externalSourceFiles.size() ? externalSourceFiles.begin() + position : externalSourceFiles.end(),
+        new SourceFile()
+    )));
+    newlyInsertedSourceFile.SetLanguage(language);
+    newlyInsertedSourceFile.SetFileName(name);
 
-    if (position<externalSourceFiles.size())
-        externalSourceFiles.insert(externalSourceFiles.begin()+position, newSourceFile);
-    else
-        externalSourceFiles.push_back(newSourceFile);
-
-    return *newSourceFile;
+    return newlyInsertedSourceFile;
 }
 
 #if !defined(GD_NO_WX_GUI)
@@ -1037,26 +1033,18 @@ void Project::Init(const gd::Project & game)
     for (std::size_t i =0;i<game.GetObjects().size();++i)
     	GetObjects().push_back( std::shared_ptr<gd::Object>(game.GetObjects()[i]->Clone()) );
 
-    scenes.clear();
-    for (std::size_t i =0;i<game.scenes.size();++i)
-    	scenes.push_back( std::shared_ptr<gd::Layout>(new gd::Layout(*game.scenes[i])) );
+    scenes = gd::Clone(game.scenes);
 
     #if defined(GD_IDE_ONLY)
-    externalEvents.clear();
-    for (std::size_t i =0;i<game.externalEvents.size();++i)
-    	externalEvents.push_back( std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(*game.externalEvents[i])) );
+    externalEvents = gd::Clone(game.externalEvents);
     #endif
 
-    externalLayouts.clear();
-    for (std::size_t i =0;i<game.externalLayouts.size();++i)
-    	externalLayouts.push_back( std::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout(*game.externalLayouts[i])) );
+    externalLayouts = gd::Clone(game.externalLayouts);
 
     #if defined(GD_IDE_ONLY)
     useExternalSourceFiles = game.useExternalSourceFiles;
 
-    externalSourceFiles.clear();
-    for (std::size_t i =0;i<game.externalSourceFiles.size();++i)
-    	externalSourceFiles.push_back( std::shared_ptr<gd::SourceFile>(new gd::SourceFile(*game.externalSourceFiles[i])) );
+    externalSourceFiles = gd::Clone(game.externalSourceFiles);
     #endif
 
     variables = game.GetVariables();

@@ -28,6 +28,11 @@ public:
     virtual ~SourceFile();
 
     /**
+     * \brief Return a pointer to a new SourceFile constructed from this one.
+     */
+    SourceFile * Clone() const { return new SourceFile(*this); };
+
+    /**
      * \brief Get the filename
      */
     gd::String GetFileName() const { return filename; };
@@ -80,8 +85,8 @@ private:
 /**
  * Functor testing Source Files name
  */
-struct ExternalSourceFileHasName : public std::binary_function<std::shared_ptr<SourceFile>, gd::String, bool> {
-    bool operator()(const std::shared_ptr<SourceFile> & externalEvents, gd::String name) const { return externalEvents->GetFileName() == name; }
+struct ExternalSourceFileHasName : public std::binary_function<std::unique_ptr<SourceFile>, gd::String, bool> {
+    bool operator()(const std::unique_ptr<SourceFile> & externalEvents, gd::String name) const { return externalEvents->GetFileName() == name; }
 };
 
 }

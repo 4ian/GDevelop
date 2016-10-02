@@ -32,6 +32,11 @@ public:
     ExternalEvents& operator=(const ExternalEvents & rhs);
 
     /**
+     * \brief Return a pointer to a new ExternalEvents constructed from this one.
+     */
+    ExternalEvents * Clone() const { return new ExternalEvents(*this); };
+
+    /**
      * \brief Get external events name
      */
     virtual const gd::String & GetName() const {return name;};
@@ -105,8 +110,8 @@ private:
 /**
  * \brief Functor testing ExternalEvents' name
  */
-struct ExternalEventsHasName : public std::binary_function<std::shared_ptr<gd::ExternalEvents>, gd::String, bool> {
-    bool operator()(const std::shared_ptr<gd::ExternalEvents> & externalEvents, gd::String name) const { return externalEvents->GetName() == name; }
+struct ExternalEventsHasName : public std::binary_function<std::unique_ptr<gd::ExternalEvents>, gd::String, bool> {
+    bool operator()(const std::unique_ptr<gd::ExternalEvents> & externalEvents, gd::String name) const { return externalEvents->GetName() == name; }
 };
 
 }

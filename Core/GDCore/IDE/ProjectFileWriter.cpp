@@ -12,6 +12,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/XmlLoader.h"
 #include "GDCore/String.h"
 
 #include "GDCore/TinyXml/tinyxml.h"
@@ -89,7 +90,7 @@ bool ProjectFileWriter::SaveToFile(const gd::Project & project, const gd::String
             //And write the element in it
             gd::String filename = projectPath + element.path + "-" + MakeFileNameSafe(element.name);
             gd::RecursiveMkDir::MkDir(wxFileName::FileName(filename).GetPath());
-            if (!doc.SaveFile(filename.ToLocale().c_str()))
+            if ( !gd::SaveXmlToFile( doc, filename ) )
             {
                 gd::LogError( _( "Unable to save file ") + filename + _("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
                 return false;
@@ -107,7 +108,7 @@ bool ProjectFileWriter::SaveToFile(const gd::Project & project, const gd::String
     gd::Serializer::ToXML(rootElement, root);
 
     //Write XML to file
-    if ( !doc.SaveFile( filename.ToLocale().c_str() ) )
+    if ( !gd::SaveXmlToFile( doc, filename ) )
     {
         gd::LogError( _( "Unable to save file ") + filename + _("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
         return false;
@@ -161,7 +162,7 @@ bool ProjectFileWriter::LoadFromFile(gd::Project & project, const gd::String & f
 {
     //Load the XML document structure
     TiXmlDocument doc;
-    if ( !doc.LoadFile(filename.ToLocale().c_str()) )
+    if ( !gd::LoadXmlFromFile( doc, filename ) )
     {
         gd::String errorTinyXmlDesc = doc.ErrorDesc();
         gd::String error = _( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
@@ -197,7 +198,7 @@ bool ProjectFileWriter::LoadFromFile(gd::Project & project, const gd::String & f
         gd::SerializerElement rootElement;
 
         gd::String filename = projectPath + path + "-" + MakeFileNameSafe(name);
-        if (!doc.LoadFile(filename.ToLocale().c_str()))
+        if( !gd::LoadXmlFromFile( doc, filename ) )
         {
             gd::String errorTinyXmlDesc = doc.ErrorDesc();
             gd::String error = _( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");

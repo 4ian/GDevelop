@@ -12,6 +12,7 @@
 #include <memory>
 #include <map>
 #include "GDCpp/Runtime/String.h"
+#include "GDCpp/Runtime/Tools/XmlLoader.h"
 
 /**
  * \brief Helper class wrapping a tinyxml document in RAII fashion
@@ -25,12 +26,12 @@ class XmlFile
         /**
          * Open file
          */
-        XmlFile(gd::String filename) : doc(filename.ToLocale().c_str()), modified(false) { doc.LoadFile(); };
+        XmlFile(gd::String filename) : doc(), filename(filename), modified(false) { gd::LoadXmlFromFile( doc, filename ); };
 
         /**
          * Save file is the document was marked as modified.
          */
-        ~XmlFile() { if (modified) doc.SaveFile(); }
+        ~XmlFile() { if (modified) gd::SaveXmlToFile( doc, filename ); }
 
         /**
          * Set the file to be saved when the object is destroyed.
@@ -49,6 +50,7 @@ class XmlFile
 
     private :
         TiXmlDocument doc;
+        gd::String filename;
         bool modified;
 };
 

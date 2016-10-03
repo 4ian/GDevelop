@@ -18,7 +18,7 @@ using namespace std;
 bool GD_API FileExists( const gd::String & file )
 {
     TiXmlDocument doc;
-    if ( !doc.LoadFile(file.ToLocale().c_str()) && doc.ErrorId() == 2)
+    if ( !gd::LoadXmlFromFile( doc, file ) && doc.ErrorId() == 2)
         return false;
 
     return true ;

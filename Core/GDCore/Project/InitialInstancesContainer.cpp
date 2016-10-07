@@ -106,16 +106,25 @@ gd::InitialInstance & InitialInstancesContainer::InsertNewInitialInstance()
     return initialInstances.back();
 }
 
+void InitialInstancesContainer::RemoveInstanceIf(std::function<bool(const gd::InitialInstance &)> predicat)
+{
+    // Note that we can't use erase–remove idiom here because remove_if would
+    // move the instances, and the container must guarantee that iterators/pointers
+    // to instances always remain valid.
+    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end;)
+    {
+        if (predicat(*it))
+            it = initialInstances.erase(it);
+        else
+            ++it;
+    }
+}
+
 void InitialInstancesContainer::RemoveInstance(const gd::InitialInstance & instance)
 {
-    initialInstances.erase(
-        std::remove_if(
-            initialInstances.begin(),
-            initialInstances.end(),
-            [&instance](const InitialInstance & currentInstance) { return &instance == &currentInstance; }
-        ),
-        initialInstances.end()
-    );
+    RemoveInstanceIf([&instance](const InitialInstance & currentInstance) {
+        return &instance == &currentInstance;
+    });
 }
 
 gd::InitialInstance & InitialInstancesContainer::InsertInitialInstance(const gd::InitialInstance & instance)
@@ -143,26 +152,16 @@ void InitialInstancesContainer::RenameInstancesOfObject(const gd::String & oldNa
 
 void InitialInstancesContainer::RemoveInitialInstancesOfObject(const gd::String & objectName)
 {
-    initialInstances.erase(
-        std::remove_if(
-            initialInstances.begin(),
-            initialInstances.end(),
-            [&objectName](const InitialInstance & currentInstance) { return currentInstance.GetObjectName() == objectName; }
-        ),
-        initialInstances.end()
-    );
+    RemoveInstanceIf([&objectName](const InitialInstance & currentInstance) {
+        return currentInstance.GetObjectName() == objectName;
+    });
 }
 
 void InitialInstancesContainer::RemoveAllInstancesOnLayer(const gd::String & layerName)
 {
-    initialInstances.erase(
-        std::remove_if(
-            initialInstances.begin(),
-            initialInstances.end(),
-            [&layerName](const InitialInstance & currentInstance) { return currentInstance.GetLayer() == layerName; }
-        ),
-        initialInstances.end()
-    );
+    RemoveInstanceIf([&layerName](const InitialInstance & currentInstance) {
+        return currentInstance.GetLayer() == layerName;
+    });
 }
 
 void InitialInstancesContainer::MoveInstancesToLayer(const gd::String & fromLayer, const gd::String & toLayer)

@@ -121,8 +121,10 @@ TEST_CASE( "InitialInstancesContainer", "[common][instances]" ) {
     SECTION("RemoveInstance") {
         auto & i = container.InsertNewInitialInstance();
         i.SetObjectName("new");
-        i.SetZOrder(0),
-        i.SetLayer("new");
+        auto & i2 = container.InsertNewInitialInstance();
+        i2.SetObjectName("newtwo");
+        auto & i3 = container.InsertNewInitialInstance();
+        i3.SetObjectName("newthree");
 
         {
             AllInstancesFunctor func;
@@ -136,12 +138,36 @@ TEST_CASE( "InitialInstancesContainer", "[common][instances]" ) {
                     MakeInstance("object2", "layer1", 10),
                     MakeInstance("object3", "layer2", 11),
                     MakeInstance("object3", "layer2", 9),
-                    MakeInstance("new", "new", 0)
+                    MakeInstance("new", "", 0),
+                    MakeInstance("newtwo", "", 0),
+                    MakeInstance("newthree", "", 0)
                 }
             ) == true );
         }
 
+        // Delete a few objects to make sure that pointers/references to
+        // the other objects stay the same.
         container.RemoveInstance(i);
+        container.RemoveInstance(i2);
+
+        {
+            AllInstancesFunctor func;
+            container.IterateOverInstances(func);
+            REQUIRE( func.Compare(
+                {
+                    MakeInstance("object1", "layer1", 10),
+                    MakeInstance("object1", "layer2", 10),
+                    MakeInstance("object1", "layer1", 14),
+                    MakeInstance("object2", "layer1", 12),
+                    MakeInstance("object2", "layer1", 10),
+                    MakeInstance("object3", "layer2", 11),
+                    MakeInstance("object3", "layer2", 9),
+                    MakeInstance("newthree", "", 0)
+                }
+            ) == true );
+        }
+
+        container.RemoveInstance(i3);
 
         {
             AllInstancesFunctor func;

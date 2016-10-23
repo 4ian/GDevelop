@@ -22,7 +22,7 @@ namespace gd
  * gd::String paths (useful on Windows as std::iFileStream doesn't)
  * support wide paths.
  */
-class FileStream : public std::iostream
+class GD_CORE_API FileStream : public std::iostream
 {
 public:
 #if FSTREAM_WINDOWS_MINGW
@@ -54,7 +54,7 @@ private:
 	std::unique_ptr<InternalBufferType> m_buffer;
 };
 
-class SFMLFileStream : public sf::InputStream
+class GD_CORE_API SFMLFileStream : public sf::InputStream
 {
 public :
 
@@ -73,7 +73,7 @@ public :
 
 private :
 
-    gd::FileStream m_file;
+    FILE * m_file;
 };
 
 }

@@ -1,4 +1,4 @@
-#include "GDCore/Tools/FStream.h"
+#include "GDCore/Tools/FileStream.h"
 
 #if defined(WINDOWS)
 #if __GLIBCXX__
@@ -66,7 +66,11 @@ FileStream::FileStream(const gd::String & path, std::ios_base::openmode mode) :
 {
 	setstate(ios_base::goodbit);
 	if(m_buffer)
+	{
 		std::iostream::rdbuf(m_buffer.get());
+		if((mode & std::ios_base::ate) != 0)
+			seekg(0, end);
+	}
 	else
 		setstate(ios_base::badbit);
 }
@@ -101,6 +105,8 @@ void FileStream::open(const gd::String & path, std::ios_base::openmode mode)
 		{
 			m_buffer.reset(newBuffer);
 			std::iostream::rdbuf(m_buffer.get());
+			if((mode & std::ios_base::ate) != 0)
+				seekg(0, end);
 		}
 		else
 			setstate(ios_base::badbit);

@@ -207,7 +207,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.compilerCall.inputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&game.GetLayout(i))+"RuntimeEventsSource.cpp");
         task.compilerCall.outputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&game.GetLayout(i))+"RuntimeObjectFile.o");
         task.userFriendlyName = "Compilation of events of scene "+game.GetLayout(i).GetName();
-        task.preWork = std::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, &game.GetLayout(i), resourcesMergingHelper));
+        task.preWork = std::make_shared<EventsCodeCompilerRuntimePreWork>(&game, &game.GetLayout(i), resourcesMergingHelper);
         task.scene = &game.GetLayout(i);
 
         CodeCompiler::Get()->AddTask(task);

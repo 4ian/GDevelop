@@ -8,6 +8,8 @@
 #ifndef GDCORE_PLATFORMEXTENSION_INL
 #define GDCORE_PLATFORMEXTENSION_INL
 
+#include "GDCore/Tools/MakeUnique.h"
+
 namespace gd
 {
 
@@ -23,7 +25,7 @@ gd::ObjectMetadata & PlatformExtension::AddObject(const gd::String & name,
         fullname,
         informations,
         icon24x24,
-        [](gd::String name) -> gd::Object* { return new T(name); }
+        [](gd::String name) -> std::unique_ptr<gd::Object> { return gd::make_unique<T>(name); }
     );
 
     return objectsInfos[nameWithNamespace];

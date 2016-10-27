@@ -7,6 +7,7 @@
 #define OBJECTMETADATA_H
 #include "GDCore/String.h"
 #include <map>
+#include <memory>
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/String.h"
@@ -18,7 +19,7 @@ namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
 class wxBitmap;
 
-typedef gd::Object * (*CreateFunPtr)(gd::String name);
+typedef std::unique_ptr<gd::Object> (*CreateFunPtr)(gd::String name);
 
 namespace gd
 {

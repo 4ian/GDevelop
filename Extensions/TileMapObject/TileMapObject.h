@@ -35,7 +35,7 @@ public :
 
     TileMapObject(gd::String name_);
     virtual ~TileMapObject() {};
-    virtual gd::Object * Clone() const { return new TileMapObject(*this);}
+    virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<TileMapObject>(*this); }
 
     #if defined(GD_IDE_ONLY)
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;

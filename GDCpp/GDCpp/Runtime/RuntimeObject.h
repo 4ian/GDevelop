@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "GDCore/Tools/MakeUnique.h"
 #include "GDCpp/Runtime/RuntimeVariablesContainer.h"
 #include "GDCpp/Runtime/Force.h"
 #include "GDCpp/Runtime/String.h"
@@ -84,7 +85,7 @@ public:
      * return new MyRuntimeObject(*this);
      * \endcode
      */
-    virtual RuntimeObject * Clone() const { return new RuntimeObject(*this);}
+    virtual std::unique_ptr<RuntimeObject> Clone() const { return gd::make_unique<RuntimeObject>(*this);}
 
     /**
      * \brief Called by RuntimeScene when creating the RuntimeObject from an initial instance.

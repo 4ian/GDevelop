@@ -26,8 +26,8 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
           "",
           "CppPlatform/Extensions/topdownmovementicon.png",
           "TopDownMovementBehavior",
-          std::shared_ptr<gd::Behavior>(new TopDownMovementBehavior),
-          std::shared_ptr<gd::BehaviorsSharedData>(new gd::BehaviorsSharedData));
+          std::make_shared<TopDownMovementBehavior>(),
+          std::make_shared<gd::BehaviorsSharedData>());
 
     #if defined(GD_IDE_ONLY)
 

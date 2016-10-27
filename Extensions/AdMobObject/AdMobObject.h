@@ -21,7 +21,7 @@ class GD_EXTENSION_API AdMobObject : public gd::Object
 public:
     AdMobObject(gd::String name_);
     virtual ~AdMobObject() {};
-    virtual gd::Object * Clone() const { return new AdMobObject(*this); }
+    virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<AdMobObject>(*this); }
 
     #if !defined(GD_NO_WX_GUI)
     void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout) override;

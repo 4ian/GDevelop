@@ -67,7 +67,7 @@ Project::Project() :
     maxFPS(60),
     minFPS(10),
     verticalSync(false),
-    imageManager(std::shared_ptr<gd::ImageManager>(new ImageManager))
+    imageManager(std::make_shared<ImageManager>())
     #if defined(GD_IDE_ONLY)
     ,useExternalSourceFiles(false),
     currentPlatform(NULL),
@@ -1026,7 +1026,7 @@ void Project::Init(const gd::Project & game)
 
     //Resources
     resourcesManager = game.resourcesManager;
-    imageManager = std::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
+    imageManager = std::make_shared<ImageManager>(*game.imageManager);
     imageManager->SetResourcesManager(&resourcesManager);
 
     initialObjects = gd::Clone(game.initialObjects);

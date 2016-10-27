@@ -172,7 +172,7 @@ void EventsListSerialization::UnserializeEventsFrom(gd::Project & project, Event
         else
         {
             std::cout << "WARNING: Unknown event of type " << type << std::endl;
-            event = std::shared_ptr<gd::BaseEvent>(new EmptyEvent);
+            event = std::make_shared<EmptyEvent>();
         }
 
         event->SetDisabled(eventElem.GetBoolAttribute("disabled"));

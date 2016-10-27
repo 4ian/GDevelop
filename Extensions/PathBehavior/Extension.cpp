@@ -41,8 +41,8 @@ public:
                       "",
                       "CppPlatform/Extensions/pathicon.png",
                       "PathBehavior",
-                      std::shared_ptr<gd::Behavior>(new PathBehavior),
-                      std::shared_ptr<gd::BehaviorsSharedData>(new ScenePathDatas));
+                      std::make_shared<PathBehavior>(),
+                      std::make_shared<ScenePathDatas>());
 
                 #if defined(GD_IDE_ONLY)
 

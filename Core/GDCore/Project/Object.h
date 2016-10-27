@@ -11,7 +11,9 @@
 #include <map>
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Tools/MakeUnique.h"
 #include <SFML/System/Vector2.hpp>
+
 namespace gd { class PropertyDescriptor; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -62,7 +64,7 @@ public:
      * return new MyObject(*this);
      * \endcode
      */
-    virtual gd::Object * Clone() const { return new gd::Object(*this); }
+    virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<gd::Object>(*this); }
 
     /** \name Common properties
      * Members functions related to common properties

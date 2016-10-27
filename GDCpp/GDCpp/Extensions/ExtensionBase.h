@@ -20,6 +20,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/CommonTools.h"
+
 namespace gd { class Instruction; }
 namespace gd { class Layout; }
 namespace gd { class Object; }
@@ -35,7 +36,7 @@ class EventsCodeGenerator;
 #undef CreateEvent
 
 //Declare typedefs for objects creations/destructions functions
-typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const gd::Object & object);
+typedef std::unique_ptr<RuntimeObject> (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const gd::Object & object);
 
 
 /**

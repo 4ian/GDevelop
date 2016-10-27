@@ -71,7 +71,7 @@ class XmlFilesManager
     static void LoadFile(gd::String filename)
     {
         if ( openedFiles.find(filename) == openedFiles.end() )
-            openedFiles[filename] = std::shared_ptr<XmlFile>(new XmlFile(filename));
+            openedFiles[filename] = std::make_shared<XmlFile>(filename);
     }
 
     /**
@@ -89,7 +89,7 @@ class XmlFilesManager
      */
     static std::shared_ptr<XmlFile> GetFile(gd::String filename, bool isGoingToModifyFile = true)
     {
-        std::shared_ptr<XmlFile> file = openedFiles.find(filename) != openedFiles.end() ? openedFiles[filename] : std::shared_ptr<XmlFile>(new XmlFile(filename));
+        std::shared_ptr<XmlFile> file = openedFiles.find(filename) != openedFiles.end() ? openedFiles[filename] : std::make_shared<XmlFile>(filename);
         if ( isGoingToModifyFile ) file->MarkAsModified();
 
         return file;

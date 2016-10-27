@@ -38,8 +38,8 @@ public:
                   "",
                   "CppPlatform/Extensions/AStaricon.png",
                   "PathfindingBehavior",
-                  std::shared_ptr<gd::Behavior>(new PathfindingBehavior),
-                  std::shared_ptr<gd::BehaviorsSharedData>(new gd::BehaviorsSharedData));
+                  std::make_shared<PathfindingBehavior>(),
+                  std::make_shared<gd::BehaviorsSharedData>());
 
             #if defined(GD_IDE_ONLY)
 
@@ -483,8 +483,8 @@ public:
                   "",
                   "CppPlatform/Extensions/pathfindingobstacleicon.png",
                   "PathfindingObstacleBehavior",
-                  std::shared_ptr<gd::Behavior>(new PathfindingObstacleBehavior),
-                  std::shared_ptr<gd::BehaviorsSharedData>(new gd::BehaviorsSharedData));
+                  std::make_shared<PathfindingObstacleBehavior>(),
+                  std::make_shared<gd::BehaviorsSharedData>());
 
             #if defined(GD_IDE_ONLY)
             aut.SetIncludeFile("PathfindingBehavior/PathfindingObstacleBehavior.h");

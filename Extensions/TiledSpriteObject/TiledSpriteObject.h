@@ -31,7 +31,7 @@ public :
 
     TiledSpriteObject(gd::String name_);
     virtual ~TiledSpriteObject() {};
-    virtual gd::Object * Clone() const { return new TiledSpriteObject(*this);}
+    virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<TiledSpriteObject>(*this); }
 
     #if defined(GD_IDE_ONLY)
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
@@ -74,7 +74,7 @@ public :
 
     RuntimeTiledSpriteObject(RuntimeScene & scene, const TiledSpriteObject & tiledSpriteObject);
     virtual ~RuntimeTiledSpriteObject() {};
-    virtual RuntimeObject * Clone() const { return new RuntimeTiledSpriteObject(*this);}
+    virtual std::unique_ptr<RuntimeObject> Clone() const { return gd::make_unique<RuntimeTiledSpriteObject>(*this);}
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 

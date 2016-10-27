@@ -25,7 +25,7 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension & extension)
           "",
           "CppPlatform/Extensions/draggableicon.png",
           "DraggableBehavior",
-          std::shared_ptr<gd::Behavior>(new DraggableBehavior),
+          std::make_shared<DraggableBehavior>(),
           std::shared_ptr<gd::BehaviorsSharedData>());
 
     #if defined(GD_IDE_ONLY)

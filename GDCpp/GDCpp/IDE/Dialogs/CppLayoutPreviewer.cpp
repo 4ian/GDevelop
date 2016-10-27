@@ -274,7 +274,7 @@ void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
 
     //Create now the window if necessary (not done in the constructor because, on linux, the window was not hidden).
     if (!externalPreviewWindow)
-        externalPreviewWindow = std::shared_ptr<RenderDialog>(new RenderDialog(editor.GetParentControl(), this) );
+        externalPreviewWindow = std::make_shared<RenderDialog>(editor.GetParentControl(), this);
 
     externalPreviewWindow->Show(true);
 
@@ -365,7 +365,7 @@ void CppLayoutPreviewer::SetParentAuiManager(wxAuiManager * manager)
         }
         if ( !profiler )
         {
-            profiler = std::shared_ptr<ProfileDlg>(new ProfileDlg(editor.GetParentControl(), *this));
+            profiler = std::make_shared<ProfileDlg>(editor.GetParentControl(), *this);
             editor.GetLayout().SetProfiler(profiler.get());
             if ( !parentAuiManager->GetPane("PROFILER").IsOk() )
                 parentAuiManager->AddPane( profiler.get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );

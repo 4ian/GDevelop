@@ -86,12 +86,12 @@ const Resource & ResourcesManager::GetResource(const gd::String & name) const
 std::shared_ptr<Resource> ResourcesManager::CreateResource(const gd::String & kind)
 {
     if (kind == "image")
-        return std::shared_ptr<Resource>(new ImageResource);
+        return std::make_shared<ImageResource>();
     else if (kind == "audio")
-        return std::shared_ptr<Resource>(new AudioResource);
+        return std::make_shared<AudioResource>();
 
     std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
-    return std::shared_ptr<Resource>(new Resource);
+    return std::make_shared<Resource>();
 }
 
 bool ResourcesManager::HasResource(const gd::String & name) const

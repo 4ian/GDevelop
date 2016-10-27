@@ -56,7 +56,7 @@ void GD_EXTENSION_API CreateSFMLTexture( RuntimeScene & scene, const gd::String 
     //Get or create the texture in memory
     std::shared_ptr<SFMLTextureWrapper> newTexture;
     if ( !scene.GetImageManager()->HasLoadedSFMLTexture(imageName) )
-        newTexture = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
+        newTexture = std::make_shared<SFMLTextureWrapper>();
     else
         newTexture = scene.GetImageManager()->GetSFMLTexture(imageName);
 
@@ -84,7 +84,7 @@ void GD_EXTENSION_API OpenSFMLTextureFromFile( RuntimeScene & scene, const gd::S
     //Get or create the texture in memory
     std::shared_ptr<SFMLTextureWrapper> newTexture;
     if ( !scene.GetImageManager()->HasLoadedSFMLTexture(imageName) )
-        newTexture = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
+        newTexture = std::make_shared<SFMLTextureWrapper>();
     else
         newTexture = scene.GetImageManager()->GetSFMLTexture(imageName);
 

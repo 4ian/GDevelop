@@ -7,6 +7,8 @@
 #ifndef EXTENSIONBASE_INL
 #define EXTENSIONBASE_INL
 
+#include "GDCore/Tools/MakeUnique.h"
+
 template<class T, class U>
 void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, gd::String className)
 {
@@ -14,11 +16,11 @@ void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, gd::String cla
     object.className = className;
 #endif
     runtimeObjectCreationFunctionTable[object.GetName()] =
-        [](RuntimeScene & scene, const gd::Object & object) -> RuntimeObject* {
+        [](RuntimeScene & scene, const gd::Object & object) -> std::unique_ptr<RuntimeObject> {
             try
             {
                 const T& derivedObject = dynamic_cast<const T&>(object);
-                return new U(scene, derivedObject);
+                return gd::make_unique<U>(scene, derivedObject);
             }
             catch(const std::bad_cast &e)
             {
@@ -26,7 +28,7 @@ void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, gd::String cla
                 std::cout << e.what() << std::endl;
             }
 
-            return nullptr;
+            return std::unique_ptr<U>();
         };
 }
 

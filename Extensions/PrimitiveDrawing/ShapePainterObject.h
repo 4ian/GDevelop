@@ -113,7 +113,7 @@ class GD_EXTENSION_API ShapePainterObject : public gd::Object, public ShapePaint
 public:
     ShapePainterObject(gd::String name_);
     virtual ~ShapePainterObject() {};
-    virtual gd::Object * Clone() const { return new ShapePainterObject(*this); }
+    virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<ShapePainterObject>(*this); }
 
     #if defined(GD_IDE_ONLY)
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
@@ -139,7 +139,7 @@ class GD_EXTENSION_API RuntimeShapePainterObject : public RuntimeObject, public 
 public:
     RuntimeShapePainterObject(RuntimeScene & scene, const ShapePainterObject & shapePainterObject);
     virtual ~RuntimeShapePainterObject() {};
-    virtual RuntimeObject * Clone() const { return new RuntimeShapePainterObject(*this);}
+    virtual std::unique_ptr<RuntimeObject> Clone() const { return gd::make_unique<RuntimeShapePainterObject>(*this);}
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 

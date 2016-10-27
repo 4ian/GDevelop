@@ -107,7 +107,7 @@ public:
             _("Function event : An event which is launched only thanks to action \"Launch a function\""),
             "",
             "res/function.png",
-            std::shared_ptr<gd::BaseEvent>(new FunctionEvent))
+            std::make_shared<FunctionEvent>())
             .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator,
                 gd::EventsCodeGenerationContext & /* The function has nothing to do with the current context */){
                 FunctionEvent & event = dynamic_cast<FunctionEvent&>(event_);

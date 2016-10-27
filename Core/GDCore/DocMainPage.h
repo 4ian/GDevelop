@@ -531,7 +531,7 @@ AddEvent("Name",
          "Description",
          "Group",
          "path-to-a-16-by-16-icon.png",
-         std::shared_ptr<gd::BaseEvent>(new EventClassName))
+         std::make_shared<EventClassName>())
  * \endcode
  *
  * The event must be able to generate its code when events are being translated to C++ or Javascript:<br>
@@ -543,7 +543,7 @@ AddEvent("Standard",
          _("Standard event: Actions are run if conditions are fulfilled."),
          "",
          "res/eventaddicon.png",
-         std::shared_ptr<gd::BaseEvent>(new gd::StandardEvent))
+         std::make_shared<gd::StandardEvent>())
 	.SetCodeGenerator(std::shared_ptr<gd::EventMetadata::CodeGenerator>(codeGen));
  * \endcode
 
@@ -560,8 +560,8 @@ gd::BehaviorMetadata & aut = AddBehavior("Name",
 	"Group",
 	"path-to-a-32-by-32-icon.png",
 	"BehaviorClassName",
-	std::shared_ptr<gd::Behavior>(new BehaviorClassName),
-	std::shared_ptr<gd::BehaviorsSharedData>(new BehaviorSharedDataClassName));
+	std::make_shared<BehaviorClassName>(),
+	std::make_shared<BehaviorSharedDataClassName>());
  * \endcode
  * The last line can be replaced by <code>std::shared_ptr<gd::BehaviorsSharedData>()</code> if no shared data are being used.
  *
@@ -619,8 +619,8 @@ public:
                        "",
                        "CppPlatform/Extensions/myicon.png",
                        "PhysicsBehavior",
-                       std::shared_ptr<gd::Behavior>(new BehaviorClassName),
-                       std::shared_ptr<gd::BehaviorsSharedData>(new BehaviorSharedDataClassName));
+                       std::make_shared<BehaviorClassName>(),
+                       std::make_shared<BehaviorSharedDataClassName>());
 
             #if defined(GD_IDE_ONLY)
             behaviorInfo.SetIncludeFile("MyExtension/MyIncludeFile.h");

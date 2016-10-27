@@ -58,7 +58,7 @@ gd::BaseEvent & EventsList::InsertNewEvent(gd::Project & project, const gd::Stri
     if ( event == std::shared_ptr<gd::BaseEvent>())
     {
         std::cout << "Unknown event of type " << eventType;
-        event = std::shared_ptr<gd::BaseEvent>(new EmptyEvent);
+        event = std::make_shared<EmptyEvent>();
     }
 
     InsertEvent(event, position);

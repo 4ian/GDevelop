@@ -42,7 +42,7 @@ public :
 
     SoundObject(gd::String name_);
     virtual ~SoundObject() {};
-    virtual gd::Object * Clone() const { return new SoundObject(*this);}
+    virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<SoundObject>(*this); }
 
     #if defined(GD_IDE_ONLY)
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
@@ -108,7 +108,7 @@ public :
     RuntimeSoundObject(const RuntimeSoundObject & other);
     RuntimeSoundObject & operator=(const RuntimeSoundObject & other);
     virtual ~RuntimeSoundObject();
-    virtual RuntimeSoundObject * Clone() const { return new RuntimeSoundObject(*this);}
+    virtual std::unique_ptr<RuntimeObject> Clone() const { return gd::make_unique<RuntimeSoundObject>(*this);}
 
     virtual bool ExtraInitializationFromInitialInstance(const gd::InitialInstance & position);
 

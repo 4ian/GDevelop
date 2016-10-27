@@ -29,7 +29,7 @@ const gd::String & SoundManager::GetFileFromSoundName(const gd::String & name) c
 
 void SoundManager::PlaySoundOnChannel(const gd::String & name, unsigned int channel, bool repeat, float volume, float pitch)
 {
-    std::shared_ptr<Sound> sound = std::shared_ptr<Sound>(new Sound(GetFileFromSoundName(name)));
+    std::shared_ptr<Sound> sound = std::make_shared<Sound>(GetFileFromSoundName(name));
     sound->sound.play();
 
     SetSoundOnChannel(channel, sound);

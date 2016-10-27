@@ -70,37 +70,37 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonInstructionsExten
     extension.AddEvent("Standard", _("Standard event"),
               _("Standard event: Actions are run if conditions are fulfilled."),
               "", "res/eventaddicon.png",
-              std::shared_ptr<gd::BaseEvent>(new gd::StandardEvent));
+              std::make_shared<gd::StandardEvent>());
 
     extension.AddEvent("Link", _("Link"),
               _("Link to some external events"),
               "", "res/lienaddicon.png",
-              std::shared_ptr<gd::BaseEvent>(new gd::LinkEvent));
+              std::make_shared<gd::LinkEvent>());
 
     extension.AddEvent("Comment", _("Comment"),
               _("Event displaying a text in the events editor"),
               "", "res/comment.png",
-              std::shared_ptr<gd::BaseEvent>(new gd::CommentEvent));
+              std::make_shared<gd::CommentEvent>());
 
     extension.AddEvent("While", _("While"),
               _("The event is repeated while the conditions are true"),
               "", "res/while.png",
-              std::shared_ptr<gd::BaseEvent>(new gd::WhileEvent));
+              std::make_shared<gd::WhileEvent>());
 
     extension.AddEvent("Repeat", _("Repeat"),
               _("Event repeated a number of times"),
               "", "res/repeat.png",
-              std::shared_ptr<gd::BaseEvent>(new gd::RepeatEvent));
+              std::make_shared<gd::RepeatEvent>());
 
     extension.AddEvent("ForEach", _("For each object"),
               _("Repeat the event for each specified object."),
               "", "res/foreach.png",
-              std::shared_ptr<gd::BaseEvent>(new gd::ForEachEvent));
+              std::make_shared<gd::ForEachEvent>());
 
     extension.AddEvent("Group", _("Group"),
               _("Group containing events"),
               "", "res/foreach.png",
-              std::shared_ptr<gd::BaseEvent>(new gd::GroupEvent));
+              std::make_shared<gd::GroupEvent>());
 #endif
 }
 

@@ -37,7 +37,7 @@ public :
 
     RuntimeTileMapObject(RuntimeScene & scene, const TileMapObject & tileMapObject);
     virtual ~RuntimeTileMapObject() {};
-    virtual RuntimeObject * Clone() const { return new RuntimeTileMapObject(*this);}
+    virtual std::unique_ptr<RuntimeObject> Clone() const { return gd::make_unique<RuntimeTileMapObject>(*this);}
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 

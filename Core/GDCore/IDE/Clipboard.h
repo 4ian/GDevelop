@@ -41,8 +41,8 @@ public:
      */
     static void DestroySingleton();
 
-    void SetObject( const gd::Object * object );
-    gd::Object * GetObject();
+    void SetObject( const gd::Object& object );
+    std::unique_ptr<gd::Object> GetObject();
     bool HasObject() { return hasObject; };
     void ForgetObject() { hasObject = false; };
 
@@ -82,7 +82,7 @@ private:
     Clipboard();
     virtual ~Clipboard();
 
-    gd::Object * objectCopied;
+    std::unique_ptr<gd::Object> objectCopied;
     bool hasObject;
 
     gd::EventsList eventsCopied;

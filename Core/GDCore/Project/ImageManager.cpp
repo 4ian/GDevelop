@@ -21,7 +21,7 @@ ImageManager::ImageManager() :
     resourcesManager(NULL)
 {
     #if !defined(EMSCRIPTEN)
-    badTexture = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
+    badTexture = std::make_shared<SFMLTextureWrapper>();
     badTexture->texture.loadFromMemory(gd::InvalidImageData, sizeof(gd::InvalidImageData));
     badTexture->texture.setSmooth(false);
     badTexture->image = badTexture->texture.copyToImage();
@@ -124,7 +124,7 @@ std::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const gd::S
 
     std::cout << "Load OpenGL Texture" << name << std::endl;
 
-    std::shared_ptr<OpenGLTextureWrapper> texture = std::shared_ptr<OpenGLTextureWrapper>(new OpenGLTextureWrapper(GetSFMLTexture(name)));
+    std::shared_ptr<OpenGLTextureWrapper> texture = std::make_shared<OpenGLTextureWrapper>(GetSFMLTexture(name));
     alreadyLoadedOpenGLTextures[name] = texture;
     return texture;
 }

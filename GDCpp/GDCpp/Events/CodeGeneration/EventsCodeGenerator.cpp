@@ -521,7 +521,7 @@ void EventsCodeGenerator::PreprocessEventList( gd::EventsList & eventsList )
             if ( scene.GetProfiler() && scene.GetProfiler()->profilingActivated && eventsList[i].IsExecutable() )
             {
                 //Define a new profile event
-                std::shared_ptr<ProfileEvent> profileEvent = std::shared_ptr<ProfileEvent>(new ProfileEvent);
+                std::shared_ptr<ProfileEvent> profileEvent = std::make_shared<ProfileEvent>();
                 profileEvent->originalEvent = eventsList[i].originalEvent;
                 profileEvent->SetPreviousProfileEvent(previousProfileEvent);
 
@@ -539,7 +539,7 @@ void EventsCodeGenerator::PreprocessEventList( gd::EventsList & eventsList )
     if ( !eventsList.IsEmpty() && scene.GetProfiler() && scene.GetProfiler()->profilingActivated )
     {
         //Define a new profile events
-        std::shared_ptr<ProfileEvent> profileEvent = std::shared_ptr<ProfileEvent>(new ProfileEvent);
+        std::shared_ptr<ProfileEvent> profileEvent = std::make_shared<ProfileEvent>();
         profileEvent->SetPreviousProfileEvent(previousProfileEvent);
 
         //Add it at the end of the events list

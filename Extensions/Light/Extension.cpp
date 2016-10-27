@@ -197,8 +197,8 @@ public:
               "",
               "CppPlatform/Extensions/lightObstacleIcon32.png",
               "LightObstacleBehavior",
-              std::shared_ptr<gd::Behavior>(new LightObstacleBehavior),
-              std::shared_ptr<gd::BehaviorsSharedData>(new SceneLightObstacleDatas));
+              std::make_shared<LightObstacleBehavior>(),
+              std::make_shared<SceneLightObstacleDatas>());
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

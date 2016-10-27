@@ -12,6 +12,7 @@
 #include "GDCore/String.h"
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/LayoutEditorPreviewer.h"
+
 namespace gd { class InstructionsMetadataHolder; }
 namespace gd { class Project; }
 namespace gd { class Object; }
@@ -24,8 +25,7 @@ namespace gd { class PlatformExtension; }
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class ProjectExporter; }
 
-typedef void (*DestroyFunPtr)(gd::Object*);
-typedef gd::Object * (*CreateFunPtr)(gd::String name);
+typedef std::unique_ptr<gd::Object> (*CreateFunPtr)(gd::String name);
 
 #undef CreateEvent
 

@@ -176,8 +176,8 @@ public:
                   "",
                   "CppPlatform/Extensions/networkicon32.png",
                   "NetworkBehavior",
-                  std::shared_ptr<gd::Behavior>(new NetworkBehavior),
-                  std::shared_ptr<gd::BehaviorsSharedData>(new SceneNetworkDatas));
+                  std::make_shared<NetworkBehavior>(),
+                  std::make_shared<SceneNetworkDatas>());
 
             #if defined(GD_IDE_ONLY)
             aut.SetIncludeFile("Network/NetworkBehavior.h");

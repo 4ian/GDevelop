@@ -121,7 +121,7 @@ void Layer::UnserializeFrom(const SerializerElement & element)
     {
         const SerializerElement & effectElement = effectsElement.GetChild(i);
 
-        auto effect = std::shared_ptr<gd::Effect>(new Effect);
+        auto effect = std::make_shared<Effect>();
         effect->UnserializeFrom(effectElement);
         effects.push_back(effect);
     }
@@ -180,7 +180,7 @@ std::size_t Layer::GetEffectPosition(const gd::String & name) const
 
 gd::Effect & Layer::InsertNewEffect(const gd::String & name, std::size_t position)
 {
-    auto newEffect = std::shared_ptr<gd::Effect>(new Effect);
+    auto newEffect = std::make_shared<Effect>();
     newEffect->SetName(name);
     newEffect->SetEffectName(name);
     if (position<effects.size())
@@ -193,7 +193,7 @@ gd::Effect & Layer::InsertNewEffect(const gd::String & name, std::size_t positio
 
 void Layer::InsertEffect(const gd::Effect & effect, std::size_t position)
 {
-    auto newEffect = std::shared_ptr<gd::Effect>(new Effect(effect));
+    auto newEffect = std::make_shared<gd::Effect>(effect);
     if (position<effects.size())
         effects.insert(effects.begin()+position, newEffect);
     else

@@ -46,7 +46,7 @@ public :
 
     LightObject(gd::String name_);
     virtual ~LightObject() {};
-    virtual gd::Object * Clone() const { return new LightObject(*this);}
+    virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<LightObject>(*this); }
 
     #if defined(GD_IDE_ONLY)
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
@@ -94,7 +94,7 @@ public :
 
     RuntimeLightObject(RuntimeScene & scene, const LightObject & lightObject);
     virtual ~RuntimeLightObject() {};
-    virtual RuntimeObject * Clone() const { return new RuntimeLightObject(*this);}
+    virtual std::unique_ptr<RuntimeObject> Clone() const { return gd::make_unique<RuntimeLightObject>(*this);}
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 

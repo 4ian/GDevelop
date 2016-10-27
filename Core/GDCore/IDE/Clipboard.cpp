@@ -21,16 +21,16 @@ namespace gd
 {
 
 Clipboard::Clipboard() :
-objectCopied(NULL),
+objectCopied(nullptr),
 hasObject(false),
 hasEvents(false),
 hasInstructions(false),
 instructionsAreConditions(true),
-externalEventsCopied(NULL),
+externalEventsCopied(nullptr),
 hasExternalEvents(false),
-externalLayoutCopied(NULL),
+externalLayoutCopied(nullptr),
 hasExternalLayout(false),
-layoutCopied(NULL),
+layoutCopied(nullptr),
 hasLayout(false),
 hasObjectGroup(false),
 hasInstances(false)
@@ -60,14 +60,14 @@ void Clipboard::DestroySingleton()
     }
 }
 
-void Clipboard::SetObject( const gd::Object * object )
+void Clipboard::SetObject( const gd::Object& object )
 {
-    objectCopied = object->Clone();
+    objectCopied = object.Clone();
 
     hasObject = true;
 }
 
-gd::Object * Clipboard::GetObject()
+std::unique_ptr<gd::Object> Clipboard::GetObject()
 {
     return objectCopied->Clone();
 }

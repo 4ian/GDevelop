@@ -1202,7 +1202,7 @@ void ObjectsEditor::OnCopySelected(wxCommandEvent& event)
         if ( !objects.HasObjectNamed(name) )
             return;
 
-        gd::Clipboard::Get()->SetObject(&objects.GetObject(name));
+        gd::Clipboard::Get()->SetObject(objects.GetObject(name));
         gd::Clipboard::Get()->ForgetObjectGroup();
     }
     else if ( data->GetString() == "GlobalGroup" || data->GetString() == "LayoutGroup" )
@@ -1234,7 +1234,7 @@ void ObjectsEditor::OnCutSelected(wxCommandEvent& event)
         if ( !objects.HasObjectNamed(name) )
             return;
 
-        gd::Clipboard::Get()->SetObject(&objects.GetObject(name));
+        gd::Clipboard::Get()->SetObject(objects.GetObject(name));
         gd::Clipboard::Get()->ForgetObjectGroup();
 
         objects.RemoveObject(name);
@@ -1278,7 +1278,7 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
         gd::ClassWithObjects & objects = !globalObject ? static_cast<gd::ClassWithObjects&>(layout) : project;
 
         //Add a new object of selected type to objects list
-        gd::Object * object = clipboard->GetObject()->Clone();
+        std::unique_ptr<gd::Object> object = clipboard->GetObject();
         object->SetName(gd::NewNameGenerator::Generate(object->GetName(), _("CopyOf"), [&nameChecker, globalObject](const gd::String & name) {
             return nameChecker.HasObjectOrGroupNamed(
                 name, globalObject /* Only search other layouts if it's a global object */) != gd::ObjectOrGroupFinder::No;

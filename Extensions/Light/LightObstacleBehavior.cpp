@@ -58,7 +58,7 @@ void LightObstacleBehavior::DoStepPostEvents(RuntimeScene & scene)
     //Get a manager for the scene
     if ( RuntimeLightObject::lightManagersList[&scene].expired() )
     {
-        manager = std::shared_ptr<Light_Manager>(new Light_Manager);
+        manager = std::make_shared<Light_Manager>();
         RuntimeLightObject::lightManagersList[&scene] = manager;
     }
     else

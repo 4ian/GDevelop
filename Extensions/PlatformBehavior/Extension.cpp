@@ -28,8 +28,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
               "",
               "CppPlatform/Extensions/platformerobjecticon.png",
               "PlatformerObjectBehavior",
-              std::shared_ptr<gd::Behavior>(new PlatformerObjectBehavior),
-              std::shared_ptr<gd::BehaviorsSharedData>(new gd::BehaviorsSharedData));
+              std::make_shared<PlatformerObjectBehavior>(),
+              std::make_shared<gd::BehaviorsSharedData>());
 
         #if defined(GD_IDE_ONLY)
         aut.SetIncludeFile("PlatformBehavior/PlatformerObjectBehavior.h");
@@ -429,8 +429,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
               "",
               "CppPlatform/Extensions/platformicon.png",
               "PlatformBehavior",
-              std::shared_ptr<gd::Behavior>(new PlatformBehavior),
-              std::shared_ptr<gd::BehaviorsSharedData>(new gd::BehaviorsSharedData));
+              std::make_shared<PlatformBehavior>(),
+              std::make_shared<gd::BehaviorsSharedData>());
 
         #if defined(GD_IDE_ONLY)
         aut.SetIncludeFile("PlatformBehavior/PlatformBehavior.h");

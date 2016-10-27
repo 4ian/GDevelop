@@ -53,7 +53,7 @@ public:
 
     RuntimeSpriteObject(RuntimeScene & scene, const gd::SpriteObject & spriteObject);
     virtual ~RuntimeSpriteObject();
-    virtual RuntimeObject * Clone() const { return new RuntimeSpriteObject(*this);}
+    virtual std::unique_ptr<RuntimeObject> Clone() const { return gd::make_unique<RuntimeSpriteObject>(*this);}
 
     virtual bool ExtraInitializationFromInitialInstance(const gd::InitialInstance & position);
 

@@ -100,7 +100,7 @@ RuntimeLightObject::RuntimeLightObject(RuntimeScene & scene, const LightObject &
     //Get a manager for the scene
     if ( lightManagersList[&scene].expired() )
     {
-        manager = std::shared_ptr<Light_Manager>(new Light_Manager);
+        manager = std::make_shared<Light_Manager>();
         lightManagersList[&scene] = manager;
     }
     else
@@ -124,7 +124,7 @@ void RuntimeLightObject::UpdateGlobalLightMembers()
     if ( globalLight )
     {
         //Create supplementary members for the global light
-        if ( !globalLightImage ) globalLightImage = std::shared_ptr<sf::RenderTexture>(new sf::RenderTexture);
+        if ( !globalLightImage ) globalLightImage = std::make_shared<sf::RenderTexture>();
     }
     else
     {

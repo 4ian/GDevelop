@@ -25,7 +25,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension & extension)
           "",
           "CppPlatform/Extensions/destroyoutsideicon.png",
           "DestroyOutsideBehavior",
-          std::shared_ptr<gd::Behavior>(new DestroyOutsideBehavior),
+          std::make_shared<DestroyOutsideBehavior>(),
           std::shared_ptr<gd::BehaviorsSharedData>());
 
     #if defined(GD_IDE_ONLY)

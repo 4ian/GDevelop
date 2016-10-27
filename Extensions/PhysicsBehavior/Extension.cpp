@@ -41,8 +41,8 @@ public:
                   "",
                   "res/physics32.png",
                   "PhysicsBehavior",
-                  std::shared_ptr<gd::Behavior>(new PhysicsBehavior),
-                  std::shared_ptr<gd::BehaviorsSharedData>(new ScenePhysicsDatas));
+                  std::make_shared<PhysicsBehavior>(),
+                  std::make_shared<ScenePhysicsDatas>());
 
             #if defined(GD_IDE_ONLY)
             aut.SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");

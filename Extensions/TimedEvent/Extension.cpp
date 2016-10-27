@@ -44,7 +44,7 @@ public:
                       _("Event which launch its conditions and actions only after a amount of time is reached."),
                       "",
                       "CppPlatform/Extensions/timedevent16.png",
-                      std::shared_ptr<gd::BaseEvent>(new TimedEvent))
+                      std::make_shared<TimedEvent>())
             .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
                 TimedEvent & event = dynamic_cast<TimedEvent&>(event_);
 

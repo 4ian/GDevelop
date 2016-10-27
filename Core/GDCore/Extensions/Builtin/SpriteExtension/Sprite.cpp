@@ -142,7 +142,7 @@ void Sprite::MakeSpriteOwnsItsImage()
 {
     if ( !hasItsOwnImage || sfmlImage == std::shared_ptr<SFMLTextureWrapper>() )
     {
-        sfmlImage = std::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper(sfmlImage->texture)); //Copy the texture.
+        sfmlImage = std::make_shared<SFMLTextureWrapper>(sfmlImage->texture); //Copy the texture.
         sfmlSprite.setTexture(sfmlImage->texture);
         hasItsOwnImage = true;
     }

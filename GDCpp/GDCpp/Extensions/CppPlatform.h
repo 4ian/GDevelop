@@ -16,8 +16,7 @@ namespace gd { class Object; }
 class RuntimeObject;
 class RuntimeScene;
 
-typedef void (*DestroyRuntimeObjectFunPtr)(RuntimeObject*);
-typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const gd::Object & object);
+typedef std::unique_ptr<RuntimeObject> (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const gd::Object & object);
 
 /**
  * \brief GDevelop C++ Platform

@@ -16,6 +16,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/VersionPriv.h"
+
 namespace gd { class Instruction; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
@@ -29,8 +30,7 @@ namespace gd { class BehaviorsSharedData; }
 namespace gd { class Behavior; }
 namespace gd { class Object; }
 
-typedef void (*DestroyFunPtr)(gd::Object*);
-typedef gd::Object * (*CreateFunPtr)(gd::String name);
+typedef std::unique_ptr<gd::Object> (*CreateFunPtr)(gd::String name);
 
 namespace gd
 {

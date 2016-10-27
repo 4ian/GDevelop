@@ -84,7 +84,7 @@ void LayoutEditorCanvas::OnUpdate()
 void LayoutEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
 {
     //Create the shapes
-    std::shared_ptr<sf::Shape> selection = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
+    std::shared_ptr<sf::Shape> selection = std::make_shared<sf::RectangleShape>(sf::Vector2f(rectangle.width, rectangle.height));
     selection->setPosition(rectangle.left, rectangle.top);
     selection->setFillColor(sf::Color( 0, 0, 200, 40 ));
     selection->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
@@ -97,20 +97,20 @@ void LayoutEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < std::sha
 void LayoutEditorCanvas::DrawAngleButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle )
 {
     //Create the shapes
-    std::shared_ptr<sf::Shape> centerShape = std::shared_ptr<sf::Shape>(new sf::CircleShape(3));
+    std::shared_ptr<sf::Shape> centerShape = std::make_shared<sf::CircleShape>(3);
     centerShape->setPosition(position);
     centerShape->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
     centerShape->setOutlineThickness(1);
     centerShape->setFillColor(sf::Color( 0, 0, 200, 40 ));
     centerShape->setOrigin(sf::Vector2f(3,3));
 
-    std::shared_ptr<sf::Shape> angleButton = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
+    std::shared_ptr<sf::Shape> angleButton = std::make_shared<sf::RectangleShape>(sf::Vector2f(smallButtonSize, smallButtonSize));
     angleButton->setPosition(position+sf::Vector2f(25.0*cos(angle/180.0*3.14159), 25.0*sin(angle/180.0*3.14159)));
     angleButton->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
     angleButton->setOutlineThickness(1);
     angleButton->setOrigin(sf::Vector2f(smallButtonSize/2.0, smallButtonSize/2.0));
 
-    std::shared_ptr<sf::Shape> line = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(26, 1)));
+    std::shared_ptr<sf::Shape> line = std::make_shared<sf::RectangleShape>(sf::Vector2f(26, 1));
     line->setPosition(position+sf::Vector2f(3.0*cos(angle/180.0*3.14159), 3.0*sin(angle/180.0*3.14159)));
     line->setRotation(angle);
     line->setFillColor(sf::Color( 0, 0, 200, 128 ));
@@ -136,7 +136,7 @@ void LayoutEditorCanvas::DrawAngleButtonGuiElement(std::vector < std::shared_ptr
 
 void LayoutEditorCanvas::DrawHighlightRectangleGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
 {
-    std::shared_ptr<sf::Shape> highlight = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
+    std::shared_ptr<sf::Shape> highlight = std::make_shared<sf::RectangleShape>(sf::Vector2f(rectangle.width, rectangle.height));
     highlight->setPosition(rectangle.left, rectangle.top);
     highlight->setFillColor(sf::Color( 230, 230, 230, 20 ));
     highlight->setOutlineColor(sf::Color( 200, 200, 200, 70 ));
@@ -154,7 +154,7 @@ void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < std::shared_ptr<
     guiElements.push_back(guiElement);
 
     //Draw button
-    std::shared_ptr<sf::Shape> button = std::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
+    std::shared_ptr<sf::Shape> button = std::make_shared<sf::RectangleShape>(sf::Vector2f(smallButtonSize, smallButtonSize));
     button->setPosition(position);
     button->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
     button->setOutlineThickness(1);

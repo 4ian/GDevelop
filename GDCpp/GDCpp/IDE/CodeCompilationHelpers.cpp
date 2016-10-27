@@ -134,7 +134,7 @@ namespace
             task.compilerCall.outputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&sourceFile)+"RuntimeObjectFile.o");
             task.compilerCall.extraHeaderDirectories.push_back(wxFileName::FileName(game.GetProjectFile()).GetPath());
             task.scene = NULL;
-            task.postWork = std::shared_ptr<CodeCompilerExtraWork>(new SourceFileCodeCompilerPostWork(optionalScene));
+            task.postWork = std::make_shared<SourceFileCodeCompilerPostWork>(optionalScene);
             task.userFriendlyName = "Compilation of file "+task.compilerCall.inputFile;
 
             CodeCompiler::Get()->AddTask(task);
@@ -155,7 +155,7 @@ namespace
 
                     task.compilerCall.inputFile = CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&events)+"RuntimeEventsSource.cpp";
                     task.compilerCall.outputFile = CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&events)+"RuntimeObjectFile.o";
-                    task.preWork = std::shared_ptr<CodeCompilerExtraWork>(new ExternalEventsCodeCompilerRuntimePreWork(&game, &events, resourceWorker));
+                    task.preWork = std::make_shared<ExternalEventsCodeCompilerRuntimePreWork>(&game, &events, resourceWorker);
                     task.userFriendlyName = "Compilation of external events "+events.GetName();
 
                     CodeCompiler::Get()->AddTask(task);
@@ -183,7 +183,7 @@ namespace
         task.compilerCall.eventsGeneratedCode = true;
         task.compilerCall.inputFile = CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&scene)+"ObjectFile.o";
         task.compilerCall.outputFile = CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&scene)+"Code.dll";
-        task.postWork = std::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerLinkingPostWork(&game, &scene));
+        task.postWork = std::make_shared<EventsCodeCompilerLinkingPostWork>(&game, &scene);
         task.scene = &scene;
         task.userFriendlyName = "Linking code for scene "+scene.GetName();
 
@@ -506,8 +506,8 @@ void GD_API CodeCompilationHelpers::CreateSceneEventsCompilationTask(gd::Project
     task.compilerCall.inputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&scene)+"EventsSource.cpp");
     task.compilerCall.outputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&scene)+"ObjectFile.o");
     task.scene = &scene;
-    task.preWork = std::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPreWork(&game, &scene));
-    task.postWork = std::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPostWork(&game, &scene));
+    task.preWork = std::make_shared<EventsCodeCompilerPreWork>(&game, &scene);
+    task.postWork = std::make_shared<EventsCodeCompilerPostWork>(&game, &scene);
     task.userFriendlyName = "Compilation of events of scene "+scene.GetName();
 
     CodeCompiler::Get()->AddTask(task);
@@ -527,7 +527,7 @@ void GD_API CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(gd::
     task.compilerCall.extraHeaderDirectories.push_back(wxFileName::FileName(game.GetProjectFile()).GetPath());
 
     task.scene = scene;
-    if ( scene ) task.postWork = std::shared_ptr<CodeCompilerExtraWork>(new SourceFileCodeCompilerPostWork(scene));
+    if ( scene ) task.postWork = std::make_shared<SourceFileCodeCompilerPostWork>(scene);
 
     task.userFriendlyName = "Compilation of file "+file.GetFileName();
 
@@ -543,8 +543,8 @@ void  GD_API CodeCompilationHelpers::CreateExternalEventsCompilationTask(gd::Pro
     task.compilerCall.inputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&events)+"EventsSource.cpp");
     task.compilerCall.outputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(&events)+"ObjectFile.o");
 
-    task.preWork = std::shared_ptr<CodeCompilerExtraWork>(new ExternalEventsCodeCompilerPreWork(&game, &events));
-    task.postWork = std::shared_ptr<CodeCompilerExtraWork>(new ExternalEventsCodeCompilerPostWork(&game, &events));
+    task.preWork = std::make_shared<ExternalEventsCodeCompilerPreWork>(&game, &events);
+    task.postWork = std::make_shared<ExternalEventsCodeCompilerPostWork>(&game, &events);
     task.userFriendlyName = "Compilation of external events "+events.GetName();
 
     CodeCompiler::Get()->AddTask(task);

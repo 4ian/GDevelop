@@ -35,21 +35,25 @@ std::wstring GetStdioMode(std::ios_base::openmode mode)
 	else if(MODE(true, true, false, false)) strMode += L"r+";
 	else if(MODE(true, true, true, false)) strMode += L"w+";
 
-	if(mode & std::ios_base::binary) strMode += L"b";
+	if((mode & std::ios_base::binary) != 0) strMode += L"b";
 
 	return strMode;
 }
 #endif
 
-FileStream::InternalBufferType* OpenBuffer(const gd::String & path, std::ios_base::openmode mode) {
+/**
+ * Open the given file into a filebuf and return it.
+ * On Windows, return the associated FILE* inside the file argument.
+ */
+FileStream::InternalBufferType* OpenBuffer(const gd::String & path, std::ios_base::openmode mode, FILE ** file) {
 #if FSTREAM_WINDOWS_MINGW
-	FILE* c_file = _wfopen(path.ToWide().c_str(), GetStdioMode(mode).c_str());
-	if(!c_file)
+	*file = _wfopen(path.ToWide().c_str(), GetStdioMode(mode).c_str());
+	if(!(*file))
 		return nullptr;
-	return new __gnu_cxx::stdio_filebuf<char>(c_file, mode, 1);
+	return new __gnu_cxx::stdio_filebuf<char>(*file, mode, 1);
 #else
-	auto * filebuffer =  new std::filebuf();
-	return filebuffer->open(path.ToUTF8().c_str(), mode);
+	auto * filebuffer = new std::filebuf();
+	return filebuffer->open(path.ToLocale().c_str(), mode);
 #endif
 }
 
@@ -62,7 +66,8 @@ FileStream::FileStream()
 
 FileStream::FileStream(const gd::String & path, std::ios_base::openmode mode) :
 	std::iostream(),
-	m_buffer(OpenBuffer(path, mode))
+	m_file(nullptr),
+	m_buffer(OpenBuffer(path, mode, &m_file))
 {
 	setstate(ios_base::goodbit);
 	if(m_buffer)
@@ -73,6 +78,11 @@ FileStream::FileStream(const gd::String & path, std::ios_base::openmode mode) :
 	}
 	else
 		setstate(ios_base::badbit);
+}
+
+FileStream::~FileStream()
+{
+	close();
 }
 
 /*
@@ -100,9 +110,12 @@ void FileStream::open(const gd::String & path, std::ios_base::openmode mode)
 	}
 	else
 	{
-		auto * newBuffer = OpenBuffer(path, mode);
+		auto * newBuffer = OpenBuffer(path, mode, &m_file);
 		if(newBuffer)
 		{
+			if(m_buffer)
+				m_buffer->close();
+
 			m_buffer.reset(newBuffer);
 			std::iostream::rdbuf(m_buffer.get());
 			if((mode & std::ios_base::ate) != 0)
@@ -123,8 +136,15 @@ bool FileStream::is_open() const
 
 void FileStream::close()
 {
-	if(!m_buffer->close())
+#if FSTREAM_WINDOWS_MINGW
+	if(m_buffer)
+		m_buffer->close();
+	if(!m_file || fclose(m_file) != 0)
 		setstate(ios_base::failbit);
+#else
+	if(!m_buffer || m_buffer->close() == nullptr)
+		setstate(ios_base::failbit);
+#endif
 }
 
 /*void FileStream::swap(FileStream & other) //WILL WORK with GCC>=5 (not 4.9 used on Windows)

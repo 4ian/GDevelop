@@ -33,6 +33,7 @@ public:
 
 	FileStream();
 	FileStream(const gd::String & path, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
+	~FileStream();
 
 	FileStream(const FileStream & other) = delete;
 	FileStream(FileStream && other) = delete; //HACK for GCC 4.9 (Windows)
@@ -51,6 +52,7 @@ public:
 	// void swap(FileStream & other); //WILL WORK with GCC>=5 (not 4.9 used on Windows)
 
 private:
+	FILE * m_file;
 	std::unique_ptr<InternalBufferType> m_buffer;
 };
 

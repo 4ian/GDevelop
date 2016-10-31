@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-09-18 10:01-0400\n"
+"PO-Revision-Date: 2016-10-31 18:32-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -5914,7 +5914,7 @@ msgstr "Ocultar anuncio banner"
 
 #: ../Extensions//AdMobObject/Extension.cpp:44
 msgid "Hide the banner ad"
-msgstr "Ocultar el banner publicitario"
+msgstr "Oculta el anuncio banner"
 
 #: ../Extensions//AdMobObject/Extension.cpp:45
 msgid "Hide the banner ad of _PARAM0_"
@@ -9736,7 +9736,7 @@ msgstr "Longitud :"
 
 #: ../Extensions//PathBehavior/Extension.cpp:31
 msgid "Path Behavior"
-msgstr "Comportamiento Ruta"
+msgstr "Comportamiento de ruta"
 
 #: ../Extensions//PathBehavior/Extension.cpp:32
 msgid "Behavior allowing to move objects on a predefined path"

@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-09-18 09:59-0400\n"
+"PO-Revision-Date: 2016-10-31 18:30-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -11407,11 +11407,11 @@ msgstr "Kraft anwenden (Winkel)"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:260
 msgid "Apply a force to an object, using an angle and a length as coordinates."
-msgstr ""
+msgstr "Übt Druck auf ein Objekt aus, benutzt Winkel und Länge als Koordinaten."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:261
 msgid "Apply to _PARAM0_ force _PARAM3_ at angle _PARAM2_"
-msgstr ""
+msgstr "Auf _PARAM0_ kraft _PARAM3_ im winkel _PARAM2_ anwenden"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:268
 #: ../Extensions//PhysicsBehavior/Extension.cpp:283
@@ -11428,7 +11428,7 @@ msgstr "Eine Kraft anwenden, der auf die Position des Objekts gerichtet ist."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:275
 msgid "Add to _PARAM0_ force _PARAM4_ toward position _PARAM2_;_PARAM3_"
-msgstr ""
+msgstr "Füge zu _PARAM0_ Kraft _PARAM4_ zur position _PARAM2_;_PARAM3_ hinzu"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:288
 msgid "Add a torque (a rotation)"
@@ -11440,7 +11440,7 @@ msgstr "Drehmoment zu einem Objekt hinzufügen (eine Rotation)."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:290
 msgid "Add to _PARAM0_ torque _PARAM2_"
-msgstr ""
+msgstr "_PARAM0_ Drehmoment _PARAM2_ hinzufügen"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:296
 msgid "Torque value"
@@ -11456,7 +11456,7 @@ msgstr "Modifizieren Sie die Geschwindigkeit eines Objekts."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:303
 msgid "Set linear velocity of _PARAM0_ to _PARAM2_;_PARAM3_"
-msgstr ""
+msgstr "Lineare Geschwindigkeit von _PARAM0_ auf _PARAM_2;_PARAM3_ setzen"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:309
 #: ../Extensions//PhysicsBehavior/Extension.cpp:459
@@ -11505,7 +11505,7 @@ msgstr "Vergleichen sie die Lineare Geschwindigkeit des Objektes."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:345
 msgid "Linear velocity of _PARAM0_ is _PARAM2__PARAM3_"
-msgstr ""
+msgstr "Lineare Geschwindigkeit des _PARAM0_ ist _PARAM2__PARAM3_"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:357
 #: ../Extensions//PhysicsBehavior/Extension.cpp:370
@@ -11515,11 +11515,11 @@ msgstr "Winkelgeschwindigkeit"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:358
 msgid "Modify angular velocity of object."
-msgstr ""
+msgstr "Winkelgeschwindigkeit des Objekts ändern."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:359
 msgid "Set angular speed of _PARAM0_ to _PARAM2_"
-msgstr ""
+msgstr "Winkelgeschwindigkeit des _PARAM0_ auf _PARAM2_ festlegen"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:365
 msgid "New value"
@@ -11527,11 +11527,11 @@ msgstr "Neuer Wert"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:371
 msgid "Compare the angular speed of the object."
-msgstr ""
+msgstr "Vergleichen Sie die Winkelgeschwindigkeit des Objekts."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:372
 msgid "Angular speed of _PARAM0_ is _PARAM2__PARAM3_"
-msgstr ""
+msgstr "Winkelgeschwindigkeit des _PARAM0_ ist _PARAM2__PARAM3_"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:384
 #: ../Extensions//PhysicsBehavior/Extension.cpp:411
@@ -11541,11 +11541,11 @@ msgstr "Lineare Dämpfung"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:385
 msgid "Compare the linear damping of the object."
-msgstr ""
+msgstr "Vergleichen Sie die lineare Dämpfung des Objekts."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:386
 msgid "Linear damping of _PARAM0_ is _PARAM2__PARAM3_"
-msgstr ""
+msgstr "Lineare Dämpfung der _PARAM0_ ist _PARAM2__PARAM3_"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:398
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:812
@@ -11557,19 +11557,20 @@ msgstr "Kollision"
 #: ../Extensions//PhysicsBehavior/Extension.cpp:399
 msgid "Test if two objects are colliding.\n"
 "Attention! Only objects specified in the first parameter will be taken in account by the next actions and conditions, if they are colliding with the other objects."
-msgstr ""
+msgstr "Testen, ob zwei Objekte kollidieren. \n"
+"Vorsicht! Nur im ersten Parameter angegebene Objekte werden durch den nächsten Aktionen und Bedingungen berücksichtigt werden wenn sie mit den anderen Objekten kollidieren."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:400
 msgid "_PARAM0_ is in collision with a _PARAM2_"
-msgstr ""
+msgstr "_PARAM0_ kollidiert gerade mit _PARAM2_"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:412
 msgid "Modify linear damping of object."
-msgstr ""
+msgstr "Ändere Lineare Dämpfung des Objektes."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:413
 msgid "Put linear damping of _PARAM0_ to _PARAM2_"
-msgstr ""
+msgstr "Setze lineare Dämpfung von _PARAM0_ auf _PARAM2_"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:424
 #: ../Extensions//PhysicsBehavior/Extension.cpp:438
@@ -11579,19 +11580,19 @@ msgstr "Winkeldämpfung"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:425
 msgid "Test object's angular damping"
-msgstr ""
+msgstr "Teste die eckige Dämpfung des Objekts"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:426
 msgid "Angular damping of _PARAM0_ is _PARAM2__PARAM3_"
-msgstr ""
+msgstr "Kantige Dämpfung der _PARAM0_ ist _PARAM2__PARAM3_"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:439
 msgid "Modify angular damping of object."
-msgstr ""
+msgstr "Eckige Dämpfung des Objects ändern."
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:440
 msgid "Set angular damping of _PARAM0_ to _PARAM2_"
-msgstr ""
+msgstr "Die eckige Dämpfung von _PARAM0_ auf _PARAM2_ setzen"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:452
 msgid "Modify the gravity"
@@ -11599,7 +11600,7 @@ msgstr "Ändert die Schwerkraft"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:453
 msgid "Set gravity force to _PARAM2_;_PARAM3_"
-msgstr ""
+msgstr "Gravitationskraft auf _PARAM2_;_PARAM3_ setzen"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:454
 msgid "Global options"
@@ -11607,7 +11608,7 @@ msgstr "Globale Optionen"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:465
 msgid "Change collision polygon X scale"
-msgstr ""
+msgstr "Umfang des Kollisions Polygons X ändern"
 
 #: ../Extensions//PhysicsBehavior/Extension.cpp:466
 msgid "Change the X scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."

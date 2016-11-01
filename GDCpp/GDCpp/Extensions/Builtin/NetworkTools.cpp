@@ -79,9 +79,15 @@ void GD_API SendDataToPhpWebPage(const gd::String & webpageurl,
 void GD_API SendHttpRequest(const gd::String & host, const gd::String & uri, const gd::String & body,
     const gd::String & method, const gd::String & contentType, gd::Variable & responseVar)
 {
+    // Separate the host and the port number
+    auto hostInfo = host.Split(U':');
+
+    if(hostInfo.size() < 2)
+        return; //Invalid address (there should be two elements: "http" and "//the.domain.com")
+
     // Create Http
-    sf::Http Http;
-    Http.setHost(host.ToUTF8());
+    sf::Http http;
+    http.setHost(hostInfo[0].ToUTF8() + ":" + hostInfo[1].ToUTF8(), hostInfo.size() > 2 ? hostInfo[2].To<unsigned short>() : 0);
 
     // Create request
     sf::Http::Request request;
@@ -91,7 +97,7 @@ void GD_API SendHttpRequest(const gd::String & host, const gd::String & uri, con
     request.setBody(body.ToUTF8());
 
     // Send request & Get response
-    sf::Http::Response response = Http.sendRequest(request);
+    sf::Http::Response response = http.sendRequest(request);
 
     if (response.getStatus() == sf::Http::Response::Ok)
     {
@@ -102,9 +108,15 @@ void GD_API SendHttpRequest(const gd::String & host, const gd::String & uri, con
 
 void GD_API DownloadFile( const gd::String & host, const gd::String & uri, const gd::String & outputfilename )
 {
+    // Separate the host and the port number
+    auto hostInfo = host.Split(U':');
+
+    if(hostInfo.size() < 2)
+        return; //Invalid address (there should be two elements: "http" and "//the.domain.com")
+
     // Create Http
-    sf::Http Http;
-    Http.setHost(host.ToUTF8());
+    sf::Http http;
+    http.setHost(hostInfo[0].ToUTF8() + ":" + hostInfo[1].ToUTF8(), hostInfo.size() > 2 ? hostInfo[2].To<unsigned short>() : 0);
 
     // Create request
     sf::Http::Request Request;
@@ -112,7 +124,7 @@ void GD_API DownloadFile( const gd::String & host, const gd::String & uri, const
     Request.setUri(uri.ToUTF8());
 
     // Send request & Get response
-    sf::Http::Response datas = Http.sendRequest(Request);
+    sf::Http::Response datas = http.sendRequest(Request);
 
     ofstream ofile(outputfilename.ToLocale().c_str(), ios_base::binary);
     if ( ofile.is_open() )

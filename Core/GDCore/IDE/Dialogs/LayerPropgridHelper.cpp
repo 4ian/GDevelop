@@ -90,14 +90,14 @@ void LayerPropgridHelper::RefreshFrom(const Layer & layer)
         grid->SetPropertyCell("CAMERA_REMOVE" + suffix, 1, _("Remove"), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
         grid->SetPropertyReadOnly("CAMERA_REMOVE" + suffix);
 
-        grid->AppendIn(suffix, new wxBoolProperty(_("Custom size"), "CAMERA_CUSTOM_SIZE" + suffix, !camera.UseDefaultSize()));
+        grid->AppendIn("CAMERA" + suffix, new wxBoolProperty(_("Custom size"), "CAMERA_CUSTOM_SIZE" + suffix, !camera.UseDefaultSize()));
         grid->EnableProperty(grid->Append(
             new wxStringProperty(_("Width"), "CAMERA_SIZE_WIDTH" + suffix, gd::String::From(camera.GetWidth()))),
             !camera.UseDefaultSize());
         grid->EnableProperty(grid->Append(
             new wxStringProperty(_("Height"), "CAMERA_SIZE_HEIGHT" + suffix, gd::String::From(camera.GetHeight()))),
             !camera.UseDefaultSize());
-        grid->AppendIn(suffix, new wxBoolProperty(_("Custom viewport (native games only)"), "CAMERA_CUSTOM_VIEWPORT" + suffix, !camera.UseDefaultViewport()));
+        grid->AppendIn("CAMERA" + suffix, new wxBoolProperty(_("Custom viewport (native games only)"), "CAMERA_CUSTOM_VIEWPORT" + suffix, !camera.UseDefaultViewport()));
         grid->EnableProperty(grid->Append(
             new wxStringProperty(_("Top-left x"), "CAMERA_VIEWPORT_X1" + suffix, gd::String::From(camera.GetViewportX1()))),
             !camera.UseDefaultViewport());

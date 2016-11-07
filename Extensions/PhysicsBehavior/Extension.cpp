@@ -9,7 +9,7 @@ This project is released under the MIT License.
  * Victor Levasseur ( Collisions using custom polygons, fixed time step fix )
  */
 
-#include "GDCore/Tools/Version.h"
+
 #include "PhysicsBehavior.h"
 #include "ScenePhysicsDatas.h"
 

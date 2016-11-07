@@ -7,7 +7,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/ExtensionsLoader.h"
-#include "GDCore/Tools/Version.h"
+#include "GDCore/Tools/VersionPriv.h"
 #include "GDCore/Tools/DynamicLibrariesTools.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Log.h"
@@ -245,8 +245,8 @@ void ExtensionsLoader::LoadExtension(const gd::String & fullpath, gd::Platform &
               extensionPtr->compilationInfo.sfmlMinorVersion != 0 )
         error += "Not the same SFML version.\n";
 
-    else if ( extensionPtr->compilationInfo.gdCoreVersion != GDCore_RC_FILEVERSION_STRING)
-        error += "Not the same GDevelop Core version.\n(Extension is using "+extensionPtr->compilationInfo.gdCoreVersion+", GDevelop is using "+GDCore_RC_FILEVERSION_STRING+")\n";
+    else if ( extensionPtr->compilationInfo.gdCoreVersion != GD_VERSION_STRING)
+        error += "Not the same GDevelop Core version.\n(Extension is using "+extensionPtr->compilationInfo.gdCoreVersion+", GDevelop is using "+GD_VERSION_STRING+")\n";
 
     else if ( extensionPtr->compilationInfo.sizeOfpInt != sizeof(int*))
         error += "Not the same architecture.\n(Extension sizeof(int*) is "+gd::String::From(extensionPtr->compilationInfo.sizeOfpInt)+", GDevelop sizeof(int*) is "+gd::String::From(sizeof(int*))+")\n";

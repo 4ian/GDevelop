@@ -73,6 +73,7 @@ IF(NO_GUI)
 ENDIF()
 
 add_library(GDCore SHARED ${source_files})
+add_dependencies(GDCore GDVersion)
 IF(EMSCRIPTEN)
 	set_target_properties(GDCore PROPERTIES SUFFIX ".bc")
 ELSEIF(WIN32)

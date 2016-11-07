@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCore/Tools/Version.h"
+
 #include "AdMobObject.h"
 
 void DeclareAdMobObjectExtension(gd::PlatformExtension & extension)

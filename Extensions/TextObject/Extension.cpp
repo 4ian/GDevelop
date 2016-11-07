@@ -11,7 +11,7 @@ This project is released under the MIT License.
 
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/Tools/Version.h"
+
 #include "TextObject.h"
 
 

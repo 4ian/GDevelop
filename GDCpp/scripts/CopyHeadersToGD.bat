@@ -24,7 +24,7 @@ IF NOT EXIST "%MINGW_DIR%" set MINGW_DIR="C:\MinGW32"
 IF NOT EXIST "%MINGW_DIR%" set MINGW_DIR="C:\MinGW"
 
 IF EXIST "%MINGW_DIR%" (
-	xcopy "%MINGW_DIR%" "%destDir%\MinGW32\" /E /D /Q
+	xcopy "%MINGW_DIR%" "%destDir%\MinGW32\" /E /D /Q /C
 	 ::Delete fat gdb.exe (+/-30mb)
 	del "%destDir%\MinGW32\bin\gdb.exe"
 	 ::Delete fat installer (+/-30mb)

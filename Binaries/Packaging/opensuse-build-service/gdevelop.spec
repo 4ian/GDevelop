@@ -12,11 +12,11 @@ Source100:	gdevelop-rpmlintrc
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  git rsync curl gcc-c++ cmake p7zip glew-devel xorg-x11-devel libsndfile-devel openal-soft-devel desktop-file-utils
+BuildRequires:  git rsync curl gcc-c++ cmake p7zip glew-devel libsndfile-devel openal-soft-devel desktop-file-utils
 %if 0%{?fedora}
-BuildRequires:	systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel
+BuildRequires:	systemd-devel libjpeg-turbo-devel gtk2-devel wxGTK3-devel libX11-devel
 %else
-BuildRequires:  update-desktop-files libudev-devel libjpeg8-devel wxWidgets-3_0-devel 
+BuildRequires:  update-desktop-files libudev-devel libjpeg8-devel wxWidgets-3_0-devel xorg-x11-devel
 %endif
 Requires:       gcc-c++ p7zip
 

@@ -76,6 +76,8 @@ endif()
 set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR})
 
 #Add all the CMakeLists:
+ADD_SUBDIRECTORY(Version)
+
 ADD_SUBDIRECTORY(ExtLibs)
 IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Core/CMakeLists.txt" AND BUILD_CORE)
 	ADD_SUBDIRECTORY(Core)

@@ -5,46 +5,46 @@
  */
 
 #include "GDCore/Tools/VersionWrapper.h"
-#include "GDCore/Tools/Version.h"
 
 namespace gd
 {
 
 int VersionWrapper::Major()
 {
-    return AutoVersion::GDCore_MAJOR;
+    return gd::String(GD_VERSION_STRING).Split(U'-')[0].Split(U'.')[0].To<int>();
 }
 int VersionWrapper::Minor()
 {
-     return AutoVersion::GDCore_MINOR;
+    return gd::String(GD_VERSION_STRING).Split(U'-')[0].Split(U'.')[1].To<int>();
 }
 int VersionWrapper::Build()
 {
-     return AutoVersion::GDCore_BUILD;
+    return gd::String(GD_VERSION_STRING).Split(U'-')[0].Split(U'.')[2].To<int>();
 }
 int VersionWrapper::Revision()
 {
-     return AutoVersion::GDCore_REVISION;
+    return gd::String(GD_VERSION_STRING).Split(U'-').size() > 1 ?
+        gd::String(GD_VERSION_STRING).Split(U'-')[1].To<int>() : 0;
 }
 gd::String VersionWrapper::FullString()
 {
-    return AutoVersion::GDCore_FULLVERSION_STRING;
+    return GD_VERSION_STRING;
 }
 gd::String VersionWrapper::Date()
 {
-    return AutoVersion::GDCore_DATE;
+    return gd::String(GD_DATE_STRING).substr(4, 2);
 }
 gd::String VersionWrapper::Month()
 {
-    return AutoVersion::GDCore_MONTH;
+    return gd::String(GD_DATE_STRING).substr(0, 3);
 }
 gd::String VersionWrapper::Year()
 {
-    return AutoVersion::GDCore_YEAR;
+    return gd::String(GD_DATE_STRING).substr(7, 4);
 }
 gd::String VersionWrapper::Status()
 {
-    return AutoVersion::GDCore_STATUS;
+    return Revision() == 0 ? "Release" : "Dev";
 }
 bool VersionWrapper::CompiledForEdittime()
 {

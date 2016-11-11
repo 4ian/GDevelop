@@ -24,21 +24,21 @@ if(GIT_FOUND)
 	# Generate the version RC macro
 	string(REGEX REPLACE
 		"([0-9]*)\\.([0-9]*)\\.([0-9]*)-([0-9]*)-.*"
-		"\\1, \\2, \\3, \\4"
+		"\\1,\\2,\\3,\\4"
 		GD_VERSION_RC
 		"${GD_VERSION_STR}")
 
-	if(NOT ("${ORIGINAL_CONTENT}" STREQUAL "#define GD_VERSION_STRING \"${GD_VERSION_STR}\"\n#define GD_DATE_STRING __DATE__"))
+	if(NOT ("${ORIGINAL_CONTENT}" STREQUAL "#define GD_VERSION_STRING \"${GD_VERSION_STR}\"\n#define GD_VERSION_RC ${GD_VERSION_RC}\n#define GD_DATE_STRING __DATE__"))
 		# Write only the version file if different from the previous one
 		message(STATUS "Updating VersionPriv.h header to version ${GD_VERSION_STR}.")
 		file(WRITE
 			"${VERSIONPRIV_PATH}"
-		"#define GD_VERSION_STRING \"${GD_VERSION_STR}\"\n#define GD_VERSION_RC \"${GD_VERSION_RC}\"\n#define GD_DATE_STRING __DATE__")
+			"#define GD_VERSION_STRING \"${GD_VERSION_STR}\"\n#define GD_VERSION_RC ${GD_VERSION_RC}\n#define GD_DATE_STRING __DATE__")
 	else()
 		message(STATUS "VersionPriv.h already up-to-date.")
 	endif()
 else()
 	file(WRITE
 		"${VERSIONPRIV_PATH}"
-	"#define GD_VERSION_STRING \"0.0.0-0-unknown\"\n#define GD_VERSION_RC \"0, 0, 0, 0\"\n#define GD_DATE_STRING __DATE__")
+		"#define GD_VERSION_STRING \"0.0.0-0-unknown\"\n#define GD_VERSION_RC 0, 0, 0, 0\n#define GD_DATE_STRING __DATE__")
 endif()

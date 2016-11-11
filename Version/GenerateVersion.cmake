@@ -16,7 +16,12 @@ if(GIT_FOUND)
 		file(READ "${VERSIONPRIV_PATH}" ORIGINAL_CONTENT)
 	endif()
 
-	if(NOT (${ORIGINAL_CONTENT} STREQUAL "#define GD_VERSION_STRING \"${GD_VERSION_STR}\"\n#define GD_DATE_STRING __DATE__"))
+	if("${GD_VERSION_STR}" STREQUAL "")
+		message(STATUS "No tags found to determine the version of GDevelop!")
+		set(GD_VERSION_STR "0.0.0-0-unknown")
+	endif()
+
+	if(NOT ("${ORIGINAL_CONTENT}" STREQUAL "#define GD_VERSION_STRING \"${GD_VERSION_STR}\"\n#define GD_DATE_STRING __DATE__"))
 		# Write only the version file if different from the previous one
 		message(STATUS "Updating VersionPriv.h header to version ${GD_VERSION_STR}.")
 		file(WRITE
@@ -28,5 +33,5 @@ if(GIT_FOUND)
 else()
 	file(WRITE
 		"${VERSIONPRIV_PATH}"
-		"#define GD_VERSION_STRING \"0.0.0.0 (Unknown)\"\n#define GD_DATE_STRING __DATE__")
+		"#define GD_VERSION_STRING \"0.0.0-0-unknown\"\n#define GD_DATE_STRING __DATE__")
 endif()

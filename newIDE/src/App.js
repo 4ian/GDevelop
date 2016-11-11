@@ -9,6 +9,7 @@ import Panes from './UI/Panes';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import EventsSheetContainer from './EventsSheet/EventsSheetContainer.js';
+import SceneEditorContainer from './SceneEditor/SceneEditorContainer.js';
 import ProjectManager from './ProjectManager';
 
 import JSONTree from 'react-json-tree'
@@ -26,6 +27,7 @@ class App extends Component {
     this.state = {
       currentProject: null,
       externalEventsOpened: '',
+      sceneOpened: '',
     }
   }
 
@@ -42,7 +44,7 @@ class App extends Component {
   }
 
   render() {
-    const { currentProject, externalEventsOpened } = this.state;
+    const { currentProject, externalEventsOpened, sceneOpened } = this.state;
 
     return (
       <MuiThemeProvider>
@@ -54,6 +56,9 @@ class App extends Component {
                   project={currentProject}
                   onOpenExternalEvents={name => this.setState({
                     externalEventsOpened: name
+                  })}
+                  onOpenLayout={name => this.setState({
+                    sceneOpened: name
                   })}
                 />
               )
@@ -69,6 +74,14 @@ class App extends Component {
                 </p>
                 <RaisedButton label="Load game" onClick={this.loadGame} />
                 {/*<JSONTree data={game} />*/}
+                {
+                  currentProject && currentProject.hasLayoutNamed(sceneOpened) && (
+                    <SceneEditorContainer
+                      project={currentProject}
+                      layout={currentProject.getLayout(sceneOpened)}
+                    />
+                  )
+                }
                 {
                   currentProject && currentProject.hasExternalEventsNamed(externalEventsOpened) && (
                     <EventsSheetContainer

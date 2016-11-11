@@ -20,6 +20,7 @@ export default class EventsSheetContainer extends Component {
     };
   }
 
+  //TODO: Refactor openInstructionEditor/openNewInstructionEditor in a single function?
   openInstructionEditor(isCondition, instruction, instructionsList, cb = undefined) {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();

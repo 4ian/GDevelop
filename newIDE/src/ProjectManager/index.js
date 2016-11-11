@@ -1,7 +1,6 @@
 import React from 'react';
 import {List, ListItem} from 'material-ui/List';
 import ContentInbox from 'material-ui/svg-icons/content/inbox';
-import ContentDrafts from 'material-ui/svg-icons/content/drafts';
 import ContentSend from 'material-ui/svg-icons/content/send';
 
 const loop = (start, end, func) => { //TODO: move me in utils/package
@@ -22,7 +21,25 @@ export default class ProjectManager extends React.Component {
     return (
       <List>
         <ListItem primaryText="Resources" leftIcon={<ContentSend />} />
-        <ListItem primaryText="Scenes" leftIcon={<ContentDrafts />} />
+        <ListItem
+          primaryText="Scenes"
+          leftIcon={<ContentInbox />}
+          initiallyOpen={true}
+          primaryTogglesNestedList={true}
+          autoGenerateNestedIndicator={true}
+          nestedItems={loop(0, project.getLayoutsCount(), (i) => {
+            const layout = project.getLayoutAt(i);
+            const name = layout.getName();
+            return (
+              <ListItem
+                key={i}
+                primaryText={name}
+                leftIcon={<ContentInbox />}
+                onTouchTap={() => this.props.onOpenLayout(name)}
+              />
+            );
+          })}
+        />
         <ListItem
           primaryText="External events"
           leftIcon={<ContentInbox />}

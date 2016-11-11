@@ -10,8 +10,8 @@ aaaa ICON "icon.ico"
 #endif
 
 1 VERSIONINFO
-FILEVERSION    	GD_VERSION_STRING
-PRODUCTVERSION 	GD_VERSION_STRING
+FILEVERSION    	GD_VERSION_RC
+PRODUCTVERSION 	GD_VERSION_RC
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -19,14 +19,14 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "Florian Rival"
             VALUE "FileDescription",  "GDevelop Integrated Development Environment"
-            VALUE "FileVersion",      GD_VERSION_STRING
+            VALUE "FileVersion",      GD_VERSION_RC
             VALUE "InternalName",     "GDevelop IDE"
             VALUE "LegalCopyright",   "2008-2016 Florian Rival"
             VALUE "LegalTrademarks1", ""
             VALUE "LegalTrademarks2", ""
             VALUE "OriginalFilename", "GDIDE.exe"
             VALUE "ProductName",      "GDevelop"
-            VALUE "ProductVersion",   GD_VERSION_STRING
+            VALUE "ProductVersion",   GD_VERSION_RC
         END
     END
 

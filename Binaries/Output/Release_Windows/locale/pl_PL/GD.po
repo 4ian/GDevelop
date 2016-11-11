@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-09-18 10:00-0400\n"
+"PO-Revision-Date: 2016-10-31 18:31-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -7114,7 +7114,7 @@ msgstr ""
 
 #: ../Extensions//CommonDialogs/Extension.cpp:34
 msgid "Display message \"_PARAM1_\" with title \"_PARAM2_\""
-msgstr ""
+msgstr "Wyświetl komunikat \"_PARAM1_\" pod tytułem \"_PARAM2_\""
 
 #: ../Extensions//CommonDialogs/Extension.cpp:35
 #: ../Extensions//CommonDialogs/Extension.cpp:49
@@ -7137,11 +7137,12 @@ msgstr "Pokaż okno wyboru pliku"
 #: ../Extensions//CommonDialogs/Extension.cpp:47
 msgid "Display a window allowing to choose a file.\n"
 "The name and the directory of the file will be saved in the specified variable."
-msgstr ""
+msgstr "Wyświetl okno, aby wybrać nazwę pliku. \n"
+" Nazwa i położenie pliku będzie zapisane w określonej zmiennej."
 
 #: ../Extensions//CommonDialogs/Extension.cpp:48
 msgid "Open a window so as to choose a file, and save the result in _PARAM1_"
-msgstr ""
+msgstr "Otwórz okno aby wybrać plik i zapisać wynik w _PARAM1_"
 
 #: ../Extensions//CommonDialogs/Extension.cpp:54
 #: ../Extensions//CommonDialogs/Extension.cpp:69
@@ -7184,7 +7185,7 @@ msgstr "Otwórz okno wyboru Tak/Nie i zapisz rezultat do _PARAM1_"
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:16
 #: ../Extensions//DestroyOutsideBehavior/JsExtension.cpp:29
 msgid "Destroy Outside Screen Behavior"
-msgstr ""
+msgstr "Verhalten bei \"Zerstören außerhalb des Bildschirms\""
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:17
 #: ../Extensions//DestroyOutsideBehavior/JsExtension.cpp:30
@@ -7193,7 +7194,7 @@ msgstr ""
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:22
 msgid "Destroy when outside the screen"
-msgstr ""
+msgstr "Zerstören wenn außerhalb des Bildschirms"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:23
 msgid "DestroyOutside"
@@ -7422,24 +7423,24 @@ msgstr ""
 #: ../Extensions//DraggableBehavior/Extension.cpp:16
 #: ../Extensions//DraggableBehavior/JsExtension.cpp:29
 msgid "Draggable Behavior"
-msgstr ""
+msgstr "Verhalten beim Verschieben"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:17
 #: ../Extensions//DraggableBehavior/JsExtension.cpp:30
 msgid "Behavior allowing to move objects with the mouse"
-msgstr ""
+msgstr "Verhalten ermöglicht Objekte mit der Maus zu bewegen"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:22
 msgid "Draggable object"
-msgstr ""
+msgstr "Verschiebbares Objekt"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:23
 msgid "Draggable"
-msgstr ""
+msgstr "Verschiebbar"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:24
 msgid "Allows objects to be moved using the mouse."
-msgstr ""
+msgstr "Ermöglicht Objekte mit der Maus zu bewegen."
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:35
 msgid "Being dragged"
@@ -7447,7 +7448,7 @@ msgstr ""
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:36
 msgid "Check if the object is being dragged"
-msgstr ""
+msgstr "Sprawdź, czy obiekt jest przeciągany"
 
 #: ../Extensions//DraggableBehavior/Extension.cpp:37
 msgid "_PARAM0_ is being dragged"
@@ -7874,12 +7875,12 @@ msgstr ""
 #: ../Extensions//LinkedObjects/Extension.cpp:84
 #: ../Extensions//LinkedObjects/Extension.cpp:99
 msgid "Pick these objects..."
-msgstr ""
+msgstr "Wybierz te obiekty..."
 
 #: ../Extensions//LinkedObjects/Extension.cpp:85
 #: ../Extensions//LinkedObjects/Extension.cpp:100
 msgid "...if they are linked to this object"
-msgstr ""
+msgstr "...jeśli są powiązane z tym obiektem"
 
 #: ../Extensions//LinkedObjects/Extension.cpp:92
 msgid "Take objects linked to the object into account for next actions."

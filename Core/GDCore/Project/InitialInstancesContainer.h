@@ -21,8 +21,8 @@ namespace gd
  *
  * The container is notably able to ensure that pointers
  * to the elements of the container are not invalidated when
- * a change occurs ( through InsertNewInitialInstance or RemoveInstance
- * for example ). <br>
+ * a change occurs (through InsertNewInitialInstance or RemoveInstance
+ * for example). <br>
  * Thus, the implementations uses a std::list
  * for holding the instances. In this way, the container is not required
  * to provide a direct access to element based on an index. Instead,
@@ -155,6 +155,8 @@ public:
     ///@}
 
 private:
+    void RemoveInstanceIf(std::function<bool(const gd::InitialInstance &)> predicat);
+
     std::list<gd::InitialInstance> initialInstances;
 
     static gd::InitialInstance badPosition;

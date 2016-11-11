@@ -465,7 +465,7 @@ public:
      * \param externalEvents The external events that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the external events must be inserted at the end of the external events list.
      */
-    void InsertExternalEvents(const ExternalEvents & externalEvents, std::size_t position);
+    ExternalEvents & InsertExternalEvents(const ExternalEvents & externalEvents, std::size_t position);
 
     /**
      * Must delete external events named "name".
@@ -534,7 +534,7 @@ public:
      * \param externalLayout The external layout that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the external layout must be inserted at the end of the external layout list.
      */
-    void InsertExternalLayout(const ExternalLayout & externalLayout, std::size_t position);
+    gd::ExternalLayout & InsertExternalLayout(const ExternalLayout & externalLayout, std::size_t position);
 
     /**
      * Must delete external layout named "name".
@@ -664,7 +664,7 @@ public:
      * \brief Return a const reference to the vector containing all the source files used by
      * the game.
      */
-    const std::vector < std::shared_ptr<gd::SourceFile> > & GetAllSourceFiles() const { return externalSourceFiles; }
+    const std::vector < std::unique_ptr<gd::SourceFile> > & GetAllSourceFiles() const { return externalSourceFiles; }
 
     /**
      * \brief Return true if the source file with the specified name is used by the game.
@@ -723,9 +723,9 @@ private:
     int                                                 maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
     unsigned int                                        minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
     bool                                                verticalSync; ///< If true, must activate vertical synchronization.
-    std::vector < std::shared_ptr<gd::Layout> >       scenes; ///< List of all scenes
+    std::vector < std::unique_ptr<gd::Layout> >       scenes; ///< List of all scenes
     gd::VariablesContainer                              variables; ///< Initial global variables
-    std::vector < std::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
+    std::vector < std::unique_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     gd::ResourcesManager                                resourcesManager; ///< Contains all resources used by the project
     std::shared_ptr<gd::ImageManager>                 imageManager;///< Image manager is accessed thanks to a (smart) ptr as it can be shared with GD C++ Platform projects.
     std::vector < gd::String >                         extensionsUsed; ///< List of extensions used
@@ -733,7 +733,7 @@ private:
     gd::String                                         firstLayout;
     #if defined(GD_IDE_ONLY)
     bool                                                useExternalSourceFiles; ///< True if game used external source files.
-    std::vector < std::shared_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
+    std::vector < std::unique_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
     std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
     gd::String                                         author; ///< Game author name
     gd::String                                         packageName; ///< Game package name
@@ -741,7 +741,7 @@ private:
     gd::String                                         gameFile; ///< File of the game
     gd::String                                         latestCompilationDirectory; ///< File of the game
     gd::Platform*                                       currentPlatform; ///< The platform being used to edit the project.
-    std::vector < std::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
+    std::vector < std::unique_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.
     mutable unsigned int                                GDMinorVersion; ///< The GD minor version used the last time the project was saved.
     mutable bool                                        dirty; ///< True to flag the project as being modified.

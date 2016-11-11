@@ -32,7 +32,7 @@ msgstr ""
 "Project-Id-Version: gdevelop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-13 21:53+0200\n"
-"PO-Revision-Date: 2016-09-18 10:01-0400\n"
+"PO-Revision-Date: 2016-10-31 18:32-0400\n"
 "Last-Translator: 4ian <Florian.rival@gmail.com>\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -5932,11 +5932,12 @@ msgstr "Преднагрузки интерстициальном экраном
 #: ../Extensions//AdMobObject/Extension.cpp:62
 msgid "Preload the interstitial screen in memory, so that it can be shown later.\n"
 "You can use this action at the beginning of a level for example."
-msgstr ""
+msgstr "Предзагрузить рекламный баннер, что бы использовать его позже.\n"
+"Вы можете использовать это действие в начале уровня, например."
 
 #: ../Extensions//AdMobObject/Extension.cpp:63
 msgid "Preload an interstitial screen for _PARAM0_"
-msgstr ""
+msgstr "Предзагрузить рекламный баннер для _PARAM0_"
 
 #: ../Extensions//AdMobObject/Extension.cpp:64
 #: ../Extensions//AdMobObject/Extension.cpp:73
@@ -5945,16 +5946,17 @@ msgstr "Интерстициальный экран"
 
 #: ../Extensions//AdMobObject/Extension.cpp:70
 msgid "Show interstitial screen"
-msgstr ""
+msgstr "Показать рекламный баннер"
 
 #: ../Extensions//AdMobObject/Extension.cpp:71
 msgid "Show the interstitial screen.\n"
 "If the interstitial screen has not been preloaded, it will be loaded and displayed when ready."
-msgstr ""
+msgstr "Предзагрузить рекламный баннер.\n"
+"Если баннер не был предзагружен, он будет загружен и показан когда будет готов."
 
 #: ../Extensions//AdMobObject/Extension.cpp:72
 msgid "Show the interstitial screen of _PARAM0_"
-msgstr ""
+msgstr "Предзагрузить рекламный баннер _PARAM0_"
 
 #: ../Extensions//AdMobObject/Extension.cpp:79
 msgid "Interstitial screen is ready"
@@ -5962,11 +5964,11 @@ msgstr "Интерстициальный экран готов"
 
 #: ../Extensions//AdMobObject/Extension.cpp:80
 msgid "Return true if the interstitial screen was loaded and is ready to be shown."
-msgstr ""
+msgstr "Выдаёт значение true если рекламный баннер был загружен и готов к показу."
 
 #: ../Extensions//AdMobObject/Extension.cpp:81
 msgid "Interstitial screen of _PARAM0_ is ready"
-msgstr ""
+msgstr "Рекламный баннер _PARAM0_ готов"
 
 #: ../Extensions//AdvancedXML/src/Extension.cpp:31
 msgid "Advanced XML 1.0"
@@ -7187,7 +7189,7 @@ msgstr "Уничтожить поведение вне экрана"
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:17
 #: ../Extensions//DestroyOutsideBehavior/JsExtension.cpp:30
 msgid "Behavior destroying object when they go outside the screen"
-msgstr ""
+msgstr "Поведение уничтожения объекта за экраном"
 
 #: ../Extensions//DestroyOutsideBehavior/Extension.cpp:22
 msgid "Destroy when outside the screen"
@@ -8131,7 +8133,7 @@ msgstr "Создание уникальных сетевых идентифик�
 #: ../Extensions//Network/Extension.cpp:213
 #: ../Extensions//Network/Extension.cpp:222
 msgid "Behavior Automatic Network Updater"
-msgstr ""
+msgstr "Поведение автоматического интернет обновления"
 
 #: ../Extensions//Network/Extension.cpp:173
 msgid "Automatic network update"
@@ -13861,15 +13863,15 @@ msgstr "Удаляет выбранную точку"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:695
 msgid ".tmx file :"
-msgstr ""
+msgstr ".tmx файл :"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:709
 msgid "The tmx file saved with Tiled"
-msgstr ""
+msgstr "Tmx файл сохранен с Tiled"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:719
 msgid "Import settings"
-msgstr ""
+msgstr "Импорт настройки"
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.cpp:731
 msgid "Import the tileset configuration"
@@ -13943,11 +13945,11 @@ msgstr ""
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:67
 msgid "The image can't be found !"
-msgstr ""
+msgstr "Эта картинка не была найдена!"
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:76
 msgid "The image is imported as "
-msgstr ""
+msgstr "Эта картинка импортирована как "
 
 #: ../Extensions//TileMapObject/IDE/TMXImport/TileMapImporter.cpp:86
 msgid "Tileset image importation completed."
@@ -14216,7 +14218,7 @@ msgstr ""
 
 #: ../Extensions//TileMapObject/IDE/Dialogs/TileMapDialogs.h:257
 msgid "Import a .tmx file (Tiled)"
-msgstr ""
+msgstr "Импорт .tmx файла (Tiled)"
 
 #: ../Core/GDCore/Events/Builtin/ForEachEvent.cpp:113
 #: ../Core/GDCore/Extensions/Builtin/CommonInstructionsExtension.cpp:95
@@ -15678,7 +15680,7 @@ msgstr "Текст, представляющий имя создаваемого
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:706
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:764
 msgid "Pick all objects"
-msgstr ""
+msgstr "Выбраны все объекты"
 
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:707
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:765
@@ -15693,7 +15695,7 @@ msgstr ""
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:717
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:775
 msgid "Pick a random object"
-msgstr ""
+msgstr "Выбран случайный объект"
 
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:718
 #: ../Core/GDCore/Extensions/Builtin/BaseObjectExtension.cpp:776

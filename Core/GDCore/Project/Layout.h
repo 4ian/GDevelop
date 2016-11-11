@@ -457,8 +457,8 @@ private:
  * \brief Functor testing layout name.
  * \see gd::Layout
  */
-struct LayoutHasName : public std::binary_function<std::shared_ptr<Layout>, gd::String, bool> {
-    bool operator()(const std::shared_ptr<Layout> & layout, gd::String name) const { return layout->GetName() == name; }
+struct LayoutHasName : public std::binary_function<std::unique_ptr<Layout>, gd::String, bool> {
+    bool operator()(const std::unique_ptr<Layout> & layout, gd::String name) const { return layout->GetName() == name; }
 };
 
 /**

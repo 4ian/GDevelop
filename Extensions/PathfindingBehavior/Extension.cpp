@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
-#include "GDCore/Tools/Version.h"
+
 #include "PathfindingBehavior.h"
 #include "PathfindingObstacleBehavior.h"
 

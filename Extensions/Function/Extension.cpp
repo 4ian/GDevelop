@@ -6,7 +6,7 @@ This project is released under the MIT License.
 */
 
 #include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCore/Tools/Version.h"
+
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"

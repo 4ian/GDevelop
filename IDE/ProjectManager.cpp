@@ -504,7 +504,7 @@ void ProjectManager::Refresh()
         {
             gdTreeItemProjectData * sourceFilesItemData = new gdTreeItemProjectData("SourceFiles", "", mainEditor.games[i].get());
             wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("Source files"), 5 ,5, sourceFilesItemData);
-            const std::vector < std::shared_ptr<gd::SourceFile> > & allFiles = game->GetAllSourceFiles();
+            const auto & allFiles = game->GetAllSourceFiles();
             for (std::size_t j = 0;j<allFiles.size();++j)
             {
                 if ( allFiles[j]->IsGDManaged() )

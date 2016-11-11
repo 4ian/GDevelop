@@ -154,8 +154,11 @@ void ExternalLayoutEditor::Refresh()
     gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
     if ( scene != NULL )
+    {
         SetupForScene(*scene);
-    else
+        parentSceneComboBox->SetValue(scene->GetName());
+    }
+	else
         SetupForScene(emptyLayout);
 }
 
@@ -259,7 +262,6 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 
     //Save the choice
     externalLayout.SetAssociatedLayout(layout.GetName());
-    if(parentSceneComboBox->GetValue() != layout.GetName()) parentSceneComboBox->SetValue(layout.GetName());
 
     if (onAssociatedLayoutChangedCb) onAssociatedLayoutChangedCb();
 }

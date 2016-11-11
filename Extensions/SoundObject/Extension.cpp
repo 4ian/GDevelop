@@ -11,7 +11,7 @@ This project is released under the MIT License.
  */
 
 #include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCore/Tools/Version.h"
+
 #include "SoundObject.h"
 
 

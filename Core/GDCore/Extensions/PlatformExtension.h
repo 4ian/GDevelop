@@ -15,6 +15,7 @@
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/VersionPriv.h"
 namespace gd { class Instruction; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
@@ -433,7 +434,7 @@ private:
 #define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() compilationInfo.runtimeOnly = false; \
     compilationInfo.sfmlMajorVersion = 2; \
     compilationInfo.sfmlMinorVersion = 0; \
-    compilationInfo.gdCoreVersion = GDCore_RC_FILEVERSION_STRING; \
+    compilationInfo.gdCoreVersion = GD_VERSION_STRING; \
     compilationInfo.sizeOfpInt = sizeof(int*); \
     GD_COMPLETE_WX_COMPILATION_INFORMATION() \
     compilationInfo.gccMajorVersion = __GNUC__; \
@@ -447,7 +448,7 @@ private:
 #define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() compilationInfo.runtimeOnly = true;\
     compilationInfo.sfmlMajorVersion = 2; \
     compilationInfo.sfmlMinorVersion = 0; \
-    compilationInfo.gdCoreVersion = GDCore_RC_FILEVERSION_STRING; \
+    compilationInfo.gdCoreVersion = GD_VERSION_STRING; \
     compilationInfo.sizeOfpInt = sizeof(int*); \
     compilationInfo.gccMajorVersion = __GNUC__; \
     compilationInfo.gccMinorVersion = __GNUC_MINOR__; \

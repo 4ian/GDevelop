@@ -7,6 +7,8 @@
 #define GDCORE_VERSIONWRAPPER_H
 #include "GDCore/String.h"
 
+#include "GDCore/Tools/VersionPriv.h"
+
 namespace gd
 {
 

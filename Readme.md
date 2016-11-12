@@ -53,9 +53,10 @@ Links
 ### Community
 
 * [GDevelop forums](http://forum.compilgames.net)
-* [GDevelop homepage](http://www.compilgames.net)
+* [GDevelop homepage](http://www.compilgames.net) ([open source](https://github.com/4ian/GDevelop-website))
 * [GDevelop wiki](http://wiki.compilgames.net)
 * Help translate GD in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).
+* [GDevelop Nightly Builds](http://nightlies.gd.victorlevasseur.com/) (powered by a [Buildbot](https://github.com/victorlevasseur/GD-Buildbot)) ([open source](https://github.com/victorlevasseur/GD-Nightlies-Website))
 
 ### Development Roadmap
 
@@ -64,7 +65,7 @@ Links
 
 ### Related projects
 
-* [GDevelop.js](https://github.com/4ian/GDevelop.js) is a binding to use GDevelop engine in Javascript. 
+* [GDevelop.js](https://github.com/4ian/GDevelop.js) is a binding to use GDevelop engine in Javascript.
 * [GDevApp.com](https://gdevapp.com) is a radically innovative online game creator, compatible with GDevelop. It is based on GDevelop.js and can be used on any browser, including iOS and Android.
 * [Lil BUB's HELLO EARTH](http://lilbub.com/game) is a retro 8-bit mobile video game featuring [Lil BUB](http://lilbub.com). It's created with GDevelop and made up of equal parts science, magic, and heart.
 

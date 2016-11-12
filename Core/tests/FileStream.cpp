@@ -22,7 +22,7 @@ TEST_CASE( "FileStream", "[common][fstream]" ) {
 	testFile << "the last line!";
 	testFile.close();
 
-    SECTION("Opening a file") {
+    SECTION("Input file") {
 		gd::FileStream f;
 		f.open("FileStreamTest.test", std::ios_base::in);
 
@@ -46,7 +46,39 @@ TEST_CASE( "FileStream", "[common][fstream]" ) {
 		REQUIRE(f.fail() == false);
 	}
 
-	SECTION("std::ios_base::ate") {
+	SECTION("Output/Input file with special characters in filepath") {
+		gd::FileStream output("\xEA\x88\xA1.txt", std::ios_base::out);
+		REQUIRE(output.is_open() == true);
+
+		output << "TEST";
+		output.close();
+
+		gd::FileStream input("\xEA\x88\xA1.txt", std::ios_base::in);
+		REQUIRE(input.is_open() == true);
+
+		std::string lineContent;
+		REQUIRE(input.eof() == false);
+		std::getline(input, lineContent);
+		REQUIRE(lineContent == "TEST");
+
+		REQUIRE(input.eof() == true);
+
+		input.close();
+		REQUIRE(input.is_open() == false);
+		REQUIRE(input.fail() == false);
+	}
+
+	SECTION("File opening failure") {
+		gd::FileStream f("\xE4\x84\xA2"); //A file that doesn't exist
+
+		REQUIRE(f.is_open() == false);
+		REQUIRE(f.fail() == true); //As the opening failed, the "fail" flag should be set
+
+		f.close();
+		REQUIRE(f.bad() == true); //As no files are opened, this should set the "bad" flag of the stream
+	}
+
+	SECTION("std::ios_base::ate") { //As ate is "emulated", needs testing
 		gd::FileStream f;
 		f.open("FileStreamTest.test", std::ios_base::in|std::ios_base::ate);
 

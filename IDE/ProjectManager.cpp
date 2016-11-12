@@ -20,6 +20,7 @@
 #include <wx/busyinfo.h>
 #include <fstream>
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/Tools/FileStream.h"
 #include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -1693,8 +1694,8 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
 
     //TODO: Create file with some contents adapted to the chosen platform.
     //Create an empty file
-    std::ofstream file;
-    file.open(gd::String(dialog.GetPath()).ToLocale().c_str());
+    gd::FileStream file;
+    file.open(dialog.GetPath(), std::ios_base::out);
     file << "\n";
     file.close();
 

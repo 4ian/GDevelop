@@ -7,6 +7,7 @@
 #include "ProjectFileWriter.h"
 #include <fstream>
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/FileStream.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/Splitter.h"
 #include "GDCore/Project/Project.h"
@@ -125,7 +126,7 @@ bool ProjectFileWriter::SaveToJSONFile(const gd::Project & project, const gd::St
 
     //Write JSON to file
     gd::String str = gd::Serializer::ToJSON(rootElement);
-    std::ofstream ofs(filename.ToLocale().c_str());
+    gd::FileStream ofs(filename);
     if (!ofs.is_open())
     {
         gd::LogError( _( "Unable to save file ")+ filename + _("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
@@ -139,7 +140,7 @@ bool ProjectFileWriter::SaveToJSONFile(const gd::Project & project, const gd::St
 
 bool ProjectFileWriter::LoadFromJSONFile(gd::Project & project, const gd::String & filename)
 {
-    std::ifstream ifs(filename.ToLocale().c_str());
+    gd::FileStream ifs(filename);
     if (!ifs.is_open())
     {
         gd::String error = _( "Unable to open the file.") + _("Make sure the file exists and that you have the right to open the file.");
@@ -232,8 +233,8 @@ void ProjectFileWriter::ConvertANSIXMLFile(TiXmlHandle & hdl, TiXmlDocument & do
         //The document has not been converted for/saved by GDevelop UTF8, now, try to determine if the project
         //was saved on Linux and is already in UTF8 or on Windows and still in the locale encoding.
         bool isNotInUTF8 = false;
-        std::ifstream docStream;
-        docStream.open(filename.ToLocale(), std::ios::in);
+        gd::FileStream docStream;
+        docStream.open(filename, std::ios::in);
 
         while( !docStream.eof() )
         {
@@ -261,8 +262,8 @@ void ProjectFileWriter::ConvertANSIXMLFile(TiXmlHandle & hdl, TiXmlDocument & do
             #if defined(WINDOWS)
             //Convert using the current locale
             wxString tmpFileName = wxFileName::CreateTempFileName("");
-            std::ofstream outStream;
-            docStream.open(filename.ToLocale(), std::ios::in);
+            gd::FileStream outStream;
+            docStream.open(filename, std::ios::in);
 
             outStream.open(tmpFileName, std::ios::out | std::ios::trunc);
 

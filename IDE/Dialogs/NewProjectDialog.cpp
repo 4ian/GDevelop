@@ -23,6 +23,7 @@
 #include "GDCore/IDE/Analytics/AnalyticsSender.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/PlatformManager.h"
+#include "GDCore/Tools/FileStream.h"
 
 //(*IdInit(NewProjectDialog)
 const long NewProjectDialog::ID_STATICTEXT1 = wxNewId();
@@ -219,7 +220,7 @@ void NewProjectDialog::RefreshTemplateList()
 
                 wxFileName descriptionFileName = wxFileName::FileName(currentDir+"/"+filename+"/GDTemplateDescription.txt");
                 descriptionFileName.MakeAbsolute();
-                std::ifstream descriptionFile(descriptionFileName.GetFullPath().c_str());
+                gd::FileStream descriptionFile(descriptionFileName.GetFullPath(), std::ios_base::in);
                 if (descriptionFile.is_open())
                 {
                     std::string currentLine;
@@ -306,7 +307,6 @@ void NewProjectDialog::SendAnalyticsData()
 {
     gd::AnalyticsSender::Get()->SendNewGameCreated(chosenTemplatePlatform, chosenTemplateFile);
 }
-
 
 void NewProjectDialog::OncancelBtClick(wxCommandEvent& event)
 {

@@ -32,6 +32,7 @@
 #include "GDCpp/Runtime/SceneNameMangler.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/Project/SourceFile.h"
+#include "GDCore/Tools/FileStream.h"
 
 using namespace std;
 using namespace gd;
@@ -273,8 +274,8 @@ bool EventsCodeCompilerPreWork::Execute()
     gd::EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
     gd::String eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
-    std::ofstream myfile;
-    myfile.open ( (CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(scene)+"EventsSource.cpp").ToLocale().c_str() );
+    gd::FileStream myfile;
+    myfile.open ( CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(scene)+"EventsSource.cpp", std::ios_base::out );
     myfile << eventsOutput.c_str();
     myfile.close();
 
@@ -313,8 +314,8 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
     gd::EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
     gd::String eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), true /*Compilation for runtime*/);
-    std::ofstream myfile;
-    myfile.open ( gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(scene)+"RuntimeEventsSource.cpp").ToLocale().c_str() );
+    gd::FileStream myfile;
+    myfile.open ( CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(scene)+"RuntimeEventsSource.cpp", std::ios_base::out );
     myfile << eventsOutput.c_str();
     myfile.close();
 
@@ -413,8 +414,8 @@ bool ExternalEventsCodeCompilerPreWork::Execute()
     gd::EventsCodeGenerator::DeleteUselessEvents(eventsCopy.GetEvents());
 
     gd::String eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, eventsCopy, false /*Compilation for edittime*/);
-    std::ofstream myfile;
-    myfile.open ( gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(externalEvents)+"EventsSource.cpp").ToLocale().c_str() );
+    gd::FileStream myfile;
+    myfile.open ( CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(externalEvents)+"EventsSource.cpp", std::ios_base::out );
     myfile << eventsOutput.c_str();
     myfile.close();
 
@@ -488,8 +489,8 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
     gd::EventsCodeGenerator::DeleteUselessEvents(eventsCopy.GetEvents());
 
     gd::String eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, eventsCopy, true /*Compilation for runtime*/);
-    std::ofstream myfile;
-    myfile.open ( gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(externalEvents)+"RuntimeEventsSource.cpp").ToLocale().c_str() );
+    gd::FileStream myfile;
+    myfile.open ( CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::From(externalEvents)+"RuntimeEventsSource.cpp", std::ios_base::out );
     myfile << eventsOutput.c_str();
     myfile.close();
 

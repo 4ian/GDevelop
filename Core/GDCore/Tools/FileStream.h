@@ -12,15 +12,17 @@
 
 #if FSTREAM_WINDOWS_MINGW
 #include <ext/stdio_filebuf.h>
+#else
+#include <fstream> //for std::filebuf
 #endif
 
 namespace gd
 {
 
 /**
- * Similar to std::iFileStream except that it can open file with
- * gd::String paths (useful on Windows as std::iFileStream doesn't)
- * support wide paths.
+ * Similar to std::i/ofstream except that it can open file with
+ * gd::String paths (useful on Windows where fstream doesn't
+ * support wide paths).
  */
 class GD_CORE_API FileStream : public std::iostream
 {

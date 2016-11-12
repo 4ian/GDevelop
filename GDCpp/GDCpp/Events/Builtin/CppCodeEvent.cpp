@@ -17,6 +17,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCore/Events/Serialization.h"
+#include "GDCore/Tools/FileStream.h"
 #include "GDCpp/Runtime/TinyXml/tinyxml.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
@@ -67,8 +68,8 @@ void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(gd::Project & project) c
     //The associated source file is non existing or not up to date: Regenerate it.
     //It will be compiled ( see CodeCompilationHelpers ) as it will be detected ( by DependenciesAnalyzer )
     //as a SourceFile dependency which is not up to date.
-    std::ofstream file;
-    file.open( outputFile.ToLocale().c_str() );
+    gd::FileStream file;
+    file.open( outputFile, std::ios_base::out );
     file << GenerateAssociatedFileCode();
     file.close();
 #else

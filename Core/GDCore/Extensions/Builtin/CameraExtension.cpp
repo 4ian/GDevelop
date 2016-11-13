@@ -288,69 +288,97 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("expression", _("New value"))
         .MarkAsAdvanced();
 
-    extension.AddExpression("CameraWidth", _("Width of a camera of a layer"), _("Width of a camera of a layer"), _("Camera"), "res/actions/camera.png")
+    extension.AddCondition("LayerTimeScale",
+                   _("Layer time scale"),
+                   _("Compare the time scale applied on the objects of the layer."),
+                   _("The time scale of layer _PARAM1_ is _PARAM2__PARAM3_"),
+                   _("Layers and cameras/Time"),
+                   "res/conditions/time24.png",
+                   "res/conditions/time.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("layer", _("Layer (base layer if empty)"), "",true).SetDefaultValue("\"\"")
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
+        .MarkAsAdvanced()
+        .SetManipulatedType("number");
+
+    extension.AddAction("ChangeLayerTimeScale",
+                   _("Change layer time scale"),
+                   _("Change the time scale applied on the objects of the layer."),
+                   _("Set time scale of layer _PARAM1_ to _PARAM2_"),
+                   _("Layers and cameras/Time"),
+                   "res/actions/time24.png",
+                   "res/actions/time.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("layer", _("Layer (base layer if empty)"), "",true).SetDefaultValue("\"\"")
+        .AddParameter("expression", _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
+
+    extension.AddExpression("CameraWidth", _("Width of a camera of a layer"), _("Width of a camera of a layer"), _("Layers and cameras"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"))
         .AddParameter("expression", _("Camera number (default : 0)")).SetDefaultValue("0");
 
-    extension.AddExpression("CameraHeight", _("Height of a camera of a layer"), _("Height of a camera of a layer"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("CameraHeight", _("Height of a camera of a layer"), _("Height of a camera of a layer"), _("Layers and cameras"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"))
         .AddParameter("expression", _("Camera number (default : 0)")).SetDefaultValue("0");
 
-    extension.AddExpression("CameraViewportLeft", _("X position of the top left side point of a render zone"), _("X position of the top left side point of a render zone"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("CameraViewportLeft", _("X position of the top left side point of a render zone"), _("X position of the top left side point of a render zone"), _("Layers and cameras"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"))
         .AddParameter("expression", _("Camera number (default : 0)")).SetDefaultValue("0");
 
-    extension.AddExpression("CameraViewportTop", _("Y position of the top left side point of a render zone"), _("Y position of the top left side point of a render zone"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("CameraViewportTop", _("Y position of the top left side point of a render zone"), _("Y position of the top left side point of a render zone"), _("Layers and cameras"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"))
         .AddParameter("expression", _("Camera number (default : 0)")).SetDefaultValue("0");
 
-    extension.AddExpression("CameraViewportRight", _("X position of the bottom right side point of a render zone"), _("X position of the bottom right side point of a render zone"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("CameraViewportRight", _("X position of the bottom right side point of a render zone"), _("X position of the bottom right side point of a render zone"), _("Layers and cameras"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"))
         .AddParameter("expression", _("Camera number (default : 0)")).SetDefaultValue("0");
 
-    extension.AddExpression("CameraViewportBottom", _("Y position of the bottom right side point of a render zone"), _("Y position of the bottom right side point of a render zone"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("CameraViewportBottom", _("Y position of the bottom right side point of a render zone"), _("Y position of the bottom right side point of a render zone"), _("Layers and cameras"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"))
         .AddParameter("expression", _("Camera number (default : 0)")).SetDefaultValue("0");
 
-    extension.AddExpression("CameraX", _("Camera X position"), _("Camera X position"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("CameraX", _("Camera X position"), _("Camera X position"), _("Layers and cameras"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number (default : 0)"), "",true).SetDefaultValue("0");
 
-    extension.AddExpression("VueX", _("Camera X position"), _("Camera X position"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("VueX", _("Camera X position"), _("Camera X position"), _("Layers and cameras"), "res/actions/camera.png")
         .SetHidden()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number (default : 0)"), "",true).SetDefaultValue("0");
 
-    extension.AddExpression("CameraY", _("Camera Y position"), _("Camera Y position"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("CameraY", _("Camera Y position"), _("Camera Y position"), _("Layers and cameras"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number (default : 0)"), "",true).SetDefaultValue("0");
 
-    extension.AddExpression("VueY", _("Camera Y position"), _("Camera Y position"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("VueY", _("Camera Y position"), _("Camera Y position"), _("Layers and cameras"), "res/actions/camera.png")
         .SetHidden()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number (default : 0)"), "",true).SetDefaultValue("0");
 
-    extension.AddExpression("CameraRotation", _("Angle of a camera of a layer"), _("Angle of a camera of a layer"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("CameraRotation", _("Angle of a camera of a layer"), _("Angle of a camera of a layer"), _("Layers and cameras"), "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number (default : 0)"), "",true).SetDefaultValue("0");
 
-    extension.AddExpression("VueRotation", _("Angle of a camera of a layer"), _("Angle of a camera of a layer"), _("Camera"), "res/actions/camera.png")
+    extension.AddExpression("VueRotation", _("Angle of a camera of a layer"), _("Angle of a camera of a layer"), _("Layers and cameras"), "res/actions/camera.png")
         .SetHidden()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number (default : 0)"), "",true).SetDefaultValue("0");
 
+    extension.AddExpression("LayerTimeScale", _("Time scale"), _("Time scale"), _("Layers and cameras"), "res/actions/time.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("layer", _("Layer"));
     #endif
 }
 

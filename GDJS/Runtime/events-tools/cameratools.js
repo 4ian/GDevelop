@@ -128,3 +128,13 @@ gdjs.evtTools.camera.setLayerEffectParameter = function(runtimeScene, layer, eff
 
     return runtimeScene.getLayer(layer).setEffectParameter(effect, parameter, value);
 }
+
+gdjs.evtTools.camera.setLayerTimeScale = function(runtimeScene, layer, timeScale) {
+    if ( !runtimeScene.hasLayer(layer) ) { return; }
+    return runtimeScene.getLayer(layer).setTimeScale(timeScale);
+}
+
+gdjs.evtTools.camera.getLayerTimeScale = function(runtimeScene, layer) {
+    if ( !runtimeScene.hasLayer(layer) ) { return 1; }
+    return runtimeScene.getLayer(layer).getTimeScale();
+}

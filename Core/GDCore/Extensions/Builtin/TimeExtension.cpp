@@ -106,7 +106,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
                    "res/actions/time24.png",
                    "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("expression", _("Scale (1 : Default, 2 : Faster, 0.5 : Slower...)"));
+        .AddParameter("expression", _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
 
     extension.AddExpression("TimeDelta", _("Time elapsed since the last image"), _("Time elapsed since the last image"), _("Time"), "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "");

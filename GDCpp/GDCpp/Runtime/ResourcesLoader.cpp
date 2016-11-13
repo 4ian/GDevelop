@@ -5,6 +5,7 @@
  */
 #if !defined(GD_IDE_ONLY)
 #include "GDCpp/Runtime/ResourcesLoader.h"
+#include "GDCpp/Runtime/Tools/FileStream.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
@@ -47,8 +48,12 @@ void ResourcesLoader::LoadSFMLImage( const gd::String & filename, sf::Image & im
         if (!image.loadFromMemory(buffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a SFML image from resource file: " << filename << endl;
     }
-    else if (!image.loadFromFile(filename.ToLocale()))
-        cout << "Failed to load a SFML texture: " << filename << endl;
+    else
+    {
+        gd::SFMLFileStream stream;
+        if (!stream.open(filename) || !image.loadFromStream(stream))
+            cout << "Failed to load a SFML image: " << filename << endl;
+    }
 }
 
 sf::Texture ResourcesLoader::LoadSFMLTexture(const gd::String & filename)
@@ -71,8 +76,12 @@ void ResourcesLoader::LoadSFMLTexture( const gd::String & filename, sf::Texture 
         if (!texture.loadFromMemory(buffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a SFML texture from resource file: " << filename << endl;
     }
-    else if (!texture.loadFromFile(filename.ToLocale()))
-        cout << "Failed to load a SFML texture: " << filename << endl;
+    else
+    {
+        gd::SFMLFileStream stream;
+        if (!stream.open(filename) || !texture.loadFromStream(stream))
+            cout << "Failed to load a SFML texture: " << filename << endl;
+    }
 }
 
 std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filename)
@@ -103,7 +112,9 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filen
     else
     {
         sf::Font * font = new sf::Font();
-        if (!font->loadFromFile(filename.ToLocale()))
+        gd::SFMLFileStream stream;
+
+        if (!stream.open(filename) || !font->loadFromStream(stream))
         {
             cout << "Failed to load a font from a file: " << filename << endl;
             delete font;
@@ -127,8 +138,12 @@ sf::SoundBuffer ResourcesLoader::LoadSoundBuffer( const gd::String & filename )
         if (!sbuffer.loadFromMemory(buffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a sound buffer from resource file: " << filename << endl;
     }
-    else if (!sbuffer.loadFromFile(filename.ToLocale()))
-        cout << "Failed to load a sound buffer: " << filename << endl;
+    else
+    {
+        gd::SFMLFileStream stream;
+        if (!stream.open(filename) || !sbuffer.loadFromStream(stream))
+            cout << "Failed to load a sound buffer: " << filename << endl;
+    }
 
     return sbuffer;
 }
@@ -188,7 +203,7 @@ char* ResourcesLoader::LoadBinaryFile( const gd::String & filename )
             return memblock;
         }
         #else //TODO: Also use the SFML implementation?
-        ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
+        gd::FileStream file (filename, ios::in|ios::binary|ios::ate);
         if (file.is_open()) {
             ifstream::pos_type size = file.tellg();
             char * memblock = new char [size];
@@ -216,7 +231,7 @@ long int ResourcesLoader::GetBinaryFileSize( const gd::String & filename)
         if (file.open(filename.ToLocale()))
             return file.getSize();
         #else //TODO: Also use the SFML implementation?
-        ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
+        gd::FileStream file (filename, ios::in|ios::binary|ios::ate);
         if (file.is_open()) {
             return file.tellg();
         }

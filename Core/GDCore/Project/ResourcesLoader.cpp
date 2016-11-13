@@ -1,6 +1,7 @@
 #include "GDCore/Project/ResourcesLoader.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include "GDCore/Tools/FileStream.h"
 #include "GDCore/String.h"
 #include <fstream>
 #include <iostream>
@@ -17,7 +18,8 @@ ResourcesLoader * ResourcesLoader::_singleton = NULL;
 
 void ResourcesLoader::LoadSFMLImage( const gd::String & filename, sf::Image & image )
 {
-    if (!image.loadFromFile(filename.ToLocale()))
+    gd::SFMLFileStream stream;
+    if (!stream.open(filename) || !image.loadFromStream(stream))
         cout << "Failed to load a SFML image: " << filename << endl;
 }
 
@@ -31,14 +33,16 @@ sf::Texture ResourcesLoader::LoadSFMLTexture(const gd::String & filename)
 
 void ResourcesLoader::LoadSFMLTexture( const gd::String & filename, sf::Texture & texture )
 {
-    if (!texture.loadFromFile(filename.ToLocale()))
+    gd::SFMLFileStream stream;
+    if (!stream.open(filename) || !texture.loadFromStream(stream))
         cout << "Failed to load a SFML texture: " << filename << endl;
 }
 
 std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filename)
 {
     sf::Font * font = new sf::Font;
-    if (!font->loadFromFile(filename.ToLocale()))
+    gd::SFMLFileStream stream;
+    if (!stream.open(filename) || !font->loadFromStream(stream))
     {
         cout << "Failed to load a font from a file: " << filename << endl;
         return std::make_pair<sf::Font*, char*>(NULL, NULL);
@@ -51,7 +55,8 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filen
 sf::SoundBuffer ResourcesLoader::LoadSoundBuffer( const gd::String & filename )
 {
     sf::SoundBuffer sbuffer;
-    if (!sbuffer.loadFromFile(filename.ToLocale()))
+    gd::SFMLFileStream stream;
+    if (!stream.open(filename) || !sbuffer.loadFromStream(stream))
         cout << "Failed to load a sound buffer: " << filename << endl;
 
     return sbuffer;
@@ -60,7 +65,7 @@ sf::SoundBuffer ResourcesLoader::LoadSoundBuffer( const gd::String & filename )
 gd::String ResourcesLoader::LoadPlainText( const gd::String & filename )
 {
     gd::String text;
-    ifstream file(filename.ToLocale().c_str(), ios::in);
+    gd::FileStream file(filename, ios::in);
 
     if(!file.fail())
     {
@@ -82,9 +87,9 @@ gd::String ResourcesLoader::LoadPlainText( const gd::String & filename )
  */
 char* ResourcesLoader::LoadBinaryFile( const gd::String & filename )
 {
-    ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
+    gd::FileStream file (filename, ios::in|ios::binary|ios::ate);
     if (file.is_open()) {
-        ifstream::pos_type size = file.tellg();
+        iostream::pos_type size = file.tellg();
         char * memblock = new char [size];
         file.seekg (0, ios::beg);
         file.read (memblock, size);
@@ -99,7 +104,7 @@ char* ResourcesLoader::LoadBinaryFile( const gd::String & filename )
 
 long int ResourcesLoader::GetBinaryFileSize( const gd::String & filename)
 {
-    ifstream file (filename.ToLocale().c_str(), ios::in|ios::binary|ios::ate);
+    gd::FileStream file (filename, ios::in|ios::binary|ios::ate);
     if (file.is_open()) {
         return file.tellg();
     }

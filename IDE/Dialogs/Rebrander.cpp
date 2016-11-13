@@ -7,6 +7,7 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Serialization/Serializer.h"
+#include "GDCore/Tools/FileStream.h"
 #include <fstream>
 #include <regex>
 #include <wx/aboutdlg.h>
@@ -15,7 +16,7 @@ using namespace gd;
 
 bool Rebrander::LoadRebrandingConfigFromFile(const gd::String & filename)
 {
-    std::ifstream ifs(filename.ToLocale().c_str());
+    gd::FileStream ifs(filename);
     if (!ifs.is_open()) return false;
 
     std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());

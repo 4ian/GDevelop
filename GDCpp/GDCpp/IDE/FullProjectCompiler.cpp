@@ -330,8 +330,10 @@ void FullProjectCompiler::LaunchProjectCompilation()
             wxFileName filename(file);
             if ( filename.GetFullName() != "gam.egd" ) //On supprime tout sauf gam.egd
             {
-                if ( !wxRemoveFile( file ) )
+                if ( !wxRemoveFile( filename.GetFullPath() ) )
+                {
                     diagnosticManager.AddError(_( "Unable to delete the file" ) + file + _(" in compilation directory.\n" ));
+                }
             }
 
             file = wxFindNextFile();

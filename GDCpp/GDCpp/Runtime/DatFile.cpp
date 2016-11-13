@@ -1,8 +1,12 @@
+
 #include "GDCpp/Runtime/DatFile.h"
+
+#include "GDCpp/Runtime/Tools/FileStream.h"
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
 #include <fstream>
+
 DatFile::DatFile (void)
 {
     m_buffer = NULL;
@@ -18,9 +22,9 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
     //An file entry in order to push it in the object's std::vector
     sFileEntry entry;
     //An input file stream to read each file included
-    std::ifstream file;
+    gd::FileStream file;
     //An output file stream to write our DAT file
-    std::ofstream datfile;
+    gd::FileStream datfile;
     //The buffer used to read/write the DAT file
     char buffer[1];
 
@@ -38,7 +42,7 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
     for (std::size_t i = 0; i<files.size(); i++)
     {
         gd::String fileToOpen = directory + "/" + files[i];
-        file.open (fileToOpen.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
+        file.open (fileToOpen, std::ios_base::in | std::ios_base::binary);
         if (file.is_open())
         {
             //Filling the FileEntry with 0
@@ -52,6 +56,9 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
             entry.offset = 0;
             //We finished with this file
             file.close();
+
+            if(file.fail())
+                std::cout << "Failure when closing a file! A" << std::endl;
 
             //Finally, we add this File Entry in our std::vector
             m_entries.push_back(entry);
@@ -75,7 +82,7 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
     }
 
     //And finally, we are writing the DAT file
-    datfile.open (destination.ToLocale().c_str(), std::ofstream::out | std::ofstream::binary);
+    datfile.open (destination, std::ios_base::out | std::ios_base::binary);
 
     //First, we write the header
     datfile.write ((char*)&m_header, sizeof(sDATHeader) );
@@ -90,7 +97,7 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
     for (std::size_t i = 0; i<m_entries.size(); i++)
     {
         gd::String fileToOpen = directory + "/" + files[i];
-        file.open (fileToOpen.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
+        file.open (fileToOpen, std::ios_base::in | std::ios_base::binary);
         if (file.is_open())
         {
             file.seekg (0, std::ios::beg);
@@ -100,11 +107,13 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
             }
             file.close();
         }
-        file.clear();
+
+        if(file.fail())
+            std::cout << "Failure when closing a file!" << std::endl;
     }
     //And it's finished
     datfile.close();
-    return (true);
+    return true;
 }
 
 /**
@@ -115,14 +124,14 @@ bool DatFile::Read (gd::String source)
     bool success = false;
 
     //The input file stream from which we want informations
-    std::ifstream datfile;
+    gd::FileStream datfile;
     //A file entry in order to push it in the object's std::vector
     sFileEntry entry;
 
     //Filling the header with 0
     memset (&m_header, 0, sizeof(m_header));
     //We open the DAT file to read it
-    datfile.open (source.ToLocale(), std::ifstream::in | std::ifstream::binary);
+    datfile.open (source, std::ios_base::in | std::ios_base::binary);
     if (datfile.is_open())
     {
         //Getting to the Header position
@@ -166,7 +175,7 @@ bool DatFile::ContainsFile(const gd::String & filename)
 char* DatFile::GetFile (gd::String filename)
 {
     //The input file stream from which we want information
-    std::ifstream datfile;
+    gd::FileStream datfile;
 
     //Cleaning properly an ancient file loaded
     if (m_buffer != NULL)
@@ -191,7 +200,7 @@ char* DatFile::GetFile (gd::String filename)
             }
 
             //Opening the DAT file ot read the file datas needed
-            datfile.open (m_datfile.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
+            datfile.open (m_datfile, std::ios_base::in | std::ios_base::binary);
             if (datfile.is_open())
             {
                 //Going to the right position

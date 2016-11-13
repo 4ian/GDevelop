@@ -266,16 +266,16 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
         this._injectExternalLayout);
 
     //Uncomment to profile the first x frames of the game.
-    /*var x = 250;
-    var startTime = Date.now();
-    console.profile("Stepping for " + x + " frames")
-    for(var i = 0; i < x; ++i) {
-        this._sceneStack.step(16);
-    }
-    console.profileEnd();
-    var time = Date.now() - startTime;
-    console.log("Took", time, "ms");
-    return;*/
+    // var x = 500;
+    // var startTime = Date.now();
+    // console.profile("Stepping for " + x + " frames")
+    // for(var i = 0; i < x; ++i) {
+    //     this._sceneStack.step(16);
+    // }
+    // console.profileEnd();
+    // var time = Date.now() - startTime;
+    // console.log("Took", time, "ms");
+    // return;
 
     //The standard game loop
     var that = this;

@@ -211,10 +211,11 @@ gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = func
 };
 
 /**
- * Update the current frame according to the elapsed time.
- * @method updateTime
+ * Update the current frame of the object according to the elapsed time on the scene.
+ * @method update
  */
-gdjs.SpriteRuntimeObject.prototype.updateTime = function(elapsedTime) {
+gdjs.SpriteRuntimeObject.prototype.update = function(runtimeScene) {
+    var elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
     var oldFrame = this._currentFrame;
     this._frameElapsedTime += this._animationPaused ? 0 : elapsedTime * this._animationSpeedScale;
 

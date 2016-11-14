@@ -140,7 +140,7 @@ void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, RuntimeObject *
 
     float xOffset = 0;
     float yOffset = 0;
-    double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
+    double elapsedTime = static_cast<double>(object->GetElapsedTime(scene)) / 1000000.0;
     if (anticipateObjectMove)
     {
         xOffset = object->TotalForceX() * elapsedTime;
@@ -166,7 +166,7 @@ void GD_API CenterCameraOnObject(RuntimeScene & scene, RuntimeObject * object,  
 
     float xOffset = 0;
     float yOffset = 0;
-    double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
+    double elapsedTime = static_cast<double>(object->GetElapsedTime(scene)) / 1000000.0;
     if (anticipateObjectMove)
     {
         xOffset = object->TotalForceX() * elapsedTime;

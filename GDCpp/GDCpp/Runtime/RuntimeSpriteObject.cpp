@@ -317,11 +317,12 @@ void RuntimeSpriteObject::UpdateCurrentSprite() const
     needUpdateCurrentSprite = false;
 }
 
-void RuntimeSpriteObject::UpdateTime(float elapsedTime)
+void RuntimeSpriteObject::Update(const RuntimeScene & scene)
 {
     if ( animationStopped || currentAnimation >= GetAnimationsCount() ) return;
 
-    timeElapsedOnCurrentSprite += elapsedTime * animationSpeedScale;
+    double elapsedTimeInSeconds = static_cast<double>(GetElapsedTime(scene))/1000000.0;
+    timeElapsedOnCurrentSprite += elapsedTimeInSeconds * animationSpeedScale;
 
     const gd::Direction & direction = animations[currentAnimation].Get().GetDirection( currentDirection );
 

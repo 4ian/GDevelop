@@ -84,9 +84,9 @@ void GD_API MoveObjects( RuntimeScene & scene )
 {
     RuntimeObjNonOwningPtrList allObjects = scene.objectsInstances.GetAllObjects();
 
-    double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
     for (std::size_t id = 0;id < allObjects.size();++id)
     {
+        double elapsedTime = static_cast<double>(allObjects[id]->GetElapsedTime(scene)) / 1000000.0;
         allObjects[id]->SetX(allObjects[id]->GetX() + allObjects[id]->TotalForceX() * elapsedTime);
         allObjects[id]->SetY(allObjects[id]->GetY() + allObjects[id]->TotalForceY() * elapsedTime);
 

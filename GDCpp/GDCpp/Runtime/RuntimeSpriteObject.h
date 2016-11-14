@@ -65,7 +65,7 @@ public:
     virtual std::size_t GetNumberOfProperties() const;
     #endif
 
-    virtual void UpdateTime(float timeElapsed);
+    virtual void Update(const RuntimeScene & scene);
 
     virtual void OnPositionChanged() {needUpdateCurrentSprite = true;};
 

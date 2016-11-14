@@ -9,6 +9,7 @@
 #include "GDCpp/Runtime/String.h"
 namespace gd { class Camera; }
 namespace gd { class Layer; }
+class RuntimeScene;
 
 /**
  * \brief A camera which is displayed on a part of a window ( see Viewport related methods )
@@ -111,7 +112,7 @@ private:
 class GD_API RuntimeLayer
 {
 public:
-    RuntimeLayer() : isVisible(true) {};
+    RuntimeLayer() : isVisible(true), timeScale(1) {};
     RuntimeLayer(gd::Layer & layer, const sf::View & defaultView);
     virtual ~RuntimeLayer() {};
 
@@ -160,11 +161,28 @@ public:
      */
     inline void AddCamera(const RuntimeCamera & camera) { cameras.push_back(camera); };
 
+    /**
+     * \brief Get the time scale of the layer
+     */
+    double GetTimeScale() { return timeScale; }
+
+    /**
+     * \brief Change the time scale applied on the (objects of the) layer.
+     */
+    void SetTimeScale(double timeScale_) { if (timeScale_ > 0) timeScale = timeScale_; }
+
+    /**
+     * \brief Return the time elapsed since the last frame, in microseconds, for the layer.
+     * This can be different than the time elapsed on the scene
+     */
+    signed long long GetElapsedTime(const RuntimeScene & scene) const;
+
 private:
 
     gd::String name; ///< The name of the layer
     bool isVisible; ///< True if the layer is visible
     std::vector < RuntimeCamera > cameras; ///< The camera displayed by the layer
+    double timeScale; ///< Time scale that is applied on the (objects of the) layer.
 };
 
 #endif // RUNTIMELAYER_H

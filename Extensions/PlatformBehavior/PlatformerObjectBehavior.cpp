@@ -96,7 +96,7 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene & scene)
 
     if ( !sceneManager ) return;
 
-    double timeDelta = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
+    double timeDelta = static_cast<double>(object->GetElapsedTime(scene)) / 1000000.0;
 
     //0.1) Get the player input:
 

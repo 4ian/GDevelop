@@ -290,10 +290,19 @@ bool RuntimeScene::OrderObjectsByZOrder(RuntimeObjNonOwningPtrList & objList)
 
 RuntimeLayer & RuntimeScene::GetRuntimeLayer(const gd::String & name)
 {
-    for (std::size_t i = 0;i<layers.size();++i)
+    for(RuntimeLayer & layer : layers)
     {
-        if ( layers[i].GetName() == name )
-            return layers[i];
+        if (layer.GetName() == name) return layer;
+    }
+
+    return badRuntimeLayer;
+}
+
+const RuntimeLayer & RuntimeScene::GetRuntimeLayer(const gd::String & name) const
+{
+    for(const RuntimeLayer & layer : layers)
+    {
+        if (layer.GetName() == name) return layer;
     }
 
     return badRuntimeLayer;
@@ -316,14 +325,14 @@ void RuntimeScene::ManageObjectsAfterEvents()
 
     //Update objects positions, forces and behaviors
     allObjects = objectsInstances.GetAllObjects();
-    double elapsedTime = static_cast<double>(timeManager.GetElapsedTime())/1000000.0;
-    for (std::size_t id = 0;id<allObjects.size();++id)
+    for (RuntimeObjSPtr & object : allObjects)
     {
-        allObjects[id]->SetX( allObjects[id]->GetX() + (allObjects[id]->TotalForceX() * elapsedTime));
-        allObjects[id]->SetY( allObjects[id]->GetY() + (allObjects[id]->TotalForceY() * elapsedTime));
-        allObjects[id]->UpdateTime(elapsedTime);
-        allObjects[id]->UpdateForce(elapsedTime);
-        allObjects[id]->DoBehaviorsPostEvents(*this);
+        double elapsedTimeInSeconds = static_cast<double>(object->GetElapsedTime(*this))/1000000.0;
+        object->SetX( object->GetX() + (object->TotalForceX() * elapsedTimeInSeconds));
+        object->SetY( object->GetY() + (object->TotalForceY() * elapsedTimeInSeconds));
+        object->Update(*this);
+        object->UpdateForce(elapsedTimeInSeconds);
+        object->DoBehaviorsPostEvents(*this);
     }
 }
 

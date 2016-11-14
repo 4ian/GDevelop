@@ -259,7 +259,7 @@ public :
     virtual float GetWidth() const {return 32;};
     virtual float GetHeight() const {return 32;};
 
-    virtual void UpdateTime(float timeElapsed);
+    virtual void Update(const RuntimeScene & scene);
 
     bool NoMoreParticles() const {return !hasSomeParticles;};
 
@@ -281,7 +281,6 @@ public :
 private:
 
     bool hasSomeParticles;
-    const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
 };
 
 #endif // PARTICLEEMITTEROBJECT_H

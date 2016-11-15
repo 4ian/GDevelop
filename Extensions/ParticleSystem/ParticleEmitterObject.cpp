@@ -368,10 +368,10 @@ void ParticleEmitterBase::CreateParticleSystem()
 	{
 	    SPK::GL::GLQuadRenderer * quadRenderer = new SPK::GL::GLQuadRenderer(rendererParam1,rendererParam2);
 
-        if ( particleSystem->openGLTextureParticle && particleSystem->openGLTextureParticle->GetOpenGLTexture() != 0 )
+        if ( particleSystem->textureParticle )
         {
             quadRenderer->setTexturingMode(SPK::TEXTURE_2D);
-            quadRenderer->setTexture(particleSystem->openGLTextureParticle->GetOpenGLTexture());
+            quadRenderer->setTexture(particleSystem->textureParticle->texture.getNativeHandle());
         }
 
         particleSystem->renderer = quadRenderer;
@@ -759,15 +759,15 @@ void ParticleEmitterBase::SetTexture( RuntimeScene & scene, const gd::String & t
     if ( particleSystem && rendererType == Quad )
     {
         //Load new texture
-        particleSystem->openGLTextureParticle = scene.GetImageManager()->GetOpenGLTexture(textureParticleName);
+        particleSystem->textureParticle = scene.GetImageManager()->GetSFMLTexture(textureParticleName);
 
 	    //Notify the renderer of the change
 	    SPK::GL::GLQuadRenderer * quadRenderer = dynamic_cast<SPK::GL::GLQuadRenderer*>(particleSystem->renderer);
 
-        if ( quadRenderer && particleSystem->openGLTextureParticle->GetOpenGLTexture() != 0 )
+        if ( quadRenderer )
         {
             quadRenderer->setTexturingMode(SPK::TEXTURE_2D);
-            quadRenderer->setTexture(particleSystem->openGLTextureParticle->GetOpenGLTexture());
+            quadRenderer->setTexture(particleSystem->textureParticle->texture.getNativeHandle());
         }
     }
 }

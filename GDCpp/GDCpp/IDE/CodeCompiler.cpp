@@ -188,11 +188,11 @@ gd::String CodeCompilerCall::GetFullCall() const
         args.push_back("\""+baseDir+"libsfml-window.dylib\"");
         args.push_back("\""+baseDir+"libsfml-system.dylib\"");
         #else
-        args.push_back("\""+baseDir+"libsfml-audio.so.2\"");
-        args.push_back("\""+baseDir+"libsfml-network.so.2\"");
-        args.push_back("\""+baseDir+"libsfml-graphics.so.2\"");
-        args.push_back("\""+baseDir+"libsfml-window.so.2\"");
-        args.push_back("\""+baseDir+"libsfml-system.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-audio.so.2.4\"");
+        args.push_back("\""+baseDir+"libsfml-network.so.2.4\"");
+        args.push_back("\""+baseDir+"libsfml-graphics.so.2.4\"");
+        args.push_back("\""+baseDir+"libsfml-window.so.2.4\"");
+        args.push_back("\""+baseDir+"libsfml-system.so.2.4\"");
         #endif
         #elif defined(DEBUG)
         #if defined(WINDOWS)
@@ -208,11 +208,11 @@ gd::String CodeCompilerCall::GetFullCall() const
         args.push_back("\""+baseDir+"libsfml-window.dylib\"");
         args.push_back("\""+baseDir+"libsfml-system.dylib\"");
         #else
-        args.push_back("\""+baseDir+"libsfml-audio-d.so.2\"");
-        args.push_back("\""+baseDir+"libsfml-network-d.so.2\"");
-        args.push_back("\""+baseDir+"libsfml-graphics-d.so.2\"");
-        args.push_back("\""+baseDir+"libsfml-window-d.so.2\"");
-        args.push_back("\""+baseDir+"libsfml-system-d.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-audio-d.so.2.4\"");
+        args.push_back("\""+baseDir+"libsfml-network-d.so.2.4\"");
+        args.push_back("\""+baseDir+"libsfml-graphics-d.so.2.4\"");
+        args.push_back("\""+baseDir+"libsfml-window-d.so.2.4\"");
+        args.push_back("\""+baseDir+"libsfml-system-d.so.2.4\"");
         #endif
         #endif
         for (std::size_t i = 0;i<extraLibFiles.size();++i)

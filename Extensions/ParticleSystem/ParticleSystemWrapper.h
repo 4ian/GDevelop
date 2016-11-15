@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #define PARTICLESYSTEMWRAPPER_H
 
 #include <memory>
-class OpenGLTextureWrapper;
+class SFMLTextureWrapper;
 
 namespace SPK
 {
@@ -57,7 +57,7 @@ class GD_EXTENSION_API ParticleSystemWrapper
         SPK::Sphere * zone;
         SPK::Group * group;
         SPK::GL::GLRenderer * renderer;
-        std::shared_ptr<OpenGLTextureWrapper> openGLTextureParticle;
+        std::shared_ptr<SFMLTextureWrapper> textureParticle;
 
     private:
         void Init(const ParticleSystemWrapper & other);
@@ -66,4 +66,3 @@ class GD_EXTENSION_API ParticleSystemWrapper
 };
 
 #endif // PARTICLESYSTEMWRAPPER_H
-

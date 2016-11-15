@@ -169,7 +169,7 @@ public:
     /**
      * \brief Change the time scale applied on the (objects of the) layer.
      */
-    void SetTimeScale(double timeScale_) { if (timeScale_ > 0) timeScale = timeScale_; }
+    void SetTimeScale(double timeScale_) { if (timeScale_ >= 0) timeScale = timeScale_; }
 
     /**
      * \brief Return the time elapsed since the last frame, in microseconds, for the layer.

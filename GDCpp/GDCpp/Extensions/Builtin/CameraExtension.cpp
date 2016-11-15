@@ -49,6 +49,10 @@ CameraExtension::CameraExtension()
 
     GetAllConditions()["LayerVisible"].SetFunctionName("LayerVisible").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
 
+    GetAllConditions()["LayerTimeScale"].SetFunctionName("GetLayerTimeScale").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
+    GetAllActions()["ChangeLayerTimeScale"].SetFunctionName("SetLayerTimeScale").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
+    GetAllExpressions()["LayerTimeScale"].SetFunctionName("GetLayerTimeScale").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
+
     GetAllExpressions()["CameraWidth"].SetFunctionName("GetCameraWidth").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
     GetAllExpressions()["CameraHeight"].SetFunctionName("GetCameraHeight").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
     GetAllExpressions()["CameraViewportLeft"].SetFunctionName("GetCameraViewportLeft").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneCameraTools.h");
@@ -64,4 +68,3 @@ CameraExtension::CameraExtension()
 
     #endif
 }
-

@@ -27,5 +27,8 @@ void GD_API CenterCameraOnObject(RuntimeScene & scene, RuntimeObject * object, b
 void GD_API ActDeleteCamera(RuntimeScene & scene, const gd::String & layer, std::size_t camera);
 void GD_API AddCamera( RuntimeScene & scene, const gd::String & layer, float width, float height, float viewportLeft, float viewportTop, float viewportRight, float viewportBottom );
 void GD_API SetCameraViewport( RuntimeScene & scene,  const gd::String & layer, std::size_t cameraNb, float viewportLeft, float viewportTop, float viewportRight, float viewportBottom );
+double GD_API GetLayerTimeScale(RuntimeScene & scene, const gd::String & layer);
+void GD_API SetLayerTimeScale(RuntimeScene & scene, const gd::String & layer, double timeScale);
+
 
 #endif // RUNTIMESCENECAMERATOOLS_H

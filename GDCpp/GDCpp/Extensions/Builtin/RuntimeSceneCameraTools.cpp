@@ -221,3 +221,13 @@ void GD_API SetCameraViewport( RuntimeScene & scene,  const gd::String & layer, 
     RuntimeCamera & camera = scene.GetRuntimeLayer(layer).GetCamera(cameraNb);
     camera.SetViewport(viewportLeft, viewportTop, viewportRight, viewportBottom);
 }
+
+double GD_API GetLayerTimeScale(RuntimeScene & scene, const gd::String & layer)
+{
+    return scene.GetRuntimeLayer(layer).GetTimeScale();
+}
+
+void GD_API SetLayerTimeScale(RuntimeScene & scene, const gd::String & layer, double timeScale)
+{
+    scene.GetRuntimeLayer(layer).SetTimeScale(timeScale);
+}

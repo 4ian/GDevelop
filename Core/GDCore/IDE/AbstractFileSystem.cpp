@@ -109,7 +109,7 @@ gd::String NativeFileSystem::GetTempDir()
 
 bool NativeFileSystem::WriteToFile(const gd::String & filename, const gd::String & content)
 {
-    gd::FileStream file( filename );
+    gd::FileStream file( filename, std::ios_base::out );
     if ( file.is_open() ) {
         file << content.ToUTF8();
         file.close();
@@ -121,7 +121,7 @@ bool NativeFileSystem::WriteToFile(const gd::String & filename, const gd::String
 
 gd::String NativeFileSystem::ReadFile(const gd::String & file)
 {
-    gd::FileStream t(file);
+    gd::FileStream t( file, std::ios_base::in );
     std::stringstream buffer;
     buffer << t.rdbuf();
     return gd::String::FromUTF8(buffer.str());

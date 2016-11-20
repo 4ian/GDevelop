@@ -18,6 +18,7 @@ gd_set_option(BUILD_IDE TRUE BOOL "TRUE to build the IDE")
 gd_set_option(BUILD_EXTENSIONS TRUE BOOL "TRUE to build the extensions")
 gd_set_option(BUILD_TESTS FALSE BOOL "TRUE to build the tests")
 gd_set_option(NO_GUI FALSE BOOL "TRUE to build without wxWidgets GUI")
+gd_set_option(FULL_VERSION_NUMBER TRUE BOOL "TRUE to build GDevelop with its full version number (lastest tag + commit hash), FALSE to only use the lastest tag (avoid rebulding many source file when developping)")
 
 #Setting up installation directory, for Linux (has to be done before "project" command).
 IF(NOT WIN32)

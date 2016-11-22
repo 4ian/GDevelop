@@ -31,6 +31,7 @@ void SoundManager::PlaySoundOnChannel(const gd::String & name, unsigned int chan
 {
     std::shared_ptr<Sound> sound = std::make_shared<Sound>(GetFileFromSoundName(name));
     sound->sound.play();
+    sound->sound.setRelativeToListener(true);
 
     SetSoundOnChannel(channel, sound);
     GetSoundOnChannel(channel)->sound.setLoop(repeat);
@@ -42,6 +43,7 @@ void SoundManager::PlaySound(const gd::String & name, bool repeat, float volume,
 {
     sounds.push_back(std::shared_ptr<Sound>(new Sound(GetFileFromSoundName(name))));
     sounds.back()->sound.play();
+    sounds.back()->sound.setRelativeToListener(true);
 
     sounds.back()->sound.setLoop(repeat);
     sounds.back()->SetVolume(volume, globalVolume);
@@ -67,6 +69,7 @@ void SoundManager::PlayMusic(const gd::String & name, bool repeat, float volume,
     }
 
     musics.push_back(music);
+    musics.back()->music.setRelativeToListener(true);
     musics.back()->Play();
 
     music->SetLoop(repeat);
@@ -93,6 +96,7 @@ void SoundManager::PlayMusicOnChannel(const gd::String & name, unsigned int chan
     }
 
     SetMusicOnChannel(channel, music);
+    music->music.setRelativeToListener(true);
     music->Play();
 
     music->SetLoop(repeat);

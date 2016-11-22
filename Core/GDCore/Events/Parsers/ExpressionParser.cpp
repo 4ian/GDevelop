@@ -31,6 +31,9 @@ size_t ExpressionParser::GetMinimalParametersNumber(const std::vector < gd::Para
     	if ( !parametersInfos[i].optional && !parametersInfos[i].codeOnly ) nb++;
     }
 
+    if(parametersInfos.size() > 0 && parametersInfos.back().type == "variadic")
+        nb--; //The last parameter is a variadic parameter, it can receive "no" values
+
     return nb;
 }
 
@@ -41,6 +44,9 @@ size_t ExpressionParser::GetMaximalParametersNumber(const std::vector < gd::Para
     {
     	if ( !parametersInfos[i].codeOnly ) nb++;
     }
+
+    if(parametersInfos.size() > 0 && parametersInfos.back().type == "variadic")
+        nb = static_cast<size_t>(-1); //The last parameter is a variadic parameter, it can receive an infinite amount of values
 
     return nb;
 }

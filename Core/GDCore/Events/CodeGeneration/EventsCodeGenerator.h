@@ -305,6 +305,10 @@ protected:
      * - operator : Used to update a value using a setter and a getter -> string
      * - key, mouse, objectvar, scenevar, globalvar, password, musicfile, soundfile, police -> string
      * - trueorfalse, yesorno -> boolean ( See GenerateTrue/GenerateFalse ).
+     * - variadic -> like a parameter pack in a variadic template function
+     *              between 0 and infinity of parameters of type string
+     *              (if ExtraInfo is "string") or expression (if ExtraInfo is "expression")
+     *              /!\ Can only be used as the last parameter!
      *
      * <br><br>
      * "Code only" parameters types:

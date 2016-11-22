@@ -424,7 +424,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
             context.ObjectsListNeeded(realObjects[i]);
 
             //Prepare arguments and generate the whole action code
-            vector<gd::String>  arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
+            vector<gd::String> arguments = GenerateParametersCodes(action.GetParameters(), instrInfos.parameters, context);
             actionCode += GenerateBehaviorAction(realObjects[i], action.GetParameter(1).GetPlainString(), autoInfo, arguments, instrInfos, context);
 
             context.SetNoCurrentObject();
@@ -461,7 +461,9 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
 {
     gd::String argOutput;
 
-    if ( metadata.type == "expression" || metadata.type == "camera" )
+    if ( metadata.type == "expression" ||
+        metadata.type == "camera" ||
+        ( metadata.type == "variadic" && metadata.GetExtraInfo() == "expression" ) )
     {
         CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
 
@@ -475,7 +477,12 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
 
         if (argOutput.empty()) argOutput = "0";
     }
-    else if ( metadata.type == "string" || metadata.type == "layer" || metadata.type == "color" || metadata.type == "file" || metadata.type == "joyaxis" )
+    else if ( metadata.type == "string" ||
+        metadata.type == "layer" ||
+        metadata.type == "color" ||
+        metadata.type == "file" ||
+        metadata.type == "joyaxis" ||
+        ( metadata.type == "variadic" && metadata.GetExtraInfo() == "string" ))
     {
         CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
 
@@ -572,13 +579,19 @@ vector<gd::String>  EventsCodeGenerator::GenerateParametersCodes(vector < gd::Ex
     while(parameters.size() < parametersInfo.size())
         parameters.push_back(gd::Expression(""));
 
-    for (std::size_t pNb = 0;pNb < parametersInfo.size() && pNb < parameters.size();++pNb)
+    bool lastParameterIsVariadic = parametersInfo.size() > 0 ? (parametersInfo.back().GetType() == "variadic") : false;
+
+    for (std::size_t pNb = 0;(lastParameterIsVariadic || pNb < parametersInfo.size()) && pNb < parameters.size();++pNb)
     {
         if ( parameters[pNb].GetPlainString().empty() && parametersInfo[pNb].optional  )
             parameters[pNb] = gd::Expression(parametersInfo[pNb].defaultValue);
 
-        gd::String argOutput = GenerateParameterCodes(parameters[pNb].GetPlainString(), parametersInfo[pNb], context,
-            pNb == 0 ? "" : parameters[pNb-1].GetPlainString(), supplementaryParametersTypes);
+        gd::String argOutput = GenerateParameterCodes(
+            parameters[pNb].GetPlainString(),
+            parametersInfo[std::min(pNb, parametersInfo.size() - 1)],
+            context,
+            pNb == 0 ? "" : parameters[pNb-1].GetPlainString(),
+            supplementaryParametersTypes);
 
         arguments.push_back(argOutput);
     }

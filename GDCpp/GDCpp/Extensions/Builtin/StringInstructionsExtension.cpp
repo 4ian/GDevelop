@@ -27,5 +27,17 @@ StringInstructionsExtension::StringInstructionsExtension()
     GetAllExpressions()["StrRFind"].SetFunctionName("GDpriv::StringTools::StrRFind").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
     GetAllExpressions()["StrFindFrom"].SetFunctionName("GDpriv::StringTools::StrFindFrom").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
     GetAllExpressions()["StrRFindFrom"].SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
+
+    AddStrExpression("Format",
+                   _("Format a string"),
+                   _("Format a string"),
+                   _("Manipulation on text"),
+                   "res/conditions/toujours24.png")
+            .AddParameter("string", _("Text"))
+            .AddParameter("variadic", _("Arguments"), "string")
+
+            .SetFunctionName("GDpriv::StringTools::Format")
+            .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
+
     #endif
 }

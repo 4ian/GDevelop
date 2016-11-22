@@ -7,6 +7,9 @@
 #define STRINGEXPRESSIONS_H
 
 #include <string>
+
+#include "GDCpp/Runtime/StringFormatter.h"
+
 class RuntimeScene;
 
 namespace GDpriv
@@ -29,6 +32,19 @@ int GD_API StrFind(const gd::String & str, const gd::String & findwhat);
 int GD_API StrRFind(const gd::String & str, const gd::String & findwhat);
 int GD_API StrFindFrom(const gd::String & str, const gd::String & findwhat, std::size_t start);
 int GD_API StrRFindFrom(const gd::String & str, const gd::String & findwhat, std::size_t start);
+
+template<typename... Args>
+gd::String GD_API Format(const gd::String & str, Args... args)
+{
+    try
+    {
+        return FormatString(str, args...);
+    }
+    catch( const FormatStringException & e)
+    {
+        return str;
+    }
+}
 
 }
 

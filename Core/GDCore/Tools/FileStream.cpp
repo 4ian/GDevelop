@@ -65,7 +65,7 @@ FileStream::FileStream()
 }
 
 FileStream::FileStream(const gd::String & path, std::ios_base::openmode mode) :
-	std::iostream(),
+	std::iostream(nullptr),
 	m_file(nullptr),
 	m_buffer(OpenBuffer(path, mode, &m_file))
 {

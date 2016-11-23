@@ -8,10 +8,24 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include "GDCore/String.h"
+#include "GDCore/Tools/FileStream.h"
 #undef LoadImage //Undef macro from windows.h
 
 namespace gd
 {
+
+/**
+ * \brief A class holding a buffer and/or a file stream (useful for SFML classes
+ * that needs their buffer/stream continuously opened)
+ */
+struct StreamHolder
+{
+    StreamHolder() : buffer(nullptr), stream() {}
+    ~StreamHolder() { if ( buffer ) delete buffer; }
+
+    char* buffer;
+    gd::SFMLFileStream stream;
+};
 
 /**
  * \brief Class used by games to load resources from files: this is purely an abstraction
@@ -42,7 +56,7 @@ public:
      * that need to be kept alive while the font is used (can be NULL if the font was loaded
      * from a file).
      */
-    std::pair<sf::Font *, char *> LoadFont( const gd::String & filename );
+    std::pair<sf::Font *, StreamHolder *> LoadFont( const gd::String & filename );
 
     /**
      * Load a SFML Sound Buffer

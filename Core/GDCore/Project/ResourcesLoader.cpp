@@ -38,18 +38,20 @@ void ResourcesLoader::LoadSFMLTexture( const gd::String & filename, sf::Texture 
         cout << "Failed to load a SFML texture: " << filename << endl;
 }
 
-std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filename)
+std::pair<sf::Font *, StreamHolder *> ResourcesLoader::LoadFont(const gd::String & filename)
 {
-    sf::Font * font = new sf::Font;
-    gd::SFMLFileStream stream;
-    if (!stream.open(filename) || !font->loadFromStream(stream))
+    sf::Font * font = new sf::Font();
+    StreamHolder * streamHolder = new StreamHolder();
+
+    if (!streamHolder->stream.open(filename) || !font->loadFromStream(streamHolder->stream))
     {
         cout << "Failed to load a font from a file: " << filename << endl;
-        return std::make_pair<sf::Font*, char*>(NULL, NULL);
+        delete font;
+        delete streamHolder;
+        return std::make_pair((sf::Font*)nullptr, (StreamHolder*)nullptr);
     }
 
-    //Extra (sf::Font*) added to avoid a compilation error with Clang 3.3
-    return std::make_pair<sf::Font*, char*>((sf::Font*)font, NULL);
+    return std::make_pair(font, streamHolder);
 }
 
 sf::SoundBuffer ResourcesLoader::LoadSoundBuffer( const gd::String & filename )

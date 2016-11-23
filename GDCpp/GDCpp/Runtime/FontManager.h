@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include "GDCpp/Runtime/String.h"
+#include "GDCpp/Runtime/ResourcesLoader.h"
 
 /**
  * \brief FontManager loads and manages SFML fonts.
@@ -59,7 +60,7 @@ private:
     void EnsureDefaultFontIsLoaded();
 
     std::map < gd::String, sf::Font* > fonts; ///< The font being loaded.
-    std::map < gd::String, char* > fontsBuffer; ///< The buffer associated to each font, if any.
+    std::map < gd::String, gd::StreamHolder* > fontsBuffer; ///< The buffer associated to each font, if any.
     sf::Font * defaultFont; ///< The default font used when no font is specified. Initialized at first use.
 
     FontManager() : defaultFont(NULL) {};

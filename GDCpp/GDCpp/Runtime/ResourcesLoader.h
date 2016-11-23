@@ -18,10 +18,24 @@ class Music;
 #include <SFML/Audio.hpp>
 #include <string>
 #include "GDCpp/Runtime/String.h"
+#include "GDCpp/Runtime/Tools/FileStream.h"
 #undef LoadImage //Undef macro from windows.h
 
 namespace gd
 {
+
+/**
+ * \brief A class holding a buffer and/or a file stream (useful for SFML classes
+ * that needs their buffer/stream continuously opened)
+ */
+struct StreamHolder
+{
+    StreamHolder() : buffer(nullptr), stream() {}
+    ~StreamHolder() { if ( buffer ) delete buffer; }
+
+    char* buffer;
+    gd::SFMLFileStream stream;
+};
 
 /**
  * \brief Class used by games to load resources from files or from a DatFile.
@@ -44,7 +58,7 @@ public:
     sf::Texture LoadSFMLTexture( const gd::String & filename );
     void LoadSFMLTexture( const gd::String & filename, sf::Texture & texture );
 
-    std::pair<sf::Font *, char *> LoadFont( const gd::String & filename );
+    std::pair<sf::Font *, StreamHolder *> LoadFont( const gd::String & filename );
 
     sf::SoundBuffer LoadSoundBuffer( const gd::String & filename );
 

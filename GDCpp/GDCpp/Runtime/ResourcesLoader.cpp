@@ -5,7 +5,6 @@
  */
 #if !defined(GD_IDE_ONLY)
 #include "GDCpp/Runtime/ResourcesLoader.h"
-#include "GDCpp/Runtime/Tools/FileStream.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
@@ -84,15 +83,15 @@ void ResourcesLoader::LoadSFMLTexture( const gd::String & filename, sf::Texture 
     }
 }
 
-std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filename)
+std::pair<sf::Font *, StreamHolder *> ResourcesLoader::LoadFont(const gd::String & filename)
 {
     if (resFile.ContainsFile(filename))
     {
         char* buffer = resFile.GetFile(filename);
         size_t bufferSize = resFile.GetFileSize(filename);
-        if (buffer==NULL) {
+        if (buffer==nullptr) {
             cout << "Failed to get the file of a font from resource file:" << filename << endl;
-            return std::make_pair((sf::Font*)NULL, (char*)NULL);
+            return std::make_pair((sf::Font*)nullptr, (StreamHolder*)nullptr);
         }
 
         sf::Font * font = new sf::Font();
@@ -104,24 +103,27 @@ std::pair<sf::Font *, char *> ResourcesLoader::LoadFont(const gd::String & filen
             cout << "Failed to load a font from resource file: " << filename << endl;
             delete font;
             delete fontBuffer;
-            return std::make_pair((sf::Font*)NULL, (char*)NULL);
+            return std::make_pair((sf::Font*)nullptr, (StreamHolder*)nullptr);
         }
 
-        return std::make_pair(font, fontBuffer);
+        StreamHolder * streamHolder = new StreamHolder();
+        streamHolder->buffer = fontBuffer;
+        return std::make_pair(font, streamHolder);
     }
     else
     {
         sf::Font * font = new sf::Font();
-        gd::SFMLFileStream stream;
+        StreamHolder * streamHolder = new StreamHolder();
 
-        if (!stream.open(filename) || !font->loadFromStream(stream))
+        if (!streamHolder->stream.open(filename) || !font->loadFromStream(streamHolder->stream))
         {
             cout << "Failed to load a font from a file: " << filename << endl;
             delete font;
-            return std::make_pair<sf::Font*, char*>(NULL, NULL);
+            delete streamHolder;
+            return std::make_pair((sf::Font*)nullptr, (StreamHolder*)nullptr);
         }
 
-        return std::make_pair(font, (char*)nullptr);
+        return std::make_pair(font, streamHolder);
     }
 }
 

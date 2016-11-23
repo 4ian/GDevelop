@@ -1,5 +1,4 @@
 #include "GDCpp/Runtime/FontManager.h"
-#include "GDCpp/Runtime/ResourcesLoader.h"
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
@@ -17,12 +16,12 @@ FontManager::~FontManager()
 void FontManager::UnloadAllFonts()
 {
     //Need to explicit delete fonts...
-    for ( map<gd::String, sf::Font*>::iterator it=fonts.begin() ; it != fonts.end(); ++it )
+    for ( auto it = fonts.begin() ; it != fonts.end(); ++it )
     {
         if ((*it).second) delete (*it).second;
     }
     //...and their buffers
-    for ( map<gd::String, char*>::iterator it=fontsBuffer.begin() ; it != fontsBuffer.end(); ++it )
+    for ( auto it = fontsBuffer.begin() ; it != fontsBuffer.end(); ++it )
     {
         if ((*it).second) delete (*it).second;
     }
@@ -30,7 +29,7 @@ void FontManager::UnloadAllFonts()
     fonts.clear();
     fontsBuffer.clear();
     if ( defaultFont ) delete defaultFont;
-    defaultFont = NULL;
+    defaultFont = nullptr;
 }
 
 void FontManager::EnsureDefaultFontIsLoaded()
@@ -65,7 +64,7 @@ const sf::Font * FontManager::GetFont(const gd::String & fontName)
 
     //Load an new font
     gd::ResourcesLoader * ressourcesLoader = gd::ResourcesLoader::Get();
-    std::pair<sf::Font *, char*> font = ressourcesLoader->LoadFont(fontName);
+    std::pair<sf::Font *, gd::StreamHolder*> font = ressourcesLoader->LoadFont(fontName);
     if (font.first)
     {
         if (font.second) //Store the buffer if any.

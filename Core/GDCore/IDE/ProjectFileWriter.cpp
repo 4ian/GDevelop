@@ -126,7 +126,7 @@ bool ProjectFileWriter::SaveToJSONFile(const gd::Project & project, const gd::St
 
     //Write JSON to file
     gd::String str = gd::Serializer::ToJSON(rootElement);
-    gd::FileStream ofs(filename);
+    gd::FileStream ofs(filename, std::ios_base::out);
     if (!ofs.is_open())
     {
         gd::LogError( _( "Unable to save file ")+ filename + _("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
@@ -140,7 +140,7 @@ bool ProjectFileWriter::SaveToJSONFile(const gd::Project & project, const gd::St
 
 bool ProjectFileWriter::LoadFromJSONFile(gd::Project & project, const gd::String & filename)
 {
-    gd::FileStream ifs(filename);
+    gd::FileStream ifs(filename, std::ios_base::in);
     if (!ifs.is_open())
     {
         gd::String error = _( "Unable to open the file.") + _("Make sure the file exists and that you have the right to open the file.");

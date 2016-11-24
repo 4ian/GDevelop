@@ -16,7 +16,7 @@ using namespace gd;
 
 bool Rebrander::LoadRebrandingConfigFromFile(const gd::String & filename)
 {
-    gd::FileStream ifs(filename);
+    gd::FileStream ifs(filename, std::ios_base::in);
     if (!ifs.is_open()) return false;
 
     std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());

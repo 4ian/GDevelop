@@ -34,7 +34,7 @@ public:
 #endif
 
 	FileStream();
-	FileStream(const gd::String & path, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
+	FileStream(const gd::String & path, std::ios_base::openmode mode);
 	~FileStream();
 
 	FileStream(const FileStream & other) = delete;
@@ -45,7 +45,7 @@ public:
 	FileStream& operator=(FileStream && other) = delete; //HACK for GCC 4.9 (Windows)
 	//FileStream& operator=(FileStream && other); WILL WORK with GCC>=5 (not 4.9 used on Windows)
 
-	void open(const gd::String & path, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
+	void open(const gd::String & path, std::ios_base::openmode mode);
 
 	bool is_open() const;
 

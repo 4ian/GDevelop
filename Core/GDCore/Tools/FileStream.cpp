@@ -72,7 +72,7 @@ FileStream::FileStream(const gd::String & path, std::ios_base::openmode mode) :
 	setstate(ios_base::goodbit);
 	if(m_buffer)
 	{
-		std::iostream::rdbuf(m_buffer.get());
+		std::iostream::init(m_buffer.get());
 		if((mode & std::ios_base::ate) != 0)
 			seekg(0, end);
 	}
@@ -117,7 +117,7 @@ void FileStream::open(const gd::String & path, std::ios_base::openmode mode)
 				m_buffer->close();
 
 			m_buffer.reset(newBuffer);
-			std::iostream::rdbuf(m_buffer.get());
+			std::iostream::init(m_buffer.get());
 			if((mode & std::ios_base::ate) != 0)
 				seekg(0, end);
 		}

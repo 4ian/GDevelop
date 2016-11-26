@@ -46,6 +46,8 @@ gd::String GD_API Format(const gd::String & str, Args... args)
     }
 }
 
+gd::String GD_API Translate(const gd::String & str);
+
 }
 
 }

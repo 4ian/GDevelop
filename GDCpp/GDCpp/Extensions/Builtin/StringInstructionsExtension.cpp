@@ -39,5 +39,15 @@ StringInstructionsExtension::StringInstructionsExtension()
             .SetFunctionName("GDpriv::StringTools::Format")
             .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
 
+    AddStrExpression("_",
+                   _("Translate a string"),
+                   _("Translate a string"),
+                   _("Translation"),
+                   "res/conditions/toujours24.png")
+            .AddParameter("string", _("Text"))
+
+            .SetFunctionName("GDpriv::StringTools::Translate")
+            .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
+
     #endif
 }

@@ -117,5 +117,10 @@ gd::String GD_API NewLine()
     return "\n";
 };
 
+gd::String GD_API Translate(const gd::String & str)
+{
+    return str;
+}
+
 }
 }

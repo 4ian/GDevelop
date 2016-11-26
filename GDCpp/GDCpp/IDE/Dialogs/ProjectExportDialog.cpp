@@ -196,6 +196,13 @@ public:
     virtual void OnCompilationSucceeded()
     {
         staticText1->SetLabel(_("Compilation finished")); staticText2->SetLabel(_("Compiled project is now available in the export folder."));
+
+        //Display the errors if there are some
+        if( !GetErrors().empty() )
+        {
+            wxMessageBox(_("Some errors happened during the compilation, but the game was still compiled successfully:") + gd::String("\n") + GetErrors(), _("Compilation finished"));
+        }
+
         if ( wxMessageBox(_("Compilation achieved. Do you want to open the folder where the project has been compiled\?"), _("Compilation finished"), wxYES_NO) == wxYES )
         {
             gd::ShowFolder(destinationDirectory);

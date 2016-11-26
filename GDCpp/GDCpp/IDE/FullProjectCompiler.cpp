@@ -245,7 +245,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         diagnosticManager.OnMessage( _("Copying resources..."), it->first );
 
         if ( !it->first.empty() && wxCopyFile( it->first, tempDir + "/" + it->second, true ) == false )
-            diagnosticManager.AddError(_( "Unable to copy " )+it->first+_(" in compilation directory.\n" ));
+            diagnosticManager.AddError(_( "Unable to copy " )+it->first+_(" in compilation directory." ));
 
         ++i;
         diagnosticManager.OnPercentUpdate( 50.0 + static_cast<float>(i) / static_cast<float>(resourcesNewFilename.size())*25.0 );
@@ -332,7 +332,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
             {
                 if ( !wxRemoveFile( filename.GetFullPath() ) )
                 {
-                    diagnosticManager.AddError(_( "Unable to delete the file" ) + file + _(" in compilation directory.\n" ));
+                    diagnosticManager.AddError(_( "Unable to delete the file" ) + file + _(" in compilation directory." ));
                 }
             }
 
@@ -397,19 +397,19 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( windowsTarget)
             {
                 if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgdw", tempDir + "/" + game.GetUsedExtensions()[i]+".xgdw", true ) == false )
-                    diagnosticManager.AddError(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Windows in compilation directory.\n" ));
+                    diagnosticManager.AddError(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Windows in compilation directory." ));
             }
 
             if ( linuxTarget )
             {
                 if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgd", tempDir + "/"+game.GetUsedExtensions()[i]+".xgd", true ) == false )
-                    diagnosticManager.AddError(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Linux in compilation directory.\n" ));
+                    diagnosticManager.AddError(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Linux in compilation directory." ));
             }
 
             if ( macTarget )
             {
                 if ( wxCopyFile( "CppPlatform/Extensions/Runtime/"+game.GetUsedExtensions()[i]+".xgd", tempDir + "/"+game.GetUsedExtensions()[i]+".xgd", true ) == false )
-                    diagnosticManager.AddError(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Mac OS in compilation directory.\n" ));
+                    diagnosticManager.AddError(_( "Unable to copy extension ")+game.GetUsedExtensions()[i]+_(" for Mac OS in compilation directory." ));
             }
         }
 
@@ -422,14 +422,14 @@ void FullProjectCompiler::LaunchProjectCompilation()
             {
 
                 if ( wxCopyFile( supplementaryFiles[i].second, tempDir + "/" + wxFileName::FileName(supplementaryFiles[i].second).GetFullName(), true ) == false )
-                    diagnosticManager.AddError(_( "Unable to copy ")+supplementaryFiles[i].second+_(" in compilation directory.\n" ));
+                    diagnosticManager.AddError(_( "Unable to copy ")+supplementaryFiles[i].second+_(" in compilation directory." ));
             }
         }
     }
     if ( game.UseExternalSourceFiles() )
     {
         if ( wxCopyFile( "dynext.dxgd", tempDir + "/" + "dynext.dxgd", true ) == false )
-            diagnosticManager.AddError(_( "Unable to copy C++ sources ( dynext.dxgd ) in compilation directory.\n" ));
+            diagnosticManager.AddError(_( "Unable to copy C++ sources ( dynext.dxgd ) in compilation directory." ));
     }
 
 
@@ -437,30 +437,30 @@ void FullProjectCompiler::LaunchProjectCompilation()
     if ( windowsTarget )
     {
         if ( wxCopyFile( "CppPlatform/Runtime/PlayWin.exe", tempDir + "/" + winExecutableName, true ) == false )
-            diagnosticManager.AddError(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory.\n" ));
+            diagnosticManager.AddError(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory." ));
 
         if ( wxCopyFile( "CppPlatform/Runtime/GDCpp.dll", tempDir + "/GDCpp.dll", true ) == false )
-            diagnosticManager.AddError(_( "Unable to create ")+"GDCpp.dll"+_(" in compilation directory.\n" ));
+            diagnosticManager.AddError(_( "Unable to create ")+"GDCpp.dll"+_(" in compilation directory." ));
 
     }
     if ( linuxTarget )
     {
         if ( wxCopyFile( "CppPlatform/Runtime/ExeLinux", tempDir + "/ExeLinux", true ) == false )
-            diagnosticManager.AddError(_( "Unable to create ")+"l'executable Linux"+_(" in compilation directory.\n" ));
+            diagnosticManager.AddError(_( "Unable to create ")+"l'executable Linux"+_(" in compilation directory." ));
 
         if ( wxCopyFile( "CppPlatform/Runtime/PlayLinux", tempDir + "/" + linuxExecutableName, true ) == false )
-            diagnosticManager.AddError(_( "Unable to create ")+"le script executable Linux"+_(" in compilation directory.\n" ));
+            diagnosticManager.AddError(_( "Unable to create ")+"le script executable Linux"+_(" in compilation directory." ));
 
         if ( wxCopyFile( "CppPlatform/Runtime/libGDCpp.so", tempDir + "/libGDCpp.so", true ) == false )
-            diagnosticManager.AddError(_( "Unable to create ")+"libGDCpp.so"+_(" in compilation directory.\n" ));
+            diagnosticManager.AddError(_( "Unable to create ")+"libGDCpp.so"+_(" in compilation directory." ));
     }
     if ( macTarget )
     {
         if ( wxCopyFile( "CppPlatform/MacRuntime/MacExe", tempDir + "/MacExe", true ) == false )
-            diagnosticManager.AddError(_( "Unable to create ")+"l'executable Mac OS"+_(" in compilation directory.\n" ));
+            diagnosticManager.AddError(_( "Unable to create ")+"l'executable Mac OS"+_(" in compilation directory." ));
 
         if ( wxCopyFile( "CppPlatform/MacRuntime/libGDCpp.dylib", tempDir + "/libGDCpp.dylib", true ) == false )
-            diagnosticManager.AddError(_( "Unable to create ")+"libGDCpp.dylib"+_(" in compilation directory.\n" ));
+            diagnosticManager.AddError(_( "Unable to create ")+"libGDCpp.dylib"+_(" in compilation directory." ));
     }
 
     //Copy everything into the destination directory
@@ -469,7 +469,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     {
         wxFileName fileName(file);
         if ( !wxCopyFile( file, outDir + "/" + fileName.GetFullName(), true ) )
-            diagnosticManager.AddError(_("Unable to copy file") + gd::String(file) + _(" from compilation directory to final directory.\n" ));
+            diagnosticManager.AddError(_("Unable to copy file") + gd::String(file) + _(" from compilation directory to final directory." ));
 
         file = wxFindNextFile();
     }
@@ -516,13 +516,13 @@ void FullProjectCompiler::ClearDirectory(gd::String directory)
 {
 #if !defined(GD_NO_WX_GUI)
     if ( !wxDirExists( directory ) && !wxMkdir( directory ) )
-            diagnosticManager.AddError(_( "Unable to create directory:" ) + directory + "\n");
+            diagnosticManager.AddError(_( "Unable to create directory:" ) + directory);
 
     wxString file = wxFindFirstFile( directory + "/*" );
     while ( !file.empty() )
     {
         if ( !wxRemoveFile( file ) )
-            diagnosticManager.AddError(_("Unable to delete ") + gd::String(file) + _("in directory ")+ directory +"\n" );
+            diagnosticManager.AddError(_("Unable to delete ") + gd::String(file) + _("in directory ")+ directory );
 
         file = wxFindNextFile();
     }

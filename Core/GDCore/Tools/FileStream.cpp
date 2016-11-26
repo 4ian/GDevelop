@@ -82,7 +82,8 @@ FileStream::FileStream(const gd::String & path, std::ios_base::openmode mode) :
 
 FileStream::~FileStream()
 {
-	close();
+	if(is_open())
+		close();
 }
 
 /*
@@ -107,22 +108,22 @@ void FileStream::open(const gd::String & path, std::ios_base::openmode mode)
 	if(is_open())
 	{
 		setstate(ios_base::failbit);
+		std::cout << "is_open true when trying to open!" << std::endl;
 	}
 	else
 	{
 		auto * newBuffer = OpenBuffer(path, mode, &m_file);
 		if(newBuffer)
 		{
-			if(m_buffer)
-				m_buffer->close();
-
 			m_buffer.reset(newBuffer);
 			std::iostream::init(m_buffer.get());
 			if((mode & std::ios_base::ate) != 0)
 				seekg(0, end);
 		}
 		else
+		{
 			setstate(ios_base::badbit);
+		}
 	}
 
 }
@@ -138,12 +139,15 @@ void FileStream::close()
 {
 #if FSTREAM_WINDOWS_MINGW
 	if(m_buffer)
-	{
 		m_buffer->close();
-		m_buffer.reset(nullptr);
-	}
-	if(!m_file || fclose(m_file) != 0)
+
+	if(m_file && fclose(m_file) != 0)
+	{
 		setstate(ios_base::failbit);
+	}
+
+	m_buffer.reset(nullptr);
+	m_file = nullptr;
 #else
 	if(!m_buffer || m_buffer->close() == nullptr)
 	{

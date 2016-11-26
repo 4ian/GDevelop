@@ -57,9 +57,6 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
             //We finished with this file
             file.close();
 
-            if(file.fail())
-                std::cout << "Failure when closing a file! A" << std::endl;
-
             //Finally, we add this File Entry in our std::vector
             m_entries.push_back(entry);
         }
@@ -101,15 +98,9 @@ bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::S
         if (file.is_open())
         {
             file.seekg (0, std::ios::beg);
-            while (file.read (buffer, 1))
-            {
-                datfile.write (buffer, 1);
-            }
+            datfile << file.rdbuf();
             file.close();
         }
-
-        if(file.fail())
-            std::cout << "Failure when closing a file!" << std::endl;
     }
     //And it's finished
     datfile.close();

@@ -34,7 +34,7 @@ int GD_API StrFindFrom(const gd::String & str, const gd::String & findwhat, std:
 int GD_API StrRFindFrom(const gd::String & str, const gd::String & findwhat, std::size_t start);
 
 template<typename... Args>
-gd::String GD_API Format(const gd::String & str, Args... args)
+gd::String Format(const gd::String & str, Args... args)
 {
     try
     {

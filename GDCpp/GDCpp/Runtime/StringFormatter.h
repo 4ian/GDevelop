@@ -71,7 +71,7 @@ gd::String FormatString( const gd::String & str, Args... args )
                 std::size_t parameterIndex;
                 try
                 {
-                    parameterIndex = std::stoul( stack.substr( 1, stack.size() - 1 ) );
+                    parameterIndex = gd::String::FromUTF8( stack.substr( 1, stack.size() - 1 ) ).To<std::size_t>();
                 }
                 catch( const std::exception& e )
                 {

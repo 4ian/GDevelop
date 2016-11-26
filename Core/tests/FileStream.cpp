@@ -69,7 +69,7 @@ TEST_CASE( "FileStream", "[common][fstream]" ) {
 	}
 
 	SECTION("File opening failure") {
-		gd::FileStream f("\xE4\x84\xA2"); //A file that doesn't exist
+		gd::FileStream f("\xE4\x84\xA2", std::ios_base::in); //A file that doesn't exist
 
 		REQUIRE(f.is_open() == false);
 		REQUIRE(f.fail() == true); //As the opening failed, the "fail" flag should be set

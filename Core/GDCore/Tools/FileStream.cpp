@@ -138,12 +138,21 @@ void FileStream::close()
 {
 #if FSTREAM_WINDOWS_MINGW
 	if(m_buffer)
+	{
 		m_buffer->close();
+		m_buffer.reset(nullptr);
+	}
 	if(!m_file || fclose(m_file) != 0)
 		setstate(ios_base::failbit);
 #else
 	if(!m_buffer || m_buffer->close() == nullptr)
+	{
 		setstate(ios_base::failbit);
+	}
+	else
+	{
+		m_buffer.reset(nullptr);
+	}
 #endif
 }
 

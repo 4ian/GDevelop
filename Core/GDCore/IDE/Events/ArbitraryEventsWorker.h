@@ -40,6 +40,8 @@ private:
     void VisitInstructionList(gd::InstructionsList & instructions, bool areConditions);
     bool VisitInstruction(gd::Instruction & instruction, bool isCondition);
 
+protected:
+
     /**
      * Called to do some work on an event list.
      */

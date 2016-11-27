@@ -190,6 +190,7 @@ protected:
     static const long idRibbonEncoder;
     static const long idRibbonImporter;
     static const long idRibbonHelp;
+    static const long idRibbonGeneratePOT;
 
 private:
 
@@ -264,6 +265,7 @@ private:
 
     static wxRibbonButtonBar * projectRibbonBar;
     static wxRibbonButtonBar * operationsRibbonBar;
+	static wxRibbonButtonBar * translationRibbonBar;
 
     static const std::size_t gameMaxCharDisplayedInEditor = 15;
 

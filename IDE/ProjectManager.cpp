@@ -116,9 +116,11 @@ const long ProjectManager::idRibbonImporter = wxNewId();
 const long ProjectManager::idRibbonEncoder = wxNewId();
 const long ProjectManager::idRibbonProjectsManager = wxNewId();
 const long ProjectManager::idRibbonHelp = wxNewId();
+const long ProjectManager::idRibbonGeneratePOT = wxNewId();
 
-wxRibbonButtonBar * ProjectManager::projectRibbonBar = NULL;
-wxRibbonButtonBar * ProjectManager::operationsRibbonBar = NULL;
+wxRibbonButtonBar * ProjectManager::projectRibbonBar = nullptr;
+wxRibbonButtonBar * ProjectManager::operationsRibbonBar = nullptr;
+wxRibbonButtonBar * ProjectManager::translationRibbonBar = nullptr;
 
 
 BEGIN_EVENT_TABLE(ProjectManager,wxPanel)
@@ -391,6 +393,12 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         operationsRibbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Add an external layout") : gd::String(), SkinHelper::GetRibbonIcon("externallayoutadd"));
         operationsRibbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions and platforms") : gd::String(), SkinHelper::GetRibbonIcon("extension"));
     }
+	{
+		wxRibbonPanel *translationPanel = new wxRibbonPanel(page, wxID_ANY, _("Project translations"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        translationRibbonBar = new wxRibbonButtonBar(translationPanel, wxID_ANY);
+
+		translationRibbonBar->AddButton(idRibbonGeneratePOT, !hideLabels ? _("Generate .pot template file") : gd::String(), SkinHelper::GetRibbonIcon("projectManager"), _("Generate the .pot translation template file"));
+	}
     {
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("View"), SkinHelper::GetRibbonIcon("image"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *affichage_bar = new wxRibbonButtonBar(affichagePanel, wxID_ANY);
@@ -428,6 +436,10 @@ void ProjectManager::UpdateRibbonButtonsState()
 	    operationsRibbonBar->EnableButton(idRibbonAddExternalLayout, projectOpened);
 	    operationsRibbonBar->EnableButton(idRibbonExtensions, projectOpened);
 	}
+	if(translationRibbonBar)
+	{
+		translationRibbonBar->EnableButton(idRibbonGeneratePOT, projectOpened);
+	}
 }
 
 void ProjectManager::ConnectEvents()
@@ -451,7 +463,7 @@ void ProjectManager::ConnectEvents()
     mainEditor.Connect( idRibbonEncoder, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuItem23Selected, NULL, &mainEditor );
     mainEditor.Connect( idRibbonImporter, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonDecomposerDropDownClicked, NULL, &mainEditor );
     mainEditor.Connect( idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonHelpSelected, NULL, &mainEditor );
-
+    mainEditor.Connect( idRibbonGeneratePOT, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnGeneratePOTSelected, NULL, &mainEditor );
 }
 
 void ProjectManager::Refresh()

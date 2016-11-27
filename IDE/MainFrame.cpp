@@ -33,6 +33,7 @@
 #include <wx/ribbon/buttonbar.h>
 
 #include "MainFrame.h"
+#include "GDCore/Tools/FileStream.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -46,6 +47,8 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
+#include "GDCore/IDE/POTFileWriter.h"
+#include "GDCore/IDE/TranslatableStringsFinder.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -1029,4 +1032,27 @@ void MainFrame::OnDecomposeSSSelected(wxCommandEvent& event)
 void MainFrame::OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt)
 {
     evt.PopupMenu(&decomposerContextMenu);
+}
+
+void MainFrame::OnGeneratePOTSelected(wxRibbonButtonBarEvent& event)
+{
+    auto currentGame = GetCurrentGame();
+    if(!currentGame)
+        return;
+
+	auto strings = gd::TranslatableStringsFinder::GetTranslatableStrings( *currentGame );
+
+    wxFileDialog saveFileDialog(
+        this,
+        _("Where do you want to save the .pot file ?"),
+        "",
+        "",
+        _("Translation template file") + gd::String("|*.pot"),
+        wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+
+    if( saveFileDialog.ShowModal() == wxID_CANCEL )
+        return;
+
+    gd::POTFileWriter::WriteTranslatableStringsToPOT( saveFileDialog.GetPath(), strings );
+    //TODO: Catch exception
 }

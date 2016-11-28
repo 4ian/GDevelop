@@ -1,5 +1,7 @@
 #include "GDCore/IDE/POTFileWriter.h"
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
 #include "GDCore/Tools/FileStream.h"
 
 namespace gd
@@ -26,3 +28,5 @@ void POTFileWriter::WriteTranslatableStringsToPOT(const gd::String & path, const
 }
 
 }
+
+#endif

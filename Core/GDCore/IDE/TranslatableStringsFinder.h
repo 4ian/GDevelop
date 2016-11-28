@@ -1,6 +1,8 @@
 #ifndef TRANSLATABLESTRINGSFINDER_H
 #define TRANSLATABLESTRINGSFINDER_H
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
 #include <memory>
 #include <set>
 #include <vector>
@@ -36,5 +38,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif

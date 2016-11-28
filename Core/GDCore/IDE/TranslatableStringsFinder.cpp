@@ -1,5 +1,7 @@
 #include "GDCore/IDE/TranslatableStringsFinder.h"
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
@@ -106,3 +108,5 @@ void EventsListTranslatableStringsFinder::FindTranslatable(gd::Instruction & ins
 }
 
 }
+
+#endif

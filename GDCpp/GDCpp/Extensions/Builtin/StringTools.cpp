@@ -3,8 +3,10 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
+#include "GDCpp/Extensions/Builtin/StringTools.h"
+
 #include <string>
-#include "GDCpp/Runtime/RuntimeScene.h"
+#include "GDCpp/Runtime/RuntimeGame.h"
 #include "GDCpp/Runtime/String.h"
 
 using namespace std;
@@ -117,9 +119,14 @@ gd::String GD_API NewLine()
     return "\n";
 };
 
-gd::String GD_API Translate(const gd::String & str)
+gd::String GD_API Translate(const RuntimeScene & scene, const gd::String & str)
 {
-    return str;
+    return scene.game->GetTranslationsManager().GetTranslation(str);
+}
+
+gd::String GD_API LoadTranslation(RuntimeScene & scene, const gd::String & path)
+{
+    scene.game->GetTranslationsManager().LoadMOFile( path );
 }
 
 }

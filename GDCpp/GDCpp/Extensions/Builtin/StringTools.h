@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCpp/Runtime/StringFormatter.h"
 
 class RuntimeScene;
@@ -46,7 +47,9 @@ gd::String Format(const gd::String & str, Args... args)
     }
 }
 
-gd::String GD_API Translate(const gd::String & str);
+gd::String GD_API Translate(const RuntimeScene & scene, const gd::String & str);
+
+gd::String GD_API LoadTranslation(RuntimeScene & scene, const gd::String & path);
 
 }
 

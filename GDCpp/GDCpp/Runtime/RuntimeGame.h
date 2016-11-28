@@ -7,8 +7,9 @@
 #define RUNTIMEGAME_H
 
 #include "GDCpp/Runtime/Project/Project.h"
-#include "GDCpp/Runtime/SoundManager.h"
 #include "GDCpp/Runtime/RuntimeVariablesContainer.h"
+#include "GDCpp/Runtime/SoundManager.h"
+#include "GDCpp/Runtime/TranslationsManager.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -54,6 +55,10 @@ public:
      */
     inline RuntimeVariablesContainer & GetVariables() { return variables; }
 
+    TranslationsManager & GetTranslationsManager() { return translationsManager; }
+    
+    const TranslationsManager & GetTranslationsManager() const { return translationsManager; }
+
     /**
      * \brief Get the width of the window at the startup of the game.
      * \note This won't changed after the game startup, even if the window
@@ -71,6 +76,7 @@ public:
 private:
     RuntimeVariablesContainer variables; ///<List of the global variables
     SoundManager soundManager;
+    TranslationsManager translationsManager;
 
     unsigned int windowOriginalWidth; ///< Game window width at the start of the game
     unsigned int windowOriginalHeight; ///< Game window height at the start of the game

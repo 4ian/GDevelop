@@ -8,7 +8,7 @@
 namespace gd
 {
 
-class POTFileWriter
+class GD_CORE_API POTFileWriter
 {
 public:
 	static void WriteTranslatableStringsToPOT(const gd::String & path, const std::set<gd::String> & translatableStrings);

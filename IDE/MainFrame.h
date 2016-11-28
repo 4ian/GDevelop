@@ -267,6 +267,7 @@ public:
     void OnRibbonHelpBtLeave(wxMouseEvent& event);
     void OnRibbonHelpBtEnter(wxMouseEvent& event);
 	void OnGeneratePOTSelected(wxRibbonButtonBarEvent& event);
+	void OnTranslationHelpSelected(wxRibbonButtonBarEvent& event);
     void SaveAs(std::shared_ptr<gd::Project> project = nullptr);
     void OnRecentClicked(wxCommandEvent& event );
     void UpdateNotebook();

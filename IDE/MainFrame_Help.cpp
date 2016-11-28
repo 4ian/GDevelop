@@ -12,6 +12,11 @@
 #include "Credits.h"
 #include "MAJ.h"
 
+void MainFrame::OnTranslationHelpSelected(wxRibbonButtonBarEvent& event)
+{
+	gd::HelpFileAccess::Get()->OpenPage("gdevelop/documentation/game_translation");
+}
+
 /**
  * Display help
  */

@@ -191,6 +191,7 @@ protected:
     static const long idRibbonImporter;
     static const long idRibbonHelp;
     static const long idRibbonGeneratePOT;
+	static const long idRibbonTranslationHelp;
 
 private:
 

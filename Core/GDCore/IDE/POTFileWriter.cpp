@@ -13,7 +13,7 @@ void POTFileWriter::WriteTranslatableStringsToPOT(const gd::String & path, const
         for( const gd::String & str : translatableStrings )
         {
             potFile << "\n";
-            potFile << "msgid \"" << str.FindAndReplace("\"", "\\\"").FindAndReplace("\n", "\"\n\"") << "\"\n";
+            potFile << "msgid \"" << str.FindAndReplace("\n", "\"\n\"") << "\"\n";
             potFile << "msgstr \"\"\n";
         }
 

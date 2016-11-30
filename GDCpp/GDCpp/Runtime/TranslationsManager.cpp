@@ -63,14 +63,16 @@ void TranslationsManager::LoadMOFile(const gd::String & path)
 
 			//Read the untranslated string length and offset
 			moFile.seekg( untranslatedPositionOffset );
-			moFile.read( reinterpret_cast<char*>( &stringInfo.first ), 8 );
+			moFile.read( reinterpret_cast<char*>( &stringInfo.first.length ), 4 );
+			moFile.read( reinterpret_cast<char*>( &stringInfo.first.offset ), 4 );
 
 			if( moFile.fail() )
 				return;
 
 			//Read the translated string length and offset
 			moFile.seekg( translatedPositionOffset );
-			moFile.read( reinterpret_cast<char*>( &stringInfo.second ), 8 );
+			moFile.read( reinterpret_cast<char*>( &stringInfo.second.length ), 4 );
+			moFile.read( reinterpret_cast<char*>( &stringInfo.second.offset ), 4 );
 
 			if( moFile.fail() )
 				return;

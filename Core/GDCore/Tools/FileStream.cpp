@@ -59,7 +59,8 @@ FileStream::InternalBufferType* OpenBuffer(const gd::String & path, std::ios_bas
 
 }
 
-FileStream::FileStream()
+FileStream::FileStream() :
+	std::iostream(nullptr)
 {
 
 }

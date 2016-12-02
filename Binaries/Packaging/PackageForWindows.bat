@@ -35,14 +35,14 @@ del Output\Release_Windows\log.txt > NUL 2> NUL
 
 echo.
 echo --Creating installer...
-IF NOT "%SKIPINSTALLER%"=="1" "C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Releases\InnoSetupInstallerScript.iss /Q
+IF NOT "%SKIPINSTALLER%"=="1" "C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Releases\InnoSetupInstallerScript.iss /Qp
 IF "%SKIPINSTALLER%"=="1" echo (Skipped)
 
 echo.
 echo --Creating archive...
 if exist Releases\gd4xxxx.7z (del Releases\gd4xxxx.7z)
 cd Output\Release_Windows\
-IF NOT "%SKIPINSTALLERANDARCHIVE%"=="1" "..\..\..\ExtLibs\7za.exe" a ..\..\Releases\gd4xxxx.7z * > ..\..\Packaging\logs\7zArchiveLog.txt
+IF NOT "%SKIPINSTALLERANDARCHIVE%"=="1" "..\..\..\ExtLibs\7za.exe" a ..\..\Releases\gd4xxxx.7z * -bb
 IF "%SKIPINSTALLERANDARCHIVE%"=="1" echo (Skipped)
 cd ..\..\..
 

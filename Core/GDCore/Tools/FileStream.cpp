@@ -50,7 +50,7 @@ FileStream::InternalBufferType* OpenBuffer(const gd::String & path, std::ios_bas
 	*file = _wfopen(path.ToWide().c_str(), GetStdioMode(mode).c_str());
 	if(!(*file))
 		return nullptr;
-	return new __gnu_cxx::stdio_filebuf<char>(*file, mode, 1);
+	return new __gnu_cxx::stdio_filebuf<char>(*file, mode);
 #else
 	auto * filebuffer = new std::filebuf();
 	return filebuffer->open(path.ToLocale().c_str(), mode);

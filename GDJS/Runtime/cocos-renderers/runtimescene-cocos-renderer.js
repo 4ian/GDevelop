@@ -20,9 +20,16 @@ gdjs.RuntimeSceneCocosRenderer = function(runtimeScene, runtimeGameRenderer)
         onEnter: function() {
             this._super();
             this.scheduleUpdate();
+
+            // Hide the first frame of the scene (until update is called)
+            // to let the scene render method run (including scene events).
+            // This can avoid a glitchy first frame where objects are shown before
+            // events are run.
+            this.visible = false;
         },
         update: function(dt) {
             runtimeGameRenderer.onSceneUpdated(dt*1000);
+            this.visible = true;
         }
     });
     this._cocosScene = new ContainerScene();

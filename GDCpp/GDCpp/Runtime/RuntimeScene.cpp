@@ -325,7 +325,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
 
     //Update objects positions, forces and behaviors
     allObjects = objectsInstances.GetAllObjects();
-    for (RuntimeObjSPtr & object : allObjects)
+    for (RuntimeObject * object : allObjects)
     {
         double elapsedTimeInSeconds = static_cast<double>(object->GetElapsedTime(*this))/1000000.0;
         object->SetX( object->GetX() + (object->TotalForceX() * elapsedTimeInSeconds));

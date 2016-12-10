@@ -372,8 +372,10 @@ gdjs.RuntimeObject.prototype.setZOrder = function(z) {
     if ( z === this.zOrder ) return;
     this.zOrder = z;
 
-    var theLayer = this._runtimeScene.getLayer(this.layer);
-    theLayer.getRenderer().changeRendererObjectZOrder(this.getRendererObject(), z);
+    if ( this.getRendererObject() ) {
+        var theLayer = this._runtimeScene.getLayer(this.layer);
+        theLayer.getRenderer().changeRendererObjectZOrder(this.getRendererObject(), z);
+    }
 };
 
 /**

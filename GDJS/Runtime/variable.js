@@ -92,11 +92,11 @@ gdjs.Variable.prototype.getChild = function(childName) {
 };
 
 /**
- * Get the child with the specified name.
+ * Return the child in a variable.
  *
- * If the variable has not the specified child, an empty variable with the specified name
- * is added as child.
- * @method getChild
+ * Check if the variable has the specified children
+ * @method hasChild
+ * @return true if variable has the children with the specified name
  */
 gdjs.Variable.prototype.hasChild = function(childName) {
 	return (this._isStructure && this._children.hasOwnProperty(childName) );

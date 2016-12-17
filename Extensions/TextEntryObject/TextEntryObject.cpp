@@ -40,7 +40,6 @@ TextEntryObject::TextEntryObject(gd::String name_) :
 RuntimeTextEntryObject::RuntimeTextEntryObject(RuntimeScene & scene_, const TextEntryObject & textEntryObject) :
     RuntimeObject(scene_, textEntryObject),
     text(),
-    scene(&scene_),
     activated(true)
 {
 }
@@ -48,12 +47,12 @@ RuntimeTextEntryObject::RuntimeTextEntryObject(RuntimeScene & scene_, const Text
 /**
  * \brief Used to update input
  */
-void RuntimeTextEntryObject::UpdateTime(float)
+void RuntimeTextEntryObject::Update(const RuntimeScene & scene)
 {
-    if (!activated || scene == NULL) return;
+    if (!activated) return;
 
     //Retrieve text entered
-    const auto & characters = scene->GetInputManager().GetCharactersEntered();
+    const auto & characters = scene.GetInputManager().GetCharactersEntered();
     for (std::size_t i = 0;i<characters.size();++i)
     {
         //Skip some non displayable characters
@@ -64,7 +63,6 @@ void RuntimeTextEntryObject::UpdateTime(float)
         }
         else if (characters[i] == 8)
         {
-            std::cout << "Backspace" << std::endl;
             //Backspace : find the previous codepoint and remove it
             if(text.empty())
                 continue;

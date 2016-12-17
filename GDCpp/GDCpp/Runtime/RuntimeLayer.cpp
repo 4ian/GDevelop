@@ -5,14 +5,21 @@
  */
 #include "RuntimeLayer.h"
 #include "GDCpp/Runtime/Project/Layer.h"
+#include "GDCpp/Runtime/RuntimeScene.h"
 #include <SFML/Graphics.hpp>
 
 RuntimeLayer::RuntimeLayer(gd::Layer & layer, const sf::View & defaultView) :
     name(layer.GetName()),
-    isVisible(layer.GetVisibility())
+    isVisible(layer.GetVisibility()),
+    timeScale(1)
 {
     for (std::size_t i = 0;i<layer.GetCameraCount();++i)
         cameras.push_back(RuntimeCamera(layer.GetCamera(i), defaultView));
+}
+
+signed long long RuntimeLayer::GetElapsedTime(const RuntimeScene & scene) const
+{
+    return scene.GetTimeManager().GetElapsedTime() * timeScale;
 }
 
 RuntimeCamera::RuntimeCamera(sf::View & view) :

@@ -120,7 +120,7 @@ void PathBehavior::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //  add to the current time along the path
-    timeOnSegment += static_cast<double>(scene.GetTimeManager().GetElapsedTime())
+    timeOnSegment += static_cast<double>(object->GetElapsedTime(scene))
         / 1000000.0 * speed;
 
     //  if I reached the end of this segment, move to a new segment

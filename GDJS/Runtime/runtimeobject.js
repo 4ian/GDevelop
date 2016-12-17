@@ -96,18 +96,32 @@ gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avo
 //Common members functions related to the object and its runtimeScene :
 
 /**
- * Called each time the scene is rendered.
+ * Return the time elapsed since the last frame,
+ * in milliseconds, for the object.
  *
- * @method updateTime
- * @param elapsedTime {Number} The time elapsedTime since the last frame, in **seconds**.
+ * Objects can have different elapsed time if they are on layers with different time scales.
+ *
+ * @method getElapsedTime
+ * @param runtimeScene The RuntimeScene the object belongs to.
  */
-gdjs.RuntimeObject.prototype.updateTime = function(elapsedTime) {
+gdjs.RuntimeObject.prototype.getElapsedTime = function(runtimeScene) {
+    //TODO: Memoize?
+    var theLayer = runtimeScene.getLayer(this.layer);
+    return theLayer.getElapsedTime(runtimeScene);
+}
+
+/**
+ * Called once during the game loop, before events and rendering.
+ * @method update
+ * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
+ */
+gdjs.RuntimeObject.prototype.update = function(runtimeScene) {
     //Nothing to do.
 };
 
 /**
  * Called when the object is created from an initial instance at the startup of the scene.<br>
- * Note this.common properties ( position, angle, z order... ) have already been setup.
+ * Note that common properties (position, angle, z order...) have already been setup.
  *
  * @method extraInitializationFromInitialInstance
  * @param initialInstanceData The data of the initial instance.
@@ -285,7 +299,7 @@ gdjs.RuntimeObject.prototype.rotateTowardAngle = function(angle, speed, runtimeS
     var diffWasPositive = angularDiff >= 0;
 
     var newAngle = this.getAngle() + (diffWasPositive ? -1.0 : 1.0)
-        * speed * runtimeScene.getTimeManager().getElapsedTime() / 1000;
+        * speed * this.getElapsedTime(runtimeScene) / 1000;
     if (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0 ^ diffWasPositive)
         newAngle = angle;
     this.setAngle(newAngle);
@@ -295,8 +309,7 @@ gdjs.RuntimeObject.prototype.rotateTowardAngle = function(angle, speed, runtimeS
 };
 
 gdjs.RuntimeObject.prototype.rotate = function(speed, runtimeScene) {
-    this.setAngle(this.getAngle() +
-        speed * runtimeScene.getTimeManager().getElapsedTime() / 1000);
+    this.setAngle(this.getAngle() + speed * this.getElapsedTime(runtimeScene) / 1000);
 };
 
 /**
@@ -419,6 +432,7 @@ gdjs.RuntimeObject.prototype.getVariableNumber = gdjs.RuntimeObject.getVariableN
 gdjs.RuntimeObject.getVariableString = function(variable) {
     return variable.getAsString();
 };
+gdjs.RuntimeObject.prototype.getVariableString = gdjs.RuntimeObject.getVariableString;
 
 /**
  * Get the number of children from a variable
@@ -431,8 +445,6 @@ gdjs.RuntimeObject.getVariableChildCount = function(variable) {
     if (variable.isStructure() == false) return 0;
     return Object.keys(variable.getAllChildren()).length;
 };
-
-gdjs.RuntimeObject.prototype.getVariableString = gdjs.RuntimeObject.getVariableString;
 
 /**
  * Shortcut to set the value of a variable considered as a number

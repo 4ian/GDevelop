@@ -171,14 +171,28 @@ gdjs.getBehaviorConstructor = function(name) {
     return gdjs.behaviorsTypes.get(""); //Create a base empty runtime behavior.
 };
 
+/**
+ * Create a static array that won't need a new allocation each time it's used.
+ */
 gdjs.staticArray = function(owner) {
     owner._staticArray = owner._staticArray || [];
     return owner._staticArray;
 }
 
+/**
+ * Create a second static array that won't need a new allocation each time it's used.
+ */
 gdjs.staticArray2 = function(owner) {
     owner._staticArray2 = owner._staticArray2 || [];
     return owner._staticArray2;
+}
+
+/**
+ * Create a static object that won't need a new allocation each time it's used.
+ */
+gdjs.staticObject = function(owner) {
+    owner._staticObject = owner._staticObject || {};
+    return owner._staticObject;
 }
 
 Array.prototype.remove = function(from) {

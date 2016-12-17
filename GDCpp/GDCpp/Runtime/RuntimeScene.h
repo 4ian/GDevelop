@@ -97,6 +97,11 @@ public:
     RuntimeLayer & GetRuntimeLayer(const gd::String & name);
 
     /**
+     * Get the layer with specified name.
+     */
+    const RuntimeLayer & GetRuntimeLayer(const gd::String & name) const;
+
+    /**
      * \brief Return the shared data for a behavior.
      * \warning Be careful, no check is made to ensure that the shared data exist.
      * \param name The name of the behavior for which shared data must be fetched.

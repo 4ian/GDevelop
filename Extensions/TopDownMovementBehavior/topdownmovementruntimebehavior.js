@@ -94,7 +94,7 @@ gdjs.TopDownMovementRuntimeBehavior.prototype.doStepPreEvents = function(runtime
     var DOWNKEY = 40;
     var SHIFTKEY = 16;
     var object = this.owner;
-    var timeDelta = runtimeScene.getTimeManager().getElapsedTime()/1000;
+    var timeDelta = this.owner.getElapsedTime(runtimeScene)/1000;
 
     //Get the player input:
     this._leftKey |= !this._ignoreDefaultControls && runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY);

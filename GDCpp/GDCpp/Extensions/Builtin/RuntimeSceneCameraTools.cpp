@@ -140,7 +140,7 @@ void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, RuntimeObject *
 
     float xOffset = 0;
     float yOffset = 0;
-    double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
+    double elapsedTime = static_cast<double>(object->GetElapsedTime(scene)) / 1000000.0;
     if (anticipateObjectMove)
     {
         xOffset = object->TotalForceX() * elapsedTime;
@@ -166,7 +166,7 @@ void GD_API CenterCameraOnObject(RuntimeScene & scene, RuntimeObject * object,  
 
     float xOffset = 0;
     float yOffset = 0;
-    double elapsedTime = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
+    double elapsedTime = static_cast<double>(object->GetElapsedTime(scene)) / 1000000.0;
     if (anticipateObjectMove)
     {
         xOffset = object->TotalForceX() * elapsedTime;
@@ -220,4 +220,14 @@ void GD_API SetCameraViewport( RuntimeScene & scene,  const gd::String & layer, 
 
     RuntimeCamera & camera = scene.GetRuntimeLayer(layer).GetCamera(cameraNb);
     camera.SetViewport(viewportLeft, viewportTop, viewportRight, viewportBottom);
+}
+
+double GD_API GetLayerTimeScale(RuntimeScene & scene, const gd::String & layer)
+{
+    return scene.GetRuntimeLayer(layer).GetTimeScale();
+}
+
+void GD_API SetLayerTimeScale(RuntimeScene & scene, const gd::String & layer, double timeScale)
+{
+    scene.GetRuntimeLayer(layer).SetTimeScale(timeScale);
 }

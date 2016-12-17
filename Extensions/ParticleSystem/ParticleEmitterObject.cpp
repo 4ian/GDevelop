@@ -483,17 +483,14 @@ void ParticleEmitterBase::UpdateLifeTime()
     particleSystem->particleModel->setLifeTime(particleLifeTimeMin,particleLifeTimeMax);
 }
 
-RuntimeParticleEmitterObject::RuntimeParticleEmitterObject(RuntimeScene & scene_, const ParticleEmitterObject & particleEmitterObject):
-    RuntimeObject(scene_, particleEmitterObject),
+RuntimeParticleEmitterObject::RuntimeParticleEmitterObject(RuntimeScene & scene, const ParticleEmitterObject & particleEmitterObject):
+    RuntimeObject(scene, particleEmitterObject),
     hasSomeParticles(true)
 {
     ParticleEmitterBase::operator=(particleEmitterObject);
 
-    //Store a pointer to the scene
-    scene = &scene_;
-
 	CreateParticleSystem();
-    SetTexture(scene_, GetParticleTexture());
+    SetTexture(scene, GetParticleTexture());
 
     OnPositionChanged();
 }
@@ -683,13 +680,14 @@ void ParticleEmitterBase::SetZoneRadius(float newValue)
     if ( particleSystem && particleSystem->zone ) particleSystem->zone->setRadius(zoneRadius);
 }
 
-void RuntimeParticleEmitterObject::UpdateTime(float deltaTime)
+void RuntimeParticleEmitterObject::Update(const RuntimeScene & scene)
 {
+    double elapsedTimeInSeconds = static_cast<double>(GetElapsedTime(scene))/1000000.0;
     if ( GetParticleSystem() )
-        hasSomeParticles = GetParticleSystem()->particleSystem->update(deltaTime);
+        hasSomeParticles = GetParticleSystem()->particleSystem->update(elapsedTimeInSeconds);
 
 	if (GetDestroyWhenNoParticles() && !hasSomeParticles)
-        DeleteFromScene(const_cast<RuntimeScene&>(*scene)); //Ugly const cast
+        DeleteFromScene(const_cast<RuntimeScene&>(scene)); //Ugly const cast
 }
 
 void ParticleEmitterBase::SetParticleGravityAngle( float newAngleInDegree )

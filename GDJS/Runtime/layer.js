@@ -18,6 +18,7 @@ gdjs.Layer = function(layerData, runtimeScene)
     this._name = layerData.name;
     this._cameraRotation = 0;
     this._zoomFactor = 1;
+    this._timeScale = 1;
     this._hidden = !layerData.visibility;
     this._effects = layerData.effects || [];
     this._cameraX = runtimeScene.getGame().getDefaultWidth()/2;
@@ -221,3 +222,30 @@ gdjs.Layer.prototype.setEffectsDefaultParameters = function() {
         }
     }
 };
+
+/**
+ * Set the time scale for the objects on the layer:
+ * time will be slower if time scale is < 1, faster if > 1.
+ * @method setTimeScale
+ * @param timeScale {Number} The new time scale (must be positive).
+ */
+gdjs.Layer.prototype.setTimeScale = function(timeScale) {
+	if ( timeScale >= 0 ) this._timeScale = timeScale;
+};
+
+/**
+ * Get the time scale for the objects on the layer.
+ * @method getTimeScale
+ */
+gdjs.Layer.prototype.getTimeScale = function() {
+	return this._timeScale;
+};
+
+/**
+ * Return the time elapsed since the last frame,
+ * in milliseconds, for objects on the layer.
+ * @method getElapsedTime
+ */
+gdjs.Layer.prototype.getElapsedTime = function(runtimeScene) {
+   return runtimeScene.getTimeManager().getElapsedTime() * this._timeScale;
+}

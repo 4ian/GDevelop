@@ -37,7 +37,7 @@ gdjs.Timer.prototype.getTime = function() {
 }
 
 /**
- * Notify the timer this.some time elapsed.
+ * Notify the timer that some time elapsed.
  * @method updateTime
  */
 gdjs.Timer.prototype.updateTime = function(time) {

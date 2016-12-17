@@ -62,7 +62,7 @@ public :
     virtual std::size_t GetNumberOfProperties() const;
     #endif
 
-    virtual void UpdateTime(float);
+    virtual void Update(const RuntimeScene & scene);
 
     inline void SetString(gd::String str) { text = str; };
     const gd::String & GetString() const { return text; };
@@ -73,7 +73,6 @@ public :
 private:
 
     gd::String text;
-    const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
     bool activated;
 };
 

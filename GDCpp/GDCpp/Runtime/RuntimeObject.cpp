@@ -124,6 +124,12 @@ std::size_t RuntimeObject::GetNumberOfProperties() const
 }
 #endif
 
+signed long long RuntimeObject::GetElapsedTime(const RuntimeScene & scene) const
+{
+    const RuntimeLayer & theLayer = scene.GetRuntimeLayer(layer);
+    return theLayer.GetElapsedTime(scene);
+}
+
 void RuntimeObject::DeleteFromScene(RuntimeScene & scene)
 {
     name = "";
@@ -316,7 +322,7 @@ void RuntimeObject::RotateTowardAngle(float angleInDegrees, float speed, Runtime
         return;
     }
 
-    float timeDelta = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
+    float timeDelta = static_cast<double>(GetElapsedTime(scene)) / 1000000.0;
     float angularDiff = GDpriv::MathematicalTools::angleDifference(GetAngle(), angleInDegrees);
     bool diffWasPositive = angularDiff >= 0;
 
@@ -331,7 +337,7 @@ void RuntimeObject::RotateTowardAngle(float angleInDegrees, float speed, Runtime
 
 void RuntimeObject::Rotate(float speed, RuntimeScene & scene)
 {
-    float timeDelta = static_cast<double>(scene.GetTimeManager().GetElapsedTime()) / 1000000.0;
+    float timeDelta = static_cast<double>(GetElapsedTime(scene)) / 1000000.0;
     SetAngle(GetAngle()+speed*timeDelta);
 }
 

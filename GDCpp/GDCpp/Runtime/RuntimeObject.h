@@ -243,10 +243,17 @@ public:
     virtual bool CursorOnObject(RuntimeScene & scene, bool accurate);
 
     /**
-     * \brief Called at each frame so as to update internal object's things using time (such as animation for a sprite).
+     * \brief Called at each frame, before events and rendering.
      * \note The default implementation does nothing.
      */
-    virtual void UpdateTime(float timeElapsed) {};
+    virtual void Update(const RuntimeScene & scene) {};
+
+    /**
+     * \brief Return the time elapsed since the last frame, in microseconds, for the object.
+     *
+     * Objects can have different elapsed time if they are on layers with different time scales.
+     */
+    signed long long GetElapsedTime(const RuntimeScene & scene) const;
 
     /**
      * \brief Get the width of the object, in pixels.

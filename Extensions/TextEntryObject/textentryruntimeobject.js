@@ -33,7 +33,7 @@ gdjs.TextEntryRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene
     }
 };
 
-gdjs.TextEntryRuntimeObject.prototype.updateTime = function(elapsedTime) {
+gdjs.TextEntryRuntimeObject.prototype.update = function() {
     if (this._renderer.getString) {
         this._str = this._renderer.getString();
     }

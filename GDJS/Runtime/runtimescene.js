@@ -365,9 +365,8 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
 	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
 	//may delete the objects.
 	this._constructListOfAllInstances();
-	var elapsedTimeInSeconds = this._timeManager.getElapsedTime() / 1000;
 	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-		this._allInstancesList[i].updateTime(elapsedTimeInSeconds);
+		this._allInstancesList[i].update(this);
 		this._allInstancesList[i].stepBehaviorsPostEvents(this);
 	}
 
@@ -399,7 +398,6 @@ gdjs.RuntimeScene.prototype.getName = function() {
  * @method updateObjectsForces
  */
 gdjs.RuntimeScene.prototype.updateObjectsForces = function() {
-    var elapsedTimeInSeconds = this._timeManager.getElapsedTime() / 1000;
     for (var name in this._instances.items) {
         if (this._instances.items.hasOwnProperty(name)) {
             var list = this._instances.items[name];
@@ -408,6 +406,7 @@ gdjs.RuntimeScene.prototype.updateObjectsForces = function() {
         		var obj = list[j];
         		if (!obj.hasNoForces()) {
         			var averageForce = obj.getAverageForce();
+                    var elapsedTimeInSeconds = obj.getElapsedTime(this) / 1000;
 
         			obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
         			obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
@@ -416,7 +415,6 @@ gdjs.RuntimeScene.prototype.updateObjectsForces = function() {
         	}
         }
     }
-
 };
 
 /**

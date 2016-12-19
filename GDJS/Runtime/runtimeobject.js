@@ -459,7 +459,7 @@ gdjs.RuntimeObject.prototype.setVariableNumber = gdjs.RuntimeObject.setVariableN
 
 /**
  * Shortcut to set the value of a variable considered as a string
- * @method setVariableNumber
+ * @method setVariableString
  * @param variable The variable to be changed
  * @param newValue {String} The value to be set
  */

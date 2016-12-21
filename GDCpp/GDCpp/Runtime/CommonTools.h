@@ -9,7 +9,6 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
-#include <SFML/System/String.hpp>
 #include "GDCpp/Runtime/String.h"
 #if defined(GD_IDE_ONLY)
 class wxString;

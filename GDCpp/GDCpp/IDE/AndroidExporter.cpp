@@ -110,7 +110,7 @@ bool AndroidExporter::ExportMainFile(gd::Project & project, gd::String outputDir
 
         gd::EventsCodeGenerator codeGenerator(project, layout, CppPlatform::Get());
         layoutFunctionDeclarations += "extern \"C\" int  " + layoutFunctionName + "(RuntimeContext * runtimeContext);\n";
-        functionAssignmentCode += "\t\tif (scene->GetName() == \"" +
+        functionAssignmentCode += "\t\tif (scene.GetName() == \"" +
             codeGenerator.ConvertToString(layout.GetName()) +
             "\") function = &" + layoutFunctionName + ";\n";
     }

@@ -29,12 +29,14 @@
 #include "GDCpp/Runtime/RuntimeContext.h"
 #include "GDCpp/Runtime/Project/Project.h"
 #include "GDCpp/Runtime/ManualTimer.h"
-#include "GDCpp/Runtime/Tools/OpenGLTools.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#if !defined(ANDROID) && !defined(MACOS)
+#if !defined(ANDROID) //TODO: OpenGL
+#include "GDCpp/Runtime/Tools/OpenGLTools.h"
+#if !defined(MACOS)
 #include <GL/glu.h>
+#endif
 #endif
 
 #include "GDCpp/Runtime/CodeExecutionEngine.h"

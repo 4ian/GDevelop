@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
         std::cout << error << std::endl;
         abort = true;
     });
-    sceneStack.OnLoadScene([](std::shared_ptr<RuntimeScene> scene) {
+    sceneStack.OnLoadScene([](RuntimeScene & scene) {
         int (*function)(RuntimeContext*) = nullptr;
         /* GDCPP_EVENTS_ASSIGNMENTS */
 

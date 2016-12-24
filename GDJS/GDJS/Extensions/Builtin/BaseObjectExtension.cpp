@@ -53,8 +53,6 @@ BaseObjectExtension::BaseObjectExtension()
     objectConditions["VarObjet"].SetFunctionName("getVariableNumber").SetIncludeFile("runtimeobject.js");
     objectConditions["VarObjetTxt"].SetFunctionName("getVariableString").SetIncludeFile("runtimeobject.js");
     objectConditions["VarObjetDef"].SetFunctionName("hasVariable").SetIncludeFile("runtimeobject.js");
-    objectActions["ModVarObjet"].SetFunctionName("setVariableNumber").SetManipulatedType("number").SetGetter("getVariableNumber").SetIncludeFile("runtimeobject.js");
-    objectActions["ModVarObjetTxt"].SetFunctionName("setVariableString").SetManipulatedType("number").SetGetter("getVariableString").SetIncludeFile("runtimeobject.js");
     objectActions["AddForceXY"].SetFunctionName("addForce").SetIncludeFile("runtimeobject.js");
     objectActions["AddForceAL"].SetFunctionName("addPolarForce").SetIncludeFile("runtimeobject.js");
     objectActions["AddForceVersPos"].SetFunctionName("addForceTowardPosition").SetIncludeFile("runtimeobject.js");
@@ -111,6 +109,23 @@ BaseObjectExtension::BaseObjectExtension()
     GetAllConditions()["AjoutHasard"].SetFunctionName("gdjs.evtTools.object.pickRandomObject");
     GetAllConditions()["PickNearest"].SetFunctionName("gdjs.evtTools.object.pickNearestObject");
 
+    objectActions["ModVarObjet"].SetFunctionName("returnVariable")
+        .SetManipulatedType("number")
+        .SetMutators({
+            {"=", "setNumber"},
+            {"+", "add"},
+            {"-", "sub"},
+            {"*", "mul"},
+            {"/", "div"},
+        })
+        .SetIncludeFile("runtimeobject.js");
+    objectActions["ModVarObjetTxt"].SetFunctionName("returnVariable")
+        .SetManipulatedType("string")
+        .SetMutators({
+            {"=", "setString"},
+            {"+", "concatenate"},
+        })
+        .SetIncludeFile("runtimeobject.js");
 
     GetAllActions()["MoveObjects"].codeExtraInformation
         .SetCustomCodeGenerator([](gd::Instruction &, gd::EventsCodeGenerator &, gd::EventsCodeGenerationContext &) {

@@ -289,9 +289,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & obj
 }
 
 gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectName,
-                                                                   const gd::ObjectMetadata & objInfo,
-                                                                   const std::vector<gd::String> & arguments,
-                                                                   const gd::InstructionMetadata & instrInfos,
+                                                      const gd::ObjectMetadata & objInfo,
+                                                      const std::vector<gd::String> & arguments,
+                                                      const gd::InstructionMetadata & instrInfos,
                                                       gd::EventsCodeGenerationContext & context)
 {
     gd::String actionCode;
@@ -304,9 +304,11 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
     if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string")
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
-            call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName, objectPart+instrInfos.codeExtraInformation.optionalAssociatedInstruction,1);
+            call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName, objectPart+instrInfos.codeExtraInformation.optionalAssociatedInstruction, 1);
+        else if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::Mutators )
+            call = GenerateMutatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName, 1);
         else
-            call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName,1);
+            call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName, 1);
     }
     else
     {
@@ -346,9 +348,11 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & object
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
-            call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName, objectPart+instrInfos.codeExtraInformation.optionalAssociatedInstruction,2);
+            call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName, objectPart+instrInfos.codeExtraInformation.optionalAssociatedInstruction, 2);
+        else if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::Mutators )
+            call = GenerateMutatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName, 2);
         else
-            call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName,2);
+            call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.codeExtraInformation.functionCallName, 2);
     }
     else
     {

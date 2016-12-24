@@ -11,6 +11,7 @@
 #include "GDCore/Events/Instruction.h"
 #include <memory>
 #include <functional>
+#include <map>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
@@ -232,7 +233,7 @@ public:
     class ExtraInformation
     {
     public:
-        enum AccessType {Reference, MutatorAndOrAccessor};
+        enum AccessType {Reference, MutatorAndOrAccessor, Mutators};
         ExtraInformation() : accessType(Reference), hasCustomCodeGenerator(false) {};
         virtual ~ExtraInformation() {};
 
@@ -281,6 +282,13 @@ public:
         {
             optionalAssociatedInstruction = getter;
             accessType = MutatorAndOrAccessor;
+            return *this;
+        }
+
+        ExtraInformation & SetMutators(const std::map<gd::String, gd::String> & mutators)
+        {
+            optionalMutators = mutators;
+            accessType = Mutators;
             return *this;
         }
 
@@ -333,6 +341,7 @@ public:
         gd::String type;
         AccessType accessType;
         gd::String optionalAssociatedInstruction;
+        std::map<gd::String, gd::String> optionalMutators;
         bool hasCustomCodeGenerator;
         std::function<gd::String(Instruction & instruction,
             gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)> customCodeGenerator;

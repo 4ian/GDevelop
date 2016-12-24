@@ -423,6 +423,20 @@ gdjs.RuntimeObject.getVariableNumber = function(variable) {
 gdjs.RuntimeObject.prototype.getVariableNumber = gdjs.RuntimeObject.getVariableNumber;
 
 /**
+ * Return the variable passed as argument without any change.
+ * Only for usage by events.
+ *
+ * @method returnVariable
+ * @param variable The variable to be accessed
+ * @return The specified variable
+ * @static
+ */
+gdjs.RuntimeObject.returnVariable = function(variable) {
+    return variable;
+}
+gdjs.RuntimeObject.prototype.returnVariable = gdjs.RuntimeObject.returnVariable;
+
+/**
  * Get the value of a variable considered as a string. Equivalent of variable.getAsString()
  * @method getVariableString
  * @param variable The variable to be accessed

@@ -179,6 +179,49 @@ gd::String EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::Instructi
     return callStartString+"("+argumentsStr+") "+operatorStr+" ("+rhs+")";
 }
 
+gd::String EventsCodeGenerator::GenerateMutatorCall(const gd::InstructionMetadata & instrInfos, const vector<gd::String> & arguments, const gd::String & callStartString, std::size_t startFromArgument)
+{
+   std::size_t operatorIndex = instrInfos.parameters.size();
+   for (std::size_t i = startFromArgument;i<instrInfos.parameters.size();++i)
+   {
+       if ( instrInfos.parameters[i].type == "operator" )
+           operatorIndex = i;
+   }
+
+   //Ensure that there is at least one parameter after the operator
+   if ( operatorIndex+1 >= instrInfos.parameters.size() )
+   {
+       ReportError();
+       return "";
+   }
+
+   gd::String operatorStr = arguments[operatorIndex];
+   if ( operatorStr.size() > 2 ) operatorStr = operatorStr.substr(1, operatorStr.length()-1-1); //Operator contains quote which must be removed.
+
+   auto mutators = instrInfos.codeExtraInformation.optionalMutators;
+   auto mutator = mutators.find(operatorStr);
+   if ( mutator == mutators.end() )
+   {
+       ReportError();
+       return "";
+   }
+
+   gd::String rhs = arguments[operatorIndex+1];
+
+   //Generate arguments for calling the mutator
+   gd::String argumentsStr;
+   for (std::size_t i = startFromArgument;i<arguments.size();++i)
+   {
+       if ( i != operatorIndex && i != operatorIndex+1) //Generate classic arguments
+       {
+           if ( !argumentsStr.empty() ) argumentsStr += ", ";
+           argumentsStr += arguments[i];
+       }
+   }
+
+   return callStartString + "(" + argumentsStr + ")." + mutator->second + "(" + rhs + ")";
+}
+
 gd::String EventsCodeGenerator::GenerateConditionCode(gd::Instruction & condition, gd::String returnBoolean, EventsCodeGenerationContext & context)
 {
     gd::String conditionCode;
@@ -883,6 +926,8 @@ gd::String EventsCodeGenerator::GenerateFreeAction(const std::vector<gd::String>
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
             call = GenerateOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName, instrInfos.codeExtraInformation.optionalAssociatedInstruction);
+        else if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::Mutators )
+            call = GenerateMutatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName);
         else
             call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName);
     }
@@ -911,9 +956,9 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
-            call = GenerateOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName, instrInfos.codeExtraInformation.optionalAssociatedInstruction,2);
+            call = GenerateOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName, instrInfos.codeExtraInformation.optionalAssociatedInstruction, 2);
         else
-            call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName,2);
+            call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName, 2);
 
         return "For each picked object \""+objectName+"\", call "+call+".\n";
     }
@@ -944,9 +989,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & object
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
-            call = GenerateOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName, instrInfos.codeExtraInformation.optionalAssociatedInstruction,2);
+            call = GenerateOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName, instrInfos.codeExtraInformation.optionalAssociatedInstruction, 2);
         else
-            call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName,2);
+            call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName, 2);
         return "For each picked object \""+objectName+"\", call "+call
                 +" for behavior \""+behaviorName+"\".\n";
     }

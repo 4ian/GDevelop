@@ -443,6 +443,7 @@ protected:
     gd::String GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, std::size_t startFromArgument = 0);
     gd::String GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, const gd::String & getterStartString, std::size_t startFromArgument = 0);
     gd::String GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, std::size_t startFromArgument = 0);
+    gd::String GenerateMutatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<gd::String> & arguments, const gd::String & callStartString, std::size_t startFromArgument = 0);
 
     /**
      * \brief Must return an expression whose value is true.

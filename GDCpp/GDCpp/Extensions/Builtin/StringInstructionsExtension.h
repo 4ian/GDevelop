@@ -20,7 +20,9 @@ class StringInstructionsExtension : public ExtensionBase
         StringInstructionsExtension();
         virtual ~StringInstructionsExtension() {};
 
+    #if defined(GD_IDE_ONLY)
+        virtual void ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker);
+    #endif
 };
 
 #endif // STRINGINSTRUCTIONSEXTENSION_H
-

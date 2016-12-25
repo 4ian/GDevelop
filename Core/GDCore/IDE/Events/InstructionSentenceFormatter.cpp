@@ -120,6 +120,7 @@ gd::String InstructionSentenceFormatter::LabelFromType(const gd::String & type)
     else if ( type == "operator" ) return _("Operator");
     else if ( type == "relationalOperator" ) return _( "Relational operator" );
     else if ( type == "file" ) return _("File");
+    else if ( type == "rawfile" ) return _("File");
     else if ( type == "key" ) return _( "Key" );
     else if ( type == "mouse" ) return _( "Mouse button" );
     else if ( type == "yesorno" ) return _("Yes or no");
@@ -188,6 +189,7 @@ wxBitmap InstructionSentenceFormatter::BitmapFromType(const gd::String & type)
     else if ( type == "operator" ) return CommonBitmapProvider->signeBt;
     else if ( type == "relationalOperator" ) return CommonBitmapProvider->signeBt;
     else if ( type == "file" ) return CommonBitmapProvider->fileBt;
+    else if ( type == "rawfile" ) return CommonBitmapProvider->fileBt;
     else if ( type == "key" ) return CommonBitmapProvider->keyBt;
     else if ( type == "mouse" ) return CommonBitmapProvider->mouseBt;
     else if ( type == "yesorno" ) return CommonBitmapProvider->yesnoBt;

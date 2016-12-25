@@ -303,7 +303,7 @@ protected:
      * - layer, color, file, joyaxis : Same as string
      * - relationalOperator : Used to make a comparison between the function resturn value and value of the parameter preceding the relationOperator parameter -> string
      * - operator : Used to update a value using a setter and a getter -> string
-     * - key, mouse, objectvar, scenevar, globalvar, password, musicfile, soundfile, police -> string
+     * - key, mouse, objectvar, scenevar, globalvar, password, musicfile, soundfile, rawfile, police -> string
      * - trueorfalse, yesorno -> boolean ( See GenerateTrue/GenerateFalse ).
      * - variadic -> like a parameter pack in a variadic template function
      *              between 0 and infinity of parameters of type string

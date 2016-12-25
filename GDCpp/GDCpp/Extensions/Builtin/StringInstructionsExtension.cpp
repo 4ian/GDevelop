@@ -7,6 +7,10 @@
 #include "GDCpp/Extensions/Builtin/StringInstructionsExtension.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
+#include "GDCore/Events/Instruction.h"
+#endif
 #if !defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/Builtin/StringInstructionsExtension.cpp"
 #endif
@@ -58,10 +62,24 @@ StringInstructionsExtension::StringInstructionsExtension()
                "res/actions/son24.png",
                "res/actions/son.png")
             .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("file", _("Path to the translation file"))
+            .AddParameter("rawfile", _("Path to the translation file"), _("Binary translation file (*.mo)|*.mo"))
 
             .SetFunctionName("GDpriv::StringTools::LoadTranslation")
             .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
 
     #endif
 }
+
+#if defined(GD_IDE_ONLY)
+
+void StringInstructionsExtension::ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker)
+{
+    if ( action.GetType() == "LoadTranslation" )
+    {
+        gd::String parameter = action.GetParameter(1).GetPlainString();
+        worker.ExposeFile(parameter);
+        action.SetParameter(1, parameter);
+    }
+}
+
+#endif

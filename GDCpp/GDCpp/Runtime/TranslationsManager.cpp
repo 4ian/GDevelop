@@ -1,8 +1,10 @@
 #include "GDCpp/Runtime/TranslationsManager.h"
 
 #include <iostream>
+#include <sstream>
 
 #include "GDCpp/Runtime/Tools/FileStream.h"
+#include "GDCpp/Runtime/ResourcesLoader.h"
 
 TranslationsManager::TranslationsManager()
 {
@@ -22,9 +24,12 @@ void TranslationsManager::LoadMOFile(const gd::String & path)
 {
 	translations.clear();
 
-	gd::FileStream moFile( path, std::ios_base::in|std::ios_base::binary );
-	if( moFile.good() )
+	std::size_t bufferSize = gd::ResourcesLoader::Get()->GetBinaryFileSize(path);
+	char * buffer = gd::ResourcesLoader::Get()->LoadBinaryFile(path);
+	if( buffer )
 	{
+		std::istringstream moFile(std::string(buffer, bufferSize));
+
 		uint32_t magicNumber = 0;
 		moFile.read( reinterpret_cast<char*>( &magicNumber ), 4 );
 		if( moFile.fail() )

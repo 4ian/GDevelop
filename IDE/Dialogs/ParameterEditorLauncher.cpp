@@ -178,6 +178,20 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
 
         return;
     }
+	else if ( metadata.GetType() == "rawfile" )
+    {
+        wxString projectDirectory = wxFileName::FileName(project.GetProjectFile()).GetPath();
+        wxFileDialog dialog(parent, _("Choose a file"), projectDirectory, "", metadata.GetExtraInfo());
+        dialog.ShowModal();
+
+        if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
+        {
+            wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(projectDirectory);
+            editCtrl->ChangeValue(filename.GetFullPath());
+        }
+
+        return;
+    }
     else if ( metadata.GetType() == "operator" )
     {
         SigneModification dialog(parent);

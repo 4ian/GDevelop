@@ -528,7 +528,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
     }
     else if (metadata.type == "objectvar" || metadata.type == "scenevar" || metadata.type == "globalvar" ||
              metadata.type == "password" || metadata.type == "musicfile" || metadata.type == "soundfile" ||
-             metadata.type == "police")
+             metadata.type == "police" || metadata.type == "rawfile")
     {
         argOutput = "\""+ConvertToString(parameter)+"\"";
     }

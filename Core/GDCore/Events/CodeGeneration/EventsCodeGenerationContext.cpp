@@ -33,6 +33,13 @@ void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext
     }
 }
 
+void EventsCodeGenerationContext::Reuse(const EventsCodeGenerationContext & parent_)
+{
+    InheritsFrom(parent_);
+    if (parent_.CanReuse())
+        contextDepth = parent_.GetContextDepth(); // Keep same context depth
+}
+
 void EventsCodeGenerationContext::ObjectsListNeeded(const gd::String & objectName)
 {
     if ( emptyObjectsListsToBeDeclared.find(objectName) == emptyObjectsListsToBeDeclared.end() )

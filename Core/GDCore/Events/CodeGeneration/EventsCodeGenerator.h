@@ -46,7 +46,7 @@ public:
     virtual ~EventsCodeGenerator() {};
 
     /**
-     * \brief Preprocess an events list ( Replacing for example links with the linked event ).
+     * \brief Preprocess an events list (replacing for example links with the linked events).
      *
      * This should be called before any code generation.
      */
@@ -57,7 +57,7 @@ public:
      *
      * \param events std::vector of events
      * \param context Context used for generation
-     * \return C++ code
+     * \return Code
      */
     gd::String GenerateEventsListCode(gd::EventsList & events, const EventsCodeGenerationContext & context);
 

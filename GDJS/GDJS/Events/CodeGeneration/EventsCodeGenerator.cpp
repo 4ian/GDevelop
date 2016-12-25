@@ -391,41 +391,52 @@ gd::String EventsCodeGenerator::GetObjectListName(const gd::String & name, const
 
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context)
 {
+    auto declareObjectList = [this](gd::String object, gd::EventsCodeGenerationContext & context) {
+        gd::String newListName = GetObjectListName(object, context);
+        if (!context.GetParentContext())
+        {
+            std::cout << "ERROR: During code generation, a context tried to use an already declared object list without having a parent" << std::endl;
+            return "/* Could not declare " + newListName + " */";
+        }
+
+        //*Optimization*: Avoid expensive copy of the object list if we're using
+        //the same list as the one from the parent context. 
+        gd::String copiedListName = GetObjectListName(object, *context.GetParentContext());
+        if (newListName == copiedListName)
+            return "/* Reuse " + copiedListName + " */";
+
+        return newListName + ".createFrom("+copiedListName+");\n";
+    };
+
     gd::String declarationsCode;
-    for ( set<gd::String>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
+    for (auto object : context.GetObjectsListsToBeDeclared())
     {
-        declarationsCode += GetObjectListName(*it, context);
-        if ( !context.ObjectAlreadyDeclared(*it) )
+        gd::String objectListDeclaration = "";
+        if ( !context.ObjectAlreadyDeclared(object) )
         {
-            declarationsCode += ".createFrom(runtimeScene.getObjects(\""+ConvertToString(*it)+"\"));\n";
-            context.SetObjectDeclared(*it);
+            objectListDeclaration += GetObjectListName(object, context) + ".createFrom(runtimeScene.getObjects(\"" + ConvertToString(object) + "\"));";
+            context.SetObjectDeclared(object);
         }
         else
-        {
-            if (context.GetParentContext())
-                declarationsCode += ".createFrom("+GetObjectListName(*it, *context.GetParentContext())+");\n";
-            else
-                std::cout << "ERROR: During code generation, a context tried tried to use an already declared object list without having a parent" << std::endl;
-        }
+            objectListDeclaration = declareObjectList(object, context);
+
+        declarationsCode += objectListDeclaration + "\n";
     }
-    for ( set<gd::String>::iterator it = context.GetObjectsListsToBeDeclaredEmpty().begin() ; it != context.GetObjectsListsToBeDeclaredEmpty().end(); ++it )
+    for (auto object : context.GetObjectsListsToBeDeclaredEmpty())
     {
-        declarationsCode += GetObjectListName(*it, context);
-        if ( !context.ObjectAlreadyDeclared(*it) )
+        gd::String objectListDeclaration = "";
+        if ( !context.ObjectAlreadyDeclared(object) )
         {
-            declarationsCode +=".length = 0;\n";
-            context.SetObjectDeclared(*it);
+            objectListDeclaration = GetObjectListName(object, context) + ".length = 0;\n";
+            context.SetObjectDeclared(object);
         }
         else
-        {
-            if (context.GetParentContext())
-                declarationsCode += ".createFrom("+GetObjectListName(*it, *context.GetParentContext())+");\n";
-            else
-                std::cout << "ERROR: During code generation, a context tried tried to use an already declared object list without having a parent" << std::endl;
-        }
+            objectListDeclaration = declareObjectList(object, context);
+
+        declarationsCode += objectListDeclaration + "\n";
     }
 
-    return declarationsCode ;
+    return declarationsCode;
 }
 
 gd::String EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, gd::EventsCodeGenerationContext & context)

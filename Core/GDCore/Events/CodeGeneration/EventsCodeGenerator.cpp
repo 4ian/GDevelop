@@ -675,8 +675,17 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(gd::EventsList & events, 
     for ( std::size_t eId = 0; eId < events.size();++eId )
     {
         //Each event has its own context : Objects picked in an event are totally different than the one picked in another.
-        gd::EventsCodeGenerationContext context;
-        context.InheritsFrom(parentContext); //Events in the same "level" share the same context as their parent.
+        gd::EventsCodeGenerationContext newContext;
+        newContext.InheritsFrom(parentContext); //Events in the same "level" share the same context as their parent.
+
+        //*Optimization*: when the event is the last of a list, we can use the
+        //same lists of objects as the parent (as they will be discarded just after).
+        //This avoids a copy of the lists of objects which is an expensive operation.
+        bool reuseParentContext = parentContext.CanReuse() && eId == events.size()-1;
+        gd::EventsCodeGenerationContext reusedContext;
+        reusedContext.Reuse(parentContext);
+
+        auto & context = reuseParentContext ? reusedContext : newContext;
 
         gd::String eventCoreCode = events[eId].GenerateEventCode(*this, context);
         gd::String scopeBegin = GenerateScopeBegin(context);

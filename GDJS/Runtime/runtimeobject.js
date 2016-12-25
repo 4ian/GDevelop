@@ -440,7 +440,7 @@ gdjs.RuntimeObject.prototype.variableRemoveChild = gdjs.RuntimeObject.variableRe
  * Shortcut to test if a variable exists for the object.
  * @method hasVariable
  * @param name {String} The variable to be tested
- * @return {Boolean} true if the variable exist.
+ * @return {Boolean} true if the variable exists.
  */
 gdjs.RuntimeObject.prototype.hasVariable = function(name) {
     return this._variables.has(name);

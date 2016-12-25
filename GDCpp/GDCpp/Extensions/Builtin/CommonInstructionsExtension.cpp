@@ -57,6 +57,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 //For example, two sub conditions using an object called "MyObject" will both have to declare a "MyObject" object list.
                 gd::EventsCodeGenerationContext context;
                 context.InheritsFrom(parentContext);
+                context.ForbidReuse(); //TODO: This may not be necessary
 
                 gd::String conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId)+"IsTrue", context);
 
@@ -244,6 +245,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
             gd::EventsCodeGenerationContext context;
             context.InheritsFrom(parentContext);
+            context.ForbidReuse();
             if ( event.HasInfiniteLoopWarning() && !codeGenerator.GenerateCodeForRuntime() ) codeGenerator.AddIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
 
             //Prepare codes
@@ -300,6 +302,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
             gd::EventsCodeGenerationContext context;
             context.InheritsFrom(parentContext);
+            context.ForbidReuse();
 
             //Prepare conditions/actions codes
             gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
@@ -347,6 +350,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
             gd::EventsCodeGenerationContext context;
             context.InheritsFrom(parentContext);
+            context.ForbidReuse();
 
             //Prepare conditions/actions codes
             gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);

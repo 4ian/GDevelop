@@ -101,15 +101,15 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
 
     output +=
     codeGenerator.GetCustomCodeOutsideMain()+"\n\n"
-    +globalObjectLists+"\n"
-    +globalConditionsBooleans+"\n"
-    +"gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code.func = function(runtimeScene, context) {\n"
-    +"context.startNewFrame();\n"
-    +globalObjectListsReset+"\n"
-	+codeGenerator.GetCustomCodeInMain()
-    +wholeEventsCode
-    +"return;\n"
-    +"}\n";
+    + globalObjectLists+"\n"
+    + globalConditionsBooleans+"\n"
+    + codeGenerator.GetCodeNamespace() + "func = function(runtimeScene, context) {\n"
+    + "context.startNewFrame();\n"
+    + globalObjectListsReset+"\n"
+	+ codeGenerator.GetCustomCodeInMain()
+    + wholeEventsCode
+    + "return;\n"
+    + "}\n";
 
     //Export the symbols to avoid them being stripped by the Closure Compiler:
     output += "gdjs['"+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code']"
@@ -400,7 +400,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGen
         }
 
         //*Optimization*: Avoid expensive copy of the object list if we're using
-        //the same list as the one from the parent context. 
+        //the same list as the one from the parent context.
         gd::String copiedListName = GetObjectListName(object, *context.GetParentContext());
         if (newListName == copiedListName)
             return "/* Reuse " + copiedListName + " */";
@@ -437,6 +437,31 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGen
     }
 
     return declarationsCode;
+}
+
+gd::String EventsCodeGenerator::GenerateEventsListCode(gd::EventsList & events, const gd::EventsCodeGenerationContext & context)
+{
+    // *Optimization*: generating all JS code of events in a single, enormous function is
+    // badly handled by JS engines and in particular the garbage collectors,
+    // leading to intermittent lag/freeze while the garbage collector is running.
+    // This is especially noticeable on Android devices. To reduce the stress on the JS
+    // engines, we generate a new function for each list of events.
+
+    gd::String code = gd::EventsCodeGenerator::GenerateEventsListCode(events, context);
+
+    // Generate a unique name for the function.
+    gd::String functionName = GetCodeNamespace() + "eventsList" + gd::String::From(&events);
+    AddCustomCodeOutsideMain(
+        // The only local parameters are runtimeScene and context.
+        // List of objects, conditions booleans and any variables used by events are stored
+        // in static variables that are globally available by the whole code.
+        functionName + " = function(runtimeScene, context) {\n" +
+        code + "\n" +
+        "}; //End of " + functionName+"\n");
+
+    // Replace the code of the events by the call to the function. This does not
+    // interfere with the objects picking as the lists are in static variables globally available.
+    return functionName+"(runtimeScene, context);";
 }
 
 gd::String EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, gd::EventsCodeGenerationContext & context)

@@ -59,7 +59,7 @@ public:
      * \param context Context used for generation
      * \return Code
      */
-    gd::String GenerateEventsListCode(gd::EventsList & events, const EventsCodeGenerationContext & context);
+    virtual gd::String GenerateEventsListCode(gd::EventsList & events, const EventsCodeGenerationContext & context);
 
     /**
      * \brief Generate code for executing a condition list

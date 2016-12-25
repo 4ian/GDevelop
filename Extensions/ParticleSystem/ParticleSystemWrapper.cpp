@@ -42,7 +42,7 @@ ParticleSystemWrapper::~ParticleSystemWrapper()
 
 void ParticleSystemWrapper::Init(const ParticleSystemWrapper & other)
 {
-    openGLTextureParticle = other.openGLTextureParticle;
+    textureParticle = other.textureParticle;
     if ( particleSystem ) delete particleSystem;
     if ( particleModel ) delete particleModel;
     if ( emitter ) delete emitter;
@@ -68,4 +68,3 @@ void ParticleSystemWrapper::Init(const ParticleSystemWrapper & other)
     particleSystem->removeGroup(other.group);
     particleSystem->addGroup(group);
 }
-

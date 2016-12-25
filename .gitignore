@@ -3,10 +3,9 @@
 /docs/GDJS Documentation
 /docs/GDCpp Documentation
 /docs/GDCore Documentation
-/ExtLibs/boost
-/ExtLibs/SFML
 /ExtLibs/wxwidgets
 /ExtLibs/wxWidgets
+/ExtLibs/SFML
 /ExtLibs/*.7z
 /scripts/Repository keys
 /scripts/logs/*.txt
@@ -71,6 +70,9 @@ Binaries/Packaging/logs
 !/Binaries/Output/Release_Windows/locale/msgfmt.exe
 !/ExtLibs/curl.exe
 !/ExtLibs/7za.exe
+!/ExtLibs/SFML/extlibs/**/*.dll
+!/ExtLibs/SFML/extlibs/**/*.so
+!/ExtLibs/SFML/extlibs/**/*.a
 **/.DS_Store
 **/node_modules/
 .idea

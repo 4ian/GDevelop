@@ -51,9 +51,9 @@ cd $CUR_DIR/opensuse-build-service/gdevelop
 tar zxf gdevelop_$GD_VERSION.orig.tar.gz
 echo "[OK]"
 
-#We need to include ExtLibs/SFML.7z and ExtLibs/boost.7z because buildbot do not have access to internet
+#We need to include ExtLibs/SFML.7z because the buildbot do not have access to internet
 printf " Copying SFML archive... "
-cp $GD_BASE_DIR/ExtLibs/SFML.7z gdevelop-$GD_VERSION/ExtLibs/
+cp -rf $GD_BASE_DIR/ExtLibs/SFML gdevelop-$GD_VERSION/ExtLibs/
 echo "[OK]"
 
 #Recreate the tar.gz with the added sources

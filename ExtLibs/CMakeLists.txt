@@ -1,13 +1,44 @@
+#Clone SFML from its official directory using Git
+find_package(Git)
+if(GIT_FOUND)
+	message( "Cloning SFML in ExtLibs/SFML with Git..." )
+	execute_process(
+		COMMAND ${GIT_EXECUTABLE} clone "https://www.github.com/SFML/SFML.git" SFML
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+		ERROR_QUIET
+		OUTPUT_QUIET)
+
+	message( "Resetting SFML source code to version 2.4.1..." )
+	execute_process(
+		COMMAND ${GIT_EXECUTABLE} reset --hard 2.4.1
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SFML
+		ERROR_QUIET
+		OUTPUT_QUIET)
+
+	message( "Applying the patches..." )
+	file(GLOB SFML_PATCHES
+     	LIST_DIRECTORIES FALSE
+		${CMAKE_CURRENT_SOURCE_DIR}/SFML-patches/*.patch)
+
+	if(SFML_PATCHES)
+		list(SORT SFML_PATCHES)
+
+		foreach(SFML_PATCH ${SFML_PATCHES})
+			message( "Applying patch: ${SFML_PATCH}..." )
+			execute_process(
+				COMMAND ${GIT_EXECUTABLE} apply ${SFML_PATCH}
+				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/SFML
+				ERROR_QUIET
+				OUTPUT_QUIET)
+		endforeach()
+	endif()
+else()
+	message( "Git not found, make sure you have SFML >= 2.4 in ExtLibs/SFML and you applied the needed patches (from ExtLibs/SFML-patches)!" )
+endif()
 
 #SFML:
-IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/SFML")
-	message( "Downloading SFML... (can take a bit of time, be patient)" )
-	execute_process(COMMAND curl -o SFML.7z http://www.compilgames.net/code/GameDevelopSDK/SFML.7z -\# WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ )
-	message( "Extracting SFML in ExtLibs/SFML... (can take a bit of time, be patient)" )
-	execute_process(COMMAND 7za x -y SFML.7z WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ OUTPUT_QUIET)
-ENDIF()
 IF(NOT EMSCRIPTEN) #Don't build SFML binaries when compiling with emscripten (but keep include files!)
-	ADD_SUBDIRECTORY(SFML)
+	add_subdirectory(SFML)
 	set(sfml_lib_dir ${CMAKE_BINARY_DIR}/ExtLibs/SFML/lib PARENT_SCOPE)
 	set(sfml_LIBRARIES sfml-audio sfml-graphics sfml-window sfml-network sfml-system)
 	IF(WIN32)

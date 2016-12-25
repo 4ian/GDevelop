@@ -14,12 +14,12 @@ SYS_LIB_DIR2=/lib/x86_64-linux-gnu/
 if [ -d $SFML_LIB_DIR ]; then
 	echo "Copying SFML files to '$DESTINATION'..."
 
-	cp "$SFML_LIB_DIR"/libsfml-audio.so.2.1 "$SFML_LIB_DIR"/libsfml-network.so.2.1 "$SFML_LIB_DIR"/libsfml-graphics.so.2.1 "$SFML_LIB_DIR"/libsfml-window.so.2.1 "$SFML_LIB_DIR"/libsfml-system.so.2.1 "$DESTINATION"/
-	mv "$DESTINATION"/libsfml-audio.so.2.1 "$DESTINATION"/libsfml-audio.so.2
-	mv "$DESTINATION"/libsfml-network.so.2.1 "$DESTINATION"/libsfml-network.so.2
-	mv "$DESTINATION"/libsfml-graphics.so.2.1 "$DESTINATION"/libsfml-graphics.so.2
-	mv "$DESTINATION"/libsfml-window.so.2.1 "$DESTINATION"/libsfml-window.so.2
-	mv "$DESTINATION"/libsfml-system.so.2.1 "$DESTINATION"/libsfml-system.so.2
+	cp "$SFML_LIB_DIR"/libsfml-audio.so.2.4 "$SFML_LIB_DIR"/libsfml-network.so.2.4 "$SFML_LIB_DIR"/libsfml-graphics.so.2.4 "$SFML_LIB_DIR"/libsfml-window.so.2.4 "$SFML_LIB_DIR"/libsfml-system.so.2.4 "$DESTINATION"/
+	#mv "$DESTINATION"/libsfml-audio.so.2.4 "$DESTINATION"/libsfml-audio.so.2
+	#mv "$DESTINATION"/libsfml-network.so.2.4 "$DESTINATION"/libsfml-network.so.2
+	#mv "$DESTINATION"/libsfml-graphics.so.2.4 "$DESTINATION"/libsfml-graphics.so.2
+	#mv "$DESTINATION"/libsfml-window.so.2.4 "$DESTINATION"/libsfml-window.so.2
+	#mv "$DESTINATION"/libsfml-system.so.2.4 "$DESTINATION"/libsfml-system.so.2
 else
 	echo "SFML lib files not found in '$SFML_LIB_DIR', skipping it..."
 fi

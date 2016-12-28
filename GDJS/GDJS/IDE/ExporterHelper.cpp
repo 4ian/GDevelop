@@ -320,6 +320,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project & project, gd::String outputDi
     InsertUnique(includesFiles, "libs/jshashtable.js");
     InsertUnique(includesFiles, "gd.js");
     InsertUnique(includesFiles, "libs/hshg.js");
+    InsertUnique(includesFiles, "libs/rbush.js");
     InsertUnique(includesFiles, "inputmanager.js");
     InsertUnique(includesFiles, "timemanager.js");
     InsertUnique(includesFiles, "runtimeobject.js");

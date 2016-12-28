@@ -35,6 +35,8 @@ StringInstructionsExtension::StringInstructionsExtension()
         .SetFunctionName("gdjs.evtTools.string.subStr");
     GetAllStrExpressions()["StrAt"]
         .SetFunctionName("gdjs.evtTools.string.strAt");
+    GetAllStrExpressions()["StrRepeat"]
+        .SetFunctionName("gdjs.evtTools.string.strRepeat");
     GetAllExpressions()["StrLength"]
         .SetFunctionName("gdjs.evtTools.string.strLen");
     GetAllExpressions()["StrFind"]

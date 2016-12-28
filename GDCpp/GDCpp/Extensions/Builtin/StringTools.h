@@ -24,6 +24,7 @@ gd::String GD_API NewLine();
 gd::String GD_API FromCodePoint(int32_t codepoint);
 gd::String GD_API ToUpperCase(const gd::String & str);
 gd::String GD_API ToLowerCase(const gd::String & str);
+gd::String GD_API StrRepeat(const gd::String & str, std::size_t repCount);
 std::size_t GD_API StrLen(const gd::String & str);
 int GD_API StrFind(const gd::String & str, const gd::String & findwhat);
 int GD_API StrRFind(const gd::String & str, const gd::String & findwhat);

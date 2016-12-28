@@ -75,6 +75,19 @@ gdjs.evtTools.string.strAt = function(str, start) {
 };
 
 /**
+ * Return the string repeated.
+ * @method strAt
+ * @private
+ */
+gdjs.evtTools.string.strRepeat = function(str, count) {
+    var result = "";
+    for ( var i = 0; i < count; i++ )
+        result += str;
+
+    return result;
+}
+
+/**
  * Return the length of the string
  * @method strLen
  * @private

@@ -45,7 +45,7 @@ gd::String GD_API FromCodePoint(int32_t codepoint)
 }
 
 /**
- * Expression function for getting the uppercased version of a string
+ * Expression function for getting the uppercase version of a string
  */
 gd::String GD_API ToUpperCase(const gd::String & str)
 {
@@ -53,11 +53,25 @@ gd::String GD_API ToUpperCase(const gd::String & str)
 }
 
 /**
- * Expression function for getting the uppercased version of a string
+ * Expression function for getting the lowercase version of a string
  */
 gd::String GD_API ToLowerCase(const gd::String & str)
 {
     return str.LowerCase();
+}
+
+/**
+ * Expression function for getting a repeated version of a string
+ */
+gd::String GD_API StrRepeat(const gd::String & str, std::size_t repCount)
+{
+    gd::String result;
+
+    result.Raw().reserve(str.Raw().size() * repCount);
+    for(std::size_t i = 0; i < repCount; ++i)
+        result.Raw() += str.Raw();
+
+    return result;
 }
 
 /**

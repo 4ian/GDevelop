@@ -139,11 +139,9 @@ bool RuntimeBox3DObject::Draw( sf::RenderTarget& window )
     glTranslatef(-sizeWidth/2, -sizeHeight/2, -sizeDepth/2);
 
     //Render the box
-    glAlphaFunc(GL_GREATER, 0.0);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     sf::Texture::bind(&backTexture->texture);
     glBegin(GL_QUADS);
@@ -192,8 +190,6 @@ bool RuntimeBox3DObject::Draw( sf::RenderTarget& window )
         glTexCoord2f(1, 0); glVertex3f(sizeWidth,   sizeHeight, 0);
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   sizeHeight, sizeDepth);
     glEnd();
-
-    glDisable(GL_ALPHA_TEST);
 
     window.pushGLStates();
 
@@ -273,11 +269,9 @@ void Box3DObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Render
     glTranslatef(-sizeWidth/2, -sizeHeight/2, -sizeDepth/2);
 
     //Render the box
-    glAlphaFunc(GL_GREATER, 0.0);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     sf::Texture::bind(&backTexture->texture);
     glBegin(GL_QUADS);
@@ -326,8 +320,6 @@ void Box3DObject::DrawInitialInstance(gd::InitialInstance & instance, sf::Render
         glTexCoord2f(1, 0); glVertex3f(sizeWidth,   sizeHeight, 0);
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   sizeHeight, sizeDepth);
     glEnd();
-
-    glDisable(GL_ALPHA_TEST);
 
     renderTarget.pushGLStates();
 }

@@ -360,14 +360,24 @@ gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
 gdjs.RuntimeScene.prototype._updateObjects = function() {
 	this._cacheOrClearRemovedInstances();
 
-	this.updateObjectsForces();
-
 	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
 	//may delete the objects.
 	this._constructListOfAllInstances();
 	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-		this._allInstancesList[i].update(this);
-		this._allInstancesList[i].stepBehaviorsPostEvents(this);
+        var obj = this._allInstancesList[i];
+
+        if (!obj.hasNoForces()) {
+            var averageForce = obj.getAverageForce();
+            var elapsedTimeInSeconds = obj.getElapsedTime(this) / 1000;
+
+            obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
+            obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
+            obj.update(this);
+            obj.updateForces(elapsedTimeInSeconds);
+        } else {
+            obj.update(this);
+        }
+		obj.stepBehaviorsPostEvents(this);
 	}
 
 	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.

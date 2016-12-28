@@ -109,7 +109,10 @@ void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
 
     //For Each text
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
-    dc.SetTextForeground(wxColour(0,0,0));
+    if ( !IsDisabled() )
+        dc.SetTextForeground( wxColour( 0, 0, 0 ) );
+    else
+        dc.SetTextForeground( wxColour( 160, 160, 160 ) );
     dc.DrawText( _("For each object") + " " + objectsToPick.GetPlainString() + _(", repeat :"), x + 4, y + 3 );
 
     //Draw conditions rectangle

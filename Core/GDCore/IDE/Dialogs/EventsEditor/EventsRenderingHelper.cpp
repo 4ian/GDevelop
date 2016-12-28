@@ -174,7 +174,7 @@ int EventsRenderingHelper::DrawConditionsList(gd::InstructionsList & conditions,
             dc.DrawRectangle(x + 2, y, width-2, 2);
         }
 
-        dc.SetTextForeground( wxColour(0,0,0) );
+        dc.SetTextForeground(!event->IsDisabled() ? wxColour(0, 0, 0) : wxColour(160, 160, 160));
         dc.SetFont( niceFont.Italic() );
         dc.DrawText( _("No conditions"), x + 2, y + 1 );
 
@@ -275,7 +275,7 @@ int EventsRenderingHelper::DrawActionsList(gd::InstructionsList & actions, wxDC 
             dc.DrawRectangle(x + 2, y, width-2, 2);
         }
 
-        dc.SetTextForeground( wxColour(0,0,0) );
+        dc.SetTextForeground(!event->IsDisabled() ? wxColour(0, 0, 0) : wxColour(160, 160, 160));
         dc.SetFont( niceFont.Italic() );
         dc.DrawText( _("No actions"), x + 2, y + 1 );
 

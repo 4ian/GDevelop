@@ -108,7 +108,10 @@ void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Events
 
     //Repeat text
     dc.SetFont( renderingHelper->GetNiceFont().Bold() );
-    dc.SetTextForeground(wxColour(0,0,0));
+    if ( !IsDisabled() )
+        dc.SetTextForeground( wxColour( 0, 0, 0 ) );
+    else
+        dc.SetTextForeground( wxColour( 160, 160, 160 ) );
     dc.DrawText( _("Repeat") + " " + repeatNumberExpression.GetPlainString() + " " + _("times :"), x + 4, y + 3 );
 
     //Draw conditions rectangle

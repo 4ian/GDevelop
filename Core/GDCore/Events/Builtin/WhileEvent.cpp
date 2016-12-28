@@ -96,7 +96,10 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsE
 
     //While text
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
-    dc.SetTextForeground(wxColour(0,0,0));
+    if ( !IsDisabled() )
+        dc.SetTextForeground( wxColour( 0, 0, 0 ) );
+    else
+        dc.SetTextForeground( wxColour( 160, 160, 160 ) );
     dc.DrawText( _("While :"), x+5, y+5 );
 
     //Draw icon if infinite loop warning is deactivated.
@@ -110,7 +113,10 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsE
     renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection, platform);
 
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
-    dc.SetTextForeground(wxColour(0,0,0));
+    if ( !IsDisabled() )
+        dc.SetTextForeground( wxColour( 0, 0, 0 ) );
+    else
+        dc.SetTextForeground( wxColour( 160, 160, 160 ) );
     dc.DrawText( _("Repeat :"), x+4, y+whileConditionsHeight+3);
     whileConditionsHeight += repeatHeight;
 

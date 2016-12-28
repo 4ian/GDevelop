@@ -117,7 +117,10 @@ void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::Event
 
     //Header
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
-    dc.SetTextForeground(wxColour(0,0,0));
+    if ( !IsDisabled() )
+        dc.SetTextForeground( wxColour( 0, 0, 0 ) );
+    else
+        dc.SetTextForeground( wxColour( 160, 160, 160 ) );
     dc.DrawText( (displayedName.empty() ? _("C++ code") : _("C++ code:")) + displayedName, x + 4, y + 3 );
 
     if ( codeDisplayedInEditor )

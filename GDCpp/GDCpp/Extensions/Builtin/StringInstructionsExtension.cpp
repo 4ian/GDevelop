@@ -22,6 +22,7 @@ StringInstructionsExtension::StringInstructionsExtension()
     GetAllStrExpressions()["ToLowerCase"].SetFunctionName("GDpriv::StringTools::ToLowerCase").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
     GetAllStrExpressions()["SubStr"].SetFunctionName("GDpriv::StringTools::SubStr").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
     GetAllStrExpressions()["StrAt"].SetFunctionName("GDpriv::StringTools::StrAt").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
+    GetAllStrExpressions()["StrRepeat"].SetFunctionName("GDpriv::StringTools::StrRepeat").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
     GetAllExpressions()["StrLength"].SetFunctionName("GDpriv::StringTools::StrLen").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
     GetAllExpressions()["StrFind"].SetFunctionName("GDpriv::StringTools::StrFind").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
     GetAllExpressions()["StrRFind"].SetFunctionName("GDpriv::StringTools::StrRFind").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");

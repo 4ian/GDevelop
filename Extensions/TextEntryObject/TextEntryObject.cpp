@@ -58,7 +58,6 @@ void RuntimeTextEntryObject::Update(const RuntimeScene & scene)
         //Skip some non displayable characters
         if (characters[i] > 30 && (characters[i] < 127 || characters[i] > 159))
         {
-            std::cout << characters[i] << std::endl;
             text += static_cast<char32_t>(characters[i]);
         }
         else if (characters[i] == 8)

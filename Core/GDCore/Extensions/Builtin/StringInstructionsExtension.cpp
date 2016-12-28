@@ -68,6 +68,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
         .AddParameter("string", _("Text"))
         .AddParameter("expression", _("Position of the character (the first letter is at position 0)"));
 
+    extension.AddStrExpression("StrRepeat",
+                   _("Repeat a text"),
+                   _("Repeat a text"),
+                   _("Manipulation on text"),
+                   "res/conditions/toujours24.png")
+
+        .AddParameter("string", _("Text to repeat"))
+        .AddParameter("expression", _("Repetition count"));
+
     extension.AddExpression("StrLength",
                    _("Length of a text"),
                    _("Length of a text"),
@@ -75,7 +84,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"));
-
 
 
     extension.AddExpression("StrFind",
@@ -86,7 +94,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
 
         .AddParameter("string", _("Text"))
         .AddParameter("string", _("Text to search for"));
-
 
 
     extension.AddExpression("StrRFind",

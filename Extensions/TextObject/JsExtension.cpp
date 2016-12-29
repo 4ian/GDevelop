@@ -58,6 +58,8 @@ public:
         GetAllActionsForObject("TextObject::Text")["TextObject::Font"].SetFunctionName("");
         GetAllActionsForObject("TextObject::Text")["TextObject::SetUnderlined"].SetFunctionName("");
         GetAllConditionsForObject("TextObject::Text")["TextObject::IsUnderlined"].SetFunctionName("");
+        GetAllActionsForObject("TextObject::Text")["TextObject::SetSmooth"].SetFunctionName("");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::Smoothed"].SetFunctionName("");
 
         StripUnimplementedInstructionsAndExpressions();
 

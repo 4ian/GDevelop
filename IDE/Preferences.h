@@ -106,7 +106,6 @@ class Preferences: public wxDialog
 		wxButton* OkBt;
 		wxPanel* fileBtColorPnl;
 		wxStaticText* StaticText6;
-		wxCheckBox* hidePageTabsCheck;
 		wxPanel* backColorPnl;
 		wxButton* browseJavaBt;
 		wxPanel* ribbonColor1Pnl;
@@ -176,7 +175,6 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT2;
 		static const long ID_PANEL10;
 		static const long ID_CHECKBOX2;
-		static const long ID_CHECKBOX5;
 		static const long ID_STATICTEXT22;
 		static const long ID_PANEL21;
 		static const long ID_STATICTEXT4;

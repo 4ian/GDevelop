@@ -370,15 +370,8 @@ MainFrame::MainFrame( wxWindow* parent ) :
     std::vector<wxWindow*> controlsToBeDisabledOnPreview; //Used below:
 
     //Ribbon setup
-    long ribbonStyle = wxRIBBON_BAR_DEFAULT_STYLE;
-    bool hidePageTabs = false;
-    pConfig->Read( _T( "/Skin/HidePageTabs" ), &hidePageTabs );
-    if ( hidePageTabs )
-    {
-        ribbonStyle &= ~wxRIBBON_BAR_SHOW_PAGE_LABELS;
-    }
     ribbon = new wxRibbonBar(this, ID_RIBBON);
-    ribbon->SetWindowStyle(ribbonStyle);
+    ribbon->SetWindowStyle(wxRIBBON_BAR_DEFAULT_STYLE);
     bool hideLabels = false;
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
     {

@@ -163,6 +163,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     this._flippedX = false;
     this._flippedY = false;
     this.opacity = 255;
+    this._updateIfNotVisible = !!objectData.updateIfNotVisible;
 
     //Animations:
     if ( this._animations === undefined ) this._animations = [];
@@ -215,6 +216,12 @@ gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = func
  * @method update
  */
 gdjs.SpriteRuntimeObject.prototype.update = function(runtimeScene) {
+    //Playing the animation of all objects including the ones outside the screen can be
+    //costly when the scene is big with a lot of animated objects. By default, we skip
+    //updating the object if it is not visible.
+    if (!this._updateIfNotVisible && !this._renderer.getRendererObject().visible)
+        return;
+
     if ( this._currentAnimation >= this._animations.length ||
          this._currentDirection >= this._animations[this._currentAnimation].directions.length) {
         return;

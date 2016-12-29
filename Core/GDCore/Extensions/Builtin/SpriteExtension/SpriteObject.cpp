@@ -34,7 +34,8 @@ namespace gd {
 Animation SpriteObject::badAnimation;
 
 SpriteObject::SpriteObject(gd::String name_) :
-    Object(name_)
+    Object(name_),
+    updateIfNotVisible(false)
 {
 }
 
@@ -42,9 +43,10 @@ SpriteObject::~SpriteObject()
 {
 };
 
-
 void SpriteObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
+    updateIfNotVisible = element.GetBoolAttribute("updateIfNotVisible", true);
+
     const gd::SerializerElement & animationsElement = element.GetChild("animations", 0, "Animations");
     animationsElement.ConsiderAsArrayOf("animation", "Animation");
     for (std::size_t i = 0; i < animationsElement.GetChildrenCount(); ++i)
@@ -89,6 +91,8 @@ void SpriteObject::DoUnserializeFrom(gd::Project & project, const gd::Serializer
 #if defined(GD_IDE_ONLY)
 void SpriteObject::DoSerializeTo(gd::SerializerElement & element) const
 {
+    element.SetAttribute("updateIfNotVisible", updateIfNotVisible);
+
     //Animations
     gd::SerializerElement & animationsElement = element.AddChild("animations");
     animationsElement.ConsiderAsArrayOf("animation");
@@ -107,6 +111,23 @@ void SpriteObject::DoSerializeTo(gd::SerializerElement & element) const
         }
     }
 }
+
+std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetProperties(gd::Project & project) const
+{
+    std::map<gd::String, gd::PropertyDescriptor> properties;
+    properties[_("Animate even if hidden or far from the screen")].SetValue(updateIfNotVisible ? "true" : "false").SetType("Boolean");
+    properties[_("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS")].SetValue("");
+
+    return properties;
+}
+
+bool SpriteObject::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
+{
+    if (name == _("Animate even if hidden or far from the screen")) updateIfNotVisible = value == "1";
+
+    return true;
+}
+
 #if !defined(EMSCRIPTEN)
 void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {

@@ -125,9 +125,19 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     FlexGridSizer3->Add(BoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     rightPartSizer->Add(FlexGridSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
+
+    // Selected instruction description
     instructionDescriptionTxt = new wxStaticText(this, ID_STATICTEXT2, editingAction ? _("Choose an action in the list") : _("Choose a condition in the list"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     BoxSizer3->Add(instructionDescriptionTxt, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     rightPartSizer->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+
+    // A warning displayed if the instruction is not available on one of the project's platforms despite being available in the current one
+    notAvailableWarningTxt = new wxStaticText(this, wxNewId(), "", wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    notAvailableWarningTxt->Hide();
+    wxFont notAvailableWarningTxtFont(wxFontInfo().Bold());
+    notAvailableWarningTxt->SetFont(notAvailableWarningTxtFont);
+    rightPartSizer->Add(notAvailableWarningTxt, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+
     instructionHelpLinkCtrl = new wxHyperlinkCtrl(this, ID_INSTRUCTIONHELPLINKCTRL, _("Help on this ") + (editingAction ? _("action") : _("condition")), "");
     rightPartSizer->Add(instructionHelpLinkCtrl, 0, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
@@ -436,6 +446,25 @@ void InstructionSelectorDialog::RefreshFromInstruction()
     instructionDescriptionTxt->Wrap( 450 );
     if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
     else ActionImg->SetBitmap(gd::CommonBitmapProvider::Get()->unknownAction24);
+
+    // Display the warning if the instruction is not available in the other platforms of the project
+    notAvailableWarningTxt->Hide();
+    notAvailableWarningTxt->SetLabel( editingAction ?
+        _("This action is not available in one of the platforms the project uses, it will be ignored on these platforms:") :
+        _("This condition is not available in one of the platforms the project uses, it will be ignored on these platforms:") );
+    for ( gd::Platform * platform : game.GetUsedPlatforms() )
+    {
+        const gd::InstructionMetadata & otherPlatformMetadata = editingAction ?
+            gd::MetadataProvider::GetActionMetadata(*platform, instructionType) :
+            gd::MetadataProvider::GetConditionMetadata(*platform, instructionType);
+
+        if ( otherPlatformMetadata.codeExtraInformation.functionCallName.empty() )
+        {
+            notAvailableWarningTxt->SetLabel( notAvailableWarningTxt->GetLabel() + gd::String(" ") + platform->GetFullName() );
+            notAvailableWarningTxt->Show();
+        }
+    }
+    notAvailableWarningTxt->Wrap( 450 );
 
     //Show or hide the instructionHelpLinkCtrl
     instructionHelpLinkCtrl->Show( instructionMetadata.GetHelpPage() != "" );

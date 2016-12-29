@@ -68,6 +68,7 @@ public:
 	wxNotebook* objectsListsNotebook;
 	wxSearchCtrl* objectsSearchCtrl;
 	wxStaticText* instructionDescriptionTxt;
+	wxStaticText* notAvailableWarningTxt;
 	wxHyperlinkCtrl* instructionHelpLinkCtrl;
 	wxCheckBox* objSortCheck;
 	wxTreeCtrl* instructionsTree;

@@ -158,9 +158,9 @@ public :
 
     void SetColor(unsigned int r, unsigned int g, unsigned int b);
     void SetColor(const gd::String & colorStr);
-    unsigned int GetColorR() const { return text.getColor().r; };
-    unsigned int GetColorG() const { return text.getColor().g; };
-    unsigned int GetColorB() const { return text.getColor().b; };
+    unsigned int GetColorR() const { return text.getFillColor().r; };
+    unsigned int GetColorG() const { return text.getFillColor().g; };
+    unsigned int GetColorB() const { return text.getFillColor().b; };
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 

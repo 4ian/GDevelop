@@ -81,7 +81,7 @@ void TextObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderT
     sfText.setOrigin(sfText.getLocalBounds().width/2, sfText.getLocalBounds().height/2);
     sfText.setPosition( instance.GetX()+sfText.getOrigin().x, instance.GetY()+sfText.getOrigin().y );
     sfText.setRotation( instance.GetAngle() );
-    sfText.setColor(sf::Color(colorR, colorG, colorB));
+    sfText.setFillColor(sf::Color(colorR, colorG, colorB));
 
     renderTarget.draw(sfText);
 }
@@ -245,7 +245,7 @@ gd::String RuntimeTextObject::GetString() const
  */
 void RuntimeTextObject::SetColor( unsigned int r, unsigned int g, unsigned int b )
 {
-    text.setColor(sf::Color(r, g, b, opacity));
+    text.setFillColor(sf::Color(r, g, b, opacity));
 }
 
 void RuntimeTextObject::SetColor(const gd::String & colorStr)
@@ -265,8 +265,8 @@ void RuntimeTextObject::SetOpacity(float val)
     else if ( val < 0 ) val = 0;
 
     opacity = val;
-    const sf::Color & currentColor = text.getColor();
-    text.setColor(sf::Color(currentColor.r, currentColor.g, currentColor.b, opacity));
+    const sf::Color & currentColor = text.getFillColor();
+    text.setFillColor(sf::Color(currentColor.r, currentColor.g, currentColor.b, opacity));
 }
 
 void RuntimeTextObject::ChangeFont(const gd::String & fontName_)

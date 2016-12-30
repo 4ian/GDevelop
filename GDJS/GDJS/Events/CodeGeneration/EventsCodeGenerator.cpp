@@ -392,20 +392,20 @@ gd::String EventsCodeGenerator::GetObjectListName(const gd::String & name, const
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context)
 {
     auto declareObjectList = [this](gd::String object, gd::EventsCodeGenerationContext & context) {
-        gd::String newListName = GetObjectListName(object, context);
+        gd::String objectListName = GetObjectListName(object, context);
         if (!context.GetParentContext())
         {
             std::cout << "ERROR: During code generation, a context tried to use an already declared object list without having a parent" << std::endl;
-            return "/* Could not declare " + newListName + " */";
+            return "/* Could not declare " + objectListName + " */";
         }
 
         //*Optimization*: Avoid expensive copy of the object list if we're using
         //the same list as the one from the parent context.
-        gd::String copiedListName = GetObjectListName(object, *context.GetParentContext());
-        if (newListName == copiedListName)
-            return "/* Reuse " + copiedListName + " */";
+        if (context.IsSameObjectsList(object, *context.GetParentContext()))
+            return "/* Reuse " + objectListName + " */";
 
-        return newListName + ".createFrom("+copiedListName+");\n";
+        gd::String copiedListName = GetObjectListName(object, *context.GetParentContext());
+        return objectListName + ".createFrom("+copiedListName+");\n";
     };
 
     gd::String declarationsCode;

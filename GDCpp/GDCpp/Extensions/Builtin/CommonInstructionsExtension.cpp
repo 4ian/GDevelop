@@ -170,11 +170,9 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     GetAllEvents()["BuiltinCommonInstructions::Standard"]
         .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
-            gd::String outputCode;
             gd::StandardEvent & event = dynamic_cast<gd::StandardEvent&>(event_);
 
-            outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
-
+            gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
             gd::String ifPredicat;
             for (std::size_t i = 0;i<event.GetConditions().size();++i)
             {
@@ -182,16 +180,23 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 ifPredicat += "condition"+gd::String::From(i)+"IsTrue";
             }
 
-            if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
-            outputCode += "{\n";
-            outputCode += codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+            gd::EventsCodeGenerationContext actionsContext;
+            actionsContext.Reuse(context);
+            gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), actionsContext);
             if ( event.HasSubEvents() ) //Sub events
             {
-                outputCode += "\n{\n";
-                outputCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
-                outputCode += "}\n";
+                actionsCode += "\n{ //Subevents\n";
+                actionsCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), actionsContext);
+                actionsCode += "} //End of subevents\n";
             }
+            gd::String actionsDeclarationsCode = codeGenerator.GenerateObjectsDeclarationCode(actionsContext);
 
+            gd::String outputCode;
+            outputCode += conditionsCode;
+            if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
+            outputCode += "{\n";
+            outputCode += actionsDeclarationsCode;
+            outputCode += actionsCode;
             outputCode += "}\n";
 
             return outputCode;

@@ -72,4 +72,9 @@ unsigned int EventsCodeGenerationContext::GetLastDepthObjectListWasNeeded(const 
     return 0;
 }
 
+bool EventsCodeGenerationContext::IsSameObjectsList(const gd::String & objectName, const EventsCodeGenerationContext & otherContext) const
+{
+    return GetLastDepthObjectListWasNeeded(objectName) == otherContext.GetLastDepthObjectListWasNeeded(objectName);
+}
+
 }

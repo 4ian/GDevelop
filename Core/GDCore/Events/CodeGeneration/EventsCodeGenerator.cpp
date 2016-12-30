@@ -631,38 +631,58 @@ vector<gd::String>  EventsCodeGenerator::GenerateParametersCodes(vector < gd::Ex
 
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(EventsCodeGenerationContext & context)
 {
+    auto declareObjectList = [this](gd::String object, gd::EventsCodeGenerationContext & context) {
+        gd::String objectListName = GetObjectListName(object, context);
+        if (!context.GetParentContext())
+        {
+            std::cout << "ERROR: During code generation, a context tried to use an already declared object list without having a parent" << std::endl;
+            return "/* Could not declare " + objectListName + " */";
+        }
+
+        //*Optimization*: Avoid a copy of the object list if we're using
+        //the same list as the one from the parent context.
+        if (context.IsSameObjectsList(object, *context.GetParentContext()))
+            return "/* Reuse " + objectListName + " */";
+
+        gd::String declarationCode;
+
+        //Use a temporary variable as the names of lists are the same between contexts.
+        gd::String copiedListName = GetObjectListName(object, *context.GetParentContext());
+        declarationCode += "std::vector<RuntimeObject*> & " + objectListName + "T = " + copiedListName + ";\n";
+        declarationCode += "std::vector<RuntimeObject*> " + objectListName + " = " + objectListName + "T;\n";
+        return declarationCode;
+    };
+
     gd::String declarationsCode;
-    for ( set<gd::String>::iterator it = context.objectsListsToBeDeclared.begin() ; it != context.objectsListsToBeDeclared.end(); ++it )
+    for (auto object : context.GetObjectsListsToBeDeclared())
     {
-        if ( context.alreadyDeclaredObjectsLists.find(*it) == context.alreadyDeclaredObjectsLists.end() )
+        gd::String objectListDeclaration = "";
+        if ( !context.ObjectAlreadyDeclared(object) )
         {
-            declarationsCode += "std::vector<RuntimeObject*> "+GetObjectListName(*it, context)
-                                +" = runtimeContext->GetObjectsRawPointers(\""+ConvertToString(*it)+"\");\n";
-            context.alreadyDeclaredObjectsLists.insert(*it);
+            objectListDeclaration = "std::vector<RuntimeObject*> "+GetObjectListName(object, context)
+                                +" = runtimeContext->GetObjectsRawPointers(\""+ConvertToString(object)+"\");\n";
+            context.SetObjectDeclared(object);
         }
         else
-        {
-            //Could normally be done in one line, but clang sometimes miscompile it.
-            declarationsCode += "std::vector<RuntimeObject*> & "+GetObjectListName(*it, context)+"T = "+GetObjectListName(*it, context)+";\n";
-            declarationsCode += "std::vector<RuntimeObject*> "+GetObjectListName(*it, context)+" = "+GetObjectListName(*it, context)+"T;\n";
-        }
+            objectListDeclaration = declareObjectList(object, context);
+
+        declarationsCode += objectListDeclaration + "\n";
     }
-    for ( set<gd::String>::iterator it = context.emptyObjectsListsToBeDeclared.begin() ; it != context.emptyObjectsListsToBeDeclared.end(); ++it )
+    for (auto object : context.GetObjectsListsToBeDeclaredEmpty())
     {
-        if ( context.alreadyDeclaredObjectsLists.find(*it) == context.alreadyDeclaredObjectsLists.end() )
+        gd::String objectListDeclaration = "";
+        if ( !context.ObjectAlreadyDeclared(object) )
         {
-            declarationsCode += "std::vector<RuntimeObject*> "+GetObjectListName(*it, context)+";\n";
-            context.alreadyDeclaredObjectsLists.insert(*it);
+            objectListDeclaration = "std::vector<RuntimeObject*> "+GetObjectListName(object, context)+";\n";
+            context.SetObjectDeclared(object);
         }
         else
-        {
-            //Could normally be done in one line, but clang sometimes miscompile it.
-            declarationsCode += "std::vector<RuntimeObject*> & "+GetObjectListName(*it, context)+"T = "+GetObjectListName(*it, context)+";\n";
-            declarationsCode += "std::vector<RuntimeObject*> "+GetObjectListName(*it, context)+" = "+GetObjectListName(*it, context)+"T;\n";
-        }
+            objectListDeclaration = declareObjectList(object, context);
+
+        declarationsCode += objectListDeclaration + "\n";
     }
 
-    return declarationsCode ;
+    return declarationsCode;
 }
 
 /**
@@ -671,7 +691,6 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(EventsCodeGenerat
 gd::String EventsCodeGenerator::GenerateEventsListCode(gd::EventsList & events, const EventsCodeGenerationContext & parentContext)
 {
     gd::String output;
-
     for ( std::size_t eId = 0; eId < events.size();++eId )
     {
         //Each event has its own context : Objects picked in an event are totally different than the one picked in another.

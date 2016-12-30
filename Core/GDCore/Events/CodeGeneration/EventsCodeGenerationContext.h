@@ -120,7 +120,7 @@ public:
     /**
      * \brief Consider that \a objectName is now declared in the context.
      */
-    void SetObjectDeclared(const gd::String & objectName ) { alreadyDeclaredObjectsLists.insert(objectName); }
+    void SetObjectDeclared(const gd::String & objectName) { alreadyDeclaredObjectsLists.insert(objectName); }
 
     /**
      * Return all the objects lists which will be declared by the current context
@@ -149,6 +149,13 @@ public:
      * If \a objectName is needed in this context, it will return the depth of this context.
      */
     unsigned int GetLastDepthObjectListWasNeeded(const gd::String & objectName) const;
+
+    /**
+     * \brief Check if twos context have the same list for an object.
+     *
+     * This can be the case when a context is reusing the lists of another (see gd::EventsCodeGenerationContext::Reuse).
+     */
+    bool IsSameObjectsList(const gd::String & objectName, const EventsCodeGenerationContext & otherContext) const;
 
     /**
      * \brief Called when a custom condition code is generated.

@@ -52,23 +52,29 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     GetAllEvents()["BuiltinCommonInstructions::Standard"]
         .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
-            gd::String outputCode;
             gd::StandardEvent & event = dynamic_cast<gd::StandardEvent&>(event_);
 
-            outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
-
+            gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
             gd::String ifPredicat = event.GetConditions().empty() ? "" : codeGenerator.GenerateBooleanFullName("condition"+gd::String::From(event.GetConditions().size()-1)+"IsTrue", context)+".val";
 
-            if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ") {\n";
-            outputCode += codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+            gd::EventsCodeGenerationContext actionsContext;
+            actionsContext.Reuse(context);
+            gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), actionsContext);
             if ( event.HasSubEvents() ) //Sub events
             {
-                outputCode += "\n{ //Subevents\n";
-                outputCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
-                outputCode += "} //End of subevents\n";
+                actionsCode += "\n{ //Subevents\n";
+                actionsCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), actionsContext);
+                actionsCode += "} //End of subevents\n";
             }
+            gd::String actionsDeclarationsCode = codeGenerator.GenerateObjectsDeclarationCode(actionsContext);
 
-            if ( !ifPredicat.empty() ) outputCode += "}\n";
+            gd::String outputCode;
+            outputCode += conditionsCode;
+            if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ") ";
+            outputCode += "{\n";
+            outputCode += actionsDeclarationsCode;
+            outputCode += actionsCode;
+            outputCode += "}\n";
 
             return outputCode;
         });

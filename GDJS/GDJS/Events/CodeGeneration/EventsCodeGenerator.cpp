@@ -100,9 +100,9 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
     }
 
     output +=
-    codeGenerator.GetCustomCodeOutsideMain()+"\n\n"
-    + globalObjectLists+"\n"
-    + globalConditionsBooleans+"\n"
+    globalObjectLists+"\n"
+    + globalConditionsBooleans+"\n\n"
+    + codeGenerator.GetCustomCodeOutsideMain()+"\n\n"
     + codeGenerator.GetCodeNamespace() + "func = function(runtimeScene, context) {\n"
     + "context.startNewFrame();\n"
     + globalObjectListsReset+"\n"
@@ -501,6 +501,25 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
                                                         const gd::String & previousParameter,
                                                         std::vector < std::pair<gd::String, gd::String> > * supplementaryParametersTypes)
 {
+    //*Optimization:* when a function need objects, it receive a map of (references to) objects lists.
+    //We statically declare and construct them to avoid re-creating them at runtime.
+    //Arrays are passed as reference in JS and we always use the same static arrays, making this possible.
+    auto declareMapOfObjects = [this](const std::vector<gd::String> & objects, const gd::EventsCodeGenerationContext & context) {
+        gd::String objectsMapName = GetCodeNamespace() + "mapOf";
+        gd::String mapDeclaration;
+        for(auto & objectName : objects)
+        {
+            //The map name must be unique for each set of objects lists.
+            objectsMapName += ManObjListName(GetObjectListName(objectName, context));
+
+            if (!mapDeclaration.empty()) mapDeclaration += ", ";
+            mapDeclaration += "\"" + ConvertToString(objectName) + "\": " + GetObjectListName(objectName, context);
+        }
+
+        AddCustomCodeOutsideMain(objectsMapName + " = Hashtable.newFrom({" + mapDeclaration + "});");
+        return objectsMapName;
+    };
+
     gd::String argOutput;
 
     //Code only parameter type
@@ -512,27 +531,19 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
     else if ( metadata.type == "objectList" )
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
+        for(auto & objectName : realObjects) context.ObjectsListNeeded(objectName);
 
-        argOutput += "context.clearEventsObjectsMap()";
-        for (std::size_t i = 0;i<realObjects.size();++i)
-        {
-            context.ObjectsListNeeded(realObjects[i]);
-            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+GetObjectListName(realObjects[i], context)+")";
-        }
-        argOutput += ".getEventsObjectsMap()";
+        gd::String objectsMapName = declareMapOfObjects(realObjects, context);
+        argOutput = objectsMapName;
     }
     //Code only parameter type
     else if ( metadata.type == "objectListWithoutPicking" )
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
+        for(auto & objectName : realObjects) context.EmptyObjectsListNeeded(objectName);
 
-        argOutput += "context.clearEventsObjectsMap()";
-        for (std::size_t i = 0;i<realObjects.size();++i)
-        {
-            context.EmptyObjectsListNeeded(realObjects[i]);
-            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+GetObjectListName(realObjects[i], context)+")";
-        }
-        argOutput += ".getEventsObjectsMap()";
+        gd::String objectsMapName = declareMapOfObjects(realObjects, context);
+        argOutput = objectsMapName;
     }
     //Code only parameter type
     else if ( metadata.type == "objectPtr")

@@ -44,23 +44,26 @@ public :
 
     SpriteObject(gd::String name_);
     virtual ~SpriteObject();
-    virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<SpriteObject>(*this); }
+    std::unique_ptr<gd::Object> Clone() const override { return gd::make_unique<SpriteObject>(*this); }
 
     #if defined(GD_IDE_ONLY)
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
-    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
+    bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const override;
+    void ExposeResources(gd::ArbitraryResourceWorker & worker) override;
 
-    virtual std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
-    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & scene);
-    virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
+    std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const override;
+    bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project) override;
+
+    std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene) override;
+    bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & scene) override;
+    void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ ) override;
     #if !defined(EMSCRIPTEN)
-    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
-    virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
-    virtual sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
-    virtual void LoadResources(gd::Project & project, gd::Layout & layout);
+    void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout) override;
+    sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const override;
+    sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const override;
+    void LoadResources(gd::Project & project, gd::Layout & layout) override;
     #endif
 
-    virtual bool SupportShaders() { return true; }
+    bool SupportShaders() override { return true; };
     #endif
 
     /** \name Animations
@@ -117,13 +120,14 @@ public :
 
 private:
 
-    virtual void DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element);
+    void DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element) override;
     #if defined(GD_IDE_ONLY)
-    virtual void DoSerializeTo(gd::SerializerElement & element) const;
+    void DoSerializeTo(gd::SerializerElement & element) const override;
     #endif
 
     const Sprite * GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout, bool * shouldNotRotate = NULL) const;
     mutable std::vector < Animation > animations;
+    bool updateIfNotVisible; ///< If set to true, ask the game engine to play object animation even if hidden or far from the screen.
 
     static Animation badAnimation; //< Bad animation when an out of bound animation is requested.
 };

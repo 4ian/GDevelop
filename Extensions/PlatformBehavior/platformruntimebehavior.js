@@ -15,8 +15,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 gdjs.PlatformObjectsManager = function(runtimeScene, sharedData)
 {
-    this._platformsHSHG = new gdjs.HSHG.HSHG();
-    //this._hshgNeedUpdate = true; Useless: The behaviors track by themselves changes in objects size or position.
+    this._platformRBush = new rbush(9, ['.owner.getAABB().min[0]', '.owner.getAABB().min[1]', '.owner.getAABB().max[0]', '.owner.getAABB().max[1]']);
 };
 
 /**
@@ -39,7 +38,7 @@ gdjs.PlatformObjectsManager.getManager = function(runtimeScene) {
  * @method addPlatform
  */
 gdjs.PlatformObjectsManager.prototype.addPlatform = function(platformBehavior) {
-    this._platformsHSHG.addObject(platformBehavior);
+    this._platformRBush.insert(platformBehavior);
 };
 
 /**
@@ -49,41 +48,7 @@ gdjs.PlatformObjectsManager.prototype.addPlatform = function(platformBehavior) {
  * @method removePlatform
  */
 gdjs.PlatformObjectsManager.prototype.removePlatform = function(platformBehavior) {
-    this._platformsHSHG.removeObject(platformBehavior);
-};
-
-/**
- * Tool class which represents a simple point with a radius and a getAABB method.
- * @class Vertex
- * @namespace gdjs.PlatformObjectsManager
- * @private
- * @constructor
- */
-gdjs.PlatformObjectsManager.Vertex = function(x,y,radius) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this._aabbComputed = false;
-
-    if (!this._aabb) {
-        this._aabb = {min: [0, 0], max: [0, 0]};
-    }
-};
-
-/**
- * Return an axis aligned bouding box for the vertex.
- * @method getAABB
- */
-gdjs.PlatformObjectsManager.Vertex.prototype.getAABB = function(){
-    if (!this._aabbComputed) {
-        this._aabb.min[0] = this.x - this.radius;
-        this._aabb.min[1] = this.y - this.radius;
-        this._aabb.max[0] = this.x + this.radius;
-        this._aabb.max[1] = this.y + this.radius;
-        this._aabbComputed = true;
-    }
-
-    return this._aabb;
+    this._platformRBush.remove(platformBehavior);
 };
 
 /**
@@ -98,16 +63,15 @@ gdjs.PlatformObjectsManager.prototype.getAllPlatformsAround = function(object, m
     var oh = object.getHeight();
     var x = object.getDrawableX()+object.getCenterX();
     var y = object.getDrawableY()+object.getCenterY();
-    var objBoundingRadius = Math.sqrt(ow*ow+oh*oh)/2.0 + maxMovementLength;
 
-    if (!this._aroundVertex)
-        this._aroundVertex = new gdjs.PlatformObjectsManager.Vertex(x, y, objBoundingRadius);
-    else
-        gdjs.PlatformObjectsManager.Vertex.call(this._aroundVertex, x, y, objBoundingRadius);
-
-    this._platformsHSHG.addObject(this._aroundVertex);
-    this._platformsHSHG.queryForCollisionWith(this._aroundVertex, result);
-    this._platformsHSHG.removeObject(this._aroundVertex);
+    var searchArea = gdjs.staticObject(gdjs.PlatformObjectsManager.prototype.getAllPlatformsAround);
+    searchArea.minX = x - ow / 2 - maxMovementLength;
+    searchArea.minY = y - oh / 2 - maxMovementLength;
+    searchArea.maxX = x + ow / 2 + maxMovementLength;
+    searchArea.maxY = y + oh / 2 + maxMovementLength;
+    var nearbyPlatforms = this._platformRBush.search(searchArea);
+    result.length = 0;
+    result.push.apply(result, nearbyPlatforms);
 };
 
 /**
@@ -167,12 +131,6 @@ gdjs.PlatformRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) 
         registeredInManager = false;
     }*/
 
-    //No need for update as we take care of this below.
-    /*if ( this._hshgNeedUpdate ) {
-        this._manager._platformsHSHG.update();
-        this._manager._hshgNeedUpdate = false;
-    }*/
-
     //Make sure the platform is or is not in the platforms manager.
     if (!this.activated() && this._registeredInManager)
     {
@@ -202,7 +160,6 @@ gdjs.PlatformRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) 
 };
 
 gdjs.PlatformRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
-    //this._manager._hshgNeedUpdate = true; //Useless, see above.
 };
 
 gdjs.PlatformRuntimeBehavior.prototype.getAABB = function(){

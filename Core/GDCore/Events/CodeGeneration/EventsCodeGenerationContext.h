@@ -32,7 +32,13 @@ public:
      * Default constructor. You may want to call InheritsFrom just after.
      * \param maxDepthLevel Optional pointer to an unsigned integer that will be updated to contain the maximal scope depth reached.
      */
-    EventsCodeGenerationContext(unsigned int * maxDepthLevel_ = nullptr) : contextDepth(0), customConditionDepth(0), maxDepthLevel(maxDepthLevel_), parent(NULL) {};
+    EventsCodeGenerationContext(unsigned int * maxDepthLevel_ = nullptr) :
+        contextDepth(0),
+        customConditionDepth(0),
+        maxDepthLevel(maxDepthLevel_),
+        parent(NULL),
+        reuseExplicitlyForbidden(false)
+    {};
     virtual ~EventsCodeGenerationContext() {};
 
     /**
@@ -40,6 +46,28 @@ public:
      * The child will then for example not declare again objects already declared by its parent.
      */
     void InheritsFrom(const EventsCodeGenerationContext & parent);
+
+    /**
+     * \brief As InheritsFrom, mark the context as being the child of another one, but enabling
+     * the child context to use the same object lists.
+     *
+     * Used for example for optimizing the last event of a list.
+     */
+    void Reuse(const EventsCodeGenerationContext & parent);
+
+    /**
+     * \brief Forbid any optimization that would reuse and modify the object list from this context
+     * in children context.
+     *
+     * Used in while/for each/repeat or any event that have a loop and must ensure that
+     * the list of objects stay clean.
+     */
+    void ForbidReuse() { reuseExplicitlyForbidden = true; }
+
+    /**
+     * \brief Return false if the object lists of the context can not be reused in a child context.
+     */
+    bool CanReuse() const { return !reuseExplicitlyForbidden && parent != nullptr; }
 
     /**
      * \brief Returns the depth of the inheritance of the context.
@@ -92,7 +120,7 @@ public:
     /**
      * \brief Consider that \a objectName is now declared in the context.
      */
-    void SetObjectDeclared(const gd::String & objectName ) { alreadyDeclaredObjectsLists.insert(objectName); }
+    void SetObjectDeclared(const gd::String & objectName) { alreadyDeclaredObjectsLists.insert(objectName); }
 
     /**
      * Return all the objects lists which will be declared by the current context
@@ -123,6 +151,13 @@ public:
     unsigned int GetLastDepthObjectListWasNeeded(const gd::String & objectName) const;
 
     /**
+     * \brief Check if twos context have the same list for an object.
+     *
+     * This can be the case when a context is reusing the lists of another (see gd::EventsCodeGenerationContext::Reuse).
+     */
+    bool IsSameObjectsList(const gd::String & objectName, const EventsCodeGenerationContext & otherContext) const;
+
+    /**
      * \brief Called when a custom condition code is generated.
      */
     void EnterCustomCondition() { customConditionDepth++; };
@@ -150,6 +185,7 @@ private:
     unsigned int customConditionDepth; ///< The depth of the conditions being generated.
     unsigned int * maxDepthLevel; ///< A pointer to a unsigned int updated with the maximum depth reached.
     const EventsCodeGenerationContext * parent; ///< The parent of the current context. Can be NULL.
+    bool reuseExplicitlyForbidden; ///< If set to true, forbid children context to reuse this one without inheriting.
 };
 
 }

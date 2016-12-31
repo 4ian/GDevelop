@@ -42,6 +42,19 @@ public:
         const gd::Layout & scene, const gd::EventsList & events,
         std::set < gd::String > & includeFiles, bool compilationForRuntime = false);
 
+
+    /**
+     * \brief Generate code for executing an event list
+     * \note To reduce the stress on JS engines, the code is generated inside
+     * a separate JS function (see gd::EventsCodeGenerator::AddCustomCodeOutsideMain).
+     * This method will return the code to call this separate function.
+     *
+     * \param events std::vector of events
+     * \param context Context used for generation
+     * \return Code
+     */
+    virtual gd::String GenerateEventsListCode(gd::EventsList & events, const gd::EventsCodeGenerationContext & context);
+
     /**
      * Generate code for executing a condition list
      *

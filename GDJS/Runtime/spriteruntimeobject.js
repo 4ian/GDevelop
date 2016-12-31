@@ -163,6 +163,7 @@ gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
     this._flippedX = false;
     this._flippedY = false;
     this.opacity = 255;
+    this._updateIfNotVisible = !!objectData.updateIfNotVisible;
 
     //Animations:
     if ( this._animations === undefined ) this._animations = [];
@@ -215,31 +216,41 @@ gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = func
  * @method update
  */
 gdjs.SpriteRuntimeObject.prototype.update = function(runtimeScene) {
-    var elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
-    var oldFrame = this._currentFrame;
-    this._frameElapsedTime += this._animationPaused ? 0 : elapsedTime * this._animationSpeedScale;
+    //Playing the animation of all objects including the ones outside the screen can be
+    //costly when the scene is big with a lot of animated objects. By default, we skip
+    //updating the object if it is not visible.
+    if (!this._updateIfNotVisible && !this._renderer.getRendererObject().visible)
+        return;
 
     if ( this._currentAnimation >= this._animations.length ||
          this._currentDirection >= this._animations[this._currentAnimation].directions.length) {
         return;
     }
-
     var direction = this._animations[this._currentAnimation].directions[this._currentDirection];
+    var oldFrame = this._currentFrame;
 
-    if ( this._frameElapsedTime > direction.timeBetweenFrames ) {
-        var count = Math.floor(this._frameElapsedTime / direction.timeBetweenFrames);
-        this._currentFrame += count;
-        this._frameElapsedTime = this._frameElapsedTime-count*direction.timeBetweenFrames;
-        if ( this._frameElapsedTime < 0 ) this._frameElapsedTime = 0;
+    if (!direction.loop && this._currentFrame >= direction.frames.length) {
+        //*Optimization*: Animation is finished, don't change the current frame
+        //and compute nothing more.
+    } else {
+        var elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
+        this._frameElapsedTime += this._animationPaused ? 0 : elapsedTime * this._animationSpeedScale;
+
+        if ( this._frameElapsedTime > direction.timeBetweenFrames ) {
+            var count = Math.floor(this._frameElapsedTime / direction.timeBetweenFrames);
+            this._currentFrame += count;
+            this._frameElapsedTime = this._frameElapsedTime-count*direction.timeBetweenFrames;
+            if ( this._frameElapsedTime < 0 ) this._frameElapsedTime = 0;
+        }
+
+        if ( this._currentFrame >= direction.frames.length ) {
+            this._currentFrame = direction.loop ? this._currentFrame % direction.frames.length : direction.frames.length-1;
+        }
+        if ( this._currentFrame < 0 ) this._currentFrame = 0; //May happen if there is no frame.
     }
 
-    if ( this._currentFrame >= direction.frames.length ) {
-        this._currentFrame = direction.loop ? this._currentFrame % direction.frames.length : direction.frames.length-1;
-    }
-    if ( this._currentFrame < 0 ) this._currentFrame = 0; //May happen if there is no frame.
-
-    if ( oldFrame != this._currentFrame || this._frameDirty ) this._updateFrame();
-    if ( oldFrame != this._currentFrame ) this.hitBoxesDirty = true;
+    if ( oldFrame !== this._currentFrame || this._frameDirty ) this._updateFrame();
+    if ( oldFrame !== this._currentFrame ) this.hitBoxesDirty = true;
 
     this._renderer.ensureUpToDate();
 };
@@ -367,8 +378,7 @@ gdjs.SpriteRuntimeObject.prototype.setDirectionOrAngle = function(newValue) {
 
         if (newValue === this._currentDirection
             || newValue >= anim.directions.length
-            || anim.directions[newValue].frames.length === 0
-            || this._currentDirection === newValue )
+            || anim.directions[newValue].frames.length === 0)
             return;
 
         this._currentDirection = newValue;
@@ -405,7 +415,7 @@ gdjs.SpriteRuntimeObject.prototype.setAnimationFrame = function(newFrame) {
     }
     var direction = this._animations[this._currentAnimation].directions[this._currentDirection];
 
-    if ( newFrame >= 0 && newFrame < direction.frames.length && newFrame != this._currentFrame ) {
+    if ( newFrame >= 0 && newFrame < direction.frames.length && newFrame !== this._currentFrame ) {
         this._currentFrame = newFrame;
         this._frameDirty = true;
         this.hitBoxesDirty = true;
@@ -600,6 +610,8 @@ gdjs.SpriteRuntimeObject.prototype.getAngle = function(angle) {
 //Visibility and display :
 
 gdjs.SpriteRuntimeObject.prototype.setBlendMode = function(newMode) {
+    if (this._blendMode === newMode) return;
+
     this._blendMode = newMode;
     this._renderer.update();
 };
@@ -685,8 +697,8 @@ gdjs.SpriteRuntimeObject.prototype.setHeight = function(newHeight) {
 };
 
 gdjs.SpriteRuntimeObject.prototype.setScale = function(newScale) {
-    if ( newScale === Math.abs(this._scaleX) && newScale === Math.abs(this._scaleY) ) return;
     if ( newScale < 0 ) newScale = 0;
+    if ( newScale === Math.abs(this._scaleX) && newScale === Math.abs(this._scaleY) ) return;
 
     this._scaleX = newScale * (this._flippedX ? -1 : 1);
     this._scaleY = newScale * (this._flippedY ? -1 : 1);
@@ -695,8 +707,8 @@ gdjs.SpriteRuntimeObject.prototype.setScale = function(newScale) {
 };
 
 gdjs.SpriteRuntimeObject.prototype.setScaleX = function(newScale) {
-    if ( newScale === Math.abs(this._scaleX) ) return;
     if ( newScale < 0 ) newScale = 0;
+    if ( newScale === Math.abs(this._scaleX) ) return;
 
     this._scaleX = newScale * (this._flippedX ? -1 : 1);
     this._renderer.update();
@@ -704,8 +716,8 @@ gdjs.SpriteRuntimeObject.prototype.setScaleX = function(newScale) {
 };
 
 gdjs.SpriteRuntimeObject.prototype.setScaleY = function(newScale) {
-    if ( newScale === Math.abs(this._scaleY) ) return;
     if ( newScale < 0 ) newScale = 0;
+    if ( newScale === Math.abs(this._scaleY) ) return;
 
     this._scaleY = newScale * (this._flippedY ? -1 : 1);
     this._renderer.update();

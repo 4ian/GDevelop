@@ -97,7 +97,9 @@ gdjs.evtTools.common.toNumber = function(str) {
  * @static
  */
 gdjs.evtTools.common.toString = function(num) {
-    return num.toString();
+    //Using String literal is fastest than using toString according to
+    //http://jsperf.com/number-to-string/2 and http://jsben.ch/#/ghQYR
+    return "" + num;
 };
 
 /**

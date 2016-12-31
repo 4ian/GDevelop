@@ -10,6 +10,7 @@ module.exports = function(config) {
       '../Runtime/libs/jshashtable.js',
       '../Runtime/gd.js',
       '../Runtime/libs/hshg.js',
+      '../Runtime/libs/rbush.js',
       '../Runtime/cocos-renderers/cocos-director-manager.js',
       '../Runtime/pixi-renderers/pixi.js',
       '../Runtime/pixi-renderers/*.js',

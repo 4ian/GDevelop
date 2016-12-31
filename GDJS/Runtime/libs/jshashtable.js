@@ -4,6 +4,12 @@ function Hashtable()
     this.items = {};
 }
 
+Hashtable.newFrom = function(items) {
+    var hashtable = new Hashtable();
+    hashtable.items = items;
+    return hashtable;
+}
+
 Hashtable.prototype.put = function(key, value) {
     this.items[key] = value;
 }

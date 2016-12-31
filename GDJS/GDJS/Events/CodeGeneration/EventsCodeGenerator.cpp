@@ -100,16 +100,16 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & pr
     }
 
     output +=
-    codeGenerator.GetCustomCodeOutsideMain()+"\n\n"
-    +globalObjectLists+"\n"
-    +globalConditionsBooleans+"\n"
-    +"gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code.func = function(runtimeScene, context) {\n"
-    +"context.startNewFrame();\n"
-    +globalObjectListsReset+"\n"
-	+codeGenerator.GetCustomCodeInMain()
-    +wholeEventsCode
-    +"return;\n"
-    +"}\n";
+    globalObjectLists+"\n"
+    + globalConditionsBooleans+"\n\n"
+    + codeGenerator.GetCustomCodeOutsideMain()+"\n\n"
+    + codeGenerator.GetCodeNamespace() + "func = function(runtimeScene, context) {\n"
+    + "context.startNewFrame();\n"
+    + globalObjectListsReset+"\n"
+	+ codeGenerator.GetCustomCodeInMain()
+    + wholeEventsCode
+    + "return;\n"
+    + "}\n";
 
     //Export the symbols to avoid them being stripped by the Closure Compiler:
     output += "gdjs['"+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code']"
@@ -391,41 +391,77 @@ gd::String EventsCodeGenerator::GetObjectListName(const gd::String & name, const
 
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context)
 {
+    auto declareObjectList = [this](gd::String object, gd::EventsCodeGenerationContext & context) {
+        gd::String objectListName = GetObjectListName(object, context);
+        if (!context.GetParentContext())
+        {
+            std::cout << "ERROR: During code generation, a context tried to use an already declared object list without having a parent" << std::endl;
+            return "/* Could not declare " + objectListName + " */";
+        }
+
+        //*Optimization*: Avoid expensive copy of the object list if we're using
+        //the same list as the one from the parent context.
+        if (context.IsSameObjectsList(object, *context.GetParentContext()))
+            return "/* Reuse " + objectListName + " */";
+
+        gd::String copiedListName = GetObjectListName(object, *context.GetParentContext());
+        return objectListName + ".createFrom("+copiedListName+");\n";
+    };
+
     gd::String declarationsCode;
-    for ( set<gd::String>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
+    for (auto object : context.GetObjectsListsToBeDeclared())
     {
-        declarationsCode += GetObjectListName(*it, context);
-        if ( !context.ObjectAlreadyDeclared(*it) )
+        gd::String objectListDeclaration = "";
+        if ( !context.ObjectAlreadyDeclared(object) )
         {
-            declarationsCode += ".createFrom(runtimeScene.getObjects(\""+ConvertToString(*it)+"\"));\n";
-            context.SetObjectDeclared(*it);
+            objectListDeclaration += GetObjectListName(object, context) + ".createFrom(runtimeScene.getObjects(\"" + ConvertToString(object) + "\"));";
+            context.SetObjectDeclared(object);
         }
         else
-        {
-            if (context.GetParentContext())
-                declarationsCode += ".createFrom("+GetObjectListName(*it, *context.GetParentContext())+");\n";
-            else
-                std::cout << "ERROR: During code generation, a context tried tried to use an already declared object list without having a parent" << std::endl;
-        }
+            objectListDeclaration = declareObjectList(object, context);
+
+        declarationsCode += objectListDeclaration + "\n";
     }
-    for ( set<gd::String>::iterator it = context.GetObjectsListsToBeDeclaredEmpty().begin() ; it != context.GetObjectsListsToBeDeclaredEmpty().end(); ++it )
+    for (auto object : context.GetObjectsListsToBeDeclaredEmpty())
     {
-        declarationsCode += GetObjectListName(*it, context);
-        if ( !context.ObjectAlreadyDeclared(*it) )
+        gd::String objectListDeclaration = "";
+        if ( !context.ObjectAlreadyDeclared(object) )
         {
-            declarationsCode +=".length = 0;\n";
-            context.SetObjectDeclared(*it);
+            objectListDeclaration = GetObjectListName(object, context) + ".length = 0;\n";
+            context.SetObjectDeclared(object);
         }
         else
-        {
-            if (context.GetParentContext())
-                declarationsCode += ".createFrom("+GetObjectListName(*it, *context.GetParentContext())+");\n";
-            else
-                std::cout << "ERROR: During code generation, a context tried tried to use an already declared object list without having a parent" << std::endl;
-        }
+            objectListDeclaration = declareObjectList(object, context);
+
+        declarationsCode += objectListDeclaration + "\n";
     }
 
-    return declarationsCode ;
+    return declarationsCode;
+}
+
+gd::String EventsCodeGenerator::GenerateEventsListCode(gd::EventsList & events, const gd::EventsCodeGenerationContext & context)
+{
+    // *Optimization*: generating all JS code of events in a single, enormous function is
+    // badly handled by JS engines and in particular the garbage collectors,
+    // leading to intermittent lag/freeze while the garbage collector is running.
+    // This is especially noticeable on Android devices. To reduce the stress on the JS
+    // engines, we generate a new function for each list of events.
+
+    gd::String code = gd::EventsCodeGenerator::GenerateEventsListCode(events, context);
+
+    // Generate a unique name for the function.
+    gd::String functionName = GetCodeNamespace() + "eventsList" + gd::String::From(&events);
+    AddCustomCodeOutsideMain(
+        // The only local parameters are runtimeScene and context.
+        // List of objects, conditions booleans and any variables used by events are stored
+        // in static variables that are globally available by the whole code.
+        functionName + " = function(runtimeScene, context) {\n" +
+        code + "\n" +
+        "}; //End of " + functionName+"\n");
+
+    // Replace the code of the events by the call to the function. This does not
+    // interfere with the objects picking as the lists are in static variables globally available.
+    return functionName+"(runtimeScene, context);";
 }
 
 gd::String EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, gd::EventsCodeGenerationContext & context)
@@ -465,6 +501,25 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
                                                         const gd::String & previousParameter,
                                                         std::vector < std::pair<gd::String, gd::String> > * supplementaryParametersTypes)
 {
+    //*Optimization:* when a function need objects, it receive a map of (references to) objects lists.
+    //We statically declare and construct them to avoid re-creating them at runtime.
+    //Arrays are passed as reference in JS and we always use the same static arrays, making this possible.
+    auto declareMapOfObjects = [this](const std::vector<gd::String> & objects, const gd::EventsCodeGenerationContext & context) {
+        gd::String objectsMapName = GetCodeNamespace() + "mapOf";
+        gd::String mapDeclaration;
+        for(auto & objectName : objects)
+        {
+            //The map name must be unique for each set of objects lists.
+            objectsMapName += ManObjListName(GetObjectListName(objectName, context));
+
+            if (!mapDeclaration.empty()) mapDeclaration += ", ";
+            mapDeclaration += "\"" + ConvertToString(objectName) + "\": " + GetObjectListName(objectName, context);
+        }
+
+        AddCustomCodeOutsideMain(objectsMapName + " = Hashtable.newFrom({" + mapDeclaration + "});");
+        return objectsMapName;
+    };
+
     gd::String argOutput;
 
     //Code only parameter type
@@ -476,27 +531,19 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
     else if ( metadata.type == "objectList" )
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
+        for(auto & objectName : realObjects) context.ObjectsListNeeded(objectName);
 
-        argOutput += "context.clearEventsObjectsMap()";
-        for (std::size_t i = 0;i<realObjects.size();++i)
-        {
-            context.ObjectsListNeeded(realObjects[i]);
-            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+GetObjectListName(realObjects[i], context)+")";
-        }
-        argOutput += ".getEventsObjectsMap()";
+        gd::String objectsMapName = declareMapOfObjects(realObjects, context);
+        argOutput = objectsMapName;
     }
     //Code only parameter type
     else if ( metadata.type == "objectListWithoutPicking" )
     {
         std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
+        for(auto & objectName : realObjects) context.EmptyObjectsListNeeded(objectName);
 
-        argOutput += "context.clearEventsObjectsMap()";
-        for (std::size_t i = 0;i<realObjects.size();++i)
-        {
-            context.EmptyObjectsListNeeded(realObjects[i]);
-            argOutput += ".addObjectsToEventsMap(\""+ConvertToString(realObjects[i])+"\", "+GetObjectListName(realObjects[i], context)+")";
-        }
-        argOutput += ".getEventsObjectsMap()";
+        gd::String objectsMapName = declareMapOfObjects(realObjects, context);
+        argOutput = objectsMapName;
     }
     //Code only parameter type
     else if ( metadata.type == "objectPtr")

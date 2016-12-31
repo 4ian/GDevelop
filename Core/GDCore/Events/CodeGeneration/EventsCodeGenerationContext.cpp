@@ -33,6 +33,13 @@ void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext
     }
 }
 
+void EventsCodeGenerationContext::Reuse(const EventsCodeGenerationContext & parent_)
+{
+    InheritsFrom(parent_);
+    if (parent_.CanReuse())
+        contextDepth = parent_.GetContextDepth(); // Keep same context depth
+}
+
 void EventsCodeGenerationContext::ObjectsListNeeded(const gd::String & objectName)
 {
     if ( emptyObjectsListsToBeDeclared.find(objectName) == emptyObjectsListsToBeDeclared.end() )
@@ -63,6 +70,11 @@ unsigned int EventsCodeGenerationContext::GetLastDepthObjectListWasNeeded(const 
 
     std::cout << "WARNING: During code generation, the last depth of an object list was 0." << std::endl;
     return 0;
+}
+
+bool EventsCodeGenerationContext::IsSameObjectsList(const gd::String & objectName, const EventsCodeGenerationContext & otherContext) const
+{
+    return GetLastDepthObjectListWasNeeded(objectName) == otherContext.GetLastDepthObjectListWasNeeded(objectName);
 }
 
 }

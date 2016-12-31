@@ -52,23 +52,29 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     GetAllEvents()["BuiltinCommonInstructions::Standard"]
         .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
-            gd::String outputCode;
             gd::StandardEvent & event = dynamic_cast<gd::StandardEvent&>(event_);
 
-            outputCode += codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
-
+            gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
             gd::String ifPredicat = event.GetConditions().empty() ? "" : codeGenerator.GenerateBooleanFullName("condition"+gd::String::From(event.GetConditions().size()-1)+"IsTrue", context)+".val";
 
-            if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ") {\n";
-            outputCode += codeGenerator.GenerateActionsListCode(event.GetActions(), context);
+            gd::EventsCodeGenerationContext actionsContext;
+            actionsContext.Reuse(context);
+            gd::String actionsCode = codeGenerator.GenerateActionsListCode(event.GetActions(), actionsContext);
             if ( event.HasSubEvents() ) //Sub events
             {
-                outputCode += "\n{ //Subevents\n";
-                outputCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
-                outputCode += "} //End of subevents\n";
+                actionsCode += "\n{ //Subevents\n";
+                actionsCode += codeGenerator.GenerateEventsListCode(event.GetSubEvents(), actionsContext);
+                actionsCode += "} //End of subevents\n";
             }
+            gd::String actionsDeclarationsCode = codeGenerator.GenerateObjectsDeclarationCode(actionsContext);
 
-            if ( !ifPredicat.empty() ) outputCode += "}\n";
+            gd::String outputCode;
+            outputCode += conditionsCode;
+            if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ") ";
+            outputCode += "{\n";
+            outputCode += actionsDeclarationsCode;
+            outputCode += actionsCode;
+            outputCode += "}\n";
 
             return outputCode;
         });
@@ -97,6 +103,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 //For example, two sub conditions using an object called "MyObject" will both have to declare a "MyObject" object list.
                 gd::EventsCodeGenerationContext context;
                 context.InheritsFrom(parentContext);
+                context.ForbidReuse(); //TODO: This may not be necessary
 
                 gd::String conditionCode = codeGenerator.GenerateConditionCode(conditions[cId], "condition"+gd::String::From(cId)+"IsTrue", context);
 
@@ -231,6 +238,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
             gd::EventsCodeGenerationContext context;
             context.InheritsFrom(parentContext);
+            context.ForbidReuse();
 
             //Prepare codes
             gd::String whileConditionsStr = codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(), context);
@@ -285,6 +293,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
             gd::EventsCodeGenerationContext context;
             context.InheritsFrom(parentContext);
+            context.ForbidReuse();
 
             //Prepare conditions/actions codes
             gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(event.GetConditions(), context);
@@ -339,6 +348,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
             gd::EventsCodeGenerationContext context;
             context.InheritsFrom(parentContext);
+            context.ForbidReuse();
 
             for (unsigned int i = 0;i<realObjects.size();++i)
                 context.ObjectsListNeeded(realObjects[i]);

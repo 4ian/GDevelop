@@ -123,4 +123,42 @@ TEST_CASE( "EventsCodeGenerationContext", "[common][events]" ) {
         c3.SetNoCurrentObject();
         REQUIRE( c3.GetCurrentObject() == "" );
     }
+
+    SECTION("Reuse") {
+        /**
+         * Generate a tree of contexts with declared objects as below:
+         *                  ...
+         *                   \
+         *                   c5 -> c5.object1, c5.empty1 (empty list request), c1.object2
+         *                  /
+         *                c6  (reuse c5) -> c5.object1, c6.object3
+         *               /
+         *              c7 -> c5.object1
+         */
+        gd::EventsCodeGenerationContext c6;
+        c6.Reuse(c5);
+        c6.ObjectsListNeeded("c5.object1");
+        c6.ObjectsListNeeded("c6.object3");
+
+        gd::EventsCodeGenerationContext c7;
+        c7.InheritsFrom(c6);
+        c7.ObjectsListNeeded("c5.object1");
+        c7.ObjectsListNeeded("c6.object3");
+
+        //c6 is reusing c5 context so it has the same depth:
+        REQUIRE( c6.GetParentContext() == &c5 );
+        REQUIRE( c6.GetContextDepth() == c5.GetContextDepth() );
+        REQUIRE( c6.GetLastDepthObjectListWasNeeded("c6.object3") == 2 );
+
+        //c6 reuse the objects lists from c5:
+        REQUIRE( c6.IsSameObjectsList("c5.object1", c5) == true );
+        REQUIRE( c6.IsSameObjectsList("c5.empty1", c5) == true );
+        REQUIRE( c6.GetLastDepthObjectListWasNeeded("c5.object1") == c5.GetLastDepthObjectListWasNeeded("c5.object1") );
+        REQUIRE( c6.GetLastDepthObjectListWasNeeded("c5.empty1") == c5.GetLastDepthObjectListWasNeeded("c5.empty1") );
+
+        REQUIRE( c7.GetParentContext() == &c6 );
+        REQUIRE( c7.GetContextDepth() == 3 );
+        REQUIRE( c7.IsSameObjectsList("c5.object1", c6) == false );
+        REQUIRE( c7.IsSameObjectsList("c6.object3", c6) == false );
+    }
 }

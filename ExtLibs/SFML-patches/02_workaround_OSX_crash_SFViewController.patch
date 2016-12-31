@@ -1,16 +1,15 @@
-diff --git a/ExtLibs/SFML/src/SFML/Window/OSX/SFViewController.mm b/ExtLibs/SFML/src/SFML/Window/OSX/SFViewController.mm
+diff --git a/src/SFML/Window/OSX/SFViewController.mm b/src/SFML/Window/OSX/SFViewController.mm
 index 7d736e3..113cacd 100644
---- a/ExtLibs/SFML/src/SFML/Window/OSX/SFViewController.mm
-+++ b/ExtLibs/SFML/src/SFML/Window/OSX/SFViewController.mm
+--- a/src/SFML/Window/OSX/SFViewController.mm
++++ b/src/SFML/Window/OSX/SFViewController.mm
 @@ -82,8 +82,11 @@ -(id)initWithView:(NSView *)view
  ////////////////////////////////////////////////////////
  -(void)dealloc
  {
 +    NSLog(@"SFViewController::dealloc called on %@", self);
      [self closeWindow];
- 
+
 +    // See https://github.com/SFML/SFML/issues/824
 +    [[NSNotificationCenter defaultCenter] removeObserver:m_oglView];
      [m_view release];
      [m_oglView release];
- 

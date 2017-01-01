@@ -122,6 +122,32 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
         .AddParameter("string", _("Text to search for"))
         .AddParameter("expression", _("Position of the last character in the string to be considered in the search"));
 
+    extension.AddStrExpression("Format",
+                   _("Format a string"),
+                   _("Format a string"),
+                   _("Manipulation on text"),
+                   "res/conditions/toujours24.png")
+            .AddParameter("string", _("Text"))
+            .AddParameter("variadic", _("Arguments"), "string");
+
+    extension.AddStrExpression("_",
+                   _("Translate a string"),
+                   _("Translate a string"),
+                   _("Translation"),
+                   "res/conditions/toujours24.png")
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("string", _("Text"));
+
+    extension.AddAction("LoadTranslation",
+               _("Load a translation file"),
+               _("Load a translation file."),
+               _("Load the translation file: _PARAM1_"),
+               _("Translations"),
+               "res/actions/son24.png",
+               "res/actions/son.png")
+            .AddCodeOnlyParameter("currentScene", "")
+            .AddParameter("rawfile", _("Path to the translation file"), _("Binary translation file (*.mo)|*.mo"));
+
 
     #endif
 }

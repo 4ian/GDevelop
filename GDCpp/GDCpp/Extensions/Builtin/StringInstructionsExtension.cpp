@@ -31,41 +31,10 @@ StringInstructionsExtension::StringInstructionsExtension()
     GetAllExpressions()["StrRFind"].SetFunctionName("GDpriv::StringTools::StrRFind").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
     GetAllExpressions()["StrFindFrom"].SetFunctionName("GDpriv::StringTools::StrFindFrom").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
     GetAllExpressions()["StrRFindFrom"].SetFunctionName("GDpriv::StringTools::StrRFindFrom").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
-
-    AddStrExpression("Format",
-                   _("Format a string"),
-                   _("Format a string"),
-                   _("Manipulation on text"),
-                   "res/conditions/toujours24.png")
-            .AddParameter("string", _("Text"))
-            .AddParameter("variadic", _("Arguments"), "string")
-
-            .SetFunctionName("GDpriv::StringTools::Format")
-            .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
-
-    AddStrExpression("_",
-                   _("Translate a string"),
-                   _("Translate a string"),
-                   _("Translation"),
-                   "res/conditions/toujours24.png")
-            .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("string", _("Text"))
-
-            .SetFunctionName("GDpriv::StringTools::Translate")
-            .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
-
-    AddAction("LoadTranslation",
-               _("Load a translation file"),
-               _("Load a translation file."),
-               _("Load the translation file: _PARAM1_"),
-               _("Translations"),
-               "res/actions/son24.png",
-               "res/actions/son.png")
-            .AddCodeOnlyParameter("currentScene", "")
-            .AddParameter("rawfile", _("Path to the translation file"), _("Binary translation file (*.mo)|*.mo"))
-
-            .SetFunctionName("GDpriv::StringTools::LoadTranslation")
-            .SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
+    
+    GetAllStrExpressions()["Format"].SetFunctionName("GDpriv::StringTools::Format").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
+    GetAllStrExpressions()["_"].SetFunctionName("GDpriv::StringTools::Translate").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
+    GetAllActions()["LoadTranslation"].SetFunctionName("GDpriv::StringTools::LoadTranslation").SetIncludeFile("GDCpp/Extensions/Builtin/StringTools.h");
 
     #endif
 }

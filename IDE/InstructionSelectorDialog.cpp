@@ -144,9 +144,13 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(480,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
     BoxSizer1->Add(StaticLine1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     rightPartSizer->Add(BoxSizer1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    scrolledPanel = new wxScrolledWindow(this);
     GridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
     GridSizer1->AddGrowableCol(1);
-    rightPartSizer->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    scrolledPanel->SetSizer(GridSizer1);
+    scrolledPanel->FitInside();
+    scrolledPanel->SetScrollRate(5, 5);
+    rightPartSizer->Add(scrolledPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     topPartSizer->Add(rightPartSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer6->Add(topPartSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
@@ -195,7 +199,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     SetMinSize(wxSize(500,500));
     Center();
 
-    parametersHelper.SetWindowAndSizer(this, GridSizer1)
+    parametersHelper.SetWindowAndSizer(scrolledPanel, GridSizer1)
         .SetProjectAndLayout(game, scene);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeItemActivated);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeSelectionChanged);
@@ -477,6 +481,7 @@ void InstructionSelectorDialog::RefreshFromInstruction()
     }
 
     GridSizer1->Layout();
+    scrolledPanel->FitInside();
 
     if (!editingAction)
         invertedCheck->SetValue(isInverted);

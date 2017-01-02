@@ -23,6 +23,7 @@
 #include <wx/checkbox.h>
 #include <wx/imaglist.h>
 #include <wx/bmpbuttn.h>
+#include <wx/scrolwin.h>
 #include "GDCore/Events/Expression.h"
 #include "GDCore/IDE/Dialogs/ParameterControlsHelper.h"
 #include "GDCore/String.h"
@@ -57,6 +58,7 @@ public:
 	wxNotebook* Notebook1;
 	wxStaticText* instructionNameTxt;
 	wxStaticBitmap* StaticBitmap1;
+	wxScrolledWindow* scrolledPanel;
 	wxFlexGridSizer* GridSizer1;
 	wxPanel* Panel1;
 	wxCheckBox* invertedCheck;

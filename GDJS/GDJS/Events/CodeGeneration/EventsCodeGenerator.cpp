@@ -164,14 +164,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(const std::vector<gd::Stri
     }
     else
     {
-        gd::String argumentsStr;
-        for (std::size_t i = 0;i<arguments.size();++i)
-        {
-            if ( i != 0 ) argumentsStr += ", ";
-            argumentsStr += arguments[i];
-        }
-
-        predicat = instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
+        predicat = instrInfos.codeExtraInformation.functionCallName+"("+GenerateArgumentsList(arguments)+")";
     }
 
     //Add logical not if needed
@@ -208,14 +201,7 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objec
     }
     else
     {
-        gd::String argumentsStr;
-        for (std::size_t i = 1;i<arguments.size();++i)
-        {
-            if ( i != 1 ) argumentsStr += ", ";
-            argumentsStr += arguments[i];
-        }
-
-        predicat = objectFunctionCallNamePart+"("+argumentsStr+")";
+        predicat = objectFunctionCallNamePart+"("+GenerateArgumentsList(arguments, 1)+")";
     }
     if ( conditionInverted ) predicat = GenerateNegatedPredicat(predicat);
 
@@ -255,14 +241,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(const gd::String & obj
     }
     else
     {
-        gd::String argumentsStr;
-        for (std::size_t i = 2;i<arguments.size();++i)
-        {
-            if ( i != 2 ) argumentsStr += ", ";
-            argumentsStr += arguments[i];
-        }
-
-        predicat = objectFunctionCallNamePart+"("+argumentsStr+")";
+        predicat = objectFunctionCallNamePart+"("+GenerateArgumentsList(arguments, 2)+")";
     }
     if ( conditionInverted ) predicat = GenerateNegatedPredicat(predicat);
 
@@ -312,14 +291,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectNa
     }
     else
     {
-        gd::String argumentsStr;
-        for (std::size_t i = 1;i<arguments.size();++i)
-        {
-            if ( i != 1 ) argumentsStr += ", ";
-            argumentsStr += arguments[i];
-        }
-
-        call = objectPart+instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
+        call = objectPart+instrInfos.codeExtraInformation.functionCallName+"("+GenerateArgumentsList(arguments, 1)+")";
     }
 
     actionCode += "for(var i = 0, len = "+GetObjectListName(objectName, context)+".length ;i < len;++i) {\n";
@@ -356,14 +328,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(const gd::String & object
     }
     else
     {
-        gd::String argumentsStr;
-        for (std::size_t i = 2;i<arguments.size();++i)
-        {
-            if ( i != 2 ) argumentsStr += ", ";
-            argumentsStr += arguments[i];
-        }
-
-        call = objectPart+instrInfos.codeExtraInformation.functionCallName+"("+argumentsStr+")";
+        call = objectPart+instrInfos.codeExtraInformation.functionCallName+"("+GenerateArgumentsList(arguments, 2)+")";
     }
 
     //Verify that object has behavior.

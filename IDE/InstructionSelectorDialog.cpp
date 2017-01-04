@@ -77,7 +77,6 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     wxBoxSizer* BoxSizer5;
     wxBoxSizer* BoxSizer10;
     wxBoxSizer* topPartSizer;
-    wxBoxSizer* rightPartSizer;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer2;
@@ -482,6 +481,7 @@ void InstructionSelectorDialog::RefreshFromInstruction()
 
     GridSizer1->Layout();
     scrolledPanel->FitInside();
+    rightPartSizer->Layout();
 
     if (!editingAction)
         invertedCheck->SetValue(isInverted);

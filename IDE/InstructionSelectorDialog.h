@@ -74,6 +74,7 @@ public:
 	wxHyperlinkCtrl* instructionHelpLinkCtrl;
 	wxCheckBox* objSortCheck;
 	wxTreeCtrl* instructionsTree;
+    wxBoxSizer* rightPartSizer;
 
 protected:
 

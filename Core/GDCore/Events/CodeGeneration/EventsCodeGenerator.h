@@ -455,6 +455,13 @@ protected:
      */
     gd::String GenerateFalse() const { return "false"; };
 
+    /**
+     * \brief Generate the list of comma-separated arguments to be used to call a function.
+     * \param arguments The code already generated for the arguments
+     * \param startFrom Index of the first argument, the previous will be ignored.
+     */
+    virtual gd::String GenerateArgumentsList(const std::vector<gd::String> & arguments, size_t startFrom = 0);
+
     gd::Project & project; ///< The project being used.
     const gd::Layout & scene; ///< The scene being generated.
     const gd::Platform & platform; ///< The platform being used.

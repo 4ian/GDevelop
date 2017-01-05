@@ -148,7 +148,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     GridSizer1->AddGrowableCol(1);
     scrolledPanel->SetSizer(GridSizer1);
     scrolledPanel->FitInside();
-    scrolledPanel->SetScrollRate(5, 5);
+    scrolledPanel->SetScrollRate(0, 5);
     rightPartSizer->Add(scrolledPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     topPartSizer->Add(rightPartSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer6->Add(topPartSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

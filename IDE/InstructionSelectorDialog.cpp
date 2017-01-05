@@ -100,16 +100,17 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     treeSizer->AddGrowableRow(0);
 
     instructionsTree = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
-    instructionsTree->SetMinSize(wxSize(300,-1));
+    instructionsTree->SetMinSize(wxSize(300,200));
     instructionsTree->SetToolTip(editingAction ? _("Choose the action to use") : _("Choose the condition to use"));
 
-    treeSizer->Add(instructionsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    treeSizer->Add(instructionsTree, 1, wxALL|wxEXPAND, 0);
 
     searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     searchCtrl->SetMinSize(wxSize(-1,24));
 
-    treeSizer->Add(searchCtrl, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    topPartSizer->Add(treeSizer, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    treeSizer->Add(searchCtrl, 1, wxALL|wxEXPAND, 0);
+
+    topPartSizer->Add(treeSizer, 0, wxALL|wxEXPAND, 0);
     rightPartSizer = new wxBoxSizer(wxVERTICAL);
     FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
     FlexGridSizer3->AddGrowableCol(1);
@@ -118,6 +119,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     FlexGridSizer3->Add(ActionImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
     instructionNameTxt = new wxStaticText(this, ID_STATICTEXT1, editingAction ? _("No action chosen") : _("No condition chosen"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    instructionNameTxt->SetMinSize(wxSize(450, -1));
     wxFont instructionNameTxtFont(16,wxFONTFAMILY_SWISS,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     instructionNameTxt->SetFont(instructionNameTxtFont);
     BoxSizer4->Add(instructionNameTxt, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -127,6 +129,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
 
     // Selected instruction description
     instructionDescriptionTxt = new wxStaticText(this, ID_STATICTEXT2, editingAction ? _("Choose an action in the list") : _("Choose a condition in the list"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    instructionDescriptionTxt->SetMinSize(wxSize(450, -1));
     BoxSizer3->Add(instructionDescriptionTxt, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     rightPartSizer->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 

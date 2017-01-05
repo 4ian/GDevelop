@@ -453,7 +453,7 @@ void InstructionSelectorDialog::RefreshFromInstruction()
             gd::MetadataProvider::GetActionMetadata(*platform, instructionType) :
             gd::MetadataProvider::GetConditionMetadata(*platform, instructionType);
 
-        if ( otherPlatformMetadata.codeExtraInformation.functionCallName.empty() )
+        if ( otherPlatformMetadata.codeExtraInformation.functionCallName.empty() && !otherPlatformMetadata.codeExtraInformation.HasCustomCodeGenerator() )
         {
             notAvailableWarningTxt->SetLabel( notAvailableWarningTxt->GetLabel() + gd::String(" ") + platform->GetFullName() );
             notAvailableWarningTxt->Show();

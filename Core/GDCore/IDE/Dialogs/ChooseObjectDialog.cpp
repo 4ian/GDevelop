@@ -59,18 +59,19 @@ canSelectGroup(canSelectGroup_)
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
 	objectsList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
-	FlexGridSizer1->Add(objectsList, 0, wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+	objectsList->SetMinSize(wxSize(300, 200));
+	FlexGridSizer1->Add(objectsList, 0, wxALL|wxEXPAND, 0);
 	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	searchCtrl->SetFocus();
-	FlexGridSizer1->Add(searchCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->Add(searchCtrl, 1, wxALL|wxEXPAND, 0);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	ChoisirBt = new wxButton(this, ID_BUTTON1, _("Choose"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	FlexGridSizer2->Add(ChoisirBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(ChoisirBt, 1, wxALL|wxALIGN_RIGHT, 5);
 	AnnulerBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	FlexGridSizer2->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer2->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT, 5);
+	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_RIGHT, 0);
 	SetSizer(FlexGridSizer1);
 	editMenuItem = new wxMenuItem((&Menu1), ID_MENUITEM2, _("Choose this object"), wxEmptyString, wxITEM_NORMAL);
 	Menu1.Append(editMenuItem);
@@ -113,7 +114,6 @@ canSelectGroup(canSelectGroup_)
         objectsList->SetWindowStyleFlag(objectsList->GetWindowStyleFlag() & ~wxTR_MULTIPLE);
     }
 
-	ChoisirBt->SetMinSize(wxSize(-1, 25)); //Ensure the choose button is not hidden.
     SetSize(400, 500);
 	Refresh();
 }

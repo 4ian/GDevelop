@@ -108,7 +108,7 @@ gdjs.PanelSpriteRuntimeObjectCocosRenderer.prototype._updateLocalPositions = fun
     this._borderSprites[5].setPositionY(0);
 
     this._borderSprites[6].setPositionX(obj._lBorder);
-    this._borderSprites[6].setPositionY(0);
+    this._borderSprites[6].setPositionY(1); //FIXME: 1 pixel is somewhat needed for pixel perfect alignment
 
     this._borderSprites[7].setPositionX(obj._width - obj._rBorder);
     this._borderSprites[7].setPositionY(0);

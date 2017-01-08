@@ -5,14 +5,14 @@ export default class Panes extends Component {
     return (
       <div style={{display: 'flex'}}>
         <div style={{
-          flex: 0.4,
+          flex: 0.3,
           borderRightWidth: 1,
           borderRightColor: '#DDD',
           borderRightStyle: 'solid',
         }}>
           {this.props.firstChild}
         </div>
-        <div style={{flex: 0.6}}>
+        <div style={{flex: 0.8}}>
           {this.props.secondChild}
         </div>
       </div>

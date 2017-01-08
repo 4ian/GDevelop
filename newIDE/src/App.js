@@ -79,6 +79,7 @@ class App extends Component {
                     <SceneEditorContainer
                       project={currentProject}
                       layout={currentProject.getLayout(sceneOpened)}
+                      initialInstances={currentProject.getLayout(sceneOpened).getInitialInstances()}
                     />
                   )
                 }

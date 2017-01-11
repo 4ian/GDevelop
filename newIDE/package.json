@@ -12,7 +12,8 @@
     "react": "^15.3.2",
     "react-addons-css-transition-group": "^15.3.2",
     "react-dom": "^15.3.2",
-    "react-json-tree": "^0.10.0"
+    "react-json-tree": "^0.10.0",
+    "react-measure": "^1.4.5"
   },
   "scripts": {
     "start": "react-scripts start",

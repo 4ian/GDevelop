@@ -9,7 +9,7 @@ import Panes from './UI/Panes';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import EventsSheetContainer from './EventsSheet/EventsSheetContainer.js';
-import SceneEditorContainer from './SceneEditor/SceneEditorContainer.js';
+import FullSizeSceneEditor from './SceneEditor/FullSizeSceneEditor.js';
 import ProjectManager from './ProjectManager';
 
 import JSONTree from 'react-json-tree'
@@ -48,55 +48,50 @@ class App extends Component {
 
     return (
       <MuiThemeProvider>
-        <div>
-          <Panes
-            firstChild={
-              currentProject && (
-                <ProjectManager
-                  project={currentProject}
-                  onOpenExternalEvents={name => this.setState({
-                    externalEventsOpened: name
-                  })}
-                  onOpenLayout={name => this.setState({
-                    sceneOpened: name
-                  })}
-                />
-              )
-            }
+        <Panes
+          firstChild={
+            currentProject && (
+              <ProjectManager
+                project={currentProject}
+                onOpenExternalEvents={name => this.setState({
+                  externalEventsOpened: name
+                })}
+                onOpenLayout={name => this.setState({
+                  sceneOpened: name
+                })}
+              />
+            )
+          }
 
-            secondChild={
-              <div className="App">
-                <div className="App-header">
-                  <h2>Welcome to React</h2>
-                </div>
-                <p className="App-intro">
-                  To get started, edit <code>src/App.js</code> and save to reload.
-                </p>
-                <RaisedButton label="Load game" onClick={this.loadGame} />
-                {/*<JSONTree data={game} />*/}
-                {
-                  currentProject && currentProject.hasLayoutNamed(sceneOpened) && (
-                    <SceneEditorContainer
-                      key={sceneOpened}
-                      project={currentProject}
-                      layout={currentProject.getLayout(sceneOpened)}
-                      initialInstances={currentProject.getLayout(sceneOpened).getInitialInstances()}
-                    />
-                  )
-                }
-                {
-                  currentProject && currentProject.hasExternalEventsNamed(externalEventsOpened) && (
-                    <EventsSheetContainer
-                      project={currentProject}
-                      events={currentProject.getExternalEvents(externalEventsOpened).getEvents()}
-                      layout={currentProject.getLayoutAt(0)}
-                    />
-                  )
-                }
-              </div>
-            }
-          />
-        </div>
+          secondChild={
+            <div className="App">
+              <p className="App-intro">
+                To get started, edit <code>src/App.js</code> and save to reload.
+              </p>
+              <RaisedButton label="Load game" onClick={this.loadGame} />
+              {/*<JSONTree data={game} />*/}
+              {
+                currentProject && currentProject.hasLayoutNamed(sceneOpened) && (
+                  <FullSizeSceneEditor
+                    key={sceneOpened}
+                    project={currentProject}
+                    layout={currentProject.getLayout(sceneOpened)}
+                    initialInstances={currentProject.getLayout(sceneOpened).getInitialInstances()}
+                  />
+                )
+              }
+              {
+                currentProject && currentProject.hasExternalEventsNamed(externalEventsOpened) && (
+                  <EventsSheetContainer
+                    project={currentProject}
+                    events={currentProject.getExternalEvents(externalEventsOpened).getEvents()}
+                    layout={currentProject.getLayoutAt(0)}
+                  />
+                )
+              }
+            </div>
+          }
+        />
       </MuiThemeProvider>
     );
   }

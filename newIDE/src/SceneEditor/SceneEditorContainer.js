@@ -28,14 +28,14 @@ export default class SceneEditorContainer extends Component {
   }
 
   componentDidMount() {
-    this.pixiRenderer = PIXI.autoDetectRenderer(800, 800);
+    this.pixiRenderer = PIXI.autoDetectRenderer(this.props.width, this.props.height);
     this.refs.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', (e) => {
       e.preventDefault();
     });
 
     this.backgroundArea = new PIXI.Container();
-    this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, 800, 800); //TODO:Resize
+    this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, this.props.width, this.props.height);
     gesture.panable(this.backgroundArea);
     this.backgroundArea.on('mousedown', this._onBackgroundClicked);
     this.backgroundArea.on('panmove', (event) => this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y));
@@ -98,6 +98,11 @@ export default class SceneEditorContainer extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
+      this.pixiRenderer.resize(nextProps.width, nextProps.height);
+      this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, nextProps.width, nextProps.height);
+    }
+
     if (this.props.layout !== nextProps.layout ||
       this.props.initialInstances !== nextProps.initialInstances ||
       this.props.project !== nextProps.project)
@@ -191,11 +196,12 @@ export default class SceneEditorContainer extends Component {
     const {project, layout, initialInstances} = this.props;
     if (!project) return null;
 
+    // <RaisedButton label="Delete selection" onClick={this.deleteSelection} />
+    // <RaisedButton label="Move" onClick={() => this.viewPosition.scrollBy(50, 40)} />
+
     return (
-      <div>
-        <RaisedButton label="Delete selection" onClick={this.deleteSelection} />
-        <RaisedButton label="Move" onClick={() => this.viewPosition.scrollBy(50, 40)} />
-        <div ref="canvasArea" />
+      <div style={{flex: 1, display: 'flex', overflow: 'hidden'}}>
+        <div ref="canvasArea" style={{flex: 1, display: 'flex', overflow: 'hidden'}} />
       </div>
     )
   }

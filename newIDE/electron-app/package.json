@@ -1,0 +1,14 @@
+{
+  "name": "gdevapp-electron",
+  "version": "1.0.0",
+  "description": "GDevApp running on the Electron runtime",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Florian Rival",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.4.14"
+  }
+}

@@ -11,6 +11,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import EventsSheetContainer from './EventsSheet/EventsSheetContainer.js';
 import FullSizeSceneEditor from './SceneEditor/FullSizeSceneEditor.js';
 import ProjectManager from './ProjectManager';
+import ExternalEditor from './ExternalEditor';
 
 import JSONTree from 'react-json-tree'
 
@@ -28,6 +29,12 @@ class App extends Component {
       currentProject: null,
       externalEventsOpened: '',
       sceneOpened: '',
+    }
+
+    if (ExternalEditor.isSupported()) {
+      ExternalEditor.connectTo(50000);
+    } else {
+      console.log("Connection to an external editor is not supported");
     }
   }
 

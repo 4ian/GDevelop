@@ -30,6 +30,14 @@
 
     <!-- GDevelop.js core -->
     <script src="%PUBLIC_URL%/libGD.js"></script>
+    <script>
+      //Always inject gd into the global namespace, even on environment with
+      //CommonJS support (Electron)
+      if (typeof global !== 'undefined' && !global.gd) {
+        const name = './libGD.js';
+        global.gd = require(name)();
+      }
+    </script>
 
     <!-- GDJS game engine -->
     <script src="Runtime/libs/jshashtable.js"></script>

@@ -77,6 +77,7 @@ class App extends Component {
                 {
                   currentProject && currentProject.hasLayoutNamed(sceneOpened) && (
                     <SceneEditorContainer
+                      key={sceneOpened}
                       project={currentProject}
                       layout={currentProject.getLayout(sceneOpened)}
                       initialInstances={currentProject.getLayout(sceneOpened).getInitialInstances()}

@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 
 import RaisedButton from 'material-ui/RaisedButton';
+import gesture from 'pixi-simple-gesture';
 
 import SceneRenderer from './SceneRenderer';
 import ViewPosition from './ViewPosition';
 import InstancesSelection from './InstancesSelection';
 import KeyboardShortcuts from './KeyboardShortcuts';
 import HighlightedInstance from './HighlightedInstance';
+import SelectionRectangle from './SelectionRectangle';
 const gd = global.gd;
 const PIXI = global.PIXI;
 
@@ -26,11 +28,29 @@ export default class SceneEditorContainer extends Component {
   }
 
   componentDidMount() {
-    this.pixiRenderer = PIXI.autoDetectRenderer(500, 500);
+    this.pixiRenderer = PIXI.autoDetectRenderer(800, 800);
     this.refs.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', (e) => {
       e.preventDefault();
     });
+
+    this.backgroundArea = new PIXI.Container();
+    this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, 800, 800); //TODO:Resize
+    gesture.panable(this.backgroundArea);
+    this.backgroundArea.on('mousedown', this._onBackgroundClicked);
+    this.backgroundArea.on('panmove', (event) => this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y));
+    this.backgroundArea.on('panend', (event) => this._onEndSelectionRectangle());
+
+    this.pixiRenderer.view.onmousewheel = (event) => {
+      if (this.keyboardShortcuts.shouldZoom()) {
+        this.viewPosition.zoomBy(event.wheelDelta / 5000);
+      } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
+        this.viewPosition.scrollBy(-event.wheelDelta / 20, 0);
+      } else {
+        this.viewPosition.scrollBy(0, -event.wheelDelta / 20);
+      }
+      event.preventDefault();
+    };
 
     this.pixiContainer = new PIXI.Container();
     this.viewPosition = new ViewPosition({
@@ -46,6 +66,12 @@ export default class SceneEditorContainer extends Component {
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
     });
+    this.selectionRectangle = new SelectionRectangle({
+      instances: this.props.initialInstances,
+      getInstanceWidth: this.sceneRenderer.getInstanceWidth,
+      getInstanceHeight: this.sceneRenderer.getInstanceHeight,
+      toSceneCoordinates: this.viewPosition.toSceneCoordinates,
+    });
     this.instancesSelection = new InstancesSelection({
       getInstanceWidth: this.sceneRenderer.getInstanceWidth,
       getInstanceHeight: this.sceneRenderer.getInstanceHeight,
@@ -56,7 +82,9 @@ export default class SceneEditorContainer extends Component {
     });
     this.keyboardShortcuts = new KeyboardShortcuts();
 
+    this.pixiContainer.addChild(this.backgroundArea);
     this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
+    this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
     this.viewPosition.getPixiContainer().addChild(this.sceneRenderer.getPixiContainer());
     this.viewPosition.getPixiContainer().addChild(this.highlightedInstance.getPixiObject());
     this.viewPosition.getPixiContainer().addChild(this.instancesSelection.getPixiContainer());
@@ -74,6 +102,21 @@ export default class SceneEditorContainer extends Component {
       this.props.initialInstances !== nextProps.initialInstances ||
       this.props.project !== nextProps.project)
       throw new Error("Changing project/layout/initialInstances is not supported yet")
+  }
+
+  _onBackgroundClicked = () => {
+    console.log("Background clicked");
+    if (!this.keyboardShortcuts.shouldMultiSelect())
+      this.instancesSelection.clearSelection();
+  }
+
+  _onMakeSelectionRectangle = (x, y) => {
+    this.selectionRectangle.makeSelectionRectangle(x, y);
+  }
+
+  _onEndSelectionRectangle = () => {
+    const instancesSelected = this.selectionRectangle.endSelectionRectangle();
+    instancesSelected.forEach(instance => this.instancesSelection.selectInstance(instance));
   }
 
   _onInstanceClicked = (instance) => {
@@ -139,6 +182,7 @@ export default class SceneEditorContainer extends Component {
     this.sceneRenderer.render();
     this.highlightedInstance.render();
     this.instancesSelection.render();
+    this.selectionRectangle.render();
     this.pixiRenderer.render(this.pixiContainer);
     this.nextFrame = requestAnimationFrame(this.renderScene);
   }
@@ -150,6 +194,7 @@ export default class SceneEditorContainer extends Component {
     return (
       <div>
         <RaisedButton label="Delete selection" onClick={this.deleteSelection} />
+        <RaisedButton label="Move" onClick={() => this.viewPosition.scrollBy(50, 40)} />
         <div ref="canvasArea" />
       </div>
     )

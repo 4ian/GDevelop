@@ -14,7 +14,7 @@ export default class ViewPosition {
 
 
   /**
-   * Convert a point from the canvas coordinates (For example, the mouse position) to the
+   * Convert a point from the canvas coordinates (for example, the mouse position) to the
    * "world" coordinates.
    */
   toSceneCoordinates = (x, y) => {
@@ -30,7 +30,7 @@ export default class ViewPosition {
   }
 
   /**
-   * Convert a point from the "world" coordinates (For example, an object position) to the
+   * Convert a point from the "world" coordinates (for example, an object position) to the
    * canvas coordinates.
    */
   toCanvasCoordinates = (x, y) => {
@@ -59,8 +59,8 @@ export default class ViewPosition {
   }
 
   render() {
-    this._pixiContainer.position.x = -this.viewX;
-    this._pixiContainer.position.y = -this.viewY;
+    this._pixiContainer.position.x = -this.viewX * this._zoomFactor;
+    this._pixiContainer.position.y = -this.viewY * this._zoomFactor;
   	this._pixiContainer.scale.x = this._zoomFactor;
   	this._pixiContainer.scale.y = this._zoomFactor;
   }

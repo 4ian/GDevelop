@@ -18,5 +18,14 @@ export default {
 	},
 	requestUpdate: function() {
 		return bridge.send("requestUpdate");
+	},
+	getArguments: function() {
+			try {
+				//TODO: Factor global['require']
+				return global['require']('electron').remote.getGlobal('args');
+			} catch(ex) {
+				console.warn("Unable to get bridge arguments");
+				return {};
+			}
 	}
 };

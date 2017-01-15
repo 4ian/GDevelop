@@ -32,18 +32,33 @@ class App extends Component {
     }
 
     if (ExternalEditor.isSupported()) {
-      ExternalEditor.connectTo(50000);
+      console.log("Connection to an external editor...");
+      ExternalEditor.connectTo(50000); //TODO: port from arguments
+      console.log(ExternalEditor.getArguments().editor);
+
+      ExternalEditor.onUpdateReceived((serializedObject) => {
+          console.log("Received update from server");
+          this.loadGame(serializedObject);
+      });
     } else {
       console.log("Connection to an external editor is not supported");
     }
   }
 
-  loadGame = () => {
+  requestUpdate = () => {
+    ExternalEditor.requestUpdate();
+  }
+
+  loadBuiltinGame = () => {
+    const unserializedProject = gd.Serializer.fromJSON(JSON.stringify(game));
+    return this.loadGame(unserializedProject);
+  }
+
+  loadGame = (unserializedProject) => {
     let { currentProject } = this.state;
     if (currentProject) currentProject.delete();
     const newProject = gd.ProjectHelper.createNewGDJSProject();
 
-    const unserializedProject = gd.Serializer.fromJSON(JSON.stringify(game));
     newProject.unserializeFrom(unserializedProject);
     this.setState({
       currentProject: newProject,
@@ -75,7 +90,8 @@ class App extends Component {
               <p className="App-intro">
                 To get started, edit <code>src/App.js</code> and save to reload.
               </p>
-              <RaisedButton label="Load game" onClick={this.loadGame} />
+              <RaisedButton label="Load game" onClick={this.loadBuiltinGame} />
+              <RaisedButton label="Request update" onClick={this.requestUpdate} />
               {/*<JSONTree data={game} />*/}
               {
                 currentProject && currentProject.hasLayoutNamed(sceneOpened) && (

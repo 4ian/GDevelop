@@ -29,6 +29,11 @@
     -->
 
     <!-- GDevelop.js core -->
+    <script>
+        //Ensure module is not defined to avoid libraries to think
+        //that they are in a CommonJS environment (useful when using Electron).
+        if (typeof module !== "undefined") module = undefined;
+    </script>
     <script src="%PUBLIC_URL%/libGD.js"></script>
     <script>
       //Always inject gd into the global namespace, even on environment with

@@ -222,7 +222,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("expression", _("Top left side of the boundary: Y Position"))
         .AddParameter("expression", _("Bottom right side of the boundary: X Position"))
         .AddParameter("expression", _("Bottom right side of the boundary: Y Position"))
-        .AddParameter("yesorno", _("Anticipate the movement of the object (yes by default)"), "",true).SetDefaultValue("true")
+        .AddParameter("yesorno", _("Anticipate the movement of the object (yes by default)"), "",true).SetDefaultValue("yes")
         .AddParameter("layer", _("Layer (base layer if empty)"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number (default : 0)"), "",true).SetDefaultValue("0")
         .MarkAsAdvanced();
@@ -236,7 +236,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("objectPtr", _("Object"))
-        .AddParameter("yesorno", _("Anticipate the movement of the object (yes by default)"), "",true).SetDefaultValue("true")
+        .AddParameter("yesorno", _("Anticipate the movement of the object (yes by default)"), "",true).SetDefaultValue("yes")
         .AddParameter("layer", _("Layer (base layer if empty)"), "",true).SetDefaultValue("\"\"")
         .AddParameter("expression", _("Camera number (default : 0)"), "",true).SetDefaultValue("0")
         .MarkAsSimple();

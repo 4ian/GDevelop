@@ -30,6 +30,8 @@ std::size_t InitialInstancesContainer::GetInstancesCount() const
 
 void InitialInstancesContainer::UnserializeFrom(const SerializerElement & element)
 {
+    initialInstances.clear();
+
     element.ConsiderAsArrayOf("instance", "Objet");
     for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
     {

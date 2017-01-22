@@ -166,20 +166,21 @@ mainFrameWrapper(mainFrameWrapper_)
     m_mgr.Update();
 
     //TODO: Temporary test
-    externalEventsEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
-    externalEventsEditor->OnSendUpdate([this]() {
-        gd::SerializerElement serializedProject;
-        project.SerializeTo(serializedProject);
-
-        return serializedProject;
-    });
-    externalEventsEditor->OnUpdateReceived([this](gd::SerializerElement object) {
-        std::cout << "Updating events from the external editor." << std::endl;
-        this->layout.GetEvents().UnserializeFrom(this->project, object);
-    });
-    externalEventsEditor->Launch("eventseditor");
+    // externalEventsEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
+    // externalEventsEditor->OnSendUpdate([this]() {
+    //     gd::SerializerElement serializedProject;
+    //     project.SerializeTo(serializedProject);
+	//
+    //     return serializedProject;
+    // });
+    // externalEventsEditor->OnUpdateReceived([this](gd::SerializerElement object) {
+    //     std::cout << "Updating events from the external editor." << std::endl;
+    //     this->layout.GetEvents().UnserializeFrom(this->project, object);
+    // });
+    // externalEventsEditor->Launch("eventseditor");
 
     //TODO: Temporary test
+		std::cout << project.GetProjectFile() << std::endl;
     externalLayoutEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
     externalLayoutEditor->OnSendUpdate([this]() {
         gd::SerializerElement serializedProject;
@@ -199,6 +200,9 @@ void EditorScene::OnscenePanelResize(wxSizeEvent& event)
     layoutEditorCanvas->UpdateSize();
     hScrollbar->SetSize(0, scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight(), scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), hScrollbar->GetSize().GetHeight());
     vScrollbar->SetSize(scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), 0, vScrollbar->GetSize().GetWidth(), scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight());
+
+		auto rect = scenePanel->GetScreenRect();
+		externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
 }
 
 EditorScene::~EditorScene()
@@ -242,6 +246,7 @@ bool EditorScene::CanBeClosed()
  */
 void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 {
+		externalLayoutEditor->Show();
     ForceRefreshRibbonAndConnect();
 }
 

@@ -75,6 +75,7 @@ export default class SceneEditorContainer extends Component {
     this.instancesSelection = new InstancesSelection({
       getInstanceWidth: this.sceneRenderer.getInstanceWidth,
       getInstanceHeight: this.sceneRenderer.getInstanceHeight,
+      onResize: this._onResize,
     });
     this.highlightedInstance = new HighlightedInstance({
       getInstanceWidth: this.sceneRenderer.getInstanceWidth,
@@ -166,6 +167,22 @@ export default class SceneEditorContainer extends Component {
   _onPanMoveView = (deltaX, deltaY) => {
     if (this.highlightedInstance.getInstance() === null)
       this.viewPosition.scrollBy(-deltaX, -deltaY);
+  }
+
+  _onResize = (deltaX, deltaY) => {
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    for (var i = 0;i < selectedInstances.length;i++) {
+      const selectedInstance = selectedInstances[i];
+
+      if (!selectedInstance.hasCustomSize()) {
+        selectedInstance.setCustomWidth(this.sceneRenderer.getInstanceWidth(selectedInstance));
+        selectedInstance.setCustomHeight(this.sceneRenderer.getInstanceHeight(selectedInstance));
+      }
+
+      selectedInstance.setHasCustomSize(true);
+      selectedInstance.setCustomWidth(selectedInstance.getCustomWidth() + deltaX);
+      selectedInstance.setCustomHeight(selectedInstance.getCustomHeight() + deltaY);
+    }
   }
 
   deleteSelection = () => {

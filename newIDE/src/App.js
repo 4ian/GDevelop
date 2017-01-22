@@ -13,6 +13,8 @@ import FullSizeSceneEditor from './SceneEditor/FullSizeSceneEditor.js';
 import ProjectManager from './ProjectManager';
 import ExternalEditor from './ExternalEditor';
 
+import Window from './Utils/Window.js';
+
 import JSONTree from 'react-json-tree'
 
 const gd = global.gd;
@@ -33,12 +35,30 @@ class App extends Component {
 
     if (ExternalEditor.isSupported()) {
       console.log("Connection to an external editor...");
-      ExternalEditor.connectTo(50000); //TODO: port from arguments
-      console.log(ExternalEditor.getArguments().editor);
+      const editorArguments = Window.getArguments();
+      ExternalEditor.connectTo(editorArguments['server-port']);
 
       ExternalEditor.onUpdateReceived((serializedObject) => {
-          console.log("Received update from server");
-          this.loadGame(serializedObject);
+        console.log("Received update from server");
+        this.loadGame(serializedObject);
+      });
+      ExternalEditor.onSetBoundsReceived((x, y, width, height) => {
+        Window.setBounds(x, y, width, height);
+      });
+      ExternalEditor.onShowReceived(() => {
+        Window.show();
+      });
+      Window.onBlur(() => {
+        console.log("Sending update to server");
+        const { currentProject, sceneOpened } = this.state;
+        if (!currentProject || !currentProject.hasLayoutNamed(sceneOpened))
+          return;
+
+        const instances = currentProject.getLayout(sceneOpened).getInitialInstances();
+
+        const serializedInstances = new gd.SerializerElement();
+        instances.serializeTo(serializedInstances);
+        ExternalEditor.send(serializedInstances);
       });
     } else {
       console.log("Connection to an external editor is not supported");
@@ -55,7 +75,7 @@ class App extends Component {
   }
 
   loadGame = (unserializedProject) => {
-    let { currentProject } = this.state;
+    const { currentProject } = this.state;
     if (currentProject) currentProject.delete();
     const newProject = gd.ProjectHelper.createNewGDJSProject();
 

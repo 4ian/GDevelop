@@ -1,3 +1,4 @@
+import gesture from 'pixi-simple-gesture';
 const gd = global.gd;
 const PIXI = global.PIXI;
 
@@ -5,9 +6,10 @@ const resizeButtonWidth = 18;
 const resizeButtonHeight = 18;
 
 export default class InstancesSelection {
-    constructor({getInstanceWidth, getInstanceHeight}) {
+    constructor({getInstanceWidth, getInstanceHeight, onResize}) {
       this.getInstanceWidth = getInstanceWidth;
       this.getInstanceHeight = getInstanceHeight;
+      this.onResize = onResize;
 
       this.selection = [];
       this.selectionOriginalPos = [];
@@ -22,6 +24,12 @@ export default class InstancesSelection {
       this.pixiContainer.addChild(this.rectanglesContainer);
       this.pixiContainer.addChild(this.resizeButton);
       this.pixiContainer.addChild(this.resizeIcon);
+
+      this.resizeButton.interactive = true;
+      gesture.panable(this.resizeButton);
+      this.resizeButton.on('panmove', (event) => {
+        this.onResize(event.deltaX, event.deltaY);
+      });
     }
 
     getSelectedInstances() {
@@ -124,6 +132,9 @@ export default class InstancesSelection {
           this.resizeButton.fillAlpha = 0.9;
           this.resizeButton.drawRect(resizeButtonX, resizeButtonY, resizeButtonWidth, resizeButtonHeight);
           this.resizeButton.endFill();
+          this.resizeButton.hitArea = new PIXI.Rectangle(resizeButtonX, resizeButtonY, resizeButtonWidth, resizeButtonHeight);
+      } else {
+        this.resizeButton.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
       }
     }
 }

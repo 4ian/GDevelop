@@ -52,6 +52,28 @@ public:
 
 	bool Launch(const gd::String & editorName);
 
+	void Hide()
+	{
+		gd::SerializerElement emptyPayload;
+		editorBridge.Send("hide", emptyPayload);
+	}
+
+	void Show()
+	{
+		gd::SerializerElement emptyPayload;
+		editorBridge.Send("show", emptyPayload);
+	}
+
+	void SetBounds(int x, int y, int width, int height)
+	{
+		gd::SerializerElement bounds;
+		bounds.SetAttribute("x", x);
+		bounds.SetAttribute("y", y);
+		bounds.SetAttribute("width", width);
+		bounds.SetAttribute("height", height);
+		editorBridge.Send("setBounds", bounds);
+	}
+
 private:
 
 	bool SendUpdate()

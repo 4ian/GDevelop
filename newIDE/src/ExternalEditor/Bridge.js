@@ -1,17 +1,11 @@
+import optionalRequire from '../Utils/OptionalRequire.js';
+const electron = optionalRequire('electron');
 const gd = global.gd;
 
 //TODO: Update to ES6
 function Bridge()
 {
-	try {
-		const netModuleName = 'net';
-		this.net = global['require'](netModuleName);
-		if (!this.net || !this.net.Socket) {
-			this.net = null;
-		}
-	} catch(e) {
-		this.net = null;
-	}
+	this.net = optionalRequire('net');
 
 	this.client = null;
 	this.connected = false;

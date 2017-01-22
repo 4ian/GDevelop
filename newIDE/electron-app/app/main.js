@@ -2,9 +2,6 @@ var app = require('electron').app;  // Module to control application life.
 var BrowserWindow = require('electron').BrowserWindow;  // Module to create native browser window.
 var parseArgs = require('minimist');
 
-//Allow to access to local files
-app.commandLine.appendSwitch('disable-web-security');
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
@@ -28,8 +25,12 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    "web-preferences": {
-      "web-security": false
+    frame: false,
+    hasShadow: false,
+    skipTaskbar: true,
+    //Allow to access to local files
+    webPreferences: {
+      webSecurity: false
     }
   });
 
@@ -37,7 +38,8 @@ app.on('ready', function() {
   global['args'] = args;
 
   // and load the index.html of the app.
-  mainWindow.loadURL('file://' + __dirname + '/www/index.html');
+  // mainWindow.loadURL('file://' + __dirname + '/www/index.html');
+  mainWindow.loadURL('http://localhost:3000');
 
   // Open the DevTools.
   mainWindow.openDevTools();

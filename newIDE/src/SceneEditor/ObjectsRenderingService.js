@@ -1,6 +1,27 @@
 const gd = global.gd;
 const PIXI = global.PIXI;
 
+
+import optionalRequire from '../Utils/OptionalRequire.js';
+const electron = optionalRequire('electron');
+const path = optionalRequire('path');
+
+class ResourceLoader {
+    static get(project, resourceName) {
+        if (electron) {
+            const file = project.getProjectFile();
+            const projectPath = path.dirname(file);
+            const resourceRelativePath =
+                project.getResourcesManager().getResource(resourceName).getFile();
+            const resourceAbsolutePath = path.resolve(projectPath, resourceRelativePath);
+            console.log("Loading", resourceAbsolutePath);
+            return 'file://' + resourceAbsolutePath;
+        }
+
+        return resourceName;
+    }
+};
+
 /**
  * RendereredInstance represents the object associated to an instance
  * when it is rendered in a scene editor (see SceneAreaCtrl).
@@ -175,7 +196,7 @@ RenderedSpriteInstance.prototype.updatePIXITexture = function() {
             this._renderedSprite = 0;
             if (this._renderedSprite < direction.getSpritesCount()) {
                 var sprite = direction.getSprite(this._renderedSprite);
-                this._pixiObject.texture = PIXI.Texture.fromImage(sprite.getImageName());
+                this._pixiObject.texture = PIXI.Texture.fromImage(ResourceLoader.get(this._project, sprite.getImageName()));
 
                 //TODO: Only default origin and center point are supported.
                 if (this._pixiObject.texture.noFrame) {

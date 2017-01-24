@@ -34,7 +34,7 @@ void GD_EXTENSION_API CopyImageOnAnother( const gd::String & destName, const gd:
 
 void GD_EXTENSION_API CaptureScreen( RuntimeScene & scene, const gd::String & destFileName, const gd::String & destImageName )
 {
-    if ( !scene.renderWindow ) return;
+    /*if ( !scene.renderWindow ) return;
     sf::Image capture = scene.renderWindow->capture();
 
     if ( !destFileName.empty() ) capture.saveToFile(destFileName.ToLocale());
@@ -43,7 +43,7 @@ void GD_EXTENSION_API CaptureScreen( RuntimeScene & scene, const gd::String & de
         std::shared_ptr<SFMLTextureWrapper> sfmlTexture = scene.GetImageManager()->GetSFMLTexture(destImageName);
         sfmlTexture->image = capture;
         sfmlTexture->texture.loadFromImage(sfmlTexture->image); //Do not forget to update the associated texture
-    }
+    }*/
 }
 
 namespace

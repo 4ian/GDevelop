@@ -5,7 +5,11 @@
  */
 #include "InputManager.h"
 
-InputManager::InputManager(sf::Window * win) :
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
+
+InputManager::InputManager(gd::RenderingWindow * win) :
     window(win),
     lastPressedKey(0),
     keyWasPressed(false),
@@ -44,7 +48,7 @@ void InputManager::NextFrame()
             sf::Mouse::isButtonPressed(static_cast<sf::Mouse::Button>(it->second));
     }
 
-    if (window) mousePosition = sf::Mouse::getPosition(*window);
+    if (window) mousePosition = gd::RenderingWindow::GetMousePosition(*window);
     if (touchSimulateMouse && !touches.empty()) SimulateMousePressed(touches.begin()->second);
 }
 

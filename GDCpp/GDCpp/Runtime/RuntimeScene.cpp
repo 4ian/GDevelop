@@ -29,6 +29,7 @@
 #include "GDCpp/Runtime/RuntimeContext.h"
 #include "GDCpp/Runtime/Project/Project.h"
 #include "GDCpp/Runtime/ManualTimer.h"
+#include "GDCpp/Runtime/Window/RenderingWindow.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
@@ -51,7 +52,7 @@
 
 RuntimeLayer RuntimeScene::badRuntimeLayer;
 
-RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
+RuntimeScene::RuntimeScene(gd::RenderingWindow * renderWindow_, RuntimeGame * game_) :
     renderWindow(renderWindow_),
     game(game_),
     #if defined(GD_IDE_ONLY)
@@ -83,19 +84,19 @@ std::shared_ptr<gd::ImageManager> RuntimeScene::GetImageManager() const
     return game->GetImageManager();
 }
 
-void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
+void RuntimeScene::ChangeRenderWindow(gd::RenderingWindow * newWindow)
 {
     renderWindow = newWindow;
     inputManager.SetWindow(newWindow);
 
     if (!renderWindow) return;
 
-    renderWindow->setTitle(GetWindowDefaultTitle());
+    renderWindow->SetTitle(GetWindowDefaultTitle());
 
     if(game)
     {
-        renderWindow->setFramerateLimit(game->GetMaximumFPS());
-        renderWindow->setVerticalSyncEnabled(game->IsVerticalSynchronizationEnabledByDefault());
+        renderWindow->SetFramerateLimit(game->GetMaximumFPS());
+        renderWindow->SetVerticalSyncEnabled(game->IsVerticalSynchronizationEnabledByDefault());
     }
     SetupOpenGLProjection();
 }
@@ -111,7 +112,7 @@ void RuntimeScene::SetupOpenGLProjection()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    double windowRatio = static_cast<double>(renderWindow->getSize().x)/static_cast<double>(renderWindow->getSize().y);
+    double windowRatio = static_cast<double>(renderWindow->GetSize().x)/static_cast<double>(renderWindow->GetSize().y);
     OpenGLTools::PerspectiveGL(GetOpenGLFOV(), windowRatio, GetOpenGLZNear(), GetOpenGLZFar());
     #endif
 }
@@ -175,13 +176,13 @@ void RuntimeScene::ManageRenderTargetEvents()
     inputManager.NextFrame();
 
     sf::Event event;
-    while (renderWindow->pollEvent(event))
+    while (renderWindow->PollEvent(event))
     {
         if ( event.type == sf::Event::Closed )
         {
             //Handle window closing
             RequestChange(SceneChange::STOP_GAME);
-            renderWindow->close();
+            renderWindow->Close();
         }
         else if (event.type == sf::Event::Resized)
         {
@@ -213,7 +214,7 @@ void RuntimeScene::Render()
 {
     if (!renderWindow) return;
 
-    renderWindow->clear( sf::Color( GetBackgroundColorRed(), GetBackgroundColorGreen(), GetBackgroundColorBlue() ) );
+    renderWindow->GetRenderingTarget().clear( sf::Color( GetBackgroundColorRed(), GetBackgroundColorGreen(), GetBackgroundColorBlue() ) );
 
     //Sort object by order to render them
     RuntimeObjNonOwningPtrList allObjects = objectsInstances.GetAllObjects();
@@ -222,9 +223,9 @@ void RuntimeScene::Render()
     #if !defined(ANDROID) //TODO: OpenGL
     //To allow using OpenGL to draw:
     glClear(GL_DEPTH_BUFFER_BIT); // Clear the depth buffer
-    renderWindow->pushGLStates();
+    renderWindow->GetRenderingTarget().pushGLStates();
     #endif
-    renderWindow->setActive();
+    renderWindow->SetActive();
 
     //Draw layer by layer
     for (std::size_t layerIndex =0;layerIndex<layers.size();++layerIndex)
@@ -237,7 +238,7 @@ void RuntimeScene::Render()
 
                 //Prepare OpenGL rendering
                 #if !defined(ANDROID) //TODO: OpenGL
-                renderWindow->popGLStates();
+                renderWindow->GetRenderingTarget().popGLStates();
 
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
@@ -247,22 +248,22 @@ void RuntimeScene::Render()
                 const sf::FloatRect & viewport = camera.GetSFMLView().getViewport();
 
                 #if !defined(ANDROID) //TODO: OpenGL
-                glViewport(viewport.left*renderWindow->getSize().x,
-                           renderWindow->getSize().y-(viewport.top+viewport.height)*renderWindow->getSize().y, //Y start from bottom
-                           viewport.width*renderWindow->getSize().x,
-                           viewport.height*renderWindow->getSize().y);
+                glViewport(viewport.left*renderWindow->GetSize().x,
+                           renderWindow->GetSize().y-(viewport.top+viewport.height)*renderWindow->GetSize().y, //Y start from bottom
+                           viewport.width*renderWindow->GetSize().x,
+                           viewport.height*renderWindow->GetSize().y);
 
-                renderWindow->pushGLStates();
+                renderWindow->GetRenderingTarget().pushGLStates();
                 #endif
 
                 //Prepare SFML rendering
-                renderWindow->setView(camera.GetSFMLView());
+                renderWindow->GetRenderingTarget().setView(camera.GetSFMLView());
 
                 //Rendering all objects
                 for (std::size_t id = 0;id < allObjects.size();++id)
                 {
                     if (allObjects[id]->GetLayer() == layers[layerIndex].GetName())
-                        allObjects[id]->Draw(*renderWindow);
+                        allObjects[id]->Draw(renderWindow->GetRenderingTarget());
                 }
             }
         }
@@ -271,9 +272,9 @@ void RuntimeScene::Render()
     // Display window contents on screen
     //TODO: If nothing is displayed, double check popGLStates.
     #if !defined(ANDROID) //TODO: OpenGL
-    renderWindow->popGLStates();
+    renderWindow->GetRenderingTarget().popGLStates();
     #endif
-    renderWindow->display();
+    renderWindow->Display();
 }
 
 bool RuntimeScene::OrderObjectsByZOrder(RuntimeObjNonOwningPtrList & objList)
@@ -467,7 +468,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     std::cout << ".";
     if ( StopSoundsOnStartup() ) {game->GetSoundManager().ClearAllSoundsAndMusics(); }
-    if ( renderWindow ) renderWindow->setTitle(GetWindowDefaultTitle());
+    if ( renderWindow ) renderWindow->SetTitle(GetWindowDefaultTitle());
 
     std::cout << " Done." << std::endl;
 

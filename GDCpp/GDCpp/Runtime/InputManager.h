@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 #include <set>
-#include <SFML/Window.hpp>
+#include "GDCpp/Runtime/Window/RenderingWindow.h"
 #include "GDCpp/Runtime/String.h"
 
 /**
@@ -42,7 +42,7 @@ public:
     /**
      * @brief Constructor with a window to manage.
      */
-    InputManager(sf::Window * win);
+    InputManager(gd::RenderingWindow * win);
 
     /** \name Connection with window and events management
      */
@@ -50,7 +50,7 @@ public:
     /**
      * \brief Set the window managed by the input manager.
      */
-    InputManager & SetWindow(sf::Window * win) { window = win; return *this; }
+    InputManager & SetWindow(gd::RenderingWindow * win) { window = win; return *this; }
 
     /**
      * Set if the input must be disabled when window lose focus.
@@ -139,7 +139,7 @@ public:
     ///@}
 
 private:
-    sf::Window * window;
+    gd::RenderingWindow * window;
 
     int lastPressedKey; ///< SFML key code of the last pressed key.
     bool keyWasPressed; ///< True if a key was pressed during the last step.

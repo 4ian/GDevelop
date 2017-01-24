@@ -13,6 +13,7 @@
 #include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCpp/Runtime/PolygonCollision.h"
 #include "GDCpp/Runtime/Polygon2d.h"
+#include "GDCpp/Runtime/Window/RenderingWindow.h"
 #include "GDCore/CommonTools.h"
 #include <SFML/System.hpp>
 #include <iostream>
@@ -576,7 +577,7 @@ bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)
     {
         const auto & view = theLayer.GetCamera(cameraIndex).GetSFMLView();
 
-        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
+        sf::Vector2f mousePos = scene.renderWindow->GetRenderingTarget().mapPixelToCoords(
             scene.GetInputManager().GetMousePosition(), view);
 
         if (insideObject(mousePos)) return true;
@@ -584,7 +585,7 @@ bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)
         auto & touches = scene.GetInputManager().GetAllTouches();
         for(auto & it : touches)
         {
-            sf::Vector2f touchPos = scene.renderWindow->mapPixelToCoords(it.second, view);
+            sf::Vector2f touchPos = scene.renderWindow->GetRenderingTarget().mapPixelToCoords(it.second, view);
             if (insideObject(touchPos)) return true;
         }
     }

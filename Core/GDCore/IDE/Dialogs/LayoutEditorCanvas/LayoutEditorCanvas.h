@@ -20,6 +20,7 @@
 #include <wx/gdicmn.h>
 #include <wx/panel.h>
 #include "GDCore/Project/LayoutEditorPreviewer.h"
+#include "GDCore/Window/WxRenderingWindow.h"
 #include "GDCore/String.h"
 namespace gd { class MainFrameWrapper; }
 namespace gd { class InitialInstancesContainer; }
@@ -67,7 +68,7 @@ public:
  * \ingroup IDE
  * \ingroup IDE dialogs
  */
-class GD_CORE_API LayoutEditorCanvas: public wxPanel, public sf::RenderWindow
+class GD_CORE_API LayoutEditorCanvas: public gd::WxRenderingWindow
 {
     friend class InstancesRenderer;
 public:
@@ -349,8 +350,6 @@ protected:
 
     //Methods allowing to run SFML within the wxWidgets control
     virtual void OnUpdate();
-    virtual void OnPaint(wxPaintEvent& event);
-    virtual void OnEraseBackground(wxEraseEvent& event);
     virtual void OnIdle(wxIdleEvent&);
     //Changing the state of the editor
     virtual void OnPreviewBtClick( wxCommandEvent & event );

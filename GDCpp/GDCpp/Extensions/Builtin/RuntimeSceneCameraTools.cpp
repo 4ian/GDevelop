@@ -7,6 +7,7 @@
 #include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCpp/Runtime/RuntimeObject.h"
 #include "GDCpp/Runtime/RuntimeLayer.h"
+#include "GDCpp/Runtime/Window/RenderingWindow.h"
 
 float GD_API GetCameraX(RuntimeScene & scene, const gd::String & layer, std::size_t camera)
 {
@@ -196,8 +197,8 @@ void GD_API ActDeleteCamera(RuntimeScene & scene, const gd::String & layerName, 
 void GD_API AddCamera( RuntimeScene & scene, const gd::String & layerName, float width, float height, float viewportLeft, float viewportTop, float viewportRight, float viewportBottom )
 {
     //Create the new view
-    const sf::RenderWindow * window = scene.renderWindow;
-    sf::View view = window ? window->getDefaultView() : sf::View();
+    const gd::RenderingWindow * window = scene.renderWindow;
+    sf::View view = window ? window->GetRenderingTarget().getDefaultView() : sf::View();
 
     //Setup the viewport and the view
     if ( viewportBottom != 0 && viewportLeft != 0 && viewportRight != 0 && viewportTop != 0) {

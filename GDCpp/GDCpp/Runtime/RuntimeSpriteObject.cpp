@@ -576,7 +576,7 @@ bool RuntimeSpriteObject::CursorOnObject(RuntimeScene & scene, bool accurate)
     {
         const auto & view = theLayer.GetCamera(cameraIndex).GetSFMLView();
 
-        sf::Vector2f mousePos = scene.renderWindow->mapPixelToCoords(
+        sf::Vector2f mousePos = scene.renderWindow->GetRenderingTarget().mapPixelToCoords(
             scene.GetInputManager().GetMousePosition(), view);
 
         if (insideObject(mousePos)) return true;
@@ -584,7 +584,7 @@ bool RuntimeSpriteObject::CursorOnObject(RuntimeScene & scene, bool accurate)
         auto & touches = scene.GetInputManager().GetAllTouches();
         for(auto & it : touches)
         {
-            sf::Vector2f touchPos = scene.renderWindow->mapPixelToCoords(it.second, view);
+            sf::Vector2f touchPos = scene.renderWindow->GetRenderingTarget().mapPixelToCoords(it.second, view);
             if (insideObject(touchPos)) return true;
         }
     }

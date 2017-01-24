@@ -20,6 +20,7 @@
 #include "GDCpp/Runtime/BehaviorsRuntimeSharedDataHolder.h"
 namespace sf { class RenderWindow; }
 namespace sf { class Event; }
+namespace gd { class RenderingWindow; }
 namespace gd { class Project; }
 namespace gd { class Object; }
 namespace gd { class ImageManager; }
@@ -45,10 +46,10 @@ class BaseDebugger;
 class GD_API RuntimeScene : public Scene
 {
 public:
-    RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
+    RuntimeScene(gd::RenderingWindow * renderWindow_, RuntimeGame * game_);
     virtual ~RuntimeScene();
 
-    sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display.
+    gd::RenderingWindow *                      renderWindow; ///< Pointer to the render window used for display.
     RuntimeGame *                           game; ///< Pointer to the game the scene is linked to.
     #if defined(GD_IDE_ONLY)
     BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
@@ -137,7 +138,7 @@ public:
     /**
      * \brief Change the window used for rendering the scene
      */
-    void ChangeRenderWindow(sf::RenderWindow * window);
+    void ChangeRenderWindow(gd::RenderingWindow * window);
 
     /**
      * \brief Check if scene is rendered full screen.

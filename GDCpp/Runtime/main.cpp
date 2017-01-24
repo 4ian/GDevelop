@@ -32,6 +32,7 @@
 #include "GDCpp/Runtime/Serialization/SerializerElement.h"
 #include "GDCpp/Runtime/TinyXml/tinyxml.h"
 #include "GDCpp/Runtime/RuntimeGame.h"
+#include "GDCpp/Runtime/Window/SFMLRenderingWindow.h"
 #include "CompilationChecker.h"
 
 #include <stdlib.h>
@@ -172,14 +173,13 @@ int main( int argc, char *p_argv[] )
     game.GetImageManager()->LoadPermanentImages();
 
     //Create main window
-    sf::RenderWindow window;
 
     RuntimeGame runtimeGame;
     runtimeGame.LoadFromProject(game);
 
-    window.create(sf::VideoMode(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32),
+    gd::SFMLRenderingWindow window(sf::VideoMode(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32),
         "", sf::Style::Close, sf::ContextSettings(24, 8));
-    window.setActive(true);
+    window.SetActive(true);
 
     //Game main loop
     bool abort = false;

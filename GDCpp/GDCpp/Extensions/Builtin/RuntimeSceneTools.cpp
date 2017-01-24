@@ -21,6 +21,7 @@
 #include "GDCpp/Runtime/profile.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Project/Variable.h"
+#include "GDCpp/Runtime/Window/RenderingWindow.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 
 gd::String GD_API GetSceneName(RuntimeScene & scene)
@@ -257,13 +258,14 @@ void GD_API SetWindowIcon(RuntimeScene & scene, const gd::String & imageName)
     if ( image == std::shared_ptr<SFMLTextureWrapper>() )
         return;
 
-    scene.renderWindow->setIcon(image->image.getSize().x, image->image.getSize().y, image->image.getPixelsPtr());
+    //TODO:
+    //scene.renderWindow->setIcon(image->image.getSize().x, image->image.getSize().y, image->image.getPixelsPtr());
 }
 
 void GD_API SetWindowTitle(RuntimeScene & scene, const gd::String & newName)
 {
     scene.SetWindowDefaultTitle( newName );
-    if (scene.renderWindow != NULL) scene.renderWindow->setTitle(scene.GetWindowDefaultTitle());
+    if (scene.renderWindow != NULL) scene.renderWindow->SetTitle(scene.GetWindowDefaultTitle());
 }
 
 const gd::String & GD_API GetWindowTitle(RuntimeScene & scene)
@@ -280,7 +282,9 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
         scene.game->SetDefaultHeight( windowHeight );
     }
 
-    //Avoid recreating every tick a new window if the size has not changed!
+    scene.renderWindow->SetSize(sf::Vector2u(windowWidth, windowHeight));
+
+    /*//Avoid recreating every tick a new window if the size has not changed!
     if ( windowWidth == scene.renderWindow->getSize().x && windowHeight == scene.renderWindow->getSize().y )
         return;
 
@@ -288,29 +292,31 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
     return; //The size of the window is always the same.
     #endif
 
-    scene.renderWindow->create(
+    scene.renderWindow->Create(
         sf::VideoMode( windowWidth, windowHeight, 32 ),
         scene.GetWindowDefaultTitle(),
         sf::Style::Close | (scene.RenderWindowIsFullScreen() ? sf::Style::Fullscreen : 0) );
-    scene.ChangeRenderWindow(scene.renderWindow);
+    scene.ChangeRenderWindow(scene.renderWindow);*/
     #endif
 }
 
 void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen, bool)
 {
     #if !defined(GD_IDE_ONLY)
-    if ( fullscreen && !scene.RenderWindowIsFullScreen() )
+    /*if ( fullscreen && !scene.RenderWindowIsFullScreen() )
     {
         scene.SetRenderWindowIsFullScreen();
-        scene.renderWindow->create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );
+        scene.renderWindow->Create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
     else if ( !fullscreen && scene.RenderWindowIsFullScreen() )
     {
         scene.SetRenderWindowIsFullScreen(false);
-        scene.renderWindow->create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
+        scene.renderWindow->Create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
         scene.ChangeRenderWindow(scene.renderWindow);
-    }
+    }*/
+    scene.SetRenderWindowIsFullScreen(fullscreen);
+    scene.renderWindow->SetFullScreen(fullscreen);
     #endif
 }
 unsigned int GD_API GetSceneWindowWidth(RuntimeScene & scene)
@@ -319,7 +325,7 @@ unsigned int GD_API GetSceneWindowWidth(RuntimeScene & scene)
     return scene.game->GetMainWindowDefaultWidth();
     #else
     if ( scene.renderWindow != NULL )
-        return scene.renderWindow->getSize().x;
+        return scene.renderWindow->GetSize().x;
 
     return 0;
     #endif
@@ -331,7 +337,7 @@ unsigned int GD_API GetSceneWindowHeight(RuntimeScene & scene)
     return scene.game->GetMainWindowDefaultHeight();
     #else
     if ( scene.renderWindow != NULL )
-        return scene.renderWindow->getSize().y;
+        return scene.renderWindow->GetSize().y;
 
     return 0;
     #endif

@@ -97,7 +97,7 @@ bool CppLayoutPreviewer::LaunchPreview( )
 
     playing = false;
 
-    editor.setFramerateLimit(editor.GetProject().GetMaximumFPS());
+    editor.SetFramerateLimit(editor.GetProject().GetMaximumFPS());
 
     if ( debugger ) debugger->Play();
 
@@ -156,8 +156,8 @@ void CppLayoutPreviewer::OnUpdate()
         bool changeRequested = previewScene.RenderAndStep();
         if (externalPreviewWindow && externalPreviewWindow->IsShown()) //Be sure that the editor is updated.
         {
-            editor.clear(sf::Color(255,255,255));
-            editor.display();
+            editor.GetRenderingTarget().clear(sf::Color(255,255,255));
+            editor.Display();
         }
 
         if (changeRequested)
@@ -266,7 +266,7 @@ void CppLayoutPreviewer::OnPreviewPlayBtClick( wxCommandEvent & event )
 }
 void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
 {
-    PlayPreview();
+    /*PlayPreview();
 
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlay, true);
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPause, true);
@@ -279,7 +279,7 @@ void CppLayoutPreviewer::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
     externalPreviewWindow->Show(true);
 
     externalPreviewWindow->SetSizeOfRenderingZone(editor.GetProject().GetMainWindowDefaultWidth(), editor.GetProject().GetMainWindowDefaultHeight());
-    previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);
+    previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);*/
 }
 void CppLayoutPreviewer::ExternalWindowClosed()
 {
@@ -324,25 +324,25 @@ void CppLayoutPreviewer::RenderCompilationScreen()
 {
     //Ignore all events
     sf::Event event;
-    while ( editor.pollEvent( event ) )
+    while ( editor.PollEvent( event ) )
         ;
 
     //Render the screen
-    editor.clear(sf::Color(255,255,255));
+    editor.GetRenderingTarget().clear(sf::Color(255,255,255));
 
-    editor.pushGLStates();
-    editor.setView(sf::View(sf::Vector2f(editor.getSize().x/2, editor.getSize().y/2), sf::Vector2f(editor.getSize().x, editor.getSize().y)));
+    editor.GetRenderingTarget().pushGLStates();
+    editor.GetRenderingTarget().setView(sf::View(sf::Vector2f(editor.GetSize().x/2, editor.GetSize().y/2), sf::Vector2f(editor.GetSize().x, editor.GetSize().y)));
 
     reloadingIconSprite.setTexture(reloadingIconImage);
     reloadingIconSprite.setColor(sf::Color(255,255,255,128));
-    reloadingIconSprite.setPosition(editor.getSize().x/2-reloadingIconSprite.getLocalBounds().width/2, editor.getSize().y/2-reloadingIconSprite.getLocalBounds().height/2);
-    reloadingText.setPosition(editor.getSize().x/2-reloadingText.getLocalBounds().width/2, reloadingIconSprite.getPosition().y+reloadingIconSprite.getLocalBounds().height+10);
+    reloadingIconSprite.setPosition(editor.GetSize().x/2-reloadingIconSprite.getLocalBounds().width/2, editor.GetSize().y/2-reloadingIconSprite.getLocalBounds().height/2);
+    reloadingText.setPosition(editor.GetSize().x/2-reloadingText.getLocalBounds().width/2, reloadingIconSprite.getPosition().y+reloadingIconSprite.getLocalBounds().height+10);
 
-    editor.draw(reloadingIconSprite);
-    editor.draw(reloadingText);
+    editor.GetRenderingTarget().draw(reloadingIconSprite);
+    editor.GetRenderingTarget().draw(reloadingText);
 
-    editor.popGLStates();
-    editor.display();
+    editor.GetRenderingTarget().popGLStates();
+    editor.Display();
 }
 
 void CppLayoutPreviewer::SetParentAuiManager(wxAuiManager * manager)

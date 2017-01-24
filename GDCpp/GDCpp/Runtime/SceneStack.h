@@ -9,7 +9,7 @@
 #include <GDCpp/Runtime/String.h>
 class RuntimeGame;
 class RuntimeScene;
-namespace sf { class RenderWindow; }
+namespace gd { class RenderingWindow; }
 
 /**
  * A stack of RuntimeScene.
@@ -23,7 +23,7 @@ public:
 	 * \param window The sf::RenderWindow to be used to render the scenes.
 	 * \param codeLibraryName Filename to a shared library containing the code to execute for scenes.
 	 */
-	SceneStack(RuntimeGame & game_, sf::RenderWindow * window_) :
+	SceneStack(RuntimeGame & game_, gd::RenderingWindow * window_) :
 		game(game_),
 		window(window_)
 	{
@@ -76,7 +76,7 @@ public:
 
 private:
 	RuntimeGame & game;
-	sf::RenderWindow * window;
+	gd::RenderingWindow * window;
 	std::vector<std::unique_ptr<RuntimeScene>> stack;
 	std::function<void(gd::String)> errorCallback;
 	std::function<bool(RuntimeScene &)> loadCallback;

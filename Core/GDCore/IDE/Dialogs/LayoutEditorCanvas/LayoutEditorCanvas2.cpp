@@ -121,7 +121,7 @@ void LayoutEditorCanvas::DrawAngleButtonGuiElement(std::vector < std::shared_ptr
     guiElement.name = "angle";
     guiElement.area = wxRect(angleButton->getPosition().x-smallButtonSize/2.0, angleButton->getPosition().y-smallButtonSize/2.0, smallButtonSize, smallButtonSize);
     guiElements.push_back(guiElement);
-    if ( !guiElement.area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
+    if ( !guiElement.area.Contains(wxPoint(gd::RenderingWindow::GetMousePosition(*this).x, gd::RenderingWindow::GetMousePosition(*this).y)) )
         angleButton->setFillColor(sf::Color( 220, 220, 220, 255 ));
     else
         angleButton->setFillColor(sf::Color( 255, 255, 255, 255 ));
@@ -158,7 +158,7 @@ void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < std::shared_ptr<
     button->setPosition(position);
     button->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
     button->setOutlineThickness(1);
-    if ( !guiElement.area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
+    if ( !guiElement.area.Contains(wxPoint(gd::RenderingWindow::GetMousePosition(*this).x, gd::RenderingWindow::GetMousePosition(*this).y)) )
         button->setFillColor(sf::Color( 220, 220, 220, 255 ));
     else
         button->setFillColor(sf::Color( 255, 255, 255, 255 ));
@@ -190,7 +190,7 @@ public:
         gd::Object * associatedObject = editor.GetObjectLinkedToInitialInstance(instance);
         if ( !associatedObject ) return;
 
-        associatedObject->DrawInitialInstance(instance, editor, editor.project, editor.layout);
+        associatedObject->DrawInitialInstance(instance, editor.GetRenderingTarget(), editor.project, editor.layout);
         sf::Vector2f origin = associatedObject->GetInitialInstanceOrigin(instance, editor.project, editor.layout);
         sf::Vector2f size = sf::Vector2f(instance.GetCustomWidth(), instance.GetCustomHeight());
         if ( !instance.HasCustomSize() )
@@ -245,11 +245,11 @@ private:
 
 void LayoutEditorCanvas::RenderEdittime()
 {
-    clear( sf::Color( layout.GetBackgroundColorRed(), layout.GetBackgroundColorGreen(), layout.GetBackgroundColorBlue() ) );
-    setView(editionView);
+    GetRenderingTarget().clear( sf::Color( layout.GetBackgroundColorRed(), layout.GetBackgroundColorGreen(), layout.GetBackgroundColorBlue() ) );
+    GetRenderingTarget().setView(editionView);
 
     glClear(GL_DEPTH_BUFFER_BIT);
-    pushGLStates(); //To allow using OpenGL to draw
+    GetRenderingTarget().pushGLStates(); //To allow using OpenGL to draw
 
     //Prepare GUI elements and the renderer
     std::vector < std::shared_ptr<sf::Shape> > guiElementsShapes;
@@ -261,15 +261,15 @@ void LayoutEditorCanvas::RenderEdittime()
     {
         if ( layout.GetLayer(layerIndex).GetVisibility() )
         {
-            popGLStates();
+            GetRenderingTarget().popGLStates();
 
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            OpenGLTools::PerspectiveGL(layout.GetOpenGLFOV(), static_cast<double>(getSize().x)/static_cast<double>(getSize().y), layout.GetOpenGLZNear(), layout.GetOpenGLZFar());
+            OpenGLTools::PerspectiveGL(layout.GetOpenGLFOV(), static_cast<double>(GetSize().x)/static_cast<double>(GetSize().y), layout.GetOpenGLZNear(), layout.GetOpenGLZFar());
 
-            glViewport(0,0, getSize().x, getSize().y);
+            glViewport(0,0, GetSize().x, GetSize().y);
 
-            pushGLStates();
+            GetRenderingTarget().pushGLStates();
 
             instances.IterateOverInstancesWithZOrdering(renderer, layout.GetLayer(layerIndex).GetName());
         }
@@ -277,7 +277,7 @@ void LayoutEditorCanvas::RenderEdittime()
 
 
     //Go back to "window" view before drawing GUI elements
-    setView(sf::View(sf::Vector2f(getSize().x/2,getSize().y/2), sf::Vector2f(getSize().x,getSize().y)));
+    GetRenderingTarget().setView(sf::View(sf::Vector2f(GetSize().x/2,GetSize().y/2), sf::Vector2f(GetSize().x,GetSize().y)));
 
     if ( options.grid ) RenderGrid();
     RenderInitialWindowBorder();
@@ -313,13 +313,13 @@ void LayoutEditorCanvas::RenderEdittime()
     }
 
     for (std::size_t i = 0;i<guiElementsShapes.size();++i)
-    	draw(*guiElementsShapes[i]);
+    	GetRenderingTarget().draw(*guiElementsShapes[i]);
 
     if ( options.windowMask ) RenderWindowMask();
 
-    setView(editionView);
-    popGLStates();
-    display();
+    GetRenderingTarget().setView(editionView);
+    GetRenderingTarget().popGLStates();
+    Display();
 }
 
 void LayoutEditorCanvas::RenderWindowMask()
@@ -335,28 +335,28 @@ void LayoutEditorCanvas::RenderWindowMask()
         (layout.GetBackgroundColorBlue()+128)%255, 128);
 
     {
-        sf::RectangleShape mask(sf::Vector2f(getSize().x, rectangleOrigin.y));
+        sf::RectangleShape mask(sf::Vector2f(GetSize().x, rectangleOrigin.y));
         mask.setPosition(0, 0);
         mask.setFillColor(maskColor);
-        draw(mask);
+        GetRenderingTarget().draw(mask);
     }
     {
-        sf::RectangleShape mask(sf::Vector2f(rectangleOrigin.x, getSize().y-rectangleOrigin.y));
+        sf::RectangleShape mask(sf::Vector2f(rectangleOrigin.x, GetSize().y-rectangleOrigin.y));
         mask.setPosition(0, rectangleOrigin.y);
         mask.setFillColor(maskColor);
-        draw(mask);
+        GetRenderingTarget().draw(mask);
     }
     {
-        sf::RectangleShape mask(sf::Vector2f(getSize().x-rectangleEnd.x, getSize().y-rectangleOrigin.y));
+        sf::RectangleShape mask(sf::Vector2f(GetSize().x-rectangleEnd.x, GetSize().y-rectangleOrigin.y));
         mask.setPosition(rectangleEnd.x, rectangleOrigin.y);
         mask.setFillColor(maskColor);
-        draw(mask);
+        GetRenderingTarget().draw(mask);
     }
     {
-        sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, getSize().y-rectangleEnd.y));
+        sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, GetSize().y-rectangleEnd.y));
         mask.setPosition(rectangleOrigin.x, rectangleEnd.y);
         mask.setFillColor(maskColor);
-        draw(mask);
+        GetRenderingTarget().draw(mask);
     }
 }
 
@@ -373,7 +373,7 @@ void LayoutEditorCanvas::RenderInitialWindowBorder()
         sf::Vertex(ConvertToWindowCoordinates(0, project.GetMainWindowDefaultHeight(), editionView), color),
         sf::Vertex(ConvertToWindowCoordinates(0, project.GetMainWindowDefaultHeight(), editionView), color),
         sf::Vertex(ConvertToWindowCoordinates(0, 0, editionView), color),};
-    draw(line, 8, sf::Lines);
+    GetRenderingTarget().draw(line, 8, sf::Lines);
 }
 
 void LayoutEditorCanvas::RenderGrid()
@@ -387,14 +387,14 @@ void LayoutEditorCanvas::RenderGrid()
     {
         sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(Xpos, initialYPos, editionView), sf::Color(options.gridR, options.gridG, options.gridB)),
                               sf::Vertex(ConvertToWindowCoordinates(Xpos, editionView.getCenter().y+editionView.getSize().y/2, editionView), sf::Color(options.gridR, options.gridG, options.gridB))};
-        draw(line, 2, sf::Lines);
+        GetRenderingTarget().draw(line, 2, sf::Lines);
     }
 
     for ( int Ypos = initialYPos + options.gridOffsetY; Ypos < (editionView.getCenter().y+editionView.getSize().y/2); Ypos += options.gridHeight )
     {
         sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(initialXPos, Ypos, editionView), sf::Color(options.gridR, options.gridG, options.gridB)),
                               sf::Vertex(ConvertToWindowCoordinates(editionView.getCenter().x+editionView.getSize().x/2, Ypos, editionView), sf::Color(options.gridR, options.gridG, options.gridB))};
-        draw(line, 2, sf::Lines);
+        GetRenderingTarget().draw(line, 2, sf::Lines);
     }
 }
 
@@ -404,7 +404,7 @@ sf::Vector2f LayoutEditorCanvas::ConvertToWindowCoordinates(float x, float y, co
     sf::Vector2f hCoords = view.getTransform().transformPoint(x,y);
 
     //Go back from homogeneous coordinates to viewport ones.
-    sf::IntRect viewport = getViewport(view);
+    sf::IntRect viewport = GetRenderingTarget().getViewport(view);
     return sf::Vector2f(( hCoords.x + 1.f ) / 2.f * viewport.width + viewport.left,
                         (-hCoords.y + 1.f ) / 2.f * viewport.height + viewport.top);
 }
@@ -606,7 +606,7 @@ void LayoutEditorCanvas::OnMouseWheel( wxMouseEvent &event )
     {
         float rotation = -event.GetWheelRotation()*8;
         float newheight = editionView.getSize().y + ( rotation / 25 );
-        float newZoomFactor = static_cast<float>(getSize().y)/newheight;
+        float newZoomFactor = static_cast<float>(GetSize().y)/newheight;
         if ( newZoomFactor > 0 ) options.zoomFactor = newZoomFactor;
         UpdateViewAccordingToZoomFactor();
     }
@@ -686,7 +686,7 @@ void LayoutEditorCanvas::UpdateSize()
         double scaleFactor = GUIContentScaleFactor::Get();
 
         //Scene takes all the space available in edition mode.
-        Window::setSize(sf::Vector2u(width * scaleFactor, height * scaleFactor));
+        WxRenderingWindow::SetSize(sf::Vector2u(width * scaleFactor, height * scaleFactor));
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(width * scaleFactor, height * scaleFactor);
 
@@ -695,7 +695,7 @@ void LayoutEditorCanvas::UpdateSize()
     else
     {
         //Scene has the size of the project's window size in preview mode.
-        Window::setSize(sf::Vector2u(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight()));
+        WxRenderingWindow::SetSize(sf::Vector2u(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight()));
         wxWindowBase::SetClientSize(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight());
 
         //Scene is centered in preview mode
@@ -709,7 +709,7 @@ void LayoutEditorCanvas::OnvScrollbarScroll(wxScrollEvent& event)
     if ( vScrollbar == NULL )
         return;
 
-    int newY = event.GetPosition()-(vScrollbar->GetRange()/2)+(getSize().y/2);
+    int newY = event.GetPosition()-(vScrollbar->GetRange()/2)+(GetSize().y/2);
     editionView.setCenter( editionView.getCenter().x, newY);
 
     OnUpdate();
@@ -720,7 +720,7 @@ void LayoutEditorCanvas::OnhScrollbarScroll(wxScrollEvent& event)
     if ( hScrollbar == NULL )
         return;
 
-    int newX = event.GetPosition()-(hScrollbar->GetRange()/2)+(getSize().x/2);
+    int newX = event.GetPosition()-(hScrollbar->GetRange()/2)+(GetSize().x/2);
     editionView.setCenter( newX, editionView.getCenter().y );
 
     OnUpdate();
@@ -732,31 +732,31 @@ void LayoutEditorCanvas::UpdateScrollbars()
         return;
 
     //Compute the thumb position
-    int thumbY = editionView.getCenter().y+vScrollbar->GetRange()/2-getSize().y/2;
-    vScrollbar->SetScrollbar(thumbY, getSize().y, vScrollbar->GetRange(), getSize().y);
+    int thumbY = editionView.getCenter().y+vScrollbar->GetRange()/2-GetSize().y/2;
+    vScrollbar->SetScrollbar(thumbY, GetSize().y, vScrollbar->GetRange(), GetSize().y);
 
-    int thumbX = editionView.getCenter().x+hScrollbar->GetRange()/2-getSize().x/2;
-    hScrollbar->SetScrollbar(thumbX, getSize().x, hScrollbar->GetRange(), getSize().x);
+    int thumbX = editionView.getCenter().x+hScrollbar->GetRange()/2-GetSize().x/2;
+    hScrollbar->SetScrollbar(thumbX, GetSize().x, hScrollbar->GetRange(), GetSize().x);
 
     //Update the size if needed
     if ( hScrollbar->HasFocus() || vScrollbar->HasFocus() )
         return;
 
-    if ( thumbY <= 0 || static_cast<int>(thumbY+getSize().y) >= vScrollbar->GetRange())
+    if ( thumbY <= 0 || static_cast<int>(thumbY+GetSize().y) >= vScrollbar->GetRange())
     {
-        int offset = getSize().y;
-        vScrollbar->SetScrollbar(thumbY+offset/2, getSize().y, vScrollbar->GetRange()+offset, getSize().y);
+        int offset = GetSize().y;
+        vScrollbar->SetScrollbar(thumbY+offset/2, GetSize().y, vScrollbar->GetRange()+offset, GetSize().y);
     }
 
-    if ( thumbX <= 0 || static_cast<int>(thumbX+getSize().x) >= hScrollbar->GetRange())
+    if ( thumbX <= 0 || static_cast<int>(thumbX+GetSize().x) >= hScrollbar->GetRange())
     {
-        int offset = getSize().x;
-        hScrollbar->SetScrollbar(thumbX+offset/2, getSize().x, hScrollbar->GetRange()+offset, getSize().x);
+        int offset = GetSize().x;
+        hScrollbar->SetScrollbar(thumbX+offset/2, GetSize().x, hScrollbar->GetRange()+offset, GetSize().x);
     }
 }
 void LayoutEditorCanvas::UpdateViewAccordingToZoomFactor()
 {
-    editionView.setSize(getSize().x/options.zoomFactor, getSize().y/options.zoomFactor);
+    editionView.setSize(GetSize().x/options.zoomFactor, GetSize().y/options.zoomFactor);
 }
 
 void LayoutEditorCanvas::OnHelpBtClick( wxCommandEvent & event )

@@ -1,9 +1,9 @@
 #include "GDCore/Window/WxRenderingWindow.h"
 
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
 #include <wx/dcbuffer.h>
 #include <wx/rawbmp.h>
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 namespace
 {

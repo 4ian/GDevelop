@@ -11,7 +11,7 @@
 namespace gd
 {
 
-class WxRenderingWindow : public wxPanel, public RenderingWindow
+class GD_CORE_API WxRenderingWindow : public wxPanel, public RenderingWindow
 {
 public:
  	WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSize = sf::Vector2u(-1, -1), wxWindowID id = wxID_ANY, const wxPoint & pos = wxDefaultPosition, const wxSize & size = wxDefaultSize, long style = wxWANTS_CHARS, const wxString & name = wxPanelNameStr);

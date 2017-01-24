@@ -11,7 +11,7 @@ namespace sf { class Event; }
 namespace gd
 {
 
-class RenderingWindow
+class GD_CORE_API RenderingWindow
 {
 public:
     RenderingWindow() {};

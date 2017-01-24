@@ -8,7 +8,7 @@
 namespace gd
 {
 
-class SFMLRenderingWindow : public RenderingWindow
+class GD_CORE_API SFMLRenderingWindow : public RenderingWindow
 {
 public:
     SFMLRenderingWindow(sf::VideoMode mode, const gd::String & title, sf::Uint32 style = sf::Style::Default, const sf::ContextSettings & settings = sf::ContextSettings());

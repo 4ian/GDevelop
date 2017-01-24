@@ -91,17 +91,17 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
     {
         sf::Vector2u windowSize = m_relativeToOriginalWindowSize ?
             sf::Vector2u(scene.game->getWindowOriginalWidth(), scene.game->getWindowOriginalHeight()) :
-            scene.renderWindow->getSize();
+            scene.renderWindow->GetSize();
 
         //Calculate the distances from the window's bounds.
         sf::Vector2f topLeftPixel = mapCoordsToFloatPixel(
             sf::Vector2f(object->GetDrawableX(), object->GetDrawableY()),
-            *(scene.renderWindow),
+            scene.renderWindow->GetRenderingTarget(),
             firstCamera.GetSFMLView());
 
         sf::Vector2f bottomRightPixel = mapCoordsToFloatPixel(
             sf::Vector2f(object->GetDrawableX() + object->GetWidth(), object->GetDrawableY() + object->GetHeight()),
-            *(scene.renderWindow),
+            scene.renderWindow->GetRenderingTarget(),
             firstCamera.GetSFMLView());
 
         //Left edge
@@ -140,7 +140,7 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
     }
     else
     {
-        sf::Vector2u windowSize = scene.renderWindow->getSize();
+        sf::Vector2u windowSize = scene.renderWindow->GetSize();
 
         //Move and resize the object if needed
         sf::Vector2f topLeftPixel;
@@ -178,8 +178,8 @@ void AnchorBehavior::DoStepPostEvents(RuntimeScene & scene)
         else if(m_bottomEdgeAnchor == ANCHOR_VERTICAL_PROPORTIONAL)
             bottomRightPixel.y = m_bottomEdgeDistance * static_cast<float>(windowSize.y);
 
-        sf::Vector2f topLeftCoord = mapFloatPixelToCoords(topLeftPixel, (*scene.renderWindow), firstCamera.GetSFMLView());
-        sf::Vector2f bottomRightCoord = mapFloatPixelToCoords(bottomRightPixel, (*scene.renderWindow), firstCamera.GetSFMLView());
+        sf::Vector2f topLeftCoord = mapFloatPixelToCoords(topLeftPixel, scene.renderWindow->GetRenderingTarget(), firstCamera.GetSFMLView());
+        sf::Vector2f bottomRightCoord = mapFloatPixelToCoords(bottomRightPixel, scene.renderWindow->GetRenderingTarget(), firstCamera.GetSFMLView());
 
         //Move and resize the object according to the anchors
         if(m_rightEdgeAnchor != ANCHOR_HORIZONTAL_NONE)

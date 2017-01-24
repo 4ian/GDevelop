@@ -27,6 +27,15 @@ void SFMLRenderingWindow::Display()
     window.display();
 }
 
+sf::Texture SFMLRenderingWindow::CaptureAsTexture() const
+{
+    sf::Texture texture;
+    texture.create(window.getSize().x, window.getSize().y);
+    texture.update(window);
+
+    return texture;
+}
+
 void SFMLRenderingWindow::Close()
 {
     window.close();

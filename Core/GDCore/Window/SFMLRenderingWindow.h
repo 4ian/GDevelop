@@ -18,6 +18,8 @@ public:
 
     virtual void Display();
 
+    virtual sf::Texture CaptureAsTexture() const;
+
     virtual void Close();
 
     virtual bool PollEvent(sf::Event & event);

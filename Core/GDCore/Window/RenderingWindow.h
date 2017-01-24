@@ -1,6 +1,7 @@
 #ifndef GDCORE_RENDERINGWINDOW_H
 #define GDCORE_RENDERINGWINDOW_H
 
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 
 #include "GDCore/String.h"
@@ -21,6 +22,8 @@ public:
     virtual sf::RenderTarget & GetRenderingTarget() = 0;
 
     virtual void Display() = 0;
+
+    virtual sf::Texture CaptureAsTexture() const = 0;
 
     static sf::Vector2i GetMousePosition();
     static sf::Vector2i GetMousePosition(const RenderingWindow & window);

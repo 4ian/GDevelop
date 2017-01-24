@@ -40,6 +40,11 @@ void WxRenderingWindow::Display()
     Refresh();
 }
 
+sf::Texture WxRenderingWindow::CaptureAsTexture() const
+{
+    return sf::Texture(texture.getTexture());
+}
+
 bool WxRenderingWindow::PollEvent(sf::Event & event)
 {
     return false;

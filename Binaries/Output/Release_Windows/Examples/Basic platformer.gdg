@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="84" major="3" minor="6" revision="0" />
-    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+    <gdVersion build="94" major="4" minor="0" revision="0" />
+    <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" packageName="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Basic platformer</name>
         <author></author>
         <windowWidth>800</windowWidth>
@@ -31,7 +31,7 @@
             <extension name="BuiltinMathematicalTools" />
             <extension name="BuiltinExternalLayouts" />
             <extension name="TiledSpriteObject" />
-            <extension name="PlatformAutomatism" />
+            <extension name="PlatformBehavior" />
         </extensions>
         <platforms>
             <platform name="GDevelop C++ platform" />
@@ -71,7 +71,7 @@
     <variables />
     <layouts>
         <layout b="252" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="201" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="233">
-            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="70" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="70" snap="true" windowMask="false" zoomFactor="0.764706" />
+            <uiSettings grid="false" gridB="255" gridG="180" gridHeight="70" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="70" snap="true" windowMask="false" zoomFactor="0.764706" />
             <objectsGroups />
             <variables />
             <instances>
@@ -102,7 +102,7 @@
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Platform" width="0.000000" x="575.076965" y="268.769287" zOrder="1">
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Platform" width="0.000000" x="575.076965" y="270.076965" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
@@ -241,13 +241,13 @@
                 </instance>
             </instances>
             <objects>
-                <object name="Player" type="Sprite">
+                <object name="Player" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms>
-                        <automatism acceleration="1500.000000" deceleration="1500.000000" gravity="1300.000000" ignoreDefaultControls="false" jumpSpeed="1000.000000" maxFallingSpeed="1000.000000" maxSpeed="250.000000" name="PlatformerObject" slopeMaxAngle="0.000000" type="PlatformAutomatism::PlatformerObjectAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior acceleration="1500.000000" canGrabPlatforms="false" deceleration="1500.000000" gravity="1300.000000" ignoreDefaultControls="false" jumpSpeed="1000.000000" maxFallingSpeed="1000.000000" maxSpeed="250.000000" name="PlatformerObject" slopeMaxAngle="0.000000" type="PlatformBehavior::PlatformerObjectBehavior" xGrabTolerance="10.000000" yGrabOffset="0.000000" />
+                    </behaviors>
                     <animations>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -268,7 +268,7 @@
                                 </direction>
                             </directions>
                         </animation>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -289,7 +289,7 @@
                                 </direction>
                             </directions>
                         </animation>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="true" timeBetweenFrames="0.050000">
                                     <sprites>
@@ -364,13 +364,13 @@
                         </animation>
                     </animations>
                 </object>
-                <object name="Platform" type="Sprite">
+                <object name="Platform" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="NormalPlatform" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior canBeGrabbed="true" name="Platform" platformType="NormalPlatform" type="PlatformBehavior::PlatformBehavior" yGrabOffset="0.000000" />
+                    </behaviors>
                     <animations>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -391,7 +391,7 @@
                                 </direction>
                             </directions>
                         </animation>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -414,13 +414,13 @@
                         </animation>
                     </animations>
                 </object>
-                <object name="Jumpthru" type="Sprite">
+                <object name="Jumpthru" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="Jumpthru" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior canBeGrabbed="true" name="Platform" platformType="Jumpthru" type="PlatformBehavior::PlatformBehavior" yGrabOffset="0.000000" />
+                    </behaviors>
                     <animations>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -445,23 +445,23 @@
                 </object>
                 <object height="70.000000" name="TiledGrassPlatform" texture="grassHalfMid.png" type="TiledSpriteObject::TiledSprite" width="70.000000">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="NormalPlatform" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior canBeGrabbed="true" name="Platform" platformType="NormalPlatform" type="PlatformBehavior::PlatformBehavior" yGrabOffset="0.000000" />
+                    </behaviors>
                 </object>
                 <object height="70.000000" name="TiledCastlePlatform" texture="castleCenter.png" type="TiledSpriteObject::TiledSprite" width="70.000000">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="NormalPlatform" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior canBeGrabbed="true" name="Platform" platformType="NormalPlatform" type="PlatformBehavior::PlatformBehavior" yGrabOffset="0.000000" />
+                    </behaviors>
                 </object>
-                <object name="MovingPlatform" type="Sprite">
+                <object name="MovingPlatform" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="Jumpthru" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior canBeGrabbed="true" name="Platform" platformType="Jumpthru" type="PlatformBehavior::PlatformBehavior" yGrabOffset="0.000000" />
+                    </behaviors>
                     <animations>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -484,11 +484,11 @@
                         </animation>
                     </animations>
                 </object>
-                <object name="GoLeft" type="Sprite">
+                <object name="GoLeft" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <animations>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -511,11 +511,11 @@
                         </animation>
                     </animations>
                 </object>
-                <object name="GoRight" type="Sprite">
+                <object name="GoRight" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <animations>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -540,9 +540,9 @@
                 </object>
                 <object height="70.000000" name="Ladder" texture="ladder_mid.png" type="TiledSpriteObject::TiledSprite" width="70.000000">
                     <variables />
-                    <automatisms>
-                        <automatism name="Platform" platformType="Ladder" type="PlatformAutomatism::PlatformAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior canBeGrabbed="true" name="Platform" platformType="Ladder" type="PlatformBehavior::PlatformBehavior" yGrabOffset="0.000000" />
+                    </behaviors>
                 </object>
             </objects>
             <events>
@@ -562,7 +562,7 @@
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
                         <condition>
-                            <type inverted="false" value="PlatformAutomatism::IsJumping" />
+                            <type inverted="false" value="PlatformBehavior::IsJumping" />
                             <parameters>
                                 <parameter>Player</parameter>
                                 <parameter>PlatformerObject</parameter>
@@ -587,7 +587,7 @@
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
                         <condition>
-                            <type inverted="false" value="PlatformAutomatism::IsFalling" />
+                            <type inverted="false" value="PlatformBehavior::IsFalling" />
                             <parameters>
                                 <parameter>Player</parameter>
                                 <parameter>PlatformerObject</parameter>
@@ -612,7 +612,7 @@
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
                         <condition>
-                            <type inverted="false" value="PlatformAutomatism::IsOnFloor" />
+                            <type inverted="false" value="PlatformBehavior::IsOnFloor" />
                             <parameters>
                                 <parameter>Player</parameter>
                                 <parameter>PlatformerObject</parameter>
@@ -626,7 +626,7 @@
                             <type>BuiltinCommonInstructions::Standard</type>
                             <conditions>
                                 <condition>
-                                    <type inverted="true" value="PlatformAutomatism::IsMoving" />
+                                    <type inverted="true" value="PlatformBehavior::IsMoving" />
                                     <parameters>
                                         <parameter>Player</parameter>
                                         <parameter>PlatformerObject</parameter>
@@ -651,7 +651,7 @@
                             <type>BuiltinCommonInstructions::Standard</type>
                             <conditions>
                                 <condition>
-                                    <type inverted="false" value="PlatformAutomatism::IsMoving" />
+                                    <type inverted="false" value="PlatformBehavior::IsMoving" />
                                     <parameters>
                                         <parameter>Player</parameter>
                                         <parameter>PlatformerObject</parameter>
@@ -855,12 +855,13 @@
                     <cameras>
                         <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
                     </cameras>
+                    <effects />
                 </layer>
             </layers>
-            <automatismsSharedData>
-                <automatismSharedData name="Platform" type="PlatformAutomatism::PlatformAutomatism" />
-                <automatismSharedData name="PlatformerObject" type="PlatformAutomatism::PlatformerObjectAutomatism" />
-            </automatismsSharedData>
+            <behaviorsSharedData>
+                <behaviorSharedData name="Platform" type="PlatformBehavior::PlatformBehavior" />
+                <behaviorSharedData name="PlatformerObject" type="PlatformBehavior::PlatformerObjectBehavior" />
+            </behaviorsSharedData>
         </layout>
     </layouts>
     <externalEvents />

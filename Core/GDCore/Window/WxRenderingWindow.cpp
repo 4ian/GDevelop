@@ -1,8 +1,55 @@
 #include "GDCore/Window/WxRenderingWindow.h"
 
 #include <wx/dcbuffer.h>
+#include <wx/rawbmp.h>
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+namespace
+{
+
+    /**
+     * Thanks to https://forums.wxwidgets.org/viewtopic.php?t=20074
+     */
+    typedef wxAlphaPixelData PixelData;
+    wxBitmap * RGBAtoBitmap(const unsigned char *rgba, int w, int h)
+    {
+        wxBitmap * bitmap = new wxBitmap(w, h, 32);
+        if(!bitmap->Ok())
+        {
+            delete bitmap;
+            return NULL;
+        }
+
+        PixelData bmdata(*bitmap);
+        if(bmdata == NULL)
+        {
+            delete bitmap;
+            return NULL;
+        }
+
+        bmdata.UseAlpha();
+        PixelData::Iterator dst(bmdata);
+
+        for(int y = 0; y < h; y++)
+        {
+            dst.MoveTo(bmdata, 0, y);
+            for(int x = 0; x < w; x++)
+            {
+                // wxBitmap contains rgb values pre-multiplied with alpha
+                unsigned char a = rgba[3];
+                dst.Red() = rgba[0] * a / 255;
+                dst.Green() = rgba[1] * a / 255;
+                dst.Blue() = rgba[2] * a / 255;
+                dst.Alpha() = a;
+                dst++;
+                rgba += 4;
+            }
+        }
+        return bitmap;
+    }
+
+}
 
 namespace gd
 {
@@ -91,7 +138,7 @@ void WxRenderingWindow::OnPaint(wxPaintEvent& event)
     wxAutoBufferedPaintDC dc(this);
 
     sf::Image sfImage = texture.getTexture().copyToImage();
-    wxImage image(sfImage.getSize().x, sfImage.getSize().y, false);
+    /*wxImage image(sfImage.getSize().x, sfImage.getSize().y, false);
 
     for(std::size_t x = 0; x < sfImage.getSize().x; ++x)
     {
@@ -103,9 +150,11 @@ void WxRenderingWindow::OnPaint(wxPaintEvent& event)
         }
     }
 
-    wxBitmap bitmap(image);
+    wxBitmap bitmap(image);*/
 
-    dc.DrawBitmap(bitmap, 0, 0, false);
+    wxBitmap * bitmap = RGBAtoBitmap(sfImage.getPixelsPtr(), sfImage.getSize().x, sfImage.getSize().y);
+    dc.DrawBitmap(*bitmap, 0, 0, false);
+    delete bitmap;
 }
 
 void WxRenderingWindow::OnEraseBackground(wxEraseEvent& event)

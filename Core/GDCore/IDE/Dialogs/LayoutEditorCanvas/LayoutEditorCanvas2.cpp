@@ -687,7 +687,6 @@ void LayoutEditorCanvas::UpdateSize()
         double scaleFactor = GUIContentScaleFactor::Get();
 
         //Scene takes all the space available in edition mode.
-        WxRenderingWindow::SetSize(sf::Vector2u(width * scaleFactor, height * scaleFactor));
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(width * scaleFactor, height * scaleFactor);
 
@@ -696,7 +695,6 @@ void LayoutEditorCanvas::UpdateSize()
     else
     {
         //Scene has the size of the project's window size in preview mode.
-        WxRenderingWindow::SetSize(sf::Vector2u(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight()));
         wxWindowBase::SetClientSize(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight());
 
         //Scene is centered in preview mode

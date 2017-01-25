@@ -62,14 +62,12 @@ WxRenderingWindow::WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSi
 {
     bool automaticSize = (renderingSize == sf::Vector2u(-1, -1));
 
-    texture.create(
-        automaticSize ? size.GetWidth() : renderingSize.x,
-        automaticSize ? size.GetHeight() : renderingSize.y,
-        true);
+    texture.create(size.GetWidth(), size.GetHeight(), true);
 
     Connect(wxEVT_PAINT, wxPaintEventHandler(WxRenderingWindow::OnPaint), NULL, this);
 	Connect(wxEVT_ERASE_BACKGROUND, (wxObjectEventFunction)& WxRenderingWindow::OnEraseBackground);
     Connect(wxEVT_IDLE, (wxObjectEventFunction)& WxRenderingWindow::OnIdle);
+    Connect(wxEVT_SIZE, (wxObjectEventFunction)& WxRenderingWindow::OnSizeChanged);
 }
 
 const sf::RenderTarget & WxRenderingWindow::GetRenderingTarget() const
@@ -116,14 +114,7 @@ sf::Vector2u WxRenderingWindow::GetSize() const
 
 void WxRenderingWindow::SetSize(const sf::Vector2u & size)
 {
-    if(size == sf::Vector2u(-1, -1))
-    {
-        texture.create(wxPanel::GetSize().GetWidth(), wxPanel::GetSize().GetHeight(), true);
-    }
-    else
-    {
-        texture.create(size.x, size.y, true);
-    }
+
 }
 
 bool WxRenderingWindow::SetActive(bool active)
@@ -134,8 +125,7 @@ bool WxRenderingWindow::SetActive(bool active)
 void WxRenderingWindow::EnableIdleEvents(bool enable)
 {
     idleEventEnabled = enable;
-    if(idleEventEnabled)
-        wxWakeUpIdle();
+    ForceUpdate();
 }
 
 void WxRenderingWindow::OnPaint(wxPaintEvent& event)
@@ -167,13 +157,26 @@ void WxRenderingWindow::OnIdle(wxIdleEvent & event)
         if(hasRendered)
         {
             OnUpdate();
-            Refresh();
             hasRendered = false; //Prevent another idle event to update the game before the previous frame has been drawn
+            Refresh();
         }
 
         //Note: A new idle event will be required in OnPaint to avoid to process useless idle events
         //      This greatly reduce the CPU load of this panel
     }
+}
+
+void WxRenderingWindow::OnSizeChanged(wxSizeEvent & event)
+{
+    texture.create(GetClientSize().GetWidth(), GetClientSize().GetHeight(), true);
+    ForceUpdate();
+}
+
+void WxRenderingWindow::ForceUpdate()
+{
+    texture.clear(sf::Color(255, 255, 255, 255));
+    hasRendered = true;
+    wxWakeUpIdle();
 }
 
 }

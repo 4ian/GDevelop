@@ -64,6 +64,10 @@ private:
 
     virtual void OnIdle(wxIdleEvent & event);
 
+    virtual void OnSizeChanged(wxSizeEvent & event);
+
+    void ForceUpdate();
+
     sf::RenderTexture texture;
     bool idleEventEnabled;
 

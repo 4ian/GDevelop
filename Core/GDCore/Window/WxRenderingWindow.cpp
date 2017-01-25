@@ -2,6 +2,7 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
+#include <wx/app.h>
 #include <wx/dcbuffer.h>
 #include <wx/rawbmp.h>
 
@@ -55,12 +56,11 @@ namespace gd
 {
 
 WxRenderingWindow::WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSize, wxWindowID id, const wxPoint & pos, const wxSize & size, long style, const wxString & name) :
-    wxPanel(parent, id, pos, size, style|wxWANTS_CHARS, name)
+    wxPanel(parent, id, pos, size, style|wxWANTS_CHARS, name),
+    idleEventEnabled(true),
+    hasRendered(true)
 {
-    if(renderingSize == sf::Vector2u(-1, -1))
-        automaticSize = true;
-    else
-        automaticSize = false;
+    bool automaticSize = (renderingSize == sf::Vector2u(-1, -1));
 
     texture.create(
         automaticSize ? size.GetWidth() : renderingSize.x,
@@ -69,6 +69,7 @@ WxRenderingWindow::WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSi
 
     Connect(wxEVT_PAINT, wxPaintEventHandler(WxRenderingWindow::OnPaint), NULL, this);
 	Connect(wxEVT_ERASE_BACKGROUND, (wxObjectEventFunction)& WxRenderingWindow::OnEraseBackground);
+    Connect(wxEVT_IDLE, (wxObjectEventFunction)& WxRenderingWindow::OnIdle);
 }
 
 const sf::RenderTarget & WxRenderingWindow::GetRenderingTarget() const
@@ -84,7 +85,6 @@ sf::RenderTarget & WxRenderingWindow::GetRenderingTarget()
 void WxRenderingWindow::Display()
 {
     texture.display();
-    Refresh();
 }
 
 sf::Texture WxRenderingWindow::CaptureAsTexture() const
@@ -118,12 +118,10 @@ void WxRenderingWindow::SetSize(const sf::Vector2u & size)
 {
     if(size == sf::Vector2u(-1, -1))
     {
-        automaticSize = true;
         texture.create(wxPanel::GetSize().GetWidth(), wxPanel::GetSize().GetHeight(), true);
     }
     else
     {
-        automaticSize = false;
         texture.create(size.x, size.y, true);
     }
 }
@@ -133,33 +131,49 @@ bool WxRenderingWindow::SetActive(bool active)
     texture.setActive(active);
 }
 
+void WxRenderingWindow::EnableIdleEvents(bool enable)
+{
+    idleEventEnabled = enable;
+    if(idleEventEnabled)
+        wxWakeUpIdle();
+}
+
 void WxRenderingWindow::OnPaint(wxPaintEvent& event)
 {
     wxAutoBufferedPaintDC dc(this);
 
     sf::Image sfImage = texture.getTexture().copyToImage();
-    /*wxImage image(sfImage.getSize().x, sfImage.getSize().y, false);
-
-    for(std::size_t x = 0; x < sfImage.getSize().x; ++x)
-    {
-        for(std::size_t y = 0; y < sfImage.getSize().y; ++y)
-        {
-            sf::Color pixel = sfImage.getPixel(x, y);
-            image.SetRGB(x, y, pixel.r, pixel.g, pixel.b);
-            image.SetAlpha(x, y, pixel.a);
-        }
-    }
-
-    wxBitmap bitmap(image);*/
-
     wxBitmap * bitmap = RGBAtoBitmap(sfImage.getPixelsPtr(), sfImage.getSize().x, sfImage.getSize().y);
+
     dc.DrawBitmap(*bitmap, 0, 0, false);
     delete bitmap;
+
+    hasRendered = true;
+
+    if(idleEventEnabled)
+        wxWakeUpIdle(); // Tell wxWidgets to send an idle event
 }
 
 void WxRenderingWindow::OnEraseBackground(wxEraseEvent& event)
 {
 
+}
+
+void WxRenderingWindow::OnIdle(wxIdleEvent & event)
+{
+    if(idleEventEnabled)
+    {
+        // Send a paint message when the control is idle and has rendered the previous frame
+        if(hasRendered)
+        {
+            OnUpdate();
+            Refresh();
+            hasRendered = false; //Prevent another idle event to update the game before the previous frame has been drawn
+        }
+
+        //Note: A new idle event will be required in OnPaint to avoid to process useless idle events
+        //      This greatly reduce the CPU load of this panel
+    }
 }
 
 }

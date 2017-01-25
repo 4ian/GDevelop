@@ -49,13 +49,25 @@ public:
 
     bool IsOpen() const { return true; }
 
-    virtual void OnPaint(wxPaintEvent& event);
-    virtual void OnEraseBackground(wxEraseEvent& event);
+    /**
+     * \brief Enable or disable idle events. Disabling them avoid the panel to be constantly rendered.
+     */
+    void EnableIdleEvents(bool enable = true);
+
+protected:
+    virtual void OnUpdate() {}
 
 private:
-    sf::RenderTexture texture;
+    virtual void OnPaint(wxPaintEvent & event);
 
-    bool automaticSize;
+    virtual void OnEraseBackground(wxEraseEvent & event);
+
+    virtual void OnIdle(wxIdleEvent & event);
+
+    sf::RenderTexture texture;
+    bool idleEventEnabled;
+
+    bool hasRendered; // Not to update more times than render
 };
 
 }

@@ -286,12 +286,6 @@ public:
      */
     void GoToEditingState();
 
-    /**
-     * \brief Enable or disable idle events. Disabling them avoid the scene to be constantly rendered.
-     * \note Used by the scene editor when the user switch to the event editor.
-     */
-    void EnableIdleEvents(bool enable = true) {enableIdleEvents = enable;};
-
     virtual sf::Vector2f GetInitialInstanceSize(gd::InitialInstance & instance) const;
     virtual sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance & instance) const;
 
@@ -349,8 +343,7 @@ protected:
     //*)
 
     //Methods allowing to run SFML within the wxWidgets control
-    virtual void OnUpdate();
-    virtual void OnIdle(wxIdleEvent&);
+    virtual void OnUpdate() override;
     //Changing the state of the editor
     virtual void OnPreviewBtClick( wxCommandEvent & event );
     virtual void OnPreviewDropDownBtClick( wxRibbonButtonBarEvent & event );
@@ -543,8 +536,6 @@ protected:
     //State
     bool editing; ///< True if the layout is being edited, false if a preview is running.
     std::shared_ptr<gd::LayoutEditorPreviewer> currentPreviewer; ///< The previewer being used to preview the layout.
-
-    bool enableIdleEvents;
 
     wxMenu contextMenu;
     wxMenu noObjectContextMenu;

@@ -79,6 +79,8 @@ void LayoutEditorCanvas::OnUpdate()
             UpdateScrollbars();
 
     }
+
+    Display();
 }
 
 void LayoutEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
@@ -319,7 +321,6 @@ void LayoutEditorCanvas::RenderEdittime()
 
     GetRenderingTarget().setView(editionView);
     GetRenderingTarget().popGLStates();
-    Display();
 }
 
 void LayoutEditorCanvas::RenderWindowMask()

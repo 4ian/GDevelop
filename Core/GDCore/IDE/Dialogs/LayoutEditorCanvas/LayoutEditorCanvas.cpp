@@ -121,15 +121,12 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     smallButtonSize(gd::GUIContentScaleFactor::Get() > 1 ? 12 : 5),
     firstRefresh(true),
     isSelecting(false),
-    editing(true),
-    enableIdleEvents(true)
+    editing(true)
 {
 	//(*Initialize(LayoutEditorCanvas)
 	//*)
 
-	/*Connect(wxEVT_PAINT,(wxObjectEventFunction)&LayoutEditorCanvas::OnPaint);
-	Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&LayoutEditorCanvas::OnEraseBackground);*/
-	Connect(wxEVT_IDLE,(wxObjectEventFunction)&LayoutEditorCanvas::OnIdle);
+
 	Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftDown);
 	Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftUp);
 	Connect(wxEVT_LEFT_DCLICK,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftDClick);
@@ -278,18 +275,6 @@ LayoutEditorCanvas::~LayoutEditorCanvas()
 {
 	//(*Destroy(LayoutEditorCanvas)
 	//*)
-}
-
-void LayoutEditorCanvas::OnIdle(wxIdleEvent & event)
-{
-    if(enableIdleEvents)
-    {
-        // Send a paint message when the control is idle, to ensure maximum framerate
-        OnUpdate();
-        #if defined(__WXGTK__)
-        event.RequestMore(); //On GTK, we need to specify that we want continuous idle events.
-        #endif
-    }
 }
 
 void LayoutEditorCanvas::AddAssociatedEditor(gd::LayoutEditorCanvasAssociatedEditor * editor)

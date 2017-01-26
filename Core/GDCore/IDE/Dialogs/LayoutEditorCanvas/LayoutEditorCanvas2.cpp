@@ -689,6 +689,7 @@ void LayoutEditorCanvas::UpdateSize()
         //Scene takes all the space available in edition mode.
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(width * scaleFactor, height * scaleFactor);
+        WxRenderingWindow::SetSize(sf::Vector2u(width * scaleFactor, height * scaleFactor));
 
         UpdateViewAccordingToZoomFactor();
     }
@@ -700,6 +701,8 @@ void LayoutEditorCanvas::UpdateSize()
         //Scene is centered in preview mode
         wxWindowBase::SetPosition(wxPoint((parentControl->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,
                               (parentControl->GetSize().GetHeight()-wxWindowBase::GetSize().GetY())/2));
+
+        WxRenderingWindow::SetSize(sf::Vector2u(project.GetMainWindowDefaultWidth(), project.GetMainWindowDefaultHeight()));
     }
 }
 

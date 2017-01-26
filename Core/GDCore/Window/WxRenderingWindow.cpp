@@ -114,7 +114,8 @@ sf::Vector2u WxRenderingWindow::GetSize() const
 
 void WxRenderingWindow::SetSize(const sf::Vector2u & size)
 {
-
+    texture.create(size.x, size.y, true);
+    ForceUpdate();
 }
 
 bool WxRenderingWindow::SetActive(bool active)
@@ -168,8 +169,7 @@ void WxRenderingWindow::OnIdle(wxIdleEvent & event)
 
 void WxRenderingWindow::OnSizeChanged(wxSizeEvent & event)
 {
-    texture.create(GetClientSize().GetWidth(), GetClientSize().GetHeight(), true);
-    ForceUpdate();
+    //Do nothing as it causes some troubles on Windows!
 }
 
 void WxRenderingWindow::ForceUpdate()

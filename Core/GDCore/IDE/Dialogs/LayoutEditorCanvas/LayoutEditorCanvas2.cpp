@@ -73,6 +73,10 @@ void LayoutEditorCanvas::OnUpdate()
             ReloadResources();
         }
 
+        //Empty the event queue
+        sf::Event dummyEvent;
+        while(PollEvent(dummyEvent));
+
         //Then display the layout
         RenderEdittime();
         if (vScrollbar && hScrollbar && !hScrollbar->HasFocus() && !vScrollbar->HasFocus())
@@ -601,6 +605,8 @@ void LayoutEditorCanvas::OnPreviewDropDownBtClick(wxRibbonButtonBarEvent& evt)
 
 void LayoutEditorCanvas::OnMouseWheel( wxMouseEvent &event )
 {
+    event.Skip(); //To allow WxRenderingWindow to generate events from this
+
     if (!editing) return;
 
     if ( ctrlPressed )

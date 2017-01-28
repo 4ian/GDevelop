@@ -56,18 +56,21 @@ namespace gd
 {
 
 WxRenderingWindow::WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSize, wxWindowID id, const wxPoint & pos, const wxSize & size, long style, const wxString & name) :
-    wxPanel(parent, id, pos, size, style|wxWANTS_CHARS, name),
+    wxControl(parent, id, pos, size, style|wxWANTS_CHARS|wxBORDER_NONE, wxDefaultValidator, name),
     idleEventEnabled(true),
-    hasRendered(true)
+    hasRendered(true),
+    eventsQueue()
 {
     bool automaticSize = (renderingSize == sf::Vector2u(-1, -1));
 
     texture.create(size.GetWidth(), size.GetHeight(), true);
 
-    Connect(wxEVT_PAINT, wxPaintEventHandler(WxRenderingWindow::OnPaint), NULL, this);
-	Connect(wxEVT_ERASE_BACKGROUND, (wxObjectEventFunction)& WxRenderingWindow::OnEraseBackground);
-    Connect(wxEVT_IDLE, (wxObjectEventFunction)& WxRenderingWindow::OnIdle);
-    Connect(wxEVT_SIZE, (wxObjectEventFunction)& WxRenderingWindow::OnSizeChanged);
+    Bind(wxEVT_PAINT, WxRenderingWindow::OnPaint, this);
+	Bind(wxEVT_ERASE_BACKGROUND, WxRenderingWindow::OnEraseBackground, this);
+    Bind(wxEVT_IDLE, WxRenderingWindow::OnIdle, this);
+    Bind(wxEVT_SIZE, WxRenderingWindow::OnSizeChanged, this);
+    Bind(wxEVT_CHAR, WxRenderingWindow::OnCharEntered, this);
+    Bind(wxEVT_MOUSEWHEEL, WxRenderingWindow::OnMouseWheelScrolled, this);
 }
 
 const sf::RenderTarget & WxRenderingWindow::GetRenderingTarget() const
@@ -92,14 +95,19 @@ sf::Texture WxRenderingWindow::CaptureAsTexture() const
 
 bool WxRenderingWindow::PollEvent(sf::Event & event)
 {
-    return false;
+    if(eventsQueue.empty())
+        return false;
+
+    event = eventsQueue.front();
+    eventsQueue.pop();
+    return true;
 }
 
 sf::Vector2i WxRenderingWindow::GetPosition() const
 {
     return sf::Vector2i(
-        wxPanel::GetScreenPosition().x,
-        wxPanel::GetScreenPosition().y);
+        wxControl::GetScreenPosition().x,
+        wxControl::GetScreenPosition().y);
 }
 
 void WxRenderingWindow::SetPosition(const sf::Vector2i & pos)
@@ -170,6 +178,41 @@ void WxRenderingWindow::OnIdle(wxIdleEvent & event)
 void WxRenderingWindow::OnSizeChanged(wxSizeEvent & event)
 {
     //Do nothing as it causes some troubles on Windows!
+}
+
+void WxRenderingWindow::OnCharEntered(wxKeyEvent & event)
+{
+    if(event.GetUnicodeKey() != WXK_NONE)
+    {
+        sf::Event textEvent;
+        textEvent.type = sf::Event::TextEntered;
+        textEvent.text.unicode = static_cast<sf::Uint32>(event.GetUnicodeKey());
+
+        eventsQueue.push(textEvent);
+    }
+}
+
+void WxRenderingWindow::OnMouseWheelScrolled(wxMouseEvent & event)
+{
+    // Push the corresponding SFML mouse wheel event
+    sf::Event wheelEvent;
+    wheelEvent.type = sf::Event::MouseWheelScrolled;
+    wheelEvent.mouseWheelScroll.wheel =
+        event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL ?
+            sf::Mouse::Wheel::VerticalWheel :
+            sf::Mouse::Wheel::HorizontalWheel;
+    wheelEvent.mouseWheelScroll.delta = static_cast<float>(event.GetWheelRotation()) / static_cast<float>(event.GetWheelDelta());
+    wheelEvent.mouseWheelScroll.x = GetMousePosition(*this).x;
+    wheelEvent.mouseWheelScroll.y = GetMousePosition(*this).y;
+    eventsQueue.push(wheelEvent);
+
+    // Also generate the deprecated one
+    sf::Event deprecatedEvent;
+    deprecatedEvent.type = sf::Event::MouseWheelMoved;
+    deprecatedEvent.mouseWheel.delta = static_cast<float>(event.GetWheelRotation()) / static_cast<float>(event.GetWheelDelta());
+    deprecatedEvent.mouseWheel.x = GetMousePosition(*this).x;
+    deprecatedEvent.mouseWheel.y = GetMousePosition(*this).y;
+    eventsQueue.push(deprecatedEvent);
 }
 
 void WxRenderingWindow::ForceUpdate()

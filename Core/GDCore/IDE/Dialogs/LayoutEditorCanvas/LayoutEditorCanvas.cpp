@@ -52,7 +52,7 @@ using namespace std;
 namespace gd
 {
 
-BEGIN_EVENT_TABLE(LayoutEditorCanvas,wxPanel)
+BEGIN_EVENT_TABLE(LayoutEditorCanvas,wxControl)
 	//(*EventTable(LayoutEditorCanvas)
 	//*)
 END_EVENT_TABLE()
@@ -1133,7 +1133,7 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
 {
     if (!editing)
     {
-        evt.StopPropagation();
+        evt.Skip(); //To allow WxRenderingWindow to generate events from this
         return;
     }
 
@@ -1197,7 +1197,7 @@ void LayoutEditorCanvas::OnKeyUp( wxKeyEvent& evt )
 {
     if (!editing)
     {
-        evt.StopPropagation();
+        evt.Skip(); //To allow WxRenderingWindow to generate events from this
         return;
     }
 

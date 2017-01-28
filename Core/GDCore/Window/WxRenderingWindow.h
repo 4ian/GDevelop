@@ -3,15 +3,19 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
+#include <queue>
+
+#include <wx/control.h>
 #include <wx/panel.h>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Window/Event.hpp>
 
 #include "GDCore/Window/RenderingWindow.h"
 
 namespace gd
 {
 
-class GD_CORE_API WxRenderingWindow : public wxPanel, public RenderingWindow
+class GD_CORE_API WxRenderingWindow : public wxControl, public RenderingWindow
 {
 public:
  	WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSize = sf::Vector2u(-1, -1), wxWindowID id = wxID_ANY, const wxPoint & pos = wxDefaultPosition, const wxSize & size = wxDefaultSize, long style = wxWANTS_CHARS, const wxString & name = wxPanelNameStr);
@@ -66,12 +70,18 @@ private:
 
     virtual void OnSizeChanged(wxSizeEvent & event);
 
+    void OnCharEntered(wxKeyEvent & event);
+
+    void OnMouseWheelScrolled(wxMouseEvent & event);
+
     void ForceUpdate();
 
     sf::RenderTexture texture;
     bool idleEventEnabled;
 
     bool hasRendered; // Not to update more times than render
+
+    std::queue<sf::Event> eventsQueue;
 };
 
 }

@@ -66,7 +66,8 @@ void ParameterControlsHelper::UpdateControls(std::size_t count)
 
         //Addings controls
         paramCheckboxes.push_back(new wxCheckBox(window, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num));
-        paramTexts.push_back(new wxStaticText(window, ID_TEXTARRAY, _("Parameter:"), wxDefaultPosition, wxDefaultSize, 0, "TxtPara" + num ));
+        paramTexts.push_back(new wxStaticText(window, ID_TEXTARRAY, _("Parameter:"), wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END, "TxtPara" + num ));
+        paramTexts.back()->SetMinSize(wxSize(15, -1));
         paramSpacers1.push_back(new wxPanel(window));
         paramSpacers2.push_back(new wxPanel(window));
         paramEdits.push_back(new wxTextCtrl( window, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "EditPara" + num ));
@@ -114,6 +115,7 @@ void ParameterControlsHelper::UpdateParameterContent(std::size_t i, const Parame
 
     paramCheckboxes.at(i)->SetValue(!paramEdits.at(i)->GetValue().empty());
     paramTexts.at(i)->SetLabel(metadata.GetDescription() + _(":"));
+    paramTexts.at(i)->SetToolTip(metadata.GetDescription());
     paramBmpBts.at(i)->SetBitmapLabel(gd::InstructionSentenceFormatter::Get()->BitmapFromType(type));
     paramBmpBts.at(i)->SetToolTip(gd::InstructionSentenceFormatter::Get()->LabelFromType(type));
     paramEdits.at(i)->SetValue(content);

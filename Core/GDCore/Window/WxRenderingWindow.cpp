@@ -65,12 +65,12 @@ WxRenderingWindow::WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSi
 
     texture.create(size.GetWidth(), size.GetHeight(), true);
 
-    Bind(wxEVT_PAINT, WxRenderingWindow::OnPaint, this);
-	Bind(wxEVT_ERASE_BACKGROUND, WxRenderingWindow::OnEraseBackground, this);
-    Bind(wxEVT_IDLE, WxRenderingWindow::OnIdle, this);
-    Bind(wxEVT_SIZE, WxRenderingWindow::OnSizeChanged, this);
-    Bind(wxEVT_CHAR, WxRenderingWindow::OnCharEntered, this);
-    Bind(wxEVT_MOUSEWHEEL, WxRenderingWindow::OnMouseWheelScrolled, this);
+    Bind(wxEVT_PAINT, &WxRenderingWindow::OnPaint, this);
+	Bind(wxEVT_ERASE_BACKGROUND, &WxRenderingWindow::OnEraseBackground, this);
+    Bind(wxEVT_IDLE, &WxRenderingWindow::OnIdle, this);
+    Bind(wxEVT_SIZE, &WxRenderingWindow::OnSizeChanged, this);
+    Bind(wxEVT_CHAR, &WxRenderingWindow::OnCharEntered, this);
+    Bind(wxEVT_MOUSEWHEEL, &WxRenderingWindow::OnMouseWheelScrolled, this);
 }
 
 const sf::RenderTarget & WxRenderingWindow::GetRenderingTarget() const

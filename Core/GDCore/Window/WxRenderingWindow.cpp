@@ -2,31 +2,33 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
+#include <memory>
+
 #include <wx/app.h>
 #include <wx/dcbuffer.h>
 #include <wx/rawbmp.h>
+
+#include "GDCore/Tools/MakeUnique.h"
 
 namespace
 {
 
     /**
-     * Thanks to https://forums.wxwidgets.org/viewtopic.php?t=20074
+     * Adapted from https://forums.wxwidgets.org/viewtopic.php?t=20074
      */
     typedef wxAlphaPixelData PixelData;
-    wxBitmap * RGBAtoBitmap(const unsigned char *rgba, int w, int h)
+    std::unique_ptr<wxBitmap> RGBAtoBitmap(const unsigned char *rgba, int w, int h)
     {
-        wxBitmap * bitmap = new wxBitmap(w, h, 32);
+        auto bitmap = gd::make_unique<wxBitmap>(w, h, 32);
         if(!bitmap->Ok())
         {
-            delete bitmap;
-            return NULL;
+            return std::unique_ptr<wxBitmap>();
         }
 
         PixelData bmdata(*bitmap);
-        if(bmdata == NULL)
+        if(!bmdata)
         {
-            delete bitmap;
-            return NULL;
+            return std::unique_ptr<wxBitmap>();
         }
 
         bmdata.UseAlpha();
@@ -93,6 +95,11 @@ sf::Texture WxRenderingWindow::CaptureAsTexture() const
     return sf::Texture(texture.getTexture());
 }
 
+sf::Texture WxRenderingWindow::CaptureAsTexture() const
+{
+    return sf::Texture(texture.getTexture());
+}
+
 bool WxRenderingWindow::PollEvent(sf::Event & event)
 {
     if(eventsQueue.empty())
@@ -142,10 +149,9 @@ void WxRenderingWindow::OnPaint(wxPaintEvent& event)
     wxAutoBufferedPaintDC dc(this);
 
     sf::Image sfImage = texture.getTexture().copyToImage();
-    wxBitmap * bitmap = RGBAtoBitmap(sfImage.getPixelsPtr(), sfImage.getSize().x, sfImage.getSize().y);
+    auto bitmap = RGBAtoBitmap(sfImage.getPixelsPtr(), sfImage.getSize().x, sfImage.getSize().y);
 
     dc.DrawBitmap(*bitmap, 0, 0, false);
-    delete bitmap;
 
     hasRendered = true;
 

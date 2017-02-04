@@ -3,12 +3,14 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
+#include <map>
 #include <queue>
 
 #include <wx/control.h>
 #include <wx/panel.h>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 
 #include "GDCore/Window/RenderingWindow.h"
 
@@ -70,6 +72,8 @@ private:
 
     virtual void OnSizeChanged(wxSizeEvent & event);
 
+    void OnKeyDown(wxKeyEvent & event);
+
     void OnCharEntered(wxKeyEvent & event);
 
     void OnMouseWheelScrolled(wxMouseEvent & event);
@@ -82,6 +86,11 @@ private:
     bool hasRendered; // Not to update more times than render
 
     std::queue<sf::Event> eventsQueue;
+
+    static std::map<int, sf::Keyboard::Key> & GetKeyMap();
+
+    static std::map<int, sf::Keyboard::Key> keysMap;
+    static bool keysMapInitialized;
 };
 
 }

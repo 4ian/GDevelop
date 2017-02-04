@@ -57,6 +57,9 @@ namespace
 namespace gd
 {
 
+std::map<int, sf::Keyboard::Key> WxRenderingWindow::keysMap = std::map<int, sf::Keyboard::Key>();
+bool WxRenderingWindow::keysMapInitialized = false;
+
 WxRenderingWindow::WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSize, wxWindowID id, const wxPoint & pos, const wxSize & size, long style, const wxString & name) :
     wxControl(parent, id, pos, size, style|wxWANTS_CHARS|wxBORDER_NONE, wxDefaultValidator, name),
     idleEventEnabled(true),
@@ -71,6 +74,7 @@ WxRenderingWindow::WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSi
 	Bind(wxEVT_ERASE_BACKGROUND, &WxRenderingWindow::OnEraseBackground, this);
     Bind(wxEVT_IDLE, &WxRenderingWindow::OnIdle, this);
     Bind(wxEVT_SIZE, &WxRenderingWindow::OnSizeChanged, this);
+    Bind(wxEVT_KEY_DOWN, &WxRenderingWindow::OnKeyDown, this);
     Bind(wxEVT_CHAR, &WxRenderingWindow::OnCharEntered, this);
     Bind(wxEVT_MOUSEWHEEL, &WxRenderingWindow::OnMouseWheelScrolled, this);
 }
@@ -88,11 +92,6 @@ sf::RenderTarget & WxRenderingWindow::GetRenderingTarget()
 void WxRenderingWindow::Display()
 {
     texture.display();
-}
-
-sf::Texture WxRenderingWindow::CaptureAsTexture() const
-{
-    return sf::Texture(texture.getTexture());
 }
 
 sf::Texture WxRenderingWindow::CaptureAsTexture() const
@@ -186,6 +185,23 @@ void WxRenderingWindow::OnSizeChanged(wxSizeEvent & event)
     //Do nothing as it causes some troubles on Windows!
 }
 
+void WxRenderingWindow::OnKeyDown(wxKeyEvent & event)
+{
+    event.Skip();
+    if(event.GetKeyCode() == WXK_NONE || GetKeyMap().count(event.GetKeyCode()) == 0)
+        return;
+
+    sf::Event keyEvent;
+    keyEvent.type = sf::Event::KeyPressed;
+    keyEvent.key.code = GetKeyMap()[event.GetKeyCode()];
+    keyEvent.key.alt = event.AltDown();
+    keyEvent.key.control = event.ControlDown();
+    keyEvent.key.shift = event.ShiftDown();
+    keyEvent.key.system = event.MetaDown();
+
+    eventsQueue.push(keyEvent);
+}
+
 void WxRenderingWindow::OnCharEntered(wxKeyEvent & event)
 {
     if(event.GetUnicodeKey() != WXK_NONE)
@@ -196,6 +212,8 @@ void WxRenderingWindow::OnCharEntered(wxKeyEvent & event)
 
         eventsQueue.push(textEvent);
     }
+
+    event.Skip();
 }
 
 void WxRenderingWindow::OnMouseWheelScrolled(wxMouseEvent & event)
@@ -219,6 +237,8 @@ void WxRenderingWindow::OnMouseWheelScrolled(wxMouseEvent & event)
     deprecatedEvent.mouseWheel.x = GetMousePosition(*this).x;
     deprecatedEvent.mouseWheel.y = GetMousePosition(*this).y;
     eventsQueue.push(deprecatedEvent);
+
+    event.Skip();
 }
 
 void WxRenderingWindow::ForceUpdate()
@@ -226,6 +246,142 @@ void WxRenderingWindow::ForceUpdate()
     texture.clear(sf::Color(255, 255, 255, 255));
     hasRendered = true;
     wxWakeUpIdle();
+}
+
+std::map<int, sf::Keyboard::Key> & WxRenderingWindow::GetKeyMap()
+{
+    if(!keysMapInitialized)
+    {
+        /*keysMap[WXK_F1] = sf::Keyboard::F1;
+        keysMap[WXK_F2] = sf::Keyboard::F2;
+        keysMap['Z'] = sf::Keyboard::Z;*/
+
+        keysMap[WXK_NONE] = sf::Keyboard::Unknown;
+
+        keysMap['A'] = sf::Keyboard::A;
+        keysMap['B'] = sf::Keyboard::B;
+        keysMap['C'] = sf::Keyboard::C;
+        keysMap['D'] = sf::Keyboard::D;
+        keysMap['E'] = sf::Keyboard::E;
+        keysMap['F'] = sf::Keyboard::F;
+        keysMap['G'] = sf::Keyboard::G;
+        keysMap['H'] = sf::Keyboard::H;
+        keysMap['I'] = sf::Keyboard::I;
+        keysMap['J'] = sf::Keyboard::J;
+        keysMap['K'] = sf::Keyboard::K;
+        keysMap['L'] = sf::Keyboard::L;
+        keysMap['M'] = sf::Keyboard::M;
+        keysMap['N'] = sf::Keyboard::N;
+        keysMap['O'] = sf::Keyboard::O;
+        keysMap['P'] = sf::Keyboard::P;
+        keysMap['Q'] = sf::Keyboard::Q;
+        keysMap['R'] = sf::Keyboard::R;
+        keysMap['S'] = sf::Keyboard::S;
+        keysMap['T'] = sf::Keyboard::T;
+        keysMap['U'] = sf::Keyboard::U;
+        keysMap['V'] = sf::Keyboard::V;
+        keysMap['W'] = sf::Keyboard::W;
+        keysMap['X'] = sf::Keyboard::X;
+        keysMap['Y'] = sf::Keyboard::Y;
+        keysMap['Z'] = sf::Keyboard::Z;
+
+        keysMap['1'] = sf::Keyboard::Num1;
+        keysMap['2'] = sf::Keyboard::Num2;
+        keysMap['3'] = sf::Keyboard::Num3;
+        keysMap['4'] = sf::Keyboard::Num4;
+        keysMap['5'] = sf::Keyboard::Num5;
+        keysMap['6'] = sf::Keyboard::Num6;
+        keysMap['7'] = sf::Keyboard::Num7;
+        keysMap['8'] = sf::Keyboard::Num8;
+        keysMap['9'] = sf::Keyboard::Num9;
+        keysMap['0'] = sf::Keyboard::Num0;
+
+        keysMap[WXK_ESCAPE] = sf::Keyboard::Escape;
+
+        keysMap[WXK_RAW_CONTROL /* or WXK_CONTROL, depends on Mac OS X impl of SFML ? */] = sf::Keyboard::LControl;
+        keysMap[WXK_SHIFT] = sf::Keyboard::LShift;
+        keysMap[WXK_ALT] = sf::Keyboard::LAlt;
+        keysMap[WXK_RAW_CONTROL /* or WXK_CONTROL, depends on Mac OS X impl of SFML ? */] = sf::Keyboard::RControl;
+        keysMap[WXK_SHIFT] = sf::Keyboard::RShift;
+        keysMap[WXK_ALT] = sf::Keyboard::RAlt;
+        // Unfortunately, no ways to distinguish between left and right modifiers with wxWidgets' key codes
+
+        #if defined(WIN32)
+        keysMap[WXK_WINDOWS_LEFT] = sf::Keyboard::LSystem;
+        keysMap[WXK_WINDOWS_RIGHT] = sf::Keyboard::RSystem;
+        #elif defined(MACOS)
+        keysMap[WXK_CONTROL] = sf::Keyboard::LSystem;
+        keysMap[WXK_CONTROL] = sf::Keyboard::RSystem; // No way to know the side of this key too on MACOS
+        #endif
+        // The Windows/Command key doesn't work on Linux
+
+        keysMap[WXK_MENU] = sf::Keyboard::Menu;
+
+        keysMap['('] = sf::Keyboard::LBracket;
+        keysMap[')'] = sf::Keyboard::RBracket;
+        keysMap[';'] = sf::Keyboard::SemiColon;
+        keysMap[','] = sf::Keyboard::Comma;
+        keysMap['.'] = sf::Keyboard::Period;
+        keysMap['"'] = sf::Keyboard::Quote;
+        keysMap['/'] = sf::Keyboard::Slash;
+        keysMap['\\'] = sf::Keyboard::BackSlash;
+        keysMap['~'] = sf::Keyboard::Tilde;
+        keysMap['='] = sf::Keyboard::Equal;
+        keysMap['-'] = sf::Keyboard::Dash;
+
+        keysMap[WXK_SPACE] = sf::Keyboard::Space;
+        keysMap[WXK_RETURN] = sf::Keyboard::Return;
+        keysMap[WXK_BACK] = sf::Keyboard::BackSpace;
+        keysMap[WXK_TAB] = sf::Keyboard::Tab;
+
+        keysMap[WXK_PAGEUP] = sf::Keyboard::PageUp;
+        keysMap[WXK_PAGEDOWN] = sf::Keyboard::PageDown;
+        keysMap[WXK_END] = sf::Keyboard::End;
+        keysMap[WXK_HOME] = sf::Keyboard::Home;
+        keysMap[WXK_INSERT] = sf::Keyboard::Insert;
+        keysMap[WXK_DELETE] = sf::Keyboard::Delete;
+
+        keysMap[WXK_NUMPAD_ADD] = sf::Keyboard::Add;
+        keysMap[WXK_NUMPAD_SUBTRACT] = sf::Keyboard::Subtract;
+        keysMap[WXK_NUMPAD_MULTIPLY] = sf::Keyboard::Multiply;
+        keysMap[WXK_NUMPAD_DIVIDE] = sf::Keyboard::Divide;
+
+        keysMap[WXK_UP] = sf::Keyboard::Left;
+        keysMap[WXK_RIGHT] = sf::Keyboard::Right;
+        keysMap[WXK_UP] = sf::Keyboard::Up;
+        keysMap[WXK_DOWN] = sf::Keyboard::Down;
+
+        keysMap[WXK_NUMPAD0] = sf::Keyboard::Numpad0;
+        keysMap[WXK_NUMPAD1] = sf::Keyboard::Numpad1;
+        keysMap[WXK_NUMPAD2] = sf::Keyboard::Numpad2;
+        keysMap[WXK_NUMPAD3] = sf::Keyboard::Numpad3;
+        keysMap[WXK_NUMPAD4] = sf::Keyboard::Numpad4;
+        keysMap[WXK_NUMPAD5] = sf::Keyboard::Numpad5;
+        keysMap[WXK_NUMPAD6] = sf::Keyboard::Numpad6;
+        keysMap[WXK_NUMPAD7] = sf::Keyboard::Numpad7;
+        keysMap[WXK_NUMPAD8] = sf::Keyboard::Numpad8;
+        keysMap[WXK_NUMPAD9] = sf::Keyboard::Numpad9;
+
+        keysMap[WXK_F1] = sf::Keyboard::F1;
+        keysMap[WXK_F2] = sf::Keyboard::F2;
+        keysMap[WXK_F3] = sf::Keyboard::F3;
+        keysMap[WXK_F4] = sf::Keyboard::F4;
+        keysMap[WXK_F5] = sf::Keyboard::F5;
+        keysMap[WXK_F6] = sf::Keyboard::F6;
+        keysMap[WXK_F7] = sf::Keyboard::F7;
+        keysMap[WXK_F8] = sf::Keyboard::F8;
+        keysMap[WXK_F9] = sf::Keyboard::F9;
+        keysMap[WXK_F10] = sf::Keyboard::F10;
+        keysMap[WXK_F11] = sf::Keyboard::F11;
+        keysMap[WXK_F12] = sf::Keyboard::F12;
+        keysMap[WXK_F13] = sf::Keyboard::F13;
+        keysMap[WXK_F14] = sf::Keyboard::F14;
+        keysMap[WXK_F15] = sf::Keyboard::F15;
+
+        keysMap[WXK_PAUSE] = sf::Keyboard::Pause;
+    }
+
+    return keysMap;
 }
 
 }

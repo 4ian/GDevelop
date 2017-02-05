@@ -8,8 +8,8 @@
 #define GDCORE_PROJECTFILEWRITER_H
 #include "GDCore/String.h"
 namespace gd { class Project; }
-class TiXmlHandle;
-class TiXmlDocument;
+namespace tinyxml2 { class XMLHandle; }
+namespace tinyxml2 { class XMLDocument; }
 
 namespace gd
 {
@@ -57,7 +57,7 @@ private:
      * \brief Check if the current TinyXML file (represented by hdl and doc) is in UTF8.
      * If not, the file is converted to UTF8 and reopened.
      */
-    static void ConvertANSIXMLFile(TiXmlHandle & hdl, TiXmlDocument & doc, const gd::String & filename);
+    static void ConvertANSIXMLFile(tinyxml2::XMLHandle & hdl, tinyxml2::XMLDocument & doc, const gd::String & filename);
 };
 
 }

@@ -13,16 +13,18 @@
 #include <utility>
 #include <iomanip>
 #if !defined(EMSCRIPTEN)
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/TinyXml/tinyxml2.h"
 #endif
 
 namespace gd
 {
 
 #if !defined(EMSCRIPTEN)
-void Serializer::ToXML(SerializerElement & element, TiXmlElement * xmlElement)
+void Serializer::ToXML(SerializerElement & element, tinyxml2::XMLElement * xmlElement)
 {
 	if(!xmlElement) return;
+
+	tinyxml2::XMLDocument * doc = xmlElement->GetDocument();
 
 	if (element.IsValueUndefined())
 	{
@@ -38,7 +40,7 @@ void Serializer::ToXML(SerializerElement & element, TiXmlElement * xmlElement)
 			else if (attr.IsInt())
 				xmlElement->SetAttribute(it->first.c_str(), attr.GetInt());
 			else if (attr.IsDouble())
-				xmlElement->SetDoubleAttribute(it->first.c_str(), attr.GetDouble());
+				xmlElement->SetAttribute(it->first.c_str(), attr.GetDouble());
 			else
 				xmlElement->SetAttribute(it->first.c_str(), attr.GetString().c_str());
 		}
@@ -49,24 +51,24 @@ void Serializer::ToXML(SerializerElement & element, TiXmlElement * xmlElement)
 			if (children[i].second == std::shared_ptr<SerializerElement>())
 				continue;
 
-		    TiXmlElement * xmlChild = new TiXmlElement( children[i].first.c_str() );
+		    tinyxml2::XMLElement * xmlChild = doc->NewElement( children[i].first.c_str() );
 	        xmlElement->LinkEndChild( xmlChild );
 			ToXML(*children[i].second, xmlChild);
 		}
 	}
 	else
 	{
-		TiXmlText * xmlValue = new TiXmlText(element.GetValue().GetString().c_str());
+		tinyxml2::XMLText * xmlValue = doc->NewText(element.GetValue().GetString().c_str());
 		xmlElement->LinkEndChild(xmlValue);
 	}
 
 }
 
-void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlElement)
+void Serializer::FromXML(SerializerElement & element, const tinyxml2::XMLElement * xmlElement)
 {
 	if(!xmlElement) return;
 
-	const TiXmlAttribute * attr = xmlElement->FirstAttribute();
+	const tinyxml2::XMLAttribute * attr = xmlElement->FirstAttribute();
 	while(attr)
 	{
 		if ( attr->Name() != NULL )
@@ -79,7 +81,7 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 		attr = attr->Next();
 	}
 
-	const TiXmlElement * child = xmlElement->FirstChildElement();
+	const tinyxml2::XMLElement * child = xmlElement->FirstChildElement();
 	while(child)
 	{
 		if (child->Value())

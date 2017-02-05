@@ -30,7 +30,7 @@
 #include "GDCpp/Runtime/Tools/AES.h"
 #include "GDCpp/Runtime/Serialization/Serializer.h"
 #include "GDCpp/Runtime/Serialization/SerializerElement.h"
-#include "GDCpp/Runtime/TinyXml/tinyxml.h"
+#include "GDCpp/Runtime/TinyXml/tinyxml2.h"
 #include "GDCpp/Runtime/RuntimeGame.h"
 #include "CompilationChecker.h"
 
@@ -125,15 +125,15 @@ int main( int argc, char *p_argv[] )
         delete [] obuffer;
 
         cout << "Loading game data..." << endl;
-        TiXmlDocument doc;
+        tinyxml2::XMLDocument doc;
         if ( !doc.Parse(uncryptedSrc.c_str()) )
         {
             return DisplayMessage("Unable to parse game data. Aborting.");
         }
 
-        TiXmlHandle hdl(&doc);
+        tinyxml2::XMLHandle hdl(&doc);
         gd::SerializerElement rootElement;
-        gd::Serializer::FromXML(rootElement, hdl.FirstChildElement().Element());
+        gd::Serializer::FromXML(rootElement, hdl.FirstChildElement().ToElement());
         game.UnserializeFrom(rootElement);
 	}
 

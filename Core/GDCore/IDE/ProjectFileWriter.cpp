@@ -16,7 +16,7 @@
 #include "GDCore/Tools/XmlLoader.h"
 #include "GDCore/String.h"
 
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/TinyXml/tinyxml2.h"
 #include <SFML/System.hpp>
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h>
@@ -81,10 +81,10 @@ bool ProjectFileWriter::SaveToFile(const gd::Project & project, const gd::String
         for (auto & element : splitElements)
         {
             //Create a partial XML document
-            TiXmlDocument doc;
-            doc.LinkEndChild(new TiXmlDeclaration("1.0", "UTF-8", ""));
+            tinyxml2::XMLDocument doc;
+            doc.LinkEndChild(doc.NewDeclaration());
 
-            TiXmlElement * root = new TiXmlElement("projectPartial");
+            tinyxml2::XMLElement * root = doc.NewElement("projectPartial");
             doc.LinkEndChild(root);
             gd::Serializer::ToXML(element.element, root);
 
@@ -101,10 +101,10 @@ bool ProjectFileWriter::SaveToFile(const gd::Project & project, const gd::String
     #endif
 
     //Create the main XML document
-    TiXmlDocument doc;
-    doc.LinkEndChild(new TiXmlDeclaration( "1.0", "UTF-8", "" ));
+    tinyxml2::XMLDocument doc;
+    doc.LinkEndChild(doc.NewDeclaration());
 
-    TiXmlElement * root = new TiXmlElement( "project" );
+    tinyxml2::XMLElement * root = doc.NewElement( "project" );
     doc.LinkEndChild(root);
     gd::Serializer::ToXML(rootElement, root);
 
@@ -162,10 +162,10 @@ bool ProjectFileWriter::LoadFromJSONFile(gd::Project & project, const gd::String
 bool ProjectFileWriter::LoadFromFile(gd::Project & project, const gd::String & filename)
 {
     //Load the XML document structure
-    TiXmlDocument doc;
+    tinyxml2::XMLDocument doc;
     if ( !gd::LoadXmlFromFile( doc, filename ) )
     {
-        gd::String errorTinyXmlDesc = doc.ErrorDesc();
+        gd::String errorTinyXmlDesc = doc.GetErrorStr1() ? gd::String(doc.GetErrorStr1()) : gd::String();
         gd::String error = _( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
 
         gd::LogError( error );
@@ -177,13 +177,13 @@ bool ProjectFileWriter::LoadFromFile(gd::Project & project, const gd::String & f
     project.SetDirty(false);
     #endif
 
-    TiXmlHandle hdl( &doc );
+    tinyxml2::XMLHandle hdl( &doc );
     gd::SerializerElement rootElement;
 
     ConvertANSIXMLFile(hdl, doc, filename);
 
     //Load the root element
-    TiXmlElement * rootXmlElement = hdl.FirstChildElement("project").ToElement();
+    tinyxml2::XMLElement * rootXmlElement = hdl.FirstChildElement("project").ToElement();
     //Compatibility with GD <= 3.3
     if (!rootXmlElement) rootXmlElement = hdl.FirstChildElement("Project").ToElement();
     if (!rootXmlElement) rootXmlElement = hdl.FirstChildElement("Game").ToElement();
@@ -195,20 +195,20 @@ bool ProjectFileWriter::LoadFromFile(gd::Project & project, const gd::String & f
     wxString projectPath = wxFileName::FileName(filename).GetPath();
     gd::Splitter splitter;
     splitter.Unsplit(rootElement, [&projectPath](gd::String path, gd::String name) {
-        TiXmlDocument doc;
+        tinyxml2::XMLDocument doc;
         gd::SerializerElement rootElement;
 
         gd::String filename = projectPath + path + "-" + MakeFileNameSafe(name);
         if( !gd::LoadXmlFromFile( doc, filename ) )
         {
-            gd::String errorTinyXmlDesc = doc.ErrorDesc();
+            gd::String errorTinyXmlDesc = doc.GetErrorStr1() ? gd::String(doc.GetErrorStr1()) : gd::String();
             gd::String error = _( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
 
             gd::LogError(error);
             return rootElement;
         }
 
-        TiXmlHandle hdl( &doc );
+        tinyxml2::XMLHandle hdl( &doc );
         gd::Serializer::FromXML(rootElement, hdl.FirstChildElement().ToElement());
         return rootElement;
     });
@@ -220,87 +220,81 @@ bool ProjectFileWriter::LoadFromFile(gd::Project & project, const gd::String & f
     return true;
 }
 
-void ProjectFileWriter::ConvertANSIXMLFile(TiXmlHandle & hdl, TiXmlDocument & doc, const gd::String & filename)
+void ProjectFileWriter::ConvertANSIXMLFile(tinyxml2::XMLHandle & hdl, tinyxml2::XMLDocument & doc, const gd::String & filename)
 {
     //COMPATIBILITY CODE WITH ANSI GDEVELOP ( <= 3.6.83 )
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI) //There should not be any problem with encoding in compiled games
-    //Get the declaration element
-    TiXmlDeclaration * declXmlElement = hdl.FirstChild().ToNode()->ToDeclaration();
-    if(strcmp(declXmlElement->Encoding(), "UTF-8") != 0)
-    {
-        std::cout << "This is a legacy GDevelop project, checking if it is already encoded in UTF8..." << std::endl;
 
-        //The document has not been converted for/saved by GDevelop UTF8, now, try to determine if the project
-        //was saved on Linux and is already in UTF8 or on Windows and still in the locale encoding.
-        bool isNotInUTF8 = false;
-        gd::FileStream docStream;
+    //Try to determine if the project
+    //was saved on Linux and is already in UTF8 or on Windows and still in the locale encoding.
+    bool isNotInUTF8 = false;
+    gd::FileStream docStream;
+    docStream.open(filename, std::ios::in);
+
+    while( !docStream.eof() )
+    {
+        std::string docLine;
+        std::getline(docStream, docLine);
+
+        if( !gd::String::FromUTF8(docLine).IsValid() )
+        {
+            //The file contains an invalid character,
+            //the file has been saved by the legacy ANSI Windows version of GDevelop
+            // -> stop reading the file and start converting from the locale to UTF8
+            isNotInUTF8 = true;
+            break;
+        }
+    }
+
+    docStream.close();
+
+    //If the file is not encoded in UTF8, encode it
+    if(isNotInUTF8)
+    {
+        std::cout << "The project file is not encoded in UTF8, conversion started... ";
+
+        //Create a temporary file
+        #if defined(WINDOWS)
+        //Convert using the current locale
+        wxString tmpFileName = wxFileName::CreateTempFileName("");
+        gd::FileStream outStream;
         docStream.open(filename, std::ios::in);
+
+        outStream.open(tmpFileName, std::ios::out | std::ios::trunc);
 
         while( !docStream.eof() )
         {
             std::string docLine;
-            std::getline(docStream, docLine);
+            std::string convLine;
 
-            if( !gd::String::FromUTF8(docLine).IsValid() )
-            {
-                //The file contains an invalid character,
-                //the file has been saved by the legacy ANSI Windows version of GDevelop
-                // -> stop reading the file and start converting from the locale to UTF8
-                isNotInUTF8 = true;
-                break;
-            }
+            std::getline(docStream, docLine);
+            sf::Utf8::fromAnsi(docLine.begin(), docLine.end(), std::back_inserter(convLine));
+
+            outStream << convLine << '\n';
         }
 
+        outStream.close();
         docStream.close();
 
-        //If the file is not encoded in UTF8, encode it
-        if(isNotInUTF8)
-        {
-            std::cout << "The project file is not encoded in UTF8, conversion started... ";
+        #else
+        //Convert using iconv command tool
+        wxString tmpFileName = wxStandardPaths::Get().GetUserConfigDir() + "/gdevelop_converted_project";
+        gd::String iconvCall = gd::String("iconv -f LATIN1 -t UTF-8 \"") + filename.ToLocale() + "\" ";
+        #if defined(MACOS)
+        iconvCall += "> \"" + tmpFileName + "\"";
+        #else
+        iconvCall += "-o \"" + tmpFileName + "\"";
+        #endif
 
-            //Create a temporary file
-            #if defined(WINDOWS)
-            //Convert using the current locale
-            wxString tmpFileName = wxFileName::CreateTempFileName("");
-            gd::FileStream outStream;
-            docStream.open(filename, std::ios::in);
+        std::cout << "Executing " << iconvCall  << std::endl;
+        system(iconvCall.c_str());
+        #endif
 
-            outStream.open(tmpFileName, std::ios::out | std::ios::trunc);
+        //Reload the converted file, forcing UTF8 encoding as the XML header is false (still written ISO-8859-1)
+        LoadXmlFromFile(doc, tmpFileName);
 
-            while( !docStream.eof() )
-            {
-                std::string docLine;
-                std::string convLine;
-
-                std::getline(docStream, docLine);
-                sf::Utf8::fromAnsi(docLine.begin(), docLine.end(), std::back_inserter(convLine));
-
-                outStream << convLine << '\n';
-            }
-
-            outStream.close();
-            docStream.close();
-
-            #else
-            //Convert using iconv command tool
-            wxString tmpFileName = wxStandardPaths::Get().GetUserConfigDir() + "/gdevelop_converted_project";
-            gd::String iconvCall = gd::String("iconv -f LATIN1 -t UTF-8 \"") + filename.ToLocale() + "\" ";
-            #if defined(MACOS)
-            iconvCall += "> \"" + tmpFileName + "\"";
-            #else
-            iconvCall += "-o \"" + tmpFileName + "\"";
-            #endif
-
-            std::cout << "Executing " << iconvCall  << std::endl;
-            system(iconvCall.c_str());
-            #endif
-
-            //Reload the converted file, forcing UTF8 encoding as the XML header is false (still written ISO-8859-1)
-            doc.LoadFile(std::string(tmpFileName).c_str(), TIXML_ENCODING_UTF8);
-
-            std::cout << "Finished." << std::endl;
-            gd::LogMessage(_("Your project has been upgraded to be used with GDevelop 4.\nIf you save it, you won't be able to open it with an older version: please do a backup of your project file if you want to go back to GDevelop 3."));
-        }
+        std::cout << "Finished." << std::endl;
+        gd::LogMessage(_("Your project has been upgraded to be used with GDevelop 4.\nIf you save it, you won't be able to open it with an older version: please do a backup of your project file if you want to go back to GDevelop 3."));
     }
     #endif
     //END OF COMPATIBILITY CODE

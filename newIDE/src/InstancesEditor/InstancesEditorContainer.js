@@ -28,10 +28,14 @@ export default class InstancesEditorContainer extends Component {
   }
 
   componentDidMount() {
+    this.zOrderFinder = new gd.HighestZOrderFinder();
     this.pixiRenderer = PIXI.autoDetectRenderer(this.props.width, this.props.height);
     this.refs.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', (e) => {
       e.preventDefault();
+    });
+    this.pixiRenderer.view.addEventListener('click', (e) => {
+      this._onClick(e.offsetX, e.offsetY);
     });
 
     this.backgroundArea = new PIXI.Container();
@@ -95,6 +99,7 @@ export default class InstancesEditorContainer extends Component {
 
   componentWillUnmount() {
     this.keyboardShortcuts.unmount();
+    this.zOrderFinder.delete();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
   }
 
@@ -183,6 +188,22 @@ export default class InstancesEditorContainer extends Component {
       selectedInstance.setCustomWidth(selectedInstance.getCustomWidth() + deltaX);
       selectedInstance.setCustomHeight(selectedInstance.getCustomHeight() + deltaY);
     }
+  }
+
+  _onClick = (x, y) => {
+    if (!this.props.selectedObjectName) return;
+
+    const instance = this.props.initialInstances.insertNewInitialInstance();
+    instance.setObjectName(this.props.selectedObjectName);
+
+    const newPos = this.viewPosition.toSceneCoordinates(x, y);
+    instance.setX(newPos[0]);
+    instance.setY(newPos[1]);
+
+    this.props.initialInstances.iterateOverInstances(this.zOrderFinder);
+    instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
+
+    this.props.onNewInstanceAdded && this.props.onNewInstanceAdded(instance);
   }
 
   deleteSelection = () => {

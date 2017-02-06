@@ -9,7 +9,7 @@ import Panes from './UI/Panes';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import EventsSheetContainer from './EventsSheet/EventsSheetContainer.js';
-import FullSizeInstancesEditor from './InstancesEditor/FullSizeInstancesEditor.js';
+import SceneEditor from './SceneEditor';
 import ProjectManager from './ProjectManager';
 import ExternalEditor from './ExternalEditor';
 
@@ -114,12 +114,11 @@ class App extends Component {
               <RaisedButton label="Request update" onClick={this.requestUpdate} />
               {/*<JSONTree data={game} />*/}
               {
-                currentProject && currentProject.hasLayoutNamed(sceneOpened) && (
-                  <FullSizeInstancesEditor
+                currentProject && sceneOpened && (
+                  <SceneEditor
                     key={sceneOpened}
                     project={currentProject}
-                    layout={currentProject.getLayout(sceneOpened)}
-                    initialInstances={currentProject.getLayout(sceneOpened).getInitialInstances()}
+                    layoutName={sceneOpened}
                   />
                 )
               }

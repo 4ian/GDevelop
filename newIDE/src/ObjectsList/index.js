@@ -12,12 +12,13 @@ export default class ProjectManager extends React.Component {
       <List>
         {mapFor(0, objectsContainer.getObjectsCount(), (i) => {
           const object = objectsContainer.getObjectAt(i);
+          const objectName = object.getName();
 
           return (<ListItem
             key={i}
-            primaryText={object.getName()}
+            primaryText={objectName}
             leftIcon={<ContentInbox />}
-            onTouchTap={() => {/*TODO*/}}
+            onTouchTap={() => this.props.onObjectSelected(objectName)}
           />);
         })}
       </List>

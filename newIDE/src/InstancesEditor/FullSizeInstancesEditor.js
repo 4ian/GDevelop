@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import Measure from 'react-measure';
-import SceneEditorContainer from './SceneEditorContainer.js';
+import InstancesEditorContainer from './InstancesEditorContainer.js';
 
-export default class FullSizeSceneEditor extends Component {
+export default class FullSizeInstancesEditor extends Component {
   constructor() {
     super();
 
@@ -20,7 +20,7 @@ export default class FullSizeSceneEditor extends Component {
         <div style={{display: 'flex', flex: 1}}>
         {
           this.state.width && this.state.height &&
-            <SceneEditorContainer
+            <InstancesEditorContainer
               width={this.state.width}
               height={this.state.height}
               {...this.props}

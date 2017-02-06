@@ -2,16 +2,12 @@ const PIXI = global.PIXI;
 import gesture from 'pixi-simple-gesture';
 
 export default class ViewPosition {
-  constructor({onPanMoveView}) {
+  constructor() {
     this.viewX = 0;
     this.viewY = 0;
     this._zoomFactor = 1;
     this._pixiContainer = new PIXI.Container();
-
-    // gesture.panable(this._pixiContainer);
-    // this._pixiContainer.on('panmove', (event) => onPanMoveView(event.deltaX, event.deltaY));
   }
-
 
   /**
    * Convert a point from the canvas coordinates (for example, the mouse position) to the
@@ -34,6 +30,9 @@ export default class ViewPosition {
    * canvas coordinates.
    */
   toCanvasCoordinates = (x, y) => {
+    x -= this.viewX;
+    y -= this.viewY;
+
     var viewRotation = -0;
     var tmp = x;
     x = Math.cos(viewRotation/180*3.14159)*x - Math.sin(viewRotation/180*3.14159)*y;
@@ -42,7 +41,7 @@ export default class ViewPosition {
     x *= Math.abs(this._pixiContainer.scale.x);
     y *= Math.abs(this._pixiContainer.scale.y);
 
-    return [x-this.viewX, y-this.viewY];
+    return [x, y];
   }
 
   scrollBy(x, y) {

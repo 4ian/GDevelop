@@ -2,18 +2,10 @@ import React from 'react';
 import {List, ListItem} from 'material-ui/List';
 import ContentInbox from 'material-ui/svg-icons/content/inbox';
 import ContentSend from 'material-ui/svg-icons/content/send';
-
-const loop = (start, end, func) => { //TODO: move me in utils/package
-  const result = [];
-  for(let i = start; i < end; i++) {
-    result.push(func(i));
-  }
-  return result;
-}
+import mapFor from '../Utils/MapFor';
 
 export default class ProjectManager extends React.Component {
-  state = {
-  };
+  state = {};
 
   render() {
     const { project } = this.props;
@@ -27,7 +19,7 @@ export default class ProjectManager extends React.Component {
           initiallyOpen={true}
           primaryTogglesNestedList={true}
           autoGenerateNestedIndicator={true}
-          nestedItems={loop(0, project.getLayoutsCount(), (i) => {
+          nestedItems={mapFor(0, project.getLayoutsCount(), (i) => {
             const layout = project.getLayoutAt(i);
             const name = layout.getName();
             return (
@@ -46,7 +38,7 @@ export default class ProjectManager extends React.Component {
           initiallyOpen={true}
           primaryTogglesNestedList={true}
           autoGenerateNestedIndicator={true}
-          nestedItems={loop(0, project.getExternalEventsCount(), (i) => {
+          nestedItems={mapFor(0, project.getExternalEventsCount(), (i) => {
             const externalEvents = project.getExternalEventsAt(i);
             const name = externalEvents.getName();
             return (

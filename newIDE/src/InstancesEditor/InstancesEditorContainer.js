@@ -21,7 +21,7 @@ import gameData from '../fixtures/game.json';
  */
 const rgbToHex = (r, g, b) => "" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 
-export default class SceneEditorContainer extends Component {
+export default class InstancesEditorContainer extends Component {
   constructor() {
     super();
     this.state = {};
@@ -53,9 +53,7 @@ export default class SceneEditorContainer extends Component {
     };
 
     this.pixiContainer = new PIXI.Container();
-    this.viewPosition = new ViewPosition({
-      onPanMoveView: this._onPanMoveView,
-    });
+    this.viewPosition = new ViewPosition();
     this.sceneRenderer = new SceneRenderer({
       project: this.props.project,
       layout: this.props.layout,
@@ -76,10 +74,12 @@ export default class SceneEditorContainer extends Component {
       getInstanceWidth: this.sceneRenderer.getInstanceWidth,
       getInstanceHeight: this.sceneRenderer.getInstanceHeight,
       onResize: this._onResize,
+      toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.highlightedInstance = new HighlightedInstance({
       getInstanceWidth: this.sceneRenderer.getInstanceWidth,
       getInstanceHeight: this.sceneRenderer.getInstanceHeight,
+      toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.keyboardShortcuts = new KeyboardShortcuts();
 
@@ -87,8 +87,8 @@ export default class SceneEditorContainer extends Component {
     this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
     this.viewPosition.getPixiContainer().addChild(this.sceneRenderer.getPixiContainer());
-    this.viewPosition.getPixiContainer().addChild(this.highlightedInstance.getPixiObject());
-    this.viewPosition.getPixiContainer().addChild(this.instancesSelection.getPixiContainer());
+    this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
+    this.pixiContainer.addChild(this.instancesSelection.getPixiContainer());
 
     this.renderScene();
   }

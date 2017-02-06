@@ -424,6 +424,8 @@ RenderedAdMobInstance.prototype.getDefaultHeight = function() {
  * Mainly used by "scenearea" directive and its associated controller.
  *
  * Call registerObject to add a new function to render a type of object.
+ *
+ * TODO: The module should be renamed InstancesRenderingService
  */
 export default {
     renderers: {

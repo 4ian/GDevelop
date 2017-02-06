@@ -9,7 +9,7 @@ import Panes from './UI/Panes';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import EventsSheetContainer from './EventsSheet/EventsSheetContainer.js';
-import FullSizeSceneEditor from './SceneEditor/FullSizeSceneEditor.js';
+import FullSizeInstancesEditor from './InstancesEditor/FullSizeInstancesEditor.js';
 import ProjectManager from './ProjectManager';
 import ExternalEditor from './ExternalEditor';
 
@@ -115,7 +115,7 @@ class App extends Component {
               {/*<JSONTree data={game} />*/}
               {
                 currentProject && currentProject.hasLayoutNamed(sceneOpened) && (
-                  <FullSizeSceneEditor
+                  <FullSizeInstancesEditor
                     key={sceneOpened}
                     project={currentProject}
                     layout={currentProject.getLayout(sceneOpened)}

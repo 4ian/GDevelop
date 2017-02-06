@@ -1,4 +1,5 @@
 import gesture from 'pixi-simple-gesture';
+import transformRect from '../Utils/TransformRect';
 const gd = global.gd;
 const PIXI = global.PIXI;
 
@@ -6,10 +7,11 @@ const resizeButtonWidth = 18;
 const resizeButtonHeight = 18;
 
 export default class InstancesSelection {
-    constructor({getInstanceWidth, getInstanceHeight, onResize}) {
+    constructor({getInstanceWidth, getInstanceHeight, onResize, toCanvasCoordinates}) {
       this.getInstanceWidth = getInstanceWidth;
       this.getInstanceHeight = getInstanceHeight;
       this.onResize = onResize;
+      this.toCanvasCoordinates = toCanvasCoordinates;
 
       this.selection = [];
       this.selectionOriginalPos = [];
@@ -95,15 +97,20 @@ export default class InstancesSelection {
         }
 
         const instance = this.selection[i];
-        var width = this.getInstanceWidth(instance);
-        var height = this.getInstanceHeight(instance);
+        const width = this.getInstanceWidth(instance);
+        const height = this.getInstanceHeight(instance);
+
+        const selectionRectangle = transformRect(this.toCanvasCoordinates, {
+            x: instance.getX(), y: instance.getY(), width, height
+        });
 
         this.selectedRectangles[i].clear();
         this.selectedRectangles[i].beginFill(0x6868E8);
         this.selectedRectangles[i].lineStyle(1, 0x6868E8, 1);
         this.selectedRectangles[i].fillAlpha = 0.3;
         this.selectedRectangles[i].alpha = 0.8;
-        this.selectedRectangles[i].drawRect(instance.getX(), instance.getY(), width, height);
+        this.selectedRectangles[i].drawRect(selectionRectangle.x, selectionRectangle.y,
+            selectionRectangle.width, selectionRectangle.height);
         this.selectedRectangles[i].endFill();
 
         if ( x1 === undefined || instance.getX() < x1 ) x1 = instance.getX();
@@ -122,17 +129,17 @@ export default class InstancesSelection {
       this.resizeButton.clear();
       this.resizeIcon.visible = false;
       if (this.selection.length !== 0) {
+          const resizeButtonPos = this.toCanvasCoordinates(x2 + 5, y2 + 5);
+
           this.resizeIcon.visible = true;
-          const resizeButtonX = x2 + 5;
-          const resizeButtonY = y2 + 5;
-          this.resizeIcon.position.x = this.resizeButtonX + 1;
-          this.resizeIcon.position.y = this.resizeButtonY + 1;
+          this.resizeIcon.position.x = resizeButtonPos[0] + 1;
+          this.resizeIcon.position.y = resizeButtonPos[1] + 1;
           this.resizeButton.beginFill(0xFFFFFF);
           this.resizeButton.lineStyle(1, 0x6868E8, 1);
           this.resizeButton.fillAlpha = 0.9;
-          this.resizeButton.drawRect(resizeButtonX, resizeButtonY, resizeButtonWidth, resizeButtonHeight);
+          this.resizeButton.drawRect(resizeButtonPos[0], resizeButtonPos[1], resizeButtonWidth, resizeButtonHeight);
           this.resizeButton.endFill();
-          this.resizeButton.hitArea = new PIXI.Rectangle(resizeButtonX, resizeButtonY, resizeButtonWidth, resizeButtonHeight);
+          this.resizeButton.hitArea = new PIXI.Rectangle(resizeButtonPos[0], resizeButtonPos[1], resizeButtonWidth, resizeButtonHeight);
       } else {
         this.resizeButton.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
       }

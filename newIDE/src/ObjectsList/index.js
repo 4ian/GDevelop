@@ -1,7 +1,6 @@
 import React from 'react';
 import {List, ListItem} from 'material-ui/List';
 import ContentInbox from 'material-ui/svg-icons/content/inbox';
-import ContentSend from 'material-ui/svg-icons/content/send';
 import mapFor from '../Utils/MapFor';
 
 export default class ProjectManager extends React.Component {

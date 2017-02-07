@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-
-import RaisedButton from 'material-ui/RaisedButton';
 import gesture from 'pixi-simple-gesture';
-
 import SceneRenderer from './SceneRenderer';
 import ViewPosition from './ViewPosition';
 import InstancesSelection from './InstancesSelection';

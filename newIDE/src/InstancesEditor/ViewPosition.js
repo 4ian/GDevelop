@@ -1,5 +1,4 @@
 const PIXI = global.PIXI;
-import gesture from 'pixi-simple-gesture';
 
 export default class ViewPosition {
   constructor() {

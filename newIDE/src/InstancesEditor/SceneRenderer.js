@@ -1,5 +1,5 @@
 import gesture from 'pixi-simple-gesture';
-import ObjectsRenderingService from './ObjectsRenderingService';
+import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 const gd = global.gd;
 const PIXI = global.PIXI;
 
@@ -22,6 +22,7 @@ export default class SceneRenderer {
     this.pixiGUIContainer = new PIXI.Container();
     this.pixiSceneContainer.addChild(this.pixiGUIContainer);
 
+    // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
     this.instancesRenderer.invoke = (instance) => {
         instance = gd.wrapPointer(instance, gd.InitialInstance);
@@ -91,17 +92,15 @@ export default class SceneRenderer {
   }
 
   render() {
-    for (var i = 0; i < this.layout.getLayersCount(); i++) {
+    for (let i = 0; i < this.layout.getLayersCount(); i++) {
         var layerName = this.layout.getLayerAt(i).getName();
         this.instances.iterateOverInstancesWithZOrdering(this.instancesRenderer,
             layerName);
     }
-    // updateSelectionRectangle();
-    // updateSelectedRectangles();
 
     //Clean up rendered instances that are no more associated to any instance
     //(this can happen after an instance having been deleted).
-    for(var i in this.renderedInstances) {
+    for(let i in this.renderedInstances) {
         if (this.renderedInstances.hasOwnProperty(i)) {
             var renderedInstance = this.renderedInstances[i];
             if (!renderedInstance.wasUsed) {

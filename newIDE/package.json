@@ -4,6 +4,13 @@
   "private": true,
   "homepage": ".",
   "devDependencies": {
+    "babel-eslint": "^6.1.2",
+    "eslint": "^3.5.0",
+    "eslint-config-react-app": "^0.2.1",
+    "eslint-plugin-flowtype": "^2.18.1",
+    "eslint-plugin-import": "^1.12.0",
+    "eslint-plugin-jsx-a11y": "^2.2.2",
+    "eslint-plugin-react": "^6.3.0",
     "react-scripts": "0.6.1"
   },
   "dependencies": {
@@ -21,5 +28,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
   }
 }

@@ -1,5 +1,4 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
-const electron = optionalRequire('electron');
 const gd = global.gd;
 
 //TODO: Update to ES6

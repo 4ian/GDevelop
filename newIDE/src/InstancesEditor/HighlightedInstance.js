@@ -1,5 +1,4 @@
 import transformRect from '../Utils/TransformRect';
-const gd = global.gd;
 const PIXI = global.PIXI;
 
 export default class InstancesSelection {

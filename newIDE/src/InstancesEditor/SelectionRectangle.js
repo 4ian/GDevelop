@@ -1,6 +1,5 @@
 const gd = global.gd;
 const PIXI = global.PIXI;
-import gesture from 'pixi-simple-gesture';
 
 export default class SelectionRectangle {
   constructor({instances, getInstanceWidth, getInstanceHeight, toSceneCoordinates, toCanvasCoordinates}) {

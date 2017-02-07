@@ -66,7 +66,23 @@ public:
      */
     bool HasNoDirections() const;
 
-    bool useMultipleDirections;
+    /**
+     * \brief Return true if the animation is composed of more than one direction.
+     *
+     * By default, an animation is composed of a single direction, and the sprite
+     * is rotated.
+     */
+    bool UseMultipleDirections() const { return useMultipleDirections; }
+
+    /**
+     * \brief Set if the animation is using more than one direction.
+     *
+     * By default, an animation is composed of a single direction, and the sprite
+     * is rotated.
+     */
+    void SetUseMultipleDirections(bool enable) { useMultipleDirections = enable; }
+
+    bool useMultipleDirections; ///< deprecated This should be moved to class private members
 
 private:
     std::vector < Direction > directions;

@@ -1,11 +1,17 @@
 const PIXI = global.PIXI;
 
 export default class ViewPosition {
-  constructor() {
+  constructor({width, height}) {
     this.viewX = 0;
     this.viewY = 0;
     this._zoomFactor = 1;
     this._pixiContainer = new PIXI.Container();
+    this.resize(width, height);
+  }
+
+  resize(width, height) {
+    this._width = width;
+    this._height = height;
   }
 
   /**
@@ -13,6 +19,8 @@ export default class ViewPosition {
    * "world" coordinates.
    */
   toSceneCoordinates = (x, y) => {
+    x -= this._width / 2;
+    y -= this._height / 2;
     x /= Math.abs(this._pixiContainer.scale.x);
     y /= Math.abs(this._pixiContainer.scale.y);
 
@@ -40,7 +48,7 @@ export default class ViewPosition {
     x *= Math.abs(this._pixiContainer.scale.x);
     y *= Math.abs(this._pixiContainer.scale.y);
 
-    return [x, y];
+    return [x + this._width / 2, y + this._height / 2];
   }
 
   scrollBy(x, y) {
@@ -59,6 +67,8 @@ export default class ViewPosition {
   render() {
     this._pixiContainer.position.x = -this.viewX * this._zoomFactor;
     this._pixiContainer.position.y = -this.viewY * this._zoomFactor;
+  	this._pixiContainer.position.x += this._width / 2;
+  	this._pixiContainer.position.y += this._height / 2;
   	this._pixiContainer.scale.x = this._zoomFactor;
   	this._pixiContainer.scale.y = this._zoomFactor;
   }

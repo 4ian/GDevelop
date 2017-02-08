@@ -13,10 +13,11 @@ function RenderedSpriteInstance(project, layout, instance, associatedObject, pix
     RenderedInstance.call( this, project, layout, instance, associatedObject, pixiContainer);
 
     this._renderedAnimation = 0;
-    this._renderedDirection = 0; //TODO: Custom direction/angle support
-    this._renderedSprite = 0; //Always render the first sprite of the animation
+    this._renderedDirection = 0;
     this._centerX = 0;
     this._centerY = 0;
+    this._originX = 0;
+    this._originY = 0;
 
     //Setup the PIXI object:
     this._resourcesLoader = resourcesLoader;
@@ -49,7 +50,7 @@ RenderedSpriteInstance.getThumbnail = function(project, layout, object) {
 RenderedSpriteInstance.prototype.updatePIXISprite = function() {
     this._pixiObject.anchor.x = this._centerX/this._pixiObject.texture.frame.width;
     this._pixiObject.anchor.y = this._centerY/this._pixiObject.texture.frame.height;
-    this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
+    this._pixiObject.rotation = this._shouldNotRotate ? 0 : RenderedInstance.toRad(this._instance.getAngle());
     if (this._instance.hasCustomSize()) {
         this._pixiObject.scale.x = this._instance.getCustomWidth()/this._pixiObject.texture.frame.width;
         this._pixiObject.scale.y = this._instance.getCustomHeight()/this._pixiObject.texture.frame.height;
@@ -58,42 +59,71 @@ RenderedSpriteInstance.prototype.updatePIXISprite = function() {
     this._pixiObject.position.y = this._instance.getY() + (this._centerY - this._originY)*Math.abs(this._pixiObject.scale.y);
 };
 
+RenderedSpriteInstance.prototype.updateSprite = function() {
+    this._sprite = null;
+    this._shouldNotRotate = false;
+
+    const spriteObject = gd.asSpriteObject(this._associatedObject);
+    if ( spriteObject.hasNoAnimations() ) return false;
+
+    const properties = this._instance.getCustomProperties(this._project, this._layout);
+    const animationProperty = properties.get("Animation");
+    this._renderedAnimation = parseInt(animationProperty.getValue(), 10);
+    if (this._renderedAnimation >= spriteObject.getAnimationsCount())
+        this._renderedAnimation = 0;
+
+    const animation = spriteObject.getAnimation(this._renderedAnimation);
+    if (animation.hasNoDirections()) return false;
+
+    this._renderedDirection = 0;
+    if ( animation.useMultipleDirections() ) {
+        let normalizedAngle = Math.floor(this._instance.getAngle()) % 360;
+        if ( normalizedAngle < 0 ) normalizedAngle += 360;
+
+        this._renderedDirection = Math.round(normalizedAngle/45) % 8;
+    }
+
+    if (this._renderedDirection >= animation.getDirectionsCount())
+        this._renderedDirection = 0;
+
+    const direction = animation.getDirection(this._renderedDirection);
+
+    if (direction.getSpritesCount() === 0) return false;
+
+    this._shouldNotRotate = animation.useMultipleDirections();
+    this._sprite = direction.getSprite(0);
+    return true;
+}
+
 RenderedSpriteInstance.prototype.updatePIXITexture = function() {
-    var spriteObject = gd.asSpriteObject(this._associatedObject);
+    this.updateSprite();
+    if (!this._sprite) return;
 
-    var properties = this._instance.getCustomProperties(this._project, this._layout);
-    var property = properties.get("Animation");
-    this._renderedAnimation = parseInt(property.getValue(), 10);
-    if (this._renderedAnimation < spriteObject.getAnimationsCount()) {
-        var animation = spriteObject.getAnimation(this._renderedAnimation);
+    this._pixiObject.texture = PIXI.Texture.fromImage(
+        this._resourcesLoader.get(this._project, this._sprite.getImageName())
+    );
 
-        this._renderedDirection = 0; //TODO: Custom direction/angle support
-        if (this._renderedDirection < animation.getDirectionsCount()) {
-            var direction = animation.getDirection(this._renderedDirection);
+    const origin = this._sprite.getOrigin();
+    this._originX = origin.getX();
+    this._originY = origin.getY();
 
-            this._renderedSprite = 0;
-            if (this._renderedSprite < direction.getSpritesCount()) {
-                var sprite = direction.getSprite(this._renderedSprite);
-                this._pixiObject.texture = PIXI.Texture.fromImage(
-                    this._resourcesLoader.get(this._project, sprite.getImageName())
-                );
-
-                //TODO: Only default origin and center point are supported.
-                if (this._pixiObject.texture.noFrame) {
-                    var that = this;
-                    this._pixiObject.texture.on("update", function() {
-                        that._centerX = that._pixiObject.texture.width/2;
-                        that._centerY = that._pixiObject.texture.height/2;
-                        that._pixiObject.texture.off("update", this);
-                    });
-                } else {
-                    this._centerX = this._pixiObject.texture.width/2;
-                    this._centerY = this._pixiObject.texture.height/2;
-                }
-                this._originX = 0;
-                this._originY = 0;
-            }
+    if (this._sprite.isDefaultCenterPoint()) {
+        if (this._pixiObject.texture.noFrame) {
+            var that = this;
+            // We might have to wait for the texture to load
+            this._pixiObject.texture.on("update", function() {
+                that._centerX = that._pixiObject.texture.width/2;
+                that._centerY = that._pixiObject.texture.height/2;
+                that._pixiObject.texture.off("update", this);
+            });
+        } else {
+            this._centerX = this._pixiObject.texture.width/2;
+            this._centerY = this._pixiObject.texture.height/2;
         }
+    } else {
+        const center = this._sprite.getCenter();
+        this._centerX = center.getX();
+        this._centerY = center.getY();
     }
 };
 

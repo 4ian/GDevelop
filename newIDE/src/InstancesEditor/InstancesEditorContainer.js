@@ -54,7 +54,10 @@ export default class InstancesEditorContainer extends Component {
     };
 
     this.pixiContainer = new PIXI.Container();
-    this.viewPosition = new ViewPosition();
+    this.viewPosition = new ViewPosition({
+      width: this.props.width,
+      height: this.props.height
+    });
     this.sceneRenderer = new SceneRenderer({
       project: this.props.project,
       layout: this.props.layout,
@@ -103,6 +106,7 @@ export default class InstancesEditorContainer extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
       this.pixiRenderer.resize(nextProps.width, nextProps.height);
+      this.viewPosition.resize(nextProps.width, nextProps.height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, nextProps.width, nextProps.height);
     }
 
@@ -228,7 +232,7 @@ export default class InstancesEditorContainer extends Component {
   }
 
   render() {
-    const {project, layout, initialInstances} = this.props;
+    const { project } = this.props;
     if (!project) return null;
 
     // <RaisedButton label="Delete selection" onClick={this.deleteSelection} />

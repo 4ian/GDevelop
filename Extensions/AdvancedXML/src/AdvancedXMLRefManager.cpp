@@ -11,7 +11,8 @@ This project is released under the MIT License.
 #include <vector>
 
 #include "GDCpp/Runtime/CommonTools.h"
-#include "GDCpp/Runtime/TinyXml/tinyxml.h"
+#include "GDCpp/Runtime/TinyXml/tinyxml2.h"
+#include "GDCpp/Runtime/Tools/XmlLoader.h"
 
 namespace AdvancedXML
 {
@@ -24,18 +25,18 @@ namespace AdvancedXML
 
     RefManager::~RefManager()
     {
-        std::map<gd::String, TiXmlNode*>::iterator it;
+        std::map<gd::String, tinyxml2::XMLNode*>::iterator it;
         for(it = m_refs.begin(); it != m_refs.end(); it++)
         {
-            if(it->second)
-                delete it->second;
+            if(it->second && it->second->ToDocument())
+                delete it->second->ToDocument(); // Only documents can be deleted
         }
         m_refs.clear();
     }
 
     RefManager* RefManager::Get(RuntimeScene *scene)
     {
-        if((*inst)[scene] == NULL)
+        if((*inst)[scene] == nullptr)
         {
             (*inst)[scene] = new RefManager();
         }
@@ -52,27 +53,27 @@ namespace AdvancedXML
         }
     }
 
-    TiXmlNode* RefManager::GetRef(const gd::String &refName)
+    tinyxml2::XMLNode* RefManager::GetRef(const gd::String &refName)
     {
         return m_refs[refName];
     }
 
-    void RefManager::SetRef(const gd::String &refName, TiXmlNode *node)
+    void RefManager::SetRef(const gd::String &refName, tinyxml2::XMLNode *node)
     {
         m_refs[refName] = node;
     }
 
     void RefManager::DeleteChildRefs(const gd::String &parentRef)
     {
-        TiXmlNode *parentNode = GetRef(parentRef);
+        tinyxml2::XMLNode *parentNode = GetRef(parentRef);
 
         if(parentNode)
         {
-            TiXmlNode *childNode = parentNode->FirstChild();
+            tinyxml2::XMLNode *childNode = parentNode->FirstChild();
             while(childNode)
             {
                 //Search the element in the map
-                std::map<gd::String, TiXmlNode*>::iterator findedEle = m_refs.begin();
+                std::map<gd::String, tinyxml2::XMLNode*>::iterator findedEle = m_refs.begin();
                 while(findedEle->second != childNode && findedEle != m_refs.end())
                 {
                     findedEle++;
@@ -92,18 +93,21 @@ namespace AdvancedXML
 
     void RefManager::CreateNewDocument(const gd::String &refname)
     {
-        TiXmlDocument *doc = new TiXmlDocument();
+        tinyxml2::XMLDocument *doc = new tinyxml2::XMLDocument();
         m_refs[refname] = doc;
     }
 
     void RefManager::LoadDocument(const gd::String &filename, const gd::String &refName)
     {
-        TiXmlDocument *doc = new TiXmlDocument(filename.ToLocale().c_str());
+        tinyxml2::XMLDocument *doc = new tinyxml2::XMLDocument();
 
-        if(doc->LoadFile())
+        if(gd::LoadXmlFromFile(*doc, filename))
             m_refs[refName] = doc;
         else
+        {
+            delete doc;
             m_refs[refName] = 0;
+        }
     }
 
     void RefManager::SaveDocument(const gd::String &filename, const gd::String &refName)
@@ -111,8 +115,8 @@ namespace AdvancedXML
         if(!GetRef(refName))
             return;
 
-        TiXmlDocument *doc = GetRef(refName)->ToDocument();
-        if(doc) doc->SaveFile(filename.ToLocale().c_str());
+        tinyxml2::XMLDocument *doc = GetRef(refName)->ToDocument();
+        if(doc) gd::SaveXmlToFile(*doc, filename);
     }
 
     void RefManager::CreateRef(const gd::String &baseRef, const gd::String &newRef, const gd::String &path)
@@ -124,13 +128,13 @@ namespace AdvancedXML
             Each path elements has to be separated by "/"
         */
 
-        TiXmlNode *baseNode = GetRef(baseRef);
+        tinyxml2::XMLNode *baseNode = GetRef(baseRef);
 
         if(!baseNode)
             return;
 
         std::vector<gd::String> pathArgs = path.Split('/');
-        TiXmlNode *currentNode = baseNode;
+        tinyxml2::XMLNode *currentNode = baseNode;
 
         for(std::size_t a = 0;
             a < pathArgs.size() && currentNode;
@@ -144,7 +148,7 @@ namespace AdvancedXML
                 }
                 else
                 {
-                    currentNode = 0;
+                    currentNode = nullptr;
                 }
             }
             else if(pathArgs.at(a) == "..")
@@ -155,7 +159,7 @@ namespace AdvancedXML
                 }
                 else
                 {
-                    currentNode = 0;
+                    currentNode = nullptr;
                 }
             }
             else if(pathArgs.at(a) == "*")
@@ -164,10 +168,46 @@ namespace AdvancedXML
             }
             else
             {
-                currentNode = currentNode->FirstChild(pathArgs.at(a).c_str());
+                currentNode = currentNode->FirstChildElement(pathArgs.at(a).c_str());
             }
         }
 
         m_refs[newRef] = currentNode;
+    }
+
+    void RefManager::CreateElement(const gd::String &refName, const gd::String &content, const gd::String &documentRef)
+    {
+        tinyxml2::XMLDocument * doc = GetRef(documentRef)->ToDocument();
+        if(!doc)
+            return;
+
+        m_refs[refName] = doc->NewElement(content.c_str());
+    }
+
+    void RefManager::CreateText(const gd::String &refName, const gd::String &content, const gd::String &documentRef)
+    {
+        tinyxml2::XMLDocument * doc = GetRef(documentRef)->ToDocument();
+        if(!doc)
+            return;
+
+        m_refs[refName] = doc->NewText(content.c_str());
+    }
+
+    void RefManager::CreateComment(const gd::String &refName, const gd::String &content, const gd::String &documentRef)
+    {
+        tinyxml2::XMLDocument * doc = GetRef(documentRef)->ToDocument();
+        if(!doc)
+            return;
+
+        m_refs[refName] = doc->NewComment(content.c_str());
+    }
+
+    void RefManager::CreateDeclaration(const gd::String &refName, const gd::String &content, const gd::String &documentRef)
+    {
+        tinyxml2::XMLDocument * doc = GetRef(documentRef)->ToDocument();
+        if(!doc)
+            return;
+
+        m_refs[refName] = doc->NewDeclaration(content.c_str());
     }
 }

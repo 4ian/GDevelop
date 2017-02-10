@@ -18,9 +18,10 @@
 #include <iostream>
 #include <fstream>
 #include "SFML/Network.hpp"
-#include "GDCore/TinyXml/tinyxml.h"
+#include "GDCore/TinyXml/tinyxml2.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
+#include "GDCore/Tools/XmlLoader.h"
 
 using namespace std;
 
@@ -63,17 +64,17 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
     }
 
 	gd::String updateInfoFileName = wxFileName::GetTempDir()+"/GDTemporaries/updateinfo.xml";
-    TiXmlDocument doc( updateInfoFileName.ToLocale().c_str() );
-    if ( !doc.LoadFile() )
+    tinyxml2::XMLDocument doc;
+    if ( !gd::LoadXmlFromFile(doc, updateInfoFileName) )
     {
         gd::LogWarning( _( "Error while loading the update file.\nPlease check your internet connection and your firewall.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
         return;
     }
 
-    TiXmlHandle hdl( &doc );
+    tinyxml2::XMLHandle hdl( &doc );
 
     //Comparing versions
-    TiXmlElement *elem = hdl.FirstChildElement().FirstChildElement("Version").Element();
+    tinyxml2::XMLElement *elem = hdl.FirstChildElement().FirstChildElement("Version").ToElement();
     if (elem)
     {
         newMajor = 0;
@@ -96,7 +97,7 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
             newVersionAvailable = false;
     }
 
-    elem = hdl.FirstChildElement().FirstChildElement("Info").Element();
+    elem = hdl.FirstChildElement().FirstChildElement("Info").ToElement();
     if (elem)
     {
         if (elem->Attribute( "Info") != NULL) info = gd::String(elem->Attribute( "Info"));
@@ -105,7 +106,7 @@ void UpdateChecker::DownloadInformation(bool excludeFromStatistics)
         link.ReplaceInvalid();
     }
 
-    elem = hdl.FirstChildElement().FirstChildElement("CommunityNews").Element();
+    elem = hdl.FirstChildElement().FirstChildElement("CommunityNews").ToElement();
     if (elem)
     {
         if (elem->Attribute( "text") != NULL)

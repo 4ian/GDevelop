@@ -10,7 +10,7 @@
 #include <wx/msgdlg.h>
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #endif
-#include "GDCore/TinyXml/tinyxml.h"
+
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"

@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #include "AdvancedXMLTools.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
-#include "GDCpp/Runtime/TinyXml/tinyxml.h"
+#include "GDCpp/Runtime/TinyXml/tinyxml2.h"
 #include "AdvancedXMLRefManager.h"
 
 #include <iostream>
@@ -33,26 +33,28 @@ namespace AdvancedXML
         RefManager::Get(&scene)->SaveDocument(filename, refname);
     }
 
-    void GD_EXTENSION_API CreateNewElement(const gd::String &refname, const int type, const gd::String &content, RuntimeScene &scene)
+    void GD_EXTENSION_API CreateNewElement(const gd::String &refname, const int type, const gd::String &content, const gd::String &docRef, RuntimeScene &scene)
     {
         if(type == 0)
-            RefManager::Get(&scene)->CreateElement<TiXmlElement>(refname, content);
+            RefManager::Get(&scene)->CreateElement(refname, content, docRef);
         else if(type == 1)
-            RefManager::Get(&scene)->CreateElement<TiXmlText>(refname, content);
+            RefManager::Get(&scene)->CreateText(refname, content, docRef);
         else if(type == 2)
-            RefManager::Get(&scene)->CreateElement<TiXmlComment>(refname, content);
+            RefManager::Get(&scene)->CreateComment(refname, content, docRef);
+        else if(type == 4)
+            RefManager::Get(&scene)->CreateDeclaration(refname, content, docRef);
     }
 
     void GD_EXTENSION_API DeleteAnElement(const gd::String &refname, RuntimeScene &scene)
     {
-        TiXmlNode *nodeToRemove = RefManager::Get(&scene)->GetRef(refname);
+        tinyxml2::XMLNode *nodeToRemove = RefManager::Get(&scene)->GetRef(refname);
 
         if(nodeToRemove)
         {
             RefManager::Get(&scene)->DeleteChildRefs(refname);
             if(nodeToRemove->Parent())
             {
-                nodeToRemove->Parent()->RemoveChild(nodeToRemove);
+                nodeToRemove->Parent()->DeleteChild(nodeToRemove);
             }
             RefManager::Get(&scene)->SetRef(refname, 0);
         }
@@ -60,12 +62,12 @@ namespace AdvancedXML
 
     void GD_EXTENSION_API InsertElementIntoAnother(const gd::String &refNameOfElementToAdd, const gd::String &refNameOfParentElement, const gd::String &refNameOfNextElement, RuntimeScene &scene)
     {
-        TiXmlNode *parentEle = RefManager::Get(&scene)->GetRef(refNameOfParentElement);
-        TiXmlNode *nextEle = RefManager::Get(&scene)->GetRef(refNameOfNextElement);
-        TiXmlNode *toBeAddedEle = RefManager::Get(&scene)->GetRef(refNameOfElementToAdd);
+        tinyxml2::XMLNode *parentEle = RefManager::Get(&scene)->GetRef(refNameOfParentElement);
+        tinyxml2::XMLNode *nextEle = RefManager::Get(&scene)->GetRef(refNameOfNextElement);
+        tinyxml2::XMLNode *toBeAddedEle = RefManager::Get(&scene)->GetRef(refNameOfElementToAdd);
 
-        if ( parentEle == NULL || toBeAddedEle == NULL )
-            return; //These element cannot be invalid
+        if ( !parentEle || !toBeAddedEle )
+            return; //These elements cannot be invalid
         else
         {
             if(!nextEle || nextEle->Parent() != parentEle)
@@ -74,8 +76,18 @@ namespace AdvancedXML
             }
             else
             {
-                TiXmlNode *insertedEle = 0;
-                insertedEle = parentEle->InsertBeforeChild(nextEle, *toBeAddedEle);
+                tinyxml2::XMLNode *insertedEle = nullptr;
+
+                // To emulate an "insert before child" with InsertAfterChild,
+                // we get the previous sibling of the element after the
+                // insertion position or if it's the first, we use the
+                // InsertFirstChild function.
+                tinyxml2::XMLNode * previousEle = nextEle->PreviousSibling();
+                if(previousEle)
+                    insertedEle = parentEle->InsertAfterChild(previousEle, toBeAddedEle);
+                else
+                    insertedEle = parentEle->InsertFirstChild(toBeAddedEle);
+
                 RefManager::Get(&scene)->SetRef(refNameOfElementToAdd, insertedEle);
             }
 
@@ -94,7 +106,7 @@ namespace AdvancedXML
 
         RefManager::Get(&scene)->SetRef(futureRefName,
                                                 tagName == "" ? RefManager::Get(&scene)->GetRef(baseRefName)->NextSibling() :
-                                                                RefManager::Get(&scene)->GetRef(baseRefName)->NextSibling(tagName.c_str()));
+                                                                RefManager::Get(&scene)->GetRef(baseRefName)->NextSiblingElement(tagName.c_str()));
     }
 
     bool GD_EXTENSION_API IsRefValid(const gd::String &refName, RuntimeScene &scene)
@@ -107,25 +119,25 @@ namespace AdvancedXML
         if(!RefManager::Get(&scene)->GetRef(refName))
             return -1;
 
-        int type = RefManager::Get(&scene)->GetRef(refName)->Type();
+        tinyxml2::XMLNode * node = RefManager::Get(&scene)->GetRef(refName);
 
-        if(type == TiXmlNode::ELEMENT)
+        if(node->ToElement())
             return 0;
-        if(type == TiXmlNode::TEXT)
+        else if(node->ToText())
             return 1;
-        if(type == TiXmlNode::COMMENT)
+        else if(node->ToComment())
             return 2;
-        if(type == TiXmlNode::DOCUMENT)
+        else if(node->ToDocument())
             return 3;
+        else if(node->ToDeclaration())
+            return 4;
         else
             return -1;
-
-        return -1;
     }
 
     gd::String GD_EXTENSION_API GetText(const gd::String &refName, RuntimeScene &scene)
     {
-        TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refName);
+        tinyxml2::XMLNode *refNode = RefManager::Get(&scene)->GetRef(refName);
 
         if(refNode)
         {
@@ -137,7 +149,7 @@ namespace AdvancedXML
 
     void GD_EXTENSION_API SetText(const gd::String &refName, const gd::String &text, RuntimeScene &scene)
     {
-        TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refName);
+        tinyxml2::XMLNode *refNode = RefManager::Get(&scene)->GetRef(refName);
 
         if(refNode)
         {
@@ -147,11 +159,11 @@ namespace AdvancedXML
 
     gd::String GD_EXTENSION_API GetAttributeString(const gd::String &refname, const gd::String &property, RuntimeScene &scene)
     {
-        TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
+        tinyxml2::XMLNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 
         if(refNode)
         {
-            TiXmlElement *refEle = refNode->ToElement();
+            tinyxml2::XMLElement *refEle = refNode->ToElement();
             if(refEle)
             {
                 gd::String attributeStr = refEle->Attribute(property.c_str());
@@ -170,11 +182,11 @@ namespace AdvancedXML
 
     double GD_EXTENSION_API GetAttributeNumber(const gd::String &refname, const gd::String &property, RuntimeScene &scene)
     {
-        TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
+        tinyxml2::XMLNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 
         if(refNode)
         {
-            TiXmlElement *refEle = refNode->ToElement();
+            tinyxml2::XMLElement *refEle = refNode->ToElement();
             if(refEle)
             {
                 double attributeDouble = 0;
@@ -195,11 +207,11 @@ namespace AdvancedXML
 
     void GD_EXTENSION_API SetAttributeString(const gd::String &refname, const gd::String &property, const gd::String &value, RuntimeScene &scene)
     {
-        TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
+        tinyxml2::XMLNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 
         if(refNode)
         {
-            TiXmlElement *refEle = refNode->ToElement();
+            tinyxml2::XMLElement *refEle = refNode->ToElement();
             if(refEle)
             {
                 refEle->SetAttribute(property.c_str(), value.c_str());
@@ -209,30 +221,29 @@ namespace AdvancedXML
 
     void GD_EXTENSION_API SetAttributeNumber(const gd::String &refname, const gd::String &property, const double &value, RuntimeScene &scene)
     {
-        TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
+        tinyxml2::XMLNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 
         if(refNode)
         {
-            TiXmlElement *refEle = refNode->ToElement();
+            tinyxml2::XMLElement *refEle = refNode->ToElement();
             if(refEle)
             {
-                refEle->SetDoubleAttribute(property.c_str(), value);
+                refEle->SetAttribute(property.c_str(), value);
             }
         }
     }
 
     void GD_EXTENSION_API RemoveAttribute(const gd::String &refname, const gd::String &property, RuntimeScene &scene)
     {
-        TiXmlNode *refNode = RefManager::Get(&scene)->GetRef(refname);
+        tinyxml2::XMLNode *refNode = RefManager::Get(&scene)->GetRef(refname);
 
         if(refNode)
         {
-            TiXmlElement *refEle = refNode->ToElement();
+            tinyxml2::XMLElement *refEle = refNode->ToElement();
             if(refEle)
             {
-                refEle->RemoveAttribute(property.c_str());
+                refEle->DeleteAttribute(property.c_str());
             }
         }
     }
 }
-

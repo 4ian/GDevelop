@@ -9,7 +9,6 @@
 #include "GDCore/String.h"
 #include <map>
 namespace gd { class SerializerElement; }
-class TiXmlElement;
 
 namespace gd
 {
@@ -143,15 +142,6 @@ public:
      * Methods used when to load or save a variable to XML.
      */
     ///@{
-    /**
-     * Called to save the variable to a TiXmlElement.
-     */
-    void SaveToXml(TiXmlElement * element) const;
-
-    /**
-     * Called to load the variable from a TiXmlElement.
-     */
-    void LoadFromXml(const TiXmlElement * element);
 
     /**
      * \brief Serialize variable.

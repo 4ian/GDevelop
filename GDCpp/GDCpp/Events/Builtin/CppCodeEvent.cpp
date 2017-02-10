@@ -18,7 +18,7 @@
 #include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Tools/FileStream.h"
-#include "GDCpp/Runtime/TinyXml/tinyxml.h"
+
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"

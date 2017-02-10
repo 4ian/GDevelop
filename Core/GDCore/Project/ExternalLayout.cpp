@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-#include "GDCore/TinyXml/tinyxml.h"
+
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"

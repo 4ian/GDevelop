@@ -6,7 +6,7 @@
 
 #include "ForEachEvent.h"
 #include <iostream>
-#include "GDCore/TinyXml/tinyxml.h"
+
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"

@@ -17,18 +17,6 @@ namespace
 	}
 }
 
-bool GD_CORE_API LoadXmlFromFile(TiXmlDocument & doc, const gd::String & filepath)
-{
-	FILE * xmlFile = GetFileHandle(filepath, "rb");
-	if(!xmlFile)
-		return false;
-
-	bool res = doc.LoadFile(xmlFile);
-	fclose(xmlFile);
-
-	return res;
-}
-
 bool GD_CORE_API LoadXmlFromFile(tinyxml2::XMLDocument & doc, const gd::String & filepath)
 {
 	FILE * xmlFile = GetFileHandle(filepath, "rb");
@@ -39,18 +27,6 @@ bool GD_CORE_API LoadXmlFromFile(tinyxml2::XMLDocument & doc, const gd::String &
 	fclose(xmlFile);
 
 	return res == 0;
-}
-
-bool GD_CORE_API SaveXmlToFile(const TiXmlDocument & doc, const gd::String & filepath)
-{
-	FILE * xmlFile = GetFileHandle(filepath, "wb");
-	if(!xmlFile)
-		return false;
-
-	bool res = doc.SaveFile(xmlFile);
-	fclose(xmlFile);
-
-	return res;
 }
 
 bool GD_CORE_API SaveXmlToFile(const tinyxml2::XMLDocument & doc, const gd::String & filepath)

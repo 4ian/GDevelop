@@ -7,7 +7,7 @@
 #include "GDCore/String.h"
 #include <algorithm>
 #include "GDCore/Project/Variable.h"
-#include "GDCore/TinyXml/tinyxml.h"
+
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 

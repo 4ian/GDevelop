@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ObjectsList from '../ObjectsList';
 import FullSizeInstancesEditor from '../InstancesEditor/FullSizeInstancesEditor';
+import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 
 export default class SceneEditor extends Component {
   state = {};
@@ -17,6 +18,12 @@ export default class SceneEditor extends Component {
     });
   }
 
+  _onInstancesSelected = (instances) => {
+    this.setState({
+      selectedInstances: instances,
+    });
+  }
+
   render() {
     const { project, layoutName } = this.props;
     if (!project.hasLayoutNamed(layoutName)) {
@@ -28,6 +35,12 @@ export default class SceneEditor extends Component {
     return (
       <div style={{display: 'flex', flex: 1}}>
         <div style={{
+          flex: 0.2,
+          overflowY: 'scroll',
+        }}>
+          <InstancePropertiesEditor instances={this.state.selectedInstances}/>
+        </div>
+        <div style={{
           flex: 1,
           display: 'flex',
         }}>
@@ -37,10 +50,11 @@ export default class SceneEditor extends Component {
             initialInstances={layout.getInitialInstances()}
             selectedObjectName={this.state.selectedObjectName}
             onNewInstanceAdded={this._onNewInstanceAdded}
+            onInstancesSelected={this._onInstancesSelected}
           />
         </div>
         <div style={{
-          flex: 0.3,
+          flex: 0.2,
           overflowY: 'scroll',
         }}>
           <ObjectsList

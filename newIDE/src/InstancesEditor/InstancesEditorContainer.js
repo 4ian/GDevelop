@@ -135,6 +135,10 @@ export default class InstancesEditorContainer extends Component {
     if (!this.keyboardShortcuts.shouldMultiSelect())
       this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstance(instance);
+
+    if (this.props.onInstancesSelected) {
+      this.props.onInstancesSelected(this.instancesSelection.getSelectedInstances());
+    }
   }
 
   _onOverInstance = (instance) => {

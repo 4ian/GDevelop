@@ -4,7 +4,6 @@ import './App.css';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
-import Drawer from 'material-ui/Drawer';
 import Panes from './UI/Panes';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
@@ -12,10 +11,9 @@ import EventsSheetContainer from './EventsSheet/EventsSheetContainer.js';
 import SceneEditor from './SceneEditor';
 import ProjectManager from './ProjectManager';
 import ExternalEditor from './ExternalEditor';
+import InstancePropertiesEditor from './InstancesEditor/InstancePropertiesEditor';
 
 import Window from './Utils/Window.js';
-
-import JSONTree from 'react-json-tree'
 
 const gd = global.gd;
 import game from './fixtures/game.json';

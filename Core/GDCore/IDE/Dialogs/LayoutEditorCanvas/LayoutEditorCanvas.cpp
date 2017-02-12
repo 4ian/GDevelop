@@ -674,6 +674,7 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
 {
     SetFocus();
 
+    event.Skip();
     if ( !editing ) return;
 
     if ( hasJustRightClicked )
@@ -738,6 +739,7 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
 
 void LayoutEditorCanvas::OnRightUp( wxMouseEvent &event )
 {
+    event.Skip();
     if ( !editing ) return;
 
 
@@ -856,8 +858,9 @@ private:
     std::set<gd::String> excludedLayers;
 };
 
-void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
+void LayoutEditorCanvas::OnLeftUp(wxMouseEvent & event)
 {
+    event.Skip();
     if ( !editing ) return;
 
     if ( !currentDraggableBt.empty() ) //First check if we were dragging a button.
@@ -938,8 +941,9 @@ void LayoutEditorCanvas::OnLeftUp(wxMouseEvent &)
     }
 }
 
-void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
+void LayoutEditorCanvas::OnMotion(wxMouseEvent & event)
 {
+    event.Skip();
     if (!editing) return;
 
     auto preserveWidthRatio = [this](gd::InitialInstance * instance) {
@@ -1102,8 +1106,9 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
     }
 }
 
-void LayoutEditorCanvas::OnMiddleDown(wxMouseEvent &)
+void LayoutEditorCanvas::OnMiddleDown(wxMouseEvent & event)
 {
+    event.Skip();
     if ( !editing ) return;
 
     //User can move the view thanks to middle click
@@ -1115,6 +1120,7 @@ void LayoutEditorCanvas::OnMiddleDown(wxMouseEvent &)
 
 void LayoutEditorCanvas::OnMiddleUp(wxMouseEvent & event)
 {
+    event.Skip();
     if ( !editing ) return;
 
     isMovingView = false;
@@ -1123,6 +1129,7 @@ void LayoutEditorCanvas::OnMiddleUp(wxMouseEvent & event)
 
 void LayoutEditorCanvas::OnLeftDClick( wxMouseEvent &event )
 {
+    event.Skip();
     if ( !editing ) return;
 
     parentAuiManager->GetPane("PROPERTIES").Show();
@@ -1195,11 +1202,9 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
 
 void LayoutEditorCanvas::OnKeyUp( wxKeyEvent& evt )
 {
+    evt.Skip(); //To allow WxRenderingWindow to generate events from this
     if (!editing)
-    {
-        evt.Skip(); //To allow WxRenderingWindow to generate events from this
         return;
-    }
 
     if ( evt.GetKeyCode() == WXK_CONTROL )
         ctrlPressed = false;

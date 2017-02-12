@@ -90,6 +90,9 @@ WxRenderingWindow::WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSi
     Bind(wxEVT_AUX2_DOWN, &WxRenderingWindow::OnMouseEvents, this);
     Bind(wxEVT_AUX2_UP, &WxRenderingWindow::OnMouseEvents, this);
     Bind(wxEVT_MOUSEWHEEL, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_MOTION, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_ENTER_WINDOW, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_LEAVE_WINDOW, &WxRenderingWindow::OnMouseEvents, this);
 }
 
 const sf::RenderTarget & WxRenderingWindow::GetRenderingTarget() const
@@ -297,6 +300,26 @@ void WxRenderingWindow::OnMouseEvents(wxMouseEvent & event)
         deprecatedEvent.mouseWheel.x = GetMousePosition(*this).x;
         deprecatedEvent.mouseWheel.y = GetMousePosition(*this).y;
         eventsQueue.push(deprecatedEvent);
+    }
+    else if(event.Moving() || event.Dragging())
+    {
+        sf::Event mouseMovedEvent;
+        mouseMovedEvent.type = sf::Event::MouseMoved;
+        mouseMovedEvent.mouseMove.x = GetMousePosition(*this).x;
+        mouseMovedEvent.mouseMove.y = GetMousePosition(*this).y;
+        eventsQueue.push(mouseMovedEvent);
+    }
+    else if(event.Entering())
+    {
+        sf::Event mouseEnteredEvent;
+        mouseEnteredEvent.type = sf::Event::MouseEntered;
+        eventsQueue.push(mouseEnteredEvent);
+    }
+    else if(event.Leaving())
+    {
+        sf::Event mouseLeftEvent;
+        mouseLeftEvent.type = sf::Event::MouseLeft;
+        eventsQueue.push(mouseLeftEvent);
     }
 
     event.Skip();

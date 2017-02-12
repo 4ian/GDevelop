@@ -74,9 +74,11 @@ private:
 
     void OnKeyDown(wxKeyEvent & event);
 
+    void OnKeyUp(wxKeyEvent & event);
+
     void OnCharEntered(wxKeyEvent & event);
 
-    void OnMouseWheelScrolled(wxMouseEvent & event);
+    void OnMouseEvents(wxMouseEvent & event);
 
     void ForceUpdate();
 

@@ -74,9 +74,22 @@ WxRenderingWindow::WxRenderingWindow(wxWindow * parent, sf::Vector2u renderingSi
 	Bind(wxEVT_ERASE_BACKGROUND, &WxRenderingWindow::OnEraseBackground, this);
     Bind(wxEVT_IDLE, &WxRenderingWindow::OnIdle, this);
     Bind(wxEVT_SIZE, &WxRenderingWindow::OnSizeChanged, this);
+
     Bind(wxEVT_KEY_DOWN, &WxRenderingWindow::OnKeyDown, this);
+    Bind(wxEVT_KEY_UP, &WxRenderingWindow::OnKeyUp, this);
     Bind(wxEVT_CHAR, &WxRenderingWindow::OnCharEntered, this);
-    Bind(wxEVT_MOUSEWHEEL, &WxRenderingWindow::OnMouseWheelScrolled, this);
+
+    Bind(wxEVT_LEFT_DOWN, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_LEFT_UP, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_RIGHT_DOWN, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_RIGHT_UP, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_MIDDLE_DOWN, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_MIDDLE_UP, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_AUX1_DOWN, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_AUX1_UP, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_AUX2_DOWN, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_AUX2_UP, &WxRenderingWindow::OnMouseEvents, this);
+    Bind(wxEVT_MOUSEWHEEL, &WxRenderingWindow::OnMouseEvents, this);
 }
 
 const sf::RenderTarget & WxRenderingWindow::GetRenderingTarget() const
@@ -202,6 +215,23 @@ void WxRenderingWindow::OnKeyDown(wxKeyEvent & event)
     eventsQueue.push(keyEvent);
 }
 
+void WxRenderingWindow::OnKeyUp(wxKeyEvent & event)
+{
+    event.Skip();
+    if(event.GetKeyCode() == WXK_NONE || GetKeyMap().count(event.GetKeyCode()) == 0)
+        return;
+
+    sf::Event keyEvent;
+    keyEvent.type = sf::Event::KeyReleased;
+    keyEvent.key.code = GetKeyMap()[event.GetKeyCode()];
+    keyEvent.key.alt = event.AltDown();
+    keyEvent.key.control = event.ControlDown();
+    keyEvent.key.shift = event.ShiftDown();
+    keyEvent.key.system = event.MetaDown();
+
+    eventsQueue.push(keyEvent);
+}
+
 void WxRenderingWindow::OnCharEntered(wxKeyEvent & event)
 {
     if(event.GetUnicodeKey() != WXK_NONE)
@@ -216,27 +246,58 @@ void WxRenderingWindow::OnCharEntered(wxKeyEvent & event)
     event.Skip();
 }
 
-void WxRenderingWindow::OnMouseWheelScrolled(wxMouseEvent & event)
+void WxRenderingWindow::OnMouseEvents(wxMouseEvent & event)
 {
-    // Push the corresponding SFML mouse wheel event
-    sf::Event wheelEvent;
-    wheelEvent.type = sf::Event::MouseWheelScrolled;
-    wheelEvent.mouseWheelScroll.wheel =
-        event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL ?
-            sf::Mouse::Wheel::VerticalWheel :
-            sf::Mouse::Wheel::HorizontalWheel;
-    wheelEvent.mouseWheelScroll.delta = static_cast<float>(event.GetWheelRotation()) / static_cast<float>(event.GetWheelDelta());
-    wheelEvent.mouseWheelScroll.x = GetMousePosition(*this).x;
-    wheelEvent.mouseWheelScroll.y = GetMousePosition(*this).y;
-    eventsQueue.push(wheelEvent);
+    if(event.IsButton() && !event.ButtonDClick())
+    {
+        sf::Event buttonEvent;
 
-    // Also generate the deprecated one
-    sf::Event deprecatedEvent;
-    deprecatedEvent.type = sf::Event::MouseWheelMoved;
-    deprecatedEvent.mouseWheel.delta = static_cast<float>(event.GetWheelRotation()) / static_cast<float>(event.GetWheelDelta());
-    deprecatedEvent.mouseWheel.x = GetMousePosition(*this).x;
-    deprecatedEvent.mouseWheel.y = GetMousePosition(*this).y;
-    eventsQueue.push(deprecatedEvent);
+        if(event.ButtonDown())
+            buttonEvent.type = sf::Event::MouseButtonPressed;
+        else if(event.ButtonUp()) // Button up
+            buttonEvent.type = sf::Event::MouseButtonReleased;
+        else
+            return;
+
+        if(event.Button(wxMOUSE_BTN_LEFT))
+            buttonEvent.mouseButton.button = sf::Mouse::Left;
+        else if(event.Button(wxMOUSE_BTN_RIGHT))
+            buttonEvent.mouseButton.button = sf::Mouse::Right;
+        else if(event.Button(wxMOUSE_BTN_MIDDLE))
+            buttonEvent.mouseButton.button = sf::Mouse::Middle;
+        else if(event.Button(wxMOUSE_BTN_AUX1))
+            buttonEvent.mouseButton.button = sf::Mouse::XButton1;
+        else if(event.Button(wxMOUSE_BTN_AUX2))
+            buttonEvent.mouseButton.button = sf::Mouse::XButton2;
+        else
+            return;
+
+        buttonEvent.mouseButton.x = GetMousePosition(*this).x;
+        buttonEvent.mouseButton.y = GetMousePosition(*this).y;
+        eventsQueue.push(buttonEvent);
+    }
+    else if(event.GetEventType() == wxEVT_MOUSEWHEEL)
+    {
+        // Push the corresponding SFML mouse wheel event
+        sf::Event wheelEvent;
+        wheelEvent.type = sf::Event::MouseWheelScrolled;
+        wheelEvent.mouseWheelScroll.wheel =
+            event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL ?
+                sf::Mouse::Wheel::VerticalWheel :
+                sf::Mouse::Wheel::HorizontalWheel;
+        wheelEvent.mouseWheelScroll.delta = static_cast<float>(event.GetWheelRotation()) / static_cast<float>(event.GetWheelDelta());
+        wheelEvent.mouseWheelScroll.x = GetMousePosition(*this).x;
+        wheelEvent.mouseWheelScroll.y = GetMousePosition(*this).y;
+        eventsQueue.push(wheelEvent);
+
+        // Also generate the deprecated one
+        sf::Event deprecatedEvent;
+        deprecatedEvent.type = sf::Event::MouseWheelMoved;
+        deprecatedEvent.mouseWheel.delta = static_cast<float>(event.GetWheelRotation()) / static_cast<float>(event.GetWheelDelta());
+        deprecatedEvent.mouseWheel.x = GetMousePosition(*this).x;
+        deprecatedEvent.mouseWheel.y = GetMousePosition(*this).y;
+        eventsQueue.push(deprecatedEvent);
+    }
 
     event.Skip();
 }

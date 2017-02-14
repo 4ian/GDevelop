@@ -25,9 +25,6 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    frame: false,
-    hasShadow: false,
-    skipTaskbar: true,
     //Allow to access to local files
     webPreferences: {
       webSecurity: false

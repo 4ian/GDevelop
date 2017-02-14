@@ -35,7 +35,7 @@ export default class SceneEditor extends Component {
     return (
       <div style={{display: 'flex', flex: 1}}>
         <div style={{
-          flex: 0.2,
+          width: 200,
           overflowY: 'scroll',
         }}>
           <InstancePropertiesEditor instances={this.state.selectedInstances}/>
@@ -54,7 +54,7 @@ export default class SceneEditor extends Component {
           />
         </div>
         <div style={{
-          flex: 0.2,
+          width: 200,
           overflowY: 'scroll',
         }}>
           <ObjectsList

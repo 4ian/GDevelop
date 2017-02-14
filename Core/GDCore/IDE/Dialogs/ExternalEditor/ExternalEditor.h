@@ -50,7 +50,7 @@ public:
 		onSendUpdate = cb;
 	}
 
-	bool Launch(const gd::String & editorName);
+	bool Launch(const gd::String & editorName, const gd::String editedElementName);
 
 	void Hide()
 	{

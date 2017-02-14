@@ -82,10 +82,10 @@ export default class InstancesSelection {
     }
 
     render() {
-      let x1 = 0;
-      let y1 = 0;
-      let x2 = 0;
-      let y2 = 0;
+      let x1;
+      let y1;
+      let x2;
+      let y2;
 
       //Update the selection rectangle of each instance
       for (var i = 0; i < this.selection.length; i++) {

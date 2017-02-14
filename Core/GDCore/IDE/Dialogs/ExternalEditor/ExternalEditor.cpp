@@ -18,7 +18,7 @@
 
 namespace gd {
 
-bool ExternalEditor::Launch(const gd::String & editorName)
+bool ExternalEditor::Launch(const gd::String & editorName, const gd::String editedElementName)
 {
 	unsigned int port = editorBridge.Start();
 	if (port == 0)
@@ -27,14 +27,14 @@ bool ExternalEditor::Launch(const gd::String & editorName)
         return false;
 	}
 
-	// String cmd = "/Users/florian/Projects/F/gdwebapp/deployment/electron-app/node_modules/electron-prebuilt/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/gdwebapp/deployment/electron-app/app";
     String cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
     //cmd += " --hide-icon";
 	if (editorName != "") cmd += " --editor " + editorName;
+	if (editedElementName != "") cmd += " --edited-element-name \"" + editedElementName + "\"";
 	externalEditorPid = wxExecute(cmd + " --server-port " + String::From(port), wxEXEC_ASYNC);
     if (externalEditorPid == 0)
     {
-        LogError(_("Unable to launch the external events editor."));
+        LogError(_("Unable to launch the external editor."));
         return false;
     }
 

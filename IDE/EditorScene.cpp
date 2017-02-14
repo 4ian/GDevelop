@@ -192,7 +192,7 @@ mainFrameWrapper(mainFrameWrapper_)
         std::cout << "Updating instances from the external editor." << std::endl;
         this->layout.GetInitialInstances().UnserializeFrom(object);
     });
-    externalLayoutEditor->Launch("sceneeditor");
+    externalLayoutEditor->Launch("scene-editor", layout.GetName());
 }
 
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)
@@ -201,6 +201,7 @@ void EditorScene::OnscenePanelResize(wxSizeEvent& event)
     hScrollbar->SetSize(0, scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight(), scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), hScrollbar->GetSize().GetHeight());
     vScrollbar->SetSize(scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), 0, vScrollbar->GetSize().GetWidth(), scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight());
 
+		    //TODO: Temporary test
 		auto rect = scenePanel->GetScreenRect();
 		externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
 }

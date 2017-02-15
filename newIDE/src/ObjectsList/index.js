@@ -19,6 +19,7 @@ export default class ProjectManager extends React.Component {
             primaryText={objectName}
             leftAvatar={<Avatar
               src={ObjectsRenderingService.getThumbnail(project, object)}
+              style={{borderRadius: 0}}
             />}
             onTouchTap={() => this.props.onObjectSelected(objectName)}
           />);

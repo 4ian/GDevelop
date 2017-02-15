@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import gesture from 'pixi-simple-gesture';
-import SceneRenderer from './SceneRenderer';
+import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import InstancesSelection from './InstancesSelection';
 import KeyboardShortcuts from './KeyboardShortcuts';
@@ -58,7 +58,7 @@ export default class InstancesEditorContainer extends Component {
       width: this.props.width,
       height: this.props.height
     });
-    this.sceneRenderer = new SceneRenderer({
+    this.instancesRenderer = new InstancesRenderer({
       project: this.props.project,
       layout: this.props.layout,
       instances: this.props.initialInstances,
@@ -70,19 +70,19 @@ export default class InstancesEditorContainer extends Component {
     });
     this.selectionRectangle = new SelectionRectangle({
       instances: this.props.initialInstances,
-      getInstanceWidth: this.sceneRenderer.getInstanceWidth,
-      getInstanceHeight: this.sceneRenderer.getInstanceHeight,
+      getInstanceWidth: this.instancesRenderer.getInstanceWidth,
+      getInstanceHeight: this.instancesRenderer.getInstanceHeight,
       toSceneCoordinates: this.viewPosition.toSceneCoordinates,
     });
     this.instancesSelection = new InstancesSelection({
-      getInstanceWidth: this.sceneRenderer.getInstanceWidth,
-      getInstanceHeight: this.sceneRenderer.getInstanceHeight,
+      getInstanceWidth: this.instancesRenderer.getInstanceWidth,
+      getInstanceHeight: this.instancesRenderer.getInstanceHeight,
       onResize: this._onResize,
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.highlightedInstance = new HighlightedInstance({
-      getInstanceWidth: this.sceneRenderer.getInstanceWidth,
-      getInstanceHeight: this.sceneRenderer.getInstanceHeight,
+      getInstanceWidth: this.instancesRenderer.getInstanceWidth,
+      getInstanceHeight: this.instancesRenderer.getInstanceHeight,
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.keyboardShortcuts = new KeyboardShortcuts();
@@ -90,7 +90,7 @@ export default class InstancesEditorContainer extends Component {
     this.pixiContainer.addChild(this.backgroundArea);
     this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
-    this.viewPosition.getPixiContainer().addChild(this.sceneRenderer.getPixiContainer());
+    this.viewPosition.getPixiContainer().addChild(this.instancesRenderer.getPixiContainer());
     this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.pixiContainer.addChild(this.instancesSelection.getPixiContainer());
 
@@ -185,8 +185,8 @@ export default class InstancesEditorContainer extends Component {
       const selectedInstance = selectedInstances[i];
 
       if (!selectedInstance.hasCustomSize()) {
-        selectedInstance.setCustomWidth(this.sceneRenderer.getInstanceWidth(selectedInstance));
-        selectedInstance.setCustomHeight(this.sceneRenderer.getInstanceHeight(selectedInstance));
+        selectedInstance.setCustomWidth(this.instancesRenderer.getInstanceWidth(selectedInstance));
+        selectedInstance.setCustomHeight(this.instancesRenderer.getInstanceHeight(selectedInstance));
       }
 
       selectedInstance.setHasCustomSize(true);
@@ -227,7 +227,7 @@ export default class InstancesEditorContainer extends Component {
         layout.getBackgroundColorBlue()), 16), 10);
 
     this.viewPosition.render();
-    this.sceneRenderer.render();
+    this.instancesRenderer.render();
     this.highlightedInstance.render();
     this.instancesSelection.render();
     this.selectionRectangle.render();

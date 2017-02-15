@@ -129,6 +129,7 @@ gd::PlatformExtension * CreateGDJSDraggableBehaviorExtension();
 gd::PlatformExtension * CreateGDJSTopDownMovementBehaviorExtension();
 gd::PlatformExtension * CreateGDJSTextObjectExtension();
 gd::PlatformExtension * CreateGDJSAdMobObjectExtension();
+gd::PlatformExtension * CreateGDJSPanelSpriteObjectExtension();
 }
 #endif
 
@@ -167,6 +168,7 @@ JsPlatform::JsPlatform() :
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTopDownMovementBehaviorExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTextObjectExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSAdMobObjectExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSPanelSpriteObjectExtension())); std::cout.flush();
     #endif
     std::cout << "done." << std::endl;
 };

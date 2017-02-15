@@ -27,7 +27,7 @@ function RenderedUnknownInstance(project, layout, instance, associatedObject, pi
     this._pixiObject.endFill();
 }
 RenderedUnknownInstance.prototype = Object.create( RenderedInstance.prototype );
-RenderedUnknownInstance.getThumbnail = function(project, layout, object) {
+RenderedUnknownInstance.getThumbnail = function(project, resourcesLoader, object) {
     return "res/unknown32.png";
 };
 

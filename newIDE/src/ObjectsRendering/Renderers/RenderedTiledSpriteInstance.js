@@ -25,7 +25,7 @@ RenderedTiledSpriteInstance.prototype = Object.create( RenderedInstance.prototyp
  * @method getThumbnail
  * @static
  */
-RenderedTiledSpriteInstance.getThumbnail = function(project, layout, object) {
+RenderedTiledSpriteInstance.getThumbnail = function(project, resourcesLoader, object) {
     var tiledSprite = gd.asTiledSpriteObject(object);
 
     var texture = tiledSprite.getTexture();

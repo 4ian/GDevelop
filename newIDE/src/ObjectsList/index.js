@@ -1,11 +1,12 @@
 import React from 'react';
 import {List, ListItem} from 'material-ui/List';
-import ContentInbox from 'material-ui/svg-icons/content/inbox';
+import Avatar from 'material-ui/Avatar';
+import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import mapFor from '../Utils/MapFor';
 
 export default class ProjectManager extends React.Component {
   render() {
-    const { objectsContainer } = this.props;
+    const { project, objectsContainer } = this.props;
 
     return (
       <List>
@@ -14,9 +15,11 @@ export default class ProjectManager extends React.Component {
           const objectName = object.getName();
 
           return (<ListItem
-            key={i}
+            key={object.ptr}
             primaryText={objectName}
-            leftIcon={<ContentInbox />}
+            leftAvatar={<Avatar
+              src={ObjectsRenderingService.getThumbnail(project, object)}
+            />}
             onTouchTap={() => this.props.onObjectSelected(objectName)}
           />);
         })}

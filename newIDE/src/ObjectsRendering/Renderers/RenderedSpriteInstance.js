@@ -33,15 +33,15 @@ RenderedSpriteInstance.prototype = Object.create( RenderedInstance.prototype );
  * @method getThumbnail
  * @static
  */
-RenderedSpriteInstance.getThumbnail = function(project, layout, object) {
-    var spriteObject = gd.asSpriteObject(object);
+RenderedSpriteInstance.getThumbnail = function(project, resourcesLoader, object) {
+    const spriteObject = gd.asSpriteObject(object);
 
     if (spriteObject.getAnimationsCount() > 0 &&
         spriteObject.getAnimation(0).getDirectionsCount() > 0 &&
         spriteObject.getAnimation(0).getDirection(0).getSpritesCount() > 0) {
 
         const imageName = spriteObject.getAnimation(0).getDirection(0).getSprite(0).getImageName();
-        return this._resourcesLoader.get(imageName);
+        return resourcesLoader.get(project, imageName);
     }
 
     return "res/unknown32.png";

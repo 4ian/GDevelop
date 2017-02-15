@@ -52,7 +52,7 @@ RenderedAdMobInstance.prototype = Object.create( RenderedInstance.prototype );
  * @method getThumbnail
  * @static
  */
-RenderedAdMobInstance.getThumbnail = function(project, layout, object) {
+RenderedAdMobInstance.getThumbnail = function(project, resourcesLoader, object) {
     return "JsPlatform/Extensions/admobicon24.png";
 };
 

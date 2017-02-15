@@ -2,8 +2,8 @@ const PIXI = global.PIXI;
 
 export default class ViewPosition {
   constructor({width, height}) {
-    this.viewX = 0;
-    this.viewY = 0;
+    this.viewX = width / 2;
+    this.viewY = height / 2;
     this._zoomFactor = 1;
     this._pixiContainer = new PIXI.Container();
     this.resize(width, height);

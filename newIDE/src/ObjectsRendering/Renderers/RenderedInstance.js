@@ -34,6 +34,10 @@ RenderedInstance.prototype.update = function() {
     //Nothing to do.
 };
 
+RenderedInstance.prototype.getPixiObject = function() {
+    return this._pixiObject;
+}
+
 /**
  * Called to notify the instance renderer that its associated instance was removed from
  * the scene. The PIXI object should probably be removed from the container: This is what

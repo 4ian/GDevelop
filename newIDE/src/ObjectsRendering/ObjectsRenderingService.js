@@ -17,12 +17,12 @@ export default {
         "AdMobObject::AdMob" : RenderedAdMobInstance,
         "TextObject::Text" : RenderedTextInstance
     },
-    getThumbnail: function(project, layout, object) {
+    getThumbnail: function(project, object) {
         var objectType = object.getType();
         if (this.renderers.hasOwnProperty(objectType))
-            return this.renderers[objectType].getThumbnail(project, layout, object);
+            return this.renderers[objectType].getThumbnail(project, ResourcesLoader, object);
         else
-            return this.renderers["unknownObjectType"].getThumbnail(project, layout, object);
+            return this.renderers["unknownObjectType"].getThumbnail(project, ResourcesLoader, object);
     },
     createNewInstanceRenderer: function(project, layout, instance, associatedObject, pixiContainer) {
         var objectType = associatedObject.getType();

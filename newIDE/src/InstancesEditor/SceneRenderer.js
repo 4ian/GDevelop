@@ -31,6 +31,9 @@ export default class SceneRenderer {
         var renderedInstance = this.getRendererOfInstance(instance);
         if (!renderedInstance) return;
 
+        const pixiObject = renderedInstance.getPixiObject();
+        if (pixiObject) pixiObject.zOrder = instance.getZOrder();
+        if (pixiObject) pixiObject.interactive = !instance.isLocked();
         renderedInstance.update();
         renderedInstance.wasUsed = true;
     };
@@ -91,12 +94,21 @@ export default class SceneRenderer {
       return renderedInstance;
   }
 
+  updatePixiObjectsZOrder() {
+    this.pixiInstancesContainer.children.sort((a, b) => {
+        a.zOrder = a.zOrder || 0;
+        b.zOrder = b.zOrder || 0;
+        return a.zOrder - b.zOrder;
+    });
+  }
+
   render() {
     for (let i = 0; i < this.layout.getLayersCount(); i++) {
         var layerName = this.layout.getLayerAt(i).getName();
         this.instances.iterateOverInstancesWithZOrdering(this.instancesRenderer,
             layerName);
     }
+    this.updatePixiObjectsZOrder();
 
     //Clean up rendered instances that are no more associated to any instance
     //(this can happen after an instance having been deleted).

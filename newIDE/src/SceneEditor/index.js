@@ -58,6 +58,7 @@ export default class SceneEditor extends Component {
           overflowY: 'scroll',
         }}>
           <ObjectsList
+            project={project}
             objectsContainer={layout}
             onObjectSelected={this._onObjectSelected}
           />

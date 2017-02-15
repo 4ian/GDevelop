@@ -51,6 +51,25 @@ export default class ProjectManager extends React.Component {
             );
           })}
         />
+        <ListItem
+          primaryText="External layouts"
+          leftIcon={<ContentInbox />}
+          initiallyOpen={true}
+          primaryTogglesNestedList={true}
+          autoGenerateNestedIndicator={true}
+          nestedItems={mapFor(0, project.getExternalLayoutsCount(), (i) => {
+            const externalLayout = project.getExternalLayoutAt(i);
+            const name = externalLayout.getName();
+            return (
+              <ListItem
+                key={i}
+                primaryText={name}
+                leftIcon={<ContentInbox />}
+                onTouchTap={() => this.props.onOpenExternalLayout(name)}
+              />
+            );
+          })}
+        />
       </List>
     );
   }

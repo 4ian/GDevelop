@@ -12,6 +12,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import EventsSheetContainer from './EventsSheet/EventsSheetContainer.js';
 import SceneEditor from './SceneEditor';
+import ExternalLayoutEditor from './SceneEditor/ExternalLayoutEditor';
 import ProjectManager from './ProjectManager';
 import ExternalEditor from './ExternalEditor';
 
@@ -32,6 +33,7 @@ class App extends Component {
       externalEventsOpened: '',
       projectManagerOpen: false,
       sceneOpened: '',
+      externalLayoutOpened: '',
     }
 
     if (ExternalEditor.isSupported()) {
@@ -45,6 +47,11 @@ class App extends Component {
         if (!this.state.sceneOpened && editorArguments['editor'] === 'scene-editor') {
           this.setState({
             sceneOpened: editorArguments['edited-element-name'],
+          });
+        }
+        if (!this.state.externalLayoutOpened && editorArguments['editor'] === 'external-layout-editor') {
+          this.setState({
+            externalLayoutOpened: editorArguments['edited-element-name'],
           });
         }
       });
@@ -100,7 +107,7 @@ class App extends Component {
   }
 
   render() {
-    const { currentProject, externalEventsOpened, sceneOpened } = this.state;
+    const { currentProject, externalEventsOpened, sceneOpened, externalLayoutOpened } = this.state;
 
     return (
       <MuiThemeProvider>
@@ -121,6 +128,9 @@ class App extends Component {
                   onOpenLayout={name => this.setState({
                     sceneOpened: name
                   })}
+                  onOpenExternalLayout={name => this.setState({
+                    externalLayoutOpened: name
+                  })}
                 />
               )
             }
@@ -138,6 +148,15 @@ class App extends Component {
                 key={sceneOpened}
                 project={currentProject}
                 layoutName={sceneOpened}
+              />
+            )
+          }
+          {
+            currentProject && externalLayoutOpened && (
+              <ExternalLayoutEditor
+                key={externalLayoutOpened}
+                project={currentProject}
+                externalLayoutName={externalLayoutOpened}
               />
             )
           }

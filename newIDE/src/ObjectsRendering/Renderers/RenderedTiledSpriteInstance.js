@@ -9,13 +9,16 @@ const PIXI = global.PIXI;
  * @class RenderedTiledSpriteInstance
  * @constructor
  */
-function RenderedTiledSpriteInstance(project, layout, instance, associatedObject, pixiContainer) {
+function RenderedTiledSpriteInstance(project, layout, instance, associatedObject, pixiContainer, resourcesLoader) {
     RenderedInstance.call( this, project, layout, instance, associatedObject, pixiContainer );
 
     //Setup the PIXI object:
     var tiledSprite = gd.asTiledSpriteObject(associatedObject);
-    this._pixiObject = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage(tiledSprite.getTexture()), //TODO
-        tiledSprite.getWidth(), tiledSprite.getHeight());
+    this._pixiObject = new PIXI.extras.TilingSprite(
+        PIXI.Texture.fromImage(resourcesLoader.get(project, tiledSprite.getTexture())),
+        tiledSprite.getWidth(),
+        tiledSprite.getHeight()
+    );
     this._pixiContainer.addChild(this._pixiObject);
 }
 RenderedTiledSpriteInstance.prototype = Object.create( RenderedInstance.prototype );
@@ -28,8 +31,7 @@ RenderedTiledSpriteInstance.prototype = Object.create( RenderedInstance.prototyp
 RenderedTiledSpriteInstance.getThumbnail = function(project, resourcesLoader, object) {
     var tiledSprite = gd.asTiledSpriteObject(object);
 
-    var texture = tiledSprite.getTexture();
-    return texture ? texture : "res/unknown32.png";
+    return resourcesLoader.get(project, tiledSprite.getTexture());
 };
 
 RenderedTiledSpriteInstance.prototype.update = function() {

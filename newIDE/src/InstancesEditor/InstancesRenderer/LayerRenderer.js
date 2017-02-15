@@ -122,4 +122,8 @@ export default class LayerRenderer {
       }
     }
   }
+
+  delete() {
+    this.instancesRenderer.delete();
+  }
 }

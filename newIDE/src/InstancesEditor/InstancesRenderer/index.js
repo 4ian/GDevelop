@@ -1,6 +1,4 @@
-import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import LayerRenderer from './LayerRenderer';
-const gd = global.gd;
 const PIXI = global.PIXI;
 
 export default class InstancesRenderer {
@@ -93,10 +91,19 @@ export default class InstancesRenderer {
         const layerRenderer = this.layersRenderers[i];
         if (!layerRenderer.wasUsed) {
           this.pixiContainer.removeChild(layerRenderer.getPixiContainer());
+          layerRenderer.delete();
           delete this.layersRenderers[i];
         }
         else
           layerRenderer.wasUsed = false;
+      }
+    }
+  }
+
+  delete() {
+    for(let i in this.layersRenderers) {
+      if (this.layersRenderers.hasOwnProperty(i)) {
+        this.layersRenderers[i].delete();
       }
     }
   }

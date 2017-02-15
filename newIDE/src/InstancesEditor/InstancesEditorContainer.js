@@ -100,6 +100,8 @@ export default class InstancesEditorContainer extends Component {
   componentWillUnmount() {
     this.keyboardShortcuts.unmount();
     this.zOrderFinder.delete();
+    this.selectionRectangle.delete();
+    this.instancesRenderer.delete();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
   }
 

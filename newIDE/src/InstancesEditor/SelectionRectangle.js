@@ -16,19 +16,19 @@ export default class SelectionRectangle {
 
     this.selector = new gd.InitialInstanceJSFunctor();
     this.selector.invoke = (instancePtr) => {
-        const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
-        const x = instance.getX();
-        const y = instance.getY();
-        const instanceHeight = this.getInstanceHeight(instance);
-        const instanceWidth = this.getInstanceWidth(instance);
+      const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
+      const x = instance.getX();
+      const y = instance.getY();
+      const instanceHeight = this.getInstanceHeight(instance);
+      const instanceWidth = this.getInstanceWidth(instance);
 
-        const selectionSceneStart = toSceneCoordinates(this.selectionRectangleStart.x, this.selectionRectangleStart.y);
-        const selectionSceneEnd = toSceneCoordinates(this.selectionRectangleEnd.x, this.selectionRectangleEnd.y);
+      const selectionSceneStart = toSceneCoordinates(this.selectionRectangleStart.x, this.selectionRectangleStart.y);
+      const selectionSceneEnd = toSceneCoordinates(this.selectionRectangleEnd.x, this.selectionRectangleEnd.y);
 
-        if (selectionSceneStart[0] <= x && x + instanceWidth <= selectionSceneEnd[0] &&
-          selectionSceneStart[1] <= y && y + instanceHeight <= selectionSceneEnd[1]) {
-          this._instancesInSelectionRectangle.push(instance);
-        }
+      if (selectionSceneStart[0] <= x && x + instanceWidth <= selectionSceneEnd[0] &&
+        selectionSceneStart[1] <= y && y + instanceHeight <= selectionSceneEnd[1]) {
+        this._instancesInSelectionRectangle.push(instance);
+      }
     };
   }
 
@@ -82,5 +82,9 @@ export default class SelectionRectangle {
     this.pixiRectangle.drawRect(Math.min(x1, x2),  Math.min(y1, y2),
       Math.abs(x2 - x1),  Math.abs(y2 - y1));
     this.pixiRectangle.endFill();
+  }
+
+  delete() {
+    this.selector.delete();
   }
 }

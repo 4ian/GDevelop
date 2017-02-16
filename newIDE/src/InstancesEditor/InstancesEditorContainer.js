@@ -9,8 +9,6 @@ import SelectionRectangle from './SelectionRectangle';
 const gd = global.gd;
 const PIXI = global.PIXI;
 
-import gameData from '../fixtures/game.json';
-
 /**
  * Convert a rgb color value to a hex value.
  * @note No "#" or "0x" are added.
@@ -34,14 +32,6 @@ export default class InstancesEditorContainer extends Component {
     this.pixiRenderer.view.addEventListener('click', (e) => {
       this._onClick(e.offsetX, e.offsetY);
     });
-
-    this.backgroundArea = new PIXI.Container();
-    this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, this.props.width, this.props.height);
-    gesture.panable(this.backgroundArea);
-    this.backgroundArea.on('mousedown', this._onBackgroundClicked);
-    this.backgroundArea.on('panmove', (event) => this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y));
-    this.backgroundArea.on('panend', (event) => this._onEndSelectionRectangle());
-
     this.pixiRenderer.view.onmousewheel = (event) => {
       if (this.keyboardShortcuts.shouldZoom()) {
         this.viewPosition.zoomBy(event.wheelDelta / 5000);
@@ -54,14 +44,48 @@ export default class InstancesEditorContainer extends Component {
     };
 
     this.pixiContainer = new PIXI.Container();
+
+    this.backgroundArea = new PIXI.Container();
+    this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, this.props.width, this.props.height);
+    gesture.panable(this.backgroundArea);
+    this.backgroundArea.on('mousedown', this._onBackgroundClicked);
+    this.backgroundArea.on('panmove', (event) => this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y));
+    this.backgroundArea.on('panend', (event) => this._onEndSelectionRectangle());
+    this.pixiContainer.addChild(this.backgroundArea);
+
     this.viewPosition = new ViewPosition({
       width: this.props.width,
       height: this.props.height
     });
+    this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
+
+    this.keyboardShortcuts = new KeyboardShortcuts();
+
+    this._mountEditorComponents(this.props);
+    this.renderScene();
+  }
+
+  _mountEditorComponents(props) {
+    //Remove and delete any existing editor component
+    if (this.highlightedInstance) {
+      this.pixiContainer.removeChild(this.highlightedInstance.getPixiObject());
+    }
+    if (this.instancesSelection) {
+      this.pixiContainer.removeChild(this.instancesSelection.getPixiContainer());
+    }
+    if (this.instancesRenderer) {
+      this.viewPosition.getPixiContainer().removeChild(this.instancesRenderer.getPixiContainer());
+      this.instancesRenderer.delete();
+    }
+    if (this.selectionRectangle) {
+      this.pixiContainer.removeChild(this.selectionRectangle.getPixiObject());
+      this.selectionRectangle.delete();
+    }
+
     this.instancesRenderer = new InstancesRenderer({
-      project: this.props.project,
-      layout: this.props.layout,
-      instances: this.props.initialInstances,
+      project: props.project,
+      layout: props.layout,
+      instances: props.initialInstances,
       onOverInstance: this._onOverInstance,
       onMoveInstance: this._onMoveInstance,
       onDownInstance: this._onDownInstance,
@@ -69,7 +93,7 @@ export default class InstancesEditorContainer extends Component {
       onInstanceClicked: this._onInstanceClicked,
     });
     this.selectionRectangle = new SelectionRectangle({
-      instances: this.props.initialInstances,
+      instances: props.initialInstances,
       getInstanceWidth: this.instancesRenderer.getInstanceWidth,
       getInstanceHeight: this.instancesRenderer.getInstanceHeight,
       toSceneCoordinates: this.viewPosition.toSceneCoordinates,
@@ -85,16 +109,11 @@ export default class InstancesEditorContainer extends Component {
       getInstanceHeight: this.instancesRenderer.getInstanceHeight,
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
-    this.keyboardShortcuts = new KeyboardShortcuts();
 
-    this.pixiContainer.addChild(this.backgroundArea);
-    this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
     this.viewPosition.getPixiContainer().addChild(this.instancesRenderer.getPixiContainer());
     this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.pixiContainer.addChild(this.instancesSelection.getPixiContainer());
-
-    this.renderScene();
   }
 
   componentWillUnmount() {
@@ -114,12 +133,12 @@ export default class InstancesEditorContainer extends Component {
 
     if (this.props.layout !== nextProps.layout ||
       this.props.initialInstances !== nextProps.initialInstances ||
-      this.props.project !== nextProps.project)
-      throw new Error("Changing project/layout/initialInstances is not supported yet")
+      this.props.project !== nextProps.project) {
+      this._mountEditorComponents(nextProps);
+    }
   }
 
   _onBackgroundClicked = () => {
-    console.log("Background clicked");
     if (!this.keyboardShortcuts.shouldMultiSelect())
       this.instancesSelection.clearSelection();
   }

@@ -1,6 +1,7 @@
 import RenderedUnknownInstance from './Renderers/RenderedUnknownInstance';
 import RenderedSpriteInstance from './Renderers/RenderedSpriteInstance';
 import RenderedTiledSpriteInstance from './Renderers/RenderedTiledSpriteInstance';
+import RenderedPanelSpriteInstance from './Renderers/RenderedPanelSpriteInstance';
 import RenderedAdMobInstance from './Renderers/RenderedAdMobInstance';
 import RenderedTextInstance from './Renderers/RenderedTextInstance';
 import ResourcesLoader from './ResourcesLoader';
@@ -14,6 +15,7 @@ export default {
         "unknownObjectType" : RenderedUnknownInstance,
         "Sprite" : RenderedSpriteInstance,
         "TiledSpriteObject::TiledSprite" : RenderedTiledSpriteInstance,
+        "PanelSpriteObject::PanelSprite" : RenderedPanelSpriteInstance,
         "AdMobObject::AdMob" : RenderedAdMobInstance,
         "TextObject::Text" : RenderedTextInstance
     },

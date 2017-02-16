@@ -15,6 +15,7 @@ import SceneEditor from './SceneEditor';
 import ExternalLayoutEditor from './SceneEditor/ExternalLayoutEditor';
 import ProjectManager from './ProjectManager';
 import ExternalEditor from './ExternalEditor';
+import LoaderModal from './UI/LoaderModal';
 
 import Window from './Utils/Window.js';
 
@@ -34,6 +35,7 @@ class App extends Component {
       projectManagerOpen: false,
       sceneOpened: '',
       externalLayoutOpened: '',
+      loading: false,
     }
 
     if (ExternalEditor.isSupported()) {
@@ -72,7 +74,11 @@ class App extends Component {
         const serializedInstances = new gd.SerializerElement();
         instances.serializeTo(serializedInstances);
         ExternalEditor.send(serializedInstances);
+        serializedInstances.delete();
       });
+      Window.onFocus(() => {
+        this.requestUpdate();
+      })
 
       ExternalEditor.connectTo(editorArguments['server-port']);
     } else {
@@ -81,23 +87,36 @@ class App extends Component {
   }
 
   requestUpdate = () => {
-    ExternalEditor.requestUpdate();
+    this.setState({
+      loading: true,
+    }, () => {
+      ExternalEditor.requestUpdate();
+    });
   }
 
   loadBuiltinGame = () => {
-    const unserializedProject = gd.Serializer.fromJSON(JSON.stringify(game));
-    return this.loadGame(unserializedProject);
+    this.setState({
+      loading: true,
+    }, () => {
+      const unserializedProject = gd.Serializer.fromJSON(JSON.stringify(game));
+      return this.loadGame(unserializedProject);
+    });
   }
 
   loadGame = (unserializedProject) => {
-    const { currentProject } = this.state;
-    if (currentProject) currentProject.delete();
-    const newProject = gd.ProjectHelper.createNewGDJSProject();
-
-    newProject.unserializeFrom(unserializedProject);
     this.setState({
-      currentProject: newProject,
-    })
+      loading: true,
+    }, () => {
+      const { currentProject } = this.state;
+      if (currentProject) currentProject.delete();
+      const newProject = gd.ProjectHelper.createNewGDJSProject();
+
+      newProject.unserializeFrom(unserializedProject);
+      this.setState({
+        currentProject: newProject,
+        loading: false,
+      });
+    });
   }
 
   toggleProjectManager = () => {
@@ -135,6 +154,7 @@ class App extends Component {
               )
             }
           </Drawer>
+          <LoaderModal show={this.state.loading} />
           <Toolbar>
             <ToolbarGroup firstChild={true}>
               <RaisedButton label="Project manager" onClick={this.toggleProjectManager} />

@@ -60,6 +60,10 @@ export default class ViewPosition {
     this._zoomFactor = Math.max(Math.min(this._zoomFactor + value, 10), 0.05);
   }
 
+  getZoomFactor() {
+    return this._zoomFactor;
+  }
+
   getPixiContainer() {
     return this._pixiContainer;
   }

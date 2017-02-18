@@ -7,16 +7,12 @@ const resizeButtonWidth = 18;
 const resizeButtonHeight = 18;
 
 export default class InstancesSelection {
-    constructor({getInstanceWidth, getInstanceHeight, onResize, toCanvasCoordinates}) {
-      this.getInstanceWidth = getInstanceWidth;
-      this.getInstanceHeight = getInstanceHeight;
+    constructor({instanceMeasurer, onResize, toCanvasCoordinates}) {
+      this.instanceMeasurer = instanceMeasurer;
       this.onResize = onResize;
       this.toCanvasCoordinates = toCanvasCoordinates;
 
       this.selection = [];
-      this.selectionOriginalPos = [];
-      this.selectionOriginalHeight = [];
-      this.selectionOriginalWidth = [];
 
       this.pixiContainer = new PIXI.Container();
       this.rectanglesContainer = new PIXI.Container();
@@ -49,17 +45,11 @@ export default class InstancesSelection {
 
     clearSelection() {
       this.selection.length = 0;
-      this.selectionOriginalPos.length = 0;
-      this.selectionOriginalHeight.length = 0;
-      this.selectionOriginalWidth.length = 0;
     }
 
     selectInstance(instance) {
       if (!this.isInstanceSelected(instance)) {
         this.selection.push(instance);
-        this.selectionOriginalPos.push([instance.getX(), instance.getY()]);
-        this.selectionOriginalWidth.push(this.getInstanceWidth(instance));
-        this.selectionOriginalHeight.push(this.getInstanceHeight(instance));
       }
     }
 
@@ -71,9 +61,6 @@ export default class InstancesSelection {
         }
 
         this.selection.splice(i, 1);
-        this.selectionOriginalPos.splice(i, 1);
-        this.selectionOriginalWidth.splice(i, 1);
-        this.selectionOriginalHeight.splice(i, 1);
       }
     }
 
@@ -97,12 +84,8 @@ export default class InstancesSelection {
         }
 
         const instance = this.selection[i];
-        const width = this.getInstanceWidth(instance);
-        const height = this.getInstanceHeight(instance);
-
-        const selectionRectangle = transformRect(this.toCanvasCoordinates, {
-            x: instance.getX(), y: instance.getY(), width, height
-        });
+        const instanceRect = this.instanceMeasurer.getInstanceRect(instance);
+        const selectionRectangle = transformRect(this.toCanvasCoordinates, instanceRect);
 
         this.selectedRectangles[i].clear();
         this.selectedRectangles[i].beginFill(0x6868E8);
@@ -113,12 +96,12 @@ export default class InstancesSelection {
             selectionRectangle.width, selectionRectangle.height);
         this.selectedRectangles[i].endFill();
 
-        if ( x1 === undefined || instance.getX() < x1 ) x1 = instance.getX();
-        if ( y1 === undefined || instance.getY() < y1 ) y1 = instance.getY();
-        if ( x2 === undefined || instance.getX() + width > x2 )
-            x2 = instance.getX() + width;
-        if ( y2 === undefined || instance.getY() + height > y2 )
-            y2 = instance.getY() + height;
+        if ( x1 === undefined || instanceRect.x < x1 ) x1 = instanceRect.x;
+        if ( y1 === undefined || instanceRect.y < y1 ) y1 = instanceRect.y;
+        if ( x2 === undefined || instanceRect.x + instanceRect.width > x2 )
+            x2 = instanceRect.x + instanceRect.width;
+        if ( y2 === undefined || instanceRect.y + instanceRect.height > y2 )
+            y2 = instanceRect.y + instanceRect.height;
       }
 
       while (this.selectedRectangles.length > this.selection.length) {

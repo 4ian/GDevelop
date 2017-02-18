@@ -49,6 +49,14 @@ RenderedInstance.prototype.instanceRemovedFromScene = function() {
         this._pixiContainer.removeChild(this._pixiObject);
 };
 
+RenderedInstance.prototype.getOriginX = function() {
+    return 0;
+}
+
+RenderedInstance.prototype.getOriginY = function() {
+    return 0;
+}
+
 /**
  * Return the width of the instance when the instance doesn't have a custom size.
  * @method getDefaultWidth

@@ -138,6 +138,18 @@ RenderedSpriteInstance.prototype.update = function() {
     this.updatePIXISprite();
 };
 
+RenderedSpriteInstance.prototype.getOriginX = function() {
+    if (!this._sprite || !this._pixiObject) return 0;
+
+    return this._sprite.getOrigin().getX() * this._pixiObject.scale.x;
+}
+
+RenderedSpriteInstance.prototype.getOriginY = function() {
+    if (!this._sprite || !this._pixiObject) return 0;
+
+    return this._sprite.getOrigin().getY() * this._pixiObject.scale.y;
+}
+
 RenderedSpriteInstance.prototype.getDefaultWidth = function() {
     return Math.abs(this._pixiObject.width);
 };

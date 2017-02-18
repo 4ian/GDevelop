@@ -2,9 +2,8 @@ import transformRect from '../Utils/TransformRect';
 const PIXI = global.PIXI;
 
 export default class InstancesSelection {
-    constructor({getInstanceWidth, getInstanceHeight, toCanvasCoordinates}) {
-      this.getInstanceWidth = getInstanceWidth;
-      this.getInstanceHeight = getInstanceHeight;
+    constructor({instanceMeasurer, toCanvasCoordinates}) {
+      this.instanceMeasurer = instanceMeasurer;
       this.toCanvasCoordinates = toCanvasCoordinates;
 
       this.highlightedInstance = null;
@@ -30,12 +29,9 @@ export default class InstancesSelection {
         return;
       }
 
-      const highlightRectangle = transformRect(this.toCanvasCoordinates, {
-          x: this.highlightedInstance.getX(),
-          y: this.highlightedInstance.getY(),
-          width: this.getInstanceWidth(this.highlightedInstance),
-          height: this.getInstanceHeight(this.highlightedInstance),
-      });
+      const highlightRectangle = transformRect(this.toCanvasCoordinates,
+          this.instanceMeasurer.getInstanceRect(this.highlightedInstance)
+      );
 
       this.highlightRectangle.visible = true;
       this.highlightRectangle.clear();

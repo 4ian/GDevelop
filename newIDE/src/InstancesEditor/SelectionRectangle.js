@@ -2,10 +2,9 @@ const gd = global.gd;
 const PIXI = global.PIXI;
 
 export default class SelectionRectangle {
-  constructor({instances, getInstanceWidth, getInstanceHeight, toSceneCoordinates, toCanvasCoordinates}) {
+  constructor({instances, instanceMeasurer, toSceneCoordinates, toCanvasCoordinates}) {
     this.instances = instances;
-    this.getInstanceWidth = getInstanceWidth;
-    this.getInstanceHeight = getInstanceHeight;
+    this.instanceMeasurer = instanceMeasurer;
     this.toSceneCoordinates = toSceneCoordinates;
 
     this.pixiRectangle = new PIXI.Graphics();
@@ -17,10 +16,10 @@ export default class SelectionRectangle {
     this.selector = new gd.InitialInstanceJSFunctor();
     this.selector.invoke = (instancePtr) => {
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
-      const x = instance.getX();
-      const y = instance.getY();
-      const instanceHeight = this.getInstanceHeight(instance);
-      const instanceWidth = this.getInstanceWidth(instance);
+      const x = this.instanceMeasurer.getInstanceLeft(instance);
+      const y = this.instanceMeasurer.getInstanceTop(instance);
+      const instanceHeight = this.instanceMeasurer.getInstanceHeight(instance);
+      const instanceWidth = this.instanceMeasurer.getInstanceWidth(instance);
 
       const selectionSceneStart = toSceneCoordinates(this.selectionRectangleStart.x, this.selectionRectangleStart.y);
       const selectionSceneEnd = toSceneCoordinates(this.selectionRectangleEnd.x, this.selectionRectangleEnd.y);

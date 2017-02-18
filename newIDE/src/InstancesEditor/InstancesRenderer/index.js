@@ -15,32 +15,59 @@ export default class InstancesRenderer {
     this.layersRenderers = {};
 
     this.pixiContainer = new PIXI.Container();
+    this.instanceMeasurer = {
+      getInstanceLeft: (instance) => {
+        const layerName = instance.getLayer();
+        const layerRenderer = this.layersRenderers[layerName];
+        if (!layerRenderer) return instance.getX();
+
+        return layerRenderer.getInstanceLeft(instance);
+      },
+      getInstanceTop: (instance) => {
+        const layerName = instance.getLayer();
+        const layerRenderer = this.layersRenderers[layerName];
+        if (!layerRenderer) return instance.getY();
+
+        return layerRenderer.getInstanceTop(instance);
+      },
+      getInstanceWidth: (instance) => {
+        if (instance.hasCustomSize())
+          return instance.getCustomWidth();
+
+        const layerName = instance.getLayer();
+        const layerRenderer = this.layersRenderers[layerName];
+        if (!layerRenderer) return 0;
+
+        return layerRenderer.getInstanceWidth(instance);
+      },
+
+      getInstanceHeight: (instance) => {
+        if (instance.hasCustomSize())
+          return instance.getCustomHeight();
+
+        const layerName = instance.getLayer();
+        const layerRenderer = this.layersRenderers[layerName];
+        if (!layerRenderer) return 0;
+
+        return layerRenderer.getInstanceHeight(instance);
+      },
+      getInstanceRect: (instance) => {
+        return {
+          x: this.instanceMeasurer.getInstanceLeft(instance),
+          y: this.instanceMeasurer.getInstanceTop(instance),
+          width: this.instanceMeasurer.getInstanceWidth(instance),
+          height: this.instanceMeasurer.getInstanceHeight(instance),
+        };
+      }
+    }
   }
 
   getPixiContainer() {
     return this.pixiContainer;
   }
 
-  getInstanceWidth = (instance) => {
-    if (instance.hasCustomSize())
-      return instance.getCustomWidth();
-
-    const layerName = instance.getLayer();
-    const layerRenderer = this.layersRenderers[layerName];
-    if (!layerRenderer) return 0;
-
-    return layerRenderer.getInstanceWidth(instance);
-  }
-
-  getInstanceHeight = (instance) => {
-    if (instance.hasCustomSize())
-      return instance.getCustomHeight();
-
-    const layerName = instance.getLayer();
-    const layerRenderer = this.layersRenderers[layerName];
-    if (!layerRenderer) return 0;
-
-    return layerRenderer.getInstanceHeight(instance);
+  getInstanceMeasurer() {
+    return this.instanceMeasurer;
   }
 
   render() {

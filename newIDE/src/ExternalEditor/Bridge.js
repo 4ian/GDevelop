@@ -55,6 +55,7 @@ Bridge.prototype.send = function(command, serializedObject) {
 }
 
 Bridge.prototype._receive = function(data) {
+	console.log("RECEIVED one");
 	var serializedObject = gd.Serializer.fromJSON(data);
 	if (this._onReceiveCb) {
 		this._onReceiveCb(serializedObject.getChild("command").getValue().getString(),

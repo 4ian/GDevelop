@@ -39,6 +39,14 @@ export default class LayerRenderer {
     return this.pixiContainer;
   }
 
+  getInstanceLeft = (instance) => {
+    return instance.getX() - this.renderedInstances[instance.ptr].getOriginX();
+  }
+
+  getInstanceTop = (instance) => {
+    return instance.getY() - this.renderedInstances[instance.ptr].getOriginY();
+  }
+
   getInstanceWidth = (instance) => {
     return instance.hasCustomSize() ?
       instance.getCustomWidth() :

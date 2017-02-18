@@ -94,19 +94,16 @@ export default class InstancesEditorContainer extends Component {
     });
     this.selectionRectangle = new SelectionRectangle({
       instances: props.initialInstances,
-      getInstanceWidth: this.instancesRenderer.getInstanceWidth,
-      getInstanceHeight: this.instancesRenderer.getInstanceHeight,
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toSceneCoordinates: this.viewPosition.toSceneCoordinates,
     });
     this.instancesSelection = new InstancesSelection({
-      getInstanceWidth: this.instancesRenderer.getInstanceWidth,
-      getInstanceHeight: this.instancesRenderer.getInstanceHeight,
       onResize: this._onResize,
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.highlightedInstance = new HighlightedInstance({
-      getInstanceWidth: this.instancesRenderer.getInstanceWidth,
-      getInstanceHeight: this.instancesRenderer.getInstanceHeight,
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
 
@@ -182,6 +179,9 @@ export default class InstancesEditorContainer extends Component {
   }
 
   _onMoveInstance = (instance, deltaX, deltaY) => {
+    const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
+    const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
+    
     if (!this.instancesSelection.isInstanceSelected(instance)) {
       this._onInstanceClicked(instance);
     }
@@ -190,29 +190,36 @@ export default class InstancesEditorContainer extends Component {
     for (var i = 0;i < selectedInstances.length;i++) {
       const selectedInstance = selectedInstances[i];
 
-      selectedInstance.setX(selectedInstance.getX() + deltaX);
-      selectedInstance.setY(selectedInstance.getY() + deltaY);
+      selectedInstance.setX(selectedInstance.getX() + sceneDeltaX);
+      selectedInstance.setY(selectedInstance.getY() + sceneDeltaY);
     }
   }
 
   _onPanMoveView = (deltaX, deltaY) => {
+    const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
+    const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
+
     if (this.highlightedInstance.getInstance() === null)
-      this.viewPosition.scrollBy(-deltaX, -deltaY);
+      this.viewPosition.scrollBy(-sceneDeltaX, -sceneDeltaY);
   }
 
   _onResize = (deltaX, deltaY) => {
+    const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
+    const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
+
     const selectedInstances = this.instancesSelection.getSelectedInstances();
+    const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
     for (var i = 0;i < selectedInstances.length;i++) {
       const selectedInstance = selectedInstances[i];
 
       if (!selectedInstance.hasCustomSize()) {
-        selectedInstance.setCustomWidth(this.instancesRenderer.getInstanceWidth(selectedInstance));
-        selectedInstance.setCustomHeight(this.instancesRenderer.getInstanceHeight(selectedInstance));
+        selectedInstance.setCustomWidth(instanceMeasurer.getInstanceWidth(selectedInstance));
+        selectedInstance.setCustomHeight(instanceMeasurer.getInstanceHeight(selectedInstance));
       }
 
       selectedInstance.setHasCustomSize(true);
-      selectedInstance.setCustomWidth(selectedInstance.getCustomWidth() + deltaX);
-      selectedInstance.setCustomHeight(selectedInstance.getCustomHeight() + deltaY);
+      selectedInstance.setCustomWidth(selectedInstance.getCustomWidth() + sceneDeltaX);
+      selectedInstance.setCustomHeight(selectedInstance.getCustomHeight() + sceneDeltaY);
     }
   }
 

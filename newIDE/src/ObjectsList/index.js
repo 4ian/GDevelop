@@ -4,7 +4,14 @@ import Avatar from 'material-ui/Avatar';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import mapFor from '../Utils/MapFor';
 
-export default class ProjectManager extends React.Component {
+export default class ObjectsList extends React.Component {
+  shouldComponentUpdate() {
+    // Rendering the component can be costly as it ask for the thumbnails of
+    // every objects, so the prop freezeUpdate allow to ask the component to stop
+    // updating, for example when hidden.
+    return !this.props.freezeUpdate;
+  }
+
   _renderObjectListItem(project, object) {
     const objectName = object.getName();
 

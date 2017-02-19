@@ -2,7 +2,7 @@ import LayerRenderer from './LayerRenderer';
 const PIXI = global.PIXI;
 
 export default class InstancesRenderer {
-  constructor({project, layout, instances, onInstanceClicked, onOverInstance, onOutInstance, onMoveInstance, onDownInstance}) {
+  constructor({project, layout, instances, onInstanceClicked, onOverInstance, onOutInstance, onMoveInstance, onMoveInstanceEnd, onDownInstance}) {
     this.project = project;
     this.instances = instances;
     this.layout = layout;
@@ -10,6 +10,7 @@ export default class InstancesRenderer {
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
     this.onMoveInstance = onMoveInstance;
+    this.onMoveInstanceEnd = onMoveInstanceEnd;
     this.onDownInstance = onDownInstance;
 
     this.layersRenderers = {};
@@ -87,6 +88,7 @@ export default class InstancesRenderer {
             onOverInstance: this.onOverInstance,
             onOutInstance: this.onOutInstance,
             onMoveInstance: this.onMoveInstance,
+            onMoveInstanceEnd: this.onMoveInstanceEnd,
             onDownInstance: this.onDownInstance,
           });
         this.pixiContainer.addChild(layerRenderer.getPixiContainer());

@@ -23,6 +23,7 @@ export default class FullSizeInstancesEditor extends Component {
             <InstancesEditorContainer
               width={this.state.width}
               height={this.state.height}
+              ref={(editor) => this.props.editorRef && this.props.editorRef(editor)}
               {...this.props}
             />
         }

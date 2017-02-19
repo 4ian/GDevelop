@@ -7,9 +7,10 @@ const resizeButtonWidth = 18;
 const resizeButtonHeight = 18;
 
 export default class InstancesSelection {
-    constructor({instanceMeasurer, onResize, toCanvasCoordinates}) {
+    constructor({instanceMeasurer, onResize, onResizeEnd, toCanvasCoordinates}) {
       this.instanceMeasurer = instanceMeasurer;
       this.onResize = onResize;
+      this.onResizeEnd = onResizeEnd;
       this.toCanvasCoordinates = toCanvasCoordinates;
 
       this.selection = [];
@@ -27,6 +28,9 @@ export default class InstancesSelection {
       gesture.panable(this.resizeButton);
       this.resizeButton.on('panmove', (event) => {
         this.onResize(event.deltaX, event.deltaY);
+      });
+      this.resizeButton.on('panend', () => {
+        this.onResizeEnd();
       });
     }
 

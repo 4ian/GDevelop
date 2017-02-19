@@ -4,7 +4,7 @@ const gd = global.gd;
 const PIXI = global.PIXI;
 
 export default class LayerRenderer {
-  constructor({project, layout, layer, instances, onInstanceClicked, onOverInstance, onOutInstance, onMoveInstance, onDownInstance}) {
+  constructor({project, layout, layer, instances, onInstanceClicked, onOverInstance, onOutInstance, onMoveInstance, onMoveInstanceEnd, onDownInstance}) {
     this.project = project;
     this.instances = instances;
     this.layout = layout;
@@ -13,6 +13,7 @@ export default class LayerRenderer {
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
     this.onMoveInstance = onMoveInstance;
+    this.onMoveInstanceEnd = onMoveInstanceEnd;
     this.onDownInstance = onDownInstance;
 
     this.renderedInstances = {};
@@ -40,23 +41,29 @@ export default class LayerRenderer {
   }
 
   getInstanceLeft = (instance) => {
-    return instance.getX() - this.renderedInstances[instance.ptr].getOriginX();
+    return instance.getX() - (this.renderedInstances[instance.ptr] ?
+      this.renderedInstances[instance.ptr].getOriginX() : 0);
   }
 
   getInstanceTop = (instance) => {
-    return instance.getY() - this.renderedInstances[instance.ptr].getOriginY();
+    return instance.getY() - (this.renderedInstances[instance.ptr] ?
+      this.renderedInstances[instance.ptr].getOriginY() : 0);
   }
 
   getInstanceWidth = (instance) => {
-    return instance.hasCustomSize() ?
-      instance.getCustomWidth() :
-      this.renderedInstances[instance.ptr].getDefaultWidth();
+    if (instance.hasCustomSize())
+      return instance.getCustomWidth();
+
+    return this.renderedInstances[instance.ptr] ?
+      this.renderedInstances[instance.ptr].getDefaultWidth() : 0;
   }
 
   getInstanceHeight = (instance) => {
-    return instance.hasCustomSize() ?
-      instance.getCustomHeight() :
-      this.renderedInstances[instance.ptr].getDefaultHeight();
+    if (instance.hasCustomSize())
+      return instance.getCustomHeight();
+
+    return this.renderedInstances[instance.ptr] ?
+      this.renderedInstances[instance.ptr].getDefaultHeight() : 0;
   }
 
   getRendererOfInstance = (instance) => {
@@ -92,6 +99,9 @@ export default class LayerRenderer {
       });
       renderedInstance._pixiObject.on('panmove', (event) => {
         this.onMoveInstance(instance, event.deltaX, event.deltaY);
+      });
+      renderedInstance._pixiObject.on('panend', (event) => {
+        this.onMoveInstanceEnd();
       });
     }
 

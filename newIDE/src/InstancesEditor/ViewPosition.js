@@ -14,6 +14,10 @@ export default class ViewPosition {
     this._height = height;
   }
 
+  getWidth() { return this._width; }
+
+  getHeight() { return this._height; }
+
   /**
    * Convert a point from the canvas coordinates (for example, the mouse position) to the
    * "world" coordinates.
@@ -56,12 +60,20 @@ export default class ViewPosition {
     this.viewY += y;
   }
 
+  getViewX() { return this.viewX; }
+
+  getViewY() { return this.viewY; }
+
   zoomBy(value) {
-    this._zoomFactor = Math.max(Math.min(this._zoomFactor + value, 10), 0.05);
+    this.setZoomFactor(this.getZoomFactor() + value);
   }
 
   getZoomFactor() {
     return this._zoomFactor;
+  }
+
+  setZoomFactor(zoomFactor) {
+    this._zoomFactor = Math.max(Math.min(zoomFactor, 10), 0.05);
   }
 
   getPixiContainer() {

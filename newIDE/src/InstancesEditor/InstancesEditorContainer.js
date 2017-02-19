@@ -6,6 +6,9 @@ import InstancesSelection from './InstancesSelection';
 import KeyboardShortcuts from './KeyboardShortcuts';
 import HighlightedInstance from './HighlightedInstance';
 import SelectionRectangle from './SelectionRectangle';
+import InstancesResizer from './InstancesResizer';
+import InstancesMover from './InstancesMover';
+import Grid from './Grid';
 const gd = global.gd;
 const PIXI = global.PIXI;
 
@@ -59,7 +62,15 @@ export default class InstancesEditorContainer extends Component {
     });
     this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
 
-    this.keyboardShortcuts = new KeyboardShortcuts();
+    this.grid = new Grid({
+      viewPosition: this.viewPosition,
+      options: this.props.options,
+    });
+    this.pixiContainer.addChild(this.grid.getPixiObject());
+
+    this.keyboardShortcuts = new KeyboardShortcuts({
+      onDelete: this.deleteSelection,
+    });
 
     this._mountEditorComponents(this.props);
     this.renderScene();
@@ -88,6 +99,7 @@ export default class InstancesEditorContainer extends Component {
       instances: props.initialInstances,
       onOverInstance: this._onOverInstance,
       onMoveInstance: this._onMoveInstance,
+      onMoveInstanceEnd: this._onMoveInstanceEnd,
       onDownInstance: this._onDownInstance,
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
@@ -99,12 +111,21 @@ export default class InstancesEditorContainer extends Component {
     });
     this.instancesSelection = new InstancesSelection({
       onResize: this._onResize,
+      onResizeEnd: this._onResizeEnd,
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.highlightedInstance = new HighlightedInstance({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+    });
+    this.instancesResizer = new InstancesResizer({
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
+      options: this.props.options,
+    });
+    this.instancesMover = new InstancesMover({
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
+      options: this.props.options,
     });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
@@ -128,6 +149,12 @@ export default class InstancesEditorContainer extends Component {
       this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, nextProps.width, nextProps.height);
     }
 
+    if (nextProps.options !== this.props.options) {
+      this.grid.setOptions(nextProps.options);
+      this.instancesMover.setOptions(nextProps.options);
+      this.instancesResizer.setOptions(nextProps.options);
+    }
+
     if (this.props.layout !== nextProps.layout ||
       this.props.initialInstances !== nextProps.initialInstances ||
       this.props.project !== nextProps.project) {
@@ -136,8 +163,10 @@ export default class InstancesEditorContainer extends Component {
   }
 
   _onBackgroundClicked = () => {
-    if (!this.keyboardShortcuts.shouldMultiSelect())
+    if (!this.keyboardShortcuts.shouldMultiSelect()) {
       this.instancesSelection.clearSelection();
+      this.props.onInstancesSelected([]);
+    }
   }
 
   _onMakeSelectionRectangle = (x, y) => {
@@ -181,18 +210,17 @@ export default class InstancesEditorContainer extends Component {
   _onMoveInstance = (instance, deltaX, deltaY) => {
     const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
     const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
-    
+
     if (!this.instancesSelection.isInstanceSelected(instance)) {
       this._onInstanceClicked(instance);
     }
 
     const selectedInstances = this.instancesSelection.getSelectedInstances();
-    for (var i = 0;i < selectedInstances.length;i++) {
-      const selectedInstance = selectedInstances[i];
+    this.instancesMover.moveBy(selectedInstances, sceneDeltaX, sceneDeltaY)
+  }
 
-      selectedInstance.setX(selectedInstance.getX() + sceneDeltaX);
-      selectedInstance.setY(selectedInstance.getY() + sceneDeltaY);
-    }
+  _onMoveInstanceEnd = () => {
+    this.instancesMover.endMove();
   }
 
   _onPanMoveView = (deltaX, deltaY) => {
@@ -208,19 +236,11 @@ export default class InstancesEditorContainer extends Component {
     const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
 
     const selectedInstances = this.instancesSelection.getSelectedInstances();
-    const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
-    for (var i = 0;i < selectedInstances.length;i++) {
-      const selectedInstance = selectedInstances[i];
+    this.instancesResizer.resizeBy(selectedInstances, sceneDeltaX, sceneDeltaY);
+  }
 
-      if (!selectedInstance.hasCustomSize()) {
-        selectedInstance.setCustomWidth(instanceMeasurer.getInstanceWidth(selectedInstance));
-        selectedInstance.setCustomHeight(instanceMeasurer.getInstanceHeight(selectedInstance));
-      }
-
-      selectedInstance.setHasCustomSize(true);
-      selectedInstance.setCustomWidth(selectedInstance.getCustomWidth() + sceneDeltaX);
-      selectedInstance.setCustomHeight(selectedInstance.getCustomHeight() + sceneDeltaY);
-    }
+  _onResizeEnd = () => {
+    this.instancesResizer.endResize();
   }
 
   _onClick = (x, y) => {
@@ -236,15 +256,21 @@ export default class InstancesEditorContainer extends Component {
     this.props.initialInstances.iterateOverInstances(this.zOrderFinder);
     instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
 
-    this.props.onNewInstanceAdded && this.props.onNewInstanceAdded(instance);
+    if (this.props.onNewInstanceAdded) this.props.onNewInstanceAdded(instance);
   }
 
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
-    for (var i in selectedInstances) {
-        this.props.initialInstances.removeInstance(selectedInstances[i]);
-    }
+    for (let i = 0;i< selectedInstances.length;i++)
+      this.props.initialInstances.removeInstance(selectedInstances[i]);
+
     this.instancesSelection.clearSelection();
+    this.highlightedInstance.setInstance(null);
+    this.props.onInstancesSelected([]);
+  }
+
+  setZoomFactor = (zoomFactor) => {
+    this.viewPosition.setZoomFactor(zoomFactor);
   }
 
   renderScene = () => {
@@ -255,6 +281,7 @@ export default class InstancesEditorContainer extends Component {
         layout.getBackgroundColorBlue()), 16), 10);
 
     this.viewPosition.render();
+    this.grid.render();
     this.instancesRenderer.render();
     this.highlightedInstance.render();
     this.instancesSelection.render();

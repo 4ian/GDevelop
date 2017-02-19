@@ -1,6 +1,7 @@
 export default class KeyboardShortcuts {
-  constructor() {
+  constructor({onDelete}) {
     this.mount();
+    this.onDelete = onDelete;
   }
 
   shouldCloneInstances() { return this.ctrlPressed; }
@@ -23,6 +24,9 @@ export default class KeyboardShortcuts {
     if ( !evt.altKey ) this.altPressed = false;
     if ( evt.which === 17 ) this.ctrlPressed = false;
     if ( evt.which === 16 ) this.shiftPressed = false;
+    if ( evt.which === 8 || evt.which === 46 ) {
+      this.onDelete();
+    }
   }
 
   mount() {

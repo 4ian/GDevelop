@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import './App.css';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import IconButton from 'material-ui/IconButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
-import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import AppBar from 'material-ui/AppBar';
-import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
+import {Toolbar, ToolbarGroup, ToolbarSeparator} from 'material-ui/Toolbar';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import EventsSheetContainer from './EventsSheet/EventsSheetContainer.js';
@@ -16,6 +15,7 @@ import ExternalLayoutEditor from './SceneEditor/ExternalLayoutEditor';
 import ProjectManager from './ProjectManager';
 import ExternalEditor from './ExternalEditor';
 import LoaderModal from './UI/LoaderModal';
+import EditorBar from './UI/EditorBar';
 
 import Window from './Utils/Window.js';
 
@@ -56,9 +56,6 @@ class App extends Component {
             externalLayoutOpened: editorArguments['edited-element-name'],
           });
         }
-      });
-      ExternalEditor.onSetBoundsReceived((x, y, width, height) => {
-        // Window.setBounds(x, y, width, height);
       });
       ExternalEditor.onShowReceived(() => {
         Window.show();
@@ -125,6 +122,12 @@ class App extends Component {
     });
   }
 
+  setToolbar = (toolbar) => {
+    this.setState({
+      toolbar,
+    })
+  }
+
   render() {
     const { currentProject, externalEventsOpened, sceneOpened, externalLayoutOpened } = this.state;
 
@@ -132,7 +135,7 @@ class App extends Component {
       <MuiThemeProvider>
         <div className="App">
           <Drawer open={this.state.projectManagerOpen}>
-            <AppBar
+            <EditorBar
               title={currentProject ? currentProject.getName() : 'No project'}
               showMenuIconButton={false}
               iconElementRight={<IconButton onClick={this.toggleProjectManager}><NavigationClose /></IconButton>}
@@ -161,6 +164,8 @@ class App extends Component {
               <RaisedButton label="Load game" onClick={this.loadBuiltinGame} />
               <RaisedButton label="Request update" onClick={this.requestUpdate} />
             </ToolbarGroup>
+            <ToolbarSeparator />
+            {this.state.toolbar || <ToolbarGroup />}
           </Toolbar>
           {
             currentProject && sceneOpened && (
@@ -168,6 +173,7 @@ class App extends Component {
                 key={sceneOpened}
                 project={currentProject}
                 layoutName={sceneOpened}
+                setToolbar={this.setToolbar}
               />
             )
           }

@@ -11,6 +11,18 @@ export default class InstancesResizer {
     this.options = options;
   }
 
+  _roundWidth(width) {
+    if (!this.options.snap) return width;
+
+    return Math.round(width / this.options.gridWidth) * this.options.gridWidth;
+  }
+
+  _roundHeight(height) {
+    if (!this.options.snap) return height;
+
+    return Math.round(height / this.options.gridHeight) * this.options.gridHeight;
+  }
+
   resizeBy(instances, deltaX, deltaY) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
@@ -32,8 +44,8 @@ export default class InstancesResizer {
       }
 
       selectedInstance.setHasCustomSize(true);
-      selectedInstance.setCustomWidth(initialSize.width + this.totalDeltaX);
-      selectedInstance.setCustomHeight(initialSize.height + this.totalDeltaY);
+      selectedInstance.setCustomWidth(this._roundWidth(initialSize.width + this.totalDeltaX));
+      selectedInstance.setCustomHeight(this._roundHeight(initialSize.height + this.totalDeltaY));
     }
   }
 

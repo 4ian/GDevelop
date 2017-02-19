@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ObjectsList from '../ObjectsList';
 import FullSizeInstancesEditor from '../InstancesEditor/FullSizeInstancesEditor';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
+import SetupGridDialog from './SetupGridDialog';
 
 import {ToolbarGroup} from 'material-ui/Toolbar';
 import Drawer from 'material-ui/Drawer';
@@ -18,6 +19,7 @@ export default class InstancesFullEditor extends Component {
     super();
     this.state = {
       objectsListOpen: false,
+      setupGridOpen: false,
       options: {
         grid: false,
         snap: false,
@@ -44,7 +46,7 @@ export default class InstancesFullEditor extends Component {
           iconButtonElement={<ToolbarIcon src="res/ribbon_default/grid32.png" />}
         >
           <MenuItem primaryText="Show grid" onTouchTap={() => this.toggleGrid()} />
-          <MenuItem primaryText="Setup grid" onTouchTap={() => {/*TODO*/}} />
+          <MenuItem primaryText="Setup grid" onTouchTap={() => this.openSetupGrid()} />
         </IconMenu>
         <IconMenu
           iconButtonElement={<ToolbarIcon src="res/ribbon_default/zoom32.png" />}
@@ -70,8 +72,21 @@ export default class InstancesFullEditor extends Component {
       options: {
         ...this.state.options,
         grid: !this.state.options.grid,
-        snap: !this.state.options.snap,
+        snap: !this.state.options.grid,
       }
+    });
+  }
+
+  openSetupGrid = (open = true) => {
+    this.setState({ setupGridOpen: open });
+  }
+
+  setOptions = (options) => {
+    this.setState({
+      options: {
+        ...this.state.options,
+        ...options,
+      },
     });
   }
 
@@ -142,6 +157,15 @@ export default class InstancesFullEditor extends Component {
         <InfoBar
           message="Touch/click on the scene to add the object"
           show={!!this.state.selectedObjectName}
+        />
+        <SetupGridDialog
+          open={this.state.setupGridOpen}
+          options={this.state.options}
+          onCancel={() => this.openSetupGrid(false)}
+          onApply={(options) => {
+            this.setOptions(options);
+            this.openSetupGrid(false);
+          }}
         />
       </div>
     )

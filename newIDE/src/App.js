@@ -16,6 +16,7 @@ import ProjectManager from './ProjectManager';
 import ExternalEditor from './ExternalEditor';
 import LoaderModal from './UI/LoaderModal';
 import EditorBar from './UI/EditorBar';
+import defaultTheme from './UI/Theme/DefaultTheme';
 
 import Window from './Utils/Window.js';
 
@@ -132,7 +133,7 @@ class App extends Component {
     const { currentProject, externalEventsOpened, sceneOpened, externalLayoutOpened } = this.state;
 
     return (
-      <MuiThemeProvider>
+      <MuiThemeProvider muiTheme={defaultTheme}>
         <div className="App">
           <Drawer open={this.state.projectManagerOpen}>
             <EditorBar

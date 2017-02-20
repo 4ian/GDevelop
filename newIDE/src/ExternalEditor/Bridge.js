@@ -38,11 +38,12 @@ Bridge.prototype.connectTo = function(port) {
 	});
 }
 
-Bridge.prototype.send = function(command, serializedObject) {
+Bridge.prototype.send = function(command, serializedObject, scope = "") {
 	if (!this.connected) return false;
 
 	var element = new gd.SerializerElement();
 	element.addChild("command").setString(command);
+	element.addChild("scope").setString(scope);
 	element.addChild("payload");
 	if (serializedObject) element.setChild("payload", serializedObject);
 
@@ -55,11 +56,16 @@ Bridge.prototype.send = function(command, serializedObject) {
 }
 
 Bridge.prototype._receive = function(data) {
-	console.log("RECEIVED one");
+	console.log("Received data");
+	var t0 = performance.now();
 	var serializedObject = gd.Serializer.fromJSON(data);
+	var t1 = performance.now();
+	console.log("Call to gd.Serializer.fromJSON took " + (t1 - t0) + " milliseconds.");
 	if (this._onReceiveCb) {
-		this._onReceiveCb(serializedObject.getChild("command").getValue().getString(),
-			serializedObject.getChild("payload"));
+		this._onReceiveCb(
+			serializedObject.getChild("command").getValue().getString(),
+			serializedObject.getChild("payload"),
+			serializedObject.getChild("scope").getValue().getString());
 	}
 }
 

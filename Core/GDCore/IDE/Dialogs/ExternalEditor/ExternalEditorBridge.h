@@ -53,12 +53,13 @@ public:
 		return port;
 	}
 
-	bool Send(const gd::String & cmd, const gd::SerializerElement & payloadObject)
+	bool Send(const gd::String & cmd, const gd::SerializerElement & payloadObject, const gd::String & scope = "")
 	{
 		sf::Lock lock(outMessagesMutex);
 
 		gd::SerializerElement object;
 		object.AddChild("command").SetValue(cmd);
+		object.AddChild("scope").SetValue(scope);
 		object.AddChild("payload") = payloadObject;
 
 	    std::string message = gd::Serializer::ToJSON(object).ToLocale(); //TODO: UTF8?
@@ -67,7 +68,7 @@ public:
 		return true;
 	}
 
-	void OnReceive(std::function<void(gd::String cmd, gd::SerializerElement object)> cb)
+	void OnReceive(std::function<void(gd::String cmd, gd::SerializerElement object, gd::String scope)> cb)
 	{
 		onReceiveCb = cb;
 	}
@@ -82,12 +83,13 @@ private:
 	    	inMessages.pop();
 
 			std::cout << "Message passed to the main thread." << message << std::endl;
-		    gd::SerializerElement object =
-		    	gd::Serializer::FromJSON(message);
+		    gd::SerializerElement object = gd::Serializer::FromJSON(message);
 			if (onReceiveCb)
 			{
-				onReceiveCb(object.GetChild("command").GetValue().GetString(),
-					object.GetChild("payload"));
+				onReceiveCb(
+					object.GetChild("command").GetValue().GetString(),
+					object.GetChild("payload"),
+					object.GetChild("scope").GetValue().GetString());
 			}
 	    }
 	}
@@ -202,7 +204,7 @@ private:
 	bool connected;
 	sf::TcpListener serverListener;
 	std::shared_ptr<sf::Thread> serverThread;
-	std::function<void(gd::String cmd, gd::SerializerElement object)> onReceiveCb;
+	std::function<void(gd::String cmd, gd::SerializerElement object, gd::String scope)> onReceiveCb;
 };
 
 }

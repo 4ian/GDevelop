@@ -5,9 +5,9 @@ let updateCb = null;
 let setBoundsCb = null;
 let showCb = null;
 let hideCb = null;
-bridge.onReceive(function(command, object) {
+bridge.onReceive(function(command, object, scope) {
 	if (command === "update" && updateCb) {
-		updateCb(object);
+		updateCb(object, scope);
 	} else if (command == "setBounds" && setBoundsCb) {
 		setBoundsCb(
 			object.getChild('x').getValue().getInt(),
@@ -41,10 +41,10 @@ export default {
 	onHideReceived: function(cb) {
 		hideCb = cb;
 	},
-	send: function(object) {
-		return bridge.send("update", object);
+	send: function(object, scope = "") {
+		return bridge.send("update", object, scope);
 	},
-	requestUpdate: function() {
-		return bridge.send("requestUpdate");
+	requestUpdate: function(scope = "") {
+		return bridge.send("requestUpdate", undefined, scope);
 	}
 };

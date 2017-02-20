@@ -166,17 +166,27 @@ mainFrameWrapper(mainFrameWrapper_)
     m_mgr.Update();
 
     //TODO: Temporary test
-	std::cout << project.GetProjectFile() << std::endl;
     externalLayoutEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
-    externalLayoutEditor->OnSendUpdate([this]() {
+    externalLayoutEditor->OnSendUpdate([this](gd::String scope) {
+		if (scope == "instances") {
+	        gd::SerializerElement serializedInstances;
+	        this->layout.GetInitialInstances().SerializeTo(serializedInstances);
+			return serializedInstances;
+		}
+
         gd::SerializerElement serializedProject;
         project.SerializeTo(serializedProject);
 
         return serializedProject;
     });
-    externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object) {
-        std::cout << "Updating instances from the external editor." << std::endl;
-        this->layout.GetInitialInstances().UnserializeFrom(object);
+    externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object, gd::String scope) {
+		if (scope == "instances") {
+			std::cout << "Updating instances from the external editor." << std::endl;
+	        this->layout.GetInitialInstances().UnserializeFrom(object);
+			return;
+		}
+
+		std::cout << "Updating anything else from instances from the external editor is not supported" << std::endl;
     });
     externalLayoutEditor->Launch("scene-editor", layout.GetName());
 }

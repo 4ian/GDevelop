@@ -43,19 +43,24 @@ class App extends Component {
       console.log("Connection to an external editor...");
       const editorArguments = Window.getArguments();
 
-      ExternalEditor.onUpdateReceived((serializedObject) => {
-        console.log("Received update from server");
-        this.loadGame(serializedObject);
+      ExternalEditor.onUpdateReceived((serializedObject, scope) => {
+        if (scope === 'instances') {
+          //TODO
+          console.warn("Not implemented: received instances update from server");
+        } else {
+          console.log("Received project update from server");
+          this.loadGame(serializedObject);
 
-        if (!this.state.sceneOpened && editorArguments['editor'] === 'scene-editor') {
-          this.setState({
-            sceneOpened: editorArguments['edited-element-name'],
-          });
-        }
-        if (!this.state.externalLayoutOpened && editorArguments['editor'] === 'external-layout-editor') {
-          this.setState({
-            externalLayoutOpened: editorArguments['edited-element-name'],
-          });
+          if (!this.state.sceneOpened && editorArguments['editor'] === 'scene-editor') {
+            this.setState({
+              sceneOpened: editorArguments['edited-element-name'],
+            });
+          }
+          if (!this.state.externalLayoutOpened && editorArguments['editor'] === 'external-layout-editor') {
+            this.setState({
+              externalLayoutOpened: editorArguments['edited-element-name'],
+            });
+          }
         }
       });
       ExternalEditor.onShowReceived(() => {
@@ -71,7 +76,7 @@ class App extends Component {
 
         const serializedInstances = new gd.SerializerElement();
         instances.serializeTo(serializedInstances);
-        ExternalEditor.send(serializedInstances);
+        ExternalEditor.send(serializedInstances, 'instances');
         serializedInstances.delete();
       });
       Window.onFocus(() => {
@@ -84,11 +89,11 @@ class App extends Component {
     }
   }
 
-  requestUpdate = () => {
+  requestUpdate = (scope = "") => {
     this.setState({
       loading: true,
     }, () => {
-      ExternalEditor.requestUpdate();
+      ExternalEditor.requestUpdate(scope);
     });
   }
 

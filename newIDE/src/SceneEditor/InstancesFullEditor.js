@@ -10,6 +10,7 @@ import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
+import Paper from 'material-ui/Paper';
 import EditorBar from '../UI/EditorBar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import InfoBar from '../UI/Messages/InfoBar';
@@ -121,12 +122,16 @@ export default class InstancesFullEditor extends Component {
 
     return (
       <div style={{display: 'flex', flex: 1}}>
-        <div style={{
-          width: 200,
-          overflowY: 'scroll',
-        }}>
-          <InstancePropertiesEditor instances={this.state.selectedInstances}/>
-        </div>
+        <Paper
+          style={{width: 200, zIndex: 1}} 
+          zDepth={2}
+        >
+          <div style={{
+            overflowY: 'scroll',
+          }}>
+            <InstancePropertiesEditor instances={this.state.selectedInstances}/>
+          </div>
+        </Paper>
         <div style={{
           flex: 1,
           display: 'flex',

@@ -1,5 +1,5 @@
 const gd = global.gd;
-const PIXI = global.PIXI;
+import PIXI from 'pixi.js';
 
 export default class SelectionRectangle {
   constructor({instances, instanceMeasurer, toSceneCoordinates, toCanvasCoordinates}) {

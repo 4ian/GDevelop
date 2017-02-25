@@ -37,7 +37,7 @@ app.on('ready', function() {
   // mainWindow.loadURL('file://' + __dirname + '/www/index.html');
 
   // Development (with npm start)
-  mainWindow.loadURL('http://localhost:3000');
+  mainWindow.loadURL('http://localhost:3001');
 
   // Open the DevTools.
   mainWindow.openDevTools();

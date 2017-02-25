@@ -1,7 +1,7 @@
 import gesture from 'pixi-simple-gesture';
 import transformRect from '../Utils/TransformRect';
 const gd = global.gd;
-const PIXI = global.PIXI;
+import PIXI from 'pixi.js';
 
 const resizeButtonWidth = 18;
 const resizeButtonHeight = 18;

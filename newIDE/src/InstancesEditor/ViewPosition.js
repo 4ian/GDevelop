@@ -1,4 +1,4 @@
-const PIXI = global.PIXI;
+import PIXI from 'pixi.js';
 
 export default class ViewPosition {
   constructor({width, height}) {

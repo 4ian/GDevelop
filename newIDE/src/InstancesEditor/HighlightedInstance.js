@@ -1,5 +1,5 @@
 import transformRect from '../Utils/TransformRect';
-const PIXI = global.PIXI;
+import PIXI from 'pixi.js';
 
 export default class InstancesSelection {
     constructor({instanceMeasurer, toCanvasCoordinates}) {

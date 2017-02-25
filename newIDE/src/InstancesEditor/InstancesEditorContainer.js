@@ -10,7 +10,7 @@ import InstancesResizer from './InstancesResizer';
 import InstancesMover from './InstancesMover';
 import Grid from './Grid';
 const gd = global.gd;
-const PIXI = global.PIXI;
+import PIXI from 'pixi.js';
 
 /**
  * Convert a rgb color value to a hex value.

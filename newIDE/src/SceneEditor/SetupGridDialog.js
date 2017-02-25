@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
-import Toggle from 'material-ui/Toggle';
 
 export default class SetupGridDialog extends Component {
   constructor(props) {

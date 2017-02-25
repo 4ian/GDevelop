@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ObjectsList from '../ObjectsList';
 import FullSizeInstancesEditor from '../InstancesEditor/FullSizeInstancesEditor';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
+import InstancesList from '../InstancesEditor/InstancesList';
 import SetupGridDialog from './SetupGridDialog';
 
 import {ToolbarGroup} from 'material-ui/Toolbar';
@@ -20,6 +21,7 @@ export default class InstancesFullEditor extends Component {
     super();
     this.state = {
       objectsListOpen: false,
+      instancesListOpen: false,
       setupGridOpen: false,
       options: {
         grid: false,
@@ -42,6 +44,10 @@ export default class InstancesFullEditor extends Component {
         <ToolbarIcon
           onClick={this._deleteSelection}
           src="res/ribbon_default/deleteselected32.png"
+        />
+        <ToolbarIcon
+          onClick={this.toggleInstancesList}
+          src="res/ribbon_default/ObjectsPositionsList32.png"
         />
         <IconMenu
           iconButtonElement={<ToolbarIcon src="res/ribbon_default/grid32.png" />}
@@ -66,6 +72,10 @@ export default class InstancesFullEditor extends Component {
 
   toggleObjectsList = () => {
     this.setState({objectsListOpen: !this.state.objectsListOpen});
+  }
+
+  toggleInstancesList = () => {
+    this.setState({instancesListOpen: !this.state.instancesListOpen});
   }
 
   toggleGrid = () => {
@@ -123,14 +133,14 @@ export default class InstancesFullEditor extends Component {
     return (
       <div style={{display: 'flex', flex: 1}}>
         <Paper
-          style={{width: 200, zIndex: 1}} 
+          style={{width: 200, zIndex: 1, display: 'flex'}}
           zDepth={2}
         >
-          <div style={{
-            overflowY: 'scroll',
-          }}>
-            <InstancePropertiesEditor instances={this.state.selectedInstances}/>
-          </div>
+          <InstancePropertiesEditor
+            project={project}
+            layout={layout}
+            instances={this.state.selectedInstances}
+          />
         </Paper>
         <div style={{
           flex: 1,
@@ -157,6 +167,18 @@ export default class InstancesFullEditor extends Component {
             project={project}
             objectsContainer={layout}
             onObjectSelected={this._onObjectSelected}
+          />
+        </Drawer>
+        <Drawer open={this.state.instancesListOpen} width={500} openSecondary={true}>
+          <EditorBar
+            title="Instances list"
+            iconElementLeft={<IconButton onClick={this.toggleInstancesList}><NavigationClose /></IconButton>}
+          />
+          <InstancesList
+            freezeUpdate={!this.state.instancesListOpen}
+            instances={initialInstances}
+            selectedInstances={this.state.selectedInstances}
+            onSelection={() => {/*TODO: Refactor selection outside of InstancesEditorContainer and allow instances list to be used to select instances*/}}
           />
         </Drawer>
         <InfoBar

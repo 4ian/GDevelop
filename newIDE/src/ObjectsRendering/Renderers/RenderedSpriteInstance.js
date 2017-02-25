@@ -1,6 +1,6 @@
 import RenderedInstance from './RenderedInstance';
 const gd = global.gd;
-const PIXI = global.PIXI;
+import PIXI from 'pixi.js';
 
 /**
  * Renderer for gd.SpriteObject

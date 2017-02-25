@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-const PIXI = global.PIXI;
+import PIXI from 'pixi.js';
 
 /**
  * Objects with an unknown type are rendered with a placeholder rectangle.

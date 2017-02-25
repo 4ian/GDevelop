@@ -1,7 +1,7 @@
 import gesture from 'pixi-simple-gesture';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 const gd = global.gd;
-const PIXI = global.PIXI;
+import PIXI from 'pixi.js';
 
 export default class LayerRenderer {
   constructor({project, layout, layer, instances, onInstanceClicked, onOverInstance, onOutInstance, onMoveInstance, onMoveInstanceEnd, onDownInstance}) {
@@ -21,8 +21,8 @@ export default class LayerRenderer {
 
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
-    this.instancesRenderer.invoke = (instance) => {
-      instance = gd.wrapPointer(instance, gd.InitialInstance);
+    this.instancesRenderer.invoke = (instancePtr) => {
+      const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
 
       //Get the "RendereredInstance" object associated to the instance and tell it to update.
       var renderedInstance = this.getRendererOfInstance(instance);

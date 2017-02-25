@@ -4,6 +4,8 @@ import InstancesFullEditor from './InstancesFullEditor';
 export default class SceneEditor extends Component {
   render() {
     const { project, layoutName } = this.props;
+    if (!this.props.project) return null;
+
     if (!project.hasLayoutNamed(layoutName)) {
       //TODO: Error component
       return <div>No layout called {layoutName} found!</div>;

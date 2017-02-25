@@ -1,5 +1,5 @@
 import LayerRenderer from './LayerRenderer';
-const PIXI = global.PIXI;
+import PIXI from 'pixi.js';
 
 export default class InstancesRenderer {
   constructor({project, layout, instances, onInstanceClicked, onOverInstance, onOutInstance, onMoveInstance, onMoveInstanceEnd, onDownInstance}) {

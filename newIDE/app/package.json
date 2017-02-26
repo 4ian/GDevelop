@@ -1,7 +1,8 @@
 {
-  "name": "newIDE",
+  "name": "gdevelop-ide",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "homepage": ".",
   "devDependencies": {
     "babel-eslint": "^6.1.2",

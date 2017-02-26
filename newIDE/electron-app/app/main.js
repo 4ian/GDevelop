@@ -34,10 +34,10 @@ app.on('ready', function() {
 
   // and load the index.html of the app.
   // Produciton (with npm run build)
-  // mainWindow.loadURL('file://' + __dirname + '/www/index.html');
+  mainWindow.loadURL('file://' + __dirname + '/www/index.html');
 
   // Development (with npm start)
-  mainWindow.loadURL('http://localhost:3001');
+  // mainWindow.loadURL('http://localhost:3001');
 
   // Open the DevTools.
   mainWindow.openDevTools();

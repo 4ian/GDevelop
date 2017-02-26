@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    <title>GDevelop</title>
+  </head>
+  <body>
+    <!-- Root div used for React `App` component rendering-->
+    <div id="root"></div>
+
+    <!-- GDevelop.js core -->
+    <script>
+        //Ensure module is not defined to avoid libraries to think
+        //that they are in a CommonJS environment (useful when using Electron).
+        if (typeof module !== "undefined") module = undefined;
+    </script>
+    <script src="%PUBLIC_URL%/libGD.js"></script>
+    <script>
+      //Always inject gd into the global namespace, even on environment with
+      //CommonJS support (Electron)
+      if (typeof global !== 'undefined' && !global.gd) {
+        const name = './libGD.js';
+        global.gd = require(name)();
+      }
+    </script>
+  </body>
+</html>

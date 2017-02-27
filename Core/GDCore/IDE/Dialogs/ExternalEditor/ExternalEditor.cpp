@@ -27,16 +27,18 @@ bool ExternalEditor::Launch(const gd::String & editorName, const gd::String edit
         return false;
 	}
 
-    String cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
-    //cmd += " --hide-icon";
+    // String cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
+    String cmd = "\"/Users/florian/Projects/F/GD/newIDE/electron-app/dist/mac/GDevelop IDE.app/Contents/MacOS/GDevelop IDE\" .";
+
 	if (editorName != "") cmd += " --editor " + editorName;
 	if (editedElementName != "") cmd += " --edited-element-name \"" + editedElementName + "\"";
 	externalEditorPid = wxExecute(cmd + " --server-port " + String::From(port), wxEXEC_ASYNC);
-    if (externalEditorPid == 0)
+    if (externalEditorPid == 0 || externalEditorPid == -1)
     {
         LogError(_("Unable to launch the external editor."));
         return false;
     }
+    std::cout << "External editor launched with PID: " << externalEditorPid << std::endl;
 
     SendUpdate();
     return true;

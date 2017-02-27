@@ -16,3 +16,6 @@ npm-debug.log
 
 # GD library
 public/libGD.js
+
+# Resources
+public/res

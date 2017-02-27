@@ -27,7 +27,8 @@
     "react-measure": "^1.4.5"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "import-resources": "cd ../scripts && ./import-libGD.js.sh && ./import-res-folder.sh",
+    "start": "npm run import-resources && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"

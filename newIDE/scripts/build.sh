@@ -1,7 +1,11 @@
-cd ..
-npm run build:app
+cd ../electron-app
+if ! [ -f "node_modules/.bin/build" ]; then
+  echo "Please run npm install in electron-app folder"
+  exit
+fi
 
-cd electron-app
+# npm run build:app
+
 rm -rf app/www
 mkdir -p app/www
 cp -r ../app/build/* app/www

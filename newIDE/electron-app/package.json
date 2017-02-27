@@ -1,27 +1,27 @@
 {
   "name": "gdevelop-electron",
   "productName": "GDevelop IDE",
-  "version": "1.0.0",
   "description": "GDevelop IDE running on the Electron runtime",
-  "main": "index.js",
+  "version": "1.0.0",
+  "author": "Florian Rival",
+  "license": "MIT",
+  "homepage": "http://compilgames.net",
   "scripts": {
     "build:app": "cd ../app && npm run build && cd -",
     "build": "../scripts/build.sh"
   },
-  "author": "Florian Rival",
-  "license": "MIT",
   "dependencies": {
-    "electron": "^1.4.14"
   },
   "build": {
     "appId": "com.gdevelop.ide",
-    "app-category-type": "public.app-category.editor",
+    "category": "Development",
     "win": {
       "iconUrl": "http://compilgames.net/TODO"
     },
     "asar": false
   },
   "devDependencies": {
+    "electron": "^1.4.14",
     "electron-builder": "^5.12.1"
   }
 }

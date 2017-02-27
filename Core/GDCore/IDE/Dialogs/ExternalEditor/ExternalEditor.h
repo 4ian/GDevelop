@@ -36,8 +36,9 @@ public:
 
 	~ExternalEditor()
 	{
-		if (externalEditorPid != 0)
+		if (externalEditorPid != 0 && externalEditorPid != 1) {
 			wxProcess::Kill(externalEditorPid);
+		}
 	}
 
 	void OnUpdateReceived(std::function<void(SerializerElement object, gd::String scope)> cb)

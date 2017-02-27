@@ -27,8 +27,8 @@ bool ExternalEditor::Launch(const gd::String & editorName, const gd::String edit
         return false;
 	}
 
-    // String cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
-    String cmd = "\"/Users/florian/Projects/F/GD/newIDE/electron-app/dist/mac/GDevelop IDE.app/Contents/MacOS/GDevelop IDE\" .";
+    String cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
+    // String cmd = "\"/Users/florian/Projects/F/GD/newIDE/electron-app/dist/mac/GDevelop IDE.app/Contents/MacOS/GDevelop IDE\" .";
 
 	if (editorName != "") cmd += " --editor " + editorName;
 	if (editedElementName != "") cmd += " --edited-element-name \"" + editedElementName + "\"";

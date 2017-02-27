@@ -73,6 +73,10 @@ public:
 		onReceiveCb = cb;
 	}
 
+	bool IsConnected() {
+		return connected;
+	}
+
 private:
 	void Receive(wxThreadEvent & event)
 	{
@@ -107,7 +111,9 @@ private:
 
 	unsigned int LaunchListener()
 	{
-		//Launch a listener socket on a free port.
+		serverListener.close();
+
+		//Launch the listener socket on a free port.
 		unsigned int serverPort = 50000;
 		while (serverPort < 55555)
 		{

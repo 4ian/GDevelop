@@ -75,6 +75,10 @@ public:
 		editorBridge.Send("setBounds", bounds);
 	}
 
+    bool IsLaunchedAndConnected() {
+        return editorBridge.IsConnected();
+    }
+
 private:
 
 	bool SendUpdate(gd::String scope = "")

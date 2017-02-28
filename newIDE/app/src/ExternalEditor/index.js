@@ -26,6 +26,9 @@ export default {
 	isSupported: function() {
 		return bridge.isSupported();
 	},
+	onConnected: function(cb) {
+		return bridge.onConnected(cb);
+	},
 	connectTo: function(port) {
 		return bridge.connectTo(port);
 	},

@@ -43,24 +43,28 @@ class App extends Component {
       console.log("Connection to an external editor...");
       const editorArguments = Window.getArguments();
 
+      ExternalEditor.onConnected(() => {
+        this.requestUpdate();
+      });
       ExternalEditor.onUpdateReceived((serializedObject, scope) => {
+        console.log("Received project update from server");
         if (scope === 'instances') {
           //TODO
           console.warn("Not implemented: received instances update from server");
-        } else {
-          console.log("Received project update from server");
-          this.loadGame(serializedObject);
+          return;
+        }
 
-          if (!this.state.sceneOpened && editorArguments['editor'] === 'scene-editor') {
-            this.setState({
-              sceneOpened: editorArguments['edited-element-name'],
-            });
-          }
-          if (!this.state.externalLayoutOpened && editorArguments['editor'] === 'external-layout-editor') {
-            this.setState({
-              externalLayoutOpened: editorArguments['edited-element-name'],
-            });
-          }
+        this.loadGame(serializedObject);
+
+        if (!this.state.sceneOpened && editorArguments['editor'] === 'scene-editor') {
+          this.setState({
+            sceneOpened: editorArguments['edited-element-name'],
+          });
+        }
+        if (!this.state.externalLayoutOpened && editorArguments['editor'] === 'external-layout-editor') {
+          this.setState({
+            externalLayoutOpened: editorArguments['edited-element-name'],
+          });
         }
       });
       ExternalEditor.onShowReceived(() => {
@@ -81,7 +85,7 @@ class App extends Component {
       });
       Window.onFocus(() => {
         this.requestUpdate();
-      })
+      });
 
       ExternalEditor.connectTo(editorArguments['server-port']);
     } else {

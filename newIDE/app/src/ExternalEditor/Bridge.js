@@ -21,7 +21,9 @@ Bridge.prototype.connectTo = function(port) {
 	var that = this;
 	this.client = new this.net.Socket();
 	this.client.connect(port, 'localhost', function() {
+		console.log("Connection made on port", port);
 		that.connected = true;
+		if (that._onConnected) that._onConnected();
 	});
 
 	var data = "";
@@ -71,6 +73,10 @@ Bridge.prototype._receive = function(data) {
 
 Bridge.prototype.onReceive = function(cb) {
 	this._onReceiveCb = cb;
+}
+
+Bridge.prototype.onConnected = function(cb) {
+	this._onConnected = cb;
 }
 
 export default Bridge;

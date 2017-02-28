@@ -38,9 +38,9 @@ bool ExternalEditor::Launch(const gd::String & editorName, const gd::String edit
         LogError(_("Unable to launch the external editor."));
         return false;
     }
-    std::cout << "External editor launched with PID: " << externalEditorPid << std::endl;
 
-    SendUpdate();
+	// The external editor is launched and can now connect to this editor using the given port
+    std::cout << "External editor launched with PID: " << externalEditorPid << std::endl;
     return true;
 }
 

@@ -26,7 +26,8 @@ app.on('ready', function() {
     //Allow to access to local files
     webPreferences: {
       webSecurity: false
-    }
+    },
+    backgroundColor: '#f0f0f0',
   });
 
   //Expose program arguments

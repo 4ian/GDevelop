@@ -1,11 +1,17 @@
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
+const gdevelopPurple = '#9100ce';
+const gdevelopLightBlue = '#4ab0e4';
+const gdevelopDarkBlue = '#3c4698';
+
+const systemSelectionColor = '#4c92ff'; //OS X selection
+
 export default getMuiTheme({
   fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', //OS X font
   palette: {
-    primary1Color: '#3c4698',
-    primary2Color: '#4ab0e4',
-    accent1Color: '#9100ce',
+    primary1Color: gdevelopLightBlue,
+    primary2Color: gdevelopDarkBlue,
+    accent1Color: gdevelopPurple,
     canvasColor: '#f0f0f0',
   },
   avatar: {
@@ -14,17 +20,17 @@ export default getMuiTheme({
   toolbar: {
     backgroundColor: '#f7f7f7',
     separatorColor: '#cecece',
-    menuHoverColor: '#4c92ff', //OS X selection
-    hoverColor: '#4c92ff', //OS X selection
+    menuHoverColor: systemSelectionColor,
+    hoverColor: systemSelectionColor,
   },
   menuItem: {
     dataHeight: 24,
     height: 32,
-    hoverColor: '#4c92ff', //OS X selection
+    hoverColor: systemSelectionColor,
     padding: 8,
   },
   appBar: {
-    color: '#9100ce',
+    color: gdevelopPurple,
   },
   button: {
     height: 32,

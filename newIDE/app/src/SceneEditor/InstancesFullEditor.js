@@ -3,6 +3,7 @@ import ObjectsList from '../ObjectsList';
 import FullSizeInstancesEditor from '../InstancesEditor/FullSizeInstancesEditor';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../InstancesEditor/InstancesList';
+import LayersList from '../LayersList';
 import SetupGridDialog from './SetupGridDialog';
 
 import {ToolbarGroup} from 'material-ui/Toolbar';
@@ -22,6 +23,7 @@ export default class InstancesFullEditor extends Component {
       objectsListOpen: false,
       instancesListOpen: false,
       setupGridOpen: false,
+      layersListOpen: false,
       options: {
         grid: false,
         snap: false,
@@ -47,6 +49,10 @@ export default class InstancesFullEditor extends Component {
         <ToolbarIcon
           onClick={this.toggleInstancesList}
           src="res/ribbon_default/ObjectsPositionsList32.png"
+        />
+        <ToolbarIcon
+          onClick={this.toggleLayersList}
+          src="res/ribbon_default/layers32.png"
         />
         <IconMenu
           iconButtonElement={<ToolbarIcon src="res/ribbon_default/grid32.png" />}
@@ -82,6 +88,10 @@ export default class InstancesFullEditor extends Component {
 
   toggleInstancesList = () => {
     this.setState({instancesListOpen: !this.state.instancesListOpen});
+  }
+
+  toggleLayersList = () => {
+    this.setState({layersListOpen: !this.state.layersListOpen});
   }
 
   toggleGrid = () => {
@@ -177,7 +187,7 @@ export default class InstancesFullEditor extends Component {
         </Drawer>
         <Drawer open={this.state.instancesListOpen} width={500} openSecondary={true}>
           <EditorBar
-            title="Instances list"
+            title="Instances"
             iconElementLeft={<IconButton onClick={this.toggleInstancesList}><NavigationClose /></IconButton>}
           />
           <InstancesList
@@ -185,6 +195,16 @@ export default class InstancesFullEditor extends Component {
             instances={initialInstances}
             selectedInstances={this.state.selectedInstances}
             onSelection={() => {/*TODO: Refactor selection outside of InstancesEditorContainer and allow instances list to be used to select instances*/}}
+          />
+        </Drawer>
+        <Drawer open={this.state.layersListOpen} width={400} openSecondary={true}>
+          <EditorBar
+            title="Layers"
+            iconElementLeft={<IconButton onClick={this.toggleLayersList}><NavigationClose /></IconButton>}
+          />
+          <LayersList
+            freezeUpdate={!this.state.layersListOpen}
+            layersContainer={layout}
           />
         </Drawer>
         <InfoBar

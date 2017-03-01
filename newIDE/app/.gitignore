@@ -19,3 +19,5 @@ public/libGD.js
 
 # Resources
 public/res
+public/CppPlatform
+public/JsPlatform

@@ -112,6 +112,7 @@ export default class LayerRenderer {
     this.instances.iterateOverInstancesWithZOrdering(this.instancesRenderer,
       this.layer.getName());
     this._updatePixiObjectsZOrder();
+    this._updateVisibility();
     this._cleanRenderers();
   }
 
@@ -121,6 +122,10 @@ export default class LayerRenderer {
       b.zOrder = b.zOrder || 0;
       return a.zOrder - b.zOrder;
     });
+  }
+
+  _updateVisibility() {
+    this.pixiContainer.visible = this.layer.getVisibility();
   }
 
   /**

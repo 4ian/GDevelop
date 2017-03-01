@@ -9,8 +9,7 @@ import {ToolbarGroup} from 'material-ui/Toolbar';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
+import IconMenu from '../UI/Menu/IconMenu';
 import Paper from 'material-ui/Paper';
 import EditorBar from '../UI/EditorBar';
 import ToolbarIcon from '../UI/ToolbarIcon';
@@ -27,7 +26,7 @@ export default class InstancesFullEditor extends Component {
         grid: false,
         snap: false,
         gridWidth: 32,
-        gridHeight: 64+32,
+        gridHeight: 32,
         gridOffsetX: 0,
         gridOffsetY: 0,
       }
@@ -51,20 +50,27 @@ export default class InstancesFullEditor extends Component {
         />
         <IconMenu
           iconButtonElement={<ToolbarIcon src="res/ribbon_default/grid32.png" />}
+          menuTemplate={[{
+            label: "Show grid",
+            click: () => this.toggleGrid(),
+          }, {
+            label: "Setup grid",
+            click: () => this.openSetupGrid(),
+          }]}
         >
-          <MenuItem primaryText="Show grid" onTouchTap={() => this.toggleGrid()} />
-          <MenuItem primaryText="Setup grid" onTouchTap={() => this.openSetupGrid()} />
         </IconMenu>
         <IconMenu
           iconButtonElement={<ToolbarIcon src="res/ribbon_default/zoom32.png" />}
+          menuTemplate={[
+            { label: "5%", click: () => this.setZoomFactor(0.05)},
+            { label: "10%", click: () => this.setZoomFactor(0.10)},
+            { label: "25%", click: () => this.setZoomFactor(0.25)},
+            { label: "50%", click: () => this.setZoomFactor(0.50)},
+            { label: "100%", click: () => this.setZoomFactor(1.00)},
+            { label: "150%", click: () => this.setZoomFactor(1.50)},
+            { label: "200%", click: () => this.setZoomFactor(2.00)},
+          ]}
         >
-          <MenuItem primaryText="5%" onTouchTap={() => this.setZoomFactor(0.05)} />
-          <MenuItem primaryText="10%" onTouchTap={() => this.setZoomFactor(0.10)} />
-          <MenuItem primaryText="25%" onTouchTap={() => this.setZoomFactor(0.25)} />
-          <MenuItem primaryText="50%" onTouchTap={() => this.setZoomFactor(0.50)} />
-          <MenuItem primaryText="100%" onTouchTap={() => this.setZoomFactor(1.00)} />
-          <MenuItem primaryText="150%" onTouchTap={() => this.setZoomFactor(1.50)} />
-          <MenuItem primaryText="200%" onTouchTap={() => this.setZoomFactor(2.00)} />
         </IconMenu>
       </ToolbarGroup>
     );

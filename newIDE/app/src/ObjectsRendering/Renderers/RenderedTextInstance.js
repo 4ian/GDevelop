@@ -9,10 +9,11 @@ import PIXI from 'pixi.js';
  * @class RenderedTextInstance
  * @constructor
  */
-function RenderedTextInstance(project, layout, instance, associatedObject, pixiContainer) {
+function RenderedTextInstance(project, layout, instance, associatedObject, pixiContainer, resourcesLoader) {
     RenderedInstance.call( this, project, layout, instance, associatedObject, pixiContainer );
 
     //Setup the PIXI object:
+    this._resourcesLoader = resourcesLoader;
     this._pixiObject = new PIXI.Text(" ", {align:"left"});
     this._pixiObject.anchor.x = 0.5;
     this._pixiObject.anchor.y = 0.5;
@@ -44,12 +45,9 @@ RenderedTextInstance.prototype.update = function() {
 
     if (this._fontFilename !== textObject.getFontFilename()) { //Avoid calling getFontName if the font didn't changed.
         this._fontFilename = textObject.getFontFilename();
-        console.warn("TODO: Font support");
-        this._fontName = 'Arial';
-
-        // this._fontName = this._renderingService.getFontName(textObject.getFontFilename()) || "Arial";
+        this._fontFamily = this._resourcesLoader.getFontFamily(this._project, textObject.getFontFilename());
     }
-    style.font += textObject.getCharacterSize() + "px  " + this._fontName;
+    style.font += textObject.getCharacterSize() + "px  " + this._fontFamily;
     style.fill = "rgb(" + textObject.getColorR() + "," + textObject.getColorG()+"," + textObject.getColorB() + ")";
     this._pixiObject.style = style;
 };

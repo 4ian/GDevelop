@@ -24,7 +24,9 @@
     "react-addons-css-transition-group": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-json-tree": "^0.10.0",
-    "react-measure": "^1.4.5"
+    "react-measure": "^1.4.5",
+    "react-tap-event-plugin": "1.0.0",
+    "slug": "^0.9.1"
   },
   "scripts": {
     "import-resources": "cd ../scripts && ./import-libGD.js.sh && ./import-res-folder.sh",

@@ -60,6 +60,8 @@ Bridge.prototype.send = function(command, serializedObject, scope = "") {
 
 Bridge.prototype._receive = function(data) {
 	console.log("Received data");
+
+	// Parse the received JSON
 	var t0 = performance.now();
 	var dataObject;
 	try {
@@ -69,13 +71,17 @@ Bridge.prototype._receive = function(data) {
 		return;
 	}
 	var t1 = performance.now();
-	var serializedObject = gd.Serializer.fromJSObject(dataObject.payload);
+
+	// Transform the payload into a gd.SerializerElement
+	// Note that gd.Serializer.fromJSObject returns a new gd.SerializerElement object at every call
+	if (this._serializedObject) this._serializedObject.delete();
+	this._serializedObject = gd.Serializer.fromJSObject(dataObject.payload);
 	var t2 = performance.now();
+
 	console.log("JSON parse took " + (t1 - t0) + " milliseconds.");
 	console.log("Call to gd.Serializer.fromJSObject took " + (t2 - t1) + " milliseconds.");
-
 	if (this._onReceiveCb) {
-		this._onReceiveCb(dataObject.command, serializedObject, dataObject.scope);
+		this._onReceiveCb(dataObject.command, this._serializedObject, dataObject.scope);
 	}
 }
 

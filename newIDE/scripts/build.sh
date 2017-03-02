@@ -4,7 +4,7 @@ if ! [ -f "node_modules/.bin/build" ]; then
   exit
 fi
 
-# npm run build:app
+npm run build:app
 
 rm -rf app/www
 mkdir -p app/www

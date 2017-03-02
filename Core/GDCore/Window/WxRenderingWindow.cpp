@@ -336,10 +336,6 @@ std::map<int, sf::Keyboard::Key> & WxRenderingWindow::GetKeyMap()
 {
     if(!keysMapInitialized)
     {
-        /*keysMap[WXK_F1] = sf::Keyboard::F1;
-        keysMap[WXK_F2] = sf::Keyboard::F2;
-        keysMap['Z'] = sf::Keyboard::Z;*/
-
         keysMap[WXK_NONE] = sf::Keyboard::Unknown;
 
         keysMap['A'] = sf::Keyboard::A;

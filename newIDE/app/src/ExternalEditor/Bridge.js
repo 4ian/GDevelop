@@ -28,11 +28,12 @@ Bridge.prototype.connectTo = function(port) {
 
 	var data = "";
 	this.client.on('data', function(dataBuffer) {
-	    data += dataBuffer;
-	    if (!dataBuffer.length || dataBuffer[dataBuffer.length - 1] == 0) {
+		data += dataBuffer;
+		if (!dataBuffer.length || dataBuffer[dataBuffer.length - 1] == 0) {
+			data = data.slice(0, -1); //Strip ending null character
 			that._receive(data);
 			data = "";
-	    }
+		}
 	});
 
 	this.client.on('close', function() {
@@ -60,14 +61,21 @@ Bridge.prototype.send = function(command, serializedObject, scope = "") {
 Bridge.prototype._receive = function(data) {
 	console.log("Received data");
 	var t0 = performance.now();
-	var serializedObject = gd.Serializer.fromJSON(data);
+	var dataObject;
+	try {
+		dataObject = JSON.parse(data);
+	} catch(ex) {
+		console.warn("Received invalid data (JSON parse failed)", ex);
+		return;
+	}
 	var t1 = performance.now();
-	console.log("Call to gd.Serializer.fromJSON took " + (t1 - t0) + " milliseconds.");
+	var serializedObject = gd.Serializer.fromJSObject(dataObject.payload);
+	var t2 = performance.now();
+	console.log("JSON parse took " + (t1 - t0) + " milliseconds.");
+	console.log("Call to gd.Serializer.fromJSObject took " + (t2 - t1) + " milliseconds.");
+
 	if (this._onReceiveCb) {
-		this._onReceiveCb(
-			serializedObject.getChild("command").getValue().getString(),
-			serializedObject.getChild("payload"),
-			serializedObject.getChild("scope").getValue().getString());
+		this._onReceiveCb(dataObject.command, serializedObject, dataObject.scope);
 	}
 }
 

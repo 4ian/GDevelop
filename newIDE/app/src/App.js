@@ -105,7 +105,11 @@ class App extends Component {
     this.setState({
       loading: true,
     }, () => {
-      const unserializedProject = gd.Serializer.fromJSON(JSON.stringify(game));
+      var t0 = performance.now();
+
+      const unserializedProject = gd.Serializer.fromJSObject(game);
+      var t1 = performance.now();
+      console.log("Call to gd.Serializer.fromJSON on builtin game took " + (t1 - t0) + " milliseconds.");
       return this.loadGame(unserializedProject);
     });
   }
@@ -114,11 +118,14 @@ class App extends Component {
     this.setState({
       loading: true,
     }, () => {
+      var t0 = performance.now();
       const { currentProject } = this.state;
       if (currentProject) currentProject.delete();
       const newProject = gd.ProjectHelper.createNewGDJSProject();
 
       newProject.unserializeFrom(unserializedProject);
+      var t1 = performance.now();
+      console.log("Creation and unserialization project took " + (t1 - t0) + " milliseconds.");
       this.setState({
         currentProject: newProject,
         loading: false,

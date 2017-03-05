@@ -1,8 +1,19 @@
+const CTRL_KEY = 17;
+const SHIFT_KEY = 16;
+const LEFT_KEY = 37;
+const UP_KEY = 38;
+const RIGHT_KEY = 39;
+const DOWN_KEY = 40;
+const BACKSPACE_KEY = 8;
+const DELETE_KEY = 46;
+
 export default class KeyboardShortcuts {
-  constructor({domElement, onDelete}) {
-    this.mount();
+  constructor({domElement, onDelete, onMove}) {
     this.domElement = domElement;
     this.onDelete = onDelete;
+    this.onMove = onMove;
+    this.lastDownTarget = null;
+    this.mount();
   }
 
   shouldCloneInstances() { return this.ctrlPressed; }
@@ -14,33 +25,57 @@ export default class KeyboardShortcuts {
   shouldZoom() { return this.metaPressed; }
 
   _onKeyDown = (evt) => {
+    if(this.lastDownTarget !== this.domElement) return;
+
     if ( evt.metaKey ) this.metaPressed = true;
     if ( evt.altKey ) this.altPressed = true;
-    if ( evt.which === 17 ) this.ctrlPressed = true;
-    if ( evt.which === 16 ) this.shiftPressed = true;
+    if ( evt.which === CTRL_KEY ) this.ctrlPressed = true;
+    if ( evt.which === SHIFT_KEY ) this.shiftPressed = true;
   }
 
   _onKeyUp = (evt) => {
+    if(this.lastDownTarget !== this.domElement) return;
+
     if ( !evt.metaKey ) this.metaPressed = false;
     if ( !evt.altKey ) this.altPressed = false;
-    if ( evt.which === 17 ) this.ctrlPressed = false;
-    if ( evt.which === 16 ) this.shiftPressed = false;
-    if ( evt.which === 8 || evt.which === 46 ) {
+    if ( evt.which === CTRL_KEY ) this.ctrlPressed = false;
+    if ( evt.which === SHIFT_KEY ) this.shiftPressed = false;
+    if ( evt.which === UP_KEY ) {
+      this.onMove(0, -1);
+    } else if ( evt.which === DOWN_KEY ) {
+      this.onMove(0, 1);
+    } else if ( evt.which === LEFT_KEY ) {
+      this.onMove(-1, 0);
+    } else if ( evt.which === RIGHT_KEY ) {
+      this.onMove(1, 0);
+    } else if ( evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY ) {
       this.onDelete();
     }
   }
 
-  mount() {
-    if (!this.domElement) return;
+  _onKeyPress = (evt) => {
+    if(this.lastDownTarget !== this.domElement) return;
+  }
 
-    this.domElement.addEventListener('keydown', this._onKeyDown);
-    this.domElement.addEventListener('keyup', this._onKeyUp);
+  _onMouseDown = (evt) => {
+    this.lastDownTarget = evt.target;
+  }
+
+  mount() {
+    if (typeof document === 'undefined') return;
+
+    document.addEventListener('mousedown', this._onMouseDown);
+    document.addEventListener('keydown', this._onKeyDown);
+    document.addEventListener('keyup', this._onKeyUp);
+    document.addEventListener('keypress', this._onKeyPress);
   }
 
   unmount() {
-    if (!this.domElement) return;
+    if (typeof document === 'undefined') return;
 
-    this.domElement.removeEventListener('keydown', this._onKeyDown);
-    this.domElement.removeEventListener('keyup', this._onKeyUp);
+    document.removeEventListener('mousedown', this._onMouseDown);
+    document.removeEventListener('keydown', this._onKeyDown);
+    document.removeEventListener('keyup', this._onKeyUp);
+    document.removeEventListener('keypress', this._onKeyPress);
   }
 }

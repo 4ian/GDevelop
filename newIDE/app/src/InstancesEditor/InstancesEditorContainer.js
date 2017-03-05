@@ -72,6 +72,7 @@ export default class InstancesEditorContainer extends Component {
     this.keyboardShortcuts = new KeyboardShortcuts({
       domElement: this.pixiRenderer.view,
       onDelete: this.deleteSelection,
+      onMove: this.moveSelection,
     });
 
     this._mountEditorComponents(this.props);
@@ -272,6 +273,15 @@ export default class InstancesEditorContainer extends Component {
     this.props.instancesSelection.clearSelection();
     this.highlightedInstance.setInstance(null);
     this.props.onInstancesSelected([]);
+  }
+
+  moveSelection = (x, y) => {
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    selectedInstances.forEach(instance => {
+      instance.setX(instance.getX() + x);
+      instance.setY(instance.getY() + y);
+    });
+    this.props.onInstancesMoved(selectedInstances);
   }
 
   centerViewOn(instances) {

@@ -3,6 +3,7 @@ import ObjectsList from '../ObjectsList';
 import FullSizeInstancesEditor from '../InstancesEditor/FullSizeInstancesEditor';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../InstancesEditor/InstancesList';
+import InstancesSelection from './InstancesSelection';
 import LayersList from '../LayersList';
 import SetupGridDialog from './SetupGridDialog';
 
@@ -19,6 +20,8 @@ import InfoBar from '../UI/Messages/InfoBar';
 export default class InstancesFullEditor extends Component {
   constructor() {
     super();
+
+    this.instancesSelection = new InstancesSelection();
     this.state = {
       objectsListOpen: false,
       instancesListOpen: false,
@@ -82,6 +85,14 @@ export default class InstancesFullEditor extends Component {
     );
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.layout !== nextProps.layout ||
+      this.props.initialInstances !== nextProps.initialInstances ||
+      this.props.project !== nextProps.project) {
+      this.instancesSelection.clearSelection();
+    }
+  }
+
   toggleObjectsList = () => {
     this.setState({objectsListOpen: !this.state.objectsListOpen});
   }
@@ -130,9 +141,25 @@ export default class InstancesFullEditor extends Component {
   }
 
   _onInstancesSelected = (instances) => {
-    this.setState({
-      selectedInstances: instances,
-    });
+    this.forceUpdate();
+  }
+
+  _onInstancesMoved = (instances) => {
+    this.forceUpdate();
+  }
+
+  _onInstancesModified = (instances) => {
+    this.forceUpdate();
+  }
+
+  _onSelectInstances = (instances, centerView = true) => {
+    this.instancesSelection.clearSelection();
+    instances.forEach(instance => this.instancesSelection.selectInstance(instance));
+
+    if (centerView) {
+      this.editor.centerViewOn(instances);
+    }
+    this.forceUpdate();
   }
 
   _deleteSelection = () => {
@@ -155,7 +182,8 @@ export default class InstancesFullEditor extends Component {
           <InstancePropertiesEditor
             project={project}
             layout={layout}
-            instances={this.state.selectedInstances}
+            instances={this.instancesSelection.getSelectedInstances()}
+            onInstancesModified={this._onInstancesModified}
           />
         </Paper>
         <div style={{
@@ -168,8 +196,10 @@ export default class InstancesFullEditor extends Component {
             initialInstances={initialInstances}
             selectedObjectName={this.state.selectedObjectName}
             options={this.state.options}
+            instancesSelection={this.instancesSelection}
             onNewInstanceAdded={this._onNewInstanceAdded}
             onInstancesSelected={this._onInstancesSelected}
+            onInstancesMoved={this._onInstancesMoved}
             editorRef={(editor) => this.editor = editor}
           />
         </div>
@@ -193,8 +223,8 @@ export default class InstancesFullEditor extends Component {
           <InstancesList
             freezeUpdate={!this.state.instancesListOpen}
             instances={initialInstances}
-            selectedInstances={this.state.selectedInstances}
-            onSelection={() => {/*TODO: Refactor selection outside of InstancesEditorContainer and allow instances list to be used to select instances*/}}
+            selectedInstances={this.instancesSelection.getSelectedInstances()}
+            onSelectInstances={this._onSelectInstances}
           />
         </Drawer>
         <Drawer open={this.state.layersListOpen} width={400} openSecondary={true}>

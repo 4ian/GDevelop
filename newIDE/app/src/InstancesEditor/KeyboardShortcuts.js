@@ -1,6 +1,7 @@
 export default class KeyboardShortcuts {
-  constructor({onDelete}) {
+  constructor({domElement, onDelete}) {
     this.mount();
+    this.domElement = domElement;
     this.onDelete = onDelete;
   }
 
@@ -30,16 +31,16 @@ export default class KeyboardShortcuts {
   }
 
   mount() {
-    if (!document) return;
+    if (!this.domElement) return;
 
-    document.addEventListener('keydown', this._onKeyDown);
-    document.addEventListener('keyup', this._onKeyUp);
+    this.domElement.addEventListener('keydown', this._onKeyDown);
+    this.domElement.addEventListener('keyup', this._onKeyUp);
   }
 
   unmount() {
-    if (!document) return;
+    if (!this.domElement) return;
 
-    document.removeEventListener('keydown', this._onKeyDown);
-    document.removeEventListener('keyup', this._onKeyUp);
+    this.domElement.removeEventListener('keydown', this._onKeyDown);
+    this.domElement.removeEventListener('keyup', this._onKeyUp);
   }
 }

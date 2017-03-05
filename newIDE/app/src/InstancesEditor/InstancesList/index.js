@@ -21,7 +21,10 @@ export default class InstancesList extends Component {
       this.renderedRows.push({
         instance,
         element: (
-          <TableRow key={instancePtr}>
+          <TableRow
+            key={instancePtr}
+            selected={this.props.selectedInstances.indexOf(instance) !== -1}
+          >
             <TableRowColumn>{instance.getObjectName()}</TableRowColumn>
             <TableRowColumn>{instance.getX().toFixed(2)}</TableRowColumn>
             <TableRowColumn>{instance.getY().toFixed(2)}</TableRowColumn>
@@ -39,11 +42,11 @@ export default class InstancesList extends Component {
   }
 
   onRowSelection(selection) {
-    this.props.onSelection(selection.map(i => this.renderedRows[i] ))
+    this.props.onSelectInstances(selection.map(i => this.renderedRows[i].instance));
   }
 
   render() {
-    const { selectedInstances, instances } = this.props;
+    const { instances } = this.props;
 
     this.renderedRows.length = 0;
     instances.iterateOverInstances(this.instanceRowRenderer);
@@ -51,6 +54,7 @@ export default class InstancesList extends Component {
     return (
       <Table
         selectable={true}
+        multiSelectable={true}
         onRowSelection={(selection) => this.onRowSelection(selection)}
       >
         <TableHeader
@@ -68,7 +72,7 @@ export default class InstancesList extends Component {
         </TableHeader>
         <TableBody
           displayRowCheckbox={false}
-          deselectOnClickaway={true}
+          deselectOnClickaway={false}
           showRowHover={true}
         >
           { this.renderedRows.map(row => row.element) }

@@ -96,21 +96,22 @@ export default class InstancePropertiesEditor extends Component {
       return (<Checkbox
         label={field.name}
         key={field.name}
-        defaultChecked={this._getFieldValue(this.props.instances, field)}
+        checked={this._getFieldValue(this.props.instances, field)}
         onCheck={(event, newValue) => {
-          this.props.instances.forEach(i => field.setValue(i, !!newValue))
+          this.props.instances.forEach(i => field.setValue(i, !!newValue));
+          this.props.onInstancesModified(this.props.instances);
         }}
         disabled={field.disabled}
       />);
     } else if (field.valueType === 'number') {
       return (<TextField
-        defaultValue={this._getFieldValue(this.props.instances, field)}
+        value={this._getFieldValue(this.props.instances, field)}
         key={field.name}
         floatingLabelText={field.name}
         floatingLabelFixed={true}
         onChange={(event, newValue) => {
-          console.log(parseFloat(newValue) || 0);
-          this.props.instances.forEach(i => field.setValue(i, parseFloat(newValue) || 0))
+          this.props.instances.forEach(i => field.setValue(i, parseFloat(newValue) || 0));
+          this.props.onInstancesModified(this.props.instances);
         }}
         type="number"
         fullWidth={true}
@@ -118,12 +119,13 @@ export default class InstancePropertiesEditor extends Component {
       />);
     } else {
       return (<TextField
-        defaultValue={this._getFieldValue(this.props.instances, field, '(Multiple values)')}
+        value={this._getFieldValue(this.props.instances, field, '(Multiple values)')}
         key={field.name}
         floatingLabelText={field.name}
         floatingLabelFixed={true}
         onChange={(event, newValue) => {
-          this.props.instances.forEach(i => field.setValue(i, newValue || ''))
+          this.props.instances.forEach(i => field.setValue(i, newValue || ''));
+          this.props.onInstancesModified(this.props.instances);
         }}
         fullWidth={true}
         disabled={field.disabled}

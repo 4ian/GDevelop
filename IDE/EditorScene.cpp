@@ -188,6 +188,9 @@ mainFrameWrapper(mainFrameWrapper_)
 
 		std::cout << "Updating anything else from instances from the external editor is not supported" << std::endl;
     });
+	externalLayoutEditor->OnLaunchPreview([this](){
+		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
+	});
     externalLayoutEditor->Launch("scene-editor", layout.GetName());
 }
 

@@ -441,6 +441,11 @@ void LayoutEditorCanvas::UpdateModeButtonsState()
  */
 void LayoutEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
 {
+    LaunchPreview();
+}
+
+void LayoutEditorCanvas::LaunchPreview()
+{
     if ( !editing ) return;
 
     if ( !currentPreviewer ) {

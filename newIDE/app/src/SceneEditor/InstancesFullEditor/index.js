@@ -1,21 +1,19 @@
 import React, { Component } from 'react';
-import ObjectsList from '../ObjectsList';
-import FullSizeInstancesEditor from '../InstancesEditor/FullSizeInstancesEditor';
-import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
-import InstancesList from '../InstancesEditor/InstancesList';
+import ObjectsList from '../../ObjectsList';
+import FullSizeInstancesEditor from '../../InstancesEditor/FullSizeInstancesEditor';
+import InstancePropertiesEditor from '../../InstancesEditor/InstancePropertiesEditor';
+import InstancesList from '../../InstancesEditor/InstancesList';
 import InstancesSelection from './InstancesSelection';
-import LayersList from '../LayersList';
+import LayersList from '../../LayersList';
 import SetupGridDialog from './SetupGridDialog';
+import Toolbar from './Toolbar';
 
-import {ToolbarGroup} from 'material-ui/Toolbar';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import IconMenu from '../UI/Menu/IconMenu';
-import Paper from 'material-ui/Paper';
-import EditorBar from '../UI/EditorBar';
-import ToolbarIcon from '../UI/ToolbarIcon';
-import InfoBar from '../UI/Messages/InfoBar';
+import SmallDrawer from '../../UI/SmallDrawer';
+import EditorBar from '../../UI/EditorBar';
+import InfoBar from '../../UI/Messages/InfoBar';
 
 export default class InstancesFullEditor extends Component {
   constructor() {
@@ -39,49 +37,23 @@ export default class InstancesFullEditor extends Component {
   }
 
   componentWillMount() {
+    this._updateToolbar();
+  }
+
+  _updateToolbar() {
     this.props.setToolbar(
-      <ToolbarGroup>
-        <ToolbarIcon
-          onClick={this.toggleObjectsList}
-          src="res/ribbon_default/add32.png"
-        />
-        <ToolbarIcon
-          onClick={this._deleteSelection}
-          src="res/ribbon_default/deleteselected32.png"
-        />
-        <ToolbarIcon
-          onClick={this.toggleInstancesList}
-          src="res/ribbon_default/ObjectsPositionsList32.png"
-        />
-        <ToolbarIcon
-          onClick={this.toggleLayersList}
-          src="res/ribbon_default/layers32.png"
-        />
-        <IconMenu
-          iconButtonElement={<ToolbarIcon src="res/ribbon_default/grid32.png" />}
-          menuTemplate={[{
-            label: "Show grid",
-            click: () => this.toggleGrid(),
-          }, {
-            label: "Setup grid",
-            click: () => this.openSetupGrid(),
-          }]}
-        >
-        </IconMenu>
-        <IconMenu
-          iconButtonElement={<ToolbarIcon src="res/ribbon_default/zoom32.png" />}
-          menuTemplate={[
-            { label: "5%", click: () => this.setZoomFactor(0.05)},
-            { label: "10%", click: () => this.setZoomFactor(0.10)},
-            { label: "25%", click: () => this.setZoomFactor(0.25)},
-            { label: "50%", click: () => this.setZoomFactor(0.50)},
-            { label: "100%", click: () => this.setZoomFactor(1.00)},
-            { label: "150%", click: () => this.setZoomFactor(1.50)},
-            { label: "200%", click: () => this.setZoomFactor(2.00)},
-          ]}
-        >
-        </IconMenu>
-      </ToolbarGroup>
+      <Toolbar
+        showPreviewButton={this.props.showPreviewButton}
+        onPreview={this.onPreview}
+        instancesSelection={this.instancesSelection}
+        toggleObjectsList={this.toggleObjectsList}
+        deleteSelection={this.deleteSelection}
+        toggleInstancesList={this.toggleInstancesList}
+        toggleLayersList={this.toggleLayersList}
+        toggleGrid={this.toggleGrid}
+        openSetupGrid={this.openSetupGrid}
+        setZoomFactor={this.setZoomFactor}
+      />
     );
   }
 
@@ -142,6 +114,7 @@ export default class InstancesFullEditor extends Component {
 
   _onInstancesSelected = (instances) => {
     this.forceUpdate();
+    this._updateToolbar();
   }
 
   _onInstancesMoved = (instances) => {
@@ -160,10 +133,12 @@ export default class InstancesFullEditor extends Component {
       this.editor.centerViewOn(instances);
     }
     this.forceUpdate();
+    this._updateToolbar();
   }
 
-  _deleteSelection = () => {
+  deleteSelection = () => {
     this.editor.deleteSelection();
+    this._updateToolbar();
   }
 
   setZoomFactor = (zoomFactor) => {
@@ -172,37 +147,32 @@ export default class InstancesFullEditor extends Component {
 
   render() {
     const { project, layout, initialInstances } = this.props;
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
 
     return (
-      <div style={{display: 'flex', flex: 1}}>
-        <Paper
-          style={{width: 200, zIndex: 1, display: 'flex'}}
-          zDepth={2}
+      <div style={{display: 'flex', flex: 1, position: 'relative'}}>
+        <SmallDrawer
+          open={!!selectedInstances.length}
         >
           <InstancePropertiesEditor
             project={project}
             layout={layout}
-            instances={this.instancesSelection.getSelectedInstances()}
+            instances={selectedInstances}
             onInstancesModified={this._onInstancesModified}
           />
-        </Paper>
-        <div style={{
-          flex: 1,
-          display: 'flex',
-        }}>
-          <FullSizeInstancesEditor
-            project={project}
-            layout={layout}
-            initialInstances={initialInstances}
-            selectedObjectName={this.state.selectedObjectName}
-            options={this.state.options}
-            instancesSelection={this.instancesSelection}
-            onNewInstanceAdded={this._onNewInstanceAdded}
-            onInstancesSelected={this._onInstancesSelected}
-            onInstancesMoved={this._onInstancesMoved}
-            editorRef={(editor) => this.editor = editor}
-          />
-        </div>
+        </SmallDrawer>
+        <FullSizeInstancesEditor
+          project={project}
+          layout={layout}
+          initialInstances={initialInstances}
+          selectedObjectName={this.state.selectedObjectName}
+          options={this.state.options}
+          instancesSelection={this.instancesSelection}
+          onNewInstanceAdded={this._onNewInstanceAdded}
+          onInstancesSelected={this._onInstancesSelected}
+          onInstancesMoved={this._onInstancesMoved}
+          editorRef={(editor) => this.editor = editor}
+        />
         <Drawer open={this.state.objectsListOpen} openSecondary={true}>
           <EditorBar
             title="Objects"
@@ -223,7 +193,7 @@ export default class InstancesFullEditor extends Component {
           <InstancesList
             freezeUpdate={!this.state.instancesListOpen}
             instances={initialInstances}
-            selectedInstances={this.instancesSelection.getSelectedInstances()}
+            selectedInstances={selectedInstances}
             onSelectInstances={this._onSelectInstances}
           />
         </Drawer>

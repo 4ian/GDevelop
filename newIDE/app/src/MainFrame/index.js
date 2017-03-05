@@ -6,8 +6,8 @@ import IconButton from 'material-ui/IconButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import {Toolbar, ToolbarGroup, ToolbarSeparator} from 'material-ui/Toolbar';
 
+import Toolbar from './Toolbar';
 import EventsSheetContainer from '../EventsSheet/EventsSheetContainer.js';
 import SceneEditor from '../SceneEditor';
 import ExternalLayoutEditor from '../SceneEditor/ExternalLayoutEditor';
@@ -44,7 +44,6 @@ class MainFrame extends Component {
       newProject.unserializeFrom(serializedProject);
       var t1 = performance.now();
       console.log("Creation and unserialization project took " + (t1 - t0) + " milliseconds.");
-
 
       if (!this.state.sceneOpened && this.props.selectedEditor === 'scene-editor') {
         this.setState({
@@ -136,16 +135,12 @@ class MainFrame extends Component {
               )
             }
           </Drawer>
-          <LoaderModal show={this.state.loadingProject || this.props.loading} />
-          <Toolbar>
-            <ToolbarGroup firstChild={true}>
-              <RaisedButton label="Project manager" onClick={this.toggleProjectManager} />
-              <RaisedButton label="Load game" onClick={this.loadBuiltinGame} />
-              <RaisedButton label="Request update" onClick={this.requestUpdate} />
-            </ToolbarGroup>
-            <ToolbarSeparator />
-            {this.state.toolbar || <ToolbarGroup />}
-          </Toolbar>
+          <Toolbar
+            editorToolbar={this.state.toolbar}
+            toggleProjectManager={this.toggleProjectManager}
+            loadBuiltinGame={this.loadBuiltinGame}
+            requestUpdate={this.requestUpdate}
+          />
           {
             currentProject && sceneOpened && (
               <SceneEditor
@@ -153,6 +148,8 @@ class MainFrame extends Component {
                 project={currentProject}
                 layoutName={sceneOpened}
                 setToolbar={this.setToolbar}
+                onPreview={this.props.onPreview}
+                showPreviewButton
               />
             )
           }
@@ -174,6 +171,7 @@ class MainFrame extends Component {
               />
             )
           }
+          <LoaderModal show={this.state.loadingProject || this.props.loading} />
         </div>
       </MuiThemeProvider>
     );

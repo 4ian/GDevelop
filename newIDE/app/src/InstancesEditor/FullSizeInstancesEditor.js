@@ -17,7 +17,7 @@ export default class FullSizeInstancesEditor extends Component {
       <Measure
         onMeasure={({width, height}) => this.setState({width, height})}
       >
-        <div style={{display: 'flex', flex: 1}}>
+        <div style={{display: 'flex', flex: 1, position: 'relative'}}>
         {
           this.state.width && this.state.height &&
             <InstancesEditorContainer

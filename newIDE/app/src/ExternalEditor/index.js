@@ -77,6 +77,10 @@ class ExternalEditor extends Component {
 		console.log("Update send done");
 	}
 
+  launchPreview = () => {
+    this.bridge.send('requestPreview', undefined);
+  }
+
   requestUpdate = (scope = "") => {
     this.setState({
       loading: true,
@@ -108,6 +112,7 @@ class ExternalEditor extends Component {
         loading: this.state.loading,
 				ref: (editor) => this.editor = editor,
 				requestUpdate: this.requestUpdate,
+        onPreview: this.launchPreview,
 				selectedEditor: this.selectedEditor,
 				editedElementName: this.editedElementName,
       })

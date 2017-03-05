@@ -29,7 +29,9 @@ public:
 			}
 			else if (cmd == "requestUpdate")
 				SendUpdate(scope);
-			else
+			else if (cmd == "requestPreview") {
+				if (onLaunchPreview) onLaunchPreview();
+			} else
 				std::cout << "Received message with unknown command: \"" << cmd << "\"" << std::endl;
 		});
 	}
@@ -49,6 +51,11 @@ public:
 	void OnSendUpdate(std::function<SerializerElement(gd::String scope)> cb)
 	{
 		onSendUpdate = cb;
+	}
+
+	void OnLaunchPreview(std::function<void()> cb)
+	{
+		onLaunchPreview = cb;
 	}
 
 	bool Launch(const gd::String & editorName, const gd::String editedElementName);
@@ -92,6 +99,7 @@ private:
 	int externalEditorPid;
 	std::function<void(SerializerElement object, gd::String scope)> onUpdateReceivedCb;
 	std::function<SerializerElement(gd::String scope)> onSendUpdate;
+	std::function<void()> onLaunchPreview;
 };
 
 }

@@ -222,11 +222,13 @@ export default class InstancesEditorContainer extends Component {
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.instancesMover.moveBy(selectedInstances, sceneDeltaX, sceneDeltaY)
-    this.props.onInstancesMoved(selectedInstances);
   }
 
   _onMoveInstanceEnd = () => {
     this.instancesMover.endMove();
+    
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    this.props.onInstancesMoved(selectedInstances);
   }
 
   _onPanMoveView = (deltaX, deltaY) => {
@@ -315,9 +317,7 @@ export default class InstancesEditorContainer extends Component {
     if (!this.props.project) return null;
 
     return (
-      <div style={{flex: 1, display: 'flex', overflow: 'hidden'}}>
-        <div ref="canvasArea" style={{flex: 1, display: 'flex', overflow: 'hidden'}} />
-      </div>
+      <div ref="canvasArea" style={{flex: 1, position: 'absolute', overflow: 'hidden'}} />
     )
   }
 }

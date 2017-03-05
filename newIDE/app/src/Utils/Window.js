@@ -23,9 +23,15 @@ export default {
 
     return electron.remote.getCurrentWindow().on('blur', cb);
 	},
+  onClose: (cb) => {
+		if (!electron) return;
+
+    return electron.remote.getCurrentWindow().on('close', cb);
+	},
 	getArguments: () => {
 		if (!electron) {
 			console.warn("Unable to get arguments, electron not defined");
+			return {};
 		}
 
 		return electron.remote.getGlobal('args');

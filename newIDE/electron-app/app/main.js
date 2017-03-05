@@ -34,11 +34,11 @@ app.on('ready', function() {
   global['args'] = args;
 
   // and load the index.html of the app.
-  // Produciton (with npm run build)
-  mainWindow.loadURL('file://' + __dirname + '/www/index.html');
+  // Production (with npm run build)
+  // mainWindow.loadURL('file://' + __dirname + '/www/index.html');
 
   // Development (with npm start)
-  // mainWindow.loadURL('http://localhost:3001');
+  mainWindow.loadURL('http://localhost:3000');
 
   // Open the DevTools.
   mainWindow.openDevTools();

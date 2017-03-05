@@ -15,6 +15,7 @@ class MaterialUIMenuImplementation {
       }
 
       return (<MenuItem
+        key={item.label}
         primaryText={item.label}
         onTouchTap={() => item.click()}
       />);

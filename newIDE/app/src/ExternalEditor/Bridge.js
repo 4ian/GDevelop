@@ -29,6 +29,8 @@ Bridge.prototype.connectTo = function(port) {
 	var data = "";
 	this.client.on('data', function(dataBuffer) {
 		data += dataBuffer;
+
+		// eslint-disable-next-line
 		if (!dataBuffer.length || dataBuffer[dataBuffer.length - 1] == 0) {
 			data = data.slice(0, -1); //Strip ending null character
 			that._receive(data);

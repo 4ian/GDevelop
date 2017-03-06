@@ -131,7 +131,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         }
 
         //Strip the project (*after* generating events as the events may use stripped things like objects groups...)...
-        gd::ProjectStripper::StripProject(exportedProject);
+        gd::ProjectStripper::StripProjectForExport(exportedProject);
 
         //...and export it
         helper.ExportToJSON(fs, exportedProject, fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/data.js",
@@ -233,7 +233,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     }
 
     //Strip the project (*after* generating events as the events may use stripped things like objects groups...)...
-    gd::ProjectStripper::StripProject(exportedProject);
+    gd::ProjectStripper::StripProjectForExport(exportedProject);
 
     //...and export it
     helper.ExportToJSON(fs, exportedProject, fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/data.js",

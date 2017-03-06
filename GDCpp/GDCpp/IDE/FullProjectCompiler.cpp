@@ -255,7 +255,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     gd::SafeYield::Do();
     diagnosticManager.OnMessage(_( "Copying resources..." ), _( "Step 1 out of 3" ));
     gd::Project strippedProject = game;
-    gd::ProjectStripper::StripProject(strippedProject);
+    gd::ProjectStripper::StripProjectForExport(strippedProject);
     gd::ProjectFileWriter::SaveToFile(strippedProject, tempDir + "/GDProjectSrcFile.gdg", true);
     diagnosticManager.OnPercentUpdate(80);
 

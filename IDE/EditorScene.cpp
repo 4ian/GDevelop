@@ -37,7 +37,7 @@
 #include "GDCore/IDE/Dialogs/ExternalEditor/ExternalEditor.h"
 
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/Project.h"
+#include "GDCore/IDE/ProjectStripper.h"
 
 //(*IdInit(EditorScene)
 const long EditorScene::ID_SCROLLBAR3 = wxNewId();
@@ -175,7 +175,9 @@ mainFrameWrapper(mainFrameWrapper_)
 		}
 
         gd::SerializerElement serializedProject;
-        project.SerializeTo(serializedProject);
+		gd::Project strippedProject = project;
+		gd::ProjectStripper::StripProjectForLayoutEdition(strippedProject, this->layout.GetName());
+        strippedProject.SerializeTo(serializedProject);
 
         return serializedProject;
     });

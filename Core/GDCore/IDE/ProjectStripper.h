@@ -6,6 +6,7 @@
 #ifndef GDCORE_PROJECTSTRIPPER_H
 #define GDCORE_PROJECTSTRIPPER_H
 namespace gd { class Project; }
+namespace gd { class String; }
 
 namespace gd
 {
@@ -23,7 +24,13 @@ public:
      *
      * \param project The project to be stripped.
      */
-    static void StripProject(gd::Project & project);
+    static void StripProjectForExport(gd::Project & project);
+
+    /**
+     * \brief Strip project to keep only the full content of the specified
+     * layout. The content of other layouts, external events and external layout is removed.
+     */
+    static void StripProjectForLayoutEdition(gd::Project & project, const gd::String & layoutName);
 
 private:
     ProjectStripper() {};

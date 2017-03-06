@@ -232,6 +232,12 @@ void InitialInstancesContainer::SerializeTo(SerializerElement & element) const
         (*it).GetVariables().SerializeTo(instanceElement.AddChild("initialVariables"));
     }
 }
+
+void InitialInstancesContainer::Clear()
+{
+    initialInstances.clear();
+}
+
 #endif
 
 InitialInstanceFunctor::~InitialInstanceFunctor()

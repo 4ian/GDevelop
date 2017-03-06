@@ -89,7 +89,7 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project & project, gd::Layou
     }
 
     //Strip the project (*after* generating events as the events may use stripped things (objects groups...))
-    gd::ProjectStripper::StripProject(exportedProject);
+    gd::ProjectStripper::StripProjectForExport(exportedProject);
     exportedProject.SetFirstLayout(layout.GetName());
 
     //Export the project

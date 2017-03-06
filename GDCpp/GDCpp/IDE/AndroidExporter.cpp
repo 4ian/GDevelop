@@ -81,7 +81,7 @@ bool AndroidExporter::ExportWholeProject(gd::Project & project, gd::String expor
     ExportMainFile(exportedProject, exportDir);
 
     //Strip the project (*after* generating events as the events may use stripped things (objects groups...))
-    gd::ProjectStripper::StripProject(exportedProject);
+    gd::ProjectStripper::StripProjectForExport(exportedProject);
 
     //Export the project file
     gd::SerializerElement rootElement;

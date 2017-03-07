@@ -37,7 +37,7 @@ export default {
 		return electron.remote.getGlobal('args');
 	},
   isDev: () => {
-		if (!electron) return;
+		if (!electron) return true;
 
     return electron.remote.require('electron-is-dev');
 	}

@@ -18,6 +18,15 @@ export default class Toolbar extends Component {
       {this.props.showPreviewButton &&
         <ToolbarSeparator />}
       <ToolbarIcon
+        onClick={this.props.undo}
+        src="res/ribbon_default/undo32.png"
+      />
+      <ToolbarIcon
+        onClick={this.props.redo}
+        src="res/ribbon_default/redo32.png"
+      />
+      <ToolbarSeparator />
+      <ToolbarIcon
         onClick={this.props.toggleObjectsList}
         src="res/ribbon_default/add32.png"
       />

@@ -15,9 +15,73 @@ import SmallDrawer from '../../UI/SmallDrawer';
 import EditorBar from '../../UI/EditorBar';
 import InfoBar from '../../UI/Messages/InfoBar';
 
+const gd = global.gd;
+
+const getHistoryInitialState = (instances) => {
+  const serializedElement = new gd.SerializerElement();
+  instances.serializeTo(serializedElement);
+  const savedInstances = JSON.parse(gd.Serializer.toJSON(serializedElement));
+  serializedElement.delete();
+
+  return {
+    undoHistory: [],
+    current: savedInstances,
+    redoHistory: [],
+  };
+};
+
+const saveToHistory = (history, instances) => {
+  const serializedElement = new gd.SerializerElement();
+  instances.serializeTo(serializedElement);
+  const savedInstances = JSON.parse(gd.Serializer.toJSON(serializedElement));
+  serializedElement.delete();
+
+  return {
+    undoHistory: [...history.undoHistory, history.current],
+    current: savedInstances,
+    redoHistory: [],
+  };
+}
+
+const undo = (history, instances) => {
+  if (!history.undoHistory.length) {
+    return history;
+  }
+
+  const newCurrent = history.undoHistory[history.undoHistory.length - 1];
+
+  const serializedNewElement = gd.Serializer.fromJSObject(newCurrent);
+  instances.unserializeFrom(serializedNewElement);
+  serializedNewElement.delete();
+
+  return {
+    undoHistory: history.undoHistory.slice(0, -1),
+    current: newCurrent,
+    redoHistory: [...history.redoHistory, history.current],
+  }
+}
+
+const redo = (history, instances) => {
+  if (!history.redoHistory.length) {
+    return history;
+  }
+
+  const newCurrent = history.redoHistory[history.redoHistory.length - 1];
+
+  const serializedNewElement = gd.Serializer.fromJSObject(newCurrent);
+  instances.unserializeFrom(serializedNewElement);
+  serializedNewElement.delete();
+
+  return {
+    undoHistory: [...history.undoHistory, history.current],
+    current: newCurrent,
+    redoHistory: history.redoHistory.slice(0, -1),
+  }
+}
+
 export default class InstancesFullEditor extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.instancesSelection = new InstancesSelection();
     this.state = {
@@ -32,7 +96,8 @@ export default class InstancesFullEditor extends Component {
         gridHeight: 32,
         gridOffsetX: 0,
         gridOffsetY: 0,
-      }
+      },
+      history: getHistoryInitialState(props.initialInstances),
     };
   }
 
@@ -53,6 +118,8 @@ export default class InstancesFullEditor extends Component {
         toggleGrid={this.toggleGrid}
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
+        undo={this.undo}
+        redo={this.redo}
       />
     );
   }
@@ -100,6 +167,18 @@ export default class InstancesFullEditor extends Component {
     });
   }
 
+  undo = () => {
+    this.setState({
+      history: undo(this.state.history, this.props.initialInstances),
+    });
+  }
+
+  redo = () => {
+    this.setState({
+      history: redo(this.state.history, this.props.initialInstances),
+    });
+  }
+
   _onObjectSelected = (selectedObjectName) => {
     this.setState({
       selectedObjectName,
@@ -108,7 +187,8 @@ export default class InstancesFullEditor extends Component {
 
   _onNewInstanceAdded = () => {
     this.setState({
-      selectedObjectName: null
+      selectedObjectName: null,
+      history: saveToHistory(this.state.history, this.props.initialInstances),
     });
   }
 
@@ -119,10 +199,12 @@ export default class InstancesFullEditor extends Component {
 
   _onInstancesMoved = (instances) => {
     this.forceUpdate();
+    //Save for redo
   }
 
   _onInstancesModified = (instances) => {
     this.forceUpdate();
+    //Save for redo with debounce (and cancel on unmount)?????
   }
 
   _onSelectInstances = (instances, centerView = true) => {
@@ -139,6 +221,7 @@ export default class InstancesFullEditor extends Component {
   deleteSelection = () => {
     this.editor.deleteSelection();
     this._updateToolbar();
+    //Save for redo
   }
 
   setZoomFactor = (zoomFactor) => {

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import {ToolbarGroup, ToolbarSeparator} from 'material-ui/Toolbar';
+import {ToolbarGroup} from 'material-ui/Toolbar';
+import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import ToolbarIcon from '../../UI/ToolbarIcon';
 import IconMenu from '../../UI/Menu/IconMenu';
 

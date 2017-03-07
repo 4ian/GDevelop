@@ -2,6 +2,13 @@ import React, { Component } from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 const gd = global.gd;
 
+const styles = {
+  smallMarginsColumn: {
+    paddingLeft: 8,
+    paddingRight: 8,
+  },
+}
+
 export default class InstancesList extends Component {
   shouldComponentUpdate() {
     // Rendering the component can be costly as it iterates over
@@ -25,12 +32,12 @@ export default class InstancesList extends Component {
             key={instancePtr}
             selected={this.props.selectedInstances.indexOf(instance) !== -1}
           >
-            <TableRowColumn>{instance.getObjectName()}</TableRowColumn>
-            <TableRowColumn>{instance.getX().toFixed(2)}</TableRowColumn>
-            <TableRowColumn>{instance.getY().toFixed(2)}</TableRowColumn>
-            <TableRowColumn>{instance.getAngle()}</TableRowColumn>
-            <TableRowColumn>{instance.getLayer()}</TableRowColumn>
-            <TableRowColumn>{instance.getZOrder()}</TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getObjectName()}</TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getX().toFixed(2)}</TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getY().toFixed(2)}</TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getAngle()}</TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getLayer()}</TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getZOrder()}</TableRowColumn>
           </TableRow>
         ),
       });
@@ -62,12 +69,12 @@ export default class InstancesList extends Component {
           adjustForCheckbox={false}
         >
           <TableRow>
-            <TableHeaderColumn>Object name</TableHeaderColumn>
-            <TableHeaderColumn>X</TableHeaderColumn>
-            <TableHeaderColumn>Y</TableHeaderColumn>
-            <TableHeaderColumn>Angle</TableHeaderColumn>
-            <TableHeaderColumn>Layer</TableHeaderColumn>
-            <TableHeaderColumn>Z Order</TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>Object name</TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>X</TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>Y</TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>Angle</TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>Layer</TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>Z Order</TableHeaderColumn>
           </TableRow>
         </TableHeader>
         <TableBody

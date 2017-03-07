@@ -18,6 +18,19 @@
 
 namespace gd {
 
+gd::String GetExternalGDevelopIDEExecutable()
+{
+	#if defined(WINDOWS)
+	return "\"./newIDE/GDevelop IDE.exe\" .";
+	#elif defined(MACOS)
+	return "\"./newIDE/GDevelop IDE.app/Contents/MacOS/GDevelop IDE\" .";
+	#elif defined(LINUX)
+	return "\"./newIDE/GDevelop IDE\" .";
+	#endif
+
+	return "";
+}
+
 bool ExternalEditor::Launch(const gd::String & editorName, const gd::String editedElementName)
 {
 	unsigned int port = editorBridge.Start();
@@ -27,8 +40,9 @@ bool ExternalEditor::Launch(const gd::String & editorName, const gd::String edit
         return false;
 	}
 
-    String cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
-    // String cmd = "\"/Users/florian/Projects/F/GD/newIDE/electron-app/dist/mac/GDevelop IDE.app/Contents/MacOS/GDevelop IDE\" .";
+    String cmd = GetExternalGDevelopIDEExecutable();
+	// Uncomment and adapt to launch a local development version of the GDevelop IDE:
+	// cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
 
 	if (editorName != "") cmd += " --editor " + editorName;
 	if (editedElementName != "") cmd += " --edited-element-name \"" + editedElementName + "\"";

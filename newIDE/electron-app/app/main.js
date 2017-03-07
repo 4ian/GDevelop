@@ -1,6 +1,7 @@
 var app = require('electron').app;  // Module to control application life.
 var BrowserWindow = require('electron').BrowserWindow;  // Module to create native browser window.
 var parseArgs = require('minimist');
+var isDev = require('electron-is-dev');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -33,15 +34,16 @@ app.on('ready', function() {
   //Expose program arguments
   global['args'] = args;
 
-  // and load the index.html of the app.
-  // Production (with npm run build)
-  // mainWindow.loadURL('file://' + __dirname + '/www/index.html');
-
-  // Development (with npm start)
-  mainWindow.loadURL('http://localhost:3000');
-
-  // Open the DevTools.
-  mainWindow.openDevTools();
+  // Load the index.html of the app.
+  if (isDev) {
+    // Development (server hosted by npm run start)
+    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.openDevTools();
+  } else {
+    // Production (with npm run build)
+    mainWindow.loadURL('file://' + __dirname + '/www/index.html');
+    // mainWindow.openDevTools();
+  }
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {

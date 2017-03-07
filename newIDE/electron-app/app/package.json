@@ -8,6 +8,7 @@
   "homepage": "http://compilgames.net",
   "main": "main.js",
   "dependencies": {
+    "electron-is-dev": "^0.1.2",
     "minimist": "^1.2.0"
   }
 }

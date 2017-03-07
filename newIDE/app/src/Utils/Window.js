@@ -35,5 +35,10 @@ export default {
 		}
 
 		return electron.remote.getGlobal('args');
+	},
+  isDev: () => {
+		if (!electron) return;
+
+    return electron.remote.require('electron-is-dev');
 	}
 }

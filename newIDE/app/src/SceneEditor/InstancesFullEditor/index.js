@@ -14,70 +14,7 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import SmallDrawer from '../../UI/SmallDrawer';
 import EditorBar from '../../UI/EditorBar';
 import InfoBar from '../../UI/Messages/InfoBar';
-
-const gd = global.gd;
-
-const getHistoryInitialState = (instances) => {
-  const serializedElement = new gd.SerializerElement();
-  instances.serializeTo(serializedElement);
-  const savedInstances = JSON.parse(gd.Serializer.toJSON(serializedElement));
-  serializedElement.delete();
-
-  return {
-    undoHistory: [],
-    current: savedInstances,
-    redoHistory: [],
-  };
-};
-
-const saveToHistory = (history, instances) => {
-  const serializedElement = new gd.SerializerElement();
-  instances.serializeTo(serializedElement);
-  const savedInstances = JSON.parse(gd.Serializer.toJSON(serializedElement));
-  serializedElement.delete();
-
-  return {
-    undoHistory: [...history.undoHistory, history.current],
-    current: savedInstances,
-    redoHistory: [],
-  };
-}
-
-const undo = (history, instances) => {
-  if (!history.undoHistory.length) {
-    return history;
-  }
-
-  const newCurrent = history.undoHistory[history.undoHistory.length - 1];
-
-  const serializedNewElement = gd.Serializer.fromJSObject(newCurrent);
-  instances.unserializeFrom(serializedNewElement);
-  serializedNewElement.delete();
-
-  return {
-    undoHistory: history.undoHistory.slice(0, -1),
-    current: newCurrent,
-    redoHistory: [...history.redoHistory, history.current],
-  }
-}
-
-const redo = (history, instances) => {
-  if (!history.redoHistory.length) {
-    return history;
-  }
-
-  const newCurrent = history.redoHistory[history.redoHistory.length - 1];
-
-  const serializedNewElement = gd.Serializer.fromJSObject(newCurrent);
-  instances.unserializeFrom(serializedNewElement);
-  serializedNewElement.delete();
-
-  return {
-    undoHistory: [...history.undoHistory, history.current],
-    current: newCurrent,
-    redoHistory: history.redoHistory.slice(0, -1),
-  }
-}
+import {undo, redo, getHistoryInitialState, saveToHistory} from './History';
 
 export default class InstancesFullEditor extends Component {
   constructor(props) {
@@ -170,12 +107,20 @@ export default class InstancesFullEditor extends Component {
   undo = () => {
     this.setState({
       history: undo(this.state.history, this.props.initialInstances),
+    }, () => {
+      // /!\ Force the instances editor to destroy and mount again the
+      // renderers to avoid keeping any references to existing instances
+      this.editor.forceRemount();
     });
   }
 
   redo = () => {
     this.setState({
       history: redo(this.state.history, this.props.initialInstances),
+    }, () => {
+      // /!\ Force the instances editor to destroy and mount again the
+      // renderers to avoid keeping any references to existing instances
+      this.editor.forceRemount();
     });
   }
 

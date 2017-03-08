@@ -18,6 +18,7 @@ function RenderedTextInstance(project, layout, instance, associatedObject, pixiC
     this._pixiObject.anchor.x = 0.5;
     this._pixiObject.anchor.y = 0.5;
     this._pixiContainer.addChild(this._pixiObject);
+    this.update();
 }
 RenderedTextInstance.prototype = Object.create( RenderedInstance.prototype );
 

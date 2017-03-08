@@ -79,6 +79,16 @@ export default class InstancesEditorContainer extends Component {
     this.renderScene();
   }
 
+  /**
+   * Force the internal InstancesRenderer to be destroyed and recreated
+   * (as well as other components holding references to instances). Call
+   * this when the initial instances were recreated to ensure that there
+   * is not mismatch between renderers and the instances that were updated.
+   */
+  forceRemount() {
+    this._mountEditorComponents(this.props);
+  }
+
   _mountEditorComponents(props) {
     //Remove and delete any existing editor component
     if (this.highlightedInstance) {
@@ -226,7 +236,7 @@ export default class InstancesEditorContainer extends Component {
 
   _onMoveInstanceEnd = () => {
     this.instancesMover.endMove();
-    
+
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesMoved(selectedInstances);
   }

@@ -48,7 +48,7 @@ export default class InstancesFullEditor extends Component {
     this.props.setToolbar(
       <Toolbar
         showPreviewButton={this.props.showPreviewButton}
-        onPreview={this.onPreview}
+        onPreview={this.props.onPreview}
         instancesSelection={this.instancesSelection}
         toggleObjectsList={this.toggleObjectsList}
         deleteSelection={this.deleteSelection}

@@ -528,6 +528,12 @@ wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
         modeRibbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Stop the preview") : gd::String(), SkinHelper::GetRibbonIcon("edit"), _("Stop the preview and go back to editing"));
         modeRibbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : gd::String(), SkinHelper::GetRibbonIcon("preview"), _("Launch a preview"), wxRIBBON_BUTTON_HYBRID);
     }
+    {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Editors"), SkinHelper::GetRibbonIcon("preview"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        ribbonBar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects editor") : gd::String(), gd::SkinHelper::GetRibbonIcon("objects"), _("Show the list of objects of the scene"));
+        ribbonBar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers editor") : gd::String(), gd::SkinHelper::GetRibbonIcon("layers"), _("Show the layers editor"));
+    }
 
     wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), SkinHelper::GetRibbonIcon("tools"), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
     wxRibbonButtonBar * ribbonToolbar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
@@ -563,8 +569,6 @@ void LayoutEditorCanvas::CreateEditionRibbonTools()
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     wxRibbonButtonBar * ribbonToolbar = mainFrameWrapper.GetRibbonSceneEditorButtonBar();
-    ribbonToolbar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects editor") : gd::String(), gd::SkinHelper::GetRibbonIcon("objects"), _("Show the list of objects of the scene"));
-    ribbonToolbar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers editor") : gd::String(), gd::SkinHelper::GetRibbonIcon("layers"), _("Show the layers editor"));
     ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Instances") : gd::String(), gd::SkinHelper::GetRibbonIcon("ObjectsPositionsList"), _("Open a list of all instances of objects put on the scene"));
     ribbonToolbar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Undo") : gd::String(), gd::SkinHelper::GetRibbonIcon("undo"), _("Undo the last change"));
     ribbonToolbar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : gd::String(), gd::SkinHelper::GetRibbonIcon("redo"));

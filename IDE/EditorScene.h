@@ -10,8 +10,10 @@
 #include <vector>
 //(*Headers(EditorScene)
 #include <wx/sizer.h>
+#include <wx/stattext.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
+#include <wx/button.h>
 #include <wx/scrolbar.h>
 //*)
 #include <wx/help.h>
@@ -70,6 +72,9 @@ protected:
     static const long ID_SCROLLBAR4;
     static const long ID_CUSTOM3;
     static const long ID_PANEL1;
+    static const long ID_STATICTEXT1;
+    static const long ID_BUTTON1;
+    static const long ID_PANEL2;
     static const long ID_CUSTOM2;
     static const long ID_PANEL6;
     static const long ID_AUINOTEBOOK1;
@@ -96,10 +101,15 @@ private:
     void OnhScrollbarScroll(wxScrollEvent& event);
     void OnvScrollbarScrollThumbRelease(wxScrollEvent& event);
     void OnhScrollbarScrollThumbRelease(wxScrollEvent& event);
+    void OnopenSceneEditorBtClick(wxCommandEvent& event);
     //*)
+    void CreateExternalLayoutEditor();
 
     //(*Declarations(EditorScene)
     EventsEditor* eventsEditor;
+    wxStaticText* externalSceneEditorExplanationTxt;
+    wxButton* openSceneEditorBt;
+    wxPanel* externalSceneEditorPanel;
     gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxPanel* scenePanel;
     wxPanel* eventsPanel;

@@ -1,11 +1,11 @@
 #include "Preferences.h"
 
 //(*InternalHeaders(Preferences)
-#include <wx/settings.h>
-#include <wx/string.h>
-#include <wx/intl.h>
 #include <wx/bitmap.h>
+#include <wx/settings.h>
+#include <wx/intl.h>
 #include <wx/image.h>
+#include <wx/string.h>
 //*)
 #include <wx/propgrid/advprops.h>
 #include <wx/imaglist.h>
@@ -48,6 +48,7 @@ const long Preferences::ID_STATICTEXT5 = wxNewId();
 const long Preferences::ID_STATICTEXT14 = wxNewId();
 const long Preferences::ID_CHECKBOX8 = wxNewId();
 const long Preferences::ID_CHECKBOX9 = wxNewId();
+const long Preferences::ID_CHECKBOX5 = wxNewId();
 const long Preferences::ID_PANEL6 = wxNewId();
 const long Preferences::ID_STATICTEXT13 = wxNewId();
 const long Preferences::ID_CHOICE2 = wxNewId();
@@ -139,65 +140,66 @@ Preferences::Preferences( wxWindow* parent ) :
 changesNeedRestart(false)
 {
     //(*Initialize(Preferences)
-    wxStaticBoxSizer* StaticBoxSizer17;
-    wxFlexGridSizer* FlexGridSizer30;
     wxStaticBoxSizer* StaticBoxSizer2;
-    wxFlexGridSizer* FlexGridSizer21;
-    wxFlexGridSizer* FlexGridSizer28;
-    wxFlexGridSizer* FlexGridSizer8;
-    wxStaticBoxSizer* StaticBoxSizer10;
-    wxFlexGridSizer* FlexGridSizer1;
-    wxFlexGridSizer* FlexGridSizer25;
-    wxFlexGridSizer* FlexGridSizer2;
-    wxFlexGridSizer* FlexGridSizer15;
-    wxStaticBoxSizer* StaticBoxSizer19;
-    wxStaticBoxSizer* StaticBoxSizer7;
-    wxStaticBoxSizer* StaticBoxSizer5;
-    wxFlexGridSizer* FlexGridSizer17;
-    wxFlexGridSizer* FlexGridSizer29;
-    wxFlexGridSizer* FlexGridSizer11;
+    wxFlexGridSizer* FlexGridSizer4;
+    wxFlexGridSizer* FlexGridSizer16;
+    wxFlexGridSizer* FlexGridSizer24;
     wxFlexGridSizer* FlexGridSizer19;
     wxStaticBoxSizer* StaticBoxSizer12;
-    wxFlexGridSizer* FlexGridSizer7;
-    wxFlexGridSizer* FlexGridSizer4;
-    wxStaticBoxSizer* StaticBoxSizer16;
-    wxFlexGridSizer* FlexGridSizer26;
-    wxFlexGridSizer* FlexGridSizer9;
-    wxStaticBoxSizer* StaticBoxSizer3;
-    wxFlexGridSizer* FlexGridSizer14;
-    wxFlexGridSizer* FlexGridSizer33;
-    wxFlexGridSizer* FlexGridSizer6;
-    wxStaticBoxSizer* StaticBoxSizer20;
-    wxStaticBoxSizer* StaticBoxSizer13;
+    wxStaticBoxSizer* StaticBoxSizer21;
+    wxFlexGridSizer* FlexGridSizer23;
     wxFlexGridSizer* FlexGridSizer38;
-    wxFlexGridSizer* FlexGridSizer27;
-    wxFlexGridSizer* FlexGridSizer37;
-    wxFlexGridSizer* FlexGridSizer3;
-    wxFlexGridSizer* FlexGridSizer22;
     wxStaticBoxSizer* StaticBoxSizer15;
+    wxStaticBoxSizer* StaticBoxSizer14;
+    wxStaticBoxSizer* StaticBoxSizer4;
+    wxFlexGridSizer* FlexGridSizer10;
+    wxFlexGridSizer* FlexGridSizer3;
+    wxFlexGridSizer* FlexGridSizer27;
+    wxStaticBoxSizer* StaticBoxSizer16;
+    wxFlexGridSizer* FlexGridSizer37;
+    wxFlexGridSizer* FlexGridSizer5;
+    wxFlexGridSizer* FlexGridSizer25;
+    wxFlexGridSizer* FlexGridSizer22;
+    wxFlexGridSizer* FlexGridSizer9;
+    wxFlexGridSizer* FlexGridSizer2;
+    wxStaticBoxSizer* StaticBoxSizer9;
+    wxFlexGridSizer* FlexGridSizer7;
+    wxStaticBoxSizer* StaticBoxSizer7;
+    wxStaticBoxSizer* StaticBoxSizer17;
+    wxStaticBoxSizer* StaticBoxSizer13;
+    wxStaticBoxSizer* StaticBoxSizer10;
+    wxStaticBoxSizer* StaticBoxSizer19;
+    wxFlexGridSizer* FlexGridSizer29;
+    wxFlexGridSizer* FlexGridSizer34;
     wxStaticBoxSizer* StaticBoxSizer8;
+    wxStaticBoxSizer* StaticBoxSizer3;
+    wxStaticBoxSizer* StaticBoxSizer6;
+    wxFlexGridSizer* FlexGridSizer15;
+    wxFlexGridSizer* FlexGridSizer18;
+    wxFlexGridSizer* FlexGridSizer8;
+    wxStaticBoxSizer* StaticBoxSizer20;
+    wxFlexGridSizer* FlexGridSizer21;
+    wxFlexGridSizer* FlexGridSizer14;
+    wxStaticBoxSizer* StaticBoxSizer11;
+    wxFlexGridSizer* FlexGridSizer20;
+    wxFlexGridSizer* FlexGridSizer13;
+    wxFlexGridSizer* FlexGridSizer35;
+    wxFlexGridSizer* FlexGridSizer12;
+    wxFlexGridSizer* FlexGridSizer36;
+    wxFlexGridSizer* FlexGridSizer6;
+    wxStaticBoxSizer* StaticBoxSizer1;
+    wxFlexGridSizer* FlexGridSizer1;
+    wxFlexGridSizer* FlexGridSizer33;
+    wxFlexGridSizer* FlexGridSizer11;
+    wxFlexGridSizer* FlexGridSizer17;
+    wxStaticBoxSizer* StaticBoxSizer5;
+    wxFlexGridSizer* FlexGridSizer32;
     wxFlexGridSizer* FlexGridSizer31;
     wxFlexGridSizer* FlexGridSizer39;
-    wxStaticBoxSizer* StaticBoxSizer9;
-    wxStaticBoxSizer* StaticBoxSizer4;
-    wxStaticBoxSizer* StaticBoxSizer6;
-    wxStaticBoxSizer* StaticBoxSizer14;
     wxStaticBoxSizer* StaticBoxSizer18;
-    wxFlexGridSizer* FlexGridSizer16;
-    wxFlexGridSizer* FlexGridSizer34;
-    wxFlexGridSizer* FlexGridSizer23;
-    wxFlexGridSizer* FlexGridSizer10;
-    wxStaticBoxSizer* StaticBoxSizer11;
-    wxFlexGridSizer* FlexGridSizer13;
-    wxFlexGridSizer* FlexGridSizer18;
-    wxFlexGridSizer* FlexGridSizer36;
-    wxFlexGridSizer* FlexGridSizer12;
-    wxFlexGridSizer* FlexGridSizer35;
-    wxFlexGridSizer* FlexGridSizer5;
-    wxFlexGridSizer* FlexGridSizer24;
-    wxFlexGridSizer* FlexGridSizer32;
-    wxStaticBoxSizer* StaticBoxSizer1;
-    wxFlexGridSizer* FlexGridSizer20;
+    wxFlexGridSizer* FlexGridSizer28;
+    wxFlexGridSizer* FlexGridSizer26;
+    wxFlexGridSizer* FlexGridSizer30;
 
     Create(parent, wxID_ANY, _("GDevelop settings"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -215,10 +217,10 @@ changesNeedRestart(false)
     Panel1->SetSizer(FlexGridSizer12);
     FlexGridSizer12->Fit(Panel1);
     FlexGridSizer12->SetSizeHints(Panel1);
-    FlexGridSizer17->Add(Panel1, 1, wxALL|wxEXPAND, 0);
+    FlexGridSizer17->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
-    FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND, 0);
+    FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     Listbook1 = new wxListbook(this, ID_LISTBOOK1, wxDefaultPosition, wxDefaultSize, wxLB_DEFAULT, _T("ID_LISTBOOK1"));
     Panel2 = new wxPanel(Listbook1, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL6"));
     FlexGridSizer14 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -232,8 +234,8 @@ changesNeedRestart(false)
     sendInfoCheck->SetValue(false);
     sendInfoCheck->SetToolTip(_("When checked, GDevelop will send some anonymous information to our server so as to get some statistics about the software"));
     FlexGridSizer39->Add(sendInfoCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer1->Add(FlexGridSizer39, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer14->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND, 5);
+    StaticBoxSizer1->Add(FlexGridSizer39, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer14->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Autosave"));
     FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer19 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -248,17 +250,22 @@ changesNeedRestart(false)
     FlexGridSizer10->Add(FlexGridSizer19, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     StaticText14 = new wxStaticText(Panel2, ID_STATICTEXT14, _("Files will be saved with .gdg.autosave at the end of their name"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
     FlexGridSizer10->Add(StaticText14, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer4->Add(FlexGridSizer10, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer14->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND, 5);
+    StaticBoxSizer4->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer14->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer12 = new wxStaticBoxSizer(wxVERTICAL, Panel2, _("Miscellaneous"));
     logCheck = new wxCheckBox(Panel2, ID_CHECKBOX8, _("Activate a log file"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX8"));
     logCheck->SetValue(false);
-    StaticBoxSizer12->Add(logCheck, 1, wxALL|wxALIGN_LEFT, 5);
+    StaticBoxSizer12->Add(logCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
     avertOnSaveCheck = new wxCheckBox(Panel2, ID_CHECKBOX9, _("Warn when saving a project in a new directory"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX9"));
     avertOnSaveCheck->SetValue(false);
     avertOnSaveCheck->SetToolTip(_("Warn, when the project is saved in a new folder, that project resources should also be copied to the folder."));
-    StaticBoxSizer12->Add(avertOnSaveCheck, 1, wxALL|wxALIGN_LEFT, 5);
-    FlexGridSizer14->Add(StaticBoxSizer12, 1, wxALL|wxEXPAND, 5);
+    StaticBoxSizer12->Add(avertOnSaveCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    FlexGridSizer14->Add(StaticBoxSizer12, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    StaticBoxSizer21 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("External scene editor"));
+    externalSceneEditorCheck = new wxCheckBox(Panel2, ID_CHECKBOX5, _("Activate a log file"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
+    externalSceneEditorCheck->SetValue(false);
+    StaticBoxSizer21->Add(externalSceneEditorCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer14->Add(StaticBoxSizer21, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel2->SetSizer(FlexGridSizer14);
     FlexGridSizer14->Fit(Panel2);
     FlexGridSizer14->SetSizeHints(Panel2);
@@ -282,11 +289,11 @@ changesNeedRestart(false)
     FlexGridSizer24->Add(StaticText16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     newProjectFolderEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL7, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
     newProjectFolderEdit->SetToolTip(_("Path to the image editing program."));
-    FlexGridSizer24->Add(newProjectFolderEdit, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer24->Add(newProjectFolderEdit, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     newProjectFolderBrowseBt = new wxButton(Panel3, ID_BUTTON9, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON9"));
     FlexGridSizer24->Add(newProjectFolderBrowseBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer17->Add(FlexGridSizer24, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer15->Add(StaticBoxSizer17, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer15->Add(StaticBoxSizer17, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, Panel3, _("External programs"));
     FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer11->AddGrowableCol(1);
@@ -294,11 +301,11 @@ changesNeedRestart(false)
     FlexGridSizer11->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     EditeurImageEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
     EditeurImageEdit->SetToolTip(_("Path to the image editing program."));
-    FlexGridSizer11->Add(EditeurImageEdit, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer11->Add(EditeurImageEdit, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     BrowseEditionImage = new wxButton(Panel3, ID_BUTTON5, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
     FlexGridSizer11->Add(BrowseEditionImage, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer5->Add(FlexGridSizer11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer15->Add(StaticBoxSizer5, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer15->Add(StaticBoxSizer5, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer6 = new wxStaticBoxSizer(wxVERTICAL, Panel3, _("Compilation"));
     FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer13->AddGrowableCol(1);
@@ -306,24 +313,24 @@ changesNeedRestart(false)
     FlexGridSizer13->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     DossierTempCompEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
     DossierTempCompEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nWe must own write permissions on this folder.\nIf empty, the default temporary folder of the system is used."));
-    FlexGridSizer13->Add(DossierTempCompEdit, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer13->Add(DossierTempCompEdit, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     BrowseDossierTempBt = new wxButton(Panel3, ID_BUTTON4, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer13->Add(BrowseDossierTempBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer6->Add(FlexGridSizer13, 1, wxALL|wxEXPAND, 0);
+    StaticBoxSizer6->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     FlexGridSizer31 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer31->AddGrowableCol(1);
     StaticText21 = new wxStaticText(Panel3, ID_STATICTEXT21, _("Temporary folder for compilation:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT21"));
     FlexGridSizer31->Add(StaticText21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     eventsCompilerTempDirEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
     eventsCompilerTempDirEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nWe must own write permissions on this folder.\nIf empty, the default temporary folder of the system is used."));
-    FlexGridSizer31->Add(eventsCompilerTempDirEdit, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer31->Add(eventsCompilerTempDirEdit, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     browseCompilationTempDir = new wxButton(Panel3, ID_BUTTON12, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     FlexGridSizer31->Add(browseCompilationTempDir, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer6->Add(FlexGridSizer31, 1, wxALL|wxEXPAND, 0);
+    StaticBoxSizer6->Add(FlexGridSizer31, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     deleteTemporariesCheck = new wxCheckBox(Panel3, ID_CHECKBOX7, _("Delete temporaries as soon as possible"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
     deleteTemporariesCheck->SetValue(true);
-    StaticBoxSizer6->Add(deleteTemporariesCheck, 1, wxALL|wxALIGN_LEFT, 5);
-    FlexGridSizer15->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND, 5);
+    StaticBoxSizer6->Add(deleteTemporariesCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    FlexGridSizer15->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer19 = new wxStaticBoxSizer(wxHORIZONTAL, Panel3, _("Java"));
     FlexGridSizer34 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer34->AddGrowableCol(1);
@@ -331,11 +338,11 @@ changesNeedRestart(false)
     FlexGridSizer34->Add(StaticText24, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     javaDirEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL8, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
     javaDirEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nWe must own write permissions on this folder.\nIf empty, the default temporary folder of the system is used."));
-    FlexGridSizer34->Add(javaDirEdit, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer34->Add(javaDirEdit, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     browseJavaBt = new wxButton(Panel3, ID_BUTTON15, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON15"));
     FlexGridSizer34->Add(browseJavaBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer19->Add(FlexGridSizer34, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer15->Add(StaticBoxSizer19, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer15->Add(StaticBoxSizer19, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     Panel3->SetSizer(FlexGridSizer15);
     FlexGridSizer15->Fit(Panel3);
     FlexGridSizer15->SetSizeHints(Panel3);
@@ -350,8 +357,8 @@ changesNeedRestart(false)
     sceneEventsTabPosition->Append(_("Top"));
     sceneEventsTabPosition->SetSelection( sceneEventsTabPosition->Append(_("Bottom")) );
     FlexGridSizer21->Add(sceneEventsTabPosition, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer11->Add(FlexGridSizer21, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer20->Add(StaticBoxSizer11, 1, wxALL|wxEXPAND, 5);
+    StaticBoxSizer11->Add(FlexGridSizer21, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer20->Add(StaticBoxSizer11, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     Panel6->SetSizer(FlexGridSizer20);
     FlexGridSizer20->Fit(Panel6);
     FlexGridSizer20->SetSizeHints(Panel6);
@@ -373,7 +380,7 @@ changesNeedRestart(false)
     oxygenStyleBt = new wxButton(Panel4, ID_BUTTON13, _("Oxygen"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON13"));
     FlexGridSizer2->Add(oxygenStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer2->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer16->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer16->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     FlexGridSizer3 = new wxFlexGridSizer(0, 4, 0, 0);
     wxString __wxRadioBoxChoices_1[3] =
     {
@@ -382,7 +389,7 @@ changesNeedRestart(false)
     	_("Metro")
     };
     ribbonStyleBox = new wxRadioBox(Panel4, ID_RADIOBOX1, _("Ribbon\'s style"), wxDefaultPosition, wxDefaultSize, 3, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
-    FlexGridSizer3->Add(ribbonStyleBox, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer3->Add(ribbonStyleBox, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer7 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Ribbon\'s colors"));
     FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticText1 = new wxStaticText(Panel4, ID_STATICTEXT1, _("Primary :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
@@ -393,25 +400,25 @@ changesNeedRestart(false)
     FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     ribbonColor2Pnl = new wxPanel(Panel4, ID_PANEL10, wxDefaultPosition, wxSize(39,16), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL10"));
     FlexGridSizer4->Add(ribbonColor2Pnl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer7->Add(FlexGridSizer4, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer3->Add(StaticBoxSizer7, 1, wxALL|wxEXPAND, 5);
+    StaticBoxSizer7->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer3->Add(StaticBoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer10 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Ribbon labels"));
     FlexGridSizer22 = new wxFlexGridSizer(2, 1, 0, 0);
     FlexGridSizer22->AddGrowableCol(0);
     hideLabelsCheck = new wxCheckBox(Panel4, ID_CHECKBOX2, _("Hide the button\'s labels"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
     hideLabelsCheck->SetValue(false);
     FlexGridSizer22->Add(hideLabelsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
-    StaticBoxSizer10->Add(FlexGridSizer22, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer3->Add(StaticBoxSizer10, 1, wxALL|wxEXPAND, 5);
+    StaticBoxSizer10->Add(FlexGridSizer22, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer3->Add(StaticBoxSizer10, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer16 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("File button"));
     FlexGridSizer32 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText22 = new wxStaticText(Panel4, ID_STATICTEXT22, _("Color"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT22"));
     FlexGridSizer32->Add(StaticText22, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     fileBtColorPnl = new wxPanel(Panel4, ID_PANEL21, wxDefaultPosition, wxSize(39,16), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL21"));
     FlexGridSizer32->Add(fileBtColorPnl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer16->Add(FlexGridSizer32, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer3->Add(StaticBoxSizer16, 1, wxALL|wxEXPAND, 5);
-    FlexGridSizer16->Add(FlexGridSizer3, 1, wxALL|wxEXPAND, 0);
+    StaticBoxSizer16->Add(FlexGridSizer32, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer3->Add(StaticBoxSizer16, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    FlexGridSizer16->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     FlexGridSizer18 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBoxSizer3 = new wxStaticBoxSizer(wxVERTICAL, Panel4, _("Panes\' color"));
     FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -427,7 +434,7 @@ changesNeedRestart(false)
     FlexGridSizer7->Add(InactifColorPnl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     InactifColor2Pnl = new wxPanel(Panel4, ID_PANEL2, wxDefaultPosition, wxSize(39,16), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL2"));
     FlexGridSizer7->Add(InactifColor2Pnl, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer3->Add(FlexGridSizer7, 1, wxALL|wxEXPAND, 0);
+    StaticBoxSizer3->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     FlexGridSizer18->Add(StaticBoxSizer3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer8 = new wxStaticBoxSizer(wxVERTICAL, Panel4, _("Sash\'s color"));
     FlexGridSizer8 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -439,7 +446,7 @@ changesNeedRestart(false)
     FlexGridSizer8->Add(StaticText10, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     borderColorPnl = new wxPanel(Panel4, ID_PANEL13, wxDefaultPosition, wxSize(39,16), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL13"));
     FlexGridSizer8->Add(borderColorPnl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer8->Add(FlexGridSizer8, 1, wxALL|wxEXPAND, 0);
+    StaticBoxSizer8->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     FlexGridSizer18->Add(StaticBoxSizer8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer9 = new wxStaticBoxSizer(wxVERTICAL, Panel4, _("Text\'s color"));
     FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -451,9 +458,9 @@ changesNeedRestart(false)
     FlexGridSizer6->Add(StaticText12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     inactiveTextColorPnl = new wxPanel(Panel4, ID_PANEL14, wxDefaultPosition, wxSize(39,16), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL14"));
     FlexGridSizer6->Add(inactiveTextColorPnl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer9->Add(FlexGridSizer6, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer18->Add(StaticBoxSizer9, 1, wxALL|wxEXPAND, 5);
-    FlexGridSizer16->Add(FlexGridSizer18, 1, wxALL|wxEXPAND, 0);
+    StaticBoxSizer9->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer18->Add(StaticBoxSizer9, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    FlexGridSizer16->Add(FlexGridSizer18, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     FlexGridSizer38 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBoxSizer14 = new wxStaticBoxSizer(wxVERTICAL, Panel4, _("Tabs"));
     FlexGridSizer30 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -466,16 +473,16 @@ changesNeedRestart(false)
     FlexGridSizer37->Add(StaticText20, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     tabColorPnl = new wxPanel(Panel4, ID_PANEL20, wxDefaultPosition, wxSize(39,16), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL20"));
     FlexGridSizer37->Add(tabColorPnl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer30->Add(FlexGridSizer37, 1, wxALL|wxEXPAND, 0);
+    FlexGridSizer30->Add(FlexGridSizer37, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     wxString __wxRadioBoxChoices_2[2] =
     {
     	_("Normal"),
     	_("Flat")
     };
     tabBox = new wxRadioBox(Panel4, ID_RADIOBOX2, _("Style"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_2, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX2"));
-    FlexGridSizer30->Add(tabBox, 1, wxALL|wxEXPAND, 5);
-    StaticBoxSizer14->Add(FlexGridSizer30, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer38->Add(StaticBoxSizer14, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer30->Add(tabBox, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    StaticBoxSizer14->Add(FlexGridSizer30, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer38->Add(StaticBoxSizer14, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer20 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Toolbars"));
     FlexGridSizer35 = new wxFlexGridSizer(0, 2, 0, 0);
     FlexGridSizer36 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -484,17 +491,17 @@ changesNeedRestart(false)
     FlexGridSizer36->Add(customToolbarColorCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     toolbarColorPanel = new wxPanel(Panel4, ID_PANEL22, wxDefaultPosition, wxSize(39,16), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL22"));
     FlexGridSizer36->Add(toolbarColorPanel, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer35->Add(FlexGridSizer36, 1, wxALL|wxEXPAND, 0);
+    FlexGridSizer35->Add(FlexGridSizer36, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     wxString __wxRadioBoxChoices_3[2] =
     {
     	_("Normal"),
     	_("Flat")
     };
     toolbarBox = new wxRadioBox(Panel4, ID_RADIOBOX3, _("Style"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_3, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX3"));
-    FlexGridSizer35->Add(toolbarBox, 1, wxALL|wxEXPAND, 5);
-    StaticBoxSizer20->Add(FlexGridSizer35, 1, wxALL|wxEXPAND, 0);
+    FlexGridSizer35->Add(toolbarBox, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
+    StaticBoxSizer20->Add(FlexGridSizer35, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     FlexGridSizer38->Add(StaticBoxSizer20, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer16->Add(FlexGridSizer38, 1, wxALL|wxEXPAND, 0);
+    FlexGridSizer16->Add(FlexGridSizer38, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     Panel4->SetSizer(FlexGridSizer16);
     FlexGridSizer16->Fit(Panel4);
     FlexGridSizer16->SetSizeHints(Panel4);
@@ -508,7 +515,7 @@ changesNeedRestart(false)
     FlexGridSizer28->Add(conditionsColumnWidthEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText18 = new wxStaticText(Panel8, ID_STATICTEXT18, _("pixels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
     FlexGridSizer28->Add(StaticText18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer27->Add(FlexGridSizer28, 1, wxALL|wxEXPAND, 0);
+    FlexGridSizer27->Add(FlexGridSizer28, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     hideContextPanelsLabels = new wxCheckBox(Panel8, ID_CHECKBOX6, _("Hide the button\'s labels in context panels"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
     hideContextPanelsLabels->SetValue(false);
     FlexGridSizer27->Add(hideContextPanelsLabels, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -516,9 +523,9 @@ changesNeedRestart(false)
     FlexGridSizer29 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer29->AddGrowableCol(0);
     eventsEditorParametersProperties = new wxPropertyGrid(Panel8,ID_CUSTOM1,wxDefaultPosition,wxSize(532,211),0,_T("ID_CUSTOM1"));
-    FlexGridSizer29->Add(eventsEditorParametersProperties, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer29->Add(eventsEditorParametersProperties, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer15->Add(FlexGridSizer29, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer27->Add(StaticBoxSizer15, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer27->Add(StaticBoxSizer15, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     eventsEditorFontBt = new wxButton(Panel8, ID_BUTTON14, _("Choose the font used by events editors"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON14"));
     FlexGridSizer27->Add(eventsEditorFontBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel8->SetSizer(FlexGridSizer27);
@@ -538,12 +545,12 @@ changesNeedRestart(false)
     externalCodeEditorCheck = new wxRadioButton(Panel7, ID_RADIOBUTTON1, _("Use an external program :"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
     FlexGridSizer26->Add(externalCodeEditorCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     codeEditorEdit = new wxTextCtrl(Panel7, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
-    FlexGridSizer26->Add(codeEditorEdit, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer26->Add(codeEditorEdit, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     browseCodeEditorBt = new wxButton(Panel7, ID_BUTTON11, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
     FlexGridSizer26->Add(browseCodeEditorBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer25->Add(FlexGridSizer26, 1, wxALL|wxEXPAND, 0);
-    StaticBoxSizer13->Add(FlexGridSizer25, 1, wxALL|wxEXPAND, 0);
-    FlexGridSizer23->Add(StaticBoxSizer13, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer25->Add(FlexGridSizer26, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    StaticBoxSizer13->Add(FlexGridSizer25, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
+    FlexGridSizer23->Add(StaticBoxSizer13, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer18 = new wxStaticBoxSizer(wxHORIZONTAL, Panel7, _("Internal code compiler"));
     FlexGridSizer33 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText23 = new wxStaticText(Panel7, ID_STATICTEXT23, _("Maximum thread number for code compiler :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT23"));
@@ -552,7 +559,7 @@ changesNeedRestart(false)
     codeCompilerThreadEdit->SetValue(_T("1"));
     FlexGridSizer33->Add(codeCompilerThreadEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer18->Add(FlexGridSizer33, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer23->Add(StaticBoxSizer18, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer23->Add(StaticBoxSizer18, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     Panel7->SetSizer(FlexGridSizer23);
     FlexGridSizer23->Fit(Panel7);
     FlexGridSizer23->SetSizeHints(Panel7);
@@ -563,9 +570,9 @@ changesNeedRestart(false)
     Listbook1->AddPage(Panel4, _("Appearance"), false);
     Listbook1->AddPage(Panel8, _("Events editor"), false);
     Listbook1->AddPage(Panel7, _("C++ Compilation"), false);
-    FlexGridSizer1->Add(Listbook1, 1, wxALL|wxEXPAND, 5);
+    FlexGridSizer1->Add(Listbook1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-    FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND, 0);
+    FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
     OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
@@ -574,7 +581,7 @@ changesNeedRestart(false)
     FlexGridSizer5->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     AideBt = new wxButton(this, ID_BUTTON3, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     FlexGridSizer5->Add(AideBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND, 0);
+    FlexGridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
     SetSizer(FlexGridSizer1);
     	wxFontData fontData_1;
     	fontData_1.EnableEffects(false);
@@ -586,6 +593,7 @@ changesNeedRestart(false)
 
     Connect(ID_CHECKBOX4,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnMAJCheckClick);
     Connect(ID_CHECKBOX8,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnlogCheckClick);
+    Connect(ID_CHECKBOX5,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnexternalSceneEditorCheckClick);
     Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&Preferences::OnlangChoiceSelect);
     Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnnewProjectFolderBrowseBtClick);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseEditionImageClick);
@@ -890,6 +898,11 @@ changesNeedRestart(false)
         pConfig->Read("/Save/AvertOnSaveAs", &avertOnSave, true);
         if ( avertOnSave ) avertOnSaveCheck->SetValue(true);
     }
+    {
+        bool useExternalEditor;
+        pConfig->Read("/SceneEditor/ExternalSceneEditor", &useExternalEditor, false);
+        if ( useExternalEditor ) externalSceneEditorCheck->SetValue(true);
+    }
 
 	conditionsColumnWidthEdit->SetValue(gd::String::From(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
 	hideContextPanelsLabels->SetValue(pConfig->ReadBool("EventsEditor/HideContextPanelsLabels", false));
@@ -1051,6 +1064,8 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write("/Startup/SendInfo", sendInfoCheck->GetValue());
 
     pConfig->Write("/Save/AvertOnSaveAs", avertOnSaveCheck->GetValue());
+
+    pConfig->Write("/SceneEditor/ExternalSceneEditor", externalSceneEditorCheck->GetValue());
 
     gd::InstructionSentenceFormatter * eventsEditorConfig = gd::InstructionSentenceFormatter::Get();
     for (std::map<gd::String, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
@@ -1729,4 +1744,8 @@ void Preferences::OntoolbarColorPanelLeftUp(wxMouseEvent& event)
         toolbarColorPanel->SetBackgroundColour( cData.GetColour() );
         toolbarColorPanel->Refresh();
     }
+}
+
+void Preferences::OnexternalSceneEditorCheckClick(wxCommandEvent& event)
+{
 }

@@ -44,6 +44,9 @@ const long EditorScene::ID_SCROLLBAR3 = wxNewId();
 const long EditorScene::ID_SCROLLBAR4 = wxNewId();
 const long EditorScene::ID_CUSTOM3 = wxNewId();
 const long EditorScene::ID_PANEL1 = wxNewId();
+const long EditorScene::ID_STATICTEXT1 = wxNewId();
+const long EditorScene::ID_BUTTON1 = wxNewId();
+const long EditorScene::ID_PANEL2 = wxNewId();
 const long EditorScene::ID_CUSTOM2 = wxNewId();
 const long EditorScene::ID_PANEL6 = wxNewId();
 const long EditorScene::ID_AUINOTEBOOK1 = wxNewId();
@@ -61,6 +64,8 @@ mainFrameWrapper(mainFrameWrapper_)
 {
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;
+	wxFlexGridSizer* FlexGridSizer2;
+	wxFlexGridSizer* externalSceneEditorSizer;
 	wxFlexGridSizer* FlexGridSizer1;
 
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, _T("wxID_ANY"));
@@ -77,6 +82,19 @@ mainFrameWrapper(mainFrameWrapper_)
 	hScrollbar = new wxScrollBar(scenePanel, ID_SCROLLBAR4, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR4"));
 	hScrollbar->SetScrollbar(2500, 10, 5000, 10);
 	layoutEditorCanvas = new gd::LayoutEditorCanvas(scenePanel, project, layout, layout.GetInitialInstances(), layout.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);
+	externalSceneEditorPanel = new wxPanel(notebook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
+	externalSceneEditorSizer = new wxFlexGridSizer(0, 3, 0, 0);
+	externalSceneEditorSizer->AddGrowableCol(0);
+	externalSceneEditorSizer->AddGrowableRow(0);
+	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
+	externalSceneEditorExplanationTxt = new wxStaticText(externalSceneEditorPanel, ID_STATICTEXT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer2->Add(externalSceneEditorExplanationTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	openSceneEditorBt = new wxButton(externalSceneEditorPanel, ID_BUTTON1, _("Open the scene editor"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	FlexGridSizer2->Add(openSceneEditorBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	externalSceneEditorSizer->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	externalSceneEditorPanel->SetSizer(externalSceneEditorSizer);
+	externalSceneEditorSizer->Fit(externalSceneEditorPanel);
+	externalSceneEditorSizer->SetSizeHints(externalSceneEditorPanel);
 	eventsPanel = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
 	eventsPanel->SetHelpText(_("Edit the events of the scene"));
@@ -89,6 +107,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer3->Fit(eventsPanel);
 	FlexGridSizer3->SetSizeHints(eventsPanel);
 	notebook->AddPage(scenePanel, _("Scene"), false, gd::SkinHelper::GetIcon("scene", 16));
+	notebook->AddPage(externalSceneEditorPanel, _("Scene"), false, gd::SkinHelper::GetIcon("scene", 16));
 	notebook->AddPage(eventsPanel, _("Events"), false, gd::SkinHelper::GetIcon("events", 16));
 	FlexGridSizer1->Add(notebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -103,6 +122,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	Connect(ID_SCROLLBAR4,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnhScrollbarScroll);
 	layoutEditorCanvas->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorScene::OnsceneCanvasSetFocus,0,this);
 	scenePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnscenePanelResize,0,this);
+	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorScene::OnopenSceneEditorBtClick);
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanged);
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanging);
 	//*)
@@ -165,44 +185,58 @@ mainFrameWrapper(mainFrameWrapper_)
 
     m_mgr.Update();
 
-    //TODO: Temporary test
-    externalLayoutEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
-    externalLayoutEditor->OnSendUpdate([this](gd::String scope) {
+	//Only show the selected editor
+    bool useExternalEditor = false;
+	wxConfigBase::Get()->Read("/SceneEditor/ExternalSceneEditor", &useExternalEditor, false);
+	if (useExternalEditor)
+	{
+		notebook->RemovePage(0);
+		CreateExternalLayoutEditor();
+	}
+	else
+	{
+		notebook->RemovePage(1);
+	}
+}
+
+void EditorScene::CreateExternalLayoutEditor()
+{
+	externalLayoutEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
+	externalLayoutEditor->OnSendUpdate([this](gd::String scope) {
 		if (scope == "instances") {
-	        gd::SerializerElement serializedInstances;
-	        this->layout.GetInitialInstances().SerializeTo(serializedInstances);
+			gd::SerializerElement serializedInstances;
+			this->layout.GetInitialInstances().SerializeTo(serializedInstances);
 			return serializedInstances;
 		}
 
-        gd::SerializerElement serializedProject;
+		gd::SerializerElement serializedProject;
 		gd::Project strippedProject = project;
 		gd::ProjectStripper::StripProjectForLayoutEdition(strippedProject, this->layout.GetName());
-        strippedProject.SerializeTo(serializedProject);
+		strippedProject.SerializeTo(serializedProject);
 
-        return serializedProject;
-    });
-    externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object, gd::String scope) {
+		return serializedProject;
+	});
+	externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object, gd::String scope) {
 		if (scope == "instances") {
 			std::cout << "Updating instances from the external editor." << std::endl;
-	        this->layout.GetInitialInstances().UnserializeFrom(object);
+			this->layout.GetInitialInstances().UnserializeFrom(object);
 			return;
 		}
 
 		std::cout << "Updating anything else from instances from the external editor is not supported" << std::endl;
-    });
+	});
 	externalLayoutEditor->OnLaunchPreview([this](){
 		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
 	});
-    externalLayoutEditor->Launch("scene-editor", layout.GetName());
+	externalLayoutEditor->Launch("scene-editor", layout.GetName());
 }
 
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)
 {
-    layoutEditorCanvas->UpdateSize();
+    if (layoutEditorCanvas) layoutEditorCanvas->UpdateSize();
     hScrollbar->SetSize(0, scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight(), scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), hScrollbar->GetSize().GetHeight());
     vScrollbar->SetSize(scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), 0, vScrollbar->GetSize().GetWidth(), scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight());
 
-	//TODO: Temporary test
 	if (externalLayoutEditor)
 	{
 		auto rect = scenePanel->GetScreenRect();
@@ -223,15 +257,19 @@ void EditorScene::ForceRefreshRibbonAndConnect()
 {
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scene") )
     {
-        layoutEditorCanvas->RecreateRibbonToolbar();
-        layoutEditorCanvas->EnableIdleEvents();
+        if (layoutEditorCanvas)
+		{
+			layoutEditorCanvas->RecreateRibbonToolbar();
+        	layoutEditorCanvas->EnableIdleEvents();
+			layoutEditorCanvas->ConnectEvents();
+		}
+
         mainFrameWrapper.SetRibbonPage(_("Scene"));
-        layoutEditorCanvas->ConnectEvents();
     }
     else if ( notebook->GetPageText(notebook->GetSelection()) == _("Events") )
     {
         mainFrameWrapper.SetRibbonPage(_("Events"));
-        layoutEditorCanvas->EnableIdleEvents(false);
+        if (layoutEditorCanvas) layoutEditorCanvas->EnableIdleEvents(false);
         eventsEditor->ConnectEvents();
     }
 }
@@ -251,28 +289,42 @@ bool EditorScene::CanBeClosed()
  */
 void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 {
-		externalLayoutEditor->Show();
     ForceRefreshRibbonAndConnect();
 }
 
 void EditorScene::OnnotebookPageChanging(wxAuiNotebookEvent& event)
 {
-    if ( !layoutEditorCanvas->IsEditing() && !layoutEditorCanvas->PreviewPaused() )
+    if (layoutEditorCanvas &&
+		!layoutEditorCanvas->IsEditing() &&
+		!layoutEditorCanvas->PreviewPaused())
+	{
         layoutEditorCanvas->PausePreview();
+	}
 }
 
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
     mainFrameWrapper.SetRibbonPage(_("Scene"));
-    layoutEditorCanvas->ConnectEvents();
+    if (layoutEditorCanvas) layoutEditorCanvas->ConnectEvents();
 }
 
 void EditorScene::OnvScrollbarScroll(wxScrollEvent& event)
 {
-    layoutEditorCanvas->OnvScrollbarScroll(event);
+    if (layoutEditorCanvas) layoutEditorCanvas->OnvScrollbarScroll(event);
 }
 
 void EditorScene::OnhScrollbarScroll(wxScrollEvent& event)
 {
-    layoutEditorCanvas->OnhScrollbarScroll(event);
+    if (layoutEditorCanvas) layoutEditorCanvas->OnhScrollbarScroll(event);
+}
+
+void EditorScene::OnopenSceneEditorBtClick(wxCommandEvent& event)
+{
+	if (externalLayoutEditor)
+	{
+		if (externalLayoutEditor->IsLaunchedAndConnected())
+			externalLayoutEditor->Show();
+		else
+			externalLayoutEditor->Launch("scene-editor", layout.GetName());
+	}
 }

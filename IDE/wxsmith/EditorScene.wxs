@@ -53,6 +53,42 @@
 						<icon code='gd::SkinHelper::GetIcon(&quot;scene&quot;, 16)' />
 					</object>
 					<object class="AuiNotebookPage">
+						<object class="wxPanel" name="ID_PANEL2" variable="externalSceneEditorPanel" member="yes">
+							<object class="wxFlexGridSizer" variable="externalSceneEditorSizer" member="no">
+								<cols>3</cols>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+										<cols>2</cols>
+										<object class="sizeritem">
+											<object class="wxStaticText" name="ID_STATICTEXT1" variable="externalSceneEditorExplanationTxt" member="yes">
+												<label></label>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON1" variable="openSceneEditorBt" member="yes">
+												<label>Open the scene editor</label>
+												<handler function="OnopenSceneEditorBtClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>Scene</label>
+						<icon code='gd::SkinHelper::GetIcon(&quot;scene&quot;, 16)' />
+					</object>
+					<object class="AuiNotebookPage">
 						<object class="wxPanel" name="ID_PANEL6" variable="eventsPanel" member="yes">
 							<bg>#FFFFFF</bg>
 							<help>Edit the events of the scene</help>

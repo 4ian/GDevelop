@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import Checkbox from 'material-ui/Checkbox';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from 'material-ui/Table';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 import ArrowDownward from 'material-ui/svg-icons/navigation/arrow-downward';
@@ -15,7 +22,7 @@ const styles = {
   moveColumn: {
     width: 96,
   },
-}
+};
 
 export default class InstancesList extends Component {
   shouldComponentUpdate() {
@@ -42,49 +49,50 @@ export default class InstancesList extends Component {
   render() {
     const { layersContainer } = this.props;
 
-    const containerLayersList = mapFor(0, layersContainer.getLayersCount(), (i) => {
-      const layer = layersContainer.getLayerAt(i);
-      const layerName = layer.getName() || 'Base layer';
+    const containerLayersList = mapFor(
+      0,
+      layersContainer.getLayersCount(),
+      i => {
+        const layer = layersContainer.getLayerAt(i);
+        const layerName = layer.getName() || 'Base layer';
 
-      return (
-        <TableRow key={layerName}>
-          <TableRowColumn>{layerName}</TableRowColumn>
-          <TableRowColumn style={styles.visibleColumn}>
-            {this._renderVisibilityToogle(layer)}
-          </TableRowColumn>
-          <TableRowColumn style={styles.moveColumn}>
-            <IconButton
-              disabled={i === 0}
-              onTouchTap={() => {
-                layersContainer.swapLayers(i, i-1);
-                this.forceUpdate(); //TODO: Should this be done by the parent component?
-              }}
-            >
-              <ArrowUpward />
-            </IconButton>
-            <IconButton
-              disabled={i === layersContainer.getLayersCount() - 1}
-              onTouchTap={() => {
-                layersContainer.swapLayers(i, i+1);
-                this.forceUpdate(); //TODO: Should this be done by the parent component?
-              }}
-            >
-              <ArrowDownward />
-            </IconButton>
-          </TableRowColumn>
-        </TableRow>
-      );
-    });
+        return (
+          <TableRow key={layerName}>
+            <TableRowColumn>{layerName}</TableRowColumn>
+            <TableRowColumn style={styles.visibleColumn}>
+              {this._renderVisibilityToogle(layer)}
+            </TableRowColumn>
+            <TableRowColumn style={styles.moveColumn}>
+              <IconButton
+                disabled={i === 0}
+                onTouchTap={() => {
+                  layersContainer.swapLayers(i, i - 1);
+                  this.forceUpdate(); //TODO: Should this be done by the parent component?
+                }}
+              >
+                <ArrowUpward />
+              </IconButton>
+              <IconButton
+                disabled={i === layersContainer.getLayersCount() - 1}
+                onTouchTap={() => {
+                  layersContainer.swapLayers(i, i + 1);
+                  this.forceUpdate(); //TODO: Should this be done by the parent component?
+                }}
+              >
+                <ArrowDownward />
+              </IconButton>
+            </TableRowColumn>
+          </TableRow>
+        );
+      }
+    );
 
     return (
       <Table
         selectable={true}
-        onRowSelection={(selection) => this.onRowSelection(selection)}
+        onRowSelection={selection => this.onRowSelection(selection)}
       >
-        <TableHeader
-          displaySelectAll={false}
-          adjustForCheckbox={false}
-        >
+        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
           <TableRow>
             <TableHeaderColumn>Layer name</TableHeaderColumn>
             <TableHeaderColumn style={styles.visibleColumn}>
@@ -98,7 +106,7 @@ export default class InstancesList extends Component {
           deselectOnClickaway={true}
           showRowHover={true}
         >
-          { containerLayersList }
+          {containerLayersList}
         </TableBody>
       </Table>
     );

@@ -20,6 +20,7 @@
     "material-ui": "^0.16.0",
     "pixi-simple-gesture": "^0.2.2",
     "pixi.js": "^3.0.8",
+    "prettier": "^0.22.0",
     "react": "^15.3.2",
     "react-addons-css-transition-group": "^15.3.2",
     "react-dom": "^15.3.2",
@@ -32,6 +33,7 @@
     "import-resources": "cd ../scripts && ./import-libGD.js.sh && ./import-res-folder.sh",
     "start": "npm run import-resources && react-scripts start",
     "build": "react-scripts build",
+    "format": "prettier --single-quote --trailing-comma es5 --write \"src/**/*.js\"",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },

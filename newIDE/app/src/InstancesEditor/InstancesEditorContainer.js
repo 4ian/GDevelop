@@ -17,7 +17,8 @@ import PIXI from 'pixi.js';
  * @note No "#" or "0x" are added.
  * @static
  */
-const rgbToHex = (r, g, b) => "" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+const rgbToHex = (r, g, b) =>
+  '' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 
 export default class InstancesEditorContainer extends Component {
   constructor() {
@@ -27,15 +28,18 @@ export default class InstancesEditorContainer extends Component {
 
   componentDidMount() {
     this.zOrderFinder = new gd.HighestZOrderFinder();
-    this.pixiRenderer = PIXI.autoDetectRenderer(this.props.width, this.props.height);
+    this.pixiRenderer = PIXI.autoDetectRenderer(
+      this.props.width,
+      this.props.height
+    );
     this.refs.canvasArea.appendChild(this.pixiRenderer.view);
-    this.pixiRenderer.view.addEventListener('contextmenu', (e) => {
+    this.pixiRenderer.view.addEventListener('contextmenu', e => {
       e.preventDefault();
     });
-    this.pixiRenderer.view.addEventListener('click', (e) => {
+    this.pixiRenderer.view.addEventListener('click', e => {
       this._onClick(e.offsetX, e.offsetY);
     });
-    this.pixiRenderer.view.onmousewheel = (event) => {
+    this.pixiRenderer.view.onmousewheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
         this.viewPosition.zoomBy(event.wheelDelta / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
@@ -45,21 +49,27 @@ export default class InstancesEditorContainer extends Component {
       }
       event.preventDefault();
     };
-    this.pixiRenderer.view.setAttribute("tabIndex", 1);
+    this.pixiRenderer.view.setAttribute('tabIndex', 1);
 
     this.pixiContainer = new PIXI.Container();
 
     this.backgroundArea = new PIXI.Container();
-    this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, this.props.width, this.props.height);
+    this.backgroundArea.hitArea = new PIXI.Rectangle(
+      0,
+      0,
+      this.props.width,
+      this.props.height
+    );
     gesture.panable(this.backgroundArea);
     this.backgroundArea.on('mousedown', this._onBackgroundClicked);
-    this.backgroundArea.on('panmove', (event) => this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y));
-    this.backgroundArea.on('panend', (event) => this._onEndSelectionRectangle());
+    this.backgroundArea.on('panmove', event =>
+      this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y));
+    this.backgroundArea.on('panend', event => this._onEndSelectionRectangle());
     this.pixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
       width: this.props.width,
-      height: this.props.height
+      height: this.props.height,
     });
     this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
 
@@ -98,7 +108,9 @@ export default class InstancesEditorContainer extends Component {
       this.pixiContainer.removeChild(this.selectedInstances.getPixiContainer());
     }
     if (this.instancesRenderer) {
-      this.viewPosition.getPixiContainer().removeChild(this.instancesRenderer.getPixiContainer());
+      this.viewPosition
+        .getPixiContainer()
+        .removeChild(this.instancesRenderer.getPixiContainer());
       this.instancesRenderer.delete();
     }
     if (this.selectionRectangle) {
@@ -143,7 +155,9 @@ export default class InstancesEditorContainer extends Component {
     });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
-    this.viewPosition.getPixiContainer().addChild(this.instancesRenderer.getPixiContainer());
+    this.viewPosition
+      .getPixiContainer()
+      .addChild(this.instancesRenderer.getPixiContainer());
     this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
   }
@@ -157,10 +171,18 @@ export default class InstancesEditorContainer extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.width !== this.props.width || nextProps.height !== this.props.height) {
+    if (
+      nextProps.width !== this.props.width ||
+      nextProps.height !== this.props.height
+    ) {
       this.pixiRenderer.resize(nextProps.width, nextProps.height);
       this.viewPosition.resize(nextProps.width, nextProps.height);
-      this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, nextProps.width, nextProps.height);
+      this.backgroundArea.hitArea = new PIXI.Rectangle(
+        0,
+        0,
+        nextProps.width,
+        nextProps.height
+      );
     }
 
     if (nextProps.options !== this.props.options) {
@@ -169,9 +191,11 @@ export default class InstancesEditorContainer extends Component {
       this.instancesResizer.setOptions(nextProps.options);
     }
 
-    if (this.props.layout !== nextProps.layout ||
+    if (
+      this.props.layout !== nextProps.layout ||
       this.props.initialInstances !== nextProps.initialInstances ||
-      this.props.project !== nextProps.project) {
+      this.props.project !== nextProps.project
+    ) {
       this._mountEditorComponents(nextProps);
     }
   }
@@ -181,46 +205,52 @@ export default class InstancesEditorContainer extends Component {
       this.props.instancesSelection.clearSelection();
       this.props.onInstancesSelected([]);
     }
-  }
+  };
 
   _onMakeSelectionRectangle = (x, y) => {
     this.selectionRectangle.makeSelectionRectangle(x, y);
-  }
+  };
 
   _onEndSelectionRectangle = () => {
     const instancesSelected = this.selectionRectangle.endSelectionRectangle();
-    instancesSelected.forEach(instance => this.props.instancesSelection.selectInstance(instance));
+    instancesSelected.forEach(instance =>
+      this.props.instancesSelection.selectInstance(instance));
     this.props.onInstancesSelected(instancesSelected);
-  }
+  };
 
-  _onInstanceClicked = (instance) => {
+  _onInstanceClicked = instance => {
     if (!this.keyboardShortcuts.shouldMultiSelect())
       this.props.instancesSelection.clearSelection();
-    this.props.instancesSelection.selectInstance(instance, !this.keyboardShortcuts.shouldMultiSelect());
+    this.props.instancesSelection.selectInstance(
+      instance,
+      !this.keyboardShortcuts.shouldMultiSelect()
+    );
 
     if (this.props.onInstancesSelected) {
-      this.props.onInstancesSelected(this.props.instancesSelection.getSelectedInstances());
+      this.props.onInstancesSelected(
+        this.props.instancesSelection.getSelectedInstances()
+      );
     }
-  }
+  };
 
-  _onOverInstance = (instance) => {
+  _onOverInstance = instance => {
     this.highlightedInstance.setInstance(instance);
-  }
+  };
 
-  _onDownInstance = (instance) => {
+  _onDownInstance = instance => {
     if (this.keyboardShortcuts.shouldCloneInstances()) {
       const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-      for (var i = 0;i < selectedInstances.length;i++) {
+      for (var i = 0; i < selectedInstances.length; i++) {
         const instance = selectedInstances[i];
         this.props.initialInstances.insertInitialInstance(instance);
       }
     }
-  }
+  };
 
-  _onOutInstance = (instance) => {
+  _onOutInstance = instance => {
     if (instance === this.highlightedInstance.getInstance())
       this.highlightedInstance.setInstance(null);
-  }
+  };
 
   _onMoveInstance = (instance, deltaX, deltaY) => {
     const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
@@ -231,15 +261,15 @@ export default class InstancesEditorContainer extends Component {
     }
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-    this.instancesMover.moveBy(selectedInstances, sceneDeltaX, sceneDeltaY)
-  }
+    this.instancesMover.moveBy(selectedInstances, sceneDeltaX, sceneDeltaY);
+  };
 
   _onMoveInstanceEnd = () => {
     this.instancesMover.endMove();
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesMoved(selectedInstances);
-  }
+  };
 
   _onPanMoveView = (deltaX, deltaY) => {
     const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
@@ -247,7 +277,7 @@ export default class InstancesEditorContainer extends Component {
 
     if (this.highlightedInstance.getInstance() === null)
       this.viewPosition.scrollBy(-sceneDeltaX, -sceneDeltaY);
-  }
+  };
 
   _onResize = (deltaX, deltaY) => {
     const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
@@ -255,11 +285,11 @@ export default class InstancesEditorContainer extends Component {
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.instancesResizer.resizeBy(selectedInstances, sceneDeltaX, sceneDeltaY);
-  }
+  };
 
   _onResizeEnd = () => {
     this.instancesResizer.endResize();
-  }
+  };
 
   _onClick = (x, y) => {
     if (!this.props.selectedObjectName) return;
@@ -275,17 +305,18 @@ export default class InstancesEditorContainer extends Component {
     instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
 
     if (this.props.onNewInstanceAdded) this.props.onNewInstanceAdded(instance);
-  }
+  };
 
-  deleteSelection = () => { //TODO: move?
+  deleteSelection = () => {
+    //TODO: move?
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-    for (let i = 0;i< selectedInstances.length;i++)
+    for (let i = 0; i < selectedInstances.length; i++)
       this.props.initialInstances.removeInstance(selectedInstances[i]);
 
     this.props.instancesSelection.clearSelection();
     this.highlightedInstance.setInstance(null);
     this.props.onInstancesSelected([]);
-  }
+  };
 
   moveSelection = (x, y) => {
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
@@ -294,7 +325,7 @@ export default class InstancesEditorContainer extends Component {
       instance.setY(instance.getY() + y);
     });
     this.props.onInstancesMoved(selectedInstances);
-  }
+  };
 
   centerViewOn(instances) {
     if (!instances.length) return;
@@ -302,16 +333,23 @@ export default class InstancesEditorContainer extends Component {
     this.viewPosition.scrollTo(instances[instances.length - 1]);
   }
 
-  setZoomFactor = (zoomFactor) => {
+  setZoomFactor = zoomFactor => {
     this.viewPosition.setZoomFactor(zoomFactor);
-  }
+  };
 
   renderScene = () => {
     const { layout } = this.props;
-    this.pixiRenderer.backgroundColor = parseInt(parseInt(rgbToHex(
-        layout.getBackgroundColorRed(),
-        layout.getBackgroundColorGreen(),
-        layout.getBackgroundColorBlue()), 16), 10);
+    this.pixiRenderer.backgroundColor = parseInt(
+      parseInt(
+        rgbToHex(
+          layout.getBackgroundColorRed(),
+          layout.getBackgroundColorGreen(),
+          layout.getBackgroundColorBlue()
+        ),
+        16
+      ),
+      10
+    );
 
     this.viewPosition.render();
     this.grid.render();
@@ -321,13 +359,16 @@ export default class InstancesEditorContainer extends Component {
     this.selectionRectangle.render();
     this.pixiRenderer.render(this.pixiContainer);
     this.nextFrame = requestAnimationFrame(this.renderScene);
-  }
+  };
 
   render() {
     if (!this.props.project) return null;
 
     return (
-      <div ref="canvasArea" style={{flex: 1, position: 'absolute', overflow: 'hidden'}} />
-    )
+      <div
+        ref="canvasArea"
+        style={{ flex: 1, position: 'absolute', overflow: 'hidden' }}
+      />
+    );
   }
 }

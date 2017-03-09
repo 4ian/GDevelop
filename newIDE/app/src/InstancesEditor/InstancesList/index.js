@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from 'material-ui/Table';
 const gd = global.gd;
 
 const styles = {
@@ -7,7 +14,7 @@ const styles = {
     paddingLeft: 8,
     paddingRight: 8,
   },
-}
+};
 
 export default class InstancesList extends Component {
   shouldComponentUpdate() {
@@ -22,7 +29,7 @@ export default class InstancesList extends Component {
 
     // Functor used to display an instance row
     this.instanceRowRenderer = new gd.InitialInstanceJSFunctor();
-    this.instanceRowRenderer.invoke = (instancePtr) => {
+    this.instanceRowRenderer.invoke = instancePtr => {
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
 
       this.renderedRows.push({
@@ -32,12 +39,24 @@ export default class InstancesList extends Component {
             key={instancePtr}
             selected={this.props.selectedInstances.indexOf(instance) !== -1}
           >
-            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getObjectName()}</TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getX().toFixed(2)}</TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getY().toFixed(2)}</TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getAngle()}</TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getLayer()}</TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>{instance.getZOrder()}</TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>
+              {instance.getObjectName()}
+            </TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>
+              {instance.getX().toFixed(2)}
+            </TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>
+              {instance.getY().toFixed(2)}
+            </TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>
+              {instance.getAngle()}
+            </TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>
+              {instance.getLayer()}
+            </TableRowColumn>
+            <TableRowColumn style={styles.smallMarginsColumn}>
+              {instance.getZOrder()}
+            </TableRowColumn>
           </TableRow>
         ),
       });
@@ -49,7 +68,9 @@ export default class InstancesList extends Component {
   }
 
   onRowSelection(selection) {
-    this.props.onSelectInstances(selection.map(i => this.renderedRows[i].instance));
+    this.props.onSelectInstances(
+      selection.map(i => this.renderedRows[i].instance)
+    );
   }
 
   render() {
@@ -62,19 +83,28 @@ export default class InstancesList extends Component {
       <Table
         selectable={true}
         multiSelectable={true}
-        onRowSelection={(selection) => this.onRowSelection(selection)}
+        onRowSelection={selection => this.onRowSelection(selection)}
       >
-        <TableHeader
-          displaySelectAll={false}
-          adjustForCheckbox={false}
-        >
+        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
           <TableRow>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>Object name</TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>X</TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>Y</TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>Angle</TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>Layer</TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>Z Order</TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>
+              Object name
+            </TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>
+              X
+            </TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>
+              Y
+            </TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>
+              Angle
+            </TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>
+              Layer
+            </TableHeaderColumn>
+            <TableHeaderColumn style={styles.smallMarginsColumn}>
+              Z Order
+            </TableHeaderColumn>
           </TableRow>
         </TableHeader>
         <TableBody
@@ -82,7 +112,7 @@ export default class InstancesList extends Component {
           deselectOnClickaway={false}
           showRowHover={true}
         >
-          { this.renderedRows.map(row => row.element) }
+          {this.renderedRows.map(row => row.element)}
         </TableBody>
       </Table>
     );

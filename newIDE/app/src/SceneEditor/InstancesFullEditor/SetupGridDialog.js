@@ -16,7 +16,7 @@ export default class SetupGridDialog extends Component {
       gridOffsetX: this.state.gridOffsetX,
       gridOffsetY: this.state.gridOffsetY,
     });
-  }
+  };
 
   render() {
     const actions = [
@@ -45,27 +45,31 @@ export default class SetupGridDialog extends Component {
           floatingLabelText="Cell width (in pixels)"
           type="number"
           value={this.state.gridWidth}
-          onChange={(e, value) => this.setState({gridWidth: parseInt(value, 10)})}
+          onChange={(e, value) =>
+            this.setState({ gridWidth: parseInt(value, 10) })}
         />
         <TextField
           floatingLabelText="Cell height (in pixels)"
           type="number"
           value={this.state.gridHeight}
-          onChange={(e, value) => this.setState({gridHeight: parseInt(value, 10)})}
+          onChange={(e, value) =>
+            this.setState({ gridHeight: parseInt(value, 10) })}
         />
         <TextField
           floatingLabelText="X offset (in pixels)"
           type="number"
           value={this.state.gridOffsetX}
-          onChange={(e, value) => this.setState({gridOffsetX: parseInt(value, 10)})}
+          onChange={(e, value) =>
+            this.setState({ gridOffsetX: parseInt(value, 10) })}
         />
         <TextField
           floatingLabelText="Y offset (in pixels)"
           type="number"
           value={this.state.gridOffsetY}
-          onChange={(e, value) => this.setState({gridOffsetY: parseInt(value, 10)})}
+          onChange={(e, value) =>
+            this.setState({ gridOffsetY: parseInt(value, 10) })}
         />
       </Dialog>
-    )
+    );
   }
 }

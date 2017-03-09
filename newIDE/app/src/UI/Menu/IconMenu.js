@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
@@ -9,17 +9,19 @@ const electron = optionalRequire('electron');
 
 class MaterialUIMenuImplementation {
   buildFromTemplate(template) {
-    return template.map((item) => {
+    return template.map(item => {
       if (item.type === 'separator') {
         return <Divider />;
       }
 
-      return (<MenuItem
-        key={item.label}
-        primaryText={item.label}
-        onTouchTap={() => item.click()}
-      />);
-    })
+      return (
+        <MenuItem
+          key={item.label}
+          primaryText={item.label}
+          onTouchTap={() => item.click()}
+        />
+      );
+    });
   }
 
   showMenu() {
@@ -32,7 +34,7 @@ class MaterialUIMenuImplementation {
         vertical: 'bottom',
         horizontal: 'left',
       },
-    }
+    };
   }
 }
 
@@ -48,18 +50,17 @@ class ElectronMenuImplementation {
 
   showMenu(dimensions) {
     if (!electron) return;
-    console.log(dimensions)
+    console.log(dimensions);
     if (this.menu) {
-      setTimeout(
-        () => this.menu.popup(dimensions.left, dimensions.top + dimensions.height)
-      );
+      setTimeout(() =>
+        this.menu.popup(dimensions.left, dimensions.top + dimensions.height));
     }
   }
 
   getMenuProps() {
     return {
       open: false,
-    }
+    };
   }
 }
 
@@ -69,21 +70,25 @@ export default class GDIconMenu extends Component {
     this.state = {
       children: undefined,
     };
-    this.menuImplementation = electron ?
-      new ElectronMenuImplementation() :
-      new MaterialUIMenuImplementation() ;
+    this.menuImplementation = electron
+      ? new ElectronMenuImplementation()
+      : new MaterialUIMenuImplementation();
   }
 
   componentWillMount() {
     this.setState({
-      children: this.menuImplementation.buildFromTemplate(this.props.menuTemplate),
+      children: this.menuImplementation.buildFromTemplate(
+        this.props.menuTemplate
+      ),
     });
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.menuTemplate !== nextProps.menuTemplate) {
       this.setState({
-        children: this.menuImplementation.buildFromTemplate(nextProps.menuTemplate),
+        children: this.menuImplementation.buildFromTemplate(
+          nextProps.menuTemplate
+        ),
       });
     }
   }
@@ -95,7 +100,7 @@ export default class GDIconMenu extends Component {
   render() {
     return (
       <Measure>
-        { dimensions =>
+        {dimensions => (
           <IconMenu
             {...this.props}
             onTouchTap={this._onTouchTap.bind(this, dimensions)}
@@ -103,8 +108,8 @@ export default class GDIconMenu extends Component {
           >
             {this.state.children}
           </IconMenu>
-        }
+        )}
       </Measure>
-    )
+    );
   }
 }

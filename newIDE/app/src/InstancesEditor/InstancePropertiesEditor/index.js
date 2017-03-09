@@ -59,7 +59,8 @@ export default class InstancePropertiesEditor extends Component {
             name: 'Enabled?',
             valueType: 'boolean',
             getValue: instance => instance.hasCustomSize(),
-            setValue: (instance, newValue) => instance.setHasCustomSize(newValue),
+            setValue: (instance, newValue) =>
+              instance.setHasCustomSize(newValue),
           },
           {
             name: 'Width',
@@ -71,19 +72,19 @@ export default class InstancePropertiesEditor extends Component {
             name: 'Height',
             valueType: 'number',
             getValue: instance => instance.getCustomHeight(),
-            setValue: (instance, newValue) => instance.setCustomHeight(newValue),
+            setValue: (instance, newValue) =>
+              instance.setCustomHeight(newValue),
           },
         ],
       },
-    ]
+    ];
   }
 
   _getFieldValue(instances, field, defaultValue) {
     let value = field.getValue(instances[0]);
-    for(var i = 1;i < instances.length;++i) {
+    for (var i = 1; i < instances.length; ++i) {
       if (value !== field.getValue(instances[i])) {
-        if (typeof defaultValue !== 'undefined')
-          value = defaultValue;
+        if (typeof defaultValue !== 'undefined') value = defaultValue;
         break;
       }
     }
@@ -91,47 +92,59 @@ export default class InstancePropertiesEditor extends Component {
     return value;
   }
 
-  _renderEditField = (field) => {
+  _renderEditField = field => {
     if (field.valueType === 'boolean') {
-      return (<Checkbox
-        label={field.name}
-        key={field.name}
-        checked={this._getFieldValue(this.props.instances, field)}
-        onCheck={(event, newValue) => {
-          this.props.instances.forEach(i => field.setValue(i, !!newValue));
-          this.props.onInstancesModified(this.props.instances);
-        }}
-        disabled={field.disabled}
-      />);
+      return (
+        <Checkbox
+          label={field.name}
+          key={field.name}
+          checked={this._getFieldValue(this.props.instances, field)}
+          onCheck={(event, newValue) => {
+            this.props.instances.forEach(i => field.setValue(i, !!newValue));
+            this.props.onInstancesModified(this.props.instances);
+          }}
+          disabled={field.disabled}
+        />
+      );
     } else if (field.valueType === 'number') {
-      return (<TextField
-        value={this._getFieldValue(this.props.instances, field)}
-        key={field.name}
-        floatingLabelText={field.name}
-        floatingLabelFixed={true}
-        onChange={(event, newValue) => {
-          this.props.instances.forEach(i => field.setValue(i, parseFloat(newValue) || 0));
-          this.props.onInstancesModified(this.props.instances);
-        }}
-        type="number"
-        fullWidth={true}
-        disabled={field.disabled}
-      />);
+      return (
+        <TextField
+          value={this._getFieldValue(this.props.instances, field)}
+          key={field.name}
+          floatingLabelText={field.name}
+          floatingLabelFixed={true}
+          onChange={(event, newValue) => {
+            this.props.instances.forEach(i =>
+              field.setValue(i, parseFloat(newValue) || 0));
+            this.props.onInstancesModified(this.props.instances);
+          }}
+          type="number"
+          fullWidth={true}
+          disabled={field.disabled}
+        />
+      );
     } else {
-      return (<TextField
-        value={this._getFieldValue(this.props.instances, field, '(Multiple values)')}
-        key={field.name}
-        floatingLabelText={field.name}
-        floatingLabelFixed={true}
-        onChange={(event, newValue) => {
-          this.props.instances.forEach(i => field.setValue(i, newValue || ''));
-          this.props.onInstancesModified(this.props.instances);
-        }}
-        fullWidth={true}
-        disabled={field.disabled}
-      />);
+      return (
+        <TextField
+          value={this._getFieldValue(
+            this.props.instances,
+            field,
+            '(Multiple values)'
+          )}
+          key={field.name}
+          floatingLabelText={field.name}
+          floatingLabelFixed={true}
+          onChange={(event, newValue) => {
+            this.props.instances.forEach(i =>
+              field.setValue(i, newValue || ''));
+            this.props.onInstancesModified(this.props.instances);
+          }}
+          fullWidth={true}
+          disabled={field.disabled}
+        />
+      );
     }
-  }
+  };
 
   _renderFields(schema) {
     return schema.map(field => {
@@ -140,8 +153,8 @@ export default class InstancePropertiesEditor extends Component {
         return (
           <div key={field.name}>
             <Subheader>{field.name}</Subheader>
-            <div style={{marginLeft: 15}}>
-              { this._renderFields(field.children) }
+            <div style={{ marginLeft: 15 }}>
+              {this._renderFields(field.children)}
             </div>
           </div>
         );
@@ -153,13 +166,12 @@ export default class InstancePropertiesEditor extends Component {
 
   render() {
     const { project, layout, instances } = this.props;
-    if (!instances || !instances.length)
-      return null;
+    if (!instances || !instances.length) return null;
 
     //TODO: multiple instances support
     const properties = instances[0].getCustomProperties(project, layout);
     const propertyNames = properties.keys();
-    const propertyFields = mapFor(0, propertyNames.size(), (i) => {
+    const propertyFields = mapFor(0, propertyNames.size(), i => {
       const name = propertyNames.at(i);
       const property = properties.get(name);
       const valueType = property.getType().toLowerCase();
@@ -169,7 +181,10 @@ export default class InstancePropertiesEditor extends Component {
         valueType,
         getValue: instance => {
           // Instance custom properties are always stored as string, cast them if necessary
-          const rawValue = instance.getCustomProperties(project, layout).get(name).getValue();
+          const rawValue = instance
+            .getCustomProperties(project, layout)
+            .get(name)
+            .getValue();
           if (valueType === 'boolean') {
             return rawValue === 'true';
           } else if (valueType === 'number') {
@@ -188,13 +203,13 @@ export default class InstancePropertiesEditor extends Component {
           }
 
           instance.updateCustomProperty(name, value, project, layout);
-        }
+        },
       };
     });
 
     return (
       <div
-        style={{padding: 10, overflowY: 'scroll'}}
+        style={{ padding: 10, overflowY: 'scroll' }}
         key={instances.map(instance => '' + instance.ptr).join(';')}
       >
         {this._renderFields(this.schema.concat(propertyFields))}

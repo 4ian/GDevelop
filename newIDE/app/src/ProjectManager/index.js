@@ -1,5 +1,5 @@
 import React from 'react';
-import {List, ListItem} from 'material-ui/List';
+import { List, ListItem } from 'material-ui/List';
 import ContentInbox from 'material-ui/svg-icons/content/inbox';
 import ContentSend from 'material-ui/svg-icons/content/send';
 import mapFor from '../Utils/MapFor';
@@ -19,7 +19,7 @@ export default class ProjectManager extends React.Component {
           initiallyOpen={true}
           primaryTogglesNestedList={true}
           autoGenerateNestedIndicator={true}
-          nestedItems={mapFor(0, project.getLayoutsCount(), (i) => {
+          nestedItems={mapFor(0, project.getLayoutsCount(), i => {
             const layout = project.getLayoutAt(i);
             const name = layout.getName();
             return (
@@ -38,7 +38,7 @@ export default class ProjectManager extends React.Component {
           initiallyOpen={true}
           primaryTogglesNestedList={true}
           autoGenerateNestedIndicator={true}
-          nestedItems={mapFor(0, project.getExternalEventsCount(), (i) => {
+          nestedItems={mapFor(0, project.getExternalEventsCount(), i => {
             const externalEvents = project.getExternalEventsAt(i);
             const name = externalEvents.getName();
             return (
@@ -57,7 +57,7 @@ export default class ProjectManager extends React.Component {
           initiallyOpen={true}
           primaryTogglesNestedList={true}
           autoGenerateNestedIndicator={true}
-          nestedItems={mapFor(0, project.getExternalLayoutsCount(), (i) => {
+          nestedItems={mapFor(0, project.getExternalLayoutsCount(), i => {
             const externalLayout = project.getExternalLayoutAt(i);
             const name = externalLayout.getName();
             return (

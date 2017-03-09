@@ -2,7 +2,19 @@ import LayerRenderer from './LayerRenderer';
 import PIXI from 'pixi.js';
 
 export default class InstancesRenderer {
-  constructor({project, layout, instances, onInstanceClicked, onOverInstance, onOutInstance, onMoveInstance, onMoveInstanceEnd, onDownInstance}) {
+  constructor(
+    {
+      project,
+      layout,
+      instances,
+      onInstanceClicked,
+      onOverInstance,
+      onOutInstance,
+      onMoveInstance,
+      onMoveInstanceEnd,
+      onDownInstance,
+    }
+  ) {
     this.project = project;
     this.instances = instances;
     this.layout = layout;
@@ -17,23 +29,22 @@ export default class InstancesRenderer {
 
     this.pixiContainer = new PIXI.Container();
     this.instanceMeasurer = {
-      getInstanceLeft: (instance) => {
+      getInstanceLeft: instance => {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
         if (!layerRenderer) return instance.getX();
 
         return layerRenderer.getInstanceLeft(instance);
       },
-      getInstanceTop: (instance) => {
+      getInstanceTop: instance => {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
         if (!layerRenderer) return instance.getY();
 
         return layerRenderer.getInstanceTop(instance);
       },
-      getInstanceWidth: (instance) => {
-        if (instance.hasCustomSize())
-          return instance.getCustomWidth();
+      getInstanceWidth: instance => {
+        if (instance.hasCustomSize()) return instance.getCustomWidth();
 
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
@@ -42,9 +53,8 @@ export default class InstancesRenderer {
         return layerRenderer.getInstanceWidth(instance);
       },
 
-      getInstanceHeight: (instance) => {
-        if (instance.hasCustomSize())
-          return instance.getCustomHeight();
+      getInstanceHeight: instance => {
+        if (instance.hasCustomSize()) return instance.getCustomHeight();
 
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
@@ -52,15 +62,15 @@ export default class InstancesRenderer {
 
         return layerRenderer.getInstanceHeight(instance);
       },
-      getInstanceRect: (instance) => {
+      getInstanceRect: instance => {
         return {
           x: this.instanceMeasurer.getInstanceLeft(instance),
           y: this.instanceMeasurer.getInstanceTop(instance),
           width: this.instanceMeasurer.getInstanceWidth(instance),
           height: this.instanceMeasurer.getInstanceHeight(instance),
         };
-      }
-    }
+      },
+    };
   }
 
   getPixiContainer() {
@@ -78,19 +88,18 @@ export default class InstancesRenderer {
 
       let layerRenderer = this.layersRenderers[layerName];
       if (!layerRenderer) {
-        this.layersRenderers[layerName] = layerRenderer =
-          new LayerRenderer({
-            project: this.project,
-            layout: this.layout,
-            instances: this.instances,
-            layer: layer,
-            onInstanceClicked: this.onInstanceClicked,
-            onOverInstance: this.onOverInstance,
-            onOutInstance: this.onOutInstance,
-            onMoveInstance: this.onMoveInstance,
-            onMoveInstanceEnd: this.onMoveInstanceEnd,
-            onDownInstance: this.onDownInstance,
-          });
+        this.layersRenderers[layerName] = (layerRenderer = new LayerRenderer({
+          project: this.project,
+          layout: this.layout,
+          instances: this.instances,
+          layer: layer,
+          onInstanceClicked: this.onInstanceClicked,
+          onOverInstance: this.onOverInstance,
+          onOutInstance: this.onOutInstance,
+          onMoveInstance: this.onMoveInstance,
+          onMoveInstanceEnd: this.onMoveInstanceEnd,
+          onDownInstance: this.onDownInstance,
+        }));
         this.pixiContainer.addChild(layerRenderer.getPixiContainer());
       }
 
@@ -115,22 +124,21 @@ export default class InstancesRenderer {
    * Clean up rendered layers that are not existing anymore
    */
   _cleanRenderers() {
-    for(let i in this.layersRenderers) {
+    for (let i in this.layersRenderers) {
       if (this.layersRenderers.hasOwnProperty(i)) {
         const layerRenderer = this.layersRenderers[i];
         if (!layerRenderer.wasUsed) {
           this.pixiContainer.removeChild(layerRenderer.getPixiContainer());
           layerRenderer.delete();
           delete this.layersRenderers[i];
-        }
-        else
+        } else
           layerRenderer.wasUsed = false;
       }
     }
   }
 
   delete() {
-    for(let i in this.layersRenderers) {
+    for (let i in this.layersRenderers) {
       if (this.layersRenderers.hasOwnProperty(i)) {
         this.layersRenderers[i].delete();
       }

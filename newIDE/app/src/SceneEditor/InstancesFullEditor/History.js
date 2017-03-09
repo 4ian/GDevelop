@@ -1,6 +1,6 @@
 const gd = global.gd;
 
-export const getHistoryInitialState = (instances) => {
+export const getHistoryInitialState = instances => {
   const serializedElement = new gd.SerializerElement();
   instances.serializeTo(serializedElement);
   const savedInstances = JSON.parse(gd.Serializer.toJSON(serializedElement));
@@ -24,7 +24,7 @@ export const saveToHistory = (history, instances) => {
     current: savedInstances,
     redoHistory: [],
   };
-}
+};
 
 export const undo = (history, instances) => {
   if (!history.undoHistory.length) {
@@ -41,8 +41,8 @@ export const undo = (history, instances) => {
     undoHistory: history.undoHistory.slice(0, -1),
     current: newCurrent,
     redoHistory: [...history.redoHistory, history.current],
-  }
-}
+  };
+};
 
 export const redo = (history, instances) => {
   if (!history.redoHistory.length) {
@@ -59,5 +59,5 @@ export const redo = (history, instances) => {
     undoHistory: [...history.undoHistory, history.current],
     current: newCurrent,
     redoHistory: history.redoHistory.slice(0, -1),
-  }
-}
+  };
+};

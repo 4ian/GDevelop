@@ -13,10 +13,7 @@ export default class ToolbarIcon extends Component {
         }}
         {...this.props}
       >
-        <img
-          alt={this.props.tooltip}
-          src={this.props.src}
-        />
+        <img alt={this.props.tooltip} src={this.props.src} />
       </IconButton>
     );
   }

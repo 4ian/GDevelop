@@ -9,52 +9,74 @@ import PIXI from 'pixi.js';
  * @class RenderedTiledSpriteInstance
  * @constructor
  */
-function RenderedTiledSpriteInstance(project, layout, instance, associatedObject, pixiContainer, resourcesLoader) {
-    RenderedInstance.call( this, project, layout, instance, associatedObject, pixiContainer );
+function RenderedTiledSpriteInstance(
+  project,
+  layout,
+  instance,
+  associatedObject,
+  pixiContainer,
+  resourcesLoader
+) {
+  RenderedInstance.call(
+    this,
+    project,
+    layout,
+    instance,
+    associatedObject,
+    pixiContainer
+  );
 
-    //Setup the PIXI object:
-    var tiledSprite = gd.asTiledSpriteObject(associatedObject);
-    this._pixiObject = new PIXI.extras.TilingSprite(
-        PIXI.Texture.fromImage(resourcesLoader.get(project, tiledSprite.getTexture())),
-        tiledSprite.getWidth(),
-        tiledSprite.getHeight()
-    );
-    this._pixiContainer.addChild(this._pixiObject);
+  //Setup the PIXI object:
+  var tiledSprite = gd.asTiledSpriteObject(associatedObject);
+  this._pixiObject = new PIXI.extras.TilingSprite(
+    PIXI.Texture.fromImage(
+      resourcesLoader.get(project, tiledSprite.getTexture())
+    ),
+    tiledSprite.getWidth(),
+    tiledSprite.getHeight()
+  );
+  this._pixiContainer.addChild(this._pixiObject);
 }
-RenderedTiledSpriteInstance.prototype = Object.create( RenderedInstance.prototype );
+RenderedTiledSpriteInstance.prototype = Object.create(
+  RenderedInstance.prototype
+);
 
 /**
  * Return a URL for thumbnail of the specified object.
  * @method getThumbnail
  * @static
  */
-RenderedTiledSpriteInstance.getThumbnail = function(project, resourcesLoader, object) {
-    var tiledSprite = gd.asTiledSpriteObject(object);
+RenderedTiledSpriteInstance.getThumbnail = function(
+  project,
+  resourcesLoader,
+  object
+) {
+  var tiledSprite = gd.asTiledSpriteObject(object);
 
-    return resourcesLoader.get(project, tiledSprite.getTexture());
+  return resourcesLoader.get(project, tiledSprite.getTexture());
 };
 
 RenderedTiledSpriteInstance.prototype.update = function() {
-    this._pixiObject.x = this._instance.getX();
-    this._pixiObject.y = this._instance.getY();
-    if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this._instance.getCustomWidth();
-        this._pixiObject.height = this._instance.getCustomHeight();
-    } else {
-        var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
-        this._pixiObject.width = tiledSprite.getWidth();
-        this._pixiObject.height = tiledSprite.getHeight();
-    }
+  this._pixiObject.x = this._instance.getX();
+  this._pixiObject.y = this._instance.getY();
+  if (this._instance.hasCustomSize()) {
+    this._pixiObject.width = this._instance.getCustomWidth();
+    this._pixiObject.height = this._instance.getCustomHeight();
+  } else {
+    var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
+    this._pixiObject.width = tiledSprite.getWidth();
+    this._pixiObject.height = tiledSprite.getHeight();
+  }
 };
 
 RenderedTiledSpriteInstance.prototype.getDefaultWidth = function() {
-    var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
-    return tiledSprite.getWidth();
+  var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
+  return tiledSprite.getWidth();
 };
 
 RenderedTiledSpriteInstance.prototype.getDefaultHeight = function() {
-    var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
-    return tiledSprite.getHeight();
+  var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
+  return tiledSprite.getHeight();
 };
 
 export default RenderedTiledSpriteInstance;

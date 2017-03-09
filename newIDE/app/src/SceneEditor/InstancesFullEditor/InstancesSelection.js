@@ -11,8 +11,7 @@ export default class InstancesSelection {
 
   isInstanceSelected(instance) {
     for (var i = 0; i < this.selection.length; i++) {
-      if (gd.compare(this.selection[i], instance))
-        return true;
+      if (gd.compare(this.selection[i], instance)) return true;
     }
 
     return false;
@@ -32,7 +31,7 @@ export default class InstancesSelection {
     if (this.isInstanceSelected(instance)) {
       var i = this.selection.length - 1;
       while (i >= -1 && this.selection[i].ptr !== instance.ptr) {
-          --i;
+        --i;
       }
 
       this.selection.splice(i, 1);

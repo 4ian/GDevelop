@@ -7,14 +7,20 @@
  * @param associatedObject The (layout or global) object that the instance is associated to.
  * @param pixiContainer The PIXI.DisplayObjectContainer where the instance must be rendered
  */
-function RenderedInstance(project, layout, instance, associatedObject, pixiContainer) {
-    this._pixiObject = null;
-    this._instance = instance;
-    this._associatedObject = associatedObject;
-    this._pixiContainer = pixiContainer;
-    this._project = project;
-    this._layout = layout;
-    this.wasUsed = true; //Used by SceneAreaCtrl to track rendered instance that are not used anymore.
+function RenderedInstance(
+  project,
+  layout,
+  instance,
+  associatedObject,
+  pixiContainer
+) {
+  this._pixiObject = null;
+  this._instance = instance;
+  this._associatedObject = associatedObject;
+  this._pixiContainer = pixiContainer;
+  this._project = project;
+  this._layout = layout;
+  this.wasUsed = true; //Used by SceneAreaCtrl to track rendered instance that are not used anymore.
 }
 
 /**
@@ -23,7 +29,7 @@ function RenderedInstance(project, layout, instance, associatedObject, pixiConta
  * @method toRad
  */
 RenderedInstance.toRad = function(angleInDegrees) {
-    return angleInDegrees/180*3.14159;
+  return angleInDegrees / 180 * 3.14159;
 };
 
 /**
@@ -31,12 +37,12 @@ RenderedInstance.toRad = function(angleInDegrees) {
  * @method update
  */
 RenderedInstance.prototype.update = function() {
-    //Nothing to do.
+  //Nothing to do.
 };
 
 RenderedInstance.prototype.getPixiObject = function() {
-    return this._pixiObject;
-}
+  return this._pixiObject;
+};
 
 /**
  * Called to notify the instance renderer that its associated instance was removed from
@@ -45,24 +51,27 @@ RenderedInstance.prototype.getPixiObject = function() {
  * @method instanceRemovedFromScene
  */
 RenderedInstance.prototype.instanceRemovedFromScene = function() {
-    if (this._pixiObject !== null && this._pixiContainer.children.indexOf(this._pixiObject) !== -1)
-        this._pixiContainer.removeChild(this._pixiObject);
+  if (
+    this._pixiObject !== null &&
+    this._pixiContainer.children.indexOf(this._pixiObject) !== -1
+  )
+    this._pixiContainer.removeChild(this._pixiObject);
 };
 
 RenderedInstance.prototype.getOriginX = function() {
-    return 0;
-}
+  return 0;
+};
 
 RenderedInstance.prototype.getOriginY = function() {
-    return 0;
-}
+  return 0;
+};
 
 /**
  * Return the width of the instance when the instance doesn't have a custom size.
  * @method getDefaultWidth
  */
 RenderedInstance.prototype.getDefaultWidth = function() {
-    return 32;
+  return 32;
 };
 
 /**
@@ -70,7 +79,7 @@ RenderedInstance.prototype.getDefaultWidth = function() {
  * @method getDefaultHeight
  */
 RenderedInstance.prototype.getDefaultHeight = function() {
-    return 32;
+  return 32;
 };
 
 export default RenderedInstance;

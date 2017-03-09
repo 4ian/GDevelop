@@ -1,7 +1,7 @@
 import React from 'react';
-import {ToolbarSeparator} from 'material-ui/Toolbar';
+import { ToolbarSeparator } from 'material-ui/Toolbar';
 
-export default (props) => {
+export default props => {
   return (
     <ToolbarSeparator
       style={{
@@ -10,4 +10,4 @@ export default (props) => {
       {...props}
     />
   );
-}
+};

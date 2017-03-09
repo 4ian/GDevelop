@@ -1,5 +1,5 @@
 export default class InstancesResizer {
-  constructor({instanceMeasurer, options}) {
+  constructor({ instanceMeasurer, options }) {
     this.instanceMeasurer = instanceMeasurer;
     this.options = options;
     this.instanceSizes = {};
@@ -20,32 +20,41 @@ export default class InstancesResizer {
   _roundHeight(height) {
     if (!this.options.snap) return height;
 
-    return Math.round(height / this.options.gridHeight) * this.options.gridHeight;
+    return Math.round(height / this.options.gridHeight) *
+      this.options.gridHeight;
   }
 
   resizeBy(instances, deltaX, deltaY) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
-    for (var i = 0;i < instances.length;i++) {
+    for (var i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
       if (!selectedInstance.hasCustomSize()) {
-        selectedInstance.setCustomWidth(this.instanceMeasurer.getInstanceWidth(selectedInstance));
-        selectedInstance.setCustomHeight(this.instanceMeasurer.getInstanceHeight(selectedInstance));
+        selectedInstance.setCustomWidth(
+          this.instanceMeasurer.getInstanceWidth(selectedInstance)
+        );
+        selectedInstance.setCustomHeight(
+          this.instanceMeasurer.getInstanceHeight(selectedInstance)
+        );
       }
 
       let initialSize = this.instanceSizes[selectedInstance.ptr];
       if (!initialSize) {
-        initialSize = this.instanceSizes[selectedInstance.ptr] = {
+        initialSize = (this.instanceSizes[selectedInstance.ptr] = {
           width: selectedInstance.getCustomWidth(),
           height: selectedInstance.getCustomHeight(),
-        }
+        });
       }
 
       selectedInstance.setHasCustomSize(true);
-      selectedInstance.setCustomWidth(this._roundWidth(initialSize.width + this.totalDeltaX));
-      selectedInstance.setCustomHeight(this._roundHeight(initialSize.height + this.totalDeltaY));
+      selectedInstance.setCustomWidth(
+        this._roundWidth(initialSize.width + this.totalDeltaX)
+      );
+      selectedInstance.setCustomHeight(
+        this._roundHeight(initialSize.height + this.totalDeltaY)
+      );
     }
   }
 

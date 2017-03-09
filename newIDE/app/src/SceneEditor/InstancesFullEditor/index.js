@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import ObjectsList from '../../ObjectsList';
-import FullSizeInstancesEditor from '../../InstancesEditor/FullSizeInstancesEditor';
-import InstancePropertiesEditor from '../../InstancesEditor/InstancePropertiesEditor';
+import FullSizeInstancesEditor
+  from '../../InstancesEditor/FullSizeInstancesEditor';
+import InstancePropertiesEditor
+  from '../../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../../InstancesEditor/InstancesList';
 import InstancesSelection from './InstancesSelection';
 import LayersList from '../../LayersList';
@@ -14,7 +16,7 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import SmallDrawer from '../../UI/SmallDrawer';
 import EditorBar from '../../UI/EditorBar';
 import InfoBar from '../../UI/Messages/InfoBar';
-import {undo, redo, getHistoryInitialState, saveToHistory} from './History';
+import { undo, redo, getHistoryInitialState, saveToHistory } from './History';
 
 export default class InstancesFullEditor extends Component {
   constructor(props) {
@@ -62,24 +64,26 @@ export default class InstancesFullEditor extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.layout !== nextProps.layout ||
+    if (
+      this.props.layout !== nextProps.layout ||
       this.props.initialInstances !== nextProps.initialInstances ||
-      this.props.project !== nextProps.project) {
+      this.props.project !== nextProps.project
+    ) {
       this.instancesSelection.clearSelection();
     }
   }
 
   toggleObjectsList = () => {
-    this.setState({objectsListOpen: !this.state.objectsListOpen});
-  }
+    this.setState({ objectsListOpen: !this.state.objectsListOpen });
+  };
 
   toggleInstancesList = () => {
-    this.setState({instancesListOpen: !this.state.instancesListOpen});
-  }
+    this.setState({ instancesListOpen: !this.state.instancesListOpen });
+  };
 
   toggleLayersList = () => {
-    this.setState({layersListOpen: !this.state.layersListOpen});
-  }
+    this.setState({ layersListOpen: !this.state.layersListOpen });
+  };
 
   toggleGrid = () => {
     this.setState({
@@ -87,101 +91,106 @@ export default class InstancesFullEditor extends Component {
         ...this.state.options,
         grid: !this.state.options.grid,
         snap: !this.state.options.grid,
-      }
+      },
     });
-  }
+  };
 
   openSetupGrid = (open = true) => {
     this.setState({ setupGridOpen: open });
-  }
+  };
 
-  setOptions = (options) => {
+  setOptions = options => {
     this.setState({
       options: {
         ...this.state.options,
         ...options,
       },
     });
-  }
+  };
 
   undo = () => {
-    this.setState({
-      history: undo(this.state.history, this.props.initialInstances),
-    }, () => {
-      // /!\ Force the instances editor to destroy and mount again the
-      // renderers to avoid keeping any references to existing instances
-      this.editor.forceRemount();
-    });
-  }
+    this.setState(
+      {
+        history: undo(this.state.history, this.props.initialInstances),
+      },
+      () => {
+        // /!\ Force the instances editor to destroy and mount again the
+        // renderers to avoid keeping any references to existing instances
+        this.editor.forceRemount();
+      }
+    );
+  };
 
   redo = () => {
-    this.setState({
-      history: redo(this.state.history, this.props.initialInstances),
-    }, () => {
-      // /!\ Force the instances editor to destroy and mount again the
-      // renderers to avoid keeping any references to existing instances
-      this.editor.forceRemount();
-    });
-  }
+    this.setState(
+      {
+        history: redo(this.state.history, this.props.initialInstances),
+      },
+      () => {
+        // /!\ Force the instances editor to destroy and mount again the
+        // renderers to avoid keeping any references to existing instances
+        this.editor.forceRemount();
+      }
+    );
+  };
 
-  _onObjectSelected = (selectedObjectName) => {
+  _onObjectSelected = selectedObjectName => {
     this.setState({
       selectedObjectName,
     });
-  }
+  };
 
   _onNewInstanceAdded = () => {
     this.setState({
       selectedObjectName: null,
       history: saveToHistory(this.state.history, this.props.initialInstances),
     });
-  }
+  };
 
-  _onInstancesSelected = (instances) => {
+  _onInstancesSelected = instances => {
     this.forceUpdate();
     this._updateToolbar();
-  }
+  };
 
-  _onInstancesMoved = (instances) => {
+  _onInstancesMoved = instances => {
     this.forceUpdate();
     //Save for redo
-  }
+  };
 
-  _onInstancesModified = (instances) => {
+  _onInstancesModified = instances => {
     this.forceUpdate();
     //Save for redo with debounce (and cancel on unmount)?????
-  }
+  };
 
   _onSelectInstances = (instances, centerView = true) => {
     this.instancesSelection.clearSelection();
-    instances.forEach(instance => this.instancesSelection.selectInstance(instance));
+    instances.forEach(instance =>
+      this.instancesSelection.selectInstance(instance));
 
     if (centerView) {
       this.editor.centerViewOn(instances);
     }
     this.forceUpdate();
     this._updateToolbar();
-  }
+  };
 
   deleteSelection = () => {
     this.editor.deleteSelection();
     this._updateToolbar();
     //Save for redo
-  }
+  };
 
-  setZoomFactor = (zoomFactor) => {
+  setZoomFactor = zoomFactor => {
     this.editor.setZoomFactor(zoomFactor);
-  }
+  };
 
   render() {
     const { project, layout, initialInstances } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
     return (
-      <div style={{display: 'flex', flex: 1, position: 'relative'}}>
-        <SmallDrawer
-          open={!!selectedInstances.length}
-        >
+      <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
+        <SmallDrawer open={!!selectedInstances.length}>
           <InstancePropertiesEditor
             project={project}
             layout={layout}
@@ -199,12 +208,16 @@ export default class InstancesFullEditor extends Component {
           onNewInstanceAdded={this._onNewInstanceAdded}
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
-          editorRef={(editor) => this.editor = editor}
+          editorRef={editor => this.editor = editor}
         />
         <Drawer open={this.state.objectsListOpen} openSecondary={true}>
           <EditorBar
             title="Objects"
-            iconElementLeft={<IconButton onClick={this.toggleObjectsList}><NavigationClose /></IconButton>}
+            iconElementLeft={
+              <IconButton onClick={this.toggleObjectsList}>
+                <NavigationClose />
+              </IconButton>
+            }
           />
           <ObjectsList
             freezeUpdate={!this.state.objectsListOpen}
@@ -213,10 +226,18 @@ export default class InstancesFullEditor extends Component {
             onObjectSelected={this._onObjectSelected}
           />
         </Drawer>
-        <Drawer open={this.state.instancesListOpen} width={500} openSecondary={true}>
+        <Drawer
+          open={this.state.instancesListOpen}
+          width={500}
+          openSecondary={true}
+        >
           <EditorBar
             title="Instances"
-            iconElementLeft={<IconButton onClick={this.toggleInstancesList}><NavigationClose /></IconButton>}
+            iconElementLeft={
+              <IconButton onClick={this.toggleInstancesList}>
+                <NavigationClose />
+              </IconButton>
+            }
           />
           <InstancesList
             freezeUpdate={!this.state.instancesListOpen}
@@ -225,10 +246,18 @@ export default class InstancesFullEditor extends Component {
             onSelectInstances={this._onSelectInstances}
           />
         </Drawer>
-        <Drawer open={this.state.layersListOpen} width={400} openSecondary={true}>
+        <Drawer
+          open={this.state.layersListOpen}
+          width={400}
+          openSecondary={true}
+        >
           <EditorBar
             title="Layers"
-            iconElementLeft={<IconButton onClick={this.toggleLayersList}><NavigationClose /></IconButton>}
+            iconElementLeft={
+              <IconButton onClick={this.toggleLayersList}>
+                <NavigationClose />
+              </IconButton>
+            }
           />
           <LayersList
             freezeUpdate={!this.state.layersListOpen}
@@ -243,12 +272,12 @@ export default class InstancesFullEditor extends Component {
           open={this.state.setupGridOpen}
           options={this.state.options}
           onCancel={() => this.openSetupGrid(false)}
-          onApply={(options) => {
+          onApply={options => {
             this.setOptions(options);
             this.openSetupGrid(false);
           }}
         />
       </div>
-    )
+    );
   }
 }

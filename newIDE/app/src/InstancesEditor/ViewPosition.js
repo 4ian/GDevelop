@@ -1,7 +1,7 @@
 import PIXI from 'pixi.js';
 
 export default class ViewPosition {
-  constructor({width, height}) {
+  constructor({ width, height }) {
     this.viewX = width / 2;
     this.viewY = height / 2;
     this._zoomFactor = 1;
@@ -14,9 +14,13 @@ export default class ViewPosition {
     this._height = height;
   }
 
-  getWidth() { return this._width; }
+  getWidth() {
+    return this._width;
+  }
 
-  getHeight() { return this._height; }
+  getHeight() {
+    return this._height;
+  }
 
   /**
    * Convert a point from the canvas coordinates (for example, the mouse position) to the
@@ -30,11 +34,13 @@ export default class ViewPosition {
 
     var viewRotation = 0;
     var tmp = x;
-    x = Math.cos(viewRotation/180*3.14159)*x - Math.sin(viewRotation/180*3.14159)*y;
-    y = Math.sin(viewRotation/180*3.14159)*tmp + Math.cos(viewRotation/180*3.14159)*y;
+    x = Math.cos(viewRotation / 180 * 3.14159) * x -
+      Math.sin(viewRotation / 180 * 3.14159) * y;
+    y = Math.sin(viewRotation / 180 * 3.14159) * tmp +
+      Math.cos(viewRotation / 180 * 3.14159) * y;
 
-    return [x+this.viewX, y+this.viewY];
-  }
+    return [x + this.viewX, y + this.viewY];
+  };
 
   /**
    * Convert a point from the "world" coordinates (for example, an object position) to the
@@ -46,14 +52,16 @@ export default class ViewPosition {
 
     var viewRotation = -0;
     var tmp = x;
-    x = Math.cos(viewRotation/180*3.14159)*x - Math.sin(viewRotation/180*3.14159)*y;
-    y = Math.sin(viewRotation/180*3.14159)*tmp + Math.cos(viewRotation/180*3.14159)*y;
+    x = Math.cos(viewRotation / 180 * 3.14159) * x -
+      Math.sin(viewRotation / 180 * 3.14159) * y;
+    y = Math.sin(viewRotation / 180 * 3.14159) * tmp +
+      Math.cos(viewRotation / 180 * 3.14159) * y;
 
     x *= Math.abs(this._pixiContainer.scale.x);
     y *= Math.abs(this._pixiContainer.scale.y);
 
     return [x + this._width / 2, y + this._height / 2];
-  }
+  };
 
   scrollBy(x, y) {
     this.viewX += x;
@@ -65,9 +73,13 @@ export default class ViewPosition {
     this.viewY = instance.getY();
   }
 
-  getViewX() { return this.viewX; }
+  getViewX() {
+    return this.viewX;
+  }
 
-  getViewY() { return this.viewY; }
+  getViewY() {
+    return this.viewY;
+  }
 
   zoomBy(value) {
     this.setZoomFactor(this.getZoomFactor() + value);
@@ -88,9 +100,9 @@ export default class ViewPosition {
   render() {
     this._pixiContainer.position.x = -this.viewX * this._zoomFactor;
     this._pixiContainer.position.y = -this.viewY * this._zoomFactor;
-  	this._pixiContainer.position.x += this._width / 2;
-  	this._pixiContainer.position.y += this._height / 2;
-  	this._pixiContainer.scale.x = this._zoomFactor;
-  	this._pixiContainer.scale.y = this._zoomFactor;
+    this._pixiContainer.position.x += this._width / 2;
+    this._pixiContainer.position.y += this._height / 2;
+    this._pixiContainer.scale.x = this._zoomFactor;
+    this._pixiContainer.scale.y = this._zoomFactor;
   }
 }

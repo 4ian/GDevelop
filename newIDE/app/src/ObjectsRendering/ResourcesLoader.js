@@ -3,8 +3,7 @@ import slug from 'slug';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
-const loadedFontFamilies = {
-};
+const loadedFontFamilies = {};
 
 class FilenamesCache {
   constructor() {
@@ -14,7 +13,7 @@ class FilenamesCache {
   _getProjectCache(project) {
     const cache = this.projectCache[project.ptr];
     if (!cache) {
-      return this.projectCache[project.ptr] = {};
+      return (this.projectCache[project.ptr] = {});
     }
 
     return cache;
@@ -27,7 +26,7 @@ class FilenamesCache {
 
   cacheSystemFilename(project, filename, systemFilename) {
     const cache = this._getProjectCache(project);
-    return cache[filename] = systemFilename;
+    return (cache[filename] = systemFilename);
   }
 }
 
@@ -35,17 +34,24 @@ export default class ResourceLoader {
   static _cache = new FilenamesCache();
 
   static _getSystemFullFilename(project, filename) {
-    const cachedSystemFilename =
-      ResourceLoader._cache.getSystemFilename(project, filename);
+    const cachedSystemFilename = ResourceLoader._cache.getSystemFilename(
+      project,
+      filename
+    );
     if (cachedSystemFilename) return cachedSystemFilename;
 
-    if (electron) { // Support local filesystem with Electron
+    if (electron) {
+      // Support local filesystem with Electron
       const file = project.getProjectFile();
       const projectPath = path.dirname(file);
       const resourceAbsolutePath = path.resolve(projectPath, filename);
 
-      console.log("Loading", resourceAbsolutePath);
-      return this._cache.cacheSystemFilename(project, filename, 'file://' + resourceAbsolutePath);
+      console.log('Loading', resourceAbsolutePath);
+      return this._cache.cacheSystemFilename(
+        project,
+        filename,
+        'file://' + resourceAbsolutePath
+      );
     }
 
     return this._cache.cacheSystemFilename(project, filename, filename);
@@ -53,33 +59,42 @@ export default class ResourceLoader {
 
   static get(project, resourceName) {
     if (project.getResourcesManager().hasResource(resourceName)) {
-      const resourceRelativePath =
-        project.getResourcesManager().getResource(resourceName).getFile();
-      return ResourceLoader._getSystemFullFilename(project, resourceRelativePath);
+      const resourceRelativePath = project
+        .getResourcesManager()
+        .getResource(resourceName)
+        .getFile();
+      return ResourceLoader._getSystemFullFilename(
+        project,
+        resourceRelativePath
+      );
     }
 
     return resourceName;
   }
 
   static getFontFamily(project, fontFilename) {
-    if (!fontFilename) return "";
+    if (!fontFilename) return '';
 
     if (loadedFontFamilies[fontFilename]) {
       return loadedFontFamilies[fontFilename];
     }
 
     const fontFamily = slug(fontFilename);
-    const fontFaceDeclaration =
-      "@font-face { font-family: '" + fontFamily + "';" +
-      "src: url(" + ResourceLoader._getSystemFullFilename(project, fontFilename) + "); }";
-    const declaration =
-      "<style type='text/css'>" +
+    const fontFaceDeclaration = "@font-face { font-family: '" +
+      fontFamily +
+      "';" +
+      'src: url(' +
+      ResourceLoader._getSystemFullFilename(project, fontFilename) +
+      '); }';
+    const declaration = "<style type='text/css'>" +
       fontFaceDeclaration +
-      "</style>";
+      '</style>';
 
     document.querySelector('head').innerHTML += declaration;
-    return loadedFontFamilies[fontFilename] = fontFamily;
+    return (loadedFontFamilies[fontFilename] = fontFamily);
   }
 
-  static getInvalidImageURL() { return "res/error48.png" }
-};
+  static getInvalidImageURL() {
+    return 'res/error48.png';
+  }
+}

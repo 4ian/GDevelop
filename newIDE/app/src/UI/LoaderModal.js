@@ -3,7 +3,7 @@ import RefreshIndicator from 'material-ui/RefreshIndicator';
 
 const loaderSize = 50;
 
-export default (props) => {
+export default props => {
   return (
     <div
       style={{
@@ -33,9 +33,9 @@ export default (props) => {
           size={loaderSize}
           left={0}
           top={0}
-          status={"loading"}
+          status={'loading'}
         />
       </div>
     </div>
   );
-}
+};

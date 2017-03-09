@@ -2,7 +2,9 @@ const gd = global.gd;
 import PIXI from 'pixi.js';
 
 export default class SelectionRectangle {
-  constructor({instances, instanceMeasurer, toSceneCoordinates, toCanvasCoordinates}) {
+  constructor(
+    { instances, instanceMeasurer, toSceneCoordinates, toCanvasCoordinates }
+  ) {
     this.instances = instances;
     this.instanceMeasurer = instanceMeasurer;
     this.toSceneCoordinates = toSceneCoordinates;
@@ -14,18 +16,28 @@ export default class SelectionRectangle {
     this._instancesInSelectionRectangle = [];
 
     this.selector = new gd.InitialInstanceJSFunctor();
-    this.selector.invoke = (instancePtr) => {
+    this.selector.invoke = instancePtr => {
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
       const x = this.instanceMeasurer.getInstanceLeft(instance);
       const y = this.instanceMeasurer.getInstanceTop(instance);
       const instanceHeight = this.instanceMeasurer.getInstanceHeight(instance);
       const instanceWidth = this.instanceMeasurer.getInstanceWidth(instance);
 
-      const selectionSceneStart = toSceneCoordinates(this.selectionRectangleStart.x, this.selectionRectangleStart.y);
-      const selectionSceneEnd = toSceneCoordinates(this.selectionRectangleEnd.x, this.selectionRectangleEnd.y);
+      const selectionSceneStart = toSceneCoordinates(
+        this.selectionRectangleStart.x,
+        this.selectionRectangleStart.y
+      );
+      const selectionSceneEnd = toSceneCoordinates(
+        this.selectionRectangleEnd.x,
+        this.selectionRectangleEnd.y
+      );
 
-      if (selectionSceneStart[0] <= x && x + instanceWidth <= selectionSceneEnd[0] &&
-        selectionSceneStart[1] <= y && y + instanceHeight <= selectionSceneEnd[1]) {
+      if (
+        selectionSceneStart[0] <= x &&
+        x + instanceWidth <= selectionSceneEnd[0] &&
+        selectionSceneStart[1] <= y &&
+        y + instanceHeight <= selectionSceneEnd[1]
+      ) {
         this._instancesInSelectionRectangle.push(instance);
       }
     };
@@ -33,10 +45,10 @@ export default class SelectionRectangle {
 
   makeSelectionRectangle = (lastX, lastY) => {
     if (!this.selectionRectangleStart)
-      this.selectionRectangleStart = {x: lastX, y: lastY};
+      this.selectionRectangleStart = { x: lastX, y: lastY };
 
-    this.selectionRectangleEnd = {x: lastX, y: lastY};
-  }
+    this.selectionRectangleEnd = { x: lastX, y: lastY };
+  };
 
   endSelectionRectangle = () => {
     this._instancesInSelectionRectangle.length = 0;
@@ -55,7 +67,7 @@ export default class SelectionRectangle {
 
     this.selectionRectangleStart = null;
     return this._instancesInSelectionRectangle;
-  }
+  };
 
   getPixiObject() {
     return this.pixiRectangle;
@@ -74,12 +86,16 @@ export default class SelectionRectangle {
 
     this.pixiRectangle.visible = true;
     this.pixiRectangle.clear();
-    this.pixiRectangle.beginFill(0x6868E8);
-    this.pixiRectangle.lineStyle(1, 0x6868E8, 1);
+    this.pixiRectangle.beginFill(0x6868e8);
+    this.pixiRectangle.lineStyle(1, 0x6868e8, 1);
     this.pixiRectangle.fillAlpha = 0.1;
     this.pixiRectangle.alpha = 0.8;
-    this.pixiRectangle.drawRect(Math.min(x1, x2),  Math.min(y1, y2),
-      Math.abs(x2 - x1),  Math.abs(y2 - y1));
+    this.pixiRectangle.drawRect(
+      Math.min(x1, x2),
+      Math.min(y1, y2),
+      Math.abs(x2 - x1),
+      Math.abs(y2 - y1)
+    );
     this.pixiRectangle.endFill();
   }
 

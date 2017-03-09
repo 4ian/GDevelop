@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import InstructionTypeSelector from './InstructionTypeSelector.js'
+import InstructionTypeSelector from './InstructionTypeSelector.js';
 
 export default class InstructionEditor extends Component {
   render() {
@@ -11,12 +11,12 @@ export default class InstructionEditor extends Component {
         {instruction.getType()}
         <InstructionTypeSelector
           isCondition={this.props.isCondition}
-          onChoose={(type) => {
+          onChoose={type => {
             instruction.setType(type);
             this.forceUpdate();
           }}
         />
       </div>
-    )
+    );
   }
 }

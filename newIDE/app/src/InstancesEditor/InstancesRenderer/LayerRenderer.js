@@ -1,10 +1,24 @@
 import gesture from 'pixi-simple-gesture';
-import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import ObjectsRenderingService
+  from '../../ObjectsRendering/ObjectsRenderingService';
 const gd = global.gd;
 import PIXI from 'pixi.js';
 
 export default class LayerRenderer {
-  constructor({project, layout, layer, instances, onInstanceClicked, onOverInstance, onOutInstance, onMoveInstance, onMoveInstanceEnd, onDownInstance}) {
+  constructor(
+    {
+      project,
+      layout,
+      layer,
+      instances,
+      onInstanceClicked,
+      onOverInstance,
+      onOutInstance,
+      onMoveInstance,
+      onMoveInstanceEnd,
+      onDownInstance,
+    }
+  ) {
     this.project = project;
     this.instances = instances;
     this.layout = layout;
@@ -21,7 +35,7 @@ export default class LayerRenderer {
 
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
-    this.instancesRenderer.invoke = (instancePtr) => {
+    this.instancesRenderer.invoke = instancePtr => {
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
 
       //Get the "RendereredInstance" object associated to the instance and tell it to update.
@@ -40,48 +54,59 @@ export default class LayerRenderer {
     return this.pixiContainer;
   }
 
-  getInstanceLeft = (instance) => {
-    return instance.getX() - (this.renderedInstances[instance.ptr] ?
-      this.renderedInstances[instance.ptr].getOriginX() : 0);
-  }
+  getInstanceLeft = instance => {
+    return instance.getX() -
+      (this.renderedInstances[instance.ptr]
+        ? this.renderedInstances[instance.ptr].getOriginX()
+        : 0);
+  };
 
-  getInstanceTop = (instance) => {
-    return instance.getY() - (this.renderedInstances[instance.ptr] ?
-      this.renderedInstances[instance.ptr].getOriginY() : 0);
-  }
+  getInstanceTop = instance => {
+    return instance.getY() -
+      (this.renderedInstances[instance.ptr]
+        ? this.renderedInstances[instance.ptr].getOriginY()
+        : 0);
+  };
 
-  getInstanceWidth = (instance) => {
-    if (instance.hasCustomSize())
-      return instance.getCustomWidth();
+  getInstanceWidth = instance => {
+    if (instance.hasCustomSize()) return instance.getCustomWidth();
 
-    return this.renderedInstances[instance.ptr] ?
-      this.renderedInstances[instance.ptr].getDefaultWidth() : 0;
-  }
+    return this.renderedInstances[instance.ptr]
+      ? this.renderedInstances[instance.ptr].getDefaultWidth()
+      : 0;
+  };
 
-  getInstanceHeight = (instance) => {
-    if (instance.hasCustomSize())
-      return instance.getCustomHeight();
+  getInstanceHeight = instance => {
+    if (instance.hasCustomSize()) return instance.getCustomHeight();
 
-    return this.renderedInstances[instance.ptr] ?
-      this.renderedInstances[instance.ptr].getDefaultHeight() : 0;
-  }
+    return this.renderedInstances[instance.ptr]
+      ? this.renderedInstances[instance.ptr].getDefaultHeight()
+      : 0;
+  };
 
-  getRendererOfInstance = (instance) => {
+  getRendererOfInstance = instance => {
     var renderedInstance = this.renderedInstances[instance.ptr];
-    if ( renderedInstance === undefined ) {
+    if (renderedInstance === undefined) {
       //No renderer associated yet, the instance must have been just created!...
       var associatedObjectName = instance.getObjectName();
       var associatedObject = null;
       if (this.layout.hasObjectNamed(associatedObjectName))
-          associatedObject = this.layout.getObject(associatedObjectName);
+        associatedObject = this.layout.getObject(associatedObjectName);
       else if (this.project.hasObjectNamed(associatedObjectName))
-          associatedObject = this.project.getObject(associatedObjectName);
-      else return;
+        associatedObject = this.project.getObject(associatedObjectName);
+      else
+        return;
 
       //...so let's create a renderer.
-      renderedInstance = this.renderedInstances[instance.ptr] =
-          ObjectsRenderingService.createNewInstanceRenderer(this.project, this.layout, instance,
-            associatedObject, this.pixiContainer);
+      renderedInstance = (this.renderedInstances[
+        instance.ptr
+      ] = ObjectsRenderingService.createNewInstanceRenderer(
+        this.project,
+        this.layout,
+        instance,
+        associatedObject,
+        this.pixiContainer
+      ));
 
       renderedInstance._pixiObject.interactive = true;
       gesture.panable(renderedInstance._pixiObject);
@@ -97,20 +122,22 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.on('mouseout', () => {
         this.onOutInstance(instance);
       });
-      renderedInstance._pixiObject.on('panmove', (event) => {
+      renderedInstance._pixiObject.on('panmove', event => {
         this.onMoveInstance(instance, event.deltaX, event.deltaY);
       });
-      renderedInstance._pixiObject.on('panend', (event) => {
+      renderedInstance._pixiObject.on('panend', event => {
         this.onMoveInstanceEnd();
       });
     }
 
     return renderedInstance;
-  }
+  };
 
   render() {
-    this.instances.iterateOverInstancesWithZOrdering(this.instancesRenderer,
-      this.layer.getName());
+    this.instances.iterateOverInstancesWithZOrdering(
+      this.instancesRenderer,
+      this.layer.getName()
+    );
     this._updatePixiObjectsZOrder();
     this._updateVisibility();
     this._cleanRenderers();
@@ -133,15 +160,14 @@ export default class LayerRenderer {
    * (this can happen after an instance has been deleted).
    */
   _cleanRenderers() {
-    for(let i in this.renderedInstances) {
+    for (let i in this.renderedInstances) {
       if (this.renderedInstances.hasOwnProperty(i)) {
-          const renderedInstance = this.renderedInstances[i];
-          if (!renderedInstance.wasUsed) {
-            renderedInstance.instanceRemovedFromScene();
-            delete this.renderedInstances[i];
-          }
-          else
-            renderedInstance.wasUsed = false;
+        const renderedInstance = this.renderedInstances[i];
+        if (!renderedInstance.wasUsed) {
+          renderedInstance.instanceRemovedFromScene();
+          delete this.renderedInstances[i];
+        } else
+          renderedInstance.wasUsed = false;
       }
     }
   }

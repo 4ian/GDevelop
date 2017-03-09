@@ -1,5 +1,5 @@
 export default class InstancesResizer {
-  constructor({instanceMeasurer, options}) {
+  constructor({ instanceMeasurer, options }) {
     this.instanceMeasurer = instanceMeasurer;
     this.options = options;
     this.instancePositions = {};
@@ -27,19 +27,23 @@ export default class InstancesResizer {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
-    for (var i = 0;i < instances.length;i++) {
+    for (var i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
       let initialPosition = this.instancePositions[selectedInstance.ptr];
       if (!initialPosition) {
-        initialPosition = this.instancePositions[selectedInstance.ptr] = {
+        initialPosition = (this.instancePositions[selectedInstance.ptr] = {
           x: selectedInstance.getX(),
           y: selectedInstance.getY(),
-        }
+        });
       }
 
-      selectedInstance.setX(this._roundXPosition(initialPosition.x + this.totalDeltaX));
-      selectedInstance.setY(this._roundYPosition(initialPosition.y + this.totalDeltaY));
+      selectedInstance.setX(
+        this._roundXPosition(initialPosition.x + this.totalDeltaX)
+      );
+      selectedInstance.setY(
+        this._roundYPosition(initialPosition.y + this.totalDeltaY)
+      );
     }
   }
 

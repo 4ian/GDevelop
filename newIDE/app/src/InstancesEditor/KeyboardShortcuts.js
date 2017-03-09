@@ -8,7 +8,7 @@ const BACKSPACE_KEY = 8;
 const DELETE_KEY = 46;
 
 export default class KeyboardShortcuts {
-  constructor({domElement, onDelete, onMove}) {
+  constructor({ domElement, onDelete, onMove }) {
     this.domElement = domElement;
     this.onDelete = onDelete;
     this.onMove = onMove;
@@ -16,50 +16,58 @@ export default class KeyboardShortcuts {
     this.mount();
   }
 
-  shouldCloneInstances() { return this.ctrlPressed; }
-
-  shouldMultiSelect() { return this.shiftPressed; }
-
-  shouldScrollHorizontally() { return this.altPressed; }
-
-  shouldZoom() { return this.metaPressed; }
-
-  _onKeyDown = (evt) => {
-    if(this.lastDownTarget !== this.domElement) return;
-
-    if ( evt.metaKey ) this.metaPressed = true;
-    if ( evt.altKey ) this.altPressed = true;
-    if ( evt.which === CTRL_KEY ) this.ctrlPressed = true;
-    if ( evt.which === SHIFT_KEY ) this.shiftPressed = true;
+  shouldCloneInstances() {
+    return this.ctrlPressed;
   }
 
-  _onKeyUp = (evt) => {
-    if(this.lastDownTarget !== this.domElement) return;
+  shouldMultiSelect() {
+    return this.shiftPressed;
+  }
 
-    if ( !evt.metaKey ) this.metaPressed = false;
-    if ( !evt.altKey ) this.altPressed = false;
-    if ( evt.which === CTRL_KEY ) this.ctrlPressed = false;
-    if ( evt.which === SHIFT_KEY ) this.shiftPressed = false;
-    if ( evt.which === UP_KEY ) {
+  shouldScrollHorizontally() {
+    return this.altPressed;
+  }
+
+  shouldZoom() {
+    return this.metaPressed;
+  }
+
+  _onKeyDown = evt => {
+    if (this.lastDownTarget !== this.domElement) return;
+
+    if (evt.metaKey) this.metaPressed = true;
+    if (evt.altKey) this.altPressed = true;
+    if (evt.which === CTRL_KEY) this.ctrlPressed = true;
+    if (evt.which === SHIFT_KEY) this.shiftPressed = true;
+  };
+
+  _onKeyUp = evt => {
+    if (this.lastDownTarget !== this.domElement) return;
+
+    if (!evt.metaKey) this.metaPressed = false;
+    if (!evt.altKey) this.altPressed = false;
+    if (evt.which === CTRL_KEY) this.ctrlPressed = false;
+    if (evt.which === SHIFT_KEY) this.shiftPressed = false;
+    if (evt.which === UP_KEY) {
       this.onMove(0, -1);
-    } else if ( evt.which === DOWN_KEY ) {
+    } else if (evt.which === DOWN_KEY) {
       this.onMove(0, 1);
-    } else if ( evt.which === LEFT_KEY ) {
+    } else if (evt.which === LEFT_KEY) {
       this.onMove(-1, 0);
-    } else if ( evt.which === RIGHT_KEY ) {
+    } else if (evt.which === RIGHT_KEY) {
       this.onMove(1, 0);
-    } else if ( evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY ) {
+    } else if (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY) {
       this.onDelete();
     }
-  }
+  };
 
-  _onKeyPress = (evt) => {
-    if(this.lastDownTarget !== this.domElement) return;
-  }
+  _onKeyPress = evt => {
+    if (this.lastDownTarget !== this.domElement) return;
+  };
 
-  _onMouseDown = (evt) => {
+  _onMouseDown = evt => {
     this.lastDownTarget = evt.target;
-  }
+  };
 
   mount() {
     if (typeof document === 'undefined') return;

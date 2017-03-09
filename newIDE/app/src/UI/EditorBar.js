@@ -1,7 +1,7 @@
 import React from 'react';
 import AppBar from 'material-ui/AppBar';
 
-export default (props) => {
+export default props => {
   return (
     <AppBar
       style={{
@@ -26,4 +26,4 @@ export default (props) => {
       {...props}
     />
   );
-}
+};

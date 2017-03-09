@@ -13,7 +13,11 @@ export default class ExternalLayoutEditor extends Component {
     const layoutName = externalLayout.getAssociatedLayout();
     if (!project.hasLayoutNamed(layoutName)) {
       //TODO: Error component
-      return <div>No layout called {layoutName} found for the external layout editor!</div>;
+      return (
+        <div>
+          No layout called {layoutName} found for the external layout editor!
+        </div>
+      );
     }
     const layout = project.getLayout(layoutName);
 

@@ -15,7 +15,7 @@ import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
 import defaultTheme from '../UI/Theme/DefaultTheme';
 
-import game from '../fixtures/game.json';
+import fixtureGame from '../fixtures/fixture-game.json';
 const gd = global.gd;
 
 class MainFrame extends Component {
@@ -104,7 +104,7 @@ class MainFrame extends Component {
       () => {
         var t0 = performance.now();
 
-        const unserializedProject = gd.Serializer.fromJSObject(game);
+        const unserializedProject = gd.Serializer.fromJSObject(fixtureGame);
         var t1 = performance.now();
         console.log(
           'Call to gd.Serializer.fromJSON on builtin game took ' +

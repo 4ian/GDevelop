@@ -262,7 +262,7 @@ changesNeedRestart(false)
     StaticBoxSizer12->Add(avertOnSaveCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
     FlexGridSizer14->Add(StaticBoxSizer12, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     StaticBoxSizer21 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("External scene editor"));
-    externalSceneEditorCheck = new wxCheckBox(Panel2, ID_CHECKBOX5, _("Activate a log file"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
+    externalSceneEditorCheck = new wxCheckBox(Panel2, ID_CHECKBOX5, _("Use the experimental, new scene editor"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
     externalSceneEditorCheck->SetValue(false);
     StaticBoxSizer21->Add(externalSceneEditorCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer14->Add(StaticBoxSizer21, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

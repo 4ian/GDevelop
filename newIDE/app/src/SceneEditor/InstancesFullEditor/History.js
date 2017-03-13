@@ -13,6 +13,14 @@ export const getHistoryInitialState = instances => {
   };
 };
 
+export const canRedo = history => {
+  return history.redoHistory.length;
+};
+
+export const canUndo = history => {
+  return history.undoHistory.length;
+};
+
 export const saveToHistory = (history, instances) => {
   const serializedElement = new gd.SerializerElement();
   instances.serializeTo(serializedElement);

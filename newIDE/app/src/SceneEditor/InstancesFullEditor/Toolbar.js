@@ -17,10 +17,12 @@ export default class Toolbar extends Component {
         <ToolbarIcon
           onClick={this.props.undo}
           src="res/ribbon_default/undo32.png"
+          disabled={!this.props.canUndo}
         />
         <ToolbarIcon
           onClick={this.props.redo}
           src="res/ribbon_default/redo32.png"
+          disabled={!this.props.canRedo}
         />
         <ToolbarSeparator />
         <ToolbarIcon

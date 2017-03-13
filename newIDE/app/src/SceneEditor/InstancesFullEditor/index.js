@@ -17,7 +17,14 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import SmallDrawer from '../../UI/SmallDrawer';
 import EditorBar from '../../UI/EditorBar';
 import InfoBar from '../../UI/Messages/InfoBar';
-import { undo, redo, getHistoryInitialState, saveToHistory } from './History';
+import {
+  undo,
+  redo,
+  canUndo,
+  canRedo,
+  getHistoryInitialState,
+  saveToHistory,
+} from './History';
 
 export default class InstancesFullEditor extends Component {
   constructor(props) {
@@ -59,6 +66,8 @@ export default class InstancesFullEditor extends Component {
         toggleGrid={this.toggleGrid}
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
+        canUndo={canUndo(this.state.history)}
+        canRedo={canRedo(this.state.history)}
         undo={this.undo}
         redo={this.redo}
       />
@@ -101,9 +110,9 @@ export default class InstancesFullEditor extends Component {
     this.setState({ setupGridOpen: open });
   };
 
-  editInstanceVariables = (instance) => {
+  editInstanceVariables = instance => {
     this.setState({ variablesEditedInstance: instance });
-  }
+  };
 
   setOptions = options => {
     this.setState({
@@ -123,6 +132,7 @@ export default class InstancesFullEditor extends Component {
         // /!\ Force the instances editor to destroy and mount again the
         // renderers to avoid keeping any references to existing instances
         this.editor.forceRemount();
+        this._updateToolbar();
       }
     );
   };
@@ -136,6 +146,7 @@ export default class InstancesFullEditor extends Component {
         // /!\ Force the instances editor to destroy and mount again the
         // renderers to avoid keeping any references to existing instances
         this.editor.forceRemount();
+        this._updateToolbar();
       }
     );
   };
@@ -147,10 +158,13 @@ export default class InstancesFullEditor extends Component {
   };
 
   _onNewInstanceAdded = () => {
-    this.setState({
-      selectedObjectName: null,
-      history: saveToHistory(this.state.history, this.props.initialInstances),
-    });
+    this.setState(
+      {
+        selectedObjectName: null,
+        history: saveToHistory(this.state.history, this.props.initialInstances),
+      },
+      () => this._updateToolbar()
+    );
   };
 
   _onInstancesSelected = instances => {
@@ -286,8 +300,10 @@ export default class InstancesFullEditor extends Component {
         />
         <VariablesEditorDialog
           open={!!this.state.variablesEditedInstance}
-          variablesContainer={this.state.variablesEditedInstance &&
-            this.state.variablesEditedInstance.getVariables()}
+          variablesContainer={
+            this.state.variablesEditedInstance &&
+              this.state.variablesEditedInstance.getVariables()
+          }
           onCancel={() => this.editInstanceVariables(null)}
           onApply={() => {
             //TODO

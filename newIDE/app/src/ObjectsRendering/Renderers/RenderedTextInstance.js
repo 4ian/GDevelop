@@ -54,29 +54,54 @@ RenderedTextInstance.prototype.update = function() {
   this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
   this._pixiObject.text = textObject.getString();
 
-  //Update style
-  var style = { align: 'left' };
-  style.font = '';
-  if (textObject.isItalic()) style.font += 'italic ';
-  if (textObject.isBold()) style.font += 'bold ';
+  //Update style, only if needed to avoid destroying text rendering performances
+  this._styleFontNeedUpdate = false;
+  if (
+    textObject.isItalic() !== this._isItalic ||
+    textObject.isBold() !== this._isBold ||
+    textObject.getCharacterSize() !== this._characterSize
+  ) {
+    this._isItalic = textObject.isItalic();
+    this._isBold = textObject.isBold();
+    this._characterSize = textObject.getCharacterSize();
+    this._styleFontNeedUpdate = true;
+  }
 
   if (this._fontFilename !== textObject.getFontFilename()) {
-    //Avoid calling getFontName if the font didn't changed.
+    //Avoid calling getFontFamily if the font didn't changed.
     this._fontFilename = textObject.getFontFilename();
     this._fontFamily = this._resourcesLoader.getFontFamily(
       this._project,
       textObject.getFontFilename()
     );
+    this._styleFontNeedUpdate = true;
   }
-  style.font += textObject.getCharacterSize() + 'px  ' + this._fontFamily;
-  style.fill = 'rgb(' +
-    textObject.getColorR() +
-    ',' +
-    textObject.getColorG() +
-    ',' +
-    textObject.getColorB() +
-    ')';
-  this._pixiObject.style = style;
+
+  if (this._styleFontNeedUpdate) {
+    let font = '';
+    if (this._isItalic) font += 'italic ';
+    if (this._isBold) font += 'bold ';
+    font += this._characterSize + 'px  ' + this._fontFamily;
+
+    this._pixiObject.style.font = font;
+  }
+
+  if (
+    textObject.getColorR() !== this._colorR ||
+    textObject.getColorG() !== this._colorG ||
+    textObject.getColorB() !== this._colorB
+  ) {
+    this._colorR = textObject.getColorR();
+    this._colorG = textObject.getColorG();
+    this._colorB = textObject.getColorB();
+    this._pixiObject.style.fill = 'rgb(' +
+      this._colorR +
+      ',' +
+      this._colorG +
+      ',' +
+      this._colorB +
+      ')';
+  }
 };
 
 RenderedTextInstance.prototype.getDefaultWidth = function() {

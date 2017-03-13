@@ -111,6 +111,9 @@ export default class InstancesList extends Component {
           displayRowCheckbox={false}
           deselectOnClickaway={false}
           showRowHover={true}
+          style={{
+            backgroundColor: 'white',
+          }}
         >
           {this.renderedRows.map(row => row.element)}
         </TableBody>

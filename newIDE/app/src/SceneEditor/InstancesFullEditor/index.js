@@ -5,8 +5,9 @@ import FullSizeInstancesEditor
 import InstancePropertiesEditor
   from '../../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../../InstancesEditor/InstancesList';
-import InstancesSelection from './InstancesSelection';
 import LayersList from '../../LayersList';
+import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
+import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import Toolbar from './Toolbar';
 
@@ -28,6 +29,7 @@ export default class InstancesFullEditor extends Component {
       instancesListOpen: false,
       setupGridOpen: false,
       layersListOpen: false,
+      variablesEditedInstance: null,
       options: {
         grid: false,
         snap: false,
@@ -98,6 +100,10 @@ export default class InstancesFullEditor extends Component {
   openSetupGrid = (open = true) => {
     this.setState({ setupGridOpen: open });
   };
+
+  editInstanceVariables = (instance) => {
+    this.setState({ variablesEditedInstance: instance });
+  }
 
   setOptions = options => {
     this.setState({
@@ -196,6 +202,7 @@ export default class InstancesFullEditor extends Component {
             layout={layout}
             instances={selectedInstances}
             onInstancesModified={this._onInstancesModified}
+            editInstanceVariables={this.editInstanceVariables}
           />
         </SmallDrawer>
         <FullSizeInstancesEditor
@@ -275,6 +282,16 @@ export default class InstancesFullEditor extends Component {
           onApply={options => {
             this.setOptions(options);
             this.openSetupGrid(false);
+          }}
+        />
+        <VariablesEditorDialog
+          open={!!this.state.variablesEditedInstance}
+          variablesContainer={this.state.variablesEditedInstance &&
+            this.state.variablesEditedInstance.getVariables()}
+          onCancel={() => this.editInstanceVariables(null)}
+          onApply={() => {
+            //TODO
+            this.editInstanceVariables(null);
           }}
         />
       </div>

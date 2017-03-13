@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import Subheader from 'material-ui/Subheader';
+import RaisedButton from 'material-ui/RaisedButton';
 import mapFor from '../../Utils/MapFor';
 
 export default class InstancePropertiesEditor extends Component {
@@ -51,6 +52,11 @@ export default class InstancePropertiesEditor extends Component {
         valueType: 'boolean',
         getValue: instance => instance.isLocked(),
         setValue: (instance, newValue) => instance.setLocked(newValue),
+      },
+      {
+        name: 'Edit instance variables',
+        getLabel: (instance) => 'Edit instance variables (' + instance.getVariables().count() + ')',
+        onClick: (instance) => this.props.editInstanceVariables(instance),
       },
       {
         name: 'Custom size',
@@ -146,9 +152,22 @@ export default class InstancePropertiesEditor extends Component {
     }
   };
 
+  _renderButton = field => {
+    //TODO: multi selection handling
+    return (
+      <RaisedButton
+        key={field.name}
+        fullWidth
+        label={field.getLabel(this.props.instances[0])}
+        onTouchTap={() => field.onClick(this.props.instances[0])}
+      />
+    );
+  }
+
   _renderFields(schema) {
     return schema.map(field => {
       if (field.getValue) return this._renderEditField(field);
+      if (field.onClick) return this._renderButton(field);
       if (field.children) {
         return (
           <div key={field.name}>

@@ -99,9 +99,10 @@ public:
     void Remove(const gd::String & name);
 
     /**
-     * \brief Rename a variable
+     * \brief Rename a variable.
+     * \return true if the variable was renamed, false otherwise.
      */
-    void Rename(const gd::String & oldName, const gd::String & newName);
+    bool Rename(const gd::String & oldName, const gd::String & newName);
 
     /**
      * \brief Swap the position of the specified variables.

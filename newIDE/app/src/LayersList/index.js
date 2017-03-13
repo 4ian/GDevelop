@@ -24,7 +24,7 @@ const styles = {
   },
 };
 
-export default class InstancesList extends Component {
+export default class LayersList extends Component {
   shouldComponentUpdate() {
     // Rendering the component can be costly as it iterates over
     // every layers, so the prop freezeUpdate allow to ask the component to stop
@@ -90,7 +90,6 @@ export default class InstancesList extends Component {
     return (
       <Table
         selectable={true}
-        onRowSelection={selection => this.onRowSelection(selection)}
       >
         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
           <TableRow>
@@ -105,6 +104,9 @@ export default class InstancesList extends Component {
           displayRowCheckbox={false}
           deselectOnClickaway={true}
           showRowHover={true}
+          style={{
+            backgroundColor: 'white',
+          }}
         >
           {containerLayersList}
         </TableBody>

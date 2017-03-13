@@ -2,7 +2,7 @@ import React from 'react';
 import Paper from 'material-ui/Paper';
 
 export default props => {
-  const width = props.width || 250;
+  const width = props.width || 300;
   const xOffset = props.open ? 0 : -width;
 
   return (

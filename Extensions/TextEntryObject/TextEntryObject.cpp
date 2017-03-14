@@ -27,7 +27,7 @@ This project is released under the MIT License.
 
 using namespace std;
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 sf::Texture TextEntryObject::edittimeIconImage;
 sf::Sprite TextEntryObject::edittimeIcon;
 #endif
@@ -71,7 +71,7 @@ void RuntimeTextEntryObject::Update(const RuntimeScene & scene)
     }
 }
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 void TextEntryObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
     edittimeIcon.setPosition(instance.GetX(), instance.GetY());
@@ -86,13 +86,13 @@ void TextEntryObject::LoadEdittimeIcon()
 
 bool TextEntryObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
-#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/textentry.png", wxBITMAP_TYPE_ANY);
-#endif
 
     return true;
 }
+#endif
 
+#if defined(GD_IDE_ONLY)
 void RuntimeTextEntryObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Text in memory");    value = GetString();}

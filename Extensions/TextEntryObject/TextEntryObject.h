@@ -34,14 +34,14 @@ public :
     virtual ~TextEntryObject() {};
     virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<TextEntryObject>(*this); }
 
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
     static void LoadEdittimeIcon();
     #endif
 
 private:
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     static sf::Texture edittimeIconImage;
     static sf::Sprite edittimeIcon;
     #endif

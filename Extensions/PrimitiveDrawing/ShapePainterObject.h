@@ -52,11 +52,6 @@ public:
     ShapePainterObjectBase();
     virtual ~ShapePainterObjectBase() {};
 
-    virtual void UnserializeFrom(const gd::SerializerElement & element);
-    #if defined(GD_IDE_ONLY)
-    virtual void SerializeTo(gd::SerializerElement & element) const;
-    #endif
-
     inline void SetOutlineSize(float size) { outlineSize = size; };
     inline float GetOutlineSize() const { return outlineSize; };
 
@@ -87,6 +82,13 @@ public:
     inline void SetCoordinatesAbsolute() { absoluteCoordinates = true; }
     inline void SetCoordinatesRelative() { absoluteCoordinates = false; }
     inline bool AreCoordinatesAbsolute() { return absoluteCoordinates; }
+
+protected:
+    virtual void DoUnserializeFrom(const gd::SerializerElement & element);
+    #if defined(GD_IDE_ONLY)
+    virtual void DoSerializeTo(gd::SerializerElement & element) const;
+    #endif
+
 private:
     //Fill color
     unsigned int fillColorR;
@@ -115,7 +117,7 @@ public:
     virtual ~ShapePainterObject() {};
     virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<ShapePainterObject>(*this); }
 
-    #if defined(GD_IDE_ONLY)
+    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
     virtual sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const {return sf::Vector2f(32,32);};
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
@@ -129,8 +131,10 @@ private:
     #if defined(GD_IDE_ONLY)
     virtual void DoSerializeTo(gd::SerializerElement & element) const;
 
+    #if !defined(GD_NO_WX_GUI)
     static sf::Texture edittimeIconImage;
     static sf::Sprite edittimeIcon;
+    #endif
     #endif
 };
 

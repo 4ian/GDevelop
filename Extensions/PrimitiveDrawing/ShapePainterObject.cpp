@@ -27,7 +27,7 @@ This project is released under the MIT License.
 #include "ShapePainterObjectEditor.h"
 #endif
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 sf::Texture ShapePainterObject::edittimeIconImage;
 sf::Sprite ShapePainterObject::edittimeIcon;
 #endif
@@ -59,7 +59,7 @@ RuntimeShapePainterObject::RuntimeShapePainterObject(RuntimeScene & scene, const
     ShapePainterObjectBase::operator=(shapePainterObject);
 }
 
-void ShapePainterObjectBase::UnserializeFrom(const gd::SerializerElement & element)
+void ShapePainterObjectBase::DoUnserializeFrom(const gd::SerializerElement & element)
 {
     fillOpacity = element.GetChild("fillOpacity", 0, "FillOpacity").GetValue().GetInt();
     outlineSize = element.GetChild("outlineSize", 0, "OutlineSize").GetValue().GetInt();
@@ -78,11 +78,11 @@ void ShapePainterObjectBase::UnserializeFrom(const gd::SerializerElement & eleme
 
 void ShapePainterObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
-    ShapePainterObjectBase::UnserializeFrom(element);
+    ShapePainterObjectBase::DoUnserializeFrom(element);
 }
 
 #if defined(GD_IDE_ONLY)
-void ShapePainterObjectBase::SerializeTo(gd::SerializerElement & element) const
+void ShapePainterObjectBase::DoSerializeTo(gd::SerializerElement & element) const
 {
     element.AddChild("fillOpacity").SetValue(fillOpacity);
     element.AddChild("outlineSize").SetValue(outlineSize);
@@ -100,7 +100,7 @@ void ShapePainterObjectBase::SerializeTo(gd::SerializerElement & element) const
 
 void ShapePainterObject::DoSerializeTo(gd::SerializerElement & element) const
 {
-    ShapePainterObjectBase::SerializeTo(element);
+    ShapePainterObjectBase::DoSerializeTo(element);
 }
 #endif
 
@@ -127,7 +127,7 @@ bool RuntimeShapePainterObject::Draw( sf::RenderTarget& renderTarget )
     return true;
 }
 
-#if defined(GD_IDE_ONLY)
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 /**
  * Render object at edittime
  */
@@ -145,21 +145,20 @@ void ShapePainterObject::LoadEdittimeIcon()
 
 bool ShapePainterObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
-#if !defined(GD_NO_WX_GUI)
     thumbnail = wxBitmap("CppPlatform/Extensions/primitivedrawingicon24.png", wxBITMAP_TYPE_ANY);
-#endif
 
     return true;
 }
 
 void ShapePainterObject::EditObject( wxWindow* parent, gd::Project & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
-#if !defined(GD_NO_WX_GUI)
     ShapePainterObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
-#endif
 }
+#endif
 
+
+#if defined(GD_IDE_ONLY)
 void RuntimeShapePainterObject::GetPropertyForDebugger(std::size_t propertyNb, gd::String & name, gd::String & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Fill color");    value = gd::String::From(GetFillColorR())+";"+gd::String::From(GetFillColorG())+";"+gd::String::From(GetFillColorB());}

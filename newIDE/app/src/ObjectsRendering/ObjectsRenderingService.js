@@ -6,6 +6,8 @@ import RenderedPanelSpriteInstance
   from './Renderers/RenderedPanelSpriteInstance';
 import RenderedAdMobInstance from './Renderers/RenderedAdMobInstance';
 import RenderedTextInstance from './Renderers/RenderedTextInstance';
+import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstance';
+import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
 import ResourcesLoader from './ResourcesLoader';
 
 /**
@@ -20,6 +22,8 @@ export default {
     'PanelSpriteObject::PanelSprite': RenderedPanelSpriteInstance,
     'AdMobObject::AdMob': RenderedAdMobInstance,
     'TextObject::Text': RenderedTextInstance,
+    'PrimitiveDrawing::Drawer': RenderedShapePainterInstance,
+    'TextEntryObject::TextEntry': RenderedTextEntryInstance,
   },
   getThumbnail: function(project, object) {
     var objectType = object.getType();

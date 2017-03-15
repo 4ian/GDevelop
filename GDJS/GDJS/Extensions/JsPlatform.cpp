@@ -134,6 +134,8 @@ gd::PlatformExtension * CreateGDJSAnchorBehaviorExtension();
 gd::PlatformExtension * CreateGDJSPrimitiveDrawingExtension();
 gd::PlatformExtension * CreateGDJSTextEntryObjectExtension();
 gd::PlatformExtension * CreateGDJSInventoryExtension();
+gd::PlatformExtension * CreateGDJSLinkedObjectsExtension();
+gd::PlatformExtension * CreateGDJSSystemInfoExtension();
 }
 #endif
 
@@ -177,6 +179,8 @@ JsPlatform::JsPlatform() :
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSPrimitiveDrawingExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSTextEntryObjectExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSInventoryExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSLinkedObjectsExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSSystemInfoExtension())); std::cout.flush();
     #endif
     std::cout << "done." << std::endl;
 };

@@ -11,6 +11,8 @@ This project is released under the MIT License.
 #include <iostream>
 #include "GDCore/Tools/Localization.h"
 
+void DeclareInventoryExtension(gd::PlatformExtension & extension);
+
 /**
  * \brief This class declares information about the JS extension.
  */
@@ -23,13 +25,7 @@ public:
      */
     InventoryJsExtension()
     {
-        SetExtensionInformation("Inventory",
-	        _("Inventory"),
-	        _("Provides action and condition to store an inventory with items in memory."),
-	        "Florian Rival",
-	        "Open source (MIT License)");
-
-        CloneExtension("GDevelop C++ platform", "Inventory");
+        DeclareInventoryExtension(*this);
 
 		GetAllActions()["Inventory::Add"].codeExtraInformation
 			.SetIncludeFile("Inventory/inventory.js")

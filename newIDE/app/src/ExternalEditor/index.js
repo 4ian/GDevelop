@@ -80,7 +80,8 @@ class ExternalEditor extends Component {
   };
 
   launchPreview = () => {
-    this.bridge.send('requestPreview', undefined);
+    this.sendUpdate();
+    setTimeout(() => this.bridge.send('requestPreview', undefined), 1);
   };
 
   requestUpdate = (scope = '') => {

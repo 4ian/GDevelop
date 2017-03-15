@@ -35,6 +35,8 @@ function RenderedTiledSpriteInstance(
     tiledSprite.getWidth(),
     tiledSprite.getHeight()
   );
+  this._pixiObject.anchor.x = 0.5;
+  this._pixiObject.anchor.y = 0.5;
   this._pixiContainer.addChild(this._pixiObject);
 }
 RenderedTiledSpriteInstance.prototype = Object.create(
@@ -57,8 +59,6 @@ RenderedTiledSpriteInstance.getThumbnail = function(
 };
 
 RenderedTiledSpriteInstance.prototype.update = function() {
-  this._pixiObject.x = this._instance.getX();
-  this._pixiObject.y = this._instance.getY();
   if (this._instance.hasCustomSize()) {
     this._pixiObject.width = this._instance.getCustomWidth();
     this._pixiObject.height = this._instance.getCustomHeight();
@@ -67,6 +67,10 @@ RenderedTiledSpriteInstance.prototype.update = function() {
     this._pixiObject.width = tiledSprite.getWidth();
     this._pixiObject.height = tiledSprite.getHeight();
   }
+
+  this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;
+  this._pixiObject.y = this._instance.getY() + this._pixiObject.height / 2;
+  this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
 };
 
 RenderedTiledSpriteInstance.prototype.getDefaultWidth = function() {

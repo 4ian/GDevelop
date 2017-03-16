@@ -305,10 +305,7 @@ export default class InstancesFullEditor extends Component {
               this.state.variablesEditedInstance.getVariables()
           }
           onCancel={() => this.editInstanceVariables(null)}
-          onApply={() => {
-            //TODO
-            this.editInstanceVariables(null);
-          }}
+          onApply={() => this.editInstanceVariables(null)}
         />
       </div>
     );

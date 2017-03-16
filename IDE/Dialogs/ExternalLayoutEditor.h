@@ -24,6 +24,7 @@ namespace gd { class ExternalLayout; }
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class ObjectsEditor; }
 class LayersEditorPanel;
+namespace gd { class ExternalEditor; }
 class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
 
@@ -77,6 +78,7 @@ public:
 
     /**
      * Get the layout editor owned by this editor.
+     * \note Can be NULL if no layout editor was created.
      */
     gd::LayoutEditorCanvas * GetLayoutEditorCanvas() const { return layoutEditorCanvas; }
 
@@ -108,6 +110,7 @@ private:
     //*)
     void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
     void SetupForScene(gd::Layout & scene);
+    void CreateExternalLayoutEditor();
 
     //(*Declarations(ExternalLayoutEditor)
     wxScrollBar* scrollBar1;
@@ -131,6 +134,8 @@ private:
     gd::ExternalLayout & externalLayout;
     gd::MainFrameWrapper mainFrameWrapper;
     Scene emptyLayout;
+
+    std::shared_ptr<gd::ExternalEditor> externalLayoutEditor;
 
     std::function<void()> onAssociatedLayoutChangedCb;
     wxAuiManager m_mgr;

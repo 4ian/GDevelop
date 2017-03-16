@@ -144,7 +144,7 @@ mainFrameWrapper(mainFrameWrapper_)
     layoutEditorCanvas->AddAssociatedEditor(propertiesPnl.get());
     layoutEditorCanvas->AddAssociatedEditor(initialInstancesBrowser.get());
     layersEditor->SetAssociatedLayoutEditorCanvas(layoutEditorCanvas);
-		layersEditor->SetAssociatedPropertiesPanel(propertiesPnl.get(), &m_mgr);
+	layersEditor->SetAssociatedPropertiesPanel(propertiesPnl.get(), &m_mgr);
     eventsEditor->SetAssociatedLayoutCanvas(layoutEditorCanvas);
     objectsEditor->SetAssociatedPropertiesPanel(propertiesPnl.get(), &m_mgr);
 
@@ -203,7 +203,8 @@ void EditorScene::CreateExternalLayoutEditor()
 {
 	externalLayoutEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
 	externalLayoutEditor->OnSendUpdate([this](gd::String scope) {
-		if (scope == "instances") {
+		if (scope == "instances")
+		{
 			gd::SerializerElement serializedInstances;
 			this->layout.GetInitialInstances().SerializeTo(serializedInstances);
 			return serializedInstances;
@@ -217,7 +218,8 @@ void EditorScene::CreateExternalLayoutEditor()
 		return serializedProject;
 	});
 	externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object, gd::String scope) {
-		if (scope == "instances") {
+		if (scope == "instances")
+		{
 			std::cout << "Updating instances from the external editor." << std::endl;
 			this->layout.GetInitialInstances().UnserializeFrom(object);
 			return;

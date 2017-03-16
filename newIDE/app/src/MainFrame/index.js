@@ -190,6 +190,9 @@ class MainFrame extends Component {
               key={externalLayoutOpened}
               project={currentProject}
               externalLayoutName={externalLayoutOpened}
+              setToolbar={this.setToolbar}
+              onPreview={this.props.onPreview}
+              showPreviewButton
             />}
           {currentProject &&
             currentProject.hasExternalEventsNamed(externalEventsOpened) &&

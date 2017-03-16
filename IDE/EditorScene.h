@@ -24,12 +24,12 @@
 #include <wx/ribbon/toolbar.h>
 #include <memory>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-namespace gd {class Layout;}
-namespace gd {class Project;}
-namespace gd {class LayoutEditorCanvas;}
-namespace gd {class ObjectsEditor;}
+namespace gd { class Layout; }
+namespace gd { class Project; }
+namespace gd { class LayoutEditorCanvas; }
+namespace gd { class ObjectsEditor; }
 class LayersEditorPanel;
-namespace gd {class ExternalEditor;}
+namespace gd { class ExternalEditor; }
 class CppLayoutPreviewer;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;

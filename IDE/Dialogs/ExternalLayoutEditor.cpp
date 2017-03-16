@@ -22,6 +22,8 @@
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/IDE/Dialogs/ExternalEditor/ExternalEditor.h"
+#include "GDCore/IDE/ProjectStripper.h"
 
 using namespace gd;
 
@@ -138,6 +140,40 @@ mainFrameWrapper(mainFrameWrapper_)
     Refresh();
 }
 
+void ExternalLayoutEditor::CreateExternalLayoutEditor()
+{
+	externalLayoutEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
+	externalLayoutEditor->OnSendUpdate([this](gd::String scope) {
+		if (scope == "instances")
+        {
+			gd::SerializerElement serializedInstances;
+			this->externalLayout.GetInitialInstances().SerializeTo(serializedInstances);
+			return serializedInstances;
+		}
+
+		gd::SerializerElement serializedProject;
+		gd::Project strippedProject = project;
+		gd::ProjectStripper::StripProjectForExternalLayoutEdition(strippedProject, this->externalLayout.GetName());
+		strippedProject.SerializeTo(serializedProject);
+
+		return serializedProject;
+	});
+	externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object, gd::String scope) {
+		if (scope == "instances")
+        {
+			std::cout << "Updating instances from the external editor." << std::endl;
+			this->externalLayout.GetInitialInstances().UnserializeFrom(object);
+			return;
+		}
+
+		std::cout << "Updating anything else from instances from the external editor is not supported" << std::endl;
+	});
+	externalLayoutEditor->OnLaunchPreview([this](){
+		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
+	});
+	externalLayoutEditor->Launch("external-layout-editor", externalLayout.GetName());
+}
+
 ExternalLayoutEditor::~ExternalLayoutEditor()
 {
 	//(*Destroy(ExternalLayoutEditor)
@@ -205,14 +241,28 @@ void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
 
 void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 {
+    bool useExternalEditor = false;
+    wxConfigBase::Get()->Read("/SceneEditor/ExternalSceneEditor", &useExternalEditor, false);
+
     if ( &layout == &emptyLayout )
     {
         layoutPanel->Hide();
+        // externalEditorPanel->Hide();
         helpPanel->Show();
+    }
+    else if (useExternalEditor)
+    {
+        layoutPanel->Hide();
+        // externalEditorPanel->Show();
+        helpPanel->Show();
+        // helpPanel->Hide();
+
+        CreateExternalLayoutEditor();
     }
     else
     {
         layoutPanel->Show();
+        // externalEditorPanel->Hide();
         helpPanel->Hide();
 
         gd::InitialInstancesContainer & instanceContainer = externalLayout.GetInitialInstances();

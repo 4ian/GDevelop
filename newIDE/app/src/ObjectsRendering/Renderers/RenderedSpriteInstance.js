@@ -99,12 +99,7 @@ RenderedSpriteInstance.prototype.updateSprite = function() {
   const spriteObject = gd.asSpriteObject(this._associatedObject);
   if (spriteObject.hasNoAnimations()) return false;
 
-  const properties = this._instance.getCustomProperties(
-    this._project,
-    this._layout
-  );
-  const animationProperty = properties.get('Animation');
-  this._renderedAnimation = parseInt(animationProperty.getValue(), 10);
+  this._renderedAnimation = this._instance.getRawFloatProperty('animation');
   if (this._renderedAnimation >= spriteObject.getAnimationsCount())
     this._renderedAnimation = 0;
 
@@ -164,13 +159,7 @@ RenderedSpriteInstance.prototype.updatePIXITexture = function() {
 };
 
 RenderedSpriteInstance.prototype.update = function() {
-  var properties = this._instance.getCustomProperties(
-    this._project,
-    this._layout
-  );
-  var property = properties.get('Animation');
-  var animation = parseInt(property.getValue(), 10);
-
+  const animation = this._instance.getRawFloatProperty('animation');
   if (this._renderedAnimation !== animation) this.updatePIXITexture();
 
   this.updatePIXISprite();

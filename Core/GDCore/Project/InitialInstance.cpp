@@ -15,6 +15,8 @@
 namespace gd
 {
 
+gd::String * InitialInstance::badStringProperyValue = NULL;
+
 InitialInstance::InitialInstance() :
     objectName(""),
     x(0),
@@ -31,7 +33,7 @@ InitialInstance::InitialInstance() :
 
 
 #if defined(GD_IDE_ONLY)
-std::map<gd::String, gd::PropertyDescriptor> gd::InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
+std::map<gd::String, gd::PropertyDescriptor> InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
 {
     //Find an object
     if ( layout.HasObjectNamed(GetObjectName()) )
@@ -43,7 +45,7 @@ std::map<gd::String, gd::PropertyDescriptor> gd::InitialInstance::GetCustomPrope
     return nothing;
 }
 
-bool gd::InitialInstance::UpdateCustomProperty(const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & layout)
+bool InitialInstance::UpdateCustomProperty(const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & layout)
 {
     if ( layout.HasObjectNamed(GetObjectName()) )
         return layout.GetObject(GetObjectName()).UpdateInitialInstanceProperty(*this, name, value, project, layout);
@@ -51,6 +53,20 @@ bool gd::InitialInstance::UpdateCustomProperty(const gd::String & name, const gd
         return project.GetObject(GetObjectName()).UpdateInitialInstanceProperty(*this, name, value, project, layout);
 
     return false;
+}
+
+float InitialInstance::GetRawFloatProperty(const gd::String & name) const
+{
+	const auto & it = floatInfos.find(name);
+	return it != floatInfos.end() ? it->second : 0;
+}
+
+const gd::String & InitialInstance::GetRawStringProperty(const gd::String & name) const
+{
+	if (!badStringProperyValue) badStringProperyValue = new gd::String("");
+
+	const auto & it = stringInfos.find(name);
+	return it != stringInfos.end() ? it->second : *badStringProperyValue;
 }
 
 #endif

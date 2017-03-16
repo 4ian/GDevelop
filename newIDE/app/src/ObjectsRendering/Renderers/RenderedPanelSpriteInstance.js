@@ -5,6 +5,9 @@ import PIXI from 'pixi.js';
 /**
  * Renderer for gd.PanelSpriteObject
  *
+ * Heavily inspired from the GDJS PIXI renderer for PanelSprite objects.
+ * TODO: Find a way to factor GDJS objects and IDE instances renderers.
+ *
  * @extends RenderedInstance
  * @class RenderedPanelSpriteInstance
  * @constructor

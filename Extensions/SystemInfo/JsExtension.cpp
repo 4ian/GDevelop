@@ -29,6 +29,7 @@ public:
             .SetFunctionName("gdjs.evtTools.systemInfo.isMobile");
 
         StripUnimplementedInstructionsAndExpressions();
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 

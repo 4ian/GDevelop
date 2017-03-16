@@ -39,6 +39,7 @@ public:
             .SetFunctionName("gdjs.evtTools.linkedObjects.pickObjectsLinkedTo");
 
         StripUnimplementedInstructionsAndExpressions();
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 

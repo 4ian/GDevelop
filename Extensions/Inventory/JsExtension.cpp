@@ -80,6 +80,7 @@ public:
 			.SetFunctionName("gdjs.evtTools.inventory.count");
 
         StripUnimplementedInstructionsAndExpressions();
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 

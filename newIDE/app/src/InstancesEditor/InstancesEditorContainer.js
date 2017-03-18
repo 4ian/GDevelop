@@ -9,6 +9,7 @@ import SelectionRectangle from './SelectionRectangle';
 import InstancesResizer from './InstancesResizer';
 import InstancesMover from './InstancesMover';
 import Grid from './Grid';
+import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
 const gd = global.gd;
 import PIXI from 'pixi.js';
 
@@ -43,9 +44,9 @@ export default class InstancesEditorContainer extends Component {
       if (this.keyboardShortcuts.shouldZoom()) {
         this.viewPosition.zoomBy(event.wheelDelta / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
-        this.viewPosition.scrollBy(-event.wheelDelta / 20, 0);
+        this.viewPosition.scrollBy((-event.wheelDelta) / 20, 0);
       } else {
-        this.viewPosition.scrollBy(0, -event.wheelDelta / 20);
+        this.viewPosition.scrollBy(0, (-event.wheelDelta) / 20);
       }
       event.preventDefault();
     };
@@ -86,6 +87,7 @@ export default class InstancesEditorContainer extends Component {
     });
 
     this._mountEditorComponents(this.props);
+    ResourcesLoader.loadTextures(this.props.project, () => {}, () => {});
     this.renderScene();
   }
 
@@ -213,8 +215,9 @@ export default class InstancesEditorContainer extends Component {
 
   _onEndSelectionRectangle = () => {
     const instancesSelected = this.selectionRectangle.endSelectionRectangle();
-    instancesSelected.forEach(instance =>
-      this.props.instancesSelection.selectInstance(instance));
+    instancesSelected.forEach(
+      instance => this.props.instancesSelection.selectInstance(instance)
+    );
     this.props.onInstancesSelected(instancesSelected);
   };
 

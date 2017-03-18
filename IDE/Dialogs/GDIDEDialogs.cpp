@@ -394,3 +394,50 @@ LayersEditorPanelBase::~LayersEditorPanelBase()
     delete m_auimgr;
 
 }
+
+ExternalEditorPanelBase::ExternalEditorPanelBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxCraftergfm8VaInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer119 = new wxFlexGridSizer(0, 0, 0, 0);
+    flexGridSizer119->SetFlexibleDirection( wxBOTH );
+    flexGridSizer119->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer119->AddGrowableCol(0);
+    flexGridSizer119->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer119);
+    
+    wxFlexGridSizer* flexGridSizer121 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer121->SetFlexibleDirection( wxBOTH );
+    flexGridSizer121->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer119->Add(flexGridSizer121, 1, wxALL|wxALIGN_CENTER, 5);
+    
+    m_staticText123 = new wxStaticText(this, wxID_ANY, _("The scene is edited in a separate window"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer121->Add(m_staticText123, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    
+    m_button125 = new wxButton(this, wxID_ANY, _("Open the scene editor"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer121->Add(m_button125, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    
+    SetName(wxT("ExternalEditorPanelBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    // Connect events
+    m_button125->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ExternalEditorPanelBase::onOpenEditorClicked), NULL, this);
+    
+}
+
+ExternalEditorPanelBase::~ExternalEditorPanelBase()
+{
+    m_button125->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ExternalEditorPanelBase::onOpenEditorClicked), NULL, this);
+    
+}

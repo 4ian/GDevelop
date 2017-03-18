@@ -29,9 +29,7 @@ function RenderedTiledSpriteInstance(
   //Setup the PIXI object:
   var tiledSprite = gd.asTiledSpriteObject(associatedObject);
   this._pixiObject = new PIXI.extras.TilingSprite(
-    PIXI.Texture.fromImage(
-      resourcesLoader.get(project, tiledSprite.getTexture())
-    ),
+    resourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
     tiledSprite.getWidth(),
     tiledSprite.getHeight()
   );
@@ -55,7 +53,7 @@ RenderedTiledSpriteInstance.getThumbnail = function(
 ) {
   var tiledSprite = gd.asTiledSpriteObject(object);
 
-  return resourcesLoader.get(project, tiledSprite.getTexture());
+  return resourcesLoader.getFilename(project, tiledSprite.getTexture());
 };
 
 RenderedTiledSpriteInstance.prototype.update = function() {

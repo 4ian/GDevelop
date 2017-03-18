@@ -75,10 +75,10 @@ RenderedPanelSpriteInstance.prototype.update = function() {
 RenderedPanelSpriteInstance.prototype.makeObjects = function() {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   this._textureName = panelSprite.getTexture();
-  const texture = PIXI.Texture.fromImage(this._resourcesLoader.get(
+  const texture = this._resourcesLoader.getPIXITexture(
     this._project,
     this._textureName,
-  ));
+  );
 
   this._tiled = panelSprite.isTiled();
   var StretchedSprite = !this._tiled ? PIXI.Sprite : PIXI.extras.TilingSprite;
@@ -213,10 +213,10 @@ RenderedPanelSpriteInstance.prototype._updateSpritesAndTexturesSize = function()
 RenderedPanelSpriteInstance.prototype.updateTexture = function() {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   this._textureName = panelSprite.getTexture();
-  const texture = PIXI.Texture.fromImage(this._resourcesLoader.get(
+  const texture = this._resourcesLoader.getPIXITexture(
     this._project,
     this._textureName,
-  ));
+  );
 
   if (texture.noFrame) { //Post pone texture update if texture is not loaded
     const renderer = this;
@@ -394,7 +394,7 @@ RenderedPanelSpriteInstance.getThumbnail = function(
 ) {
   const panelSprite = gd.asPanelSpriteObject(object);
 
-  return resourcesLoader.get(project, panelSprite.getTexture());
+  return resourcesLoader.getFilename(project, panelSprite.getTexture());
 };
 
 export default RenderedPanelSpriteInstance;

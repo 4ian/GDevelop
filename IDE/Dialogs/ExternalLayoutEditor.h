@@ -27,6 +27,7 @@ class LayersEditorPanel;
 namespace gd { class ExternalEditor; }
 class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
+class ExternalEditorPanel;
 
 class ExternalLayoutEditor: public wxPanel
 {
@@ -136,6 +137,7 @@ private:
     Scene emptyLayout;
 
     std::shared_ptr<gd::ExternalEditor> externalLayoutEditor;
+    ExternalEditorPanel * externalEditorPanel;
 
     std::function<void()> onAssociatedLayoutChangedCb;
     wxAuiManager m_mgr;

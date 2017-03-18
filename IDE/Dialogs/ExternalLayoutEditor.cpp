@@ -18,6 +18,7 @@
 #include "LayoutEditorPropertiesPnl.h"
 #include "ObjectsEditor.h"
 #include "LayersEditorPanel.h"
+#include "ExternalEditorPanel.h"
 #include "../MainFrame.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
@@ -130,6 +131,17 @@ mainFrameWrapper(mainFrameWrapper_)
     Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&ExternalLayoutEditor::OnscrollBar2Scroll);
     Connect(ID_SCROLLBAR2,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&ExternalLayoutEditor::OnscrollBar2Scroll);
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_DROPDOWN,(wxObjectEventFunction)&ExternalLayoutEditor::OnparentSceneComboBoxDropDown);
+
+	externalEditorPanel = new ExternalEditorPanel(corePanel);
+	FlexGridSizer3->Add(externalEditorPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	externalEditorPanel->OnOpenEditor([this]() {
+		if (!externalLayoutEditor) return;
+
+		if (externalLayoutEditor->IsLaunchedAndConnected())
+			externalLayoutEditor->Show();
+		else
+			externalLayoutEditor->Launch("external-layout-editor", externalLayout.GetName());
+	});
 
 	//Prepare pane manager
     m_mgr.SetManagedWindow( this );
@@ -247,23 +259,23 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
     if ( &layout == &emptyLayout )
     {
         layoutPanel->Hide();
-        // externalEditorPanel->Hide();
+        externalEditorPanel->Hide();
         helpPanel->Show();
-    }
-    else if (useExternalEditor)
-    {
-        layoutPanel->Hide();
-        // externalEditorPanel->Show();
-        helpPanel->Show();
-        // helpPanel->Hide();
-
-        CreateExternalLayoutEditor();
     }
     else
     {
-        layoutPanel->Show();
-        // externalEditorPanel->Hide();
-        helpPanel->Hide();
+		if (useExternalEditor)
+		{
+	        layoutPanel->Hide();
+	        externalEditorPanel->Show();
+	        helpPanel->Hide();
+
+	        CreateExternalLayoutEditor();
+		} else {
+	        layoutPanel->Show();
+	        externalEditorPanel->Hide();
+	        helpPanel->Hide();
+		}
 
         gd::InitialInstancesContainer & instanceContainer = externalLayout.GetInitialInstances();
 

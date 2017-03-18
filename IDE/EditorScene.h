@@ -10,10 +10,8 @@
 #include <vector>
 //(*Headers(EditorScene)
 #include <wx/sizer.h>
-#include <wx/stattext.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
-#include <wx/button.h>
 #include <wx/scrolbar.h>
 //*)
 #include <wx/help.h>
@@ -34,6 +32,7 @@ class CppLayoutPreviewer;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
+class ExternalEditorPanel;
 
 /**
  * \brief Panel containing all the editors of a layout.
@@ -72,8 +71,6 @@ protected:
     static const long ID_SCROLLBAR4;
     static const long ID_CUSTOM3;
     static const long ID_PANEL1;
-    static const long ID_STATICTEXT1;
-    static const long ID_BUTTON1;
     static const long ID_PANEL2;
     static const long ID_CUSTOM2;
     static const long ID_PANEL6;
@@ -101,22 +98,20 @@ private:
     void OnhScrollbarScroll(wxScrollEvent& event);
     void OnvScrollbarScrollThumbRelease(wxScrollEvent& event);
     void OnhScrollbarScrollThumbRelease(wxScrollEvent& event);
-    void OnopenSceneEditorBtClick(wxCommandEvent& event);
     //*)
     void CreateExternalLayoutEditor();
 
     //(*Declarations(EditorScene)
     EventsEditor* eventsEditor;
-    wxStaticText* externalSceneEditorExplanationTxt;
-    wxButton* openSceneEditorBt;
-    wxPanel* externalSceneEditorPanel;
     gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxPanel* scenePanel;
     wxPanel* eventsPanel;
+    wxPanel* externalSceneEditorContainerPanel;
     wxScrollBar* hScrollbar;
     wxAuiNotebook* notebook;
     wxScrollBar* vScrollbar;
     //*)
+    ExternalEditorPanel * externalEditorPanel;
     std::shared_ptr<gd::ObjectsEditor> objectsEditor;
     std::shared_ptr<LayersEditorPanel> layersEditor;
     std::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;

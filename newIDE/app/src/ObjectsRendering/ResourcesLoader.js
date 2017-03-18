@@ -1,9 +1,13 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
 import slug from 'slug';
+import PIXI from 'pixi.js';
+const gd = global.gd;
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
 const loadedFontFamilies = {};
+const loadedTextures = {};
+const invalidTexture = PIXI.Texture.fromImage('res/error48.png');
 
 class FilenamesCache {
   constructor() {
@@ -57,19 +61,91 @@ export default class ResourceLoader {
     return this._cache.cacheSystemFilename(project, filename, filename);
   }
 
-  static get(project, resourceName) {
+  static loadTextures(project, onProgress, onComplete) {
+    const resourcesManager = project.getResourcesManager();
+    const loader = PIXI.loader;
+
+    const resourcesList = resourcesManager.getAllResourcesList().toJSArray();
+    const allResources = {};
+    resourcesList.forEach(resourceName => {
+      const resource = resourcesManager.getResource(resourceName);
+      const filename = ResourceLoader._getSystemFullFilename(
+        project,
+        resource.getFile()
+      );
+      loader.add(resourceName, filename);
+      allResources[resourceName] = resource;
+    });
+
+    const totalCount = resourcesList.length;
+    if (!totalCount) {
+      onComplete();
+      return;
+    }
+
+    let loadingCount = 0;
+    loader.once('complete', function(loader, loadedResources) {
+      //Store the loaded textures so that they are ready to use.
+      for (const resourceName in loadedResources) {
+        if (loadedResources.hasOwnProperty(resourceName)) {
+          const resource = resourcesManager.getResource(resourceName);
+          if (resource.getKind() !== 'image') return;
+
+          const imageResource = gd.asImageResource(resource);
+          loadedTextures[resourceName] = loadedResources[resourceName].texture;
+          if (!imageResource.isSmooth()) {
+            loadedTextures[
+              resourceName
+            ].baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+          }
+        }
+      }
+
+      onComplete();
+    });
+    loader.on('progress', function() {
+      loadingCount++;
+      onProgress(loadingCount, totalCount);
+    });
+
+    loader.load();
+  }
+
+  static getFilename(project, resourceName) {
     if (project.getResourcesManager().hasResource(resourceName)) {
       const resourceRelativePath = project
         .getResourcesManager()
         .getResource(resourceName)
         .getFile();
-      return ResourceLoader._getSystemFullFilename(
-        project,
-        resourceRelativePath
-      );
+      return ResourceLoader._getSystemFullFilename(project, resourceRelativePath)
     }
 
     return resourceName;
+  }
+
+  static getPIXITexture(project, resourceName) {
+    if (loadedTextures[resourceName]) {
+      return loadedTextures[resourceName];
+    }
+
+    console.warn(
+      "Trying to get a texture that wasn't preloaded: ",
+      resourceName
+    );
+
+    if (project.getResourcesManager().hasResource(resourceName)) {
+      const resourceRelativePath = project
+        .getResourcesManager()
+        .getResource(resourceName)
+        .getFile();
+      loadedTextures[resourceName] = PIXI.Texture.fromImage(
+        ResourceLoader._getSystemFullFilename(project, resourceRelativePath)
+      );
+      //TODO: smooth handling
+      return loadedTextures[resourceName];
+    }
+
+    return invalidTexture;
   }
 
   static getFontFamily(project, fontFilename) {
@@ -94,7 +170,7 @@ export default class ResourceLoader {
     return (loadedFontFamilies[fontFilename] = fontFamily);
   }
 
-  static getInvalidImageURL() {
-    return 'res/error48.png';
+  static getInvalidPIXITexture() {
+    return invalidTexture;
   }
 }

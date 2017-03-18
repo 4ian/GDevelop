@@ -79,17 +79,31 @@ class MainFrame extends Component {
   };
 
   getSerializedEditedElement = serializedElement => {
-    const { currentProject, sceneOpened } = this.state;
-    if (!currentProject || !currentProject.hasLayoutNamed(sceneOpened)) {
-      console.warn('No project/layout to be serialized');
+    const { currentProject, sceneOpened, externalLayoutOpened } = this.state;
+    if (!currentProject) {
+      console.warn('No project');
       return;
     }
-
-    const instances = currentProject
-      .getLayout(sceneOpened)
-      .getInitialInstances();
-    instances.serializeTo(serializedElement);
-    return 'instances';
+    if (
+      this.props.selectedEditor === 'scene-editor' &&
+      currentProject.hasLayoutNamed(sceneOpened)
+    ) {
+      const instances = currentProject
+        .getLayout(sceneOpened)
+        .getInitialInstances();
+      instances.serializeTo(serializedElement);
+      return 'instances';
+    }
+    if (
+      this.props.selectedEditor === 'external-layout-editor' &&
+      currentProject.hasExternalLayoutNamed(externalLayoutOpened)
+    ) {
+      const instances = currentProject
+        .getExternalLayout(externalLayoutOpened)
+        .getInitialInstances();
+      instances.serializeTo(serializedElement);
+      return 'instances';
+    }
   };
 
   requestUpdate = () => {
@@ -154,18 +168,15 @@ class MainFrame extends Component {
             {currentProject &&
               <ProjectManager
                 project={currentProject}
-                onOpenExternalEvents={name =>
-                  this.setState({
-                    externalEventsOpened: name,
-                  })}
-                onOpenLayout={name =>
-                  this.setState({
-                    sceneOpened: name,
-                  })}
-                onOpenExternalLayout={name =>
-                  this.setState({
-                    externalLayoutOpened: name,
-                  })}
+                onOpenExternalEvents={name => this.setState({
+                  externalEventsOpened: name,
+                })}
+                onOpenLayout={name => this.setState({
+                  sceneOpened: name,
+                })}
+                onOpenExternalLayout={name => this.setState({
+                  externalLayoutOpened: name,
+                })}
               />}
           </Drawer>
           <Toolbar

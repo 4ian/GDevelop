@@ -36,7 +36,7 @@ function RenderedSpriteInstance(
   //Setup the PIXI object:
   this._resourcesLoader = resourcesLoader;
   this._pixiObject = new PIXI.Sprite(
-    PIXI.Texture.fromImage(this._resourcesLoader.getInvalidImageURL())
+    this._resourcesLoader.getInvalidPIXITexture()
   );
   this._pixiContainer.addChild(this._pixiObject);
   this.updatePIXITexture();
@@ -66,7 +66,7 @@ RenderedSpriteInstance.getThumbnail = function(
       .getDirection(0)
       .getSprite(0)
       .getImageName();
-    return resourcesLoader.get(project, imageName);
+    return resourcesLoader.getFilename(project, imageName);
   }
 
   return 'res/unknown32.png';
@@ -130,8 +130,9 @@ RenderedSpriteInstance.prototype.updatePIXITexture = function() {
   this.updateSprite();
   if (!this._sprite) return;
 
-  this._pixiObject.texture = PIXI.Texture.fromImage(
-    this._resourcesLoader.get(this._project, this._sprite.getImageName())
+  this._pixiObject.texture = this._resourcesLoader.getPIXITexture(
+    this._project,
+    this._sprite.getImageName()
   );
 
   const origin = this._sprite.getOrigin();

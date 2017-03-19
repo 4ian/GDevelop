@@ -6,7 +6,7 @@ import Dialog from 'material-ui/Dialog';
 export default class SetupGridDialog extends Component {
   constructor(props) {
     super(props);
-    this.state = props.options;
+    this.state = { ...props.gridOptions };
   }
 
   _onApply = () => {
@@ -20,17 +20,21 @@ export default class SetupGridDialog extends Component {
 
   render() {
     const actions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.props.onCancel}
-      />,
-      <FlatButton
-        label="Apply"
-        primary={true}
-        keyboardFocused={true}
-        onTouchTap={this._onApply}
-      />,
+      (
+        <FlatButton
+          label="Cancel"
+          primary={true}
+          onTouchTap={this.props.onCancel}
+        />
+      ),
+      (
+        <FlatButton
+          label="Apply"
+          primary={true}
+          keyboardFocused={true}
+          onTouchTap={this._onApply}
+        />
+      ),
     ];
 
     return (

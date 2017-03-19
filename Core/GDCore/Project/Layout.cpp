@@ -228,7 +228,7 @@ void Layout::SerializeTo(SerializerElement & element) const
     element.SetAttribute( "stopSoundsOnStartup", stopSoundsOnStartup);
     element.SetAttribute( "disableInputWhenNotFocused", disableInputWhenNotFocused);
 
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    #if defined(GD_IDE_ONLY)
     GetAssociatedLayoutEditorCanvasOptions().SerializeTo(element.AddChild("uiSettings"));
     #endif
 
@@ -268,11 +268,9 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
     stopSoundsOnStartup = element.GetBoolAttribute( "stopSoundsOnStartup" );
     disableInputWhenNotFocused = element.GetBoolAttribute( "disableInputWhenNotFocused" );
 
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    associatedSettings.UnserializeFrom(element.GetChild("uiSettings", 0, "UISettings"));
-    #endif
-
     #if defined(GD_IDE_ONLY)
+    associatedSettings.UnserializeFrom(element.GetChild("uiSettings", 0, "UISettings"));
+
     gd::ObjectGroup::UnserializeFrom(objectGroups, element.GetChild( "objectsGroups", 0, "GroupesObjets" ));
     gd::EventsListSerialization::UnserializeEventsFrom(project, GetEvents(), element.GetChild("events", 0, "Events"));
     #endif

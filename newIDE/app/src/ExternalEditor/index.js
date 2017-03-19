@@ -17,15 +17,15 @@ class ExternalEditor extends Component {
     if (this.bridge.isSupported()) {
       console.log('Connection to an external editor...');
 
-      this.bridge.onReceive((command, object, scope) => {
+      this.bridge.onReceive((command, payload, scope) => {
         if (command === 'update') {
-          this._onUpdateReceived(object, scope);
+          this._onUpdateReceived(payload, scope);
         } else if (command === 'setBounds') {
           // Window.setBounds(
-          // 	object.getChild('x').getValue().getInt(),
-          // 	object.getChild('y').getValue().getInt(),
-          // 	object.getChild('width').getValue().getInt(),
-          // 	object.getChild('height').getValue().getInt()
+          // 	payload.x,
+          // 	payload.y,
+          // 	payload.width,
+          // 	payload.height
           // );
         } else if (command === 'show') {
           Window.show();
@@ -70,12 +70,14 @@ class ExternalEditor extends Component {
     }
 
     this.sendingUpdate = true;
-    const serializedElement = new gd.SerializerElement();
-    const scope = this.editor.getSerializedEditedElement(serializedElement);
-    this.bridge.send('update', serializedElement, scope);
-    serializedElement.delete();
-
+    const elements = this.editor.getSerializedElements();
+    for(const scope in elements) {
+      if (elements.hasOwnProperty(scope)) {
+        this.bridge.send('update', elements[scope], scope)
+      }
+    }
     this.sendingUpdate = false;
+
     console.log('Update send done');
   };
 
@@ -95,7 +97,7 @@ class ExternalEditor extends Component {
     );
   };
 
-  _onUpdateReceived = (serializedObject, scope) => {
+  _onUpdateReceived = (payload, scope) => {
     console.log('Received project update from server');
     if (scope === 'instances') {
       console.warn('Not implemented: received instances update from server');
@@ -105,7 +107,20 @@ class ExternalEditor extends Component {
       return;
     }
 
-    this.editor.loadFullProject(serializedObject, () => {
+    // Transform the payload into a gd.SerializerElement
+    // Note that gd.Serializer.fromJSObject returns a new gd.SerializerElement object at every call
+    if (this._serializedObject) this._serializedObject.delete();
+
+    var t1 = performance.now();
+    this._serializedObject = gd.Serializer.fromJSObject(payload);
+    var t2 = performance.now();
+    console.log(
+      'Call to gd.Serializer.fromJSObject took ' + (t2 - t1) + ' milliseconds.'
+    );
+
+    this.editor.loadFullProject(this._serializedObject, () => {
+      this._serializedObject.delete();
+      this._serializedObject = null;
       this.setState({
         loading: false,
       });

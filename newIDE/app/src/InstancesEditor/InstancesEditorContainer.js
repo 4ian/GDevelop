@@ -9,7 +9,6 @@ import SelectionRectangle from './SelectionRectangle';
 import InstancesResizer from './InstancesResizer';
 import InstancesMover from './InstancesMover';
 import Grid from './Grid';
-import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
 const gd = global.gd;
 import PIXI from 'pixi.js';
 

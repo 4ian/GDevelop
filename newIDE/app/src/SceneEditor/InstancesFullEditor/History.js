@@ -1,14 +1,9 @@
-const gd = global.gd;
+import { serializeToJSObject, unserializeFromJSObject } from '../../Utils/Serializer';
 
 export const getHistoryInitialState = instances => {
-  const serializedElement = new gd.SerializerElement();
-  instances.serializeTo(serializedElement);
-  const savedInstances = JSON.parse(gd.Serializer.toJSON(serializedElement));
-  serializedElement.delete();
-
   return {
     undoHistory: [],
-    current: savedInstances,
+    current: serializeToJSObject(instances),
     redoHistory: [],
   };
 };
@@ -22,14 +17,9 @@ export const canUndo = history => {
 };
 
 export const saveToHistory = (history, instances) => {
-  const serializedElement = new gd.SerializerElement();
-  instances.serializeTo(serializedElement);
-  const savedInstances = JSON.parse(gd.Serializer.toJSON(serializedElement));
-  serializedElement.delete();
-
   return {
     undoHistory: [...history.undoHistory, history.current],
-    current: savedInstances,
+    current: serializeToJSObject(instances),
     redoHistory: [],
   };
 };
@@ -40,10 +30,7 @@ export const undo = (history, instances) => {
   }
 
   const newCurrent = history.undoHistory[history.undoHistory.length - 1];
-
-  const serializedNewElement = gd.Serializer.fromJSObject(newCurrent);
-  instances.unserializeFrom(serializedNewElement);
-  serializedNewElement.delete();
+  unserializeFromJSObject(instances, newCurrent);
 
   return {
     undoHistory: history.undoHistory.slice(0, -1),
@@ -58,10 +45,7 @@ export const redo = (history, instances) => {
   }
 
   const newCurrent = history.redoHistory[history.redoHistory.length - 1];
-
-  const serializedNewElement = gd.Serializer.fromJSObject(newCurrent);
-  instances.unserializeFrom(serializedNewElement);
-  serializedNewElement.delete();
+  unserializeFromJSObject(instances, newCurrent);
 
   return {
     undoHistory: [...history.undoHistory, history.current],

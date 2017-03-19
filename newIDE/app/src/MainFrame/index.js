@@ -14,6 +14,7 @@ import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
 import defaultTheme from '../UI/Theme/DefaultTheme';
+import { serializeToJSObject } from '../Utils/Serializer';
 
 import fixtureGame from '../fixtures/fixture-game.json';
 const gd = global.gd;
@@ -78,7 +79,7 @@ class MainFrame extends Component {
     );
   };
 
-  getSerializedEditedElement = serializedElement => {
+  getSerializedElements = () => {
     const { currentProject, sceneOpened, externalLayoutOpened } = this.state;
     if (!currentProject) {
       console.warn('No project');
@@ -88,21 +89,25 @@ class MainFrame extends Component {
       this.props.selectedEditor === 'scene-editor' &&
       currentProject.hasLayoutNamed(sceneOpened)
     ) {
-      const instances = currentProject
-        .getLayout(sceneOpened)
-        .getInitialInstances();
-      instances.serializeTo(serializedElement);
-      return 'instances';
+      return {
+        instances: serializeToJSObject(
+          currentProject.getLayout(sceneOpened).getInitialInstances()
+        ),
+        uiSettings: this.sceneEditor.getUiSettings(),
+      };
     }
     if (
       this.props.selectedEditor === 'external-layout-editor' &&
       currentProject.hasExternalLayoutNamed(externalLayoutOpened)
     ) {
-      const instances = currentProject
-        .getExternalLayout(externalLayoutOpened)
-        .getInitialInstances();
-      instances.serializeTo(serializedElement);
-      return 'instances';
+      return {
+        instances: serializeToJSObject(
+          currentProject
+            .getExternalLayout(externalLayoutOpened)
+            .getInitialInstances()
+        ),
+        uiSettings: this.externalLayoutEditor.getUiSettings(),
+      };
     }
   };
 
@@ -190,6 +195,7 @@ class MainFrame extends Component {
             sceneOpened &&
             <SceneEditor
               key={sceneOpened}
+              ref={sceneEditor => this.sceneEditor = sceneEditor}
               project={currentProject}
               layoutName={sceneOpened}
               setToolbar={this.setEditorToolbar}
@@ -200,6 +206,8 @@ class MainFrame extends Component {
             externalLayoutOpened &&
             <ExternalLayoutEditor
               key={externalLayoutOpened}
+              ref={externalLayoutEditor =>
+                this.externalLayoutEditor = externalLayoutEditor}
               project={currentProject}
               externalLayoutName={externalLayoutOpened}
               setToolbar={this.setEditorToolbar}

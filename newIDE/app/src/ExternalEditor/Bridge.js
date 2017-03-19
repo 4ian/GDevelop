@@ -1,5 +1,4 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
-const gd = global.gd;
 
 //TODO: Update to ES6
 function Bridge() {
@@ -42,18 +41,14 @@ Bridge.prototype.connectTo = function(port) {
   });
 };
 
-Bridge.prototype.send = function(command, serializedObject, scope = '') {
+Bridge.prototype.send = function(command, payload, scope = '') {
   if (!this.connected) return false;
 
-  var element = new gd.SerializerElement();
-  element.addChild('command').setString(command);
-  element.addChild('scope').setString(scope);
-  element.addChild('payload');
-  if (serializedObject) element.setChild('payload', serializedObject);
-
-  var json = gd.Serializer.toJSON(element);
-  element.delete();
-
+  const json = JSON.stringify({
+    command,
+    scope,
+    payload
+  });
   this.client.write(json + '\0');
 
   return true;
@@ -73,20 +68,12 @@ Bridge.prototype._receive = function(data) {
   }
   var t1 = performance.now();
 
-  // Transform the payload into a gd.SerializerElement
-  // Note that gd.Serializer.fromJSObject returns a new gd.SerializerElement object at every call
-  if (this._serializedObject) this._serializedObject.delete();
-  this._serializedObject = gd.Serializer.fromJSObject(dataObject.payload);
-  var t2 = performance.now();
-
   console.log('JSON parse took ' + (t1 - t0) + ' milliseconds.');
-  console.log(
-    'Call to gd.Serializer.fromJSObject took ' + (t2 - t1) + ' milliseconds.'
-  );
+
   if (this._onReceiveCb) {
     this._onReceiveCb(
       dataObject.command,
-      this._serializedObject,
+      dataObject.payload,
       dataObject.scope
     );
   }

@@ -17,7 +17,7 @@
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Layer.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #endif
 namespace gd { class BaseEvent; }
@@ -244,7 +244,7 @@ public:
      */
     void UpdateBehaviorsSharedData(gd::Project & project);
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    #if defined(GD_IDE_ONLY)
     /**
      * Return the settings associated to the layout.
      * \see gd::LayoutEditorCanvasOptions
@@ -256,7 +256,7 @@ public:
      * \see gd::LayoutEditorCanvasOptions
      */
     gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() { return associatedSettings; }
-#endif
+    #endif
 
     /** \name Other properties
      */
@@ -433,8 +433,6 @@ private:
     static gd::Layer                            badLayer; ///< Null object, returned when GetLayer can not find an appropriate layer.
     #if defined(GD_IDE_ONLY)
     EventsList                                  events; ///< Scene events
-    #endif
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     gd::LayoutEditorCanvasOptions               associatedSettings;
     #endif
 

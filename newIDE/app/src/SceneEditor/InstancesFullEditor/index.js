@@ -37,20 +37,17 @@ export default class InstancesFullEditor extends Component {
       setupGridOpen: false,
       layersListOpen: false,
       variablesEditedInstance: null,
-      options: {
-        grid: false,
-        snap: false,
-        gridWidth: 32,
-        gridHeight: 32,
-        gridOffsetX: 0,
-        gridOffsetY: 0,
-      },
+      uiSettings: props.initialUiSettings,
       history: getHistoryInitialState(props.initialInstances),
     };
   }
 
   componentDidMount() {
     this._updateToolbar();
+  }
+
+  getUiSettings() {
+    return this.state.uiSettings;
   }
 
   _updateToolbar() {
@@ -98,10 +95,10 @@ export default class InstancesFullEditor extends Component {
 
   toggleGrid = () => {
     this.setState({
-      options: {
-        ...this.state.options,
-        grid: !this.state.options.grid,
-        snap: !this.state.options.grid,
+      uiSettings: {
+        ...this.state.uiSettings,
+        grid: !this.state.uiSettings.grid,
+        snap: !this.state.uiSettings.grid,
       },
     });
   };
@@ -114,11 +111,11 @@ export default class InstancesFullEditor extends Component {
     this.setState({ variablesEditedInstance: instance });
   };
 
-  setOptions = options => {
+  setUiSettings = uiSettings => {
     this.setState({
-      options: {
-        ...this.state.options,
-        ...options,
+      uiSettings: {
+        ...this.state.uiSettings,
+        ...uiSettings,
       },
     });
   };
@@ -224,7 +221,7 @@ export default class InstancesFullEditor extends Component {
           layout={layout}
           initialInstances={initialInstances}
           selectedObjectName={this.state.selectedObjectName}
-          options={this.state.options}
+          options={this.state.uiSettings /*TODO*/}
           instancesSelection={this.instancesSelection}
           onNewInstanceAdded={this._onNewInstanceAdded}
           onInstancesSelected={this._onInstancesSelected}
@@ -296,10 +293,10 @@ export default class InstancesFullEditor extends Component {
         />
         <SetupGridDialog
           open={this.state.setupGridOpen}
-          options={this.state.options}
+          gridOptions={this.state.uiSettings}
           onCancel={() => this.openSetupGrid(false)}
-          onApply={options => {
-            this.setOptions(options);
+          onApply={gridOptions => {
+            this.setUiSettings(gridOptions);
             this.openSetupGrid(false);
           }}
         />

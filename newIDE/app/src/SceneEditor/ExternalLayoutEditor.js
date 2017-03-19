@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import InstancesFullEditor from './InstancesFullEditor';
+import { serializeToJSObject } from '../Utils/Serializer';
 
 export default class ExternalLayoutEditor extends Component {
+  getUiSettings() {
+    return this.editor.getUiSettings();
+  }
+
   render() {
     const { project, externalLayoutName } = this.props;
     if (!project.hasExternalLayoutNamed(externalLayoutName)) {
@@ -24,9 +29,13 @@ export default class ExternalLayoutEditor extends Component {
     return (
       <InstancesFullEditor
         {...this.props}
+        ref={editor => this.editor = editor}
         project={project}
         layout={layout}
         initialInstances={externalLayout.getInitialInstances()}
+        initialUiSettings={serializeToJSObject(
+          externalLayout.getAssociatedSettings()
+        )}
       />
     );
   }

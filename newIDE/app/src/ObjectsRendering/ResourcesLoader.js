@@ -61,6 +61,15 @@ export default class ResourceLoader {
     return this._cache.cacheSystemFilename(project, filename, filename);
   }
 
+  static _initializeTexture(resource, texture) {
+    if (resource.getKind() !== 'image') return;
+
+    const imageResource = gd.asImageResource(resource);
+    if (!imageResource.isSmooth()) {
+      texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+    }
+  }
+
   static loadTextures(project, onProgress, onComplete) {
     const resourcesManager = project.getResourcesManager();
     const loader = PIXI.loader;
@@ -89,15 +98,10 @@ export default class ResourceLoader {
       for (const resourceName in loadedResources) {
         if (loadedResources.hasOwnProperty(resourceName)) {
           const resource = resourcesManager.getResource(resourceName);
-          if (resource.getKind() !== 'image') return;
+          if (resource.getKind() !== 'image') continue;
 
-          const imageResource = gd.asImageResource(resource);
           loadedTextures[resourceName] = loadedResources[resourceName].texture;
-          if (!imageResource.isSmooth()) {
-            loadedTextures[
-              resourceName
-            ].baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-          }
+          ResourceLoader._initializeTexture(resource, loadedTextures[resourceName]);
         }
       }
 
@@ -117,7 +121,10 @@ export default class ResourceLoader {
         .getResourcesManager()
         .getResource(resourceName)
         .getFile();
-      return ResourceLoader._getSystemFullFilename(project, resourceRelativePath)
+      return ResourceLoader._getSystemFullFilename(
+        project,
+        resourceRelativePath
+      );
     }
 
     return resourceName;
@@ -128,24 +135,19 @@ export default class ResourceLoader {
       return loadedTextures[resourceName];
     }
 
-    console.warn(
-      "Trying to get a texture that wasn't preloaded: ",
-      resourceName
+    if (!project.getResourcesManager().hasResource(resourceName))
+      return invalidTexture;
+
+    const resource = project.getResourcesManager().getResource(resourceName);
+    if (resource.getKind() !== 'image') return invalidTexture;
+
+    const resourceRelativePath = resource.getFile();
+    loadedTextures[resourceName] = PIXI.Texture.fromImage(
+      ResourceLoader._getSystemFullFilename(project, resourceRelativePath)
     );
 
-    if (project.getResourcesManager().hasResource(resourceName)) {
-      const resourceRelativePath = project
-        .getResourcesManager()
-        .getResource(resourceName)
-        .getFile();
-      loadedTextures[resourceName] = PIXI.Texture.fromImage(
-        ResourceLoader._getSystemFullFilename(project, resourceRelativePath)
-      );
-      //TODO: smooth handling
-      return loadedTextures[resourceName];
-    }
-
-    return invalidTexture;
+    ResourceLoader._initializeTexture(resource, loadedTextures[resourceName]);
+    return loadedTextures[resourceName];
   }
 
   static getFontFamily(project, fontFilename) {

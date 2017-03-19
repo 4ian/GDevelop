@@ -85,6 +85,9 @@ RenderedSpriteInstance.prototype.updatePIXISprite = function() {
       this._pixiObject.texture.frame.width;
     this._pixiObject.scale.y = this._instance.getCustomHeight() /
       this._pixiObject.texture.frame.height;
+  } else {
+    this._pixiObject.scale.x = 1;
+    this._pixiObject.scale.y = 1;
   }
   this._pixiObject.position.x = this._instance.getX() +
     (this._centerX - this._originX) * Math.abs(this._pixiObject.scale.x);

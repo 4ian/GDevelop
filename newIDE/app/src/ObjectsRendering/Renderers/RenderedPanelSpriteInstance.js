@@ -62,7 +62,7 @@ RenderedPanelSpriteInstance.prototype.update = function() {
     this._width = this._instance.getCustomWidth();
     this._height = this._instance.getCustomHeight();
   } else {
-    var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
+    var tiledSprite = gd.asPanelSpriteObject(this._associatedObject);
     this._width = tiledSprite.getWidth();
     this._height = tiledSprite.getHeight();
   }

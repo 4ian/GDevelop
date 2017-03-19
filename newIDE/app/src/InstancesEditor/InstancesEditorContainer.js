@@ -87,7 +87,6 @@ export default class InstancesEditorContainer extends Component {
     });
 
     this._mountEditorComponents(this.props);
-    ResourcesLoader.loadTextures(this.props.project, () => {}, () => {});
     this.renderScene();
   }
 

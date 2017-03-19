@@ -133,15 +133,16 @@ class MainFrame extends Component {
   };
 
   toggleProjectManager = () => {
-    this.setState({
-      projectManagerOpen: !this.state.projectManagerOpen,
-    });
+    if (!this.refs.toolbar)
+      this.setState({
+        projectManagerOpen: !this.state.projectManagerOpen,
+      });
   };
 
-  setToolbar = toolbar => {
-    this.setState({
-      toolbar,
-    });
+  setEditorToolbar = editorToolbar => {
+    if (!this.toolbar) return;
+
+    this.toolbar.setEditorToolbar(editorToolbar);
   };
 
   render() {
@@ -180,7 +181,7 @@ class MainFrame extends Component {
               />}
           </Drawer>
           <Toolbar
-            editorToolbar={this.state.toolbar}
+            ref={toolbar => this.toolbar = toolbar}
             toggleProjectManager={this.toggleProjectManager}
             loadBuiltinGame={this.loadBuiltinGame}
             requestUpdate={this.requestUpdate}
@@ -191,7 +192,7 @@ class MainFrame extends Component {
               key={sceneOpened}
               project={currentProject}
               layoutName={sceneOpened}
-              setToolbar={this.setToolbar}
+              setToolbar={this.setEditorToolbar}
               onPreview={this.props.onPreview}
               showPreviewButton
             />}
@@ -201,7 +202,7 @@ class MainFrame extends Component {
               key={externalLayoutOpened}
               project={currentProject}
               externalLayoutName={externalLayoutOpened}
-              setToolbar={this.setToolbar}
+              setToolbar={this.setEditorToolbar}
               onPreview={this.props.onPreview}
               showPreviewButton
             />}

@@ -9,6 +9,16 @@ export default class MainFrameToolbar extends Component {
   constructor() {
     super();
     this.isDev = Window.isDev();
+
+    this.state = {
+      editorToolbar: null,
+    };
+  }
+
+  setEditorToolbar(editorToolbar) {
+    this.setState({
+      editorToolbar,
+    });
   }
 
   render() {
@@ -37,7 +47,7 @@ export default class MainFrameToolbar extends Component {
             />}
           <ToolbarSeparator />
         </ToolbarGroup>
-        {this.props.editorToolbar || <ToolbarGroup />}
+        {this.state.editorToolbar || <ToolbarGroup />}
       </Toolbar>
     );
   }

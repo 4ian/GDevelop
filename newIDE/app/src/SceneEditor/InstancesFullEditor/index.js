@@ -50,7 +50,7 @@ export default class InstancesFullEditor extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this._updateToolbar();
   }
 

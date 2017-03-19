@@ -1,9 +1,12 @@
 import React from 'react';
-import { List, ListItem } from 'material-ui/List';
+import { ListItem } from 'material-ui/List';
+import { AutoSizer, List } from 'react-virtualized';
 import Avatar from 'material-ui/Avatar';
 import ObjectsRenderingService
   from '../ObjectsRendering/ObjectsRenderingService';
 import mapFor from '../Utils/MapFor';
+
+const listItemHeight = 56;
 
 export default class ObjectsList extends React.Component {
   shouldComponentUpdate() {
@@ -13,11 +16,12 @@ export default class ObjectsList extends React.Component {
     return !this.props.freezeUpdate;
   }
 
-  _renderObjectListItem(project, object) {
+  _renderObjectRow(project, object, key, style) {
     const objectName = object.getName();
 
     return (
       <ListItem
+        style={style}
         key={object.ptr}
         primaryText={objectName}
         leftAvatar={
@@ -37,24 +41,30 @@ export default class ObjectsList extends React.Component {
     const containerObjectsList = mapFor(
       0,
       objectsContainer.getObjectsCount(),
-      i => {
-        const object = objectsContainer.getObjectAt(i);
-        return this._renderObjectListItem(project, object);
-      }
+      i => objectsContainer.getObjectAt(i)
     );
 
     const projectObjectsList = project === objectsContainer
       ? null
-      : mapFor(0, project.getObjectsCount(), i => {
-          const object = project.getObjectAt(i);
-          return this._renderObjectListItem(project, object);
-        });
+      : mapFor(0, project.getObjectsCount(), i => project.getObjectAt(i));
+
+    const fullList = projectObjectsList
+      ? containerObjectsList.concat(projectObjectsList)
+      : containerObjectsList;
 
     return (
-      <List>
-        {containerObjectsList}
-        {projectObjectsList}
-      </List>
+      <AutoSizer>
+        {({ height, width }) => (
+          <List
+            height={height}
+            rowCount={fullList.length}
+            rowHeight={listItemHeight}
+            rowRenderer={({ index, key, style }) =>
+              this._renderObjectRow(project, fullList[index], key, style)}
+            width={width}
+          />
+        )}
+      </AutoSizer>
     );
   }
 }

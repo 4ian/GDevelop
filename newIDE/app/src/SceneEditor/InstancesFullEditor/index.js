@@ -239,7 +239,11 @@ export default class InstancesFullEditor extends Component {
           onInstancesMoved={this._onInstancesMoved}
           editorRef={editor => this.editor = editor}
         />
-        <Drawer open={this.state.objectsListOpen} openSecondary={true}>
+        <Drawer
+          open={this.state.objectsListOpen}
+          openSecondary={true}
+          containerStyle={{ overflow: 'hidden' }}
+        >
           <EditorBar
             title="Objects"
             iconElementLeft={

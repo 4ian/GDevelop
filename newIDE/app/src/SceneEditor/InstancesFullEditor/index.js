@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Perf from 'react-addons-perf';
 import ObjectsList from '../../ObjectsList';
 import FullSizeInstancesEditor
   from '../../InstancesEditor/FullSizeInstancesEditor';
@@ -90,14 +89,7 @@ export default class InstancesFullEditor extends Component {
   };
 
   toggleInstancesList = () => {
-    Perf.start();
-    this.setState({ instancesListOpen: !this.state.instancesListOpen }, () => {
-      Perf.stop();
-
-      Perf.printInclusive(Perf.getLastMeasurements());
-      console.log('wasted:');
-      Perf.printWasted(Perf.getLastMeasurements());
-    });
+    this.setState({ instancesListOpen: !this.state.instancesListOpen });
   };
 
   toggleLayersList = () => {
@@ -263,6 +255,7 @@ export default class InstancesFullEditor extends Component {
           open={this.state.instancesListOpen}
           width={500}
           openSecondary={true}
+          containerStyle={{ overflow: 'hidden' }}
         >
           <EditorBar
             title="Instances"

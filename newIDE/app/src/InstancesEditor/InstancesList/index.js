@@ -1,20 +1,7 @@
 import React, { Component } from 'react';
-import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn,
-} from 'material-ui/Table';
+import { AutoSizer, Table, Column } from 'react-virtualized';
+import '../../UI/Theme/Table.css';
 const gd = global.gd;
-
-const styles = {
-  smallMarginsColumn: {
-    paddingLeft: 8,
-    paddingRight: 8,
-  },
-};
 
 export default class InstancesList extends Component {
   shouldComponentUpdate() {
@@ -34,31 +21,13 @@ export default class InstancesList extends Component {
 
       this.renderedRows.push({
         instance,
-        element: (
-          <TableRow
-            key={instancePtr}
-            selected={this.props.selectedInstances.indexOf(instance) !== -1}
-          >
-            <TableRowColumn style={styles.smallMarginsColumn}>
-              {instance.getObjectName()}
-            </TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>
-              {instance.getX().toFixed(2)}
-            </TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>
-              {instance.getY().toFixed(2)}
-            </TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>
-              {instance.getAngle()}
-            </TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>
-              {instance.getLayer()}
-            </TableRowColumn>
-            <TableRowColumn style={styles.smallMarginsColumn}>
-              {instance.getZOrder()}
-            </TableRowColumn>
-          </TableRow>
-        ),
+        name: instance.getObjectName(),
+        locked: instance.isLocked() ? '🔒' : '',
+        x: instance.getX().toFixed(2),
+        y: instance.getY().toFixed(2),
+        angle: instance.getAngle().toFixed(2),
+        layer: instance.getLayer(),
+        zOrder: instance.getZOrder(),
       });
     };
   }
@@ -67,11 +36,26 @@ export default class InstancesList extends Component {
     this.instanceRowRenderer.delete();
   }
 
-  onRowSelection(selection) {
-    this.props.onSelectInstances(
-      selection.map(i => this.renderedRows[i].instance)
-    );
-  }
+  _onRowClick = ({ index }) => {
+    if (!this.renderedRows[index]) return;
+    this.props.onSelectInstances([this.renderedRows[index].instance]);
+  };
+
+  _rowGetter = ({ index }) => {
+    return this.renderedRows[index];
+  };
+
+  _rowClassName = ({ index }) => {
+    if (index < 0) {
+      return 'tableHeaderRow';
+    } else {
+      const row = this.renderedRows[index];
+      if (row && this.props.selectedInstances.indexOf(row.instance) !== -1)
+        return 'tableSelectedRow';
+
+      return index % 2 === 0 ? 'tableEvenRow' : 'tableOddRow';
+    }
+  };
 
   render() {
     const { instances } = this.props;
@@ -80,44 +64,64 @@ export default class InstancesList extends Component {
     instances.iterateOverInstances(this.instanceRowRenderer);
 
     return (
-      <Table
-        selectable={true}
-        multiSelectable={true}
-        onRowSelection={selection => this.onRowSelection(selection)}
-      >
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-          <TableRow>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>
-              Object name
-            </TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>
-              X
-            </TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>
-              Y
-            </TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>
-              Angle
-            </TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>
-              Layer
-            </TableHeaderColumn>
-            <TableHeaderColumn style={styles.smallMarginsColumn}>
-              Z Order
-            </TableHeaderColumn>
-          </TableRow>
-        </TableHeader>
-        <TableBody
-          displayRowCheckbox={false}
-          deselectOnClickaway={false}
-          showRowHover={true}
-          style={{
-            backgroundColor: 'white',
-          }}
-        >
-          {this.renderedRows.map(row => row.element)}
-        </TableBody>
-      </Table>
+      <AutoSizer>
+        {({ height, width }) => (
+          <Table
+            headerHeight={30}
+            height={height}
+            headerClassName={'tableHeaderColumn'}
+            rowCount={this.renderedRows.length}
+            rowGetter={this._rowGetter}
+            rowHeight={35}
+            onRowClick={this._onRowClick}
+            rowClassName={this._rowClassName}
+            width={width}
+          >
+            <Column
+              label="Object name"
+              dataKey="name"
+              width={width * 0.35}
+              className={'tableColumn'}
+            />
+            <Column
+              label=""
+              dataKey="locked"
+              width={width * 0.05}
+              className={'tableColumn'}
+            />
+            <Column
+              label="X"
+              dataKey="x"
+              width={width * 0.1}
+              className={'tableColumn'}
+            />
+            <Column
+              label="Y"
+              dataKey="y"
+              width={width * 0.1}
+              className={'tableColumn'}
+            />
+            <Column
+              label="Angle"
+              dataKey="angle"
+              width={width * 0.1}
+              className={'tableColumn'}
+            />
+            <Column
+              label="Layer"
+              dataKey="layer"
+              width={width * 0.2}
+              className={'tableColumn'}
+            />
+            <Column
+              label="Z Order"
+              dataKey="zOrder"
+              width={width * 0.1}
+              className={'tableColumn'}
+            />
+          </Table>
+        )}
+      </AutoSizer>
     );
   }
 }

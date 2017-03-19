@@ -21,10 +21,21 @@ export default class InstancesSelection {
     this.selection.length = 0;
   }
 
-  selectInstance(instance) {
-    if (!this.isInstanceSelected(instance)) {
-      this.selection.push(instance);
+  selectInstance(instance, multiselect) {
+    if (this.isInstanceSelected(instance)) {
+      if (multiselect) this.unselectInstance(instance);
+
+      return;
     }
+
+    if (!multiselect) this.clearSelection();
+    this.selection.push(instance);
+  }
+
+  selectInstances(instances, multiselect) {
+    if (!multiselect) this.clearSelection();
+
+    instances.forEach(instance => this.selectInstance(instance, true));
   }
 
   unselectInstance(instance) {

@@ -24,7 +24,21 @@ export default class InstancesResizer {
       this.options.gridHeight;
   }
 
-  resizeBy(instances, deltaX, deltaY) {
+  _getSizeDeltaX(proportional, initialSize) {
+    if (proportional && Math.abs(this.totalDeltaX) < Math.abs(this.totalDeltaY))
+      return initialSize.width / initialSize.height * this.totalDeltaY;
+
+    return this.totalDeltaX;
+  }
+
+  _getSizeDeltaY(proportional, initialSize) {
+    if (proportional && Math.abs(this.totalDeltaY) < Math.abs(this.totalDeltaX))
+      return initialSize.height / initialSize.width * this.totalDeltaX;
+
+    return this.totalDeltaY;
+  }
+
+  resizeBy(instances, deltaX, deltaY, proportional) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
@@ -50,10 +64,10 @@ export default class InstancesResizer {
 
       selectedInstance.setHasCustomSize(true);
       selectedInstance.setCustomWidth(
-        this._roundWidth(initialSize.width + this.totalDeltaX)
+        this._roundWidth(initialSize.width + this._getSizeDeltaX(proportional, initialSize))
       );
       selectedInstance.setCustomHeight(
-        this._roundHeight(initialSize.height + this.totalDeltaY)
+        this._roundHeight(initialSize.height + this._getSizeDeltaY(proportional, initialSize))
       );
     }
   }

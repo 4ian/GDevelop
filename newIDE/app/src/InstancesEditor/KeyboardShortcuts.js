@@ -24,6 +24,14 @@ export default class KeyboardShortcuts {
     return this.shiftPressed;
   }
 
+  shouldFollowAxis() {
+    return this.shiftPressed;
+  }
+
+  shouldResizeProportionally() {
+    return this.shiftPressed;
+  }
+
   shouldScrollHorizontally() {
     return this.altPressed;
   }

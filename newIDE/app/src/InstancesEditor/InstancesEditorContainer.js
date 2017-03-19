@@ -215,26 +215,14 @@ export default class InstancesEditorContainer extends Component {
 
   _onEndSelectionRectangle = () => {
     const instancesSelected = this.selectionRectangle.endSelectionRectangle();
-    instancesSelected.forEach(
-      instance => this.props.instancesSelection.selectInstance(instance)
+    this.props.instancesSelection.selectInstances(
+      instancesSelected,
+      this.keyboardShortcuts.shouldMultiSelect()
     );
     this.props.onInstancesSelected(instancesSelected);
   };
 
-  _onInstanceClicked = instance => {
-    if (!this.keyboardShortcuts.shouldMultiSelect())
-      this.props.instancesSelection.clearSelection();
-    this.props.instancesSelection.selectInstance(
-      instance,
-      !this.keyboardShortcuts.shouldMultiSelect()
-    );
-
-    if (this.props.onInstancesSelected) {
-      this.props.onInstancesSelected(
-        this.props.instancesSelection.getSelectedInstances()
-      );
-    }
-  };
+  _onInstanceClicked = instance => {};
 
   _onOverInstance = instance => {
     this.highlightedInstance.setInstance(instance);
@@ -246,6 +234,17 @@ export default class InstancesEditorContainer extends Component {
       for (var i = 0; i < selectedInstances.length; i++) {
         const instance = selectedInstances[i];
         this.props.initialInstances.insertInitialInstance(instance);
+      }
+    } else {
+      this.props.instancesSelection.selectInstance(
+        instance,
+        this.keyboardShortcuts.shouldMultiSelect()
+      );
+
+      if (this.props.onInstancesSelected) {
+        this.props.onInstancesSelected(
+          this.props.instancesSelection.getSelectedInstances()
+        );
       }
     }
   };
@@ -264,7 +263,12 @@ export default class InstancesEditorContainer extends Component {
     }
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-    this.instancesMover.moveBy(selectedInstances, sceneDeltaX, sceneDeltaY);
+    this.instancesMover.moveBy(
+      selectedInstances,
+      sceneDeltaX,
+      sceneDeltaY,
+      this.keyboardShortcuts.shouldFollowAxis()
+    );
   };
 
   _onMoveInstanceEnd = () => {
@@ -287,7 +291,12 @@ export default class InstancesEditorContainer extends Component {
     const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-    this.instancesResizer.resizeBy(selectedInstances, sceneDeltaX, sceneDeltaY);
+    this.instancesResizer.resizeBy(
+      selectedInstances,
+      sceneDeltaX,
+      sceneDeltaY,
+      this.keyboardShortcuts.shouldResizeProportionally()
+    );
   };
 
   _onResizeEnd = () => {

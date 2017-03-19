@@ -23,7 +23,21 @@ export default class InstancesResizer {
     return Math.round(y / this.options.gridHeight) * this.options.gridHeight;
   }
 
-  moveBy(instances, deltaX, deltaY) {
+  _getMoveDeltaX(followAxis) {
+    if (followAxis && Math.abs(this.totalDeltaX) < Math.abs(this.totalDeltaY))
+      return 0;
+
+    return this.totalDeltaX;
+  }
+
+  _getMoveDeltaY(followAxis) {
+    if (followAxis && Math.abs(this.totalDeltaY) < Math.abs(this.totalDeltaX))
+      return 0;
+
+    return this.totalDeltaY;
+  }
+
+  moveBy(instances, deltaX, deltaY, followAxis) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
@@ -39,10 +53,14 @@ export default class InstancesResizer {
       }
 
       selectedInstance.setX(
-        this._roundXPosition(initialPosition.x + this.totalDeltaX)
+        this._roundXPosition(
+          initialPosition.x + this._getMoveDeltaX(followAxis)
+        )
       );
       selectedInstance.setY(
-        this._roundYPosition(initialPosition.y + this.totalDeltaY)
+        this._roundYPosition(
+          initialPosition.y + this._getMoveDeltaY(followAxis)
+        )
       );
     }
   }

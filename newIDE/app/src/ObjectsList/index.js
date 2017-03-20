@@ -47,7 +47,8 @@ export default class ObjectsList extends React.Component {
       : containerObjectsList;
 
     // Force List component to be mounted again if project or objectsContainer
-    // has been changed. Avoid accessing to invalid objects.
+    // has been changed. Avoid accessing to invalid objects that could
+    // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
 
     return (

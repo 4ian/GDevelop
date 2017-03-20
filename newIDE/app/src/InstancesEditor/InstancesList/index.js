@@ -5,10 +5,19 @@ const gd = global.gd;
 
 export default class InstancesList extends Component {
   shouldComponentUpdate() {
-    // Rendering the component can be costly as it iterates over
-    // every instances, so the prop freezeUpdate allow to ask the component to stop
+    // Rendering the component is costly as it iterates over
+    // every instances, so the prop freezeUpdate allows to ask the component to stop
     // updating, for example when hidden.
     return !this.props.freezeUpdate;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // If the component was frozen and is now allowed to update,
+    // force the table to be refreshed to reflect changes (new instances,
+    // or selection changes).
+    if (!nextProps.freezeUpdate && this.props.freezeUpdate) {
+      if (this.table) this.table.forceUpdateGrid();
+    }
   }
 
   componentWillMount() {
@@ -63,10 +72,17 @@ export default class InstancesList extends Component {
     this.renderedRows.length = 0;
     instances.iterateOverInstances(this.instanceRowRenderer);
 
+    // Force Table component to be mounted again if instances
+    // has been changed. Avoid accessing to invalid objects that could
+    // crash the app.
+    const tableKey = instances.ptr;
+
     return (
       <AutoSizer>
         {({ height, width }) => (
           <Table
+            ref={table => this.table = table}
+            key={tableKey}
             headerHeight={30}
             height={height}
             headerClassName={'tableHeaderColumn'}

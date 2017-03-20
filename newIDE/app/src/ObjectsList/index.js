@@ -9,14 +9,8 @@ import mapFor from '../Utils/MapFor';
 const listItemHeight = 56;
 
 export default class ObjectsList extends React.Component {
-  shouldComponentUpdate() {
-    // Rendering the component can be costly as it ask for the thumbnails of
-    // every objects, so the prop freezeUpdate allow to ask the component to stop
-    // updating, for example when hidden.
-    return !this.props.freezeUpdate;
-  }
-
   _renderObjectRow(project, object, key, style) {
+    if (this.props.freezeUpdate) return;
     const objectName = object.getName();
 
     return (
@@ -52,10 +46,15 @@ export default class ObjectsList extends React.Component {
       ? containerObjectsList.concat(projectObjectsList)
       : containerObjectsList;
 
+    // Force List component to be mounted again if project or objectsContainer
+    // has been changed. Avoid accessing to invalid objects.
+    const listKey = project.ptr + ';' + objectsContainer.ptr;
+
     return (
       <AutoSizer>
         {({ height, width }) => (
           <List
+            key={listKey}
             height={height}
             rowCount={fullList.length}
             rowHeight={listItemHeight}

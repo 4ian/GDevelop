@@ -83,10 +83,10 @@ private:
 		sf::Lock lock(inMessagesMutex);
 	    while (!inMessages.empty())
 	    {
-	    	gd::String message = gd::String::FromLocale(inMessages.front()); //TODO: UTF8?
+	    	gd::String message = gd::String::FromLocale(inMessages.front());
 	    	inMessages.pop();
 
-			std::cout << "Message passed to the main thread." << message << std::endl;
+			std::cout << "Message passed to the main thread: " << message << std::endl;
 		    gd::SerializerElement object = gd::Serializer::FromJSON(message);
 			if (onReceiveCb)
 			{
@@ -126,6 +126,29 @@ private:
 		return 0;
 	}
 
+	void ReceiveChunk(std::string & data, char * buffer, std::size_t bufferSize)
+	{
+		size_t pos = 0;
+		while (pos < bufferSize) {
+			if (buffer[pos] == '\0')
+			{
+				sf::Lock lock(inMessagesMutex);
+				wxThreadEvent evt;
+				this->QueueEvent(evt.Clone());
+
+				std::cout << "Message (size: "
+					<< data.size()
+					<< ") queued, to be passed to main thread." << std::endl;
+				inMessages.push(data);
+				data.clear();
+			} else {
+				data += buffer[pos];
+			}
+
+			pos++;
+		}
+	}
+
 	void RunServer()
 	{
 		std::cout << "Running server for external editor on "
@@ -145,24 +168,13 @@ private:
 				{
 					//Receive messages
 				    char buffer[1024];
-				    std::size_t received = 0;
-				    sf::Socket::Status status = client.receive(buffer, sizeof(buffer), received);
+				    std::size_t receivedSize = 0;
+				    sf::Socket::Status status = client.receive(buffer, sizeof(buffer), receivedSize);
 				    if (status == sf::Socket::Done)
 				    {
-				    	std::string str = "";
-				    	str.append(buffer, received);
-					    std::cout << "RECEIVED: " << str << std::endl << "END RECEIVED" << std::endl;
-
-				    	data.append(buffer, received);
-				    	if (received == 0 || buffer[received - 1] == '\0') {
-							sf::Lock lock(inMessagesMutex);
-					    	std::cout << "Server received a message from " << client.getRemotePort() << std::endl;
-				    		wxThreadEvent evt;
-						    this->QueueEvent(evt.Clone());
-
-						    inMessages.push(data);
-						    data.clear();
-				    	}
+						std::cout << "Server received " << receivedSize
+							<< " bytes from client " << client.getRemotePort() << std::endl;
+				    	ReceiveChunk(data, buffer, receivedSize);
 			    	}
 					else if (status == sf::Socket::Disconnected)
 					{

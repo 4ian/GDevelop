@@ -9,6 +9,7 @@ import SelectionRectangle from './SelectionRectangle';
 import InstancesResizer from './InstancesResizer';
 import InstancesMover from './InstancesMover';
 import Grid from './Grid';
+import WindowBorder from './WindowBorder';
 const gd = global.gd;
 import PIXI from 'pixi.js';
 
@@ -117,6 +118,9 @@ export default class InstancesEditorContainer extends Component {
       this.pixiContainer.removeChild(this.selectionRectangle.getPixiObject());
       this.selectionRectangle.delete();
     }
+    if (this.windowBorder) {
+      this.pixiContainer.removeChild(this.windowBorder.getPixiObject());
+    }
 
     this.instancesRenderer = new InstancesRenderer({
       project: props.project,
@@ -153,6 +157,10 @@ export default class InstancesEditorContainer extends Component {
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       options: this.props.options,
     });
+    this.windowBorder = new WindowBorder({
+      project: props.project,
+      toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+    });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
     this.viewPosition
@@ -160,6 +168,7 @@ export default class InstancesEditorContainer extends Component {
       .addChild(this.instancesRenderer.getPixiContainer());
     this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
+    this.pixiContainer.addChild(this.windowBorder.getPixiObject());
   }
 
   componentWillUnmount() {
@@ -367,6 +376,7 @@ export default class InstancesEditorContainer extends Component {
     this.highlightedInstance.render();
     this.selectedInstances.render();
     this.selectionRectangle.render();
+    this.windowBorder.render();
     this.pixiRenderer.render(this.pixiContainer);
     this.nextFrame = requestAnimationFrame(this.renderScene);
   };

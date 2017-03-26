@@ -7,10 +7,8 @@
   "license": "MIT",
   "homepage": "http://compilgames.net",
   "scripts": {
-    "build:app": "cd ../app && npm run build && cd -",
-    "build": "../scripts/build.sh"
-  },
-  "dependencies": {
+    "build:app": "cd ../app && npm run build",
+    "build": "node scripts/build.js"
   },
   "build": {
     "appId": "com.gdevelop.ide",
@@ -21,6 +19,7 @@
     "asar": false
   },
   "devDependencies": {
+    "shelljs": "^0.7.7",
     "electron": "^1.4.14",
     "electron-builder": "^5.12.1"
   }

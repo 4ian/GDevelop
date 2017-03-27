@@ -1,4 +1,7 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
+const electron = optionalRequire('electron');
+const bsplit = electron ? electron.remote.require('buffer-split') : null;
+const Buffer = electron ? electron.remote.require('buffer').Buffer : null;
 
 //TODO: Update to ES6
 function Bridge() {
@@ -24,15 +27,26 @@ Bridge.prototype.connectTo = function(port) {
     if (that._onConnected) that._onConnected();
   });
 
-  var data = '';
+  let data = '';
+  const nullCharacterBuffer = Buffer.from([0]);
   this.client.on('data', function(dataBuffer) {
-    data += dataBuffer;
+    let startPos = 0;
+    let nextNullCharacterPos = dataBuffer.indexOf(nullCharacterBuffer);
+    while (startPos < dataBuffer.length) {
+      if (nextNullCharacterPos === -1) {
+        data += dataBuffer.slice(startPos);
+        startPos = dataBuffer.length;
+      } else {
+        data += dataBuffer.slice(startPos, nextNullCharacterPos);
+        that._receive(data);
 
-    // eslint-disable-next-line
-    if (!dataBuffer.length || dataBuffer[dataBuffer.length - 1] == 0) {
-      data = data.slice(0, -1); //Strip ending null character
-      that._receive(data);
-      data = '';
+        data = '';
+        startPos = nextNullCharacterPos + 1;
+        nextNullCharacterPos = dataBuffer.indexOf(
+          nullCharacterBuffer,
+          startPos
+        );
+      }
     }
   });
 
@@ -47,7 +61,7 @@ Bridge.prototype.send = function(command, payload, scope = '') {
   const json = JSON.stringify({
     command,
     scope,
-    payload
+    payload,
   });
   this.client.write(json + '\0');
 
@@ -69,13 +83,10 @@ Bridge.prototype._receive = function(data) {
   var t1 = performance.now();
 
   console.log('JSON parse took ' + (t1 - t0) + ' milliseconds.');
+  console.log('received', dataObject.command);
 
   if (this._onReceiveCb) {
-    this._onReceiveCb(
-      dataObject.command,
-      dataObject.payload,
-      dataObject.scope
-    );
+    this._onReceiveCb(dataObject.command, dataObject.payload, dataObject.scope);
   }
 };
 

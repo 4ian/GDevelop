@@ -8,9 +8,7 @@ var isDev = require('electron-is-dev');
 var mainWindow = null;
 var args = parseArgs(process.argv.slice(2));
 
-if (args['hide-icon']) {
-  app.dock.hide();
-}
+var isIntegrated = args.mode === 'integrated';
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -20,16 +18,34 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
+  if (isIntegrated) {
+    app.dock.hide();
+  }
+
   // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    //Allow to access to local files
+  var options = {
+    width: args.width || 800,
+    height: args.height || 600,
+    x: args.x,
+    y: args.y,
     webPreferences: {
-      webSecurity: false
+      webSecurity: false // Allow to access to local files
     },
-    backgroundColor: '#f0f0f0',
-  });
+    enableLargerThanScreen: true,
+    backgroundColor: '#f0f0f0'
+  };
+
+  if (isIntegrated) {
+    options.acceptFirstMouse = true;
+    options.skipTaskbar = true;
+    options.hasShadow = false;
+    options.frame = false;
+    options.minimizable = false;
+    options.resizable = false;
+    options.fullscreenable = false;
+  }
+
+  mainWindow = new BrowserWindow(options);
 
   //Expose program arguments
   global['args'] = args;

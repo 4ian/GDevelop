@@ -47,6 +47,12 @@ public:
     void ForceRefreshRibbonAndConnect();
 
     /**
+     * Can be called by parent to let the editor know that it's not the editor
+     * displayed and focused.
+     */
+    void EditorNotDisplayed();
+
+    /**
      * \brief Set a function that is called when the layout used for editing the external layout
      * is changed.
      */

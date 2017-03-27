@@ -20,7 +20,11 @@ namespace gd {
 class GD_CORE_API ExternalEditor {
 public:
 	ExternalEditor() :
-		externalEditorPid(0)
+		externalEditorPid(0),
+		launchX(0),
+		launchY(0),
+		launchWidth(0),
+		launchHeight(0)
 	{
 		editorBridge.OnReceive([this](gd::String cmd, gd::SerializerElement object, gd::String scope) {
 			if (cmd == "update")
@@ -82,6 +86,14 @@ public:
 		editorBridge.Send("setBounds", bounds);
 	}
 
+	void SetLaunchBounds(int x, int y, int width, int height)
+	{
+		launchX = x;
+		launchY = y;
+		launchWidth = width;
+		launchHeight = height;
+	}
+
     bool IsLaunchedAndConnected() {
         return editorBridge.IsConnected();
     }
@@ -100,6 +112,11 @@ private:
 	std::function<void(SerializerElement object, gd::String scope)> onUpdateReceivedCb;
 	std::function<SerializerElement(gd::String scope)> onSendUpdate;
 	std::function<void()> onLaunchPreview;
+
+	int launchX;
+	int launchY;
+	int launchWidth;
+	int launchHeight;
 };
 
 }

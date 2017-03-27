@@ -292,7 +292,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_PAGE_CHANGING, ( wxObjectEventFunction )&MainFrame::OnRibbonPageChanging );
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_HELP_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonHelpBtClick );
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_TOGGLED, ( wxObjectEventFunction )&MainFrame::OnRibbonToggleBtClick );
-    Connect( wxID_ANY, wxEVT_KILL_FOCUS, ( wxObjectEventFunction )&MainFrame::OnLoseFocus );
+    Connect( wxID_ANY, wxEVT_ACTIVATE, ( wxObjectEventFunction )&MainFrame::OnActivate );
 
     #ifdef GD_NO_UPDATE_CHECKER //Remove the menu item to check for updates
     helpMenu.Delete(MenuItem21); //(useful when GD is distributed on a system managing updates by itself).
@@ -655,31 +655,7 @@ void MainFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
         editorsNotebook->SetWindowStyleFlag(style);
     }
 
-    if ( EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        sceneEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to the editor of layout \""+sceneEditorPtr->GetLayout().GetName()+"\"");
-    }
-    else if ( ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        imagesEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to resources editor of project \""+imagesEditorPtr->project.GetName()+"\"");
-    }
-    else if ( CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        codeEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to code editor of file \""+codeEditorPtr->filename+"\"");
-    }
-    else if ( ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        externalEventsEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to the editor of external events \""+externalEventsEditorPtr->events.GetName()+"\"");
-    }
-    else if ( ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        externalLayoutEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to the editor of external layout \""+externalLayoutEditorPtr->GetExternalLayout().GetName()+"\"");
-    }
+    editorsManager.PageChanged(editorsNotebook->GetPage(event.GetSelection()));
 }
 
 void MainFrame::OnRibbonPageChanging(wxRibbonBarEvent& evt)
@@ -1025,7 +1001,12 @@ void MainFrame::OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt)
     evt.PopupMenu(&decomposerContextMenu);
 }
 
-void MainFrame::OnLoseFocus(wxFocusEvent& event)
+void MainFrame::OnActivate(wxActivateEvent& event)
 {
-    std::cout << "Lose focus" << std::endl;
+    std::cout << "Activated" << event.GetActive() << std::endl;
+    if (event.GetActive()) 
+    {
+        editorsManager.PageChanged(editorsNotebook->GetCurrentPage());
+    }
+    event.Skip();
 }

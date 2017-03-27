@@ -44,8 +44,16 @@ bool ExternalEditor::Launch(const gd::String & editorName, const gd::String edit
 	// Uncomment and adapt to launch a local development version of the GDevelop IDE:
 	// cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
 
+	cmd += " --mode=integrated";
 	if (editorName != "") cmd += " --editor " + editorName;
 	if (editedElementName != "") cmd += " --edited-element-name \"" + editedElementName + "\"";
+	if (launchWidth != 0 && launchHeight != 0)
+	{
+		cmd += " --x " + String::From(launchX) + " --y " + String::From(launchY)
+			+ " --width " + String::From(launchWidth) + " --height " + String::From(launchHeight);
+	}
+
+	std::cout << cmd << std::endl;
 	externalEditorPid = wxExecute(cmd + " --server-port " + String::From(port), wxEXEC_ASYNC);
     if (externalEditorPid == 0 || externalEditorPid == -1)
     {

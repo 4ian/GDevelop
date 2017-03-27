@@ -4,11 +4,13 @@
 #include "../ExternalEventsEditor.h"
 #include "../EditorScene.h"
 #include "../CodeEditor.h"
+#include "../LogFileManager.h"
 #include "ExternalLayoutEditor.h"
 #include "StartHerePage.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/String.h"
@@ -25,6 +27,53 @@ void EditorsNotebookManager::UpdatePageLabel(int pageIndex, wxString name)
 		return;
 
 	notebook->SetPageText(pageIndex, GetLabelFor(notebook->GetPage(pageIndex), name));
+}
+
+void EditorsNotebookManager::NotifyPageDisplayed(wxWindow * newPage)
+{
+	if ( EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(newPage) )
+    {
+        sceneEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::Get()->WriteToLogFile("Switched to the editor of layout \""+sceneEditorPtr->GetLayout().GetName()+"\"");
+    }
+    else if ( ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(newPage) )
+    {
+        imagesEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::Get()->WriteToLogFile("Switched to resources editor of project \""+imagesEditorPtr->project.GetName()+"\"");
+    }
+    else if ( CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(newPage) )
+    {
+        codeEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::Get()->WriteToLogFile("Switched to code editor of file \""+codeEditorPtr->filename+"\"");
+    }
+    else if ( ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(newPage) )
+    {
+        externalEventsEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::Get()->WriteToLogFile("Switched to the editor of external events \""+externalEventsEditorPtr->events.GetName()+"\"");
+    }
+    else if ( ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(newPage) )
+    {
+        externalLayoutEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::Get()->WriteToLogFile("Switched to the editor of external layout \""+externalLayoutEditorPtr->GetExternalLayout().GetName()+"\"");
+    }
+}
+
+void EditorsNotebookManager::NotifyPageNotDisplayed(wxWindow * newPage)
+{
+	if ( EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(newPage) )
+        sceneEditorPtr->EditorNotDisplayed();
+    else if ( ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(newPage) )
+        externalLayoutEditorPtr->EditorNotDisplayed();
+}
+
+void EditorsNotebookManager::PageChanged(wxWindow * newPage)
+{
+	for (std::size_t k =0;k<notebook->GetPageCount();k++)
+	{
+		wxWindow * page = notebook->GetPage(k);
+		if (page == newPage) NotifyPageDisplayed(page);
+		else NotifyPageNotDisplayed(page);
+	}
 }
 
 wxBitmap EditorsNotebookManager::GetIconFor(wxWindow * page)

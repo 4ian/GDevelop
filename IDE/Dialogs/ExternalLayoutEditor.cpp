@@ -245,6 +245,14 @@ void ExternalLayoutEditor::ForceRefreshRibbonAndConnect()
     if (layoutEditorCanvas) layoutEditorCanvas->ConnectEvents();
 }
 
+void ExternalLayoutEditor::EditorNotDisplayed()
+{
+	if (externalLayoutEditor)
+	{
+		externalLayoutEditor->Hide();
+	}
+}
+
 void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
     mainFrameWrapper.SetRibbonPage(_("Scene"));

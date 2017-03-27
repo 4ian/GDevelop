@@ -8,7 +8,7 @@ if (!shell.test('-f', './node_modules/.bin/build')) {
   shell.exit();
 }
 
-// shell.exec('npm run build:app');
+shell.exec('npm run build:app');
 
 shell.rm('-rf', 'app/www');
 shell.mkdir('-p', 'app/www');
@@ -16,13 +16,14 @@ shell.cp('-r', '../app/build/*', 'app/www');
 
 shell.exec('node node_modules/.bin/build --mac');
 shell.mkdir('-p', gdBinariesOutputDir + '/Release_Darwin/newIDE');
+shell.rm('-rf', gdBinariesOutputDir + '/Release_Darwin/newIDE/GDevelop IDE.app');
 shell.cp(
-  '-r',
+  '-rf',
   './dist/mac/GDevelop IDE.app',
   gdBinariesOutputDir + '/Release_Darwin/newIDE'
 );
 
-shell.exec('node node_modules/.bin/build --win --ia32');
+shell.exec('node node_modules/.bin/build --win --ia32 --dir');
 shell.mkdir('-p', gdBinariesOutputDir + '/Release_Windows/newIDE');
 shell.cp(
   '-r',
@@ -32,4 +33,4 @@ shell.cp(
 
 shell.exec('node node_modules/.bin/build --linux tar.gz');
 shell.mkdir('-p', gdBinariesOutputDir + '/Release_Linux/newIDE');
-shell.cp('-r', './dist/linux/*', gdBinariesOutputDir + '/Release_Linux/newIDE');
+shell.cp('-r', './dist/linux-unpacked/*', gdBinariesOutputDir + '/Release_Linux/newIDE');

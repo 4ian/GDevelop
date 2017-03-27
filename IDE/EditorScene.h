@@ -60,6 +60,12 @@ public:
     void ForceRefreshRibbonAndConnect();
 
     /**
+     * Can be called by parent to let the editor know that it's not the editor
+     * displayed and focused.
+     */
+    void EditorNotDisplayed();
+
+    /**
      * Return true if the editor can be closed, false otherwise ( i.e. Scene is being previewed )
      */
     bool CanBeClosed();
@@ -99,6 +105,9 @@ private:
     void OnvScrollbarScrollThumbRelease(wxScrollEvent& event);
     void OnhScrollbarScrollThumbRelease(wxScrollEvent& event);
     //*)
+    void OnexternalEditorPanelResize(wxSizeEvent& event);
+    void OnexternalEditorPanelMoved(wxMoveEvent& event);
+    void OnMainFrameActivate(wxActivateEvent& event);
     void CreateExternalLayoutEditor();
 
     //(*Declarations(EditorScene)

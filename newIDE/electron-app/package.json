@@ -12,15 +12,13 @@
   },
   "build": {
     "appId": "com.gdevelop.ide",
-    "category": "Development",
-    "win": {
-      "iconUrl": "http://compilgames.net/TODO"
-    },
-    "asar": false
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
   },
   "devDependencies": {
-    "shelljs": "^0.7.7",
     "electron": "^1.4.14",
-    "electron-builder": "^5.12.1"
+    "electron-builder": "^16.4.2",
+    "shelljs": "^0.7.7"
   }
 }

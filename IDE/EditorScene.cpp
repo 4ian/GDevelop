@@ -21,6 +21,7 @@
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
+#include <wx/app.h>
 
 #include "GDCore/Project/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
@@ -122,6 +123,9 @@ mainFrameWrapper(mainFrameWrapper_)
 
 	externalEditorPanel = new ExternalEditorPanel(externalSceneEditorContainerPanel);
 	externalEditorContainerSizer->Add(externalEditorPanel, 1, wxALL|wxEXPAND, 0);
+	externalEditorPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnexternalEditorPanelResize,0,this);
+	mainFrameWrapper.GetMainEditor()->Connect(wxEVT_MOVE,(wxObjectEventFunction)&EditorScene::OnexternalEditorPanelMoved,0,this);
+	mainFrameWrapper.GetMainEditor()->Connect(wxEVT_ACTIVATE,(wxObjectEventFunction)&EditorScene::OnMainFrameActivate,0,this);
 	externalEditorPanel->OnOpenEditor([this]() {
 		if (!externalLayoutEditor) return;
 
@@ -232,6 +236,10 @@ void EditorScene::CreateExternalLayoutEditor()
 	externalLayoutEditor->OnLaunchPreview([this](){
 		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
 	});
+
+	Layout();
+	auto rect = externalEditorPanel->GetScreenRect();
+	externalLayoutEditor->SetLaunchBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
 	externalLayoutEditor->Launch("scene-editor", layout.GetName());
 }
 
@@ -240,12 +248,47 @@ void EditorScene::OnscenePanelResize(wxSizeEvent& event)
     if (layoutEditorCanvas) layoutEditorCanvas->UpdateSize();
     hScrollbar->SetSize(0, scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight(), scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), hScrollbar->GetSize().GetHeight());
     vScrollbar->SetSize(scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), 0, vScrollbar->GetSize().GetWidth(), scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight());
+}
 
+void EditorScene::OnexternalEditorPanelMoved(wxMoveEvent& event)
+{
+	//TODO: Factor
 	if (externalLayoutEditor)
 	{
-		auto rect = scenePanel->GetScreenRect();
+		auto rect = externalEditorPanel->GetScreenRect();
 		externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
 	}
+	event.Skip();
+}
+
+void EditorScene::OnexternalEditorPanelResize(wxSizeEvent& event)
+{
+	if (externalLayoutEditor)
+	{
+		auto rect = externalEditorPanel->GetScreenRect();
+		externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
+	}
+	event.Skip();
+}
+
+void EditorScene::EditorNotDisplayed()
+{
+	if (externalLayoutEditor)
+	{
+		externalLayoutEditor->Hide();
+	}
+}
+
+void EditorScene::OnMainFrameActivate(wxActivateEvent& event)
+{
+	if (externalLayoutEditor)
+	{
+		if (!event.GetActive())
+		{
+			externalLayoutEditor->Hide();
+		}
+	}
+	event.Skip();
 }
 
 EditorScene::~EditorScene()
@@ -261,6 +304,10 @@ void EditorScene::ForceRefreshRibbonAndConnect()
 {
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scene") )
     {
+		std::cout << "Show" << std::endl;
+		if (externalLayoutEditor)
+			externalLayoutEditor->Show();
+
         if (layoutEditorCanvas)
 		{
 			layoutEditorCanvas->RecreateRibbonToolbar();
@@ -272,6 +319,9 @@ void EditorScene::ForceRefreshRibbonAndConnect()
     }
     else if ( notebook->GetPageText(notebook->GetSelection()) == _("Events") )
     {
+		if (externalLayoutEditor)
+			externalLayoutEditor->Hide();
+
         mainFrameWrapper.SetRibbonPage(_("Events"));
         if (layoutEditorCanvas) layoutEditorCanvas->EnableIdleEvents(false);
         eventsEditor->ConnectEvents();

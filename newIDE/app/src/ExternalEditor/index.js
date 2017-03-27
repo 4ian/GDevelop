@@ -10,6 +10,7 @@ class ExternalEditor extends Component {
     this.editorArguments = Window.getArguments();
     this.selectedEditor = this.editorArguments['editor'];
     this.editedElementName = this.editorArguments['edited-element-name'];
+    this.isIntegrated = this.editorArguments['mode'] === 'integrated';
     this.state = {
       loading: false,
     };
@@ -21,22 +22,24 @@ class ExternalEditor extends Component {
         if (command === 'update') {
           this._onUpdateReceived(payload, scope);
         } else if (command === 'setBounds') {
-          // Window.setBounds(
-          // 	payload.x,
-          // 	payload.y,
-          // 	payload.width,
-          // 	payload.height
-          // );
+          if (this.isIntegrated) {
+            Window.setBounds(payload.x, payload.y, payload.width, payload.height);
+          }
         } else if (command === 'show') {
           Window.show();
         } else if (command === 'hide') {
-          Window.hide();
+          if (this.isIntegrated) {
+            Window.hide();
+          }
         }
       });
       this.bridge.onConnected(() => {
         this.requestUpdate();
       });
       Window.onBlur(() => {
+        if (this.isIntegrated) {
+          Window.hide();
+        }
         this.sendUpdate();
       });
       Window.onFocus(() => {
@@ -71,9 +74,9 @@ class ExternalEditor extends Component {
 
     this.sendingUpdate = true;
     const elements = this.editor.getSerializedElements();
-    for(const scope in elements) {
+    for (const scope in elements) {
       if (elements.hasOwnProperty(scope)) {
-        this.bridge.send('update', elements[scope], scope)
+        this.bridge.send('update', elements[scope], scope);
       }
     }
     this.sendingUpdate = false;

@@ -24,7 +24,7 @@ export default props => {
           top: '50%',
           left: '50%',
           marginTop: -loaderSize / 2,
-          marginBottom: -loaderSize / 2,
+          marginLeft: -loaderSize / 2,
           width: loaderSize,
           height: loaderSize,
         }}

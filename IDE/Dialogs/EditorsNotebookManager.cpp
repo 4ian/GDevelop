@@ -33,27 +33,27 @@ void EditorsNotebookManager::NotifyPageDisplayed(wxWindow * newPage)
 {
 	if ( EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(newPage) )
     {
-        sceneEditorPtr->ForceRefreshRibbonAndConnect();
+        sceneEditorPtr->EditorDisplayed();
         LogFileManager::Get()->WriteToLogFile("Switched to the editor of layout \""+sceneEditorPtr->GetLayout().GetName()+"\"");
     }
     else if ( ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(newPage) )
     {
-        imagesEditorPtr->ForceRefreshRibbonAndConnect();
+        imagesEditorPtr->EditorDisplayed();
         LogFileManager::Get()->WriteToLogFile("Switched to resources editor of project \""+imagesEditorPtr->project.GetName()+"\"");
     }
     else if ( CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(newPage) )
     {
-        codeEditorPtr->ForceRefreshRibbonAndConnect();
+        codeEditorPtr->EditorDisplayed();
         LogFileManager::Get()->WriteToLogFile("Switched to code editor of file \""+codeEditorPtr->filename+"\"");
     }
     else if ( ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(newPage) )
     {
-        externalEventsEditorPtr->ForceRefreshRibbonAndConnect();
+        externalEventsEditorPtr->EditorDisplayed();
         LogFileManager::Get()->WriteToLogFile("Switched to the editor of external events \""+externalEventsEditorPtr->events.GetName()+"\"");
     }
     else if ( ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(newPage) )
     {
-        externalLayoutEditorPtr->ForceRefreshRibbonAndConnect();
+        externalLayoutEditorPtr->EditorDisplayed();
         LogFileManager::Get()->WriteToLogFile("Switched to the editor of external layout \""+externalLayoutEditorPtr->GetExternalLayout().GetName()+"\"");
     }
 }

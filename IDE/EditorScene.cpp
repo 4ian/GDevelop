@@ -300,7 +300,7 @@ EditorScene::~EditorScene()
 	m_mgr.UnInit();
 }
 
-void EditorScene::ForceRefreshRibbonAndConnect()
+void EditorScene::EditorDisplayed()
 {
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scene") )
     {
@@ -343,7 +343,7 @@ bool EditorScene::CanBeClosed()
  */
 void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 {
-    ForceRefreshRibbonAndConnect();
+    EditorDisplayed();
 }
 
 void EditorScene::OnnotebookPageChanging(wxAuiNotebookEvent& event)

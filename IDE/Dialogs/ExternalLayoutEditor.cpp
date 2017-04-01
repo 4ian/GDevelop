@@ -239,7 +239,7 @@ void ExternalLayoutEditor::OnscrollBar1Scroll(wxScrollEvent& event)
     layoutEditorCanvas->OnhScrollbarScroll(event);
 }
 
-void ExternalLayoutEditor::ForceRefreshRibbonAndConnect()
+void ExternalLayoutEditor::EditorDisplayed()
 {
     mainFrameWrapper.SetRibbonPage(_("Scene"));
     if (layoutEditorCanvas) layoutEditorCanvas->ConnectEvents();
@@ -327,7 +327,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         m_mgr.LoadPerspective(perspective);
 
         m_mgr.Update();
-        ForceRefreshRibbonAndConnect();
+        EditorDisplayed();
     }
 
     //Save the choice

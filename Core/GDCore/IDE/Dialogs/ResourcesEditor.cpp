@@ -1241,10 +1241,10 @@ void ResourcesEditor::TriggerDrop(wxCoord x, wxCoord y, std::vector<gd::String >
  */
 void ResourcesEditor::OnSetFocus(wxFocusEvent& event)
 {
-    ForceRefreshRibbonAndConnect();
+    EditorDisplayed();
 }
 
-void ResourcesEditor::ForceRefreshRibbonAndConnect()
+void ResourcesEditor::EditorDisplayed()
 {
     if ( useRibbon )
     {

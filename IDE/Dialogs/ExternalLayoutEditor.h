@@ -44,7 +44,7 @@ public:
     /**
      * Can be called by parent so as to refresh ribbon for this editor.
      */
-    void ForceRefreshRibbonAndConnect();
+    void EditorDisplayed();
 
     /**
      * Can be called by parent to let the editor know that it's not the editor

@@ -98,7 +98,7 @@ public:
     /**
      * Can be called by parent so as to refresh ribbon for this editor.
      */
-    void ForceRefreshRibbonAndConnect();
+    void EditorDisplayed();
 
     static const long idRibbonAdd;
     static const long idRibbonAddFromLibrary;

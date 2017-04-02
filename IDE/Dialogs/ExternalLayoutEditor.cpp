@@ -48,10 +48,11 @@ BEGIN_EVENT_TABLE(ExternalLayoutEditor,wxPanel)
 END_EVENT_TABLE()
 
 ExternalLayoutEditor::ExternalLayoutEditor(wxWindow* parent, gd::Project & project_, gd::ExternalLayout & externalLayout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
-layoutEditorCanvas(NULL),
-externalLayout(externalLayout_),
-project(project_),
-mainFrameWrapper(mainFrameWrapper_)
+	layoutEditorCanvas(NULL),
+	externalLayout(externalLayout_),
+	project(project_),
+	mainFrameWrapper(mainFrameWrapper_),
+	isEditorDisplayed(true)
 {
     gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
 
@@ -132,8 +133,12 @@ mainFrameWrapper(mainFrameWrapper_)
     Connect(ID_SCROLLBAR2,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&ExternalLayoutEditor::OnscrollBar2Scroll);
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_DROPDOWN,(wxObjectEventFunction)&ExternalLayoutEditor::OnparentSceneComboBoxDropDown);
 
+	m_mgr.SetManagedWindow( this );
+
 	externalEditorPanel = new ExternalEditorPanel(corePanel);
 	FlexGridSizer3->Add(externalEditorPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+ 	externalEditorPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&ExternalLayoutEditor::OnexternalEditorPanelResize,0,this);
+	mainFrameWrapper.GetMainEditor()->Connect(wxEVT_MOVE,(wxObjectEventFunction)&ExternalLayoutEditor::OnexternalEditorPanelMoved,0,this);
 	externalEditorPanel->OnOpenEditor([this]() {
 		if (!externalLayoutEditor) return;
 
@@ -144,7 +149,6 @@ mainFrameWrapper(mainFrameWrapper_)
 	});
 
 	//Prepare pane manager
-    m_mgr.SetManagedWindow( this );
     m_mgr.AddPane( corePanel, wxAuiPaneInfo().Name( wxT( "LayoutPanel" ) ).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
@@ -177,8 +181,14 @@ void ExternalLayoutEditor::CreateExternalLayoutEditor()
 			this->externalLayout.GetInitialInstances().UnserializeFrom(object);
 			return;
 		}
+		if (scope == "uiSettings")
+		{
+			std::cout << "Updating uiSettings from the external editor." << std::endl;
+			this->externalLayout.GetAssociatedSettings().UnserializeFrom(object);
+			return;
+		}
 
-		std::cout << "Updating anything else from instances from the external editor is not supported" << std::endl;
+		std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
 	});
 	externalLayoutEditor->OnLaunchPreview([this](){
 		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
@@ -218,6 +228,12 @@ void ExternalLayoutEditor::OnResize(wxSizeEvent& event)
     contextPanel->SetSize(GetSize().GetWidth(), contextPanel->GetSize().GetHeight());
     layoutPanel->SetPosition(wxPoint(0,contextPanel->GetSize().GetHeight()));
     layoutPanel->SetSize(GetSize().GetWidth(),GetSize().GetHeight()-contextPanel->GetSize().GetHeight());
+	if (externalEditorPanel)
+	{
+		externalEditorPanel->SetPosition(wxPoint(0,contextPanel->GetSize().GetHeight()));
+		externalEditorPanel->SetSize(GetSize().GetWidth(),GetSize().GetHeight()-contextPanel->GetSize().GetHeight());
+		UpdateExternalLayoutEditorSize();
+	}
 }
 
 void ExternalLayoutEditor::OnscenePanelResize(wxSizeEvent& event)
@@ -227,6 +243,28 @@ void ExternalLayoutEditor::OnscenePanelResize(wxSizeEvent& event)
 
     scrollBar1->SetSize(0, layoutPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight(), layoutPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), scrollBar1->GetSize().GetHeight());
     scrollBar2->SetSize(layoutPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), 0, scrollBar2->GetSize().GetWidth(), layoutPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
+}
+
+void ExternalLayoutEditor::UpdateExternalLayoutEditorSize()
+{
+	if (!externalLayoutEditor || !isEditorDisplayed) return;
+
+	auto rect = corePanel->GetScreenRect();
+	rect.SetY(rect.GetY() + contextPanel->GetSize().GetHeight());
+	rect.SetHeight(rect.GetHeight() - contextPanel->GetSize().GetHeight());
+	externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
+}
+
+void ExternalLayoutEditor::OnexternalEditorPanelMoved(wxMoveEvent& event)
+{
+	UpdateExternalLayoutEditorSize();
+	event.Skip();
+}
+
+void ExternalLayoutEditor::OnexternalEditorPanelResize(wxSizeEvent& event)
+{
+	UpdateExternalLayoutEditorSize();
+	event.Skip();
 }
 
 void ExternalLayoutEditor::OnscrollBar2Scroll(wxScrollEvent& event)
@@ -241,12 +279,19 @@ void ExternalLayoutEditor::OnscrollBar1Scroll(wxScrollEvent& event)
 
 void ExternalLayoutEditor::EditorDisplayed()
 {
-    mainFrameWrapper.SetRibbonPage(_("Scene"));
+	isEditorDisplayed = true;
+	mainFrameWrapper.SetRibbonPage(_("Scene"));
     if (layoutEditorCanvas) layoutEditorCanvas->ConnectEvents();
+	if (externalLayoutEditor)
+	{
+		UpdateExternalLayoutEditorSize();
+		externalLayoutEditor->Show();
+	}
 }
 
 void ExternalLayoutEditor::EditorNotDisplayed()
 {
+	isEditorDisplayed = false;
 	if (externalLayoutEditor)
 	{
 		externalLayoutEditor->Hide();

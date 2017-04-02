@@ -115,9 +115,12 @@ private:
     void OnResize(wxSizeEvent& event);
     void OnparentSceneComboBoxSelected(wxCommandEvent& event);
     //*)
+    void OnexternalEditorPanelResize(wxSizeEvent& event);
+    void OnexternalEditorPanelMoved(wxMoveEvent& event);
     void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
     void SetupForScene(gd::Layout & scene);
     void CreateExternalLayoutEditor();
+    void UpdateExternalLayoutEditorSize();
 
     //(*Declarations(ExternalLayoutEditor)
     wxScrollBar* scrollBar1;
@@ -144,6 +147,7 @@ private:
 
     std::shared_ptr<gd::ExternalEditor> externalLayoutEditor;
     ExternalEditorPanel * externalEditorPanel;
+    bool isEditorDisplayed;
 
     std::function<void()> onAssociatedLayoutChangedCb;
     wxAuiManager m_mgr;

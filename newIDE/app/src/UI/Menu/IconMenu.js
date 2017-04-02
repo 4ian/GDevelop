@@ -53,7 +53,10 @@ class ElectronMenuImplementation {
     console.log(dimensions);
     if (this.menu) {
       setTimeout(() =>
-        this.menu.popup(dimensions.left, dimensions.top + dimensions.height));
+        this.menu.popup(
+          Math.round(dimensions.left),
+          Math.round(dimensions.top + dimensions.height)
+        ));
     }
   }
 

@@ -1,6 +1,5 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
-const bsplit = electron ? electron.remote.require('buffer-split') : null;
 const Buffer = electron ? electron.remote.require('buffer').Buffer : null;
 
 //TODO: Update to ES6

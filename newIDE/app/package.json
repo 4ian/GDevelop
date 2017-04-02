@@ -15,7 +15,6 @@
     "react-scripts": "0.6.1"
   },
   "dependencies": {
-    "buffer-split": "^1.0.0",
     "flat": "^2.0.1",
     "lodash": "^4.16.4",
     "material-ui": "^0.16.0",

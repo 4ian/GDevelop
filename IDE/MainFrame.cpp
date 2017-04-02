@@ -1003,10 +1003,10 @@ void MainFrame::OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt)
 
 void MainFrame::OnActivate(wxActivateEvent& event)
 {
-    std::cout << "Activated" << event.GetActive() << std::endl;
-    if (event.GetActive()) 
-    {
+    if (event.GetActive())
         editorsManager.PageChanged(editorsNotebook->GetCurrentPage());
-    }
+    else if (!event.GetActive())
+        editorsManager.MainFrameNotDisplayed();
+
     event.Skip();
 }

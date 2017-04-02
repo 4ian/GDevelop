@@ -108,7 +108,8 @@ private:
     void OnexternalEditorPanelResize(wxSizeEvent& event);
     void OnexternalEditorPanelMoved(wxMoveEvent& event);
     void OnMainFrameActivate(wxActivateEvent& event);
-    void CreateExternalLayoutEditor();
+    void CreateExternalLayoutEditor(wxWindow * parent = NULL);
+    void UpdateExternalLayoutEditorSize();
 
     //(*Declarations(EditorScene)
     EventsEditor* eventsEditor;
@@ -132,6 +133,7 @@ private:
 
     std::shared_ptr<gd::ExternalEditor> externalEventsEditor;
     std::shared_ptr<gd::ExternalEditor> externalLayoutEditor;
+    bool isEditorDisplayed;
 
     wxAuiManager m_mgr;
 

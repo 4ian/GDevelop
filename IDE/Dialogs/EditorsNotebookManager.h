@@ -30,6 +30,7 @@ public:
 	void OnPageAdded(std::function<void(wxWindow*)> cb) { onPageAddedCb = cb; }
 
 	void PageChanged(wxWindow * newPage);
+	void MainFrameNotDisplayed();
 
 	void UpdatePageLabel(int pageIndex, wxString name);
 

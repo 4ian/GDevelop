@@ -58,9 +58,10 @@ BEGIN_EVENT_TABLE(EditorScene,wxPanel)
 END_EVENT_TABLE()
 
 EditorScene::EditorScene(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
-project(project_),
-layout(layout_),
-mainFrameWrapper(mainFrameWrapper_)
+	project(project_),
+	layout(layout_),
+	mainFrameWrapper(mainFrameWrapper_),
+	isEditorDisplayed(true)
 {
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;
@@ -125,9 +126,11 @@ mainFrameWrapper(mainFrameWrapper_)
 	externalEditorContainerSizer->Add(externalEditorPanel, 1, wxALL|wxEXPAND, 0);
 	externalEditorPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnexternalEditorPanelResize,0,this);
 	mainFrameWrapper.GetMainEditor()->Connect(wxEVT_MOVE,(wxObjectEventFunction)&EditorScene::OnexternalEditorPanelMoved,0,this);
-	mainFrameWrapper.GetMainEditor()->Connect(wxEVT_ACTIVATE,(wxObjectEventFunction)&EditorScene::OnMainFrameActivate,0,this);
 	externalEditorPanel->OnOpenEditor([this]() {
 		if (!externalLayoutEditor) return;
+
+		auto rect = externalEditorPanel->GetScreenRect();
+		externalLayoutEditor->SetLaunchBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
 
 		if (externalLayoutEditor->IsLaunchedAndConnected())
 			externalLayoutEditor->Show();
@@ -197,7 +200,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	if (useExternalEditor)
 	{
 		notebook->RemovePage(0);
-		CreateExternalLayoutEditor();
+		CreateExternalLayoutEditor(this);
 	}
 	else
 	{
@@ -205,7 +208,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	}
 }
 
-void EditorScene::CreateExternalLayoutEditor()
+void EditorScene::CreateExternalLayoutEditor(wxWindow * parent)
 {
 	externalLayoutEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
 	externalLayoutEditor->OnSendUpdate([this](gd::String scope) {
@@ -230,17 +233,35 @@ void EditorScene::CreateExternalLayoutEditor()
 			this->layout.GetInitialInstances().UnserializeFrom(object);
 			return;
 		}
+		if (scope == "uiSettings")
+		{
+			std::cout << "Updating uiSettings from the external editor." << std::endl;
+			this->layout.GetAssociatedLayoutEditorCanvasOptions().UnserializeFrom(object);
+			return;
+		}
 
-		std::cout << "Updating anything else from instances from the external editor is not supported" << std::endl;
+		std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
 	});
 	externalLayoutEditor->OnLaunchPreview([this](){
 		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
 	});
 
 	Layout();
-	auto rect = externalEditorPanel->GetScreenRect();
-	externalLayoutEditor->SetLaunchBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
+	if (parent)
+	{
+		auto rect = parent->GetScreenRect();
+		externalLayoutEditor->SetLaunchBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
+	}
 	externalLayoutEditor->Launch("scene-editor", layout.GetName());
+}
+
+void EditorScene::UpdateExternalLayoutEditorSize()
+{
+	if (!externalLayoutEditor || !isEditorDisplayed) return;
+	if (notebook->GetPageText(notebook->GetSelection()) != _("Scene")) return;
+
+	auto rect = externalEditorPanel->GetScreenRect();
+	externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
 }
 
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)
@@ -252,43 +273,23 @@ void EditorScene::OnscenePanelResize(wxSizeEvent& event)
 
 void EditorScene::OnexternalEditorPanelMoved(wxMoveEvent& event)
 {
-	//TODO: Factor
-	if (externalLayoutEditor)
-	{
-		auto rect = externalEditorPanel->GetScreenRect();
-		externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
-	}
+	UpdateExternalLayoutEditorSize();
 	event.Skip();
 }
 
 void EditorScene::OnexternalEditorPanelResize(wxSizeEvent& event)
 {
-	if (externalLayoutEditor)
-	{
-		auto rect = externalEditorPanel->GetScreenRect();
-		externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
-	}
+	UpdateExternalLayoutEditorSize();
 	event.Skip();
 }
 
 void EditorScene::EditorNotDisplayed()
 {
+	isEditorDisplayed = false;
 	if (externalLayoutEditor)
 	{
 		externalLayoutEditor->Hide();
 	}
-}
-
-void EditorScene::OnMainFrameActivate(wxActivateEvent& event)
-{
-	if (externalLayoutEditor)
-	{
-		if (!event.GetActive())
-		{
-			externalLayoutEditor->Hide();
-		}
-	}
-	event.Skip();
 }
 
 EditorScene::~EditorScene()
@@ -302,11 +303,14 @@ EditorScene::~EditorScene()
 
 void EditorScene::EditorDisplayed()
 {
+	isEditorDisplayed = true;
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scene") )
     {
-		std::cout << "Show" << std::endl;
 		if (externalLayoutEditor)
+		{
+			UpdateExternalLayoutEditorSize();
 			externalLayoutEditor->Show();
+		}
 
         if (layoutEditorCanvas)
 		{

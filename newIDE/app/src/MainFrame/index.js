@@ -215,6 +215,7 @@ class MainFrame extends Component {
               showPreviewButton
             />}
           {currentProject &&
+            externalEventsOpened &&
             currentProject.hasExternalEventsNamed(externalEventsOpened) &&
             <EventsSheetContainer
               project={currentProject}

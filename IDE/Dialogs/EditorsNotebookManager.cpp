@@ -66,6 +66,15 @@ void EditorsNotebookManager::NotifyPageNotDisplayed(wxWindow * newPage)
         externalLayoutEditorPtr->EditorNotDisplayed();
 }
 
+void EditorsNotebookManager::MainFrameNotDisplayed()
+{
+	for (std::size_t k =0;k<notebook->GetPageCount();k++)
+	{
+		wxWindow * page = notebook->GetPage(k);
+		NotifyPageNotDisplayed(page);
+	}
+}
+
 void EditorsNotebookManager::PageChanged(wxWindow * newPage)
 {
 	for (std::size_t k =0;k<notebook->GetPageCount();k++)

@@ -2,8 +2,9 @@ import gesture from 'pixi-simple-gesture';
 import transformRect from '../Utils/TransformRect';
 import PIXI from 'pixi.js';
 
-const resizeButtonWidth = 18;
-const resizeButtonHeight = 18;
+const buttonSize = 10;
+const smallButtonSize = 8;
+const buttonPadding = 5;
 
 export default class InstancesSelection {
   constructor(
@@ -24,24 +25,76 @@ export default class InstancesSelection {
     this.pixiContainer = new PIXI.Container();
     this.rectanglesContainer = new PIXI.Container();
     this.selectedRectangles = [];
+    this.pixiContainer.addChild(this.rectanglesContainer);
+
     this.resizeButton = new PIXI.Graphics();
     this.resizeIcon = new PIXI.Sprite.fromImage('res/actions/direction.png');
-    this.pixiContainer.addChild(this.rectanglesContainer);
-    this.pixiContainer.addChild(this.resizeButton);
-    this.pixiContainer.addChild(this.resizeIcon);
+    this.rightResizeButton = new PIXI.Graphics();
+    this.bottomResizeButton = new PIXI.Graphics();
+    this._makeButton(
+      this.resizeButton,
+      event => {
+        this.onResize(event.deltaX, event.deltaY);
+      },
+      () => {
+        this.onResizeEnd();
+      },
+      "nwse-resize"
+    );
+    this._makeButton(
+      this.rightResizeButton,
+      event => {
+        this.onResize(event.deltaX, 0);
+      },
+      () => {
+        this.onResizeEnd();
+      },
+      "ew-resize"
+    );
+    this._makeButton(
+      this.bottomResizeButton,
+      event => {
+        this.onResize(0, event.deltaY);
+      },
+      () => {
+        this.onResizeEnd();
+      },
+      "ns-resize"
+    );
+  }
 
-    this.resizeButton.interactive = true;
-    gesture.panable(this.resizeButton);
-    this.resizeButton.on('panmove', event => {
-      this.onResize(event.deltaX, event.deltaY);
-    });
-    this.resizeButton.on('panend', () => {
-      this.onResizeEnd();
-    });
+  _makeButton(objectButton, onMove, onEnd, cursor) {
+    objectButton.interactive = true;
+    objectButton.buttonMode = true;
+    objectButton.defaultCursor = cursor;
+    gesture.panable(objectButton);
+    objectButton.on('panmove', onMove);
+    objectButton.on('panend', onEnd);
+    this.pixiContainer.addChild(objectButton);
   }
 
   getPixiContainer() {
     return this.pixiContainer;
+  }
+
+  _renderButton(show, buttonObject, canvasPosition, size) {
+    buttonObject.clear();
+    if (!show) {
+      buttonObject.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
+      return;
+    }
+
+    buttonObject.beginFill(0xffffff);
+    buttonObject.lineStyle(1, 0x6868e8, 1);
+    buttonObject.fillAlpha = 0.9;
+    buttonObject.drawRect(canvasPosition[0], canvasPosition[1], size, size);
+    buttonObject.endFill();
+    buttonObject.hitArea = new PIXI.Rectangle(
+      canvasPosition[0],
+      canvasPosition[1],
+      size,
+      size
+    );
   }
 
   render() {
@@ -93,32 +146,37 @@ export default class InstancesSelection {
     }
 
     //Position the resize button.
-    this.resizeButton.clear();
-    this.resizeIcon.visible = false;
-    if (selection.length !== 0) {
-      const resizeButtonPos = this.toCanvasCoordinates(x2 + 5, y2 + 5);
+    const show = selection.length !== 0;
+    const resizeButtonPos = this.toCanvasCoordinates(x2, y2);
+    resizeButtonPos[0] += buttonPadding;
+    resizeButtonPos[1] += buttonPadding;
 
-      this.resizeIcon.visible = true;
-      this.resizeIcon.position.x = resizeButtonPos[0] + 1;
-      this.resizeIcon.position.y = resizeButtonPos[1] + 1;
-      this.resizeButton.beginFill(0xffffff);
-      this.resizeButton.lineStyle(1, 0x6868e8, 1);
-      this.resizeButton.fillAlpha = 0.9;
-      this.resizeButton.drawRect(
-        resizeButtonPos[0],
-        resizeButtonPos[1],
-        resizeButtonWidth,
-        resizeButtonHeight
-      );
-      this.resizeButton.endFill();
-      this.resizeButton.hitArea = new PIXI.Rectangle(
-        resizeButtonPos[0],
-        resizeButtonPos[1],
-        resizeButtonWidth,
-        resizeButtonHeight
-      );
-    } else {
-      this.resizeButton.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
-    }
+    const rightResizeButtonPos = this.toCanvasCoordinates(
+      x2,
+      y1 + (y2 - y1) / 2
+    );
+    rightResizeButtonPos[0] += buttonPadding;
+    rightResizeButtonPos[1] -= (-smallButtonSize) / 2;
+
+    const bottomResizeButtonPos = this.toCanvasCoordinates(
+      x1 + (x2 - x1) / 2,
+      y2
+    );
+    bottomResizeButtonPos[0] -= (-smallButtonSize) / 2;
+    bottomResizeButtonPos[1] += buttonPadding;
+
+    this._renderButton(show, this.resizeButton, resizeButtonPos, buttonSize);
+    this._renderButton(
+      show,
+      this.rightResizeButton,
+      rightResizeButtonPos,
+      smallButtonSize
+    );
+    this._renderButton(
+      show,
+      this.bottomResizeButton,
+      bottomResizeButtonPos,
+      smallButtonSize
+    );
   }
 }

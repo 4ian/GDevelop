@@ -98,8 +98,8 @@ export default class ViewPosition {
   }
 
   render() {
-    this._pixiContainer.position.x = -this.viewX * this._zoomFactor;
-    this._pixiContainer.position.y = -this.viewY * this._zoomFactor;
+    this._pixiContainer.position.x = (-this.viewX) * this._zoomFactor;
+    this._pixiContainer.position.y = (-this.viewY) * this._zoomFactor;
     this._pixiContainer.position.x += this._width / 2;
     this._pixiContainer.position.y += this._height / 2;
     this._pixiContainer.scale.x = this._zoomFactor;

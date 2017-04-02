@@ -1,4 +1,5 @@
 var shell = require('shelljs');
+var args = require('minimist')(process.argv.slice(2));
 
 var gdRootDir = '../..';
 var gdBinariesOutputDir = gdRootDir + '/Binaries/Output';
@@ -8,13 +9,15 @@ if (!shell.test('-f', './node_modules/.bin/build')) {
   shell.exit();
 }
 
-shell.exec('npm run build:app');
+if (!args['skip-app-build']) {
+  shell.exec('npm run build:app');
+}
 
 shell.rm('-rf', 'app/www');
 shell.mkdir('-p', 'app/www');
 shell.cp('-r', '../app/build/*', 'app/www');
 
-shell.exec('node node_modules/.bin/build --mac');
+shell.exec('node node_modules/.bin/build --mac --dir');
 shell.mkdir('-p', gdBinariesOutputDir + '/Release_Darwin/newIDE');
 shell.rm('-rf', gdBinariesOutputDir + '/Release_Darwin/newIDE/GDevelop IDE.app');
 shell.cp(

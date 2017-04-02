@@ -19,6 +19,7 @@
   "devDependencies": {
     "electron": "^1.4.14",
     "electron-builder": "^16.4.2",
+    "minimist": "^1.2.0",
     "shelljs": "^0.7.7"
   }
 }

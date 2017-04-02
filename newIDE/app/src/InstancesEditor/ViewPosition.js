@@ -90,7 +90,7 @@ export default class ViewPosition {
   }
 
   setZoomFactor(zoomFactor) {
-    this._zoomFactor = Math.max(Math.min(zoomFactor, 10), 0.05);
+    this._zoomFactor = Math.max(Math.min(zoomFactor, 10), 0.01);
   }
 
   getPixiContainer() {

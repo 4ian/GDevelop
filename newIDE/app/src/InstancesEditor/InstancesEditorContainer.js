@@ -10,6 +10,7 @@ import InstancesResizer from './InstancesResizer';
 import InstancesMover from './InstancesMover';
 import Grid from './Grid';
 import WindowBorder from './WindowBorder';
+import WindowMask from './WindowMask';
 const gd = global.gd;
 import PIXI from 'pixi.js';
 
@@ -121,6 +122,9 @@ export default class InstancesEditorContainer extends Component {
     if (this.windowBorder) {
       this.pixiContainer.removeChild(this.windowBorder.getPixiObject());
     }
+    if (this.windowMask) {
+      this.pixiContainer.removeChild(this.windowMask.getPixiObject());
+    }
 
     this.instancesRenderer = new InstancesRenderer({
       project: props.project,
@@ -161,6 +165,11 @@ export default class InstancesEditorContainer extends Component {
       project: props.project,
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
+    this.windowMask = new WindowMask({
+      project: props.project,
+      viewPosition: this.viewPosition,
+      options: this.props.options,
+    });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
     this.viewPosition
@@ -169,6 +178,7 @@ export default class InstancesEditorContainer extends Component {
     this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.pixiContainer.addChild(this.windowBorder.getPixiObject());
+    this.pixiContainer.addChild(this.windowMask.getPixiObject());
   }
 
   componentWillUnmount() {
@@ -198,6 +208,7 @@ export default class InstancesEditorContainer extends Component {
       this.grid.setOptions(nextProps.options);
       this.instancesMover.setOptions(nextProps.options);
       this.instancesResizer.setOptions(nextProps.options);
+      this.windowMask.setOptions(nextProps.options);
     }
 
     if (
@@ -377,6 +388,7 @@ export default class InstancesEditorContainer extends Component {
     this.selectedInstances.render();
     this.selectionRectangle.render();
     this.windowBorder.render();
+    this.windowMask.render();
     this.pixiRenderer.render(this.pixiContainer);
     this.nextFrame = requestAnimationFrame(this.renderScene);
   };

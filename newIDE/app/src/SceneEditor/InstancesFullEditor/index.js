@@ -60,6 +60,7 @@ export default class InstancesFullEditor extends Component {
         deleteSelection={this.deleteSelection}
         toggleInstancesList={this.toggleInstancesList}
         toggleLayersList={this.toggleLayersList}
+        toggleWindowMask={this.toggleWindowMask}
         toggleGrid={this.toggleGrid}
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
@@ -91,6 +92,15 @@ export default class InstancesFullEditor extends Component {
 
   toggleLayersList = () => {
     this.setState({ layersListOpen: !this.state.layersListOpen });
+  };
+
+  toggleWindowMask = () => {
+    this.setState({
+      uiSettings: {
+        ...this.state.uiSettings,
+        windowMask: !this.state.uiSettings.windowMask,
+      },
+    });
   };
 
   toggleGrid = () => {

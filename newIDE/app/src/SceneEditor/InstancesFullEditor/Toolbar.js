@@ -44,6 +44,11 @@ export default class Toolbar extends Component {
           onClick={this.props.toggleLayersList}
           src="res/ribbon_default/layers32.png"
         />
+        <ToolbarSeparator />
+        <ToolbarIcon
+          onClick={this.props.toggleWindowMask}
+          src="res/ribbon_default/windowMask32.png"
+        />
         <IconMenu
           iconButtonElement={
             <ToolbarIcon src="res/ribbon_default/grid32.png" />

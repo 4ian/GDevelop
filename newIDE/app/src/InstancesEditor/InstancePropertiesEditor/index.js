@@ -3,6 +3,8 @@ import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import Subheader from 'material-ui/Subheader';
 import RaisedButton from 'material-ui/RaisedButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import mapFor from '../../Utils/MapFor';
 
 export default class InstancePropertiesEditor extends Component {
@@ -44,6 +46,14 @@ export default class InstancePropertiesEditor extends Component {
       {
         name: 'Layer',
         valueType: 'string',
+        getChoices: (project, layout) => {
+          return mapFor(0, layout.getLayersCount(), i => {
+            return {
+              value: layout.getLayerAt(i).getName(),
+              label: layout.getLayerAt(i).getName() || 'Base layer',
+            };
+          });
+        },
         getValue: instance => instance.getLayer(),
         setValue: (instance, newValue) => instance.setLayer(newValue),
       },
@@ -55,8 +65,9 @@ export default class InstancePropertiesEditor extends Component {
       },
       {
         name: 'Edit instance variables',
-        getLabel: (instance) => 'Edit instance variables (' + instance.getVariables().count() + ')',
-        onClick: (instance) => this.props.editInstanceVariables(instance),
+        getLabel: instance =>
+          'Edit instance variables (' + instance.getVariables().count() + ')',
+        onClick: instance => this.props.editInstanceVariables(instance),
       },
       {
         name: 'Custom size',
@@ -125,7 +136,7 @@ export default class InstancePropertiesEditor extends Component {
             this.props.onInstancesModified(this.props.instances);
           }}
           type="number"
-          fullWidth={true}
+          fullWidth
           disabled={field.disabled}
         />
       );
@@ -145,9 +156,60 @@ export default class InstancePropertiesEditor extends Component {
               field.setValue(i, newValue || ''));
             this.props.onInstancesModified(this.props.instances);
           }}
-          fullWidth={true}
+          fullWidth
           disabled={field.disabled}
         />
+      );
+    }
+  };
+
+  _renderSelectField = field => {
+    const { project, layout } = this.props;
+    const children = field
+      .getChoices(project, layout)
+      .map(({ value, label }) => (
+        <MenuItem value={value} primaryText={label} />
+      ));
+
+    if (field.valueType === 'number') {
+      return (
+        <SelectField
+          value={this._getFieldValue(this.props.instances, field)}
+          key={field.name}
+          floatingLabelText={field.name}
+          floatingLabelFixed={true}
+          onChange={(event, index, newValue) => {
+            this.props.instances.forEach(i =>
+              field.setValue(i, parseFloat(newValue) || 0));
+            this.props.onInstancesModified(this.props.instances);
+          }}
+          fullWidth
+          disabled={field.disabled}
+        >
+          {children}
+        </SelectField>
+      );
+    } else {
+      return (
+        <SelectField
+          value={this._getFieldValue(
+            this.props.instances,
+            field,
+            '(Multiple values)'
+          )}
+          key={field.name}
+          floatingLabelText={field.name}
+          floatingLabelFixed={true}
+          onChange={(event, index, newValue) => {
+            this.props.instances.forEach(i =>
+              field.setValue(i, newValue || ''));
+            this.props.onInstancesModified(this.props.instances);
+          }}
+          fullWidth
+          disabled={field.disabled}
+        >
+          {children}
+        </SelectField>
       );
     }
   };
@@ -162,10 +224,12 @@ export default class InstancePropertiesEditor extends Component {
         onTouchTap={() => field.onClick(this.props.instances[0])}
       />
     );
-  }
+  };
 
   _renderFields(schema) {
     return schema.map(field => {
+      if (field.getChoices && field.getValue)
+        return this._renderSelectField(field);
       if (field.getValue) return this._renderEditField(field);
       if (field.onClick) return this._renderButton(field);
       if (field.children) {

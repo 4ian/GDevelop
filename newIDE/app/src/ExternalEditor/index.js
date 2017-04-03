@@ -23,7 +23,12 @@ class ExternalEditor extends Component {
           this._onUpdateReceived(payload, scope);
         } else if (command === 'setBounds') {
           if (this.isIntegrated) {
-            Window.setBounds(payload.x, payload.y, payload.width, payload.height);
+            Window.setBounds(
+              payload.x,
+              payload.y,
+              payload.width,
+              payload.height
+            );
           }
         } else if (command === 'show') {
           Window.show();
@@ -34,7 +39,7 @@ class ExternalEditor extends Component {
         }
       });
       this.bridge.onConnected(() => {
-        this.requestUpdate();
+        this.requestUpdate('', true);
       });
       Window.onBlur(() => {
         if (this.isIntegrated) {
@@ -86,55 +91,60 @@ class ExternalEditor extends Component {
 
   launchPreview = () => {
     this.sendUpdate();
-    setTimeout(() => this.bridge.send('requestPreview', undefined), 1);
+    this.bridge.send('requestPreview', undefined);
   };
 
-  requestUpdate = (scope = '') => {
-    this.setState(
-      {
-        loading: true,
-      },
-      () => {
-        this.bridge.send('requestUpdate', undefined, scope);
-      }
-    );
+  /**
+   * Request an update to the server. Note that if forcedUpdate is set to false,
+   * the server may not send back an update (for example if nothing changed).
+   */
+  requestUpdate = (scope = '', forcedUpdate = false) => {
+    const command = forcedUpdate ? 'requestForcedUpdate' : 'requestUpdate';
+    this.bridge.send(command, undefined, scope);
   };
 
   _onUpdateReceived = (payload, scope) => {
     console.log('Received project update from server');
-    if (scope === 'instances') {
-      console.warn('Not implemented: received instances update from server');
-      this.setState({
-        loading: false,
-      });
+    if (scope !== '') {
+      console.warn(`Not implemented: received ${scope} update from server`);
       return;
     }
 
-    // Transform the payload into a gd.SerializerElement
-    // Note that gd.Serializer.fromJSObject returns a new gd.SerializerElement object at every call
-    if (this._serializedObject) this._serializedObject.delete();
+    this.setState(
+      {
+        loading: true,
+      },
+      () => setTimeout(() => {
+        // Transform the payload into a gd.SerializerElement
+        // Note that gd.Serializer.fromJSObject returns a new gd.SerializerElement object at every call
+        if (this._serializedObject) this._serializedObject.delete();
 
-    var t1 = performance.now();
-    this._serializedObject = gd.Serializer.fromJSObject(payload);
-    var t2 = performance.now();
-    console.log(
-      'Call to gd.Serializer.fromJSObject took ' + (t2 - t1) + ' milliseconds.'
+        var t1 = performance.now();
+        this._serializedObject = gd.Serializer.fromJSObject(payload);
+        var t2 = performance.now();
+        console.log(
+          'Call to gd.Serializer.fromJSObject took ' +
+            (t2 - t1) +
+            ' milliseconds.'
+        );
+
+        this.editor.loadFullProject(this._serializedObject, () => {
+          this._serializedObject.delete();
+          this._serializedObject = null;
+          this.setState({
+            loading: false,
+          });
+        });
+      }),
+      10 // Let some time for the loader to be shown
     );
-
-    this.editor.loadFullProject(this._serializedObject, () => {
-      this._serializedObject.delete();
-      this._serializedObject = null;
-      this.setState({
-        loading: false,
-      });
-    });
   };
 
   render() {
     return React.cloneElement(this.props.children, {
       loading: this.state.loading,
       ref: editor => this.editor = editor,
-      requestUpdate: this.requestUpdate,
+      requestUpdate: () => this.requestUpdate('', true),
       onPreview: this.launchPreview,
       selectedEditor: this.selectedEditor,
       editedElementName: this.editedElementName,

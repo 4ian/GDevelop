@@ -62,7 +62,7 @@ public:
 		object.AddChild("scope").SetValue(scope);
 		object.AddChild("payload") = payloadObject;
 
-	    std::string message = gd::Serializer::ToJSON(object).ToLocale(); //TODO: UTF8?
+	    std::string message = gd::Serializer::ToJSON(object).ToLocale();
 	    outMessages.push(message);
 
 		return true;

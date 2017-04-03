@@ -750,6 +750,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     renamedItemOldName = newName;
 
     project.SetDirty();
+    if (onChangeCb) onChangeCb("rename");
 }
 
 void ObjectsEditor::OnobjectsListSelectionChanged(wxTreeEvent& event)
@@ -850,6 +851,7 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObject ? NULL : &layout, *object);
 
             project.SetDirty();
+            if (onChangeCb) onChangeCb("object-edited");
 
             listsHelper.MakeObjectItem(objectsList, lastSelectedItem, *object, globalObject);
 
@@ -880,6 +882,9 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
         if (dialog.ShowModal() == 1) { //Add objects to the group
             for(std::size_t i = 0;i < dialog.GetChosenObjects().size();++i)
                 group->AddObject(dialog.GetChosenObjects()[i]);
+
+            project.SetDirty();
+            if (onChangeCb) onChangeCb("group-edited");
         }
 
         for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
@@ -937,6 +942,9 @@ void ObjectsEditor::OnAddObjectSelected(wxCommandEvent& event)
     objectsList->EditLabel(itemAdded);
     renamedItemOldName = name; //With wxGTK, calling EditLabel do not update renamedItemOldName with the name of the new object.
 
+    project.SetDirty();
+    if (onChangeCb) onChangeCb("object-added");
+
     gd::LogStatus( _( "The object was correctly added" ) );
     objectsList->Expand(objectsRootItem);
 }
@@ -968,6 +976,9 @@ void ObjectsEditor::OnAddGroupSelected(wxCommandEvent& event)
     for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, &layout, name);
     gd::LogStatus( _( "The group was correctly added." ) );
+
+    project.SetDirty();
+    if (onChangeCb) onChangeCb("group-added");
 
     //Make sure that the group root item is expanded
     objectsList->Expand(groupsRootItem);
@@ -1108,6 +1119,9 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
         UpdateGroup(groupItem);
     }
 
+    project.SetDirty();
+    if (onChangeCb) onChangeCb("objects-deleted");
+
     //Call the notifiers
     for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
         project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectsDeleted(project, &layout, objectsDeleted);
@@ -1239,6 +1253,8 @@ void ObjectsEditor::OnCutSelected(wxCommandEvent& event)
 
         objects.RemoveObject(name);
 
+        project.SetDirty();
+        if (onChangeCb) onChangeCb("objects-deleted");
         std::vector<gd::String> objectsDeleted;
         objectsDeleted.push_back(name);
         for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
@@ -1257,6 +1273,8 @@ void ObjectsEditor::OnCutSelected(wxCommandEvent& event)
         gd::Clipboard::Get()->ForgetObject();
 
         RemoveGroup(name, objectsGroups);
+        project.SetDirty();
+        if (onChangeCb) onChangeCb("objects-deleted");
         for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupDeleted(project, globalGroup ? NULL : &layout, name);
     }
@@ -1286,6 +1304,9 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
 
         //Add it to the list
         objects.InsertObject(*object, objects.GetObjectsCount());
+
+        project.SetDirty();
+        if (onChangeCb) onChangeCb("object-added");
         for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, globalObject ? NULL : &layout, *object);
     }
@@ -1302,6 +1323,8 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
         }));
         objectsGroups.push_back( groupPasted );
 
+        project.SetDirty();
+        if (onChangeCb) onChangeCb("group-added");
         for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, globalGroup ? NULL : &layout,  groupPasted.GetName());
     }
@@ -1354,6 +1377,9 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectAdded(project, NULL, project.GetObject(objectName));
         }
 
+        project.SetDirty();
+        if (onChangeCb) onChangeCb("object-set-global");
+
         //Delete the old item
         objectsList->Delete(lastSelectedItem);
 
@@ -1395,6 +1421,9 @@ void ObjectsEditor::OnSetGlobalSelected(wxCommandEvent& event)
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupDeleted(project, &layout, groupName);
             project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectGroupAdded(project, NULL, groupName);
         }
+
+        project.SetDirty();
+        if (onChangeCb) onChangeCb("group-set-global");
 
         //Add the item corresponding to the global group
         bool wasExpanded = objectsList->IsExpanded(lastSelectedItem);

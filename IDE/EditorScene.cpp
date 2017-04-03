@@ -201,6 +201,12 @@ EditorScene::EditorScene(wxWindow* parent, gd::Project & project_, gd::Layout & 
 	{
 		notebook->RemovePage(0);
 		CreateExternalLayoutEditor(this);
+		objectsEditor->OnChange([this](gd::String changeScope) {
+			externalLayoutEditor->SetDirty();
+		});
+		layersEditor->OnChange([this](gd::String changeScope) {
+			externalLayoutEditor->SetDirty();
+		});
 	}
 	else
 	{

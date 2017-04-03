@@ -24,7 +24,8 @@ public:
 		launchX(0),
 		launchY(0),
 		launchWidth(0),
-		launchHeight(0)
+		launchHeight(0),
+		dirty(true)
 	{
 		editorBridge.OnReceive([this](gd::String cmd, gd::SerializerElement object, gd::String scope) {
 			if (cmd == "update")
@@ -33,6 +34,8 @@ public:
 			}
 			else if (cmd == "requestUpdate")
 				SendUpdate(scope);
+			else if (cmd == "requestForcedUpdate")
+				SendUpdate(scope, true);
 			else if (cmd == "requestPreview") {
 				if (onLaunchPreview) onLaunchPreview();
 			} else
@@ -98,11 +101,15 @@ public:
         return editorBridge.IsConnected();
     }
 
+	void SetDirty() { dirty = true; }
+
 private:
 
-	bool SendUpdate(gd::String scope = "")
+	bool SendUpdate(gd::String scope = "", bool forcedUpdate = false)
 	{
 		if (!onSendUpdate) return false;
+		if (!dirty && !forcedUpdate) return true;
+		dirty = false;
 
 		return editorBridge.Send("update", onSendUpdate(scope), scope);
 	}
@@ -117,6 +124,7 @@ private:
 	int launchY;
 	int launchWidth;
 	int launchHeight;
+	bool dirty;
 };
 
 }

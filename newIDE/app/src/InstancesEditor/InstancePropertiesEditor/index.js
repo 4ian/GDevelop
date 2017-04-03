@@ -168,7 +168,7 @@ export default class InstancePropertiesEditor extends Component {
     const children = field
       .getChoices(project, layout)
       .map(({ value, label }) => (
-        <MenuItem value={value} primaryText={label} />
+        <MenuItem key={value} value={value} primaryText={label} />
       ));
 
     if (field.valueType === 'number') {

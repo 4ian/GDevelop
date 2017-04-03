@@ -371,6 +371,13 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
         m_mgr.LoadPerspective(perspective);
 
+		objectsEditor->OnChange([this](gd::String changeScope) {
+			if (externalLayoutEditor) externalLayoutEditor->SetDirty();
+		});
+		layersEditor->OnChange([this](gd::String changeScope) {
+			if (externalLayoutEditor) externalLayoutEditor->SetDirty();
+		});
+
         m_mgr.Update();
         EditorDisplayed();
     }

@@ -60,6 +60,11 @@ public:
     void OnRefreshed(std::function<void()> cb) { onRefreshedCb = cb; }
 
     /**
+     * \brief Set a function to call each time a change is made.
+     */
+    void OnChange(std::function<void(gd::String)> cb) { onChangeCb = cb; }
+
+    /**
      * \brief Create the ribbon buttons for this editor
      */
     static void CreateRibbonPage(wxRibbonPage * page);
@@ -231,6 +236,7 @@ private:
     gd::String renamedItemOldName;
     wxTreeItemId lastSelectedItem;
     std::function<void()> onRefreshedCb;
+    std::function<void(gd::String)> onChangeCb;
 
     DECLARE_EVENT_TABLE()
 };

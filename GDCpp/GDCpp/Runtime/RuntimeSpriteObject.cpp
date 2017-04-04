@@ -16,7 +16,7 @@
 #include "GDCpp/Runtime/Project/Project.h"
 #include "GDCpp/Runtime/RuntimeLayer.h"
 #include "GDCpp/Runtime/ImageManager.h"
-#include "GDCpp/Runtime/TinyXml/tinyxml.h"
+
 #include "GDCpp/Runtime/Project/InitialInstance.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/RuntimeScene.h"

@@ -11,7 +11,6 @@ This project is released under the MIT License.
 #include "GDCore/Serialization/SerializerElement.h"
 #include "TimedEvent.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
-#include "GDCpp/Runtime/TinyXml/tinyxml.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"

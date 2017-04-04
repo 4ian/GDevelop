@@ -17,8 +17,8 @@ using namespace std;
 
 bool GD_API FileExists( const gd::String & file )
 {
-    TiXmlDocument doc;
-    if ( !gd::LoadXmlFromFile( doc, file ) && doc.ErrorId() == 2)
+    tinyxml2::XMLDocument doc;
+    if ( !gd::LoadXmlFromFile( doc, file ) && doc.ErrorID() == tinyxml2::XML_ERROR_FILE_NOT_FOUND)
         return false;
 
     return true ;
@@ -27,7 +27,7 @@ bool GD_API FileExists( const gd::String & file )
 bool GD_API GroupExists( const gd::String & filename, const gd::String & group )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
-    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
+    tinyxml2::XMLHandle hdl( &file->GetTinyXmlDocument() );
 
     //D�coupage des groupes
     istringstream groupsStr( group.Raw() );
@@ -118,7 +118,7 @@ void GD_API UnloadFileFromMemory( const gd::String & filename )
 void GD_API DeleteGroupFromFile( const gd::String & filename, const gd::String & group )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
-    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
+    tinyxml2::XMLHandle hdl( &file->GetTinyXmlDocument() );
 
     //D�coupage des groupes
     istringstream groupsStr( group.Raw() );
@@ -137,14 +137,14 @@ void GD_API DeleteGroupFromFile( const gd::String & filename, const gd::String &
     //A chaque fois, on v�rifie si le groupe voulu existe
     for (std::size_t i =0;i<groups.size();i++)
     {
-        if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
+        if ( hdl.FirstChildElement(groups.at(i).c_str()).ToElement() == nullptr )
             return;
 
         //Si on arrive au groupe parent du groupe
         //� supprimer
         if ( i >= (groups.size()-1)-1 )
         {
-            hdl.ToNode()->RemoveChild(hdl.FirstChildElement(groups.at(i).c_str()).ToNode());
+            hdl.ToNode()->DeleteChild(hdl.FirstChildElement(groups.at(i).c_str()).ToNode());
             return;
         }
 
@@ -157,7 +157,7 @@ void GD_API DeleteGroupFromFile( const gd::String & filename, const gd::String &
 void GD_API WriteValueInFile( const gd::String & filename, const gd::String & group, double value )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
-    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
+    tinyxml2::XMLHandle hdl( &file->GetTinyXmlDocument() );
 
     //D�coupage des groupes
     istringstream groupsStr( group.Raw() );
@@ -172,21 +172,10 @@ void GD_API WriteValueInFile( const gd::String & filename, const gd::String & gr
     if ( groups.empty() )
         return;
 
-    //Insertion de la d�claration
-    TiXmlDeclaration decl( "1.0", "UTF-8", "" );
-    if ( hdl.FirstChildElement().Element() != NULL )
-    {
-        //Il y a d�j� un noeud, on v�rifie que c'est pas une d�claration
-        if ( hdl.FirstChild().ToNode()->ToDeclaration() == NULL )
-            file->GetTinyXmlDocument().InsertBeforeChild(hdl.FirstChildElement().Element(), decl);
-    }
-    else
-        file->GetTinyXmlDocument().InsertEndChild(decl); //Il n'y a rien, on peut ins�rer notre d�claration
-
     //Cr�ation si besoin est de la racine
-    if ( hdl.FirstChildElement(groups.at(0).c_str()).Element() == NULL )
+    if ( hdl.FirstChildElement(groups.at(0).c_str()).ToElement() == nullptr )
     {
-        TiXmlElement root(groups.at(0).c_str());
+        tinyxml2::XMLElement * root = file->GetTinyXmlDocument().NewElement(groups.at(0).c_str());
         file->GetTinyXmlDocument().InsertEndChild(root);
     }
 
@@ -194,18 +183,18 @@ void GD_API WriteValueInFile( const gd::String & filename, const gd::String & gr
     //et on se d�place dedans.
     for (std::size_t i =0;i<groups.size();i++)
     {
-        if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
+        if ( hdl.FirstChildElement(groups.at(i).c_str()).ToElement() == nullptr )
         {
-            TiXmlElement le_nouveau (groups.at(i).c_str());
-            hdl.Element()->InsertEndChild(le_nouveau);
+            tinyxml2::XMLElement * le_nouveau = file->GetTinyXmlDocument().NewElement(groups.at(i).c_str());
+            hdl.ToElement()->InsertEndChild(le_nouveau);
         }
 
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
     }
 
     //Ecriture dans le groupe
-    if ( hdl.Element() != NULL )
-        hdl.Element()->SetDoubleAttribute("value", value);
+    if ( hdl.ToElement() != nullptr )
+        hdl.ToElement()->SetAttribute("value", value);
 
     return;
 }
@@ -213,7 +202,7 @@ void GD_API WriteValueInFile( const gd::String & filename, const gd::String & gr
 void GD_API WriteStringInFile( const gd::String & filename, const gd::String & group, const gd::String & str )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename);
-    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
+    tinyxml2::XMLHandle hdl( &file->GetTinyXmlDocument() );
 
     //D�coupage des groupes
     istringstream groupsStr( group.Raw() );
@@ -228,21 +217,10 @@ void GD_API WriteStringInFile( const gd::String & filename, const gd::String & g
     if ( groups.empty() )
         return;
 
-    //Insertion de la d�claration
-    TiXmlDeclaration decl( "1.0", "ISO-8859-1", "" );
-    if ( hdl.FirstChildElement().Element() != NULL )
-    {
-        //Il y a d�j� un noeud, on v�rifie que c'est pas une d�claration
-        if ( hdl.FirstChild().ToNode()->ToDeclaration() == NULL )
-            file->GetTinyXmlDocument().InsertBeforeChild(hdl.FirstChildElement().Element(), decl);
-    }
-    else
-        file->GetTinyXmlDocument().InsertEndChild(decl); //Il n'y a rien, on peut ins�rer notre d�claration
-
     //Cr�ation si besoin est de la racine
-    if ( hdl.FirstChildElement(groups.at(0).c_str()).Element() == NULL )
+    if ( hdl.FirstChildElement(groups.at(0).c_str()).ToElement() == nullptr )
     {
-        TiXmlElement root(groups.at(0).c_str());
+        tinyxml2::XMLElement * root = file->GetTinyXmlDocument().NewElement(groups.at(0).c_str());
         file->GetTinyXmlDocument().InsertEndChild(root);
     }
 
@@ -250,17 +228,17 @@ void GD_API WriteStringInFile( const gd::String & filename, const gd::String & g
     //et on se d�place dedans.
     for (std::size_t i =0;i<groups.size();i++)
     {
-        if ( hdl.FirstChildElement(groups.at(i).c_str()).Element() == NULL )
+        if ( hdl.FirstChildElement(groups.at(i).c_str()).ToElement() == nullptr )
         {
-            TiXmlElement le_nouveau (groups.at(i).c_str());
-            hdl.Element()->InsertEndChild(le_nouveau);
+            tinyxml2::XMLElement * le_nouveau = file->GetTinyXmlDocument().NewElement(groups.at(i).c_str());
+            hdl.ToElement()->InsertEndChild(le_nouveau);
         }
 
         hdl = hdl.FirstChildElement(groups.at(i).c_str());
     }
 
     //Ecriture dans le groupe
-    if ( hdl.Element() != NULL ) hdl.Element()->SetAttribute("texte", str.c_str());
+    if ( hdl.ToElement() != nullptr ) hdl.ToElement()->SetAttribute("texte", str.c_str());
 
     return;
 }
@@ -268,7 +246,7 @@ void GD_API WriteStringInFile( const gd::String & filename, const gd::String & g
 void GD_API ReadValueFromFile( const gd::String & filename, const gd::String & group, RuntimeScene & scene, gd::Variable & variable )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
-    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
+    tinyxml2::XMLHandle hdl( &file->GetTinyXmlDocument() );
 
     //D�coupage des groupes
     istringstream groupsStr( group.Raw() );
@@ -291,9 +269,9 @@ void GD_API ReadValueFromFile( const gd::String & filename, const gd::String & g
     }
 
     //On stocke la valeur
-    if ( hdl.ToElement()->Attribute("value") == NULL ) return;
-    double value;
-    hdl.ToElement()->Attribute("value", &value);
+    if ( hdl.ToElement()->Attribute("value") == nullptr ) return;
+    double value = variable.GetValue();
+    hdl.ToElement()->QueryDoubleAttribute("value", &value);
 
     //Update variable value
     variable.SetValue(value);
@@ -304,7 +282,7 @@ void GD_API ReadValueFromFile( const gd::String & filename, const gd::String & g
 void GD_API ReadStringFromFile( const gd::String & filename, const gd::String & group, RuntimeScene & scene, gd::Variable & variable )
 {
     std::shared_ptr<XmlFile> file = XmlFilesManager::GetFile(filename, false);
-    TiXmlHandle hdl( &file->GetTinyXmlDocument() );
+    tinyxml2::XMLHandle hdl( &file->GetTinyXmlDocument() );
 
     //D�coupage des groupes
     istringstream groupsStr( group.Raw() );
@@ -327,7 +305,7 @@ void GD_API ReadStringFromFile( const gd::String & filename, const gd::String & 
     }
 
     //On stocke la valeur
-    if ( hdl.ToElement()->Attribute("texte") == NULL ) return;
+    if ( hdl.ToElement()->Attribute("texte") == nullptr ) return;
 
     //Update variable texte
     variable.SetString(hdl.ToElement()->Attribute("texte"));

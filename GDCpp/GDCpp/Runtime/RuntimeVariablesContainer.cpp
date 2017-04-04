@@ -6,7 +6,6 @@
 #include <iostream>
 #include <string>
 #include "GDCore/Project/Variable.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCpp/Runtime/RuntimeVariablesContainer.h"
 

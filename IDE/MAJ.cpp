@@ -25,7 +25,6 @@
 #include <wx/wfstream.h>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/VersionWrapper.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "UpdateChecker.h"

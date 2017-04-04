@@ -7,7 +7,7 @@
 #ifndef XMLFILESHELPER_H
 #define XMLFILESHELPER_H
 
-#include "GDCpp/Runtime/TinyXml/tinyxml.h"
+#include "GDCpp/Runtime/TinyXml/tinyxml2.h"
 #include <string>
 #include <memory>
 #include <map>
@@ -41,15 +41,15 @@ class XmlFile
         /**
          * Access to the tinyxml representation of the file
          */
-        TiXmlDocument & GetTinyXmlDocument() { return doc; };
+        tinyxml2::XMLDocument & GetTinyXmlDocument() { return doc; };
 
         /**
          * Access to the tinyxml representation of the file
          */
-        const TiXmlDocument & GetTinyXmlDocument() const { return doc; };
+        const tinyxml2::XMLDocument & GetTinyXmlDocument() const { return doc; };
 
     private :
-        TiXmlDocument doc;
+        tinyxml2::XMLDocument doc;
         gd::String filename;
         bool modified;
 };

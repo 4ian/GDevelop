@@ -8,7 +8,8 @@
 #define GDCORE_SERIALIZER_H
 #include <string>
 #include "GDCore/Serialization/SerializerElement.h"
-class TiXmlElement;
+
+namespace tinyxml2 { class XMLElement; }
 
 namespace gd
 {
@@ -20,11 +21,11 @@ namespace gd
  * Usage example, with TinyXML:
  \code
     //Unserialize from a XML string:
-    TiXmlDocument doc;
+    tinyxml2::XMLDocument doc;
     if ( !doc.Parse(xmlString.c_str()) )
         return false; //Error in XML file!
 
-    TiXmlHandle hdl(&doc);
+    tinyxml2::XMLHandle hdl(&doc);
     gd::SerializerElement rootElement;
     gd::Serializer::FromXML(rootElement, hdl.FirstChildElement().Element());
     game.UnserializeFrom(rootElement);
@@ -38,8 +39,8 @@ public:
      */
     ///@{
     #if !defined(EMSCRIPTEN)
-	static void ToXML(SerializerElement & element, TiXmlElement * xmlElement);
-	static void FromXML(SerializerElement & element, const TiXmlElement * xmlElement);
+	static void ToXML(SerializerElement & element, tinyxml2::XMLElement * xmlElement);
+	static void FromXML(SerializerElement & element, const tinyxml2::XMLElement * xmlElement);
 	#endif
     ///@}
 

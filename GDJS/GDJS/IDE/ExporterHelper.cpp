@@ -19,7 +19,6 @@
 #endif
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/ExternalLayout.h"

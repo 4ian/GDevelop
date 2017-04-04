@@ -11,7 +11,7 @@ This project is released under the MIT License.
 #include <map>
 #include "GDCpp/Runtime/String.h"
 
-class TiXmlNode;
+namespace tinyxml2 { class XMLNode; }
 class RuntimeScene;
 
 namespace AdvancedXML
@@ -24,14 +24,14 @@ namespace AdvancedXML
         static void Destroy();
 
         /**
-            Get the TiXmlNode corresponding to the ref name.
+            Get the tinyxml2::XMLNode corresponding to the ref name.
          */
-        TiXmlNode* GetRef(const gd::String &refName);
+        tinyxml2::XMLNode* GetRef(const gd::String &refName);
 
-        void SetRef(const gd::String &refName, TiXmlNode *node);
+        void SetRef(const gd::String &refName, tinyxml2::XMLNode *node);
 
         /**
-            Delete all child (TiXmlNode) refs from a given ref (use to prevent memory leaks and pointers pointing on invalid data to avoid crashs).
+            Delete all child (tinyxml2::XMLNode) refs from a given ref (use to prevent memory leaks and pointers pointing on invalid data to avoid crashs).
          */
         void DeleteChildRefs(const gd::String &parentRef);
 
@@ -46,7 +46,7 @@ namespace AdvancedXML
         void LoadDocument(const gd::String &filename, const gd::String &refName);
 
         /**
-            Save the document (if the ref refers to a TiXmlDocument).
+            Save the document (if the ref refers to a tinyxml2::XMLDocument).
          */
         void SaveDocument(const gd::String &filename, const gd::String &refName);
 
@@ -59,24 +59,22 @@ namespace AdvancedXML
         /**
             Create an element with the given reference name.
          */
-        template<class T>
-        void CreateElement(const gd::String &refName, const gd::String &content);
+        void CreateElement(const gd::String &refName, const gd::String &content, const gd::String &documentRef);
+
+        void CreateText(const gd::String &refName, const gd::String &content, const gd::String &documentRef);
+
+        void CreateComment(const gd::String &refName, const gd::String &content, const gd::String &documentRef);
+
+        void CreateDeclaration(const gd::String &refName, const gd::String &content, const gd::String &documentRef);
 
         private:
         RefManager();
 
-        std::map< gd::String, TiXmlNode* > m_refs;
+        std::map< gd::String, tinyxml2::XMLNode* > m_refs;
 
         //Singleton instance
         static std::map< RuntimeScene*, RefManager* > *inst;
     };
-
-    //TEMPLATES IMPL
-    template<class T>
-    void RefManager::CreateElement(const gd::String &refName, const gd::String &content)
-    {
-        m_refs[refName] = new T(content.c_str());
-    }
 }
 
 #endif

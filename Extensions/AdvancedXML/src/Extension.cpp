@@ -113,11 +113,9 @@ public:
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("AdvancedXML::IsRefValid").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
-
-
         AddCondition("GetElementType",
                        _("Element type"),
-                       _("Test the type of the element.\n(0-> Tag, 1-> Text, 2-> Comment, 3-> XML Document, -1 -> Unknown )"),
+                       _("Test the type of the element.\n(0-> Tag, 1-> Text, 2-> Comment, 3-> XML Document, 4-> Declaration, -1 -> Unknown )"),
                        _("Type of _PARAM0_ _PARAM1__PARAM2_"),
                        _("Advanced XML: General"),
                        "res/AdvancedXML/AdvancedXML.png",
@@ -129,19 +127,15 @@ public:
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("AdvancedXML::GetRefType").SetManipulatedType("number").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
-
-
         AddExpression("GetElementType",
                        _("Element type"),
-                       _("Return the type of the element.\n(0-> Tag, 1-> Text, 2-> Comment, 3-> XML Document, -1 -> Unknown )"),
+                       _("Return the type of the element.\n(0-> Tag, 1-> Text, 2-> Comment, 3-> XML Document, 4-> Declaration, -1 -> Unknown )"),
                        _("Advanced XML: General"),
                        "res/AdvancedXML/AdvancedXML16.png")
 
             .AddParameter("string", _("Element reference"))
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("AdvancedXML::GetRefType").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
-
-
 
         AddAction("CreateNewElement",
                        _("Create a new element"),
@@ -154,6 +148,7 @@ public:
             .AddParameter("string", _("Reference which will be used to access to the element"))
             .AddParameter("expression", _("Tye of the element to be created\n(0-> Tag, 1-> Text, 2-> Comment )"))
             .AddParameter("string", _("Text of the element\nIf the element is a tag, it will be the tag name,if the element is a text or a comment, it will be the content."))
+            .AddParameter("string", _("Reference of the root document in which the element will be used"))
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("AdvancedXML::CreateNewElement").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
@@ -207,8 +202,6 @@ public:
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("AdvancedXML::GetText").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
-
-
         AddAction("SetContent",
                        _("Change the content of the element"),
                        _("Change the content (text) of the element ( For text and comments elements only )."),
@@ -233,8 +226,6 @@ public:
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("AdvancedXML::GetText").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
-
-
         AddExpression("GetAttributeNumber",
                        _("Value of an attribute of an element"),
                        _("Get the value of an attribute of an element"),
@@ -245,8 +236,6 @@ public:
             .AddParameter("string", _("Name of the attribute"))
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("AdvancedXML::GetAttributeNumber").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
-
-
 
         AddAction("SetAttributeNumber",
                        _("Change the value of an attribute"),
@@ -273,8 +262,6 @@ public:
             .AddParameter("string", _("Name of the attribute"))
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("AdvancedXML::GetAttributeString").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
-
-
 
         AddAction("SetAttributeString",
                        _("Change the text of an attribute"),

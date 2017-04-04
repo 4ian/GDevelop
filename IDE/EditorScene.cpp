@@ -81,7 +81,7 @@ EditorScene::EditorScene(wxWindow* parent, gd::Project & project_, gd::Layout & 
 	vScrollbar->SetScrollbar(2500, 10, 5000, 10);
 	hScrollbar = new wxScrollBar(scenePanel, ID_SCROLLBAR4, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR4"));
 	hScrollbar->SetScrollbar(2500, 10, 5000, 10);
-	layoutEditorCanvas = new gd::LayoutEditorCanvas(scenePanel, project, layout, layout.GetInitialInstances(), layout.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);
+	layoutEditorCanvas = new gd::LayoutEditorCanvas(scenePanel, project, layout, layout.GetInitialInstances(), layout.GetAssociatedSettings(), mainFrameWrapper);
 	externalSceneEditorContainerPanel = new wxPanel(notebook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	externalEditorContainerSizer = new wxFlexGridSizer(1, 1, 0, 0);
 	externalEditorContainerSizer->AddGrowableCol(0);
@@ -242,7 +242,7 @@ void EditorScene::CreateExternalLayoutEditor(wxWindow * parent)
 		if (scope == "uiSettings")
 		{
 			std::cout << "Updating uiSettings from the external editor." << std::endl;
-			this->layout.GetAssociatedLayoutEditorCanvasOptions().UnserializeFrom(object);
+			this->layout.GetAssociatedSettings().UnserializeFrom(object);
 			return;
 		}
 

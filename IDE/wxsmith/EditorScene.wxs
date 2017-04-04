@@ -40,7 +40,7 @@
 								<handler function="OnhScrollbarScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
 							</object>
 							<object class="Custom" name="ID_CUSTOM3" subclass="gd::LayoutEditorCanvas" variable="layoutEditorCanvas" member="yes">
-								<creating_code>$(THIS) = new $(CLASS)($(PARENT), project, layout, layout.GetInitialInstances(), layout.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);</creating_code>
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT), project, layout, layout.GetInitialInstances(), layout.GetAssociatedSettings(), mainFrameWrapper);</creating_code>
 								<local_include>1</local_include>
 								<style></style>
 								<pos>0,0</pos>

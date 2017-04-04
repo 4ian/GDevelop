@@ -27,7 +27,7 @@ export default class SceneEditor extends Component {
         layout={layout}
         initialInstances={initialInstances}
         initialUiSettings={serializeToJSObject(
-          layout.getAssociatedLayoutEditorCanvasOptions()
+          layout.getAssociatedSettings()
         )}
       />
     );

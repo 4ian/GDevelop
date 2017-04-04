@@ -249,13 +249,13 @@ public:
      * Return the settings associated to the layout.
      * \see gd::LayoutEditorCanvasOptions
      */
-    const gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() const { return associatedSettings; }
+    const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const { return associatedSettings; }
 
     /**
      * Return the settings associated to the layout.
      * \see gd::LayoutEditorCanvasOptions
      */
-    gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() { return associatedSettings; }
+    gd::LayoutEditorCanvasOptions & GetAssociatedSettings() { return associatedSettings; }
     #endif
 
     /** \name Other properties

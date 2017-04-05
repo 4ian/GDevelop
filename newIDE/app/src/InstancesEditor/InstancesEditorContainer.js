@@ -11,16 +11,9 @@ import InstancesMover from './InstancesMover';
 import Grid from './Grid';
 import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
-const gd = global.gd;
+import DropHandler from './DropHandler';
+import BackgroundColor from './BackgroundColor';
 import PIXI from 'pixi.js';
-
-/**
- * Convert a rgb color value to a hex value.
- * @note No "#" or "0x" are added.
- * @static
- */
-const rgbToHex = (r, g, b) =>
-  '' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 
 export default class InstancesEditorContainer extends Component {
   constructor() {
@@ -29,7 +22,6 @@ export default class InstancesEditorContainer extends Component {
   }
 
   componentDidMount() {
-    this.zOrderFinder = new gd.HighestZOrderFinder();
     this.pixiRenderer = PIXI.autoDetectRenderer(
       this.props.width,
       this.props.height
@@ -87,6 +79,11 @@ export default class InstancesEditorContainer extends Component {
       onMove: this.moveSelection,
     });
 
+    this.dropHandler = new DropHandler({
+      canvas: this.refs.canvasArea,
+      onDrop: this._onDrop,
+    });
+
     this._mountEditorComponents(this.props);
     this.renderScene();
   }
@@ -126,6 +123,10 @@ export default class InstancesEditorContainer extends Component {
       this.pixiContainer.removeChild(this.windowMask.getPixiObject());
     }
 
+    this.backgroundColor = new BackgroundColor({
+      layout: props.layout,
+      pixiRenderer: this.pixiRenderer,
+    });
     this.instancesRenderer = new InstancesRenderer({
       project: props.project,
       layout: props.layout,
@@ -183,7 +184,6 @@ export default class InstancesEditorContainer extends Component {
 
   componentWillUnmount() {
     this.keyboardShortcuts.unmount();
-    this.zOrderFinder.delete();
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
@@ -296,14 +296,6 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesMoved(selectedInstances);
   };
 
-  _onPanMoveView = (deltaX, deltaY) => {
-    const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
-    const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
-
-    if (this.highlightedInstance.getInstance() === null)
-      this.viewPosition.scrollBy(-sceneDeltaX, -sceneDeltaY);
-  };
-
   _onResize = (deltaX, deltaY) => {
     const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
     const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
@@ -322,23 +314,21 @@ export default class InstancesEditorContainer extends Component {
   };
 
   _onClick = (x, y) => {
-    if (!this.props.selectedObjectName) return;
-
-    const instance = this.props.initialInstances.insertNewInitialInstance();
-    instance.setObjectName(this.props.selectedObjectName);
-
     const newPos = this.viewPosition.toSceneCoordinates(x, y);
-    instance.setX(newPos[0]);
-    instance.setY(newPos[1]);
+    if (this.props.onAddInstance) {
+      this.props.onAddInstance(newPos[0], newPos[1]);
+    }
+  };
 
-    this.props.initialInstances.iterateOverInstances(this.zOrderFinder);
-    instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
-
-    if (this.props.onNewInstanceAdded) this.props.onNewInstanceAdded(instance);
+  _onDrop = (x, y, objectName) => {
+    const newPos = this.viewPosition.toSceneCoordinates(x, y);
+    if (this.props.onAddInstance) {
+      this.props.onAddInstance(newPos[0], newPos[1], objectName);
+    }
   };
 
   deleteSelection = () => {
-    //TODO: move?
+    //TODO: move this outside this class?
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     for (let i = 0; i < selectedInstances.length; i++)
       this.props.initialInstances.removeInstance(selectedInstances[i]);
@@ -368,19 +358,7 @@ export default class InstancesEditorContainer extends Component {
   };
 
   renderScene = () => {
-    const { layout } = this.props;
-    this.pixiRenderer.backgroundColor = parseInt(
-      parseInt(
-        rgbToHex(
-          layout.getBackgroundColorRed(),
-          layout.getBackgroundColorGreen(),
-          layout.getBackgroundColorBlue()
-        ),
-        16
-      ),
-      10
-    );
-
+    this.backgroundColor.render();
     this.viewPosition.render();
     this.grid.render();
     this.instancesRenderer.render();

@@ -25,6 +25,7 @@ import {
   getHistoryInitialState,
   saveToHistory,
 } from './History';
+const gd = global.gd;
 
 export default class InstancesFullEditor extends Component {
   constructor(props) {
@@ -37,13 +38,22 @@ export default class InstancesFullEditor extends Component {
       setupGridOpen: false,
       layersListOpen: false,
       variablesEditedInstance: null,
+      selectedObjectName: null,
       uiSettings: props.initialUiSettings,
       history: getHistoryInitialState(props.initialInstances),
     };
   }
 
+  componentWillMount() {
+    this.zOrderFinder = new gd.HighestZOrderFinder();
+  }
+
   componentDidMount() {
     this._updateToolbar();
+  }
+
+  componentWillUnmount() {
+    this.keyboardShortcuts.unmount();
   }
 
   getUiSettings() {
@@ -164,7 +174,17 @@ export default class InstancesFullEditor extends Component {
     });
   };
 
-  _onNewInstanceAdded = () => {
+  _onAddInstance = (x, y, objectName = '') => {
+    const newInstanceObjectName = objectName || this.state.selectedObjectName;
+    if (!newInstanceObjectName) return;
+
+    const instance = this.props.initialInstances.insertNewInitialInstance();
+    instance.setObjectName(newInstanceObjectName);
+    instance.setX(x);
+    instance.setY(y);
+
+    this.props.initialInstances.iterateOverInstances(this.zOrderFinder);
+    instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
     this.setState(
       {
         selectedObjectName: null,
@@ -230,10 +250,9 @@ export default class InstancesFullEditor extends Component {
           project={project}
           layout={layout}
           initialInstances={initialInstances}
-          selectedObjectName={this.state.selectedObjectName}
-          options={this.state.uiSettings /*TODO*/}
+          onAddInstance={this._onAddInstance}
+          options={this.state.uiSettings}
           instancesSelection={this.instancesSelection}
-          onNewInstanceAdded={this._onNewInstanceAdded}
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
           editorRef={editor => this.editor = editor}

@@ -50,7 +50,7 @@ export default class ResourceLoader {
       const projectPath = path.dirname(file);
       const resourceAbsolutePath = path.resolve(projectPath, filename);
 
-      console.log('Loading', resourceAbsolutePath);
+      console.info('Loading', resourceAbsolutePath);
       return this._cache.cacheSystemFilename(
         project,
         filename,
@@ -101,7 +101,10 @@ export default class ResourceLoader {
           if (resource.getKind() !== 'image') continue;
 
           loadedTextures[resourceName] = loadedResources[resourceName].texture;
-          ResourceLoader._initializeTexture(resource, loadedTextures[resourceName]);
+          ResourceLoader._initializeTexture(
+            resource,
+            loadedTextures[resourceName]
+          );
         }
       }
 
@@ -115,6 +118,9 @@ export default class ResourceLoader {
     loader.load();
   }
 
+  /**
+   * Get the URL/filename associated with the given resource.
+   */
   static getFilename(project, resourceName) {
     if (project.getResourcesManager().hasResource(resourceName)) {
       const resourceRelativePath = project
@@ -130,6 +136,12 @@ export default class ResourceLoader {
     return resourceName;
   }
 
+  /**
+   * Load the PIXI texture represented by the given resource.
+   * @returns The PIXI.Texture to be used. It can be loading, so you
+   * should listen to PIXI.Texture `update` event, and refresh your object
+   * if this event is triggered.
+   */
   static getPIXITexture(project, resourceName) {
     if (loadedTextures[resourceName]) {
       return loadedTextures[resourceName];
@@ -150,26 +162,32 @@ export default class ResourceLoader {
     return loadedTextures[resourceName];
   }
 
+  /**
+   * Load the given font from its url/filename.
+   * @returns a Promise that resolves with the font-family to be used
+   * to render a text with the font.
+   */
   static getFontFamily(project, fontFilename) {
-    if (!fontFilename) return '';
-
+    // Avoid reloading a font if it's already cached
     if (loadedFontFamilies[fontFilename]) {
-      return loadedFontFamilies[fontFilename];
+      return Promise.resolve(loadedFontFamilies[fontFilename]);
     }
 
+    // Load the given font using CSS Font Loading API.
     const fontFamily = slug(fontFilename);
-    const fontFaceDeclaration = "@font-face { font-family: '" +
-      fontFamily +
-      "';" +
-      'src: url(' +
-      ResourceLoader._getSystemFullFilename(project, fontFilename) +
-      '); }';
-    const declaration = "<style type='text/css'>" +
-      fontFaceDeclaration +
-      '</style>';
+    const fullFilename = ResourceLoader._getSystemFullFilename(
+      project,
+      fontFilename
+    );
+    const fontFace = new FontFace(fontFamily, `url(${fullFilename})`, {});
+    document.fonts.add(fontFace);
+    return fontFace.load().then(
+      loadedFace => {
+        loadedFontFamilies[fontFilename] = fontFamily;
 
-    document.querySelector('head').innerHTML += declaration;
-    return (loadedFontFamilies[fontFilename] = fontFamily);
+        return fontFamily;
+      }
+    );
   }
 
   static getInvalidPIXITexture() {

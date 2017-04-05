@@ -32,6 +32,8 @@ function RenderedTextInstance(
   this._pixiObject.anchor.x = 0.5;
   this._pixiObject.anchor.y = 0.5;
   this._pixiContainer.addChild(this._pixiObject);
+  this._styleFontDirty = true;
+  this._fontFamily = 'serif';
   this.update();
 }
 RenderedTextInstance.prototype = Object.create(RenderedInstance.prototype);
@@ -55,7 +57,6 @@ RenderedTextInstance.prototype.update = function() {
   this._pixiObject.text = textObject.getString();
 
   //Update style, only if needed to avoid destroying text rendering performances
-  this._styleFontNeedUpdate = false;
   if (
     textObject.isItalic() !== this._isItalic ||
     textObject.isBold() !== this._isBold ||
@@ -64,26 +65,36 @@ RenderedTextInstance.prototype.update = function() {
     this._isItalic = textObject.isItalic();
     this._isBold = textObject.isBold();
     this._characterSize = textObject.getCharacterSize();
-    this._styleFontNeedUpdate = true;
+    this._styleFontDirty = true;
   }
 
   if (this._fontFilename !== textObject.getFontFilename()) {
     //Avoid calling getFontFamily if the font didn't changed.
     this._fontFilename = textObject.getFontFilename();
-    this._fontFamily = this._resourcesLoader.getFontFamily(
-      this._project,
-      textObject.getFontFilename()
-    );
-    this._styleFontNeedUpdate = true;
+    this._resourcesLoader
+      .getFontFamily(this._project, textObject.getFontFilename())
+      .then(fontFamily => {
+        // Once the font is loaded, we can use the given fontFamily. 
+        this._fontFamily = fontFamily;
+        this._styleFontDirty = true;
+      })
+      .catch(() => {
+        // Ignore errors
+      });
   }
 
-  if (this._styleFontNeedUpdate) {
+  if (this._styleFontDirty) {
     let font = '';
     if (this._isItalic) font += 'italic ';
     if (this._isBold) font += 'bold ';
     font += this._characterSize + 'px  ' + this._fontFamily;
 
     this._pixiObject.style.font = font;
+
+    // Manually ask the PIXI object to re-render as we changed a style property
+    // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/
+    this._pixiObject.dirty = true;
+    this._styleFontDirty = false;
   }
 
   if (
@@ -101,6 +112,10 @@ RenderedTextInstance.prototype.update = function() {
       ',' +
       this._colorB +
       ')';
+
+    // Manually ask the PIXI object to re-render as we changed a style property
+    // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/
+    this._pixiObject.dirty = true;
   }
 };
 

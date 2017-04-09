@@ -207,6 +207,9 @@ EditorScene::EditorScene(wxWindow* parent, gd::Project & project_, gd::Layout & 
 		layersEditor->OnChange([this](gd::String changeScope) {
 			externalLayoutEditor->SetDirty();
 		});
+		propertiesPnl->OnChange([this](gd::String changeScope) {
+			externalLayoutEditor->SetDirty();
+		});
 	}
 	else
 	{

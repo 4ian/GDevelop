@@ -168,11 +168,19 @@ void LayoutEditorPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)
     if (layoutEditorCanvas && displayInstancesProperties) instancesHelper.OnPropertySelected(layoutEditorCanvas->GetSelection(), event);
     if (object)
     {
-        if (objectsHelper.OnPropertySelected(object, &layout, event)) launchRefresh();
+        if (objectsHelper.OnPropertySelected(object, &layout, event))
+		{
+			launchRefresh();
+			if (onChangeCb) onChangeCb("object-edited");
+		}
     }
     if (layer)
     {
-        if (layerHelper.OnPropertySelected(*layer, event)) launchRefresh();
+        if (layerHelper.OnPropertySelected(*layer, event))
+		{
+			launchRefresh();
+			if (onChangeCb) onChangeCb("layer-edited");
+		}
     }
 }
 
@@ -204,7 +212,10 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
     }
     if ( object )
     {
-        if (objectsHelper.OnPropertyChanged(object, &layout, event)) launchRefresh();
+        if (objectsHelper.OnPropertyChanged(object, &layout, event))
+			launchRefresh();
+
+		if (onChangeCb) onChangeCb("object-property-changed");
     }
     if (layer)
     {
@@ -223,10 +234,15 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
             layout.GetInitialInstances().MoveInstancesToLayer(oldName, layer->GetName());
             if ( layoutEditorCanvas && layoutEditorCanvas->GetCurrentLayer() == oldName )
                 layoutEditorCanvas->SetCurrentLayer(layer->GetName());
+
+			if (onChangeCb) onChangeCb("layer-renamed");
         }
         else
         {
-            if (layerHelper.OnPropertyChanged(*layer, event)) launchRefresh();
+            if (layerHelper.OnPropertyChanged(*layer, event))
+				launchRefresh();
+
+			if (onChangeCb) onChangeCb("layer-property-changed");
         }
     }
 }

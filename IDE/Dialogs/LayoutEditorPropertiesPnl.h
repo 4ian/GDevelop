@@ -44,6 +44,11 @@ public:
      */
     void OnRefreshed(std::function<void()> cb) { onRefreshedCb = cb; };
 
+    /**
+     * \brief Set a function to call each time a change is made.
+     */
+    void OnChange(std::function<void(gd::String)> cb) { onChangeCb = cb; }
+
     /** \name Initial instances properties
      * Members functions related to displaying the properties of the instances selected in the layout editor canvas.
      * Most of these members functions are inherited from gd::LayoutEditorCanvasAssociatedEditor.
@@ -104,6 +109,7 @@ private:
 
     static const wxEventType refreshEventType; ///< The internal wxWidgets event used to ask the grid to be refreshed.
     std::function<void()> onRefreshedCb;
+    std::function<void(gd::String)> onChangeCb;
 
     DECLARE_EVENT_TABLE()
 };

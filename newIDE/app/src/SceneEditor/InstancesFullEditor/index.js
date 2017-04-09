@@ -206,8 +206,9 @@ export default class InstancesFullEditor extends Component {
   };
 
   _onInstancesMoved = instances => {
-    this.forceUpdate();
-    //Save for redo
+    this.setState({
+      history: saveToHistory(this.state.history, this.props.initialInstances),
+    });
   };
 
   _onInstancesModified = instances => {
@@ -262,9 +263,20 @@ export default class InstancesFullEditor extends Component {
   };
 
   deleteSelection = () => {
-    this.editor.deleteSelection();
-    this._updateToolbar();
-    //Save for redo
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    selectedInstances.map(
+      instance => this.props.initialInstances.removeInstance(instance)
+    );
+
+    this.instancesSelection.clearSelection();
+    this.editor.clearHighlightedInstance();
+
+    this.setState(
+      {
+        history: saveToHistory(this.state.history, this.props.initialInstances),
+      },
+      () => this._updateToolbar()
+    );
   };
 
   setZoomFactor = zoomFactor => {
@@ -293,6 +305,7 @@ export default class InstancesFullEditor extends Component {
           onAddInstance={this._onAddInstance}
           options={this.state.uiSettings}
           instancesSelection={this.instancesSelection}
+          onDeleteSelection={this.deleteSelection}
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
           editorRef={editor => this.editor = editor}

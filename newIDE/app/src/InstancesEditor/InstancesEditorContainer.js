@@ -75,7 +75,7 @@ export default class InstancesEditorContainer extends Component {
 
     this.keyboardShortcuts = new KeyboardShortcuts({
       domElement: this.pixiRenderer.view,
-      onDelete: this.deleteSelection,
+      onDelete: this.props.onDeleteSelection,
       onMove: this.moveSelection,
     });
 
@@ -327,15 +327,8 @@ export default class InstancesEditorContainer extends Component {
     }
   };
 
-  deleteSelection = () => {
-    //TODO: move this outside this class?
-    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-    for (let i = 0; i < selectedInstances.length; i++)
-      this.props.initialInstances.removeInstance(selectedInstances[i]);
-
-    this.props.instancesSelection.clearSelection();
+  clearHighlightedInstance = () => {
     this.highlightedInstance.setInstance(null);
-    this.props.onInstancesSelected([]);
   };
 
   moveSelection = (x, y) => {

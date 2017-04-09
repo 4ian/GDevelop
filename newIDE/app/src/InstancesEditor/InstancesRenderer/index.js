@@ -103,6 +103,11 @@ export default class InstancesRenderer {
         this.pixiContainer.addChild(layerRenderer.getPixiContainer());
       }
 
+      // /!\ Objects representing layers can be deleted at any moment and replaced
+      // by new one, for example when two layers are swapped.
+      // We update the layer object of the renderer so that the renderer always has
+      // a valid layer object that can be used.
+      layerRenderer.layer = layer;
       layerRenderer.wasUsed = true;
       layerRenderer.getPixiContainer().zOrder = i;
       layerRenderer.render();

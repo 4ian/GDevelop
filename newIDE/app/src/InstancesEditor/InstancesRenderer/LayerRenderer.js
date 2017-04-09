@@ -22,7 +22,8 @@ export default class LayerRenderer {
     this.project = project;
     this.instances = instances;
     this.layout = layout;
-    this.layer = layer;
+    this.layer = layer; // /!\ Don't store any other reference.
+    // `layer` can be changed at any moment (see InstancesRenderer).
     this.onInstanceClicked = onInstanceClicked;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;

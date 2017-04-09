@@ -14,7 +14,7 @@ import Add from 'material-ui/svg-icons/content/add';
 import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
-import mapFor from '../Utils/MapFor';
+import { mapFor } from '../Utils/MapFor';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import flatten from 'lodash/flatten';
 const gd = global.gd;

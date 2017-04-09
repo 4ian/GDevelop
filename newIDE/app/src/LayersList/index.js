@@ -12,15 +12,18 @@ import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 import ArrowDownward from 'material-ui/svg-icons/navigation/arrow-downward';
 import ArrowUpward from 'material-ui/svg-icons/navigation/arrow-upward';
+import Delete from 'material-ui/svg-icons/action/delete';
+import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
-import mapFor from '../Utils/MapFor';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import { mapReverseFor } from '../Utils/MapFor';
 
 const styles = {
   visibleColumn: {
     width: 48,
   },
-  moveColumn: {
-    width: 96,
+  toolColumn: {
+    width: 144,
   },
 };
 
@@ -49,7 +52,7 @@ export default class LayersList extends Component {
   render() {
     const { layersContainer } = this.props;
 
-    const containerLayersList = mapFor(
+    const containerLayersList = mapReverseFor(
       0,
       layersContainer.getLayersCount(),
       i => {
@@ -62,24 +65,36 @@ export default class LayersList extends Component {
             <TableRowColumn style={styles.visibleColumn}>
               {this._renderVisibilityToogle(layer)}
             </TableRowColumn>
-            <TableRowColumn style={styles.moveColumn}>
+            <TableRowColumn style={styles.toolColumn}>
               <IconButton
-                disabled={i === 0}
+                disabled={i === layersContainer.getLayersCount() - 1}
                 onTouchTap={() => {
-                  layersContainer.swapLayers(i, i - 1);
-                  this.forceUpdate(); //TODO: Should this be done by the parent component?
+                  layersContainer.swapLayers(i, i + 1);
+                  this.forceUpdate();
                 }}
               >
                 <ArrowUpward />
               </IconButton>
               <IconButton
-                disabled={i === layersContainer.getLayersCount() - 1}
+                disabled={i === 0}
                 onTouchTap={() => {
-                  layersContainer.swapLayers(i, i + 1);
-                  this.forceUpdate(); //TODO: Should this be done by the parent component?
+                  layersContainer.swapLayers(i, i - 1);
+                  this.forceUpdate();
                 }}
               >
                 <ArrowDownward />
+              </IconButton>
+              <IconButton
+                onTouchTap={() => {
+                  this.props.onRemoveLayer(layerName, doRemove => {
+                    if (!doRemove) return;
+
+                    layersContainer.removeLayer(layerName);
+                    this.forceUpdate();
+                  });
+                }}
+              >
+                <Delete />
               </IconButton>
             </TableRowColumn>
           </TableRow>
@@ -87,10 +102,32 @@ export default class LayersList extends Component {
       }
     );
 
+    const addRow = (
+      <TableRow key="add-row">
+        <TableRowColumn />
+        <TableRowColumn />
+        <TableRowColumn style={styles.toolColumn}>
+          <IconButton
+            onTouchTap={() => {
+              const name = newNameGenerator(
+                'Layer',
+                name => layersContainer.hasLayerNamed(name)
+              );
+              layersContainer.insertNewLayer(
+                name,
+                layersContainer.getLayersCount()
+              );
+              this.forceUpdate();
+            }}
+          >
+            <Add />
+          </IconButton>
+        </TableRowColumn>
+      </TableRow>
+    );
+
     return (
-      <Table
-        selectable={true}
-      >
+      <Table selectable={true}>
         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
           <TableRow>
             <TableHeaderColumn>Layer name</TableHeaderColumn>
@@ -108,9 +145,13 @@ export default class LayersList extends Component {
             backgroundColor: 'white',
           }}
         >
-          {containerLayersList}
+          {containerLayersList.concat(addRow)}
         </TableBody>
       </Table>
     );
   }
 }
+
+LayersList.defaultProps = {
+  onRemoveLayer: (layerName, cb) => cb(true),
+};

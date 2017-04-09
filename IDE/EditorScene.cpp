@@ -248,6 +248,13 @@ void EditorScene::CreateExternalLayoutEditor(wxWindow * parent)
 			this->layout.GetAssociatedSettings().UnserializeFrom(object);
 			return;
 		}
+		if (scope == "layers")
+		{
+			std::cout << "Updating layers from the external editor." << std::endl;
+			this->layout.UnserializeLayersFrom(object);
+			if (layersEditor) layersEditor->Refresh();
+			return;
+		}
 
 		std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
 	});

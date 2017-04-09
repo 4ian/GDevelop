@@ -5,7 +5,8 @@ import Subheader from 'material-ui/Subheader';
 import RaisedButton from 'material-ui/RaisedButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import mapFor from '../../Utils/MapFor';
+import enumerateLayers from '../../LayersList/EnumerateLayers';
+import { mapFor } from '../../Utils/MapFor';
 
 export default class InstancePropertiesEditor extends Component {
   constructor() {
@@ -46,14 +47,7 @@ export default class InstancePropertiesEditor extends Component {
       {
         name: 'Layer',
         valueType: 'string',
-        getChoices: (project, layout) => {
-          return mapFor(0, layout.getLayersCount(), i => {
-            return {
-              value: layout.getLayerAt(i).getName(),
-              label: layout.getLayerAt(i).getName() || 'Base layer',
-            };
-          });
-        },
+        getChoices: (project, layout) => enumerateLayers(layout),
         getValue: instance => instance.getLayer(),
         setValue: (instance, newValue) => instance.setLayer(newValue),
       },

@@ -6,6 +6,7 @@ import InstancePropertiesEditor
   from '../../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../../InstancesEditor/InstancesList';
 import LayersList from '../../LayersList';
+import LayerRemoveDialog from '../../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
@@ -37,8 +38,13 @@ export default class InstancesFullEditor extends Component {
       instancesListOpen: false,
       setupGridOpen: false,
       layersListOpen: false,
+      layerRemoveDialogOpen: false,
+      onCloseLayerRemoveDialog: null,
+      layerRemoved: null,
+
       variablesEditedInstance: null,
       selectedObjectName: null,
+
       uiSettings: props.initialUiSettings,
       history: getHistoryInitialState(props.initialInstances),
     };
@@ -221,6 +227,40 @@ export default class InstancesFullEditor extends Component {
     this._updateToolbar();
   };
 
+  _onRemoveLayer = (layerName, done) => {
+    this.setState({
+      layerRemoveDialogOpen: true,
+      layerRemoved: layerName,
+      onCloseLayerRemoveDialog: (doRemove, newLayer) => {
+        this.setState(
+          {
+            layerRemoveDialogOpen: false,
+          },
+          () => {
+            if (doRemove) {
+              if (newLayer === null) {
+                this.props.initialInstances.removeAllInstancesOnLayer(
+                  layerName
+                );
+              } else {
+                this.props.initialInstances.moveInstancesToLayer(
+                  layerName,
+                  newLayer
+                );
+              }
+            }
+
+            done(doRemove);
+            // /!\ Force the instances editor to destroy and mount again the
+            // renderers to avoid keeping any references to existing instances
+            this.editor.forceRemount();
+            this._updateToolbar();
+          }
+        );
+      },
+    });
+  };
+
   deleteSelection = () => {
     this.editor.deleteSelection();
     this._updateToolbar();
@@ -313,6 +353,8 @@ export default class InstancesFullEditor extends Component {
           />
           <LayersList
             freezeUpdate={!this.state.layersListOpen}
+            onRemoveLayer={this._onRemoveLayer}
+            onRenameLayer={() => {} /*TODO*/}
             layersContainer={layout}
           />
         </Drawer>
@@ -337,6 +379,12 @@ export default class InstancesFullEditor extends Component {
           }
           onCancel={() => this.editInstanceVariables(null)}
           onApply={() => this.editInstanceVariables(null)}
+        />
+        <LayerRemoveDialog
+          open={!!this.state.layerRemoveDialogOpen}
+          layersContainer={layout}
+          layerRemoved={this.state.layerRemoved}
+          onClose={this.state.onCloseLayerRemoveDialog}
         />
       </div>
     );

@@ -4,7 +4,7 @@ import { AutoSizer, List } from 'react-virtualized';
 import Avatar from 'material-ui/Avatar';
 import ObjectsRenderingService
   from '../ObjectsRendering/ObjectsRenderingService';
-import mapFor from '../Utils/MapFor';
+import { mapFor } from '../Utils/MapFor';
 
 const listItemHeight = 56;
 

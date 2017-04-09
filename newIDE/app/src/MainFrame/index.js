@@ -94,19 +94,30 @@ class MainFrame extends Component {
           currentProject.getLayout(sceneOpened).getInitialInstances()
         ),
         uiSettings: this.sceneEditor.getUiSettings(),
+        layers: serializeToJSObject(
+          currentProject.getLayout(sceneOpened),
+          'serializeLayersTo'
+        ),
       };
     }
     if (
       this.props.selectedEditor === 'external-layout-editor' &&
       currentProject.hasExternalLayoutNamed(externalLayoutOpened)
     ) {
+      const externalLayout = currentProject.getExternalLayout(
+        externalLayoutOpened
+      );
+      const layoutName = externalLayout.getAssociatedLayout();
+
       return {
-        instances: serializeToJSObject(
-          currentProject
-            .getExternalLayout(externalLayoutOpened)
-            .getInitialInstances()
-        ),
+        instances: serializeToJSObject(externalLayout.getInitialInstances()),
         uiSettings: this.externalLayoutEditor.getUiSettings(),
+        layers: currentProject.hasLayoutNamed(layoutName)
+          ? serializeToJSObject(
+              currentProject.getLayout(layoutName),
+              'serializeLayersTo'
+            )
+          : undefined,
       };
     }
   };

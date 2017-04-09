@@ -172,6 +172,7 @@ public:
 
     /** \name Layout layers management
      * Members functions related to layout layers management.
+     * TODO: This should be moved to a separate class
      */
     ///@{
 
@@ -232,6 +233,18 @@ public:
      * Must swap the position of the specified layers.
      */
     void SwapLayers(std::size_t firstLayerIndex, std::size_t secondLayerIndex);
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Serialize the layers.
+     */
+    void SerializeLayersTo(SerializerElement & element) const;
+    #endif
+
+    /**
+     * \brief Unserialize the layers.
+     */
+    void UnserializeLayersFrom(const SerializerElement & element);
     ///@}
 
     /**

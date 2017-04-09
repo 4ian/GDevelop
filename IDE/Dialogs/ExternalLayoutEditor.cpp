@@ -187,6 +187,19 @@ void ExternalLayoutEditor::CreateExternalLayoutEditor()
 			this->externalLayout.GetAssociatedSettings().UnserializeFrom(object);
 			return;
 		}
+		if (scope == "layers")
+		{
+		    gd::String name = externalLayout.GetAssociatedLayout();
+		    gd::Layout * layout = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
+
+			if (layout)
+			{
+				std::cout << "Updating layers from the external editor." << std::endl;
+				layout->UnserializeLayersFrom(object);
+				if (layersEditor) layersEditor->Refresh();
+			}
+			return;
+		}
 
 		std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
 	});

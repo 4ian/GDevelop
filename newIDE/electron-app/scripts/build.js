@@ -1,5 +1,8 @@
 var shell = require('shelljs');
+var path = require('path');
 var args = require('minimist')(process.argv.slice(2));
+var isWin = /^win/.test(process.platform);
+var isDarwin = /^darwin/.test(process.platform);
 
 var gdRootDir = '../..';
 var gdBinariesOutputDir = gdRootDir + '/Binaries/Output';
@@ -17,16 +20,18 @@ shell.rm('-rf', 'app/www');
 shell.mkdir('-p', 'app/www');
 shell.cp('-r', '../app/build/*', 'app/www');
 
-shell.exec('node node_modules/.bin/build --mac --dir');
-shell.mkdir('-p', gdBinariesOutputDir + '/Release_Darwin/newIDE');
-shell.rm('-rf', gdBinariesOutputDir + '/Release_Darwin/newIDE/GDevelop IDE.app');
-shell.cp(
-  '-rf',
-  './dist/mac/GDevelop IDE.app',
-  gdBinariesOutputDir + '/Release_Darwin/newIDE'
-);
+if (isDarwin) {
+  shell.exec(path.join('node_modules', '.bin', 'build') + ' --mac --dir');
+  shell.mkdir('-p', gdBinariesOutputDir + '/Release_Darwin/newIDE');
+  shell.rm('-rf', gdBinariesOutputDir + '/Release_Darwin/newIDE/GDevelop IDE.app');
+  shell.cp(
+    '-rf',
+    './dist/mac/GDevelop IDE.app',
+    gdBinariesOutputDir + '/Release_Darwin/newIDE'
+  );
+}
 
-shell.exec('node node_modules/.bin/build --win --ia32 --dir');
+shell.exec(path.join('node_modules', '.bin', 'build') + ' --win --ia32 --dir');
 shell.mkdir('-p', gdBinariesOutputDir + '/Release_Windows/newIDE');
 shell.cp(
   '-r',
@@ -34,6 +39,8 @@ shell.cp(
   gdBinariesOutputDir + '/Release_Windows/newIDE'
 );
 
-shell.exec('node node_modules/.bin/build --linux tar.gz');
-shell.mkdir('-p', gdBinariesOutputDir + '/Release_Linux/newIDE');
-shell.cp('-r', './dist/linux-unpacked/*', gdBinariesOutputDir + '/Release_Linux/newIDE');
+if (!isWin) {
+  shell.exec(path.join('node_modules', '.bin', 'build') + ' --linux tar.gz');
+  shell.mkdir('-p', gdBinariesOutputDir + '/Release_Linux/newIDE');
+  shell.cp('-r', './dist/linux-unpacked/*', gdBinariesOutputDir + '/Release_Linux/newIDE');
+}

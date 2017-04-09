@@ -18,7 +18,7 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
-  if (isIntegrated) {
+  if (isIntegrated && app.dock) {
     app.dock.hide();
   }
 

@@ -48,7 +48,8 @@ export default class ResourceLoader {
       // Support local filesystem with Electron
       const file = project.getProjectFile();
       const projectPath = path.dirname(file);
-      const resourceAbsolutePath = path.resolve(projectPath, filename);
+      const resourceAbsolutePath = path.resolve(projectPath, filename)
+        .replace(/\\/g, '/');
 
       console.info('Loading', resourceAbsolutePath);
       return this._cache.cacheSystemFilename(

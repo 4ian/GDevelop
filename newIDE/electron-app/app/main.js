@@ -1,7 +1,7 @@
 var app = require('electron').app;  // Module to control application life.
 var BrowserWindow = require('electron').BrowserWindow;  // Module to create native browser window.
 var parseArgs = require('minimist');
-var isDev = require('electron-is-dev');
+var isDev = require('electron-is').dev();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

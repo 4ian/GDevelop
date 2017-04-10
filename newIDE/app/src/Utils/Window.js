@@ -1,13 +1,31 @@
 import optionalRequire from './OptionalRequire.js';
 const electron = optionalRequire('electron');
 
+let isWindows = false;
+if (electron) {
+  isWindows = electron.remote.require('electron-is').windows();
+}
+
 export default class Window {
   static setBounds(x, y, width, height) {
     if (!electron) return;
 
-    console.log({ x, y, width, height });
+    let scaleFactor = 1;
+    if (isWindows) {
+      // setBounds need to be called with the scale factor of the screen
+      // on Windows.
+      const rect = { x, y, width, height };
+      const display = electron.remote.screen.getDisplayMatching(rect);
+      scaleFactor = display.scaleFactor;
+    }
+
     const browserWindow = electron.remote.getCurrentWindow();
-    browserWindow.setBounds({ x, y, width, height });
+    browserWindow.setBounds({
+      x: x / scaleFactor,
+      y: y / scaleFactor,
+      width: width / scaleFactor,
+      height: height / scaleFactor,
+    });
     this.show();
   }
 
@@ -59,7 +77,6 @@ export default class Window {
   static isDev() {
     if (!electron) return true;
 
-    return electron.remote.require('electron-is-dev');
+    return electron.remote.require('electron-is').dev();
   }
-
-};
+}

@@ -21,10 +21,10 @@ export default class Window {
 
     const browserWindow = electron.remote.getCurrentWindow();
     browserWindow.setBounds({
-      x: x / scaleFactor,
-      y: y / scaleFactor,
-      width: width / scaleFactor,
-      height: height / scaleFactor,
+      x: Math.round(x / scaleFactor),
+      y: Math.round(y / scaleFactor),
+      width: Math.round(width / scaleFactor),
+      height: Math.round(height / scaleFactor),
     });
     this.show();
   }

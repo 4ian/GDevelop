@@ -5,32 +5,31 @@
   "license": "MIT",
   "homepage": ".",
   "devDependencies": {
-    "babel-eslint": "^6.1.2",
+    "babel-eslint": "6.1.2",
     "eslint": "3.5.0",
     "eslint-config-react-app": "0.2.1",
     "eslint-plugin-flowtype": "2.18.1",
     "eslint-plugin-import": "1.12.0",
     "eslint-plugin-jsx-a11y": "2.2.2",
     "eslint-plugin-react": "6.3.0",
-    "react-scripts": "0.6.1"
+    "prettier": "^0.22.0",
+    "react-scripts": "0.6.1",
+    "shelljs": "^0.7.7"
   },
   "dependencies": {
-    "flat": "^2.0.1",
+    "flat": "2.0.1",
     "lodash": "^4.16.4",
-    "material-ui": "0.16.4",
-    "pixi-simple-gesture": "^0.2.2",
-    "pixi.js": "^3.0.8",
-    "prettier": "^0.22.0",
+    "material-ui": "0.17.3",
+    "pixi-simple-gesture": "0.2.2",
+    "pixi.js": "3.0.11",
     "react": "15.4.2",
     "react-addons-css-transition-group": "15.4.2",
     "react-addons-perf": "15.4.2",
     "react-dom": "15.4.2",
-    "react-json-tree": "^0.10.0",
-    "react-measure": "^1.4.5",
+    "react-measure": "1.4.6",
     "react-tap-event-plugin": "2.0.1",
-    "react-virtualized": "^9.3.0",
-    "shelljs": "^0.7.7",
-    "slug": "^0.9.1"
+    "react-virtualized": "9.3.0",
+    "slug": "0.9.1"
   },
   "scripts": {
     "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js",

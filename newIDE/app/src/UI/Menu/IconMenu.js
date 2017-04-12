@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
-import Measure from 'react-measure';
+import ReactDOM from 'react-dom';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 
 const electron = optionalRequire('electron');
@@ -96,23 +96,25 @@ export default class GDIconMenu extends Component {
     }
   }
 
-  _onTouchTap(dimensions) {
-    this.menuImplementation.showMenu(dimensions);
-  }
+  _onTouchTap = () => {
+    if (!this.iconMenu) return;
+
+    const node = ReactDOM.findDOMNode(this.iconMenu);
+    if (!node) return;
+
+    this.menuImplementation.showMenu(node.getBoundingClientRect());
+  };
 
   render() {
     return (
-      <Measure>
-        {dimensions => (
-          <IconMenu
-            {...this.props}
-            onTouchTap={this._onTouchTap.bind(this, dimensions)}
-            {...this.menuImplementation.getMenuProps()}
-          >
-            {this.state.children}
-          </IconMenu>
-        )}
-      </Measure>
+      <IconMenu
+        {...this.props}
+        onTouchTap={this._onTouchTap}
+        ref={iconMenu => this.iconMenu = iconMenu}
+        {...this.menuImplementation.getMenuProps()}
+      >
+        {this.state.children}
+      </IconMenu>
     );
   }
 }

@@ -41,6 +41,7 @@ app.on('ready', function() {
     options.hasShadow = false;
     options.frame = false;
     options.minimizable = false;
+    options.movable = false;
     options.resizable = false;
     options.fullscreenable = false;
   }

@@ -11,6 +11,7 @@ class ExternalEditor extends Component {
     this.selectedEditor = this.editorArguments['editor'];
     this.editedElementName = this.editorArguments['edited-element-name'];
     this.isIntegrated = this.editorArguments['mode'] === 'integrated';
+    this.lastShowCommandDate = 0;
     this.state = {
       loading: false,
     };
@@ -31,6 +32,7 @@ class ExternalEditor extends Component {
             );
           }
         } else if (command === 'show') {
+          this.lastShowCommandDate = Date.now();
           Window.show();
         } else if (command === 'hide') {
           if (this.isIntegrated) {
@@ -42,9 +44,7 @@ class ExternalEditor extends Component {
         this.requestUpdate('', true);
       });
       Window.onBlur(() => {
-        if (this.isIntegrated) {
-          Window.hide();
-        }
+        if (this.isIntegrated) this._hideIfNotJustShown();
         this.sendUpdate();
       });
       Window.onFocus(() => {
@@ -59,6 +59,24 @@ class ExternalEditor extends Component {
       console.warn('Connection to an external editor is not supported');
     }
   }
+
+  _hideIfNotJustShown = () => {
+    // Sometime, we'll receive the blur event AFTER
+    // the external editor containing this editor
+    // received the activate event from the system (wxActivateEvent in the case of
+    // wxWidgets).
+    // So we'll receive a show command THEN hide, which is not what we want
+    // (we want to hide and then show again the editor if needed).
+    if (Date.now() - this.lastShowCommandDate < 100) {
+      console.info(
+        'The editor is not hidden because it receive a `show` command less ' +
+          'than 100ms ago.'
+      );
+      return;
+    }
+
+    Window.hide();
+  };
 
   sendUpdate = () => {
     console.log('Sending update to server editor');

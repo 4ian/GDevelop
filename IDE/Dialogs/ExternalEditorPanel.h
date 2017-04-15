@@ -9,6 +9,7 @@ public:
     ExternalEditorPanel(wxWindow* parent);
     virtual ~ExternalEditorPanel();
 
+    void HideLoader(bool hide = true);
     void OnOpenEditor(std::function<void()> cb);
 
 protected:

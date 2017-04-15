@@ -268,6 +268,9 @@ void EditorScene::CreateExternalLayoutEditor(wxWindow * parent)
 		auto rect = parent->GetScreenRect();
 		externalLayoutEditor->SetLaunchBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
 	}
+	externalLayoutEditor->OnLaunched([this]() {
+		externalEditorPanel->HideLoader();
+	});
 	externalLayoutEditor->Launch("scene-editor", layout.GetName());
 }
 

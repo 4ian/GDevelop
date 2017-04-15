@@ -418,13 +418,18 @@ ExternalEditorPanelBase::ExternalEditorPanelBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer119->Add(flexGridSizer121, 1, wxALL|wxALIGN_CENTER, 5);
     
-    m_staticText123 = new wxStaticText(this, wxID_ANY, _("The scene is edited in a separate window"), wxDefaultPosition, wxSize(-1,-1), 0);
+    captionText = new wxStaticText(this, wxID_ANY, _("The scene is edited in a separate window"), wxDefaultPosition, wxSize(-1,-1), 0);
     
-    flexGridSizer121->Add(m_staticText123, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    flexGridSizer121->Add(captionText, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
     
-    m_button125 = new wxButton(this, wxID_ANY, _("Open the scene editor"), wxDefaultPosition, wxSize(-1,-1), 0);
+    loadingProgress = new wxGauge(this, wxID_ANY, 100, wxDefaultPosition, wxSize(-1,-1), wxGA_HORIZONTAL);
+    loadingProgress->SetValue(10);
     
-    flexGridSizer121->Add(m_button125, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    flexGridSizer121->Add(loadingProgress, 0, wxALL|wxEXPAND, 5);
+    
+    openButton = new wxButton(this, wxID_ANY, _("Open the scene editor"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer121->Add(openButton, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
     
     SetName(wxT("ExternalEditorPanelBase"));
     SetSize(-1,-1);
@@ -432,12 +437,12 @@ ExternalEditorPanelBase::ExternalEditorPanelBase(wxWindow* parent, wxWindowID id
          GetSizer()->Fit(this);
     }
     // Connect events
-    m_button125->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ExternalEditorPanelBase::onOpenEditorClicked), NULL, this);
+    openButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ExternalEditorPanelBase::onOpenEditorClicked), NULL, this);
     
 }
 
 ExternalEditorPanelBase::~ExternalEditorPanelBase()
 {
-    m_button125->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ExternalEditorPanelBase::onOpenEditorClicked), NULL, this);
+    openButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ExternalEditorPanelBase::onOpenEditorClicked), NULL, this);
     
 }

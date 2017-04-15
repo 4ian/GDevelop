@@ -206,6 +206,9 @@ void ExternalLayoutEditor::CreateExternalLayoutEditor()
 	externalLayoutEditor->OnLaunchPreview([this](){
 		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
 	});
+	externalLayoutEditor->OnLaunched([this]() {
+		externalEditorPanel->HideLoader();
+	});
 	externalLayoutEditor->Launch("external-layout-editor", externalLayout.GetName());
 }
 

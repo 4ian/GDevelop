@@ -44,6 +44,7 @@ app.on('ready', function() {
     options.movable = false;
     options.resizable = false;
     options.fullscreenable = false;
+    options.show = false;
   }
 
   mainWindow = new BrowserWindow(options);

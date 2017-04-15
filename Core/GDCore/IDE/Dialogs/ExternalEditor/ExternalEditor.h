@@ -25,9 +25,16 @@ public:
 		launchY(0),
 		launchWidth(0),
 		launchHeight(0),
-		dirty(true)
+		dirty(true),
+		hasReceivedFirstMessage(false)
 	{
 		editorBridge.OnReceive([this](gd::String cmd, gd::SerializerElement object, gd::String scope) {
+			if (!hasReceivedFirstMessage)
+			{
+				hasReceivedFirstMessage = true;
+				if (onLaunchedCb) onLaunchedCb();
+			}
+
 			if (cmd == "update")
 			{
 				if (onUpdateReceivedCb) onUpdateReceivedCb(object, scope);
@@ -37,7 +44,7 @@ public:
 			else if (cmd == "requestForcedUpdate")
 				SendUpdate(scope, true);
 			else if (cmd == "requestPreview") {
-				if (onLaunchPreview) onLaunchPreview();
+				if (onLaunchPreviewCb) onLaunchPreviewCb();
 			} else
 				std::cout << "Received message with unknown command: \"" << cmd << "\"" << std::endl;
 		});
@@ -57,12 +64,17 @@ public:
 
 	void OnSendUpdate(std::function<SerializerElement(gd::String scope)> cb)
 	{
-		onSendUpdate = cb;
+		onSendUpdateCb = cb;
 	}
 
 	void OnLaunchPreview(std::function<void()> cb)
 	{
-		onLaunchPreview = cb;
+		onLaunchPreviewCb = cb;
+	}
+
+	void OnLaunched(std::function<void()> cb)
+	{
+		onLaunchedCb = cb;
 	}
 
 	bool Launch(const gd::String & editorName, const gd::String editedElementName);
@@ -107,24 +119,26 @@ private:
 
 	bool SendUpdate(gd::String scope = "", bool forcedUpdate = false)
 	{
-		if (!onSendUpdate) return false;
+		if (!onSendUpdateCb) return false;
 		if (!dirty && !forcedUpdate) return true;
 		dirty = false;
 
-		return editorBridge.Send("update", onSendUpdate(scope), scope);
+		return editorBridge.Send("update", onSendUpdateCb(scope), scope);
 	}
 
 	ExternalEditorBridge editorBridge;
 	int externalEditorPid;
 	std::function<void(SerializerElement object, gd::String scope)> onUpdateReceivedCb;
-	std::function<SerializerElement(gd::String scope)> onSendUpdate;
-	std::function<void()> onLaunchPreview;
+	std::function<SerializerElement(gd::String scope)> onSendUpdateCb;
+	std::function<void()> onLaunchPreviewCb;
+	std::function<void()> onLaunchedCb;
 
 	int launchX;
 	int launchY;
 	int launchWidth;
 	int launchHeight;
 	bool dirty;
+	bool hasReceivedFirstMessage;
 };
 
 }

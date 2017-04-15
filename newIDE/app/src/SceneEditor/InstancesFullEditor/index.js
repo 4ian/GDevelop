@@ -18,6 +18,7 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import SmallDrawer from '../../UI/SmallDrawer';
 import EditorBar from '../../UI/EditorBar';
 import InfoBar from '../../UI/Messages/InfoBar';
+import ContextMenu from '../../UI/Menu/ContextMenu';
 import {
   undo,
   redo,
@@ -283,6 +284,10 @@ export default class InstancesFullEditor extends Component {
     this.editor.setZoomFactor(zoomFactor);
   };
 
+  _onContextMenu = (x, y) => {
+    this.contextMenu.open(x, y);
+  }
+
   render() {
     const { project, layout, initialInstances } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
@@ -308,6 +313,7 @@ export default class InstancesFullEditor extends Component {
           onDeleteSelection={this.deleteSelection}
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
+          onContextMenu={this._onContextMenu}
           editorRef={editor => this.editor = editor}
         />
         <Drawer
@@ -398,6 +404,12 @@ export default class InstancesFullEditor extends Component {
           layersContainer={layout}
           layerRemoved={this.state.layerRemoved}
           onClose={this.state.onCloseLayerRemoveDialog}
+        />
+        <ContextMenu
+          ref={(contextMenu) => this.contextMenu = contextMenu}
+          menuTemplate={[
+            { label: 'Scene properties', click: () => {} },
+          ]}
         />
       </div>
     );

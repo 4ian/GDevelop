@@ -29,6 +29,7 @@ export default class InstancesEditorContainer extends Component {
     this.refs.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', e => {
       e.preventDefault();
+      if (this.props.onContextMenu) this.props.onContextMenu(e.clientX, e.clientY);
     });
     this.pixiRenderer.view.addEventListener('click', e => {
       this._onClick(e.offsetX, e.offsetY);

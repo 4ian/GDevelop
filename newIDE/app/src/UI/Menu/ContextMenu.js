@@ -1,0 +1,92 @@
+import React, { Component } from 'react';
+import Menu from 'material-ui/Menu';
+import Popover from 'material-ui/Popover';
+import ElectronMenuImplementation from './ElectronMenuImplementation';
+import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
+import optionalRequire from '../../Utils/OptionalRequire.js';
+const electron = optionalRequire('electron');
+
+class MaterialUIContextMenu extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: false,
+    };
+    this.menuImplementation = new MaterialUIMenuImplementation();
+  }
+
+  open = (x, y) => {
+    this.setState(
+      {
+        anchorX: x,
+        anchorY: y,
+      },
+      () => {
+        this.setState({
+          open: true,
+        });
+      }
+    );
+  };
+
+  _onClose = () => {
+    this.setState({
+      open: false,
+    });
+  };
+
+  render() {
+    return (
+      <div>
+        <div
+          ref={element => this.anchorEl = element}
+          style={{
+            position: 'fixed',
+            pointerEvents: 'none',
+            left: this.state.anchorX,
+            top: this.state.anchorY,
+          }}
+        />
+        <Popover
+          open={this.state.open}
+          anchorEl={this.anchorEl}
+          onRequestClose={this._onClose}
+          {...this.menuImplementation.getMenuProps()}
+        >
+          <Menu>
+            {this.menuImplementation.buildFromTemplate(this.props.menuTemplate)}
+          </Menu>
+        </Popover>
+      </div>
+    );
+  }
+}
+
+class ElectronContextMenu extends React.Component {
+  constructor(props) {
+    super(props);
+    this.menuImplementation = new ElectronMenuImplementation();
+    this.menuImplementation.buildFromTemplate(props.menuTemplate);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.menuTemplate !== nextProps.menuTemplate) {
+      this.menuImplementation.buildFromTemplate(nextProps.menuTemplate);
+    }
+  }
+
+  open = (x, y) => {
+    this.menuImplementation.showMenu({
+      left: x,
+      top: y,
+      width: 0,
+      height: 0,
+    });
+  };
+
+  render() {
+    return null;
+  }
+}
+
+export default (electron ? ElectronContextMenu : MaterialUIContextMenu);

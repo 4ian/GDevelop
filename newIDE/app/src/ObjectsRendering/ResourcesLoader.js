@@ -168,7 +168,7 @@ export default class ResourceLoader {
    * @returns a Promise that resolves with the font-family to be used
    * to render a text with the font.
    */
-  static getFontFamily(project, fontFilename) {
+  static loadFontFamily(project, fontFilename) {
     // Avoid reloading a font if it's already cached
     if (loadedFontFamilies[fontFilename]) {
       return Promise.resolve(loadedFontFamilies[fontFilename]);
@@ -189,6 +189,20 @@ export default class ResourceLoader {
         return fontFamily;
       }
     );
+  }
+
+  /**
+   * Get the font family name for the given font from its url/filename.
+   * The font won't be loaded.
+   * @returns The font-family to be used to render a text with the font.
+   */
+  static getFontFamily(project, fontFilename) {
+    if (loadedFontFamilies[fontFilename]) {
+      return loadedFontFamilies[fontFilename];
+    }
+
+    const fontFamily = slug(fontFilename);
+    return fontFamily;
   }
 
   static getInvalidPIXITexture() {

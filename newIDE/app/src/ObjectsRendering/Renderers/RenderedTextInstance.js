@@ -27,13 +27,17 @@ function RenderedTextInstance(
   );
 
   //Setup the PIXI object:
+  const textObject = gd.asTextObject(this._associatedObject);
   this._resourcesLoader = resourcesLoader;
   this._pixiObject = new PIXI.Text(' ', { align: 'left' });
   this._pixiObject.anchor.x = 0.5;
   this._pixiObject.anchor.y = 0.5;
   this._pixiContainer.addChild(this._pixiObject);
   this._styleFontDirty = true;
-  this._fontFamily = 'serif';
+  this._fontFamily = this._resourcesLoader.getFontFamily(
+    this._project,
+    textObject.getFontFilename()
+  );
   this.update();
 }
 RenderedTextInstance.prototype = Object.create(RenderedInstance.prototype);
@@ -48,7 +52,7 @@ RenderedTextInstance.getThumbnail = function(project, resourcesLoader, object) {
 };
 
 RenderedTextInstance.prototype.update = function() {
-  var textObject = gd.asTextObject(this._associatedObject);
+  const textObject = gd.asTextObject(this._associatedObject);
   this._pixiObject.position.x = this._instance.getX() +
     this._pixiObject.width / 2;
   this._pixiObject.position.y = this._instance.getY() +
@@ -69,12 +73,12 @@ RenderedTextInstance.prototype.update = function() {
   }
 
   if (this._fontFilename !== textObject.getFontFilename()) {
-    //Avoid calling getFontFamily if the font didn't changed.
+    //Avoid calling loadFontFamily if the font didn't changed.
     this._fontFilename = textObject.getFontFilename();
     this._resourcesLoader
-      .getFontFamily(this._project, textObject.getFontFilename())
+      .loadFontFamily(this._project, textObject.getFontFilename())
       .then(fontFamily => {
-        // Once the font is loaded, we can use the given fontFamily. 
+        // Once the font is loaded, we can use the given fontFamily.
         this._fontFamily = fontFamily;
         this._styleFontDirty = true;
       })

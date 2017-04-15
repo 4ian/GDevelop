@@ -176,10 +176,10 @@ export default class InstancesEditorContainer extends Component {
     this.viewPosition
       .getPixiContainer()
       .addChild(this.instancesRenderer.getPixiContainer());
-    this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
-    this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
     this.pixiContainer.addChild(this.windowBorder.getPixiObject());
     this.pixiContainer.addChild(this.windowMask.getPixiObject());
+    this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
+    this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
   }
 
   componentWillUnmount() {

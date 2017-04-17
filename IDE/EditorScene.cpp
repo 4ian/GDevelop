@@ -236,27 +236,22 @@ void EditorScene::CreateExternalLayoutEditor(wxWindow * parent)
 		return serializedProject;
 	});
 	externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object, gd::String scope) {
+		std::cout << "Updating \"" << scope << "\" from the external editor." << std::endl;
 		if (scope == "instances")
-		{
-			std::cout << "Updating instances from the external editor." << std::endl;
 			this->layout.GetInitialInstances().UnserializeFrom(object);
-			return;
-		}
-		if (scope == "uiSettings")
-		{
-			std::cout << "Updating uiSettings from the external editor." << std::endl;
+		else if (scope == "uiSettings")
 			this->layout.GetAssociatedSettings().UnserializeFrom(object);
-			return;
-		}
-		if (scope == "layers")
+		else if (scope == "windowTitle")
+			this->layout.SetWindowDefaultTitle(object.GetValue().GetString());
+		else if (scope == "layers")
 		{
-			std::cout << "Updating layers from the external editor." << std::endl;
 			this->layout.UnserializeLayersFrom(object);
 			if (layersEditor) layersEditor->Refresh();
-			return;
 		}
-
-		std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
+		else
+		{
+			std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
+		}
 	});
 	externalLayoutEditor->OnLaunchPreview([this](){
 		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();

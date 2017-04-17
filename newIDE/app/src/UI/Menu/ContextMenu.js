@@ -77,8 +77,8 @@ class ElectronContextMenu extends React.Component {
 
   open = (x, y) => {
     this.menuImplementation.showMenu({
-      left: x,
-      top: y,
+      left: x || 0,
+      top: y || 0,
       width: 0,
       height: 0,
     });

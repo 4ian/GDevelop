@@ -89,15 +89,12 @@ class MainFrame extends Component {
       this.props.selectedEditor === 'scene-editor' &&
       currentProject.hasLayoutNamed(sceneOpened)
     ) {
+      const layout = currentProject.getLayout(sceneOpened);
       return {
-        instances: serializeToJSObject(
-          currentProject.getLayout(sceneOpened).getInitialInstances()
-        ),
+        instances: serializeToJSObject(layout.getInitialInstances()),
         uiSettings: this.sceneEditor.getUiSettings(),
-        layers: serializeToJSObject(
-          currentProject.getLayout(sceneOpened),
-          'serializeLayersTo'
-        ),
+        windowTitle: layout.getWindowDefaultTitle(),
+        layers: serializeToJSObject(layout, 'serializeLayersTo'),
       };
     }
     if (

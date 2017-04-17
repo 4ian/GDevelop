@@ -175,33 +175,25 @@ void ExternalLayoutEditor::CreateExternalLayoutEditor()
 		return serializedProject;
 	});
 	externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object, gd::String scope) {
+		std::cout << "Updating \"" << scope << "\" from the external editor." << std::endl;
+
+		gd::String name = externalLayout.GetAssociatedLayout();
+	    gd::Layout * layout = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 		if (scope == "instances")
-        {
-			std::cout << "Updating instances from the external editor." << std::endl;
 			this->externalLayout.GetInitialInstances().UnserializeFrom(object);
-			return;
-		}
-		if (scope == "uiSettings")
-		{
-			std::cout << "Updating uiSettings from the external editor." << std::endl;
+		else if (scope == "uiSettings")
 			this->externalLayout.GetAssociatedSettings().UnserializeFrom(object);
-			return;
-		}
-		if (scope == "layers")
+		else if (scope == "windowTitle" && layout)
+			layout->SetWindowDefaultTitle(object.GetValue().GetString());
+		else if (scope == "layers" && layout)
 		{
-		    gd::String name = externalLayout.GetAssociatedLayout();
-		    gd::Layout * layout = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
-
-			if (layout)
-			{
-				std::cout << "Updating layers from the external editor." << std::endl;
-				layout->UnserializeLayersFrom(object);
-				if (layersEditor) layersEditor->Refresh();
-			}
-			return;
+			layout->UnserializeLayersFrom(object);
+			if (layersEditor) layersEditor->Refresh();
 		}
-
-		std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
+		else
+		{
+			std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
+		}
 	});
 	externalLayoutEditor->OnLaunchPreview([this](){
 		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();

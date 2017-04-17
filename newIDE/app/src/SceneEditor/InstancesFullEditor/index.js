@@ -10,6 +10,7 @@ import LayerRemoveDialog from '../../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
+import ScenePropertiesDialog from './ScenePropertiesDialog';
 import Toolbar from './Toolbar';
 
 import Drawer from 'material-ui/Drawer';
@@ -38,6 +39,7 @@ export default class InstancesFullEditor extends Component {
       objectsListOpen: false,
       instancesListOpen: false,
       setupGridOpen: false,
+      scenePropertiesDialogOpen: false,
       layersListOpen: false,
       layerRemoveDialogOpen: false,
       onCloseLayerRemoveDialog: null,
@@ -96,6 +98,9 @@ export default class InstancesFullEditor extends Component {
       this.props.project !== nextProps.project
     ) {
       this.instancesSelection.clearSelection();
+      this.openSetupGrid(false);
+      this.editInstanceVariables(null);
+      this.openSceneProperties(false);
     }
   }
 
@@ -132,6 +137,10 @@ export default class InstancesFullEditor extends Component {
 
   openSetupGrid = (open = true) => {
     this.setState({ setupGridOpen: open });
+  };
+
+  openSceneProperties = (open = true) => {
+    this.setState({ scenePropertiesDialogOpen: open });
   };
 
   editInstanceVariables = instance => {
@@ -286,7 +295,7 @@ export default class InstancesFullEditor extends Component {
 
   _onContextMenu = (x, y) => {
     this.contextMenu.open(x, y);
-  }
+  };
 
   render() {
     const { project, layout, initialInstances } = this.props;
@@ -405,10 +414,19 @@ export default class InstancesFullEditor extends Component {
           layerRemoved={this.state.layerRemoved}
           onClose={this.state.onCloseLayerRemoveDialog}
         />
+        <ScenePropertiesDialog
+          open={!!this.state.scenePropertiesDialogOpen}
+          layout={layout}
+          onClose={() => this.openSceneProperties(false)}
+          onApply={() => this.openSceneProperties(false)}
+        />
         <ContextMenu
-          ref={(contextMenu) => this.contextMenu = contextMenu}
+          ref={contextMenu => this.contextMenu = contextMenu}
           menuTemplate={[
-            { label: 'Scene properties', click: () => {} },
+            {
+              label: 'Scene properties',
+              click: () => this.openSceneProperties(true),
+            },
           ]}
         />
       </div>

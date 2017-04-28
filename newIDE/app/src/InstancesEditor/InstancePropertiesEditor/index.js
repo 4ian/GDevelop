@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import Subheader from 'material-ui/Subheader';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
@@ -61,10 +61,15 @@ export default class InstancePropertiesEditor extends Component {
         setValue: (instance, newValue) => instance.setLocked(newValue),
       },
       {
-        name: 'Edit instance variables',
-        getLabel: instance =>
-          'Edit instance variables (' + instance.getVariables().count() + ')',
-        onClick: instance => this.props.editInstanceVariables(instance),
+        name: 'Instance variables',
+        children: [
+          {
+            name: 'Edit variables',
+            getLabel: instance =>
+              'Edit variables (' + instance.getVariables().count() + ')',
+            onClick: instance => this.props.editInstanceVariables(instance),
+          },
+        ]
       },
       {
         name: 'Custom size',
@@ -214,9 +219,10 @@ export default class InstancePropertiesEditor extends Component {
   _renderButton = field => {
     //TODO: multi selection handling
     return (
-      <RaisedButton
+      <FlatButton
         key={field.name}
         fullWidth
+        primary
         label={field.getLabel(this.props.instances[0])}
         onTouchTap={() => field.onClick(this.props.instances[0])}
       />
@@ -232,7 +238,7 @@ export default class InstancePropertiesEditor extends Component {
       if (field.children) {
         return (
           <div key={field.name}>
-            <Subheader>{field.name}</Subheader>
+            <Subheader style={{ paddingLeft: 0 }}>{field.name}</Subheader>
             <div style={{ marginLeft: 15 }}>
               {this._renderFields(field.children)}
             </div>

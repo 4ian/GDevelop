@@ -16,7 +16,7 @@ import Toolbar from './Toolbar';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import SmallDrawer from '../../UI/SmallDrawer';
+import EditorMosaic from '../../UI/EditorMosaic';
 import EditorBar from '../../UI/EditorBar';
 import InfoBar from '../../UI/Messages/InfoBar';
 import ContextMenu from '../../UI/Menu/ContextMenu';
@@ -274,9 +274,8 @@ export default class InstancesFullEditor extends Component {
 
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
-    selectedInstances.map(
-      instance => this.props.initialInstances.removeInstance(instance)
-    );
+    selectedInstances.map(instance =>
+      this.props.initialInstances.removeInstance(instance));
 
     this.instancesSelection.clearSelection();
     this.editor.clearHighlightedInstance();
@@ -301,17 +300,17 @@ export default class InstancesFullEditor extends Component {
     const { project, layout, initialInstances } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
-    return (
-      <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
-        <SmallDrawer open={!!selectedInstances.length}>
-          <InstancePropertiesEditor
-            project={project}
-            layout={layout}
-            instances={selectedInstances}
-            onInstancesModified={this._onInstancesModified}
-            editInstanceVariables={this.editInstanceVariables}
-          />
-        </SmallDrawer>
+    const editors = {
+      properties: (
+        <InstancePropertiesEditor
+          project={project}
+          layout={layout}
+          instances={selectedInstances}
+          onInstancesModified={this._onInstancesModified}
+          editInstanceVariables={this.editInstanceVariables}
+        />
+      ),
+      'instances-editor': (
         <FullSizeInstancesEditor
           project={project}
           layout={layout}
@@ -324,6 +323,15 @@ export default class InstancesFullEditor extends Component {
           onInstancesMoved={this._onInstancesMoved}
           onContextMenu={this._onContextMenu}
           editorRef={editor => this.editor = editor}
+        />
+      ),
+    };
+
+    return (
+      <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
+        <EditorMosaic
+          editors={editors}
+          initialEditorNames={['properties', 'instances-editor']}
         />
         <Drawer
           open={this.state.objectsListOpen}

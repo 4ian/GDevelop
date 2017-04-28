@@ -5,8 +5,11 @@ import Subheader from 'material-ui/Subheader';
 import RaisedButton from 'material-ui/RaisedButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import Paper from 'material-ui/Paper';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import { mapFor } from '../../Utils/MapFor';
+import EditorBar from '../../UI/EditorBar';
+import EmptyMessage from '../../UI/EmptyMessage';
 
 export default class InstancePropertiesEditor extends Component {
   constructor() {
@@ -241,9 +244,16 @@ export default class InstancePropertiesEditor extends Component {
     });
   }
 
-  render() {
+  _renderEmpty() {
+    return (
+      <EmptyMessage>
+        Click on an instance on the scene to display its properties
+      </EmptyMessage>
+    );
+  }
+
+  _renderInstancesProperties() {
     const { project, layout, instances } = this.props;
-    if (!instances || !instances.length) return null;
 
     //TODO: multiple instances support
     const properties = instances[0].getCustomProperties(project, layout);
@@ -286,11 +296,24 @@ export default class InstancePropertiesEditor extends Component {
 
     return (
       <div
-        style={{ padding: 10, overflowY: 'scroll' }}
+        style={{ padding: 10, overflowY: 'scroll', overflowX: 'hidden' }}
         key={instances.map(instance => '' + instance.ptr).join(';')}
       >
         {this._renderFields(this.schema.concat(propertyFields))}
       </div>
+    );
+  }
+
+  render() {
+    const { instances } = this.props;
+
+    return (
+      <Paper style={{ display: 'flex', flexDirection: 'column' }}>
+        <EditorBar title="Properties" showMenuIconButton={false} />
+        {!instances || !instances.length
+          ? this._renderEmpty()
+          : this._renderInstancesProperties()}
+      </Paper>
     );
   }
 }

@@ -7,6 +7,7 @@ export default props => {
       style={{
         paddingLeft: 8,
         paddingRight: 8,
+        flexShrink: 0,
       }}
       titleStyle={{
         height: 32,

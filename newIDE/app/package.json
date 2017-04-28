@@ -27,6 +27,7 @@
     "react-addons-perf": "15.4.2",
     "react-dom": "15.4.2",
     "react-measure": "1.4.6",
+    "react-mosaic-component": "^0.3.4",
     "react-tap-event-plugin": "2.0.1",
     "react-virtualized": "9.3.0",
     "slug": "0.9.1"

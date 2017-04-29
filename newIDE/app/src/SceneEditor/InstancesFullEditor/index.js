@@ -12,6 +12,11 @@ import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
 import Toolbar from './Toolbar';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../Utils/Serializer';
+import Clipboard from '../../Utils/Clipboard';
 
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
@@ -223,7 +228,7 @@ export default class InstancesFullEditor extends Component {
 
   _onInstancesModified = instances => {
     this.forceUpdate();
-    //Save for redo with debounce (and cancel on unmount)?????
+    //TODO: Save for redo with debounce (and cancel on unmount)
   };
 
   _onSelectInstances = (instances, centerView = true) => {
@@ -294,6 +299,44 @@ export default class InstancesFullEditor extends Component {
 
   _onContextMenu = (x, y) => {
     this.contextMenu.open(x, y);
+  };
+
+  copySelection = () => {
+    const serializedSelection = this.instancesSelection
+      .getSelectedInstances()
+      .map(instance => serializeToJSObject(instance));
+
+    const position = this.editor.getLastContextMenuPosition();
+    Clipboard.set('instances', {
+      x: position[0],
+      y: position[1],
+      instances: serializedSelection,
+    });
+  };
+
+  cutSelection = () => {
+    this.copySelection();
+    this.deleteSelection();
+  };
+
+  paste = () => {
+    const clipboardContent = Clipboard.get('instances');
+    if (!clipboardContent) return;
+
+    const position = this.editor.getLastContextMenuPosition();
+    const { x, y } = clipboardContent;
+    clipboardContent.instances
+      .map(serializedInstance => {
+        const instance = new gd.InitialInstance();
+        unserializeFromJSObject(instance, serializedInstance);
+        return instance;
+      })
+      .forEach(instance => {
+        instance.setX(instance.getX() - x + position[0]);
+        instance.setY(instance.getY() - y + position[1]);
+        this.props.initialInstances.insertInitialInstance(instance);
+        instance.delete();
+      });
   };
 
   render() {
@@ -434,6 +477,19 @@ export default class InstancesFullEditor extends Component {
             {
               label: 'Scene properties',
               click: () => this.openSceneProperties(true),
+            },
+            {type: 'separator'},
+            {
+              label: 'Copy',
+              click: () => this.copySelection(),
+            },
+            {
+              label: 'Cut',
+              click: () => this.cutSelection(),
+            },
+            {
+              label: 'Paste',
+              click: () => this.paste(),
             },
           ]}
         />

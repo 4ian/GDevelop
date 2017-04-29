@@ -18,6 +18,9 @@ import PIXI from 'pixi.js';
 export default class InstancesEditorContainer extends Component {
   constructor() {
     super();
+
+    this.lastContextMenuX = 0;
+    this.lastContextMenuY = 0;
     this.state = {};
   }
 
@@ -29,7 +32,11 @@ export default class InstancesEditorContainer extends Component {
     this.refs.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', e => {
       e.preventDefault();
-      if (this.props.onContextMenu) this.props.onContextMenu(e.clientX, e.clientY);
+
+      this.lastContextMenuX = e.offsetX;
+      this.lastContextMenuY = e.offsetY;
+      if (this.props.onContextMenu)
+        this.props.onContextMenu(e.clientX, e.clientY);
     });
     this.pixiRenderer.view.addEventListener('click', e => {
       this._onClick(e.offsetX, e.offsetY);
@@ -38,9 +45,9 @@ export default class InstancesEditorContainer extends Component {
       if (this.keyboardShortcuts.shouldZoom()) {
         this.viewPosition.zoomBy(event.wheelDelta / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
-        this.viewPosition.scrollBy((-event.wheelDelta) / 20, 0);
+        this.viewPosition.scrollBy(-event.wheelDelta / 20, 0);
       } else {
-        this.viewPosition.scrollBy(0, (-event.wheelDelta) / 20);
+        this.viewPosition.scrollBy(0, -event.wheelDelta / 20);
       }
       event.preventDefault();
     };
@@ -86,7 +93,7 @@ export default class InstancesEditorContainer extends Component {
     });
 
     this._mountEditorComponents(this.props);
-    this.renderScene();
+    this._renderScene();
   }
 
   /**
@@ -351,7 +358,14 @@ export default class InstancesEditorContainer extends Component {
     this.viewPosition.setZoomFactor(zoomFactor);
   };
 
-  renderScene = () => {
+  getLastContextMenuPosition = () => {
+    return this.viewPosition.toSceneCoordinates(
+      this.lastContextMenuX,
+      this.lastContextMenuY
+    );
+  };
+
+  _renderScene = () => {
     this.backgroundColor.render();
     this.viewPosition.render();
     this.grid.render();
@@ -362,7 +376,7 @@ export default class InstancesEditorContainer extends Component {
     this.windowBorder.render();
     this.windowMask.render();
     this.pixiRenderer.render(this.pixiContainer);
-    this.nextFrame = requestAnimationFrame(this.renderScene);
+    this.nextFrame = requestAnimationFrame(this._renderScene);
   };
 
   render() {

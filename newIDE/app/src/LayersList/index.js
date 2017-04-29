@@ -145,7 +145,7 @@ export default class LayersList extends Component {
             backgroundColor: 'white',
           }}
         >
-          {containerLayersList.concat(addRow)}
+          {[addRow].concat(containerLayersList)}
         </TableBody>
       </Table>
     );

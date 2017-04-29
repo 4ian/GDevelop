@@ -58,6 +58,7 @@ export default class Toolbar extends Component {
               label: 'Show grid',
               click: () => this.props.toggleGrid(),
             },
+            { type: 'separator' },
             {
               label: 'Setup grid',
               click: () => this.props.openSetupGrid(),

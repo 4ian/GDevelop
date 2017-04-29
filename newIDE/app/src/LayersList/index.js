@@ -15,6 +15,7 @@ import ArrowUpward from 'material-ui/svg-icons/navigation/arrow-upward';
 import Delete from 'material-ui/svg-icons/action/delete';
 import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
+import TextField from 'material-ui/TextField';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapReverseFor } from '../Utils/MapFor';
 
@@ -28,6 +29,13 @@ const styles = {
 };
 
 export default class LayersList extends Component {
+  constructor() {
+    super();
+    this.state = {
+      nameErrors: {},
+    };
+  }
+
   shouldComponentUpdate() {
     // Rendering the component can be costly as it iterates over
     // every layers, so the prop freezeUpdate allow to ask the component to stop
@@ -61,7 +69,38 @@ export default class LayersList extends Component {
 
         return (
           <TableRow key={layerName}>
-            <TableRowColumn>{layerName}</TableRowColumn>
+            <TableRowColumn>
+              <TextField
+                defaultValue={layerName}
+                errorText={
+                  this.state.nameErrors[layerName]
+                    ? 'This name is already taken'
+                    : undefined
+                }
+                disabled={!layerName}
+                onBlur={event => {
+                  const newName = event.target.value;
+                  if (name === newName) return;
+
+                  let success = true;
+                  if (layersContainer.hasLayerNamed(newName)) {
+                    success = false;
+                  } else {
+                    this.props.onRenameLayer(layerName, newName, doRename => {
+                      if (doRename)
+                        layersContainer.getLayer(layerName).setName(newName);
+                    });
+                  }
+
+                  this.setState({
+                    nameErrors: {
+                      ...this.state.nameErrors,
+                      [layerName]: !success,
+                    },
+                  });
+                }}
+              />
+            </TableRowColumn>
             <TableRowColumn style={styles.visibleColumn}>
               {this._renderVisibilityToogle(layer)}
             </TableRowColumn>
@@ -109,10 +148,8 @@ export default class LayersList extends Component {
         <TableRowColumn style={styles.toolColumn}>
           <IconButton
             onTouchTap={() => {
-              const name = newNameGenerator(
-                'Layer',
-                name => layersContainer.hasLayerNamed(name)
-              );
+              const name = newNameGenerator('Layer', name =>
+                layersContainer.hasLayerNamed(name));
               layersContainer.insertNewLayer(
                 name,
                 layersContainer.getLayersCount()
@@ -127,7 +164,7 @@ export default class LayersList extends Component {
     );
 
     return (
-      <Table selectable={true}>
+      <Table selectable={false}>
         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
           <TableRow>
             <TableHeaderColumn>Layer name</TableHeaderColumn>
@@ -154,4 +191,5 @@ export default class LayersList extends Component {
 
 LayersList.defaultProps = {
   onRemoveLayer: (layerName, cb) => cb(true),
+  onRenameLayer: (oldName, newName, cb) => cb(true),
 };

@@ -277,6 +277,11 @@ export default class InstancesFullEditor extends Component {
     });
   };
 
+  _onRenameLayer = (oldName, newName, done) => {
+    this.props.initialInstances.moveInstancesToLayer(oldName, newName);
+    done(true);
+  };
+
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.map(instance =>
@@ -433,7 +438,7 @@ export default class InstancesFullEditor extends Component {
           <LayersList
             freezeUpdate={!this.state.layersListOpen}
             onRemoveLayer={this._onRemoveLayer}
-            onRenameLayer={() => {} /*TODO*/}
+            onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
           />
         </Drawer>
@@ -478,7 +483,7 @@ export default class InstancesFullEditor extends Component {
               label: 'Scene properties',
               click: () => this.openSceneProperties(true),
             },
-            {type: 'separator'},
+            { type: 'separator' },
             {
               label: 'Copy',
               click: () => this.copySelection(),

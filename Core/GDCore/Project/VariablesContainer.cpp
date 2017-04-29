@@ -139,6 +139,7 @@ void VariablesContainer::Swap(std::size_t firstVariableIndex, std::size_t second
     variables[firstVariableIndex] = variables[secondVariableIndex];
     variables[secondVariableIndex] = temp;
 }
+#endif
 
 void VariablesContainer::SerializeTo(SerializerElement & element) const
 {
@@ -150,7 +151,6 @@ void VariablesContainer::SerializeTo(SerializerElement & element) const
         variables[j].second.SerializeTo(variableElement);
     }
 }
-#endif
 
 void VariablesContainer::UnserializeFrom(const SerializerElement & element)
 {

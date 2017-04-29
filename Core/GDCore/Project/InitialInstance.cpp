@@ -8,6 +8,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #endif
@@ -31,6 +32,75 @@ InitialInstance::InitialInstance() :
 {
 }
 
+void InitialInstance::UnserializeFrom(const SerializerElement & element)
+{
+    SetObjectName(element.GetStringAttribute("name", "", "nom"));
+    SetX(element.GetDoubleAttribute("x"));
+    SetY(element.GetDoubleAttribute("y"));
+    SetAngle(element.GetDoubleAttribute("angle"));
+    SetHasCustomSize(element.GetBoolAttribute("customSize", false, "personalizedSize"));
+    SetCustomWidth(element.GetDoubleAttribute("width"));
+    SetCustomHeight(element.GetDoubleAttribute("height"));
+    SetZOrder(element.GetIntAttribute("zOrder", 0, "plan"));
+    SetLayer(element.GetStringAttribute("layer"));
+    SetLocked(element.GetBoolAttribute( "locked", false ));
+
+    floatInfos.clear();
+    const SerializerElement & floatPropElement = element.GetChild("numberProperties" , 0 ,"floatInfos");
+    floatPropElement.ConsiderAsArrayOf("property", "Info");
+    for (std::size_t j = 0; j < floatPropElement.GetChildrenCount(); ++j)
+    {
+        gd::String name = floatPropElement.GetChild(j).GetStringAttribute("name");
+        float value = floatPropElement.GetChild(j).GetDoubleAttribute("value");
+        floatInfos[name] = value;
+    }
+
+    stringInfos.clear();
+    const SerializerElement & stringPropElement = element.GetChild("stringProperties" , 0 ,"stringInfos");
+    stringPropElement.ConsiderAsArrayOf("property", "Info");
+    for (std::size_t j = 0; j < stringPropElement.GetChildrenCount(); ++j)
+    {
+        gd::String name = stringPropElement.GetChild(j).GetStringAttribute("name");
+        gd::String value = stringPropElement.GetChild(j).GetStringAttribute("value");
+        stringInfos[name] = value;
+    }
+
+    GetVariables().UnserializeFrom(element.GetChild("initialVariables", 0, "InitialVariables"));
+}
+
+void InitialInstance::SerializeTo(SerializerElement & element) const
+{
+    element.SetAttribute( "name", GetObjectName() );
+    element.SetAttribute( "x", GetX() );
+    element.SetAttribute( "y", GetY() );
+    element.SetAttribute( "zOrder", GetZOrder() );
+    element.SetAttribute( "layer", GetLayer() );
+    element.SetAttribute( "angle", GetAngle() );
+    element.SetAttribute( "customSize", HasCustomSize() );
+    element.SetAttribute( "width", GetCustomWidth() );
+    element.SetAttribute( "height", GetCustomHeight() );
+    element.SetAttribute( "locked", IsLocked() );
+
+    SerializerElement & floatPropElement = element.AddChild("numberProperties");
+    floatPropElement.ConsiderAsArrayOf("property");
+    for(std::map<gd::String, float>::const_iterator floatInfo = floatInfos.begin(); floatInfo != floatInfos.end(); ++floatInfo)
+    {
+        floatPropElement.AddChild("property")
+            .SetAttribute("name", floatInfo->first)
+            .SetAttribute("value", floatInfo->second);
+    }
+
+    SerializerElement & stringPropElement = element.AddChild("stringProperties");
+    stringPropElement.ConsiderAsArrayOf("property");
+    for(std::map<gd::String, gd::String>::const_iterator stringInfo = stringInfos.begin(); stringInfo != stringInfos.end(); ++stringInfo)
+    {
+        stringPropElement.AddChild("property")
+            .SetAttribute("name", stringInfo->first)
+            .SetAttribute("value", stringInfo->second);
+    }
+
+    GetVariables().SerializeTo(element.AddChild("initialVariables"));
+}
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
@@ -68,7 +138,6 @@ const gd::String & InitialInstance::GetRawStringProperty(const gd::String & name
 	const auto & it = stringInfos.find(name);
 	return it != stringInfos.end() ? it->second : *badStringProperyValue;
 }
-
 #endif
 
 }

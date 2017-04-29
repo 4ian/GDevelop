@@ -120,12 +120,10 @@ public:
      * Members functions related to saving and loading the object.
      */
     ///@{
-    #if defined(GD_IDE_ONLY)
     /**
      * \brief Serialize variable container.
      */
     void SerializeTo(SerializerElement & element) const;
-    #endif
 
     /**
      * \brief Unserialize the variable container.

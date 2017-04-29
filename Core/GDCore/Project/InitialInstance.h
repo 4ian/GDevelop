@@ -125,7 +125,6 @@ public:
     float GetCustomHeight() const { return height; }
     void SetCustomHeight(float height_) { height = height_; }
 
-    #if defined(GD_IDE_ONLY)
     /**
      * \brief Return true if the instance is locked and cannot be selected by clicking on it in the IDE.
      */
@@ -137,7 +136,6 @@ public:
      * An instance which is locked cannot be selected by clicking on it in a layout editor canvas.
      */
     void SetLocked(bool enable = true) { locked = enable; }
-    #endif
 
     ///@}
 
@@ -203,7 +201,22 @@ public:
     ///@}
     #endif
 
-    //In our implementation, more properties can be stored in floatInfos and stringInfos.
+    /** \name Saving and loading
+     * Members functions related to serialization.
+     */
+    ///@{
+    /**
+     * \brief Serialize instances container.
+     */
+    virtual void SerializeTo(SerializerElement & element) const;
+
+    /**
+     * \brief Unserialize the instances container.
+     */
+    virtual void UnserializeFrom(const SerializerElement & element);
+    ///@}
+
+    //More properties can be stored in floatInfos and stringInfos.
     //These properties are then managed by the Object class.
     std::map < gd::String, float > floatInfos; ///< More data which can be used by the object
     std::map < gd::String, gd::String > stringInfos; ///< More data which can be used by the object

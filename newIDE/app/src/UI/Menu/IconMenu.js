@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
-import Divider from 'material-ui/Divider';
 import ReactDOM from 'react-dom';
 import ElectronMenuImplementation from './ElectronMenuImplementation';
 import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
@@ -37,7 +35,9 @@ export default class GDIconMenu extends Component {
     }
   }
 
-  _onTouchTap = () => {
+  _onTouchTap = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!this.iconMenu) return;
 
     const node = ReactDOM.findDOMNode(this.iconMenu);

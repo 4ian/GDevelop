@@ -20,12 +20,16 @@ export default class Window {
     }
 
     const browserWindow = electron.remote.getCurrentWindow();
+    try {
     browserWindow.setBounds({
       x: Math.round(x / scaleFactor),
       y: Math.round(y / scaleFactor),
       width: Math.round(width / scaleFactor),
       height: Math.round(height / scaleFactor),
     });
+    } catch(err) {
+      console.warn("Unable to change window bounds", err);
+    }
     this.show();
   }
 

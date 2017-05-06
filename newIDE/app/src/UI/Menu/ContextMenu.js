@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Menu from 'material-ui/Menu';
 import Popover from 'material-ui/Popover';
 import ElectronMenuImplementation from './ElectronMenuImplementation';

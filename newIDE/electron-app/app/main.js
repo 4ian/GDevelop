@@ -1,5 +1,6 @@
-var app = require('electron').app;  // Module to control application life.
-var BrowserWindow = require('electron').BrowserWindow;  // Module to create native browser window.
+var electron = require('electron');
+var app = electron.app;  // Module to control application life.
+var BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 var parseArgs = require('minimist');
 var isDev = require('electron-is').dev();
 

@@ -94,8 +94,8 @@ var Event = React.createClass({
       }
 
       if (!event.isFolded()) {
-        // eslint-disable-next-line
         elements.push(
+          // eslint-disable-next-line
           React.createElement(EventsList, {
             eventsList: event.getSubEvents(),
             key: 'subEvents',

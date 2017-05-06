@@ -21,12 +21,12 @@ export default class Window {
 
     const browserWindow = electron.remote.getCurrentWindow();
     try {
-    browserWindow.setBounds({
-      x: Math.round(x / scaleFactor),
-      y: Math.round(y / scaleFactor),
-      width: Math.round(width / scaleFactor),
-      height: Math.round(height / scaleFactor),
-    });
+      browserWindow.setBounds({
+        x: Math.round(x / scaleFactor),
+        y: Math.round(y / scaleFactor),
+        width: Math.round(width / scaleFactor),
+        height: Math.round(height / scaleFactor),
+      });
     } catch(err) {
       console.warn("Unable to change window bounds", err);
     }
@@ -41,11 +41,11 @@ export default class Window {
     browserWindow.setAlwaysOnTop(true);
   }
 
-  static hide() {
+  static hide(forceHide = false) {
     if (!electron) return;
 
     const browserWindow = electron.remote.getCurrentWindow();
-    if (!browserWindow.isFocused()) {
+    if (!browserWindow.isFocused() || forceHide) {
       browserWindow.setAlwaysOnTop(false);
       browserWindow.hide();
     }

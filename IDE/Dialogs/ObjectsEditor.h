@@ -50,6 +50,16 @@ public:
     virtual ~ObjectsEditor();
 
     /**
+     * \brief Open the editor of the specified object
+     */
+    void EditObject(gd::Object & object, bool isGlobalObject);
+
+    /**
+     * \brief Select the specified object in the list
+     */
+    void SelectObject(const gd::Object & object, bool isGlobalObject);
+
+    /**
      * \brief Refresh the editor.
      */
     void Refresh();

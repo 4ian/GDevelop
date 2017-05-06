@@ -238,14 +238,14 @@ void EditorScene::CreateExternalLayoutEditor(wxWindow * parent)
 	externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object, gd::String scope) {
 		std::cout << "Updating \"" << scope << "\" from the external editor." << std::endl;
 		if (scope == "instances")
-			this->layout.GetInitialInstances().UnserializeFrom(object);
+			layout.GetInitialInstances().UnserializeFrom(object);
 		else if (scope == "uiSettings")
-			this->layout.GetAssociatedSettings().UnserializeFrom(object);
+			layout.GetAssociatedSettings().UnserializeFrom(object);
 		else if (scope == "windowTitle")
-			this->layout.SetWindowDefaultTitle(object.GetValue().GetString());
+			layout.SetWindowDefaultTitle(object.GetValue().GetString());
 		else if (scope == "layers")
 		{
-			this->layout.UnserializeLayersFrom(object);
+			layout.UnserializeLayersFrom(object);
 			if (layersEditor) layersEditor->Refresh();
 		}
 		else
@@ -255,6 +255,28 @@ void EditorScene::CreateExternalLayoutEditor(wxWindow * parent)
 	});
 	externalLayoutEditor->OnLaunchPreview([this](){
 		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
+	});
+	externalLayoutEditor->OnEditObject([this](const gd::String & objectName){
+		if (!objectsEditor) return;
+
+		externalLayoutEditor->Hide(true);
+		if (layout.HasObjectNamed(objectName))
+		{
+			objectsEditor->SelectObject(layout.GetObject(objectName), false);
+			objectsEditor->EditObject(layout.GetObject(objectName), false);
+		}
+		else if (project.HasObjectNamed(objectName))
+		{
+			objectsEditor->SelectObject(project.GetObject(objectName), true);
+			objectsEditor->EditObject(project.GetObject(objectName), true);
+		}
+		else
+		{
+			std::cout << "Could not find object \"" << objectName << "\" to edit." << std::endl;
+		}
+
+		UpdateExternalLayoutEditorSize(true);
+		externalLayoutEditor->Show();
 	});
 
 	Layout();
@@ -269,10 +291,15 @@ void EditorScene::CreateExternalLayoutEditor(wxWindow * parent)
 	externalLayoutEditor->Launch("scene-editor", layout.GetName());
 }
 
-void EditorScene::UpdateExternalLayoutEditorSize()
+void EditorScene::UpdateExternalLayoutEditorSize(bool force)
 {
-	if (!externalLayoutEditor || !isEditorDisplayed) return;
-	if (notebook->GetPageText(notebook->GetSelection()) != _("Scene")) return;
+	if (!externalLayoutEditor) return;
+
+	if (!force)
+	{
+		if (!isEditorDisplayed) return;
+		if (notebook->GetPageText(notebook->GetSelection()) != _("Scene")) return;
+	}
 
 	auto rect = externalEditorPanel->GetScreenRect();
 	externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());

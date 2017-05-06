@@ -399,6 +399,7 @@ export default class InstancesFullEditor extends Component {
             project={project}
             objectsContainer={layout}
             onObjectSelected={this._onObjectSelected}
+            onEditObject={this.props.onEditObject}
           />
         </Drawer>
         <Drawer

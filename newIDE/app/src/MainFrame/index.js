@@ -209,6 +209,7 @@ class MainFrame extends Component {
               setToolbar={this.setEditorToolbar}
               onPreview={this.props.onPreview}
               showPreviewButton
+              onEditObject={this.props.onEditObject}
             />}
           {currentProject &&
             externalLayoutOpened &&
@@ -221,6 +222,7 @@ class MainFrame extends Component {
               setToolbar={this.setEditorToolbar}
               onPreview={this.props.onPreview}
               showPreviewButton
+              onEditObject={this.props.onEditObject}
             />}
           {currentProject &&
             externalEventsOpened &&

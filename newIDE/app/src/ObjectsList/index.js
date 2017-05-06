@@ -5,10 +5,32 @@ import Avatar from 'material-ui/Avatar';
 import ObjectsRenderingService
   from '../ObjectsRendering/ObjectsRenderingService';
 import { mapFor } from '../Utils/MapFor';
+import IconMenu from '../UI/Menu/IconMenu';
+import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 const listItemHeight = 56;
 
 export default class ObjectsList extends React.Component {
+  _renderObjectMenu(object) {
+    return (
+      <IconMenu
+        iconButtonElement={
+          <IconButton onTouchTap={e => e.preventDefault()}>
+            <MoreVertIcon />
+          </IconButton>
+        }
+        menuTemplate={[
+          // TODO: This item should be hidden if onEditObject is not defined.
+          {
+            label: 'Edit object',
+            click: () => this.props.onEditObject(object),
+          },
+        ]}
+      />
+    );
+  }
+
   _renderObjectRow(project, object, key, style) {
     if (this.props.freezeUpdate) return;
     const objectName = object.getName();
@@ -24,6 +46,7 @@ export default class ObjectsList extends React.Component {
             style={{ borderRadius: 0 }}
           />
         }
+        rightIconButton={this._renderObjectMenu(object)}
         onTouchTap={() => this.props.onObjectSelected(objectName)}
       />
     );
@@ -55,6 +78,7 @@ export default class ObjectsList extends React.Component {
       <AutoSizer>
         {({ height, width }) => (
           <List
+            style={{ backgroundColor: 'white' }}
             key={listKey}
             height={height}
             rowCount={fullList.length}

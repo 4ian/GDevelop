@@ -55,7 +55,7 @@ export default class Toolbar extends Component {
           }
           menuTemplate={[
             {
-              label: 'Show grid',
+              label: 'Toggle grid',
               click: () => this.props.toggleGrid(),
             },
             { type: 'separator' },

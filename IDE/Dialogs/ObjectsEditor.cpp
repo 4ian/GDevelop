@@ -831,6 +831,35 @@ gd::ObjectGroup * ObjectsEditor::GetSelectedGroup()
     return it != objectsGroups.end() ? &(*it) : NULL;
 }
 
+void ObjectsEditor::EditObject(gd::Object & object, bool isGlobalObject)
+{
+    auto properties = object.GetProperties(project);
+    if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() ) {
+        //Open object editor
+        object.EditObject(this, project, mainFrameWrapper);
+        for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
+            project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, isGlobalObject ? NULL : &layout, object);
+
+        project.SetDirty();
+        if (onChangeCb) onChangeCb("object-edited");
+
+        listsHelper.MakeObjectItem(objectsList, lastSelectedItem, object, isGlobalObject);
+
+        //Reload resources : Do not forget to switch the working directory.
+        wxString oldWorkingDir = wxGetCwd();
+        if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
+            wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
+
+        object.LoadResources(project, layout);
+
+        wxSetWorkingDirectory(oldWorkingDir);
+    } else {
+        //No object editor: open properties panel
+        wxCommandEvent useless;
+        OnMenuPropertiesSelected(useless);
+    }
+}
+
 void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
 {
     //Get the selected item
@@ -843,32 +872,7 @@ void ObjectsEditor::OnMenuEditObjectSelected(wxCommandEvent& event)
         gd::Object * object = GetSelectedObject();
         if ( !object ) return;
 
-        auto properties = object->GetProperties(project);
-        if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() ) {
-
-            //Open object editor
-            object->EditObject(this, project, mainFrameWrapper);
-            for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
-                project.GetUsedPlatforms()[j]->GetChangesNotifier().OnObjectEdited(project, globalObject ? NULL : &layout, *object);
-
-            project.SetDirty();
-            if (onChangeCb) onChangeCb("object-edited");
-
-            listsHelper.MakeObjectItem(objectsList, lastSelectedItem, *object, globalObject);
-
-            //Reload resources : Do not forget to switch the working directory.
-            wxString oldWorkingDir = wxGetCwd();
-            if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
-                wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
-
-            object->LoadResources(project, layout);
-
-            wxSetWorkingDirectory(oldWorkingDir);
-        } else {
-            //No object editor: open properties panel
-            wxCommandEvent useless;
-            OnMenuPropertiesSelected(useless);
-        }
+        EditObject(*object, globalObject);
     }
     //Group clicked?
     else if ( data && (data->GetString() == "GlobalGroup" || data->GetString() == "LayoutGroup") )
@@ -1180,6 +1184,12 @@ void ObjectsEditor::OnMoveDownSelected(wxCommandEvent& event)
 
     Refresh();
     SelectItem(objectsRootItem, name, dataStr, dataStr2); //Select again the moved item
+}
+
+void ObjectsEditor::SelectObject(const gd::Object & object, bool isGlobalObject)
+{
+    SelectItem(objectsRootItem, object.GetName(),
+        isGlobalObject ? "GlobalObject" : "LayoutObject", "");
 }
 
 void ObjectsEditor::SelectItem(wxTreeItemId parent, gd::String name, gd::String dataStr1, gd::String dataStr2)

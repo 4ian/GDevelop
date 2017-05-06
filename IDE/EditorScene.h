@@ -109,7 +109,7 @@ private:
     void OnexternalEditorPanelMoved(wxMoveEvent& event);
     void OnMainFrameActivate(wxActivateEvent& event);
     void CreateExternalLayoutEditor(wxWindow * parent = NULL);
-    void UpdateExternalLayoutEditorSize();
+    void UpdateExternalLayoutEditorSize(bool force = false);
 
     //(*Declarations(EditorScene)
     EventsEditor* eventsEditor;

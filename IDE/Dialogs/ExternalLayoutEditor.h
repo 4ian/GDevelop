@@ -120,7 +120,7 @@ private:
     void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
     void SetupForScene(gd::Layout & scene);
     void CreateExternalLayoutEditor();
-    void UpdateExternalLayoutEditorSize();
+    void UpdateExternalLayoutEditorSize(bool force = false);
 
     //(*Declarations(ExternalLayoutEditor)
     wxScrollBar* scrollBar1;

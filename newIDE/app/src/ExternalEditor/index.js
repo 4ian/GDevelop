@@ -36,7 +36,7 @@ class ExternalEditor extends Component {
           Window.show();
         } else if (command === 'hide') {
           if (this.isIntegrated) {
-            Window.hide();
+            Window.hide(payload && payload.forceHide);
           }
         }
       });
@@ -112,6 +112,11 @@ class ExternalEditor extends Component {
     this.bridge.send('requestPreview', undefined);
   };
 
+  editObject = object => {
+    this.sendUpdate();
+    this.bridge.send('editObject', object.getName());
+  };
+
   /**
    * Request an update to the server. Note that if forcedUpdate is set to false,
    * the server may not send back an update (for example if nothing changed).
@@ -132,28 +137,29 @@ class ExternalEditor extends Component {
       {
         loading: true,
       },
-      () => setTimeout(() => {
-        // Transform the payload into a gd.SerializerElement
-        // Note that gd.Serializer.fromJSObject returns a new gd.SerializerElement object at every call
-        if (this._serializedObject) this._serializedObject.delete();
+      () =>
+        setTimeout(() => {
+          // Transform the payload into a gd.SerializerElement
+          // Note that gd.Serializer.fromJSObject returns a new gd.SerializerElement object at every call
+          if (this._serializedObject) this._serializedObject.delete();
 
-        var t1 = performance.now();
-        this._serializedObject = gd.Serializer.fromJSObject(payload);
-        var t2 = performance.now();
-        console.log(
-          'Call to gd.Serializer.fromJSObject took ' +
-            (t2 - t1) +
-            ' milliseconds.'
-        );
+          var t1 = performance.now();
+          this._serializedObject = gd.Serializer.fromJSObject(payload);
+          var t2 = performance.now();
+          console.log(
+            'Call to gd.Serializer.fromJSObject took ' +
+              (t2 - t1) +
+              ' milliseconds.'
+          );
 
-        this.editor.loadFullProject(this._serializedObject, () => {
-          this._serializedObject.delete();
-          this._serializedObject = null;
-          this.setState({
-            loading: false,
+          this.editor.loadFullProject(this._serializedObject, () => {
+            this._serializedObject.delete();
+            this._serializedObject = null;
+            this.setState({
+              loading: false,
+            });
           });
-        });
-      }),
+        }),
       10 // Let some time for the loader to be shown
     );
   };
@@ -164,6 +170,7 @@ class ExternalEditor extends Component {
       ref: editor => this.editor = editor,
       requestUpdate: () => this.requestUpdate('', true),
       onPreview: this.launchPreview,
+      onEditObject: this.editObject,
       selectedEditor: this.selectedEditor,
       editedElementName: this.editedElementName,
     });

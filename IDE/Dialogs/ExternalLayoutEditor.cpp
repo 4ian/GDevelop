@@ -195,6 +195,30 @@ void ExternalLayoutEditor::CreateExternalLayoutEditor()
 			std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
 		}
 	});
+	externalLayoutEditor->OnEditObject([this](const gd::String & objectName){
+		gd::String name = externalLayout.GetAssociatedLayout();
+	    gd::Layout * layout = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
+		if (!objectsEditor || !layout) return;
+
+		externalLayoutEditor->Hide(true);
+		if (layout->HasObjectNamed(objectName))
+		{
+			objectsEditor->SelectObject(layout->GetObject(objectName), false);
+			objectsEditor->EditObject(layout->GetObject(objectName), false);
+		}
+		else if (project.HasObjectNamed(objectName))
+		{
+			objectsEditor->SelectObject(project.GetObject(objectName), true);
+			objectsEditor->EditObject(project.GetObject(objectName), true);
+		}
+		else
+		{
+			std::cout << "Could not find object \"" << objectName << "\" to edit." << std::endl;
+		}
+
+		UpdateExternalLayoutEditorSize(true);
+		externalLayoutEditor->Show();
+	});
 	externalLayoutEditor->OnLaunchPreview([this](){
 		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
 	});
@@ -253,9 +277,10 @@ void ExternalLayoutEditor::OnscenePanelResize(wxSizeEvent& event)
     scrollBar2->SetSize(layoutPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), 0, scrollBar2->GetSize().GetWidth(), layoutPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
 }
 
-void ExternalLayoutEditor::UpdateExternalLayoutEditorSize()
+void ExternalLayoutEditor::UpdateExternalLayoutEditorSize(bool force)
 {
-	if (!externalLayoutEditor || !isEditorDisplayed) return;
+	if (!externalLayoutEditor) return;
+	if (!isEditorDisplayed && !force) return;
 
 	auto rect = corePanel->GetScreenRect();
 	rect.SetY(rect.GetY() + contextPanel->GetSize().GetHeight());
@@ -398,6 +423,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 
 void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
 {
+	if (externalLayoutEditor) externalLayoutEditor->Show();
     gd::String name = parentSceneComboBox->GetValue();
     gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
@@ -417,6 +443,7 @@ void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
  */
 void ExternalLayoutEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
 {
+	if (externalLayoutEditor) externalLayoutEditor->Hide(true);
     parentSceneComboBox->Clear();
     parentSceneComboBox->Append(_("No layout"));
 

@@ -45,6 +45,8 @@ public:
 				SendUpdate(scope, true);
 			else if (cmd == "requestPreview") {
 				if (onLaunchPreviewCb) onLaunchPreviewCb();
+			} else if (cmd == "editObject") {
+				if (onEditObjectCb) onEditObjectCb(object.GetValue().GetString());
 			} else
 				std::cout << "Received message with unknown command: \"" << cmd << "\"" << std::endl;
 		});
@@ -72,6 +74,11 @@ public:
 		onLaunchPreviewCb = cb;
 	}
 
+	void OnEditObject(std::function<void(const gd::String & objectName)> cb)
+	{
+		onEditObjectCb = cb;
+	}
+
 	void OnLaunched(std::function<void()> cb)
 	{
 		onLaunchedCb = cb;
@@ -79,10 +86,11 @@ public:
 
 	bool Launch(const gd::String & editorName, const gd::String editedElementName);
 
-	void Hide()
+	void Hide(bool forceHide = false)
 	{
-		gd::SerializerElement emptyPayload;
-		editorBridge.Send("hide", emptyPayload);
+		gd::SerializerElement payload;
+		payload.AddChild("forceHide").SetValue(forceHide);
+		editorBridge.Send("hide", payload);
 	}
 
 	void Show()
@@ -131,7 +139,9 @@ private:
 	std::function<void(SerializerElement object, gd::String scope)> onUpdateReceivedCb;
 	std::function<SerializerElement(gd::String scope)> onSendUpdateCb;
 	std::function<void()> onLaunchPreviewCb;
+	std::function<void(const gd::String & objectName)> onEditObjectCb;
 	std::function<void()> onLaunchedCb;
+
 
 	int launchX;
 	int launchY;

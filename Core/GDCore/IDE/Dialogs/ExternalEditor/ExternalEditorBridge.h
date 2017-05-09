@@ -181,6 +181,14 @@ private:
 				    	std::cout << "Connection ended with " << client.getRemotePort() << std::endl;
 				    	connected = false;
 					}
+					else
+					{
+						// Give some rest to the thread to avoid 100% of
+						// CPU usage while waiting for messages.
+						// Note that this is not done if a message was received, as
+						// other chunks could be received just after.
+						sf::sleep(sf::milliseconds(75));
+					}
 
 					//Send messages
 					if (connected)

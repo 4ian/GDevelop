@@ -15,6 +15,7 @@ import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
 import defaultTheme from '../UI/Theme/DefaultTheme';
 import { serializeToJSObject } from '../Utils/Serializer';
+import { rgbToHexNumber } from '../Utils/ColorTransformer';
 
 import fixtureGame from '../fixtures/fixture-game.json';
 const gd = global.gd;
@@ -85,16 +86,31 @@ class MainFrame extends Component {
       console.warn('No project');
       return;
     }
+
+    const getLayoutSerializedElements = layout => {
+      if (!layout) return {};
+
+      return {
+        windowTitle: layout.getWindowDefaultTitle(),
+        layers: serializeToJSObject(layout, 'serializeLayersTo'),
+        backgroundColor: '' + rgbToHexNumber(
+          layout.getBackgroundColorRed(),
+          layout.getBackgroundColorGreen(),
+          layout.getBackgroundColorBlue()
+        ),
+      };
+    };
+
     if (
       this.props.selectedEditor === 'scene-editor' &&
       currentProject.hasLayoutNamed(sceneOpened)
     ) {
       const layout = currentProject.getLayout(sceneOpened);
+
       return {
         instances: serializeToJSObject(layout.getInitialInstances()),
         uiSettings: this.sceneEditor.getUiSettings(),
-        windowTitle: layout.getWindowDefaultTitle(),
-        layers: serializeToJSObject(layout, 'serializeLayersTo'),
+        ...getLayoutSerializedElements(layout),
       };
     }
     if (
@@ -105,16 +121,14 @@ class MainFrame extends Component {
         externalLayoutOpened
       );
       const layoutName = externalLayout.getAssociatedLayout();
+      const layout = currentProject.hasLayoutNamed(layoutName)
+        ? currentProject.getLayout(layoutName)
+        : null;
 
       return {
         instances: serializeToJSObject(externalLayout.getInitialInstances()),
         uiSettings: this.externalLayoutEditor.getUiSettings(),
-        layers: currentProject.hasLayoutNamed(layoutName)
-          ? serializeToJSObject(
-              currentProject.getLayout(layoutName),
-              'serializeLayersTo'
-            )
-          : undefined,
+        ...getLayoutSerializedElements(layout),
       };
     }
   };
@@ -182,15 +196,18 @@ class MainFrame extends Component {
             {currentProject &&
               <ProjectManager
                 project={currentProject}
-                onOpenExternalEvents={name => this.setState({
-                  externalEventsOpened: name,
-                })}
-                onOpenLayout={name => this.setState({
-                  sceneOpened: name,
-                })}
-                onOpenExternalLayout={name => this.setState({
-                  externalLayoutOpened: name,
-                })}
+                onOpenExternalEvents={name =>
+                  this.setState({
+                    externalEventsOpened: name,
+                  })}
+                onOpenLayout={name =>
+                  this.setState({
+                    sceneOpened: name,
+                  })}
+                onOpenExternalLayout={name =>
+                  this.setState({
+                    externalLayoutOpened: name,
+                  })}
               />}
           </Drawer>
           <Toolbar

@@ -1,10 +1,4 @@
-/**
- * Convert a rgb color value to a hex value.
- * @note No "#" or "0x" are added.
- * @static
- */
-const rgbToHex = (r, g, b) =>
-  '' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+import { rgbToHex } from '../Utils/ColorTransformer';
 
 export default class BackgroundColor {
   constructor({ layout, pixiRenderer }) {

@@ -25,6 +25,7 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/IDE/Dialogs/ExternalEditor/ExternalEditor.h"
 #include "GDCore/IDE/ProjectStripper.h"
+#include "GDCore/Tools/HexToRgb.h"
 
 using namespace gd;
 
@@ -189,6 +190,14 @@ void ExternalLayoutEditor::CreateExternalLayoutEditor()
 		{
 			layout->UnserializeLayersFrom(object);
 			if (layersEditor) layersEditor->Refresh();
+		}
+		else if (scope == "backgroundColor" && layout)
+		{
+			std::map<gd::String, unsigned int> rgbColor = {
+				{"r", 0}, {"g", 0}, {"b", 0}
+			};
+			HexToRgb(object.GetValue().GetString().To<int>(), rgbColor);
+			layout->SetBackgroundColor(rgbColor["r"], rgbColor["g"], rgbColor["b"]);
 		}
 		else
 		{

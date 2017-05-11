@@ -25,6 +25,7 @@
     "react": "15.4.2",
     "react-addons-css-transition-group": "15.4.2",
     "react-addons-perf": "15.4.2",
+    "react-color": "2.11.7",
     "react-dom": "15.4.2",
     "react-measure": "1.4.6",
     "react-mosaic-component": "^0.3.4",

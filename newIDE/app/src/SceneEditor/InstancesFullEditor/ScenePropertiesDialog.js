@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
+import ColorField from '../../UI/ColorField';
 
 export default class ScenePropertiesDialog extends Component {
   constructor(props) {
@@ -12,6 +13,12 @@ export default class ScenePropertiesDialog extends Component {
   _loadFrom(layout) {
     return {
       windowTitle: layout.getWindowDefaultTitle(),
+      backgroundColor: {
+        r: layout.getBackgroundColorRed(),
+        g: layout.getBackgroundColorGreen(),
+        b: layout.getBackgroundColorBlue(),
+        a: 1,
+      },
     };
   }
 
@@ -26,26 +33,27 @@ export default class ScenePropertiesDialog extends Component {
 
   _onApply = () => {
     this.props.layout.setWindowDefaultTitle(this.state.windowTitle);
+    this.props.layout.setBackgroundColor(
+      this.state.backgroundColor.r,
+      this.state.backgroundColor.g,
+      this.state.backgroundColor.b
+    );
     if (this.props.onApply) this.props.onApply();
   };
 
   render() {
     const actions = [
-      (
-        <FlatButton
-          label="Cancel"
-          primary={false}
-          onTouchTap={this.props.onClose}
-        />
-      ),
-      (
-        <FlatButton
-          label="Apply"
-          primary={true}
-          keyboardFocused={true}
-          onTouchTap={this._onApply}
-        />
-      ),
+      <FlatButton
+        label="Cancel"
+        primary={false}
+        onTouchTap={this.props.onClose}
+      />,
+      <FlatButton
+        label="Apply"
+        primary={true}
+        keyboardFocused={true}
+        onTouchTap={this._onApply}
+      />,
     ];
 
     return (
@@ -55,12 +63,22 @@ export default class ScenePropertiesDialog extends Component {
         open={this.props.open}
         onRequestClose={this.props.onClose}
         autoScrollBodyContent={true}
+        contentStyle={{width: '350px'}}
       >
         <TextField
           floatingLabelText="Window title"
+          fullWidth
           type="text"
           value={this.state.windowTitle}
           onChange={(e, value) => this.setState({ windowTitle: value })}
+        />
+        <ColorField
+          floatingLabelText="Scene background color"
+          fullWidth
+          disableAlpha
+          color={this.state.backgroundColor}
+          onChangeComplete={color =>
+          this.setState({ backgroundColor: color.rgb })}
         />
       </Dialog>
     );

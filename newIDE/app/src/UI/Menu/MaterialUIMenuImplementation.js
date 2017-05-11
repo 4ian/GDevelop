@@ -4,9 +4,9 @@ import Divider from 'material-ui/Divider';
 
 export default class MaterialUIMenuImplementation {
   buildFromTemplate(template) {
-    return template.map(item => {
+    return template.map((item, id) => {
       if (item.type === 'separator') {
-        return <Divider />;
+        return <Divider key={'separator' + id} />;
       }
 
       return (

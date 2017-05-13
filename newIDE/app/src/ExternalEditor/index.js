@@ -4,13 +4,10 @@ import Window from '../Utils/Window.js';
 const gd = global.gd;
 
 class ExternalEditor extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+
     this.bridge = new Bridge();
-    this.editorArguments = Window.getArguments();
-    this.selectedEditor = this.editorArguments['editor'];
-    this.editedElementName = this.editorArguments['edited-element-name'];
-    this.isIntegrated = this.editorArguments['mode'] === 'integrated';
     this.lastShowCommandDate = 0;
     this.state = {
       loading: false,
@@ -23,7 +20,7 @@ class ExternalEditor extends Component {
         if (command === 'update') {
           this._onUpdateReceived(payload, scope);
         } else if (command === 'setBounds') {
-          if (this.isIntegrated) {
+          if (this.props.isIntegrated) {
             Window.setBounds(
               payload.x,
               payload.y,
@@ -35,7 +32,7 @@ class ExternalEditor extends Component {
           this.lastShowCommandDate = Date.now();
           Window.show();
         } else if (command === 'hide') {
-          if (this.isIntegrated) {
+          if (this.props.isIntegrated) {
             Window.hide(payload && payload.forceHide);
           }
         }
@@ -44,7 +41,7 @@ class ExternalEditor extends Component {
         this.requestUpdate('', true);
       });
       Window.onBlur(() => {
-        if (this.isIntegrated) this._hideIfNotJustShown();
+        if (this.props.isIntegrated) this._hideIfNotJustShown();
         this.sendUpdate();
       });
       Window.onFocus(() => {
@@ -54,7 +51,7 @@ class ExternalEditor extends Component {
         this.sendUpdate();
       });
 
-      this.bridge.connectTo(this.editorArguments['server-port']);
+      this.bridge.connectTo(this.props.serverPort);
     } else {
       console.warn('Connection to an external editor is not supported');
     }
@@ -171,8 +168,6 @@ class ExternalEditor extends Component {
       requestUpdate: () => this.requestUpdate('', true),
       onPreview: this.launchPreview,
       onEditObject: this.editObject,
-      selectedEditor: this.selectedEditor,
-      editedElementName: this.editedElementName,
     });
   }
 }

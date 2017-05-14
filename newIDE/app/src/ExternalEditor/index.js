@@ -12,6 +12,7 @@ class ExternalEditor extends Component {
     this.state = {
       loading: false,
     };
+    this.editorOpened = false;
 
     if (this.bridge.isSupported()) {
       console.log('Connection to an external editor...');
@@ -152,6 +153,18 @@ class ExternalEditor extends Component {
           this.editor.loadFullProject(this._serializedObject, () => {
             this._serializedObject.delete();
             this._serializedObject = null;
+
+            if (!this.editorOpened) {
+              this.editorOpened = true;
+
+              if (this.props.editor === 'scene-editor') {
+                this.editor.openLayout(this.props.editedElementName);
+              }
+              if (this.props.editor === 'external-layout-editor') {
+                this.editor.openExternalLayout(this.props.editedElementName);
+              }
+            }
+
             this.setState({
               loading: false,
             });
@@ -168,6 +181,7 @@ class ExternalEditor extends Component {
       requestUpdate: () => this.requestUpdate('', true),
       onPreview: this.launchPreview,
       onEditObject: this.editObject,
+      singleEditor: true,
     });
   }
 }

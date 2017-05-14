@@ -18,11 +18,10 @@ if (appArguments['server-port']) {
     <ExternalEditor
       serverPort={appArguments['server-port']}
       isIntegrated={appArguments['mode'] === 'integrated'}
+      editor={appArguments['editor']}
+      editedElementName={appArguments['edited-element-name']}
     >
-      <MainFrame
-        selectedEditor={appArguments['editor']}
-        editedElementName={appArguments['edited-element-name']}
-      />
+      <MainFrame />
     </ExternalEditor>
   );
 } else {

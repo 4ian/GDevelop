@@ -1,10 +1,12 @@
-import React, { Component } from 'react';
+import React from 'react';
 import EventsSheet from './EventsSheet.js';
 import InstructionEditorDialog
   from './InstructionEditor/InstructionEditorDialog.js';
+import BaseEditor from '../MainFrame/BaseEditor';
 const gd = global.gd;
 
-export default class EventsSheetContainer extends Component {
+
+export default class EventsSheetContainer extends BaseEditor {
   constructor() {
     super();
     this.state = {

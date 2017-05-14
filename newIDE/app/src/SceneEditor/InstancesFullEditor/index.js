@@ -62,10 +62,6 @@ export default class InstancesFullEditor extends Component {
     this.zOrderFinder = new gd.HighestZOrderFinder();
   }
 
-  componentDidMount() {
-    this._updateToolbar();
-  }
-
   componentWillUnmount() {
     this.keyboardShortcuts.unmount();
   }
@@ -74,7 +70,7 @@ export default class InstancesFullEditor extends Component {
     return this.state.uiSettings;
   }
 
-  _updateToolbar() {
+  updateToolbar() {
     this.props.setToolbar(
       <Toolbar
         showPreviewButton={this.props.showPreviewButton}
@@ -170,7 +166,7 @@ export default class InstancesFullEditor extends Component {
         // /!\ Force the instances editor to destroy and mount again the
         // renderers to avoid keeping any references to existing instances
         this.editor.forceRemount();
-        this._updateToolbar();
+        this.updateToolbar();
       }
     );
   };
@@ -184,7 +180,7 @@ export default class InstancesFullEditor extends Component {
         // /!\ Force the instances editor to destroy and mount again the
         // renderers to avoid keeping any references to existing instances
         this.editor.forceRemount();
-        this._updateToolbar();
+        this.updateToolbar();
       }
     );
   };
@@ -211,13 +207,13 @@ export default class InstancesFullEditor extends Component {
         selectedObjectName: null,
         history: saveToHistory(this.state.history, this.props.initialInstances),
       },
-      () => this._updateToolbar()
+      () => this.updateToolbar()
     );
   };
 
   _onInstancesSelected = instances => {
     this.forceUpdate();
-    this._updateToolbar();
+    this.updateToolbar();
   };
 
   _onInstancesMoved = instances => {
@@ -240,7 +236,7 @@ export default class InstancesFullEditor extends Component {
       this.editor.centerViewOn(instances);
     }
     this.forceUpdate();
-    this._updateToolbar();
+    this.updateToolbar();
   };
 
   _onRemoveLayer = (layerName, done) => {
@@ -270,7 +266,7 @@ export default class InstancesFullEditor extends Component {
             // /!\ Force the instances editor to destroy and mount again the
             // renderers to avoid keeping any references to existing instances
             this.editor.forceRemount();
-            this._updateToolbar();
+            this.updateToolbar();
           }
         );
       },
@@ -294,7 +290,7 @@ export default class InstancesFullEditor extends Component {
       {
         history: saveToHistory(this.state.history, this.props.initialInstances),
       },
-      () => this._updateToolbar()
+      () => this.updateToolbar()
     );
   };
 

@@ -14,8 +14,7 @@ import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
 import defaultTheme from '../UI/Theme/DefaultTheme';
-import { serializeToJSObject } from '../Utils/Serializer';
-import { rgbToHexNumber } from '../Utils/ColorTransformer';
+import { Tabs, Tab } from '../UI/Tabs';
 
 import fixtureGame from '../fixtures/fixture-game.json';
 const gd = global.gd;
@@ -26,11 +25,11 @@ class MainFrame extends Component {
     this.state = {
       loadingProject: false,
       currentProject: null,
-      externalEventsOpened: '',
       projectManagerOpen: false,
-      sceneOpened: '',
-      externalLayoutOpened: '',
+      editors: [],
     };
+    this.activeEditorTab = null;
+    this.toolbar = null;
   }
 
   loadFullProject = (serializedProject, cb) => {
@@ -52,23 +51,6 @@ class MainFrame extends Component {
             ' milliseconds.'
         );
 
-        if (
-          !this.state.sceneOpened &&
-          this.props.selectedEditor === 'scene-editor'
-        ) {
-          this.setState({
-            sceneOpened: this.props.editedElementName,
-          });
-        }
-        if (
-          !this.state.externalLayoutOpened &&
-          this.props.selectedEditor === 'external-layout-editor'
-        ) {
-          this.setState({
-            externalLayoutOpened: this.props.editedElementName,
-          });
-        }
-
         this.setState(
           {
             currentProject: newProject,
@@ -81,56 +63,12 @@ class MainFrame extends Component {
   };
 
   getSerializedElements = () => {
-    const { currentProject, sceneOpened, externalLayoutOpened } = this.state;
-    if (!currentProject) {
-      console.warn('No project');
-      return;
+    if (!this.activeEditorTab) {
+      console.warn('No active editor');
+      return {};
     }
 
-    const getLayoutSerializedElements = layout => {
-      if (!layout) return {};
-
-      return {
-        windowTitle: layout.getWindowDefaultTitle(),
-        layers: serializeToJSObject(layout, 'serializeLayersTo'),
-        backgroundColor: '' + rgbToHexNumber(
-          layout.getBackgroundColorRed(),
-          layout.getBackgroundColorGreen(),
-          layout.getBackgroundColorBlue()
-        ),
-      };
-    };
-
-    if (
-      this.props.selectedEditor === 'scene-editor' &&
-      currentProject.hasLayoutNamed(sceneOpened)
-    ) {
-      const layout = currentProject.getLayout(sceneOpened);
-
-      return {
-        instances: serializeToJSObject(layout.getInitialInstances()),
-        uiSettings: this.sceneEditor.getUiSettings(),
-        ...getLayoutSerializedElements(layout),
-      };
-    }
-    if (
-      this.props.selectedEditor === 'external-layout-editor' &&
-      currentProject.hasExternalLayoutNamed(externalLayoutOpened)
-    ) {
-      const externalLayout = currentProject.getExternalLayout(
-        externalLayoutOpened
-      );
-      const layoutName = externalLayout.getAssociatedLayout();
-      const layout = currentProject.hasLayoutNamed(layoutName)
-        ? currentProject.getLayout(layoutName)
-        : null;
-
-      return {
-        instances: serializeToJSObject(externalLayout.getInitialInstances()),
-        uiSettings: this.externalLayoutEditor.getUiSettings(),
-        ...getLayoutSerializedElements(layout),
-      };
-    }
+    return this.activeEditorTab.getSerializedElements();
   };
 
   requestUpdate = () => {
@@ -172,12 +110,87 @@ class MainFrame extends Component {
     this.toolbar.setEditorToolbar(editorToolbar);
   };
 
+  openExternalEvents = name => {
+    const editorTab = {
+      //TODO: Pass only the project and the external events name as props
+      getElement: () => (
+        <EventsSheetContainer
+          key={'external events ' + name}
+          project={this.state.currentProject}
+          events={this.state.currentProject.getExternalEvents(name).getEvents()}
+          layout={this.state.currentProject.getLayoutAt(0)}
+          setToolbar={this.setEditorToolbar}
+          ref={editorRef => editorTab.editorRef = editorRef}
+        />
+      ),
+      editorRef: null,
+    };
+
+    this.setState({
+      editors: [...this.state.editors, editorTab],
+    });
+  };
+
+  openLayout = name => {
+    const editorTab = {
+      getElement: () => (
+        <SceneEditor
+          key={'layout ' + name}
+          project={this.state.currentProject}
+          layoutName={name}
+          setToolbar={this.setEditorToolbar}
+          onPreview={this.props.onPreview}
+          showPreviewButton
+          onEditObject={this.props.onEditObject}
+          ref={editorRef => editorTab.editorRef = editorRef}
+        />
+      ),
+      editorRef: null,
+    };
+
+    this.setState({
+      editors: [...this.state.editors, editorTab],
+    });
+  };
+
+  openExternalLayout = name => {
+    const editorTab = {
+      getElement: () => (
+        <ExternalLayoutEditor
+          key={'external layout ' + name}
+          ref={editorRef => editorTab.editorRef = editorRef}
+          project={this.state.currentProject}
+          externalLayoutName={name}
+          setToolbar={this.setEditorToolbar}
+          onPreview={this.props.onPreview}
+          showPreviewButton
+          onEditObject={this.props.onEditObject}
+        />
+      ),
+      editorRef: null,
+    };
+
+    this.setState({
+      editors: [...this.state.editors, editorTab],
+    });
+  };
+
+  _onChangeEditorTab = value => {
+    this.setState({
+      currentTab: value,
+    });
+  };
+
+  _onEditorTabActive = editorTab => {
+    if (!editorTab.editorRef) return;
+
+    editorTab.editorRef.updateToolbar();
+    this.activeEditorTab = editorTab;
+  };
+
   render() {
     const {
       currentProject,
-      externalEventsOpened,
-      sceneOpened,
-      externalLayoutOpened,
     } = this.state;
 
     return (
@@ -196,18 +209,9 @@ class MainFrame extends Component {
             {currentProject &&
               <ProjectManager
                 project={currentProject}
-                onOpenExternalEvents={name =>
-                  this.setState({
-                    externalEventsOpened: name,
-                  })}
-                onOpenLayout={name =>
-                  this.setState({
-                    sceneOpened: name,
-                  })}
-                onOpenExternalLayout={name =>
-                  this.setState({
-                    externalLayoutOpened: name,
-                  })}
+                onOpenExternalEvents={this.openExternalEvents}
+                onOpenLayout={this.openLayout}
+                onOpenExternalLayout={this.openExternalLayout}
               />}
           </Drawer>
           <Toolbar
@@ -216,41 +220,24 @@ class MainFrame extends Component {
             loadBuiltinGame={this.loadBuiltinGame}
             requestUpdate={this.requestUpdate}
           />
-          {currentProject &&
-            sceneOpened &&
-            <SceneEditor
-              key={sceneOpened}
-              ref={sceneEditor => this.sceneEditor = sceneEditor}
-              project={currentProject}
-              layoutName={sceneOpened}
-              setToolbar={this.setEditorToolbar}
-              onPreview={this.props.onPreview}
-              showPreviewButton
-              onEditObject={this.props.onEditObject}
-            />}
-          {currentProject &&
-            externalLayoutOpened &&
-            <ExternalLayoutEditor
-              key={externalLayoutOpened}
-              ref={externalLayoutEditor =>
-                this.externalLayoutEditor = externalLayoutEditor}
-              project={currentProject}
-              externalLayoutName={externalLayoutOpened}
-              setToolbar={this.setEditorToolbar}
-              onPreview={this.props.onPreview}
-              showPreviewButton
-              onEditObject={this.props.onEditObject}
-            />}
-          {currentProject &&
-            externalEventsOpened &&
-            currentProject.hasExternalEventsNamed(externalEventsOpened) &&
-            <EventsSheetContainer
-              project={currentProject}
-              events={currentProject
-                .getExternalEvents(externalEventsOpened)
-                .getEvents()}
-              layout={currentProject.getLayoutAt(0)}
-            />}
+          <Tabs
+            value={this.state.currentTab}
+            onChange={this._onChangeEditorTab}
+          >
+            {//TODO: change id which is not optimal.
+            this.state.editors.map((editorTab, id) => (
+              <Tab
+                label="TODO"
+                value={id}
+                key={id}
+                onActive={() => this._onEditorTabActive(editorTab)}
+              >
+                <div style={{ display: 'flex', flex: 1, height: '100%' }}>
+                  {editorTab.getElement()}
+                </div>
+              </Tab>
+            ))}
+          </Tabs>
           <LoaderModal show={this.state.loadingProject || this.props.loading} />
         </div>
       </MuiThemeProvider>

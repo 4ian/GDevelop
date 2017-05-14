@@ -12,6 +12,7 @@
     "eslint-plugin-import": "1.12.0",
     "eslint-plugin-jsx-a11y": "2.2.2",
     "eslint-plugin-react": "6.3.0",
+    "flow-bin": "^0.46.0",
     "prettier": "^0.22.0",
     "react-scripts": "0.6.1",
     "shelljs": "^0.7.7"
@@ -39,6 +40,7 @@
     "build": "react-scripts build",
     "format": "prettier --single-quote --trailing-comma es5 --write \"src/**/*.js\"",
     "test": "react-scripts test --env=jsdom",
+    "flow": "flow",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

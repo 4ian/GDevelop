@@ -130,6 +130,7 @@ export default class InstancePropertiesEditor extends Component {
         <TextField
           value={this._getFieldValue(this.props.instances, field)}
           key={field.name}
+          id={field.name}
           floatingLabelText={field.name}
           floatingLabelFixed={true}
           onChange={(event, newValue) => {

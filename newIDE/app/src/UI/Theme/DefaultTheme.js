@@ -6,6 +6,8 @@ const gdevelopDarkBlue = '#3c4698';
 
 const systemSelectionColor = '#4c92ff'; //OS X selection
 
+const backgroundColor = '#f7f7f7';
+
 export default getMuiTheme({
   fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', //OS X font
   palette: {
@@ -18,7 +20,7 @@ export default getMuiTheme({
     backgroundColor: 'transparent',
   },
   toolbar: {
-    backgroundColor: '#f7f7f7',
+    backgroundColor: backgroundColor,
     separatorColor: '#cecece',
     menuHoverColor: systemSelectionColor,
     hoverColor: systemSelectionColor,
@@ -35,5 +37,13 @@ export default getMuiTheme({
   button: {
     height: 32,
     iconButtonSize: 24,
+  },
+  tabs: {
+    backgroundColor: backgroundColor,
+    textColor: '#878787',
+    selectedBackgroundColor: gdevelopLightBlue,
+    selectedTextColor: '#ffffff',
+    width: 200,
+    height: 32,
   },
 });

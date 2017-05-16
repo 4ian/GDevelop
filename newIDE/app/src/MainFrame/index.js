@@ -27,8 +27,8 @@ class MainFrame extends Component {
       currentProject: null,
       projectManagerOpen: false,
       editors: [],
+      currentTab: 0,
     };
-    this.activeEditorTab = null;
     this.toolbar = null;
   }
 
@@ -63,12 +63,13 @@ class MainFrame extends Component {
   };
 
   getSerializedElements = () => {
-    if (!this.activeEditorTab) {
-      console.warn('No active editor');
+    const editorTab = this.state.editors[this.state.currentTab];
+    if (!editorTab || !editorTab.editorRef) {
+      console.warn('No active editor or reference to the editor');
       return {};
     }
 
-    return this.activeEditorTab.getSerializedElements();
+    return editorTab.editorRef.getSerializedElements();
   };
 
   requestUpdate = () => {
@@ -124,6 +125,7 @@ class MainFrame extends Component {
         />
       ),
       editorRef: null,
+      name,
     };
 
     this.setState({
@@ -146,6 +148,7 @@ class MainFrame extends Component {
         />
       ),
       editorRef: null,
+      name,
     };
 
     this.setState({
@@ -168,6 +171,7 @@ class MainFrame extends Component {
         />
       ),
       editorRef: null,
+      name,
     };
 
     this.setState({
@@ -183,9 +187,19 @@ class MainFrame extends Component {
 
   _onEditorTabActive = editorTab => {
     if (!editorTab.editorRef) return;
-
     editorTab.editorRef.updateToolbar();
-    this.activeEditorTab = editorTab;
+  };
+
+  _onCloseEditorTab = editorTab => {
+    //TODO: Tab handling could be moved to a helper/hoc component?
+    let newCurrentTab = this.state.currentTab;
+    if (this.state.editors.indexOf(editorTab) < this.state.currentTab)
+      newCurrentTab--;
+
+    this.setState({
+      editors: this.state.editors.filter(e => e !== editorTab),
+      currentTab: newCurrentTab,
+    });
   };
 
   render() {
@@ -223,14 +237,15 @@ class MainFrame extends Component {
           <Tabs
             value={this.state.currentTab}
             onChange={this._onChangeEditorTab}
+            hideLabels={!!this.props.singleEditor}
           >
-            {//TODO: change id which is not optimal.
-            this.state.editors.map((editorTab, id) => (
+            {this.state.editors.map((editorTab, id) => (
               <Tab
-                label="TODO"
+                label={editorTab.name}
                 value={id}
                 key={id}
                 onActive={() => this._onEditorTabActive(editorTab)}
+                onClose={() => this._onCloseEditorTab(editorTab)}
               >
                 <div style={{ display: 'flex', flex: 1, height: '100%' }}>
                   {editorTab.getElement()}

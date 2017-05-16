@@ -62,10 +62,6 @@ export default class InstancesFullEditor extends Component {
     this.zOrderFinder = new gd.HighestZOrderFinder();
   }
 
-  componentWillUnmount() {
-    this.keyboardShortcuts.unmount();
-  }
-
   getUiSettings() {
     return this.state.uiSettings;
   }

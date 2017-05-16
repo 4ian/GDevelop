@@ -9,6 +9,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  max-width: 100%;
 
   /* Smoother startup */
   animation: fadein 0.5s;

@@ -9,7 +9,7 @@ export default class SceneEditor extends BaseEditor {
   }
 
   getSerializedElements() {
-    const { layout } = this._getLayoutAndInstances();
+    const { layout } = this._getLayout();
 
     return {
       ...BaseEditor.getLayoutSerializedElements(layout),

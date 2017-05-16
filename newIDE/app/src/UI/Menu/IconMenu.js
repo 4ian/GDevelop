@@ -47,9 +47,11 @@ export default class GDIconMenu extends Component {
   };
 
   render() {
+    const {menuTemplate, ...iconMenuProps} = this.props; //eslint-disable-line
+
     return (
       <IconMenu
-        {...this.props}
+        {...iconMenuProps}
         onTouchTap={this._onTouchTap}
         ref={iconMenu => this.iconMenu = iconMenu}
         {...this.menuImplementation.getMenuProps()}

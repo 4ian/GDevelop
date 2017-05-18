@@ -7,6 +7,7 @@ import Drawer from 'material-ui/Drawer';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 
 import Toolbar from './Toolbar';
+import StartPage from './StartPage';
 import EventsSheetContainer from '../EventsSheet/EventsSheetContainer.js';
 import SceneEditor from '../SceneEditor';
 import ExternalLayoutEditor from '../SceneEditor/ExternalLayoutEditor';
@@ -15,6 +16,7 @@ import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
 import defaultTheme from '../UI/Theme/DefaultTheme';
 import { Tabs, Tab } from '../UI/Tabs';
+import FileOpener from '../Utils/FileOpener';
 
 import fixtureGame from '../fixtures/fixture-game.json';
 const gd = global.gd;
@@ -30,6 +32,10 @@ class MainFrame extends Component {
       currentTab: 0,
     };
     this.toolbar = null;
+  }
+
+  componentWillMount() {
+    if (!this.props.singleEditor) this.openStartPage();
   }
 
   loadFullProject = (serializedProject, cb) => {
@@ -130,6 +136,7 @@ class MainFrame extends Component {
 
     this.setState({
       editors: [...this.state.editors, editorTab],
+      projectManagerOpen: false,
     });
   };
 
@@ -153,6 +160,7 @@ class MainFrame extends Component {
 
     this.setState({
       editors: [...this.state.editors, editorTab],
+      projectManagerOpen: false,
     });
   };
 
@@ -176,6 +184,61 @@ class MainFrame extends Component {
 
     this.setState({
       editors: [...this.state.editors, editorTab],
+      projectManagerOpen: false,
+    });
+  };
+
+  openStartPage = () => {
+    const editorTab = {
+      getElement: () => (
+        <StartPage
+          key={'start page'}
+          ref={editorRef => editorTab.editorRef = editorRef}
+          setToolbar={this.setEditorToolbar}
+          onOpen={this._onOpenFromFile}
+        />
+      ),
+      editorRef: null,
+      name: 'Start page',
+    };
+
+    this.setState({
+      editors: [...this.state.editors, editorTab],
+    });
+  };
+
+  _onOpenFromFile = () => {
+    FileOpener.chooseProjectFile((err, filepath) => {
+      if (!filepath || err) return;
+
+      FileOpener.readProjectJSONFile(filepath, (err, projectObject) => {
+        if (err) {
+          //TODO: Error displayed to user with a generic component
+          console.error('Unable to read project', err);
+          return;
+        }
+
+        this.setState(
+          {
+            loadingProject: true,
+          },
+          () =>
+            setTimeout(() => {
+              const serializedObject = gd.Serializer.fromJSObject(
+                projectObject
+              );
+
+              this.loadFullProject(serializedObject, () => {
+                serializedObject.delete();
+                this.setState({
+                  loadingProject: false,
+                  projectManagerOpen: true,
+                });
+              });
+            }),
+          10 // Let some time for the loader to be shown
+        );
+      });
     });
   };
 

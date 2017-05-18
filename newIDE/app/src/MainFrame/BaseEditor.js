@@ -8,6 +8,7 @@ export default class BaseEditor extends Component {
   }
 
   getLabel() {
+    //TODO
     return 'Unknown editor';
   }
 

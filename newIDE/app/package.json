@@ -15,7 +15,8 @@
     "flow-bin": "^0.46.0",
     "prettier": "^0.22.0",
     "react-scripts": "0.6.1",
-    "shelljs": "^0.7.7"
+    "shelljs": "^0.7.7",
+    "@storybook/react": "^2.21.0"
   },
   "dependencies": {
     "flat": "2.0.1",
@@ -41,7 +42,9 @@
     "format": "prettier --single-quote --trailing-comma es5 --write \"src/**/*.js\"",
     "test": "react-scripts test --env=jsdom",
     "flow": "flow",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public"
   },
   "eslintConfig": {
     "extends": "react-app"

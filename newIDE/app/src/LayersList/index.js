@@ -72,6 +72,7 @@ export default class LayersList extends Component {
             <TableRowColumn>
               <TextField
                 defaultValue={layerName}
+                id={layerName}
                 errorText={
                   this.state.nameErrors[layerName]
                     ? 'This name is already taken'

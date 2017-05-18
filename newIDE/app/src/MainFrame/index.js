@@ -16,6 +16,16 @@ import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
 import defaultTheme from '../UI/Theme/DefaultTheme';
 import { Tabs, Tab } from '../UI/Tabs';
+import {
+  getEditorTabsInitialState,
+  openEditorTab,
+  closeAll,
+  closeEditorTab,
+  changeCurrentTab,
+  getEditors,
+  getCurrentTabIndex,
+  getCurrentTab,
+} from './EditorTabsHandler';
 import FileOpener from '../Utils/FileOpener';
 
 import fixtureGame from '../fixtures/fixture-game.json';
@@ -28,8 +38,7 @@ class MainFrame extends Component {
       loadingProject: false,
       currentProject: null,
       projectManagerOpen: false,
-      editors: [],
-      currentTab: 0,
+      editorTabs: getEditorTabsInitialState(),
     };
     this.toolbar = null;
   }
@@ -69,7 +78,7 @@ class MainFrame extends Component {
   };
 
   getSerializedElements = () => {
-    const editorTab = this.state.editors[this.state.currentTab];
+    const editorTab = getCurrentTab(this.state.editorTabs);
     if (!editorTab || !editorTab.editorRef) {
       console.warn('No active editor or reference to the editor');
       return {};
@@ -118,31 +127,22 @@ class MainFrame extends Component {
   };
 
   openExternalEvents = name => {
-    const editorTab = {
-      //TODO: Pass only the project and the external events name as props
-      getElement: () => (
+    this.setState({
+      editorTabs: openEditorTab(this.state.editorTabs, name, () => (
         <EventsSheetContainer
           key={'external events ' + name}
           project={this.state.currentProject}
           events={this.state.currentProject.getExternalEvents(name).getEvents()}
           layout={this.state.currentProject.getLayoutAt(0)}
           setToolbar={this.setEditorToolbar}
-          ref={editorRef => editorTab.editorRef = editorRef}
         />
-      ),
-      editorRef: null,
-      name,
-    };
-
-    this.setState({
-      editors: [...this.state.editors, editorTab],
-      projectManagerOpen: false,
+      )),
     });
   };
 
   openLayout = name => {
-    const editorTab = {
-      getElement: () => (
+    this.setState({
+      editorTabs: openEditorTab(this.state.editorTabs, name, () => (
         <SceneEditor
           key={'layout ' + name}
           project={this.state.currentProject}
@@ -151,25 +151,16 @@ class MainFrame extends Component {
           onPreview={this.props.onPreview}
           showPreviewButton
           onEditObject={this.props.onEditObject}
-          ref={editorRef => editorTab.editorRef = editorRef}
         />
-      ),
-      editorRef: null,
-      name,
-    };
-
-    this.setState({
-      editors: [...this.state.editors, editorTab],
-      projectManagerOpen: false,
+      )),
     });
   };
 
   openExternalLayout = name => {
-    const editorTab = {
-      getElement: () => (
+    this.setState({
+      editorTabs: openEditorTab(this.state.editorTabs, name, () => (
         <ExternalLayoutEditor
           key={'external layout ' + name}
-          ref={editorRef => editorTab.editorRef = editorRef}
           project={this.state.currentProject}
           externalLayoutName={name}
           setToolbar={this.setEditorToolbar}
@@ -177,33 +168,19 @@ class MainFrame extends Component {
           showPreviewButton
           onEditObject={this.props.onEditObject}
         />
-      ),
-      editorRef: null,
-      name,
-    };
-
-    this.setState({
-      editors: [...this.state.editors, editorTab],
-      projectManagerOpen: false,
+      )),
     });
   };
 
   openStartPage = () => {
-    const editorTab = {
-      getElement: () => (
+    this.setState({
+      editorTabs: openEditorTab(this.state.editorTabs, 'Start Page', () => (
         <StartPage
           key={'start page'}
-          ref={editorRef => editorTab.editorRef = editorRef}
           setToolbar={this.setEditorToolbar}
           onOpen={this._onOpenFromFile}
         />
-      ),
-      editorRef: null,
-      name: 'Start page',
-    };
-
-    this.setState({
-      editors: [...this.state.editors, editorTab],
+      )),
     });
   };
 
@@ -244,7 +221,7 @@ class MainFrame extends Component {
 
   _onChangeEditorTab = value => {
     this.setState({
-      currentTab: value,
+      editorTabs: changeCurrentTab(this.state.editorTabs, value)
     });
   };
 
@@ -254,14 +231,8 @@ class MainFrame extends Component {
   };
 
   _onCloseEditorTab = editorTab => {
-    //TODO: Tab handling could be moved to a helper/hoc component?
-    let newCurrentTab = this.state.currentTab;
-    if (this.state.editors.indexOf(editorTab) < this.state.currentTab)
-      newCurrentTab--;
-
     this.setState({
-      editors: this.state.editors.filter(e => e !== editorTab),
-      currentTab: newCurrentTab,
+      editorTabs: closeEditorTab(this.state.editorTabs, editorTab),
     });
   };
 
@@ -298,11 +269,11 @@ class MainFrame extends Component {
             requestUpdate={this.requestUpdate}
           />
           <Tabs
-            value={this.state.currentTab}
+            value={getCurrentTabIndex(this.state.editorTabs)}
             onChange={this._onChangeEditorTab}
             hideLabels={!!this.props.singleEditor}
           >
-            {this.state.editors.map((editorTab, id) => (
+            {getEditors(this.state.editorTabs).map((editorTab, id) => (
               <Tab
                 label={editorTab.name}
                 value={id}
@@ -311,7 +282,7 @@ class MainFrame extends Component {
                 onClose={() => this._onCloseEditorTab(editorTab)}
               >
                 <div style={{ display: 'flex', flex: 1, height: '100%' }}>
-                  {editorTab.getElement()}
+                  {editorTab.render()}
                 </div>
               </Tab>
             ))}

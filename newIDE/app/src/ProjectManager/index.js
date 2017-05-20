@@ -44,7 +44,6 @@ export default class ProjectManager extends React.Component {
             return (
               <ListItem
                 key={i}
-                disabled
                 primaryText={name}
                 leftIcon={<ContentInbox />}
                 onTouchTap={() => this.props.onOpenExternalEvents(name)}

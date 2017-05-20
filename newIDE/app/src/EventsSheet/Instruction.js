@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import instructionsRenderingService from './InstructionsRenderingService.js';
 const instrLongPressTime = 350;
 
-const Instruction = React.createClass({
-  displayName: 'Instruction',
-  propTypes: {
-    instruction: React.PropTypes.object.isRequired,
-    isCondition: React.PropTypes.bool.isRequired,
-    instrsList: React.PropTypes.object.isRequired,
-    index: React.PropTypes.number.isRequired,
-    callbacks: React.PropTypes.object.isRequired,
-  },
-  handleTouch: function(event) {
+export default class Instruction extends Component {
+  static propTypes = {
+    instruction: PropTypes.object.isRequired,
+    isCondition: PropTypes.bool.isRequired,
+    instrsList: PropTypes.object.isRequired,
+    index: PropTypes.number.isRequired,
+    callbacks: PropTypes.object.isRequired,
+  }
+
+  handleTouch = (event) => {
     const { callbacks } = this.props;
     event.stopPropagation();
 
@@ -24,8 +25,9 @@ const Instruction = React.createClass({
         instrLongPressTime
       );
     }
-  },
-  handleTouchEnd: function(event) {
+  }
+
+  handleTouchEnd = (event) => {
     const { callbacks } = this.props;
     event.stopPropagation();
 
@@ -34,8 +36,9 @@ const Instruction = React.createClass({
       callbacks.onInstructionClicked(this.props);
     }
     this.touchStartDate = undefined;
-  },
-  render: function() {
+  }
+
+  render() {
     var instruction = this.props.instruction;
     var rendering = instructionsRenderingService.getInstructionHtml(
       instruction,
@@ -84,7 +87,5 @@ const Instruction = React.createClass({
       },
       children
     );
-  },
-});
-
-export default Instruction;
+  }
+}

@@ -1,8 +1,8 @@
 import gesture from 'pixi-simple-gesture';
 import ObjectsRenderingService
   from '../../ObjectsRendering/ObjectsRenderingService';
-const gd = global.gd;
 import PIXI from 'pixi.js';
+const gd = global.gd;
 
 export default class LayerRenderer {
   constructor(

@@ -1,6 +1,6 @@
 import RenderedInstance from './RenderedInstance';
-const gd = global.gd;
 import PIXI from 'pixi.js';
+const gd = global.gd;
 
 /**
  * Renderer for a Text object.

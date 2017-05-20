@@ -81,7 +81,7 @@ export default class LayersList extends Component {
                 disabled={!layerName}
                 onBlur={event => {
                   const newName = event.target.value;
-                  if (name === newName) return;
+                  if (layerName === newName) return;
 
                   let success = true;
                   if (layersContainer.hasLayerNamed(newName)) {

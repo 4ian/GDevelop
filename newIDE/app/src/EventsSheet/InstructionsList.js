@@ -1,26 +1,29 @@
-import React from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Instruction from './Instruction.js';
 
-const InstructionsList = React.createClass({
-  displayName: 'InstructionsList',
-  propTypes: {
-    instrsList: React.PropTypes.object.isRequired,
-    areConditions: React.PropTypes.bool.isRequired,
-    callbacks: React.PropTypes.object.isRequired,
-  },
-  handleAddInstruction: function() {
+export default class InstructionsList extends Component {
+  static propTypes = {
+    instrsList: PropTypes.object.isRequired,
+    areConditions: PropTypes.bool.isRequired,
+    callbacks: PropTypes.object.isRequired,
+  }
+
+  handleAddInstruction = () => {
     const { callbacks } = this.props;
     callbacks.onAddNewInstruction(this.props);
-  },
-  shouldComponentUpdate: function(nextProps) {
+  }
+
+  shouldComponentUpdate(nextProps) {
     if (this.props.instrsList.ptr !== nextProps.instrsList.ptr) return true;
 
     if (this.lastChangesHash !== nextProps.instrsList.lastChangesHash)
       return true;
 
     return false;
-  },
-  render: function() {
+  }
+
+  render() {
     this.lastChangesHash = this.props.instrsList.lastChangesHash;
 
     var children = [];
@@ -69,7 +72,5 @@ const InstructionsList = React.createClass({
       },
       children
     );
-  },
-});
-
-export default InstructionsList;
+  }
+}

@@ -38,7 +38,7 @@ export default class StartPage extends BaseEditor {
         }}
       >
         <Paper zDepth={1} style={styles.logoPaper}>
-          <img src="res/GD-logo-simple.png" role="presentation"/>
+          <img src="res/GD-logo-simple.png" alt=""/>
           <p>GDevelop is an easy-to-use game creator with no programming language to learn.</p>
         </Paper>
         <Paper zDepth={1}>

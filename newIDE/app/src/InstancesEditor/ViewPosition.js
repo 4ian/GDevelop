@@ -1,12 +1,16 @@
 import PIXI from 'pixi.js';
 
 export default class ViewPosition {
-  constructor({ width, height }) {
+  constructor({ width, height, options }) {
     this.viewX = width / 2;
     this.viewY = height / 2;
-    this._zoomFactor = 1;
+    this.options = options;
     this._pixiContainer = new PIXI.Container();
     this.resize(width, height);
+  }
+
+  setOptions(options) {
+    this.options = options;
   }
 
   resize(width, height) {
@@ -81,28 +85,16 @@ export default class ViewPosition {
     return this.viewY;
   }
 
-  zoomBy(value) {
-    this.setZoomFactor(this.getZoomFactor() + value);
-  }
-
-  getZoomFactor() {
-    return this._zoomFactor;
-  }
-
-  setZoomFactor(zoomFactor) {
-    this._zoomFactor = Math.max(Math.min(zoomFactor, 10), 0.01);
-  }
-
   getPixiContainer() {
     return this._pixiContainer;
   }
 
   render() {
-    this._pixiContainer.position.x = (-this.viewX) * this._zoomFactor;
-    this._pixiContainer.position.y = (-this.viewY) * this._zoomFactor;
+    this._pixiContainer.position.x = (-this.viewX) * this.options.zoomFactor;
+    this._pixiContainer.position.y = (-this.viewY) * this.options.zoomFactor;
     this._pixiContainer.position.x += this._width / 2;
     this._pixiContainer.position.y += this._height / 2;
-    this._pixiContainer.scale.x = this._zoomFactor;
-    this._pixiContainer.scale.y = this._zoomFactor;
+    this._pixiContainer.scale.x = this.options.zoomFactor;
+    this._pixiContainer.scale.y = this.options.zoomFactor;
   }
 }

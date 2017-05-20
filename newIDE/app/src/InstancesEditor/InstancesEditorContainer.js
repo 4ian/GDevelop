@@ -43,7 +43,7 @@ export default class InstancesEditorContainer extends Component {
     });
     this.pixiRenderer.view.onmousewheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
-        this.viewPosition.zoomBy(event.wheelDelta / 5000);
+        this.zoomBy(event.wheelDelta / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         this.viewPosition.scrollBy(-event.wheelDelta / 20, 0);
       } else {
@@ -72,6 +72,7 @@ export default class InstancesEditorContainer extends Component {
     this.viewPosition = new ViewPosition({
       width: this.props.width,
       height: this.props.height,
+      options: this.props.options,
     });
     this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
 
@@ -217,6 +218,7 @@ export default class InstancesEditorContainer extends Component {
       this.instancesMover.setOptions(nextProps.options);
       this.instancesResizer.setOptions(nextProps.options);
       this.windowMask.setOptions(nextProps.options);
+      this.viewPosition.setOptions(nextProps.options);
     }
 
     if (
@@ -226,6 +228,20 @@ export default class InstancesEditorContainer extends Component {
     ) {
       this._mountEditorComponents(nextProps);
     }
+  }
+
+  zoomBy(value) {
+    this.setZoomFactor(this.getZoomFactor() + value);
+  }
+
+  getZoomFactor() {
+    return this.props.options.zoomFactor;
+  }
+
+  setZoomFactor(zoomFactor) {
+    this.props.onChangeOptions({
+      zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
+    })
   }
 
   _onBackgroundClicked = () => {
@@ -281,8 +297,8 @@ export default class InstancesEditorContainer extends Component {
   };
 
   _onMoveInstance = (instance, deltaX, deltaY) => {
-    const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
-    const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
+    const sceneDeltaX = deltaX / this.getZoomFactor();
+    const sceneDeltaY = deltaY / this.getZoomFactor();
 
     if (!this.props.instancesSelection.isInstanceSelected(instance)) {
       this._onInstanceClicked(instance);
@@ -305,8 +321,8 @@ export default class InstancesEditorContainer extends Component {
   };
 
   _onResize = (deltaX, deltaY) => {
-    const sceneDeltaX = deltaX / this.viewPosition.getZoomFactor();
-    const sceneDeltaY = deltaY / this.viewPosition.getZoomFactor();
+    const sceneDeltaX = deltaX / this.getZoomFactor();
+    const sceneDeltaY = deltaY / this.getZoomFactor();
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.instancesResizer.resizeBy(
@@ -353,10 +369,6 @@ export default class InstancesEditorContainer extends Component {
 
     this.viewPosition.scrollTo(instances[instances.length - 1]);
   }
-
-  setZoomFactor = zoomFactor => {
-    this.viewPosition.setZoomFactor(zoomFactor);
-  };
 
   getLastContextMenuPosition = () => {
     return this.viewPosition.toSceneCoordinates(

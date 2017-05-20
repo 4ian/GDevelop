@@ -20,7 +20,7 @@ export default class FileOpener {
         ],
       },
       paths => {
-        if (!paths.length) return cb(null, null);
+        if (!paths || !paths.length) return cb(null, null);
 
         return cb(null, paths[0]);
       }

@@ -22,9 +22,10 @@ export const openEditorTab = (state, name, editorCreator: () => BaseEditor) => {
   }
 
   const editorTab = {
-    render: () => React.cloneElement(editorCreator(), {
-      ref: editorRef => editorTab.editorRef = editorRef,
-    }),
+    render: () =>
+      React.cloneElement(editorCreator(), {
+        ref: editorRef => editorTab.editorRef = editorRef,
+      }),
     editorRef: null,
     name,
   };
@@ -40,28 +41,45 @@ export const changeCurrentTab = (state, newTabId) => {
   return {
     ...state,
     currentTab: Math.max(0, Math.min(newTabId, state.editors.length - 1)),
-  }
-}
+  };
+};
 
 export const closeAll = () => {
   return getEditorTabsInitialState();
 };
 
-export const closeEditorTab = (state, editorTab) => {
-  return changeCurrentTab({
-    ...state,
-    editors: state.editors.filter(e => e !== editorTab),
-  }, state.currentTab);
+export const closeProjectTabs = (state, project) => {
+  return changeCurrentTab(
+    {
+      ...state,
+      editors: state.editors.filter(editorTab => {
+        return !editorTab.editorRef ||
+          !editorTab.editorRef.getProject() ||
+          editorTab.editorRef.getProject() !== project;
+      }),
+    },
+    state.currentTab
+  );
 };
 
-export const getEditors = (state) => {
+export const closeEditorTab = (state, editorTab) => {
+  return changeCurrentTab(
+    {
+      ...state,
+      editors: state.editors.filter(e => e !== editorTab),
+    },
+    state.currentTab
+  );
+};
+
+export const getEditors = state => {
   return state.editors;
-}
+};
 
-export const getCurrentTabIndex = (state) => {
+export const getCurrentTabIndex = state => {
   return state.currentTab;
-}
+};
 
-export const getCurrentTab = (state) => {
+export const getCurrentTab = state => {
   return state.editors[state.currentTab];
-}
+};

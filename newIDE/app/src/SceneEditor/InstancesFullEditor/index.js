@@ -357,6 +357,7 @@ export default class InstancesFullEditor extends Component {
           initialInstances={initialInstances}
           onAddInstance={this._onAddInstance}
           options={this.state.uiSettings}
+          onChangeOptions={this.setUiSettings}
           instancesSelection={this.instancesSelection}
           onDeleteSelection={this.deleteSelection}
           onInstancesSelected={this._onInstancesSelected}

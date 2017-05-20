@@ -19,12 +19,12 @@ import { Tabs, Tab } from '../UI/Tabs';
 import {
   getEditorTabsInitialState,
   openEditorTab,
-  closeAll,
   closeEditorTab,
   changeCurrentTab,
   getEditors,
   getCurrentTabIndex,
   getCurrentTab,
+  closeProjectTabs,
 } from './EditorTabsHandler';
 import FileOpener from '../Utils/FileOpener';
 
@@ -198,6 +198,7 @@ class MainFrame extends Component {
         this.setState(
           {
             loadingProject: true,
+            editorTabs: closeProjectTabs(this.state.editorTabs, this.state.currentProject)
           },
           () =>
             setTimeout(() => {

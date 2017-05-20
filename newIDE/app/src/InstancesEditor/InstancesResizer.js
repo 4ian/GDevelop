@@ -12,13 +12,13 @@ export default class InstancesResizer {
   }
 
   _roundWidth(width) {
-    if (!this.options.snap) return width;
+    if (!this.options.snap || !this.options.grid) return width;
 
     return Math.round(width / this.options.gridWidth) * this.options.gridWidth;
   }
 
   _roundHeight(height) {
-    if (!this.options.snap) return height;
+    if (!this.options.snap || !this.options.grid) return height;
 
     return Math.round(height / this.options.gridHeight) *
       this.options.gridHeight;

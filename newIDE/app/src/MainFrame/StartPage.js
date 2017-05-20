@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 import BaseEditor from './BaseEditor'

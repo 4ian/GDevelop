@@ -38,18 +38,30 @@ class ThemableTab extends Component {
   static muiName = 'Tab';
 
   render() {
-    const {muiTheme, selected, onClose, ...tabProps} = this.props;
+    const {muiTheme, selected, onClose, label, ...tabProps} = this.props;
+
+    const truncatedLabel = (
+      <span style={{
+        width: muiTheme.tabs.width - muiTheme.tabs.closeButtonWidth * 1.5,
+        marginRight: muiTheme.tabs.closeButtonWidth,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }}>
+        {label}
+      </span>
+    )
 
     return (
       <span
         style={{
           position: 'relative',
-          width: this.props.muiTheme.tabs.width,
+          width: muiTheme.tabs.width,
           display: 'inline-block',
         }}
       >
         <MaterialUITab
           {...tabProps}
+          label={truncatedLabel}
           selected={selected}
           buttonStyle={{
             height: muiTheme.tabs.height,
@@ -72,8 +84,8 @@ class ThemableTab extends Component {
             top: 0,
             bottom: 0,
             borderRadius: 0,
-            width: '24px',
-            minWidth: '24px',
+            width: muiTheme.tabs.closeButtonWidth,
+            minWidth: muiTheme.tabs.closeButtonWidth,
           }}
           icon={
             <Close

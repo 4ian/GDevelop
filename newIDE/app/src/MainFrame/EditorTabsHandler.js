@@ -9,10 +9,10 @@ export const getEditorTabsInitialState = () => {
   };
 };
 
-export const openEditorTab = (state, name, editorCreator: () => BaseEditor) => {
+export const openEditorTab = (state, name, editorCreator: () => BaseEditor, key) => {
   const existingEditorId = findIndex(
     state.editors,
-    editor => editor.name === name
+    editor => editor.key === key
   );
   if (existingEditorId !== -1) {
     return {
@@ -28,6 +28,7 @@ export const openEditorTab = (state, name, editorCreator: () => BaseEditor) => {
       }),
     editorRef: null,
     name,
+    key,
   };
 
   return {

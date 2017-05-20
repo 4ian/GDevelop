@@ -45,5 +45,6 @@ export default getMuiTheme({
     selectedTextColor: '#ffffff',
     width: 200,
     height: 32,
+    closeButtonWidth: 24,
   },
 });

@@ -130,13 +130,12 @@ class MainFrame extends Component {
     this.setState({
       editorTabs: openEditorTab(this.state.editorTabs, name, () => (
         <EventsSheetContainer
-          key={'external events ' + name}
           project={this.state.currentProject}
           events={this.state.currentProject.getExternalEvents(name).getEvents()}
           layout={this.state.currentProject.getLayoutAt(0)}
           setToolbar={this.setEditorToolbar}
         />
-      )),
+      ), 'external events ' + name),
     });
   };
 
@@ -144,7 +143,6 @@ class MainFrame extends Component {
     this.setState({
       editorTabs: openEditorTab(this.state.editorTabs, name, () => (
         <SceneEditor
-          key={'layout ' + name}
           project={this.state.currentProject}
           layoutName={name}
           setToolbar={this.setEditorToolbar}
@@ -152,7 +150,7 @@ class MainFrame extends Component {
           showPreviewButton
           onEditObject={this.props.onEditObject}
         />
-      )),
+      ), 'layout ' + name),
     });
   };
 
@@ -160,7 +158,6 @@ class MainFrame extends Component {
     this.setState({
       editorTabs: openEditorTab(this.state.editorTabs, name, () => (
         <ExternalLayoutEditor
-          key={'external layout ' + name}
           project={this.state.currentProject}
           externalLayoutName={name}
           setToolbar={this.setEditorToolbar}
@@ -168,7 +165,7 @@ class MainFrame extends Component {
           showPreviewButton
           onEditObject={this.props.onEditObject}
         />
-      )),
+      ), 'external layout ' + name),
     });
   };
 
@@ -176,11 +173,10 @@ class MainFrame extends Component {
     this.setState({
       editorTabs: openEditorTab(this.state.editorTabs, 'Start Page', () => (
         <StartPage
-          key={'start page'}
           setToolbar={this.setEditorToolbar}
           onOpen={this._onOpenFromFile}
         />
-      )),
+      ), 'start page'),
     });
   };
 
@@ -278,7 +274,7 @@ class MainFrame extends Component {
               <Tab
                 label={editorTab.name}
                 value={id}
-                key={id}
+                key={editorTab.key}
                 onActive={() => this._onEditorTabActive(editorTab)}
                 onClose={() => this._onCloseEditorTab(editorTab)}
               >

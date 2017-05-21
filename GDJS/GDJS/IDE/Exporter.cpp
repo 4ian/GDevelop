@@ -48,7 +48,7 @@ Exporter::~Exporter()
 
 bool Exporter::ExportLayoutForPixiPreview(gd::Project & project, gd::Layout & layout, gd::String exportDir)
 {
-    ExporterHelper helper(fs);
+    ExporterHelper helper(fs, gdjsRoot);
     return helper.ExportLayoutForPixiPreview(project, layout, exportDir, "");
 }
 
@@ -58,7 +58,7 @@ bool Exporter::ExportExternalLayoutForPixiPreview(gd::Project & project, gd::Lay
     gd::SerializerElement options;
     options.AddChild("injectExternalLayout").SetValue(externalLayout.GetName());
 
-    ExporterHelper helper(fs);
+    ExporterHelper helper(fs, gdjsRoot);
     return helper.ExportLayoutForPixiPreview(project, layout, exportDir,
         gd::Serializer::ToJSON(options)
     );
@@ -89,7 +89,7 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
 bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDir,
     bool minify, bool exportForCordova)
 {
-    ExporterHelper helper(fs);
+    ExporterHelper helper(fs, gdjsRoot);
 
     auto exportProject = [this, &project, &minify,
         &exportForCordova, &helper](gd::String exportDir)
@@ -147,8 +147,8 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         helper.ExportIncludesAndLibs(includesFiles, exportDir, minify);
 
         gd::String source = exportForCordova ?
-            "./JsPlatform/Runtime/Cordova/www/index.html" :
-            "./JsPlatform/Runtime/index.html";
+            (gdjsRoot + "/Runtime/Cordova/www/index.html") :
+            (gdjsRoot + "/Runtime/index.html");
 
         if (!helper.ExportPixiIndexFile(source, exportDir, includesFiles, ""))
         {
@@ -195,7 +195,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
 
 bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, gd::String exportDir)
 {
-    ExporterHelper helper(fs);
+    ExporterHelper helper(fs, gdjsRoot);
 
     wxProgressDialog * progressDialogPtr = NULL;
     #if !defined(GD_NO_WX_GUI)

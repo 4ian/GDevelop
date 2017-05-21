@@ -24,7 +24,7 @@ namespace gdjs
 class ExporterHelper
 {
 public:
-    ExporterHelper(gd::AbstractFileSystem & fileSystem) : fs(fileSystem) {};
+    ExporterHelper(gd::AbstractFileSystem & fileSystem, gd::String gdjsRoot_) : fs(fileSystem), gdjsRoot(gdjsRoot_) {};
     virtual ~ExporterHelper() {};
 
     /**
@@ -161,6 +161,7 @@ public:
 
     gd::AbstractFileSystem & fs; ///< The abstract file system to be used for exportation.
     gd::String lastError; ///< The last error that occurred.
+    gd::String gdjsRoot; ///< The root directory of GDJS, used to copy runtime files.
 };
 
 }

@@ -23,7 +23,11 @@ namespace gdjs
 class Exporter : public gd::ProjectExporter
 {
 public:
-    Exporter(gd::AbstractFileSystem & fileSystem) : fs(fileSystem) {};
+    Exporter(gd::AbstractFileSystem & fileSystem, gd::String gdjsRoot_ = "./JsPlatform") :
+        fs(fileSystem),
+        gdjsRoot(gdjsRoot_)
+    {
+    };
     virtual ~Exporter();
 
     /**
@@ -82,6 +86,7 @@ public:
 private:
     gd::AbstractFileSystem & fs; ///< The abstract file system to be used for exportation.
     gd::String lastError; ///< The last error that occurred.
+    gd::String gdjsRoot; ///< The root directory of GDJS, used to copy runtime files.
 };
 
 }

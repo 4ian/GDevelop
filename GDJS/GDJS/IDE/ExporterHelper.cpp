@@ -102,7 +102,7 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project & project, gd::Layou
     ExportIncludesAndLibs(includesFiles, exportDir, false);
 
     //Create the index file
-    if (!ExportPixiIndexFile("./JsPlatform/Runtime/index.html", exportDir, includesFiles, additionalSpec))
+    if (!ExportPixiIndexFile(gdjsRoot + "/Runtime/index.html", exportDir, includesFiles, additionalSpec))
         return false;
 
     return true;
@@ -151,7 +151,7 @@ bool ExporterHelper::ExportPixiIndexFile(gd::String source, gd::String exportDir
 
 bool ExporterHelper::ExportCordovaConfigFile(const gd::Project & project, gd::String exportDir)
 {
-    gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cordova/config.xml")
+    gd::String str = fs.ReadFile(gdjsRoot + "/Runtime/Cordova/config.xml")
         .FindAndReplace("GDJS_PROJECTNAME", project.GetName())
         .FindAndReplace("GDJS_PACKAGENAME", project.GetPackageName())
         .FindAndReplace("GDJS_ORIENTATION", "default");
@@ -167,20 +167,20 @@ bool ExporterHelper::ExportCordovaConfigFile(const gd::Project & project, gd::St
 
 bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String exportDir, bool debugMode, const std::vector<gd::String> & includesFiles)
 {
-    if (!fs.CopyFile("./JsPlatform/Runtime/Cocos2d/main.js", exportDir + "/main.js"))
+    if (!fs.CopyFile(gdjsRoot + "/Runtime/Cocos2d/main.js", exportDir + "/main.js"))
     {
         lastError = "Unable to write Cocos2d main.js file.";
         return false;
     }
 
-    if (!fs.CopyFile("./JsPlatform/Runtime/Cocos2d/cocos2d-js-v3.10.js", exportDir + "/cocos2d-js-v3.10.js"))
+    if (!fs.CopyFile(gdjsRoot + "/Runtime/Cocos2d/cocos2d-js-v3.10.js", exportDir + "/cocos2d-js-v3.10.js"))
     {
         lastError = "Unable to write Cocos2d cocos2d-js-v3.10.js file.";
         return false;
     }
 
     {
-        gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cocos2d/index.html");
+        gd::String str = fs.ReadFile(gdjsRoot + "/Runtime/Cocos2d/index.html");
 
         //Generate custom declarations for font resources
         gd::String customCss;
@@ -218,7 +218,7 @@ bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String 
             first = false;
         }
 
-        gd::String str = fs.ReadFile("./JsPlatform/Runtime/Cocos2d/project.json")
+        gd::String str = fs.ReadFile(gdjsRoot + "/Runtime/Cocos2d/project.json")
             .FindAndReplace("// GDJS_INCLUDE_FILES", includeFilesStr)
             .FindAndReplace("/*GDJS_SHOW_FPS*/", debugMode ? "true" : "false");
 
@@ -462,20 +462,20 @@ bool ExporterHelper::ExportIncludesAndLibs(std::vector<gd::String> & includesFil
     {
         for ( std::vector<gd::String>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
         {
-            if ( fs.FileExists("./JsPlatform/Runtime/"+*include) )
+            if ( fs.FileExists(gdjsRoot + "/Runtime/"+*include) )
             {
                 gd::String path = fs.DirNameFrom(exportDir+"/"+*include);
                 if ( !fs.DirExists(path) ) fs.MkDir(path);
 
-                fs.CopyFile("./JsPlatform/Runtime/"+*include, exportDir+"/"+*include);
+                fs.CopyFile(gdjsRoot + "/Runtime/"+*include, exportDir+"/"+*include);
                 //Ok, the filename is relative to the export dir.
             }
-            else if ( fs.FileExists("./JsPlatform/Runtime/Extensions/"+*include) )
+            else if ( fs.FileExists(gdjsRoot + "/Runtime/Extensions/"+*include) )
             {
                 gd::String path = fs.DirNameFrom(exportDir+"/Extensions/"+*include);
                 if ( !fs.DirExists(path) ) fs.MkDir(path);
 
-                fs.CopyFile("./JsPlatform/Runtime/Extensions/"+*include, exportDir+"/Extensions/"+*include);
+                fs.CopyFile(gdjsRoot + "/Runtime/Extensions/"+*include, exportDir+"/Extensions/"+*include);
                 *include = "Extensions/"+*include; //Ensure filename is relative to the export dir.
             }
             else if ( fs.FileExists(*include) )

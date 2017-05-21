@@ -4,6 +4,7 @@ import MainFrame from './MainFrame';
 import ExternalEditor from './ExternalEditor';
 import Window from './Utils/Window';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import registerServiceWorker from './registerServiceWorker';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
 // Needed for onTouchTap
@@ -29,3 +30,4 @@ if (appArguments['server-port']) {
 }
 
 ReactDOM.render(app, document.getElementById('root'));
+registerServiceWorker();

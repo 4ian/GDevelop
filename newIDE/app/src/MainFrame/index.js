@@ -9,6 +9,7 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import Toolbar from './Toolbar';
 import StartPage from './StartPage';
 import ProjectTitlebar from './ProjectTitlebar';
+import ExportDialog from '../Export/ExportDialog';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
 import EventsSheetContainer from '../EventsSheet/EventsSheetContainer.js';
 import SceneEditor from '../SceneEditor';
@@ -290,6 +291,10 @@ class MainFrame extends Component {
     });
   };
 
+  _onExportProject = () => {
+    this.exportDialog.show();
+  }
+
   _onChangeEditorTab = value => {
     this.setState({
       editorTabs: changeCurrentTab(this.state.editorTabs, value),
@@ -334,6 +339,7 @@ class MainFrame extends Component {
                 onOpenExternalLayout={this.openExternalLayout}
                 onSaveProject={this._onSaveToFile}
                 onCloseProject={this._onCloseProject}
+                onExportProject={this._onExportProject}
               />}
           </Drawer>
           <Toolbar
@@ -366,6 +372,10 @@ class MainFrame extends Component {
           <LoaderModal show={this.state.loadingProject || this.props.loading} />
           <ConfirmCloseDialog
             ref={confirmCloseDialog => this.confirmCloseDialog = confirmCloseDialog}
+          />
+          <ExportDialog
+            ref={exportDialog => this.exportDialog = exportDialog}
+            project={this.state.currentProject}
           />
         </div>
       </MuiThemeProvider>

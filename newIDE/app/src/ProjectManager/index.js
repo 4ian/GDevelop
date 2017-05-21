@@ -30,6 +30,12 @@ export default class ProjectManager extends React.Component {
               leftIcon={<ListIcon src="res/ribbon_default/close32.png" />}
               onTouchTap={() => this.props.onCloseProject()}
             />,
+            <ListItem
+              key="export"
+              primaryText="Export"
+              leftIcon={<ListIcon src="res/ribbon_default/close32.png" />}
+              onTouchTap={() => this.props.onExportProject()}
+            />,
           ]}
         />
         <ListItem

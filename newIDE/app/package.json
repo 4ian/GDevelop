@@ -13,6 +13,7 @@
   "dependencies": {
     "@storybook/react": "^3.0.0-alpha.0",
     "flat": "2.0.1",
+    "fs-extra": "^3.0.1",
     "lodash": "^4.16.4",
     "material-ui": "0.17.3",
     "pixi-simple-gesture": "0.2.2",

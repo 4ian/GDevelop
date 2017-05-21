@@ -120,6 +120,9 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.on('mousedown', () => {
         this.onDownInstance(instance);
       });
+      renderedInstance._pixiObject.on('touchstart', () => {
+        this.onDownInstance(instance);
+      });
       renderedInstance._pixiObject.on('mouseout', () => {
         this.onOutInstance(instance);
       });

@@ -51,7 +51,7 @@ export default class SelectionRectangle {
   };
 
   endSelectionRectangle = () => {
-    if (!this.selectionRectangleStart) return;
+    if (!this.selectionRectangleStart) return [];
 
     this._instancesInSelectionRectangle.length = 0;
     if (this.selectionRectangleStart.x > this.selectionRectangleEnd.x) {

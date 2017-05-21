@@ -7,6 +7,15 @@ if (electron) {
 }
 
 export default class Window {
+  static setTitle(title) {
+    if (electron) {
+      const browserWindow = electron.remote.getCurrentWindow();
+      browserWindow.setTitle(title);
+    } else {
+      document.title = title;
+    }
+  }
+
   static setBounds(x, y, width, height) {
     if (!electron) return;
 

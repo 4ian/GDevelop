@@ -8,6 +8,8 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 
 import Toolbar from './Toolbar';
 import StartPage from './StartPage';
+import ProjectTitlebar from './ProjectTitlebar';
+import ConfirmCloseDialog from './ConfirmCloseDialog';
 import EventsSheetContainer from '../EventsSheet/EventsSheetContainer.js';
 import SceneEditor from '../SceneEditor';
 import ExternalLayoutEditor from '../SceneEditor/ExternalLayoutEditor';
@@ -27,6 +29,7 @@ import {
   closeProjectTabs,
 } from './EditorTabsHandler';
 import FileOpener from '../Utils/FileOpener';
+import FileWriter from '../Utils/FileWriter';
 
 import fixtureGame from '../fixtures/fixture-game.json';
 const gd = global.gd;
@@ -128,55 +131,77 @@ class MainFrame extends Component {
 
   openExternalEvents = name => {
     this.setState({
-      editorTabs: openEditorTab(this.state.editorTabs, name, () => (
-        <EventsSheetContainer
-          project={this.state.currentProject}
-          events={this.state.currentProject.getExternalEvents(name).getEvents()}
-          layout={this.state.currentProject.getLayoutAt(0)}
-          setToolbar={this.setEditorToolbar}
-        />
-      ), 'external events ' + name),
+      editorTabs: openEditorTab(
+        this.state.editorTabs,
+        name,
+        () => (
+          <EventsSheetContainer
+            project={this.state.currentProject}
+            events={this.state.currentProject
+              .getExternalEvents(name)
+              .getEvents()}
+            layout={this.state.currentProject.getLayoutAt(0)}
+            setToolbar={this.setEditorToolbar}
+          />
+        ),
+        'external events ' + name
+      ),
     });
   };
 
   openLayout = name => {
     this.setState({
-      editorTabs: openEditorTab(this.state.editorTabs, name, () => (
-        <SceneEditor
-          project={this.state.currentProject}
-          layoutName={name}
-          setToolbar={this.setEditorToolbar}
-          onPreview={this.props.onPreview}
-          showPreviewButton
-          onEditObject={this.props.onEditObject}
-        />
-      ), 'layout ' + name),
+      editorTabs: openEditorTab(
+        this.state.editorTabs,
+        name,
+        () => (
+          <SceneEditor
+            project={this.state.currentProject}
+            layoutName={name}
+            setToolbar={this.setEditorToolbar}
+            onPreview={this.props.onPreview}
+            showPreviewButton
+            onEditObject={this.props.onEditObject}
+          />
+        ),
+        'layout ' + name
+      ),
     });
   };
 
   openExternalLayout = name => {
     this.setState({
-      editorTabs: openEditorTab(this.state.editorTabs, name, () => (
-        <ExternalLayoutEditor
-          project={this.state.currentProject}
-          externalLayoutName={name}
-          setToolbar={this.setEditorToolbar}
-          onPreview={this.props.onPreview}
-          showPreviewButton
-          onEditObject={this.props.onEditObject}
-        />
-      ), 'external layout ' + name),
+      editorTabs: openEditorTab(
+        this.state.editorTabs,
+        name,
+        () => (
+          <ExternalLayoutEditor
+            project={this.state.currentProject}
+            externalLayoutName={name}
+            setToolbar={this.setEditorToolbar}
+            onPreview={this.props.onPreview}
+            showPreviewButton
+            onEditObject={this.props.onEditObject}
+          />
+        ),
+        'external layout ' + name
+      ),
     });
   };
 
   openStartPage = () => {
     this.setState({
-      editorTabs: openEditorTab(this.state.editorTabs, 'Start Page', () => (
-        <StartPage
-          setToolbar={this.setEditorToolbar}
-          onOpen={this._onOpenFromFile}
-        />
-      ), 'start page'),
+      editorTabs: openEditorTab(
+        this.state.editorTabs,
+        'Start Page',
+        () => (
+          <StartPage
+            setToolbar={this.setEditorToolbar}
+            onOpen={this._onOpenFromFile}
+          />
+        ),
+        'start page'
+      ),
     });
   };
 
@@ -194,7 +219,10 @@ class MainFrame extends Component {
         this.setState(
           {
             loadingProject: true,
-            editorTabs: closeProjectTabs(this.state.editorTabs, this.state.currentProject)
+            editorTabs: closeProjectTabs(
+              this.state.editorTabs,
+              this.state.currentProject
+            ),
           },
           () =>
             setTimeout(() => {
@@ -204,6 +232,8 @@ class MainFrame extends Component {
 
               this.loadFullProject(serializedObject, () => {
                 serializedObject.delete();
+
+                this.state.currentProject.setProjectFile(filepath);
                 this.setState({
                   loadingProject: false,
                   projectManagerOpen: true,
@@ -216,9 +246,53 @@ class MainFrame extends Component {
     });
   };
 
+  _onSaveToFile = () => {
+    const filepath = this.state.currentProject.getProjectFile();
+    if (!filepath) {
+      console.warn('Unimplemented Saveas'); // TODO
+      return;
+    }
+
+    FileWriter.writeProjectJSONFile(
+      this.state.currentProject,
+      filepath,
+      err => {
+        if (err) {
+          //TODO: Error displayed to user with a generic component
+          console.error('Unable to write project', err);
+          return;
+        }
+      }
+    );
+  };
+
+  _onCloseProject = () => {
+    if (!this.state.currentProject) return;
+
+    this.confirmCloseDialog.show(closeProject => {
+      if (!closeProject || !this.state.currentProject) return;
+
+      this.setState(
+        {
+          projectManagerOpen: false,
+          editorTabs: closeProjectTabs(
+            this.state.editorTabs,
+            this.state.currentProject
+          ),
+        },
+        () => {
+          this.state.currentProject.delete();
+          this.setState({
+            currentProject: null,
+          })
+        }
+      );
+    });
+  };
+
   _onChangeEditorTab = value => {
     this.setState({
-      editorTabs: changeCurrentTab(this.state.editorTabs, value)
+      editorTabs: changeCurrentTab(this.state.editorTabs, value),
     });
   };
 
@@ -241,6 +315,7 @@ class MainFrame extends Component {
     return (
       <MuiThemeProvider muiTheme={defaultTheme}>
         <div className="main-frame">
+          <ProjectTitlebar project={this.state.currentProject} />
           <Drawer open={this.state.projectManagerOpen}>
             <EditorBar
               title={currentProject ? currentProject.getName() : 'No project'}
@@ -257,11 +332,15 @@ class MainFrame extends Component {
                 onOpenExternalEvents={this.openExternalEvents}
                 onOpenLayout={this.openLayout}
                 onOpenExternalLayout={this.openExternalLayout}
+                onSaveProject={this._onSaveToFile}
+                onCloseProject={this._onCloseProject}
               />}
           </Drawer>
           <Toolbar
             ref={toolbar => this.toolbar = toolbar}
+            hasProject={!!this.state.currentProject}
             toggleProjectManager={this.toggleProjectManager}
+            openProject={this._onOpenFromFile}
             loadBuiltinGame={this.loadBuiltinGame}
             requestUpdate={this.requestUpdate}
           />
@@ -285,6 +364,9 @@ class MainFrame extends Component {
             ))}
           </Tabs>
           <LoaderModal show={this.state.loadingProject || this.props.loading} />
+          <ConfirmCloseDialog
+            ref={confirmCloseDialog => this.confirmCloseDialog = confirmCloseDialog}
+          />
         </div>
       </MuiThemeProvider>
     );

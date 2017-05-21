@@ -37,6 +37,8 @@ export default class InstancesEditorContainer extends Component {
       this.lastContextMenuY = e.offsetY;
       if (this.props.onContextMenu)
         this.props.onContextMenu(e.clientX, e.clientY);
+
+      return false;
     });
     this.pixiRenderer.view.addEventListener('click', e => {
       this._onClick(e.offsetX, e.offsetY);
@@ -64,6 +66,7 @@ export default class InstancesEditorContainer extends Component {
     );
     gesture.panable(this.backgroundArea);
     this.backgroundArea.on('mousedown', this._onBackgroundClicked);
+    this.backgroundArea.on('touchstart', this._onBackgroundClicked);
     this.backgroundArea.on('panmove', event =>
       this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y));
     this.backgroundArea.on('panend', event => this._onEndSelectionRectangle());

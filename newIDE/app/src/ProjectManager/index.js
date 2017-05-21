@@ -1,8 +1,7 @@
 import React from 'react';
 import { List, ListItem } from 'material-ui/List';
-import ContentInbox from 'material-ui/svg-icons/content/inbox';
-import ContentSend from 'material-ui/svg-icons/content/send';
 import { mapFor } from '../Utils/MapFor';
+import ListIcon from './ListIcon';
 
 export default class ProjectManager extends React.Component {
   state = {};
@@ -12,10 +11,34 @@ export default class ProjectManager extends React.Component {
 
     return (
       <List>
-        <ListItem primaryText="Resources" leftIcon={<ContentSend />} />
+        <ListItem
+          primaryText="Options"
+          leftIcon={<ListIcon src="res/ribbon_default/new32.png" />}
+          initiallyOpen={true}
+          primaryTogglesNestedList={true}
+          autoGenerateNestedIndicator={true}
+          nestedItems={[
+            <ListItem
+              key="save"
+              primaryText="Save"
+              leftIcon={<ListIcon src="res/ribbon_default/save32.png" />}
+              onTouchTap={() => this.props.onSaveProject()}
+            />,
+            <ListItem
+              key="close"
+              primaryText="Close"
+              leftIcon={<ListIcon src="res/ribbon_default/close32.png" />}
+              onTouchTap={() => this.props.onCloseProject()}
+            />,
+          ]}
+        />
+        <ListItem
+          primaryText="Resources"
+          leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
+        />
         <ListItem
           primaryText="Scenes"
-          leftIcon={<ContentInbox />}
+          leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}
           initiallyOpen={true}
           primaryTogglesNestedList={true}
           autoGenerateNestedIndicator={true}
@@ -26,7 +49,7 @@ export default class ProjectManager extends React.Component {
               <ListItem
                 key={i}
                 primaryText={name}
-                leftIcon={<ContentInbox />}
+                leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}
                 onTouchTap={() => this.props.onOpenLayout(name)}
               />
             );
@@ -34,8 +57,8 @@ export default class ProjectManager extends React.Component {
         />
         <ListItem
           primaryText="External events"
-          leftIcon={<ContentInbox />}
-          initiallyOpen={true}
+          leftIcon={<ListIcon src="res/ribbon_default/externalevents32.png" />}
+          initiallyOpen={false}
           primaryTogglesNestedList={true}
           autoGenerateNestedIndicator={true}
           nestedItems={mapFor(0, project.getExternalEventsCount(), i => {
@@ -45,7 +68,7 @@ export default class ProjectManager extends React.Component {
               <ListItem
                 key={i}
                 primaryText={name}
-                leftIcon={<ContentInbox />}
+                leftIcon={<ListIcon src="res/ribbon_default/externalevents32.png" />}
                 onTouchTap={() => this.props.onOpenExternalEvents(name)}
               />
             );
@@ -53,8 +76,8 @@ export default class ProjectManager extends React.Component {
         />
         <ListItem
           primaryText="External layouts"
-          leftIcon={<ContentInbox />}
-          initiallyOpen={true}
+          leftIcon={<ListIcon src="res/ribbon_default/externallayout32.png" />}
+          initiallyOpen={false}
           primaryTogglesNestedList={true}
           autoGenerateNestedIndicator={true}
           nestedItems={mapFor(0, project.getExternalLayoutsCount(), i => {
@@ -64,7 +87,7 @@ export default class ProjectManager extends React.Component {
               <ListItem
                 key={i}
                 primaryText={name}
-                leftIcon={<ContentInbox />}
+                leftIcon={<ListIcon src="res/ribbon_default/externallayout32.png" />}
                 onTouchTap={() => this.props.onOpenExternalLayout(name)}
               />
             );

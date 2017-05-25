@@ -1,18 +1,40 @@
+// @flow
+
 import Bridge from './Bridge.js';
 import React, { Component } from 'react';
 import Window from '../Utils/Window.js';
 const gd = global.gd;
 
+type _State = {
+  loading: boolean,
+};
+
+type _Props = {
+  serverPort: number,
+  isIntegrated: boolean,
+  editor: string,
+  editedElementName: string,
+  children: React$Element<any>,
+};
+
 class ExternalEditor extends Component {
-  constructor(props) {
+  state: _State;
+  props: _Props;
+
+  bridge: Bridge;
+  editorOpened: boolean = false;
+  lastShowCommandDate: number = 0;
+  sendingUpdate: boolean = false;
+  editor: any = null;
+  _serializedObject: any = null;
+
+  constructor(props: _Props) {
     super(props);
 
     this.bridge = new Bridge();
-    this.lastShowCommandDate = 0;
     this.state = {
       loading: false,
     };
-    this.editorOpened = false;
 
     if (this.bridge.isSupported()) {
       console.log('Connection to an external editor...');
@@ -105,12 +127,13 @@ class ExternalEditor extends Component {
     console.log('Update send done');
   };
 
-  launchPreview = () => {
+  launchPreview = (): Promise<any> => {
     this.sendUpdate();
     this.bridge.send('requestPreview', undefined);
+    return Promise.resolve();
   };
 
-  editObject = object => {
+  editObject = (object: any) => {
     this.sendUpdate();
     this.bridge.send('editObject', object.getName());
   };
@@ -119,12 +142,12 @@ class ExternalEditor extends Component {
    * Request an update to the server. Note that if forcedUpdate is set to false,
    * the server may not send back an update (for example if nothing changed).
    */
-  requestUpdate = (scope = '', forcedUpdate = false) => {
+  requestUpdate = (scope: string = '', forcedUpdate: boolean = false) => {
     const command = forcedUpdate ? 'requestForcedUpdate' : 'requestUpdate';
     this.bridge.send(command, undefined, scope);
   };
 
-  _onUpdateReceived = (payload, scope) => {
+  _onUpdateReceived = (payload: any, scope: string) => {
     console.log('Received project update from server');
     if (scope !== '') {
       console.warn(`Not implemented: received ${scope} update from server`);
@@ -179,7 +202,8 @@ class ExternalEditor extends Component {
       loading: this.state.loading,
       ref: editor => this.editor = editor,
       requestUpdate: () => this.requestUpdate('', true),
-      onPreview: this.launchPreview,
+      onLayoutPreview: this.launchPreview,
+      onExternalLayoutPreview: this.launchPreview,
       onEditObject: this.editObject,
       singleEditor: true,
     });

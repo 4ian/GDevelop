@@ -1,6 +1,7 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
 var fs = optionalRequire('fs-extra');
 var path = optionalRequire('path');
+var os = optionalRequire('os');
 const gd = global.gd;
 
 export default {
@@ -34,7 +35,7 @@ export default {
     }
   },
   getTempDir: function() {
-    return '/tmp/';
+    return os.tmpdir();
   },
   fileNameFrom: function(fullpath) {
     if (this._isExternalURL(fullpath)) return fullpath;

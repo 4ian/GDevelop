@@ -261,18 +261,12 @@ gd::String EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditio
                  && find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == scene.GetObjectGroups().end()
                  && find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == project.GetObjectGroups().end() )
             {
-                cout << "Bad object (" << objectInParameter << ") in a parameter of a condition " << condition.GetType() << endl;
                 condition.SetParameter(pNb, gd::Expression(""));
                 condition.SetType("");
             }
             else if ( !instrInfos.parameters[pNb].supplementaryInformation.empty()
                       && gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
-                cout << "Bad object type in a parameter of a condition " << condition.GetType() << endl;
-                cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << endl;
-                cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
-                cout << "Condition has received " << objectInParameter << " of type " << gd::GetTypeOfObject(project, scene, objectInParameter) << endl;
-
                 condition.SetParameter(pNb, gd::Expression(""));
                 condition.SetType("");
             }
@@ -407,17 +401,12 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
                  && find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == scene.GetObjectGroups().end()
                  && find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == project.GetObjectGroups().end() )
             {
-                cout << "Bad object (" << objectInParameter << ") in a parameter of an action " << action.GetType() << endl;
                 action.SetParameter(pNb, gd::Expression(""));
                 action.SetType("");
             }
             else if ( !instrInfos.parameters[pNb].supplementaryInformation.empty()
                      && gd::GetTypeOfObject(project, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
-                cout << "Bad object type in parameter "+gd::String::From(pNb)+" of an action " << action.GetType() << endl;
-                cout << "Action wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
-                cout << "Action has received " << objectInParameter << " of type " << gd::GetTypeOfObject(project, scene, objectInParameter) << endl;
-
                 action.SetParameter(pNb, gd::Expression(""));
                 action.SetType("");
             }

@@ -47,6 +47,7 @@ export default class SceneEditor extends BaseEditor {
         initialUiSettings={serializeToJSObject(
           layout.getAssociatedSettings()
         )}
+        onPreview={() => this.props.onPreview(project, layout)}
       />
     );
   }

@@ -7,7 +7,7 @@
   "devDependencies": {
     "flow-bin": "^0.46.0",
     "prettier": "^0.22.0",
-    "react-scripts": "1.0.1",
+    "react-scripts": "1.0.6",
     "shelljs": "^0.7.7"
   },
   "dependencies": {

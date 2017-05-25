@@ -25,15 +25,17 @@ export default class MainFrameToolbar extends Component {
     return (
       <Toolbar>
         <ToolbarGroup firstChild={true}>
-          <ToolbarIcon
-            onClick={this.props.toggleProjectManager}
-            src="res/ribbon_default/projectManager32.png"
-            disabled={!this.props.hasProject}
-          />
-          <ToolbarIcon
-            onClick={this.props.openProject}
-            src="res/ribbon_default/open32.png"
-          />
+          {this.props.showProjectIcons &&
+            <ToolbarIcon
+              onClick={this.props.toggleProjectManager}
+              src="res/ribbon_default/projectManager32.png"
+              disabled={!this.props.hasProject}
+            />}
+          {this.props.showProjectIcons &&
+            <ToolbarIcon
+              onClick={this.props.openProject}
+              src="res/ribbon_default/open32.png"
+            />}
           {this.isDev &&
             <IconMenu
               iconButtonElement={

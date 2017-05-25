@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import nodeFileSystem from './NodeFileSystem';
+import { findGDJS } from './LocalGDJSFinder';
+import localFileSystem from './LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 const gd = global.gd;
 
-export default class ExportDialog extends Component {
+export default class LocalExportDialog extends Component {
   constructor(props) {
     super(props);
 
@@ -30,22 +31,27 @@ export default class ExportDialog extends Component {
     const { project } = this.props;
     if (!project) return;
 
-    const fileSystem = assignIn(new gd.AbstractFileSystemJS(), nodeFileSystem);
-    const outputDir = '/Users/florian/desktop/testexport';
-    const gdjsRoot = '/Users/florian/Projects/F/GD/Binaries/Output/Release_Darwin/JsPlatform';
-    const exportForCordova = false;
-    const exporter = new gd.Exporter(
-      fileSystem,
-      gdjsRoot,
-    );
-    exporter.exportWholePixiProject(
-      project,
-      outputDir,
-      false,
-      exportForCordova
-    );
-    console.log(exporter.getLastError());
-    exporter.delete();
+    findGDJS(gdjsRoot => {
+      if (!gdjsRoot) {
+        //TODO
+        console.log("Could not find GDJS");
+        return;
+      }
+      console.log("GDJS found in ", gdjsRoot);
+
+      const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
+      const outputDir = '/Users/florian/desktop/testexport';
+      const exportForCordova = false;
+      const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+      exporter.exportWholePixiProject(
+        project,
+        outputDir,
+        false,
+        exportForCordova
+      );
+      console.log(exporter.getLastError());
+      exporter.delete();
+    });
   };
 
   render() {

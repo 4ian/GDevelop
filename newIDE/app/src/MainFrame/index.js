@@ -9,7 +9,6 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import Toolbar from './Toolbar';
 import StartPage from './StartPage';
 import ProjectTitlebar from './ProjectTitlebar';
-import ExportDialog from '../Export/ExportDialog';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
 import EventsSheetContainer from '../EventsSheet/EventsSheetContainer.js';
 import SceneEditor from '../SceneEditor';
@@ -29,6 +28,7 @@ import {
   getCurrentTab,
   closeProjectTabs,
 } from './EditorTabsHandler';
+import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import FileOpener from '../Utils/FileOpener';
 import FileWriter from '../Utils/FileWriter';
 
@@ -40,6 +40,7 @@ class MainFrame extends Component {
     super();
     this.state = {
       loadingProject: false,
+      previewLoading: false,
       currentProject: null,
       projectManagerOpen: false,
       editorTabs: getEditorTabsInitialState(),
@@ -89,10 +90,6 @@ class MainFrame extends Component {
     }
 
     return editorTab.editorRef.getSerializedElements();
-  };
-
-  requestUpdate = () => {
-    this.props.requestUpdate();
   };
 
   loadBuiltinGame = () => {
@@ -160,7 +157,11 @@ class MainFrame extends Component {
             project={this.state.currentProject}
             layoutName={name}
             setToolbar={this.setEditorToolbar}
-            onPreview={this.props.onPreview}
+            onPreview={(project, layout) =>
+              watchPromiseInState(this, 'previewLoading', () =>
+                this.props.onLayoutPreview(project, layout)).catch(() => {
+                /*TODO: Error*/
+              })}
             showPreviewButton
             onEditObject={this.props.onEditObject}
           />
@@ -180,7 +181,14 @@ class MainFrame extends Component {
             project={this.state.currentProject}
             externalLayoutName={name}
             setToolbar={this.setEditorToolbar}
-            onPreview={this.props.onPreview}
+            onPreview={(project, externalLayout) =>
+              watchPromiseInState(this, 'previewLoading', () =>
+                this.props.onExternalLayoutPreview(
+                  project,
+                  externalLayout
+                )).catch(() => {
+                /*TODO: Error*/
+              })}
             showPreviewButton
             onEditObject={this.props.onEditObject}
           />
@@ -285,7 +293,7 @@ class MainFrame extends Component {
           this.state.currentProject.delete();
           this.setState({
             currentProject: null,
-          })
+          });
         }
       );
     });
@@ -293,7 +301,7 @@ class MainFrame extends Component {
 
   _onExportProject = () => {
     this.exportDialog.show();
-  }
+  };
 
   _onChangeEditorTab = value => {
     this.setState({
@@ -316,6 +324,10 @@ class MainFrame extends Component {
     const {
       currentProject,
     } = this.state;
+    const ExportDialog = this.props.exportDialogComponent;
+    const showLoader = this.state.loadingProject ||
+      this.state.previewLoading ||
+      this.props.loading;
 
     return (
       <MuiThemeProvider muiTheme={defaultTheme}>
@@ -344,11 +356,12 @@ class MainFrame extends Component {
           </Drawer>
           <Toolbar
             ref={toolbar => this.toolbar = toolbar}
+            showProjectIcons={!this.props.singleEditor}
             hasProject={!!this.state.currentProject}
             toggleProjectManager={this.toggleProjectManager}
             openProject={this._onOpenFromFile}
             loadBuiltinGame={this.loadBuiltinGame}
-            requestUpdate={this.requestUpdate}
+            requestUpdate={this.props.requestUpdate}
           />
           <Tabs
             value={getCurrentTabIndex(this.state.editorTabs)}
@@ -369,14 +382,16 @@ class MainFrame extends Component {
               </Tab>
             ))}
           </Tabs>
-          <LoaderModal show={this.state.loadingProject || this.props.loading} />
+          <LoaderModal show={showLoader} />
           <ConfirmCloseDialog
-            ref={confirmCloseDialog => this.confirmCloseDialog = confirmCloseDialog}
+            ref={confirmCloseDialog =>
+              this.confirmCloseDialog = confirmCloseDialog}
           />
-          <ExportDialog
-            ref={exportDialog => this.exportDialog = exportDialog}
-            project={this.state.currentProject}
-          />
+          {!!ExportDialog &&
+            <ExportDialog
+              ref={exportDialog => this.exportDialog = exportDialog}
+              project={this.state.currentProject}
+            />}
         </div>
       </MuiThemeProvider>
     );

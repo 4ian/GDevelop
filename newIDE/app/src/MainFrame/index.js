@@ -33,7 +33,7 @@ import { timeFunction } from '../Utils/TimeFunction';
 import FileOpener from '../Utils/FileOpener';
 import FileWriter from '../Utils/FileWriter';
 
-import fixtureGame from '../fixtures/fixture-game.json';
+import fixtureGame from '../fixtures/platformer/platformer.json';
 const gd = global.gd;
 
 class MainFrame extends Component {

@@ -66,7 +66,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
         initialUiSettings={serializeToJSObject(
           externalLayout.getAssociatedSettings()
         )}
-        onPreview={() => this.props.onPreview(project, externalLayout)}
+        onPreview={() => this.props.onPreview(project, layout, externalLayout)}
       />
     );
   }

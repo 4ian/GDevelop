@@ -29,6 +29,7 @@ import {
   closeProjectTabs,
 } from './EditorTabsHandler';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
+import { timeFunction } from '../Utils/TimeFunction';
 import FileOpener from '../Utils/FileOpener';
 import FileWriter from '../Utils/FileWriter';
 
@@ -58,25 +59,23 @@ class MainFrame extends Component {
         loadingProject: true,
       },
       () => {
-        var t0 = performance.now();
-        const { currentProject } = this.state;
-        if (currentProject) currentProject.delete();
-        const newProject = gd.ProjectHelper.createNewGDJSProject();
+        timeFunction(
+          () => {
+            const { currentProject } = this.state;
+            if (currentProject) currentProject.delete();
 
-        newProject.unserializeFrom(serializedProject);
-        var t1 = performance.now();
-        console.log(
-          'Creation and unserialization project took ' +
-            (t1 - t0) +
-            ' milliseconds.'
-        );
+            const newProject = gd.ProjectHelper.createNewGDJSProject();
+            newProject.unserializeFrom(serializedProject);
 
-        this.setState(
-          {
-            currentProject: newProject,
-            loadingProject: false,
+            this.setState(
+              {
+                currentProject: newProject,
+                loadingProject: false,
+              },
+              cb
+            );
           },
-          cb
+          time => console.info(`Unserialization took ${time} ms`)
         );
       }
     );
@@ -98,15 +97,12 @@ class MainFrame extends Component {
         loadingProject: true,
       },
       () => {
-        var t0 = performance.now();
-
-        const unserializedProject = gd.Serializer.fromJSObject(fixtureGame);
-        var t1 = performance.now();
-        console.log(
-          'Call to gd.Serializer.fromJSON on builtin game took ' +
-            (t1 - t0) +
-            ' milliseconds.'
+        let unserializedProject = null;
+        timeFunction(
+          () => unserializedProject = gd.Serializer.fromJSObject(fixtureGame),
+          time => console.info(`gd.Serializer.fromJSObject took ${time}ms`)
         );
+
         return this.loadFullProject(unserializedProject, () => {
           unserializedProject.delete();
         });
@@ -181,10 +177,11 @@ class MainFrame extends Component {
             project={this.state.currentProject}
             externalLayoutName={name}
             setToolbar={this.setEditorToolbar}
-            onPreview={(project, externalLayout) =>
+            onPreview={(project, layout, externalLayout) =>
               watchPromiseInState(this, 'previewLoading', () =>
                 this.props.onExternalLayoutPreview(
                   project,
+                  layout,
                   externalLayout
                 )).catch(() => {
                 /*TODO: Error*/

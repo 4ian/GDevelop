@@ -9,8 +9,13 @@ import Welcome from './Welcome';
 import StartPage from '../MainFrame/StartPage';
 import { Tabs, Tab } from '../UI/Tabs';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import LocalExportDialog from '../Export/LocalExportDialog';
+import LocalExport from '../Export/LocalExport';
+import Paper from 'material-ui/Paper';
 import muiDecorator from './MuiDecorator';
+
+const fakeProject = {
+  getLastCompilationDirectory: () => '/Fake/Directory'
+}
 
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
@@ -54,12 +59,22 @@ storiesOf('Tabs', module)
     </Tabs>
   ));
 
+storiesOf('LocalExport', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <Paper>
+      <LocalExport open project={fakeProject} onClose={action('close')} />
+    </Paper>
+  ));
+
 storiesOf('LocalFolderPicker', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <div>
+    <Paper>
       <LocalFolderPicker floatingLabelText="Export folder" />
-    </div>
+    </Paper>
+  )).add('full width', () => (
+      <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
   ));
 
 storiesOf('StartPage', module)

@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
@@ -18,7 +18,7 @@ const styles = {
   },
   textField: {
     flex: 1,
-  }
+  },
 };
 
 export default class LocalFolderPicker extends Component {
@@ -45,7 +45,10 @@ export default class LocalFolderPicker extends Component {
   render() {
     return (
       <div
-        style={styles.container}
+        style={{
+          ...styles.container,
+          width: this.props.fullWidth ? '100%' : undefined,
+        }}
       >
         <TextField
           style={styles.textField}
@@ -55,12 +58,11 @@ export default class LocalFolderPicker extends Component {
           hintText="Click to choose"
           value={this.props.value}
         />
-        <RaisedButton
+        <FlatButton
           label="Choose folder"
           style={styles.button}
           onClick={this.onChooseFolder}
-        >
-        </RaisedButton>
+        />
       </div>
     );
   }

@@ -4,13 +4,14 @@ import Close from 'material-ui/svg-icons/navigation/close';
 import FlatButton from 'material-ui/FlatButton';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 
-export class Tabs extends Component {
+export class ThemableTabs extends Component {
   render() {
-    const { hideLabels, ...tabsProps } = this.props;
+    const { muiTheme, hideLabels, ...tabsProps } = this.props;
     const tabItemContainerStyle = {
       maxWidth: '100%',
       overflowX: 'auto',
       display: hideLabels ? 'none' : 'block',
+      backgroundColor: muiTheme.closableTabs.backgroundColor,
     };
 
     return (
@@ -34,6 +35,9 @@ export class Tabs extends Component {
   }
 }
 
+export const Tabs = muiThemeable()(ThemableTabs);
+Tabs.muiName = 'Tabs';
+
 class ThemableTab extends Component {
   static muiName = 'Tab';
 
@@ -42,8 +46,8 @@ class ThemableTab extends Component {
 
     const truncatedLabel = (
       <span style={{
-        width: muiTheme.tabs.width - muiTheme.tabs.closeButtonWidth * 1.5,
-        marginRight: muiTheme.tabs.closeButtonWidth,
+        width: muiTheme.closableTabs.width - muiTheme.closableTabs.closeButtonWidth * 1.5,
+        marginRight: muiTheme.closableTabs.closeButtonWidth,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
       }}>
@@ -55,7 +59,7 @@ class ThemableTab extends Component {
       <span
         style={{
           position: 'relative',
-          width: muiTheme.tabs.width,
+          width: muiTheme.closableTabs.width,
           display: 'inline-block',
         }}
       >
@@ -64,10 +68,13 @@ class ThemableTab extends Component {
           label={truncatedLabel}
           selected={selected}
           buttonStyle={{
-            height: muiTheme.tabs.height,
+            height: muiTheme.closableTabs.height,
             backgroundColor: selected
-              ? muiTheme.tabs.selectedBackgroundColor
-              : undefined,
+              ? muiTheme.closableTabs.selectedBackgroundColor
+              : muiTheme.closableTabs.backgroundColor,
+            color: selected
+              ? muiTheme.closableTabs.selectedTextColor
+              : muiTheme.closableTabs.textColor,
           }}
           style={{
             height: '100%',
@@ -84,15 +91,15 @@ class ThemableTab extends Component {
             top: 0,
             bottom: 0,
             borderRadius: 0,
-            width: muiTheme.tabs.closeButtonWidth,
-            minWidth: muiTheme.tabs.closeButtonWidth,
+            width: muiTheme.closableTabs.closeButtonWidth,
+            minWidth: muiTheme.closableTabs.closeButtonWidth,
           }}
           icon={
             <Close
               color="white"
               style={{
-                width: muiTheme.tabs.height / 2,
-                height: muiTheme.tabs.height / 2,
+                width: muiTheme.closableTabs.height / 2,
+                height: muiTheme.closableTabs.height / 2,
               }}
             />
           }

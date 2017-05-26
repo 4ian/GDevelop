@@ -296,8 +296,10 @@ class MainFrame extends Component {
     });
   };
 
-  _onExportProject = () => {
-    this.exportDialog.show();
+  _openExportDialog = (open = true) => {
+    this.setState({
+      exportDialogOpen: open,
+    });
   };
 
   _onChangeEditorTab = value => {
@@ -321,7 +323,7 @@ class MainFrame extends Component {
     const {
       currentProject,
     } = this.state;
-    const ExportDialog = this.props.exportDialogComponent;
+    const { exportDialog } = this.props;
     const showLoader = this.state.loadingProject ||
       this.state.previewLoading ||
       this.props.loading;
@@ -348,7 +350,7 @@ class MainFrame extends Component {
                 onOpenExternalLayout={this.openExternalLayout}
                 onSaveProject={this._onSaveToFile}
                 onCloseProject={this._onCloseProject}
-                onExportProject={this._onExportProject}
+                onExportProject={this._openExportDialog}
               />}
           </Drawer>
           <Toolbar
@@ -384,11 +386,12 @@ class MainFrame extends Component {
             ref={confirmCloseDialog =>
               this.confirmCloseDialog = confirmCloseDialog}
           />
-          {!!ExportDialog &&
-            <ExportDialog
-              ref={exportDialog => this.exportDialog = exportDialog}
-              project={this.state.currentProject}
-            />}
+          {!!exportDialog &&
+            React.cloneElement(exportDialog, {
+              open: this.state.exportDialogOpen,
+              onClose: () => this._openExportDialog(false),
+              project: this.state.currentProject,
+            })}
         </div>
       </MuiThemeProvider>
     );

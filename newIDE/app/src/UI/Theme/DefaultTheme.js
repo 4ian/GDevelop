@@ -38,7 +38,7 @@ export default getMuiTheme({
     height: 32,
     iconButtonSize: 24,
   },
-  tabs: {
+  closableTabs: {
     backgroundColor: backgroundColor,
     textColor: '#878787',
     selectedBackgroundColor: gdevelopLightBlue,

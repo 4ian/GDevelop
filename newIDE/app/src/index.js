@@ -4,7 +4,8 @@ import MainFrame from './MainFrame';
 import ExternalEditor from './ExternalEditor';
 import Window from './Utils/Window';
 import LocalPreviewLauncher from './Export/LocalPreviewLauncher';
-import LocalExportDialog from './Export/LocalExportDialog';
+import LocalExport from './Export/LocalExport';
+import ExportDialog from './Export/ExportDialog';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import registerServiceWorker from './registerServiceWorker';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
@@ -28,11 +29,16 @@ if (appArguments['server-port']) {
     </ExternalEditor>
   );
 } else {
-  app = <MainFrame
-    onLayoutPreview={LocalPreviewLauncher.launchLayoutPreview}
-    onExternalLayoutPreview={LocalPreviewLauncher.launchExternalLayoutPreview}
-    exportDialogComponent={LocalExportDialog}
-  />;
+  app = (
+    <MainFrame
+      onLayoutPreview={LocalPreviewLauncher.launchLayoutPreview}
+      onExternalLayoutPreview={LocalPreviewLauncher.launchExternalLayoutPreview}
+      exportDialog={<ExportDialog tabs={[{
+        name: 'Local export',
+        ExportComponent: LocalExport
+      }]} />}
+    />
+  );
 }
 
 ReactDOM.render(app, document.getElementById('root'));

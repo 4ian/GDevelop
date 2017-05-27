@@ -1,17 +1,18 @@
-var electron = require('electron');
-var app = electron.app; // Module to control application life.
-var BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
-var parseArgs = require('minimist');
-var isDev = require('electron-is').dev();
-var ipcMain = electron.ipcMain;
-var { uploadGameFolderToBucket } = require('./s3upload');
+const electron = require('electron');
+const app = electron.app; // Module to control application life.
+const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
+const parseArgs = require('minimist');
+const isDev = require('electron-is').dev();
+const ipcMain = electron.ipcMain;
+const { uploadGameFolderToBucket } = require('./s3upload');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-var mainWindow = null;
-var args = parseArgs(process.argv.slice(2));
+let mainWindow = null;
 
-var isIntegrated = args.mode === 'integrated';
+const args = parseArgs(process.argv.slice(2));
+const isIntegrated = args.mode === 'integrated';
+const devTools = !!args['dev-tools'];
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -26,7 +27,7 @@ app.on('ready', function() {
   }
 
   // Create the browser window.
-  var options = {
+  const options = {
     width: args.width || 800,
     height: args.height || 600,
     x: args.x,
@@ -63,7 +64,7 @@ app.on('ready', function() {
   } else {
     // Production (with npm run build)
     mainWindow.loadURL('file://' + __dirname + '/www/index.html');
-    // mainWindow.openDevTools();
+    if (true || devTools) mainWindow.openDevTools();
   }
 
   // Emitted when the window is closed.

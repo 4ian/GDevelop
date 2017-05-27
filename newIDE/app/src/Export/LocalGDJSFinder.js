@@ -2,6 +2,8 @@
 
 import optionalRequire from '../Utils/OptionalRequire.js';
 import path from 'path';
+const electron = optionalRequire('electron');
+const app = electron ? electron.remote.app : null;
 const fs = optionalRequire('fs');
 const process = optionalRequire('process');
 var isWin = process && /^win/.test(process.platform);
@@ -20,14 +22,24 @@ const tryPath = (
 export const findGDJS = (cb: (?string) => void) => {
   if (!process || !fs) return '';
 
-  const cwd = process.cwd();
-  const releaseFolder = isWin
-    ? 'Release_Windows'
-    : isDarwin ? 'Release_Darwin' : 'Release_Linux';
-  tryPath(path.join(cwd, 'JsPlatform'), cb, () => {
-    tryPath(path.join(cwd, '..', 'JsPlatform'), cb, () => {
+  const appPath = app ? app.getAppPath() : process.cwd();
+
+  // The app path is [...]/*.app/Contents/Resources/app.asar on macOS
+  // and [...]/resources/app.asar on other OSes.
+  const pathToRoot = isDarwin ? '../../../../' : '../../';
+  const rootPath = path.join(appPath, pathToRoot);
+
+  // First try to find GDJS next to the app or in the parent folder
+  tryPath(path.join(rootPath, 'JsPlatform'), cb, () => {
+    tryPath(path.join(rootPath, '..', 'JsPlatform'), cb, () => {
+
+      // Try to find GDJS in the structure of directories of GD.
+      const releaseFolder = isWin
+        ? 'Release_Windows'
+        : isDarwin ? 'Release_Darwin' : 'Release_Linux';
       const devPath = path.join(
-        cwd,
+        appPath,
+        '..',
         '..',
         '..',
         'Binaries',

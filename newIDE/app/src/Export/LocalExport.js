@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
-import Divider from 'material-ui/Divider';
+import { Column, Line, Spacer } from '../UI/Grid';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
@@ -12,14 +12,6 @@ const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
-
-const styles = {
-  container:{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-  }
-}
 
 export default class LocalExport extends Component {
   constructor(props) {
@@ -38,7 +30,7 @@ export default class LocalExport extends Component {
     });
   }
 
-  static _prepareExporter = (): Promise<any> => {
+  static prepareExporter = (): Promise<any> => {
     return new Promise((resolve, reject) => {
       findGDJS(gdjsRoot => {
         if (!gdjsRoot) {
@@ -68,7 +60,7 @@ export default class LocalExport extends Component {
     const outputDir = this.state.outputDir;
     project.setLastCompilationDirectory(outputDir);
 
-    LocalExport._prepareExporter()
+    LocalExport.prepareExporter()
       .then(({ exporter }) => {
         const exportForCordova = false;
         exporter.exportWholePixiProject(
@@ -89,27 +81,34 @@ export default class LocalExport extends Component {
 
   openExportFolder = () => {
     shell.openItem(this.state.outputDir);
-  }
+  };
 
   render() {
     const { project } = this.props;
     if (!project) return null;
 
     return (
-      <div style={styles.container}>
-        This will export your game to a folder that you can then upload on a website
-        <Divider />
-        <LocalFolderPicker
-          value={this.state.outputDir}
-          defaultPath={project.getLastCompilationDirectory()}
-          onChange={value => this.setState({ outputDir: value })}
-          fullWidth
-        />
-        <RaisedButton
-          label="Export"
-          primary={true}
-          onTouchTap={this.launchExport}
-        />
+      <Column>
+        <Line>
+          This will export your game to a folder that you can then upload on a website
+        </Line>
+        <Line>
+          <LocalFolderPicker
+            value={this.state.outputDir}
+            defaultPath={project.getLastCompilationDirectory()}
+            onChange={value => this.setState({ outputDir: value })}
+            fullWidth
+          />
+        </Line>
+        <Line>
+          <Spacer expand />
+          <RaisedButton
+            label="Export"
+            primary={true}
+            onTouchTap={this.launchExport}
+            disabled={!this.state.outputDir}
+          />
+        </Line>
         <Dialog
           title="Export finished"
           actions={[
@@ -121,17 +120,18 @@ export default class LocalExport extends Component {
             <FlatButton
               label="Close"
               primary={false}
-              onTouchTap={() => this.setState({
-                exportFinishedDialogOpen: false,
-              })}
-            />
+              onTouchTap={() =>
+                this.setState({
+                  exportFinishedDialogOpen: false,
+                })}
+            />,
           ]}
           modal={true}
           open={this.state.exportFinishedDialogOpen}
         >
           You can now upload the game to a web hosting to play to the game.
         </Dialog>
-      </div>
+      </Column>
     );
   }
 }

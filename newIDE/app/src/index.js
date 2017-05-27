@@ -5,6 +5,7 @@ import ExternalEditor from './ExternalEditor';
 import Window from './Utils/Window';
 import LocalPreviewLauncher from './Export/LocalPreviewLauncher';
 import LocalExport from './Export/LocalExport';
+import LocalS3Export from './Export/LocalS3Export';
 import ExportDialog from './Export/ExportDialog';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import registerServiceWorker from './registerServiceWorker';
@@ -34,7 +35,10 @@ if (appArguments['server-port']) {
       onLayoutPreview={LocalPreviewLauncher.launchLayoutPreview}
       onExternalLayoutPreview={LocalPreviewLauncher.launchExternalLayoutPreview}
       exportDialog={<ExportDialog tabs={[{
-        name: 'Local export',
+        name: 'Upload online',
+        ExportComponent: LocalS3Export
+      }, {
+        name: 'Export to a folder',
         ExportComponent: LocalExport
       }]} />}
     />

@@ -9,7 +9,6 @@ const styles = {
   },
   tabContent: {
     padding: 24,
-    width: '',
   },
 };
 
@@ -46,11 +45,12 @@ export default class LocalExportDialog extends Component {
         <Tabs
           value={this.state.value}
           onChange={this.handleChange}
-          tabTemplateStyle={styles.tabContent}
         >
           {this.props.tabs.map(({ ExportComponent, name }, index) => (
             <Tab label={name} value={index} key={index}>
-              <ExportComponent project={this.props.project} />
+              <div style={styles.tabContent}>
+                <ExportComponent project={this.props.project} />
+              </div>
             </Tab>
           ))}
         </Tabs>

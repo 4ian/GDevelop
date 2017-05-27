@@ -10,6 +10,7 @@ import StartPage from '../MainFrame/StartPage';
 import { Tabs, Tab } from '../UI/Tabs';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
+import LocalS3Export from '../Export/LocalS3Export';
 import Paper from 'material-ui/Paper';
 import muiDecorator from './MuiDecorator';
 
@@ -64,6 +65,14 @@ storiesOf('LocalExport', module)
   .add('default', () => (
     <Paper>
       <LocalExport open project={fakeProject} onClose={action('close')} />
+    </Paper>
+  ));
+
+storiesOf('LocalS3Export', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <Paper>
+      <LocalS3Export open project={fakeProject} onClose={action('close')} />
     </Paper>
   ));
 

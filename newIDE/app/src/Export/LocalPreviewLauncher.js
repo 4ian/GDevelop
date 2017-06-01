@@ -5,8 +5,8 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { timeFunction } from '../Utils/TimeFunction';
 import { findGDJS } from './LocalGDJSFinder';
 import assignIn from 'lodash/assignIn';
-import path from 'path';
 const electron = optionalRequire('electron');
+const path = optionalRequire('path');
 const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
 const gd = global.gd;
 

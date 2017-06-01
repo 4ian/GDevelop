@@ -56,13 +56,13 @@ export default {
     if (!this.isAbsolute(baseDirectory))
       baseDirectory = path.resolve(baseDirectory);
 
-    return path.resolve(baseDirectory, filename).replace('\\', '/');
+    return path.resolve(baseDirectory, path.normalize(filename));
   },
   makeRelative: function(filename, baseDirectory) {
     if (this._isExternalURL(filename)) return filename;
 
     filename = this._translateURL(filename);
-    return path.relative(baseDirectory, filename).replace('\\', '/');
+    return path.relative(baseDirectory, path.normalize(filename));
   },
   isAbsolute: function(fullpath) {
     if (this._isExternalURL(fullpath)) return true;

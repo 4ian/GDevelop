@@ -9,7 +9,7 @@ Make sure to have [Node.js](https://nodejs.org) and [yarn](https://yarnpkg.com) 
 
 ```bash
 cd newIDE/app
-yarn install
+yarn #or npm install
 ```
 
 You have to compile a version of GDevelop to Javascript in `Binaries/Output/libGD.js/Release/libGD.js`. This is not yet integrated into GDevelop build process, see [Gdevelop.js](https://github.com/4ian/GDevelop.js).
@@ -17,20 +17,23 @@ You have to compile a version of GDevelop to Javascript in `Binaries/Output/libG
 ## Development
 
 ```bash
-yarn start
+yarn start #or npm start
 ```
 
 This will open the app in your web browser.
 
 ### Development of the standalone app
 
-You can run the app with Electron
+You can run the app with Electron:
 
 ```bash
 #For macOS:
 ../electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron ../electron-app/app
 
-#For Windows and Linux: TODO
+#For Windows:
+node ..\electron-app\node_modules\electron\cli.js ..\electron-app\app
+
+#For Linux: TODO
 ```
 
 ### Development of UI components
@@ -45,7 +48,7 @@ yarn run storybook
 
 ```bash
 cd newIDE/electron-app
-yarn build
+yarn build #or npm run build
 ```
 
 This will build and package the Electron app for Windows, macOS and Linux (according to your OS).

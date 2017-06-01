@@ -1,10 +1,10 @@
 // @flow
 
 import optionalRequire from '../Utils/OptionalRequire.js';
-import path from 'path';
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 const fs = optionalRequire('fs');
+const path = optionalRequire('path');
 const process = optionalRequire('process');
 var isWin = process && /^win/.test(process.platform);
 var isDarwin = process && /^darwin/.test(process.platform);
@@ -20,13 +20,13 @@ const tryPath = (
   });
 
 export const findGDJS = (cb: (?string) => void) => {
-  if (!process || !fs) return '';
+  if (!path || !process || !fs) return '';
 
   const appPath = app ? app.getAppPath() : process.cwd();
 
   // The app path is [...]/*.app/Contents/Resources/app.asar on macOS
   // and [...]/resources/app.asar on other OSes.
-  const pathToRoot = isDarwin ? '../../../../' : '../../';
+  const pathToRoot = isDarwin ? '../../../../' : path.join('..', '..');
   const rootPath = path.join(appPath, pathToRoot);
 
   // First try to find GDJS next to the app or in the parent folder

@@ -12,6 +12,12 @@
   },
   "build": {
     "appId": "com.gdevelop.ide",
+    "extraResources": [
+      {
+        "from": "../app/resources/examples",
+        "to": "examples"
+      }
+    ],
     "mac": {
       "category": "public.app-category.developer-tools"
     }

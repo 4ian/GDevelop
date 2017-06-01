@@ -40,6 +40,8 @@ class MainFrame extends Component {
   constructor() {
     super();
     this.state = {
+      createDialogOpen: false,
+      exportDialogOpen: false,
       loadingProject: false,
       previewLoading: false,
       currentProject: null,
@@ -204,6 +206,7 @@ class MainFrame extends Component {
           <StartPage
             setToolbar={this.setEditorToolbar}
             onOpen={this._onOpenFromFile}
+            onCreate={() => this._openCreateDialog()}
           />
         ),
         'start page'
@@ -211,44 +214,52 @@ class MainFrame extends Component {
     });
   };
 
+  _openCreateDialog = (open = true) => {
+    this.setState({
+      createDialogOpen: open,
+    });
+  };
+
+  _openFromFile = filepath => {
+    FileOpener.readProjectJSONFile(filepath, (err, projectObject) => {
+      if (err) {
+        //TODO: Error displayed to user with a generic component
+        console.error('Unable to read project', err);
+        return;
+      }
+
+      this.setState(
+        {
+          loadingProject: true,
+          editorTabs: closeProjectTabs(
+            this.state.editorTabs,
+            this.state.currentProject
+          ),
+        },
+        () =>
+          setTimeout(() => {
+            const serializedObject = gd.Serializer.fromJSObject(projectObject);
+
+            this.loadFullProject(serializedObject, () => {
+              serializedObject.delete();
+
+              this.state.currentProject.setProjectFile(filepath);
+              this.setState({
+                loadingProject: false,
+                projectManagerOpen: true,
+              });
+            });
+          }),
+        10 // Let some time for the loader to be shown
+      );
+    });
+  };
+
   _onOpenFromFile = () => {
     FileOpener.chooseProjectFile((err, filepath) => {
       if (!filepath || err) return;
 
-      FileOpener.readProjectJSONFile(filepath, (err, projectObject) => {
-        if (err) {
-          //TODO: Error displayed to user with a generic component
-          console.error('Unable to read project', err);
-          return;
-        }
-
-        this.setState(
-          {
-            loadingProject: true,
-            editorTabs: closeProjectTabs(
-              this.state.editorTabs,
-              this.state.currentProject
-            ),
-          },
-          () =>
-            setTimeout(() => {
-              const serializedObject = gd.Serializer.fromJSObject(
-                projectObject
-              );
-
-              this.loadFullProject(serializedObject, () => {
-                serializedObject.delete();
-
-                this.state.currentProject.setProjectFile(filepath);
-                this.setState({
-                  loadingProject: false,
-                  projectManagerOpen: true,
-                });
-              });
-            }),
-          10 // Let some time for the loader to be shown
-        );
-      });
+      this._openFromFile(filepath);
     });
   };
 
@@ -323,7 +334,7 @@ class MainFrame extends Component {
     const {
       currentProject,
     } = this.state;
-    const { exportDialog } = this.props;
+    const { exportDialog, createDialog } = this.props;
     const showLoader = this.state.loadingProject ||
       this.state.previewLoading ||
       this.props.loading;
@@ -391,6 +402,15 @@ class MainFrame extends Component {
               open: this.state.exportDialogOpen,
               onClose: () => this._openExportDialog(false),
               project: this.state.currentProject,
+            })}
+          {!!createDialog &&
+            React.cloneElement(createDialog, {
+              open: this.state.createDialogOpen,
+              onClose: () => this._openCreateDialog(false),
+              onOpen: filepath => {
+                this._openCreateDialog(false);
+                this._openFromFile(filepath);
+              },
             })}
         </div>
       </MuiThemeProvider>

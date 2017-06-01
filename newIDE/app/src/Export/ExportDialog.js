@@ -12,7 +12,7 @@ const styles = {
   },
 };
 
-export default class LocalExportDialog extends Component {
+export default class ExportDialog extends Component {
   constructor(props) {
     super(props);
     this.state = {

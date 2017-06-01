@@ -43,7 +43,7 @@ export default class StartPage extends BaseEditor {
         </Paper>
         <Paper zDepth={1}>
           <FlatButton label="Open a project" fullWidth onClick={this.props.onOpen} />
-          <FlatButton label="Create a new project" disabled fullWidth />
+          <FlatButton label="Create a new project" fullWidth onClick={this.props.onCreate} />
         </Paper>
       </div>
     );

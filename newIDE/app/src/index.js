@@ -6,6 +6,7 @@ import Window from './Utils/Window';
 import LocalPreviewLauncher from './Export/LocalPreviewLauncher';
 import LocalExport from './Export/LocalExport';
 import LocalS3Export from './Export/LocalS3Export';
+import LocalCreateDialog from './ProjectCreation/LocalCreateDialog';
 import ExportDialog from './Export/ExportDialog';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import registerServiceWorker from './registerServiceWorker';
@@ -41,6 +42,7 @@ if (appArguments['server-port']) {
         name: 'Export to a folder',
         ExportComponent: LocalExport
       }]} />}
+      createDialog={<LocalCreateDialog />}
     />
   );
 }

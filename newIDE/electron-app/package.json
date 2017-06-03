@@ -7,6 +7,7 @@
   "license": "MIT",
   "homepage": "http://compilgames.net",
   "scripts": {
+    "postinstall": "cd app && npm install",
     "build:app": "cd ../app && npm run build",
     "build": "node scripts/build.js"
   },

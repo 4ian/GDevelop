@@ -1,9 +1,9 @@
-GDevelop JS Plaform (GDJS)
---------------------------------
+GDevelop IDE
+------------
 
 The MIT License (MIT)
 
-Copyright (c) 2008-2017 Florian Rival
+Copyright (c) 2017 Florian Rival
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-External libraries used by GDevelop JS Platform
----------------------------------------------------
-
-* Pixi.js is distributed under the MIT license
-* mongoose is distributed under the MIT license
-* wxWidgets is distributed under wxWindows License (similar to GNU LGPL)

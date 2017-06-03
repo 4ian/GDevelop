@@ -3,7 +3,7 @@ GDevelop C++ Plaform (GDCpp)
 
    The MIT License (MIT)
 
-   Copyright (c) 2008-2016 Florian Rival
+   Copyright (c) 2008-2017 Florian Rival
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,7 @@ GDCpp also uses the Liberation font which is licensed under the SIL OPEN FONT LI
    requirement for fonts to remain under this license does not apply to
    any document created using the fonts or their derivatives.
 
-    
+
 
    DEFINITIONS
    "Font Software" refers to the set of files released by the Copyright

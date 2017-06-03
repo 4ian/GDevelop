@@ -275,6 +275,9 @@ public:
     void SetLastUsedFile(wxString file);
     bool Save(gd::Project & project, wxString file);
     StartHerePage* GetStartPage();
+    void OnLoseFocus(wxFocusEvent& event);
+    void OnChildFocus(wxChildFocusEvent& event);
+    void OnActivate(wxActivateEvent& event);
 
 private:
 

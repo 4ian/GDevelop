@@ -9,38 +9,41 @@ This project is released under the MIT License.
 
 #include "GDCore/Tools/Localization.h"
 
+void DeclareSystemInfoExtension(gd::PlatformExtension & extension);
+
 /**
  * \brief This class declares information about the JS extension.
  */
-class JsExtension : public gd::PlatformExtension
+class SystemInfoJsExtension : public gd::PlatformExtension
 {
 public:
 
     /**
      * \brief Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    JsExtension()
+    SystemInfoJsExtension()
     {
-        SetExtensionInformation("SystemInfo",
-            _("System information"),
-            _("Provides information about the system running the game"),
-            "Florian Rival",
-            "Open source (MIT License)");
-
-        CloneExtension("GDevelop C++ platform", "SystemInfo");
+        DeclareSystemInfoExtension(*this);
 
         GetAllConditions()["SystemInfo::IsMobile"].codeExtraInformation.SetIncludeFile("SystemInfo/systeminfotools.js")
             .SetFunctionName("gdjs.evtTools.systemInfo.isMobile");
 
         StripUnimplementedInstructionsAndExpressions();
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 
+#if defined(EMSCRIPTEN)
+extern "C" gd::PlatformExtension * CreateGDJSSystemInfoExtension() {
+    return new SystemInfoJsExtension;
+}
+#else
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
-    return new JsExtension;
+    return new SystemInfoJsExtension;
 }
+#endif
 #endif

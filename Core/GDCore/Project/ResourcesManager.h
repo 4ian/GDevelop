@@ -214,6 +214,16 @@ public:
      */
     void UnserializeFrom(const SerializerElement & element);
 
+    /**
+     * \brief Return true if the image should be smoothed.
+     */
+    bool IsSmooth() const { return smooth; }
+
+    /**
+     * \brief Set if the image should be smoothed in game.
+     */
+    void SetSmooth(bool enable = true) { smooth = enable; }
+
     bool smooth; ///< True if smoothing filter is applied
     bool alwaysLoaded; ///< True if the image must always be loaded in memory.
 private:

@@ -276,6 +276,11 @@ public:
     virtual void PausePreview();
 
     /**
+     * \brief Launch the current previewer.
+     */
+    void LaunchPreview();
+
+    /**
      * Load resources for objects.
      */
     void ReloadResources();

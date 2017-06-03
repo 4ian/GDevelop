@@ -61,8 +61,7 @@ void MainFrame::CreateNewProject()
 
             if ( !dialog.GetChosenTemplateFile().empty() )
             {
-                newProject->SetProjectFile(dialog.GetChosenTemplateFile());
-                gd::ProjectFileWriter::LoadFromFile(*newProject, newProject->GetProjectFile());
+                gd::ProjectFileWriter::LoadFromFile(*newProject, dialog.GetChosenTemplateFile());
                 gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, gd::NativeFileSystem::Get(),
                     targetDirectory, false);
             }

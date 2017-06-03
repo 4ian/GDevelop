@@ -133,6 +133,11 @@ public:
      * \brief Return true if there is at least one instance on the layer named \a layerName.
      */
     bool SomeInstancesAreOnLayer(const gd::String & layerName);
+
+    /**
+     * \brief Remove all instances
+     */
+    void Clear();
     #endif
     ///@}
 

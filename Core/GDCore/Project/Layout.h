@@ -17,7 +17,7 @@
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Layer.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #endif
 namespace gd { class BaseEvent; }
@@ -172,6 +172,7 @@ public:
 
     /** \name Layout layers management
      * Members functions related to layout layers management.
+     * TODO: This should be moved to a separate class
      */
     ///@{
 
@@ -232,6 +233,18 @@ public:
      * Must swap the position of the specified layers.
      */
     void SwapLayers(std::size_t firstLayerIndex, std::size_t secondLayerIndex);
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Serialize the layers.
+     */
+    void SerializeLayersTo(SerializerElement & element) const;
+    #endif
+
+    /**
+     * \brief Unserialize the layers.
+     */
+    void UnserializeLayersFrom(const SerializerElement & element);
     ///@}
 
     /**
@@ -244,19 +257,19 @@ public:
      */
     void UpdateBehaviorsSharedData(gd::Project & project);
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    #if defined(GD_IDE_ONLY)
     /**
      * Return the settings associated to the layout.
      * \see gd::LayoutEditorCanvasOptions
      */
-    const gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() const { return associatedSettings; }
+    const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const { return associatedSettings; }
 
     /**
      * Return the settings associated to the layout.
      * \see gd::LayoutEditorCanvasOptions
      */
-    gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() { return associatedSettings; }
-#endif
+    gd::LayoutEditorCanvasOptions & GetAssociatedSettings() { return associatedSettings; }
+    #endif
 
     /** \name Other properties
      */
@@ -433,8 +446,6 @@ private:
     static gd::Layer                            badLayer; ///< Null object, returned when GetLayer can not find an appropriate layer.
     #if defined(GD_IDE_ONLY)
     EventsList                                  events; ///< Scene events
-    #endif
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     gd::LayoutEditorCanvasOptions               associatedSettings;
     #endif
 

@@ -52,7 +52,7 @@ public :
     void SetTexture(const gd::String & newTextureName) { textureName = newTextureName; };
     const gd::String & GetTexture() const { return textureName; };
 
-    gd::String textureName;
+    gd::String textureName; ///<deprecated. Use Get/SetTexture instead.
 
 private:
 

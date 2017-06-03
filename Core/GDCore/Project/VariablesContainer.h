@@ -99,9 +99,10 @@ public:
     void Remove(const gd::String & name);
 
     /**
-     * \brief Rename a variable
+     * \brief Rename a variable.
+     * \return true if the variable was renamed, false otherwise.
      */
-    void Rename(const gd::String & oldName, const gd::String & newName);
+    bool Rename(const gd::String & oldName, const gd::String & newName);
 
     /**
      * \brief Swap the position of the specified variables.
@@ -119,12 +120,10 @@ public:
      * Members functions related to saving and loading the object.
      */
     ///@{
-    #if defined(GD_IDE_ONLY)
     /**
      * \brief Serialize variable container.
      */
     void SerializeTo(SerializerElement & element) const;
-    #endif
 
     /**
      * \brief Unserialize the variable container.

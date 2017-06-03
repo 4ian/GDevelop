@@ -35,43 +35,9 @@ void InitialInstancesContainer::UnserializeFrom(const SerializerElement & elemen
     element.ConsiderAsArrayOf("instance", "Objet");
     for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
     {
-        const SerializerElement & instanceElement = element.GetChild(i);
-        gd::InitialInstance newPosition;
-
-        newPosition.SetObjectName(instanceElement.GetStringAttribute("name", "", "nom"));
-        newPosition.SetX(instanceElement.GetDoubleAttribute("x"));
-        newPosition.SetY(instanceElement.GetDoubleAttribute("y"));
-        newPosition.SetAngle(instanceElement.GetDoubleAttribute("angle"));
-        newPosition.SetHasCustomSize(instanceElement.GetBoolAttribute("customSize", false, "personalizedSize"));
-        newPosition.SetCustomWidth(instanceElement.GetDoubleAttribute("width"));
-        newPosition.SetCustomHeight(instanceElement.GetDoubleAttribute("height"));
-        newPosition.SetZOrder(instanceElement.GetIntAttribute("zOrder", 0, "plan"));
-        newPosition.SetLayer(instanceElement.GetStringAttribute("layer"));
-        #if defined(GD_IDE_ONLY)
-        newPosition.SetLocked(instanceElement.GetBoolAttribute( "locked", false ));
-        #endif
-
-        const SerializerElement & floatPropElement = instanceElement.GetChild("numberProperties" , 0 ,"floatInfos");
-        floatPropElement.ConsiderAsArrayOf("property", "Info");
-        for (std::size_t j = 0; j < floatPropElement.GetChildrenCount(); ++j)
-        {
-            gd::String name = floatPropElement.GetChild(j).GetStringAttribute("name");
-            float value = floatPropElement.GetChild(j).GetDoubleAttribute("value");
-            newPosition.floatInfos[name] = value;
-        }
-
-        const SerializerElement & stringPropElement = instanceElement.GetChild("stringProperties" , 0 ,"stringInfos");
-        stringPropElement.ConsiderAsArrayOf("property", "Info");
-        for (std::size_t j = 0; j < stringPropElement.GetChildrenCount(); ++j)
-        {
-            gd::String name = stringPropElement.GetChild(j).GetStringAttribute("name");
-            gd::String value = stringPropElement.GetChild(j).GetStringAttribute("value");
-            newPosition.stringInfos[name] = value;
-        }
-
-        newPosition.GetVariables().UnserializeFrom(instanceElement.GetChild("initialVariables", 0, "InitialVariables"));
-
-        initialInstances.push_back( newPosition );
+        gd::InitialInstance instance;
+        instance.UnserializeFrom(element.GetChild(i));
+        initialInstances.push_back(instance);
     }
 }
 
@@ -197,40 +163,13 @@ void InitialInstancesContainer::Create(const InitialInstancesContainer & source)
 void InitialInstancesContainer::SerializeTo(SerializerElement & element) const
 {
     element.ConsiderAsArrayOf("instance");
-    for (std::list<gd::InitialInstance>::const_iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
-    {
-        SerializerElement & instanceElement = element.AddChild("instance");
-        instanceElement.SetAttribute( "name", (*it).GetObjectName() );
-        instanceElement.SetAttribute( "x", (*it).GetX() );
-        instanceElement.SetAttribute( "y", (*it).GetY() );
-        instanceElement.SetAttribute( "zOrder", (*it).GetZOrder() );
-        instanceElement.SetAttribute( "layer", (*it).GetLayer() );
-        instanceElement.SetAttribute( "angle", (*it).GetAngle() );
-        instanceElement.SetAttribute( "customSize", (*it).HasCustomSize() );
-        instanceElement.SetAttribute( "width", (*it).GetCustomWidth() );
-        instanceElement.SetAttribute( "height", (*it).GetCustomHeight() );
-        instanceElement.SetAttribute( "locked", (*it).IsLocked() );
+    for (auto instance : initialInstances)
+        instance.SerializeTo(element.AddChild("instance"));
+}
 
-        SerializerElement & floatPropElement = instanceElement.AddChild("numberProperties");
-        floatPropElement.ConsiderAsArrayOf("property");
-        for(std::map<gd::String, float>::const_iterator floatInfo = (*it).floatInfos.begin(); floatInfo != (*it).floatInfos.end(); ++floatInfo)
-        {
-            floatPropElement.AddChild("property")
-                .SetAttribute("name", floatInfo->first)
-                .SetAttribute("value", floatInfo->second);
-        }
-
-        SerializerElement & stringPropElement = instanceElement.AddChild("stringProperties");
-        stringPropElement.ConsiderAsArrayOf("property");
-        for(std::map<gd::String, gd::String>::const_iterator stringInfo = (*it).stringInfos.begin(); stringInfo != (*it).stringInfos.end(); ++stringInfo)
-        {
-            stringPropElement.AddChild("property")
-                .SetAttribute("name", stringInfo->first)
-                .SetAttribute("value", stringInfo->second);
-        }
-
-        (*it).GetVariables().SerializeTo(instanceElement.AddChild("initialVariables"));
-    }
+void InitialInstancesContainer::Clear()
+{
+    initialInstances.clear();
 }
 #endif
 

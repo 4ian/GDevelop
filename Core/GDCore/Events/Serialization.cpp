@@ -161,6 +161,7 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
 
 void EventsListSerialization::UnserializeEventsFrom(gd::Project & project, EventsList & list, const SerializerElement & events)
 {
+    list.Clear();
     events.ConsiderAsArrayOf("event", "Event");
     for(std::size_t i = 0; i<events.GetChildrenCount(); ++i)
     {

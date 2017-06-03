@@ -1,0 +1,24 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+
+# testing
+coverage
+
+# production
+build
+
+# misc
+.DS_Store
+.env
+npm-debug.log
+
+# GD library
+public/libGD.js
+
+# Resources
+public/res
+public/CppPlatform
+public/JsPlatform
+resources/GDJS

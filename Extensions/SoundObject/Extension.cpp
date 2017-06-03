@@ -18,14 +18,14 @@ This project is released under the MIT License.
 /**
  * \brief This class declares information about the extension.
  */
-class Extension : public ExtensionBase
+class SoundObjectCppExtension : public ExtensionBase
 {
 public:
 
     /**
      * Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    Extension()
+    SoundObjectCppExtension()
     {
         SetExtensionInformation("SoundObject",
                               _("Sound object"),
@@ -524,10 +524,16 @@ public:
     };
 };
 
+#if defined(ANDROID)
+extern "C" ExtensionBase * CreateGDCppSoundObjectExtension() {
+    return new SoundObjectCppExtension;
+}
+#elif !defined(EMSCRIPTEN)
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
-    return new Extension;
+    return new SoundObjectCppExtension;
 }
+#endif

@@ -24,8 +24,10 @@ namespace gd { class ExternalLayout; }
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class ObjectsEditor; }
 class LayersEditorPanel;
+namespace gd { class ExternalEditor; }
 class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
+class ExternalEditorPanel;
 
 class ExternalLayoutEditor: public wxPanel
 {
@@ -42,7 +44,13 @@ public:
     /**
      * Can be called by parent so as to refresh ribbon for this editor.
      */
-    void ForceRefreshRibbonAndConnect();
+    void EditorDisplayed();
+
+    /**
+     * Can be called by parent to let the editor know that it's not the editor
+     * displayed and focused.
+     */
+    void EditorNotDisplayed();
 
     /**
      * \brief Set a function that is called when the layout used for editing the external layout
@@ -77,6 +85,7 @@ public:
 
     /**
      * Get the layout editor owned by this editor.
+     * \note Can be NULL if no layout editor was created.
      */
     gd::LayoutEditorCanvas * GetLayoutEditorCanvas() const { return layoutEditorCanvas; }
 
@@ -106,8 +115,12 @@ private:
     void OnResize(wxSizeEvent& event);
     void OnparentSceneComboBoxSelected(wxCommandEvent& event);
     //*)
+    void OnexternalEditorPanelResize(wxSizeEvent& event);
+    void OnexternalEditorPanelMoved(wxMoveEvent& event);
     void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
     void SetupForScene(gd::Layout & scene);
+    void CreateExternalLayoutEditor();
+    void UpdateExternalLayoutEditorSize(bool force = false);
 
     //(*Declarations(ExternalLayoutEditor)
     wxScrollBar* scrollBar1;
@@ -131,6 +144,10 @@ private:
     gd::ExternalLayout & externalLayout;
     gd::MainFrameWrapper mainFrameWrapper;
     Scene emptyLayout;
+
+    std::shared_ptr<gd::ExternalEditor> externalLayoutEditor;
+    ExternalEditorPanel * externalEditorPanel;
+    bool isEditorDisplayed;
 
     std::function<void()> onAssociatedLayoutChangedCb;
     wxAuiManager m_mgr;

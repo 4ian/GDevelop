@@ -5,8 +5,8 @@ Copyright (c) 2012-2016 Victor Levasseur (victorlevasseur01@orange.fr)
 This project is released under the MIT License.
 */
 
-#ifndef TILEDSPRITEOBJECT_H
-#define TILEDSPRITEOBJECT_H
+#ifndef PANELSPRITEOBJECT_H
+#define PANELSPRITEOBJECT_H
 #include "GDCpp/Runtime/Project/Object.h"
 #include "GDCpp/Runtime/RuntimeObject.h"
 #include <memory>
@@ -64,7 +64,10 @@ public :
     bool IsTiled() const { return tiled; };
     void SetTiled(bool enable = true) { tiled = enable; };
 
-    gd::String textureName;
+    void SetTexture(const gd::String & newTextureName) { textureName = newTextureName; };
+    const gd::String & GetTexture() const { return textureName; };
+
+    gd::String textureName; ///<deprecated. Use Get/SetTexture instead.
 
 private:
     virtual void DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element);
@@ -141,4 +144,4 @@ private:
     std::shared_ptr<SFMLTextureWrapper> texture;
 };
 
-#endif // TILEDSPRITEOBJECT_H
+#endif // PANELSPRITEOBJECT_H

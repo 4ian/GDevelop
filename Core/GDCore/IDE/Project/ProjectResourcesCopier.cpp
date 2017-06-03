@@ -34,7 +34,6 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
     originalProject.ExposeResources(absolutePathChecker);
     bool copyAlsoResourcesWithAbsolutePath = !askAboutAbsoluteFilenames;
 
-    std::cout << "Copying all ressources to " << destinationDirectory;
 
     #if !defined(GD_NO_WX_GUI)
     if ( !copyAlsoResourcesWithAbsolutePath )
@@ -45,9 +44,12 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
     }
     #endif
 
+    auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
+    std::cout << "Copying all ressources from " << projectDirectory << " to " << destinationDirectory;
+
     //Get the resources to be copied
     gd::ResourcesMergingHelper resourcesMergingHelper(fs);
-    resourcesMergingHelper.SetBaseDirectory(fs.DirNameFrom(originalProject.GetProjectFile()));
+    resourcesMergingHelper.SetBaseDirectory(projectDirectory);
     resourcesMergingHelper.PreserveDirectoriesStructure(preserveDirectoryStructure);
     resourcesMergingHelper.PreserveAbsoluteFilenames(!copyAlsoResourcesWithAbsolutePath);
 

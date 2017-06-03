@@ -25,6 +25,8 @@
 #include <wx/menu.h>
 #include <wx/toolbar.h>
 #include <wx/listctrl.h>
+#include <wx/gauge.h>
+#include <wx/button.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -140,6 +142,25 @@ public:
     wxAuiManager* GetAuimgr() { return m_auimgr; }
     LayersEditorPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~LayersEditorPanelBase();
+};
+
+
+class ExternalEditorPanelBase : public wxPanel
+{
+protected:
+    wxStaticText* captionText;
+    wxGauge* loadingProgress;
+    wxButton* openButton;
+
+protected:
+    virtual void onOpenEditorClicked(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetCaptionText() { return captionText; }
+    wxGauge* GetLoadingProgress() { return loadingProgress; }
+    wxButton* GetOpenButton() { return openButton; }
+    ExternalEditorPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    virtual ~ExternalEditorPanelBase();
 };
 
 #endif

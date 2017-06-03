@@ -11,25 +11,21 @@ This project is released under the MIT License.
 #include <iostream>
 #include "GDCore/Tools/Localization.h"
 
+void DeclareInventoryExtension(gd::PlatformExtension & extension);
+
 /**
  * \brief This class declares information about the JS extension.
  */
-class JsExtension : public gd::PlatformExtension
+class InventoryJsExtension : public gd::PlatformExtension
 {
 public:
 
     /**
      * \brief Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    JsExtension()
+    InventoryJsExtension()
     {
-        SetExtensionInformation("Inventory",
-	        _("Inventory"),
-	        _("Provides action and condition to store an inventory with items in memory."),
-	        "Florian Rival",
-	        "Open source (MIT License)");
-
-        CloneExtension("GDevelop C++ platform", "Inventory");
+        DeclareInventoryExtension(*this);
 
 		GetAllActions()["Inventory::Add"].codeExtraInformation
 			.SetIncludeFile("Inventory/inventory.js")
@@ -84,14 +80,21 @@ public:
 			.SetFunctionName("gdjs.evtTools.inventory.count");
 
         StripUnimplementedInstructionsAndExpressions();
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 
+#if defined(EMSCRIPTEN)
+extern "C" gd::PlatformExtension * CreateGDJSInventoryExtension() {
+    return new InventoryJsExtension;
+}
+#else
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
-    return new JsExtension;
+    return new InventoryJsExtension;
 }
+#endif
 #endif

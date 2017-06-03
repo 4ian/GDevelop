@@ -50,6 +50,7 @@ void ObjectGroup::SerializeTo(const std::vector < gd::ObjectGroup > & list, Seri
 
 void ObjectGroup::UnserializeFrom(std::vector < gd::ObjectGroup > & list, const SerializerElement & element)
 {
+    list.clear();
     element.ConsiderAsArrayOf("group", "Groupe");
     for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
     {

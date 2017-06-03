@@ -29,6 +29,9 @@ public:
 	void AddPage(wxWindow * page, wxString name = "", bool select = false);
 	void OnPageAdded(std::function<void(wxWindow*)> cb) { onPageAddedCb = cb; }
 
+	void PageChanged(wxWindow * newPage);
+	void MainFrameNotDisplayed();
+
 	void UpdatePageLabel(int pageIndex, wxString name);
 
 	void CloseAllPagesFor(gd::Project & project);
@@ -53,6 +56,9 @@ public:
 
 	wxString GetLabelFor(wxWindow * page, wxString name = "");
 private:
+	void NotifyPageDisplayed(wxWindow * newPage);
+	void NotifyPageNotDisplayed(wxWindow * page);
+
 	gd::Project * GetProjectFor(wxWindow * page);
 	wxBitmap GetIconFor(wxWindow * page);
 

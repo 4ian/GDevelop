@@ -87,7 +87,7 @@ ExternalEventsEditor::~ExternalEventsEditor()
 	//*)
 }
 
-void ExternalEventsEditor::ForceRefreshRibbonAndConnect()
+void ExternalEventsEditor::EditorDisplayed()
 {
     mainFrameWrapper.SetRibbonPage(_("Events"));
     eventsEditor->ConnectEvents();

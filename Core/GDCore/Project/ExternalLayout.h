@@ -10,7 +10,7 @@
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include <memory>
 namespace gd { class SerializerElement; }
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #endif
 
@@ -51,7 +51,7 @@ public:
      */
     gd::InitialInstancesContainer & GetInitialInstances() { return instances; }
 
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    #if defined(GD_IDE_ONLY)
     /**
      * \brief Get the user settings for the IDE.
      */
@@ -61,6 +61,7 @@ public:
      * \brief Get the user settings for the IDE.
      */
     gd::LayoutEditorCanvasOptions & GetAssociatedSettings() { return editionSettings; }
+    #endif
 
     /**
      * \brief Get the name of the layout last used to edit the external layout.
@@ -71,7 +72,6 @@ public:
      * \brief Set the name of the layout used to edit the external layout.
      */
     void SetAssociatedLayout(const gd::String & name) { associatedLayout = name; }
-    #endif
 
     /** \name Serialization
      */
@@ -93,10 +93,10 @@ private:
 
     gd::String name;
     gd::InitialInstancesContainer instances;
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+    #if defined(GD_IDE_ONLY)
     gd::LayoutEditorCanvasOptions editionSettings;
-    gd::String associatedLayout;
     #endif
+    gd::String associatedLayout;
 };
 
 /**

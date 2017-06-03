@@ -1,0 +1,39 @@
+{
+  "name": "gdevelop-electron",
+  "productName": "GDevelop IDE",
+  "description": "GDevelop IDE running on the Electron runtime",
+  "version": "1.0.0",
+  "author": "Florian Rival",
+  "license": "MIT",
+  "homepage": "http://compilgames.net",
+  "scripts": {
+    "postinstall": "cd app && npm install",
+    "build:app": "cd ../app && npm run build",
+    "build": "node scripts/build.js"
+  },
+  "build": {
+    "appId": "com.gdevelop.ide",
+    "extraResources": [
+      {
+        "from": "../app/resources/examples",
+        "to": "examples"
+      },
+      {
+        "from": "../app/resources/GDJS",
+        "to": "GDJS"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
+  },
+  "devDependencies": {
+    "electron": "1.6.8",
+    "electron-builder": "16.8.2",
+    "minimist": "^1.2.0",
+    "shelljs": "^0.7.7"
+  },
+  "dependencies": {
+    "electron-is": "^2.4.0"
+  }
+}

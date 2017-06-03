@@ -1,0 +1,48 @@
+{
+  "name": "gdevelop-ide",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "homepage": ".",
+  "devDependencies": {
+    "flow-bin": "^0.46.0",
+    "follow-redirects": "^1.2.3",
+    "prettier": "^0.22.0",
+    "react-scripts": "1.0.6",
+    "shelljs": "^0.7.7"
+  },
+  "dependencies": {
+    "@storybook/react": "^3.0.0-alpha.0",
+    "axios": "^0.16.1",
+    "flat": "2.0.1",
+    "lodash": "^4.16.4",
+    "material-ui": "0.17.3",
+    "pixi-simple-gesture": "0.2.2",
+    "pixi.js": "3.0.11",
+    "prop-types": "^15.5.10",
+    "react": "15.4.2",
+    "react-addons-css-transition-group": "15.4.2",
+    "react-addons-perf": "15.4.2",
+    "react-color": "2.11.7",
+    "react-dom": "15.4.2",
+    "react-measure": "1.4.6",
+    "react-mosaic-component": "^0.3.4",
+    "react-tap-event-plugin": "2.0.1",
+    "react-virtualized": "9.3.0",
+    "slug": "0.9.1",
+    "wait-promise": "^0.4.1"
+  },
+  "scripts": {
+    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js",
+    "start": "npm run import-resources && react-scripts start",
+    "build": "npm run import-resources && react-scripts build",
+    "format": "prettier --single-quote --trailing-comma es5 --write \"src/**/*.js\"",
+    "test": "react-scripts test --env=jsdom",
+    "flow": "flow",
+    "storybook": "start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  }
+}

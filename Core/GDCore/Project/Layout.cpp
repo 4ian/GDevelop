@@ -228,8 +228,8 @@ void Layout::SerializeTo(SerializerElement & element) const
     element.SetAttribute( "stopSoundsOnStartup", stopSoundsOnStartup);
     element.SetAttribute( "disableInputWhenNotFocused", disableInputWhenNotFocused);
 
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    GetAssociatedLayoutEditorCanvasOptions().SerializeTo(element.AddChild("uiSettings"));
+    #if defined(GD_IDE_ONLY)
+    GetAssociatedSettings().SerializeTo(element.AddChild("uiSettings"));
     #endif
 
     ObjectGroup::SerializeTo(GetObjectGroups(), element.AddChild("objectsGroups"));
@@ -238,10 +238,7 @@ void Layout::SerializeTo(SerializerElement & element) const
     SerializeObjectsTo(element.AddChild("objects"));
     gd::EventsListSerialization::SerializeEventsTo(events, element.AddChild("events"));
 
-    SerializerElement & layersElement = element.AddChild("layers");
-    layersElement.ConsiderAsArrayOf("layer");
-    for ( std::size_t j = 0;j < GetLayersCount();++j )
-        GetLayer(j).SerializeTo(layersElement.AddChild("layer"));
+	SerializeLayersTo(element.AddChild("layers"));
 
     SerializerElement & behaviorDatasElement = element.AddChild("behaviorsSharedData");
     behaviorDatasElement.ConsiderAsArrayOf("behaviorSharedData");
@@ -255,7 +252,26 @@ void Layout::SerializeTo(SerializerElement & element) const
         it->second->SerializeTo(dataElement);
     }
 }
+
+void Layout::SerializeLayersTo(SerializerElement & element) const
+{
+	element.ConsiderAsArrayOf("layer");
+	for ( std::size_t j = 0;j < GetLayersCount();++j )
+		GetLayer(j).SerializeTo(element.AddChild("layer"));
+}
 #endif
+
+void Layout::UnserializeLayersFrom(const SerializerElement & element)
+{
+	initialLayers.clear();
+	element.ConsiderAsArrayOf("layer", "Layer");
+	for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
+	{
+		gd::Layer layer;
+		layer.UnserializeFrom(element.GetChild(i));
+		initialLayers.push_back(layer);
+	}
+}
 
 void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
@@ -268,11 +284,9 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
     stopSoundsOnStartup = element.GetBoolAttribute( "stopSoundsOnStartup" );
     disableInputWhenNotFocused = element.GetBoolAttribute( "disableInputWhenNotFocused" );
 
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    associatedSettings.UnserializeFrom(element.GetChild("uiSettings", 0, "UISettings"));
-    #endif
-
     #if defined(GD_IDE_ONLY)
+    associatedSettings.UnserializeFrom(element.GetChild("uiSettings", 0, "UISettings"));
+
     gd::ObjectGroup::UnserializeFrom(objectGroups, element.GetChild( "objectsGroups", 0, "GroupesObjets" ));
     gd::EventsListSerialization::UnserializeEventsFrom(project, GetEvents(), element.GetChild("events", 0, "Events"));
     #endif
@@ -281,16 +295,7 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
     initialInstances.UnserializeFrom(element.GetChild("instances", 0, "Positions"));
     variables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
-    initialLayers.clear();
-    SerializerElement & layersElement = element.GetChild("layers", 0, "Layers");
-    layersElement.ConsiderAsArrayOf("layer", "Layer");
-    for (std::size_t i = 0; i < layersElement.GetChildrenCount(); ++i)
-    {
-        gd::Layer layer;
-
-        layer.UnserializeFrom(layersElement.GetChild(i));
-        initialLayers.push_back(layer);
-    }
+    UnserializeLayersFrom(element.GetChild("layers", 0, "Layers"));
 
     //Compatibility with GD <= 4
     gd::String deprecatedTag1 = "automatismsSharedData";
@@ -350,6 +355,7 @@ void Layout::Init(const Layout & other)
 
     #if defined(GD_IDE_ONLY)
     events = other.events;
+    associatedSettings = other.associatedSettings;
     objectGroups = other.objectGroups;
 
     compiledEventsFile = other.compiledEventsFile;

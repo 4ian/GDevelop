@@ -1,0 +1,44 @@
+#root {
+  height: 100%;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.main-frame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+
+  /* Smoother startup */
+  animation: fadein 0.5s;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Disable selections and web-ish cursors */
+:not(input):not(textarea):not(canvas),
+:not(input):not(textarea):not(canvas)::after,
+:not(input):not(textarea):not(canvas)::before {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+a:not([draggable=true]), img:not([draggable=true]) {
+    -webkit-user-drag: none;
+    user-drag: none; /* Technically not supported in Electron yet */
+}
+a[href^="http://"],
+a[href^="https://"],
+a[href^="ftp://"] {
+    -webkit-user-drag: auto;
+    user-drag: auto; /* Technically not supported in Electron yet */
+}

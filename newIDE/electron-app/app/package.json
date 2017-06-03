@@ -1,0 +1,17 @@
+{
+  "name": "gdevelop-electron-app",
+  "productName": "GDevelop IDE",
+  "description": "GDevelop IDE running on the Electron runtime",
+  "version": "1.0.0",
+  "author": "Florian Rival",
+  "license": "MIT",
+  "homepage": "http://compilgames.net",
+  "main": "main.js",
+  "dependencies": {
+    "aws-sdk": "^2.58.0",
+    "electron-is": "^2.4.0",
+    "fs-extra": "^3.0.1",
+    "minimist": "^1.2.0",
+    "s3": "^4.4.0"
+  }
+}

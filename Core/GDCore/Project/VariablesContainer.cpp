@@ -119,11 +119,15 @@ Variable & VariablesContainer::InsertNew(const gd::String & name, std::size_t po
     return Insert(name, newVariable, position);
 }
 
-void VariablesContainer::Rename(const gd::String & oldName, const gd::String & newName)
+bool VariablesContainer::Rename(const gd::String & oldName, const gd::String & newName)
 {
+    if (Has(newName)) return false;
+
     std::vector < std::pair<gd::String, gd::Variable> >::iterator i =
         std::find_if(variables.begin(), variables.end(), VariableHasName(oldName));
     if (i != variables.end()) i->first = newName;
+
+    return true;
 }
 
 void VariablesContainer::Swap(std::size_t firstVariableIndex, std::size_t secondVariableIndex)
@@ -135,6 +139,7 @@ void VariablesContainer::Swap(std::size_t firstVariableIndex, std::size_t second
     variables[firstVariableIndex] = variables[secondVariableIndex];
     variables[secondVariableIndex] = temp;
 }
+#endif
 
 void VariablesContainer::SerializeTo(SerializerElement & element) const
 {
@@ -146,7 +151,6 @@ void VariablesContainer::SerializeTo(SerializerElement & element) const
         variables[j].second.SerializeTo(variableElement);
     }
 }
-#endif
 
 void VariablesContainer::UnserializeFrom(const SerializerElement & element)
 {

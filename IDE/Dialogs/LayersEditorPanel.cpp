@@ -267,6 +267,7 @@ void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
     m_layout.InsertNewLayer(name, m_layout.GetLayersCount()-1);
     m_layout.GetLayer(name).SetCameraCount(1);
 
+    if (onChangeCb) onChangeCb("layer-added");
     Refresh();
 }
 
@@ -305,6 +306,7 @@ void LayersEditorPanel::OnDeleteLayerClicked(wxCommandEvent& event)
             m_layout.RemoveLayer(name);
             if ( m_layoutCanvas ) m_layoutCanvas->SetCurrentLayer("");
             if ( propPnl ) propPnl->SelectedLayer(NULL);
+            if (onChangeCb) onChangeCb("layer-deleted");
             Refresh();
             return;
         }
@@ -336,6 +338,7 @@ void LayersEditorPanel::OnLayerDownClicked(wxCommandEvent& event)
             {
                 //Move the layer
                 m_layout.SwapLayers(i,i-1);
+                if (onChangeCb) onChangeCb("layer-moved-down");
                 Refresh();
 
                 //Focus it again
@@ -361,6 +364,7 @@ void LayersEditorPanel::OnLayerUpClicked(wxCommandEvent& event)
             {
                 //Move the layer
                 m_layout.SwapLayers(i,i+1);
+                if (onChangeCb) onChangeCb("layer-moved-up");
                 Refresh();
 
                 //Focus it again

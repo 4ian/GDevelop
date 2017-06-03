@@ -81,16 +81,20 @@ const Variable & Variable::GetChild(const gd::String & name) const
     return children[name];
 }
 
-/**
- * \brief Remove the child with the specified name.
- *
- * If the variable is not a structure or has not
- * the specified child, nothing is done.
- */
 void Variable::RemoveChild(const gd::String & name)
 {
     if ( !isStructure ) return;
     children.erase(name);
+}
+
+bool Variable::RenameChild(const gd::String & oldName, const gd::String & newName)
+{
+    if ( !isStructure || !HasChild(oldName)|| HasChild(newName) ) return false;
+
+    children[newName] = children[oldName];
+    children.erase(oldName);
+
+    return true;
 }
 
 void Variable::SerializeTo(SerializerElement & element) const

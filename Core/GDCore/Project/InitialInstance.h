@@ -125,7 +125,6 @@ public:
     float GetCustomHeight() const { return height; }
     void SetCustomHeight(float height_) { height = height_; }
 
-    #if defined(GD_IDE_ONLY)
     /**
      * \brief Return true if the instance is locked and cannot be selected by clicking on it in the IDE.
      */
@@ -137,7 +136,6 @@ public:
      * An instance which is locked cannot be selected by clicking on it in a layout editor canvas.
      */
     void SetLocked(bool enable = true) { locked = enable; }
-    #endif
 
     ///@}
 
@@ -186,10 +184,39 @@ public:
      * \return false if the property could not be updated.
      */
     bool UpdateCustomProperty(const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & layout);
+
+    /**
+     * \brief Get the value of a float property stored in the instance.
+     * \note Only use this when \a GetCustomProperties is too slow (when rendering instances for example).
+     * \return the value of the property, or 0 if it does not exists.
+     */
+    float GetRawFloatProperty(const gd::String & name) const;
+
+    /**
+     * \brief Get the value of a string property stored in the instance.
+     * \note Only use this when \a GetCustomProperties is too slow (when rendering instances for example).
+     * \return the value of the propety, or an empty string if it does not exists.
+     */
+    const gd::String & GetRawStringProperty(const gd::String & name) const;
     ///@}
     #endif
 
-    //In our implementation, more properties can be stored in floatInfos and stringInfos.
+    /** \name Saving and loading
+     * Members functions related to serialization.
+     */
+    ///@{
+    /**
+     * \brief Serialize instances container.
+     */
+    virtual void SerializeTo(SerializerElement & element) const;
+
+    /**
+     * \brief Unserialize the instances container.
+     */
+    virtual void UnserializeFrom(const SerializerElement & element);
+    ///@}
+
+    //More properties can be stored in floatInfos and stringInfos.
     //These properties are then managed by the Object class.
     std::map < gd::String, float > floatInfos; ///< More data which can be used by the object
     std::map < gd::String, gd::String > stringInfos; ///< More data which can be used by the object
@@ -206,6 +233,8 @@ private:
     float height; ///< Object custom height
     gd::VariablesContainer initialVariables; ///< Instance specific variables
     bool locked; ///< True if the instance is locked
+
+    static gd::String * badStringProperyValue; ///< Empty string returned by GetRawStringProperty
 };
 
 }

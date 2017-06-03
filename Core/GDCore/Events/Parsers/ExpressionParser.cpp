@@ -46,7 +46,7 @@ size_t ExpressionParser::GetMaximalParametersNumber(const std::vector < gd::Para
 }
 
 /**
- * Add blank parameters when code-only parameters are excepted.
+ * Add blank parameters when code-only parameters are expected.
  * \param Parameters information
  * \param vector of parameters without code only parameters.
  */
@@ -100,7 +100,7 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
         {
             if ( requestNumber )
             {
-                firstErrorStr = _("Number excepted");
+                firstErrorStr = _("Number expected");
 
                 return false;
             }
@@ -165,7 +165,7 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
         {
             if ( requestNumber )
             {
-                firstErrorStr = _("Number excepted");
+                firstErrorStr = _("Number expected");
 
                 return false;
             }
@@ -206,7 +206,7 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
         {
             if ( requestNumber )
             {
-                firstErrorStr = _("Number excepted");
+                firstErrorStr = _("Number expected");
 
                 return false;
             }
@@ -241,7 +241,7 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
             {
                 if ( requestNumber )
                 {
-                    firstErrorStr = _("Number excepted");
+                    firstErrorStr = _("Number expected");
 
                     return false;
                 }
@@ -283,7 +283,7 @@ bool ExpressionParser::ValidSyntax(const gd::String & str)
     }
     else if ( requestNumber )
     {
-        firstErrorStr = _("Number excepted");
+        firstErrorStr = _("Number expected");
 
         return false;
     }
@@ -452,7 +452,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const 
                         firstErrorPos = functionNameEnd;
                         firstErrorStr = _("Incorrect number of parameters");
                         firstErrorStr += " ";
-                        firstErrorStr += _("Excepted ( maximum ) :");
+                        firstErrorStr += _("Expected (maximum) :");
                         firstErrorStr += gd::String::From(GetMaximalParametersNumber(instructionInfos.parameters));
 
                         return false;

@@ -11,25 +11,21 @@ This project is released under the MIT License.
 #include <iostream>
 #include "GDCore/Tools/Localization.h"
 
+void DeclareLinkedObjectsExtension(gd::PlatformExtension & extension);
+
 /**
  * \brief This class declares information about the JS extension.
  */
-class JsExtension : public gd::PlatformExtension
+class LinkedObjectsJsExtension : public gd::PlatformExtension
 {
 public:
 
     /**
      * \brief Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    JsExtension()
+    LinkedObjectsJsExtension()
     {
-        SetExtensionInformation("LinkedObjects",
-                              _("Linked objects"),
-                              _("Extension allowing to virtually link two objects."),
-                              "Florian Rival",
-                              "Open source (MIT License)");
-
-        CloneExtension("GDevelop C++ platform", "LinkedObjects");
+        DeclareLinkedObjectsExtension(*this);
 
         GetAllActions()["LinkedObjects::LinkObjects"].codeExtraInformation.SetIncludeFile("LinkedObjects/linkedobjects.js")
             .SetFunctionName("gdjs.evtTools.linkedObjects.linkObjects");
@@ -43,14 +39,21 @@ public:
             .SetFunctionName("gdjs.evtTools.linkedObjects.pickObjectsLinkedTo");
 
         StripUnimplementedInstructionsAndExpressions();
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 
+#if defined(EMSCRIPTEN)
+extern "C" gd::PlatformExtension * CreateGDJSLinkedObjectsExtension() {
+    return new LinkedObjectsJsExtension;
+}
+#else
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
-    return new JsExtension;
+    return new LinkedObjectsJsExtension;
 }
+#endif
 #endif

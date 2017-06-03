@@ -25,12 +25,6 @@ public:
      */
     DraggableBehaviorJsExtension()
     {
-        SetExtensionInformation("DraggableBehavior",
-                              _("Draggable Behavior"),
-                              _("Behavior allowing to move objects with the mouse"),
-                              "Florian Rival",
-                              "Open source (MIT License)");
-
         DeclareDraggableBehaviorExtension(*this);
 
         GetBehaviorMetadata("DraggableBehavior::Draggable").SetIncludeFile("DraggableBehavior/draggableruntimebehavior.js");

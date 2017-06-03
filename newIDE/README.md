@@ -3,7 +3,7 @@
 This is a new, revamped editor for GDevelop. It is based on [React](https://facebook.github.io/react/), [Material-UI](http://www.material-ui.com), [Pixi.js](https://github.com/pixijs/pixi.js) and [Electron](https://electron.atom.io/).
 It uses GDevelop [core C++ classes compiled to Javascript](github.com/4ian/GDevelop.js) to work with GDevelop games.
 
-![GDevelop editor](https://raw.githubusercontent.com/4ian/GD/new-ide/newIDE/gd-ide-screenshot.png "GDevelop editor")
+![GDevelop editor](https://raw.githubusercontent.com/4ian/GD/master/newIDE/gd-ide-screenshot.png "GDevelop editor")
 
 ## Installation
 

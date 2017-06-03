@@ -6,7 +6,6 @@ const app = electron ? electron.remote.app : null;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const process = optionalRequire('process');
-var isWin = process && /^win/.test(process.platform);
 var isDarwin = process && /^darwin/.test(process.platform);
 
 const tryPath = (
@@ -29,24 +28,12 @@ export const findGDJS = (cb: (?string) => void) => {
   const pathToRoot = isDarwin ? '../../../../' : path.join('..', '..');
   const rootPath = path.join(appPath, pathToRoot);
 
-  // First try to find GDJS next to the app or in the parent folder
-  tryPath(path.join(rootPath, 'JsPlatform'), cb, () => {
-    tryPath(path.join(rootPath, '..', 'JsPlatform'), cb, () => {
-
-      // Try to find GDJS in the structure of directories of GD.
-      const releaseFolder = isWin
-        ? 'Release_Windows'
-        : isDarwin ? 'Release_Darwin' : 'Release_Linux';
-      const devPath = path.join(
-        appPath,
-        '..',
-        '..',
-        '..',
-        'Binaries',
-        'Output',
-        releaseFolder,
-        'JsPlatform'
-      );
+  // First try to find GDJS in the parent folder (when newIDE is inside IDE)
+  tryPath(path.join(rootPath, '..', 'JsPlatform'), cb, () => {
+    // Or in the resources (for a standalone newIDE)
+    tryPath(path.join(appPath, '..', 'GDJS'), cb, () => {
+      // Or in the resources when developing with Electron
+      const devPath = path.join(appPath, '..', '..', 'app', 'resources', 'GDJS');
       tryPath(devPath, cb, () => {
         cb(null);
       });

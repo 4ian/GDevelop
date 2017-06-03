@@ -8,8 +8,8 @@ var gdRootDir = '../..';
 var gdBinariesOutputDir = gdRootDir + '/Binaries/Output';
 
 if (!shell.test('-f', './node_modules/.bin/build')) {
-  shell.echo('Please run npm install in electron-app folder');
-  shell.exit();
+  shell.echo('⚠️ Please run npm install in electron-app folder');
+  shell.exit(1);
 }
 
 if (!args['skip-app-build']) {

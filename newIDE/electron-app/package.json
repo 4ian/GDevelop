@@ -16,6 +16,10 @@
       {
         "from": "../app/resources/examples",
         "to": "examples"
+      },
+      {
+        "from": "../app/resources/GDJS",
+        "to": "GDJS"
       }
     ],
     "mac": {

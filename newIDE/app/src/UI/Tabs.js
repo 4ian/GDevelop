@@ -25,7 +25,7 @@ export class ThemableTabs extends Component {
         }}
         contentContainerStyle={{
           overflowY: 'hidden',
-          height: '100%',
+          height: `calc(100% - ${muiTheme.closableTabs.height}px)`,
         }}
         tabItemContainerStyle={tabItemContainerStyle}
         inkBarStyle={{ display: 'none' }}

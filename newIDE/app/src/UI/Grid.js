@@ -8,6 +8,8 @@ export const Line = props => (
       marginTop: marginsSize,
       marginBottom: marginsSize,
       alignItems: props.alignItems,
+      justifyContent: props.justifyContent,
+      flex: props.expand ? 1 : undefined,
     }}
   >
     {props.children}
@@ -20,6 +22,7 @@ export const Column = props => (
       display: 'flex',
       flexDirection: 'column',
       alignItems: props.alignItems || 'stretch',
+      flex: props.expand ? 1 : undefined,
     }}
   >
     {props.children}

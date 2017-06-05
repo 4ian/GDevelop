@@ -3,7 +3,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import Divider from 'material-ui/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import { findExamples } from './LocalExamplesFinder';
 import generateName from '../Utils/NewNameGenerator';
 import optionalRequire from '../Utils/OptionalRequire.js';
@@ -16,7 +16,7 @@ export default class LocalCreateDialog extends Component {
   constructor(props) {
     super(props);
 
-    const outputRootPath = path.join(app.getPath('home'), 'GDevelop projects');
+    const outputRootPath = path ? path.join(app.getPath('home'), 'GDevelop projects') : "";
     this.state = {
       outputPath: this._findEmptyPath(outputRootPath),
     };
@@ -24,6 +24,8 @@ export default class LocalCreateDialog extends Component {
   }
 
   _findEmptyPath = basePath => {
+    if (!path) return basePath;
+
     const folderName = generateName('My project', name => {
       try {
         fs.accessSync(path.join(basePath, name));
@@ -63,23 +65,32 @@ export default class LocalCreateDialog extends Component {
         open={open}
       >
         <Column>
+          <Line>
           Choose the game to use as a base:
-          <FlatButton
-            label="Platformer"
-            fullWidth
-            primary
-            onClick={() => this.createFromExample('platformer')}
-          />
-          <FlatButton label="Space Shooter" fullWidth primary disabled />
-          <FlatButton label="Empty game" fullWidth primary disabled />
+          </Line>
+          <Line>
+            <Column expand>
+            <FlatButton
+              label="Platformer"
+              fullWidth
+              primary
+              onClick={() => this.createFromExample('platformer')}
+            />
+            <FlatButton label="Space Shooter" fullWidth primary disabled />
+            <FlatButton label="Empty game" fullWidth primary disabled />
+            </Column>
+          </Line>
           <Divider />
+          <Line expand>
           <LocalFolderPicker
+          fullWidth
             value={this.state.outputPath}
             onChange={outputPath =>
               this.setState({
                 outputPath,
               })}
           />
+          </Line>
         </Column>
       </Dialog>
     );

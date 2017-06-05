@@ -12,6 +12,11 @@ const styles = {
 };
 
 export default class AboutDialog extends Component {
+  constructor() {
+    super();
+    this.versionFullString = gd ? gd.VersionWrapper.fullString() : 'Unknown';
+  }
+
   _onOpenWebsite() {
     shell.openExternal('http://compilgames.net');
   }
@@ -48,7 +53,7 @@ export default class AboutDialog extends Component {
           />
           <div style={styles.content}>
             <Line>
-              GDevelop IDE based on GDevelop {gd.VersionWrapper.fullString()}
+              GDevelop IDE based on GDevelop {this.versionFullString}
             </Line>
           </div>
         </Column>

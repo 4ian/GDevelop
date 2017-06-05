@@ -7,6 +7,8 @@ import { linkTo } from '@storybook/addon-links';
 import Welcome from './Welcome';
 
 import StartPage from '../MainFrame/StartPage';
+import AboutDialog from '../MainFrame/AboutDialog';
+import LocalCreateDialog from '../ProjectCreation/LocalCreateDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
@@ -17,6 +19,15 @@ import muiDecorator from './MuiDecorator';
 const fakeProject = {
   getLastCompilationDirectory: () => '/Fake/Directory'
 }
+
+const fakeGD = {
+  VersionWrapper: {
+    fullString: () => "Fake",
+    major: () => "Fake",
+    minor: () => "Fake",
+  },
+};
+window.gd = fakeGD;
 
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
@@ -89,3 +100,12 @@ storiesOf('LocalFolderPicker', module)
 storiesOf('StartPage', module)
   .addDecorator(muiDecorator)
   .add('default', () => <StartPage />);
+
+storiesOf('AboutDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <AboutDialog open />);
+
+
+storiesOf('LocalCreateDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <LocalCreateDialog open />);

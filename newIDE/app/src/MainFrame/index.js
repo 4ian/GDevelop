@@ -6,6 +6,8 @@ import IconButton from 'material-ui/IconButton';
 import Drawer from 'material-ui/Drawer';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 
+import DragDropContextProvider
+  from '../Utils/DragDropHelpers/DragDropContextProvider';
 import Toolbar from './Toolbar';
 import StartPage from './StartPage';
 import ProjectTitlebar from './ProjectTitlebar';
@@ -36,7 +38,7 @@ import FileWriter from '../Utils/FileWriter';
 import fixtureGame from '../fixtures/platformer/platformer.json';
 const gd = global.gd;
 
-class MainFrame extends Component {
+export default class MainFrame extends Component {
   constructor() {
     super();
     this.state = {
@@ -256,6 +258,7 @@ class MainFrame extends Component {
   };
 
   _onOpenFromFile = () => {
+    // TODO: This should be moved to a LocalFileOpener passed as a props
     FileOpener.chooseProjectFile((err, filepath) => {
       if (!filepath || err) return;
 
@@ -264,6 +267,7 @@ class MainFrame extends Component {
   };
 
   _onSaveToFile = () => {
+    // TODO: This should be moved to a LocalFileWriter passed as a props
     const filepath = this.state.currentProject.getProjectFile();
     if (!filepath) {
       console.warn('Unimplemented Saveas'); // TODO
@@ -340,82 +344,82 @@ class MainFrame extends Component {
       this.props.loading;
 
     return (
-      <MuiThemeProvider muiTheme={defaultTheme}>
-        <div className="main-frame">
-          <ProjectTitlebar project={this.state.currentProject} />
-          <Drawer open={this.state.projectManagerOpen}>
-            <EditorBar
-              title={currentProject ? currentProject.getName() : 'No project'}
-              showMenuIconButton={false}
-              iconElementRight={
-                <IconButton onClick={this.toggleProjectManager}>
-                  <NavigationClose />
-                </IconButton>
-              }
+      <DragDropContextProvider>
+        <MuiThemeProvider muiTheme={defaultTheme}>
+          <div className="main-frame">
+            <ProjectTitlebar project={this.state.currentProject} />
+            <Drawer open={this.state.projectManagerOpen}>
+              <EditorBar
+                title={currentProject ? currentProject.getName() : 'No project'}
+                showMenuIconButton={false}
+                iconElementRight={
+                  <IconButton onClick={this.toggleProjectManager}>
+                    <NavigationClose />
+                  </IconButton>
+                }
+              />
+              {currentProject &&
+                <ProjectManager
+                  project={currentProject}
+                  onOpenExternalEvents={this.openExternalEvents}
+                  onOpenLayout={this.openLayout}
+                  onOpenExternalLayout={this.openExternalLayout}
+                  onSaveProject={this._onSaveToFile}
+                  onCloseProject={this._onCloseProject}
+                  onExportProject={this._openExportDialog}
+                />}
+            </Drawer>
+            <Toolbar
+              ref={toolbar => this.toolbar = toolbar}
+              showProjectIcons={!this.props.singleEditor}
+              hasProject={!!this.state.currentProject}
+              toggleProjectManager={this.toggleProjectManager}
+              openProject={this._onOpenFromFile}
+              loadBuiltinGame={this.loadBuiltinGame}
+              requestUpdate={this.props.requestUpdate}
             />
-            {currentProject &&
-              <ProjectManager
-                project={currentProject}
-                onOpenExternalEvents={this.openExternalEvents}
-                onOpenLayout={this.openLayout}
-                onOpenExternalLayout={this.openExternalLayout}
-                onSaveProject={this._onSaveToFile}
-                onCloseProject={this._onCloseProject}
-                onExportProject={this._openExportDialog}
-              />}
-          </Drawer>
-          <Toolbar
-            ref={toolbar => this.toolbar = toolbar}
-            showProjectIcons={!this.props.singleEditor}
-            hasProject={!!this.state.currentProject}
-            toggleProjectManager={this.toggleProjectManager}
-            openProject={this._onOpenFromFile}
-            loadBuiltinGame={this.loadBuiltinGame}
-            requestUpdate={this.props.requestUpdate}
-          />
-          <Tabs
-            value={getCurrentTabIndex(this.state.editorTabs)}
-            onChange={this._onChangeEditorTab}
-            hideLabels={!!this.props.singleEditor}
-          >
-            {getEditors(this.state.editorTabs).map((editorTab, id) => (
-              <Tab
-                label={editorTab.name}
-                value={id}
-                key={editorTab.key}
-                onActive={() => this._onEditorTabActive(editorTab)}
-                onClose={() => this._onCloseEditorTab(editorTab)}
-              >
-                <div style={{ display: 'flex', flex: 1, height: '100%' }}>
-                  {editorTab.render()}
-                </div>
-              </Tab>
-            ))}
-          </Tabs>
-          <LoaderModal show={showLoader} />
-          <ConfirmCloseDialog
-            ref={confirmCloseDialog =>
-              this.confirmCloseDialog = confirmCloseDialog}
-          />
-          {!!exportDialog &&
-            React.cloneElement(exportDialog, {
-              open: this.state.exportDialogOpen,
-              onClose: () => this._openExportDialog(false),
-              project: this.state.currentProject,
-            })}
-          {!!createDialog &&
-            React.cloneElement(createDialog, {
-              open: this.state.createDialogOpen,
-              onClose: () => this._openCreateDialog(false),
-              onOpen: filepath => {
-                this._openCreateDialog(false);
-                this._openFromFile(filepath);
-              },
-            })}
-        </div>
-      </MuiThemeProvider>
+            <Tabs
+              value={getCurrentTabIndex(this.state.editorTabs)}
+              onChange={this._onChangeEditorTab}
+              hideLabels={!!this.props.singleEditor}
+            >
+              {getEditors(this.state.editorTabs).map((editorTab, id) => (
+                <Tab
+                  label={editorTab.name}
+                  value={id}
+                  key={editorTab.key}
+                  onActive={() => this._onEditorTabActive(editorTab)}
+                  onClose={() => this._onCloseEditorTab(editorTab)}
+                >
+                  <div style={{ display: 'flex', flex: 1, height: '100%' }}>
+                    {editorTab.render()}
+                  </div>
+                </Tab>
+              ))}
+            </Tabs>
+            <LoaderModal show={showLoader} />
+            <ConfirmCloseDialog
+              ref={confirmCloseDialog =>
+                this.confirmCloseDialog = confirmCloseDialog}
+            />
+            {!!exportDialog &&
+              React.cloneElement(exportDialog, {
+                open: this.state.exportDialogOpen,
+                onClose: () => this._openExportDialog(false),
+                project: this.state.currentProject,
+              })}
+            {!!createDialog &&
+              React.cloneElement(createDialog, {
+                open: this.state.createDialogOpen,
+                onClose: () => this._openCreateDialog(false),
+                onOpen: filepath => {
+                  this._openCreateDialog(false);
+                  this._openFromFile(filepath);
+                },
+              })}
+          </div>
+        </MuiThemeProvider>
+      </DragDropContextProvider>
     );
   }
 }
-
-export default MainFrame;

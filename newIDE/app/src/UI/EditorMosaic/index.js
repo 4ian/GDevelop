@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
-import { Mosaic, createBalancedTreeFromLeaves } from 'react-mosaic-component';
+import { MosaicWithoutDragDropContext, createBalancedTreeFromLeaves } from 'react-mosaic-component';
 // Styles for Mosaic:
 import 'react-mosaic-component/react-mosaic-component.css';
 import '../Theme/Mosaic.css';
 
-export default class EditorMosaic extends Component {
+/**
+ * @class EditorMosaic
+ *
+ * Can be used to create a mosaic of resizable editors.
+ * Must be used inside a component wrapped in a DragDropContext.
+ */
+class EditorMosaic extends Component {
   constructor(props) {
     super(props);
 
@@ -20,7 +26,7 @@ export default class EditorMosaic extends Component {
 
   render() {
     return (
-      <Mosaic
+      <MosaicWithoutDragDropContext
         renderTile={editorName => this.props.editors[editorName]}
         className="mosaic-blueprint-theme mosaic-gd-theme"
         value={this.state.mosaicNode}
@@ -29,3 +35,5 @@ export default class EditorMosaic extends Component {
     );
   }
 }
+
+export default EditorMosaic;

@@ -14,6 +14,7 @@ import WindowMask from './WindowMask';
 import DropHandler from './DropHandler';
 import BackgroundColor from './BackgroundColor';
 import PIXI from 'pixi.js';
+import SimpleDropTarget from '../Utils/DragDropHelpers/SimpleDropTarget';
 
 export default class InstancesEditorContainer extends Component {
   constructor() {
@@ -29,7 +30,7 @@ export default class InstancesEditorContainer extends Component {
       this.props.width,
       this.props.height
     );
-    this.refs.canvasArea.appendChild(this.pixiRenderer.view);
+    this.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', e => {
       e.preventDefault();
 
@@ -92,7 +93,7 @@ export default class InstancesEditorContainer extends Component {
     });
 
     this.dropHandler = new DropHandler({
-      canvas: this.refs.canvasArea,
+      canvas: this.canvasArea,
       onDrop: this._onDrop,
     });
 
@@ -398,10 +399,12 @@ export default class InstancesEditorContainer extends Component {
     if (!this.props.project) return null;
 
     return (
-      <div
-        ref="canvasArea"
-        style={{ flex: 1, position: 'absolute', overflow: 'hidden' }}
-      />
+      <SimpleDropTarget>
+        <div
+          ref={canvasArea => this.canvasArea = canvasArea}
+          style={{ flex: 1, position: 'absolute', overflow: 'hidden' }}
+        />
+      </SimpleDropTarget>
     );
   }
 }

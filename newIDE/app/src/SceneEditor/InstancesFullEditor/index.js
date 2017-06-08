@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 import ObjectsList from '../../ObjectsList';
 import FullSizeInstancesEditor
   from '../../InstancesEditor/FullSizeInstancesEditor';

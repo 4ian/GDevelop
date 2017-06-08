@@ -57,6 +57,7 @@ export default class LocalFolderPicker extends Component {
           type="text"
           hintText="Click to choose"
           value={this.props.value}
+          onChange={(event, value) => this.props.onChange(value)}
         />
         <FlatButton
           label="Choose folder"

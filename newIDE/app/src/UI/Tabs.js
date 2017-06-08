@@ -14,6 +14,11 @@ export class ThemableTabs extends Component {
       backgroundColor: muiTheme.closableTabs.backgroundColor,
     };
 
+    const contentContainerStyle = {
+      overflowY: 'hidden',
+      height: hideLabels ? '100%' : `calc(100% - ${muiTheme.closableTabs.height}px)`,
+    };
+
     return (
       <MaterialUITabs
         style={{
@@ -23,10 +28,7 @@ export class ThemableTabs extends Component {
         tabTemplateStyle={{
           height: '100%',
         }}
-        contentContainerStyle={{
-          overflowY: 'hidden',
-          height: `calc(100% - ${muiTheme.closableTabs.height}px)`,
-        }}
+        contentContainerStyle={contentContainerStyle}
         tabItemContainerStyle={tabItemContainerStyle}
         inkBarStyle={{ display: 'none' }}
         {...tabsProps}

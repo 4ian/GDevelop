@@ -3,6 +3,7 @@ import EventsSheet from './EventsSheet.js';
 import InstructionEditorDialog
   from './InstructionEditor/InstructionEditorDialog.js';
 import BaseEditor from '../MainFrame/BaseEditor';
+import PlaceholderMessage from '../UI/PlaceholderMessage';
 const gd = global.gd;
 
 
@@ -138,6 +139,9 @@ export default class EventsSheetContainer extends BaseEditor {
             onEditEventTemplate: () => console.log('onEditEventTemplate'),
           }}
         />
+        <PlaceholderMessage>
+          This editor is not finished yet.
+        </PlaceholderMessage>
         {this.state.newInstruction.instruction &&
           <InstructionEditorDialog
             {...this.state.newInstruction}

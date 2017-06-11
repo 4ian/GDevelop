@@ -127,12 +127,6 @@ class ExternalEditor extends Component {
     console.log('Update send done');
   };
 
-  launchPreview = (): Promise<any> => {
-    this.sendUpdate();
-    this.bridge.send('requestPreview', undefined);
-    return Promise.resolve();
-  };
-
   editObject = (object: any) => {
     this.sendUpdate();
     this.bridge.send('editObject', object.getName());
@@ -202,10 +196,8 @@ class ExternalEditor extends Component {
       loading: this.state.loading,
       ref: editor => this.editor = editor,
       requestUpdate: () => this.requestUpdate('', true),
-      onLayoutPreview: this.launchPreview,
-      onExternalLayoutPreview: this.launchPreview,
       onEditObject: this.editObject,
-      singleEditor: true,
+      integratedEditor: true,
     });
   }
 }

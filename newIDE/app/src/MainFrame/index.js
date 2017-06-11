@@ -54,7 +54,7 @@ export default class MainFrame extends Component {
   }
 
   componentWillMount() {
-    if (!this.props.singleEditor) this.openStartPage();
+    if (!this.props.integratedEditor) this.openStartPage();
   }
 
   loadFullProject = (serializedProject, cb) => {
@@ -144,7 +144,7 @@ export default class MainFrame extends Component {
         ),
         'external events ' + name
       ),
-    });
+    }, () => this.updateToolbar());
   };
 
   openLayout = name => {
@@ -162,13 +162,14 @@ export default class MainFrame extends Component {
                 this.props.onLayoutPreview(project, layout)).catch(() => {
                 /*TODO: Error*/
               })}
-            showPreviewButton
+            showPreviewButton={!!this.props.onLayoutPreview}
             onEditObject={this.props.onEditObject}
+            showAddObjectButton={!this.props.integratedEditor}
           />
         ),
         'layout ' + name
       ),
-    });
+    }, () => this.updateToolbar());
   };
 
   openExternalLayout = name => {
@@ -190,13 +191,14 @@ export default class MainFrame extends Component {
                 )).catch(() => {
                 /*TODO: Error*/
               })}
-            showPreviewButton
+            showPreviewButton={!!this.props.onExternalLayoutPreview}
             onEditObject={this.props.onEditObject}
+            showAddObjectButton={!this.props.integratedEditor}
           />
         ),
         'external layout ' + name
       ),
-    });
+    }, () => this.updateToolbar());
   };
 
   openStartPage = () => {
@@ -213,7 +215,7 @@ export default class MainFrame extends Component {
         ),
         'start page'
       ),
-    });
+    }, () => this.updateToolbar());
   };
 
   _openCreateDialog = (open = true) => {
@@ -320,23 +322,28 @@ export default class MainFrame extends Component {
   _onChangeEditorTab = value => {
     this.setState({
       editorTabs: changeCurrentTab(this.state.editorTabs, value),
-    });
+    }, () => this.updateToolbar());
   };
 
   _onEditorTabActive = editorTab => {
+    this.updateToolbar();
+  };
+
+  _onCloseEditorTab = editorTab => {
+    this.setState({
+      editorTabs: closeEditorTab(this.state.editorTabs, editorTab),
+    }, () => this.updateToolbar());
+  };
+
+  updateToolbar() {
+    const editorTab = getCurrentTab(this.state.editorTabs);
     if (!editorTab || !editorTab.editorRef) {
       this.setEditorToolbar(null);
       return;
     }
 
     editorTab.editorRef.updateToolbar();
-  };
-
-  _onCloseEditorTab = editorTab => {
-    this.setState({
-      editorTabs: closeEditorTab(this.state.editorTabs, editorTab),
-    }, () => this._onEditorTabActive(getCurrentTab(this.state.editorTabs)));
-  };
+  }
 
   render() {
     const {
@@ -375,7 +382,7 @@ export default class MainFrame extends Component {
             </Drawer>
             <Toolbar
               ref={toolbar => this.toolbar = toolbar}
-              showProjectIcons={!this.props.singleEditor}
+              showProjectIcons={!this.props.integratedEditor}
               hasProject={!!this.state.currentProject}
               toggleProjectManager={this.toggleProjectManager}
               openProject={this._onOpenFromFile}
@@ -385,7 +392,7 @@ export default class MainFrame extends Component {
             <Tabs
               value={getCurrentTabIndex(this.state.editorTabs)}
               onChange={this._onChangeEditorTab}
-              hideLabels={!!this.props.singleEditor}
+              hideLabels={!!this.props.integratedEditor}
             >
               {getEditors(this.state.editorTabs).map((editorTab, id) => (
                 <Tab

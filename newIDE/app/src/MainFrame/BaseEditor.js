@@ -12,10 +12,6 @@ export default class BaseEditor extends Component {
     return 'Unknown editor';
   }
 
-  componentDidMount() {
-    this.updateToolbar();
-  }
-
   updateToolbar() {
     console.warn('No toolbar defined for this editor');
 

@@ -37,6 +37,12 @@ import {
 const gd = global.gd;
 
 export default class InstancesFullEditor extends Component {
+
+  static defaultProps = {
+    showAddObjectButton: true,
+    setToolbar: () => {},
+  };
+
   constructor(props) {
     super(props);
 
@@ -72,6 +78,7 @@ export default class InstancesFullEditor extends Component {
       <Toolbar
         showPreviewButton={this.props.showPreviewButton}
         onPreview={this.props.onPreview}
+        showAddObjectButton={this.props.showAddObjectButton}
         instancesSelection={this.instancesSelection}
         toggleObjectsList={this.toggleObjectsList}
         deleteSelection={this.deleteSelection}

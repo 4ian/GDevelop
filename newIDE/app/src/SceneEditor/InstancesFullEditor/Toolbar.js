@@ -25,10 +25,11 @@ export default class Toolbar extends Component {
           disabled={!this.props.canRedo}
         />
         <ToolbarSeparator />
-        <ToolbarIcon
-          onClick={this.props.toggleObjectsList}
-          src="res/ribbon_default/add32.png"
-        />
+        {this.props.showAddObjectButton &&
+          <ToolbarIcon
+            onClick={this.props.toggleObjectsList}
+            src="res/ribbon_default/add32.png"
+          />}
         <ToolbarIcon
           onClick={this.props.deleteSelection}
           src="res/ribbon_default/deleteselected32.png"

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import { DropTarget } from 'react-dnd';
 

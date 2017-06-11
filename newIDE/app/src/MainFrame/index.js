@@ -324,14 +324,18 @@ export default class MainFrame extends Component {
   };
 
   _onEditorTabActive = editorTab => {
-    if (!editorTab.editorRef) return;
+    if (!editorTab || !editorTab.editorRef) {
+      this.setEditorToolbar(null);
+      return;
+    }
+
     editorTab.editorRef.updateToolbar();
   };
 
   _onCloseEditorTab = editorTab => {
     this.setState({
       editorTabs: closeEditorTab(this.state.editorTabs, editorTab),
-    });
+    }, () => this._onEditorTabActive(getCurrentTab(this.state.editorTabs)));
   };
 
   render() {

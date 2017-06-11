@@ -28,10 +28,6 @@ export default class StartPage extends BaseEditor {
     return undefined;
   }
 
-  getLabel() {
-    return 'Unknown editor';
-  }
-
   updateToolbar() {
     if (this.props.setToolbar) this.props.setToolbar(null);
   }

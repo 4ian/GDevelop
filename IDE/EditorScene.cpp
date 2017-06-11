@@ -203,7 +203,10 @@ EditorScene::EditorScene(wxWindow* parent, gd::Project & project_, gd::Layout & 
 		notebook->RemovePage(0);
 		CreateExternalLayoutEditor(this);
 		objectsEditor->OnChange([this](gd::String changeScope) {
-			externalLayoutEditor->SetDirty();
+			if (changeScope == "object-added")
+				externalLayoutEditor->SendUpdate("", true);
+			else
+				externalLayoutEditor->SetDirty();
 		});
 		layersEditor->OnChange([this](gd::String changeScope) {
 			externalLayoutEditor->SetDirty();

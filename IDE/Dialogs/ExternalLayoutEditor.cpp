@@ -414,7 +414,12 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         m_mgr.LoadPerspective(perspective);
 
 		objectsEditor->OnChange([this](gd::String changeScope) {
-			if (externalLayoutEditor) externalLayoutEditor->SetDirty();
+			if (!externalLayoutEditor) return;
+
+			if (changeScope == "object-added")
+				externalLayoutEditor->SendUpdate("", true);
+			else
+				externalLayoutEditor->SetDirty();
 		});
 		layersEditor->OnChange([this](gd::String changeScope) {
 			if (externalLayoutEditor) externalLayoutEditor->SetDirty();

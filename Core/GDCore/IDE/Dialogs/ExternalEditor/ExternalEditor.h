@@ -17,6 +17,15 @@
 
 namespace gd {
 
+/**
+ * \brief Allow to launch an external editor (another program)
+ * that communicates with the IDE.
+ *
+ * Once the external editor is launched, it can send and receive commands
+ * (see Hide, Show...) and ask for/send an update of the project.
+ *
+ * \see gd::ExternalEditorBridge
+ */
 class GD_CORE_API ExternalEditor {
 public:
 	ExternalEditor() :
@@ -59,11 +68,24 @@ public:
 		}
 	}
 
+	/**
+	 * \brief Set the function called when an update is received from the external editor.
+	 *
+	 * The function is given the serialized update and the scope of the changes (usually, an empty scope means the whole project).
+	 */
 	void OnUpdateReceived(std::function<void(SerializerElement object, gd::String scope)> cb)
 	{
 		onUpdateReceivedCb = cb;
 	}
 
+	/**
+	 * \brief Set the function called when an update should be sent to the editor.
+	 *
+	 * The function is given the scope of the changes (usually, an empty scope means the whole project).
+	 * It should return a SerializerElement which represents the updated object.
+	 *
+	 * \param cb The function that should return the SerializerElement to send
+	 */
 	void OnSendUpdate(std::function<SerializerElement(gd::String scope)> cb)
 	{
 		onSendUpdateCb = cb;
@@ -84,6 +106,9 @@ public:
 		onLaunchedCb = cb;
 	}
 
+	/**
+	 * Launch the external editor with the given editorName and editedElementName arguments.
+	 */
 	bool Launch(const gd::String & editorName, const gd::String editedElementName);
 
 	void Hide(bool forceHide = false)
@@ -123,8 +148,11 @@ public:
 
 	void SetDirty() { dirty = true; }
 
-private:
-
+	/**
+	 * Send an update with the specified scope.
+	 * \param scope The scope of the changes to send. Usually, an empty string means the whole project.
+	 * \param forcedUpdate If set to true, the update will be sent even if the editor is not marked as dirty.
+	 */
 	bool SendUpdate(gd::String scope = "", bool forcedUpdate = false)
 	{
 		if (!onSendUpdateCb) return false;
@@ -133,6 +161,8 @@ private:
 
 		return editorBridge.Send("update", onSendUpdateCb(scope), scope);
 	}
+
+private:
 
 	ExternalEditorBridge editorBridge;
 	int externalEditorPid;

@@ -7,11 +7,6 @@ export default class BaseEditor extends Component {
     return this.props.project;
   }
 
-  getLabel() {
-    //TODO
-    return 'Unknown editor';
-  }
-
   updateToolbar() {
     console.warn('No toolbar defined for this editor');
 

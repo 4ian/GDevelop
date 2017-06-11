@@ -18,6 +18,13 @@
 
 namespace gd {
 
+/**
+ * \brief Run a TCP server that can be used as a bridge between this editor ("IDE")
+ * and another one ("newIDE").
+ *
+ * Other editors can connect and send/receive JSON commands.
+ * \see gd::ExternalEditor
+ */
 class GD_CORE_API ExternalEditorBridge : public wxEvtHandler {
 public:
 	ExternalEditorBridge() :
@@ -32,6 +39,9 @@ public:
 		Disconnect();
 	}
 
+	/**
+	 * \brief Start the server, listening for client connections.
+	 */
 	unsigned int Start()
 	{
 		Disconnect();
@@ -53,6 +63,9 @@ public:
 		return port;
 	}
 
+	/**
+	 * \brief Send a command to the client
+	 */
 	bool Send(const gd::String & cmd, const gd::SerializerElement & payloadObject, const gd::String & scope = "")
 	{
 		sf::Lock lock(outMessagesMutex);
@@ -68,11 +81,18 @@ public:
 		return true;
 	}
 
+	/**
+	 * \brief Set the function called when a command is received from the client.
+	 */
 	void OnReceive(std::function<void(gd::String cmd, gd::SerializerElement object, gd::String scope)> cb)
 	{
 		onReceiveCb = cb;
 	}
 
+
+	/**
+	 * \brief Return true if connected with a client.
+	 */
 	bool IsConnected() {
 		return connected;
 	}

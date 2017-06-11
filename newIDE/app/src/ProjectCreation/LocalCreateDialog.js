@@ -3,6 +3,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import Divider from 'material-ui/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
+import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 import { findExamples } from './LocalExamplesFinder';
 import generateName from '../Utils/NewNameGenerator';
@@ -20,7 +21,6 @@ export default class LocalCreateDialog extends Component {
     this.state = {
       outputPath: this._findEmptyPath(outputRootPath),
     };
-    console.log(this.state.outputPath);
   }
 
   _findEmptyPath = basePath => {
@@ -46,6 +46,7 @@ export default class LocalCreateDialog extends Component {
       fs.mkdirsSync(outputPath);
       fs.copySync(path.join(examplesPath, exampleName), outputPath);
       this.props.onOpen(path.join(outputPath, exampleName + '.json'));
+      sendNewGameCreated(exampleName);
     });
   }
 

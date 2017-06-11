@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
+import { sendProgramOpening } from './Utils/Analytics/EventSender';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import registerServiceWorker from './registerServiceWorker';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
@@ -59,3 +60,4 @@ if (electron) {
 
 ReactDOM.render(app, document.getElementById('root'));
 registerServiceWorker();
+sendProgramOpening();

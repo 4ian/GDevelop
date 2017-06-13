@@ -76,6 +76,15 @@ export const sendProgramOpening = () => {
   client.recordEvent('program_opening');
 };
 
+export const sendExportLaunched = (exportKind) => {
+  if (isDev) return;
+
+  client.recordEvent('export_launched', {
+    platform: 'GDevelop JS Platform', // Hardcoded here for now
+    exportKind,
+  });
+};
+
 export const sendNewGameCreated = templateName => {
   if (isDev) return;
 

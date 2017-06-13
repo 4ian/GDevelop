@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
+import { sendExportLaunched } from '../Utils/Analytics/EventSender';
 import { Column, Line, Spacer } from '../UI/Grid';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
@@ -56,6 +57,8 @@ export default class LocalExport extends Component {
   launchExport = () => {
     const { project } = this.props;
     if (!project) return;
+
+    sendExportLaunched('local');
 
     const outputDir = this.state.outputDir;
     project.setLastCompilationDirectory(outputDir);

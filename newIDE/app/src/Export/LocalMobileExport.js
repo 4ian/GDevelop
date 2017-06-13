@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');

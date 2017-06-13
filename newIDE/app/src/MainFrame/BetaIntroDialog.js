@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import { Column, Line } from '../UI/Grid';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
@@ -11,9 +10,18 @@ export default class BetaIntroDialog extends Component {
     shell.openExternal('https://github.com/4ian/GD');
   }
 
+  _onOpenTrello() {
+    shell.openExternal('https://trello.com/b/qf0lM7k8/gdevelop-roadmap');
+  }
+
   render() {
     const { open, onClose } = this.props;
     const actions = [
+      <FlatButton
+        label="Follow the Roadmap on Trello"
+        primary={false}
+        onTouchTap={this._onOpenTrello}
+      />,
       <FlatButton
         label="Contribute on GitHub"
         primary={false}

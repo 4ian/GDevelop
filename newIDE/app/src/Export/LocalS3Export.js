@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { sleep } from 'wait-promise';
 import RaisedButton from 'material-ui/RaisedButton';
+import { sendExportLaunched } from '../Utils/Analytics/EventSender';
 import LocalExport from './LocalExport';
 import optionalRequire from '../Utils/OptionalRequire';
 import { Column, Line, Spacer } from '../UI/Grid';
@@ -70,6 +71,7 @@ export default class LocalS3Export extends Component {
     const { project } = this.props;
     if (!project) return;
 
+    sendExportLaunched('s3');
     this.setState({
       exportStarted: true,
       exportDone: false,

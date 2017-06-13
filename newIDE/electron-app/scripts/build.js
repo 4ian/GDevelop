@@ -16,12 +16,14 @@ if (!args['skip-app-build']) {
   shell.exec('npm run build:app');
 }
 
+var packageFlag = args['skip-packaging'] ? '' : '--dir';
+
 shell.rm('-rf', 'app/www');
 shell.mkdir('-p', 'app/www');
 shell.cp('-r', '../app/build/*', 'app/www');
 
 if (isDarwin) {
-  shell.exec(path.join('node_modules', '.bin', 'build') + ' --mac --dir');
+  shell.exec(path.join('node_modules', '.bin', 'build') + ' --mac ${packageFlag}');
   shell.mkdir('-p', gdBinariesOutputDir + '/Release_Darwin/newIDE');
   shell.rm('-rf', gdBinariesOutputDir + '/Release_Darwin/newIDE/GDevelop IDE.app');
   shell.cp(
@@ -31,7 +33,7 @@ if (isDarwin) {
   );
 }
 
-shell.exec(path.join('node_modules', '.bin', 'build') + ' --win --ia32 --dir');
+shell.exec(path.join('node_modules', '.bin', 'build') + ' --win --ia32 ${packageFlag}');
 shell.mkdir('-p', gdBinariesOutputDir + '/Release_Windows/newIDE');
 shell.cp(
   '-r',

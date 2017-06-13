@@ -21,9 +21,9 @@ export default class ObjectsList extends React.Component {
           </IconButton>
         }
         menuTemplate={[
-          // TODO: This item should be hidden if onEditObject is not defined.
           {
             label: 'Edit object',
+            enabled: !!this.props.onEditObject,
             click: () => this.props.onEditObject(object),
           },
         ]}

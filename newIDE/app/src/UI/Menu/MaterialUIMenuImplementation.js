@@ -13,6 +13,7 @@ export default class MaterialUIMenuImplementation {
         <MenuItem
           key={item.label}
           primaryText={item.label}
+          disabled={item.enabled === false}
           onTouchTap={() => item.click()}
         />
       );

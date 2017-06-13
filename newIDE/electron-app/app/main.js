@@ -52,6 +52,7 @@ app.on('ready', function() {
   }
 
   mainWindow = new BrowserWindow(options);
+  if (!isIntegrated) mainWindow.maximize();
 
   //Expose program arguments
   global['args'] = args;
@@ -64,7 +65,7 @@ app.on('ready', function() {
   } else {
     // Production (with npm run build)
     mainWindow.loadURL('file://' + __dirname + '/www/index.html');
-    if (true || devTools) mainWindow.openDevTools();
+    if (devTools) mainWindow.openDevTools();
   }
 
   // Emitted when the window is closed.

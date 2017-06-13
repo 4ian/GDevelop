@@ -12,6 +12,7 @@ import LocalCreateDialog from '../ProjectCreation/LocalCreateDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
+import LocalMobileExport from '../Export/LocalMobileExport';
 import LocalS3Export from '../Export/LocalS3Export';
 import Paper from 'material-ui/Paper';
 import muiDecorator from './MuiDecorator';
@@ -84,6 +85,14 @@ storiesOf('LocalS3Export', module)
   .add('default', () => (
     <Paper>
       <LocalS3Export open project={fakeProject} onClose={action('close')} />
+    </Paper>
+  ));
+
+storiesOf('LocalMobileExport', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <Paper>
+      <LocalMobileExport />
     </Paper>
   ));
 

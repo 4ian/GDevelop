@@ -5,6 +5,12 @@ import ToolbarSeparator from '../UI/ToolbarSeparator';
 import IconMenu from '../UI/Menu/IconMenu';
 import Window from '../Utils/Window';
 
+const styles = {
+  toolbar: {
+    flexShrink: 0,
+  },
+};
+
 export default class MainFrameToolbar extends Component {
   constructor() {
     super();
@@ -23,7 +29,7 @@ export default class MainFrameToolbar extends Component {
 
   render() {
     return (
-      <Toolbar>
+      <Toolbar style={styles.toolbar}>
         <ToolbarGroup firstChild={true}>
           {this.props.showProjectIcons &&
             <ToolbarIcon

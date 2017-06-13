@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import MainFrame from './MainFrame';
+import BetaIntroDialog from './MainFrame/BetaIntroDialog';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import { sendProgramOpening } from './Utils/Analytics/EventSender';
@@ -14,6 +15,7 @@ import optionalRequire from './Utils/OptionalRequire.js';
 import LocalPreviewLauncher from './Export/LocalPreviewLauncher';
 import LocalExport from './Export/LocalExport';
 import LocalS3Export from './Export/LocalS3Export';
+import LocalMobileExport from './Export/LocalMobileExport';
 import LocalCreateDialog from './ProjectCreation/LocalCreateDialog';
 const electron = optionalRequire('electron');
 
@@ -47,8 +49,13 @@ if (electron) {
         }, {
           name: 'Export to a folder',
           ExportComponent: LocalExport
+        }, {
+          name: 'Export to iOS/Android app',
+          ExportComponent: LocalMobileExport
         }]} />}
-        createDialog={<LocalCreateDialog />}
+        createDialog={<LocalCreateDialog />
+        }
+        introDialog={<BetaIntroDialog />}
       />
     );
   }

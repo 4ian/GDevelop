@@ -44,6 +44,7 @@ export default class MainFrame extends Component {
     this.state = {
       createDialogOpen: false,
       exportDialogOpen: false,
+      introDialogOpen: false,
       loadingProject: false,
       previewLoading: false,
       currentProject: null,
@@ -55,6 +56,7 @@ export default class MainFrame extends Component {
 
   componentWillMount() {
     if (!this.props.integratedEditor) this.openStartPage();
+    if (this.props.introDialog) this._openIntroDialog(true);
   }
 
   loadFullProject = (serializedProject, cb) => {
@@ -319,6 +321,12 @@ export default class MainFrame extends Component {
     });
   };
 
+  _openIntroDialog = (open = true) => {
+    this.setState({
+      introDialogOpen: open,
+    });
+  };
+
   _onChangeEditorTab = value => {
     this.setState({
       editorTabs: changeCurrentTab(this.state.editorTabs, value),
@@ -349,7 +357,7 @@ export default class MainFrame extends Component {
     const {
       currentProject,
     } = this.state;
-    const { exportDialog, createDialog } = this.props;
+    const { exportDialog, createDialog, introDialog } = this.props;
     const showLoader = this.state.loadingProject ||
       this.state.previewLoading ||
       this.props.loading;
@@ -427,6 +435,11 @@ export default class MainFrame extends Component {
                   this._openCreateDialog(false);
                   this._openFromFile(filepath);
                 },
+              })}
+            {!!introDialog &&
+              React.cloneElement(introDialog, {
+                open: this.state.introDialogOpen,
+                onClose: () => this._openIntroDialog(false),
               })}
           </div>
         </MuiThemeProvider>

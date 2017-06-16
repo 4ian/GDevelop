@@ -5,6 +5,7 @@ import { Column, Line } from '../UI/Grid';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
+const app = electron ? electron.remote.app : null;
 const gd = global.gd;
 
 const styles = {
@@ -14,7 +15,8 @@ const styles = {
 export default class AboutDialog extends Component {
   constructor() {
     super();
-    this.versionFullString = gd ? gd.VersionWrapper.fullString() : 'Unknown';
+    this.gdVersionString = gd ? gd.VersionWrapper.fullString() : 'Unknown';
+    this.appVersionString = app ? app.getVersion() : 'Unknown';
   }
 
   _onOpenWebsite() {
@@ -53,7 +55,7 @@ export default class AboutDialog extends Component {
           />
           <div style={styles.content}>
             <Line>
-              GDevelop IDE based on GDevelop {this.versionFullString}
+              GDevelop {this.appVersionString} based on GDevelop.js {this.gdVersionString}
             </Line>
           </div>
         </Column>

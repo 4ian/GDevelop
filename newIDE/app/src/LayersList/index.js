@@ -28,6 +28,52 @@ const styles = {
   },
 };
 
+const LayerRow = (
+  {
+    layerName,
+    nameError,
+    onBlur,
+    onMoveUp,
+    onMoveDown,
+    onRemove,
+    canMoveDown,
+    canMoveUp,
+    isVisible,
+    onChangeVisibility,
+  }
+) => (
+  <TableRow>
+    <TableRowColumn>
+      <TextField
+        defaultValue={layerName}
+        id={layerName}
+        errorText={nameError ? 'This name is already taken' : undefined}
+        disabled={!layerName}
+        onBlur={onBlur}
+      />
+    </TableRowColumn>
+    <TableRowColumn style={styles.visibleColumn}>
+      <Checkbox
+        checked={isVisible}
+        checkedIcon={<Visibility />}
+        uncheckedIcon={<VisibilityOff />}
+        onCheck={onChangeVisibility}
+      />
+    </TableRowColumn>
+    <TableRowColumn style={styles.toolColumn}>
+      <IconButton disabled={canMoveUp} onTouchTap={onMoveUp}>
+        <ArrowUpward />
+      </IconButton>
+      <IconButton disabled={canMoveDown} onTouchTap={onMoveDown}>
+        <ArrowDownward />
+      </IconButton>
+      <IconButton onTouchTap={onRemove}>
+        <Delete />
+      </IconButton>
+    </TableRowColumn>
+  </TableRow>
+);
+
 export default class LayersList extends Component {
   constructor() {
     super();
@@ -43,20 +89,6 @@ export default class LayersList extends Component {
     return !this.props.freezeUpdate;
   }
 
-  _renderVisibilityToogle(layer) {
-    return (
-      <Checkbox
-        checked={layer.getVisibility()}
-        checkedIcon={<Visibility />}
-        uncheckedIcon={<VisibilityOff />}
-        onCheck={(e, visible) => {
-          layer.setVisibility(visible);
-          this.forceUpdate(); //TODO: Should this be done by the parent component?
-        }}
-      />
-    );
-  }
-
   render() {
     const { layersContainer } = this.props;
 
@@ -68,76 +100,56 @@ export default class LayersList extends Component {
         const layerName = layer.getName() || 'Base layer';
 
         return (
-          <TableRow key={layerName}>
-            <TableRowColumn>
-              <TextField
-                defaultValue={layerName}
-                id={layerName}
-                errorText={
-                  this.state.nameErrors[layerName]
-                    ? 'This name is already taken'
-                    : undefined
-                }
-                disabled={!layerName}
-                onBlur={event => {
-                  const newName = event.target.value;
-                  if (layerName === newName) return;
+          <LayerRow
+            key={layerName}
+            layer={layer}
+            layerName={layerName}
+            nameError={this.state.nameErrors[layerName]}
+            onBlur={event => {
+              const newName = event.target.value;
+              if (layerName === newName) return;
 
-                  let success = true;
-                  if (layersContainer.hasLayerNamed(newName)) {
-                    success = false;
-                  } else {
-                    this.props.onRenameLayer(layerName, newName, doRename => {
-                      if (doRename)
-                        layersContainer.getLayer(layerName).setName(newName);
-                    });
-                  }
+              let success = true;
+              if (layersContainer.hasLayerNamed(newName)) {
+                success = false;
+              } else {
+                this.props.onRenameLayer(layerName, newName, doRename => {
+                  if (doRename)
+                    layersContainer.getLayer(layerName).setName(newName);
+                });
+              }
 
-                  this.setState({
-                    nameErrors: {
-                      ...this.state.nameErrors,
-                      [layerName]: !success,
-                    },
-                  });
-                }}
-              />
-            </TableRowColumn>
-            <TableRowColumn style={styles.visibleColumn}>
-              {this._renderVisibilityToogle(layer)}
-            </TableRowColumn>
-            <TableRowColumn style={styles.toolColumn}>
-              <IconButton
-                disabled={i === layersContainer.getLayersCount() - 1}
-                onTouchTap={() => {
-                  layersContainer.swapLayers(i, i + 1);
-                  this.forceUpdate();
-                }}
-              >
-                <ArrowUpward />
-              </IconButton>
-              <IconButton
-                disabled={i === 0}
-                onTouchTap={() => {
-                  layersContainer.swapLayers(i, i - 1);
-                  this.forceUpdate();
-                }}
-              >
-                <ArrowDownward />
-              </IconButton>
-              <IconButton
-                onTouchTap={() => {
-                  this.props.onRemoveLayer(layerName, doRemove => {
-                    if (!doRemove) return;
+              this.setState({
+                nameErrors: {
+                  ...this.state.nameErrors,
+                  [layerName]: !success,
+                },
+              });
+            }}
+            onMoveDown={() => {
+              layersContainer.swapLayers(i, i - 1);
+              this.forceUpdate();
+            }}
+            canMoveDown={i === 0}
+            canMoveUp={i === layersContainer.getLayersCount() - 1}
+            onMoveUp={() => {
+              layersContainer.swapLayers(i, i + 1);
+              this.forceUpdate();
+            }}
+            onRemove={() => {
+              this.props.onRemoveLayer(layerName, doRemove => {
+                if (!doRemove) return;
 
-                    layersContainer.removeLayer(layerName);
-                    this.forceUpdate();
-                  });
-                }}
-              >
-                <Delete />
-              </IconButton>
-            </TableRowColumn>
-          </TableRow>
+                layersContainer.removeLayer(layerName);
+                this.forceUpdate();
+              });
+            }}
+            isVisible={layer.getVisibility()}
+            onChangeVisibility={(e, visible) => {
+              layer.setVisibility(visible);
+              this.forceUpdate();
+            }}
+          />
         );
       }
     );

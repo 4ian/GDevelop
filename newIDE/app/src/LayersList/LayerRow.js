@@ -27,7 +27,7 @@ const LayerRow = (
     </TableRowColumn>
     <TableRowColumn>
       <TextField
-        defaultValue={layerName}
+        defaultValue={layerName || 'Base layer'}
         id={layerName}
         errorText={nameError ? 'This name is already taken' : undefined}
         disabled={!layerName}

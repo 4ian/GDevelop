@@ -31,12 +31,12 @@ class LayersListBody extends Component {
     const layersCount = layersContainer.getLayersCount();
     const containerLayersList = mapReverseFor(0, layersCount, i => {
       const layer = layersContainer.getLayerAt(i);
-      const layerName = layer.getName() || 'Base layer';
+      const layerName = layer.getName();
 
       return (
         <SortableLayerRow
           index={layersCount - 1 - i}
-          key={'layer' + layerName}
+          key={'layer-' + layerName}
           layer={layer}
           layerName={layerName}
           nameError={this.state.nameErrors[layerName]}

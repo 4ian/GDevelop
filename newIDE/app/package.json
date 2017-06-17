@@ -30,6 +30,7 @@
     "react-dom": "15.4.2",
     "react-measure": "1.4.6",
     "react-mosaic-component": "^0.4.0",
+    "react-sortable-hoc": "^0.6.3",
     "react-tap-event-plugin": "2.0.1",
     "react-virtualized": "9.3.0",
     "slug": "0.9.1",

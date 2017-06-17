@@ -230,9 +230,14 @@ public:
     void RemoveLayer(const gd::String & name);
 
     /**
-     * Must swap the position of the specified layers.
+     * Swap the position of the specified layers.
      */
     void SwapLayers(std::size_t firstLayerIndex, std::size_t secondLayerIndex);
+
+    /**
+     * Change the position of the specified layer.
+     */
+    void MoveLayer(std::size_t oldIndex, std::size_t newIndex);
 
     #if defined(GD_IDE_ONLY)
     /**

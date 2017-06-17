@@ -155,6 +155,16 @@ void Layout::SwapLayers(std::size_t firstLayerIndex, std::size_t secondLayerInde
     );
 }
 
+void Layout::MoveLayer(std::size_t oldIndex, std::size_t newIndex)
+{
+    if ( oldIndex >= initialLayers.size() || newIndex >= initialLayers.size() )
+        return;
+
+    auto layer = initialLayers[oldIndex];
+    initialLayers.erase(initialLayers.begin() + oldIndex);
+    InsertLayer(layer, newIndex);
+}
+
 void Layout::UpdateBehaviorsSharedData(gd::Project & project)
 {
     std::vector < gd::String > allBehaviorsTypes;

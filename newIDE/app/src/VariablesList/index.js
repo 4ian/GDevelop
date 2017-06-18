@@ -154,16 +154,18 @@ export default class VariablesList extends Component {
     );
 
     return (
-      <Table selectable={false}>
-        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-          <TableRow>
-            <TableHeaderColumn>Name</TableHeaderColumn>
-            <TableHeaderColumn>
-              Value
-            </TableHeaderColumn>
-            <TableRowColumn />
-          </TableRow>
-        </TableHeader>
+      <div>
+        <Table selectable={false}>
+          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+            <TableRow>
+              <TableHeaderColumn>Name</TableHeaderColumn>
+              <TableHeaderColumn>
+                Value
+              </TableHeaderColumn>
+              <TableRowColumn />
+            </TableRow>
+          </TableHeader>
+        </Table>
         <SortableVariablesListBody
           variablesContainer={this.props.variablesContainer}
           onSortEnd={({ oldIndex, newIndex }) => {
@@ -176,7 +178,7 @@ export default class VariablesList extends Component {
         >
           {containerVariablesTree.concat(addRow)}
         </SortableVariablesListBody>
-      </Table>
+      </div>
     );
   }
 }

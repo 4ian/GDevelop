@@ -13,11 +13,14 @@ export default class KeyboardShortcuts {
     this.onDelete = onDelete;
     this.onMove = onMove;
     this.lastDownTarget = null;
+    this.shiftPressed = false;
+    this.rawCtrlPressed = false;
+    this.metaPressed = false;
     this.mount();
   }
 
   shouldCloneInstances() {
-    return this.ctrlPressed;
+    return this._isControlPressed();
   }
 
   shouldMultiSelect() {
@@ -37,7 +40,12 @@ export default class KeyboardShortcuts {
   }
 
   shouldZoom() {
-    return this.metaPressed;
+    return this._isControlPressed();
+  }
+
+  _isControlPressed = () => {
+    // On OS X, meta key (Apple/Command key) acts as Control key on Windows/Linux.
+    return this.metaPressed || this.rawCtrlPressed;
   }
 
   _onKeyDown = evt => {
@@ -45,7 +53,7 @@ export default class KeyboardShortcuts {
 
     if (evt.metaKey) this.metaPressed = true;
     if (evt.altKey) this.altPressed = true;
-    if (evt.which === CTRL_KEY) this.ctrlPressed = true;
+    if (evt.which === CTRL_KEY) this.rawCtrlPressed = true;
     if (evt.which === SHIFT_KEY) this.shiftPressed = true;
   };
 
@@ -54,7 +62,7 @@ export default class KeyboardShortcuts {
 
     if (!evt.metaKey) this.metaPressed = false;
     if (!evt.altKey) this.altPressed = false;
-    if (evt.which === CTRL_KEY) this.ctrlPressed = false;
+    if (evt.which === CTRL_KEY) this.rawCtrlPressed = false;
     if (evt.which === SHIFT_KEY) this.shiftPressed = false;
     if (evt.which === UP_KEY) {
       this.onMove(0, -1);

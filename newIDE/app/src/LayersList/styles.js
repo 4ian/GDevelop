@@ -1,9 +1,8 @@
 export default {
   handleColumn: {
-    width: 10,
+    width: 24,
     paddingLeft: 8,
     paddingRight: 0,
-    marginRight: -8,
   },
   visibleColumn: {
     width: 48,

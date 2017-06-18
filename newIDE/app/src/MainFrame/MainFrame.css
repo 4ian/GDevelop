@@ -43,7 +43,9 @@ a[href^="ftp://"] {
     user-drag: auto; /* Technically not supported in Electron yet */
 }
 
-
+/* Used for react-sortable-hoc SortableContainer, to make sure the
+ * dragged element is visible (and not hidden behind a drawer for example)
+ */
 .sortable-helper {
   z-index: 9999;
 }

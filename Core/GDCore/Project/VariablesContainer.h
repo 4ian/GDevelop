@@ -108,6 +108,11 @@ public:
      * \brief Swap the position of the specified variables.
      */
     void Swap(std::size_t firstVariableIndex, std::size_t secondVariableIndex);
+
+    /**
+     * \brief Move the specified variable at a new position in the list.
+     */
+    void Move(std::size_t oldIndex, std::size_t newIndex);
     #endif
 
     /**

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {
   Table,
-  TableBody,
   TableHeader,
   TableHeaderColumn,
   TableRow,
@@ -11,8 +10,25 @@ import { mapFor } from '../Utils/MapFor';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import VariableRow from './VariableRow';
 import AddVariableRow from './AddVariableRow';
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import flatten from 'lodash/flatten';
 const gd = global.gd;
+
+const SortableVariableRow = SortableElement(VariableRow);
+const SortableAddVariableRow = SortableElement(AddVariableRow);
+
+class VariablesListBody extends Component {
+  render() {
+    return (
+      <div>
+        {this.props.children}
+      </div>
+    );
+  }
+}
+
+const SortableVariablesListBody = SortableContainer(VariablesListBody);
+SortableVariablesListBody.muiName = 'TableBody';
 
 export default class VariablesList extends Component {
   constructor() {
@@ -23,18 +39,18 @@ export default class VariablesList extends Component {
     };
   }
 
-  _renderVariableChildren(name, parentVariable, depth, index) {
+  _renderVariableChildren(name, parentVariable, depth) {
     const children = parentVariable.getAllChildren();
     const names = children.keys().toJSArray();
 
     return flatten(
-      names.map(name => {
+      names.map((name, index) => {
         const variable = children.get(name);
         return this._renderVariableAndChildrenRows(
           name,
           variable,
           depth + 1,
-          undefined,
+          index,
           parentVariable
         );
       })
@@ -44,16 +60,15 @@ export default class VariablesList extends Component {
   _renderVariableAndChildrenRows(name, variable, depth, index, parentVariable) {
     const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
-    const key = '' + depth + name;
 
-    const variableRow = (
-      <VariableRow
+    return (
+      <SortableVariableRow
         name={name}
-        variable={variable}
-        depth={depth}
         index={index}
-        key={key}
-        parentVariable={parentVariable}
+        key={'variable-' + name}
+        variable={variable}
+        disabled={depth !== 0}
+        depth={depth}
         errorText={
           this.state.nameErrors[variable.ptr]
             ? 'This name is already taken'
@@ -95,15 +110,9 @@ export default class VariablesList extends Component {
           variable.getChild(name).setString('');
           this.forceUpdate();
         }}
+        children={isStructure ? this._renderVariableChildren(name, variable, depth) : null}
       />
     );
-
-    return !isStructure
-      ? [variableRow]
-      : [
-          variableRow,
-          this._renderVariableChildren(name, variable, depth, index),
-        ];
   }
 
   render() {
@@ -129,8 +138,10 @@ export default class VariablesList extends Component {
     );
 
     const addRow = (
-      <AddVariableRow
+      <SortableAddVariableRow
+        index={0}
         key={'add-variable-row'}
+        disabled
         onAdd={() => {
           const variable = new gd.Variable();
           variable.setString('');
@@ -153,14 +164,18 @@ export default class VariablesList extends Component {
             <TableRowColumn />
           </TableRow>
         </TableHeader>
-        <TableBody
-          displayRowCheckbox={false}
-          style={{
-            backgroundColor: 'white',
+        <SortableVariablesListBody
+          variablesContainer={this.props.variablesContainer}
+          onSortEnd={({ oldIndex, newIndex }) => {
+            this.props.variablesContainer.move(oldIndex, newIndex);
+            this.forceUpdate();
           }}
+          helperClass="sortable-helper"
+          useDragHandle
+          lockToContainerEdges
         >
-          {flatten(containerVariablesTree).concat(addRow)}
-        </TableBody>
+          {containerVariablesTree.concat(addRow)}
+        </SortableVariablesListBody>
       </Table>
     );
   }

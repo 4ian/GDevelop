@@ -10,6 +10,7 @@ import StartPage from '../MainFrame/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import LocalCreateDialog from '../ProjectCreation/LocalCreateDialog';
 import { Tabs, Tab } from '../UI/Tabs';
+import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
 import LocalMobileExport from '../Export/LocalMobileExport';
@@ -118,3 +119,7 @@ storiesOf('AboutDialog', module)
 storiesOf('LocalCreateDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCreateDialog open />);
+
+storiesOf('DragHandle', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <DragHandle />);

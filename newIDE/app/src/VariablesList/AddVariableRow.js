@@ -1,19 +1,24 @@
 import React from 'react';
-import { TableRow, TableRowColumn } from 'material-ui/Table';
+import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
+import EmptyMessage from '../UI/EmptyMessage';
 import styles from './styles';
 
 const VariableRow = ({ onAdd }) => (
-  <TableRow key="add-row">
-    <TableRowColumn />
-    <TableRowColumn />
-    <TableRowColumn style={styles.toolColumn}>
+  <TreeTableRow key="add-row">
+    <TreeTableCell />
+    <TreeTableCell>
+      <EmptyMessage style={styles.addVariableMessage}>
+        Click to add a variable:
+      </EmptyMessage>
+    </TreeTableCell>
+    <TreeTableCell style={styles.toolColumn}>
       <IconButton onTouchTap={onAdd}>
         <Add />
       </IconButton>
-    </TableRowColumn>
-  </TableRow>
+    </TreeTableCell>
+  </TreeTableRow>
 );
 
 export default VariableRow;

@@ -139,6 +139,16 @@ void VariablesContainer::Swap(std::size_t firstVariableIndex, std::size_t second
     variables[firstVariableIndex] = variables[secondVariableIndex];
     variables[secondVariableIndex] = temp;
 }
+
+void VariablesContainer::Move(std::size_t oldIndex, std::size_t newIndex)
+{
+    if ( oldIndex >= variables.size() || newIndex >= variables.size() )
+        return;
+
+    auto nameAndVariable = variables[oldIndex];
+    variables.erase(variables.begin() + oldIndex);
+    Insert(nameAndVariable.first, nameAndVariable.second, newIndex);
+}
 #endif
 
 void VariablesContainer::SerializeTo(SerializerElement & element) const

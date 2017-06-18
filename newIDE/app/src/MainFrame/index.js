@@ -18,6 +18,7 @@ import ExternalLayoutEditor from '../SceneEditor/ExternalLayoutEditor';
 import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
+import Window from '../Utils/Window';
 import defaultTheme from '../UI/Theme/DefaultTheme';
 import { Tabs, Tab } from '../UI/Tabs';
 import {
@@ -56,7 +57,7 @@ export default class MainFrame extends Component {
 
   componentWillMount() {
     if (!this.props.integratedEditor) this.openStartPage();
-    if (this.props.introDialog) this._openIntroDialog(true);
+    if (this.props.introDialog && !Window.isDev()) this._openIntroDialog(true);
   }
 
   loadFullProject = (serializedProject, cb) => {

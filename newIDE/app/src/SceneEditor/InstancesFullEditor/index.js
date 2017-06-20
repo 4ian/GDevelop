@@ -9,6 +9,7 @@ import InstancesList from '../../InstancesEditor/InstancesList';
 import LayersList from '../../LayersList';
 import LayerRemoveDialog from '../../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
+import ObjectEditorDialog from '../../ObjectEditor/ObjectEditorDialog';
 import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
@@ -37,7 +38,6 @@ import {
 const gd = global.gd;
 
 export default class InstancesFullEditor extends Component {
-
   static defaultProps = {
     showAddObjectButton: true,
     setToolbar: () => {},
@@ -57,6 +57,7 @@ export default class InstancesFullEditor extends Component {
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
 
+      editedObject: null,
       variablesEditedInstance: null,
       selectedObjectName: null,
 
@@ -150,6 +151,10 @@ export default class InstancesFullEditor extends Component {
 
   editInstanceVariables = instance => {
     this.setState({ variablesEditedInstance: instance });
+  };
+
+  editObject = object => {
+    this.setState({ editedObject: object });
   };
 
   setUiSettings = uiSettings => {
@@ -400,7 +405,14 @@ export default class InstancesFullEditor extends Component {
             project={project}
             objectsContainer={layout}
             onObjectSelected={this._onObjectSelected}
-            onEditObject={this.props.onEditObject}
+            onEditObject={this.props.onEditObject || this.editObject}
+          />
+          <ObjectEditorDialog
+            open={!!this.state.editedObject}
+            object={this.state.editedObject}
+            project={project}
+            onCancel={() => this.editObject(null)}
+            onApply={() => this.editObject(null)}
           />
         </Drawer>
         <Drawer

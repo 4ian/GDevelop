@@ -15,21 +15,12 @@ import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
 import LocalMobileExport from '../Export/LocalMobileExport';
 import LocalS3Export from '../Export/LocalS3Export';
+import TextEditor from '../ObjectEditor/Editors/TextEditor';
+import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import Paper from 'material-ui/Paper';
+import SerializedObjectDisplay from './SerializedObjectDisplay';
 import muiDecorator from './MuiDecorator';
-
-const fakeProject = {
-  getLastCompilationDirectory: () => '/Fake/Directory'
-}
-
-const fakeGD = {
-  VersionWrapper: {
-    fullString: () => "Fake",
-    major: () => "Fake",
-    minor: () => "Fake",
-  },
-};
-window.gd = fakeGD;
+import { project, tiledSpriteObject, textObject } from './TestProject';
 
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
@@ -77,7 +68,7 @@ storiesOf('LocalExport', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <Paper>
-      <LocalExport open project={fakeProject} onClose={action('close')} />
+      <LocalExport open project={project} onClose={action('close')} />
     </Paper>
   ));
 
@@ -85,7 +76,7 @@ storiesOf('LocalS3Export', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <Paper>
-      <LocalS3Export open project={fakeProject} onClose={action('close')} />
+      <LocalS3Export open project={project} onClose={action('close')} />
     </Paper>
   ));
 
@@ -103,8 +94,9 @@ storiesOf('LocalFolderPicker', module)
     <Paper>
       <LocalFolderPicker floatingLabelText="Export folder" />
     </Paper>
-  )).add('full width', () => (
-      <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
+  ))
+  .add('full width', () => (
+    <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
   ));
 
 storiesOf('StartPage', module)
@@ -115,7 +107,6 @@ storiesOf('AboutDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <AboutDialog open />);
 
-
 storiesOf('LocalCreateDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCreateDialog open />);
@@ -123,3 +114,19 @@ storiesOf('LocalCreateDialog', module)
 storiesOf('DragHandle', module)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
+
+storiesOf('TextEditor', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={textObject}>
+      <TextEditor object={textObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('TiledSpriteEditor', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={tiledSpriteObject}>
+      <TiledSpriteEditor object={tiledSpriteObject} project={project} />
+    </SerializedObjectDisplay>
+  ));

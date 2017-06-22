@@ -4,13 +4,24 @@ import { Line, Column } from '../../UI/Grid';
 import ResourceSelector from '../../ResourcesEditor/ResourceSelector';
 const gd = global.gd;
 
-export default class TextEditor extends Component {
+export default class TiledSpriteEditor extends Component {
   render() {
-    const { object, project } = this.props;
+    const { object, project, resourceSources } = this.props;
     const tiledSpriteObject = gd.asTiledSpriteObject(object);
 
     return (
       <Column>
+        <Line>
+          <ResourceSelector
+            project={project}
+            resourceSources={resourceSources}
+            resourceKind="image"
+            initialResourceName={tiledSpriteObject.getTexture()}
+            onChange={resourceName => {
+              tiledSpriteObject.setTexture(resourceName);
+            }}
+          />
+        </Line>
         <Line>
           <TextField
             floatingLabelText="Default width (in pixels)"
@@ -30,16 +41,6 @@ export default class TextEditor extends Component {
             onChange={(e, value) => {
               tiledSpriteObject.setHeight(parseInt(value, 10));
               this.forceUpdate();
-            }}
-          />
-        </Line>
-        <Line>
-          <ResourceSelector
-            project={project}
-            resourceKind="image"
-            initialResourceName={tiledSpriteObject.getTexture()}
-            onChange={resourceName => {
-              tiledSpriteObject.setTexture(resourceName);
             }}
           />
         </Line>

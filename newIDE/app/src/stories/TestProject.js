@@ -16,3 +16,4 @@ project.getResourcesManager().addResource(audioResource1);
 
 export const textObject = new gd.TextObject('MyTextObject');
 export const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
+export const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');

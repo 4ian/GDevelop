@@ -3,6 +3,7 @@ const fs = optionalRequire('fs');
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
 
+// TODO: Rename LocalFileOpener
 export default class FileOpener {
   static chooseProjectFile(cb) {
     if (!dialog) return cb('Not supported');

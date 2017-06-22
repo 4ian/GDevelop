@@ -17,6 +17,7 @@ import LocalExport from './Export/LocalExport';
 import LocalS3Export from './Export/LocalS3Export';
 import LocalMobileExport from './Export/LocalMobileExport';
 import LocalCreateDialog from './ProjectCreation/LocalCreateDialog';
+import localResourceSources from './ResourcesEditor/LocalResourceSources';
 const electron = optionalRequire('electron');
 
 // Needed for onTouchTap
@@ -35,34 +36,42 @@ if (electron) {
         editor={appArguments['editor']}
         editedElementName={appArguments['edited-element-name']}
       >
-        <MainFrame />
+        <MainFrame resourceSources={localResourceSources} />
       </ExternalEditor>
     );
   } else {
     app = (
       <MainFrame
         onLayoutPreview={LocalPreviewLauncher.launchLayoutPreview}
-        onExternalLayoutPreview={LocalPreviewLauncher.launchExternalLayoutPreview}
-        exportDialog={<ExportDialog tabs={[{
-          name: 'Upload online',
-          ExportComponent: LocalS3Export
-        }, {
-          name: 'Export to a folder',
-          ExportComponent: LocalExport
-        }, {
-          name: 'Export to iOS/Android app',
-          ExportComponent: LocalMobileExport
-        }]} />}
-        createDialog={<LocalCreateDialog />
+        onExternalLayoutPreview={
+          LocalPreviewLauncher.launchExternalLayoutPreview
         }
+        exportDialog={
+          <ExportDialog
+            tabs={[
+              {
+                name: 'Upload online',
+                ExportComponent: LocalS3Export,
+              },
+              {
+                name: 'Export to a folder',
+                ExportComponent: LocalExport,
+              },
+              {
+                name: 'Export to iOS/Android app',
+                ExportComponent: LocalMobileExport,
+              },
+            ]}
+          />
+        }
+        createDialog={<LocalCreateDialog />}
         introDialog={<BetaIntroDialog />}
+        resourceSources={localResourceSources}
       />
     );
   }
 } else {
-  app = (
-    <MainFrame />
-  );
+  app = <MainFrame />;
 }
 
 ReactDOM.render(app, document.getElementById('root'));

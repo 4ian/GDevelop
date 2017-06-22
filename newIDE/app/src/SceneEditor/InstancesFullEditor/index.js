@@ -350,7 +350,7 @@ export default class InstancesFullEditor extends Component {
   };
 
   render() {
-    const { project, layout, initialInstances } = this.props;
+    const { project, layout, initialInstances, resourceSources } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
     const editors = {
@@ -411,6 +411,7 @@ export default class InstancesFullEditor extends Component {
             open={!!this.state.editedObject}
             object={this.state.editedObject}
             project={project}
+            resourceSources={resourceSources}
             onCancel={() => this.editObject(null)}
             onApply={() => this.editObject(null)}
           />

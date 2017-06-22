@@ -20,14 +20,15 @@ export default class ResourceSelector extends Component {
   }
 
   _getDefaultItems() {
+    const sources = this.props.resourceSources || [];
     return [
-      {
-        text: 'new-image',
-        value: (
-          <MenuItem primaryText="Choose a new image" rightIcon={<Add />} />
-        ),
-        onClick: () => console.log("TODO"),
-      },
+      ...sources
+        .filter(source => source.kind === this.props.resourceKind)
+        .map(source => ({
+          text: '',
+          value: <MenuItem primaryText={source.name} rightIcon={<Add />} />,
+          onClick: () => this._addFrom(source),
+        })),
       {
         text: '',
         value: <Divider />,
@@ -46,6 +47,26 @@ export default class ResourceSelector extends Component {
     this.defaultItems = this._getDefaultItems();
     this.autoCompleteData = [...this.defaultItems, ...this.allResourcesNames];
   }
+
+  _addFrom = source => {
+    if (!source) return;
+
+    const { project } = this.props;
+    source
+      .chooseResource(project)
+      .then(resource => {
+        if (!resource) return;
+
+        project.getResourcesManager().addResource(resource);
+
+        this._loadFrom(project.getResourcesManager());
+        this._onUpdate(resource.getName());
+      })
+      .catch(err => {
+        // TODO: Display an error message
+        console.error('Unable to choose a resource', err);
+      });
+  };
 
   _onUpdate = searchText => {
     this.setState(
@@ -66,7 +87,7 @@ export default class ResourceSelector extends Component {
       return this._onUpdate(text);
 
     this.defaultItems[index].onClick();
-  }
+  };
 
   render() {
     const errorText = this.state.notExistingError

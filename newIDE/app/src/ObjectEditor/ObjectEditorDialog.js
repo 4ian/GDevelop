@@ -31,11 +31,7 @@ export default class ObjectEditorDialog extends Component {
 
   render() {
     const actions = [
-      <FlatButton
-        label="Cancel"
-        primary
-        onTouchTap={this.props.onCancel}
-      />,
+      <FlatButton label="Cancel" primary onTouchTap={this.props.onCancel} />,
       <FlatButton
         label="Apply"
         primary
@@ -55,7 +51,12 @@ export default class ObjectEditorDialog extends Component {
         onRequestClose={this.props.onCancel}
         autoScrollBodyContent
       >
-        {EditorComponent && <EditorComponent object={this.props.object} project={this.props.project} />}
+        {EditorComponent &&
+          <EditorComponent
+            object={this.props.object}
+            project={this.props.project}
+            resourceSources={this.props.resourceSources}
+          />}
       </Dialog>
     );
   }

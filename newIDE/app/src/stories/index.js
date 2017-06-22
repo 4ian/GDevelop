@@ -17,10 +17,11 @@ import LocalMobileExport from '../Export/LocalMobileExport';
 import LocalS3Export from '../Export/LocalS3Export';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
+import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import Paper from 'material-ui/Paper';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import muiDecorator from './MuiDecorator';
-import { project, tiledSpriteObject, textObject } from './TestProject';
+import { project, tiledSpriteObject, panelSpriteObject, textObject } from './TestProject';
 
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
@@ -128,5 +129,13 @@ storiesOf('TiledSpriteEditor', module)
   .add('default', () => (
     <SerializedObjectDisplay object={tiledSpriteObject}>
       <TiledSpriteEditor object={tiledSpriteObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('PanelSpriteEditor', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={panelSpriteObject}>
+      <PanelSpriteEditor object={panelSpriteObject} project={project} />
     </SerializedObjectDisplay>
   ));

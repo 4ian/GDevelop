@@ -168,6 +168,7 @@ export default class MainFrame extends Component {
             showPreviewButton={!!this.props.onLayoutPreview}
             onEditObject={this.props.onEditObject}
             showAddObjectButton={!this.props.integratedEditor}
+            resourceSources={this.props.resourceSources}
           />
         ),
         'layout ' + name
@@ -197,6 +198,7 @@ export default class MainFrame extends Component {
             showPreviewButton={!!this.props.onExternalLayoutPreview}
             onEditObject={this.props.onEditObject}
             showAddObjectButton={!this.props.integratedEditor}
+            resourceSources={this.props.resourceSources}
           />
         ),
         'external layout ' + name

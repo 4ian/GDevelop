@@ -53,9 +53,10 @@ export default class ResourceSelector extends Component {
 
     const { project } = this.props;
     source
-      .chooseResource(project)
-      .then(resource => {
-        if (!resource) return;
+      .chooseResources(project, false)
+      .then(resources => {
+        if (!resources.length) return;
+        const resource = resources[0];
 
         project.getResourcesManager().addResource(resource);
 
@@ -91,7 +92,7 @@ export default class ResourceSelector extends Component {
 
   render() {
     const errorText = this.state.notExistingError
-      ? 'This resource is not existing in the game'
+      ? 'This resource does not exist in the game'
       : null;
 
     return (

@@ -10,8 +10,22 @@ import PIXI from 'pixi.js';
  */
 export default function makeRenderer(iconPath) {
   class RenderedIconInstance extends RenderedInstance {
-    constructor(project, layout, instance, associatedObject, pixiContainer) {
-      super(project, layout, instance, associatedObject, pixiContainer);
+    constructor(
+      project,
+      layout,
+      instance,
+      associatedObject,
+      pixiContainer,
+      pixiResourcesLoader
+    ) {
+      super(
+        project,
+        layout,
+        instance,
+        associatedObject,
+        pixiContainer,
+        pixiResourcesLoader
+      );
 
       this._pixiObject = new PIXI.Sprite(PIXI.Texture.fromImage(iconPath));
       this._pixiContainer.addChild(this._pixiObject);

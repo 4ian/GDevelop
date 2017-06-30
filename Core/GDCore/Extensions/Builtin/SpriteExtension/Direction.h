@@ -95,6 +95,11 @@ public:
      */
     void SwapSprites(std::size_t firstSpriteIndex, std::size_t secondSpriteIndex);
 
+    /**
+     * Change the position of the specified sprite.
+     */
+    void MoveSprite(std::size_t oldIndex, std::size_t newIndex);
+
     void UnserializeFrom(const gd::SerializerElement & element);
     #if defined(GD_IDE_ONLY)
     void SerializeTo(gd::SerializerElement & element) const;

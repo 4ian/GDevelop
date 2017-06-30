@@ -44,7 +44,7 @@ a[href^="ftp://"] {
 }
 
 /* Used for react-sortable-hoc SortableContainer, to make sure the
- * dragged element is visible (and not hidden behind a drawer for example)
+ * dragged element is visible (and not hidden behind a drawer or dialog)
  */
 .sortable-helper {
   z-index: 9999;

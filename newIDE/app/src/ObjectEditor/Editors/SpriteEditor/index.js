@@ -1,86 +1,115 @@
 import React, { Component } from 'react';
-import {GridList, GridTile} from 'material-ui/GridList';
+import { GridList, GridTile } from 'material-ui/GridList';
 import { Line, Column } from '../../../UI/Grid';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
+import SpritesList from './SpritesList';
+import Add from 'material-ui/svg-icons/content/add';
+import IconButton from 'material-ui/IconButton';
 import { mapFor } from '../../../Utils/MapFor';
+import EmptyMessage from '../../../UI/EmptyMessage';
 const gd = global.gd;
-
-const SortableSprite = SortableElement(({ sprite }) => (
-  <span>{sprite.getImageName()}</span>
-));
-
-const SortableSpritesList = SortableContainer(({ direction }) => {
-  return (
-    <div>
-      {mapFor(0, direction.getSpritesCount(), i => {
-        const sprite = direction.getSprite(i);
-        return <SortableSprite sprite={sprite} key={i} index={i} />;
-      })}
-    </div>
-  );
-});
-
-class SpritesListContainer extends Component {
-  onSortEnd = ({ oldIndex, newIndex }) => {
-    //TODO
-    console.log('sort end direction', this.props.direction, {
-      oldIndex,
-      newIndex,
-    });
-  };
-  render() {
-    return (
-      <SortableSpritesList
-        direction={this.props.direction}
-        onSortEnd={this.onSortEnd}
-        lockAxis="x"
-        axis="x"
-      />
-    );
-  }
-}
-
-const SortableAnimation = SortableElement(({ animation, id }) => (
-  <GridTile>
-    Animation #{id} {animation.getName()}
-    {mapFor(0, animation.getDirectionsCount(), i => {
-      const direction = animation.getDirection(i);
-      return <SpritesListContainer direction={direction} key={i} />;
-    })}
-  </GridTile>
-));
 
 const styles = {
   gridList: {
     overflowY: 'auto',
   },
+  addAnimationLine: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  addAnimationText: {
+    justifyContent: 'flex-end',
+  },
 };
 
-const SortableAnimationsList = SortableContainer(({ spriteObject }) => {
+const AddAnimationLine = SortableElement(({ onAdd }) => (
+  <div style={styles.addAnimationLine}>
+    <EmptyMessage style={styles.addAnimationText}>
+      Click to add an animation:
+    </EmptyMessage>
+    <IconButton onClick={onAdd}>
+      <Add />
+    </IconButton>
+  </div>
+));
+
+const SortableAnimation = SortableElement(({
+  animation,
+  id,
+  project,
+  resourceSources,
+}) => (
+  <GridTile>
+    Animation #{id} {animation.getName()}
+    {mapFor(0, animation.getDirectionsCount(), i => {
+      const direction = animation.getDirection(i);
+      return (
+        <SpritesList
+          direction={direction}
+          key={i}
+          project={project}
+          resourceSources={resourceSources}
+        />
+      );
+    })}
+  </GridTile>
+));
+
+const SortableAnimationsList = SortableContainer(({
+  spriteObject,
+  onAddAnimation,
+  project,
+  resourceSources,
+}) => {
   return (
-    <GridList style={styles.gridList} cellHeight={60} cols={1}>
-      {mapFor(0, spriteObject.getAnimationsCount(), i => {
-        const animation = spriteObject.getAnimation(i);
-        console.log(animation);
-        console.log(animation.getName);
-        return (
-          <SortableAnimation key={i} index={i} id={i} animation={animation} />
-        );
-      })}
+    <GridList style={styles.gridList} cellHeight="auto" cols={1}>
+      {[
+        ...mapFor(0, spriteObject.getAnimationsCount(), i => {
+          const animation = spriteObject.getAnimation(i);
+          return (
+            <SortableAnimation
+              key={i}
+              index={i}
+              id={i}
+              animation={animation}
+              project={project}
+              resourceSources={resourceSources}
+            />
+          );
+        }),
+        <AddAnimationLine
+          onAdd={onAddAnimation}
+          key="add-animation-line"
+          disabled
+          index={spriteObject.getAnimationsCount()}
+        />,
+      ]}
     </GridList>
   );
 });
 
 class AnimationsListContainer extends Component {
   onSortEnd = ({ oldIndex, newIndex }) => {
-    //TODO
-    console.log(this.props.spriteObject, { oldIndex, newIndex });
+    this.props.spriteObject.moveAnimation(oldIndex, newIndex);
+    this.forceUpdate();
   };
+
+  addAnimation = () => {
+    const emptyAnimation = new gd.Animation();
+    emptyAnimation.setDirectionsCount(1);
+    this.props.spriteObject.addAnimation(emptyAnimation);
+    this.forceUpdate();
+  };
+
   render() {
     return (
       <SortableAnimationsList
         spriteObject={this.props.spriteObject}
+        helperClass="sortable-helper"
+        project={this.props.project}
         onSortEnd={this.onSortEnd}
+        onAddAnimation={this.addAnimation}
+        resourceSources={this.props.resourceSources}
       />
     );
   }
@@ -94,7 +123,11 @@ export default class PanelSpriteEditor extends Component {
     return (
       <Column>
         <Line>
-          <AnimationsListContainer spriteObject={spriteObject} />
+          <AnimationsListContainer
+            spriteObject={spriteObject}
+            resourceSources={resourceSources}
+            project={project}
+          />
         </Line>
       </Column>
     );

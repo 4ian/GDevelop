@@ -13,7 +13,8 @@ function RenderedAdMobInstance(
   layout,
   instance,
   associatedObject,
-  pixiContainer
+  pixiContainer,
+  pixiResourcesLoader
 ) {
   RenderedInstance.call(
     this,
@@ -21,7 +22,8 @@ function RenderedAdMobInstance(
     layout,
     instance,
     associatedObject,
-    pixiContainer
+    pixiContainer,
+    pixiResourcesLoader
   );
 
   //Setup the PIXI object:

@@ -15,7 +15,7 @@ function RenderedTiledSpriteInstance(
   instance,
   associatedObject,
   pixiContainer,
-  resourcesLoader
+  pixiResourcesLoader
 ) {
   RenderedInstance.call(
     this,
@@ -23,16 +23,15 @@ function RenderedTiledSpriteInstance(
     layout,
     instance,
     associatedObject,
-    pixiContainer
+    pixiContainer,
+    pixiResourcesLoader
   );
 
   //Setup the PIXI object:
-  this._resourcesLoader = resourcesLoader; //TODO: This should be done in RenderedInstance class.
-
   var tiledSprite = gd.asTiledSpriteObject(associatedObject);
   this._texture = tiledSprite.getTexture();
   this._pixiObject = new PIXI.extras.TilingSprite(
-    resourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
+    this._pixiResourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
     tiledSprite.getWidth(),
     tiledSprite.getHeight()
   );
@@ -56,7 +55,7 @@ RenderedTiledSpriteInstance.getThumbnail = function(
 ) {
   var tiledSprite = gd.asTiledSpriteObject(object);
 
-  return resourcesLoader.getFilename(project, tiledSprite.getTexture());
+  return resourcesLoader.getResourceFullFilename(project, tiledSprite.getTexture());
 };
 
 RenderedTiledSpriteInstance.prototype.update = function() {
@@ -71,7 +70,7 @@ RenderedTiledSpriteInstance.prototype.update = function() {
 
   if (this._texture !== tiledSprite.getTexture()) {
     this._texture = tiledSprite.getTexture();
-    this._pixiObject.texture = this._resourcesLoader.getPIXITexture(
+    this._pixiObject.texture = this._pixiResourcesLoader.getPIXITexture(
       this._project,
       tiledSprite.getTexture()
     );

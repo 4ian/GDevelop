@@ -15,7 +15,7 @@ function RenderedTextInstance(
   instance,
   associatedObject,
   pixiContainer,
-  resourcesLoader
+  pixiResourcesLoader
 ) {
   RenderedInstance.call(
     this,
@@ -23,18 +23,18 @@ function RenderedTextInstance(
     layout,
     instance,
     associatedObject,
-    pixiContainer
+    pixiContainer,
+    pixiResourcesLoader
   );
 
   //Setup the PIXI object:
   const textObject = gd.asTextObject(this._associatedObject);
-  this._resourcesLoader = resourcesLoader;
   this._pixiObject = new PIXI.Text(' ', { align: 'left' });
   this._pixiObject.anchor.x = 0.5;
   this._pixiObject.anchor.y = 0.5;
   this._pixiContainer.addChild(this._pixiObject);
   this._styleFontDirty = true;
-  this._fontFamily = this._resourcesLoader.getFontFamily(
+  this._fontFamily = this._pixiResourcesLoader.getFontFamily(
     this._project,
     textObject.getFontFilename()
   );
@@ -75,7 +75,7 @@ RenderedTextInstance.prototype.update = function() {
   if (this._fontFilename !== textObject.getFontFilename()) {
     //Avoid calling loadFontFamily if the font didn't changed.
     this._fontFilename = textObject.getFontFilename();
-    this._resourcesLoader
+    this._pixiResourcesLoader
       .loadFontFamily(this._project, textObject.getFontFilename())
       .then(fontFamily => {
         // Once the font is loaded, we can use the given fontFamily.

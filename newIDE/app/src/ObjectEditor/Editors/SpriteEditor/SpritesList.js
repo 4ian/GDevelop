@@ -3,6 +3,8 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
 import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
+import DirectionTools from './DirectionTools';
+import MiniToolbar from '../../../UI/MiniToolbar';
 import ResourcesLoader from '../../../ObjectsRendering/ResourcesLoader';
 const gd = global.gd;
 
@@ -129,16 +131,21 @@ export default class SpritesList extends Component {
 
   render() {
     return (
-      <SortableList
-        resourcesLoader={this.resourcesLoader}
-        direction={this.props.direction}
-        project={this.props.project}
-        onSortEnd={this.onSortEnd}
-        onAddSprite={this.onAddSprite}
-        helperClass="sortable-helper"
-        lockAxis="x"
-        axis="x"
-      />
+      <div>
+        <MiniToolbar justifyContent="flex-end">
+          <DirectionTools direction={this.props.direction} />
+        </MiniToolbar>
+        <SortableList
+          resourcesLoader={this.resourcesLoader}
+          direction={this.props.direction}
+          project={this.props.project}
+          onSortEnd={this.onSortEnd}
+          onAddSprite={this.onAddSprite}
+          helperClass="sortable-helper"
+          lockAxis="x"
+          axis="x"
+        />
+      </div>
     );
   }
 }

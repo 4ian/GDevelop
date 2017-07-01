@@ -22,6 +22,7 @@ import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
 import Paper from 'material-ui/Paper';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import muiDecorator from './MuiDecorator';
+import paperDecorator from './PaperDecorator';
 import {
   project,
   tiledSpriteObject,
@@ -73,35 +74,31 @@ storiesOf('Tabs', module)
   ));
 
 storiesOf('LocalExport', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
-      <LocalExport open project={project} onClose={action('close')} />
-    </Paper>
+    <LocalExport open project={project} onClose={action('close')} />
   ));
 
 storiesOf('LocalS3Export', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
-      <LocalS3Export open project={project} onClose={action('close')} />
-    </Paper>
+    <LocalS3Export open project={project} onClose={action('close')} />
   ));
 
 storiesOf('LocalMobileExport', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
       <LocalMobileExport />
-    </Paper>
   ));
 
 storiesOf('LocalFolderPicker', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
-      <LocalFolderPicker floatingLabelText="Export folder" />
-    </Paper>
+    <LocalFolderPicker floatingLabelText="Export folder" />
   ))
   .add('full width', () => (
     <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
@@ -120,10 +117,12 @@ storiesOf('LocalCreateDialog', module)
   .add('default', () => <LocalCreateDialog open />);
 
 storiesOf('DragHandle', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
 
 storiesOf('TextEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={textObject}>
@@ -132,6 +131,7 @@ storiesOf('TextEditor', module)
   ));
 
 storiesOf('TiledSpriteEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={tiledSpriteObject}>
@@ -140,6 +140,7 @@ storiesOf('TiledSpriteEditor', module)
   ));
 
 storiesOf('PanelSpriteEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={panelSpriteObject}>
@@ -148,6 +149,7 @@ storiesOf('PanelSpriteEditor', module)
   ));
 
 storiesOf('SpriteEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={spriteObject}>

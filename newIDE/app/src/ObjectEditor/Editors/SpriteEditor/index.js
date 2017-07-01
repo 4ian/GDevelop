@@ -4,14 +4,24 @@ import { Line, Column } from '../../../UI/Grid';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
 import Add from 'material-ui/svg-icons/content/add';
+import Delete from 'material-ui/svg-icons/action/delete';
 import IconButton from 'material-ui/IconButton';
+import TextField from 'material-ui/TextField';
 import { mapFor } from '../../../Utils/MapFor';
 import EmptyMessage from '../../../UI/EmptyMessage';
+import MiniToolbar from '../../../UI/MiniToolbar';
+import DragHandle from '../../../UI/DragHandle';
 const gd = global.gd;
 
 const styles = {
   gridList: {
     overflowY: 'auto',
+  },
+  animationTitle: {
+    flex: 1,
+  },
+  animationTools: {
+    flexShrink: 0,
   },
   addAnimationLine: {
     display: 'flex',
@@ -33,31 +43,64 @@ const AddAnimationLine = SortableElement(({ onAdd }) => (
   </div>
 ));
 
-const SortableAnimation = SortableElement(({
-  animation,
-  id,
-  project,
-  resourceSources,
-}) => (
-  <GridTile>
-    Animation #{id} {animation.getName()}
-    {mapFor(0, animation.getDirectionsCount(), i => {
-      const direction = animation.getDirection(i);
-      return (
-        <SpritesList
-          direction={direction}
-          key={i}
-          project={project}
-          resourceSources={resourceSources}
-        />
-      );
-    })}
-  </GridTile>
-));
+class Animation extends Component {
+  _onChangeAnimationName = newName => {
+    //TODO: Check that this name does not exists
+    this.props.animation.setName(newName);
+    this.forceUpdate();
+  };
+
+  render() {
+    const {
+      animation,
+      id,
+      project,
+      resourceSources,
+      onRemove,
+    } = this.props;
+
+    return (
+      <GridTile>
+        <MiniToolbar>
+          <DragHandle />
+          <span style={styles.animationTitle}>
+            Animation #
+            {id}
+            {' '}
+            <TextField
+              value={animation.getName()}
+              hintText="Optional animation name"
+              onChange={(e, text) => this._onChangeAnimationName(text)}
+            />
+          </span>
+          <span style={styles.animationTools}>
+            <IconButton onClick={onRemove}>
+              <Delete />
+            </IconButton>
+          </span>
+        </MiniToolbar>
+        {mapFor(0, animation.getDirectionsCount(), i => {
+          const direction = animation.getDirection(i);
+          return (
+            <SpritesList
+              direction={direction}
+              key={i}
+              project={project}
+              resourceSources={resourceSources}
+            />
+          );
+        })}
+      </GridTile>
+    );
+  }
+}
+
+const SortableAnimation = SortableElement(Animation);
 
 const SortableAnimationsList = SortableContainer(({
   spriteObject,
   onAddAnimation,
+  onRemoveAnimation,
   project,
   resourceSources,
 }) => {
@@ -74,6 +117,7 @@ const SortableAnimationsList = SortableContainer(({
               animation={animation}
               project={project}
               resourceSources={resourceSources}
+              onRemove={() => onRemoveAnimation(i)}
             />
           );
         }),
@@ -101,6 +145,18 @@ class AnimationsListContainer extends Component {
     this.forceUpdate();
   };
 
+  removeAnimation = i => {
+    //eslint-disable-next-line
+    const answer = confirm(
+      "Are you sure you want to remove this animation? This can't be undone."
+    );
+
+    if (answer) {
+      this.props.spriteObject.removeAnimation(i);
+      this.forceUpdate();
+    }
+  };
+
   render() {
     return (
       <SortableAnimationsList
@@ -109,7 +165,11 @@ class AnimationsListContainer extends Component {
         project={this.props.project}
         onSortEnd={this.onSortEnd}
         onAddAnimation={this.addAnimation}
+        onRemoveAnimation={this.removeAnimation}
         resourceSources={this.props.resourceSources}
+        useDragHandle
+        lockAxis="y"
+        axis="y"
       />
     );
   }
@@ -121,15 +181,11 @@ export default class PanelSpriteEditor extends Component {
     const spriteObject = gd.asSpriteObject(object);
 
     return (
-      <Column>
-        <Line>
-          <AnimationsListContainer
-            spriteObject={spriteObject}
-            resourceSources={resourceSources}
-            project={project}
-          />
-        </Line>
-      </Column>
+      <AnimationsListContainer
+        spriteObject={spriteObject}
+        resourceSources={resourceSources}
+        project={project}
+      />
     );
   }
 }

@@ -11,11 +11,14 @@ export default {
     return this.editors[type];
   },
   editors: {
-    Sprite: SpriteEditor,
-    'TiledSpriteObject::TiledSprite': TiledSpriteEditor,
-    'PanelSpriteObject::PanelSprite': PanelSpriteEditor,
+    Sprite: { component: SpriteEditor, containerProps: { noMargin: true } },
+    'TiledSpriteObject::TiledSprite': { component: TiledSpriteEditor },
+    'PanelSpriteObject::PanelSprite': { component: PanelSpriteEditor },
     'AdMobObject::AdMob': undefined,
-    'TextObject::Text': TextEditor,
+    'TextObject::Text': {
+      component: TextEditor,
+      containerProps: { noMargin: true },
+    },
     'PrimitiveDrawing::Drawer': undefined,
     'TextEntryObject::TextEntry': undefined,
   },

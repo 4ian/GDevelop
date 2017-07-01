@@ -7,17 +7,13 @@ export default class ObjectEditorDialog extends Component {
   constructor(props) {
     super(props);
 
-    this._loadFrom(props.object);
+    this.state = {
+      editor: null,
+    };
   }
 
-  _onApply = () => {
-    if (this.props.onApply) this.props.onApply();
-  };
-
-  _loadFrom(object) {
-    if (!object) return;
-
-    this.editorComponent = ObjectsEditorService.getEditor(object.getType());
+  componentWillMount() {
+    this._loadFrom(this.props.object);
   }
 
   componentWillReceiveProps(newProps) {
@@ -29,7 +25,22 @@ export default class ObjectEditorDialog extends Component {
     }
   }
 
+  _onApply = () => {
+    if (this.props.onApply) this.props.onApply();
+  };
+
+  _loadFrom(object) {
+    if (!object) return;
+
+    this.setState({
+      editor: ObjectsEditorService.getEditor(object.getType()),
+    });
+  }
+
   render() {
+    const { editor } = this.state;
+    if (!editor) return null;
+
     const actions = [
       <FlatButton label="Cancel" primary onTouchTap={this.props.onCancel} />,
       <FlatButton
@@ -40,16 +51,17 @@ export default class ObjectEditorDialog extends Component {
       />,
     ];
 
-    const EditorComponent = this.editorComponent;
+    const EditorComponent = editor.component;
+    const containerProps = editor.containerProps;
 
     return (
       <Dialog
-        noMargin
         actions={actions}
-        modal
-        open={this.props.open}
-        onRequestClose={this.props.onCancel}
         autoScrollBodyContent
+        {...containerProps}
+        modal
+        onRequestClose={this.props.onCancel}
+        open={this.props.open}
       >
         {EditorComponent &&
           <EditorComponent

@@ -32,6 +32,12 @@ import {
   testLayout,
 } from './TestProject';
 
+import injectTapEventPlugin from 'react-tap-event-plugin';
+
+// Needed for onTouchTap
+// http://stackoverflow.com/a/34015469/988941
+injectTapEventPlugin();
+
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
 ));
@@ -168,6 +174,7 @@ storiesOf('ObjectsList', module)
           getThumbnail={() => 'res/unknown32.png'}
           project={project}
           objectsContainer={testLayout}
+          onEditObject={action('On edit object')}
         />
       </div>
     </SerializedObjectDisplay>

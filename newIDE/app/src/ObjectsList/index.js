@@ -1,57 +1,49 @@
 import React from 'react';
-import { ListItem } from 'material-ui/List';
 import { AutoSizer, List } from 'react-virtualized';
-import Avatar from 'material-ui/Avatar';
 import { mapFor } from '../Utils/MapFor';
-import IconMenu from '../UI/Menu/IconMenu';
-import IconButton from 'material-ui/IconButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import ObjectRow from './ObjectRow';
+import AddObjectRow from './AddObjectRow';
+import NewObjectDialog from './NewObjectDialog';
+import newNameGenerator from '../Utils/NewNameGenerator';
 
 const listItemHeight = 56;
 
 export default class ObjectsList extends React.Component {
-  _renderObjectMenu(object) {
-    return (
-      <IconMenu
-        iconButtonElement={
-          <IconButton onClick={e => e.preventDefault()}>
-            <MoreVertIcon />
-          </IconButton>
-        }
-        menuTemplate={[
-          {
-            label: 'Edit object',
-            enabled: !!this.props.onEditObject,
-            click: () => this.props.onEditObject(object),
-          },
-        ]}
-      />
-    );
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      newObjectDialogOpen: false,
+    };
   }
 
-  _renderObjectRow(project, object, key, style) {
-    if (this.props.freezeUpdate) return;
-    const objectName = object.getName();
+  addObject = objectType => {
+    const { project, objectsContainer } = this.props;
 
-    return (
-      <ListItem
-        style={style}
-        key={object.ptr}
-        primaryText={objectName}
-        leftAvatar={
-          <Avatar
-            src={this.props.getThumbnail(project, object)}
-            style={{ borderRadius: 0 }}
-          />
-        }
-        rightIconButton={this._renderObjectMenu(object)}
-        onTouchTap={() => this.props.onObjectSelected(objectName)}
-      />
+    const name = newNameGenerator(
+      'MyObject',
+      name =>
+        objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
     );
-  }
+
+    const object = objectsContainer.insertNewObject(
+      project,
+      objectType,
+      name,
+      objectsContainer.getObjectsCount()
+    );
+
+    this.setState({
+      newObjectDialogOpen: false,
+    }, () => {
+      if (this.props.onEditObject) {
+        this.props.onEditObject(object);
+      }
+    });
+  };
 
   render() {
-    const { project, objectsContainer } = this.props;
+    const { project, objectsContainer, freezeUpdate } = this.props;
 
     const containerObjectsList = mapFor(
       0,
@@ -63,9 +55,10 @@ export default class ObjectsList extends React.Component {
       ? null
       : mapFor(0, project.getObjectsCount(), i => project.getObjectAt(i));
 
-    const fullList = projectObjectsList
+    const allObjectsList = projectObjectsList
       ? containerObjectsList.concat(projectObjectsList)
       : containerObjectsList;
+    const fullList = allObjectsList.concat('add-objects-row');
 
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
@@ -73,20 +66,44 @@ export default class ObjectsList extends React.Component {
     const listKey = project.ptr + ';' + objectsContainer.ptr;
 
     return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <List
-            style={{ backgroundColor: 'white' }}
-            key={listKey}
-            height={height}
-            rowCount={fullList.length}
-            rowHeight={listItemHeight}
-            rowRenderer={({ index, key, style }) =>
-              this._renderObjectRow(project, fullList[index], key, style)}
-            width={width}
-          />
-        )}
-      </AutoSizer>
+      <div style={{ flex: 1, display: 'flex', height: '100%' }}>
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              style={{ backgroundColor: 'white' }}
+              key={listKey}
+              height={height}
+              rowCount={fullList.length}
+              rowHeight={listItemHeight}
+              rowRenderer={({ index, key, style }) =>
+                fullList[index] === 'add-objects-row'
+                  ? <AddObjectRow
+                      key={key}
+                      style={style}
+                      onAdd={() => this.setState({ newObjectDialogOpen: true })}
+                    />
+                  : <ObjectRow
+                      key={fullList[index].ptr}
+                      project={project}
+                      object={fullList[index]}
+                      style={style}
+                      freezeUpdate={freezeUpdate}
+                      onEditObject={this.props.onEditObject}
+                      getThumbnail={this.props.getThumbnail}
+                      onObjectSelected={this.props.onObjectSelected}
+                    />}
+              width={width}
+            />
+          )}
+        </AutoSizer>
+        {this.state.newObjectDialogOpen &&
+          <NewObjectDialog
+            open={this.state.newObjectDialogOpen}
+            onClose={() => this.setState({ newObjectDialogOpen: false })}
+            onChoose={this.addObject}
+            project={project}
+          />}
+      </div>
     );
   }
 }

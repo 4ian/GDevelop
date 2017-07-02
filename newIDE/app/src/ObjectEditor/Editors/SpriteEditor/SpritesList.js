@@ -74,10 +74,11 @@ const SortableList = SortableContainer(({
   resourcesLoader,
   onAddSprite,
 }) => {
+  const spritesCount = direction.getSpritesCount();
   return (
     <div style={styles.spritesList}>
       {[
-        ...mapFor(0, direction.getSpritesCount(), i => {
+        ...mapFor(0, spritesCount, i => {
           const sprite = direction.getSprite(i);
           return (
             <SortableSpriteThumbnail
@@ -93,6 +94,7 @@ const SortableList = SortableContainer(({
           displayHint={!direction.getSpritesCount()}
           key="add-sprite-button"
           disabled
+          index={spritesCount}
           onAdd={onAddSprite}
         />,
       ]}

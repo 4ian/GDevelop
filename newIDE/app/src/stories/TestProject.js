@@ -1,6 +1,9 @@
 const gd = global.gd;
 
+// Create and expose a game project
 export const project = gd.ProjectHelper.createNewGDJSProject();
+
+// Add some fake resources
 const resource1 = new gd.ImageResource();
 const resource2 = new gd.ImageResource();
 const resource3 = new gd.ImageResource();
@@ -22,10 +25,11 @@ project.getResourcesManager().addResource(resource3);
 project.getResourcesManager().addResource(resource4);
 project.getResourcesManager().addResource(audioResource1);
 
+// Create and expose some objects
+export const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
 export const textObject = new gd.TextObject('MyTextObject');
 export const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
 export const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
-
 export const spriteObject = new gd.SpriteObject('MySpriteObject');
 
 {
@@ -67,3 +71,17 @@ export const spriteObject = new gd.SpriteObject('MySpriteObject');
     animation.getDirection(0).addSprite(sprite1);
     spriteObject.addAnimation(animation);
 }
+
+// Layout
+export const testLayout = project.insertNewLayout("TestLayout", 0);
+testLayout.insertObject(shapePainterObject, 0);
+testLayout.insertObject(textObject, 0);
+testLayout.insertObject(tiledSpriteObject, 0);
+testLayout.insertObject(panelSpriteObject, 0);
+testLayout.insertObject(spriteObject, 0);
+
+// Global objects
+const globalTextObject = new gd.TextObject('GlobalTextObject');
+const globalTiledSpriteObject = new gd.TiledSpriteObject('GlobalTiledSpriteObject');
+project.insertObject(globalTextObject, 0);
+project.insertObject(globalTiledSpriteObject, 0);

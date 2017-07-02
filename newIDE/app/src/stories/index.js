@@ -19,7 +19,7 @@ import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
-import Paper from 'material-ui/Paper';
+import ObjectsList from '../ObjectsList';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
@@ -29,6 +29,7 @@ import {
   panelSpriteObject,
   textObject,
   spriteObject,
+  testLayout,
 } from './TestProject';
 
 storiesOf('Welcome', module).add('to Storybook', () => (
@@ -154,5 +155,20 @@ storiesOf('SpriteEditor', module)
   .add('default', () => (
     <SerializedObjectDisplay object={spriteObject}>
       <SpriteEditor object={spriteObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('ObjectsList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <div style={{height: 250}}>
+        <ObjectsList
+          getThumbnail={() => 'res/unknown32.png'}
+          project={project}
+          objectsContainer={testLayout}
+        />
+      </div>
     </SerializedObjectDisplay>
   ));

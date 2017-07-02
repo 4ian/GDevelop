@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 
 import ObjectsList from '../../ObjectsList';
+import ObjectsRenderingService
+  from '../../ObjectsRendering/ObjectsRenderingService';
 import FullSizeInstancesEditor
   from '../../InstancesEditor/FullSizeInstancesEditor';
 import InstancePropertiesEditor
@@ -401,6 +403,9 @@ export default class InstancesFullEditor extends Component {
             }
           />
           <ObjectsList
+            getThumbnail={ObjectsRenderingService.getThumbnail.bind(
+              ObjectsRenderingService
+            )}
             freezeUpdate={!this.state.objectsListOpen}
             project={project}
             objectsContainer={layout}

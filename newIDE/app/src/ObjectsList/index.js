@@ -2,8 +2,6 @@ import React from 'react';
 import { ListItem } from 'material-ui/List';
 import { AutoSizer, List } from 'react-virtualized';
 import Avatar from 'material-ui/Avatar';
-import ObjectsRenderingService
-  from '../ObjectsRendering/ObjectsRenderingService';
 import { mapFor } from '../Utils/MapFor';
 import IconMenu from '../UI/Menu/IconMenu';
 import IconButton from 'material-ui/IconButton';
@@ -16,7 +14,7 @@ export default class ObjectsList extends React.Component {
     return (
       <IconMenu
         iconButtonElement={
-          <IconButton onTouchTap={e => e.preventDefault()}>
+          <IconButton onClick={e => e.preventDefault()}>
             <MoreVertIcon />
           </IconButton>
         }
@@ -42,7 +40,7 @@ export default class ObjectsList extends React.Component {
         primaryText={objectName}
         leftAvatar={
           <Avatar
-            src={ObjectsRenderingService.getThumbnail(project, object)}
+            src={this.props.getThumbnail(project, object)}
             style={{ borderRadius: 0 }}
           />
         }

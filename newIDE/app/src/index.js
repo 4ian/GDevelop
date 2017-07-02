@@ -18,6 +18,8 @@ import LocalS3Export from './Export/LocalS3Export';
 import LocalMobileExport from './Export/LocalMobileExport';
 import LocalCreateDialog from './ProjectCreation/LocalCreateDialog';
 import localResourceSources from './ResourcesEditor/LocalResourceSources';
+import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
+import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 const electron = optionalRequire('electron');
 
 // Needed for onTouchTap
@@ -66,6 +68,9 @@ if (electron) {
         }
         createDialog={<LocalCreateDialog />}
         introDialog={<BetaIntroDialog />}
+        onSaveProject={LocalProjectWriter.saveProject}
+        onChooseProject={LocalProjectOpener.chooseProjectFile}
+        onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
         resourceSources={localResourceSources}
       />
     );

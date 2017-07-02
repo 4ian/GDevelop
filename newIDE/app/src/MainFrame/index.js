@@ -33,8 +33,6 @@ import {
 } from './EditorTabsHandler';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timeFunction } from '../Utils/TimeFunction';
-import FileOpener from '../Utils/FileOpener';
-import FileWriter from '../Utils/FileWriter';
 
 import fixtureGame from '../fixtures/platformer/platformer.json';
 const gd = global.gd;
@@ -214,7 +212,7 @@ export default class MainFrame extends Component {
         () => (
           <StartPage
             setToolbar={this.setEditorToolbar}
-            onOpen={this._onOpenFromFile}
+            onOpen={this.chooseProject}
             onCreate={() => this._openCreateDialog()}
           />
         ),
@@ -229,14 +227,8 @@ export default class MainFrame extends Component {
     });
   };
 
-  _openFromFile = filepath => {
-    FileOpener.readProjectJSONFile(filepath, (err, projectObject) => {
-      if (err) {
-        //TODO: Error displayed to user with a generic component
-        console.error('Unable to read project', err);
-        return;
-      }
-
+  openFromPathOrURL = url => {
+    this.props.onReadFromPathOrURL(url).then(projectObject => {
       this.setState(
         {
           loadingProject: true,
@@ -252,7 +244,7 @@ export default class MainFrame extends Component {
             this.loadFullProject(serializedObject, () => {
               serializedObject.delete();
 
-              this.state.currentProject.setProjectFile(filepath);
+              this.state.currentProject.setProjectFile(url);
               this.setState({
                 loadingProject: false,
                 projectManagerOpen: true,
@@ -261,37 +253,25 @@ export default class MainFrame extends Component {
           }),
         10 // Let some time for the loader to be shown
       );
-    });
-  };
-
-  _onOpenFromFile = () => {
-    // TODO: This should be moved to a LocalFileOpener passed as a props
-    FileOpener.chooseProjectFile((err, filepath) => {
-      if (!filepath || err) return;
-
-      this._openFromFile(filepath);
-    });
-  };
-
-  _onSaveToFile = () => {
-    // TODO: This should be moved to a LocalFileWriter passed as a props
-    const filepath = this.state.currentProject.getProjectFile();
-    if (!filepath) {
-      console.warn('Unimplemented Saveas'); // TODO
+    }, err => {
+      alert("Unable to read this project. Please try again later or with another save of the project.");
+      console.error('Unable to read project', err);
       return;
-    }
+    });
+  };
 
-    FileWriter.writeProjectJSONFile(
-      this.state.currentProject,
-      filepath,
-      err => {
-        if (err) {
-          //TODO: Error displayed to user with a generic component
-          console.error('Unable to write project', err);
-          return;
-        }
-      }
-    );
+  chooseProject = () => {
+    this.props.onChooseProject().then(filepath => {
+      if (!filepath) return;
+
+      this.openFromPathOrURL(filepath);
+    }).catch(() => {});
+  };
+
+  save = () => {
+    this.props.onSaveProject(this.state.currentProject).catch(err => {
+      alert("Unable to save the project! Please try again by choosing another location.");
+    });
   };
 
   _onCloseProject = () => {
@@ -386,7 +366,7 @@ export default class MainFrame extends Component {
                   onOpenExternalEvents={this.openExternalEvents}
                   onOpenLayout={this.openLayout}
                   onOpenExternalLayout={this.openExternalLayout}
-                  onSaveProject={this._onSaveToFile}
+                  onSaveProject={this.save}
                   onCloseProject={this._onCloseProject}
                   onExportProject={this._openExportDialog}
                 />}
@@ -396,7 +376,7 @@ export default class MainFrame extends Component {
               showProjectIcons={!this.props.integratedEditor}
               hasProject={!!this.state.currentProject}
               toggleProjectManager={this.toggleProjectManager}
-              openProject={this._onOpenFromFile}
+              openProject={this.chooseProject}
               loadBuiltinGame={this.loadBuiltinGame}
               requestUpdate={this.props.requestUpdate}
             />
@@ -436,7 +416,7 @@ export default class MainFrame extends Component {
                 onClose: () => this._openCreateDialog(false),
                 onOpen: filepath => {
                   this._openCreateDialog(false);
-                  this._openFromFile(filepath);
+                  this.openFromPathOrURL(filepath);
                 },
               })}
             {!!introDialog &&

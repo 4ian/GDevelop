@@ -48,7 +48,7 @@ You can run a [storybook](https://github.com/storybooks/storybook) that is used 
 
 ```bash
 cd newIDE/app
-yarn run storybook
+yarn storybook #or npm run storybook
 ```
 
 ## Building the standalone app
@@ -68,7 +68,7 @@ This new editor is still in development and not yet ready to build games from sc
 - [x] Scene editor
 - [x] Export
 - [ ] Events editor
-- [ ] Objects editor
+- [ ] Objects editor (in progress here: https://github.com/4ian/GD/pull/359)
 - [ ] Support for native games
 - [ ] Editor available online
 - [ ] Export with Cocos2d-JS to Android and iOS.

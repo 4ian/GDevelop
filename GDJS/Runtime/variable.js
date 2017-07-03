@@ -29,7 +29,7 @@ gdjs.Variable = function(varData)
 			//Try to guess the type of the value, as GD has no way ( for now ) to specify
 			//the type of a variable.
 			var valueWhenConsideredAsNumber = parseFloat(initialValue, 10);
-			if(valueWhenConsideredAsNumber === valueWhenConsideredAsNumber) { //"Since NaN is the only JavaScript value that is treated as unequal to itself, you can always test if a value is NaN by checking it for equality to itself"
+			if(valueWhenConsideredAsNumber === valueWhenConsideredAsNumber && valueWhenConsideredAsNumber.toString() === initialValue) { //"Since NaN is the only JavaScript value that is treated as unequal to itself, you can always test if a value is NaN by checking it for equality to itself"
 				this._value = parseFloat(initialValue, 10);
 			}
 			else { //We have a string (Maybe empty).

@@ -98,13 +98,11 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
             }
         } catch(...) {}
 
-        try {
-            CppCodeEvent & cppCodeEvent = dynamic_cast<CppCodeEvent &>(events[i]);
+        std::vector<gd::String> dependencies = events[i].GetSourceFileDependencies();
+        sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
 
-            const std::vector<gd::String> & dependencies = cppCodeEvent.GetDependencies();
-            sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
-            sourceFilesDependencies.insert(cppCodeEvent.GetAssociatedGDManagedSourceFile(project));
-        } catch(...) {}
+        const gd::String & associatedSourceFile = events[i].GetAssociatedGDManagedSourceFile(project);
+        if (!associatedSourceFile.empty()) sourceFilesDependencies.insert(associatedSourceFile);
 
         if ( events[i].CanHaveSubEvents() )
         {

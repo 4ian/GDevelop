@@ -256,8 +256,14 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::
 
         dependenciesList->Append(allFiles[i]->GetFileName());
 
-        if ( std::find(editedEvent.GetDependencies().begin(), editedEvent.GetDependencies().end(), allFiles[i]->GetFileName() ) != editedEvent.GetDependencies().end() )
+        if (std::find(
+				editedEvent.GetSourceFileDependencies().begin(),
+				editedEvent.GetSourceFileDependencies().end(),
+				allFiles[i]->GetFileName() ) != editedEvent.GetSourceFileDependencies().end()
+		)
+		{
             dependenciesList->Check(dependenciesList->GetCount()-1, true);
+		}
     }
 
     UpdateFunctionPrototype();

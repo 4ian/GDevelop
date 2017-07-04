@@ -53,7 +53,7 @@ public:
 
     void SetLastChangeTimeStamp(time_t lastChangeTimeStamp_) { lastChangeTimeStamp = lastChangeTimeStamp_; }
 
-    const std::vector<gd::String> & GetDependencies() const { return dependencies; };
+    const std::vector<gd::String> & GetSourceFileDependencies() const { return dependencies; };
     void SetDependencies(const std::vector<gd::String> & dependencies_) { dependencies = dependencies_; };
 
     bool GetPassSceneAsParameter() const { return passSceneAsParameter; };

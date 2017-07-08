@@ -1,3 +1,9 @@
+/*
+ * GDevelop Core
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
+ */
+
 #if defined(GD_IDE_ONLY)
 #include <algorithm>
 #include "GDCore/Events/EventsList.h"
@@ -7,7 +13,6 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
-#include "GDCpp/Events/Builtin/CppCodeEvent.h"
 #include "DependenciesAnalyzer.h"
 
 DependenciesAnalyzer::DependenciesAnalyzer(gd::Project & project_, gd::Layout & layout_) :
@@ -98,12 +103,14 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
             }
         } catch(...) {}
 
+        // Search for source files dependencies
         std::vector<gd::String> dependencies = events[i].GetSourceFileDependencies();
         sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
 
         const gd::String & associatedSourceFile = events[i].GetAssociatedGDManagedSourceFile(project);
         if (!associatedSourceFile.empty()) sourceFilesDependencies.insert(associatedSourceFile);
 
+        // Analyze sub events dependencies
         if ( events[i].CanHaveSubEvents() )
         {
             if ( !Analyze(events[i].GetSubEvents(), false) )

@@ -5,7 +5,7 @@
  */
 
 #if defined(GD_IDE_ONLY)
-#include "GDCpp/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"

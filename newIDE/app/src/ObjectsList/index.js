@@ -9,6 +9,11 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 const listItemHeight = 56;
 
 export default class ObjectsList extends React.Component {
+  static defaultProps = {
+    onDeleteObject: (objectWithScope, cb) => cb(true),
+    onRenameObject: (objectWithScope, newName, cb) => cb(true),
+  };
+
   constructor(props) {
     super(props);
 
@@ -197,8 +202,3 @@ export default class ObjectsList extends React.Component {
     );
   }
 }
-
-ObjectsList.defaultProps = {
-  onDeleteObject: (objectWithScope, cb) => cb(true),
-  onRenameObject: (objectWithScope, newName, cb) => cb(true),
-};

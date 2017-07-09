@@ -289,6 +289,35 @@ export default class InstancesFullEditor extends Component {
     done(true);
   };
 
+  _onDeleteObject = (objectWithScope, done) => {
+    const { object, global } = objectWithScope;
+    const { project, layout } = this.props;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      'Do you want to remove all references to this object in groups and events (actions and conditions using the object)?'
+    );
+
+    if (global) {
+      gd.WholeProjectRefactorer.globalObjectRemoved(project, object.getName(), !!answer)
+    } else {
+      gd.WholeProjectRefactorer.objectRemovedInLayout(project, layout, object.getName(), !!answer)
+    }
+    done(true);
+  }
+
+  _onRenameObject = (objectWithScope, newName, done) => {
+    const { object, global } = objectWithScope;
+    const { project, layout } = this.props;
+
+    if (global) {
+      gd.WholeProjectRefactorer.globalObjectRenamed(project, object.getName(), newName)
+    } else {
+      gd.WholeProjectRefactorer.objectRenamedInLayout(project, layout, object.getName(), newName)
+    }
+    done(true);
+  }
+
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.map(instance =>
@@ -411,6 +440,8 @@ export default class InstancesFullEditor extends Component {
             objectsContainer={layout}
             onObjectSelected={this._onObjectSelected}
             onEditObject={this.props.onEditObject || this.editObject}
+            onDeleteObject={this._onDeleteObject}
+            onRenameObject={this._onRenameObject}
           />
           <ObjectEditorDialog
             open={!!this.state.editedObject}

@@ -59,12 +59,12 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        try {
-            gd::LinkEvent & linkEvent = dynamic_cast<gd::LinkEvent &>(events[i]);
-
+        gd::LinkEvent* linkEvent = dynamic_cast<gd::LinkEvent*>(&events[i]);
+        if (linkEvent)
+        {
             DependenciesAnalyzer analyzer(*this);
 
-            gd::String linked = linkEvent.GetTarget();
+            gd::String linked = linkEvent->GetTarget();
             if ( project.HasExternalEventsNamed(linked) )
             {
                 if ( std::find(parentExternalEvents.begin(), parentExternalEvents.end(), linked) != parentExternalEvents.end() )
@@ -101,7 +101,7 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
                 notTopLevelScenesDependencies.insert(analyzer.GetScenesDependencies().begin(), analyzer.GetScenesDependencies().end());
                 notTopLevelExternalEventsDependencies.insert(analyzer.GetExternalEventsDependencies().begin(), analyzer.GetExternalEventsDependencies().end());
             }
-        } catch(...) {}
+        }
 
         // Search for source files dependencies
         std::vector<gd::String> dependencies = events[i].GetSourceFileDependencies();

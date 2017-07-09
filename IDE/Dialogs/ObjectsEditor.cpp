@@ -35,6 +35,7 @@
 #include "GDCore/IDE/NewNameGenerator.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/ObjectOrGroupFinder.h"
+#include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/CommonTools.h"
@@ -640,50 +641,10 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         if ( !objects.HasObjectNamed(oldName) ) return;
         objects.GetObject(oldName).SetName( newName );
 
-        if ( !globalObject) //Change the object name in the layout.
-        {
-            gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), oldName, newName);
-            layout.GetInitialInstances().RenameInstancesOfObject(oldName, newName);
-            for (std::size_t g = 0;g<layout.GetObjectGroups().size();++g)
-            {
-                if ( layout.GetObjectGroups()[g].Find(oldName))
-                {
-                    layout.GetObjectGroups()[g].RemoveObject(oldName);
-                    layout.GetObjectGroups()[g].AddObject(newName);
-                }
-            }
-            //TODO: Factor this? And change the name in external events.
-        }
+        if (!globalObject)
+            gd::WholeProjectRefactorer::ObjectRenamedInLayout(project, layout, oldName, newName);
         else if ( globalObject ) //Change the object name in all layouts
-        {
-            for (std::size_t g = 0;g<project.GetObjectGroups().size();++g)
-            {
-                if ( project.GetObjectGroups()[g].Find(oldName))
-                {
-                    project.GetObjectGroups()[g].RemoveObject(oldName);
-                    project.GetObjectGroups()[g].AddObject(newName);
-                }
-            }
-
-            for (std::size_t i = 0;i<project.GetLayoutsCount();++i)
-            {
-                gd::Layout & layout = project.GetLayout(i);
-                if ( layout.HasObjectNamed(oldName) ) continue;
-
-                gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), oldName, newName);
-                layout.GetInitialInstances().RenameInstancesOfObject(oldName, newName);
-                for (std::size_t g = 0;g<layout.GetObjectGroups().size();++g)
-                {
-                    if ( layout.GetObjectGroups()[g].Find(oldName))
-                    {
-                        layout.GetObjectGroups()[g].RemoveObject(oldName);
-                        layout.GetObjectGroups()[g].AddObject(newName);
-                    }
-                }
-            }
-
-            //TODO: Factor this? And change the name in external events.
-        }
+            gd::WholeProjectRefactorer::GlobalObjectRenamed(project, oldName, newName);
 
         //Update the groups items (without refreshing the entire tree control)
         wxTreeItemIdValue cookie;
@@ -1039,26 +1000,12 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
 
             if ( objects.HasObjectNamed(objectName) )
             {
-                //Remove objects
                 objects.RemoveObject(objectName);
 
-                if ( !globalObject)
-                {
-                    if ( answer == wxYES )
-                    {
-                        gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(), project, layout, layout.GetEvents(), objectName);
-                        for (std::size_t g = 0;g<layout.GetObjectGroups().size();++g)
-                        {
-                            if ( layout.GetObjectGroups()[g].Find(objectName)) layout.GetObjectGroups()[g].RemoveObject(objectName);
-                        }
-                    }
-                    layout.GetInitialInstances().RemoveInitialInstancesOfObject(objectName);
-                    //TODO: Refactor also in external events
-                }
-                else if ( globalObject )
-                {
-                    //TODO: Refactor
-                }
+                if (!globalObject)
+                    gd::WholeProjectRefactorer::ObjectRemovedInLayout(project, layout, objectName, answer == wxYES);
+                else
+                    gd::WholeProjectRefactorer::GlobalObjectRemoved(project, objectName, answer == wxYES);
             }
         }
         else if ( data->GetString() == "GlobalGroup" || data->GetString() == "LayoutGroup" )

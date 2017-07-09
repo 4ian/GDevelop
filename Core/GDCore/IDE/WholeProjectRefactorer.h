@@ -53,12 +53,12 @@ public:
      */
     static void GlobalObjectRemoved(gd::Project & project, const gd::String & objectName, bool removeEventsAndGroups = true);
 
+    virtual ~WholeProjectRefactorer() {};
 private:
 
     static std::vector<gd::String> GetAssociatedExternalLayouts(gd::Project & project, gd::Layout & layout);
 
     WholeProjectRefactorer() {};
-    virtual ~WholeProjectRefactorer() {};
 };
 
 }

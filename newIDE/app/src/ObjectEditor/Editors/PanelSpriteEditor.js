@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import { Line, Column } from '../../UI/Grid';
-import ResourceSelector from '../../ResourcesEditor/ResourceSelector';
+import ResourcesLoader from '../../ObjectsRendering/ResourcesLoader';
+import ResourceSelectorWithThumbnail from '../ResourceSelectorWithThumbnail';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends Component {
@@ -13,19 +14,21 @@ export default class PanelSpriteEditor extends Component {
     return (
       <Column>
         <Line>
-          <ResourceSelector
+          <ResourceSelectorWithThumbnail
             project={project}
             resourceSources={resourceSources}
             resourceKind="image"
-            initialResourceName={panelSpriteObject.getTexture()}
+            resourceName={panelSpriteObject.getTexture()}
+            resourcesLoader={ResourcesLoader}
             onChange={resourceName => {
               panelSpriteObject.setTexture(resourceName);
+              this.forceUpdate();
             }}
           />
         </Line>
         <Line>
           <Checkbox
-            label="Repeat the center area"
+            label="Repeat borders and center textures (instead of stretching them)"
             checked={panelSpriteObject.isTiled()}
             onCheck={(e, checked) => {
               panelSpriteObject.setTiled(checked);

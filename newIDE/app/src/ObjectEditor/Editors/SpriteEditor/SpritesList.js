@@ -6,32 +6,21 @@ import IconButton from 'material-ui/IconButton';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import ResourcesLoader from '../../../ObjectsRendering/ResourcesLoader';
+import ImageThumbnail, { thumbnailContainerStyle } from '../../ImageThumbnail';
 const gd = global.gd;
 
-const SPRITE_SIZE = 100;
-const thumbnailContainer = {
-  display: 'inline-block',
-  width: SPRITE_SIZE,
-  height: SPRITE_SIZE,
-  justifyContent: 'center',
-  alignItems: 'center',
-  lineHeight: SPRITE_SIZE + 'px',
-  textAlign: 'center',
-  border: '#AAAAAA 1px solid',
-  marginRight: 10,
-};
+const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
 
 const styles = {
   spritesList: {
     whiteSpace: 'nowrap',
     overflowY: 'scroll',
   },
-  spriteThumbnail: {
-    ...thumbnailContainer,
-    background: 'url("res/transparentback.png") repeat',
+  thumbnailExtraStyle: {
+    marginRight: 10,
   },
   addSpriteButton: {
-    ...thumbnailContainer,
+    ...thumbnailContainerStyle,
     background: '#FFF',
   },
   spriteThumbnailImage: {
@@ -56,15 +45,13 @@ const SortableSpriteThumbnail = SortableElement(({
   project,
   resourcesLoader,
 }) => {
-  const resourceName = sprite.getImageName();
   return (
-    <div style={styles.spriteThumbnail}>
-      <img
-        style={styles.spriteThumbnailImage}
-        alt={resourceName}
-        src={resourcesLoader.getResourceFullFilename(project, resourceName)}
-      />
-    </div>
+    <ImageThumbnail
+      resourceName={sprite.getImageName()}
+      resourcesLoader={resourcesLoader}
+      project={project}
+      style={styles.thumbnailExtraStyle}
+    />
   );
 });
 

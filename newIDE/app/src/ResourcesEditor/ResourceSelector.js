@@ -105,6 +105,7 @@ export default class ResourceSelector extends Component {
         onNewRequest={this._onItemChosen}
         errorText={errorText}
         searchText={this.state.resourceName}
+        fullWidth={this.props.fullWidth}
       />
     );
   }

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
 import { Line, Column } from '../../UI/Grid';
-import ResourceSelector from '../../ResourcesEditor/ResourceSelector';
+import ResourcesLoader from '../../ObjectsRendering/ResourcesLoader';
+import ResourceSelectorWithThumbnail from '../ResourceSelectorWithThumbnail';
 const gd = global.gd;
 
 export default class TiledSpriteEditor extends Component {
@@ -12,13 +13,15 @@ export default class TiledSpriteEditor extends Component {
     return (
       <Column>
         <Line>
-          <ResourceSelector
+          <ResourceSelectorWithThumbnail
             project={project}
             resourceSources={resourceSources}
             resourceKind="image"
-            initialResourceName={tiledSpriteObject.getTexture()}
+            resourceName={tiledSpriteObject.getTexture()}
+            resourcesLoader={ResourcesLoader}
             onChange={resourceName => {
               tiledSpriteObject.setTexture(resourceName);
+              this.forceUpdate();
             }}
           />
         </Line>

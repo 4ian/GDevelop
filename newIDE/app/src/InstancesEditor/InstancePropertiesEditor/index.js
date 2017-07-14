@@ -8,8 +8,11 @@ import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import { mapFor } from '../../Utils/MapFor';
-import EditorBar from '../../UI/EditorBar';
 import EmptyMessage from '../../UI/EmptyMessage';
+
+const styles = {
+  container: { display: 'flex', flexDirection: 'column', flex: 1 },
+};
 
 export default class InstancePropertiesEditor extends Component {
   constructor() {
@@ -69,7 +72,7 @@ export default class InstancePropertiesEditor extends Component {
               'Edit variables (' + instance.getVariables().count() + ')',
             onClick: instance => this.props.editInstanceVariables(instance),
           },
-        ]
+        ],
       },
       {
         name: 'Custom size',
@@ -315,8 +318,7 @@ export default class InstancePropertiesEditor extends Component {
     const { instances } = this.props;
 
     return (
-      <Paper style={{ display: 'flex', flexDirection: 'column' }}>
-        <EditorBar title="Properties" showMenuIconButton={false} />
+      <Paper style={styles.container}>
         {!instances || !instances.length
           ? this._renderEmpty()
           : this._renderInstancesProperties()}

@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
-import { MosaicWithoutDragDropContext, createBalancedTreeFromLeaves } from 'react-mosaic-component';
+import {
+  MosaicWindow as RMMosaicWindow,
+  MosaicWithoutDragDropContext,
+  createBalancedTreeFromLeaves,
+} from 'react-mosaic-component';
 // Styles for Mosaic:
 import 'react-mosaic-component/react-mosaic-component.css';
 import '../Theme/Mosaic.css';
@@ -37,3 +41,4 @@ class EditorMosaic extends Component {
 }
 
 export default EditorMosaic;
+export const MosaicWindow = (props) => <RMMosaicWindow {...props} toolbarControls={[]} />;

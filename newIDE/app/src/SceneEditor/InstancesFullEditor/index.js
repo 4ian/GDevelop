@@ -25,7 +25,7 @@ import Clipboard from '../../Utils/Clipboard';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import EditorMosaic from '../../UI/EditorMosaic';
+import EditorMosaic, { MosaicWindow } from '../../UI/EditorMosaic';
 import EditorBar from '../../UI/EditorBar';
 import InfoBar from '../../UI/Messages/InfoBar';
 import ContextMenu from '../../UI/Menu/ContextMenu';
@@ -386,13 +386,15 @@ export default class InstancesFullEditor extends Component {
 
     const editors = {
       properties: (
-        <InstancePropertiesEditor
-          project={project}
-          layout={layout}
-          instances={selectedInstances}
-          onInstancesModified={this._onInstancesModified}
-          editInstanceVariables={this.editInstanceVariables}
-        />
+        <MosaicWindow title="Properties">
+          <InstancePropertiesEditor
+            project={project}
+            layout={layout}
+            instances={selectedInstances}
+            onInstancesModified={this._onInstancesModified}
+            editInstanceVariables={this.editInstanceVariables}
+          />
+        </MosaicWindow>
       ),
       'instances-editor': (
         <FullSizeInstancesEditor

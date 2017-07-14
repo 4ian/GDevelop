@@ -7,19 +7,19 @@ describe('gdjs.variable', function() {
 
 	it('should parse initial values into strings and numbers', function(){
 
-		var int_var = new gdjs.Variable( {value : "526"} );
-		var float_var = new gdjs.Variable( {value : "10.568"} );
-		var str_var = new gdjs.Variable( {value : "testing variables"} );
-		var num_str_var = new gdjs.Variable( {value : "5Apples"} );
+		var intVar = new gdjs.Variable( {value : "526"} );
+		var floatVar = new gdjs.Variable( {value : "10.568"} );
+		var strVar = new gdjs.Variable( {value : "testing variables"} );
+		var numStrVar = new gdjs.Variable( {value : "5Apples"} );
 
-		expect(int_var.getAsNumber()).to.be(526);
-		expect(int_var.getAsString()).to.be("526");
-		expect(float_var.getAsNumber()).to.be(10.568);
-		expect(float_var.getAsString()).to.be("10.568");
-		expect(str_var.getAsNumber()).to.be(0);
-		expect(str_var.getAsString()).to.be("testing variables");
-		expect(num_str_var.getAsNumber()).to.be(5);
-		expect(num_str_var.getAsString()).to.be("5Apples");
+		expect(intVar.getAsNumber()).to.be(526);
+		expect(intVar.getAsString()).to.be("526");
+		expect(floatVar.getAsNumber()).to.be(10.568);
+		expect(floatVar.getAsString()).to.be("10.568");
+		expect(strVar.getAsNumber()).to.be(0);
+		expect(strVar.getAsString()).to.be("testing variables");
+		expect(numStrVar.getAsNumber()).to.be(5);
+		expect(numStrVar.getAsString()).to.be("5Apples");
 	});
 
 	it('should do some variable arithmetics', function(){

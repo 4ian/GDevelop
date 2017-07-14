@@ -23,7 +23,7 @@ yarn start #or npm start
 
 This will open the app in your web browser.
 
-Images resources, GDJS Runtime, extensions will be copied in resources, and [libGD.js](github.com/4ian/GDevelop.js) will be downloaded automatically.
+Images resources, GDJS Runtime, extensions will be copied in resources, and [libGD.js](https://github.com/4ian/GDevelop.js) will be downloaded automatically.
 
 ### Development of the standalone app
 

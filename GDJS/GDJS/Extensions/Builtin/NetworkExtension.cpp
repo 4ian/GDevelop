@@ -25,8 +25,12 @@ NetworkExtension::NetworkExtension()
 
     GetAllActions()["SendRequest"].SetFunctionName("gdjs.evtTools.network.sendHttpRequest");
     GetAllActions()["JSONToVariableStructure"].SetFunctionName("gdjs.evtTools.network.jsonToVariableStructure");
+    GetAllActions()["JSONToGlobalVariableStructure"].SetFunctionName("gdjs.evtTools.network.jsonToVariableStructure");
+    GetAllActions()["JSONToObjectVariableStructure"].SetFunctionName("gdjs.evtTools.network.jsonToObjectVariableStructure");
 
     GetAllStrExpressions()["ToJSON"].SetFunctionName("gdjs.evtTools.network.variableStructureToJSON");
+    GetAllStrExpressions()["GlobalToJSON"].SetFunctionName("gdjs.evtTools.network.variableStructureToJSON");
+    GetAllStrExpressions()["ObjectToJSON"].SetFunctionName("gdjs.evtTools.network.objectVariableStructureToJSON");
 
     StripUnimplementedInstructionsAndExpressions();
 }

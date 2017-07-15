@@ -69,6 +69,11 @@ gdjs.evtTools.network.variableStructureToJSON = function(variable)
     return str;
 };
 
+gdjs.evtTools.network.objectVariableStructureToJSON = function(object, variable)
+{
+	return gdjs.evtTools.network.variableStructureToJSON(variable);
+}
+
 gdjs.evtTools.network._objectToVariable = function(obj, variable)
 {
 	if(!isNaN(obj)) {  //Number
@@ -101,4 +106,9 @@ gdjs.evtTools.network.jsonToVariableStructure = function(jsonStr, variable)
 	} catch(e) {
 		//Do nothing iF JSON was not properly parsed;
 	}
+}
+
+gdjs.evtTools.network.jsonToObjectVariableStructure = function(jsonStr, object, variable)
+{
+	gdjs.evtTools.network.jsonToVariableStructure(jsonStr, variable);
 }

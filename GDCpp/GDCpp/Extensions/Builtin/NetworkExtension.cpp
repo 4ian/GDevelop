@@ -19,8 +19,12 @@ NetworkExtension::NetworkExtension()
     GetAllActions()["SendRequest"].SetFunctionName("SendHttpRequest").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
     GetAllActions()["DownloadFile"].SetFunctionName("DownloadFile").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
     GetAllActions()["JSONToVariableStructure"].SetFunctionName("JSONToVariableStructure").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
+    GetAllActions()["JSONToGlobalVariableStructure"].SetFunctionName("JSONToVariableStructure").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
+    GetAllActions()["JSONToObjectVariableStructure"].SetFunctionName("JSONToObjectVariableStructure").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
 
     GetAllStrExpressions()["ToJSON"].SetFunctionName("VariableStructureToJSON").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
+    GetAllStrExpressions()["GlobalToJSON"].SetFunctionName("VariableStructureToJSON").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
+    GetAllStrExpressions()["ObjectToJSON"].SetFunctionName("ObjectVariableStructureToJSON").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
     #endif
 }
 

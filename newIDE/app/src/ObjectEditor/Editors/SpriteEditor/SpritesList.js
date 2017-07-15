@@ -14,7 +14,7 @@ const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
 const styles = {
   spritesList: {
     whiteSpace: 'nowrap',
-    overflowY: 'scroll',
+    overflowY: 'hidden',
   },
   thumbnailExtraStyle: {
     marginRight: 10,

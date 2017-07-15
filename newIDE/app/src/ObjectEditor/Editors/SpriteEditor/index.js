@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { GridList, GridTile } from 'material-ui/GridList';
-import { Line, Column } from '../../../UI/Grid';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
 import Add from 'material-ui/svg-icons/content/add';

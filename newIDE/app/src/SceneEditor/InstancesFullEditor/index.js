@@ -115,12 +115,20 @@ export default class InstancesFullEditor extends Component {
 
   openObjectsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('objects-list');
+    if (!this.editorMosaic.openEditor('objects-list')) {
+      this.setState({
+        showObjectsListInfoBar: true,
+      });
+    }
   };
 
   openProperties = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('properties');
+    if (!this.editorMosaic.openEditor('properties')) {
+      this.setState({
+        showPropertiesInfoBar: true,
+      });
+    }
   };
 
   toggleInstancesList = () => {
@@ -518,6 +526,14 @@ export default class InstancesFullEditor extends Component {
         <InfoBar
           message="Touch/click on the scene to add the object"
           show={!!this.state.selectedObjectName}
+        />
+        <InfoBar
+          message="Objects panel is already opened: Use it to add and edit objects."
+          show={!!this.state.showObjectsListInfoBar}
+        />
+        <InfoBar
+          message="Properties panel is already opened"
+          show={!!this.state.showPropertiesInfoBar}
         />
         <SetupGridDialog
           open={this.state.setupGridOpen}

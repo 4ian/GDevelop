@@ -2,6 +2,7 @@ import React from 'react';
 import { List, ListItem } from 'material-ui/List';
 import { mapFor } from '../Utils/MapFor';
 import ListIcon from './ListIcon';
+import ListAddItem from './ListAddItem';
 
 export default class ProjectManager extends React.Component {
   state = {};
@@ -59,7 +60,12 @@ export default class ProjectManager extends React.Component {
                 onTouchTap={() => this.props.onOpenLayout(name)}
               />
             );
-          })}
+          }).concat(
+            <ListAddItem
+              key={'add-scene'}
+              onClick={this.props.onAddLayout}
+            />
+          )}
         />
         <ListItem
           primaryText="External events"
@@ -74,7 +80,9 @@ export default class ProjectManager extends React.Component {
               <ListItem
                 key={i}
                 primaryText={name}
-                leftIcon={<ListIcon src="res/ribbon_default/externalevents32.png" />}
+                leftIcon={
+                  <ListIcon src="res/ribbon_default/externalevents32.png" />
+                }
                 onTouchTap={() => this.props.onOpenExternalEvents(name)}
               />
             );
@@ -93,7 +101,9 @@ export default class ProjectManager extends React.Component {
               <ListItem
                 key={i}
                 primaryText={name}
-                leftIcon={<ListIcon src="res/ribbon_default/externallayout32.png" />}
+                leftIcon={
+                  <ListIcon src="res/ribbon_default/externallayout32.png" />
+                }
                 onTouchTap={() => this.props.onOpenExternalLayout(name)}
               />
             );

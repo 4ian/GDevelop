@@ -33,9 +33,16 @@ import {
 } from './EditorTabsHandler';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timeFunction } from '../Utils/TimeFunction';
+import newNameGenerator from '../Utils/NewNameGenerator';
 
 import fixtureGame from '../fixtures/platformer/platformer.json';
 const gd = global.gd;
+
+const styles = {
+  drawerContent: {
+    overflowX: 'hidden',
+  }
+}
 
 export default class MainFrame extends Component {
   constructor() {
@@ -126,6 +133,14 @@ export default class MainFrame extends Component {
     if (!this.toolbar) return;
 
     this.toolbar.setEditorToolbar(editorToolbar);
+  };
+
+  addLayout = () => {
+    const { currentProject } = this.state;
+    const name = newNameGenerator('NewScene', name =>
+      currentProject.hasLayoutNamed(name));
+    currentProject.insertNewLayout(name, currentProject.getLayoutsCount());
+    this.forceUpdate();
   };
 
   openExternalEvents = name => {
@@ -380,7 +395,8 @@ export default class MainFrame extends Component {
         <MuiThemeProvider muiTheme={defaultTheme}>
           <div className="main-frame">
             <ProjectTitlebar project={this.state.currentProject} />
-            <Drawer open={this.state.projectManagerOpen}>
+            <Drawer open={this.state.projectManagerOpen}
+            containerStyle={styles.drawerContent}>
               <EditorBar
                 title={currentProject ? currentProject.getName() : 'No project'}
                 showMenuIconButton={false}
@@ -395,6 +411,7 @@ export default class MainFrame extends Component {
                   project={currentProject}
                   onOpenExternalEvents={this.openExternalEvents}
                   onOpenLayout={this.openLayout}
+                  onAddLayout={this.addLayout}
                   onOpenExternalLayout={this.openExternalLayout}
                   onSaveProject={this.save}
                   onCloseProject={this._onCloseProject}

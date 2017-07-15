@@ -2,11 +2,40 @@ import React, { Component } from 'react';
 import {
   MosaicWindow as RMMosaicWindow,
   MosaicWithoutDragDropContext,
-  createBalancedTreeFromLeaves,
+  getLeaves,
 } from 'react-mosaic-component';
+import CloseButton from './CloseButton';
 // Styles for Mosaic:
 import 'react-mosaic-component/react-mosaic-component.css';
 import '../Theme/Mosaic.css';
+
+const createMosaicNodesFromArray = (array, splitPercentage = 23) => {
+  if (array.length === 0) return null;
+  if (array.length === 1) return array[0];
+
+  return {
+    direction: 'row',
+    first: array[0],
+    second: createMosaicNodesFromArray(array.slice(1), 100 - splitPercentage),
+    splitPercentage: splitPercentage,
+  };
+};
+
+const addRightNode = (currentNode, newNode, splitPercentage) => {
+  if (currentNode.second && typeof currentNode.second !== 'string') {
+    return {
+      ...currentNode,
+      second: addRightNode(currentNode.second, newNode, splitPercentage),
+    };
+  }
+
+  return {
+    direction: 'row',
+    first: currentNode,
+    second: newNode,
+    splitPercentage,
+  };
+};
 
 /**
  * @class EditorMosaic
@@ -19,12 +48,22 @@ class EditorMosaic extends Component {
     super(props);
 
     this.state = {
-      mosaicNode: {
-        ...createBalancedTreeFromLeaves(props.initialEditorNames),
-        splitPercentage: props.initialSplitPercentage || 23,
-      },
+      mosaicNode: createMosaicNodesFromArray(
+        props.initialEditorNames,
+        props.initialSplitPercentage || 23
+      ),
     };
   }
+
+  openEditor = editorName => {
+    if (getLeaves(this.state.mosaicNode).indexOf(editorName) !== -1) {
+      return;
+    }
+
+    this.setState({
+      mosaicNode: addRightNode(this.state.mosaicNode, editorName, 75),
+    });
+  };
 
   _onChange = mosaicNode => this.setState({ mosaicNode });
 
@@ -41,4 +80,8 @@ class EditorMosaic extends Component {
 }
 
 export default EditorMosaic;
-export const MosaicWindow = (props) => <RMMosaicWindow {...props} toolbarControls={[]} />;
+export const MosaicWindow = props => {
+  const toolbarControls = props.toolbarControls || [<CloseButton key="close" />];
+
+  return <RMMosaicWindow {...props} toolbarControls={toolbarControls} />;
+};

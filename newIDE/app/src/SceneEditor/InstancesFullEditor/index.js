@@ -41,7 +41,7 @@ const gd = global.gd;
 
 export default class InstancesFullEditor extends Component {
   static defaultProps = {
-    showAddObjectButton: true,
+    showObjectsList: true,
     setToolbar: () => {},
   };
 
@@ -81,9 +81,10 @@ export default class InstancesFullEditor extends Component {
       <Toolbar
         showPreviewButton={this.props.showPreviewButton}
         onPreview={this.props.onPreview}
-        showAddObjectButton={this.props.showAddObjectButton}
+        showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
-        toggleObjectsList={this.toggleObjectsList}
+        openObjectsList={this.openObjectsList}
+        openProperties={this.openProperties}
         deleteSelection={this.deleteSelection}
         toggleInstancesList={this.toggleInstancesList}
         toggleLayersList={this.toggleLayersList}
@@ -112,8 +113,14 @@ export default class InstancesFullEditor extends Component {
     }
   }
 
-  toggleObjectsList = () => {
-    this.setState({ objectsListOpen: !this.state.objectsListOpen });
+  openObjectsList = () => {
+    if (!this.editorMosaic) return;
+    this.editorMosaic.openEditor('objects-list');
+  };
+
+  openProperties = () => {
+    if (!this.editorMosaic) return;
+    this.editorMosaic.openEditor('properties');
   };
 
   toggleInstancesList = () => {
@@ -299,24 +306,42 @@ export default class InstancesFullEditor extends Component {
     );
 
     if (global) {
-      gd.WholeProjectRefactorer.globalObjectRemoved(project, object.getName(), !!answer)
+      gd.WholeProjectRefactorer.globalObjectRemoved(
+        project,
+        object.getName(),
+        !!answer
+      );
     } else {
-      gd.WholeProjectRefactorer.objectRemovedInLayout(project, layout, object.getName(), !!answer)
+      gd.WholeProjectRefactorer.objectRemovedInLayout(
+        project,
+        layout,
+        object.getName(),
+        !!answer
+      );
     }
     done(true);
-  }
+  };
 
   _onRenameObject = (objectWithScope, newName, done) => {
     const { object, global } = objectWithScope;
     const { project, layout } = this.props;
 
     if (global) {
-      gd.WholeProjectRefactorer.globalObjectRenamed(project, object.getName(), newName)
+      gd.WholeProjectRefactorer.globalObjectRenamed(
+        project,
+        object.getName(),
+        newName
+      );
     } else {
-      gd.WholeProjectRefactorer.objectRenamedInLayout(project, layout, object.getName(), newName)
+      gd.WholeProjectRefactorer.objectRenamedInLayout(
+        project,
+        layout,
+        object.getName(),
+        newName
+      );
     }
     done(true);
-  }
+  };
 
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
@@ -412,32 +437,13 @@ export default class InstancesFullEditor extends Component {
           editorRef={editor => this.editor = editor}
         />
       ),
-    };
-
-    return (
-      <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
-        <EditorMosaic
-          editors={editors}
-          initialEditorNames={['properties', 'instances-editor']}
-        />
-        <Drawer
-          open={this.state.objectsListOpen}
-          openSecondary={true}
-          containerStyle={{ overflow: 'hidden' }}
-        >
-          <EditorBar
-            title="Objects"
-            iconElementLeft={
-              <IconButton onClick={this.toggleObjectsList}>
-                <NavigationClose />
-              </IconButton>
-            }
-          />
+      'objects-list': (
+        <MosaicWindow title="Objects">
           <ObjectsList
             getThumbnail={ObjectsRenderingService.getThumbnail.bind(
               ObjectsRenderingService
             )}
-            freezeUpdate={!this.state.objectsListOpen}
+            freezeUpdate={/*!this.state.objectsListOpen TODO*/ false}
             project={project}
             objectsContainer={layout}
             onObjectSelected={this._onObjectSelected}
@@ -445,15 +451,29 @@ export default class InstancesFullEditor extends Component {
             onDeleteObject={this._onDeleteObject}
             onRenameObject={this._onRenameObject}
           />
-          <ObjectEditorDialog
-            open={!!this.state.editedObject}
-            object={this.state.editedObject}
-            project={project}
-            resourceSources={resourceSources}
-            onCancel={() => this.editObject(null)}
-            onApply={() => this.editObject(null)}
-          />
-        </Drawer>
+        </MosaicWindow>
+      ),
+    };
+
+    return (
+      <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
+        <EditorMosaic
+          editors={editors}
+          ref={editorMosaic => this.editorMosaic = editorMosaic}
+          initialEditorNames={
+            this.props.showObjectsList
+              ? ['properties', 'instances-editor', 'objects-list']
+              : ['properties', 'instances-editor']
+          }
+        />
+        <ObjectEditorDialog
+          open={!!this.state.editedObject}
+          object={this.state.editedObject}
+          project={project}
+          resourceSources={resourceSources}
+          onCancel={() => this.editObject(null)}
+          onApply={() => this.editObject(null)}
+        />
         <Drawer
           open={this.state.instancesListOpen}
           width={500}

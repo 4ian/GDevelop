@@ -1,5 +1,6 @@
 import React from 'react';
 import { AutoSizer, List } from 'react-virtualized';
+import Paper from 'material-ui/Paper';
 import { mapFor } from '../Utils/MapFor';
 import ObjectRow from './ObjectRow';
 import AddObjectRow from './AddObjectRow';
@@ -7,6 +8,9 @@ import NewObjectDialog from './NewObjectDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 
 const listItemHeight = 56;
+const styles = {
+  container: { flex: 1, display: 'flex', height: '100%' },
+};
 
 export default class ObjectsList extends React.Component {
   static defaultProps = {
@@ -137,11 +141,10 @@ export default class ObjectsList extends React.Component {
     const listKey = project.ptr + ';' + objectsContainer.ptr;
 
     return (
-      <div style={{ flex: 1, display: 'flex', height: '100%' }}>
+      <Paper style={styles.container}>
         <AutoSizer>
           {({ height, width }) => (
             <List
-              style={{ backgroundColor: 'white' }}
               ref={list => this.list = list}
               key={listKey}
               height={height}
@@ -198,7 +201,7 @@ export default class ObjectsList extends React.Component {
             onChoose={this.addObject}
             project={project}
           />}
-      </div>
+      </Paper>
     );
   }
 }

@@ -215,6 +215,7 @@ export default class InstancesEditorContainer extends Component {
         nextProps.width,
         nextProps.height
       );
+      this._renderScene(); //Avoid flickering that could happen while waiting for next animation frame.
     }
 
     if (nextProps.options !== this.props.options) {
@@ -245,7 +246,7 @@ export default class InstancesEditorContainer extends Component {
   setZoomFactor(zoomFactor) {
     this.props.onChangeOptions({
       zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
-    })
+    });
   }
 
   _onBackgroundClicked = () => {

@@ -451,9 +451,9 @@ export default class InstancesFullEditor extends Component {
             getThumbnail={ObjectsRenderingService.getThumbnail.bind(
               ObjectsRenderingService
             )}
-            freezeUpdate={/*!this.state.objectsListOpen TODO*/ false}
             project={project}
             objectsContainer={layout}
+            selectedObjectName={this.state.selectedObjectName}
             onObjectSelected={this._onObjectSelected}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}

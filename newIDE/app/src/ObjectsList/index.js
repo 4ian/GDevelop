@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import Paper from 'material-ui/Paper';
 import { mapFor } from '../Utils/MapFor';
@@ -6,13 +6,87 @@ import ObjectRow from './ObjectRow';
 import AddObjectRow from './AddObjectRow';
 import NewObjectDialog from './NewObjectDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
 const listItemHeight = 56;
 const styles = {
   container: { flex: 1, display: 'flex', height: '100%' },
 };
 
-export default class ObjectsList extends React.Component {
+const SortableObjectRow = SortableElement(props => {
+  const { style, ...otherProps } = props;
+  return <div style={style}><ObjectRow {...otherProps} /></div>;
+});
+
+const SortableAddObjectRow = SortableElement(props => {
+  return <AddObjectRow {...props} />;
+});
+
+class ObjectsList extends Component {
+  forceUpdateGrid() {
+    if (this.list) this.list.forceUpdateGrid();
+  }
+
+  render() {
+    let { height, width, fullList, project, selectedObjectName } = this.props;
+
+    return (
+      <List
+        ref={list => this.list = list}
+        height={height}
+        rowCount={fullList.length}
+        rowHeight={listItemHeight}
+        rowRenderer={({ index, key, style }) => {
+          const objectWithScope = fullList[index];
+          if (objectWithScope.key === 'add-objects-row') {
+            return (
+              <SortableAddObjectRow
+                index={fullList.length}
+                key={key}
+                style={style}
+                disabled
+                onAdd={this.props.onAddObject}
+              />
+            );
+          }
+
+          const nameBeingEdited = this.props.renamedObjectWithScope &&
+            this.props.renamedObjectWithScope.object ===
+              objectWithScope.object &&
+            this.props.renamedObjectWithScope.global === objectWithScope.global;
+
+          return (
+            <SortableObjectRow
+              index={index}
+              key={objectWithScope.object.ptr}
+              project={project}
+              object={objectWithScope.object}
+              style={style}
+              onEdit={
+                this.props.onEditObject
+                  ? () => this.props.onEditObject(objectWithScope.object)
+                  : undefined
+              }
+              onEditName={() => this.props.onEditName(objectWithScope)}
+              onDelete={() => this.props.onDelete(objectWithScope)}
+              onRename={newName =>
+                this.props.onRename(objectWithScope, newName)}
+              editingName={nameBeingEdited}
+              getThumbnail={this.props.getThumbnail}
+              selected={objectWithScope.object.getName() === selectedObjectName}
+              onObjectSelected={this.props.onObjectSelected}
+            />
+          );
+        }}
+        width={width}
+      />
+    );
+  }
+}
+
+const SortableObjectsList = SortableContainer(ObjectsList, { withRef: true });
+
+export default class ObjectsListContainer extends React.Component {
   static defaultProps = {
     onDeleteObject: (objectWithScope, cb) => cb(true),
     onRenameObject: (objectWithScope, newName, cb) => cb(true),
@@ -25,6 +99,30 @@ export default class ObjectsList extends React.Component {
       newObjectDialogOpen: false,
       renamedObjectWithScope: false,
     };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    // The component is costly to render, so avoid any re-rendering as much
+    // as possible.
+    // We make the assumption that no changes to objects list is made outside
+    // from the component.
+    // If a change is made, the component won't notice it: you have to manually
+    // call forceUpdate.
+
+    if (
+      this.state.newObjectDialogOpen !== nextState.newObjectDialogOpen ||
+      this.state.renamedObjectWithScope !== nextState.renamedObjectWithScope
+    )
+      return true;
+
+    if (this.props.selectedObjectName !== nextProps.selectedObjectName)
+      return true;
+
+    if (this.props.project !== nextProps.project ||
+      this.props.objectsContainer !== nextProps.objectsContainer)
+      return true;
+
+    return false;
   }
 
   addObject = objectType => {
@@ -83,7 +181,7 @@ export default class ObjectsList extends React.Component {
       {
         renamedObjectWithScope: objectWithScope,
       },
-      () => this.list.forceUpdateGrid()
+      () => this.sortableList.getWrappedInstance().forceUpdateGrid()
     );
   };
 
@@ -114,7 +212,7 @@ export default class ObjectsList extends React.Component {
   };
 
   render() {
-    const { project, objectsContainer, freezeUpdate } = this.props;
+    const { project, objectsContainer } = this.props;
 
     const containerObjectsList = mapFor(
       0,
@@ -139,58 +237,33 @@ export default class ObjectsList extends React.Component {
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
+    console.log('Render');
 
     return (
       <Paper style={styles.container}>
         <AutoSizer>
           {({ height, width }) => (
-            <List
-              ref={list => this.list = list}
+            <SortableObjectsList
               key={listKey}
-              height={height}
-              rowCount={fullList.length}
-              rowHeight={listItemHeight}
-              rowRenderer={({ index, key, style }) => {
-                const objectWithScope = fullList[index];
-                if (objectWithScope.key === 'add-objects-row') {
-                  return (
-                    <AddObjectRow
-                      key={key}
-                      style={style}
-                      onAdd={() => this.setState({ newObjectDialogOpen: true })}
-                    />
-                  );
-                }
-
-                const nameBeingEdited = this.state.renamedObjectWithScope &&
-                  this.state.renamedObjectWithScope.object ===
-                    objectWithScope.object &&
-                  this.state.renamedObjectWithScope.global ===
-                    objectWithScope.global;
-
-                return (
-                  <ObjectRow
-                    key={objectWithScope.object.ptr}
-                    project={project}
-                    object={objectWithScope.object}
-                    style={style}
-                    freezeUpdate={freezeUpdate}
-                    onEdit={
-                      this.props.onEditObject
-                        ? () => this.props.onEditObject(objectWithScope.object)
-                        : undefined
-                    }
-                    onEditName={() => this._onEditName(objectWithScope)}
-                    onDelete={() => this._onDelete(objectWithScope)}
-                    onRename={newName =>
-                      this._onRename(objectWithScope, newName)}
-                    editingName={nameBeingEdited}
-                    getThumbnail={this.props.getThumbnail}
-                    onObjectSelected={this.props.onObjectSelected}
-                  />
-                );
-              }}
+              ref={sortableList => this.sortableList = sortableList}
+              fullList={fullList}
+              project={project}
               width={width}
+              height={height}
+              renamedObjectWithScope={this.state.renamedObjectWithScope}
+              getThumbnail={this.props.getThumbnail}
+              selectedObjectName={this.props.selectedObjectName}
+              onObjectSelected={this.props.onObjectSelected}
+              onEditObject={this.props.onEditObject}
+              onAddObject={() => this.setState({ newObjectDialogOpen: true })}
+              onEditName={this._onEditName}
+              onDelete={this._onDelete}
+              onRename={this._onRename}
+              onSortStart={() => console.log('STARTED')}
+              onSortEnd={({ oldIndex, newIndex }) =>
+                console.log('END', oldIndex, newIndex)}
+              helperClass="sortable-helper"
+              distance={30}
             />
           )}
         </AutoSizer>

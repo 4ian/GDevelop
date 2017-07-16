@@ -15,7 +15,13 @@ const styles = {
   objectIcon: { borderRadius: 0 },
   textField: {
     top: -16,
-  }
+  },
+  selectedBackground: {
+    backgroundColor: '#4ab0e4', //TODO: Use theme color instead
+  },
+  selectedObjectName: {
+    color: '#FFF',
+  },
 };
 
 export default class ObjectRow extends React.Component {
@@ -23,7 +29,10 @@ export default class ObjectRow extends React.Component {
     return (
       <IconMenu
         iconButtonElement={
-          <IconButton onClick={e => e.preventDefault()}>
+          <IconButton
+            onTouchTap={e =>
+              e.preventDefault() /*Prevent bubbling the event to ListItem*/}
+          >
             <MoreVertIcon />
           </IconButton>
         }
@@ -50,30 +59,48 @@ export default class ObjectRow extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (!prevProps.editingName && this.props.editingName) {
-      // TODO: This will make the text field lose focus for some reasons.
-      // setTimeout(() => { if (this.textField) this.textField.focus() }, 100);
+      setTimeout(
+        () => {
+          if (this.textField) this.textField.focus();
+        },
+        100
+      );
     }
   }
 
   render() {
-    const { project, object, style, freezeUpdate } = this.props;
-    if (freezeUpdate) return null;
+    const { project, object, selected, style } = this.props;
 
     const objectName = object.getName();
+    const label = this.props.editingName
+      ? <TextField
+          id="rename-object-field"
+          ref={textField => this.textField = textField}
+          defaultValue={objectName}
+          onBlur={e => this.props.onRename(e.target.value)}
+          onKeyPress={event => {
+            if (event.charCode === 13) {
+              // enter key pressed
+              this.textField.blur();
+            }
+          }}
+          fullWidth
+          style={styles.textField}
+        />
+      : <div
+          style={
+            selected
+              ? { ...styles.objectName, ...styles.selectedObjectName }
+              : styles.objectName
+          }
+        >
+          {objectName}
+        </div>;
+
     return (
       <ListItem
-        style={style}
-        primaryText={
-          this.props.editingName
-            ? <TextField
-                id="rename-object-field"
-                ref={textField => this.textField = textField}
-                defaultValue={objectName}
-                onBlur={e => this.props.onRename(e.target.value)}
-                style={styles.textField}
-              />
-            : <div style={styles.objectName}>{objectName}</div>
-        }
+        style={selected ? { ...styles.selectedBackground, ...style } : style}
+        primaryText={label}
         leftAvatar={
           <Avatar
             src={this.props.getThumbnail(project, object)}
@@ -81,9 +108,11 @@ export default class ObjectRow extends React.Component {
           />
         }
         rightIconButton={this._renderObjectMenu(object)}
-        onClick={() => {
-          if (this.props.onObjectSelected)
-            this.props.onObjectSelected(objectName)
+        onTouchTap={() => {
+          if (!this.props.onObjectSelected) return;
+          if (this.props.editingName) return;
+
+          this.props.onObjectSelected(selected ? '' : objectName);
         }}
       />
     );

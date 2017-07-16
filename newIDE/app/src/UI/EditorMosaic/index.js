@@ -57,12 +57,13 @@ class EditorMosaic extends Component {
 
   openEditor = editorName => {
     if (getLeaves(this.state.mosaicNode).indexOf(editorName) !== -1) {
-      return;
+      return false;
     }
 
     this.setState({
       mosaicNode: addRightNode(this.state.mosaicNode, editorName, 75),
     });
+    return true;
   };
 
   _onChange = mosaicNode => this.setState({ mosaicNode });

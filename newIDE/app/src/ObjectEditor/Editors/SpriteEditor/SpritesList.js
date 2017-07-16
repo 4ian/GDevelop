@@ -121,7 +121,7 @@ export default class SpritesList extends Component {
   render() {
     return (
       <div>
-        <MiniToolbar justifyContent="flex-end">
+        <MiniToolbar justifyContent="flex-end" smallest>
           <DirectionTools direction={this.props.direction} />
         </MiniToolbar>
         <SortableList

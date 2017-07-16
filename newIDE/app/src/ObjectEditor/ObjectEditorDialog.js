@@ -2,6 +2,14 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
+import { Column, Line } from '../UI/Grid';
+import { Tabs, Tab } from 'material-ui/Tabs';
+
+const styles = {
+  titleContainer: {
+    padding: 0,
+  }
+}
 
 export default class ObjectEditorDialog extends Component {
   constructor(props) {
@@ -9,6 +17,7 @@ export default class ObjectEditorDialog extends Component {
 
     this.state = {
       editor: null,
+      currentTab: 'properties',
     };
   }
 
@@ -24,6 +33,12 @@ export default class ObjectEditorDialog extends Component {
       this._loadFrom(newProps.object);
     }
   }
+
+  _onChangeTab = value => {
+    this.setState({
+      currentTab: value,
+    });
+  };
 
   _onApply = () => {
     if (this.props.onApply) this.props.onApply();
@@ -42,7 +57,6 @@ export default class ObjectEditorDialog extends Component {
     if (!editor) return null;
 
     const actions = [
-      <FlatButton label="Cancel" primary onTouchTap={this.props.onCancel} />,
       <FlatButton
         label="Apply"
         primary
@@ -52,23 +66,41 @@ export default class ObjectEditorDialog extends Component {
     ];
 
     const EditorComponent = editor.component;
-    const containerProps = editor.containerProps;
+    // const containerProps = editor.containerProps;
+    const { currentTab } = this.state;
 
     return (
       <Dialog
+        key={this.props.object && this.props.object.ptr}
         actions={actions}
         autoScrollBodyContent
-        {...containerProps}
+        noMargin
         modal
         onRequestClose={this.props.onCancel}
+        repositionOnUpdate={false}
         open={this.props.open}
+        title={
+          <div>
+            <Tabs value={currentTab} onChange={this._onChangeTab}>
+              <Tab label="Properties" value={'properties'} key={'properties'} />
+              <Tab label="Behaviors" value={'behaviors'} key={'behaviors'} />
+            </Tabs>
+          </div>
+        }
+        titleStyle={styles.titleContainer}
       >
-        {EditorComponent &&
+        {currentTab === 'properties' &&
+          EditorComponent &&
           <EditorComponent
             object={this.props.object}
             project={this.props.project}
             resourceSources={this.props.resourceSources}
           />}
+        {currentTab === 'behaviors' &&
+          <Column>
+            <Line>Behaviors are not available yet</Line>
+          </Column>}
+
       </Dialog>
     );
   }

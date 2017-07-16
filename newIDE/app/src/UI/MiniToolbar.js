@@ -5,16 +5,19 @@ const style = {
   display: 'flex',
   alignItems: 'center',
   height: 34,
+  paddingLeft: 5,
+  paddingRight: 5,
 };
 
 class ThemableMiniToolbar extends Component {
   render() {
-    const { muiTheme, justifyContent } = this.props;
+    const { muiTheme, justifyContent, smallest } = this.props;
 
     return (
       <div
         style={{
           ...style,
+          height: smallest ? 34 : 48,
           backgroundColor: muiTheme.toolbar.backgroundColor,
           justifyContent,
         }}

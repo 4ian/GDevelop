@@ -60,7 +60,7 @@ class Animation extends Component {
 
     return (
       <GridTile>
-        <MiniToolbar>
+        <MiniToolbar smallest>
           <DragHandle />
           <span style={styles.animationTitle}>
             Animation #

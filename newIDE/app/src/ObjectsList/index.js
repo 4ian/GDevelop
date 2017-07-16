@@ -95,6 +95,8 @@ export default class ObjectsListContainer extends React.Component {
   constructor(props) {
     super(props);
 
+    this.containerObjectsList = [];
+    this.projectObjectsList = [];
     this.state = {
       newObjectDialogOpen: false,
       renamedObjectWithScope: false,
@@ -118,8 +120,10 @@ export default class ObjectsListContainer extends React.Component {
     if (this.props.selectedObjectName !== nextProps.selectedObjectName)
       return true;
 
-    if (this.props.project !== nextProps.project ||
-      this.props.objectsContainer !== nextProps.objectsContainer)
+    if (
+      this.props.project !== nextProps.project ||
+      this.props.objectsContainer !== nextProps.objectsContainer
+    )
       return true;
 
     return false;
@@ -211,23 +215,47 @@ export default class ObjectsListContainer extends React.Component {
     });
   };
 
+  _onMove = (oldIndex, newIndex) => {
+    const { project, objectsContainer } = this.props;
+
+    const isInContainerObjectsList = oldIndex <
+      this.containerObjectsList.length;
+    if (isInContainerObjectsList) {
+      objectsContainer.moveObject(
+        oldIndex,
+        Math.min(newIndex, this.containerObjectsList.length - 1)
+      );
+    } else {
+      const projectOldIndex = oldIndex - this.containerObjectsList.length;
+      const projectNewIndex = newIndex - this.containerObjectsList.length;
+
+      project.moveObject(
+        projectOldIndex,
+        Math.min(projectNewIndex, this.projectObjectsList.length - 1)
+      );
+    }
+
+    this.forceUpdate();
+    this.sortableList.getWrappedInstance().forceUpdateGrid();
+  };
+
   render() {
     const { project, objectsContainer } = this.props;
 
-    const containerObjectsList = mapFor(
+    this.containerObjectsList = mapFor(
       0,
       objectsContainer.getObjectsCount(),
       i => objectsContainer.getObjectAt(i)
     ).map(object => ({ object, global: false }));
 
-    const projectObjectsList = project === objectsContainer
+    this.projectObjectsList = project === objectsContainer
       ? []
       : mapFor(0, project.getObjectsCount(), i =>
           project.getObjectAt(i)).map(object => ({ object, global: true }));
 
-    const allObjectsList = projectObjectsList
-      ? containerObjectsList.concat(projectObjectsList)
-      : containerObjectsList;
+    const allObjectsList = this.containerObjectsList.concat(
+      this.projectObjectsList
+    );
     const fullList = allObjectsList.concat({
       key: 'add-objects-row',
       object: null,
@@ -259,9 +287,8 @@ export default class ObjectsListContainer extends React.Component {
               onEditName={this._onEditName}
               onDelete={this._onDelete}
               onRename={this._onRename}
-              onSortStart={() => console.log('STARTED')}
               onSortEnd={({ oldIndex, newIndex }) =>
-                console.log('END', oldIndex, newIndex)}
+                this._onMove(oldIndex, newIndex)}
               helperClass="sortable-helper"
               distance={30}
             />

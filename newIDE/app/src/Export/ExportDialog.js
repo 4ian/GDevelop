@@ -20,7 +20,7 @@ export default class ExportDialog extends Component {
     };
   }
 
-  handleChange = value => {
+  _onChangeTab = value => {
     this.setState({
       value,
     });
@@ -44,7 +44,7 @@ export default class ExportDialog extends Component {
       >
         <Tabs
           value={this.state.value}
-          onChange={this.handleChange}
+          onChange={this._onChangeTab}
         >
           {this.props.tabs.map(({ ExportComponent, name }, index) => (
             <Tab label={name} value={index} key={index}>

@@ -27,6 +27,7 @@ project.getResourcesManager().addResource(audioResource1);
 
 // Create and expose some objects
 export const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
+export const adMobObject = new gd.AdMobObject('MyAdMobObject');
 export const textObject = new gd.TextObject('MyTextObject');
 export const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
 export const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
@@ -79,6 +80,10 @@ testLayout.insertObject(textObject, 0);
 testLayout.insertObject(tiledSpriteObject, 0);
 testLayout.insertObject(panelSpriteObject, 0);
 testLayout.insertObject(spriteObject, 0);
+
+export const testLayoutInstance1 = testLayout.getInitialInstances().insertNewInitialInstance();
+testLayoutInstance1.setX(10);
+testLayoutInstance1.setY(15);
 
 // Global objects
 const globalTextObject = new gd.TextObject('GlobalTextObject');

@@ -21,18 +21,22 @@ import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
+import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
 import ObjectsList from '../ObjectsList';
+import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import {
   project,
   shapePainterObject,
+  adMobObject,
   tiledSpriteObject,
   panelSpriteObject,
   textObject,
   spriteObject,
   testLayout,
+  testLayoutInstance1,
 } from './TestProject';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -176,6 +180,15 @@ storiesOf('ShapePainterEditor', module)
     </SerializedObjectDisplay>
   ));
 
+storiesOf('AdMobEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={adMobObject}>
+      <AdMobEditor object={adMobObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
 storiesOf('EmptyEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -196,5 +209,18 @@ storiesOf('ObjectsList', module)
           onEditObject={action('On edit object')}
         />
       </div>
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('InstancePropertiesEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <InstancePropertiesEditor
+        project={project}
+        layout={testLayout}
+        instances={[testLayoutInstance1]}
+      />
     </SerializedObjectDisplay>
   ));

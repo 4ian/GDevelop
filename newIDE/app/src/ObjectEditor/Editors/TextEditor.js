@@ -12,7 +12,7 @@ export default class TextEditor extends Component {
     const textObject = gd.asTextObject(object);
 
     return (
-      <Column>
+      <Column noMargin>
         <MiniToolbar>
           <p>Size:</p>
           <TextField
@@ -55,17 +55,21 @@ export default class TextEditor extends Component {
             style={{width: 'auto'}}
           />
         </MiniToolbar>
-        <Line>
-          <TextField
-            hintText="Enter the text to be displayed by the object"
-            fullWidth
-            multiLine={true}
-            value={textObject.getString()}
-            onChange={(e, value) => {
-              textObject.setString(value);
-              this.forceUpdate();
-            }}
-          />
+        <Line noMargin>
+          <Column expand>
+            <Line>
+              <TextField
+                hintText="Enter the text to be displayed by the object"
+                fullWidth
+                multiLine={true}
+                value={textObject.getString()}
+                onChange={(e, value) => {
+                  textObject.setString(value);
+                  this.forceUpdate();
+                }}
+              />
+            </Line>
+          </Column>
         </Line>
       </Column>
     );

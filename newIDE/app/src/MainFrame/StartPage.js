@@ -40,7 +40,7 @@ export default class StartPage extends BaseEditor {
 
   render() {
     return (
-      <Column expand>
+      <Column expand noMargin>
         <Line expand>
           <div
             style={{

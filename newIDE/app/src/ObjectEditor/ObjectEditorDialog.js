@@ -2,14 +2,15 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
+import EmptyMessage from '../UI/EmptyMessage';
 import { Column, Line } from '../UI/Grid';
 import { Tabs, Tab } from 'material-ui/Tabs';
 
 const styles = {
   titleContainer: {
     padding: 0,
-  }
-}
+  },
+};
 
 export default class ObjectEditorDialog extends Component {
   constructor(props) {
@@ -98,9 +99,12 @@ export default class ObjectEditorDialog extends Component {
           />}
         {currentTab === 'behaviors' &&
           <Column>
-            <Line>Behaviors are not available yet</Line>
+            <Line>
+              <EmptyMessage>
+                Behaviors are not available yet.
+              </EmptyMessage>
+            </Line>
           </Column>}
-
       </Dialog>
     );
   }

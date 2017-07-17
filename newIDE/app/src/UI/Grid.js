@@ -5,8 +5,8 @@ export const Line = props => (
   <div
     style={{
       display: 'flex',
-      marginTop: marginsSize,
-      marginBottom: marginsSize,
+      marginTop: props.noMargin ? 0 : marginsSize,
+      marginBottom: props.noMargin ? 0 : marginsSize,
       alignItems: props.alignItems,
       justifyContent: props.justifyContent,
       flex: props.expand ? 1 : undefined,
@@ -20,6 +20,8 @@ export const Column = props => (
   <div
     style={{
       display: 'flex',
+      marginLeft: props.noMargin ? 0 : marginsSize * 2,
+      marginRight: props.noMargin ? 0 : marginsSize * 2,
       flexDirection: 'column',
       alignItems: props.alignItems || 'stretch',
       flex: props.expand ? 1 : undefined,
@@ -32,9 +34,8 @@ export const Column = props => (
 export const Spacer = props => (
   <span
     style={{
-      width: marginsSize,
+      width: props.expand ? '100%' : marginsSize,
       height: marginsSize,
-      flex: props.expand ? 1 : undefined,
     }}
   />
 );

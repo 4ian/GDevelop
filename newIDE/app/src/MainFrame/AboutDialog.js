@@ -46,7 +46,7 @@ export default class AboutDialog extends Component {
           padding: 0,
         }}
       >
-        <Column>
+        <Column noMargin>
           <img
             src="res/GD-logo.png"
             alt="GDevelop logo"

@@ -4,9 +4,8 @@ import muiThemeable from 'material-ui/styles/muiThemeable';
 const style = {
   display: 'flex',
   alignItems: 'center',
-  height: 34,
-  paddingLeft: 5,
-  paddingRight: 5,
+  paddingLeft: 16,
+  paddingRight: 16,
 };
 
 class ThemableMiniToolbar extends Component {

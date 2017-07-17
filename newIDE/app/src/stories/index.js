@@ -19,12 +19,15 @@ import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
+import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
+import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ObjectsList from '../ObjectsList';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import {
   project,
+  shapePainterObject,
   tiledSpriteObject,
   panelSpriteObject,
   textObject,
@@ -162,6 +165,22 @@ storiesOf('SpriteEditor', module)
     <SerializedObjectDisplay object={spriteObject}>
       <SpriteEditor object={spriteObject} project={project} />
     </SerializedObjectDisplay>
+  ));
+
+storiesOf('ShapePainterEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={shapePainterObject}>
+      <ShapePainterEditor object={shapePainterObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('EmptyEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EmptyEditor />
   ));
 
 storiesOf('ObjectsList', module)

@@ -65,7 +65,7 @@ export default class LocalCreateDialog extends Component {
         modal={true}
         open={open}
       >
-        <Column>
+        <Column noMargin>
           <Line>
           Choose the game to use as a base:
           </Line>

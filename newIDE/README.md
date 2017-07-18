@@ -39,7 +39,8 @@ yarn #or npm install
 #For Windows:
 node node_modules\electron\cli.js app
 
-#For Linux: TODO, pull request welcome :)
+#For Linux:
+./node_modules/electron/dist/electron app
 ```
 
 ### Development of UI components

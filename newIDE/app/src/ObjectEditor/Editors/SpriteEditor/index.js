@@ -43,12 +43,6 @@ const AddAnimationLine = SortableElement(({ onAdd }) => (
 ));
 
 class Animation extends Component {
-  _onChangeAnimationName = newName => {
-    //TODO: Check that this name does not exists
-    this.props.animation.setName(newName);
-    this.forceUpdate();
-  };
-
   render() {
     const {
       animation,
@@ -69,7 +63,7 @@ class Animation extends Component {
             <TextField
               value={animation.getName()}
               hintText="Optional animation name"
-              onChange={(e, text) => this._onChangeAnimationName(text)}
+              onChange={(e, text) => this.props.onChangeName(text)}
             />
           </span>
           <span style={styles.animationTools}>
@@ -100,6 +94,7 @@ const SortableAnimationsList = SortableContainer(({
   spriteObject,
   onAddAnimation,
   onRemoveAnimation,
+  onChangeAnimationName,
   project,
   resourceSources,
 }) => {
@@ -117,6 +112,7 @@ const SortableAnimationsList = SortableContainer(({
               project={project}
               resourceSources={resourceSources}
               onRemove={() => onRemoveAnimation(i)}
+              onChangeName={newName => onChangeAnimationName(i, newName)}
             />
           );
         }),
@@ -156,6 +152,25 @@ class AnimationsListContainer extends Component {
     }
   };
 
+  changeAnimationName = (i, newName) => {
+    const { spriteObject } = this.props;
+
+    const otherNames = mapFor(0, spriteObject.getAnimationsCount(), index => {
+      return index === i
+        ? undefined // Don't check the current animation name as we're changing it.
+        : spriteObject.getAnimation(index).getName();
+    });
+
+    if (otherNames.filter(name => name === newName).length) {
+      alert(
+        'Another animation with this name already exists. Please use another name.'
+      );
+    }
+
+    spriteObject.getAnimation(i).setName(newName);
+    this.forceUpdate();
+  };
+
   render() {
     return (
       <SortableAnimationsList
@@ -164,6 +179,7 @@ class AnimationsListContainer extends Component {
         project={this.props.project}
         onSortEnd={this.onSortEnd}
         onAddAnimation={this.addAnimation}
+        onChangeAnimationName={this.changeAnimationName}
         onRemoveAnimation={this.removeAnimation}
         resourceSources={this.props.resourceSources}
         useDragHandle

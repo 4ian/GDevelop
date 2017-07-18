@@ -85,9 +85,8 @@ export default class PropertiesEditor extends Component {
   };
 
   _renderSelectField = field => {
-    const { project, layout } = this.props;
     const children = field
-      .getChoices(project, layout)
+      .getChoices()
       .map(({ value, label }) => (
         <MenuItem key={value} value={value} primaryText={label} />
       ));
@@ -163,8 +162,6 @@ export default class PropertiesEditor extends Component {
                 <div style={{ marginLeft: 15 }}>
                   <PropertiesEditor
                     schema={field.children}
-                    project={this.props.project}
-                    layout={this.props.layout}
                     instances={this.props.instances}
                   />
                 </div>

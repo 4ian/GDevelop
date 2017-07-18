@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
-import TextField from 'material-ui/TextField';
-import Checkbox from 'material-ui/Checkbox';
-import Subheader from 'material-ui/Subheader';
-import FlatButton from 'material-ui/FlatButton';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
-import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
+import propertiesMapToSchema
+  from '../../PropertiesEditor/PropertiesMapToSchema';
 
 const styles = {
   container: { display: 'flex', flexDirection: 'column', flex: 1 },
@@ -54,7 +49,7 @@ export default class InstancePropertiesEditor extends Component {
       {
         name: 'Layer',
         valueType: 'string',
-        getChoices: (project, layout) => enumerateLayers(layout),
+        getChoices: () => enumerateLayers(this.props.layout),
         getValue: instance => instance.getLayer(),
         setValue: (instance, newValue) => instance.setLayer(newValue),
       },
@@ -116,47 +111,12 @@ export default class InstancePropertiesEditor extends Component {
 
     //TODO: multiple instances support
     const properties = instances[0].getCustomProperties(project, layout);
-    const propertyNames = properties.keys();
-    const propertyFields = mapFor(0, propertyNames.size(), i => {
-      const name = propertyNames.at(i);
-      const property = properties.get(name);
-      const valueType = property.getType().toLowerCase();
-      const choices = property
-        .getExtraInfo()
-        .toJSArray()
-        .map(value => ({ value, label: value }));
-
-      return {
-        name,
-        valueType,
-        getChoices: valueType === 'choice' ? () => choices : undefined,
-        getValue: instance => {
-          // Instance custom properties are always stored as string, cast them if necessary
-          const rawValue = instance
-            .getCustomProperties(project, layout)
-            .get(name)
-            .getValue();
-          if (valueType === 'boolean') {
-            return rawValue === 'true';
-          } else if (valueType === 'number') {
-            return parseFloat(rawValue);
-          }
-
-          return rawValue;
-        },
-        setValue: (instance, newValue) => {
-          // Instance custom properties are always stored as string, cast them if necessary
-          let value;
-          if (typeof newValue === 'boolean') {
-            value = newValue ? '1' : '0';
-          } else {
-            value = '' + newValue;
-          }
-
-          instance.updateCustomProperty(name, value, project, layout);
-        },
-      };
-    });
+    const instanceSchema = propertiesMapToSchema(
+      properties,
+      instance => instance.getCustomProperties(project, layout),
+      (instance, name, value) =>
+        instance.updateCustomProperty(name, value, project, layout)
+    );
 
     return (
       <div
@@ -164,9 +124,7 @@ export default class InstancePropertiesEditor extends Component {
         key={instances.map(instance => '' + instance.ptr).join(';')}
       >
         <PropertiesEditor
-          schema={this.schema.concat(propertyFields)}
-          project={project}
-          layout={layout}
+          schema={this.schema.concat(instanceSchema)}
           instances={instances}
         />
       </div>

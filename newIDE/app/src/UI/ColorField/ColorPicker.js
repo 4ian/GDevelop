@@ -53,7 +53,7 @@ class ColorPicker extends Component {
 
   render() {
     return (
-      <div>
+      <div style={this.props.style}>
         <div style={styles.swatch} onClick={this.handleClick}>
           <div
             style={{

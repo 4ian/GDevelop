@@ -6,6 +6,25 @@ import ColorPicker from '../../UI/ColorField/ColorPicker';
 import MiniToolbar from '../../UI/MiniToolbar';
 const gd = global.gd;
 
+const toolbarItemStyle = {
+  marginRight: 10,
+};
+
+const styles = {
+  sizeTextField: {
+    width: 50,
+    ...toolbarItemStyle,
+  },
+  toolbarItem: toolbarItemStyle,
+  toolbarText: {
+    marginRight: 5
+  },
+  checkbox: {
+    width: 'auto',
+    ...toolbarItemStyle,
+  },
+};
+
 export default class TextEditor extends Component {
   render() {
     const { object } = this.props;
@@ -14,16 +33,19 @@ export default class TextEditor extends Component {
     return (
       <Column noMargin>
         <MiniToolbar>
-          <p>Size:</p>
+          <p style={styles.toolbarText}>Size:</p>
           <TextField
             type="number"
+            style={styles.sizeTextField}
             value={textObject.getCharacterSize()}
             onChange={(e, value) => {
               textObject.setCharacterSize(parseInt(value, 10));
               this.forceUpdate();
             }}
           />
+          <p style={styles.toolbarText}>Color:</p>
           <ColorPicker
+            style={styles.sizeTextField}
             disableAlpha
             color={{
               r: textObject.getColorR(),
@@ -43,7 +65,7 @@ export default class TextEditor extends Component {
               textObject.setBold(checked);
               this.forceUpdate();
             }}
-            style={{width: 'auto'}}
+            style={styles.checkbox}
           />
           <Checkbox
             label="Italic"
@@ -52,7 +74,7 @@ export default class TextEditor extends Component {
               textObject.setItalic(checked);
               this.forceUpdate();
             }}
-            style={{width: 'auto'}}
+            style={styles.checkbox}
           />
         </MiniToolbar>
         <Line noMargin>

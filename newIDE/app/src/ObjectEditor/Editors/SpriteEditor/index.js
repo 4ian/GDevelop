@@ -10,6 +10,8 @@ import { mapFor } from '../../../Utils/MapFor';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
+import { showWarningBox } from '../../../UI/Messages/MessageBox';
+
 const gd = global.gd;
 
 const styles = {
@@ -162,7 +164,7 @@ class AnimationsListContainer extends Component {
     });
 
     if (otherNames.filter(name => name === newName).length) {
-      alert(
+      showWarningBox(
         'Another animation with this name already exists. Please use another name.'
       );
     }

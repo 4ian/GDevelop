@@ -6,6 +6,7 @@ import ObjectRow from './ObjectRow';
 import AddObjectRow from './AddObjectRow';
 import NewObjectDialog from './NewObjectDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { showWarningBox } from '../UI/Messages/MessageBox';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
 const listItemHeight = 56;
@@ -203,7 +204,7 @@ export default class ObjectsListContainer extends React.Component {
       objectsContainer.hasObjectNamed(newName) ||
       project.hasObjectNamed(newName)
     ) {
-      alert('Another object with this name already exists');
+      showWarningBox('Another object with this name already exists');
       return;
     }
 

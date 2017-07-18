@@ -20,6 +20,7 @@ import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
 import Window from '../Utils/Window';
 import defaultTheme from '../UI/Theme/DefaultTheme';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 import { Tabs, Tab } from '../UI/Tabs';
 import {
   getEditorTabsInitialState,
@@ -179,8 +180,8 @@ export default class MainFrame extends Component {
               setToolbar={this.setEditorToolbar}
               onPreview={(project, layout) =>
                 watchPromiseInState(this, 'previewLoading', () =>
-                  this.props.onLayoutPreview(project, layout)).catch(() => {
-                  alert('Unable to launch the preview!');
+                  this.props.onLayoutPreview(project, layout)).catch((err) => {
+                  showErrorBox('Unable to launch the preview!', err);
                 })}
               showPreviewButton={!!this.props.onLayoutPreview}
               onEditObject={this.props.onEditObject}
@@ -212,8 +213,8 @@ export default class MainFrame extends Component {
                     project,
                     layout,
                     externalLayout
-                  )).catch(() => {
-                  alert('Unable to launch the preview!');
+                  )).catch((err) => {
+                  showErrorBox('Unable to launch the preview!', err);
                 })}
               showPreviewButton={!!this.props.onExternalLayoutPreview}
               onEditObject={this.props.onEditObject}
@@ -285,10 +286,9 @@ export default class MainFrame extends Component {
         );
       },
       err => {
-        alert(
+        showErrorBox(
           'Unable to read this project. Please try again later or with another save of the project.'
-        );
-        console.error('Unable to read project', err);
+        , err);
         return;
       }
     );
@@ -307,9 +307,9 @@ export default class MainFrame extends Component {
 
   save = () => {
     this.props.onSaveProject(this.state.currentProject).catch(err => {
-      alert(
+      showErrorBox(
         'Unable to save the project! Please try again by choosing another location.'
-      );
+      , err);
     });
   };
 

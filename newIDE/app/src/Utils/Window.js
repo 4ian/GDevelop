@@ -1,5 +1,6 @@
 import optionalRequire from './OptionalRequire.js';
 const electron = optionalRequire('electron');
+const dialog = electron ? electron.remote.dialog : null;
 
 let isWindows = false;
 if (electron) {
@@ -85,6 +86,19 @@ export default class Window {
     }
 
     return electron.remote.getGlobal('args');
+  }
+
+  static showMessageBox(message, type) {
+    if (!dialog || !electron) {
+      alert(message);
+      return;
+    }
+
+    const browserWindow = electron.remote.getCurrentWindow();
+    dialog.showMessageBox(browserWindow, {
+      message,
+      type,
+    });
   }
 
   static isDev() {

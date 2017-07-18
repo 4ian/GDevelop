@@ -2,7 +2,18 @@ import React from 'react';
 import { List, ListItem } from 'material-ui/List';
 import { mapFor } from '../Utils/MapFor';
 import ListIcon from './ListIcon';
-import ListAddItem from './ListAddItem';
+import { makeAddItem } from './AddItem';
+
+const styles = {
+  projectStructureItem: {
+  },
+  item: {
+  }
+}
+
+const ProjectStructureItem = (props) => <ListItem style={styles.projectStructureItem} {...props} />
+const Item = (props) => <ListItem style={styles.item} {...props} />
+const AddItem = makeAddItem(Item);
 
 export default class ProjectManager extends React.Component {
   state = {};
@@ -12,7 +23,7 @@ export default class ProjectManager extends React.Component {
 
     return (
       <List>
-        <ListItem
+        <ProjectStructureItem
           primaryText="Options"
           leftIcon={<ListIcon src="res/ribbon_default/new32.png" />}
           initiallyOpen={true}
@@ -39,11 +50,11 @@ export default class ProjectManager extends React.Component {
             />,
           ]}
         />
-        <ListItem
+        <ProjectStructureItem
           primaryText="Resources"
           leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
         />
-        <ListItem
+        <ProjectStructureItem
           primaryText="Scenes"
           leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}
           initiallyOpen={true}
@@ -53,7 +64,7 @@ export default class ProjectManager extends React.Component {
             const layout = project.getLayoutAt(i);
             const name = layout.getName();
             return (
-              <ListItem
+              <Item
                 key={i}
                 primaryText={name}
                 leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}
@@ -61,13 +72,13 @@ export default class ProjectManager extends React.Component {
               />
             );
           }).concat(
-            <ListAddItem
+            <AddItem
               key={'add-scene'}
               onClick={this.props.onAddLayout}
             />
           )}
         />
-        <ListItem
+        <ProjectStructureItem
           primaryText="External events"
           leftIcon={<ListIcon src="res/ribbon_default/externalevents32.png" />}
           initiallyOpen={false}
@@ -77,7 +88,7 @@ export default class ProjectManager extends React.Component {
             const externalEvents = project.getExternalEventsAt(i);
             const name = externalEvents.getName();
             return (
-              <ListItem
+              <Item
                 key={i}
                 primaryText={name}
                 leftIcon={
@@ -88,7 +99,7 @@ export default class ProjectManager extends React.Component {
             );
           })}
         />
-        <ListItem
+        <ProjectStructureItem
           primaryText="External layouts"
           leftIcon={<ListIcon src="res/ribbon_default/externallayout32.png" />}
           initiallyOpen={false}
@@ -98,7 +109,7 @@ export default class ProjectManager extends React.Component {
             const externalLayout = project.getExternalLayoutAt(i);
             const name = externalLayout.getName();
             return (
-              <ListItem
+              <Item
                 key={i}
                 primaryText={name}
                 leftIcon={

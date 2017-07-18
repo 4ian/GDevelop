@@ -1,13 +1,12 @@
 import React from 'react';
-import { ListItem } from 'material-ui/List';
 import IconButton from 'material-ui/IconButton';
 import Add from 'material-ui/svg-icons/content/add';
 
 const style = { height: 48 };
 
-export default ({ onClick }) => {
+export const makeAddItem = Item => ({ onClick }) => {
   return (
-    <ListItem
+    <Item
       key={'add-scene'}
       primaryText=""
       style={style}

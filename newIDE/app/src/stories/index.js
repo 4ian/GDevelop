@@ -15,21 +15,35 @@ import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
 import LocalMobileExport from '../Export/LocalMobileExport';
 import LocalS3Export from '../Export/LocalS3Export';
-import Paper from 'material-ui/Paper';
+import TextEditor from '../ObjectEditor/Editors/TextEditor';
+import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
+import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
+import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
+import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
+import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
+import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
+import ObjectsList from '../ObjectsList';
+import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
+import SerializedObjectDisplay from './SerializedObjectDisplay';
 import muiDecorator from './MuiDecorator';
+import paperDecorator from './PaperDecorator';
+import {
+  project,
+  shapePainterObject,
+  adMobObject,
+  tiledSpriteObject,
+  panelSpriteObject,
+  textObject,
+  spriteObject,
+  testLayout,
+  testLayoutInstance1,
+} from './TestProject';
 
-const fakeProject = {
-  getLastCompilationDirectory: () => '/Fake/Directory'
-}
+import injectTapEventPlugin from 'react-tap-event-plugin';
 
-const fakeGD = {
-  VersionWrapper: {
-    fullString: () => "Fake",
-    major: () => "Fake",
-    minor: () => "Fake",
-  },
-};
-window.gd = fakeGD;
+// Needed for onTouchTap
+// http://stackoverflow.com/a/34015469/988941
+injectTapEventPlugin();
 
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
@@ -74,37 +88,34 @@ storiesOf('Tabs', module)
   ));
 
 storiesOf('LocalExport', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
-      <LocalExport open project={fakeProject} onClose={action('close')} />
-    </Paper>
+    <LocalExport open project={project} onClose={action('close')} />
   ));
 
 storiesOf('LocalS3Export', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
-      <LocalS3Export open project={fakeProject} onClose={action('close')} />
-    </Paper>
+    <LocalS3Export open project={project} onClose={action('close')} />
   ));
 
 storiesOf('LocalMobileExport', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
       <LocalMobileExport />
-    </Paper>
   ));
 
 storiesOf('LocalFolderPicker', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
-      <LocalFolderPicker floatingLabelText="Export folder" />
-    </Paper>
-  )).add('full width', () => (
-      <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
+    <LocalFolderPicker floatingLabelText="Export folder" />
+  ))
+  .add('full width', () => (
+    <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
   ));
 
 storiesOf('StartPage', module)
@@ -115,11 +126,101 @@ storiesOf('AboutDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <AboutDialog open />);
 
-
 storiesOf('LocalCreateDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCreateDialog open />);
 
 storiesOf('DragHandle', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
+
+storiesOf('TextEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={textObject}>
+      <TextEditor object={textObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('TiledSpriteEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={tiledSpriteObject}>
+      <TiledSpriteEditor object={tiledSpriteObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('PanelSpriteEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={panelSpriteObject}>
+      <PanelSpriteEditor object={panelSpriteObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('SpriteEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={spriteObject}>
+      <SpriteEditor object={spriteObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('ShapePainterEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={shapePainterObject}>
+      <ShapePainterEditor object={shapePainterObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('AdMobEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={adMobObject}>
+      <AdMobEditor object={adMobObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('EmptyEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EmptyEditor />
+  ));
+
+storiesOf('ObjectsList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <div style={{height: 250}}>
+        <ObjectsList
+          getThumbnail={() => 'res/unknown32.png'}
+          project={project}
+          objectsContainer={testLayout}
+          onEditObject={action('On edit object')}
+        />
+      </div>
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('InstancePropertiesEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <InstancePropertiesEditor
+        project={project}
+        layout={testLayout}
+        instances={[testLayoutInstance1]}
+      />
+    </SerializedObjectDisplay>
+  ));

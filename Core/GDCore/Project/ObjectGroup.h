@@ -44,6 +44,11 @@ public:
      */
     void RemoveObject(const gd::String & name);
 
+    /**
+     * \brief Change the name of an object in the group
+     */
+    void RenameObject(const gd::String & oldName, const gd::String & newName);
+
     /** \brief Get group name
      */
     inline const gd::String & GetName() const { return name; };

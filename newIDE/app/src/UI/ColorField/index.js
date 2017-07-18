@@ -9,7 +9,7 @@ const styles = {
   },
   picker: {
     position: 'absolute',
-    right: '0px',
+    right: '8px',
     bottom: '12px',
   },
 };

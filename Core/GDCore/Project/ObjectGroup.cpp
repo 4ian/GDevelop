@@ -28,7 +28,14 @@ void ObjectGroup::AddObject(const gd::String & name)
 void ObjectGroup::RemoveObject(const gd::String & name)
 {
     memberObjects.erase(std::remove(memberObjects.begin(), memberObjects.end(), name), memberObjects.end());
-    return;
+}
+
+void ObjectGroup::RenameObject(const gd::String & oldName, const gd::String & newName)
+{
+    for(auto & object : memberObjects)
+    {
+        if (object == oldName) object = newName;
+    }
 }
 
 void ObjectGroup::SerializeTo(const std::vector < gd::ObjectGroup > & list, SerializerElement & element)

@@ -25,7 +25,7 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCpp/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCpp/Runtime/CodeExecutionEngine.h"
-#include "GDCpp/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCpp/Runtime/CommonTools.h"

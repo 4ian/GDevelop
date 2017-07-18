@@ -42,7 +42,7 @@ bool ExternalEditor::Launch(const gd::String & editorName, const gd::String edit
 
     String cmd = GetExternalGDevelopIDEExecutable();
 	// Uncomment and adapt to launch a local development version of the GDevelop IDE:
-	// cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
+	cmd = "/Users/florian/Projects/F/GD/newIDE/electron-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron /Users/florian/Projects/F/GD/newIDE/electron-app/app";
 
 	cmd += " --mode=integrated";
 	if (editorName != "") cmd += " --editor " + editorName;

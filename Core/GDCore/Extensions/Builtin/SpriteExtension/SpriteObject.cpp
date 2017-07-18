@@ -315,4 +315,14 @@ void SpriteObject::SwapAnimations(std::size_t firstIndex, std::size_t secondInde
         std::swap(animations[firstIndex], animations[secondIndex]);
 }
 
+void SpriteObject::MoveAnimation(std::size_t oldIndex, std::size_t newIndex)
+{
+    if ( oldIndex >= animations.size() || newIndex >= animations.size())
+        return;
+
+    auto animation = animations[oldIndex];
+    animations.erase(animations.begin() + oldIndex);
+    animations.insert(animations.begin() + newIndex, animation);
+}
+
 }

@@ -21,7 +21,7 @@
 #include "AndroidExporter.h"
 #include "GDCpp/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCpp/Extensions/CppPlatform.h"
-#include "GDCpp/IDE/DependenciesAnalyzer.h"
+#include "GDcore/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/IDE/Dialogs/AndroidExportDialog.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"

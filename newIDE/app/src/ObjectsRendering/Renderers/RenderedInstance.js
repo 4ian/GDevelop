@@ -12,7 +12,8 @@ function RenderedInstance(
   layout,
   instance,
   associatedObject,
-  pixiContainer
+  pixiContainer,
+  pixiResourcesLoader
 ) {
   this._pixiObject = null;
   this._instance = instance;
@@ -20,6 +21,7 @@ function RenderedInstance(
   this._pixiContainer = pixiContainer;
   this._project = project;
   this._layout = layout;
+  this._pixiResourcesLoader = pixiResourcesLoader;
   this.wasUsed = true; //Used by SceneAreaCtrl to track rendered instance that are not used anymore.
 }
 

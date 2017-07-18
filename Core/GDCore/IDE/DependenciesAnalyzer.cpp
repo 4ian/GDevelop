@@ -1,3 +1,9 @@
+/*
+ * GDevelop Core
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
+ * This project is released under the MIT License.
+ */
+
 #if defined(GD_IDE_ONLY)
 #include <algorithm>
 #include "GDCore/Events/EventsList.h"
@@ -7,7 +13,6 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
-#include "GDCpp/Events/Builtin/CppCodeEvent.h"
 #include "DependenciesAnalyzer.h"
 
 DependenciesAnalyzer::DependenciesAnalyzer(gd::Project & project_, gd::Layout & layout_) :
@@ -54,12 +59,12 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        try {
-            gd::LinkEvent & linkEvent = dynamic_cast<gd::LinkEvent &>(events[i]);
-
+        gd::LinkEvent* linkEvent = dynamic_cast<gd::LinkEvent*>(&events[i]);
+        if (linkEvent)
+        {
             DependenciesAnalyzer analyzer(*this);
 
-            gd::String linked = linkEvent.GetTarget();
+            gd::String linked = linkEvent->GetTarget();
             if ( project.HasExternalEventsNamed(linked) )
             {
                 if ( std::find(parentExternalEvents.begin(), parentExternalEvents.end(), linked) != parentExternalEvents.end() )
@@ -96,16 +101,16 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
                 notTopLevelScenesDependencies.insert(analyzer.GetScenesDependencies().begin(), analyzer.GetScenesDependencies().end());
                 notTopLevelExternalEventsDependencies.insert(analyzer.GetExternalEventsDependencies().begin(), analyzer.GetExternalEventsDependencies().end());
             }
-        } catch(...) {}
+        }
 
-        try {
-            CppCodeEvent & cppCodeEvent = dynamic_cast<CppCodeEvent &>(events[i]);
+        // Search for source files dependencies
+        std::vector<gd::String> dependencies = events[i].GetSourceFileDependencies();
+        sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
 
-            const std::vector<gd::String> & dependencies = cppCodeEvent.GetDependencies();
-            sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
-            sourceFilesDependencies.insert(cppCodeEvent.GetAssociatedGDManagedSourceFile(project));
-        } catch(...) {}
+        const gd::String & associatedSourceFile = events[i].GetAssociatedGDManagedSourceFile(project);
+        if (!associatedSourceFile.empty()) sourceFilesDependencies.insert(associatedSourceFile);
 
+        // Analyze sub events dependencies
         if ( events[i].CanHaveSubEvents() )
         {
             if ( !Analyze(events[i].GetSubEvents(), false) )

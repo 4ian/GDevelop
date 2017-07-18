@@ -91,7 +91,7 @@ export default class LocalExport extends Component {
     if (!project) return null;
 
     return (
-      <Column>
+      <Column noMargin>
         <Line>
           This will export your game to a folder that you can then upload on a website
         </Line>

@@ -62,6 +62,16 @@ void Direction::SwapSprites(std::size_t firstSpriteIndex, std::size_t secondSpri
         swap(sprites[firstSpriteIndex], sprites[secondSpriteIndex]);
 }
 
+void Direction::MoveSprite(std::size_t oldIndex, std::size_t newIndex)
+{
+    if ( oldIndex >= sprites.size() || newIndex >= sprites.size())
+        return;
+
+    auto sprite = sprites[oldIndex];
+    sprites.erase(sprites.begin() + oldIndex);
+    sprites.insert(sprites.begin() + newIndex, sprite);
+}
+
 bool Direction::HasNoSprites() const
 {
     return sprites.empty();

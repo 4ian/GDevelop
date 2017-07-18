@@ -8,6 +8,7 @@ import RenderedAdMobInstance from './Renderers/RenderedAdMobInstance';
 import RenderedTextInstance from './Renderers/RenderedTextInstance';
 import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstance';
 import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
+import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from './ResourcesLoader';
 
 /**
@@ -55,7 +56,7 @@ export default {
         instance,
         associatedObject,
         pixiContainer,
-        ResourcesLoader
+        PixiResourcesLoader
       );
     else
       return new this.renderers['unknownObjectType'](
@@ -64,7 +65,7 @@ export default {
         instance,
         associatedObject,
         pixiContainer,
-        ResourcesLoader
+        PixiResourcesLoader
       );
   },
   registerInstanceRenderer: function(objectType, renderFunction) {

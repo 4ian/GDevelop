@@ -43,7 +43,7 @@
 #include "GDCore/IDE/Project/ResourcesMergingHelper.h"
 #include "GDCpp/IDE/ExecutableIconChanger.h"
 #include "GDCpp/IDE/BaseProfiler.h"
-#include "GDCpp/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 

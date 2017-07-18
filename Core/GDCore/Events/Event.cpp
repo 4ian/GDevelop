@@ -14,6 +14,8 @@ namespace gd
 {
 
 EventsList BaseEvent::badSubEvents;
+std::vector< gd::String > BaseEvent::emptyDependencies;
+gd::String BaseEvent::emptySourceFile;
 
 BaseEvent::BaseEvent() :
     eventHeightNeedUpdate(true),

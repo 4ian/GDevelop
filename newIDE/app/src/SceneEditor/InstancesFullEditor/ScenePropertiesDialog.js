@@ -27,7 +27,7 @@ export default class ScenePropertiesDialog extends Component {
       (!this.props.open && newProps.open) ||
       (newProps.open && this.props.layout !== newProps.layout)
     ) {
-      this._loadFrom(newProps.layout);
+      this.setState(this._loadFrom(newProps.layout));
     }
   }
 

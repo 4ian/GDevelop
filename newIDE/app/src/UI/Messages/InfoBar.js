@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Snackbar from 'material-ui/Snackbar';
 
-export default class ToolbarIcon extends Component {
+export default class InfoBar extends Component {
   constructor() {
     super();
     this.state = {
@@ -10,10 +10,12 @@ export default class ToolbarIcon extends Component {
   }
 
   handleGotIt = () => {
-    localStorage.setItem(
-      `gdevelop.hiddenMessages.${this.props.messageId}`,
-      true
-    );
+    if (this.props.messageId) {
+      localStorage.setItem(
+        `gdevelop.hiddenMessages.${this.props.messageId}`,
+        true
+      );
+    }
     this.setState({ dismissed: true });
   };
 
@@ -24,7 +26,7 @@ export default class ToolbarIcon extends Component {
   }
 
   render() {
-    const hidden = localStorage.getItem(
+    const hidden = this.props.messageId && localStorage.getItem(
       `gdevelop.hiddenMessages.${this.props.messageId}`
     );
 

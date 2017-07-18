@@ -18,7 +18,7 @@ function RenderedPanelSpriteInstance(
   instance,
   associatedObject,
   pixiContainer,
-  resourcesLoader
+  pixiResourcesLoader
 ) {
   RenderedInstance.call(
     this,
@@ -26,9 +26,9 @@ function RenderedPanelSpriteInstance(
     layout,
     instance,
     associatedObject,
-    pixiContainer
+    pixiContainer,
+    pixiResourcesLoader
   );
-  this._resourcesLoader = resourcesLoader;
 
   this.makeObjects();
   this.updateTexture();
@@ -75,7 +75,7 @@ RenderedPanelSpriteInstance.prototype.update = function() {
 RenderedPanelSpriteInstance.prototype.makeObjects = function() {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   this._textureName = panelSprite.getTexture();
-  const texture = this._resourcesLoader.getPIXITexture(
+  const texture = this._pixiResourcesLoader.getPIXITexture(
     this._project,
     this._textureName,
   );
@@ -213,7 +213,7 @@ RenderedPanelSpriteInstance.prototype._updateSpritesAndTexturesSize = function()
 RenderedPanelSpriteInstance.prototype.updateTexture = function() {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   this._textureName = panelSprite.getTexture();
-  const texture = this._resourcesLoader.getPIXITexture(
+  const texture = this._pixiResourcesLoader.getPIXITexture(
     this._project,
     this._textureName,
   );
@@ -394,7 +394,7 @@ RenderedPanelSpriteInstance.getThumbnail = function(
 ) {
   const panelSprite = gd.asPanelSpriteObject(object);
 
-  return resourcesLoader.getFilename(project, panelSprite.getTexture());
+  return resourcesLoader.getResourceFullFilename(project, panelSprite.getTexture());
 };
 
 export default RenderedPanelSpriteInstance;

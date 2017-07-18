@@ -23,6 +23,9 @@ export default class SelectionRectangle {
       const instanceHeight = this.instanceMeasurer.getInstanceHeight(instance);
       const instanceWidth = this.instanceMeasurer.getInstanceWidth(instance);
 
+      if (!this.selectionRectangleStart || !this.selectionRectangleEnd)
+        return;
+
       const selectionSceneStart = toSceneCoordinates(
         this.selectionRectangleStart.x,
         this.selectionRectangleStart.y

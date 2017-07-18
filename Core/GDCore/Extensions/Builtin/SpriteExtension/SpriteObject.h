@@ -113,6 +113,11 @@ public :
     void SwapAnimations(std::size_t firstIndex, std::size_t secondIndex);
 
     /**
+     * \brief Change the position of the specified animation
+     */
+    void MoveAnimation(std::size_t oldIndex, std::size_t newIndex);
+
+    /**
      * \brief Return a read-only reference to the vector containing all the animation of the object.
      */
     const std::vector < Animation > & GetAllAnimations() const { return animations; }

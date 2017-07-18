@@ -1,4 +1,34 @@
+/* This overwrite the default React Mosaic theme to make it looks like Material UI AppBar  */
+
 .mosaic-root.mosaic-gd-theme {
   background-color: #f0f0f0;
   padding: 0;
+}
+
+.mosaic-gd-theme .mosaic-window {
+  border-radius: 0 !important;
+}
+
+.mosaic-gd-theme .mosaic-window-body {
+  display: flex;
+}
+
+.mosaic-gd-theme .mosaic-window-toolbar {
+  background: #9100ce;
+  border-top-right-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+}
+
+.mosaic-gd-theme .mosaic-window .mosaic-window-title {
+  color: white !important;
+  font-weight: 400 !important;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.mosaic-gd-theme .draggable .mosaic-window-title {
+  cursor: move;
+}
+
+.mosaic-root.mosaic-gd-theme .mosaic-window .mosaic-window-toolbar.draggable:hover, .mosaic-root.mosaic-gd-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+  background: #9100ce;
 }

@@ -135,6 +135,11 @@ public:
     bool SomeInstancesAreOnLayer(const gd::String & layerName);
 
     /**
+     * \brief Return true if there is at least one instance of the given object.
+     */
+    bool HasInstancesOfObject(const gd::String & objectName);
+
+    /**
      * \brief Remove all instances
      */
     void Clear();

@@ -101,6 +101,39 @@ export default class Window {
     });
   }
 
+  static setUpContextMenu() {
+    const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
+
+    if (electron) {
+      // `remote.require` since `Menu` is a main-process module.
+      var buildEditorContextMenu = electron.remote.require('electron-editor-context-menu');
+
+      window.addEventListener('contextmenu', function(e) {
+        // Only show the context menu in text editors.
+        if (!e.target.closest(textEditorSelectors)) return;
+
+        var menu = buildEditorContextMenu();
+
+        // The 'contextmenu' event is emitted after 'selectionchange' has fired but possibly before the
+        // visible selection has changed. Try to wait to show the menu until after that, otherwise the
+        // visible selection will update after the menu dismisses and look weird.
+        setTimeout(function() {
+          menu.popup(electron.remote.getCurrentWindow());
+        }, 30);
+      });
+    } else if (window) {
+      window.addEventListener('contextmenu', function(e) {
+        // Only show the context menu in text editors.
+        if (!e.target.closest(textEditorSelectors)) {
+          e.preventDefault();
+          return false;
+        }
+
+        return true;
+      });
+    }
+  }
+
   static isDev() {
     if (!electron) return true;
 

@@ -1,3 +1,4 @@
+import 'element-closest';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import MainFrame from './MainFrame';
@@ -25,6 +26,8 @@ const electron = optionalRequire('electron');
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
 injectTapEventPlugin();
+
+Window.setUpContextMenu();
 
 let app = null;
 

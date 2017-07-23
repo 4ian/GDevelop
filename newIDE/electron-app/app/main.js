@@ -1,10 +1,12 @@
 const electron = require('electron');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
+const Menu = electron.Menu;
 const parseArgs = require('minimist');
 const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
 const { uploadGameFolderToBucket } = require('./s3upload');
+const { buildMainMenuFor } = require('./main-menu');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -67,6 +69,8 @@ app.on('ready', function() {
     mainWindow.loadURL('file://' + __dirname + '/www/index.html');
     if (devTools) mainWindow.openDevTools();
   }
+
+  Menu.setApplicationMenu(buildMainMenuFor(mainWindow));
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {

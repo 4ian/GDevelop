@@ -21,6 +21,7 @@ import LocalCreateDialog from './ProjectCreation/LocalCreateDialog';
 import localResourceSources from './ResourcesEditor/LocalResourceSources';
 import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
 import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
+import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 const electron = optionalRequire('electron');
 
 // Needed for onTouchTap
@@ -46,36 +47,38 @@ if (electron) {
     );
   } else {
     app = (
-      <MainFrame
-        onLayoutPreview={LocalPreviewLauncher.launchLayoutPreview}
-        onExternalLayoutPreview={
-          LocalPreviewLauncher.launchExternalLayoutPreview
-        }
-        exportDialog={
-          <ExportDialog
-            tabs={[
-              {
-                name: 'Upload online',
-                ExportComponent: LocalS3Export,
-              },
-              {
-                name: 'Export to a folder',
-                ExportComponent: LocalExport,
-              },
-              {
-                name: 'Export to iOS/Android app',
-                ExportComponent: LocalMobileExport,
-              },
-            ]}
-          />
-        }
-        createDialog={<LocalCreateDialog />}
-        introDialog={<BetaIntroDialog />}
-        onSaveProject={LocalProjectWriter.saveProject}
-        onChooseProject={LocalProjectOpener.chooseProjectFile}
-        onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
-        resourceSources={localResourceSources}
-      />
+      <ElectronEventsBridge>
+        <MainFrame
+          onLayoutPreview={LocalPreviewLauncher.launchLayoutPreview}
+          onExternalLayoutPreview={
+            LocalPreviewLauncher.launchExternalLayoutPreview
+          }
+          exportDialog={
+            <ExportDialog
+              tabs={[
+                {
+                  name: 'Upload online',
+                  ExportComponent: LocalS3Export,
+                },
+                {
+                  name: 'Export to a folder',
+                  ExportComponent: LocalExport,
+                },
+                {
+                  name: 'Export to iOS/Android app',
+                  ExportComponent: LocalMobileExport,
+                },
+              ]}
+            />
+          }
+          createDialog={<LocalCreateDialog />}
+          introDialog={<BetaIntroDialog />}
+          onSaveProject={LocalProjectWriter.saveProject}
+          onChooseProject={LocalProjectOpener.chooseProjectFile}
+          onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
+          resourceSources={localResourceSources}
+        />
+      </ElectronEventsBridge>
     );
   }
 } else {

@@ -239,7 +239,7 @@ export default class MainFrame extends Component {
             <StartPage
               setToolbar={this.setEditorToolbar}
               onOpen={this.chooseProject}
-              onCreate={() => this._openCreateDialog()}
+              onCreate={() => this.openCreateDialog()}
             />
           ),
           'start page'
@@ -249,7 +249,7 @@ export default class MainFrame extends Component {
     );
   };
 
-  _openCreateDialog = (open = true) => {
+  openCreateDialog = (open = true) => {
     this.setState({
       createDialogOpen: open,
     });
@@ -306,6 +306,8 @@ export default class MainFrame extends Component {
   };
 
   save = () => {
+    if (!this.state.currentProject) return;
+
     this.props.onSaveProject(this.state.currentProject).catch(err => {
       showErrorBox(
         'Unable to save the project! Please try again by choosing another location.'
@@ -313,7 +315,7 @@ export default class MainFrame extends Component {
     });
   };
 
-  _onCloseProject = () => {
+  closeProject = () => {
     if (!this.state.currentProject) return;
 
     this.confirmCloseDialog.show(closeProject => {
@@ -337,7 +339,7 @@ export default class MainFrame extends Component {
     });
   };
 
-  _openExportDialog = (open = true) => {
+  openExportDialog = (open = true) => {
     this.setState({
       exportDialogOpen: open,
     });
@@ -414,8 +416,8 @@ export default class MainFrame extends Component {
                   onAddLayout={this.addLayout}
                   onOpenExternalLayout={this.openExternalLayout}
                   onSaveProject={this.save}
-                  onCloseProject={this._onCloseProject}
-                  onExportProject={this._openExportDialog}
+                  onCloseProject={this.closeProject}
+                  onExportProject={this.openExportDialog}
                 />}
             </Drawer>
             <Toolbar
@@ -454,15 +456,15 @@ export default class MainFrame extends Component {
             {!!exportDialog &&
               React.cloneElement(exportDialog, {
                 open: this.state.exportDialogOpen,
-                onClose: () => this._openExportDialog(false),
+                onClose: () => this.openExportDialog(false),
                 project: this.state.currentProject,
               })}
             {!!createDialog &&
               React.cloneElement(createDialog, {
                 open: this.state.createDialogOpen,
-                onClose: () => this._openCreateDialog(false),
+                onClose: () => this.openCreateDialog(false),
                 onOpen: filepath => {
-                  this._openCreateDialog(false);
+                  this.openCreateDialog(false);
                   this.openFromPathOrURL(filepath);
                 },
               })}

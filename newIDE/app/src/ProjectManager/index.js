@@ -3,53 +3,64 @@ import { List, ListItem } from 'material-ui/List';
 import { mapFor } from '../Utils/MapFor';
 import ListIcon from './ListIcon';
 import { makeAddItem } from './AddItem';
+import Window from '../Utils/Window';
 
 const styles = {
-  projectStructureItem: {
-  },
-  item: {
-  }
-}
+  projectStructureItem: {},
+  item: {},
+};
 
-const ProjectStructureItem = (props) => <ListItem style={styles.projectStructureItem} {...props} />
-const Item = (props) => <ListItem style={styles.item} {...props} />
+const ProjectStructureItem = props => (
+  <ListItem style={styles.projectStructureItem} {...props} />
+);
+const Item = props => <ListItem style={styles.item} {...props} />;
 const AddItem = makeAddItem(Item);
 
 export default class ProjectManager extends React.Component {
   state = {};
+
+  _renderMenu() {
+    // If there is already a main menu (as the native one made with
+    // Electron), don't show it in the Project Manager.
+    if (Window.hasMainMenu()) return null;
+
+    return (
+      <ProjectStructureItem
+        primaryText="Options"
+        leftIcon={<ListIcon src="res/ribbon_default/new32.png" />}
+        initiallyOpen={true}
+        primaryTogglesNestedList={true}
+        autoGenerateNestedIndicator={true}
+        nestedItems={[
+          <ListItem
+            key="save"
+            primaryText="Save"
+            leftIcon={<ListIcon src="res/ribbon_default/save32.png" />}
+            onTouchTap={() => this.props.onSaveProject()}
+          />,
+          <ListItem
+            key="close"
+            primaryText="Close"
+            leftIcon={<ListIcon src="res/ribbon_default/close32.png" />}
+            onTouchTap={() => this.props.onCloseProject()}
+          />,
+          <ListItem
+            key="export"
+            primaryText="Export"
+            leftIcon={<ListIcon src="res/ribbon_default/export32.png" />}
+            onTouchTap={() => this.props.onExportProject()}
+          />,
+        ]}
+      />
+    );
+  }
 
   render() {
     const { project } = this.props;
 
     return (
       <List>
-        <ProjectStructureItem
-          primaryText="Options"
-          leftIcon={<ListIcon src="res/ribbon_default/new32.png" />}
-          initiallyOpen={true}
-          primaryTogglesNestedList={true}
-          autoGenerateNestedIndicator={true}
-          nestedItems={[
-            <ListItem
-              key="save"
-              primaryText="Save"
-              leftIcon={<ListIcon src="res/ribbon_default/save32.png" />}
-              onTouchTap={() => this.props.onSaveProject()}
-            />,
-            <ListItem
-              key="close"
-              primaryText="Close"
-              leftIcon={<ListIcon src="res/ribbon_default/close32.png" />}
-              onTouchTap={() => this.props.onCloseProject()}
-            />,
-            <ListItem
-              key="export"
-              primaryText="Export"
-              leftIcon={<ListIcon src="res/ribbon_default/export32.png" />}
-              onTouchTap={() => this.props.onExportProject()}
-            />,
-          ]}
-        />
+        {this._renderMenu()}
         <ProjectStructureItem
           primaryText="Resources"
           leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
@@ -72,10 +83,7 @@ export default class ProjectManager extends React.Component {
               />
             );
           }).concat(
-            <AddItem
-              key={'add-scene'}
-              onClick={this.props.onAddLayout}
-            />
+            <AddItem key={'add-scene'} onClick={this.props.onAddLayout} />
           )}
         />
         <ProjectStructureItem

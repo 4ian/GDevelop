@@ -134,6 +134,10 @@ export default class Window {
     }
   }
 
+  static hasMainMenu() {
+    return !!electron;
+  }
+
   static isDev() {
     if (!electron) return true;
 

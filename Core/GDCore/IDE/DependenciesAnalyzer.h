@@ -20,7 +20,7 @@ namespace gd { class ExternalEvents; }
 /**
  * \brief Compute the dependencies of a scene or external events.
  */
-class DependenciesAnalyzer
+class GD_CORE_API DependenciesAnalyzer
 {
 public:
 

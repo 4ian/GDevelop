@@ -144,6 +144,7 @@ export default class InstancesEditorContainer extends Component {
       project: props.project,
       layout: props.layout,
       instances: props.initialInstances,
+      viewPosition: this.viewPosition,
       onOverInstance: this._onOverInstance,
       onMoveInstance: this._onMoveInstance,
       onMoveInstanceEnd: this._onMoveInstanceEnd,

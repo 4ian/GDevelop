@@ -73,7 +73,7 @@ export default class Instruction extends Component {
     );
 
     return React.createElement(
-      'span',
+      'div',
       {
         className: 'instruction ' +
           (instruction.dragging ? 'dragged-instruction ' : '') +

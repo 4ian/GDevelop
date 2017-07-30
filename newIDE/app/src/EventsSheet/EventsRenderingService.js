@@ -165,6 +165,9 @@ class CommentEvent extends Component {
       children.push(
         React.createElement('p', {
           key: 'p',
+          style: {
+            whiteSpace: 'pre-line',
+          },
           dangerouslySetInnerHTML: {
             __html: commentEvent
               .getComment()

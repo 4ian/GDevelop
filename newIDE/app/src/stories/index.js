@@ -23,10 +23,14 @@ import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
 import ObjectsList from '../ObjectsList';
-import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
+import InstancePropertiesEditor
+  from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
+import EventsTree from '../EventsSheet/EventsTree';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
+import DragDropContextProvider
+  from '../Utils/DragDropHelpers/DragDropContextProvider';
 import {
   project,
   shapePainterObject,
@@ -104,16 +108,12 @@ storiesOf('LocalS3Export', module)
 storiesOf('LocalMobileExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-      <LocalMobileExport />
-  ));
+  .add('default', () => <LocalMobileExport />);
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <LocalFolderPicker floatingLabelText="Export folder" />
-  ))
+  .add('default', () => <LocalFolderPicker floatingLabelText="Export folder" />)
   .add('full width', () => (
     <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
   ));
@@ -134,6 +134,10 @@ storiesOf('DragHandle', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
+
+storiesOf('EventsTree', module).add('default', () => (
+  <DragDropContextProvider><EventsTree events={testLayout.getEvents()} /></DragDropContextProvider>
+));
 
 storiesOf('TextEditor', module)
   .addDecorator(paperDecorator)
@@ -192,16 +196,14 @@ storiesOf('AdMobEditor', module)
 storiesOf('EmptyEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <EmptyEditor />
-  ));
+  .add('default', () => <EmptyEditor />);
 
 storiesOf('ObjectsList', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={testLayout}>
-      <div style={{height: 250}}>
+      <div style={{ height: 250 }}>
         <ObjectsList
           getThumbnail={() => 'res/unknown32.png'}
           project={project}

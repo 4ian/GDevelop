@@ -139,9 +139,6 @@ export default class EventsSheetContainer extends BaseEditor {
             onEditEventTemplate: () => console.log('onEditEventTemplate'),
           }}
         />
-        <PlaceholderMessage>
-          This editor is not finished yet.
-        </PlaceholderMessage>
         {this.state.newInstruction.instruction &&
           <InstructionEditorDialog
             {...this.state.newInstruction}

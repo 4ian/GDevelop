@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import EventsList from './EventsList';
+import EventsTree from './EventsTree';
 
 const styles = {
   container: {
@@ -23,10 +24,7 @@ export default class EventsSheet extends Component {
   render() {
     return (
       <div style={styles.container}>
-        <EventsList
-          eventsList={this.props.events}
-          callbacks={this.props.callbacks}
-        />
+        <EventsTree events={this.props.events}/>
       </div>
     );
   }

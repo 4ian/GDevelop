@@ -22,17 +22,28 @@ class UnknownEvent extends Component {
 
   render() {
     return (
-      <p
-        {...addDefaultProps(
-          {
-            className: this.props.className,
-          },
-          this.props
-        )}>
+      <p>
         {'Unknown event of type ' + this.props.event.getType()}
       </p>
     );
   }
+}
+
+const standardEventStyles = {
+  container: {
+    display: 'flex',
+  },
+  conditionsList: {
+    flex:1,
+    paddingLeft: 5,
+    paddingRight: 5,
+    background: '#F5F6FC',
+  },
+  actionsList: {
+    flex: 1,
+    paddingLeft: 5,
+    paddingRight: 5,
+  },
 }
 
 class StandardEvent extends Component {
@@ -43,28 +54,18 @@ class StandardEvent extends Component {
   render() {
     var standardEvent = gd.asStandardEvent(this.props.event);
 
-    var conditionsElement = <InstructionsList
-      instrsList={standardEvent.getConditions()}
-      areConditions={true}
-      key="theConditions"
-      className="col-xs-6 conditions-list"
-      callbacks={this.props.callbacks} />;
-    var actionsElement = <InstructionsList
-      instrsList={standardEvent.getActions()}
-      areConditions={false}
-      key="theActions"
-      className="col-xs-6 actions-list"
-      callbacks={this.props.callbacks} />;
-
     return (
-      <div
-        {...addDefaultProps(
-          {
-            className: 'row ' + this.props.className,
-          },
-          this.props
-        )}>
-        {[conditionsElement, actionsElement]}
+      <div style={standardEventStyles.container}>
+        <InstructionsList
+          instrsList={standardEvent.getConditions()}
+          style={standardEventStyles.conditionsList}
+          areConditions
+        />
+        <InstructionsList
+          instrsList={standardEvent.getActions()}
+          style={standardEventStyles.actionsList}
+          areConditions={false}
+        />
       </div>
     );
   }
@@ -105,7 +106,8 @@ class GroupEvent extends Component {
             onClick: this.handleClick,
           },
           this.props
-        )}>
+        )}
+      >
         {children}
       </div>
     );
@@ -166,7 +168,8 @@ class CommentEvent extends Component {
               .replace(/</g, '&lt;')
               .replace(/>/g, '&gt;')
               .replace(/\n/g, '<br>'),
-          }} />
+          }}
+        />
       );
     } else {
       children.push(
@@ -175,7 +178,8 @@ class CommentEvent extends Component {
           type="text"
           rows={5}
           onBlur={this.handleBlur}
-          ref="theInput" />
+          ref="theInput"
+        />
       );
     }
 
@@ -187,7 +191,8 @@ class CommentEvent extends Component {
             onClick: this.handleClick,
           },
           this.props
-        )}>
+        )}
+      >
         {children}
       </div>
     );

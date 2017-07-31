@@ -5,6 +5,7 @@ import {
 } from 'react-sortable-tree';
 import EventsRenderingService from '../EventsRenderingService';
 import { mapFor } from '../../Utils/MapFor';
+import '../../UI/Theme/EventsTree.css';
 
 //TODO: Any change (event not equal to its last height or new event should trigger a recomputeRowHeights)
 const eventHeights = {};
@@ -69,8 +70,7 @@ export default class Tree extends Component {
   }
 
   componentDidMount() {
-    this._list.wrappedInstance.recomputeRowHeights();
-    this.forceUpdate();
+    this.forceUpdate(() => this._list.wrappedInstance.recomputeRowHeights());
   }
 
   _onMoveNode = ({ treeData, path, node }) => {
@@ -107,18 +107,17 @@ export default class Tree extends Component {
     return (
       <div style={{ height: 400 }}>
         <SortableTree
+          className="gd-events-list"
           treeData={this.state.treeData}
           scaffoldBlockPxWidth={22}
           onChange={() => {}}
           onMoveNode={this._onMoveNode}
           rowHeight={({index}) => {
-            const extraBorderMargin = 30;
-            console.log(eventHeights);
+            const extraBorderMargin = 4;
             const event = this.state.flatData[index];
-            console.log(index, "is", event);
             if (!event) return 60;
 
-            console.log(eventHeights[event.ptr]);
+            console.log("Getting height for", event.ptr);
             return (eventHeights[event.ptr] + extraBorderMargin) || 60;
           }}
           reactVirtualizedListProps={{

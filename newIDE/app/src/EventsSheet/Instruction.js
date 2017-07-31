@@ -48,44 +48,34 @@ export default class Instruction extends Component {
     var children = [];
     if (instruction.isInverted()) {
       children.push(
-        React.createElement('img', {
-          src: 'res/contraire.png',
-          className: 'inverted-icon',
-          key: 'inverted-icon',
-        })
+        <img src="res/contraire.png" className="inverted-icon" key="inverted-icon" />
       );
     }
     children.push(
-      React.createElement('img', {
-        src: rendering.icon,
-        className: 'icon',
-        key: 'icon',
-      })
+      <img src={rendering.icon} className="icon" key="icon" />
     );
     children.push(
-      React.createElement('span', {
-        dangerouslySetInnerHTML: {
+      <span
+        dangerouslySetInnerHTML={{
           __html: rendering.html,
-        },
-        className: 'text',
-        key: 'text',
-      })
+        }}
+        className="text"
+        key="text" />
     );
 
-    return React.createElement(
-      'div',
-      {
-        className: 'instruction ' +
+    return (
+      <div
+        className={'instruction ' +
           (instruction.dragging ? 'dragged-instruction ' : '') +
           (instruction.isInverted() ? 'inverted ' : '') +
-          this.props.className,
-        onMouseDown: this.handleTouch,
-        onMouseUp: this.handleTouchEnd,
-        onTouchStart: this.handleTouch,
-        onTouchMove: this.handleTouch,
-        onTouchEnd: this.handleTouchEnd,
-      },
-      children
+          this.props.className}
+        onMouseDown={this.handleTouch}
+        onMouseUp={this.handleTouchEnd}
+        onTouchStart={this.handleTouch}
+        onTouchMove={this.handleTouch}
+        onTouchEnd={this.handleTouchEnd}>
+        {children}
+      </div>
     );
   }
 }

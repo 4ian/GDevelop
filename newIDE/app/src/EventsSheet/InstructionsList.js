@@ -28,49 +28,40 @@ export default class InstructionsList extends Component {
 
     var children = [];
     children.push(
-      React.createElement(
-        'button',
-        {
-          key: 'addInstrButton',
-          className: 'btn btn-xs btn-default add-instruction-button',
-          onClick: this.handleAddInstruction,
-        },
-        '+'
-      )
+      <button
+        key="addInstrButton"
+        className="btn btn-xs btn-default add-instruction-button"
+        onClick={this.handleAddInstruction}>
+        +
+      </button>
     );
     for (var i = 0; i < this.props.instrsList.size(); ++i) {
       var instruction = this.props.instrsList.get(i);
       children.push(
-        React.createElement(Instruction, {
-          instruction: instruction,
-          isCondition: this.props.areConditions,
-          instrsList: this.props.instrsList,
-          index: i,
-          key: instruction.ptr,
-          callbacks: this.props.callbacks,
-        })
+        <Instruction
+          instruction={instruction}
+          isCondition={this.props.areConditions}
+          instrsList={this.props.instrsList}
+          index={i}
+          key={instruction.ptr}
+          callbacks={this.props.callbacks} />
       );
     }
     if (this.props.instrsList.size() === 0) {
       children.push(
-        React.createElement(
-          'span',
-          {
-            key: 'noInstructions',
-            className: 'instruction',
-            onClick: this.handleAddInstruction,
-          },
-          this.props.areConditions ? 'No conditions' : 'No actions'
-        )
+        <span
+          key="noInstructions"
+          className="instruction"
+          onClick={this.handleAddInstruction}>
+          {this.props.areConditions ? 'No conditions' : 'No actions'}
+        </span>
       );
     }
 
-    return React.createElement(
-      'div',
-      {
-        className: 'instructions-list ' + this.props.className,
-      },
-      children
+    return (
+      <div className={'instructions-list ' + this.props.className}>
+        {children}
+      </div>
     );
   }
 }

@@ -14,29 +14,23 @@ export default class EventsList extends Component {
     for (var i = 0; i < this.props.eventsList.getEventsCount(); ++i) {
       var event = this.props.eventsList.getEventAt(i);
       children.push(
-        React.createElement(Event, {
-          event: event,
-          eventsList: this.props.eventsList,
-          index: i,
-          key: event.ptr,
-          callbacks: this.props.callbacks,
-        })
+        <Event
+          event={event}
+          eventsList={this.props.eventsList}
+          index={i}
+          key={event.ptr}
+          callbacks={this.props.callbacks} />
       );
     }
-    return React.createElement(
-      'div',
-      {
-        className: 'events-list ' + this.props.className,
-      },
-      React.createElement(
-        ReactCSSTransitionGroup,
-        {
-          transitionName: 'events-list-animation',
-          transitionEnterTimeout: 200,
-          transitionLeaveTimeout: 200,
-        },
-        children
-      )
+    return (
+      <div className={'events-list ' + this.props.className}>
+        <ReactCSSTransitionGroup
+          transitionName="events-list-animation"
+          transitionEnterTimeout={200}
+          transitionLeaveTimeout={200}>
+          {children}
+        </ReactCSSTransitionGroup>
+      </div>
     );
   }
 }

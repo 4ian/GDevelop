@@ -70,54 +70,46 @@ export default class Event extends Component {
 
     if (event.canHaveSubEvents()) {
       elements.push(
-        React.createElement(
-          'button',
-          {
-            className: 'btn btn-default btn-xs add-sub-events-button',
-            key: 'addSubEventsButton',
-            onClick: this.handleAddSubEventClick,
-          },
-          'Add a sub event'
-        )
+        <button
+          className="btn btn-default btn-xs add-sub-events-button"
+          key="addSubEventsButton"
+          onClick={this.handleAddSubEventClick}>
+          Add a sub event
+        </button>
       );
 
       if (event.getSubEvents().getEventsCount() > 0) {
         elements.push(
-          React.createElement(
-            'button',
-            {
-              className: 'btn btn-default btn-xs fold-sub-events-button ' +
-                'glyphicon glyphicon-chevron-' +
-                (event.isFolded() ? 'up up' : 'down down'),
-              key: 'foldSubEventsButton',
-              onClick: this.handleFoldSubEventClick,
-            },
-            ''
-          )
+          <button
+            className={'btn btn-default btn-xs fold-sub-events-button ' +
+              'glyphicon glyphicon-chevron-' +
+              (event.isFolded() ? 'up up' : 'down down')}
+            key="foldSubEventsButton"
+            onClick={this.handleFoldSubEventClick}>
+            {''}
+          </button>
         );
       }
 
       if (!event.isFolded()) {
         elements.push(
           // eslint-disable-next-line
-          React.createElement(EventsList, {
-            eventsList: event.getSubEvents(),
-            key: 'subEvents',
-            className: 'sub-events',
-            callbacks: this.props.callbacks,
-          })
+          <EventsList
+            eventsList={event.getSubEvents()}
+            key="subEvents"
+            className="sub-events"
+            callbacks={this.props.callbacks} />
         );
       }
     }
 
-    return React.createElement(
-      'div',
-      {
-        className: 'event-container ' +
+    return (
+      <div
+        className={'event-container ' +
           (event.isDisabled() ? 'disabled-event ' : '') +
-          (event.dragging ? 'dragged-event ' : ''),
-      },
-      elements
+          (event.dragging ? 'dragged-event ' : '')}>
+        {elements}
+      </div>
     );
   }
 }

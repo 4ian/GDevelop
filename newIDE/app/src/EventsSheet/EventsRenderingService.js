@@ -21,15 +21,16 @@ class UnknownEvent extends Component {
   };
 
   render() {
-    return React.createElement(
-      'p',
-      addDefaultProps(
-        {
-          className: this.props.className,
-        },
-        this.props
-      ),
-      'Unknown event of type ' + this.props.event.getType()
+    return (
+      <p
+        {...addDefaultProps(
+          {
+            className: this.props.className,
+          },
+          this.props
+        )}>
+        {'Unknown event of type ' + this.props.event.getType()}
+      </p>
     );
   }
 }
@@ -42,30 +43,29 @@ class StandardEvent extends Component {
   render() {
     var standardEvent = gd.asStandardEvent(this.props.event);
 
-    var conditionsElement = React.createElement(InstructionsList, {
-      instrsList: standardEvent.getConditions(),
-      areConditions: true,
-      key: 'theConditions',
-      className: 'col-xs-6 conditions-list',
-      callbacks: this.props.callbacks,
-    });
-    var actionsElement = React.createElement(InstructionsList, {
-      instrsList: standardEvent.getActions(),
-      areConditions: false,
-      key: 'theActions',
-      className: 'col-xs-6 actions-list',
-      callbacks: this.props.callbacks,
-    });
+    var conditionsElement = <InstructionsList
+      instrsList={standardEvent.getConditions()}
+      areConditions={true}
+      key="theConditions"
+      className="col-xs-6 conditions-list"
+      callbacks={this.props.callbacks} />;
+    var actionsElement = <InstructionsList
+      instrsList={standardEvent.getActions()}
+      areConditions={false}
+      key="theActions"
+      className="col-xs-6 actions-list"
+      callbacks={this.props.callbacks} />;
 
-    return React.createElement(
-      'div',
-      addDefaultProps(
-        {
-          className: 'row ' + this.props.className,
-        },
-        this.props
-      ),
-      [conditionsElement, actionsElement]
+    return (
+      <div
+        {...addDefaultProps(
+          {
+            className: 'row ' + this.props.className,
+          },
+          this.props
+        )}>
+        {[conditionsElement, actionsElement]}
+      </div>
     );
   }
 }
@@ -84,39 +84,30 @@ class GroupEvent extends Component {
 
     var children = [];
     children.push(
-      React.createElement(
-        'span',
-        {
-          key: 'title',
-          className: 'lead',
-        },
-        groupEvent.getName()
-      )
+      <span key="title" className="lead">
+        {groupEvent.getName()}
+      </span>
     );
 
     if (groupEvent.getSource() !== '') {
       children.push(
-        React.createElement(
-          'span',
-          {
-            key: 'editButton',
-            className: 'btn btn-sm btn-default pull-right',
-          },
-          'Click/touch to edit'
-        )
+        <span key="editButton" className="btn btn-sm btn-default pull-right">
+          Click/touch to edit
+        </span>
       );
     }
 
-    return React.createElement(
-      'div',
-      addDefaultProps(
-        {
-          className: 'row ' + this.props.className,
-          onClick: this.handleClick,
-        },
-        this.props
-      ),
-      children
+    return (
+      <div
+        {...addDefaultProps(
+          {
+            className: 'row ' + this.props.className,
+            onClick: this.handleClick,
+          },
+          this.props
+        )}>
+        {children}
+      </div>
     );
   }
 }
@@ -163,43 +154,42 @@ class CommentEvent extends Component {
     var children = [];
     if (!this.state.editing) {
       children.push(
-        React.createElement('p', {
-          key: 'p',
-          style: {
+        <p
+          key="p"
+          style={{
             whiteSpace: 'pre-line',
-          },
-          dangerouslySetInnerHTML: {
+          }}
+          dangerouslySetInnerHTML={{
             __html: commentEvent
               .getComment()
               .replace(/&/g, '&amp;')
               .replace(/</g, '&lt;')
               .replace(/>/g, '&gt;')
               .replace(/\n/g, '<br>'),
-          },
-        })
+          }} />
       );
     } else {
       children.push(
-        React.createElement('textarea', {
-          key: 'textarea',
-          type: 'text',
-          rows: 5,
-          onBlur: this.handleBlur,
-          ref: 'theInput',
-        })
+        <textarea
+          key="textarea"
+          type="text"
+          rows={5}
+          onBlur={this.handleBlur}
+          ref="theInput" />
       );
     }
 
-    return React.createElement(
-      'div',
-      addDefaultProps(
-        {
-          className: this.props.className,
-          onClick: this.handleClick,
-        },
-        this.props
-      ),
-      children
+    return (
+      <div
+        {...addDefaultProps(
+          {
+            className: this.props.className,
+            onClick: this.handleClick,
+          },
+          this.props
+        )}>
+        {children}
+      </div>
     );
   }
 }

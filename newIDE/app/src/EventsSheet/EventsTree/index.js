@@ -6,6 +6,7 @@ import {
 import EventsRenderingService from '../EventsRenderingService';
 import { mapFor } from '../../Utils/MapFor';
 import '../../UI/Theme/EventsTree.css';
+import findIndex from 'lodash/findIndex';
 
 /**
  * Store the height of events and notify a component whenever
@@ -79,13 +80,19 @@ class EventContainer extends Component {
     const EventComponent = EventsRenderingService.getEventComponent(event);
 
     return (
-      <div ref={container => this._container = container}>
+      <div
+        ref={container => this._container = container}
+        onClick={this.props.onEventClick}
+      >
         {EventComponent &&
           <EventComponent
             event={event}
+            selected={this.props.selected}
+            selectedInstructions={this.props.selectedInstructions}
             onUpdate={this._onEventUpdated}
             onAddNewInstruction={this.props.onAddNewInstruction}
             onInstructionClick={this.props.onInstructionClick}
+            onInstructionDoubleClick={this.props.onInstructionDoubleClick}
           />}
       </div>
     );
@@ -99,6 +106,10 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
  * can be drag'n'dropped and events rows are virtualized.
  */
 export default class EventsTree extends Component {
+  static defaultProps = {
+    selectedEvents: [],
+  };
+
   constructor(props) {
     super(props);
 
@@ -112,6 +123,9 @@ export default class EventsTree extends Component {
     this.onHeightsChanged();
   }
 
+  /**
+   * Should be called whenever an event height has changed
+   */
   onHeightsChanged(cb) {
     this.forceUpdate(() => {
       this._list.wrappedInstance.recomputeRowHeights();
@@ -123,10 +137,23 @@ export default class EventsTree extends Component {
    * Should be called whenever events changed (new event...)
    * from outside this component.
    */
-  forceEventsUpdate() {
+  forceEventsUpdate(cb) {
     this.setState(this._eventsToTreeData(this.props.events), () => {
       this._list.wrappedInstance.recomputeRowHeights();
+      if (cb) cb();
     });
+  }
+
+  scrollToEvent(event) {
+    const row = this._getEventRow(event);
+    if (row !== -1) this._list.wrappedInstance.scrollToRow(row);
+  }
+
+  _getEventRow(searchedEvent) {
+    return findIndex(
+      this.state.flatData,
+      event => event.ptr === searchedEvent.ptr
+    );
   }
 
   _eventsToTreeData = (eventsList, flatData = []) => {
@@ -181,12 +208,12 @@ export default class EventsTree extends Component {
     this.forceEventsUpdate();
   };
 
-  _canDrop = ({nextParent}) => {
+  _canDrop = ({ nextParent }) => {
     if (nextParent && nextParent.event)
       return nextParent.event.canHaveSubEvents();
 
     return true;
-  }
+  };
 
   _renderEvent = ({ node }) => {
     const event = node.event;
@@ -198,6 +225,14 @@ export default class EventsTree extends Component {
         eventsHeightsCache={this.eventsHeightsCache}
         onAddNewInstruction={this.props.onAddNewInstruction}
         onInstructionClick={this.props.onInstructionClick}
+        onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+        selected={this.props.selectedEvents.indexOf(event.ptr) !== -1}
+        selectedInstructions={this.props.selectedInstructions}
+        onEventClick={() =>
+          this.props.onEventClick({
+            event,
+            eventsList: node.eventsList,
+          })}
       />
     );
   };

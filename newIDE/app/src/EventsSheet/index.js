@@ -15,6 +15,8 @@ export default class EventsSheet extends BaseEditor {
         instruction: null,
         instructionsList: null,
       },
+      selectedEvents: [],
+      selectedInstructions: [],
     };
   }
 
@@ -26,8 +28,16 @@ export default class EventsSheet extends BaseEditor {
         onAddSubEvent={() => {
           /*TODO*/
         }}
+        canAddSubEvent={!!this.state.selectedEvents.length}
         onAddCommentEvent={() =>
           this.addNewEvent('BuiltinCommonInstructions::Comment')}
+        canRemove={
+          this.state.selectedEvents.length ||
+            this.state.selectedInstructions.length
+        }
+        onRemove={() => {
+          /*TODO*/
+        }}
         canUndo={false /*TODO*/}
         canRedo={false /*TODO*/}
         undo={this.undo}
@@ -38,11 +48,18 @@ export default class EventsSheet extends BaseEditor {
 
   addNewEvent = (type, context) => {
     const { project } = this.props;
+
     const eventsList = context && context.events
       ? context.event.getSubEvents()
       : this.props.events;
-    eventsList.insertNewEvent(project, type, eventsList.getEventsCount());
-    this._eventsTree.forceEventsUpdate();
+    const newEvent = eventsList.insertNewEvent(
+      project,
+      type,
+      eventsList.getEventsCount()
+    );
+
+    this._eventsTree.forceEventsUpdate(() =>
+      this._eventsTree.scrollToEvent(newEvent));
   };
 
   openInstructionEditor = (
@@ -81,6 +98,28 @@ export default class EventsSheet extends BaseEditor {
     });
   }
 
+  selectEvent = ({ event }) => {
+    // TODO: Multiselection
+    this.setState(
+      {
+        selectedEvents: [event.ptr],
+        selectedInstructions: [],
+      },
+      () => this.updateToolbar()
+    );
+  };
+
+  selectInstruction = ({ instruction }) => {
+    // TODO: Multiselection
+    this.setState(
+      {
+        selectedEvents: [],
+        selectedInstructions: [instruction.ptr],
+      },
+      () => this.updateToolbar()
+    );
+  };
+
   render() {
     const { project, layout, events } = this.props;
     if (!project) return null;
@@ -91,8 +130,12 @@ export default class EventsSheet extends BaseEditor {
           eventsTreeRef={eventsTree => this._eventsTree = eventsTree}
           events={events}
           layout={layout}
-          onInstructionClick={this.openInstructionEditor}
+          selectedEvents={this.state.selectedEvents}
+          selectedInstructions={this.state.selectedInstructions}
+          onInstructionClick={this.selectInstruction}
+          onInstructionDoubleClick={this.openInstructionEditor}
           onAddNewInstruction={this.openInstructionEditor}
+          onEventClick={this.selectEvent}
           onAddNewEvent={context =>
             this.addNewEvent('BuiltinCommonInstructions::Standard', context)}
         />
@@ -101,7 +144,9 @@ export default class EventsSheet extends BaseEditor {
             project={project}
             layout={layout}
             {...this.state.editedInstruction}
-            isNewInstruction={this.state.editedInstruction.indexInList === undefined}
+            isNewInstruction={
+              this.state.editedInstruction.indexInList === undefined
+            }
             open={true}
             onCancel={() => this.closeInstructionEditor()}
             submitDisabled={!this.state.editedInstruction.instruction.getType()}

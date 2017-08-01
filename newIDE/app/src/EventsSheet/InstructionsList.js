@@ -15,6 +15,8 @@ export default class InstructionsList extends Component {
     areConditions: PropTypes.bool.isRequired,
     onAddNewInstruction: PropTypes.func.isRequired,
     onInstructionClick: PropTypes.func.isRequired,
+    onInstructionDoubleClick: PropTypes.func.isRequired,
+    selectedInstructions: PropTypes.array.isRequired,
   };
 
   onAddNewInstruction = () => {
@@ -24,18 +26,7 @@ export default class InstructionsList extends Component {
     });
   };
 
-  shouldComponentUpdate(nextProps) {
-    if (this.props.instrsList.ptr !== nextProps.instrsList.ptr) return true;
-
-    if (this.lastChangesHash !== nextProps.instrsList.lastChangesHash)
-      return true;
-
-    return false;
-  }
-
   render() {
-    this.lastChangesHash = this.props.instrsList.lastChangesHash;
-
     const instructions = mapFor(0, this.props.instrsList.size(), i => {
       const instruction = this.props.instrsList.get(i);
       return (
@@ -45,7 +36,14 @@ export default class InstructionsList extends Component {
           instrsList={this.props.instrsList}
           index={i}
           key={instruction.ptr}
+          selected={this.props.selectedInstructions.indexOf(instruction.ptr) !== -1}
           onClick={() => this.props.onInstructionClick({
+            isCondition: this.props.areConditions,
+            instrsList: this.props.instrsList,
+            instruction,
+            indexInList: i,
+          })}
+          onDoubleClick={() => this.props.onInstructionDoubleClick({
             isCondition: this.props.areConditions,
             instrsList: this.props.instrsList,
             instruction,

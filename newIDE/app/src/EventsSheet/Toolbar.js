@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import IconMenu from '../UI/Menu/IconMenu';
 
-export default class Toolbar extends Component {
+export default class Toolbar extends PureComponent {
   render() {
     return (
       <ToolbarGroup lastChild>
@@ -15,6 +15,7 @@ export default class Toolbar extends Component {
         <ToolbarIcon
           onClick={this.props.onAddSubEvent}
           src="res/ribbon_default/subeventadd32.png"
+          disabled={!this.props.canAddSubEvent}
         />
         <ToolbarIcon
           onClick={this.props.onAddCommentEvent}
@@ -30,18 +31,19 @@ export default class Toolbar extends Component {
         />
         <ToolbarSeparator/>
         <ToolbarIcon
-          onClick={() => {/*TODO*/}}
+          onClick={this.props.onRemove}
           src="res/ribbon_default/deleteselected32.png"
+          disabled={!this.props.canRemove}
         />
         <ToolbarIcon
           onClick={this.props.undo}
           src="res/ribbon_default/undo32.png"
-          disabled={!this.props.canUndo || true /*TODO*/}
+          disabled={!this.props.canUndo}
         />
         <ToolbarIcon
           onClick={this.props.redo}
           src="res/ribbon_default/redo32.png"
-          disabled={!this.props.canRedo || true /*TODO*/}
+          disabled={!this.props.canRedo}
         />
         <ToolbarSeparator />
         <ToolbarIcon

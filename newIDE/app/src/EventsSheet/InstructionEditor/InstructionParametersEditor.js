@@ -15,9 +15,6 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
   },
-  explanationText: {
-    flex: 1,
-  },
   icon: {
     width: 24,
     height: 24,
@@ -67,7 +64,7 @@ export default class InstructionParametersEditor extends Component {
       <div style={this.props.style}>
         <div style={styles.instructionHeader}>
           <img src={instructionMetadata.getIconFilename()} alt="" style={styles.icon} />
-          <p styles={styles.explanationText}>
+          <p>
             {instructionMetadata.getDescription()}
           </p>
         </div>

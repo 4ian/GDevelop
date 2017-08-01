@@ -7,11 +7,13 @@ const commentEventStyles = {
   container: {
     minHeight: 30,
     display: 'flex',
+    backgroundColor: '#fbf3d9',
   },
   text: {
     flex: 1,
     whiteSpace: 'pre-line',
     margin: 0,
+    padding: 5,
   },
   textArea: {
     flex: 1,

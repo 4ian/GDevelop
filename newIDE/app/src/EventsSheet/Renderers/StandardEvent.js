@@ -11,10 +11,10 @@ const standardEventStyles = {
     flex: 1,
     paddingLeft: 5,
     paddingRight: 5,
-    background: '#F5F6FC',
+    background: '#f1f2f2',
   },
   actionsList: {
-    flex: 1,
+    flex: 2,
     paddingLeft: 5,
     paddingRight: 5,
   },

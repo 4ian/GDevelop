@@ -2,7 +2,7 @@
 
 .gd-events-list {
     font-family: -apple-system, ".SFNSText-Regular", "San Francisco", Roboto, "Segoe UI", "Helvetica Neue", "Lucida Grande", sans-serif;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 /**
@@ -10,12 +10,10 @@
  */
 .gd-events-list .rst__moveHandle {
     width: 10px;
-    background: #BFCCE0; /* TODO */
+    background: #4ab0e4;
     border: none;
     box-shadow: none;
     border-radius: 0;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
 }
 
 /**
@@ -30,6 +28,7 @@
     flex: 1;
     min-width: 0; /* But don't shrink scaffolding lines */
     position: static; /* Reset back to default value, don't use absolute to let flex works*/
+    margin-bottom: 2px;
 }
 
 .gd-events-list .rst__row {
@@ -44,7 +43,8 @@
  */
 .gd-events-list .rst__rowContents {
     display: flex;
-    border: #BFCCE0 1px solid;
+    border: #97999c 1px solid;
+    border-left: none;
     box-shadow: none;
     border-radius: 0;
     padding: 0;

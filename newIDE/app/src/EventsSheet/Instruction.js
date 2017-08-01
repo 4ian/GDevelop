@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import instructionsRenderingService from './InstructionsRenderingService.js';
 
 const styles = {
+  container: {
+    whiteSpace: 'normal',
+    cursor: 'pointer',
+  },
   icon: {
     verticalAlign: 'middle',
     paddingLeft: 2,
@@ -24,7 +28,7 @@ export default class Instruction extends Component {
     );
 
     return (
-      <div>
+      <div style={styles.container}>
         {instruction.isInverted() &&
           <img
             src="res/contraire.png"

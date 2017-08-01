@@ -124,6 +124,18 @@ standardEvt.getActions().push_back(makeDeleteAction("MyCharacter"));
     subCommentEvt.setComment("Kain is deified. The clans tell tales of him, few know the truth. He was mortal once, as were we all. However, his contempt for humanity drove him to create me and my brethren. I am Raziel, first born of his lieutenants. I stood with Kain and my brethren at the dawn of the empire. I have served him a millennium. Over time we became less human and more ... divine.");
 }
 
+for(let i = 0;i<20;++i) {
+    const evt = testLayout.getEvents().insertNewEvent(
+        project,
+        "BuiltinCommonInstructions::Standard",
+        testLayout.getEvents().getEventsCount()
+    );
+    const standardEvt = gd.asStandardEvent(evt);
+
+    standardEvt.getConditions().push_back(makeKeyPressedCondition());
+    standardEvt.getActions().push_back(makeDeleteAction("OtherObject" + i));
+}
+
 // Global objects
 const globalTextObject = new gd.TextObject('GlobalTextObject');
 const globalTiledSpriteObject = new gd.TiledSpriteObject('GlobalTiledSpriteObject');

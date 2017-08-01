@@ -6,6 +6,7 @@ import { mapFor } from '../Utils/MapFor';
 const styles = {
   addButton: {
     opacity: 0.3,
+    cursor: 'pointer',
   },
 };
 

@@ -7,71 +7,131 @@ import EventsRenderingService from '../EventsRenderingService';
 import { mapFor } from '../../Utils/MapFor';
 import '../../UI/Theme/EventsTree.css';
 
-//TODO: Any change (event not equal to its last height or new event should trigger a recomputeRowHeights)
-const eventHeights = {};
+/**
+ * Store the height of events and notify a component whenever
+ * heights have changed.
+ * Needed for EventsTree as we need to tell it when heights have changed
+ * so it can recompute the internal row heights of the react-virtualized List.
+ */
+class EventHeightsCache {
+  eventHeights = {};
+  component = null;
 
-class EventRenderer extends Component {
+  constructor(component) {
+    this.component = component;
+  }
+
+  _notifyComponent() {
+    if (this.updateTimeoutId) {
+      return; // An update is already scheduled.
+    }
+
+    // Notify the component, on the next tick, that heights have changed
+    this.updateTimeoutId = setTimeout(
+      () => {
+        if (this.component) {
+          this.component.onHeightsChanged(() => this.updateTimeoutId = null);
+        } else {
+          this.updateTimeoutId = null;
+        }
+      },
+      0
+    );
+  }
+
+  setEventHeight(event, height) {
+    const cachedHeight = this.eventHeights[event.ptr];
+    if (!cachedHeight || cachedHeight !== height) {
+      console.log(event.ptr, "has a new height", height, "old:", cachedHeight)
+      this._notifyComponent();
+    }
+
+    this.eventHeights[event.ptr] = height;
+  }
+
+  getEventHeight(event) {
+    return this.eventHeights[event.ptr] || 60;
+  }
+}
+
+/**
+ * The component containing an event.
+ * It will report the rendered event height so that the EventsTree can
+ * update accordingly.
+ */
+class EventContainer extends Component {
   componentDidMount() {
-    const height = this._container.clientHeight;
-    console.log(this.props.event.ptr, ' has height ', height);
-    eventHeights[this.props.event.ptr] = height;
+    const height = this._container.offsetHeight;
+    this.props.eventsHeightsCache.setEventHeight(this.props.event, height);
+  }
+
+  componentDidUpdate() {
+    const height = this._container.offsetHeight;
+    this.props.eventsHeightsCache.setEventHeight(this.props.event, height);
   }
 
   render() {
-    const {event} = this.props;
+    const { event } = this.props;
     const EventComponent = EventsRenderingService.getEventComponent(event);
 
     return (
-      <div
-        ref={container => this._container = container}
-      >
-        {EventComponent && <EventComponent event={event}/>}
+      <div ref={container => this._container = container}>
+        {EventComponent && <EventComponent event={event} />}
       </div>
     );
   }
 }
 
-const renderEvent = ({ node }) => {
-  const event = node.event;
-
-  return <EventRenderer event={event} key={event.ptr}/>;
-};
-
-const toTreeData = (eventsList, flatData = []) => {
-  const treeData = mapFor(0, eventsList.getEventsCount(), i => {
-    const event = eventsList.getEventAt(i);
-    flatData.push(event);
-
-    return {
-      title: renderEvent,
-      event,
-      eventsList,
-      expanded: true,
-      key: event.ptr,
-      children: toTreeData(event.getSubEvents(), flatData).treeData,
-    };
-  });
-
-  return {
-    treeData,
-    flatData,
-  };
-};
-
 const getNodeKey = ({ treeIndex }) => treeIndex;
 
-export default class Tree extends Component {
+/**
+ * Display a tree of event. Builtin on react-sortable-tree so that event
+ * can be drag'n'dropped and events rows are virtualized.
+ */
+export default class EventsTree extends Component {
   constructor(props) {
     super(props);
 
+    this.eventsHeightsCache = new EventHeightsCache(this);
     this.state = {
-      ...toTreeData(props.events),
+      ...this._eventsToTreeData(props.events),
     };
   }
 
   componentDidMount() {
-    this.forceUpdate(() => this._list.wrappedInstance.recomputeRowHeights());
+    this.onHeightsChanged();
   }
+
+  onHeightsChanged(cb) {
+    this.forceUpdate(() => {
+      this._list.wrappedInstance.recomputeRowHeights();
+      if (cb) cb();
+    });
+  }
+
+  _eventsToTreeData = (eventsList, flatData = []) => {
+    const treeData = mapFor(0, eventsList.getEventsCount(), i => {
+      const event = eventsList.getEventAt(i);
+      flatData.push(event);
+
+      return {
+        title: this._renderEvent,
+        event,
+        eventsList,
+        expanded: true,
+        key: event.ptr,
+        children: this._eventsToTreeData(
+          event.getSubEvents(),
+          flatData
+        ).treeData,
+      };
+    });
+
+    return {
+      treeData,
+      flatData,
+    };
+  };
 
   _onMoveNode = ({ treeData, path, node }) => {
     // Get the event list where the event should be moved to.
@@ -98,9 +158,21 @@ export default class Tree extends Component {
     targetEventsList.insertEvent(newEvent, targetPosition);
     newEvent.delete();
 
-    this.setState(toTreeData(this.props.events), () => {
+    this.setState(this._eventsToTreeData(this.props.events), () => {
       this._list.wrappedInstance.recomputeRowHeights();
     });
+  };
+
+  _renderEvent = ({ node }) => {
+    const event = node.event;
+
+    return (
+      <EventContainer
+        event={event}
+        key={event.ptr}
+        eventsHeightsCache={this.eventsHeightsCache}
+      />
+    );
   };
 
   render() {
@@ -112,13 +184,11 @@ export default class Tree extends Component {
           scaffoldBlockPxWidth={22}
           onChange={() => {}}
           onMoveNode={this._onMoveNode}
-          rowHeight={({index}) => {
+          rowHeight={({ index }) => {
             const extraBorderMargin = 4;
             const event = this.state.flatData[index];
-            if (!event) return 60;
-
-            console.log("Getting height for", event.ptr);
-            return (eventHeights[event.ptr] + extraBorderMargin) || 60;
+            return this.eventsHeightsCache.getEventHeight(event) +
+              extraBorderMargin;
           }}
           reactVirtualizedListProps={{
             ref: list => this._list = list,

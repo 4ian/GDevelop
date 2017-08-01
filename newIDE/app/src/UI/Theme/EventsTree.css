@@ -18,12 +18,25 @@
     border-bottom-left-radius: 5px;
 }
 
-.gd-events-list .rst__rowWrapper {
-    padding: 0;
+/**
+ * Container of an event line (including the scaffolding lines and the event).
+ */
+.gd-events-list .rst__node {
+    display: flex;
 }
 
 .gd-events-list .rst__nodeContent {
-    width: 100%;
+    /* Ensure the event take all the space after the scaffolding lines */
+    flex: 1;
+    min-width: 0; /* But don't shrink scaffolding lines */
+    position: static; /* Reset back to default value, don't use absolute to let flex works*/
+}
+
+.gd-events-list .rst__row {
+    /* The "landing pad" highlight box is done with positionL absolute.
+     * Ensure it will cover all the event row but not the scaffolding lines.
+     */
+    position: relative;
 }
 
 /**
@@ -35,11 +48,17 @@
     box-shadow: none;
     border-radius: 0;
     padding: 0;
+    flex: 1;
+}
+
+.gd-events-list .rst__rowWrapper {
+    padding: 0;
 }
 
 .gd-events-list .rst__rowLabel {
     padding: 0;
     flex: 1;
+    min-width: 0;
 }
 
 .gd-events-list .rst__rowTitle {

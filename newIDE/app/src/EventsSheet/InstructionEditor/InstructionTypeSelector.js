@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { List, ListItem } from 'material-ui/List';
+import { List, ListItem, makeSelectable } from 'material-ui/List';
 import { unflatten } from 'flat';
-
 const gd = global.gd;
 
-export default class InstructionTypeSelector extends Component {
+const SelectableList = makeSelectable(List);
+
+export class InstructionTypeList extends Component {
   listInstructions(groupPrefix, instructions) {
     //Get the map containing the metadata of the instructions provided by the extension...
     var instructionsTypes = instructions.keys();
@@ -103,7 +104,7 @@ export default class InstructionTypeSelector extends Component {
           <ListItem
             key={key}
             primaryText={key}
-            onTouchTap={() => this.props.onChoose(instructionOrGroup.type)}
+            value={instructionOrGroup.type}
           />
         );
       } else {
@@ -113,7 +114,6 @@ export default class InstructionTypeSelector extends Component {
             primaryText={key}
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
-            onTouchTap={() => {}}
             nestedItems={this.renderTree(instructionOrGroup)}
           />
         );
@@ -123,9 +123,19 @@ export default class InstructionTypeSelector extends Component {
 
   render() {
     return (
-      <List style={this.props.style}>
+      <SelectableList
+        style={this.props.style}
+        value={this.props.selectedType}
+        onChange={(e, value) => {
+          if (!value) return;
+
+          this.props.onChoose(value);
+        }}
+      >
         {this.renderTree(this.instructionsTree)}
-      </List>
+      </SelectableList>
     );
   }
 }
+
+export default makeSelectable(InstructionTypeList);

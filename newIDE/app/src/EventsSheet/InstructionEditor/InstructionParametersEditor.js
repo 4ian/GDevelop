@@ -10,8 +10,20 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  instructionHeader: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  explanationText: {
+    flex: 1,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
   }
-}
+};
 
 export default class InstructionParametersEditor extends Component {
   _getNonCodeOnlyParametersCount(instructionMetadata) {
@@ -23,7 +35,7 @@ export default class InstructionParametersEditor extends Component {
 
   _renderEmpty() {
     return (
-      <div style={{...styles.emptyContainer, ...this.props.style}}>
+      <div style={{ ...styles.emptyContainer, ...this.props.style }}>
         <EmptyMessage>
           {this.props.isCondition
             ? 'Choose a condition on the left'
@@ -53,8 +65,9 @@ export default class InstructionParametersEditor extends Component {
 
     return (
       <div style={this.props.style}>
-        <div>
-          <p>
+        <div style={styles.instructionHeader}>
+          <img src={instructionMetadata.getIconFilename()} alt="" style={styles.icon} />
+          <p styles={styles.explanationText}>
             {instructionMetadata.getDescription()}
           </p>
         </div>

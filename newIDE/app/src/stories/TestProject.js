@@ -81,6 +81,16 @@ testLayout.insertObject(tiledSpriteObject, 0);
 testLayout.insertObject(panelSpriteObject, 0);
 testLayout.insertObject(spriteObject, 0);
 
+const group1 = new gd.ObjectGroup();
+group1.setName("GroupOfSprites");
+group1.addObject("MySpriteObject");
+const group2 = new gd.ObjectGroup();
+group2.setName("GroupOfObjects");
+group2.addObject("MySpriteObject");
+group2.addObject("MyTextObject");
+testLayout.getObjectGroups().push_back(group1);
+testLayout.getObjectGroups().push_back(group2);
+
 export const testLayoutInstance1 = testLayout.getInitialInstances().insertNewInitialInstance();
 testLayoutInstance1.setX(10);
 testLayoutInstance1.setY(15);

@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
-import { enumerateObjects } from '../../../ObjectsList/EnumerateObjects';
+import Divider from 'material-ui/Divider';
+import {
+  enumerateObjectsAndGroups,
+} from '../../../ObjectsList/EnumerateObjects';
+
+const fuzzyFilterOrEmpty = (searchText, key) => {
+  return !key || AutoComplete.fuzzyFilter(searchText, key);
+};
 
 export default class ObjectField extends Component {
   render() {
     const { project, layout } = this.props;
-    const objects = enumerateObjects(project, layout).allObjectsList.map(({
+    const list = enumerateObjectsAndGroups(project, layout);
+    const objects = list.allObjectsList.map(({
       object,
     }) => {
       return {
@@ -13,6 +21,16 @@ export default class ObjectField extends Component {
         value: object.getName(),
       };
     });
+    const groups = list.allGroupsList.map(({
+      group,
+    }) => {
+      return {
+        text: group.getName(),
+        value: group.getName(),
+      };
+    });
+
+    const fullList = [...objects, { text: '', value: <Divider /> }, ...groups];
 
     return (
       <AutoComplete
@@ -21,8 +39,8 @@ export default class ObjectField extends Component {
         searchText={this.props.value}
         onUpdateInput={value => this.props.onChange(value)}
         onNewRequest={data => this.props.onChange(data.value)}
-        dataSource={objects}
-        filter={AutoComplete.fuzzyFilter}
+        dataSource={fullList}
+        filter={fuzzyFilterOrEmpty}
         openOnFocus={true}
       />
     );

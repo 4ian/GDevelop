@@ -18,6 +18,7 @@ export default class Instruction extends Component {
   static propTypes = {
     instruction: PropTypes.object.isRequired,
     isCondition: PropTypes.bool.isRequired,
+    onClick: PropTypes.func.isRequired,
   };
 
   render() {
@@ -28,7 +29,7 @@ export default class Instruction extends Component {
     );
 
     return (
-      <div style={styles.container}>
+      <div style={styles.container} onClick={this.props.onClick}>
         {instruction.isInverted() &&
           <img
             src="res/contraire.png"

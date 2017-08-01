@@ -1,12 +1,12 @@
 import React from 'react';
-import EventsSheet from './EventsSheet.js';
+import FullSizeEventsTree from './EventsTree/FullSizeEventsTree';
 import InstructionEditorDialog
-  from './InstructionEditor/InstructionEditorDialog.js';
+  from './InstructionEditor/InstructionEditorDialog';
 import BaseEditor from '../MainFrame/BaseEditor';
+import Toolbar from './Toolbar';
 const gd = global.gd;
 
-
-export default class EventsSheetContainer extends BaseEditor {
+export default class EventsSheet extends BaseEditor {
   constructor() {
     super();
     this.state = {
@@ -22,6 +22,33 @@ export default class EventsSheetContainer extends BaseEditor {
       },
     };
   }
+
+  updateToolbar() {
+    this.props.setToolbar(
+      <Toolbar
+        onAddStandardEvent={() =>
+          this.addNewEvent('BuiltinCommonInstructions::Standard')}
+        onAddSubEvent={() => {
+          /*TODO*/
+        }}
+        onAddCommentEvent={() =>
+          this.addNewEvent('BuiltinCommonInstructions::Comment')}
+        canUndo={false /*TODO*/}
+        canRedo={false /*TODO*/}
+        undo={this.undo}
+        redo={this.redo}
+      />
+    );
+  }
+
+  addNewEvent = (type, context) => {
+    const { project } = this.props;
+    const eventsList = context && context.events
+      ? context.event.getSubEvents()
+      : this.props.events;
+    eventsList.insertNewEvent(project, type, eventsList.getEventsCount());
+    this._eventTree.forceEventsUpdate();
+  };
 
   //TODO: Refactor openInstructionEditor/openNewInstructionEditor in a single function?
   openInstructionEditor(
@@ -103,38 +130,25 @@ export default class EventsSheetContainer extends BaseEditor {
 
     return (
       <div>
-        <EventsSheet
+        <FullSizeEventsTree
+          eventsTreeRef={eventTree => this._eventTree = eventTree}
           events={events}
           layout={layout}
-          callbacks={{
-            onInstructionClicked: context => {
-              this.openInstructionEditor(
-                context.areConditions,
-                context.instruction,
-                context.instrsList
-              );
-            },
-            onAddNewInstruction: context => {
-              this.openNewInstructionEditor(
-                context.areConditions,
-                context.instrsList
-              );
-            },
-            onEventClicked: () => console.log('onEventClicked'),
-            onEventLongClicked: () => console.log('onEventLongClicked'),
-            onAddNewEvent: context => {
-              var eventsList = context.event.getSubEvents() ||
-                layout.getEvents();
-              eventsList.insertNewEvent(
-                project,
-                'BuiltinCommonInstructions::Standard',
-                0
-              );
-              this.forceUpdate();
-            },
-            onToggleEventFolding: () => console.log('onToggleEventFolding'),
-            onEditEventTemplate: () => console.log('onEditEventTemplate'),
+          onInstructionClick={context => {
+            this.openInstructionEditor(
+              context.areConditions,
+              context.instruction,
+              context.instrsList
+            );
           }}
+          onAddNewInstruction={context => {
+            this.openNewInstructionEditor(
+              context.areConditions,
+              context.instrsList
+            );
+          }}
+          onAddNewEvent={context =>
+            this.addNewEvent('BuiltinCommonInstructions::Standard', context)}
         />
         {this.state.newInstruction.instruction &&
           <InstructionEditorDialog

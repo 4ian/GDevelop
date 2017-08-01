@@ -12,7 +12,7 @@ import Toolbar from './Toolbar';
 import StartPage from './StartPage';
 import ProjectTitlebar from './ProjectTitlebar';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
-import EventsSheetContainer from '../EventsSheet/EventsSheetContainer.js';
+import EventsSheet from '../EventsSheet';
 import SceneEditor from '../SceneEditor';
 import ExternalLayoutEditor from '../SceneEditor/ExternalLayoutEditor';
 import ProjectManager from '../ProjectManager';
@@ -151,7 +151,7 @@ export default class MainFrame extends Component {
           this.state.editorTabs,
           name,
           () => (
-            <EventsSheetContainer
+            <EventsSheet
               project={this.state.currentProject}
               events={this.state.currentProject
                 .getExternalEvents(name)

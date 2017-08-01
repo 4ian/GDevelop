@@ -27,6 +27,7 @@ import InstancePropertiesEditor
   from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
+import EventsSheet from '../EventsSheet';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import DragDropContextProvider
@@ -136,8 +137,18 @@ storiesOf('DragHandle', module)
   .add('default', () => <DragHandle />);
 
 storiesOf('EventsTree', module).add('default', () => (
-  <DragDropContextProvider><EventsTree events={testLayout.getEvents()} /></DragDropContextProvider>
+  <DragDropContextProvider>
+    <EventsTree events={testLayout.getEvents()} />
+  </DragDropContextProvider>
 ));
+
+storiesOf('EventsSheet', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <DragDropContextProvider>
+      <EventsSheet project={project} layout={testLayout} events={testLayout.getEvents()} />
+    </DragDropContextProvider>
+  ));
 
 storiesOf('TextEditor', module)
   .addDecorator(paperDecorator)

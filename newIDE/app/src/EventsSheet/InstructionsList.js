@@ -13,11 +13,15 @@ export default class InstructionsList extends Component {
   static propTypes = {
     instrsList: PropTypes.object.isRequired,
     areConditions: PropTypes.bool.isRequired,
-    onAddNewInstruction: PropTypes.func,
+    onAddNewInstruction: PropTypes.func.isRequired,
+    onInstructionClick: PropTypes.func.isRequired,
   };
 
-  handleAddInstruction = () => {
-    if (this.props.onAddNewInstruction) this.props.onAddNewInstruction();
+  onAddNewInstruction = () => {
+    if (this.props.onAddNewInstruction) this.props.onAddNewInstruction({
+      instrsList: this.props.instrsList,
+      areConditions: this.props.areConditions,
+    });
   };
 
   shouldComponentUpdate(nextProps) {
@@ -41,6 +45,11 @@ export default class InstructionsList extends Component {
           instrsList={this.props.instrsList}
           index={i}
           key={instruction.ptr}
+          onClick={() => this.props.onInstructionClick({
+            areConditions: this.props.areConditions,
+            instrsList: this.props.instrsList,
+            instruction,
+          })}
         />
       );
     });
@@ -48,7 +57,7 @@ export default class InstructionsList extends Component {
     return (
       <div style={this.props.style}>
         {instructions}
-        <a style={styles.addButton} className="add-link" onClick={this.handleAddInstruction}>
+        <a style={styles.addButton} className="add-link" onClick={this.onAddNewInstruction}>
           {this.props.areConditions ? 'Add condition' : 'Add action'}
         </a>
       </div>

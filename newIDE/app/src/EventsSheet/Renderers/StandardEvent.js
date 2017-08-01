@@ -23,6 +23,8 @@ const standardEventStyles = {
 export default class StandardEvent extends Component {
   static propTypes = {
     event: PropTypes.object.isRequired,
+    onAddNewInstruction: PropTypes.func.isRequired,
+    onInstructionClick: PropTypes.func.isRequired,
   };
 
   render() {
@@ -34,11 +36,15 @@ export default class StandardEvent extends Component {
           instrsList={standardEvent.getConditions()}
           style={standardEventStyles.conditionsList}
           areConditions
+          onAddNewInstruction={this.props.onAddNewInstruction}
+          onInstructionClick={this.props.onInstructionClick}
         />
         <InstructionsList
           instrsList={standardEvent.getActions()}
           style={standardEventStyles.actionsList}
           areConditions={false}
+          onAddNewInstruction={this.props.onAddNewInstruction}
+          onInstructionClick={this.props.onInstructionClick}
         />
       </div>
     );

@@ -81,7 +81,12 @@ class EventContainer extends Component {
     return (
       <div ref={container => this._container = container}>
         {EventComponent &&
-          <EventComponent event={event} onUpdate={this._onEventUpdated} />}
+          <EventComponent
+            event={event}
+            onUpdate={this._onEventUpdated}
+            onAddNewInstruction={this.props.onAddNewInstruction}
+            onInstructionClick={this.props.onInstructionClick}
+          />}
       </div>
     );
   }
@@ -111,6 +116,16 @@ export default class EventsTree extends Component {
     this.forceUpdate(() => {
       this._list.wrappedInstance.recomputeRowHeights();
       if (cb) cb();
+    });
+  }
+
+  /**
+   * Should be called whenever events changed (new event...)
+   * from outside this component.
+   */
+  forceEventsUpdate() {
+    this.setState(this._eventsToTreeData(this.props.events), () => {
+      this._list.wrappedInstance.recomputeRowHeights();
     });
   }
 
@@ -163,9 +178,7 @@ export default class EventsTree extends Component {
     targetEventsList.insertEvent(newEvent, targetPosition);
     newEvent.delete();
 
-    this.setState(this._eventsToTreeData(this.props.events), () => {
-      this._list.wrappedInstance.recomputeRowHeights();
-    });
+    this.forceEventsUpdate();
   };
 
   _renderEvent = ({ node }) => {
@@ -176,13 +189,15 @@ export default class EventsTree extends Component {
         event={event}
         key={event.ptr}
         eventsHeightsCache={this.eventsHeightsCache}
+        onAddNewInstruction={this.props.onAddNewInstruction}
+        onInstructionClick={this.props.onInstructionClick}
       />
     );
   };
 
   render() {
     return (
-      <div style={{ height: 400 }}>
+      <div style={{ height: this.props.height || 400 }}>
         <SortableTree
           className="gd-events-list"
           treeData={this.state.treeData}

@@ -42,7 +42,7 @@ class EventHeightsCache {
   setEventHeight(event, height) {
     const cachedHeight = this.eventHeights[event.ptr];
     if (!cachedHeight || cachedHeight !== height) {
-      console.log(event.ptr, 'has a new height', height, 'old:', cachedHeight);
+      // console.log(event.ptr, 'has a new height', height, 'old:', cachedHeight);
       this._notifyComponent();
     }
 
@@ -181,6 +181,13 @@ export default class EventsTree extends Component {
     this.forceEventsUpdate();
   };
 
+  _canDrop = ({nextParent}) => {
+    if (nextParent && nextParent.event)
+      return nextParent.event.canHaveSubEvents();
+
+    return true;
+  }
+
   _renderEvent = ({ node }) => {
     const event = node.event;
 
@@ -204,6 +211,7 @@ export default class EventsTree extends Component {
           scaffoldBlockPxWidth={22}
           onChange={() => {}}
           onMoveNode={this._onMoveNode}
+          canDrop={this._canDrop}
           rowHeight={({ index }) => {
             const extraBorderMargin = 4;
             const event = this.state.flatData[index];

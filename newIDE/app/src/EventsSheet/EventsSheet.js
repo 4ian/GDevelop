@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import EventsList from './EventsList';
 import EventsTree from './EventsTree';
 
 const styles = {

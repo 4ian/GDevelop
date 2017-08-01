@@ -42,7 +42,7 @@ class EventHeightsCache {
   setEventHeight(event, height) {
     const cachedHeight = this.eventHeights[event.ptr];
     if (!cachedHeight || cachedHeight !== height) {
-      console.log(event.ptr, "has a new height", height, "old:", cachedHeight)
+      console.log(event.ptr, 'has a new height', height, 'old:', cachedHeight);
       this._notifyComponent();
     }
 
@@ -70,13 +70,18 @@ class EventContainer extends Component {
     this.props.eventsHeightsCache.setEventHeight(this.props.event, height);
   }
 
+  _onEventUpdated = () => {
+    this.forceUpdate();
+  };
+
   render() {
     const { event } = this.props;
     const EventComponent = EventsRenderingService.getEventComponent(event);
 
     return (
       <div ref={container => this._container = container}>
-        {EventComponent && <EventComponent event={event} />}
+        {EventComponent &&
+          <EventComponent event={event} onUpdate={this._onEventUpdated} />}
       </div>
     );
   }

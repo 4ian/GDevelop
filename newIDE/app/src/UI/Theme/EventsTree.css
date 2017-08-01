@@ -71,3 +71,12 @@
 .gd-events-list .rst__lineHalfHorizontalRight::before, .rst__lineFullVertical::after, .rst__lineHalfVerticalTop::after, .rst__lineHalfVerticalBottom::after {
   opacity: 0.3;
 }
+
+/** Extra classes: **/
+
+.gd-events-list .add-link {
+    opacity: 0.3;
+}
+.gd-events-list .add-link:hover {
+    opacity: 0.8;
+}

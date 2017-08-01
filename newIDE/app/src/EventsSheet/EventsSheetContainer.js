@@ -3,7 +3,6 @@ import EventsSheet from './EventsSheet.js';
 import InstructionEditorDialog
   from './InstructionEditor/InstructionEditorDialog.js';
 import BaseEditor from '../MainFrame/BaseEditor';
-import PlaceholderMessage from '../UI/PlaceholderMessage';
 const gd = global.gd;
 
 
@@ -115,8 +114,6 @@ export default class EventsSheetContainer extends BaseEditor {
                 context.instrsList
               );
             },
-            onInstructionLongClicked: () =>
-              console.log('onInstructionLongClicked'),
             onAddNewInstruction: context => {
               this.openNewInstructionEditor(
                 context.areConditions,

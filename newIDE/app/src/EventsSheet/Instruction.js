@@ -32,9 +32,10 @@ export default class Instruction extends Component {
         {instruction.isInverted() &&
           <img
             src="res/contraire.png"
+            alt="Condition is negated"
             style={styles.icon}
           />}
-        <img src={rendering.icon} style={styles.icon}/>
+        <img src={rendering.icon} style={styles.icon} alt=""/>
         <span
           dangerouslySetInnerHTML={{
             __html: rendering.html,

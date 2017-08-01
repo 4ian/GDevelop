@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-const gd = global.gd;
 
 /**
  * Forward events received from Electron main process

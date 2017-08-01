@@ -5,7 +5,6 @@ import { mapFor } from '../Utils/MapFor';
 
 const styles = {
   addButton: {
-    opacity: 0.3,
     cursor: 'pointer',
   },
 };
@@ -49,7 +48,7 @@ export default class InstructionsList extends Component {
     return (
       <div style={this.props.style}>
         {instructions}
-        <a style={styles.addButton} onClick={this.handleAddInstruction}>
+        <a style={styles.addButton} className="add-link" onClick={this.handleAddInstruction}>
           {this.props.areConditions ? 'Add condition' : 'Add action'}
         </a>
       </div>

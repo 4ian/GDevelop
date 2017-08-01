@@ -27,6 +27,7 @@ import InstancePropertiesEditor
   from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
+import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
@@ -42,6 +43,7 @@ import {
   spriteObject,
   testLayout,
   testLayoutInstance1,
+  testInstruction,
 } from './TestProject';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -146,8 +148,24 @@ storiesOf('EventsSheet', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <DragDropContextProvider>
-      <EventsSheet project={project} layout={testLayout} events={testLayout.getEvents()} />
+      <EventsSheet
+        project={project}
+        layout={testLayout}
+        events={testLayout.getEvents()}
+      />
     </DragDropContextProvider>
+  ));
+
+storiesOf('InstructionEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <InstructionEditor
+      project={project}
+      layout={testLayout}
+      isCondition
+      instruction={testInstruction}
+    />
   ));
 
 storiesOf('TextEditor', module)

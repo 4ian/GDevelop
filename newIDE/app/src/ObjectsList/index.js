@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import Paper from 'material-ui/Paper';
-import { mapFor } from '../Utils/MapFor';
 import ObjectRow from './ObjectRow';
 import AddObjectRow from './AddObjectRow';
 import NewObjectDialog from './NewObjectDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
+import { enumerateObjects } from './EnumerateObjects';
 
 const listItemHeight = 56;
 const styles = {
@@ -243,20 +243,10 @@ export default class ObjectsListContainer extends React.Component {
   render() {
     const { project, objectsContainer } = this.props;
 
-    this.containerObjectsList = mapFor(
-      0,
-      objectsContainer.getObjectsCount(),
-      i => objectsContainer.getObjectAt(i)
-    ).map(object => ({ object, global: false }));
-
-    this.projectObjectsList = project === objectsContainer
-      ? []
-      : mapFor(0, project.getObjectsCount(), i =>
-          project.getObjectAt(i)).map(object => ({ object, global: true }));
-
-    const allObjectsList = this.containerObjectsList.concat(
-      this.projectObjectsList
-    );
+    const lists = enumerateObjects(project, objectsContainer);
+    this.containerObjectsList = lists.containerObjectsList;
+    this.projectObjectsList = lists.projectObjectsList;
+    const allObjectsList = lists.allObjectsList;
     const fullList = allObjectsList.concat({
       key: 'add-objects-row',
       object: null,

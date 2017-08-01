@@ -10,11 +10,6 @@ export default class EventsSheet extends BaseEditor {
   constructor() {
     super();
     this.state = {
-      newInstruction: {
-        isCondition: true,
-        instruction: null,
-        instructionsList: null,
-      },
       editedInstruction: {
         isCondition: true,
         instruction: null,
@@ -47,81 +42,43 @@ export default class EventsSheet extends BaseEditor {
       ? context.event.getSubEvents()
       : this.props.events;
     eventsList.insertNewEvent(project, type, eventsList.getEventsCount());
-    this._eventTree.forceEventsUpdate();
+    this._eventsTree.forceEventsUpdate();
   };
 
-  //TODO: Refactor openInstructionEditor/openNewInstructionEditor in a single function?
-  openInstructionEditor(
-    isCondition,
-    instruction,
-    instructionsList,
-    cb = undefined
-  ) {
+  openInstructionEditor = (
+    {
+      instrsList,
+      isCondition,
+      instruction,
+      indexInList,
+    }
+  ) => {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
     }
 
-    this.setState(
-      {
-        editedInstruction: {
-          isCondition,
-          instruction: instruction.clone(),
-          instructionsList,
-        },
+    this.setState({
+      editedInstruction: {
+        instrsList,
+        isCondition,
+        instruction: instruction ? instruction.clone() : new gd.Instruction(),
+        indexInList,
       },
-      cb
-    );
-  }
+    });
+  };
 
-  closeInstructionEditor(cb = undefined) {
+  closeInstructionEditor() {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
     }
 
-    this.setState(
-      {
-        editedInstruction: {
-          isCondition: true,
-          instruction: null,
-          instructionsList: null,
-        },
+    this.setState({
+      editedInstruction: {
+        isCondition: true,
+        instruction: null,
+        instructionsList: null,
       },
-      cb
-    );
-  }
-
-  openNewInstructionEditor(isCondition, instructionsList, cb = undefined) {
-    if (this.state.newInstruction.instruction) {
-      this.state.newInstruction.instruction.delete();
-    }
-
-    this.setState(
-      {
-        newInstruction: {
-          isCondition,
-          instruction: new gd.Instruction(),
-          instructionsList,
-        },
-      },
-      cb
-    );
-  }
-
-  closeNewInstructionEditor(cb = undefined) {
-    if (this.state.newInstruction.instruction) {
-      this.state.newInstruction.instruction.delete();
-    }
-
-    this.setState(
-      {
-        newInstruction: {
-          isCondition: true,
-          instruction: null,
-          instructionsList: null,
-        },
-      },
-      cb
-    );
+    });
   }
 
   render() {
@@ -131,53 +88,39 @@ export default class EventsSheet extends BaseEditor {
     return (
       <div>
         <FullSizeEventsTree
-          eventsTreeRef={eventTree => this._eventTree = eventTree}
+          eventsTreeRef={eventsTree => this._eventsTree = eventsTree}
           events={events}
           layout={layout}
-          onInstructionClick={context => {
-            this.openInstructionEditor(
-              context.areConditions,
-              context.instruction,
-              context.instrsList
-            );
-          }}
-          onAddNewInstruction={context => {
-            this.openNewInstructionEditor(
-              context.areConditions,
-              context.instrsList
-            );
-          }}
+          onInstructionClick={this.openInstructionEditor}
+          onAddNewInstruction={this.openInstructionEditor}
           onAddNewEvent={context =>
             this.addNewEvent('BuiltinCommonInstructions::Standard', context)}
         />
-        {this.state.newInstruction.instruction &&
-          <InstructionEditorDialog
-            {...this.state.newInstruction}
-            open={true}
-            onCancel={() => this.closeNewInstructionEditor()}
-            submitDisabled={!this.state.newInstruction.instruction.getType()}
-            onSubmit={() => {
-              const {
-                instructionsList,
-                instruction,
-              } = this.state.newInstruction;
-              instructionsList.insert(instruction, instructionsList.size());
-              this.closeNewInstructionEditor();
-            }}
-          />}
         {this.state.editedInstruction.instruction &&
           <InstructionEditorDialog
+            project={project}
+            layout={layout}
             {...this.state.editedInstruction}
+            isNewInstruction={this.state.editedInstruction.indexInList === undefined}
             open={true}
             onCancel={() => this.closeInstructionEditor()}
             submitDisabled={!this.state.editedInstruction.instruction.getType()}
             onSubmit={() => {
               const {
-                instructionsList,
+                instrsList,
                 instruction,
+                indexInList,
               } = this.state.editedInstruction;
-              instructionsList.insert(instruction, instructionsList.size());
+              if (indexInList !== undefined) {
+                // Replace an existing instruction
+                instrsList.set(indexInList, instruction);
+              } else {
+                // Add a new instruction
+                instrsList.insert(instruction, instrsList.size());
+              }
+
               this.closeInstructionEditor();
+              this._eventsTree.forceEventsUpdate();
             }}
           />}
       </div>

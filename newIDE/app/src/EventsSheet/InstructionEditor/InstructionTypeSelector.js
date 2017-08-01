@@ -11,11 +11,11 @@ export default class InstructionTypeSelector extends Component {
     const allInstructions = {};
 
     //... and add each instruction
-    for (var j = 0; j < instructionsTypes.size(); ++j) {
-      var instrMetadata = instructions.get(instructionsTypes.get(j));
+    for (let j = 0; j < instructionsTypes.size(); ++j) {
+      const instrMetadata = instructions.get(instructionsTypes.get(j));
       if (instrMetadata.isHidden()) continue;
 
-      var displayedName = instrMetadata.getFullName();
+      const displayedName = instrMetadata.getFullName();
       const groupName = instrMetadata.getGroup();
       const fullGroupName = groupPrefix +
         (groupName ? groupName + '/' : '') +
@@ -123,7 +123,7 @@ export default class InstructionTypeSelector extends Component {
 
   render() {
     return (
-      <List>
+      <List style={this.props.style}>
         {this.renderTree(this.instructionsTree)}
       </List>
     );

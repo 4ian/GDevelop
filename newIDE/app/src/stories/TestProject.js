@@ -136,6 +136,8 @@ for(let i = 0;i<20;++i) {
     standardEvt.getActions().push_back(makeDeleteAction("OtherObject" + i));
 }
 
+export const testInstruction = makeKeyPressedCondition();
+
 // Global objects
 const globalTextObject = new gd.TextObject('GlobalTextObject');
 const globalTiledSpriteObject = new gd.TiledSpriteObject('GlobalTiledSpriteObject');

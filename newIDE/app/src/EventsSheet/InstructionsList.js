@@ -20,7 +20,7 @@ export default class InstructionsList extends Component {
   onAddNewInstruction = () => {
     if (this.props.onAddNewInstruction) this.props.onAddNewInstruction({
       instrsList: this.props.instrsList,
-      areConditions: this.props.areConditions,
+      isCondition: this.props.areConditions,
     });
   };
 
@@ -46,9 +46,10 @@ export default class InstructionsList extends Component {
           index={i}
           key={instruction.ptr}
           onClick={() => this.props.onInstructionClick({
-            areConditions: this.props.areConditions,
+            isCondition: this.props.areConditions,
             instrsList: this.props.instrsList,
             instruction,
+            indexInList: i,
           })}
         />
       );

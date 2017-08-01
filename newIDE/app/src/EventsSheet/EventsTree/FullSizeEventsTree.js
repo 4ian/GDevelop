@@ -10,15 +10,17 @@ const styles = {
     bottom: 0,
     overflowY: 'scroll',
   },
-}
+};
 
 export default class FullSizeEventsTree extends Component {
   render() {
     return (
       <div style={styles.container}>
-        <EventsTree {...this.props}
-              ref={eventsTree =>
-                this.props.eventsTreeRef && this.props.eventsTreeRef(eventsTree)}/>
+        <EventsTree
+          {...this.props}
+          ref={eventsTree =>
+            this.props.eventsTreeRef && this.props.eventsTreeRef(eventsTree)}
+        />
       </div>
     );
   }

@@ -14,6 +14,10 @@ import {
   selectInstruction,
   hasSomethingSelected,
   hasEventSelected,
+  getSelectedEvents,
+  getSelectedInstructions,
+  clearSelection,
+  getSelectedEventContexts,
 } from './SelectionHandler';
 const gd = global.gd;
 
@@ -43,9 +47,7 @@ export default class EventsSheet extends BaseEditor {
       <Toolbar
         onAddStandardEvent={() =>
           this.addNewEvent('BuiltinCommonInstructions::Standard')}
-        onAddSubEvent={() => {
-          /*TODO*/
-        }}
+        onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
         onAddCommentEvent={() =>
           this.addNewEvent('BuiltinCommonInstructions::Comment')}
@@ -59,20 +61,55 @@ export default class EventsSheet extends BaseEditor {
     );
   }
 
-  addNewEvent = (type, context) => {
+  addSubEvents = () => {
     const { project } = this.props;
 
-    const eventsList = context && context.events
-      ? context.event.getSubEvents()
-      : this.props.events;
-    const newEvent = eventsList.insertNewEvent(
-      project,
-      type,
-      eventsList.getEventsCount()
-    );
+    getSelectedEvents(this.state.selection).forEach(event => {
+      if (event.canHaveSubEvents()) {
+        event
+          .getSubEvents()
+          .insertNewEvent(
+            project,
+            'BuiltinCommonInstructions::Standard',
+            event.getSubEvents().getEventsCount()
+          );
+      }
+    });
 
-    this._eventsTree.forceEventsUpdate(() =>
-      this._eventsTree.scrollToEvent(newEvent));
+    this._eventsTree.forceEventsUpdate();
+  };
+
+  addNewEvent = (type, context) => {
+    const { project } = this.props;
+    const hasEventsSelected = hasEventSelected(this.state.selection);
+
+    let insertions = [];
+    if (context) {
+      insertions = [context];
+    } else if (hasEventsSelected) {
+      insertions = getSelectedEventContexts(this.state.selection);
+    } else {
+      insertions = [
+        {
+          eventsList: this.props.events,
+          indexInList: this.props.events.getEventsCount(),
+        },
+      ];
+    }
+
+    const newEvents = insertions.map(context => {
+      return context.eventsList.insertNewEvent(
+        project,
+        type,
+        context.indexInList
+      );
+    });
+
+    this._eventsTree.forceEventsUpdate(() => {
+      if (!context && !hasEventsSelected) {
+        this._eventsTree.scrollToEvent(newEvents[0]);
+      }
+    });
   };
 
   openInstructionEditor = instructionContext => {
@@ -143,9 +180,28 @@ export default class EventsSheet extends BaseEditor {
       inlineEditing: false,
       inlineEditingAnchorEl: null,
     });
-  }
+  };
 
-  deleteSelection = () => {};
+  deleteSelection = () => {
+    const eventsRemover = new gd.EventsRemover();
+    getSelectedEvents(this.state.selection).forEach(event =>
+      eventsRemover.addEventToRemove(event));
+    getSelectedInstructions(this.state.selection).forEach(instruction =>
+      eventsRemover.addInstructionToRemove(instruction));
+
+    eventsRemover.launch(this.props.events);
+    this.setState(
+      {
+        selection: clearSelection(),
+        inlineEditing: false,
+        inlineEditingAnchorEl: null,
+      },
+      () => {
+        this.updateToolbar();
+        this._eventsTree.forceEventsUpdate();
+      }
+    );
+  };
 
   render() {
     const { project, layout, events } = this.props;
@@ -177,11 +233,19 @@ export default class EventsSheet extends BaseEditor {
             const { instruction, parameterIndex } = this.state.editedParameter;
             instruction.setParameter(parameterIndex, value);
             this.forceUpdate();
-          }}/>
+          }}
         />
         <KeyboardShortcuts
           ref={keyboardShortcuts => this._keyboardShortcuts = keyboardShortcuts}
-          onDelete={this.deleteSelection}
+          onDelete={() => {
+            if (
+              this.state.inlineEditing ||
+              this.state.editedInstruction.instruction
+            )
+              return;
+
+            this.deleteSelection();
+          }}
         />
         {this.state.editedInstruction.instruction &&
           <InstructionEditorDialog

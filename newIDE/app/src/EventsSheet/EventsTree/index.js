@@ -170,9 +170,10 @@ export default class EventsTree extends Component {
         title: this._renderEvent,
         event,
         eventsList,
+        indexInList: i,
         expanded: true,
         depth,
-        key: event.ptr,
+        key: event.ptr, //TODO: useless?
         children: this._eventsToTreeData(
           event.getSubEvents(),
           flatData,
@@ -237,10 +238,7 @@ export default class EventsTree extends Component {
         onInstructionDoubleClick={this.props.onInstructionDoubleClick}
         onParameterClick={this.props.onParameterClick}
         onEventClick={() =>
-          this.props.onEventClick({
-            event,
-            eventsList: node.eventsList,
-          })}
+          this.props.onEventClick(node)}
       />
     );
   };

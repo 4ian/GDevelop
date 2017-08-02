@@ -7,6 +7,7 @@ import '../UI/Theme/EventsSheet.css';
 import { container } from './ClassNames';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from './KeyboardShortcuts';
+import InlineParameterEditor from './InlineParameterEditor';
 import {
   getInitialSelection,
   selectEvent,
@@ -25,7 +26,15 @@ export default class EventsSheet extends BaseEditor {
         instruction: null,
         instructionsList: null,
       },
+      editedParameter: {
+        isCondition: true,
+        instruction: null,
+        instructionsList: null,
+        parameterIndex: 0,
+      },
       selection: getInitialSelection(),
+      inlineEditing: false,
+      inlineEditingAnchorEl: null,
     };
   }
 
@@ -122,8 +131,19 @@ export default class EventsSheet extends BaseEditor {
   };
 
   openParameterEditor = parameterContext => {
-    console.log(parameterContext);
+    this.setState({
+      editedParameter: parameterContext,
+      inlineEditing: true,
+      inlineEditingAnchorEl: parameterContext.domEvent.currentTarget,
+    });
   };
+
+  closeParameterEditor = () => {
+    this.setState({
+      inlineEditing: false,
+      inlineEditingAnchorEl: null,
+    });
+  }
 
   deleteSelection = () => {};
 
@@ -146,6 +166,19 @@ export default class EventsSheet extends BaseEditor {
           onAddNewEvent={context =>
             this.addNewEvent('BuiltinCommonInstructions::Standard', context)}
         />
+        <InlineParameterEditor
+          open={this.state.inlineEditing}
+          anchorEl={this.state.inlineEditingAnchorEl}
+          onRequestClose={this.closeParameterEditor}
+          project={project}
+          layout={layout}
+          {...this.state.editedParameter}
+          onChange={value => {
+            const { instruction, parameterIndex } = this.state.editedParameter;
+            instruction.setParameter(parameterIndex, value);
+            this.forceUpdate();
+          }}/>
+        />
         <KeyboardShortcuts
           ref={keyboardShortcuts => this._keyboardShortcuts = keyboardShortcuts}
           onDelete={this.deleteSelection}
@@ -160,7 +193,6 @@ export default class EventsSheet extends BaseEditor {
             }
             open={true}
             onCancel={() => this.closeInstructionEditor()}
-            submitDisabled={!this.state.editedInstruction.instruction.getType()}
             onSubmit={() => {
               const {
                 instrsList,

@@ -69,7 +69,7 @@ export default class Instruction extends Component {
               className={classNames({
                 [selectableArea]: true,
               })}
-              onClick={() => this.props.onParameterClick(parameterIndex)}
+              onClick={(domEvent) => this.props.onParameterClick(domEvent, parameterIndex)}
             >
               {formattedTexts.getString(i)}
             </span>

@@ -5,11 +5,21 @@ import {
   enumerateObjectsAndGroups,
 } from '../../../ObjectsList/EnumerateObjects';
 
+const styles = {
+  autoCompleteTextField: {
+    minWidth: 300,
+  },
+};
+
 const fuzzyFilterOrEmpty = (searchText, key) => {
   return !key || AutoComplete.fuzzyFilter(searchText, key);
 };
 
 export default class ObjectField extends Component {
+  focus() {
+    if (this._field) this._field.focus();
+  }
+
   render() {
     const { project, layout } = this.props;
     const list = enumerateObjectsAndGroups(project, layout);
@@ -36,12 +46,21 @@ export default class ObjectField extends Component {
       <AutoComplete
         floatingLabelText={this.props.parameterMetadata.getDescription()}
         fullWidth
+        textFieldStyle={styles.autoCompleteTextField}
         searchText={this.props.value}
         onUpdateInput={value => this.props.onChange(value)}
-        onNewRequest={data => this.props.onChange(data.value)}
+        onNewRequest={data => {
+          // Note that data may be a string or a {text, value} object.
+          if (typeof data === 'string') {
+            this.props.onChange(data);
+          } else if (typeof data.value === 'string') {
+            this.props.onChange(data.value);
+          }
+        }}
         dataSource={fullList}
         filter={fuzzyFilterOrEmpty}
-        openOnFocus={true}
+        openOnFocus={!this.props.isInline}
+        ref={field => this._field = field}
       />
     );
   }

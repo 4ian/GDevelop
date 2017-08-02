@@ -3,12 +3,15 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
 export default class RelationalOperatorField extends Component {
+  focus() {}
+
   render() {
     return (
       <SelectField
         fullWidth
         floatingLabelText={this.props.parameterMetadata.getDescription()}
         value={this.props.value}
+        ref={field => this._field = field}
         onChange={(e, i, value) => this.props.onChange(value)}
       >
         <MenuItem value="Left" primaryText="Left" />

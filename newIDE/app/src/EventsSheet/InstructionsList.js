@@ -51,12 +51,13 @@ export default class InstructionsList extends Component {
             instruction,
             indexInList: i,
           })}
-          onParameterClick={(parameterIndex) => this.props.onParameterClick({
+          onParameterClick={(domEvent, parameterIndex) => this.props.onParameterClick({
             isCondition: this.props.areConditions,
             instrsList: this.props.instrsList,
             instruction,
             indexInList: i,
             parameterIndex,
+            domEvent,
           })}
         />
       );

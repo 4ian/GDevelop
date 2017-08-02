@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Instruction from './Instruction.js';
 import { mapFor } from '../Utils/MapFor';
+import { isInstructionSelected } from './SelectionHandler';
 
 const styles = {
   addButton: {
@@ -16,7 +17,8 @@ export default class InstructionsList extends Component {
     onAddNewInstruction: PropTypes.func.isRequired,
     onInstructionClick: PropTypes.func.isRequired,
     onInstructionDoubleClick: PropTypes.func.isRequired,
-    selectedInstructions: PropTypes.array.isRequired,
+    onParameterClick: PropTypes.func.isRequired,
+    selection: PropTypes.object.isRequired,
   };
 
   onAddNewInstruction = () => {
@@ -36,7 +38,7 @@ export default class InstructionsList extends Component {
           instrsList={this.props.instrsList}
           index={i}
           key={instruction.ptr}
-          selected={this.props.selectedInstructions.indexOf(instruction.ptr) !== -1}
+          selected={isInstructionSelected(this.props.selection, instruction)}
           onClick={() => this.props.onInstructionClick({
             isCondition: this.props.areConditions,
             instrsList: this.props.instrsList,
@@ -48,6 +50,13 @@ export default class InstructionsList extends Component {
             instrsList: this.props.instrsList,
             instruction,
             indexInList: i,
+          })}
+          onParameterClick={(parameterIndex) => this.props.onParameterClick({
+            isCondition: this.props.areConditions,
+            instrsList: this.props.instrsList,
+            instruction,
+            indexInList: i,
+            parameterIndex,
           })}
         />
       );

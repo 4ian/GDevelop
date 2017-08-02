@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
+import classNames from 'classnames';
+import { largeSelectedArea, largeSelectableArea } from '../ClassNames';
 const gd = global.gd;
 
 const commentEventStyles = {
@@ -37,7 +39,7 @@ export default class CommentEvent extends Component {
     };
   }
 
-  handleClick = () => {
+  handleDoubleClick = () => {
     this.setState(
       {
         editing: true,
@@ -73,10 +75,16 @@ export default class CommentEvent extends Component {
 
   render() {
     return (
-      <div style={commentEventStyles.container}>
+      <div
+        style={commentEventStyles.container}
+        className={classNames({
+          [largeSelectableArea]: true,
+          [largeSelectedArea]: this.props.selected,
+        })}
+      >
         {!this.state.editing
           ? <p
-              onClick={this.handleClick}
+              onDoubleClick={this.handleDoubleClick}
               key="p"
               style={commentEventStyles.text}
               dangerouslySetInnerHTML={{

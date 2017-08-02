@@ -3,6 +3,10 @@ import { serializeToJSObject } from '../Utils/Serializer';
 import { rgbToHexNumber } from '../Utils/ColorTransformer';
 
 export default class BaseEditor extends Component {
+  static defaultProps = {
+    setToolbar: () => {},
+  };
+
   getProject() {
     return this.props.project;
   }

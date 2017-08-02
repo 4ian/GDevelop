@@ -3,7 +3,17 @@ import FullSizeEventsTree from './EventsTree/FullSizeEventsTree';
 import InstructionEditorDialog
   from './InstructionEditor/InstructionEditorDialog';
 import BaseEditor from '../MainFrame/BaseEditor';
+import '../UI/Theme/EventsSheet.css';
+import { container } from './ClassNames';
 import Toolbar from './Toolbar';
+import KeyboardShortcuts from './KeyboardShortcuts';
+import {
+  getInitialSelection,
+  selectEvent,
+  selectInstruction,
+  hasSomethingSelected,
+  hasEventSelected,
+} from './SelectionHandler';
 const gd = global.gd;
 
 export default class EventsSheet extends BaseEditor {
@@ -15,8 +25,7 @@ export default class EventsSheet extends BaseEditor {
         instruction: null,
         instructionsList: null,
       },
-      selectedEvents: [],
-      selectedInstructions: [],
+      selection: getInitialSelection(),
     };
   }
 
@@ -28,16 +37,11 @@ export default class EventsSheet extends BaseEditor {
         onAddSubEvent={() => {
           /*TODO*/
         }}
-        canAddSubEvent={!!this.state.selectedEvents.length}
+        canAddSubEvent={hasEventSelected(this.state.selection)}
         onAddCommentEvent={() =>
           this.addNewEvent('BuiltinCommonInstructions::Comment')}
-        canRemove={
-          this.state.selectedEvents.length ||
-            this.state.selectedInstructions.length
-        }
-        onRemove={() => {
-          /*TODO*/
-        }}
+        canRemove={hasSomethingSelected(this.state.selection)}
+        onRemove={this.deleteSelection}
         canUndo={false /*TODO*/}
         canRedo={false /*TODO*/}
         undo={this.undo}
@@ -62,24 +66,19 @@ export default class EventsSheet extends BaseEditor {
       this._eventsTree.scrollToEvent(newEvent));
   };
 
-  openInstructionEditor = (
-    {
-      instrsList,
-      isCondition,
-      instruction,
-      indexInList,
-    }
-  ) => {
+  openInstructionEditor = instructionContext => {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
     }
 
     this.setState({
       editedInstruction: {
-        instrsList,
-        isCondition,
-        instruction: instruction ? instruction.clone() : new gd.Instruction(),
-        indexInList,
+        instrsList: instructionContext.instrsList,
+        isCondition: instructionContext.isCondition,
+        instruction: instructionContext.instruction
+          ? instructionContext.instruction.clone()
+          : new gd.Instruction(),
+        indexInList: instructionContext.isCondition,
       },
     });
   };
@@ -98,46 +97,58 @@ export default class EventsSheet extends BaseEditor {
     });
   }
 
-  selectEvent = ({ event }) => {
-    // TODO: Multiselection
+  selectEvent = eventContext => {
+    const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
       {
-        selectedEvents: [event.ptr],
-        selectedInstructions: [],
+        selection: selectEvent(this.state.selection, eventContext, multiSelect),
       },
       () => this.updateToolbar()
     );
   };
 
-  selectInstruction = ({ instruction }) => {
-    // TODO: Multiselection
+  selectInstruction = instructionContext => {
+    const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
       {
-        selectedEvents: [],
-        selectedInstructions: [instruction.ptr],
+        selection: selectInstruction(
+          this.state.selection,
+          instructionContext,
+          multiSelect
+        ),
       },
       () => this.updateToolbar()
     );
   };
+
+  openParameterEditor = parameterContext => {
+    console.log(parameterContext);
+  };
+
+  deleteSelection = () => {};
 
   render() {
     const { project, layout, events } = this.props;
     if (!project) return null;
 
     return (
-      <div>
+      <div className={container}>
         <FullSizeEventsTree
           eventsTreeRef={eventsTree => this._eventsTree = eventsTree}
           events={events}
           layout={layout}
-          selectedEvents={this.state.selectedEvents}
-          selectedInstructions={this.state.selectedInstructions}
+          selection={this.state.selection}
           onInstructionClick={this.selectInstruction}
           onInstructionDoubleClick={this.openInstructionEditor}
           onAddNewInstruction={this.openInstructionEditor}
+          onParameterClick={this.openParameterEditor}
           onEventClick={this.selectEvent}
           onAddNewEvent={context =>
             this.addNewEvent('BuiltinCommonInstructions::Standard', context)}
+        />
+        <KeyboardShortcuts
+          ref={keyboardShortcuts => this._keyboardShortcuts = keyboardShortcuts}
+          onDelete={this.deleteSelection}
         />
         {this.state.editedInstruction.instruction &&
           <InstructionEditorDialog

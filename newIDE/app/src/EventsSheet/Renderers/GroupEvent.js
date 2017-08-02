@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import { largeSelectedArea, largeSelectableArea } from '../ClassNames';
 const gd = global.gd;
 
 export default class GroupEvent extends Component {
@@ -31,7 +33,12 @@ export default class GroupEvent extends Component {
     }
 
     return (
-      <div>
+      <div
+        className={classNames({
+          [largeSelectableArea]: true,
+          [largeSelectedArea]: this.props.selected,
+        })}
+      >
         {children}
       </div>
     );

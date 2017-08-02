@@ -5,8 +5,11 @@ import {
 } from 'react-sortable-tree';
 import EventsRenderingService from '../EventsRenderingService';
 import { mapFor } from '../../Utils/MapFor';
-import '../../UI/Theme/EventsTree.css';
+import { eventsTree } from '../ClassNames';
 import findIndex from 'lodash/findIndex';
+import { getInitialSelection, isEventSelected } from '../SelectionHandler';
+
+const indentWidth = 22;
 
 /**
  * Store the height of events and notify a component whenever
@@ -87,12 +90,14 @@ class EventContainer extends Component {
         {EventComponent &&
           <EventComponent
             event={event}
-            selected={this.props.selected}
-            selectedInstructions={this.props.selectedInstructions}
+            selected={isEventSelected(this.props.selection, event)}
+            selection={this.props.selection}
+            leftIndentWidth={this.props.leftIndentWidth}
             onUpdate={this._onEventUpdated}
             onAddNewInstruction={this.props.onAddNewInstruction}
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+            onParameterClick={this.props.onParameterClick}
           />}
       </div>
     );
@@ -107,7 +112,7 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
  */
 export default class EventsTree extends Component {
   static defaultProps = {
-    selectedEvents: [],
+    selection: getInitialSelection(),
   };
 
   constructor(props) {
@@ -156,7 +161,7 @@ export default class EventsTree extends Component {
     );
   }
 
-  _eventsToTreeData = (eventsList, flatData = []) => {
+  _eventsToTreeData = (eventsList, flatData = [], depth = 0) => {
     const treeData = mapFor(0, eventsList.getEventsCount(), i => {
       const event = eventsList.getEventAt(i);
       flatData.push(event);
@@ -166,10 +171,12 @@ export default class EventsTree extends Component {
         event,
         eventsList,
         expanded: true,
+        depth,
         key: event.ptr,
         children: this._eventsToTreeData(
           event.getSubEvents(),
-          flatData
+          flatData,
+          depth + 1,
         ).treeData,
       };
     });
@@ -216,18 +223,19 @@ export default class EventsTree extends Component {
   };
 
   _renderEvent = ({ node }) => {
-    const event = node.event;
+    const { event, depth } = node;
 
     return (
       <EventContainer
         event={event}
         key={event.ptr}
         eventsHeightsCache={this.eventsHeightsCache}
+        selection={this.props.selection}
+        leftIndentWidth={depth * indentWidth}
         onAddNewInstruction={this.props.onAddNewInstruction}
         onInstructionClick={this.props.onInstructionClick}
         onInstructionDoubleClick={this.props.onInstructionDoubleClick}
-        selected={this.props.selectedEvents.indexOf(event.ptr) !== -1}
-        selectedInstructions={this.props.selectedInstructions}
+        onParameterClick={this.props.onParameterClick}
         onEventClick={() =>
           this.props.onEventClick({
             event,
@@ -241,17 +249,15 @@ export default class EventsTree extends Component {
     return (
       <div style={{ height: this.props.height || 400 }}>
         <SortableTree
-          className="gd-events-list"
+          className={eventsTree}
           treeData={this.state.treeData}
-          scaffoldBlockPxWidth={22}
+          scaffoldBlockPxWidth={indentWidth}
           onChange={() => {}}
           onMoveNode={this._onMoveNode}
           canDrop={this._canDrop}
           rowHeight={({ index }) => {
-            const extraBorderMargin = 4;
             const event = this.state.flatData[index];
-            return this.eventsHeightsCache.getEventHeight(event) +
-              extraBorderMargin;
+            return this.eventsHeightsCache.getEventHeight(event);
           }}
           reactVirtualizedListProps={{
             ref: list => this._list = list,

@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import instructionsRenderingService from './InstructionsRenderingService.js';
+import { mapFor } from '../Utils/MapFor';
+import classNames from 'classnames';
+import { selectedArea, selectableArea } from './ClassNames';
+const gd = global.gd;
+const instrFormatter = gd.InstructionSentenceFormatter.get();
+instrFormatter.loadTypesFormattingFromConfig();
 
 const styles = {
   container: {
     whiteSpace: 'normal',
+    wordWrap: 'break-word',
     cursor: 'pointer',
-  },
-  selectedContainer: { //TODO
-    whiteSpace: 'normal',
-    cursor: 'pointer',
-    backgroundColor: 'orange',
+    marginBottom: 1,
   },
   icon: {
     verticalAlign: 'middle',
@@ -26,19 +28,78 @@ export default class Instruction extends Component {
     onClick: PropTypes.func.isRequired,
   };
 
-  render() {
-    var instruction = this.props.instruction;
-    var rendering = instructionsRenderingService.getInstructionHtml(
+  /**
+   * Render the different parts of the text of the instruction.
+   * Parameter can have formatting, be hovered and clicked. The rest
+   * has not particular styling.
+   */
+  _renderInstructionText = metadata => {
+    const { instruction } = this.props;
+    const formattedTexts = instrFormatter.getAsFormattedText(
       instruction,
-      this.props.isCondition
+      metadata
     );
+    const parametersCount = metadata.getParametersCount();
 
-    const containerStyle = !this.props.selected ?
-    styles.container : styles.selectedContainer;
+    return (
+      <span>
+        {mapFor(0, formattedTexts.size(), i => {
+          const formatting = formattedTexts.getTextFormatting(i);
+          const parameterIndex = formatting.getUserData();
+
+          const isParameter = parameterIndex >= 0 &&
+            parameterIndex < parametersCount;
+          if (!isParameter)
+            return <span key={i}>{formattedTexts.getString(i)}</span>;
+
+          return (
+            <span
+              key={i}
+              style={{
+                color: 'rgb(' +
+                  formatting.getColorRed() +
+                  ',' +
+                  formatting.getColorGreen() +
+                  ',' +
+                  formatting.getColorBlue() +
+                  ')',
+                fontWeight: formatting.isBold() ? 'bold' : 'normal',
+                fontStyle: formatting.isItalic() ? 'italic' : 'normal',
+              }}
+              className={classNames({
+                [selectableArea]: true,
+              })}
+              onClick={() => this.props.onParameterClick(parameterIndex)}
+            >
+              {formattedTexts.getString(i)}
+            </span>
+          );
+        })}
+      </span>
+    );
+  };
+
+  render() {
+    var { instruction, isCondition } = this.props;
+
+    //TODO: Metadata could be cached for performance boost.
+    const metadata = isCondition
+      ? gd.MetadataProvider.getConditionMetadata(
+          gd.JsPlatform.get(),
+          instruction.getType()
+        )
+      : gd.MetadataProvider.getActionMetadata(
+          gd.JsPlatform.get(),
+          instruction.getType()
+        );
 
     return (
       <div
-        style={containerStyle}
+        style={styles.container}
+        className={classNames({
+          [selectableArea]: true,
+          [selectedArea]: this.props.selected,
+        })}
         onClick={e => {
           e.stopPropagation();
           this.props.onClick();
@@ -54,12 +115,8 @@ export default class Instruction extends Component {
             alt="Condition is negated"
             style={styles.icon}
           />}
-        <img src={rendering.icon} style={styles.icon} alt="" />
-        <span
-          dangerouslySetInnerHTML={{
-            __html: rendering.html,
-          }}
-        />
+        <img src={metadata.getSmallIconFilename()} style={styles.icon} alt="" />
+        {this._renderInstructionText(metadata)}
       </div>
     );
   }

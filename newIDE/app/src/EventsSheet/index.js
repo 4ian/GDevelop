@@ -28,12 +28,12 @@ export default class EventsSheet extends BaseEditor {
       editedInstruction: {
         isCondition: true,
         instruction: null,
-        instructionsList: null,
+        instrsList: null,
       },
       editedParameter: {
         isCondition: true,
         instruction: null,
-        instructionsList: null,
+        instrsList: null,
         parameterIndex: 0,
       },
       selection: getInitialSelection(),
@@ -124,7 +124,7 @@ export default class EventsSheet extends BaseEditor {
         instruction: instructionContext.instruction
           ? instructionContext.instruction.clone()
           : new gd.Instruction(),
-        indexInList: instructionContext.isCondition,
+        indexInList: instructionContext.indexInList,
       },
     });
   };
@@ -138,7 +138,7 @@ export default class EventsSheet extends BaseEditor {
       editedInstruction: {
         isCondition: true,
         instruction: null,
-        instructionsList: null,
+        instrsList: null,
       },
     });
   }

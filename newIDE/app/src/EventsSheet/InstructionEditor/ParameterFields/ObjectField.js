@@ -21,7 +21,7 @@ export default class ObjectField extends Component {
   }
 
   render() {
-    const { project, layout } = this.props;
+    const { project, layout, parameterMetadata } = this.props;
     const list = enumerateObjectsAndGroups(project, layout);
     const objects = list.allObjectsList.map(({
       object,
@@ -42,9 +42,12 @@ export default class ObjectField extends Component {
 
     const fullList = [...objects, { text: '', value: <Divider /> }, ...groups];
 
+    const description = parameterMetadata
+      ? parameterMetadata.getDescription()
+      : undefined;
     return (
       <AutoComplete
-        floatingLabelText={this.props.parameterMetadata.getDescription()}
+        floatingLabelText={description}
         fullWidth
         textFieldStyle={styles.autoCompleteTextField}
         searchText={this.props.value}

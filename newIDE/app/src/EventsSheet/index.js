@@ -50,6 +50,7 @@ export default class EventsSheet extends Component {
         canAddSubEvent={hasEventSelected(this.state.selection)}
         onAddCommentEvent={() =>
           this.addNewEvent('BuiltinCommonInstructions::Comment')}
+        onAddEvent={this.addNewEvent}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
         showPreviewButton={this.props.showPreviewButton}
@@ -213,6 +214,7 @@ export default class EventsSheet extends Component {
         <FullSizeEventsTree
           eventsTreeRef={eventsTree => this._eventsTree = eventsTree}
           events={events}
+          project={project}
           layout={layout}
           selection={this.state.selection}
           onInstructionClick={this.selectInstruction}

@@ -1,22 +1,8 @@
 import React, { Component } from 'react';
-import Popover from 'material-ui/Popover';
+import InlinePopover from './InlinePopover';
 import ParameterRenderingService
   from './InstructionEditor/ParameterRenderingService';
 const gd = global.gd;
-
-const styles = {
-  popover: {
-    paddingBottom: 10,
-    paddingLeft: 5,
-    paddingRight: 5,
-    maxWidth: 600,
-    height: 80,
-    overflowY: 'hidden',
-  },
-  contentContainer: {
-    overflow: 'hidden',
-  },
-};
 
 export default class InlineParameterEditor extends Component {
   constructor(props) {
@@ -82,29 +68,24 @@ export default class InlineParameterEditor extends Component {
     const { ParameterComponent } = this.state;
 
     return (
-      <Popover
+      <InlinePopover
         open={this.props.open}
         anchorEl={this.props.anchorEl}
-        style={styles.popover}
-        anchorOrigin={{ horizontal: 'middle', vertical: 'bottom' }}
-        targetOrigin={{ horizontal: 'middle', vertical: 'top' }}
         onRequestClose={this.props.onRequestClose}
       >
-        <div style={styles.contentContainer}>
-          <ParameterComponent
-            parameterMetadata={this.state.parameterMetadata}
-            project={this.props.project}
-            layout={this.props.layout}
-            value={this.props.instruction.getParameter(
-              this.props.parameterIndex
-            )}
-            key={this.props.instruction.ptr}
-            onChange={this.props.onChange}
-            ref={field => this._field = field}
-            isInline
-          />
-        </div>
-      </Popover>
+        <ParameterComponent
+          parameterMetadata={this.state.parameterMetadata}
+          project={this.props.project}
+          layout={this.props.layout}
+          value={this.props.instruction.getParameter(
+            this.props.parameterIndex
+          )}
+          key={this.props.instruction.ptr}
+          onChange={this.props.onChange}
+          ref={field => this._field = field}
+          isInline
+        />
+      </InlinePopover>
     );
   }
 }

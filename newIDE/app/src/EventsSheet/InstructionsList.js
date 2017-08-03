@@ -5,6 +5,16 @@ import { mapFor } from '../Utils/MapFor';
 import { isInstructionSelected } from './SelectionHandler';
 
 const styles = {
+  conditionsContainer: {
+    paddingLeft: 5,
+    paddingRight: 5,
+    background: '#f1f2f2',
+    borderRight: '1px solid #d3d3d3',
+  },
+  actionsContainer: {
+    paddingLeft: 5,
+    paddingRight: 5,
+  },
   addButton: {
     cursor: 'pointer',
   },
@@ -63,8 +73,11 @@ export default class InstructionsList extends Component {
       );
     });
 
+    const containerStyle = this.props.areConditions ? styles.conditionsContainer :
+      styles.actionsContainer;
+
     return (
-      <div style={this.props.style}>
+      <div style={{...containerStyle, ...this.props.style}}>
         {instructions}
         <a style={styles.addButton} className="add-link" onClick={this.onAddNewInstruction}>
           {this.props.areConditions ? 'Add condition' : 'Add action'}

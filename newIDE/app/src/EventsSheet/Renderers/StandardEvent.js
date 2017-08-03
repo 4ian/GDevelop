@@ -9,16 +9,8 @@ const styles = {
   container: {
     display: 'flex',
   },
-  conditionsList: {
-    paddingLeft: 5,
-    paddingRight: 5,
-    background: '#f1f2f2',
-    borderRight: '1px solid #d3d3d3',
-  },
   actionsList: {
-    flex: 2,
-    paddingLeft: 5,
-    paddingRight: 5,
+    flex: 1,
   },
 };
 
@@ -36,7 +28,6 @@ export default class StandardEvent extends Component {
     var standardEvent = gd.asStandardEvent(this.props.event);
 
     const conditionsListSyle = {
-      ...styles.conditionsList,
       width: `calc(35vw - ${this.props.leftIndentWidth}px)`,
     };
 

@@ -7,6 +7,8 @@ import {
   largeSelectableArea,
   selectableArea,
 } from '../ClassNames';
+import InlinePopover from '../InlinePopover';
+import ObjectField from '../InstructionEditor/ParameterFields/ObjectField';
 const gd = global.gd;
 
 const styles = {
@@ -17,16 +19,8 @@ const styles = {
   instructionsContainer: {
     display: 'flex',
   },
-  conditionsList: {
-    paddingLeft: 5,
-    paddingRight: 5,
-    background: '#f1f2f2',
-    borderRight: '1px solid #d3d3d3',
-  },
   actionsList: {
-    flex: 2,
-    paddingLeft: 5,
-    paddingRight: 5,
+    flex: 1,
   },
 };
 
@@ -38,13 +32,36 @@ export default class ForEachEvent extends Component {
     onInstructionDoubleClick: PropTypes.func.isRequired,
     onParameterClick: PropTypes.func.isRequired,
     selection: PropTypes.object.isRequired,
+    onUpdate: PropTypes.func.isRequired,
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      editing: false,
+      anchorEl: null,
+    }
+  }
+
+  edit = (domEvent) => {
+    this.setState({
+      editing: true,
+      anchorEl: domEvent.currentTarget,
+    });
+  }
+
+  onEndEditing = () => {
+    this.setState({
+      editing: false,
+      anchorEl: null,
+    });
+  }
 
   render() {
     var forEachEvent = gd.asForEachEvent(this.props.event);
 
     const conditionsListSyle = {
-      ...styles.conditionsList,
       width: `calc(35vw - ${this.props.leftIndentWidth}px)`,
     };
 
@@ -61,11 +78,12 @@ export default class ForEachEvent extends Component {
           className={classNames({
             [selectableArea]: true,
           })}
+          onClick={this.edit}
         >
           {objectName
             ? `Repeat for each ${objectName} object:`
             : <i>
-                Double click to choose for which objects this event will be repeated
+                Click to choose for which objects this event will be repeated
               </i>}
         </div>
         <div style={styles.instructionsContainer}>
@@ -90,6 +108,22 @@ export default class ForEachEvent extends Component {
             onParameterClick={this.props.onParameterClick}
           />
         </div>
+        <InlinePopover
+          open={this.state.editing}
+          anchorEl={this.state.anchorEl}
+          onRequestClose={this.onEndEditing}
+        >
+          <ObjectField
+            project={this.props.project}
+            layout={this.props.layout}
+            value={objectName}
+            onChange={(text) => {
+              forEachEvent.setObjectToPick(text);
+              this.props.onUpdate();
+            }}
+            isInline
+          />
+        </InlinePopover>
       </div>
     );
   }

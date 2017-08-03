@@ -3,8 +3,31 @@ import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import IconMenu from '../UI/Menu/IconMenu';
+import { mapFor } from '../Utils/MapFor';
+import flatten from 'lodash/flatten';
+const gd = global.gd;
 
 export default class Toolbar extends PureComponent {
+  componentWillMount() {
+    const allExtensions = gd
+      .asPlatform(gd.JsPlatform.get())
+      .getAllPlatformExtensions();
+
+    this.allEventsMetadata = flatten(mapFor(0, allExtensions.size(), i => {
+      const extension = allExtensions.get(i);
+      const extensionEvents = extension.getAllEvents();
+
+      return extensionEvents.keys().toJSArray().map(type => {
+        const metadata = extensionEvents.get(type);
+        return {
+          type,
+          fullName: metadata.getFullName(),
+          description: metadata.getDescription(),
+        };
+      });
+    }));
+  }
+
   render() {
     return (
       <ToolbarGroup lastChild>
@@ -28,14 +51,15 @@ export default class Toolbar extends PureComponent {
           src="res/ribbon_default/commentaireadd32.png"
         />
         <IconMenu
-          iconButtonElement={
-            <ToolbarIcon src="res/ribbon_default/add32.png" />
-          }
-          menuTemplate={[
-            { label: 'TODO', click: () => {/*TODO*/} },
-          ]}
+          iconButtonElement={<ToolbarIcon src="res/ribbon_default/add32.png" />}
+          menuTemplate={this.allEventsMetadata.map(metadata => {
+           return {
+             label: metadata.fullName,
+             click: () => this.props.onAddEvent(metadata.type),
+           }
+          })}
         />
-        <ToolbarSeparator/>
+        <ToolbarSeparator />
         <ToolbarIcon
           onClick={this.props.onRemove}
           src="res/ribbon_default/deleteselected32.png"
@@ -53,7 +77,9 @@ export default class Toolbar extends PureComponent {
         />
         <ToolbarSeparator />
         <ToolbarIcon
-          onClick={() => {/*TODO*/}}
+          onClick={() => {
+            /*TODO*/
+          }}
           src="res/ribbon_default/search32.png"
         />
       </ToolbarGroup>

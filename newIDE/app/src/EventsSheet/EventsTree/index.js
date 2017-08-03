@@ -79,7 +79,7 @@ class EventContainer extends Component {
   };
 
   render() {
-    const { event } = this.props;
+    const { event, project, layout } = this.props;
     const EventComponent = EventsRenderingService.getEventComponent(event);
 
     return (
@@ -89,6 +89,8 @@ class EventContainer extends Component {
       >
         {EventComponent &&
           <EventComponent
+            project={project}
+            layout={layout}
             event={event}
             selected={isEventSelected(this.props.selection, event)}
             selection={this.props.selection}
@@ -228,6 +230,8 @@ export default class EventsTree extends Component {
 
     return (
       <EventContainer
+        project={this.props.project}
+        layout={this.props.layout}
         event={event}
         key={event.ptr}
         eventsHeightsCache={this.eventsHeightsCache}

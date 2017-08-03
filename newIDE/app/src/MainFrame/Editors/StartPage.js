@@ -2,8 +2,8 @@ import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 import BaseEditor from './BaseEditor';
-import AboutDialog from './AboutDialog';
-import { Line, Column } from '../UI/Grid';
+import AboutDialog from '../AboutDialog';
+import { Line, Column } from '../../UI/Grid';
 
 const styles = {
   logoPaper: {

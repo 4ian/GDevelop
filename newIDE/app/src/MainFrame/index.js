@@ -9,12 +9,8 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import DragDropContextProvider
   from '../Utils/DragDropHelpers/DragDropContextProvider';
 import Toolbar from './Toolbar';
-import StartPage from './StartPage';
 import ProjectTitlebar from './ProjectTitlebar';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
-import EventsSheet from '../EventsSheet';
-import SceneEditor from '../SceneEditor';
-import ExternalLayoutEditor from '../SceneEditor/ExternalLayoutEditor';
 import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
@@ -36,14 +32,21 @@ import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timeFunction } from '../Utils/TimeFunction';
 import newNameGenerator from '../Utils/NewNameGenerator';
 
+// Editors:
+import EventsEditor from './Editors/EventsEditor';
+import ExternalEventsEditor from './Editors/ExternalEventsEditor';
+import SceneEditor from './Editors/SceneEditor';
+import ExternalLayoutEditor from './Editors/ExternalLayoutEditor';
+import StartPage from './Editors/StartPage';
+
 import fixtureGame from '../fixtures/platformer/platformer.json';
 const gd = global.gd;
 
 const styles = {
   drawerContent: {
     overflowX: 'hidden',
-  }
-}
+  },
+};
 
 export default class MainFrame extends Component {
   constructor() {
@@ -144,53 +147,81 @@ export default class MainFrame extends Component {
     this.forceUpdate();
   };
 
+  _launchLayoutPreview = (project, layout) =>
+    watchPromiseInState(this, 'previewLoading', () =>
+      this.props.onLayoutPreview(project, layout)).catch(err => {
+      showErrorBox('Unable to launch the preview!', err);
+    });
+
+  _launchExternalLayoutPreview = (project, layout, externalLayout) =>
+    watchPromiseInState(this, 'previewLoading', () =>
+      this.props.onExternalLayoutPreview(
+        project,
+        layout,
+        externalLayout
+      )).catch(err => {
+      showErrorBox('Unable to launch the preview!', err);
+    });
+
+  openLayout = name => {
+    const sceneEditorOptions = {
+      name,
+      editorCreator: () => (
+        <SceneEditor
+          project={this.state.currentProject}
+          layoutName={name}
+          setToolbar={this.setEditorToolbar}
+          onPreview={this._launchLayoutPreview}
+          showPreviewButton={!!this.props.onLayoutPreview}
+          onEditObject={this.props.onEditObject}
+          showObjectsList={!this.props.integratedEditor}
+          resourceSources={this.props.resourceSources}
+        />
+      ),
+      key: 'layout ' + name,
+    };
+    const eventsEditorOptions = {
+      name: name + ' (Events)',
+      editorCreator: () => (
+        <EventsEditor
+          project={this.state.currentProject}
+          layoutName={name}
+          setToolbar={this.setEditorToolbar}
+          onPreview={this._launchLayoutPreview}
+          showPreviewButton={!!this.props.onLayoutPreview}
+        />
+      ),
+      key: 'layout events ' + name,
+      dontFocusTab: true,
+    };
+
+    const tabsWithSceneEditor = openEditorTab(
+      this.state.editorTabs,
+      sceneEditorOptions
+    );
+    const tabsWithSceneAndEventsEditors = openEditorTab(
+      tabsWithSceneEditor,
+      eventsEditorOptions
+    );
+
+    this.setState({ editorTabs: tabsWithSceneAndEventsEditors }, () =>
+      this.updateToolbar());
+  };
+
   openExternalEvents = name => {
     this.setState(
       {
-        editorTabs: openEditorTab(
-          this.state.editorTabs,
+        editorTabs: openEditorTab(this.state.editorTabs, {
           name,
-          () => (
-            <EventsSheet
+          editorCreator: () => (
+            <ExternalEventsEditor
               project={this.state.currentProject}
-              events={this.state.currentProject
-                .getExternalEvents(name)
-                .getEvents()}
-              layout={this.state.currentProject.getLayoutAt(0)}
+              externalEventsName={name}
               setToolbar={this.setEditorToolbar}
             />
           ),
-          'external events ' + name
-        ),
-      },
-      () => this.updateToolbar()
-    );
-  };
-
-  openLayout = name => {
-    this.setState(
-      {
-        editorTabs: openEditorTab(
-          this.state.editorTabs,
-          name,
-          () => (
-            <SceneEditor
-              project={this.state.currentProject}
-              layoutName={name}
-              setToolbar={this.setEditorToolbar}
-              onPreview={(project, layout) =>
-                watchPromiseInState(this, 'previewLoading', () =>
-                  this.props.onLayoutPreview(project, layout)).catch((err) => {
-                  showErrorBox('Unable to launch the preview!', err);
-                })}
-              showPreviewButton={!!this.props.onLayoutPreview}
-              onEditObject={this.props.onEditObject}
-              showObjectsList={!this.props.integratedEditor}
-              resourceSources={this.props.resourceSources}
-            />
-          ),
-          'layout ' + name
-        ),
+          key: 'external events ' + name,
+        }),
       },
       () => this.updateToolbar()
     );
@@ -199,31 +230,22 @@ export default class MainFrame extends Component {
   openExternalLayout = name => {
     this.setState(
       {
-        editorTabs: openEditorTab(
-          this.state.editorTabs,
+        editorTabs: openEditorTab(this.state.editorTabs, {
           name,
-          () => (
+          editorCreator: () => (
             <ExternalLayoutEditor
               project={this.state.currentProject}
               externalLayoutName={name}
               setToolbar={this.setEditorToolbar}
-              onPreview={(project, layout, externalLayout) =>
-                watchPromiseInState(this, 'previewLoading', () =>
-                  this.props.onExternalLayoutPreview(
-                    project,
-                    layout,
-                    externalLayout
-                  )).catch((err) => {
-                  showErrorBox('Unable to launch the preview!', err);
-                })}
+              onPreview={this._launchExternalLayoutPreview}
               showPreviewButton={!!this.props.onExternalLayoutPreview}
               onEditObject={this.props.onEditObject}
               showObjectsList={!this.props.integratedEditor}
               resourceSources={this.props.resourceSources}
             />
           ),
-          'external layout ' + name
-        ),
+          key: 'external layout ' + name,
+        }),
       },
       () => this.updateToolbar()
     );
@@ -232,18 +254,17 @@ export default class MainFrame extends Component {
   openStartPage = () => {
     this.setState(
       {
-        editorTabs: openEditorTab(
-          this.state.editorTabs,
-          'Start Page',
-          () => (
+        editorTabs: openEditorTab(this.state.editorTabs, {
+          name: 'Start Page',
+          editorCreator: () => (
             <StartPage
               setToolbar={this.setEditorToolbar}
               onOpen={this.chooseProject}
               onCreate={() => this.openCreateDialog()}
             />
           ),
-          'start page'
-        ),
+          key: 'start page',
+        }),
       },
       () => this.updateToolbar()
     );
@@ -287,8 +308,9 @@ export default class MainFrame extends Component {
       },
       err => {
         showErrorBox(
-          'Unable to read this project. Please try again later or with another save of the project.'
-        , err);
+          'Unable to read this project. Please try again later or with another save of the project.',
+          err
+        );
         return;
       }
     );
@@ -310,8 +332,9 @@ export default class MainFrame extends Component {
 
     this.props.onSaveProject(this.state.currentProject).catch(err => {
       showErrorBox(
-        'Unable to save the project! Please try again by choosing another location.'
-      , err);
+        'Unable to save the project! Please try again by choosing another location.',
+        err
+      );
     });
   };
 
@@ -397,8 +420,10 @@ export default class MainFrame extends Component {
         <MuiThemeProvider muiTheme={defaultTheme}>
           <div className="main-frame">
             <ProjectTitlebar project={this.state.currentProject} />
-            <Drawer open={this.state.projectManagerOpen}
-            containerStyle={styles.drawerContent}>
+            <Drawer
+              open={this.state.projectManagerOpen}
+              containerStyle={styles.drawerContent}
+            >
               <EditorBar
                 title={currentProject ? currentProject.getName() : 'No project'}
                 showMenuIconButton={false}

@@ -6,7 +6,7 @@ import { linkTo } from '@storybook/addon-links';
 
 import Welcome from './Welcome';
 
-import StartPage from '../MainFrame/StartPage';
+import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import LocalCreateDialog from '../ProjectCreation/LocalCreateDialog';
 import { Tabs, Tab } from '../UI/Tabs';

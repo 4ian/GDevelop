@@ -8,6 +8,12 @@ export default class Toolbar extends PureComponent {
   render() {
     return (
       <ToolbarGroup lastChild>
+        {this.props.showPreviewButton &&
+          <ToolbarIcon
+            onClick={this.props.onPreview}
+            src="res/ribbon_default/preview32.png"
+          />}
+        {this.props.showPreviewButton && <ToolbarSeparator />}
         <ToolbarIcon
           onClick={this.props.onAddStandardEvent}
           src="res/ribbon_default/eventadd32.png"

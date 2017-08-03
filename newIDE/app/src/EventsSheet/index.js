@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { Component } from 'react';
 import FullSizeEventsTree from './EventsTree/FullSizeEventsTree';
 import InstructionEditorDialog
   from './InstructionEditor/InstructionEditorDialog';
-import BaseEditor from '../MainFrame/BaseEditor';
 import '../UI/Theme/EventsSheet.css';
 import { container } from './ClassNames';
 import Toolbar from './Toolbar';
@@ -21,7 +20,7 @@ import {
 } from './SelectionHandler';
 const gd = global.gd;
 
-export default class EventsSheet extends BaseEditor {
+export default class EventsSheet extends Component {
   constructor() {
     super();
     this.state = {
@@ -53,6 +52,8 @@ export default class EventsSheet extends BaseEditor {
           this.addNewEvent('BuiltinCommonInstructions::Comment')}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
+        showPreviewButton={this.props.showPreviewButton}
+        onPreview={this.props.onPreview}
         canUndo={false /*TODO*/}
         canRedo={false /*TODO*/}
         undo={this.undo}

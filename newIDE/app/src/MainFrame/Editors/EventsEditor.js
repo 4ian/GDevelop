@@ -1,9 +1,9 @@
 import React from 'react';
-import InstancesFullEditor from './InstancesFullEditor';
-import { serializeToJSObject } from '../Utils/Serializer';
-import BaseEditor from '../MainFrame/BaseEditor';
+import EventsSheet from '../../EventsSheet';
+import { serializeToJSObject } from '../../Utils/Serializer';
+import BaseEditor from './BaseEditor';
 
-export default class SceneEditor extends BaseEditor {
+export default class EventsEditor extends BaseEditor {
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }
@@ -13,8 +13,7 @@ export default class SceneEditor extends BaseEditor {
 
     return {
       ...BaseEditor.getLayoutSerializedElements(layout),
-      instances: serializeToJSObject(layout.getInitialInstances()),
-      uiSettings: this.editor.getUiSettings(),
+      events: serializeToJSObject(layout.getEvents())
     };
   }
 
@@ -38,15 +37,12 @@ export default class SceneEditor extends BaseEditor {
     }
 
     return (
-      <InstancesFullEditor
+      <EventsSheet
         {...this.props}
         ref={editor => this.editor = editor}
         project={project}
         layout={layout}
-        initialInstances={layout.getInitialInstances()}
-        initialUiSettings={serializeToJSObject(
-          layout.getAssociatedSettings()
-        )}
+        events={layout.getEvents()}
         onPreview={() => this.props.onPreview(project, layout)}
       />
     );

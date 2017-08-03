@@ -1,6 +1,5 @@
 import React from 'react';
 import findIndex from 'lodash/findIndex';
-import BaseEditor from './BaseEditor';
 
 export const getEditorTabsInitialState = () => {
   return {
@@ -9,7 +8,10 @@ export const getEditorTabsInitialState = () => {
   };
 };
 
-export const openEditorTab = (state, name, editorCreator: () => BaseEditor, key) => {
+export const openEditorTab = (
+  state,
+  { name, editorCreator, key, dontFocusTab }
+) => {
   const existingEditorId = findIndex(
     state.editors,
     editor => editor.key === key
@@ -34,7 +36,7 @@ export const openEditorTab = (state, name, editorCreator: () => BaseEditor, key)
   return {
     ...state,
     editors: [...state.editors, editorTab],
-    currentTab: state.editors.length,
+    currentTab: dontFocusTab ? state.currentTab : state.editors.length,
   };
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import InstancesFullEditor from './InstancesFullEditor';
-import { serializeToJSObject } from '../Utils/Serializer';
-import BaseEditor from '../MainFrame/BaseEditor';
+import InstancesFullEditor from '../../SceneEditor/InstancesFullEditor';
+import { serializeToJSObject } from '../../Utils/Serializer';
+import BaseEditor from './BaseEditor';
 
 export default class ExternalLayoutEditor extends BaseEditor {
   updateToolbar() {

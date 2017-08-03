@@ -3,6 +3,8 @@ import StandardEvent from './Renderers/StandardEvent';
 import GroupEvent from './Renderers/GroupEvent';
 import CommentEvent from './Renderers/CommentEvent';
 import ForEachEvent from './Renderers/ForEachEvent';
+import RepeatEvent from './Renderers/RepeatEvent';
+import WhileEvent from './Renderers/WhileEvent';
 
 export default {
   components: {
@@ -11,6 +13,8 @@ export default {
     'BuiltinCommonInstructions::Group': GroupEvent,
     'BuiltinCommonInstructions::Comment': CommentEvent,
     'BuiltinCommonInstructions::ForEach': ForEachEvent,
+    'BuiltinCommonInstructions::Repeat': RepeatEvent,
+    'BuiltinCommonInstructions::While': WhileEvent,
   },
   getEventComponent: function(event) {
     if (this.components.hasOwnProperty(event.getType()))

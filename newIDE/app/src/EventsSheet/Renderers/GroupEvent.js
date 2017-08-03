@@ -11,7 +11,6 @@ export default class GroupEvent extends Component {
 
   handleClick() {
     // TODO
-    this.props.callbacks.onEditEventTemplate(this.props.event);
   }
 
   render() {

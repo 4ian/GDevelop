@@ -29,6 +29,7 @@ export default class InstructionsList extends Component {
     onInstructionDoubleClick: PropTypes.func.isRequired,
     onParameterClick: PropTypes.func.isRequired,
     selection: PropTypes.object.isRequired,
+    addButtonLabel: PropTypes.string,
   };
 
   onAddNewInstruction = () => {
@@ -69,6 +70,12 @@ export default class InstructionsList extends Component {
             parameterIndex,
             domEvent,
           })}
+
+          selection={this.props.selection}
+          onAddNewSubInstruction={this.props.onAddNewInstruction}
+          onSubInstructionClick={this.props.onInstructionClick}
+          onSubInstructionDoubleClick={this.props.onInstructionDoubleClick}
+          onSubParameterClick={this.props.onParameterClick}
         />
       );
     });
@@ -76,11 +83,12 @@ export default class InstructionsList extends Component {
     const containerStyle = this.props.areConditions ? styles.conditionsContainer :
       styles.actionsContainer;
 
+    const addButtonLabel = this.props.areConditions ? 'Add condition' : 'Add action';
     return (
       <div style={{...containerStyle, ...this.props.style}}>
         {instructions}
         <a style={styles.addButton} className="add-link" onClick={this.onAddNewInstruction}>
-          {this.props.areConditions ? 'Add condition' : 'Add action'}
+          {this.props.addButtonLabel || addButtonLabel}
         </a>
       </div>
     );

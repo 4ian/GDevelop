@@ -6,10 +6,15 @@ export default class RelationalOperatorField extends Component {
   focus() {}
 
   render() {
+    const { parameterMetadata } = this.props;
+    const description = parameterMetadata
+      ? parameterMetadata.getDescription()
+      : undefined;
+
     return (
       <SelectField
         fullWidth
-        floatingLabelText={this.props.parameterMetadata.getDescription()}
+        floatingLabelText={description}
         value={this.props.value}
         onChange={(e, i, value) => this.props.onChange(value)}
         ref={field => this._field = field}

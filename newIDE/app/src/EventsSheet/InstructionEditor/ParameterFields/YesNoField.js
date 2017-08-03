@@ -11,9 +11,14 @@ export default class DefaultField extends Component {
   focus() {}
 
   render() {
+    const { parameterMetadata } = this.props;
+    const description = parameterMetadata
+      ? parameterMetadata.getDescription()
+      : undefined;
+
     return (
       <div>
-        {this.props.parameterMetadata.getDescription()}
+        {description}
         <RaisedButton
           style={styles.button}
           label="Yes"

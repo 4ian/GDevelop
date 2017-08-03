@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { mapFor } from '../Utils/MapFor';
 import classNames from 'classnames';
 import { selectedArea, selectableArea } from './ClassNames';
+import InstructionsList from './InstructionsList';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
 instrFormatter.loadTypesFormattingFromConfig();
@@ -19,6 +20,12 @@ const styles = {
     paddingLeft: 2,
     paddingRight: 2,
   },
+  subInstructionsList: {
+    marginLeft: 9,
+    marginTop: 1,
+    borderRight: 'none',
+    borderLeft: '1px solid #d3d3d3',
+  },
 };
 
 export default class Instruction extends Component {
@@ -26,6 +33,13 @@ export default class Instruction extends Component {
     instruction: PropTypes.object.isRequired,
     isCondition: PropTypes.bool.isRequired,
     onClick: PropTypes.func.isRequired,
+
+    // For potential sub-instructions list:
+    selection: PropTypes.object,
+    onAddNewSubInstruction: PropTypes.func,
+    onSubInstructionClick: PropTypes.func,
+    onSubInstructionDoubleClick: PropTypes.func,
+    onSubParameterClick: PropTypes.func,
   };
 
   /**
@@ -117,6 +131,18 @@ export default class Instruction extends Component {
           />}
         <img src={metadata.getSmallIconFilename()} style={styles.icon} alt="" />
         {this._renderInstructionText(metadata)}
+        {metadata.canHaveSubInstructions() &&
+          <InstructionsList
+            style={styles.subInstructionsList}
+            instrsList={instruction.getSubInstructions()}
+            areConditions={this.props.isCondition}
+            selection={this.props.selection}
+            onAddNewInstruction={this.props.onAddNewSubInstruction}
+            onInstructionClick={this.props.onSubInstructionClick}
+            onInstructionDoubleClick={this.props.onSubInstructionDoubleClick}
+            onParameterClick={this.props.onSubParameterClick}
+            addButtonLabel="Add a sub-condition"
+          />}
       </div>
     );
   }

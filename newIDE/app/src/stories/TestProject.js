@@ -99,6 +99,9 @@ testLayoutInstance1.setY(15);
 //Add a new "standard" event to the scene:
 var evt = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Standard", 0);
 var evt2 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Standard", 1);
+var evt3 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::ForEach", 2);
+var evt4 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::While", 3);
+var evt5 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Repeat", 4);
 var standardEvt = gd.asStandardEvent(evt); //We need to "cast" the event to use its specific methods (getConditions and getActions):
 
 const makeKeyPressedCondition = () => {

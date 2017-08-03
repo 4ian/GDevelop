@@ -7,10 +7,15 @@ export default class DefaultField extends Component {
   }
 
   render() {
+    const { parameterMetadata } = this.props;
+    const description = parameterMetadata
+      ? parameterMetadata.getDescription()
+      : undefined;
+
     return (
       <TextField
         value={this.props.value}
-        floatingLabelText={this.props.parameterMetadata.getDescription()}
+        floatingLabelText={description}
         onChange={(e, text) => this.props.onChange(text)}
         ref={field => this._field = field}
         fullWidth

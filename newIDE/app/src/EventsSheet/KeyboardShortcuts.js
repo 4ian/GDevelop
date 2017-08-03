@@ -29,6 +29,12 @@ export default class KeyboardShortcuts extends Component {
     if (evt.altKey) this.altPressed = true;
     if (evt.which === CTRL_KEY) this.rawCtrlPressed = true;
     if (evt.which === SHIFT_KEY) this.shiftPressed = true;
+
+    const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
+    if (evt.target && evt.target.closest(textEditorSelectors)) {
+      return; // Something else is currently being edited.
+    }
+
     if (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY) {
       this.props.onDelete();
     }

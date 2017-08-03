@@ -98,7 +98,9 @@ class ThemableTab extends Component {
           }}
           icon={
             <Close
-              color="white"
+              color={selected
+              ? muiTheme.closableTabs.selectedTextColor
+              : muiTheme.closableTabs.textColor}
               style={{
                 width: muiTheme.closableTabs.height / 2,
                 height: muiTheme.closableTabs.height / 2,

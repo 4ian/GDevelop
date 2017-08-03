@@ -2,10 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import { largeSelectedArea, largeSelectableArea } from '../ClassNames';
+import {
+  largeSelectedArea,
+  largeSelectableArea,
+  selectableArea,
+} from '../ClassNames';
 const gd = global.gd;
 
-const commentEventStyles = {
+const styles = {
   container: {
     minHeight: 30,
     display: 'flex',
@@ -18,10 +22,11 @@ const commentEventStyles = {
     padding: 5,
   },
   textArea: {
+    padding: 5,
     flex: 1,
     boxSizing: 'border-box',
     width: '100%',
-    height: '100%',
+    fontSize: 14,
   },
 };
 
@@ -39,10 +44,11 @@ export default class CommentEvent extends Component {
     };
   }
 
-  handleDoubleClick = () => {
+  edit = () => {
     this.setState(
       {
         editing: true,
+        height: this._container.offsetHeight,
       },
       () => {
         const input = ReactDOM.findDOMNode(this._input);
@@ -52,7 +58,7 @@ export default class CommentEvent extends Component {
     );
   };
 
-  handleBlur = () => {
+  endEditing = () => {
     const commentEvent = gd.asCommentEvent(this.props.event);
     commentEvent.setComment(ReactDOM.findDOMNode(this._input).value);
     this.setState(
@@ -76,17 +82,21 @@ export default class CommentEvent extends Component {
   render() {
     return (
       <div
-        style={commentEventStyles.container}
+        style={styles.container}
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
         })}
+        ref={container => this._container = container}
       >
         {!this.state.editing
           ? <p
-              onDoubleClick={this.handleDoubleClick}
+              className={classNames({
+                [selectableArea]: true,
+              })}
+              onClick={this.edit}
               key="p"
-              style={commentEventStyles.text}
+              style={styles.text}
               dangerouslySetInnerHTML={{
                 __html: this._getCommentHTML(),
               }}
@@ -94,8 +104,8 @@ export default class CommentEvent extends Component {
           : <textarea
               key="textarea"
               type="text"
-              style={commentEventStyles.textArea}
-              onBlur={this.handleBlur}
+              style={{ ...styles.textArea, height: this.state.height }}
+              onBlur={this.endEditing}
               ref={input => this._input = input}
             />}
       </div>

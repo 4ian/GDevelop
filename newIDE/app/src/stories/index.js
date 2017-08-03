@@ -140,7 +140,9 @@ storiesOf('DragHandle', module)
 
 storiesOf('EventsTree', module).add('default', () => (
   <DragDropContextProvider>
-    <EventsTree events={testLayout.getEvents()} selectedEvents={[]} selectedInstructions={[]} />
+    <div className="gd-events-sheet">
+      <EventsTree events={testLayout.getEvents()} selectedEvents={[]} selectedInstructions={[]} />
+    </div>
   </DragDropContextProvider>
 ));
 

@@ -102,7 +102,10 @@ var evt2 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstruct
 var evt3 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::ForEach", 2);
 var evt4 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::While", 3);
 var evt5 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Repeat", 4);
-var standardEvt = gd.asStandardEvent(evt); //We need to "cast" the event to use its specific methods (getConditions and getActions):
+var evt6 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Group", 5);
+
+const groupEvent = gd.asGroupEvent(evt6);
+groupEvent.setName('Group #1');
 
 const makeKeyPressedCondition = () => {
     const condition = new gd.Instruction();
@@ -120,6 +123,7 @@ const makeDeleteAction = (objectToDelete) => {
     return action;
 }
 
+var standardEvt = gd.asStandardEvent(evt);
 standardEvt.getConditions().push_back(makeKeyPressedCondition());
 standardEvt.getActions().push_back(makeDeleteAction("MyCharacter"));
 

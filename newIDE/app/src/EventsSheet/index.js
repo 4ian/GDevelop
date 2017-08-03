@@ -42,6 +42,8 @@ export default class EventsSheet extends Component {
   }
 
   updateToolbar() {
+    if (!this.props.setToolbar) return;
+
     this.props.setToolbar(
       <Toolbar
         onAddStandardEvent={() =>

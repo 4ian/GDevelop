@@ -51,7 +51,7 @@ export default class RepeatEvent extends Component {
     });
   }
 
-  onEndEditing = () => {
+  endEditing = () => {
     this.setState({
       editing: false,
       anchorEl: null,
@@ -111,7 +111,7 @@ export default class RepeatEvent extends Component {
         <InlinePopover
           open={this.state.editing}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.onEndEditing}
+          onRequestClose={this.endEditing}
         >
           <DefaultField
             project={this.props.project}

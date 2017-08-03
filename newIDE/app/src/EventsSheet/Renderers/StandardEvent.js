@@ -9,10 +9,6 @@ const styles = {
   container: {
     display: 'flex',
   },
-  selectedContainer: {
-    display: 'flex',
-    background: 'orange',
-  },
   conditionsList: {
     paddingLeft: 5,
     paddingRight: 5,

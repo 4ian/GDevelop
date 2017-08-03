@@ -2,6 +2,7 @@ import UnknownEvent from './Renderers/UnknownEvent';
 import StandardEvent from './Renderers/StandardEvent';
 import GroupEvent from './Renderers/GroupEvent';
 import CommentEvent from './Renderers/CommentEvent';
+import ForEachEvent from './Renderers/ForEachEvent';
 
 export default {
   components: {
@@ -9,6 +10,7 @@ export default {
     'BuiltinCommonInstructions::Standard': StandardEvent,
     'BuiltinCommonInstructions::Group': GroupEvent,
     'BuiltinCommonInstructions::Comment': CommentEvent,
+    'BuiltinCommonInstructions::ForEach': ForEachEvent,
   },
   getEventComponent: function(event) {
     if (this.components.hasOwnProperty(event.getType()))

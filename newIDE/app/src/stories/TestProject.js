@@ -103,6 +103,7 @@ var evt3 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstruct
 var evt4 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::While", 3);
 var evt5 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Repeat", 4);
 var evt6 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Group", 5);
+var evt7 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Link", 6);
 
 const groupEvent = gd.asGroupEvent(evt6);
 groupEvent.setName('Group #1');

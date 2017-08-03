@@ -78,7 +78,7 @@ export default class GroupEvent extends Component {
               style={styles.title}
               inputStyle={{
                 color: textColor,
-                '-webkit-text-fill-color': textColor,
+                WebkitTextFillColor: textColor,
               }}
               underlineFocusStyle={{
                 borderColor: textColor,

@@ -5,6 +5,7 @@ import CommentEvent from './Renderers/CommentEvent';
 import ForEachEvent from './Renderers/ForEachEvent';
 import RepeatEvent from './Renderers/RepeatEvent';
 import WhileEvent from './Renderers/WhileEvent';
+import LinkEvent from './Renderers/LinkEvent';
 
 export default {
   components: {
@@ -15,6 +16,7 @@ export default {
     'BuiltinCommonInstructions::ForEach': ForEachEvent,
     'BuiltinCommonInstructions::Repeat': RepeatEvent,
     'BuiltinCommonInstructions::While': WhileEvent,
+    'BuiltinCommonInstructions::Link': LinkEvent,
   },
   getEventComponent: function(event) {
     if (this.components.hasOwnProperty(event.getType()))

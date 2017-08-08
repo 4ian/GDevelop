@@ -53,6 +53,7 @@ export const selectEvent = (
   multiSelection = false
 ) => {
   const event = eventContext.event;
+  if (isEventSelected(selection, event)) return selection;
 
   const existingSelection = multiSelection ? selection : clearSelection();
   return {
@@ -70,6 +71,7 @@ export const selectInstruction = (
   multiSelection = false
 ) => {
   const instruction = instructionContext.instruction;
+  if (isInstructionSelected(selection, instruction)) return selection;
 
   const existingSelection = multiSelection ? selection : clearSelection();
   return {

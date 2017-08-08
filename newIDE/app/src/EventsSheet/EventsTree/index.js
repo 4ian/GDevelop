@@ -78,6 +78,11 @@ class EventContainer extends Component {
     this.forceUpdate();
   };
 
+  _onEventContextMenu = (domEvent) => {
+    domEvent.preventDefault();
+    this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
+  };
+
   render() {
     const { event, project, layout } = this.props;
     const EventComponent = EventsRenderingService.getEventComponent(event);
@@ -86,6 +91,7 @@ class EventContainer extends Component {
       <div
         ref={container => this._container = container}
         onClick={this.props.onEventClick}
+        onContextMenu={this._onEventContextMenu}
       >
         {EventComponent &&
           <EventComponent
@@ -99,6 +105,7 @@ class EventContainer extends Component {
             onAddNewInstruction={this.props.onAddNewInstruction}
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+            onInstructionContextMenu={this.props.onInstructionContextMenu}
             onParameterClick={this.props.onParameterClick}
           />}
       </div>
@@ -243,6 +250,8 @@ export default class EventsTree extends Component {
         onParameterClick={this.props.onParameterClick}
         onEventClick={() =>
           this.props.onEventClick(node)}
+        onEventContextMenu={(x, y) => this.props.onEventContextMenu(x, y, node)}
+        onInstructionContextMenu={this.props.onInstructionContextMenu}
       />
     );
   };

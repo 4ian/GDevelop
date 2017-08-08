@@ -27,6 +27,7 @@ export default class InstructionsList extends Component {
     onAddNewInstruction: PropTypes.func.isRequired,
     onInstructionClick: PropTypes.func.isRequired,
     onInstructionDoubleClick: PropTypes.func.isRequired,
+    onInstructionContextMenu: PropTypes.func.isRequired,
     onParameterClick: PropTypes.func.isRequired,
     selection: PropTypes.object.isRequired,
     addButtonLabel: PropTypes.string,
@@ -42,6 +43,13 @@ export default class InstructionsList extends Component {
   render() {
     const instructions = mapFor(0, this.props.instrsList.size(), i => {
       const instruction = this.props.instrsList.get(i);
+      const instructionContext = {
+        isCondition: this.props.areConditions,
+        instrsList: this.props.instrsList,
+        instruction,
+        indexInList: i,
+      };
+
       return (
         <Instruction
           instruction={instruction}
@@ -50,23 +58,11 @@ export default class InstructionsList extends Component {
           index={i}
           key={instruction.ptr}
           selected={isInstructionSelected(this.props.selection, instruction)}
-          onClick={() => this.props.onInstructionClick({
-            isCondition: this.props.areConditions,
-            instrsList: this.props.instrsList,
-            instruction,
-            indexInList: i,
-          })}
-          onDoubleClick={() => this.props.onInstructionDoubleClick({
-            isCondition: this.props.areConditions,
-            instrsList: this.props.instrsList,
-            instruction,
-            indexInList: i,
-          })}
+          onClick={() => this.props.onInstructionClick(instructionContext)}
+          onDoubleClick={() => this.props.onInstructionDoubleClick(instructionContext)}
+          onContextMenu={(x, y) => this.props.onInstructionContextMenu(x, y, instructionContext)}
           onParameterClick={(domEvent, parameterIndex) => this.props.onParameterClick({
-            isCondition: this.props.areConditions,
-            instrsList: this.props.instrsList,
-            instruction,
-            indexInList: i,
+            ...instructionContext,
             parameterIndex,
             domEvent,
           })}
@@ -75,6 +71,7 @@ export default class InstructionsList extends Component {
           onAddNewSubInstruction={this.props.onAddNewInstruction}
           onSubInstructionClick={this.props.onInstructionClick}
           onSubInstructionDoubleClick={this.props.onInstructionDoubleClick}
+          onSubInstructionContextMenu={this.props.onInstructionContextMenu}
           onSubParameterClick={this.props.onParameterClick}
         />
       );

@@ -122,6 +122,10 @@ export default class Instruction extends Component {
           e.stopPropagation();
           this.props.onDoubleClick();
         }}
+        onContextMenu={e => {
+          e.stopPropagation();
+          this.props.onContextMenu(e.clientX, e.clientY);
+        }}
       >
         {instruction.isInverted() &&
           <img
@@ -140,6 +144,7 @@ export default class Instruction extends Component {
             onAddNewInstruction={this.props.onAddNewSubInstruction}
             onInstructionClick={this.props.onSubInstructionClick}
             onInstructionDoubleClick={this.props.onSubInstructionDoubleClick}
+            onInstructionContextMenu={this.props.onSubInstructionContextMenu}
             onParameterClick={this.props.onSubParameterClick}
             addButtonLabel="Add a sub-condition"
           />}

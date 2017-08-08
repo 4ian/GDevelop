@@ -30,6 +30,7 @@ export default class ForEachEvent extends Component {
     onAddNewInstruction: PropTypes.func.isRequired,
     onInstructionClick: PropTypes.func.isRequired,
     onInstructionDoubleClick: PropTypes.func.isRequired,
+    onInstructionContextMenu: PropTypes.func.isRequired,
     onParameterClick: PropTypes.func.isRequired,
     selection: PropTypes.object.isRequired,
     onUpdate: PropTypes.func.isRequired,
@@ -95,6 +96,7 @@ export default class ForEachEvent extends Component {
             onAddNewInstruction={this.props.onAddNewInstruction}
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+            onInstructionContextMenu={this.props.onInstructionContextMenu}
             onParameterClick={this.props.onParameterClick}
           />
           <InstructionsList
@@ -105,6 +107,7 @@ export default class ForEachEvent extends Component {
             onAddNewInstruction={this.props.onAddNewInstruction}
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+            onInstructionContextMenu={this.props.onInstructionContextMenu}
             onParameterClick={this.props.onParameterClick}
           />
         </div>

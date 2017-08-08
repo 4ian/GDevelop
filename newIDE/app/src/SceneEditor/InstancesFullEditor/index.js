@@ -575,17 +575,14 @@ export default class InstancesFullEditor extends Component {
             { type: 'separator' },
             {
               label: 'Copy',
-              role: 'copy',
               click: () => this.copySelection(),
             },
             {
               label: 'Cut',
-              role: 'cut',
               click: () => this.cutSelection(),
             },
             {
               label: 'Paste',
-              role: 'paste',
               click: () => this.paste(),
             },
           ]}

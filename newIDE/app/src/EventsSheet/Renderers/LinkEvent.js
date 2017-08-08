@@ -79,7 +79,7 @@ export default class LinkEvent extends Component {
                   [selectableArea]: true,
                 })}
               >
-                {' '}&lt; Enter the name of external events &gt;{' '}
+                &lt; Enter the name of external events &gt;
               </i>
             </span>}
         <InlinePopover

@@ -10,6 +10,7 @@ export default class LayerRenderer {
       project,
       layout,
       layer,
+      viewPosition,
       instances,
       onInstanceClicked,
       onOverInstance,
@@ -24,12 +25,16 @@ export default class LayerRenderer {
     this.layout = layout;
     this.layer = layer; // /!\ Don't store any other reference.
     // `layer` can be changed at any moment (see InstancesRenderer).
+    this.viewPosition = viewPosition;
     this.onInstanceClicked = onInstanceClicked;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
     this.onMoveInstance = onMoveInstance;
     this.onMoveInstanceEnd = onMoveInstanceEnd;
     this.onDownInstance = onDownInstance;
+
+    this.viewTopLeft = [0, 0]; // Used for instances culling on rendering
+    this.viewBottomRight = [0, 0]; // Used for instances culling on rendering
 
     this.renderedInstances = {};
     this.pixiContainer = new PIXI.Container();
@@ -46,6 +51,10 @@ export default class LayerRenderer {
       const pixiObject = renderedInstance.getPixiObject();
       if (pixiObject) pixiObject.zOrder = instance.getZOrder();
       if (pixiObject) pixiObject.interactive = !instance.isLocked();
+
+      // "Culling" improves rendering performance of large levels
+      if (pixiObject) pixiObject.visible = this._isInstanceVisible(instance);
+
       renderedInstance.update();
       renderedInstance.wasUsed = true;
     };
@@ -137,7 +146,32 @@ export default class LayerRenderer {
     return renderedInstance;
   };
 
+  /**
+   * This returns true if an instance is visible according to the viewPosition.
+   * The approach is a naive bounding box testing but save rendering time on large
+   * levels.
+   * @param {*} instance
+   */
+  _isInstanceVisible(instance) {
+    //TODO: Properly handle rotation
+    const left = this.getInstanceLeft(instance);
+    const top = this.getInstanceTop(instance);
+    if (left + this.getInstanceWidth(instance) < this.viewTopLeft[0] ||
+      top + this.getInstanceHeight(instance) < this.viewTopLeft[1] ||
+      left > this.viewBottomRight[0] ||
+      top > this.viewBottomRight[1])
+      return false;
+
+    return true;
+  }
+
+  _computeViewBounds() {
+    this.viewTopLeft = this.viewPosition.toSceneCoordinates(0, 0);
+    this.viewBottomRight = this.viewPosition.toSceneCoordinates(this.viewPosition.getWidth(), this.viewPosition.getHeight());
+  }
+
   render() {
+    this._computeViewBounds();
     this.instances.iterateOverInstancesWithZOrdering(
       this.instancesRenderer,
       this.layer.getName()

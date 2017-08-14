@@ -16,13 +16,26 @@ const fuzzyFilterOrEmpty = (searchText, key) => {
 };
 
 export default class ObjectField extends Component {
-  focus() {
-    if (this._field) this._field.focus();
-  }
+  constructor(props) {
+    super(props);
 
-  render() {
+    this.state = { errorText: null };
+
     const { project, layout, parameterMetadata } = this.props;
-    const list = enumerateObjectsAndGroups(project, layout);
+
+    this._description = parameterMetadata
+      ? parameterMetadata.getDescription()
+      : undefined;
+
+    this._objectTypeAllowed = parameterMetadata
+      ? parameterMetadata.getExtraInfo()
+      : undefined;
+
+    const list = enumerateObjectsAndGroups(
+      project,
+      layout,
+      this._objectTypeAllowed
+    );
     const objects = list.allObjectsList.map(({
       object,
     }) => {
@@ -40,18 +53,41 @@ export default class ObjectField extends Component {
       };
     });
 
-    const fullList = [...objects, { text: '', value: <Divider /> }, ...groups];
+    this.fullList = [...objects, { text: '', value: <Divider /> }, ...groups];
+  }
 
-    const description = parameterMetadata
-      ? parameterMetadata.getDescription()
-      : undefined;
+  focus() {
+    if (this._field) this._field.focus();
+  }
+
+  getError = () => {
+    const isValidChoice = this.fullList.filter(
+      choice => this.props.value === choice.text
+    ).length !== 0;
+
+    if (!isValidChoice)
+      return "The object does not exist or can't be used here";
+
+    return null;
+  };
+
+  doValidation = () => {
+    this.setState({ errorText: this.getError() });
+  };
+
+  render() {
     return (
       <AutoComplete
-        floatingLabelText={description}
+        floatingLabelText={this._description}
         fullWidth
         textFieldStyle={styles.autoCompleteTextField}
+        errorText={this.state.errorText}
         searchText={this.props.value}
-        onUpdateInput={value => this.props.onChange(value)}
+        onUpdateInput={value => {
+          this.setState({ errorText: null });
+          this.props.onChange(value);
+        }}
+        onBlur={this.doValidation}
         onNewRequest={data => {
           // Note that data may be a string or a {text, value} object.
           if (typeof data === 'string') {
@@ -60,7 +96,7 @@ export default class ObjectField extends Component {
             this.props.onChange(data.value);
           }
         }}
-        dataSource={fullList}
+        dataSource={this.fullList}
         filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
         ref={field => this._field = field}

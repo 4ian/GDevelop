@@ -42,7 +42,6 @@ export default class InstructionEditorDialog extends React.Component {
 
     return (
       <Dialog
-        title={this._getTitle()}
         actions={actions}
         modal={false}
         open={this.props.open}

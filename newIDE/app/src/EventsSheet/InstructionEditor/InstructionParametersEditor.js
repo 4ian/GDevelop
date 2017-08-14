@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
+import Toggle from 'material-ui/Toggle';
 import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from './ParameterRenderingService';
@@ -19,7 +20,10 @@ const styles = {
     width: 24,
     height: 24,
     marginRight: 8,
-  }
+  },
+  invertToggle: {
+    marginTop: 8,
+  },
 };
 
 export default class InstructionParametersEditor extends Component {
@@ -63,7 +67,11 @@ export default class InstructionParametersEditor extends Component {
     return (
       <div style={this.props.style}>
         <div style={styles.instructionHeader}>
-          <img src={instructionMetadata.getIconFilename()} alt="" style={styles.icon} />
+          <img
+            src={instructionMetadata.getIconFilename()}
+            alt=""
+            style={styles.icon}
+          />
           <p>
             {instructionMetadata.getDescription()}
           </p>
@@ -95,6 +103,17 @@ export default class InstructionParametersEditor extends Component {
             <EmptyMessage>
               There is nothing to configure.
             </EmptyMessage>}
+          {this.props.isCondition &&
+            <Toggle
+              label="Invert condition"
+              labelPosition="right"
+              toggled={instruction.isInverted()}
+              style={styles.invertToggle}
+              onToggle={(e, enabled) => {
+                instruction.setInverted(enabled);
+                this.forceUpdate();
+              }}
+            />}
         </div>
       </div>
     );

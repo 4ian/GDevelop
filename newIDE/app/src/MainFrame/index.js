@@ -163,7 +163,7 @@ export default class MainFrame extends Component {
       showErrorBox('Unable to launch the preview!', err);
     });
 
-  openLayout = name => {
+  openLayout = (name, openEventsEditor = true) => {
     const sceneEditorOptions = {
       name,
       editorCreator: () => (
@@ -199,10 +199,10 @@ export default class MainFrame extends Component {
       this.state.editorTabs,
       sceneEditorOptions
     );
-    const tabsWithSceneAndEventsEditors = openEditorTab(
+    const tabsWithSceneAndEventsEditors = openEventsEditor ? openEditorTab(
       tabsWithSceneEditor,
       eventsEditorOptions
-    );
+    ) : tabsWithSceneEditor;
 
     this.setState({ editorTabs: tabsWithSceneAndEventsEditors }, () =>
       this.updateToolbar());

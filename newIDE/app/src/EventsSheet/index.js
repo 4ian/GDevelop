@@ -303,6 +303,7 @@ export default class EventsSheet extends Component {
       <div className={container}>
         <FullSizeEventsTree
           eventsTreeRef={eventsTree => this._eventsTree = eventsTree}
+          key={events.ptr}
           events={events}
           project={project}
           layout={layout}

@@ -14,13 +14,13 @@ export default class InstancesResizer {
   _roundXPosition(x) {
     if (!this.options.snap || !this.options.grid) return x;
 
-    return Math.round(x / this.options.gridWidth) * this.options.gridWidth;
+    return Math.round((x - this.options.gridOffsetX) / this.options.gridWidth) * this.options.gridWidth + this.options.gridOffsetX;
   }
 
   _roundYPosition(y) {
     if (!this.options.snap || !this.options.grid) return y;
 
-    return Math.round(y / this.options.gridHeight) * this.options.gridHeight;
+    return Math.round((y - this.options.gridOffsetY) / this.options.gridHeight) * this.options.gridHeight + this.options.gridOffsetY;
   }
 
   _getMoveDeltaX(followAxis) {

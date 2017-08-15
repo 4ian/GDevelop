@@ -1,71 +1,116 @@
 import React from 'react';
 import EventsSheet from '../../EventsSheet';
+import RaisedButton from 'material-ui/RaisedButton';
 import { serializeToJSObject } from '../../Utils/Serializer';
+import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import BaseEditor from './BaseEditor';
+import LayoutChooserDialog from './LayoutChooserDialog';
 
-// TODO: Move in a folder with all editors
+const styles = {
+  container: {
+    display: 'flex',
+    flex: 1,
+  },
+};
+
 export default class ExternalEventsEditor extends BaseEditor {
+  constructor(props) {
+    super(props);
+    this.state = {
+      layoutChooserOpen: false,
+    };
+  }
+
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }
 
   getSerializedElements() {
-    const { externalLayout, layout } = this._getLayoutAndExternalEvents();
+    const externalEvents = this.getExternalEvents();
+    const layout = this.getLayout();
 
     return {
       ...BaseEditor.getLayoutSerializedElements(layout),
-      instances: serializeToJSObject(externalLayout.getInitialInstances()),
+      events: serializeToJSObject(externalEvents),
       uiSettings: this.editor.getUiSettings(),
     };
   }
 
-  _getLayoutAndExternalEvents() {
+  getExternalEvents() {
     const { project, externalEventsName } = this.props;
     if (!project.hasExternalEventsNamed(externalEventsName)) {
-      return {};
+      return null;
     }
-    const externalEvents = project.getExternalEvents(externalEventsName);
+    return project.getExternalEvents(externalEventsName);
+  }
+
+  getLayout() {
+    const { project } = this.props;
+
+    const externalEvents = this.getExternalEvents();
+    if (!externalEvents) return null;
 
     const layoutName = externalEvents.getAssociatedLayout();
     if (!project.hasLayoutNamed(layoutName)) {
-      return {
-        externalEvents,
-      };
+      return null;
     }
-    const layout = project.getLayout(layoutName);
-
-    return {
-      layout,
-      externalEvents,
-    }
+    return project.getLayout(layoutName);
   }
 
+  setAssociatedLayout = layoutName => {
+    const externalEvents = this.getExternalEvents();
+    if (!externalEvents) return;
+
+    externalEvents.setAssociatedLayout(layoutName);
+    this.setState({
+      layoutChooserOpen: false,
+    }, () => this.updateToolbar());
+  };
+
+  openLayoutChooser = () => {
+    this.setState({
+      layoutChooserOpen: true,
+    });
+  };
+
   render() {
-    const { project, layoutName, externalEventsName  } = this.props;
-    const { layout, externalEvents } = this._getLayoutAndExternalEvents();
+    const { project, externalEventsName  } = this.props;
+    const externalEvents = this.getExternalEvents();
+    const layout = this.getLayout();
+
     if (!externalEvents) {
       //TODO: Error component
       return <div>No external events called {externalEventsName} found!</div>;
     }
 
-    if (!layout) {
-      //TODO: Error component
-      return (
-        <div>
-          No layout called {layoutName} found for the external events editor!
-        </div>
-      );
-    }
-
     return (
-      <EventsSheet
-        {...this.props}
-        ref={editor => this.editor = editor}
-        project={project}
-        layout={layout}
-        events={externalEvents.getEvents()}
-        onPreview={() => this.props.onPreview(project, layout)}
-      />
+      <div style={styles.container}>
+        {layout && <EventsSheet
+          {...this.props}
+          ref={editor => this.editor = editor}
+          project={project}
+          layout={layout}
+          events={externalEvents.getEvents()}
+          onPreview={() => this.props.onPreview(project, layout)}
+        />
+        }
+        {!layout &&
+          <PlaceholderMessage>
+            To edit the external events, choose the scene in which it will be included:
+            <RaisedButton
+              label="Choose the scene"
+              primary
+              onClick={this.openLayoutChooser}
+            />
+          </PlaceholderMessage>
+          }
+        <LayoutChooserDialog
+          open={this.state.layoutChooserOpen}
+          project={project}
+          onChoose={this.setAssociatedLayout}
+          onClose={() => this.setState({layoutChooserOpen: false})}
+        />
+      </div>
     );
   }
 }

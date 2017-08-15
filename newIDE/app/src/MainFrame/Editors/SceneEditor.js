@@ -18,20 +18,16 @@ export default class SceneEditor extends BaseEditor {
     };
   }
 
-  _getLayout() {
+  getLayout() {
     const { project, layoutName } = this.props;
-    if (!project || !project.hasLayoutNamed(layoutName)) return {};
+    if (!project || !project.hasLayoutNamed(layoutName)) return null;
 
-    const layout = project.getLayout(layoutName);
-
-    return {
-      layout,
-    };
+    return project.getLayout(layoutName);
   }
 
   render() {
     const { project, layoutName } = this.props;
-    const { layout } = this._getLayout();
+    const layout = this.getLayout();
     if (!layout) {
       //TODO: Error component
       return <div>No layout called {layoutName} found!</div>;

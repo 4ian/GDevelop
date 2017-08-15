@@ -1,9 +1,26 @@
 import React from 'react';
+import RaisedButton from 'material-ui/RaisedButton';
 import InstancesFullEditor from '../../SceneEditor/InstancesFullEditor';
 import { serializeToJSObject } from '../../Utils/Serializer';
+import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import BaseEditor from './BaseEditor';
+import LayoutChooserDialog from './LayoutChooserDialog';
+
+const styles = {
+  container: {
+    display: 'flex',
+    flex: 1,
+  },
+};
 
 export default class ExternalLayoutEditor extends BaseEditor {
+  constructor(props) {
+    super(props);
+    this.state = {
+      layoutChooserOpen: false,
+    };
+  }
+
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }
@@ -18,56 +35,85 @@ export default class ExternalLayoutEditor extends BaseEditor {
     };
   }
 
-  _getLayoutAndExternalLayout() {
+  getExternalLayout() {
     const { project, externalLayoutName } = this.props;
     if (!project.hasExternalLayoutNamed(externalLayoutName)) {
-      return {};
+      return null;
     }
-    const externalLayout = project.getExternalLayout(externalLayoutName);
+    return project.getExternalLayout(externalLayoutName);
+  }
+
+  getLayout() {
+    const { project } = this.props;
+
+    const externalLayout = this.getExternalLayout();
+    if (!externalLayout) return null;
 
     const layoutName = externalLayout.getAssociatedLayout();
     if (!project.hasLayoutNamed(layoutName)) {
-      return {
-        externalLayout,
-      };
+      return null;
     }
-    const layout = project.getLayout(layoutName);
-
-    return {
-      layout,
-      externalLayout,
-    }
+    return project.getLayout(layoutName);
   }
 
+  setAssociatedLayout = layoutName => {
+    const { externalLayout } = this._getLayoutAndExternalLayout();
+    if (!externalLayout) return;
+
+    externalLayout.setAssociatedLayout(layoutName);
+    this.setState({
+      layoutChooserOpen: false,
+    }, () => this.updateToolbar());
+  };
+
+  openLayoutChooser = () => {
+    this.setState({
+      layoutChooserOpen: true,
+    });
+  };
+
   render() {
-    const { project, layoutName, externalLayoutName  } = this.props;
-    const { layout, externalLayout } = this._getLayoutAndExternalLayout();
+    const { project, externalLayoutName } = this.props;
+    const externalLayout = this.getExternalLayout();
+    const layout = this.getLayout();
+
     if (!externalLayout) {
       //TODO: Error component
       return <div>No external layout called {externalLayoutName} found!</div>;
     }
 
-    if (!layout) {
-      //TODO: Error component
-      return (
-        <div>
-          No layout called {layoutName} found for the external layout editor!
-        </div>
-      );
-    }
-
     return (
-      <InstancesFullEditor
-        {...this.props}
-        ref={editor => this.editor = editor}
-        project={project}
-        layout={layout}
-        initialInstances={externalLayout.getInitialInstances()}
-        initialUiSettings={serializeToJSObject(
-          externalLayout.getAssociatedSettings()
-        )}
-        onPreview={() => this.props.onPreview(project, layout, externalLayout)}
-      />
+      <div style={styles.container}>
+        {layout &&
+          <InstancesFullEditor
+            {...this.props}
+            ref={editor => this.editor = editor}
+            project={project}
+            layout={layout}
+            initialInstances={externalLayout.getInitialInstances()}
+            initialUiSettings={serializeToJSObject(
+              externalLayout.getAssociatedSettings()
+            )}
+            onPreview={() =>
+              this.props.onPreview(project, layout, externalLayout)}
+          />}
+        {!layout &&
+          <PlaceholderMessage>
+            To edit the external layout, choose the scene in which it will be included:
+            <RaisedButton
+              label="Choose the scene"
+              primary
+              onClick={this.openLayoutChooser}
+            />
+          </PlaceholderMessage>
+          }
+        <LayoutChooserDialog
+          open={this.state.layoutChooserOpen}
+          project={project}
+          onChoose={this.setAssociatedLayout}
+          onClose={() => this.setState({layoutChooserOpen: false})}
+        />
+      </div>
     );
   }
 }

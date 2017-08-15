@@ -11,6 +11,10 @@ export default class BaseEditor extends Component {
     return this.props.project;
   }
 
+  getLayout() {
+    return null;
+  }
+
   updateToolbar() {
     console.warn('No toolbar defined for this editor');
 

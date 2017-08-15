@@ -9,7 +9,7 @@ import { eventsTree } from '../ClassNames';
 import findIndex from 'lodash/findIndex';
 import { getInitialSelection, isEventSelected } from '../SelectionHandler';
 
-const indentWidth = 50;
+const indentWidth = 22;
 
 /**
  * Store the height of events and notify a component whenever

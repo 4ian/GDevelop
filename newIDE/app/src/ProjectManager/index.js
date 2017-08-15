@@ -4,16 +4,60 @@ import { mapFor } from '../Utils/MapFor';
 import ListIcon from './ListIcon';
 import { makeAddItem } from './AddItem';
 import Window from '../Utils/Window';
+import IconMenu from '../UI/Menu/IconMenu';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import IconButton from 'material-ui/IconButton';
 
 const styles = {
   projectStructureItem: {},
-  item: {},
+  itemName: {
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+  },
 };
 
 const ProjectStructureItem = props => (
   <ListItem style={styles.projectStructureItem} {...props} />
 );
-const Item = props => <ListItem style={styles.item} {...props} />;
+
+const Item = props => {
+  const rightIconButton = props.rightIconButton ||
+    <IconMenu
+      iconButtonElement={
+        <IconButton
+          onTouchTap={e =>
+            e.preventDefault() /*Prevent bubbling the event to ListItem*/}
+        >
+          <MoreVertIcon />
+        </IconButton>
+      }
+      menuTemplate={[
+        {
+          label: 'Edit',
+          click: () => props.onEdit(),
+        },
+        {
+          label: 'Rename',
+          click: () => props.onEditName(),
+        },
+        {
+          label: 'Delete',
+          click: () => props.onDelete(),
+        },
+      ]}
+    />;
+
+  return (
+    <ListItem
+      style={props.style}
+      primaryText={<div style={styles.itemName}>{props.primaryText}</div>}
+      rightIconButton={rightIconButton}
+      onTouchTap={props.onEdit}
+    />
+  );
+};
+
 const AddItem = makeAddItem(Item);
 
 export default class ProjectManager extends React.Component {
@@ -78,8 +122,8 @@ export default class ProjectManager extends React.Component {
               <Item
                 key={i}
                 primaryText={name}
-                leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}
-                onTouchTap={() => this.props.onOpenLayout(name)}
+                onEdit={() => this.props.onOpenLayout(name)}
+                onDelete={() => this.props.onDeleteLayout(layout)}
               />
             );
           }).concat(
@@ -99,13 +143,16 @@ export default class ProjectManager extends React.Component {
               <Item
                 key={i}
                 primaryText={name}
-                leftIcon={
-                  <ListIcon src="res/ribbon_default/externalevents32.png" />
-                }
-                onTouchTap={() => this.props.onOpenExternalEvents(name)}
+                onEdit={() => this.props.onOpenExternalEvents(name)}
+                onDelete={() => this.props.onDeleteExternalEvents(externalEvents)}
               />
             );
-          })}
+          }).concat(
+            <AddItem
+              key={'add-external-events'}
+              onClick={this.props.onAddExternalEvents}
+            />
+          )}
         />
         <ProjectStructureItem
           primaryText="External layouts"
@@ -120,13 +167,16 @@ export default class ProjectManager extends React.Component {
               <Item
                 key={i}
                 primaryText={name}
-                leftIcon={
-                  <ListIcon src="res/ribbon_default/externallayout32.png" />
-                }
-                onTouchTap={() => this.props.onOpenExternalLayout(name)}
+                onEdit={() => this.props.onOpenExternalLayout(name)}
+                onDelete={() => this.props.onDeleteExternalLayout(externalLayout)}
               />
             );
-          })}
+          }).concat(
+            <AddItem
+              key={'add-external-layout'}
+              onClick={this.props.onAddExternalLayout}
+            />
+          )}
         />
       </List>
     );

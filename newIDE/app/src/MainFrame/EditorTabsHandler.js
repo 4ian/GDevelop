@@ -51,20 +51,6 @@ export const closeAll = () => {
   return getEditorTabsInitialState();
 };
 
-export const closeProjectTabs = (state, project) => {
-  return changeCurrentTab(
-    {
-      ...state,
-      editors: state.editors.filter(editorTab => {
-        return !editorTab.editorRef ||
-          !editorTab.editorRef.getProject() ||
-          editorTab.editorRef.getProject() !== project;
-      }),
-    },
-    state.currentTab
-  );
-};
-
 export const closeEditorTab = (state, editorTab) => {
   return changeCurrentTab(
     {
@@ -85,4 +71,63 @@ export const getCurrentTabIndex = state => {
 
 export const getCurrentTab = state => {
   return state.editors[state.currentTab];
+};
+
+export const closeProjectTabs = (state, project) => {
+  return changeCurrentTab(
+    {
+      ...state,
+      editors: state.editors.filter(editorTab => {
+        return !editorTab.editorRef ||
+          !editorTab.editorRef.getProject() ||
+          editorTab.editorRef.getProject() !== project;
+      }),
+    },
+    state.currentTab
+  );
+};
+
+export const closeLayoutTabs = (state, layout) => {
+  return changeCurrentTab(
+    {
+      ...state,
+      editors: state.editors.filter(editorTab => {
+        return !editorTab.editorRef ||
+          !editorTab.editorRef.getLayout ||
+          !editorTab.editorRef.getLayout() ||
+          editorTab.editorRef.getLayout() !== layout;
+      }),
+    },
+    state.currentTab
+  );
+};
+
+export const closeExternalLayoutTabs = (state, externalLayout) => {
+  return changeCurrentTab(
+    {
+      ...state,
+      editors: state.editors.filter(editorTab => {
+        return !editorTab.editorRef ||
+          !editorTab.editorRef.getExternalLayout ||
+          !editorTab.editorRef.getExternalLayout() ||
+          editorTab.editorRef.getExternalLayout() !== externalLayout;
+      }),
+    },
+    state.currentTab
+  );
+};
+
+export const closeExternalEventsTabs = (state, externalEvents) => {
+  return changeCurrentTab(
+    {
+      ...state,
+      editors: state.editors.filter(editorTab => {
+        return !editorTab.editorRef ||
+          !editorTab.editorRef.getExternalEvents ||
+          !editorTab.editorRef.getExternalEvents() ||
+          editorTab.editorRef.getExternalEvents() !== externalEvents;
+      }),
+    },
+    state.currentTab
+  );
 };

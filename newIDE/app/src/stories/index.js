@@ -27,6 +27,7 @@ import InstancePropertiesEditor
   from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
+import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import muiDecorator from './MuiDecorator';
@@ -132,6 +133,10 @@ storiesOf('AboutDialog', module)
 storiesOf('LocalCreateDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCreateDialog open />);
+
+storiesOf('LayoutChooserDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <LayoutChooserDialog open project={project}/>);
 
 storiesOf('DragHandle', module)
   .addDecorator(paperDecorator)

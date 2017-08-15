@@ -7,7 +7,6 @@ const style = { height: 48 };
 export const makeAddItem = Item => ({ onClick }) => {
   return (
     <Item
-      key={'add-scene'}
       primaryText=""
       style={style}
       rightIconButton={
@@ -15,7 +14,7 @@ export const makeAddItem = Item => ({ onClick }) => {
           <Add />
         </IconButton>
       }
-      onClick={onClick}
+      onEdit={onClick}
     />
   );
 };

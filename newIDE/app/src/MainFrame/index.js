@@ -27,6 +27,9 @@ import {
   getCurrentTabIndex,
   getCurrentTab,
   closeProjectTabs,
+  closeLayoutTabs,
+  closeExternalLayoutTabs,
+  closeExternalEventsTabs,
 } from './EditorTabsHandler';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timeFunction } from '../Utils/TimeFunction';
@@ -147,6 +150,85 @@ export default class MainFrame extends Component {
     this.forceUpdate();
   };
 
+  addExternalLayout = () => {
+    const { currentProject } = this.state;
+    const name = newNameGenerator('NewExternalLayout', name =>
+      currentProject.hasExternalLayoutNamed(name));
+    currentProject.insertNewExternalLayout(
+      name,
+      currentProject.getExternalLayoutsCount()
+    );
+    this.forceUpdate();
+  };
+
+  addExternalEvents = () => {
+    const { currentProject } = this.state;
+    const name = newNameGenerator('NewExternalEvents', name =>
+      currentProject.hasExternalEventsNamed(name));
+    currentProject.insertNewExternalEvents(
+      name,
+      currentProject.getExternalEventsCount()
+    );
+    this.forceUpdate();
+  };
+
+  deleteLayout = layout => {
+    const { currentProject } = this.state;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      "Are you sure you want to remove this scene? This can't be undone."
+    );
+    if (!answer) return;
+
+    this.setState({
+      editorTabs: closeLayoutTabs(this.state.editorTabs, layout),
+    }, () => {
+      currentProject.removeLayout(layout.getName());
+      this.forceUpdate();
+    });
+  };
+
+  deleteExternalLayout = externalLayout => {
+    const { currentProject } = this.state;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      "Are you sure you want to remove this external layout? This can't be undone."
+    );
+    if (!answer) return;
+
+    this.setState({
+      editorTabs: closeExternalLayoutTabs(
+        this.state.editorTabs,
+        externalLayout
+      ),
+    }, () => {
+      currentProject.removeExternalLayout(externalLayout.getName());
+      this.forceUpdate();
+    });
+  };
+
+  deleteExternalEvents = externalEvents => {
+    const { currentProject } = this.state;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      "Are you sure you want to remove these external events? This can't be undone."
+    );
+    if (!answer) return;
+
+    this.setState({
+      editorTabs: closeExternalEventsTabs(
+        this.state.editorTabs,
+        externalEvents
+      ),
+    }, () => {
+      currentProject.removeExternalEvents(externalEvents.getName());
+      this.forceUpdate();
+    });
+  };
+
   _launchLayoutPreview = (project, layout) =>
     watchPromiseInState(this, 'previewLoading', () =>
       this.props.onLayoutPreview(project, layout)).catch(err => {
@@ -199,10 +281,9 @@ export default class MainFrame extends Component {
       this.state.editorTabs,
       sceneEditorOptions
     );
-    const tabsWithSceneAndEventsEditors = openEventsEditor ? openEditorTab(
-      tabsWithSceneEditor,
-      eventsEditorOptions
-    ) : tabsWithSceneEditor;
+    const tabsWithSceneAndEventsEditors = openEventsEditor
+      ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
+      : tabsWithSceneEditor;
 
     this.setState({ editorTabs: tabsWithSceneAndEventsEditors }, () =>
       this.updateToolbar());
@@ -438,8 +519,13 @@ export default class MainFrame extends Component {
                   project={currentProject}
                   onOpenExternalEvents={this.openExternalEvents}
                   onOpenLayout={this.openLayout}
-                  onAddLayout={this.addLayout}
                   onOpenExternalLayout={this.openExternalLayout}
+                  onAddLayout={this.addLayout}
+                  onAddExternalLayout={this.addExternalLayout}
+                  onAddExternalEvents={this.addExternalEvents}
+                  onDeleteLayout={this.deleteLayout}
+                  onDeleteExternalLayout={this.deleteExternalLayout}
+                  onDeleteExternalEvents={this.deleteExternalEvents}
                   onSaveProject={this.save}
                   onCloseProject={this.closeProject}
                   onExportProject={this.openExportDialog}

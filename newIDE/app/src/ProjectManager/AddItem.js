@@ -11,7 +11,7 @@ export const makeAddItem = Item => ({ onClick }) => {
       style={style}
       rightIconButton={
         <IconButton>
-          <Add />
+          <Add onClick={onClick}/>
         </IconButton>
       }
       onEdit={onClick}

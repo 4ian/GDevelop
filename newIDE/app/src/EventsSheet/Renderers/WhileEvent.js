@@ -55,6 +55,7 @@ export default class ForEachEvent extends Component {
           onAddNewInstruction={this.props.onAddNewInstruction}
           onInstructionClick={this.props.onInstructionClick}
           onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+          onInstructionContextMenu={this.props.onInstructionContextMenu}
           onParameterClick={this.props.onParameterClick}
         />
         <div>

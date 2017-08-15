@@ -61,27 +61,18 @@ export default class LinkEvent extends Component {
           [largeSelectedArea]: this.props.selected,
         })}
         style={styles.container}
-        onClick={this.edit}
       >
-        {target
-          ? <span
-              className={classNames({
-                [selectableArea]: true,
-              })}
-              style={styles.title}
-            >
-              Include events from {target}
-            </span>
-          : <span style={styles.title}>
-              Include events from
-              <i
-                className={classNames({
-                  [selectableArea]: true,
-                })}
-              >
-                &lt; Enter the name of external events &gt;
-              </i>
-            </span>}
+        <span style={styles.title}>
+          Include events from {' '}
+          <i
+            className={classNames({
+              [selectableArea]: true,
+            })}
+            onClick={this.edit}
+          >
+            {target || '< Enter the name of external events >'}
+          </i>
+        </span>
         <InlinePopover
           open={this.state.editing}
           anchorEl={this.state.anchorEl}

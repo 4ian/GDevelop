@@ -26,7 +26,8 @@ export default class ExternalLayoutEditor extends BaseEditor {
   }
 
   getSerializedElements() {
-    const { externalLayout, layout } = this._getLayoutAndExternalLayout();
+    const externalLayout = this.getExternalLayout();
+    const layout = this.getLayout();
 
     return {
       ...BaseEditor.getLayoutSerializedElements(layout),
@@ -57,7 +58,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
   }
 
   setAssociatedLayout = layoutName => {
-    const { externalLayout } = this._getLayoutAndExternalLayout();
+    const externalLayout = this.getExternalLayout();
     if (!externalLayout) return;
 
     externalLayout.setAssociatedLayout(layoutName);

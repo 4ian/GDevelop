@@ -97,6 +97,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
             )}
             onPreview={() =>
               this.props.onPreview(project, layout, externalLayout)}
+            onOpenMoreSettings={this.openLayoutChooser}
           />}
         {!layout &&
           <PlaceholderMessage>
@@ -109,6 +110,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
           </PlaceholderMessage>
           }
         <LayoutChooserDialog
+          title="Choose the associated scene"
           open={this.state.layoutChooserOpen}
           project={project}
           onChoose={this.setAssociatedLayout}

@@ -82,6 +82,11 @@ export default class Toolbar extends PureComponent {
           }}
           src="res/ribbon_default/search32.png"
         />
+        {this.props.onOpenSettings && <ToolbarSeparator />}
+        {this.props.onOpenSettings && <ToolbarIcon
+          onClick={this.props.onOpenSettings}
+          src="res/ribbon_default/pref32.png"
+        />}
       </ToolbarGroup>
     );
   }

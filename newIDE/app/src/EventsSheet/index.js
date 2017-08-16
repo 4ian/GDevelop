@@ -70,6 +70,7 @@ export default class EventsSheet extends Component {
         canRedo={false /*TODO*/}
         undo={this.undo}
         redo={this.redo}
+        onOpenSettings={this.props.onOpenSettings}
       />
     );
   }

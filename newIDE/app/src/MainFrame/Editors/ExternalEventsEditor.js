@@ -92,6 +92,7 @@ export default class ExternalEventsEditor extends BaseEditor {
           layout={layout}
           events={externalEvents.getEvents()}
           onPreview={() => this.props.onPreview(project, layout)}
+          onOpenSettings={this.openLayoutChooser}
         />
         }
         {!layout &&
@@ -105,6 +106,8 @@ export default class ExternalEventsEditor extends BaseEditor {
           </PlaceholderMessage>
           }
         <LayoutChooserDialog
+          title="Choose the associated scene"
+          helpText="You still need to add a Link event in the scene to import the external events"
           open={this.state.layoutChooserOpen}
           project={project}
           onChoose={this.setAssociatedLayout}

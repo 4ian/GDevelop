@@ -96,6 +96,7 @@ export default class InstancesFullEditor extends Component {
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
         redo={this.redo}
+        onOpenSettings={this.openSceneProperties}
       />
     );
   }
@@ -564,6 +565,7 @@ export default class InstancesFullEditor extends Component {
           layout={layout}
           onClose={() => this.openSceneProperties(false)}
           onApply={() => this.openSceneProperties(false)}
+          onOpenMoreSettings={this.props.onOpenMoreSettings}
         />
         <ContextMenu
           ref={contextMenu => this.contextMenu = contextMenu}

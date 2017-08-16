@@ -53,10 +53,12 @@ export default class LayoutChooserDialog extends Component {
         actions={actions}
         modal={true}
         open={this.props.open}
+        title={this.props.title}
         onRequestClose={this.props.onClose}
         autoScrollBodyContent={true}
         contentStyle={{ width: '350px' }}
       >
+        {this.props.helpText && <p>{this.props.helpText}</p>}
         <RadioButtonGroup
           name="associated-layout"
           valueSelected={selectedLayoutName}

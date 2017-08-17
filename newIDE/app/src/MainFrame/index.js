@@ -229,6 +229,30 @@ export default class MainFrame extends Component {
     });
   };
 
+  renameLayout = (oldName, newName) => {
+    const { currentProject } = this.state;
+    if (!currentProject.hasLayoutNamed(oldName)) return;
+
+    currentProject.getLayout(oldName).setName(newName);
+    this.forceUpdate();
+  }
+
+  renameExternalLayout = (oldName, newName) => {
+    const { currentProject } = this.state;
+    if (!currentProject.hasExternalLayoutNamed(oldName)) return;
+
+    currentProject.getExternalLayout(oldName).setName(newName);
+    this.forceUpdate();
+  }
+
+  renameExternalEvents = (oldName, newName) => {
+    const { currentProject } = this.state;
+    if (!currentProject.hasExternalEventsNamed(oldName)) return;
+
+    currentProject.getExternalEvents(oldName).setName(newName);
+    this.forceUpdate();
+  }
+
   _launchLayoutPreview = (project, layout) =>
     watchPromiseInState(this, 'previewLoading', () =>
       this.props.onLayoutPreview(project, layout)).catch(err => {
@@ -526,6 +550,9 @@ export default class MainFrame extends Component {
                   onDeleteLayout={this.deleteLayout}
                   onDeleteExternalLayout={this.deleteExternalLayout}
                   onDeleteExternalEvents={this.deleteExternalEvents}
+                  onRenameLayout={this.renameLayout}
+                  onRenameExternalLayout={this.renameExternalLayout}
+                  onRenameExternalEvents={this.renameExternalEvents}
                   onSaveProject={this.save}
                   onCloseProject={this.closeProject}
                   onExportProject={this.openExportDialog}

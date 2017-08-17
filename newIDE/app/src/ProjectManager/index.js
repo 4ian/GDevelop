@@ -127,7 +127,7 @@ export default class ProjectManager extends React.Component {
               />
             );
           }).concat(
-            <AddItem key={'add-scene'} onClick={this.props.onAddLayout} />
+            <AddItem key={'add-scene'} onClick={this.props.onAddLayout} primaryText="Click to add a scene" />
           )}
         />
         <ProjectStructureItem
@@ -150,6 +150,7 @@ export default class ProjectManager extends React.Component {
           }).concat(
             <AddItem
               key={'add-external-events'}
+              primaryText="Click to add external events"
               onClick={this.props.onAddExternalEvents}
             />
           )}
@@ -174,6 +175,7 @@ export default class ProjectManager extends React.Component {
           }).concat(
             <AddItem
               key={'add-external-layout'}
+              primaryText="Click to add an external layout"
               onClick={this.props.onAddExternalLayout}
             />
           )}

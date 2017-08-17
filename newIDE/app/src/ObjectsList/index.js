@@ -9,7 +9,7 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjects } from './EnumerateObjects';
 
-const listItemHeight = 56;
+const listItemHeight = 48;
 const styles = {
   container: { flex: 1, display: 'flex', height: '100%' },
 };

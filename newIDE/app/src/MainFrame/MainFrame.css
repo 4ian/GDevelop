@@ -47,5 +47,6 @@ a[href^="ftp://"] {
  * dragged element is visible (and not hidden behind a drawer or dialog)
  */
 .sortable-helper {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif; /* Font from the theme*/
   z-index: 9999;
 }

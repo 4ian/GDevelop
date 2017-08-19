@@ -83,7 +83,8 @@ export default class Instruction extends Component {
               className={classNames({
                 [selectableArea]: true,
               })}
-              onClick={(domEvent) => this.props.onParameterClick(domEvent, parameterIndex)}
+              onClick={domEvent =>
+                this.props.onParameterClick(domEvent, parameterIndex)}
             >
               {formattedTexts.getString(i)}
             </span>
@@ -132,8 +133,16 @@ export default class Instruction extends Component {
             src="res/contraire.png"
             alt="Condition is negated"
             style={styles.icon}
+            width="20"
+            height="16"
           />}
-        <img src={metadata.getSmallIconFilename()} style={styles.icon} alt="" />
+        <img
+          src={metadata.getSmallIconFilename()}
+          style={styles.icon}
+          alt=""
+          width="20"
+          height="16"
+        />
         {this._renderInstructionText(metadata)}
         {metadata.canHaveSubInstructions() &&
           <InstructionsList

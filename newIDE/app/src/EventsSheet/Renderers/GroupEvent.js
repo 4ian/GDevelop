@@ -15,6 +15,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     padding: 5,
+    overflow: 'hidden',
   },
   title: {
     fontSize: 18,
@@ -37,6 +38,8 @@ export default class GroupEvent extends Component {
   edit = () => {
     this.setState({
       editing: true,
+    }, () => {
+      if (this._textField) this._textField.focus();
     });
   };
 
@@ -69,6 +72,7 @@ export default class GroupEvent extends Component {
       >
         {this.state.editing
           ? <TextField
+              ref={textField => this._textField = textField}
               value={groupEvent.getName()}
               onBlur={this.endEditing}
               onChange={(e, text) => {

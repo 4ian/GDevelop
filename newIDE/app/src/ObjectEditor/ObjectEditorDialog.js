@@ -85,6 +85,7 @@ export default class ObjectEditorDialog extends Component {
             <Tabs value={currentTab} onChange={this._onChangeTab}>
               <Tab label="Properties" value={'properties'} key={'properties'} />
               <Tab label="Behaviors" value={'behaviors'} key={'behaviors'} />
+              <Tab label="Groups" value={'groups'} key={'groups'} />
             </Tabs>
           </div>
         }
@@ -102,6 +103,14 @@ export default class ObjectEditorDialog extends Component {
             <Line>
               <EmptyMessage>
                 Behaviors are not available yet.
+              </EmptyMessage>
+            </Line>
+          </Column>}
+        {currentTab === 'groups' &&
+          <Column>
+            <Line>
+              <EmptyMessage>
+                Editing groups of objects is not available yet.
               </EmptyMessage>
             </Line>
           </Column>}

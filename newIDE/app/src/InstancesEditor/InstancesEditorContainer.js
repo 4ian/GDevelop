@@ -197,6 +197,10 @@ export default class InstancesEditorContainer extends Component {
   }
 
   componentWillUnmount() {
+    // This is an antipattern and is theorically not needed, but help
+    // to protect against renders after the component is unmounted.
+    this._unmounted = true;
+
     this.keyboardShortcuts.unmount();
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
@@ -384,6 +388,9 @@ export default class InstancesEditorContainer extends Component {
   };
 
   _renderScene = () => {
+    // Protect against rendering scheduled after the component is unmounted.
+    if (this._unmounted) return;
+
     this.backgroundColor.render();
     this.viewPosition.render();
     this.grid.render();

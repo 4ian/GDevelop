@@ -7,6 +7,7 @@ export default class InstancesRenderer {
       project,
       layout,
       instances,
+      viewPosition,
       onInstanceClicked,
       onOverInstance,
       onOutInstance,
@@ -18,6 +19,7 @@ export default class InstancesRenderer {
     this.project = project;
     this.instances = instances;
     this.layout = layout;
+    this.viewPosition = viewPosition;
     this.onInstanceClicked = onInstanceClicked;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
@@ -92,6 +94,7 @@ export default class InstancesRenderer {
           project: this.project,
           layout: this.layout,
           instances: this.instances,
+          viewPosition: this.viewPosition,
           layer: layer,
           onInstanceClicked: this.onInstanceClicked,
           onOverInstance: this.onOverInstance,

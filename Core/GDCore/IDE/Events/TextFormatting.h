@@ -97,6 +97,12 @@ public:
     }
     #endif
 
+    /**
+     * Return the data (an integer) associated with the text formatting.
+     * Used to store the parameter when rendering instructions.
+     */
+    size_t GetUserData() const { return userData; }
+
     unsigned int colorRed;
     unsigned int colorGreen;
     unsigned int colorBlue;

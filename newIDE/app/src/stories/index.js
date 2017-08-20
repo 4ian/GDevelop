@@ -6,7 +6,7 @@ import { linkTo } from '@storybook/addon-links';
 
 import Welcome from './Welcome';
 
-import StartPage from '../MainFrame/StartPage';
+import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import LocalCreateDialog from '../ProjectCreation/LocalCreateDialog';
 import { Tabs, Tab } from '../UI/Tabs';
@@ -23,10 +23,17 @@ import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
 import ObjectsList from '../ObjectsList';
-import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
+import InstancePropertiesEditor
+  from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
+import EventsTree from '../EventsSheet/EventsTree';
+import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
+import InstructionEditor from '../EventsSheet/InstructionEditor';
+import EventsSheet from '../EventsSheet';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
+import DragDropContextProvider
+  from '../Utils/DragDropHelpers/DragDropContextProvider';
 import {
   project,
   shapePainterObject,
@@ -37,6 +44,7 @@ import {
   spriteObject,
   testLayout,
   testLayoutInstance1,
+  testInstruction,
 } from './TestProject';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -104,16 +112,12 @@ storiesOf('LocalS3Export', module)
 storiesOf('LocalMobileExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-      <LocalMobileExport />
-  ));
+  .add('default', () => <LocalMobileExport />);
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <LocalFolderPicker floatingLabelText="Export folder" />
-  ))
+  .add('default', () => <LocalFolderPicker floatingLabelText="Export folder" />)
   .add('full width', () => (
     <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
   ));
@@ -130,10 +134,46 @@ storiesOf('LocalCreateDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCreateDialog open />);
 
+storiesOf('LayoutChooserDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <LayoutChooserDialog open project={project}/>);
+
 storiesOf('DragHandle', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
+
+storiesOf('EventsTree', module).add('default', () => (
+  <DragDropContextProvider>
+    <div className="gd-events-sheet">
+      <EventsTree events={testLayout.getEvents()} selectedEvents={[]} selectedInstructions={[]} />
+    </div>
+  </DragDropContextProvider>
+));
+
+storiesOf('EventsSheet', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <DragDropContextProvider>
+      <EventsSheet
+        project={project}
+        layout={testLayout}
+        events={testLayout.getEvents()}
+      />
+    </DragDropContextProvider>
+  ));
+
+storiesOf('InstructionEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <InstructionEditor
+      project={project}
+      layout={testLayout}
+      isCondition
+      instruction={testInstruction}
+    />
+  ));
 
 storiesOf('TextEditor', module)
   .addDecorator(paperDecorator)
@@ -192,16 +232,14 @@ storiesOf('AdMobEditor', module)
 storiesOf('EmptyEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <EmptyEditor />
-  ));
+  .add('default', () => <EmptyEditor />);
 
 storiesOf('ObjectsList', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={testLayout}>
-      <div style={{height: 250}}>
+      <div style={{ height: 250 }}>
         <ObjectsList
           getThumbnail={() => 'res/unknown32.png'}
           project={project}

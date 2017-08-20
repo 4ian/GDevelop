@@ -12,9 +12,16 @@ export function serializeToJSObject(serializable, methodName = 'serializeTo') {
 export function unserializeFromJSObject(
   serializable,
   object,
-  methodName = 'unserializeFrom'
+  methodName = 'unserializeFrom',
+  optionalProject = undefined
 ) {
   const serializedElement = gd.Serializer.fromJSObject(object);
-  serializable[methodName](serializedElement);
+  if (!optionalProject) {
+    serializable[methodName](serializedElement);
+  } else {
+    // It's not uncommon for unserializeFrom methods of gd.* classes
+    // to require the project to be passed as first argument.
+    serializable[methodName](optionalProject, serializedElement);
+  }
   serializedElement.delete();
 }

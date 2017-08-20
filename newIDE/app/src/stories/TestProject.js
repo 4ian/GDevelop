@@ -81,9 +81,80 @@ testLayout.insertObject(tiledSpriteObject, 0);
 testLayout.insertObject(panelSpriteObject, 0);
 testLayout.insertObject(spriteObject, 0);
 
+const group1 = new gd.ObjectGroup();
+group1.setName("GroupOfSprites");
+group1.addObject("MySpriteObject");
+const group2 = new gd.ObjectGroup();
+group2.setName("GroupOfObjects");
+group2.addObject("MySpriteObject");
+group2.addObject("MyTextObject");
+testLayout.getObjectGroups().push_back(group1);
+testLayout.getObjectGroups().push_back(group2);
+
 export const testLayoutInstance1 = testLayout.getInitialInstances().insertNewInitialInstance();
 testLayoutInstance1.setX(10);
 testLayoutInstance1.setY(15);
+
+//Create a few events
+//Add a new "standard" event to the scene:
+var evt = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Standard", 0);
+var evt2 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Standard", 1);
+var evt3 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::ForEach", 2);
+var evt4 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::While", 3);
+var evt5 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Repeat", 4);
+var evt6 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Group", 5);
+var evt7 = testLayout.getEvents().insertNewEvent(project, "BuiltinCommonInstructions::Link", 6);
+
+const groupEvent = gd.asGroupEvent(evt6);
+groupEvent.setName('Group #1');
+
+const makeKeyPressedCondition = () => {
+    const condition = new gd.Instruction();
+    condition.setType("KeyPressed");
+    condition.setParametersCount(2);
+    condition.setParameter(1, "Space");
+    return condition;
+}
+
+const makeDeleteAction = (objectToDelete) => {
+    var action = new gd.Instruction(); //Add a simple action
+    action.setType("Delete");
+    action.setParametersCount(2);
+    action.setParameter(0, objectToDelete);
+    return action;
+}
+
+var standardEvt = gd.asStandardEvent(evt);
+standardEvt.getConditions().push_back(makeKeyPressedCondition());
+standardEvt.getActions().push_back(makeDeleteAction("MyCharacter"));
+
+//Add a few sub events:
+{
+    const subEvent = evt.getSubEvents().insertNewEvent(project, "BuiltinCommonInstructions::Standard", 0);
+    const subStandardEvt = gd.asStandardEvent(subEvent);
+    subStandardEvt.getConditions().push_back(makeKeyPressedCondition());
+    subStandardEvt.getActions().push_back(makeDeleteAction("MyCharacter1"));
+    subStandardEvt.getActions().push_back(makeDeleteAction("MyCharacter2"));
+}
+{
+    const subEvent = evt.getSubEvents().insertNewEvent(project, "BuiltinCommonInstructions::Comment", 0);
+    const subCommentEvt = gd.asCommentEvent(subEvent);
+    subCommentEvt.setComment("Kain is deified. The clans tell tales of him, few know the truth. He was mortal once, as were we all. However, his contempt for humanity drove him to create me and my brethren. I am Raziel, first born of his lieutenants. I stood with Kain and my brethren at the dawn of the empire. I have served him a millennium. Over time we became less human and more ... divine.");
+}
+
+for(let i = 0;i<20;++i) {
+    const evt = testLayout.getEvents().insertNewEvent(
+        project,
+        "BuiltinCommonInstructions::Standard",
+        testLayout.getEvents().getEventsCount()
+    );
+    const standardEvt = gd.asStandardEvent(evt);
+
+    standardEvt.getConditions().push_back(makeKeyPressedCondition());
+    standardEvt.getActions().push_back(makeDeleteAction("OtherObject" + i));
+}
+
+export const testInstruction = makeKeyPressedCondition();
 
 // Global objects
 const globalTextObject = new gd.TextObject('GlobalTextObject');

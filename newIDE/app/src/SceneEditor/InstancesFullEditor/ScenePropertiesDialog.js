@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
+import RaisedButton from 'material-ui/RaisedButton';
 import ColorField from '../../UI/ColorField';
 
 export default class ScenePropertiesDialog extends Component {
@@ -63,7 +64,7 @@ export default class ScenePropertiesDialog extends Component {
         open={this.props.open}
         onRequestClose={this.props.onClose}
         autoScrollBodyContent={true}
-        contentStyle={{width: '350px'}}
+        contentStyle={{ width: '350px' }}
       >
         <TextField
           floatingLabelText="Window title"
@@ -78,8 +79,17 @@ export default class ScenePropertiesDialog extends Component {
           disableAlpha
           color={this.state.backgroundColor}
           onChangeComplete={color =>
-          this.setState({ backgroundColor: color.rgb })}
+            this.setState({ backgroundColor: color.rgb })}
         />
+        {this.props.onOpenMoreSettings &&
+          <RaisedButton
+            label="Open advanced settings"
+            fullWidth
+            onTouchTap={() => {
+              this.props.onOpenMoreSettings();
+              this.props.onClose();
+            }}
+          />}
       </Dialog>
     );
   }

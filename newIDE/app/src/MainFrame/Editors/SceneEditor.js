@@ -1,7 +1,7 @@
 import React from 'react';
-import InstancesFullEditor from './InstancesFullEditor';
-import { serializeToJSObject } from '../Utils/Serializer';
-import BaseEditor from '../MainFrame/BaseEditor';
+import InstancesFullEditor from '../../SceneEditor/InstancesFullEditor';
+import { serializeToJSObject } from '../../Utils/Serializer';
+import BaseEditor from './BaseEditor';
 
 export default class SceneEditor extends BaseEditor {
   updateToolbar() {
@@ -9,7 +9,7 @@ export default class SceneEditor extends BaseEditor {
   }
 
   getSerializedElements() {
-    const { layout } = this._getLayout();
+    const { layout } = this.getLayout();
 
     return {
       ...BaseEditor.getLayoutSerializedElements(layout),
@@ -18,20 +18,16 @@ export default class SceneEditor extends BaseEditor {
     };
   }
 
-  _getLayout() {
+  getLayout() {
     const { project, layoutName } = this.props;
-    if (!project || !project.hasLayoutNamed(layoutName)) return {};
+    if (!project || !project.hasLayoutNamed(layoutName)) return null;
 
-    const layout = project.getLayout(layoutName);
-
-    return {
-      layout,
-    };
+    return project.getLayout(layoutName);
   }
 
   render() {
     const { project, layoutName } = this.props;
-    const { layout } = this._getLayout();
+    const layout = this.getLayout();
     if (!layout) {
       //TODO: Error component
       return <div>No layout called {layoutName} found!</div>;

@@ -25,18 +25,24 @@ void ArbitraryEventsWorker::VisitEventList(gd::EventsList & events)
 {
 	DoVisitEventList(events);
 
-    for (std::size_t i = 0;i<events.size();++i)
+    for (std::size_t i = 0;i<events.size();)
     {
-    	VisitEvent(events[i]);
+    	if (VisitEvent(events[i]))
+            events.RemoveEvent(i);
+        else
+        {
+            if (events[i].CanHaveSubEvents())
+                VisitEventList(events[i].GetSubEvents());
 
-        if (events[i].CanHaveSubEvents())
-        	VisitEventList(events[i].GetSubEvents());
+            ++i;
+        }
     }
 }
 
-void ArbitraryEventsWorker::VisitEvent(gd::BaseEvent & event)
+bool ArbitraryEventsWorker::VisitEvent(gd::BaseEvent & event)
 {
-    DoVisitEvent(event);
+    bool shouldDelete = DoVisitEvent(event);
+    if (shouldDelete) return true;
 
     vector < gd::InstructionsList* > conditionsVectors =  event.GetAllConditionsVectors();
     for (std::size_t j = 0;j < conditionsVectors.size();++j)
@@ -45,6 +51,8 @@ void ArbitraryEventsWorker::VisitEvent(gd::BaseEvent & event)
     vector < gd::InstructionsList* > actionsVectors =  event.GetAllActionsVectors();
     for (std::size_t j = 0;j < actionsVectors.size();++j)
     	VisitInstructionList(*actionsVectors[j], false);
+
+    return false;
 }
 
 void ArbitraryEventsWorker::VisitInstructionList(gd::InstructionsList & instructions, bool areConditions)

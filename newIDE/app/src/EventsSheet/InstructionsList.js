@@ -1,76 +1,93 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Instruction from './Instruction.js';
+import { mapFor } from '../Utils/MapFor';
+import { isInstructionSelected } from './SelectionHandler';
+
+const styles = {
+  conditionsContainer: {
+    paddingLeft: 5,
+    paddingRight: 5,
+    background: '#f1f2f2',
+    borderRight: '1px solid #d3d3d3',
+  },
+  actionsContainer: {
+    paddingLeft: 5,
+    paddingRight: 5,
+  },
+  addButton: {
+    cursor: 'pointer',
+  },
+};
 
 export default class InstructionsList extends Component {
   static propTypes = {
     instrsList: PropTypes.object.isRequired,
     areConditions: PropTypes.bool.isRequired,
-    callbacks: PropTypes.object.isRequired,
-  }
+    onAddNewInstruction: PropTypes.func.isRequired,
+    onInstructionClick: PropTypes.func.isRequired,
+    onInstructionDoubleClick: PropTypes.func.isRequired,
+    onInstructionContextMenu: PropTypes.func.isRequired,
+    onParameterClick: PropTypes.func.isRequired,
+    selection: PropTypes.object.isRequired,
+    addButtonLabel: PropTypes.string,
+  };
 
-  handleAddInstruction = () => {
-    const { callbacks } = this.props;
-    callbacks.onAddNewInstruction(this.props);
-  }
-
-  shouldComponentUpdate(nextProps) {
-    if (this.props.instrsList.ptr !== nextProps.instrsList.ptr) return true;
-
-    if (this.lastChangesHash !== nextProps.instrsList.lastChangesHash)
-      return true;
-
-    return false;
-  }
+  onAddNewInstruction = () => {
+    if (this.props.onAddNewInstruction) this.props.onAddNewInstruction({
+      instrsList: this.props.instrsList,
+      isCondition: this.props.areConditions,
+    });
+  };
 
   render() {
-    this.lastChangesHash = this.props.instrsList.lastChangesHash;
+    const instructions = mapFor(0, this.props.instrsList.size(), i => {
+      const instruction = this.props.instrsList.get(i);
+      const instructionContext = {
+        isCondition: this.props.areConditions,
+        instrsList: this.props.instrsList,
+        instruction,
+        indexInList: i,
+      };
 
-    var children = [];
-    children.push(
-      React.createElement(
-        'button',
-        {
-          key: 'addInstrButton',
-          className: 'btn btn-xs btn-default add-instruction-button',
-          onClick: this.handleAddInstruction,
-        },
-        '+'
-      )
-    );
-    for (var i = 0; i < this.props.instrsList.size(); ++i) {
-      var instruction = this.props.instrsList.get(i);
-      children.push(
-        React.createElement(Instruction, {
-          instruction: instruction,
-          isCondition: this.props.areConditions,
-          instrsList: this.props.instrsList,
-          index: i,
-          key: instruction.ptr,
-          callbacks: this.props.callbacks,
-        })
-      );
-    }
-    if (this.props.instrsList.size() === 0) {
-      children.push(
-        React.createElement(
-          'span',
-          {
-            key: 'noInstructions',
-            className: 'instruction',
-            onClick: this.handleAddInstruction,
-          },
-          this.props.areConditions ? 'No conditions' : 'No actions'
-        )
-      );
-    }
+      return (
+        <Instruction
+          instruction={instruction}
+          isCondition={this.props.areConditions}
+          instrsList={this.props.instrsList}
+          index={i}
+          key={instruction.ptr}
+          selected={isInstructionSelected(this.props.selection, instruction)}
+          onClick={() => this.props.onInstructionClick(instructionContext)}
+          onDoubleClick={() => this.props.onInstructionDoubleClick(instructionContext)}
+          onContextMenu={(x, y) => this.props.onInstructionContextMenu(x, y, instructionContext)}
+          onParameterClick={(domEvent, parameterIndex) => this.props.onParameterClick({
+            ...instructionContext,
+            parameterIndex,
+            domEvent,
+          })}
 
-    return React.createElement(
-      'div',
-      {
-        className: 'instructions-list ' + this.props.className,
-      },
-      children
+          selection={this.props.selection}
+          onAddNewSubInstruction={this.props.onAddNewInstruction}
+          onSubInstructionClick={this.props.onInstructionClick}
+          onSubInstructionDoubleClick={this.props.onInstructionDoubleClick}
+          onSubInstructionContextMenu={this.props.onInstructionContextMenu}
+          onSubParameterClick={this.props.onParameterClick}
+        />
+      );
+    });
+
+    const containerStyle = this.props.areConditions ? styles.conditionsContainer :
+      styles.actionsContainer;
+
+    const addButtonLabel = this.props.areConditions ? 'Add condition' : 'Add action';
+    return (
+      <div style={{...containerStyle, ...this.props.style}}>
+        {instructions}
+        <a style={styles.addButton} className="add-link" onClick={this.onAddNewInstruction}>
+          {this.props.addButtonLabel || addButtonLabel}
+        </a>
+      </div>
     );
   }
 }

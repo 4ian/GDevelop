@@ -233,24 +233,30 @@ export default class MainFrame extends Component {
     const { currentProject } = this.state;
     if (!currentProject.hasLayoutNamed(oldName)) return;
 
-    currentProject.getLayout(oldName).setName(newName);
-    this.forceUpdate();
+    const layout = currentProject.getLayout(oldName);
+    this.setState({
+      editorTabs: closeLayoutTabs(this.state.editorTabs, layout),
+    }, () => layout.setName(newName));
   }
 
   renameExternalLayout = (oldName, newName) => {
     const { currentProject } = this.state;
     if (!currentProject.hasExternalLayoutNamed(oldName)) return;
 
-    currentProject.getExternalLayout(oldName).setName(newName);
-    this.forceUpdate();
+    const externalLayout = currentProject.getExternalLayout(oldName);
+    this.setState({
+      editorTabs: closeExternalLayoutTabs(this.state.editorTabs, externalLayout),
+    }, () => externalLayout.setName(newName));
   }
 
   renameExternalEvents = (oldName, newName) => {
     const { currentProject } = this.state;
     if (!currentProject.hasExternalEventsNamed(oldName)) return;
 
-    currentProject.getExternalEvents(oldName).setName(newName);
-    this.forceUpdate();
+    const externalEvents = currentProject.getExternalEvents(oldName);
+    this.setState({
+      editorTabs: closeExternalEventsTabs(this.state.editorTabs, externalEvents),
+    }, () => externalEvents.setName(newName));
   }
 
   _launchLayoutPreview = (project, layout) =>

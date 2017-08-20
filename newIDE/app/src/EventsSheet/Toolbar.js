@@ -77,6 +77,7 @@ export default class Toolbar extends PureComponent {
         />
         <ToolbarSeparator />
         <ToolbarIcon
+          disabled
           onClick={() => {
             /*TODO*/
           }}

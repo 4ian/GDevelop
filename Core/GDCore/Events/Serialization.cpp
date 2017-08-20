@@ -6,6 +6,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Serialization.h"
@@ -21,7 +22,7 @@ using namespace std;
 namespace gd
 {
 
-void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project, gd::InstructionsList & list, bool instructionsAreActions)
+void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project, gd::InstructionsList & list)
 {
     for (std::size_t i = 0;i<list.size();++i)
     {
@@ -47,8 +48,6 @@ void EventsListSerialization::UpdateInstructionsFromGD31x(gd::Project & project,
         {
             instr.SetParameter(1, gd::Expression("\""+instr.GetParameter(1).GetPlainString()+"\""));
         }
-
-        //UpdateInstructionsFromGD31x(project, instr.GetSubInstructions(), instructionsAreActions);
     }
 }
 
@@ -201,79 +200,39 @@ void EventsListSerialization::SerializeEventsTo(const EventsList & list, Seriali
 
 using namespace std;
 
-void gd::EventsListSerialization::OpenConditions(gd::Project & project, gd::InstructionsList & conditions, const SerializerElement & elem)
+void gd::EventsListSerialization::UnserializeInstructionsFrom(gd::Project & project, gd::InstructionsList & instructions, const SerializerElement & elem)
 {
-    elem.ConsiderAsArrayOf("condition", "Condition");
+    elem.ConsiderAsArrayOf("instruction");
+    //Compatibility with GD <= 4.0.95
+    if (elem.HasChild("condition", "Condition"))
+        elem.ConsiderAsArrayOf("condition", "Condition");
+    else if (elem.HasChild("action", "Action"))
+        elem.ConsiderAsArrayOf("action", "Action");
+    //end of compatibility code
+
     for(std::size_t i = 0; i<elem.GetChildrenCount(); ++i)
     {
         gd::Instruction instruction;
-        const SerializerElement & conditionElem = elem.GetChild(i);
+        const SerializerElement & instrElement = elem.GetChild(i);
 
-        instruction.SetType(conditionElem.GetChild("type", 0, "Type").GetStringAttribute("value")
-                .FindAndReplace("Automatism", "Behavior")); //Compatibility with GD <= 4
-        instruction.SetInverted(conditionElem.GetChild("type", 0, "Type").GetBoolAttribute("inverted", false, "Contraire"));
-
-        //Read parameters
-        vector < gd::Expression > parameters;
-
-        //Compatibility with GD <= 3.3
-        if (conditionElem.HasChild("Parametre")) {
-
-            for (std::size_t j = 0;j<conditionElem.GetChildrenCount("Parametre");++j)
-                parameters.push_back(gd::Expression(conditionElem.GetChild("Parametre", j).GetValue().GetString()));
-
-        }
-        //end of compatibility code
-        else
-        {
-            const SerializerElement & parametersElem = conditionElem.GetChild("parameters");
-            parametersElem.ConsiderAsArrayOf("parameter");
-            for (std::size_t j = 0;j<parametersElem.GetChildrenCount();++j)
-                parameters.push_back(gd::Expression(parametersElem.GetChild(j).GetValue().GetString()));
-        }
-
-        instruction.SetParameters( parameters );
-
-        //Read sub conditions
-        if ( conditionElem.HasChild("subConditions", "SubConditions") )
-            OpenConditions(project, instruction.GetSubInstructions(), conditionElem.GetChild("subConditions", 0, "SubConditions" ));
-
-        conditions.Insert( instruction );
-    }
-
-    if ( project.GetLastSaveGDMajorVersion() < 3 ||
-         (project.GetLastSaveGDMajorVersion() == 3 && project.GetLastSaveGDMinorVersion() <= 1 ) )
-        UpdateInstructionsFromGD31x(project, conditions, false);
-
-    if ( project.GetLastSaveGDMajorVersion() < 3 )
-        UpdateInstructionsFromGD2x(project, conditions, false);
-}
-
-void gd::EventsListSerialization::OpenActions(gd::Project & project, gd::InstructionsList & actions, const SerializerElement & elem)
-{
-    elem.ConsiderAsArrayOf("action", "Action");
-    for(std::size_t i = 0; i<elem.GetChildrenCount(); ++i)
-    {
-        gd::Instruction instruction;
-        const SerializerElement & actionElem = elem.GetChild(i);
-
-        instruction.SetType(actionElem.GetChild("type", 0, "Type").GetStringAttribute("value")
+        instruction.SetType(instrElement.GetChild("type", 0, "Type").GetStringAttribute("value")
             .FindAndReplace("Automatism", "Behavior")); //Compatibility with GD <= 4
+        instruction.SetInverted(instrElement.GetChild("type", 0, "Type").GetBoolAttribute("inverted", false, "Contraire"));
 
         //Read parameters
         vector < gd::Expression > parameters;
 
         //Compatibility with GD <= 3.3
-        if (actionElem.HasChild("Parametre")) {
+        if (instrElement.HasChild("Parametre")) {
 
-            for (std::size_t j = 0;j<actionElem.GetChildrenCount("Parametre");++j)
-                parameters.push_back(gd::Expression(actionElem.GetChild("Parametre", j).GetValue().GetString()));
+            for (std::size_t j = 0;j<instrElement.GetChildrenCount("Parametre");++j)
+                parameters.push_back(gd::Expression(instrElement.GetChild("Parametre", j).GetValue().GetString()));
 
         }
         //end of compatibility code
         else
         {
-            const SerializerElement & parametersElem = actionElem.GetChild("parameters");
+            const SerializerElement & parametersElem = instrElement.GetChild("parameters");
             parametersElem.ConsiderAsArrayOf("parameter");
             for (std::size_t j = 0;j<parametersElem.GetChildrenCount();++j)
                 parameters.push_back(gd::Expression(parametersElem.GetChild(j).GetValue().GetString()));
@@ -281,62 +240,48 @@ void gd::EventsListSerialization::OpenActions(gd::Project & project, gd::Instruc
 
         instruction.SetParameters( parameters );
 
-        //Read sub actions
-        if ( actionElem.HasChild("subActions", "SubActions") )
-            OpenActions(project, instruction.GetSubInstructions(), actionElem.GetChild("subActions", 0, "SubActions" ));
+        //Read sub instructions
+        if ( instrElement.HasChild("subInstructions") )
+            UnserializeInstructionsFrom(project, instruction.GetSubInstructions(), instrElement.GetChild("subInstructions"));
+        //Compatibility with GD <= 4.0.95
+        if ( instrElement.HasChild("subConditions", "SubConditions") )
+            UnserializeInstructionsFrom(project, instruction.GetSubInstructions(), instrElement.GetChild("subConditions", 0, "SubConditions" ));
+        if ( instrElement.HasChild("subActions", "SubActions") )
+            UnserializeInstructionsFrom(project, instruction.GetSubInstructions(), instrElement.GetChild("subActions", 0, "SubActions" ));
+        //end of compatibility code
 
-        actions.Insert( instruction );
+        instructions.Insert( instruction );
     }
 
+    //Compatibility with GD <= 3.1
     if ( project.GetLastSaveGDMajorVersion() < 3 ||
          (project.GetLastSaveGDMajorVersion() == 3 && project.GetLastSaveGDMinorVersion() <= 1 ) )
-        UpdateInstructionsFromGD31x(project, actions, true);
+        UpdateInstructionsFromGD31x(project, instructions);
 
     if ( project.GetLastSaveGDMajorVersion() < 3 )
-        UpdateInstructionsFromGD2x(project, actions, true);
+        UpdateInstructionsFromGD2x(project, instructions, elem.HasChild("action", "Action"));
+    //end of compatibility code
 }
 
-void gd::EventsListSerialization::SaveActions(const gd::InstructionsList & list, SerializerElement & actions)
+void gd::EventsListSerialization::SerializeInstructionsTo(const gd::InstructionsList & list, SerializerElement & instructions)
 {
-    actions.ConsiderAsArrayOf("action");
+    instructions.ConsiderAsArrayOf("instruction");
     for ( std::size_t k = 0;k < list.size();k++ )
     {
-        SerializerElement & action = actions.AddChild("action");
-        action.AddChild("type")
+        SerializerElement & instruction = instructions.AddChild("instruction");
+        instruction.AddChild("type")
             .SetAttribute("value", list[k].GetType())
             .SetAttribute("inverted", list[k].IsInverted());
 
         //Parameters
-        SerializerElement & parameters = action.AddChild("parameters");
+        SerializerElement & parameters = instruction.AddChild("parameters");
         parameters.ConsiderAsArrayOf("parameter");
         for ( std::size_t l = 0;l < list[k].GetParameters().size();l++ )
             parameters.AddChild("parameter").SetValue(list[k].GetParameter(l).GetPlainString());
 
         //Sub instructions
-        SerializerElement & subActions = action.AddChild("subActions");
-        SaveActions(list[k].GetSubInstructions(), subActions);
-    }
-}
-
-void gd::EventsListSerialization::SaveConditions(const gd::InstructionsList & list, SerializerElement & conditions)
-{
-    conditions.ConsiderAsArrayOf("condition");
-    for ( std::size_t k = 0;k < list.size();k++ )
-    {
-        SerializerElement & condition = conditions.AddChild("condition");
-        condition.AddChild("type")
-            .SetAttribute("value", list[k].GetType())
-            .SetAttribute("inverted", list[k].IsInverted());
-
-        //Parameters
-        SerializerElement & parameters = condition.AddChild("parameters");
-        parameters.ConsiderAsArrayOf("parameter");
-        for ( std::size_t l = 0;l < list[k].GetParameters().size();l++ )
-            parameters.AddChild("parameter").SetValue(list[k].GetParameter(l).GetPlainString());
-
-        //Sub instructions
-        SerializerElement & subConditions = condition.AddChild("subConditions");
-        SaveConditions(list[k].GetSubInstructions(), subConditions);
+        SerializerElement & subInstructions = instruction.AddChild("subInstructions");
+        SerializeInstructionsTo(list[k].GetSubInstructions(), subInstructions);
     }
 }
 

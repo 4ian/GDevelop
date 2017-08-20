@@ -8,16 +8,11 @@
 #include "GDCore/String.h"
 #include <vector>
 #include "GDCore/Events/Expression.h"
-#include "GDCore/Tools/SPtrList.h"
+#include "GDCore/Events/InstructionsList.h"
 #include "GDCore/String.h"
 
 namespace gd
 {
-
-class Instruction;
-
-template<typename T> class SPtrList;
-typedef SPtrList<Instruction> InstructionsList;
 
 /**
  * \brief An instruction is a member of an event: It can be a condition or an action.

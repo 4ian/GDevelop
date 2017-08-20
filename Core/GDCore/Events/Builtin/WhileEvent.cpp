@@ -62,9 +62,9 @@ vector < const gd::InstructionsList* > WhileEvent::GetAllActionsVectors() const
 void WhileEvent::SerializeTo(SerializerElement & element) const
 {
     element.SetAttribute("infiniteLoopWarning", infiniteLoopWarning);
-    gd::EventsListSerialization::SaveConditions(whileConditions, element.AddChild("whileConditions"));
-    gd::EventsListSerialization::SaveConditions(conditions, element.AddChild("conditions"));
-    gd::EventsListSerialization::SaveActions(actions, element.AddChild("actions"));
+    gd::EventsListSerialization::SerializeInstructionsTo(whileConditions, element.AddChild("whileConditions"));
+    gd::EventsListSerialization::SerializeInstructionsTo(conditions, element.AddChild("conditions"));
+    gd::EventsListSerialization::SerializeInstructionsTo(actions, element.AddChild("actions"));
     gd::EventsListSerialization::SerializeEventsTo(events, element.AddChild("events"));
 }
 
@@ -72,9 +72,9 @@ void WhileEvent::UnserializeFrom(gd::Project & project, const SerializerElement 
 {
     justCreatedByTheUser = false;
     infiniteLoopWarning = element.GetBoolAttribute("infiniteLoopWarning");
-    gd::EventsListSerialization::OpenConditions(project, whileConditions, element.GetChild("whileConditions", 0, "WhileConditions"));
-    gd::EventsListSerialization::OpenConditions(project, conditions, element.GetChild("conditions", 0, "Conditions"));
-    gd::EventsListSerialization::OpenActions(project, actions, element.GetChild("actions", 0, "Actions"));
+    gd::EventsListSerialization::UnserializeInstructionsFrom(project, whileConditions, element.GetChild("whileConditions", 0, "WhileConditions"));
+    gd::EventsListSerialization::UnserializeInstructionsFrom(project, conditions, element.GetChild("conditions", 0, "Conditions"));
+    gd::EventsListSerialization::UnserializeInstructionsFrom(project, actions, element.GetChild("actions", 0, "Actions"));
     gd::EventsListSerialization::UnserializeEventsFrom(project, events, element.GetChild("events", 0, "Events"));
 }
 

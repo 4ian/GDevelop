@@ -150,13 +150,13 @@ public:
      */
     ///@{
     /**
-     * \brief Save the objects to xml
+     * \brief Serialize the events to the specified element
      * \see EventsListSerialization
      */
     void SerializeTo(SerializerElement & element) const;
 
     /**
-     * \brief Load the objects from xml
+     * \brief Load the events from the specified element
      * \see EventsListSerialization
      */
     void UnserializeFrom(gd::Project & project, const SerializerElement & element);

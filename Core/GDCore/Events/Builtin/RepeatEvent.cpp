@@ -79,16 +79,16 @@ vector < const gd::Expression* > RepeatEvent::GetAllExpressions() const
 void RepeatEvent::SerializeTo(SerializerElement & element) const
 {
     element.AddChild("repeatExpression").SetValue(repeatNumberExpression.GetPlainString());
-    gd::EventsListSerialization::SaveConditions(conditions, element.AddChild("conditions"));
-    gd::EventsListSerialization::SaveActions(actions, element.AddChild("actions"));
+    gd::EventsListSerialization::SerializeInstructionsTo(conditions, element.AddChild("conditions"));
+    gd::EventsListSerialization::SerializeInstructionsTo(actions, element.AddChild("actions"));
     gd::EventsListSerialization::SerializeEventsTo(events, element.AddChild("events"));
 }
 
 void RepeatEvent::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
     repeatNumberExpression = gd::Expression(element.GetChild("repeatExpression", 0, "RepeatExpression").GetValue().GetString());
-    gd::EventsListSerialization::OpenConditions(project, conditions, element.GetChild("conditions", 0, "Conditions"));
-    gd::EventsListSerialization::OpenActions(project, actions, element.GetChild("actions", 0, "Actions"));
+    gd::EventsListSerialization::UnserializeInstructionsFrom(project, conditions, element.GetChild("conditions", 0, "Conditions"));
+    gd::EventsListSerialization::UnserializeInstructionsFrom(project, actions, element.GetChild("actions", 0, "Actions"));
     gd::EventsListSerialization::UnserializeEventsFrom(project, events, element.GetChild("events", 0, "Events"));
 }
 

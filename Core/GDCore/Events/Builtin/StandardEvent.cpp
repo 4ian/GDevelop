@@ -62,15 +62,15 @@ vector < gd::InstructionsList* > StandardEvent::GetAllActionsVectors()
 
 void StandardEvent::SerializeTo(SerializerElement & element) const
 {
-    gd::EventsListSerialization::SaveConditions(conditions, element.AddChild("conditions"));
-    gd::EventsListSerialization::SaveActions(actions, element.AddChild("actions"));
+    gd::EventsListSerialization::SerializeInstructionsTo(conditions, element.AddChild("conditions"));
+    gd::EventsListSerialization::SerializeInstructionsTo(actions, element.AddChild("actions"));
     gd::EventsListSerialization::SerializeEventsTo(events, element.AddChild("events"));
 }
 
 void StandardEvent::UnserializeFrom(gd::Project & project, const SerializerElement & element)
 {
-    gd::EventsListSerialization::OpenConditions(project, conditions, element.GetChild("conditions", 0, "Conditions"));
-    gd::EventsListSerialization::OpenActions(project, actions, element.GetChild("actions", 0, "Actions"));
+    gd::EventsListSerialization::UnserializeInstructionsFrom(project, conditions, element.GetChild("conditions", 0, "Conditions"));
+    gd::EventsListSerialization::UnserializeInstructionsFrom(project, actions, element.GetChild("actions", 0, "Actions"));
     gd::EventsListSerialization::UnserializeEventsFrom(project, events, element.GetChild("events", 0, "Events"));
 }
 

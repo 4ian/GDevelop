@@ -24,6 +24,7 @@ import {
   getSelectedInstructions,
   clearSelection,
   getSelectedEventContexts,
+  getSelectedInstructionsContexts,
 } from './SelectionHandler';
 const gd = global.gd;
 
@@ -249,16 +250,20 @@ export default class EventsSheet extends Component {
 
   copySelection = () => {
     const eventsList = new gd.EventsList();
+    const instructionsList = new gd.InstructionsList();
+
     getSelectedEvents(this.state.selection).forEach(event =>
       eventsList.insertEvent(event, eventsList.getEventsCount()));
-    const instructionsList = [];
-    // getSelectedInstructions(this.state.selection).forEach(instruction =>
-    //   eventsRemover.addInstructionToRemove(instruction));
+    getSelectedInstructions(this.state.selection).forEach(instruction =>
+      instructionsList.insert(instruction, instructionsList.size()));
 
     Clipboard.set(CLIPBOARD_KIND, {
       eventsList: serializeToJSObject(eventsList),
-      instructionsList,
+      instructionsList: serializeToJSObject(instructionsList),
     });
+
+    eventsList.delete();
+    instructionsList.delete();
   };
 
   cutSelection = () => {
@@ -287,13 +292,32 @@ export default class EventsSheet extends Component {
         eventContext.indexInList
       );
     });
+    eventsList.delete();
 
     this._eventsTree.forceEventsUpdate();
   };
 
   pasteInstructions = () => {
-    if (!hasInstructionSelected(this.state.selection)) return;
-    //TODO
+    if (!hasInstructionSelected(this.state.selection) || !Clipboard.has(CLIPBOARD_KIND)) return;
+
+    const instructionsList = new gd.InstructionsList();
+    unserializeFromJSObject(
+      instructionsList,
+      Clipboard.get(CLIPBOARD_KIND).instructionsList,
+      'unserializeFrom',
+      this.props.project
+    );
+    getSelectedInstructionsContexts(this.state.selection).forEach(instructionContext => {
+      instructionContext.instrsList.insertInstructions(
+        instructionsList,
+        0,
+        instructionsList.size(),
+        instructionContext.indexInList
+      );
+    });
+    instructionsList.delete();
+
+    this._eventsTree.forceEventsUpdate();
   };
 
   render() {
@@ -370,6 +394,19 @@ export default class EventsSheet extends Component {
           ref={instructionContextMenu =>
             this.instructionContextMenu = instructionContextMenu}
           menuTemplate={[
+            {
+              label: 'Copy',
+              click: () => this.copySelection(),
+            },
+            {
+              label: 'Cut',
+              click: () => this.cutSelection(),
+            },
+            {
+              label: 'Paste',
+              click: () => this.pasteInstructions(),
+            },
+            { type: 'separator' },
             {
               label: 'Delete',
               click: () => this.deleteSelection(),

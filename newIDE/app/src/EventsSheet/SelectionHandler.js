@@ -23,6 +23,10 @@ export const getSelectedInstructions = selection => {
   );
 };
 
+export const getSelectedInstructionsContexts = selection => {
+  return values(selection.selectedInstructions);
+};
+
 export const isEventSelected = (selection, event) => {
   return !!selection.selectedEvents[event.ptr];
 };

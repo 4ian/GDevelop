@@ -18,6 +18,9 @@ namespace gd
 
 class InstructionsList : public SPtrList<gd::Instruction> {
 public:
+
+    void InsertInstructions(const InstructionsList & list, size_t begin, size_t end, size_t position = (size_t)-1);
+
     /** \name Serialization
      */
     ///@{

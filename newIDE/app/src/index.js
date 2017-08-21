@@ -10,6 +10,9 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import registerServiceWorker from './registerServiceWorker';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
+// Import for browser only IDE
+import BrowserS3PreviewLauncher from './Export/BrowserS3PreviewLauncher';
+
 // Import for Electron powered IDE.
 import ExternalEditor from './ExternalEditor';
 import optionalRequire from './Utils/OptionalRequire.js';
@@ -82,7 +85,9 @@ if (electron) {
     );
   }
 } else {
-  app = <MainFrame />;
+  app = <MainFrame
+      onLayoutPreview={BrowserS3PreviewLauncher.launchLayoutPreview}
+    />;
 }
 
 ReactDOM.render(app, document.getElementById('root'));

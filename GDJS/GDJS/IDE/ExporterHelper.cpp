@@ -64,6 +64,12 @@ static void GenerateFontsDeclaration(gd::AbstractFileSystem & fs, const gd::Stri
     }
 }
 
+ExporterHelper::ExporterHelper(gd::AbstractFileSystem & fileSystem, gd::String gdjsRoot_, gd::String codeOutputDir_) :
+    fs(fileSystem),
+    gdjsRoot(gdjsRoot_),
+    codeOutputDir(codeOutputDir_)
+{
+};
 
 bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project & project, gd::Layout & layout, gd::String exportDir, gd::String additionalSpec)
 {
@@ -76,13 +82,13 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project & project, gd::Layou
     //Export resources (*before* generating events as some resources filenames may be updated)
     ExportResources(fs, exportedProject, exportDir);
     //Generate events code
-    if ( !ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+    if ( !ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
         return false;
 
     AddLibsInclude(true, false, includesFiles);
 
     //Export source files
-    if ( !ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+    if ( !ExportExternalSourceFiles(exportedProject, codeOutputDir, includesFiles) )
     {
         gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
         return false;
@@ -93,9 +99,8 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project & project, gd::Layou
     exportedProject.SetFirstLayout(layout.GetName());
 
     //Export the project
-    ExportToJSON(fs, exportedProject, fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/data.js",
-                 "gdjs.projectData");
-    includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
+    ExportToJSON(fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+    includesFiles.push_back(codeOutputDir + "/data.js");
 
     //Copy all the dependencies
     RemoveIncludes(false, true, includesFiles);
@@ -239,15 +244,28 @@ bool ExporterHelper::CompleteIndexFile(gd::String & str, gd::String customCss, g
     gd::String codeFilesIncludes;
     for (std::vector<gd::String>::const_iterator it = includesFiles.begin(); it != includesFiles.end(); ++it)
     {
-        if ( !fs.FileExists(exportDir + "/" + *it) )
+        gd::String scriptSrc = "";
+        if (fs.IsAbsolute(*it))
         {
-            std::cout << "Warning: Unable to find " << exportDir+"/"+*it << "." << std::endl;
-            continue;
+            // Most of the time, script source are file paths relative to GDJS root or have
+            // been copied in the output directory, so they are relative.
+            // It's still useful to test here for absolute files as the exporter could be configured
+            // with a file system dealing with URL.
+            scriptSrc = *it;
+        }
+        else
+        {
+            if ( !fs.FileExists(exportDir + "/" + *it) )
+            {
+                std::cout << "Warning: Unable to find " << exportDir+"/"+*it << "." << std::endl;
+                continue;
+            }
+
+            scriptSrc = exportDir+"/"+*it;
+            fs.MakeRelative(scriptSrc, exportDir);
         }
 
-        gd::String relativeFile = exportDir+"/"+*it;
-        fs.MakeRelative(relativeFile, exportDir);
-        codeFilesIncludes += "\t<script src=\""+relativeFile+"\"></script>\n";
+        codeFilesIncludes += "\t<script src=\""+scriptSrc+"\"></script>\n";
     }
 
     str = str.FindAndReplace("/* GDJS_CUSTOM_STYLE */", customCss)
@@ -462,22 +480,33 @@ bool ExporterHelper::ExportIncludesAndLibs(std::vector<gd::String> & includesFil
     {
         for ( std::vector<gd::String>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
         {
-            if ( fs.FileExists(gdjsRoot + "/Runtime/"+*include) )
+            if ( fs.FileExists(gdjsRoot + "/Runtime/" + *include) )
             {
-                gd::String path = fs.DirNameFrom(exportDir+"/"+*include);
+                gd::String path = fs.DirNameFrom(exportDir + "/" + *include);
                 if ( !fs.DirExists(path) ) fs.MkDir(path);
 
-                fs.CopyFile(gdjsRoot + "/Runtime/"+*include, exportDir+"/"+*include);
-                //Ok, the filename is relative to the export dir.
+                fs.CopyFile(gdjsRoot + "/Runtime/" + *include, exportDir + "/" + *include);
+
+                gd::String relativeInclude = gdjsRoot + "/Runtime/" + *include;
+                fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
+                *include = relativeInclude;
             }
+
+            //TODO: Add Extensions/ directly in extensions includes, don't have a special case here.
             else if ( fs.FileExists(gdjsRoot + "/Runtime/Extensions/"+*include) )
             {
                 gd::String path = fs.DirNameFrom(exportDir+"/Extensions/"+*include);
                 if ( !fs.DirExists(path) ) fs.MkDir(path);
 
-                fs.CopyFile(gdjsRoot + "/Runtime/Extensions/"+*include, exportDir+"/Extensions/"+*include);
-                *include = "Extensions/"+*include; //Ensure filename is relative to the export dir.
+                fs.CopyFile(gdjsRoot + "/Runtime/Extensions/"+ *include, exportDir+"/Extensions/"+*include);
+
+                gd::String relativeInclude = gdjsRoot + "/Runtime/Extensions/" + *include;
+                fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
+                *include = relativeInclude;
             }
+
+            // Note: all the code generated from events are generated in another folder
+            // and fall in this case:
             else if ( fs.FileExists(*include) )
             {
                 fs.CopyFile(*include, exportDir+"/"+fs.FileNameFrom(*include));

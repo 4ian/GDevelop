@@ -1,7 +1,9 @@
 import path from 'path';
 const gd = global.gd;
 
-export const makeBrowserS3FileSystem = (filesContent) => ({
+export const makeBrowserS3FileSystem = (
+  { filesContent, awsS3Client, bucket, prefix }
+) => ({
   mkDir: function(path) {
     console.log('mkDir(' + path + ') skipped.');
   },
@@ -55,29 +57,42 @@ export const makeBrowserS3FileSystem = (filesContent) => ({
     if (this._isExternalURL(source)) return true;
 
     source = this._translateURL(source);
-    console.warn("Copy not done from", source, "to", dest);
+    console.warn('Copy not done from', source, 'to', dest);
     return true;
   },
   copyDir: function(source, dest) {
-    throw new Error(
-      'Not implemented'
-    );
+    throw new Error('Not implemented');
   },
   writeToFile: function(file, contents) {
-    console.log("Should write", file, "with", contents);
+    awsS3Client.putObject(
+      {
+        Bucket: bucket,
+        Key: prefix + file,
+        Body: contents,
+        //TODO: ContentType
+      },
+      (err, data) => {
+        if (err)
+          console.log(err, err.stack); // an error occurred
+        else
+          console.log(data); // successful response
+      }
+    );
+    //TODO: Add to a queue of promises.
+
     return true;
   },
   readFile: function(file) {
     if (filesContent.hasOwnProperty(file)) return filesContent[file];
 
     console.error(`Unknown file ${file}, returning an empty string`);
-    return "";
+    return '';
   },
   readDir: function(path, ext) {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
-    console.warn("Assume", path, "is empty for extension", ext);
+    console.warn('Assume', path, 'is empty for extension', ext);
     return output;
   },
   fileExists: function(filename) {
@@ -90,9 +105,9 @@ export const makeBrowserS3FileSystem = (filesContent) => ({
     return true;
   },
   _isExternalURL: function(filename) {
-    return filename.substr(0, 7) === 'http://'
-      || filename.substr(0, 8) === 'https://'
-      || filename.substr(0, 6) === 'ftp://';
+    return filename.substr(0, 7) === 'http://' ||
+      filename.substr(0, 8) === 'https://' ||
+      filename.substr(0, 6) === 'ftp://';
   },
   /**
    * Return the filename associated to the URL on the server, relative to the games directory.

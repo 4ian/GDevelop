@@ -480,41 +480,39 @@ bool ExporterHelper::ExportIncludesAndLibs(std::vector<gd::String> & includesFil
     {
         for ( std::vector<gd::String>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
         {
-            if ( fs.FileExists(gdjsRoot + "/Runtime/" + *include) )
+            if (!fs.IsAbsolute(*include))
             {
-                gd::String path = fs.DirNameFrom(exportDir + "/" + *include);
-                if ( !fs.DirExists(path) ) fs.MkDir(path);
+                gd::String source = gdjsRoot + "/Runtime/" + *include;
+                if (fs.FileExists(source))
+                {
+                    gd::String path = fs.DirNameFrom(exportDir + "/" + *include);
+                    if ( !fs.DirExists(path) ) fs.MkDir(path);
 
-                fs.CopyFile(gdjsRoot + "/Runtime/" + *include, exportDir + "/" + *include);
+                    fs.CopyFile(source, exportDir + "/" + *include);
 
-                gd::String relativeInclude = gdjsRoot + "/Runtime/" + *include;
-                fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
-                *include = relativeInclude;
-            }
-
-            //TODO: Add Extensions/ directly in extensions includes, don't have a special case here.
-            else if ( fs.FileExists(gdjsRoot + "/Runtime/Extensions/"+*include) )
-            {
-                gd::String path = fs.DirNameFrom(exportDir+"/Extensions/"+*include);
-                if ( !fs.DirExists(path) ) fs.MkDir(path);
-
-                fs.CopyFile(gdjsRoot + "/Runtime/Extensions/"+ *include, exportDir+"/Extensions/"+*include);
-
-                gd::String relativeInclude = gdjsRoot + "/Runtime/Extensions/" + *include;
-                fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
-                *include = relativeInclude;
-            }
-
-            // Note: all the code generated from events are generated in another folder
-            // and fall in this case:
-            else if ( fs.FileExists(*include) )
-            {
-                fs.CopyFile(*include, exportDir+"/"+fs.FileNameFrom(*include));
-                *include = fs.FileNameFrom(*include); //Ensure filename is relative to the export dir.
+                    gd::String relativeInclude = source;
+                    fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
+                    *include = relativeInclude;
+                }
+                else
+                {
+                    std::cout << "Could not find GDJS include file " << *include << std::endl;
+                }
             }
             else
             {
-                std::cout << "Could not copy include file " << *include << " (File not found)." << std::endl;
+                // Note: all the code generated from events are generated in another folder
+                // and fall in this case:
+
+                if (fs.FileExists(*include))
+                {
+                    fs.CopyFile(*include, exportDir+"/"+fs.FileNameFrom(*include));
+                    *include = fs.FileNameFrom(*include); //Ensure filename is relative to the export dir.
+                }
+                else
+                {
+                    std::cout << "Could not find include file " << *include << std::endl;
+                }
             }
         }
     }

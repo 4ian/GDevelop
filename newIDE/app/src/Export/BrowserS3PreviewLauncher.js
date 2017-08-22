@@ -48,20 +48,22 @@ export default class BrowserS3PreviewLauncher {
         }
         console.info('GDJS found in ', gdjsRoot);
 
-        const prefix = '' + Date.now() + '-' + Math.floor(Math.random()*1000);
+        const prefix = '' + Date.now() + '-' + Math.floor(Math.random()*1000000);
 
+        const outputDir = destinationBucketBaseUrl + prefix + '/';
         const fileSystem = assignIn(
           new gd.AbstractFileSystemJS(),
           makeBrowserS3FileSystem({
             filesContent,
             awsS3Client,
             bucket: destinationBucket,
+            bucketBaseUrl: destinationBucketBaseUrl,
             prefix,
           })
         );
         const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-        exporter.setCodeOutputDirectory(destinationBucketBaseUrl);
-        const outputDir = destinationBucketBaseUrl;
+        //TODO: the + '/' should not be needed.
+        exporter.setCodeOutputDirectory(destinationBucketBaseUrl + prefix + '/');
 
         resolve({
           outputDir,

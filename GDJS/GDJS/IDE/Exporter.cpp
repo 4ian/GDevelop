@@ -141,7 +141,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         gd::ProjectStripper::StripProjectForExport(exportedProject);
 
         //...and export it
-        helper.ExportToJSON(fs, exportedProject, fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/data.js",
+        helper.ExportToJSON(fs, exportedProject, codeOutputDir + "data.js",
                      "gdjs.projectData");
         includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 
@@ -243,7 +243,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     gd::ProjectStripper::StripProjectForExport(exportedProject);
 
     //...and export it
-    helper.ExportToJSON(fs, exportedProject, fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/data.js",
+    helper.ExportToJSON(fs, exportedProject, codeOutputDir + "data.js",
                  "gdjs.projectData");
     includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 

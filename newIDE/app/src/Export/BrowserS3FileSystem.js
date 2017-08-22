@@ -2,7 +2,7 @@ import path from 'path';
 const gd = global.gd;
 
 export const makeBrowserS3FileSystem = (
-  { filesContent, awsS3Client, bucket, prefix }
+  { filesContent, awsS3Client, bucket, prefix, bucketBaseUrl }
 ) => ({
   mkDir: function(path) {
     console.log('mkDir(' + path + ') skipped.');
@@ -18,8 +18,6 @@ export const makeBrowserS3FileSystem = (
     return '/tmp'; //TODO
   },
   fileNameFrom: function(fullpath) {
-    if (this._isExternalURL(fullpath)) return fullpath;
-
     fullpath = this._translateURL(fullpath);
     return path.basename(fullpath);
   },
@@ -63,13 +61,20 @@ export const makeBrowserS3FileSystem = (
   copyDir: function(source, dest) {
     throw new Error('Not implemented');
   },
-  writeToFile: function(file, contents) {
+  writeToFile: function(fullPath, contents) {
+    const key = fullPath.replace(bucketBaseUrl, '');
+    const mime = {
+      '.js': 'text/javascript',
+      '.html': 'text/html',
+    }
+    const fileExtension = path.extname(fullPath);
+
     awsS3Client.putObject(
       {
         Bucket: bucket,
-        Key: prefix + file,
+        Key: key,
         Body: contents,
-        //TODO: ContentType
+        ContentType: mime[fileExtension],
       },
       (err, data) => {
         if (err)
@@ -78,7 +83,7 @@ export const makeBrowserS3FileSystem = (
           console.log(data); // successful response
       }
     );
-    //TODO: Add to a queue of promises.
+    // TODO: Add to a queue of promises.
 
     return true;
   },

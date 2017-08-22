@@ -30,20 +30,20 @@ public:
         DeclareTiledSpriteObjectExtension(*this);
 
         GetObjectMetadata("TiledSpriteObject::TiledSprite")
-            .SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js")
-            .AddIncludeFile("TiledSpriteObject/tiledspriteruntimeobject-pixi-renderer.js")
-            .AddIncludeFile("TiledSpriteObject/tiledspriteruntimeobject-cocos-renderer.js");
+            .SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js")
+            .AddIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject-pixi-renderer.js")
+            .AddIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject-cocos-renderer.js");
 
-        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Width"].SetFunctionName("setWidth").SetGetter("getWidth").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
-        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Width"].SetFunctionName("getWidth").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
-        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Height"].SetFunctionName("setHeight").SetGetter("getHeight").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
-        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Height"].SetFunctionName("getHeight").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
-        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Angle"].SetFunctionName("setAngle").SetGetter("getAngle").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
-        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Angle"].SetFunctionName("getAngle").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
-        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::XOffset"].SetFunctionName("setXOffset").SetGetter("getXOffset").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
-        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::XOffset"].SetFunctionName("getXOffset").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
-        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::YOffset"].SetFunctionName("setYOffset").SetGetter("getYOffset").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
-        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::YOffset"].SetFunctionName("getYOffset").SetIncludeFile("TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Width"].SetFunctionName("setWidth").SetGetter("getWidth").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Width"].SetFunctionName("getWidth").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Height"].SetFunctionName("setHeight").SetGetter("getHeight").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Height"].SetFunctionName("getHeight").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Angle"].SetFunctionName("setAngle").SetGetter("getAngle").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::Angle"].SetFunctionName("getAngle").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::XOffset"].SetFunctionName("setXOffset").SetGetter("getXOffset").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::XOffset"].SetFunctionName("getXOffset").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllActionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::YOffset"].SetFunctionName("setYOffset").SetGetter("getYOffset").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+        GetAllConditionsForObject("TiledSpriteObject::TiledSprite")["TiledSpriteObject::YOffset"].SetFunctionName("getYOffset").SetIncludeFile("Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

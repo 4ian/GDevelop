@@ -123,7 +123,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         #endif
 
         //Export events
-        if ( !helper.ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+        if ( !helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
         {
             gd::LogError(_("Error during exporting! Unable to export events:\n")+lastError);
             return false;
@@ -131,7 +131,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         helper.AddLibsInclude(true, false, includesFiles);
 
         //Export source files
-        if ( !helper.ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+        if ( !helper.ExportExternalSourceFiles(exportedProject, codeOutputDir, includesFiles) )
         {
             gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
             return false;
@@ -225,7 +225,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     #endif
 
     //Export events
-    if ( !helper.ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+    if ( !helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
     {
         gd::LogError(_("Error during exporting! Unable to export events:\n")+lastError);
         return false;
@@ -233,7 +233,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     helper.AddLibsInclude(false, true, includesFiles);
 
     //Export source files
-    if ( !helper.ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+    if ( !helper.ExportExternalSourceFiles(exportedProject, codeOutputDir, includesFiles) )
     {
         gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
         return false;

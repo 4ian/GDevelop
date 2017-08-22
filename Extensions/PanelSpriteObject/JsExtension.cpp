@@ -28,9 +28,9 @@ public:
         DeclarePanelSpriteObjectExtension(*this);
 
         GetObjectMetadata("PanelSpriteObject::PanelSprite")
-            .SetIncludeFile("PanelSpriteObject/panelspriteruntimeobject.js")
-            .AddIncludeFile("PanelSpriteObject/panelspriteruntimeobject-pixi-renderer.js")
-            .AddIncludeFile("PanelSpriteObject/panelspriteruntimeobject-cocos-renderer.js");
+            .SetIncludeFile("Extensions/PanelSpriteObject/panelspriteruntimeobject.js")
+            .AddIncludeFile("Extensions/PanelSpriteObject/panelspriteruntimeobject-pixi-renderer.js")
+            .AddIncludeFile("Extensions/PanelSpriteObject/panelspriteruntimeobject-cocos-renderer.js");
 
         GetAllActionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Width"].SetFunctionName("setWidth").SetGetter("getWidth");
         GetAllConditionsForObject("PanelSpriteObject::PanelSprite")["PanelSpriteObject::Width"].SetFunctionName("getWidth");

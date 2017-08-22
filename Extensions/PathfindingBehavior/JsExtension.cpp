@@ -30,8 +30,8 @@ public:
         CloneExtension("GDevelop C++ platform", "PathfindingBehavior");
 
         GetBehaviorMetadata("PathfindingBehavior::PathfindingBehavior")
-            .SetIncludeFile("PathfindingBehavior/pathfindingruntimebehavior.js")
-            .AddIncludeFile("PathfindingBehavior/pathfindingobstacleruntimebehavior.js");
+            .SetIncludeFile("Extensions/PathfindingBehavior/pathfindingruntimebehavior.js")
+            .AddIncludeFile("Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js");
 
         {
 
@@ -86,8 +86,8 @@ public:
         }
 
         GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacleBehavior")
-            .SetIncludeFile("PathfindingBehavior/pathfindingruntimebehavior.js")
-            .AddIncludeFile("PathfindingBehavior/pathfindingobstacleruntimebehavior.js");
+            .SetIncludeFile("Extensions/PathfindingBehavior/pathfindingruntimebehavior.js")
+            .AddIncludeFile("Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js");
 
         {
             std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForBehavior("PathfindingBehavior::PathfindingObstacleBehavior");

@@ -27,15 +27,15 @@ public:
     {
         DeclareLinkedObjectsExtension(*this);
 
-        GetAllActions()["LinkedObjects::LinkObjects"].codeExtraInformation.SetIncludeFile("LinkedObjects/linkedobjects.js")
+        GetAllActions()["LinkedObjects::LinkObjects"].codeExtraInformation.SetIncludeFile("Extensions/LinkedObjects/linkedobjects.js")
             .SetFunctionName("gdjs.evtTools.linkedObjects.linkObjects");
-        GetAllActions()["LinkedObjects::RemoveLinkBetween"].codeExtraInformation.SetIncludeFile("LinkedObjects/linkedobjects.js")
+        GetAllActions()["LinkedObjects::RemoveLinkBetween"].codeExtraInformation.SetIncludeFile("Extensions/LinkedObjects/linkedobjects.js")
             .SetFunctionName("gdjs.evtTools.linkedObjects.removeLinkBetween");
-        GetAllActions()["LinkedObjects::RemoveAllLinksOf"].codeExtraInformation.SetIncludeFile("LinkedObjects/linkedobjects.js")
+        GetAllActions()["LinkedObjects::RemoveAllLinksOf"].codeExtraInformation.SetIncludeFile("Extensions/LinkedObjects/linkedobjects.js")
             .SetFunctionName("gdjs.evtTools.linkedObjects.removeAllLinksOf");
-        GetAllActions()["LinkedObjects::PickObjectsLinkedTo"].codeExtraInformation.SetIncludeFile("LinkedObjects/linkedobjects.js")
+        GetAllActions()["LinkedObjects::PickObjectsLinkedTo"].codeExtraInformation.SetIncludeFile("Extensions/LinkedObjects/linkedobjects.js")
             .SetFunctionName("gdjs.evtTools.linkedObjects.pickObjectsLinkedTo");
-        GetAllConditions()["LinkedObjects::PickObjectsLinkedTo"].codeExtraInformation.SetIncludeFile("LinkedObjects/linkedobjects.js")
+        GetAllConditions()["LinkedObjects::PickObjectsLinkedTo"].codeExtraInformation.SetIncludeFile("Extensions/LinkedObjects/linkedobjects.js")
             .SetFunctionName("gdjs.evtTools.linkedObjects.pickObjectsLinkedTo");
 
         StripUnimplementedInstructionsAndExpressions();

@@ -4,11 +4,6 @@ import Paper from 'material-ui/Paper';
 import BaseEditor from './BaseEditor';
 import AboutDialog from '../AboutDialog';
 import { Line, Column } from '../../UI/Grid';
-import Community from './Community';
-import CustomPaper from '../../UI/CustomPaper';
-import Label from '../../UI/Label';
-import Link from '../../UI/Link';
-import Button from '../../UI/Button';
 
 const styles = {
   logoPaper: {
@@ -62,22 +57,33 @@ export default class StartPage extends BaseEditor {
                 GDevelop is an easy-to-use game creator with no programming language to learn.
               </p>
             </Paper>
-            <Community />
-            <CustomPaper>
-              <Label label="Quick Menu" />
-              <Button
+            <Paper zDepth={1}>
+              <FlatButton
                 label="Open a project"
+                fullWidth
                 onClick={this.props.onOpen}
               />
-              <Button
+              <FlatButton
                 label="Create a new project"
+                fullWidth
                 onClick={this.props.onCreate}
               />
-            </CustomPaper>
+            </Paper>
           </div>
         </Line>
-        <Line justifyContent="space-between">
-          <FlatButton label="About GDevelop" onClick={() => this._openAboutDialog(true)} />
+        <Line>
+          <FlatButton
+            label="About GDevelop"
+            onClick={() => this._openAboutDialog(true)}
+          />
+          <FlatButton
+            label="Gdevelop Forum"
+            href="http://forum.compilgames.net"
+          />
+          <FlatButton
+            label="Gdevelop Wiki"
+            href="http://wiki.compilgames.net"
+          />
         </Line>
         <AboutDialog
           open={this.state.aboutDialogOpen}

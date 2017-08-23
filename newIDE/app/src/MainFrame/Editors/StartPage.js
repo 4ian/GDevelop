@@ -5,6 +5,10 @@ import BaseEditor from './BaseEditor';
 import AboutDialog from '../AboutDialog';
 import { Line, Column } from '../../UI/Grid';
 import Community from './Community';
+import CustomPaper from '../../UI/CustomPaper';
+import Label from '../../UI/Label';
+import Link from '../../UI/Link';
+import Button from '../../UI/Button';
 
 const styles = {
   logoPaper: {
@@ -59,18 +63,17 @@ export default class StartPage extends BaseEditor {
               </p>
             </Paper>
             <Community />
-            <Paper zDepth={1}>
-              <FlatButton
+            <CustomPaper>
+              <Label label="Quick Menu" />
+              <Button
                 label="Open a project"
-                fullWidth
                 onClick={this.props.onOpen}
               />
-              <FlatButton
+              <Button
                 label="Create a new project"
-                fullWidth
                 onClick={this.props.onCreate}
               />
-            </Paper>
+            </CustomPaper>
           </div>
         </Line>
         <Line justifyContent="space-between">

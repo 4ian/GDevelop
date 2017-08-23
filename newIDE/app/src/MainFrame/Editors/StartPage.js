@@ -4,6 +4,7 @@ import Paper from 'material-ui/Paper';
 import BaseEditor from './BaseEditor';
 import AboutDialog from '../AboutDialog';
 import { Line, Column } from '../../UI/Grid';
+import Community from './Community';
 
 const styles = {
   logoPaper: {
@@ -57,6 +58,7 @@ export default class StartPage extends BaseEditor {
                 GDevelop is an easy-to-use game creator with no programming language to learn.
               </p>
             </Paper>
+            <Community />
             <Paper zDepth={1}>
               <FlatButton
                 label="Open a project"

@@ -38,6 +38,7 @@ export default class MainFrameToolbar extends Component {
               disabled={!this.props.hasProject}
             />}
           {this.props.showProjectIcons &&
+            this.props.canOpenProject &&
             <ToolbarIcon
               onClick={this.props.openProject}
               src="res/ribbon_default/open32.png"

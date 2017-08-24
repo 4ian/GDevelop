@@ -11,8 +11,11 @@ const styles = {
     margin: 10,
     backgroundColor: '#FFFFFF',
     padding: 5,
-    maxWidth: 400,
+    width: 400,
     textAlign: 'center',
+  },
+  buttonsPaper: {
+    width: 400,
   },
 };
 
@@ -58,12 +61,13 @@ export default class StartPage extends BaseEditor {
                 GDevelop is an easy-to-use game creator with no programming language to learn.
               </p>
             </Paper>
-            <Paper zDepth={1}>
-              <FlatButton
-                label="Open a project"
-                fullWidth
-                onClick={this.props.onOpen}
-              />
+            <Paper zDepth={1} style={styles.buttonsPaper}>
+              {this.props.canOpen &&
+                <FlatButton
+                  label="Open a project"
+                  fullWidth
+                  onClick={this.props.onOpen}
+                />}
               <FlatButton
                 label="Create a new project"
                 fullWidth

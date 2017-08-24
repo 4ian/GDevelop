@@ -370,6 +370,7 @@ export default class MainFrame extends Component {
           editorCreator: () => (
             <StartPage
               setToolbar={this.setEditorToolbar}
+              canOpen={!!this.props.onChooseProject}
               onOpen={this.chooseProject}
               onCreate={() => this.openCreateDialog()}
             />
@@ -569,6 +570,7 @@ export default class MainFrame extends Component {
               showProjectIcons={!this.props.integratedEditor}
               hasProject={!!this.state.currentProject}
               toggleProjectManager={this.toggleProjectManager}
+              canOpenProject={!!this.props.onChooseProject}
               openProject={this.chooseProject}
               loadBuiltinGame={this.loadBuiltinGame}
               requestUpdate={this.props.requestUpdate}

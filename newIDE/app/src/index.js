@@ -12,6 +12,8 @@ import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
 // Import for browser only IDE
 import BrowserS3PreviewLauncher from './Export/BrowserS3PreviewLauncher';
+import BrowserCreateDialog from './ProjectCreation/BrowserCreateDialog';
+import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
 
 // Import for Electron powered IDE.
 import ExternalEditor from './ExternalEditor';
@@ -85,9 +87,13 @@ if (electron) {
     );
   }
 } else {
-  app = <MainFrame
+  app = (
+    <MainFrame
       onLayoutPreview={BrowserS3PreviewLauncher.launchLayoutPreview}
-    />;
+      createDialog={<BrowserCreateDialog />}
+      onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}
+    />
+  );
 }
 
 ReactDOM.render(app, document.getElementById('root'));

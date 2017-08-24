@@ -122,8 +122,8 @@ export default class Window {
           menu.popup(electron.remote.getCurrentWindow());
         }, 30);
       });
-    } else if (window) {
-      window.addEventListener('contextmenu', function(e) {
+    } else if (document) {
+      document.addEventListener('contextmenu', function(e) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) {
           e.preventDefault();

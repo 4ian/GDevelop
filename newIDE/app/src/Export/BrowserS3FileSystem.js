@@ -1,33 +1,65 @@
 import path from 'path';
 const gd = global.gd;
 
-export const makeBrowserS3FileSystem = (
-  { filesContent, awsS3Client, bucket, prefix, bucketBaseUrl }
-) => ({
-  mkDir: function(path) {
-    console.log('mkDir(' + path + ') skipped.');
-  },
-  dirExists: function(path) {
-    console.log('Assume directory ' + path + ' exists.');
+export default class BrowserS3FileSystem {
+  constructor({ filesContent, awsS3Client, bucket, prefix, bucketBaseUrl }) {
+    this.filesContent = filesContent;
+    this.awsS3Client = awsS3Client;
+    this.bucket = bucket;
+    this.prefix = prefix;
+    this.bucketBaseUrl = bucketBaseUrl;
+
+    // Store all the objects that should be written on the S3 bucket.
+    // Call uploadPendingObjects to send them
+    this._pendingUploadObjects = [];
+  }
+
+  uploadPendingObjects = () => {
+    return Promise.all(this._pendingUploadObjects.map(this._uploadObject)).then(result => {
+      console.log("Uploaded all objects:", result);
+      this._pendingUploadObjects = [];
+    }, error => {
+      console.error("Can't upload all objects:", error);
+      throw error;
+    });
+  };
+
+  _uploadObject = params => {
+    return new Promise((resolve, reject) => {
+      this.awsS3Client.putObject(params, (err, data) => {
+        if (err) return reject(err);
+
+        resolve(data);
+      });
+    });
+  };
+
+  mkDir = path => {
+    // Assume required directories always exist.
+  };
+  dirExists = path => {
+    // Assume required directories always exist.
     return true;
-  },
-  clearDir: function(path) {
-    console.log('Assume ' + path + ' is cleared.');
-  },
-  getTempDir: function() {
-    return '/tmp'; //TODO
-  },
-  fileNameFrom: function(fullpath) {
+  };
+  clearDir = path => {
+    // Assume path is cleared.
+  };
+  getTempDir = () => {
+    return '/virtual-unused-tmp-dir';
+  };
+  fileNameFrom = fullpath => {
+    if (this._isExternalURL(fullpath)) return fullpath;
+
     fullpath = this._translateURL(fullpath);
     return path.basename(fullpath);
-  },
-  dirNameFrom: function(fullpath) {
+  };
+  dirNameFrom = fullpath => {
     if (this._isExternalURL(fullpath)) return '';
 
     fullpath = this._translateURL(fullpath);
     return path.dirname(fullpath);
-  },
-  makeAbsolute: function(filename, baseDirectory) {
+  };
+  makeAbsolute = (filename, baseDirectory) => {
     if (this._isExternalURL(filename)) return filename;
 
     filename = this._translateURL(filename);
@@ -35,72 +67,67 @@ export const makeBrowserS3FileSystem = (
       baseDirectory = path.resolve(baseDirectory);
 
     return path.resolve(baseDirectory, path.normalize(filename));
-  },
-  makeRelative: function(filename, baseDirectory) {
+  };
+  makeRelative = (filename, baseDirectory) => {
     if (this._isExternalURL(filename)) return filename;
 
     filename = this._translateURL(filename);
     return path.relative(baseDirectory, path.normalize(filename));
-  },
-  isAbsolute: function(fullpath) {
+  };
+  isAbsolute = fullpath => {
     if (this._isExternalURL(fullpath)) return true;
 
     if (fullpath.length === 0) return true;
     fullpath = this._translateURL(fullpath);
     return (fullpath.length > 0 && fullpath.charAt(0) === '/') ||
       (fullpath.length > 1 && fullpath.charAt(1) === ':');
-  },
-  copyFile: function(source, dest) {
+  };
+  copyFile = (source, dest) => {
     //URL are not copied.
     if (this._isExternalURL(source)) return true;
 
     source = this._translateURL(source);
     console.warn('Copy not done from', source, 'to', dest);
     return true;
-  },
-  copyDir: function(source, dest) {
+  };
+  copyDir = (source, dest) => {
     throw new Error('Not implemented');
-  },
-  writeToFile: function(fullPath, contents) {
-    const key = fullPath.replace(bucketBaseUrl, '');
+  };
+  writeToFile = (fullPath, contents) => {
+    const key = fullPath.replace(this.bucketBaseUrl, '');
     const mime = {
       '.js': 'text/javascript',
       '.html': 'text/html',
-    }
+    };
     const fileExtension = path.extname(fullPath);
 
-    awsS3Client.putObject(
-      {
-        Bucket: bucket,
-        Key: key,
-        Body: contents,
-        ContentType: mime[fileExtension],
-      },
-      (err, data) => {
-        if (err)
-          console.log(err, err.stack); // an error occurred
-        else
-          console.log(data); // successful response
-      }
-    );
-    // TODO: Add to a queue of promises.
-
+    // Defer real upload until it's triggered by calling
+    // uploadPendingObjects.
+    this._pendingUploadObjects.push({
+      Bucket: this.bucket,
+      Key: key,
+      Body: contents,
+      ContentType: mime[fileExtension],
+    });
     return true;
-  },
-  readFile: function(file) {
-    if (filesContent.hasOwnProperty(file)) return filesContent[file];
+  };
+
+  readFile = file => {
+    if (this.filesContent.hasOwnProperty(file)) return this.filesContent[file];
 
     console.error(`Unknown file ${file}, returning an empty string`);
     return '';
-  },
-  readDir: function(path, ext) {
+  };
+
+  readDir = (path, ext) => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
     console.warn('Assume', path, 'is empty for extension', ext);
     return output;
-  },
-  fileExists: function(filename) {
+  };
+
+  fileExists = filename => {
     if (this._isExternalURL(filename)) return true;
 
     // // Do as if the virtual GDJS folder is empty so that the exporter
@@ -108,20 +135,22 @@ export const makeBrowserS3FileSystem = (
     // if (filename.indexOf(gdjsRoot) === 0) return false;
 
     return true;
-  },
-  _isExternalURL: function(filename) {
+  };
+
+  _isExternalURL = filename => {
     return filename.substr(0, 7) === 'http://' ||
       filename.substr(0, 8) === 'https://' ||
       filename.substr(0, 6) === 'ftp://';
-  },
+  };
+
   /**
    * Return the filename associated to the URL on the server, relative to the games directory.
    * (i.e: Transform g/mydirectory/myfile.png to mydirectory/myfile.png).
    */
-  _translateURL: function(filename) {
+  _translateURL = filename => {
     if (filename.substr(0, 2) === 'g/' || filename.substr(0, 2) === 'g\\')
       filename = filename.substr(2);
 
     return filename;
-  },
-});
+  };
+}

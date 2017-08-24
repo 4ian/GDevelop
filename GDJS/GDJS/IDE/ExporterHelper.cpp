@@ -374,7 +374,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project & project, gd::String outputDi
         gd::Layout & exportedLayout = project.GetLayout(i);
         gd::String eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(project, exportedLayout,
             exportedLayout.GetEvents(), eventsIncludes, false /*Export for edittime*/);
-        gd::String filename = outputDir+"code"+gd::String::From(i)+".js";
+        gd::String filename = outputDir + "/" + "code" + gd::String::From(i) + ".js";
 
         //Export the code
         if (fs.WriteToFile(filename, eventsOutput))

@@ -3220,7 +3220,7 @@
                     "variables": [],
                     "behaviors": [],
                     "string": "x 0",
-                    "font": "Bimbo_JVE.ttf",
+                    "font": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/Bimbo_JVE.ttf",
                     "characterSize": 40,
                     "color": {
                         "b": 0,
@@ -3698,7 +3698,7 @@
                             },
                             "parameters": [
                                 "",
-                                "jump.wav",
+                                "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/jump.wav",
                                 "",
                                 "",
                                 ""
@@ -4785,7 +4785,7 @@
                                             },
                                             "parameters": [
                                                 "",
-                                                "jump.wav",
+                                                "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/jump.wav",
                                                 "",
                                                 "",
                                                 ""
@@ -5017,7 +5017,7 @@
                             },
                             "parameters": [
                                 "",
-                                "coin.wav",
+                                "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/coin.wav",
                                 "",
                                 "",
                                 ""

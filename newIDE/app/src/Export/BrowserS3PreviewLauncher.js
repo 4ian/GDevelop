@@ -1,6 +1,6 @@
 // @flow
 
-import { makeBrowserS3FileSystem } from './BrowserS3FileSystem';
+import BrowserS3FileSystem from './BrowserS3FileSystem';
 import { timeFunction } from '../Utils/TimeFunction';
 import { findGDJS } from './BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
@@ -20,25 +20,13 @@ const awsS3Client = new awsS3({
 });
 
 export default class BrowserS3PreviewLauncher {
-  static _openPreviewWindow = (project, gamePath): void => {
-    console.log('TODO: Open ' + gamePath);
+  static _openPreviewWindow = (project, url): void => {
+    const windowObjectReference = window.open(url, `_blank`,
+    "menubar=no,status=no");
+    console.log(windowObjectReference);
   };
 
   static _prepareExporter = (): Promise<any> => {
-    awsS3Client.putObject(
-      {
-        Bucket: destinationBucket,
-        Key: 'test.html',
-        Body: 'testtest',
-      },
-      (err, data) => {
-        if (err)
-          console.log(err, err.stack); // an error occurred
-        else
-          console.log(data); // successful response
-      }
-    );
-
     return new Promise((resolve, reject) => {
       findGDJS(({ gdjsRoot, filesContent }) => {
         if (!gdjsRoot) {
@@ -50,25 +38,26 @@ export default class BrowserS3PreviewLauncher {
 
         const prefix = '' + Date.now() + '-' + Math.floor(Math.random()*1000000);
 
-        const outputDir = destinationBucketBaseUrl + prefix + '/';
+        const outputDir = destinationBucketBaseUrl + prefix;
+        const browserS3FileSystem = new BrowserS3FileSystem({
+          filesContent,
+          awsS3Client,
+          bucket: destinationBucket,
+          bucketBaseUrl: destinationBucketBaseUrl,
+          prefix,
+        });
         const fileSystem = assignIn(
           new gd.AbstractFileSystemJS(),
-          makeBrowserS3FileSystem({
-            filesContent,
-            awsS3Client,
-            bucket: destinationBucket,
-            bucketBaseUrl: destinationBucketBaseUrl,
-            prefix,
-          })
+          browserS3FileSystem
         );
         const exporter = new gd.Exporter(fileSystem, gdjsRoot);
         //TODO: the + '/' should not be needed.
         exporter.setCodeOutputDirectory(destinationBucketBaseUrl + prefix + '/');
 
         resolve({
-          outputDir,
           exporter,
-          prefix,
+          outputDir,
+          browserS3FileSystem,
         });
       });
     });
@@ -78,17 +67,16 @@ export default class BrowserS3PreviewLauncher {
     if (!project || !layout) return Promise.reject();
 
     return BrowserS3PreviewLauncher._prepareExporter().then(({
-      outputDir,
       exporter,
+      outputDir,
+      browserS3FileSystem,
     }) => {
-      timeFunction(
-        () => {
-          exporter.exportLayoutForPixiPreview(project, layout, outputDir);
-          exporter.delete();
-          BrowserS3PreviewLauncher._openPreviewWindow(project, outputDir);
-        },
-        time => console.info(`Preview files generation took ${time}ms`)
-      );
+      exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+      exporter.delete();
+      return browserS3FileSystem.uploadPendingObjects().then(() => {
+        const finalUrl = outputDir + '/index.html';
+        BrowserS3PreviewLauncher._openPreviewWindow(project, finalUrl);
+      });
     });
   };
 

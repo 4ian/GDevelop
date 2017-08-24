@@ -46,7 +46,7 @@ Exporter::Exporter(gd::AbstractFileSystem & fileSystem, gd::String gdjsRoot_) :
     fs(fileSystem),
     gdjsRoot(gdjsRoot_)
 {
-    SetCodeOutputDirectory(fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/");
+    SetCodeOutputDirectory(fs.GetTempDir() + "/GDTemporaries/JSCodeTemp");
 }
 
 Exporter::~Exporter()

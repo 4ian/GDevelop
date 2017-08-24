@@ -71,8 +71,19 @@ export default class StartPage extends BaseEditor {
             </Paper>
           </div>
         </Line>
-        <Line justifyContent="space-between">
-          <FlatButton label="About GDevelop" onClick={() => this._openAboutDialog(true)} />
+        <Line>
+          <FlatButton
+            label="About GDevelop"
+            onClick={() => this._openAboutDialog(true)}
+          />
+          <FlatButton
+            label="Gdevelop Forum"
+            href="http://forum.compilgames.net"
+          />
+          <FlatButton
+            label="Gdevelop Wiki"
+            href="http://wiki.compilgames.net"
+          />
         </Line>
         <AboutDialog
           open={this.state.aboutDialogOpen}

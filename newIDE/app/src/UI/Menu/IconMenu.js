@@ -14,7 +14,7 @@ export default class GDIconMenu extends Component {
     };
     this.menuImplementation = electron
       ? new ElectronMenuImplementation()
-      : new MaterialUIMenuImplementation();
+      : new MaterialUIMenuImplementation({ onClose: () => {}});
   }
 
   componentWillMount() {
@@ -54,6 +54,7 @@ export default class GDIconMenu extends Component {
         {...iconMenuProps}
         onTouchTap={this._onTouchTap}
         ref={iconMenu => this.iconMenu = iconMenu}
+        desktop
         {...this.menuImplementation.getMenuProps()}
       >
         {this.state.children}

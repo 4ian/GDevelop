@@ -1,7 +1,6 @@
 // @flow
 
 import BrowserS3FileSystem from './BrowserS3FileSystem';
-import { timeFunction } from '../Utils/TimeFunction';
 import { findGDJS } from './BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
 const gd = global.gd;
@@ -51,8 +50,7 @@ export default class BrowserS3PreviewLauncher {
           browserS3FileSystem
         );
         const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-        //TODO: the + '/' should not be needed.
-        exporter.setCodeOutputDirectory(destinationBucketBaseUrl + prefix + '/');
+        exporter.setCodeOutputDirectory(destinationBucketBaseUrl + prefix);
 
         resolve({
           exporter,

@@ -436,12 +436,16 @@ bool ExporterHelper::ExportIncludesAndLibs(std::vector<gd::String> & includesFil
             gd::String allJsFiles;
             for ( std::vector<gd::String>::iterator include = includesFiles.begin() ; include != includesFiles.end(); ++include )
             {
-                if ( fs.FileExists(jsPlatformDir+"Runtime/"+*include) )
-                    allJsFiles += "\""+jsPlatformDir+"Runtime/"+*include+"\" ";
-                else if ( fs.FileExists(jsPlatformDir+"Runtime/Extensions/"+*include) )
-                    allJsFiles += "\""+jsPlatformDir+"Runtime/Extensions/"+*include+"\" ";
-                else if ( fs.FileExists(*include) )
-                    allJsFiles += "\""+*include+"\" ";
+                if (!fs.IsAbsolute(*include))
+                {
+                    gd::String source = gdjsRoot + "/Runtime/" + *include;
+                    if ( fs.FileExists(source) )
+                        allJsFiles += "\"" + source + "\" ";
+                }
+                else
+                {
+                    if (fs.FileExists(*include)) allJsFiles += "\""+*include+"\" ";
+                }
             }
 
             cmd += allJsFiles;

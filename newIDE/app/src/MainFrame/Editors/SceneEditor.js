@@ -2,6 +2,7 @@ import React from 'react';
 import InstancesFullEditor from '../../SceneEditor/InstancesFullEditor';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import BaseEditor from './BaseEditor';
+import Error from '../../Utils/Error';
 
 export default class SceneEditor extends BaseEditor {
   updateToolbar() {
@@ -29,8 +30,9 @@ export default class SceneEditor extends BaseEditor {
     const { project, layoutName } = this.props;
     const layout = this.getLayout();
     if (!layout) {
-      //TODO: Error component
-      return <div>No layout called {layoutName} found!</div>;
+      return (
+        <Error message={`No layout called ${layoutName} found!`} />
+      );
     }
 
     return (

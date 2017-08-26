@@ -20,7 +20,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("TileMapObject",
                               _("Tile Map Object"),
-                              _("Extension allowing to use tile map objects."),
+                              _("This Extension enables the use of tile map objects."),
                               "Victor Levasseur and Florian Rival",
                               "Open source (MIT License)");
 

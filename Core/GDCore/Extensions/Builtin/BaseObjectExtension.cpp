@@ -574,7 +574,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     obj.AddAction("Rebondir",
                    _("Move an object away from another"),
                    _("Move an object away from another, using forces."),
-                   _("Move _PARAM0_ away of _PARAM1_ (only _PARAM0_ will move)"),
+                   _("Move _PARAM0_ away from _PARAM1_ (only _PARAM0_ will move)"),
                    _("Movement"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")
@@ -588,7 +588,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     obj.AddAction("Ecarter",
                    _("Move an object away from another"),
                    _("Move an object away from another without using forces."),
-                   _("Move _PARAM0_ away of _PARAM2_ (only _PARAM0_ will move)"),
+                   _("Move _PARAM0_ away from _PARAM2_ (only _PARAM0_ will move)"),
                    _("Position"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")

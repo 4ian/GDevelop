@@ -13,7 +13,7 @@ const styles = {
   },
 };
 
-export default class NewObjectDialog extends Component {
+export default class NewBehaviorDialog extends Component {
   constructor(props) {
     super(props);
     this.state = { ...this._loadFrom(props.project) };
@@ -21,28 +21,32 @@ export default class NewObjectDialog extends Component {
 
   _loadFrom(project) {
     if (!project || !project.getCurrentPlatform()) {
-      return { objectMetadata: [] };
+      return { behaviorMetadata: [] };
     }
 
     const platform = project.getCurrentPlatform();
     const extensionsList = platform.getAllPlatformExtensions();
 
     return {
-      objectMetadata: flatten(
+      behaviorMetadata: flatten(
         mapFor(0, extensionsList.size(), i => {
           const extension = extensionsList.at(i);
 
           return extension
-            .getExtensionObjectsTypes()
+            .getBehaviorsTypes()
             .toJSArray()
-            .map(objectType => extension.getObjectMetadata(objectType))
-            .map(objectMetadata => ({
+            .map(behaviorType => ({
+              behaviorType,
+              behaviorMetadata: extension.getBehaviorMetadata(behaviorType),
+            }))
+            .map(({ behaviorType, behaviorMetadata }) => ({
               extension,
-              objectMetadata,
-              name: objectMetadata.getName(),
-              fullName: objectMetadata.getFullName(),
-              description: objectMetadata.getDescription(),
-              iconFilename: objectMetadata.getIconFilename(),
+              behaviorMetadata,
+              type: behaviorType,
+              defaultName: behaviorMetadata.getDefaultName(),
+              fullName: behaviorMetadata.getFullName(),
+              description: behaviorMetadata.getDescription(),
+              iconFilename: behaviorMetadata.getIconFilename(),
             }));
         })
       ),
@@ -68,7 +72,7 @@ export default class NewObjectDialog extends Component {
 
     return (
       <Dialog
-        title="Add a new object"
+        title="Add a new behavior to the object"
         actions={actions}
         modal
         open={open}
@@ -76,28 +80,28 @@ export default class NewObjectDialog extends Component {
         autoScrollBodyContent
       >
         <List>
-          {this.state.objectMetadata.map(objectMetadata => {
-            if (objectMetadata.name === '') { // Base object is an "abstract" object
-              return null;
-            }
-
+          {this.state.behaviorMetadata.map(behaviorMetadata => {
             return (
               <ListItem
                 leftAvatar={
                   <Avatar
-                    src={objectMetadata.iconFilename}
+                    src={behaviorMetadata.iconFilename}
                     style={styles.icon}
                   />
                 }
-                key={objectMetadata.name}
-                primaryText={objectMetadata.fullName}
+                key={behaviorMetadata.type}
+                primaryText={behaviorMetadata.fullName}
                 secondaryText={
                   <p>
-                    {objectMetadata.description}
+                    {behaviorMetadata.description}
                   </p>
                 }
                 secondaryTextLines={2}
-                onClick={() => this.props.onChoose(objectMetadata.name)}
+                onClick={() =>
+                  this.props.onChoose(
+                    behaviorMetadata.type,
+                    behaviorMetadata.defaultName
+                  )}
               />
             );
           })}

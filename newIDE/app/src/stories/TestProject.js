@@ -32,6 +32,7 @@ export const textObject = new gd.TextObject('MyTextObject');
 export const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
 export const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
 export const spriteObject = new gd.SpriteObject('MySpriteObject');
+export const spriteObjectWithBehaviors = new gd.SpriteObject('MySpriteObjectWithBehaviors');
 
 {
     const animation = new gd.Animation();
@@ -72,6 +73,9 @@ export const spriteObject = new gd.SpriteObject('MySpriteObject');
     animation.getDirection(0).addSprite(sprite1);
     spriteObject.addAnimation(animation);
 }
+
+spriteObjectWithBehaviors.addNewBehavior(project, "PlatformBehavior::PlatformerObjectBehavior", "PlatformerObject");
+spriteObjectWithBehaviors.addNewBehavior(project, "DraggableBehavior::Draggable", "Draggable");
 
 // Layout
 export const testLayout = project.insertNewLayout("TestLayout", 0);

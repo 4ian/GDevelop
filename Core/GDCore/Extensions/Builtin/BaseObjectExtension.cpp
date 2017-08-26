@@ -276,14 +276,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("ChangeLayer",
                    _("Layer"),
-                   _("Change the layer where is the object."),
+                   _("Move the object to a different layer."),
                    _("Put _PARAM0_ on the layer _PARAM1_"),
                    _("Layers and cameras"),
                    "res/actions/layer24.png",
                    "res/actions/layer.png")
 
         .AddParameter("object", _("Object"))
-        .AddParameter("layer", _("Put on the layer (base layer if empty)")).SetDefaultValue("\"\"")
+        .AddParameter("layer", _("Move it to this layer (base layer if empty)")).SetDefaultValue("\"\"")
         .MarkAsAdvanced();
 
     obj.AddAction("ModVarObjet",

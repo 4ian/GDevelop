@@ -126,7 +126,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddAction("RotateCamera",
                    _("Change camera angle"),
-                   _("This action modify the angle of a camera of the specified layer."),
+                   _("This action modifies the angle of a camera in the specified layer."),
                    _("Do _PARAM1__PARAM2_ to angle of camera (layer: _PARAM3_, camera: _PARAM4_)"),
                    _("Layers and cameras"),
                    "res/actions/camera24.png",

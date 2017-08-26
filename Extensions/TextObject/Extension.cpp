@@ -19,7 +19,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("TextObject",
                           _("Text object"),
-                          _("Extension allowing to use an object displaying a text."),
+                          _("This Extension enables the use of an object that displays text."),
                           "Florian Rival and Victor Levasseur",
                           "Open source (MIT License)");
 
@@ -138,7 +138,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddAction("SetSmooth",
                    _("Smoothing"),
-                   _("Activate or desactivate text smoothing."),
+                   _("Activate or deactivate text smoothing."),
                    _("Smooth _PARAM0_: _PARAM1_"),
                    _("Style"),
                    "res/actions/opacity24.png",

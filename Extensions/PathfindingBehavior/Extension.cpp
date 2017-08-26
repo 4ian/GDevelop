@@ -34,7 +34,7 @@ public:
             gd::BehaviorMetadata & aut = AddBehavior("PathfindingBehavior",
                   _("Pathfinding"),
                   "Pathfinding",
-                  _("Behavior which move objects and avoid objects flagged as obstacles."),
+                  _("Behavior that moves objects and avoids objects flagged as obstacles."),
                   "",
                   "CppPlatform/Extensions/AStaricon.png",
                   "PathfindingBehavior",

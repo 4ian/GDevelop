@@ -32,7 +32,7 @@ public:
     {
         SetExtensionInformation("TimedEvent",
                               _("Timed events"),
-                              _("Event which launch its conditions and actions only after a amount of time is reached."),
+                              _("Event that launch its conditions and actions only after an amount of time is reached."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -41,7 +41,7 @@ public:
 
         AddEvent("TimedEvent",
                       _("Timed event"),
-                      _("Event which launch its conditions and actions only after a amount of time is reached."),
+                      _("Event that launch its conditions and actions only after an amount of time is reached."),
                       "",
                       "CppPlatform/Extensions/timedevent16.png",
                       std::make_shared<TimedEvent>())

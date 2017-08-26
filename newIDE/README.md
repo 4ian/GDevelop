@@ -65,14 +65,11 @@ Version number is read from `newIDE/electron-app/app/package.json`.
 
 ## Current status
 
-This new editor is still in development and not yet ready to build games from scratch:
+This new editor is still in development and is missing some features:
 
-- [x] Scene editor
-- [x] Export
-- [ ] Events editor
-- [x] Objects editor
+- [ ] Autocompletion of expressions and parameters in Events editor.
+- [ ] Creating and editing groups of objects
 - [ ] Support for native games
-- [ ] Editor available online
 - [ ] Export with Cocos2d-JS to Android and iOS.
 
 ## Additional help

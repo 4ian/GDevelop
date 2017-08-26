@@ -3,6 +3,7 @@ import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 import BaseEditor from './BaseEditor';
 import AboutDialog from '../AboutDialog';
+import Window from '../../Utils/Window';
 import { Line, Column } from '../../UI/Grid';
 
 const styles = {
@@ -78,11 +79,11 @@ export default class StartPage extends BaseEditor {
           />
           <FlatButton
             label="Gdevelop Forum"
-            href="http://forum.compilgames.net"
+            onClick={() => Window.openExternalURL("http://forum.compilgames.net")}
           />
           <FlatButton
             label="Gdevelop Wiki"
-            href="http://wiki.compilgames.net"
+            onClick={() => Window.openExternalURL("http://wiki.compilgames.net")}
           />
         </Line>
         <AboutDialog

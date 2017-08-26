@@ -1,5 +1,6 @@
 import optionalRequire from './OptionalRequire.js';
 const electron = optionalRequire('electron');
+const shell = electron ? electron.shell : null;
 const dialog = electron ? electron.remote.dialog : null;
 
 let isWindows = false;
@@ -132,6 +133,15 @@ export default class Window {
         return true;
       });
     }
+  }
+
+  static openExternalURL(url) {
+    if (electron) {
+      shell.openExternal(url);
+      return;
+    }
+
+    window.open(url, "_blank");
   }
 
   static hasMainMenu() {

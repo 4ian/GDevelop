@@ -15,7 +15,7 @@ void DeclareInventoryExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("Inventory",
                           _("Inventory"),
-                          _("Provides action and condition to store an inventory with items in memory."),
+                          _("Provides actions and conditions to store an inventory with items in memory."),
                           "Florian Rival",
                           "Open source (MIT License)");
 

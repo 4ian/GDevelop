@@ -26,7 +26,7 @@ public:
     {
         SetExtensionInformation("Light",
                               _("Light"),
-                              _("Allow to display lights and use light obstacles."),
+                              _("This Extension is able to display lights and use light obstacles."),
                               "Florian Rival",
                               "Open source (MIT License)");
 

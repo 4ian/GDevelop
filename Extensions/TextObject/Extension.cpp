@@ -19,7 +19,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("TextObject",
                           _("Text object"),
-                          _("This Extension enables the use of an object that displays text."),
+                          _("This Extension enables the use of objects that display text."),
                           "Florian Rival and Victor Levasseur",
                           "Open source (MIT License)");
 
@@ -123,7 +123,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("Opacity",
                    _("Opacity"),
-                   _("Test the value of the opacity of a text object."),
+                   _("Test the value of the opacity of a Text object."),
                    _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
                    _(""),
                    "res/conditions/opacity24.png",
@@ -173,7 +173,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("IsBold",
                    _("Bold"),
-                   _("Test if bold style is activated"),
+                   _("Test if the bold style is activated"),
                    _("_PARAM0_ bold style is set"),
                    _("Style"),
                    "res/conditions/bold.png",
@@ -243,7 +243,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("Angle",
                    _("Angle"),
-                   _("Test the value of the angle of a text object."),
+                   _("Test the value of the angle of a Text object."),
                    _("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Rotation"),
                    "res/conditions/rotate24.png",

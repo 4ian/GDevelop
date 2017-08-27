@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
 {
     extension.SetExtensionInformation("BuiltinStringInstructions",
                           _("Text manipulation"),
-                          _("Built-in extension providing expressions for manipulating texts."),
+                          _("Built-in extension providing expressions for manipulating text objects."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -22,13 +22,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
     extension.AddStrExpression("NewLine",
                    _("Insert a new line"),
                    _("Insert a new line"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png");
 
     extension.AddStrExpression("FromCodePoint",
                    _("Get character from code point"),
                    _("Get character from code point"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("expression", _("Code point"));
@@ -36,7 +36,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
     extension.AddStrExpression("ToUpperCase",
                    _("Uppercase a text"),
                    _("Uppercase a text"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"));
@@ -44,7 +44,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
     extension.AddStrExpression("ToLowerCase",
                    _("Lowercase a text"),
                    _("Lowercase a text"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"));
@@ -52,7 +52,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
     extension.AddStrExpression("SubStr",
                    _("Get a portion of a text"),
                    _("Get a portion of a text"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"))
@@ -62,7 +62,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
     extension.AddStrExpression("StrAt",
                    _("Get a character from a text"),
                    _("Get a character from a text"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"))
@@ -71,7 +71,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
     extension.AddStrExpression("StrRepeat",
                    _("Repeat a text"),
                    _("Repeat a text"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text to repeat"))
@@ -80,7 +80,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
     extension.AddExpression("StrLength",
                    _("Length of a text"),
                    _("Length of a text"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"));
@@ -89,7 +89,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
     extension.AddExpression("StrFind",
                    _("Search in a text"),
                    _("Search in a text (return the position of the result or -1 if not found)"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"))
@@ -97,9 +97,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
 
 
     extension.AddExpression("StrRFind",
-                   _("Search in a text from end"),
+                   _("Search in a text from the end"),
                    _("Search in a text from the end (return the position of the result or -1 if not found)"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"))
@@ -109,8 +109,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
 
     extension.AddExpression("StrFindFrom",
                    _("Search in a text, starting from a position"),
-                   _("Search in a text starting from a position (return the position of the result or -1 if not found)"),
-                   _("Manipulation on text"),
+                   _("Search in a text, starting from a position (return the position of the result or -1 if not found)"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"))
@@ -122,7 +122,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsStringInstructionsExten
     extension.AddExpression("StrRFindFrom",
                    _("Search in a text from the end, starting from a position"),
                    _("Search in a text from the end, starting from a position (return the position of the result or -1 if not found)"),
-                   _("Manipulation on text"),
+                   _("Manipulation of text"),
                    "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text"))

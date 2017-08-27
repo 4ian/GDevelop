@@ -19,7 +19,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("TextObject",
                           _("Text object"),
-                          _("This Extension enables the use of objects that display text."),
+                          _("This Extension enables the use of an object that displays text."),
                           "Florian Rival and Victor Levasseur",
                           "Open source (MIT License)");
 

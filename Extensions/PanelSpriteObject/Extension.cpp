@@ -18,14 +18,14 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("PanelSpriteObject",
         _("Panel Sprite (9-patch) Object"),
-        _("Extension allowing to use panel sprite (\"9-patch\") objects."),
+        _("This Extension enables the use of panel sprite (\"9-patch\") objects."),
         "Victor Levasseur and Florian Rival",
         "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject<PanelSpriteObject>(
         "PanelSprite",
         _("Panel Sprite (\"9-patch\")"),
-        _("An image with edges and corners that are stretched separately from the fill."),
+        _("An image with edges and corners that are stretched separately from the full image."),
         "CppPlatform/Extensions/PanelSpriteIcon.png");
 
     #if defined(GD_IDE_ONLY)

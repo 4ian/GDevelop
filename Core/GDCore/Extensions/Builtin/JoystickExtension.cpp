@@ -20,8 +20,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("JoystickButtonDown",
-                   _("A button of a joystick is pressed"),
-                   _("Test if a button of a joystick is pressed."),
+                   _("A button on a joystick is pressed"),
+                   _("Test if a button on a joystick is pressed."),
                    _("The button _PARAM2_ of joystick _PARAM1_ is pressed"),
                    _("Joystick"),
                    "res/conditions/joystick24.png",

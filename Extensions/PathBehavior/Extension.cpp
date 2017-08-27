@@ -29,7 +29,7 @@ public:
     {
         SetExtensionInformation("PathBehavior",
                               _("Path Behavior"),
-                              _("Behavior allowing to move objects on a predefined path"),
+                              _("This Extension can move objects on predefined paths to avoid obstacles."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -37,7 +37,7 @@ public:
                 gd::BehaviorMetadata & aut = AddBehavior("PathBehavior",
                       _("Path"),
                       _("Path"),
-                      _("Make objects move on a predefined path."),
+                      _("Make objects move on predefined paths."),
                       "",
                       "CppPlatform/Extensions/pathicon.png",
                       "PathBehavior",
@@ -50,7 +50,7 @@ public:
 
                 aut.AddAction("SetReverseAtEnd",
                                _("De/activate rounding"),
-                               _("Activate or desactivate rounding"),
+                               _("Activate or deactivate rounding"),
                                _("Activate rounding for _PARAM0_: _PARAM2_"),
                                _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
@@ -63,8 +63,8 @@ public:
 
 
                 aut.AddAction("SetStopAtEnd",
-                               _("De/activate the stop at the end of the path"),
-                               _("Activate or deactivate the stop at the end of the object"),
+                               _("Decide if the object should be stopped at the end of its path."),
+                               _("Decide if the object should be stopped at the end of its path."),
                                _("Stop _PARAM0_ when the end of the path is reached: _PARAM2_"),
                                _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
@@ -105,7 +105,7 @@ public:
                 aut.AddAction("Reverse",
                                _("Invert the movement on the path"),
                                _("Invert the movement on the path."),
-                               _("Invert the sens of the movement of _PARAM0_ on its path"),
+                               _("Invert the sense of the movement of _PARAM0_ on its path"),
                                _("Movement"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
@@ -132,7 +132,7 @@ public:
 
                 aut.AddAction("EnterSegment",
                                _("Position on the segment of a path"),
-                               _("Put the object directly on specific segment of the path"),
+                               _("Put the object directly on a specific segment of the path"),
                                _("Do _PARAM2__PARAM3_ to number of the current segment of _PARAM0_"),
                                _("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
@@ -152,7 +152,7 @@ public:
 
                 aut.AddCondition("GetPosition",
                                _("Position of the object on the segment"),
-                               _("Return true if the position on the path satisfy the test.\nPosition on a segment is a value between 0 and 1."),
+                               _("Return true if the position on the path satisfies the test.\nPosition on a segment is a value between 0 and 1."),
                                _("The position of _PARAM0_ on the current segment is _PARAM2__PARAM3_"),
                                _("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
@@ -235,8 +235,8 @@ public:
 
 
                 aut.AddAction("SetOffsetX",
-                               _("Modify the path X position"),
-                               _("Change the path X position."),
+                               _("Modify the path's X position"),
+                               _("Change the path's X position."),
                                _("Do _PARAM2__PARAM3_ to the X position of the path of _PARAM0_"),
                                _("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
@@ -270,8 +270,8 @@ public:
 
 
                 aut.AddAction("SetOffsetY",
-                               _("Modify the path Y position"),
-                               _("Change the path Y position."),
+                               _("Modify the path's Y position"),
+                               _("Change the path's Y position."),
                                _("Do _PARAM2__PARAM3_ to the Y position of the path of _PARAM0_"),
                                _("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
@@ -304,7 +304,7 @@ public:
 
                 aut.AddAction("SetFollowAngle",
                                _("De/activate automatic rotation"),
-                               _("Activate or deactivate the automatic update of the angle of the object on the path."),
+                               _("Activate or deactivate the automatic change of the angle of the object on the path."),
                                _("Activate automatic rotation of _PARAM0_: _PARAM2_"),
                                _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
@@ -353,7 +353,7 @@ public:
 
                 aut.AddCondition("GetSpeed",
                                _("Speed"),
-                               _("Return true if the speed satisfy the condition."),
+                               _("Return true if the speed satisfies the condition."),
                                _("The speed of _PARAM0_ on the path is _PARAM2__PARAM3_"),
                                _("Movement"),
                                "CppPlatform/Extensions/pathicon24.png",

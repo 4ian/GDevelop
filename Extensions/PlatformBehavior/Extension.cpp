@@ -16,7 +16,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("PlatformBehavior",
                           _("Platform Behavior"),
-                          _("Enables use of controllable objects which can run and jump on platforms."),
+                          _("This Extension enables the use of controllable objects that can run and jump on platforms."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -24,7 +24,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
         gd::BehaviorMetadata & aut = extension.AddBehavior("PlatformerObjectBehavior",
               _("Platformer character"),
               "PlatformerObject",
-              _("Controllable character which can jump and run on platforms."),
+              _("Controllable character that can jump and run on platforms."),
               "",
               "CppPlatform/Extensions/platformerobjecticon.png",
               "PlatformerObjectBehavior",
@@ -425,7 +425,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
         gd::BehaviorMetadata & aut = extension.AddBehavior("PlatformBehavior",
               _("Platform"),
               "Platform",
-              _("Platform on which Platformer characters can run."),
+              _("Platform that Platformer characters can run on."),
               "",
               "CppPlatform/Extensions/platformicon.png",
               "PlatformBehavior",
@@ -437,7 +437,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("ChangePlatformType",
                        _("Change platform type"),
-                       _("Change the platform type of the object: Platform, Jumpthrough or Ladder."),
+                       _("Change the platform type of the object: Platform, Jump-Through, or Ladder."),
                        _("Set platform type of _PARAM0_ to _PARAM2_"),
                        _("Platforms"),
                        "CppPlatform/Extensions/platformicon24.png",

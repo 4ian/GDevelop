@@ -36,7 +36,7 @@ public:
     {
         SetExtensionInformation("Function",
                               _("Function events"),
-                              _("Extension allowing to use events behaving as functions."),
+                              _("This Extension allows you to use events that behave as functions."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -104,7 +104,7 @@ public:
 
         AddEvent("Function",
             _("Function"),
-            _("Function event : An event which is launched only thanks to action \"Launch a function\""),
+            _("Function event : An event that is launched only thanks to the action \"Launch a function\""),
             "",
             "res/function.png",
             std::make_shared<FunctionEvent>())

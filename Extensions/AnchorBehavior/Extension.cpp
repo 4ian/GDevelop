@@ -21,7 +21,7 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension & extension)
     gd::BehaviorMetadata & aut = extension.AddBehavior("AnchorBehavior",
           _("Anchor"),
           "Anchor",
-          _("Behavior that anchors objects to the window's bounds."),
+          _("Behavior that Achor objects to the window's bounds."),
           "",
           "CppPlatform/Extensions/AnchorIcon.png",
           "AnchorBehavior",

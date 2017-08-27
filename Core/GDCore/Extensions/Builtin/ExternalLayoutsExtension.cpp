@@ -22,7 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtensio
     extension.AddAction("CreateObjectsFromExternalLayout",
                    _("Create objects from an external layout"),
                    _("Create objects from an external layout."),
-                   _("Create objects from the external layout _PARAM1_"),
+                   _("Create objects from the external layout named _PARAM1_"),
                    _("External layouts"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")

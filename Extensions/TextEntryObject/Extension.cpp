@@ -14,7 +14,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("TextEntryObject",
         _("Text entry object"),
-        _("Extension allowing to use an object capturing text entered with keyboard."),
+        _("This Extension enables the use of an object that captures text entered with a keyboard by a player."),
         "Florian Rival",
         "Open source (MIT License)");
 
@@ -58,7 +58,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddAction("Activate",
                    _("De/activate capturing text input"),
-                   _("Activate or desactivate the capture of text entered with keyboard."),
+                   _("Activate or deactivate the capture of text entered with keyboard."),
                    _("Activate capture by _PARAM0_ of the text entered with keyboard: _PARAM1_"),
                    _("Setup"),
                    "CppPlatform/Extensions/textentry24.png",
@@ -71,7 +71,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("Activated",
                    _("Text input"),
-                   _("Test if the object capture text entered with keyboard."),
+                   _("Test if the object captured text entered with keyboard."),
                    _("_PARAM0_ capture the text entered with keyboard"),
                    _("Setup"),
                    "CppPlatform/Extensions/textentry24.png",

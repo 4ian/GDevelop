@@ -29,7 +29,7 @@ public:
     {
         SetExtensionInformation("SoundObject",
                               _("Sound object"),
-                              _("Extension allowing to use spatialized sounds."),
+                              _("This Extension enables the use of spatialized sounds."),
                               "Thomas Flecy, Victor Levasseur et al.",
                               "Open source (MIT License)");
 
@@ -38,7 +38,7 @@ public:
         {
             gd::ObjectMetadata & obj = AddObject<SoundObject>("Sound",
                        _("Sound"),
-                       _("Invisible object emitting a sound which can be moved in the space."),
+                       _("Invisible object emitting a sound which can be moved around."),
                        "CppPlatform/Extensions/soundicon32.png");
 
             AddRuntimeObject<SoundObject, RuntimeSoundObject>(
@@ -106,7 +106,7 @@ public:
 
             obj.AddAction("Loop",
                            _("Automatic restart"),
-                           _("Activate or desactivate the looping of a sound."),
+                           _("Activate or deactivate the looping of a sound."),
                            _("Activate looping for _PARAM0_: _PARAM1_"),
                            _("Parameters"),
                            "res/actions/son24.png",
@@ -119,7 +119,7 @@ public:
 
             obj.AddAction("RelativeToListener",
                            _("Listener relation"),
-                           _("Activate or desactivate the sound spatialisation relative to the listener."),
+                           _("Activate or deactivate the sound spatialisation relative to the listener."),
                            _("Set _PARAM0_ as relative to the listener position: _PARAM1_"),
                            _("Parameters"),
                            "res/actions/son24.png",
@@ -238,7 +238,7 @@ public:
 
             obj.AddCondition("Loop",
                            _("Automatic restart"),
-                           _("Test if an sound is looping."),
+                           _("Test if a sound is looping."),
                            _("_PARAM0_ is looping"),
                            _("Parameters"),
                            "res/actions/son24.png",
@@ -369,8 +369,8 @@ public:
 
         AddAction("ListenerDirectionX",
                        _("Direction on X axis"),
-                       _("Change the direction of the listener on X axis."),
-                       _("Do _PARAM1__PARAM2_ to the direction on X axis of the listener"),
+                       _("Change the direction of the listener on the X axis."),
+                       _("Do _PARAM1__PARAM2_ to the direction on the X axis of the listener"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -383,8 +383,8 @@ public:
 
         AddAction("ListenerDirectionY",
                        _("Direction on Y axis"),
-                       _("Change the direction of the listener on Y axis."),
-                       _("Do _PARAM1__PARAM2_ to the direction on Y axis of the listener"),
+                       _("Change the direction of the listener on the Y axis."),
+                       _("Do _PARAM1__PARAM2_ to the direction on the Y axis of the listener"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -397,8 +397,8 @@ public:
 
         AddAction("ListenerDirectionZ",
                        _("Direction on Z axis"),
-                       _("Change the direction of the listener on Z axis."),
-                       _("Do _PARAM1__PARAM2_ to the direction on Z axis of the listener"),
+                       _("Change the direction of the listener on the Z axis."),
+                       _("Do _PARAM1__PARAM2_ to the direction on the Z axis of the listener"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -412,7 +412,7 @@ public:
         // Conditions li�es � l'�couteur
         AddCondition("ListenerX",
                        _("X position"),
-                       _("Test the position of the listener on X axis."),
+                       _("Test the position of the listener on the X axis."),
                        _("The listener X position is _PARAM1__PARAM0_"),
                        _("Listener"),
                        "res/actions/son24.png",
@@ -425,7 +425,7 @@ public:
 
         AddCondition("ListenerY",
                        _("Y position"),
-                       _("Test the position of the listener on Y axis."),
+                       _("Test the position of the listener on the Y axis."),
                        _("The listener Y position is _PARAM1__PARAM0_"),
                        _("Listener"),
                        "res/actions/son24.png",
@@ -438,7 +438,7 @@ public:
 
         AddCondition("ListenerZ",
                        _("Z position"),
-                       _("Test the position of the listener on Z axis."),
+                       _("Test the position of the listener on the Z axis."),
                        _("The listener Z position is _PARAM1__PARAM0_"),
                        _("Listener"),
                        "res/actions/son24.png",
@@ -451,7 +451,7 @@ public:
 
         AddCondition("ListenerDirectionX",
                        _("X direction"),
-                       _("Test the direction of the listener on X axis."),
+                       _("Test the direction of the listener on the X axis."),
                        _("The listener X direction is _PARAM1__PARAM0_"),
                        _("Listener"),
                        "res/actions/son24.png",
@@ -464,7 +464,7 @@ public:
 
         AddCondition("ListenerDirectionY",
                        _("Y direction"),
-                       _("Test the direction of the listener on Y axis."),
+                       _("Test the direction of the listener on the Y axis."),
                        _("The listener Y direction is _PARAM1__PARAM0_"),
                        _("Listener"),
                        "res/actions/son24.png",
@@ -480,7 +480,7 @@ public:
 
         AddCondition("ListenerDirectionZ",
                        _("Z direction"),
-                       _("Test the direction of the listener on Z axis."),
+                       _("Test the direction of the listener on the Z axis."),
                        _("The listener Z direction is _PARAM1__PARAM0_"),
                        _("Listener"),
                        "res/actions/son24.png",

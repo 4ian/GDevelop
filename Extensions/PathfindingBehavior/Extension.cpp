@@ -34,7 +34,7 @@ public:
             gd::BehaviorMetadata & aut = AddBehavior("PathfindingBehavior",
                   _("Pathfinding"),
                   "Pathfinding",
-                  _("Behavior which move objects and avoid objects flagged as obstacles."),
+                  _("With this, characters will move while avoiding all objects that are flagged as obstacles."),
                   "",
                   "CppPlatform/Extensions/AStaricon.png",
                   "PathfindingBehavior",
@@ -76,7 +76,7 @@ public:
 
             aut.AddCondition("DestinationReached",
                            _("Destination reached"),
-                           _("Return true if destination was reached."),
+                           _("Return true if the destination was reached."),
                            _("_PARAM0_ reached its destination"),
                            _(""),
                            "CppPlatform/Extensions/AStaricon24.png",
@@ -329,8 +329,8 @@ public:
 
             aut.AddAction("AllowDiagonals",
                            _("Diagonals moves"),
-                           _("Allow or restrict diagonal moves on the path"),
-                           _("Allow diagonal moves for _PARAM0_ on the path: _PARAM2_"),
+                           _("Allow or restrict diagonal movement on the path"),
+                           _("Allow diagonal movement for _PARAM0_ on the path: _PARAM2_"),
                            _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
@@ -343,7 +343,7 @@ public:
 
             aut.AddCondition("DiagonalsAllowed",
                            _("Diagonals moves"),
-                           _("Return true if the object is allowed to do diagonal moves on the path"),
+                           _("Return true if the object is allowed to move diagonally on the path"),
                            _("Diagonal moves allowed for _PARAM0_"),
                            _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
@@ -520,8 +520,8 @@ public:
 
 
             aut.AddAction("SetImpassable",
-                           _("Set impassable"),
-                           _("Set the object as being an impassable obstacle or not"),
+                           _("Should object be impassable?"),
+                           _("Decide if the object is an impassable obstacle"),
                            _("Set _PARAM0_ as an impassable obstacle: _PARAM2_"),
                            _("Obstacles"),
                            "CppPlatform/Extensions/pathfindingobstacleicon24.png",
@@ -534,7 +534,7 @@ public:
 
 
             aut.AddCondition("IsImpassable",
-                           _("Is impassable"),
+                           _("Is object impassable?"),
                            _("Return true if the obstacle is impassable"),
                            _("_PARAM0_ is impassable"),
                            _("Obstacles"),

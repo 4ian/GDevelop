@@ -32,7 +32,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
 
     extension.AddAction("LoadFile",
                    _("Load a structured file in memory"),
-                   _("This action load the structured file in memory, so as to write and read it.\nYou can open and write without using this action, but it will be slower.\nIf you use this action, do not forget to unload the file from memory.\n\nFor the native platform, the file format is XML."),
+                   _("This action loads the structured file in memory, so you can write and read it.\nYou can open and write without using this action, but it will be slower.\nIf you use this action, do not forget to unload the file from memory.\n\nFor the native platform, the file format is XML."),
                    _("Load structured file _PARAM0_ in memory"),
                    _("Storage"),
                    "res/actions/fichier24.png",
@@ -42,7 +42,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
 
     extension.AddAction("UnloadFile",
                    _("Close a structured file"),
-                   _("This action close the structured file previously loaded in memory, saving all changes made."),
+                   _("This action closes the structured file previously loaded in memory, saving all changes made."),
                    _("Close structured file _PARAM0_"),
                    _("Storage"),
                    "res/actions/fichier24.png",
@@ -98,7 +98,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
 
     extension.AddAction("DeleteGroupFichier",
                    _("Delete an element"),
-                   _("This action delete the specified element from the structured file.\nSpecify the structure leading to the element using / (example : Root/Level/Current)\nSpaces are forbidden in element names."),
+                   _("This action deletes the specified element from the structured file.\nSpecify the structure leading to the element using / (example : Root/Level/Current)\nSpaces are forbidden in element names."),
                    _("Delete _PARAM1_ from the file _PARAM0_"),
                    _("Storage"),
                    "res/actions/delete24.png",
@@ -127,8 +127,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
         .MarkAsAdvanced();
 
     extension.AddAction("LaunchFile",
-                   _("Open an URL or a file"),
-                   _("This action launch the specified file or URL, in a browser (or in a new tab if the game is using the Web platform and is launched inside a browser)."),
+                   _("Open a URL or a file"),
+                   _("This action launches the specified file or URL, in a browser (or in a new tab if the game is using the Web platform and is launched inside a browser)."),
                    _("Open URL (or file) _PARAM0_"),
                    _("Files"),
                    "res/actions/launchFile24.png",
@@ -138,7 +138,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(gd::Platf
 
     extension.AddAction("ExecuteCmd",
                    _("Execute a command"),
-                   _("This action execute the specified command."),
+                   _("This action executes the specified command."),
                    _("Execute _PARAM0_"),
                    _("Files"),
                    "res/actions/launchFile24.png",

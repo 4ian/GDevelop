@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
 {
     extension.SetExtensionInformation("BuiltinMouse",
                           _("Mouse features"),
-                          _("Built-in extension allowing to use the mouse"),
+                          _("Built-in extension that enables the use of a mouse"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -34,8 +34,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .MarkAsSimple();
 
     extension.AddAction("TouchSimulateMouse",
-                   _("De/activate moving mouse cursor with touches"),
-                   _("When activated, any touch made on a touchscreen will also move the mouse cursor. When deactivated, mouse and touch positions will be completely independant.\nBy default, this is activated so that you can simply use the mouse conditions to also support touchscreens. If you want to have multitouch and differentiate mouse and touches, just deactivate it with this action."),
+                   _("De/activate moving the mouse cursor with touches"),
+                   _("When activated, any touch made on a touchscreen will also move the mouse cursor. When deactivated, mouse and touch positions will be completely independent.\nBy default, this is activated so that you can simply use the mouse conditions to also support touchscreens. If you want to have multitouch and differentiate mouse movement and touches, just deactivate it with this action."),
                    _("Move mouse cursor when touching screen: _PARAM1_"),
                    _("Mouse and touch"),
                    "res/conditions/touch24.png",
@@ -141,8 +141,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .SetManipulatedType("number");
 
     extension.AddCondition("SourisBouton",
-                   _("Mouse button down or touch held"),
-                   _("Return true if the specified button of the mouse is down or if any touch is in contact with the screen."),
+                   _("Mouse button pressed or touch held"),
+                   _("Return true if the specified mouse button is pressed or if a touch is in contact with the screen."),
                    _("Touch or _PARAM1_ mouse button is down"),
                    _("Mouse and touch"),
                    "res/conditions/mouse24.png",
@@ -153,7 +153,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
 
     extension.AddCondition("MouseButtonReleased",
                    _("Mouse button released"),
-                   _("Return true if the specified button of the mouse was released."),
+                   _("Return true if the specified mouse button was released."),
                    _("_PARAM1_ mouse button was released"),
                    _("Mouse and touch"),
                    "res/conditions/mouse24.png",
@@ -194,7 +194,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
 
     extension.AddCondition("PopStartedTouch",
                    _("A new touch has started"),
-                   _("Return true if a touch has started. The touch identifier can be accessed using LastTouchId().\nAs more than one touch can have started, this condition is only true once for each touch: the next time you use it, it will be for a new touch or it will return false if there is no more touch that just started."),
+                   _("Return true if a touch has started. The touch identifier can be accessed using LastTouchId().\nAs more than one touch can be started, this condition is only true once for each touch: the next time you use it, it will be for a new touch, or it will return false if no more touches have just started."),
                    _("A new touch has started"),
                    _("Mouse and touch/Multitouch"),
                    "res/conditions/touch24.png",
@@ -203,7 +203,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
 
     extension.AddCondition("PopEndedTouch",
                    _("A touch has ended"),
-                   _("Return true if a touch has ended. The touch identifier can be accessed using LastEndedTouchId().\nAs more than one touch can have ended, this condition is only true once for each touch: the next time you use it, it will be for a new touch or it will return false if there is no more touch that just ended."),
+                   _("Return true if a touch has ended. The touch identifier can be accessed using LastEndedTouchId().\nAs more than one touch can be ended, this condition is only true once for each touch: the next time you use it, it will be for a new touch, or it will return false if no more touches have just ended."),
                    _("A touch has ended"),
                    _("Mouse and touch/Multitouch"),
                    "res/conditions/touch24.png",

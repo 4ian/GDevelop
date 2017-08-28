@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
 {
     extension.SetExtensionInformation("BuiltinScene",
                           _("Scene management features"),
-                          _("Built-in extension allowing to manipulate scenes"),
+                          _("This Built-in extension allows you to manipulate scenes"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -50,7 +50,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
 
     extension.AddAction("PushScene",
                    _("Pause and start a new scene"),
-                   _("Pause this scene and start the specified one.\nLater, you can use \"Stop and go back to previous scene\" action to go back to this scene."),
+                   _("Pause this scene and start the specified one.\nLater, you can use the \"Stop and go back to previous scene\" action to go back to this scene."),
                    _("Pause the scene and start _PARAM1_"),
                    _("Scene"),
                    "res/actions/pushScene24.png",
@@ -61,7 +61,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
 
     extension.AddAction("PopScene",
                    _("Stop and go back to previous scene"),
-                   _("Stop this scene and go back to the previous paused one.\nTo pause a scene, use \"Pause and start a new scene\" action."),
+                   _("Stop this scene and go back to the previous paused one.\nTo pause a scene, use the \"Pause and start a new scene\" action."),
                    _("Stop the scene and go back to the previous paused one"),
                    _("Scene"),
                    "res/actions/popScene24.png",
@@ -92,7 +92,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
 
     extension.AddAction("DisableInputWhenFocusIsLost",
                    _("Disable input when focus is lost"),
-                   _("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
+                   _("Decide if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
                    _("Disable input when focus is lost: _PARAM1_"),
                    _("Scene"),
                    "res/actions/window24.png",
@@ -103,7 +103,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
 
     extension.AddCondition("Egal",
                _("Compare two expressions"),
-               _("Test the two expression"),
+               _("Test the two expressions"),
                _("_PARAM0_ _PARAM1_ _PARAM2_"),
                _("Other"),
                "res/conditions/egal24.png",

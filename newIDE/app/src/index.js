@@ -7,6 +7,7 @@ import ExportDialog from './Export/ExportDialog';
 import { sendProgramOpening } from './Utils/Analytics/EventSender';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import registerServiceWorker from './registerServiceWorker';
+import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
 // Import for browser only IDE

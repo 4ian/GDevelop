@@ -14,7 +14,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("DestroyOutsideBehavior",
                               _("Destroy Outside Screen Behavior"),
-                              _("This Extension can be used to destroy objects when they go outside of the screen's borders."),
+                              _("This Extension can be used to destroy objects when they go outside of the borders of the game's window."),
                               "Florian Rival",
                               "Open source (MIT License)");
 

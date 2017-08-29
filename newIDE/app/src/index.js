@@ -14,6 +14,7 @@ import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import BrowserS3PreviewLauncher from './Export/BrowserS3PreviewLauncher';
 import BrowserCreateDialog from './ProjectCreation/BrowserCreateDialog';
 import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
+import BrowserSaveDialog from './ProjectsStorage/BrowserSaveDialog';
 import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
 
 // Import for Electron powered IDE.
@@ -94,6 +95,7 @@ if (electron) {
       onLayoutPreview={BrowserS3PreviewLauncher.launchLayoutPreview}
       createDialog={<BrowserCreateDialog />}
       introDialog={<BrowserIntroDialog />}
+      saveDialog={<BrowserSaveDialog />}
       onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}
     />
   );

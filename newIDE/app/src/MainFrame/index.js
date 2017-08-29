@@ -58,6 +58,7 @@ export default class MainFrame extends Component {
       createDialogOpen: false,
       exportDialogOpen: false,
       introDialogOpen: false,
+      saveDialogOpen: false,
       loadingProject: false,
       previewLoading: false,
       currentProject: null,
@@ -442,12 +443,16 @@ export default class MainFrame extends Component {
   save = () => {
     if (!this.state.currentProject) return;
 
-    this.props.onSaveProject(this.state.currentProject).catch(err => {
-      showErrorBox(
-        'Unable to save the project! Please try again by choosing another location.',
-        err
-      );
-    });
+    if (this.props.saveDialog) {
+      this._openSaveDialog();
+    } else {
+      this.props.onSaveProject(this.state.currentProject).catch(err => {
+        showErrorBox(
+          'Unable to save the project! Please try again by choosing another location.',
+          err
+        );
+      });
+    }
   };
 
   closeProject = () => {
@@ -483,6 +488,12 @@ export default class MainFrame extends Component {
   _openIntroDialog = (open = true) => {
     this.setState({
       introDialogOpen: open,
+    });
+  };
+
+  _openSaveDialog = (open = true) => {
+    this.setState({
+      saveDialogOpen: open,
     });
   };
 
@@ -522,7 +533,7 @@ export default class MainFrame extends Component {
     const {
       currentProject,
     } = this.state;
-    const { exportDialog, createDialog, introDialog } = this.props;
+    const { exportDialog, createDialog, introDialog, saveDialog } = this.props;
     const showLoader = this.state.loadingProject ||
       this.state.previewLoading ||
       this.props.loading;
@@ -618,6 +629,12 @@ export default class MainFrame extends Component {
               React.cloneElement(introDialog, {
                 open: this.state.introDialogOpen,
                 onClose: () => this._openIntroDialog(false),
+              })}
+            {!!saveDialog &&
+              React.cloneElement(saveDialog, {
+                project: this.state.currentProject,
+                open: this.state.saveDialogOpen,
+                onClose: () => this._openSaveDialog(false),
               })}
           </div>
         </MuiThemeProvider>

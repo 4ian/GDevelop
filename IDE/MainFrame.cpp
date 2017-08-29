@@ -175,7 +175,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem41 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM4, _("Decompose an animated GIF"), wxEmptyString, wxITEM_NORMAL);
     MenuItem41->SetBitmap(wxBitmap(wxImage(_T("res/importgif.png"))));
     decomposerContextMenu.Append(MenuItem41);
-    MenuItem42 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM5, _("Decompose a RPG Maker character"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem42 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM5, _("Decompose an RPG Maker character"), wxEmptyString, wxITEM_NORMAL);
     MenuItem42->SetBitmap(wxBitmap(wxImage(_T("res/importrpgmaker.png"))));
     decomposerContextMenu.Append(MenuItem42);
     MenuItem43 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM6, _("Decompose a spritesheet"), wxEmptyString, wxITEM_NORMAL);

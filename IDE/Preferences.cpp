@@ -327,7 +327,7 @@ changesNeedRestart(false)
     browseCompilationTempDir = new wxButton(Panel3, ID_BUTTON12, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     FlexGridSizer31->Add(browseCompilationTempDir, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer6->Add(FlexGridSizer31, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
-    deleteTemporariesCheck = new wxCheckBox(Panel3, ID_CHECKBOX7, _("Delete temporary versions as soon as possible"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
+    deleteTemporariesCheck = new wxCheckBox(Panel3, ID_CHECKBOX7, _("Delete temporary files as soon as possible"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
     deleteTemporariesCheck->SetValue(true);
     StaticBoxSizer6->Add(deleteTemporariesCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
     FlexGridSizer15->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);

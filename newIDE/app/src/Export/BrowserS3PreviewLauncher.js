@@ -1,6 +1,7 @@
 // @flow
-
+import React from 'react';
 import BrowserS3FileSystem from './BrowserS3FileSystem';
+import BrowserPreviewLinkDialog from './BrowserPreviewLinkDialog';
 import { findGDJS } from './BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
 const gd = global.gd;
@@ -21,7 +22,10 @@ const awsS3Client = new awsS3({
 export default class BrowserS3PreviewLauncher {
   static _openPreviewWindow = (project, url): void => {
     const windowObjectReference = window.open(url, `_blank`);
-    console.log(windowObjectReference);
+    return {
+      url,
+      windowObjectReference,
+    };
   };
 
   static _prepareExporter = (): Promise<any> => {
@@ -34,7 +38,10 @@ export default class BrowserS3PreviewLauncher {
         }
         console.info('GDJS found in ', gdjsRoot);
 
-        const prefix = '' + Date.now() + '-' + Math.floor(Math.random()*1000000);
+        const prefix = '' +
+          Date.now() +
+          '-' +
+          Math.floor(Math.random() * 1000000);
 
         const outputDir = destinationBucketBaseUrl + prefix;
         const browserS3FileSystem = new BrowserS3FileSystem({
@@ -70,10 +77,17 @@ export default class BrowserS3PreviewLauncher {
     }) => {
       exporter.exportLayoutForPixiPreview(project, layout, outputDir);
       exporter.delete();
-      return browserS3FileSystem.uploadPendingObjects().then(() => {
-        const finalUrl = outputDir + '/index.html';
-        BrowserS3PreviewLauncher._openPreviewWindow(project, finalUrl);
-      });
+      return browserS3FileSystem
+        .uploadPendingObjects()
+        .then(() => {
+          const finalUrl = outputDir + '/index.html';
+          return BrowserS3PreviewLauncher._openPreviewWindow(project, finalUrl);
+        })
+        .then(({ url, windowObjectReference }) => {
+          if (!windowObjectReference) {
+            return { dialog: <BrowserPreviewLinkDialog url={url} /> };
+          }
+        });
     });
   };
 

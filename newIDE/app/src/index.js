@@ -12,6 +12,7 @@ import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
 // Import for browser only IDE
 import BrowserS3PreviewLauncher from './Export/BrowserS3PreviewLauncher';
+import BrowserExport from './Export/BrowserExport';
 import BrowserCreateDialog from './ProjectCreation/BrowserCreateDialog';
 import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
 import BrowserSaveDialog from './ProjectsStorage/BrowserSaveDialog';
@@ -93,6 +94,16 @@ if (electron) {
   app = (
     <MainFrame
       onLayoutPreview={BrowserS3PreviewLauncher.launchLayoutPreview}
+      exportDialog={
+        <ExportDialog
+          tabs={[
+            {
+              name: 'Export your game (coming soon)',
+              ExportComponent: BrowserExport,
+            },
+          ]}
+        />
+      }
       createDialog={<BrowserCreateDialog />}
       introDialog={<BrowserIntroDialog />}
       saveDialog={<BrowserSaveDialog />}

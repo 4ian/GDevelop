@@ -544,9 +544,9 @@ void EventsEditor::OneventsPanelPaint(wxPaintEvent& event)
 
     wxString text;
     if ( events->IsEmpty() )
-        text = _("Add an event with the ribbon.\nHighlight then an event/action/condition with the cursor to get more edition options,\nor make a double click to edit an item.");
+        text = _("Add an event with the ribbon.\nHighlight an event/action/condition with the cursor to get more editing options,\nor double-click to edit an item.");
     else
-        text = _("Highlight then an event/action/condition with the cursor to get more edition options,\nor make a double click to edit an item.");
+        text = _("Highlight an event/action/condition with the cursor to get more editing options,\nor double-click to edit an item.");
     dc.SetTextForeground(wxColor(0,0,0));
     dc.SetFont(gd::EventsRenderingHelper::Get()->GetNiceFont());
     dc.DrawLabel(text,

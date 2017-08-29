@@ -431,7 +431,7 @@
             "b": 247,
             "disableInputWhenNotFocused": true,
             "mangledName": "New_32scene",
-            "name": "New scene",
+            "name": "Scene 1",
             "oglFOV": 90,
             "oglZFar": 500,
             "oglZNear": 1,
@@ -4409,7 +4409,7 @@
     ],
     "externalEvents": [
         {
-            "associatedLayout": "New scene",
+            "associatedLayout": "Scene 1",
             "lastChangeTimeStamp": 1383154438,
             "name": "EnemiesManagement",
             "events": [
@@ -4963,7 +4963,7 @@
             ]
         },
         {
-            "associatedLayout": "New scene",
+            "associatedLayout": "Scene 1",
             "lastChangeTimeStamp": 1383151997,
             "name": "ObjectsManagement",
             "events": [
@@ -5122,7 +5122,7 @@
             ]
         },
         {
-            "associatedLayout": "New scene",
+            "associatedLayout": "Scene 1",
             "lastChangeTimeStamp": 1383151997,
             "name": "GUIManagement",
             "events": [

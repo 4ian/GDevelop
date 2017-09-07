@@ -29,6 +29,19 @@ public:
     virtual ~CommentEvent() {};
     virtual gd::CommentEvent * Clone() const { return new CommentEvent(*this);}
 
+    int GetBackgroundColorRed() const { return r; }
+    int GetBackgroundColorGreen() const { return v; }
+    int GetBackgroundColorBlue() const { return b; }
+    void SetBackgroundColor(int r_, int g_, int b_) { r = r_; v = g_; b = b_; }
+
+    int GetTextColorRed() const { return textR; }
+    int GetTextColorGreen() const { return textG; }
+    int GetTextColorBlue() const { return textB; }
+    void SetTextColor(int r_, int g_, int b_) { textR = r_; textG = g_; textB = b_; }
+
+    const gd::String & GetComment() const { return com1; }
+    void SetComment(const gd::String & comment) { com1 = comment; }
+
     virtual void SerializeTo(SerializerElement & element) const;
     virtual void UnserializeFrom(gd::Project & project, const SerializerElement & element);
 
@@ -40,8 +53,8 @@ public:
     int textG; ///< Text color Green component
     int textB; ///< Text color Blue component
 
-    gd::String com1; ///< Comment gd::String
-    gd::String com2; ///< Optional second comment gd::String
+    gd::String com1; ///< Comment
+    gd::String com2; ///< Optional second column comment, deprecated
 
     /**
      * Called by event editor to draw the event.

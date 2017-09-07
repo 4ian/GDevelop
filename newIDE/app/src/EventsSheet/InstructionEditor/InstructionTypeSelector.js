@@ -14,9 +14,15 @@ const styles = {
     margin: '0 auto',
     backgroundColor: 'transparent',
   },
-  groupItemText: {
+  groupListItemText: {
     color: 'rgba(0,0,0,0.54)',
-  }
+  },
+  groupListItem: {
+    borderBottom: '1px solid #f0f0f0', //TODO: Use theme color instead
+  },
+  groupListItemNestedList: {
+    padding: 0,
+  },
 };
 
 export class InstructionTypeList extends Component {
@@ -179,7 +185,9 @@ export class InstructionTypeList extends Component {
         return (
           <ListItem
             key={key}
-            primaryText={<div style={styles.groupItemText}>{key}</div>}
+            style={styles.groupListItem}
+            nestedListStyle={styles.groupListItemNestedList}
+            primaryText={<div style={styles.groupListItemText}>{key}</div>}
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
             nestedItems={this._renderTree(instructionOrGroup)}
@@ -194,6 +202,7 @@ export class InstructionTypeList extends Component {
       return (
         <ListItem
           key={instructionInfo.type}
+          style={styles.listItem}
           primaryText={instructionInfo.displayedName}
           secondaryText={instructionInfo.fullGroupName}
           value={instructionInfo.type}

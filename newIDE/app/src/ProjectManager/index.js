@@ -46,13 +46,18 @@ class Item extends Component {
     }
   }
 
+  _onContextMenu = event => {
+    if (this._iconMenu) this._iconMenu.open(event);
+  };
+
   render() {
     const rightIconButton = this.props.rightIconButton ||
       <IconMenu
+        ref={iconMenu => this._iconMenu = iconMenu}
         iconButtonElement={
           <IconButton
-            onTouchTap={e =>
-              e.preventDefault() /*Prevent bubbling the event to ListItem*/}
+            onClick={e =>
+              e.stopPropagation() /*Prevent bubbling the event to ListItem*/}
           >
             <MoreVertIcon />
           </IconButton>
@@ -92,9 +97,10 @@ class Item extends Component {
     return (
       <ListItem
         style={this.props.style}
+        onContextMenu={this._onContextMenu}
         primaryText={label}
         rightIconButton={rightIconButton}
-        onTouchTap={this.props.onEdit}
+        onClick={this.props.onEdit}
       />
     );
   }

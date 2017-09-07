@@ -26,10 +26,11 @@ export default class ObjectRow extends React.Component {
   _renderObjectMenu(object) {
     return (
       <IconMenu
+        ref={iconMenu => this._iconMenu = iconMenu}
         iconButtonElement={
           <IconButton
-            onTouchTap={e =>
-              e.preventDefault() /*Prevent bubbling the event to ListItem*/}
+            onClick={e =>
+              e.stopPropagation() /*Prevent bubbling the event to ListItem*/}
           >
             <MoreVertIcon />
           </IconButton>
@@ -65,6 +66,10 @@ export default class ObjectRow extends React.Component {
       );
     }
   }
+
+  _onContextMenu = event => {
+    if (this._iconMenu) this._iconMenu.open(event);
+  };
 
   render() {
     const { project, object, selected, style } = this.props;
@@ -102,10 +107,11 @@ export default class ObjectRow extends React.Component {
     return (
       <ListItem
         style={{ ...itemStyle, ...style }}
+        onContextMenu={this._onContextMenu}
         primaryText={label}
         leftIcon={<ListIcon src={this.props.getThumbnail(project, object)} />}
         rightIconButton={this._renderObjectMenu(object)}
-        onTouchTap={() => {
+        onClick={() => {
           if (!this.props.onObjectSelected) return;
           if (this.props.editingName) return;
 

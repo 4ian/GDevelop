@@ -35,9 +35,19 @@ export default class GDIconMenu extends Component {
     }
   }
 
-  _onTouchTap = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  open = (event) => {
+    if (!this.iconMenu) return;
+
+    const node = ReactDOM.findDOMNode(this.iconMenu);
+    if (!node) return;
+
+    this.menuImplementation.showMenu(node.getBoundingClientRect());
+    this.iconMenu.open('unkown', event);
+  }
+
+  _onTouchTap = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (!this.iconMenu) return;
 
     const node = ReactDOM.findDOMNode(this.iconMenu);

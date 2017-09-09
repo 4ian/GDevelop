@@ -29,7 +29,7 @@ public:
     {
         SetExtensionInformation("AdvancedXML",
                               _("Advanced XML 1.0"),
-                              _("Extension allowing to manipulate XML files."),
+                              _("With this Extension, you can manipulate XML files."),
                               "Victor Levasseur",
                               "Open source (MIT License)");
 
@@ -153,7 +153,7 @@ public:
 
             .AddParameter("string", _("Reference which will be used to access to the element"))
             .AddParameter("expression", _("Tye of the element to be created\n(0-> Tag, 1-> Text, 2-> Comment )"))
-            .AddParameter("string", _("Text of the element\nIf the element is a tag, it will be the tag name,if the element is a text or a comment, it will be the content."))
+            .AddParameter("string", _("Text of the element\nIf the element is a tag, it will be the tag name. If the element is a text or a comment, it will be the content"))
             .AddCodeOnlyParameter("currentScene", "")
             .SetFunctionName("AdvancedXML::CreateNewElement").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 

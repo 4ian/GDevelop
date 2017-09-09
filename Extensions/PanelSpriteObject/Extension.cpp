@@ -18,14 +18,14 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("PanelSpriteObject",
         _("Panel Sprite (9-patch) Object"),
-        _("Extension allowing to use panel sprite (\"9-patch\") objects."),
+        _("This Extension enables the use of Panel Sprite (\"9-patch\") Objects."),
         "Victor Levasseur and Florian Rival",
         "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject<PanelSpriteObject>(
         "PanelSprite",
         _("Panel Sprite (\"9-patch\")"),
-        _("An image with edges and corners that are stretched separately from the fill."),
+        _("An image with edges and corners that are stretched separately from the full image."),
         "CppPlatform/Extensions/PanelSpriteIcon.png");
 
     #if defined(GD_IDE_ONLY)
@@ -46,7 +46,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("Width",
                    _("Width"),
-                   _("Test the width of a Panel Sprite."),
+                   _("Check the width of a Panel Sprite."),
                    _("The width of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Size and angle"),
                    "res/conditions/scaleWidth24.png",
@@ -74,7 +74,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("Height",
                    _("Height"),
-                   _("Test the height of a Panel Sprite."),
+                   _("Check the height of a Panel Sprite."),
                    _("The height of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Size and angle"),
                    "res/conditions/scaleHeight24.png",
@@ -103,7 +103,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("Angle",
                    _("Angle"),
-                   _("Test the angle of a Panel Sprite."),
+                   _("Check the angle of a Panel Sprite."),
                    _("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Size and angle"),
                    "res/conditions/rotate24.png",

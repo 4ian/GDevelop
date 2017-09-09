@@ -20,7 +20,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("TileMapObject",
                               _("Tile Map Object"),
-                              _("Extension allowing to use tile map objects."),
+                              _("This Extension enables the use of Tile Map Objects."),
                               "Victor Levasseur and Florian Rival",
                               "Open source (MIT License)");
 
@@ -74,8 +74,8 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 
     extension.AddCondition("SingleTileCollision",
                    _("Collision with one tile"),
-                   _("Test if an object collides a specific tile."),
-                   _("_PARAM4_ is in collision with the tile at _PARAM2_;_PARAM3_ (layer _PARAM1_) of _PARAM0_"),
+                   _("Test if an object collides with a specific tile."),
+                   _("_PARAM4_ is in collision with the tile named _PARAM0_, which is located at _PARAM2_;_PARAM3_ (in layer _PARAM1_)"),
                    _("Collisions"),
                    "res/conditions/collision24.png",
                    "res/conditions/collision.png")
@@ -164,7 +164,7 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddAction("ChangeTexture",
                    _("Change the tileset texture"),
-                   _("Change the tileset texture.\nNote: if the texture has a different size, it may produce strange results such as texture offset..."),
+                   _("Change the tileset texture.\nNote: if the texture has a different size, it may produce strange results, such as texture offset..."),
                    _("Change the tileset texture of _PARAM0_ to _PARAM1_"),
                    _("Tileset"),
                    "CppPlatform/Extensions/TileMapIcon24.png",

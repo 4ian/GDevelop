@@ -25,21 +25,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCommonConversionsExtens
                        _("Convert the text to a number"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("string", _("Text to convert in a number"));
+        .AddParameter("string", _("Text to convert to a number"));
 
     extension.AddStrExpression("ToString",
                        _("Number > Text"),
-                       _("Convert the result of the expression in a text"),
+                       _("Convert the result of the expression to text"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Expression to be converted to a text"));
+        .AddParameter("expression", _("Expression to be converted to text"));
 
     extension.AddStrExpression("LargeNumberToString",
                        _("Number > Text ( without scientific notation )"),
-                       _("Convert the result of the expression in a text, without using the scientific notation"),
+                       _("Convert the result of the expression to text, without using the scientific notation"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("expression", _("Expression to be converted to a text"));
+        .AddParameter("expression", _("Expression to be converted to text"));
 
     extension.AddExpression("ToRad",
                        _("Degrees > Radians"),

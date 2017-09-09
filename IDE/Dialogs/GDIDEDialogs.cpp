@@ -279,7 +279,7 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     bottomSizer->Add(localeBmp, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     
-    m_hyperLink572 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help to translate GD in your language"), wxT("https://crowdin.com/project/gdevelop"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink572 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help by translating GD to your language"), wxT("https://crowdin.com/project/gdevelop"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     m_hyperLink572->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink572->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink572->SetVisitedColour(wxColour(wxT("#FF0000")));

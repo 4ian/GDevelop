@@ -32,7 +32,7 @@ public:
     {
         SetExtensionInformation("TimedEvent",
                               _("Timed events"),
-                              _("Event which launch its conditions and actions only after a amount of time is reached."),
+                              _("These events can launch their conditions and actions only after an amount of time passes."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -41,7 +41,7 @@ public:
 
         AddEvent("TimedEvent",
                       _("Timed event"),
-                      _("Event which launch its conditions and actions only after a amount of time is reached."),
+                      _("This event launches its conditions and actions only after an amount of time passes."),
                       "",
                       "CppPlatform/Extensions/timedevent16.png",
                       std::make_shared<TimedEvent>())
@@ -107,7 +107,7 @@ public:
         AddAction("ResetTimedEvent",
                        _("Reset a timed event"),
                        _("Reset a timed event"),
-                       _("Reset the timed event(s) called _PARAM1_"),
+                       _("Reset the timed event called _PARAM1_"),
                        _("Timed events"),
                        "CppPlatform/Extensions/timedevent24.png",
                        "CppPlatform/Extensions/timedevent16.png")
@@ -124,8 +124,8 @@ public:
 
         AddAction("ResetTimedEventAndSubs",
                        _("Reset a timed event and sub events"),
-                       _("Reset a timed events, as well as all of its sub events."),
-                       _("Reset timed events called _PARAM1_ and their sub events"),
+                       _("Reset a timed event, as well as all of its sub events."),
+                       _("Reset the timed event called _PARAM1_, as well as all of its sub events"),
                        _("Timed events"),
                        "CppPlatform/Extensions/timedevent24.png",
                        "CppPlatform/Extensions/timedevent16.png")

@@ -22,7 +22,7 @@ Extension::Extension()
 {
     SetExtensionInformation("ParticleSystem",
                           _("Particle system"),
-                          _("Extension allowing to display a large number of small particles."),
+                          _("This Extension can display a large number of small particles."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -31,7 +31,7 @@ Extension::Extension()
         gd::ObjectMetadata & obj = AddObject<ParticleEmitterObject>(
                    "ParticleEmitter",
                    _("Particles emitter"),
-                   _("Displays a large number of small particles to create visual effects"),
+                   _("Displays a large number of small particles to create visual effects."),
                    "CppPlatform/Extensions/particleSystemicon.png");
 
         AddRuntimeObject<ParticleEmitterObject, RuntimeParticleEmitterObject>(

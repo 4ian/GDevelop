@@ -15,7 +15,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("LinkedObjects",
                           _("Linked objects"),
-                          _("Extension allowing to virtually link two objects."),
+                          _("This Extension can virtually link two objects."),
                           "Florian Rival",
                           "Open source (MIT License)");
 

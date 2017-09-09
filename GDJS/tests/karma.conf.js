@@ -3,7 +3,6 @@ module.exports = function(config) {
     frameworks: ['mocha'],
 
     files: [
-      'node_modules/phantomjs-polyfill/bind-polyfill.js',
       'node_modules/expect.js/index.js',
 
       //GDJS game engine files: (Order is important)

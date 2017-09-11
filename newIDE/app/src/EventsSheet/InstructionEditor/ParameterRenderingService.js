@@ -10,6 +10,7 @@ import BehaviorField from './ParameterFields/BehaviorField';
 import SceneVariableField from './ParameterFields/SceneVariableField';
 import GlobalVariableField from './ParameterFields/GlobalVariableField';
 import ObjectVariableField from './ParameterFields/ObjectVariableField';
+import LayerField from './ParameterFields/LayerField';
 const gd = global.gd;
 
 export default {
@@ -26,6 +27,7 @@ export default {
     scenevar: SceneVariableField,
     globalvar: GlobalVariableField,
     objectvar: ObjectVariableField,
+    layer: LayerField,
   },
   getParameterComponent: function(type) {
     const fieldType = gd.ParameterMetadata.isObject(type) ? 'object' : type;

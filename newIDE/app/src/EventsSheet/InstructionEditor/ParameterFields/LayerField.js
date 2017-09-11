@@ -12,11 +12,9 @@ const fuzzyFilterOrEmpty = (searchText, key) => {
   return !key || AutoComplete.fuzzyFilter(searchText, key);
 };
 
-export default class VariableField extends Component {
+export default class LayerField extends Component {
   constructor(props) {
     super(props);
-
-    this.state = { errorText: null };
 
     const { parameterMetadata } = this.props;
     this._description = parameterMetadata
@@ -31,20 +29,20 @@ export default class VariableField extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.variablesContainer !== this.props.variablesContainer) {
+    if (newProps.layout !== this.props.layout) {
       this._loadNamesFrom(newProps);
     }
   }
 
   _loadNamesFrom(props) {
-    if (!props.variablesContainer) {
-      this._variableNames = [];
+    if (!props.layout) {
+      this._layersNames = [];
       return;
     }
 
-    this._variableNames = mapFor(0, props.variablesContainer.count(), i => {
-      const variableAndName = props.variablesContainer.getAt(i);
-      return variableAndName.getName();
+    this._layersNames = mapFor(0, props.layout.getLayersCount(), i => {
+      const layer = props.layout.getLayerAt(i);
+      return layer.getName();
     });
   }
 
@@ -59,7 +57,6 @@ export default class VariableField extends Component {
         }}
         searchText={this.props.value}
         onUpdateInput={value => {
-          this.setState({ errorText: null });
           this.props.onChange(value);
         }}
         onNewRequest={data => {
@@ -70,9 +67,9 @@ export default class VariableField extends Component {
             this.props.onChange(data.value);
           }
         }}
-        dataSource={this._variableNames.map(variableName => ({
-          text: variableName,
-          value: variableName,
+        dataSource={this._layersNames.map(layerName => ({
+          text: layerName || '(Base layer)',
+          value: `"${layerName}"`,
         }))}
         filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}

@@ -6,6 +6,7 @@ import YesNoField from './ParameterFields/YesNoField';
 import TrueFalseField from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
 import StringField from './ParameterFields/StringField';
+import BehaviorField from './ParameterFields/BehaviorField';
 const gd = global.gd;
 
 export default {
@@ -18,6 +19,7 @@ export default {
     trueorfalse: TrueFalseField,
     expression: ExpressionField,
     string: StringField,
+    behavior: BehaviorField,
   },
   getParameterComponent: function(type) {
     const fieldType = gd.ParameterMetadata.isObject(type) ? 'object' : type;

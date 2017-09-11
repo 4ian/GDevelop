@@ -7,6 +7,9 @@ import TrueFalseField from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
 import StringField from './ParameterFields/StringField';
 import BehaviorField from './ParameterFields/BehaviorField';
+import SceneVariableField from './ParameterFields/SceneVariableField';
+import GlobalVariableField from './ParameterFields/GlobalVariableField';
+import ObjectVariableField from './ParameterFields/ObjectVariableField';
 const gd = global.gd;
 
 export default {
@@ -20,6 +23,9 @@ export default {
     expression: ExpressionField,
     string: StringField,
     behavior: BehaviorField,
+    scenevar: SceneVariableField,
+    globalvar: GlobalVariableField,
+    objectvar: ObjectVariableField,
   },
   getParameterComponent: function(type) {
     const fieldType = gd.ParameterMetadata.isObject(type) ? 'object' : type;

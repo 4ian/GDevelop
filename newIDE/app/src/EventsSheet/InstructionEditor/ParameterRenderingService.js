@@ -1,6 +1,7 @@
 import DefaultField from './ParameterFields/DefaultField';
 import RelationalOperatorField from './ParameterFields/RelationalOperatorField';
 import MouseField from './ParameterFields/MouseField';
+import KeyField from './ParameterFields/KeyField';
 import ObjectField from './ParameterFields/ObjectField';
 import YesNoField from './ParameterFields/YesNoField';
 import TrueFalseField from './ParameterFields/TrueFalseField';
@@ -28,6 +29,13 @@ export default {
     globalvar: GlobalVariableField,
     objectvar: ObjectVariableField,
     layer: LayerField,
+    key: KeyField,
+    file: DefaultField, //TODO
+    musicfile: DefaultField, //TODO
+    soundfile: DefaultField, //TODO
+    color: DefaultField, //TODO
+    police: DefaultField, //TODO
+    joyaxis: DefaultField, //TODO
   },
   getParameterComponent: function(type) {
     const fieldType = gd.ParameterMetadata.isObject(type) ? 'object' : type;

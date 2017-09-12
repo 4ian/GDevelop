@@ -32,10 +32,10 @@ public:
                               "Open source (MIT License)");
         DeclareDestroyOutsideBehaviorExtension(*this);
 
-        GetBehaviorMetadata("DestroyOutsideBehavior::DestroyOutside").SetIncludeFile("DestroyOutsideBehavior/destroyoutsideruntimebehavior.js");
+        GetBehaviorMetadata("DestroyOutsideBehavior::DestroyOutside").SetIncludeFile("Extensions/DestroyOutsideBehavior/destroyoutsideruntimebehavior.js");
 
-        GetAllConditionsForBehavior("DestroyOutsideBehavior::DestroyOutside")["DestroyOutsideBehavior::ExtraBorder"].SetFunctionName("getExtraBorder").SetIncludeFile("DestroyOutsideBehavior/destroyoutsideruntimebehavior.js");
-        GetAllActionsForBehavior("DestroyOutsideBehavior::DestroyOutside")["DestroyOutsideBehavior::ExtraBorder"].SetFunctionName("setExtraBorder").SetGetter("getExtraBorder").SetIncludeFile("DestroyOutsideBehavior/destroyoutsideruntimebehavior.js");
+        GetAllConditionsForBehavior("DestroyOutsideBehavior::DestroyOutside")["DestroyOutsideBehavior::ExtraBorder"].SetFunctionName("getExtraBorder").SetIncludeFile("Extensions/DestroyOutsideBehavior/destroyoutsideruntimebehavior.js");
+        GetAllActionsForBehavior("DestroyOutsideBehavior::DestroyOutside")["DestroyOutsideBehavior::ExtraBorder"].SetFunctionName("setExtraBorder").SetGetter("getExtraBorder").SetIncludeFile("Extensions/DestroyOutsideBehavior/destroyoutsideruntimebehavior.js");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

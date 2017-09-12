@@ -3,6 +3,7 @@ import FlatButton from 'material-ui/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
 import EmptyMessage from '../UI/EmptyMessage';
+import BehaviorsEditor from '../BehaviorsEditor';
 import { Column, Line } from '../UI/Grid';
 import { Tabs, Tab } from 'material-ui/Tabs';
 
@@ -67,7 +68,6 @@ export default class ObjectEditorDialog extends Component {
     ];
 
     const EditorComponent = editor.component;
-    // const containerProps = editor.containerProps;
     const { currentTab } = this.state;
 
     return (
@@ -99,13 +99,10 @@ export default class ObjectEditorDialog extends Component {
             resourceSources={this.props.resourceSources}
           />}
         {currentTab === 'behaviors' &&
-          <Column>
-            <Line>
-              <EmptyMessage>
-                Behaviors are not available yet.
-              </EmptyMessage>
-            </Line>
-          </Column>}
+          <BehaviorsEditor
+            object={this.props.object}
+            project={this.props.project}
+          />}
         {currentTab === 'groups' &&
           <Column>
             <Line>

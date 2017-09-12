@@ -31,8 +31,8 @@ public:
         CloneExtension("GDevelop C++ platform", "PhysicsBehavior");
 
         GetBehaviorMetadata("PhysicsBehavior::PhysicsBehavior")
-            .SetIncludeFile("PhysicsBehavior/box2djs/box2d.js")
-            .AddIncludeFile("PhysicsBehavior/physicsruntimebehavior.js");
+            .SetIncludeFile("Extensions/PhysicsBehavior/box2djs/box2d.js")
+            .AddIncludeFile("Extensions/PhysicsBehavior/physicsruntimebehavior.js");
 
         std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForBehavior("PhysicsBehavior::PhysicsBehavior");
         std::map<gd::String, gd::InstructionMetadata > & autConditions = GetAllConditionsForBehavior("PhysicsBehavior::PhysicsBehavior");

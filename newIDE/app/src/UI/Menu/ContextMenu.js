@@ -12,7 +12,9 @@ class MaterialUIContextMenu extends React.Component {
     this.state = {
       open: false,
     };
-    this.menuImplementation = new MaterialUIMenuImplementation();
+    this.menuImplementation = new MaterialUIMenuImplementation({
+      onClose: this._onClose,
+    });
   }
 
   open = (x, y) => {
@@ -53,7 +55,7 @@ class MaterialUIContextMenu extends React.Component {
           onRequestClose={this._onClose}
           {...this.menuImplementation.getMenuProps()}
         >
-          <Menu>
+          <Menu desktop>
             {this.menuImplementation.buildFromTemplate(this.props.menuTemplate)}
           </Menu>
         </Popover>

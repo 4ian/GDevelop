@@ -1,37 +1,36 @@
 import React from 'react';
 import { ListItem } from 'material-ui/List';
-import Avatar from 'material-ui/Avatar';
 import IconMenu from '../UI/Menu/IconMenu';
+import ListIcon from '../UI/ListIcon';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 const styles = {
+  container: {
+    borderTop: '1px solid #e0e0e0', //TODO: Use theme color instead
+  },
   objectName: {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
   },
-  objectIcon: { borderRadius: 0 },
   textField: {
     top: -16,
   },
-  selectedBackground: {
-    backgroundColor: '#4ab0e4', //TODO: Use theme color instead
-  },
-  selectedObjectName: {
-    color: '#FFF',
-  },
+  selectedBackgroundColor: '#4ab0e4', //TODO: Use theme color instead
+  selectedObjectNameColor: '#FFF',
 };
 
 export default class ObjectRow extends React.Component {
   _renderObjectMenu(object) {
     return (
       <IconMenu
+        ref={iconMenu => this._iconMenu = iconMenu}
         iconButtonElement={
           <IconButton
-            onTouchTap={e =>
-              e.preventDefault() /*Prevent bubbling the event to ListItem*/}
+            onClick={e =>
+              e.stopPropagation() /*Prevent bubbling the event to ListItem*/}
           >
             <MoreVertIcon />
           </IconButton>
@@ -68,6 +67,10 @@ export default class ObjectRow extends React.Component {
     }
   }
 
+  _onContextMenu = event => {
+    if (this._iconMenu) this._iconMenu.open(event);
+  };
+
   render() {
     const { project, object, selected, style } = this.props;
 
@@ -88,27 +91,27 @@ export default class ObjectRow extends React.Component {
           style={styles.textField}
         />
       : <div
-          style={
-            selected
-              ? { ...styles.objectName, ...styles.selectedObjectName }
-              : styles.objectName
-          }
+          style={{
+            ...styles.objectName,
+            color: selected ? styles.selectedObjectNameColor : undefined,
+          }}
         >
           {objectName}
         </div>;
 
+    const itemStyle = {
+      ...styles.container,
+      backgroundColor: selected ? styles.selectedBackgroundColor : undefined,
+    };
+
     return (
       <ListItem
-        style={selected ? { ...styles.selectedBackground, ...style } : style}
+        style={{ ...itemStyle, ...style }}
+        onContextMenu={this._onContextMenu}
         primaryText={label}
-        leftAvatar={
-          <Avatar
-            src={this.props.getThumbnail(project, object)}
-            style={styles.objectIcon}
-          />
-        }
+        leftIcon={<ListIcon src={this.props.getThumbnail(project, object)} />}
         rightIconButton={this._renderObjectMenu(object)}
-        onTouchTap={() => {
+        onClick={() => {
           if (!this.props.onObjectSelected) return;
           if (this.props.editingName) return;
 

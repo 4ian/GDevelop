@@ -27,7 +27,7 @@ public:
     {
         DeclareAnchorBehaviorExtension(*this);
 
-        GetBehaviorMetadata("AnchorBehavior::AnchorBehavior").SetIncludeFile("AnchorBehavior/anchorruntimebehavior.js");
+        GetBehaviorMetadata("AnchorBehavior::AnchorBehavior").SetIncludeFile("Extensions/AnchorBehavior/anchorruntimebehavior.js");
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };

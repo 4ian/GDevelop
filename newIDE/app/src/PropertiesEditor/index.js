@@ -6,6 +6,12 @@ import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
+const styles = {
+  checkbox: {
+    marginTop: 10,
+  },
+};
+
 export default class PropertiesEditor extends Component {
   _onInstancesModified = instances => {
     // This properties editor is dealing with fields that are
@@ -35,6 +41,7 @@ export default class PropertiesEditor extends Component {
         <Checkbox
           label={field.name}
           key={field.name}
+          style={styles.checkbox}
           checked={this._getFieldValue(this.props.instances, field)}
           onCheck={(event, newValue) => {
             this.props.instances.forEach(i => field.setValue(i, !!newValue));

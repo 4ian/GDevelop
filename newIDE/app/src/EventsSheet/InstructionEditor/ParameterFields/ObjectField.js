@@ -81,6 +81,9 @@ export default class ObjectField extends Component {
         floatingLabelText={this._description}
         fullWidth
         textFieldStyle={styles.autoCompleteTextField}
+        menuProps={{
+          maxHeight: 250,
+        }}
         errorText={this.state.errorText}
         searchText={this.props.value}
         onUpdateInput={value => {

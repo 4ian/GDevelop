@@ -7,7 +7,7 @@ import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 
 const styles = {
-  objectIcon: { borderRadius: 0 },
+  icon: { borderRadius: 0 },
   content: {
     padding: 0,
   },
@@ -86,7 +86,7 @@ export default class NewObjectDialog extends Component {
                 leftAvatar={
                   <Avatar
                     src={objectMetadata.iconFilename}
-                    style={styles.objectIcon}
+                    style={styles.icon}
                   />
                 }
                 key={objectMetadata.name}

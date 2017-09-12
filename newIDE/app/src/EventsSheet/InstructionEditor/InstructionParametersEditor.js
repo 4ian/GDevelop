@@ -91,6 +91,7 @@ export default class InstructionParametersEditor extends Component {
                 project={project}
                 layout={layout}
                 value={instruction.getParameter(i)}
+                instruction={instruction}
                 key={i}
                 onChange={value => {
                   instruction.setParameter(i, value);

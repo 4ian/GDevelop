@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import { mapFor } from '../Utils/MapFor';
-import ListIcon from './ListIcon';
+import ListIcon from '../UI/ListIcon';
 import { makeAddItem } from './AddItem';
 import Window from '../Utils/Window';
 import IconMenu from '../UI/Menu/IconMenu';
@@ -10,7 +10,12 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconButton from 'material-ui/IconButton';
 
 const styles = {
-  projectStructureItem: {},
+  projectStructureItem: {
+    borderTop: '1px solid #e0e0e0', //TODO: Use theme color instead
+  },
+  projectStructureItemNestedList: {
+    padding: 0,
+  },
   itemName: {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
@@ -22,7 +27,11 @@ const styles = {
 };
 
 const ProjectStructureItem = props => (
-  <ListItem style={styles.projectStructureItem} {...props} />
+  <ListItem
+    style={styles.projectStructureItem}
+    nestedListStyle={styles.projectStructureItemNestedList}
+    {...props}
+  />
 );
 
 class Item extends Component {
@@ -37,13 +46,18 @@ class Item extends Component {
     }
   }
 
+  _onContextMenu = event => {
+    if (this._iconMenu) this._iconMenu.open(event);
+  };
+
   render() {
     const rightIconButton = this.props.rightIconButton ||
       <IconMenu
+        ref={iconMenu => this._iconMenu = iconMenu}
         iconButtonElement={
           <IconButton
-            onTouchTap={e =>
-              e.preventDefault() /*Prevent bubbling the event to ListItem*/}
+            onClick={e =>
+              e.stopPropagation() /*Prevent bubbling the event to ListItem*/}
           >
             <MoreVertIcon />
           </IconButton>
@@ -83,9 +97,10 @@ class Item extends Component {
     return (
       <ListItem
         style={this.props.style}
+        onContextMenu={this._onContextMenu}
         primaryText={label}
         rightIconButton={rightIconButton}
-        onTouchTap={this.props.onEdit}
+        onClick={this.props.onEdit}
       />
     );
   }
@@ -174,7 +189,7 @@ export default class ProjectManager extends React.Component {
                 }
                 onEdit={() => this.props.onOpenLayout(name)}
                 onDelete={() => this.props.onDeleteLayout(layout)}
-                onRename={(newName) => this.props.onRenameLayout(name, newName)}
+                onRename={newName => this.props.onRenameLayout(name, newName)}
                 onEditName={() => this._onEditName('layout', name)}
               />
             );
@@ -206,7 +221,8 @@ export default class ProjectManager extends React.Component {
                 onEdit={() => this.props.onOpenExternalEvents(name)}
                 onDelete={() =>
                   this.props.onDeleteExternalEvents(externalEvents)}
-                onRename={(newName) => this.props.onRenameExternalEvents(name, newName)}
+                onRename={newName =>
+                  this.props.onRenameExternalEvents(name, newName)}
                 onEditName={() => this._onEditName('external-events', name)}
               />
             );
@@ -238,7 +254,8 @@ export default class ProjectManager extends React.Component {
                 onEdit={() => this.props.onOpenExternalLayout(name)}
                 onDelete={() =>
                   this.props.onDeleteExternalLayout(externalLayout)}
-                onRename={(newName) => this.props.onRenameExternalLayout(name, newName)}
+                onRename={newName =>
+                  this.props.onRenameExternalLayout(name, newName)}
                 onEditName={() => this._onEditName('external-layout', name)}
               />
             );

@@ -38,8 +38,8 @@ export default class Window {
         width: Math.round(width / scaleFactor),
         height: Math.round(height / scaleFactor),
       });
-    } catch(err) {
-      console.warn("Unable to change window bounds", err);
+    } catch (err) {
+      console.warn('Unable to change window bounds', err);
     }
     this.show();
   }
@@ -107,7 +107,9 @@ export default class Window {
 
     if (electron) {
       // `remote.require` since `Menu` is a main-process module.
-      var buildEditorContextMenu = electron.remote.require('electron-editor-context-menu');
+      var buildEditorContextMenu = electron.remote.require(
+        'electron-editor-context-menu'
+      );
 
       window.addEventListener('contextmenu', function(e) {
         // Only show the context menu in text editors.
@@ -118,12 +120,15 @@ export default class Window {
         // The 'contextmenu' event is emitted after 'selectionchange' has fired but possibly before the
         // visible selection has changed. Try to wait to show the menu until after that, otherwise the
         // visible selection will update after the menu dismisses and look weird.
-        setTimeout(function() {
-          menu.popup(electron.remote.getCurrentWindow());
-        }, 30);
+        setTimeout(
+          function() {
+            menu.popup(electron.remote.getCurrentWindow());
+          },
+          30
+        );
       });
-    } else if (window) {
-      window.addEventListener('contextmenu', function(e) {
+    } else if (document) {
+      document.addEventListener('contextmenu', function(e) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) {
           e.preventDefault();
@@ -141,7 +146,7 @@ export default class Window {
       return;
     }
 
-    window.open(url, "_blank");
+    window.open(url, '_blank');
   }
 
   static hasMainMenu() {
@@ -149,7 +154,8 @@ export default class Window {
   }
 
   static isDev() {
-    if (!electron) return true;
+    if (!electron)
+      return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
     return electron.remote.require('electron-is').dev();
   }

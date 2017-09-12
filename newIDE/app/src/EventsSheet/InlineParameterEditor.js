@@ -80,6 +80,7 @@ export default class InlineParameterEditor extends Component {
           value={this.props.instruction.getParameter(
             this.props.parameterIndex
           )}
+          instruction={this.props.instruction}
           key={this.props.instruction.ptr}
           onChange={this.props.onChange}
           ref={field => this._field = field}

@@ -30,6 +30,7 @@ import EventsTree from '../EventsSheet/EventsTree';
 import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
+import BehaviorsEditor from '../BehaviorsEditor';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import DragDropContextProvider
@@ -45,6 +46,7 @@ import {
   testLayout,
   testLayoutInstance1,
   testInstruction,
+  spriteObjectWithBehaviors,
 } from './TestProject';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -259,6 +261,18 @@ storiesOf('InstancePropertiesEditor', module)
         project={project}
         layout={testLayout}
         instances={[testLayoutInstance1]}
+      />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('BehaviorsEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={spriteObjectWithBehaviors}>
+      <BehaviorsEditor
+        project={project}
+        object={spriteObjectWithBehaviors}
       />
     </SerializedObjectDisplay>
   ));

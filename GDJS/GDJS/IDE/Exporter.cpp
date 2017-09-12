@@ -42,13 +42,20 @@
 namespace gdjs
 {
 
+Exporter::Exporter(gd::AbstractFileSystem & fileSystem, gd::String gdjsRoot_) :
+    fs(fileSystem),
+    gdjsRoot(gdjsRoot_)
+{
+    SetCodeOutputDirectory(fs.GetTempDir() + "/GDTemporaries/JSCodeTemp");
+}
+
 Exporter::~Exporter()
 {
 }
 
 bool Exporter::ExportLayoutForPixiPreview(gd::Project & project, gd::Layout & layout, gd::String exportDir)
 {
-    ExporterHelper helper(fs, gdjsRoot);
+    ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
     return helper.ExportLayoutForPixiPreview(project, layout, exportDir, "");
 }
 
@@ -58,7 +65,7 @@ bool Exporter::ExportExternalLayoutForPixiPreview(gd::Project & project, gd::Lay
     gd::SerializerElement options;
     options.AddChild("injectExternalLayout").SetValue(externalLayout.GetName());
 
-    ExporterHelper helper(fs, gdjsRoot);
+    ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
     return helper.ExportLayoutForPixiPreview(project, layout, exportDir,
         gd::Serializer::ToJSON(options)
     );
@@ -89,7 +96,7 @@ void Exporter::ShowProjectExportDialog(gd::Project & project)
 bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDir,
     bool minify, bool exportForCordova)
 {
-    ExporterHelper helper(fs, gdjsRoot);
+    ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
 
     auto exportProject = [this, &project, &minify,
         &exportForCordova, &helper](gd::String exportDir)
@@ -116,7 +123,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         #endif
 
         //Export events
-        if ( !helper.ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+        if ( !helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
         {
             gd::LogError(_("Error during exporting! Unable to export events:\n")+lastError);
             return false;
@@ -124,7 +131,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         helper.AddLibsInclude(true, false, includesFiles);
 
         //Export source files
-        if ( !helper.ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+        if ( !helper.ExportExternalSourceFiles(exportedProject, codeOutputDir, includesFiles) )
         {
             gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
             return false;
@@ -134,7 +141,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         gd::ProjectStripper::StripProjectForExport(exportedProject);
 
         //...and export it
-        helper.ExportToJSON(fs, exportedProject, fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/data.js",
+        helper.ExportToJSON(fs, exportedProject, codeOutputDir + "data.js",
                      "gdjs.projectData");
         includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 
@@ -195,7 +202,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
 
 bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, gd::String exportDir)
 {
-    ExporterHelper helper(fs, gdjsRoot);
+    ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
 
     wxProgressDialog * progressDialogPtr = NULL;
     #if !defined(GD_NO_WX_GUI)
@@ -218,7 +225,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     #endif
 
     //Export events
-    if ( !helper.ExportEventsCode(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+    if ( !helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
     {
         gd::LogError(_("Error during exporting! Unable to export events:\n")+lastError);
         return false;
@@ -226,7 +233,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     helper.AddLibsInclude(false, true, includesFiles);
 
     //Export source files
-    if ( !helper.ExportExternalSourceFiles(exportedProject, fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/", includesFiles) )
+    if ( !helper.ExportExternalSourceFiles(exportedProject, codeOutputDir, includesFiles) )
     {
         gd::LogError(_("Error during exporting! Unable to export source files:\n")+lastError);
         return false;
@@ -236,7 +243,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     gd::ProjectStripper::StripProjectForExport(exportedProject);
 
     //...and export it
-    helper.ExportToJSON(fs, exportedProject, fs.GetTempDir() + "/GDTemporaries/JSCodeTemp/data.js",
+    helper.ExportToJSON(fs, exportedProject, codeOutputDir + "data.js",
                  "gdjs.projectData");
     includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
 

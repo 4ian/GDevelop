@@ -3,6 +3,10 @@ import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
 
 export default class MaterialUIMenuImplementation {
+  constructor({ onClose }) {
+    this._onClose = onClose;
+  }
+
   buildFromTemplate(template) {
     return template.map((item, id) => {
       if (item.type === 'separator') {
@@ -14,7 +18,10 @@ export default class MaterialUIMenuImplementation {
           key={item.label}
           primaryText={item.label}
           disabled={item.enabled === false}
-          onTouchTap={() => item.click()}
+          onTouchTap={() => {
+            item.click();
+            this._onClose();
+          }}
         />
       );
     });

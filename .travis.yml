@@ -57,7 +57,6 @@ script:
   - cd ../..
 #GDCore and GDCpp game engine tests:
   - cd .build-tests
-# - export LD_LIBRARY_PATH=$PWD/Binaries/Output/Release_Linux:$PWD/.build-tests/ExtLibs/SFML/lib:$LD_LIBRARY_PATH
   - Core/GDCore_tests
   - GDCpp/GDCpp_tests
   - Extensions/PathfindingBehavior/PathfindingBehavior_Runtime_tests

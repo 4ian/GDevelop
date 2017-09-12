@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
+import { rgbToHex } from '../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
   largeSelectableArea,
@@ -80,9 +81,21 @@ export default class CommentEvent extends Component {
   };
 
   render() {
+    const commentEvent = gd.asCommentEvent(this.props.event);
+    const color = rgbToHex(
+      commentEvent.getBackgroundColorRed(),
+      commentEvent.getBackgroundColorGreen(),
+      commentEvent.getBackgroundColorBlue()
+    );
+    const textColor = rgbToHex(
+      commentEvent.getTextColorRed(),
+      commentEvent.getTextColorGreen(),
+      commentEvent.getTextColorBlue()
+    );
+
     return (
       <div
-        style={styles.container}
+        style={{ ...styles.container, backgroundColor: `#${color}` }}
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
@@ -96,7 +109,7 @@ export default class CommentEvent extends Component {
               })}
               onClick={this.edit}
               key="p"
-              style={styles.text}
+              style={{...styles.text, color: `#${textColor}`}}
               dangerouslySetInnerHTML={{
                 __html: this._getCommentHTML(),
               }}

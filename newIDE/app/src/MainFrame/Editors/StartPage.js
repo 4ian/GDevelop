@@ -1,6 +1,7 @@
 import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
+import IconButton from 'material-ui/IconButton';
 import BaseEditor from './BaseEditor';
 import AboutDialog from '../AboutDialog';
 import Window from '../../Utils/Window';
@@ -11,8 +12,11 @@ const styles = {
     margin: 10,
     backgroundColor: '#FFFFFF',
     padding: 5,
-    maxWidth: 400,
+    width: 400,
     textAlign: 'center',
+  },
+  buttonsPaper: {
+    width: 400,
   },
 };
 
@@ -58,12 +62,13 @@ export default class StartPage extends BaseEditor {
                 GDevelop is an easy-to-use game creator with no programming language to learn.
               </p>
             </Paper>
-            <Paper zDepth={1}>
-              <FlatButton
-                label="Open a project"
-                fullWidth
-                onClick={this.props.onOpen}
-              />
+            <Paper zDepth={1} style={styles.buttonsPaper}>
+              {this.props.canOpen &&
+                <FlatButton
+                  label="Open a project"
+                  fullWidth
+                  onClick={this.props.onOpen}
+                />}
               <FlatButton
                 label="Create a new project"
                 fullWidth
@@ -72,19 +77,35 @@ export default class StartPage extends BaseEditor {
             </Paper>
           </div>
         </Line>
-        <Line>
-          <FlatButton
-            label="About GDevelop"
-            onClick={() => this._openAboutDialog(true)}
-          />
-          <FlatButton
-            label="Gdevelop Forum"
-            onClick={() => Window.openExternalURL("http://forum.compilgames.net")}
-          />
-          <FlatButton
-            label="Gdevelop Wiki"
-            onClick={() => Window.openExternalURL("http://wiki.compilgames.net")}
-          />
+        <Line alignItems="center" justifyContent="space-between">
+          <div>
+            <FlatButton
+              label="About GDevelop"
+              onClick={() => this._openAboutDialog(true)}
+            />
+            <FlatButton
+              label="Gdevelop Forum"
+              onClick={() =>
+                Window.openExternalURL('http://forum.compilgames.net')}
+            />
+            <FlatButton
+              label="Gdevelop Wiki"
+              onClick={() =>
+                Window.openExternalURL('http://wiki.compilgames.net')}
+            />
+          </div>
+          <div>
+            <IconButton
+              iconClassName="icon-facebook"
+              onClick={() =>
+                Window.openExternalURL('https://www.facebook.com/GameDevelop')}
+            />
+            <IconButton
+              iconClassName="icon-twitter"
+              onClick={() =>
+                Window.openExternalURL('https://twitter.com/game_develop')}
+            />
+          </div>
         </Line>
         <AboutDialog
           open={this.state.aboutDialogOpen}

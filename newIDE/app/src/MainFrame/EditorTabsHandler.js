@@ -1,5 +1,5 @@
 import React from 'react';
-import findIndex from 'lodash/findIndex';
+import findIndex from 'lodash.findindex';
 
 export const getEditorTabsInitialState = () => {
   return {

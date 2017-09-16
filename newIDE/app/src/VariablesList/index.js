@@ -11,7 +11,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import VariableRow from './VariableRow';
 import AddVariableRow from './AddVariableRow';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import flatten from 'lodash/flatten';
+import flatten from 'lodash.flatten';
 const gd = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);

@@ -4,7 +4,7 @@ import localFileSystem from './LocalFileSystem';
 import optionalRequire from '../Utils/OptionalRequire';
 import { timeFunction } from '../Utils/TimeFunction';
 import { findGDJS } from './LocalGDJSFinder';
-import assignIn from 'lodash/assignIn';
+import assignIn from 'lodash.assignin';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const BrowserWindow = electron ? electron.remote.BrowserWindow : null;

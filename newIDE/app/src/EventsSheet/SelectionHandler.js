@@ -1,4 +1,4 @@
-import values from 'lodash/values';
+import values from 'lodash.values';
 
 export const getInitialSelection = () => {
   return {

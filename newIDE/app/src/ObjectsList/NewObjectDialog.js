@@ -4,7 +4,7 @@ import FlatButton from 'material-ui/FlatButton';
 import Avatar from 'material-ui/Avatar';
 import { List, ListItem } from 'material-ui/List';
 import { mapFor } from '../Utils/MapFor';
-import flatten from 'lodash/flatten';
+import flatten from 'lodash.flatten';
 
 const styles = {
   icon: { borderRadius: 0 },

@@ -1,4 +1,4 @@
-import slug from 'slug';
+import slugs from 'slugs';
 import PIXI from 'pixi.js';
 import ResourcesLoader from './ResourcesLoader';
 const gd = global.gd;
@@ -105,7 +105,7 @@ export default class PixiResourcesLoader {
     }
 
     // Load the given font using CSS Font Loading API.
-    const fontFamily = slug(fontFilename);
+    const fontFamily = slugs(fontFilename);
     const fullFilename = ResourcesLoader.getFullFilename(project, fontFilename);
     const fontFace = new FontFace(fontFamily, `url(${fullFilename})`, {});
     document.fonts.add(fontFace);
@@ -126,7 +126,7 @@ export default class PixiResourcesLoader {
       return loadedFontFamilies[fontFilename];
     }
 
-    const fontFamily = slug(fontFilename);
+    const fontFamily = slugs(fontFilename);
     return fontFamily;
   }
 

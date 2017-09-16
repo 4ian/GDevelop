@@ -3,7 +3,7 @@ import React from 'react';
 import BrowserS3FileSystem from './BrowserS3FileSystem';
 import BrowserPreviewLinkDialog from './BrowserPreviewLinkDialog';
 import { findGDJS } from './BrowserS3GDJSFinder';
-import assignIn from 'lodash/assignIn';
+import assignIn from 'lodash.assignin';
 const gd = global.gd;
 
 const awsS3 = require('aws-sdk/clients/s3');

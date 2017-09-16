@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
 import SearchBar from 'material-ui-search-bar';
-import keys from 'lodash/keys';
-import update from 'lodash/update';
-import compact from 'lodash/compact';
+import keys from 'lodash.keys';
+import update from 'lodash.update';
+import compact from 'lodash.compact';
 const gd = global.gd;
 
 const GROUP_DELIMITER = '/';

@@ -19,7 +19,13 @@
     "element-closest": "^2.0.2",
     "flat": "2.0.1",
     "keen-tracking": "1.1.3",
-    "lodash": "^4.16.4",
+    "lodash.assignin": "^4.2.0",
+    "lodash.compact": "^3.0.1",
+    "lodash.findindex": "^4.6.0",
+    "lodash.flatten": "^4.4.0",
+    "lodash.keys": "^4.2.0",
+    "lodash.update": "^4.10.2",
+    "lodash.values": "^4.3.0",
     "material-ui": "0.18.3",
     "material-ui-search-bar": "^0.3.0",
     "pixi-simple-gesture": "0.2.2",
@@ -38,7 +44,8 @@
     "react-sortable-tree": "^0.1.21",
     "react-tap-event-plugin": "2.0.1",
     "react-virtualized": "9.3.0",
-    "slug": "0.9.1",
+    "slugs": "^0.1.3",
+    "source-map-explorer": "^1.4.0",
     "wait-promise": "^0.4.1"
   },
   "scripts": {
@@ -48,6 +55,7 @@
     "format": "prettier --single-quote --trailing-comma es5 --write \"src/**/*.js\"",
     "test": "react-scripts test --env=jsdom",
     "flow": "flow",
+    "analyze-source-map": "source-map-explorer build/static/js/main.*",
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public"
   },

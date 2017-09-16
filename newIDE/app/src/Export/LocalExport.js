@@ -7,7 +7,7 @@ import { Column, Line, Spacer } from '../UI/Grid';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import assignIn from 'lodash/assignIn';
+import assignIn from 'lodash.assignin';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;

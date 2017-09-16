@@ -52,7 +52,9 @@ cd newIDE/app
 yarn storybook #or npm run storybook
 ```
 
-## Building the standalone app
+## Building and deploying the standalone app
+
+### Desktop version
 
 ```bash
 cd newIDE/electron-app
@@ -62,6 +64,13 @@ yarn build #or npm run build
 This will build and package the Electron app for Windows, macOS and Linux (according to your OS).
 The output are stored inside `newIDE/electron-app/dist` and copied to `Binaries/Output/Release_XXX`.
 Version number is read from `newIDE/electron-app/app/package.json`.
+
+### Webapp version
+
+```bash
+cd newIDE/web-app
+yarn deploy #or npm run deploy
+```
 
 ## Current status
 

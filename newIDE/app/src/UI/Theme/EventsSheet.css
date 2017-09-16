@@ -26,8 +26,9 @@
 .gd-events-sheet .rst__nodeContent {
     /* Ensure the event take all the space after the scaffolding lines */
     flex: 1;
+    right: 0;
+
     min-width: 0; /* But don't shrink scaffolding lines */
-    position: static; /* Reset back to default value, don't use absolute to let flex works*/
     margin-bottom: 2px; /* Margin after an event */
 }
 
@@ -62,6 +63,35 @@
 
 .gd-events-sheet .rst__rowTitle {
     font-weight: normal;
+}
+
+/**
+ * Expand/collapse buttons
+ */
+.gd-events-sheet .rst__collapseButton, .rst__expandButton {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    height: 12px;
+    width: 22px;
+}
+
+.gd-events-sheet .rst__collapseButton:hover:not(:active), .rst__expandButton:hover:not(:active) {
+    background-size: initial !important; /*Avoid buttons size to change*/
+    height: 12px !important; /*Avoid buttons size to change*/
+    width: 22px !important; /*Avoid buttons size to change*/
+}
+
+.gd-events-sheet  .rst__expandButton {
+    background-image: url('./unfold.png');
+    background-position: 11px 3px !important;
+}
+
+.gd-events-sheet  .rst__collapseButton {
+    background-image: url('./fold.png');
+    background-position: center 7px !important;
 }
 
 /**

@@ -171,6 +171,10 @@ export default class InstancesFullEditor extends Component {
     this.setState({ variablesEditedInstance: instance });
   };
 
+  editLayoutVariables = (open = true) => {
+    this.setState({ layoutVariablesDialogOpen: open });
+  };
+
   editObject = object => {
     this.setState({ editedObject: object });
   };
@@ -553,6 +557,7 @@ export default class InstancesFullEditor extends Component {
           }
           onCancel={() => this.editInstanceVariables(null)}
           onApply={() => this.editInstanceVariables(null)}
+          emptyExplanationMessage="Instance variables will override the default values of the variables of the object."
         />
         <LayerRemoveDialog
           open={!!this.state.layerRemoveDialogOpen}
@@ -565,7 +570,16 @@ export default class InstancesFullEditor extends Component {
           layout={layout}
           onClose={() => this.openSceneProperties(false)}
           onApply={() => this.openSceneProperties(false)}
+          onEditVariables={() => this.editLayoutVariables(true)}
           onOpenMoreSettings={this.props.onOpenMoreSettings}
+        />
+        <VariablesEditorDialog
+          open={!!this.state.layoutVariablesDialogOpen}
+          variablesContainer={layout.getVariables()}
+          onCancel={() => this.editLayoutVariables(false)}
+          onApply={() => this.editLayoutVariables(false)}
+          emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
+          emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
         />
         <ContextMenu
           ref={contextMenu => this.contextMenu = contextMenu}

@@ -81,6 +81,8 @@ export default class VariablesEditorDialog extends Component {
       >
         <VariablesList
           variablesContainer={this.state.editedVariablesContainer}
+          emptyExplanationMessage={this.props.emptyExplanationMessage}
+          emptyExplanationSecondMessage={this.props.emptyExplanationSecondMessage}
         />
       </Dialog>
     );

@@ -42,6 +42,11 @@ export default class ObjectRow extends React.Component {
             click: () => this.props.onEdit(object),
           },
           {
+            label: 'Edit object variables',
+            enabled: !!this.props.onEditVariables,
+            click: () => this.props.onEditVariables(),
+          },
+          {
             label: 'Rename',
             enabled: !!this.props.onEdit,
             click: () => this.props.onEditName(),

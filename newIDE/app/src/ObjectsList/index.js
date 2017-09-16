@@ -4,6 +4,7 @@ import Paper from 'material-ui/Paper';
 import ObjectRow from './ObjectRow';
 import AddObjectRow from './AddObjectRow';
 import NewObjectDialog from './NewObjectDialog';
+import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
@@ -68,6 +69,8 @@ class ObjectsList extends Component {
                   ? () => this.props.onEditObject(objectWithScope.object)
                   : undefined
               }
+              onEditVariables={() =>
+                this.props.onEditVariables(objectWithScope.object)}
               onEditName={() => this.props.onEditName(objectWithScope)}
               onDelete={() => this.props.onDelete(objectWithScope)}
               onRename={newName =>
@@ -101,6 +104,7 @@ export default class ObjectsListContainer extends React.Component {
     this.state = {
       newObjectDialogOpen: false,
       renamedObjectWithScope: false,
+      variablesEditedObject: null,
     };
   }
 
@@ -114,7 +118,8 @@ export default class ObjectsListContainer extends React.Component {
 
     if (
       this.state.newObjectDialogOpen !== nextState.newObjectDialogOpen ||
-      this.state.renamedObjectWithScope !== nextState.renamedObjectWithScope
+      this.state.renamedObjectWithScope !== nextState.renamedObjectWithScope ||
+      this.state.variablesEditedObject !== nextState.variablesEditedObject
     )
       return true;
 
@@ -188,6 +193,12 @@ export default class ObjectsListContainer extends React.Component {
       },
       () => this.sortableList.getWrappedInstance().forceUpdateGrid()
     );
+  };
+
+  _onEditVariables = object => {
+    this.setState({
+      variablesEditedObject: object,
+    });
   };
 
   _onRename = (objectWithScope, newName) => {
@@ -276,6 +287,7 @@ export default class ObjectsListContainer extends React.Component {
               onEditObject={this.props.onEditObject}
               onAddObject={() => this.setState({ newObjectDialogOpen: true })}
               onEditName={this._onEditName}
+              onEditVariables={this._onEditVariables}
               onDelete={this._onDelete}
               onRename={this._onRename}
               onSortEnd={({ oldIndex, newIndex }) =>
@@ -291,6 +303,18 @@ export default class ObjectsListContainer extends React.Component {
             onClose={() => this.setState({ newObjectDialogOpen: false })}
             onChoose={this.addObject}
             project={project}
+          />}
+        {this.state.variablesEditedObject &&
+          <VariablesEditorDialog
+            open={!!this.state.variablesEditedObject}
+            variablesContainer={
+              this.state.variablesEditedObject &&
+                this.state.variablesEditedObject.getVariables()
+            }
+            onCancel={() => this._onEditVariables(null)}
+            onApply={() => this._onEditVariables(null)}
+            emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
+            emptyExplanationSecondMessage="For example, you can have a variable called Life representing the health of the object."
           />}
       </Paper>
     );

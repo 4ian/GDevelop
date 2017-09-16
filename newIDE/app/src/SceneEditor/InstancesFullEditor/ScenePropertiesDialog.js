@@ -81,6 +81,14 @@ export default class ScenePropertiesDialog extends Component {
           onChangeComplete={color =>
             this.setState({ backgroundColor: color.rgb })}
         />
+        <RaisedButton
+          label="Edit scene variables"
+          fullWidth
+          onTouchTap={() => {
+            this.props.onEditVariables();
+            this.props.onClose();
+          }}
+        />
         {this.props.onOpenMoreSettings &&
           <RaisedButton
             label="Open advanced settings"

@@ -77,7 +77,7 @@ export default class InstructionParametersEditor extends Component {
           </p>
         </div>
         <Divider />
-        <div>
+        <div key={type}>
           {mapFor(0, instructionMetadata.getParametersCount(), i => {
             const parameterMetadata = instructionMetadata.getParameter(i);
             const ParameterComponent = ParameterRenderingService.getParameterComponent(

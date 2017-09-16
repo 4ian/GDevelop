@@ -1,8 +1,16 @@
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
+import RaisedButton from 'material-ui/RaisedButton';
 import { mapFor } from '../../../Utils/MapFor';
 
 const styles = {
+  container: {
+    display: 'flex',
+    alignItems: 'baseline',
+  },
+  moreButton: {
+    marginLeft: 10,
+  },
   autoCompleteTextField: {
     minWidth: 300,
   },
@@ -50,34 +58,45 @@ export default class VariableField extends Component {
 
   render() {
     return (
-      <AutoComplete
-        floatingLabelText={this._description}
-        fullWidth
-        textFieldStyle={styles.autoCompleteTextField}
-        menuProps={{
-          maxHeight: 250,
-        }}
-        searchText={this.props.value}
-        onUpdateInput={value => {
-          this.setState({ errorText: null });
-          this.props.onChange(value);
-        }}
-        onNewRequest={data => {
-          // Note that data may be a string or a {text, value} object.
-          if (typeof data === 'string') {
-            this.props.onChange(data);
-          } else if (typeof data.value === 'string') {
-            this.props.onChange(data.value);
-          }
-        }}
-        dataSource={this._variableNames.map(variableName => ({
-          text: variableName,
-          value: variableName,
-        }))}
-        filter={fuzzyFilterOrEmpty}
-        openOnFocus={!this.props.isInline}
-        ref={field => this._field = field}
-      />
+      <div style={styles.container}>
+        <AutoComplete
+          floatingLabelText={this._description}
+          fullWidth
+          textFieldStyle={styles.autoCompleteTextField}
+          menuProps={{
+            maxHeight: 250,
+          }}
+          searchText={this.props.value}
+          onUpdateInput={value => {
+            this.setState({ errorText: null });
+            this.props.onChange(value);
+          }}
+          onNewRequest={data => {
+            // Note that data may be a string or a {text, value} object.
+            if (typeof data === 'string') {
+              this.props.onChange(data);
+            } else if (typeof data.value === 'string') {
+              this.props.onChange(data.value);
+            }
+          }}
+          dataSource={this._variableNames.map(variableName => ({
+            text: variableName,
+            value: variableName,
+          }))}
+          filter={fuzzyFilterOrEmpty}
+          openOnFocus={!this.props.isInline}
+          ref={field => this._field = field}
+        />
+        {this.props.onOpenDialog &&
+          !this.props.isInline &&
+          <RaisedButton
+            label="..."
+            disabled={!this.props.variablesContainer}
+            primary
+            style={styles.moreButton}
+            onClick={this.props.onOpenDialog}
+          />}
+      </div>
     );
   }
 }

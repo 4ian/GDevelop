@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
 import VariableField from './VariableField';
+import VariablesEditorDialog
+  from '../../../VariablesList/VariablesEditorDialog';
 
 export default class ObjectVariableField extends Component {
+  state = {
+    editorOpen: false,
+  };
+
   focus() {
     if (this._field) this._field.focus();
   }
@@ -20,13 +26,24 @@ export default class ObjectVariableField extends Component {
     }
 
     return (
-      <VariableField
-        variablesContainer={variablesContainer}
-        value={this.props.value}
-        onChange={this.props.onChange}
-        isInline={this.props.isInline}
-        ref={field => this._field = field}
-      />
+      <div>
+        <VariableField
+          variablesContainer={variablesContainer}
+          parameterMetadata={this.props.parameterMetadata}
+          value={this.props.value}
+          onChange={this.props.onChange}
+          isInline={this.props.isInline}
+          ref={field => this._field = field}
+          onOpenDialog={() => this.setState({ editorOpen: true })}
+        />
+        {this.state.editorOpen &&
+          <VariablesEditorDialog
+            open={this.state.editorOpen}
+            variablesContainer={variablesContainer}
+            onCancel={() => this.setState({ editorOpen: false })}
+            onApply={() => this.setState({ editorOpen: false })}
+          />}
+      </div>
     );
   }
 }

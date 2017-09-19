@@ -285,7 +285,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
     aut.AddCondition("DiagonalsAllowed",
                    _("Diagonals moves"),
                    _("Return true if the object is allowed to move diagonally"),
-                   _("Size of the extra border applied to _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("Allow diagonal moves for _PARAM0_"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")

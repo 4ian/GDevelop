@@ -78,7 +78,7 @@ class EventContainer extends Component {
     this.forceUpdate();
   };
 
-  _onEventContextMenu = (domEvent) => {
+  _onEventContextMenu = domEvent => {
     domEvent.preventDefault();
     this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
   };
@@ -180,13 +180,15 @@ export default class EventsTree extends Component {
         event,
         eventsList,
         indexInList: i,
-        expanded: true,
+        expanded: !event.isFolded(),
         depth,
         key: event.ptr, //TODO: useless?
         children: this._eventsToTreeData(
           event.getSubEvents(),
-          flatData,
-          depth + 1,
+          // flatData is a flat representation of events, one for each line.
+          // Hence it should not contain the folded events.
+          !event.isFolded() ? flatData : [],
+          depth + 1
         ).treeData,
       };
     });
@@ -232,6 +234,13 @@ export default class EventsTree extends Component {
     return true;
   };
 
+  _onVisibilityToggle = ({ node }) => {
+    const { event } = node;
+
+    event.setFolded(!event.isFolded());
+    this.forceEventsUpdate();
+  };
+
   _renderEvent = ({ node }) => {
     const { event, depth } = node;
 
@@ -248,8 +257,7 @@ export default class EventsTree extends Component {
         onInstructionClick={this.props.onInstructionClick}
         onInstructionDoubleClick={this.props.onInstructionDoubleClick}
         onParameterClick={this.props.onParameterClick}
-        onEventClick={() =>
-          this.props.onEventClick(node)}
+        onEventClick={() => this.props.onEventClick(node)}
         onEventContextMenu={(x, y) => this.props.onEventContextMenu(x, y, node)}
         onInstructionContextMenu={this.props.onInstructionContextMenu}
       />
@@ -264,6 +272,7 @@ export default class EventsTree extends Component {
           treeData={this.state.treeData}
           scaffoldBlockPxWidth={indentWidth}
           onChange={() => {}}
+          onVisibilityToggle={this._onVisibilityToggle}
           onMoveNode={this._onMoveNode}
           canDrop={this._canDrop}
           rowHeight={({ index }) => {

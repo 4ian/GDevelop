@@ -141,9 +141,8 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         gd::ProjectStripper::StripProjectForExport(exportedProject);
 
         //...and export it
-        helper.ExportToJSON(fs, exportedProject, codeOutputDir + "data.js",
-                     "gdjs.projectData");
-        includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
+        helper.ExportToJSON(fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+        includesFiles.push_back(codeOutputDir + "/data.js");
 
         #if !defined(GD_NO_WX_GUI)
         progressDialog.Update(80, minify ? _("Exporting files and minifying them...") : _("Exporting files..."));
@@ -243,9 +242,8 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     gd::ProjectStripper::StripProjectForExport(exportedProject);
 
     //...and export it
-    helper.ExportToJSON(fs, exportedProject, codeOutputDir + "data.js",
-                 "gdjs.projectData");
-    includesFiles.push_back(fs.GetTempDir()+"/GDTemporaries/JSCodeTemp/data.js");
+    helper.ExportToJSON(fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
+    includesFiles.push_back(codeOutputDir + "/data.js");
 
     #if !defined(GD_NO_WX_GUI)
     progressDialog.Update(80, _("Exporting files..."));
@@ -254,8 +252,6 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     //Copy all dependencies and the index (or metadata) file.
     helper.RemoveIncludes(true, false, includesFiles);
     helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src", false);
-
-    gd::String source = "./JsPlatform/Runtime/index.html";
 
     if (!helper.ExportCocos2dFiles(project, exportDir, debugMode, includesFiles))
     {

@@ -15,6 +15,7 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
+    borderBottom: '1px solid #d3d3d3',
   },
   instructionsContainer: {
     display: 'flex',

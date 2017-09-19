@@ -8,6 +8,7 @@ const gd = global.gd;
 const styles = {
   container: {
     display: 'flex',
+    borderBottom: '1px solid #d3d3d3',
   },
   actionsList: {
     flex: 1,

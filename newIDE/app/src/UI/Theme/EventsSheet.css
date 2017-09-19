@@ -11,7 +11,7 @@
 .gd-events-sheet .rst__moveHandle {
     width: 10px;
     background: #4ab0e4;
-    border: none;
+    border: 1px solid #49AFE4;
     box-shadow: none;
     border-radius: 0;
 }
@@ -125,7 +125,7 @@
 
 .gd-events-sheet .selectable.selected {
     background-color: rgba(0,0,0, 0.1);
-    border: 1px #4ab0e4 solid;
+    border: 1px #4ab0e4 solid !important;
 }
 
 /**
@@ -137,7 +137,7 @@
 }
 
 .gd-events-sheet .large-selectable.large-selected {
-    border: 1px #4ab0e4 solid;
+    border: 1px #4ab0e4 solid !important;
 }
 
 /**

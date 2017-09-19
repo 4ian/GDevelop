@@ -84,14 +84,14 @@ export default class StartPage extends BaseEditor {
               onClick={() => this._openAboutDialog(true)}
             />
             <FlatButton
-              label="Gdevelop Forum"
+              label="Gdevelop Forums"
               onClick={() =>
                 Window.openExternalURL('http://forum.compilgames.net')}
             />
             <FlatButton
-              label="Gdevelop Wiki"
+              label="Help and tutorials"
               onClick={() =>
-                Window.openExternalURL('http://wiki.compilgames.net')}
+                Window.openExternalURL('http://wiki.compilgames.net/doku.php/gdevelop5/start')}
             />
           </div>
           <div>

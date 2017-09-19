@@ -61,7 +61,8 @@
         "freeglut_spaceball.c": "cpp",
         "__tuple": "cpp",
         "hash_map": "cpp",
-        "hash_set": "cpp"
+        "hash_set": "cpp",
+        "system_error": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

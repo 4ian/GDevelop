@@ -363,7 +363,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddCondition("MusicChannelPitch",
                    _("Pitch of the music on a channel"),
                    _("Test the pitch (speed) of the music on a specified channel. 1 is the default pitch."),
-                   _("The volume of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
+                   _("The pitch of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
                    _("Audio/Music on channels"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")

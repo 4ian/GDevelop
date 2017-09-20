@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import ObjectsList from '../../ObjectsList';
+import ObjectsGroupsList from '../../ObjectsGroupsList';
 import ObjectsRenderingService
   from '../../ObjectsRendering/ObjectsRenderingService';
 import FullSizeInstancesEditor
@@ -12,6 +13,7 @@ import LayersList from '../../LayersList';
 import LayerRemoveDialog from '../../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../../ObjectEditor/ObjectEditorDialog';
+import ObjectsGroupEditorDialog from '../../ObjectsGroupEditor/ObjectsGroupEditorDialog';
 import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
@@ -63,6 +65,8 @@ export default class InstancesFullEditor extends Component {
       variablesEditedInstance: null,
       selectedObjectName: null,
 
+      editedGroup: null,
+
       uiSettings: props.initialUiSettings,
       history: getHistoryInitialState(props.initialInstances),
     };
@@ -84,6 +88,7 @@ export default class InstancesFullEditor extends Component {
         showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
         openObjectsList={this.openObjectsList}
+        openObjectsGroupsList={this.openObjectsGroupsList}
         openProperties={this.openProperties}
         deleteSelection={this.deleteSelection}
         toggleInstancesList={this.toggleInstancesList}
@@ -132,6 +137,11 @@ export default class InstancesFullEditor extends Component {
     }
   };
 
+  openObjectsGroupsList = () => {
+    if (!this.editorMosaic) return;
+    this.editorMosaic.openEditor('objects-groups-list');
+  };
+
   toggleInstancesList = () => {
     this.setState({ instancesListOpen: !this.state.instancesListOpen });
   };
@@ -177,6 +187,10 @@ export default class InstancesFullEditor extends Component {
 
   editObject = object => {
     this.setState({ editedObject: object });
+  };
+
+  editGroup = group => {
+    this.setState({ editedGroup: group });
   };
 
   setUiSettings = uiSettings => {
@@ -356,6 +370,16 @@ export default class InstancesFullEditor extends Component {
     done(true);
   };
 
+  _onDeleteGroup = (groupWithScope, done) => {
+    //TODO
+    done(true);
+  };
+
+  _onRenameGroup = (groupWithScope, newName, done) => {
+    //TODO
+    done(true);
+  };
+
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.map(instance =>
@@ -466,6 +490,17 @@ export default class InstancesFullEditor extends Component {
           />
         </MosaicWindow>
       ),
+      'objects-groups-list': (
+        <MosaicWindow title="Objects groups">
+          <ObjectsGroupsList
+            project={project}
+            objectsContainer={layout}
+            onEditGroup={this.editGroup}
+            onDeleteGroup={this._onDeleteGroup}
+            onRenameGroup={this._onRenameGroup}
+          />
+        </MosaicWindow>
+      ),
     };
 
     return (
@@ -486,6 +521,14 @@ export default class InstancesFullEditor extends Component {
           resourceSources={resourceSources}
           onCancel={() => this.editObject(null)}
           onApply={() => this.editObject(null)}
+        />
+        <ObjectsGroupEditorDialog
+          open={!!this.state.editedGroup}
+          group={this.state.editedGroup}
+          layout={layout}
+          project={project}
+          onCancel={() => this.editGroup(null)}
+          onApply={() => this.editGroup(null)}
         />
         <Drawer
           open={this.state.instancesListOpen}

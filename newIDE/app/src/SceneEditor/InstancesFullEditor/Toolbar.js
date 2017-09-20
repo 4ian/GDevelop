@@ -19,6 +19,11 @@ export default class Toolbar extends PureComponent {
             onClick={this.props.openObjectsList}
             src="res/ribbon_default/objects32.png"
           />}
+        {this.props.showObjectsList &&
+          <ToolbarIcon
+            onClick={this.props.openObjectsGroupsList}
+            src={'res/ribbon_default/objects32.png' /*TODO*/}
+          />}
         <ToolbarIcon
           onClick={this.props.openProperties}
           src="res/ribbon_default/editprop32.png"

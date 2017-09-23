@@ -14,6 +14,7 @@
 #include "GDCore/Project/Layer.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/ObjectGroup.h"
+#include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/IDE/SceneNameMangler.h"
@@ -242,7 +243,7 @@ void Layout::SerializeTo(SerializerElement & element) const
     GetAssociatedSettings().SerializeTo(element.AddChild("uiSettings"));
     #endif
 
-    ObjectGroup::SerializeTo(GetObjectGroups(), element.AddChild("objectsGroups"));
+    GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
     GetVariables().SerializeTo(element.AddChild("variables"));
     GetInitialInstances().SerializeTo(element.AddChild("instances"));
     SerializeObjectsTo(element.AddChild("objects"));
@@ -297,7 +298,7 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
     #if defined(GD_IDE_ONLY)
     associatedSettings.UnserializeFrom(element.GetChild("uiSettings", 0, "UISettings"));
 
-    gd::ObjectGroup::UnserializeFrom(objectGroups, element.GetChild( "objectsGroups", 0, "GroupesObjets" ));
+    objectGroups.UnserializeFrom(element.GetChild( "objectsGroups", 0, "GroupesObjets" ));
     gd::EventsListSerialization::UnserializeEventsFrom(project, GetEvents(), element.GetChild("events", 0, "Events"));
     #endif
 

@@ -7,7 +7,6 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjectsAndGroups } from '../ObjectsList/EnumerateObjects';
-const gd = global.gd;
 
 const listItemHeight = 48;
 const styles = {
@@ -47,6 +46,7 @@ class GroupsList extends Component {
                 style={style}
                 disabled
                 onAdd={this.props.onAddGroup}
+                primaryText="Click to add a group"
               />
             );
           }
@@ -121,17 +121,14 @@ export default class GroupsListContainer extends React.Component {
   addGroup = () => {
     const { project, objectsContainer } = this.props;
 
-    //TODO
-    // const name = newNameGenerator(
-    //   'MyGroup',
-    //   name =>
-    //     groups.hasGroupNamed(name) || project.hasGroupNamed(name)
-    // );
+    const objectsContainerGroups = objectsContainer.getObjectGroups();
+    const name = newNameGenerator(
+      'Group',
+      name =>
+      objectsContainerGroups.has(name) || project.getObjectGroups().has(name)
+    );
 
-    const objectGroup = new gd.ObjectGroup();
-    objectGroup.setName('New group');
-    objectsContainer.getObjectGroups().push_back(objectGroup);
-
+    objectsContainerGroups.insertNew(name, objectsContainerGroups.count());
     this.forceUpdate();
   };
 
@@ -145,18 +142,17 @@ export default class GroupsListContainer extends React.Component {
     );
     if (!answer) return;
 
-    //TODO
-    // this.props.onDeleteGroup(groupWithScope, doRemove => {
-    //   if (!doRemove) return;
+    this.props.onDeleteGroup(groupWithScope, doRemove => {
+      if (!doRemove) return;
 
-    //   if (global) {
-    //     project.getObjectGroups().removeGroup(group.getName());
-    //   } else {
-    //     objectsContainer.getObjectGroups().removeGroup(group.getName());
-    //   }
+      if (global) {
+        project.getObjectGroups().remove(group.getName());
+      } else {
+        objectsContainer.getObjectGroups().remove(group.getName());
+      }
 
-    //   this.forceUpdate();
-    // });
+      this.forceUpdate();
+    });
   };
 
   _onEditName = groupWithScope => {
@@ -178,14 +174,13 @@ export default class GroupsListContainer extends React.Component {
 
     if (group.getName() === newName) return;
 
-    //TODO
-    // if (
-    //   objectsContainer.getObjectsGroups().hasGroupNamed(newName) ||
-    //   project.getObjectsGroups().hasGroupNamed(newName)
-    // ) {
-    //   showWarningBox('Another object with this name already exists');
-    //   return;
-    // }
+    if (
+      objectsContainer.getObjectsGroups().has(newName) ||
+      project.getObjectsGroups().has(newName)
+    ) {
+      showWarningBox('Another object with this name already exists');
+      return;
+    }
 
     this.props.onRenameGroup(groupWithScope, newName, doRename => {
       if (!doRename) return;
@@ -200,20 +195,18 @@ export default class GroupsListContainer extends React.Component {
 
     const isInGroupsList = oldIndex < this.containerGroupsList.length;
     if (isInGroupsList) {
-      //TODO
-      // objectsContainer.getObjectGroups().moveGroup(
-      //   oldIndex,
-      //   Math.min(newIndex, this.containerGroupsList.length - 1)
-      // );
+      objectsContainer.getObjectGroups().move(
+        oldIndex,
+        Math.min(newIndex, this.containerGroupsList.length - 1)
+      );
     } else {
       const projectOldIndex = oldIndex - this.containerGroupsList.length;
       const projectNewIndex = newIndex - this.containerGroupsList.length;
 
-      //TODO
-      // project.getObjectGroups().moveGroup(
-      //   projectOldIndex,
-      //   Math.min(projectNewIndex, this.projectGroupsList.length - 1)
-      // );
+      project.getObjectGroups().move(
+        projectOldIndex,
+        Math.min(projectNewIndex, this.projectGroupsList.length - 1)
+      );
     }
 
     this.forceUpdate();

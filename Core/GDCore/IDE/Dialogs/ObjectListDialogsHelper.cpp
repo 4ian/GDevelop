@@ -6,6 +6,7 @@
 #if defined(GD_IDE_ONLY)
 #include "ObjectListDialogsHelper.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/CommonTools.h"
@@ -133,7 +134,7 @@ wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(wxTreeCtrl * objectsList,
     return lastAddedItem;
 }
 
-wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const std::vector <ObjectGroup> & groups, bool globalGroups)
+wxTreeItemId ObjectListDialogsHelper::AddGroupsToList(wxTreeCtrl * objectsList, wxTreeItemId rootItem, const gd::ObjectGroupsContainer & groups, bool globalGroups)
 {
     bool searching = searchText.empty() ? false : true;
 

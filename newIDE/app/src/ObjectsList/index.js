@@ -48,6 +48,7 @@ class ObjectsList extends Component {
                 style={style}
                 disabled
                 onAdd={this.props.onAddObject}
+                primaryText="Click to add an object"
               />
             );
           }

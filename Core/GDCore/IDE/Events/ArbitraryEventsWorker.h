@@ -49,7 +49,7 @@ private:
      * Called to do some work on an event
      * \return true if the instruction must be deleted from the events list, false otherwise (default).
      */
-    virtual bool DoVisitEvent(gd::BaseEvent & event) {};
+    virtual bool DoVisitEvent(gd::BaseEvent & event) { return false; };
 
     /**
      * Called to do some work on an instruction list

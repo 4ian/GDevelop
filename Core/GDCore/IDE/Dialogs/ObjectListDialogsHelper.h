@@ -14,6 +14,7 @@ namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class Object; }
 namespace gd { class ClassWithObjects; }
+namespace gd { class ObjectGroupsContainer; }
 namespace gd { class ObjectGroup; }
 class wxTreeCtrl;
 class wxTreeItemId;
@@ -109,7 +110,7 @@ public:
 private:
     #if !defined(GD_NO_WX_GUI)
     wxTreeItemId AddObjectsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const gd::ClassWithObjects & objects, bool globalObjects);
-    wxTreeItemId AddGroupsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const std::vector <gd::ObjectGroup> & groups, bool globalGroup);
+    wxTreeItemId AddGroupsToList(wxTreeCtrl * tree, wxTreeItemId rootItem, const gd::ObjectGroupsContainer & groups, bool globalGroup);
 
     /**
      * \brief Generate the thumnail for the specified object, add it to the image list of the

@@ -54,8 +54,8 @@ export const enumerateObjectsAndGroups = (
     .map(object => ({ object, global: false }));
 
   const containerGroups = objectsContainer.getObjectGroups();
-  const containerGroupsList = mapFor(0, containerGroups.size(), i => {
-    return containerGroups.at(i);
+  const containerGroupsList = mapFor(0, containerGroups.count(), i => {
+    return containerGroups.getAt(i);
   })
     .filter(filterGroup)
     .map(group => ({ group, global: false }));
@@ -69,8 +69,8 @@ export const enumerateObjectsAndGroups = (
   const projectGroups = project.getObjectGroups();
   const projectGroupsList = project === objectsContainer
     ? []
-    : mapFor(0, projectGroups.size(), i => {
-        return projectGroups.at(i);
+    : mapFor(0, projectGroups.count(), i => {
+        return projectGroups.getAt(i);
       })
         .filter(filterGroup)
         .map(group => ({ group, global: true }));

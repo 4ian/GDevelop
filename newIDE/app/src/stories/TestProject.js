@@ -92,8 +92,8 @@ export const group2 = new gd.ObjectGroup();
 group2.setName("GroupOfObjects");
 group2.addObject("MySpriteObject");
 group2.addObject("MyTextObject");
-testLayout.getObjectGroups().push_back(group1);
-testLayout.getObjectGroups().push_back(group2);
+testLayout.getObjectGroups().insert(group1, 0);
+testLayout.getObjectGroups().insert(group2, 1);
 
 export const testLayoutInstance1 = testLayout.getInitialInstances().insertNewInitialInstance();
 testLayoutInstance1.setX(10);

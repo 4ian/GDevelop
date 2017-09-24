@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import Paper from 'material-ui/Paper';
 import GroupRow from './GroupRow';
-import AddGroupRow from './AddGroupRow';
+import { ListItem } from 'material-ui/List';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import { makeAddItem } from '../UI/ListAddItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjectsAndGroups } from '../ObjectsList/EnumerateObjects';
 
@@ -12,6 +13,8 @@ const listItemHeight = 48;
 const styles = {
   container: { flex: 1, display: 'flex', height: '100%' },
 };
+
+const AddGroupRow = makeAddItem(ListItem);
 
 const SortableGroupRow = SortableElement(props => {
   const { style, ...otherProps } = props;
@@ -45,7 +48,7 @@ class GroupsList extends Component {
                 key={key}
                 style={style}
                 disabled
-                onAdd={this.props.onAddGroup}
+                onClick={this.props.onAddGroup}
                 primaryText="Click to add a group"
               />
             );

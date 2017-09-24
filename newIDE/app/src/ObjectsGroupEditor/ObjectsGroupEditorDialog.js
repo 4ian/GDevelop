@@ -9,6 +9,9 @@ export default class ObjectsGroupEditorDialog extends Component {
   };
 
   render() {
+    const { group } = this.props;
+    if (!group) return null;
+
     const actions = [
       <FlatButton
         label="Apply"
@@ -20,17 +23,17 @@ export default class ObjectsGroupEditorDialog extends Component {
 
     return (
       <Dialog
-        key={this.props.group && this.props.group.ptr}
+        key={group.ptr}
         actions={actions}
         autoScrollBodyContent
         noMargin
         modal
         onRequestClose={this.props.onCancel}
         open={this.props.open}
-        title="Edit objects group"
+        title={`Edit ${group.getName()} group`}
       >
         <ObjectsGroupEditor
-          group={this.props.group}
+          group={group}
           project={this.props.project}
           layout={this.props.layout}
         />

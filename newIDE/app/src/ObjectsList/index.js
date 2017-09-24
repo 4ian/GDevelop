@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
+import { ListItem } from 'material-ui/List';
 import Paper from 'material-ui/Paper';
 import ObjectRow from './ObjectRow';
-import AddObjectRow from './AddObjectRow';
 import NewObjectDialog from './NewObjectDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import { makeAddItem } from '../UI/ListAddItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjects } from './EnumerateObjects';
 
@@ -14,6 +15,8 @@ const listItemHeight = 48;
 const styles = {
   container: { flex: 1, display: 'flex', height: '100%' },
 };
+
+const AddObjectRow = makeAddItem(ListItem);
 
 const SortableObjectRow = SortableElement(props => {
   const { style, ...otherProps } = props;
@@ -47,7 +50,7 @@ class ObjectsList extends Component {
                 key={key}
                 style={style}
                 disabled
-                onAdd={this.props.onAddObject}
+                onClick={this.props.onAddObject}
                 primaryText="Click to add an object"
               />
             );

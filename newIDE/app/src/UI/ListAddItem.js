@@ -8,17 +8,23 @@ const styles = {
   message: {padding: 0},
 }
 
-export const makeAddItem = Item => ({ onClick, primaryText }) => {
+/**
+ * An Higher-order component that create an item that must be put at the
+ * end of a list to allow the user to add a new item.
+ * @param Item The component to wrap. Should act as a material-ui ListItem.
+ */
+export const makeAddItem = Item => ({ onClick, primaryText, style, ...rest }) => {
   return (
     <Item
       primaryText={<EmptyMessage style={styles.message}>{primaryText}</EmptyMessage>}
-      style={styles.item}
+      style={{...styles.item, ...style}}
       rightIconButton={
         <IconButton>
           <Add onClick={onClick}/>
         </IconButton>
       }
-      onEdit={onClick}
+      onClick={onClick}
+      {...rest}
     />
   );
 };

@@ -31,6 +31,8 @@ import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
+import ObjectsGroupEditor from '../ObjectsGroupEditor';
+import ObjectsGroupsList from '../ObjectsGroupsList';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import DragDropContextProvider
@@ -47,6 +49,7 @@ import {
   testLayoutInstance1,
   testInstruction,
   spriteObjectWithBehaviors,
+  group2,
 } from './TestProject';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -262,6 +265,32 @@ storiesOf('InstancePropertiesEditor', module)
         layout={testLayout}
         instances={[testLayoutInstance1]}
       />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('ObjectsGroupEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ObjectsGroupEditor
+      project={project}
+      layout={testLayout}
+      group={group2}
+    />
+  ));
+
+storiesOf('ObjectsGroupsList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <div style={{ height: 250 }}>
+        <ObjectsGroupsList
+          project={project}
+          objectsContainer={testLayout}
+          onEditGroup={() => {}}
+        />
+      </div>
     </SerializedObjectDisplay>
   ));
 

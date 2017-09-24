@@ -47,7 +47,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]")
             group1.AddObject("Object2");
             group1.AddObject("NotExistingObject");
             group1.AddObject("GlobalObject1");
-            layout1.GetObjectGroups().push_back(group1);
+            layout1.GetObjectGroups().Insert(group1);
 
             layout1.InsertNewObject(project, "Sprite", "Object1", 0);
             layout1.InsertNewObject(project, "Sprite", "Object2", 0);
@@ -141,7 +141,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]")
             group1.AddObject("Object2");
             group1.AddObject("NotExistingObject");
             group1.AddObject("GlobalObject1");
-            layout1.GetObjectGroups().push_back(group1);
+            layout1.GetObjectGroups().Insert(group1);
 
             layout1.InsertNewObject(project, "Sprite", "Object1", 0);
             layout1.InsertNewObject(project, "Sprite", "Object2", 0);

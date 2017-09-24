@@ -258,8 +258,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(gd::Instruction & conditio
             gd::String objectInParameter = condition.GetParameter(pNb).GetPlainString();
 
             if ( !scene.HasObjectNamed(objectInParameter) && !project.HasObjectNamed(objectInParameter)
-                 && find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == scene.GetObjectGroups().end()
-                 && find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == project.GetObjectGroups().end() )
+                 && !scene.GetObjectGroups().Has(objectInParameter)
+                 && !project.GetObjectGroups().Has(objectInParameter))
             {
                 condition.SetParameter(pNb, gd::Expression(""));
                 condition.SetType("");
@@ -398,8 +398,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(gd::Instruction & action, Eve
         {
             gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
             if ( !scene.HasObjectNamed(objectInParameter) && !project.HasObjectNamed(objectInParameter)
-                 && find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == scene.GetObjectGroups().end()
-                 && find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectInParameter) ) == project.GetObjectGroups().end() )
+                 && !scene.GetObjectGroups().Has(objectInParameter)
+                 && !project.GetObjectGroups().Has(objectInParameter))
             {
                 action.SetParameter(pNb, gd::Expression(""));
                 action.SetType("");
@@ -742,17 +742,10 @@ gd::String EventsCodeGenerator::ConvertToStringExplicit(gd::String plainString)
 std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(const gd::String & objectName, const EventsCodeGenerationContext & context) const
 {
     std::vector<gd::String> realObjects;
-    vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(project.GetObjectGroups().begin(),
-                                                                    project.GetObjectGroups().end(),
-                                                                    bind2nd(gd::GroupHasTheSameName(), objectName));
-    vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(),
-                                                                   scene.GetObjectGroups().end(),
-                                                                   bind2nd(gd::GroupHasTheSameName(), objectName));
-
-    if ( globalGroup != project.GetObjectGroups().end() )
-        realObjects = (*globalGroup).GetAllObjectsNames();
-    else if ( sceneGroup != scene.GetObjectGroups().end() )
-        realObjects = (*sceneGroup).GetAllObjectsNames();
+    if (project.GetObjectGroups().Has(objectName))
+        realObjects = project.GetObjectGroups().Get(objectName).GetAllObjectsNames();
+    else if (scene.GetObjectGroups().Has(objectName))
+        realObjects = scene.GetObjectGroups().Get(objectName).GetAllObjectsNames();
     else
         realObjects.push_back(objectName);
 

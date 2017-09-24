@@ -3,7 +3,7 @@ import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import { mapFor } from '../Utils/MapFor';
 import ListIcon from '../UI/ListIcon';
-import { makeAddItem } from './AddItem';
+import { makeAddItem } from '../UI/ListAddItem';
 import Window from '../Utils/Window';
 import IconMenu from '../UI/Menu/IconMenu';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
@@ -106,7 +106,7 @@ class Item extends Component {
   }
 }
 
-const AddItem = makeAddItem(Item);
+const AddItem = makeAddItem(ListItem);
 
 export default class ProjectManager extends React.Component {
   state = {

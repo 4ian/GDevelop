@@ -1,7 +1,6 @@
 import React from 'react';
 import { ListItem } from 'material-ui/List';
 import IconMenu from '../UI/Menu/IconMenu';
-import ListIcon from '../UI/ListIcon';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
@@ -10,7 +9,7 @@ const styles = {
   container: {
     borderBottom: '1px solid #e0e0e0', //TODO: Use theme color instead
   },
-  objectName: {
+  groupName: {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
@@ -22,8 +21,9 @@ const styles = {
   selectedObjectNameColor: '#FFF',
 };
 
-export default class ObjectRow extends React.Component {
-  _renderObjectMenu(object) {
+// TODO: Factor with ObjectRow (same except that there is no icon)?
+export default class GroupRow extends React.Component {
+  _renderGroupMenu(group) {
     return (
       <IconMenu
         ref={iconMenu => this._iconMenu = iconMenu}
@@ -37,14 +37,8 @@ export default class ObjectRow extends React.Component {
         }
         menuTemplate={[
           {
-            label: 'Edit object',
-            enabled: !!this.props.onEdit,
-            click: () => this.props.onEdit(object),
-          },
-          {
-            label: 'Edit object variables',
-            enabled: !!this.props.onEditVariables,
-            click: () => this.props.onEditVariables(),
+            label: 'Edit group',
+            click: () => this.props.onEdit(group),
           },
           {
             label: 'Rename',
@@ -77,14 +71,14 @@ export default class ObjectRow extends React.Component {
   };
 
   render() {
-    const { project, object, selected, style } = this.props;
+    const { group, style } = this.props;
 
-    const objectName = object.getName();
+    const groupName = group.getName();
     const label = this.props.editingName
       ? <TextField
           id="rename-object-field"
           ref={textField => this.textField = textField}
-          defaultValue={objectName}
+          defaultValue={groupName}
           onBlur={e => this.props.onRename(e.target.value)}
           onKeyPress={event => {
             if (event.charCode === 13) {
@@ -96,31 +90,19 @@ export default class ObjectRow extends React.Component {
           style={styles.textField}
         />
       : <div
-          style={{
-            ...styles.objectName,
-            color: selected ? styles.selectedObjectNameColor : undefined,
-          }}
+          style={styles.groupName}
         >
-          {objectName}
+          {groupName}
         </div>;
-
-    const itemStyle = {
-      ...styles.container,
-      backgroundColor: selected ? styles.selectedBackgroundColor : undefined,
-    };
 
     return (
       <ListItem
-        style={{ ...itemStyle, ...style }}
+        style={{ ...styles.container, ...style }}
         onContextMenu={this._onContextMenu}
         primaryText={label}
-        leftIcon={<ListIcon src={this.props.getThumbnail(project, object)} />}
-        rightIconButton={this._renderObjectMenu(object)}
+        rightIconButton={this._renderGroupMenu(group)}
         onClick={() => {
-          if (!this.props.onObjectSelected) return;
-          if (this.props.editingName) return;
-
-          this.props.onObjectSelected(selected ? '' : objectName);
+          this.props.onEdit(group);
         }}
       />
     );

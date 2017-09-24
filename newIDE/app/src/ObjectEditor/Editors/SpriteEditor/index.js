@@ -140,6 +140,7 @@ class AnimationsListContainer extends Component {
     emptyAnimation.setDirectionsCount(1);
     this.props.spriteObject.addAnimation(emptyAnimation);
     this.forceUpdate();
+    this.props.onSizeUpdated();
   };
 
   removeAnimation = i => {
@@ -151,6 +152,7 @@ class AnimationsListContainer extends Component {
     if (answer) {
       this.props.spriteObject.removeAnimation(i);
       this.forceUpdate();
+      this.props.onSizeUpdated();
     }
   };
 
@@ -194,7 +196,7 @@ class AnimationsListContainer extends Component {
 
 export default class PanelSpriteEditor extends Component {
   render() {
-    const { object, project, resourceSources } = this.props;
+    const { object, project, resourceSources, onSizeUpdated } = this.props;
     const spriteObject = gd.asSpriteObject(object);
 
     return (
@@ -202,6 +204,7 @@ export default class PanelSpriteEditor extends Component {
         spriteObject={spriteObject}
         resourceSources={resourceSources}
         project={project}
+        onSizeUpdated={onSizeUpdated}
       />
     );
   }

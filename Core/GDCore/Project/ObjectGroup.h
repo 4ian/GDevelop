@@ -19,7 +19,6 @@ namespace gd
  *
  * Objects groups do not really contains objects : They are just used in events, so as to create events which can be applied to several objects.
  *
- * \see gd::GroupHasTheSameName
  * \ingroup PlatformDefinition
  */
 class GD_CORE_API ObjectGroup
@@ -66,40 +65,18 @@ public:
     }
 
     /**
-     * \brief Serialize instances container.
+     * \brief Serialize the group.
      */
-    static void SerializeTo(const std::vector < gd::ObjectGroup > & list, SerializerElement & element);
+    void SerializeTo(SerializerElement & element) const;
 
     /**
-     * \brief Unserialize the instances container.
+     * \brief Unserialize the group.
      */
-    static void UnserializeFrom(std::vector < gd::ObjectGroup > & list, const SerializerElement & element);
+    void UnserializeFrom(const SerializerElement & element);
 
 private:
     std::vector < gd::String > memberObjects;
     gd::String name; ///< Group name
-};
-
-/**
- * \brief Functor to easily find an object group with a specific name.
- *
- * Usage example:
- * \code
- * vector< gd::ObjectGroup >::const_iterator myGroup = find_if(layout.GetObjectGroups().begin(), layout.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), "myGroup"));
- * if ( myGroup != layout.GetObjectGroups().end() )
- * {
- *     //...
- * }
- * \endcode
- *
- * \see gd::ObjectGroup
- */
-struct GroupHasTheSameName : public std::binary_function<ObjectGroup, gd::String, bool>
-{
-    bool operator ()( const ObjectGroup & group, const gd::String & name ) const
-    {
-        return group.GetName() == name;
-    }
 };
 
 }

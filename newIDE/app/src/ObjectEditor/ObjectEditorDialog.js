@@ -78,14 +78,12 @@ export default class ObjectEditorDialog extends Component {
         noMargin
         modal
         onRequestClose={this.props.onCancel}
-        repositionOnUpdate={false}
         open={this.props.open}
         title={
           <div>
             <Tabs value={currentTab} onChange={this._onChangeTab}>
               <Tab label="Properties" value={'properties'} key={'properties'} />
               <Tab label="Behaviors" value={'behaviors'} key={'behaviors'} />
-              <Tab label="Groups" value={'groups'} key={'groups'} />
             </Tabs>
           </div>
         }
@@ -97,20 +95,13 @@ export default class ObjectEditorDialog extends Component {
             object={this.props.object}
             project={this.props.project}
             resourceSources={this.props.resourceSources}
+            onSizeUpdated={() => this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
           />}
         {currentTab === 'behaviors' &&
           <BehaviorsEditor
             object={this.props.object}
             project={this.props.project}
           />}
-        {currentTab === 'groups' &&
-          <Column>
-            <Line>
-              <EmptyMessage>
-                Editing groups of objects is not available yet.
-              </EmptyMessage>
-            </Line>
-          </Column>}
       </Dialog>
     );
   }

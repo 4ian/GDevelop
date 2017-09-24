@@ -6,7 +6,8 @@ import ObjectSelector from '../ObjectsList/ObjectSelector';
 
 const styles = {
   newObjectSelector: {
-    margin: 10,
+    marginLeft: 10,
+    marginRight: 10,
   },
 };
 

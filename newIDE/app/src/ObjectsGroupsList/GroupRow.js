@@ -7,7 +7,7 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 const styles = {
   container: {
-    borderTop: '1px solid #e0e0e0', //TODO: Use theme color instead
+    borderBottom: '1px solid #e0e0e0', //TODO: Use theme color instead
   },
   groupName: {
     overflow: 'hidden',

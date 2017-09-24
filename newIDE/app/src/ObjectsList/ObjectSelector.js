@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
-import {
-  enumerateObjectsAndGroups,
-} from './EnumerateObjects';
+import { enumerateObjectsAndGroups } from './EnumerateObjects';
 
 const styles = {
   autoCompleteTextField: {
@@ -49,8 +47,22 @@ export default class ObjectSelector extends Component {
     if (this._field) this._field.focus();
   }
 
+  hasAValidObject = () => {
+    return this.fullList.filter(
+      choice => this.props.value === choice.text
+    ).length !== 0;
+  };
+
   render() {
-    const { value, onChange, onChoose, ...rest } = this.props;
+    const {
+      value,
+      onChange,
+      onChoose,
+      project,
+      layout,
+      allowedObjectType,
+      ...rest
+    } = this.props;
 
     return (
       <AutoComplete

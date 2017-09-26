@@ -78,5 +78,7 @@
         "newIDE/app/build": true,
         "newIDE/app/resources/GDJS": true,
         "newIDE/electron-app/app/www": true
-    }
+    },
+    // Support for Flowtype:
+    "javascript.validate.enable": false
 }

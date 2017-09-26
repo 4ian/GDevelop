@@ -25,7 +25,7 @@ const awsS3Client = new awsS3({
 });
 
 export default class BrowserS3PreviewLauncher {
-  static _openPreviewWindow = (project, url): void => {
+  static _openPreviewWindow = (project, url): any => {
     const windowObjectReference = window.open(url, `_blank`);
     return {
       url,

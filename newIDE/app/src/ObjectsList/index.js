@@ -143,7 +143,7 @@ export default class ObjectsListContainer extends React.Component {
     const { project, objectsContainer } = this.props;
 
     const name = newNameGenerator(
-      'MyObject',
+      'NewObject',
       name =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
     );

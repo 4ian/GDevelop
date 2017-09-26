@@ -113,25 +113,6 @@ export default class MainFrame extends Component {
     return editorTab.editorRef.getSerializedElements();
   };
 
-  loadBuiltinGame = () => {
-    this.setState(
-      {
-        loadingProject: true,
-      },
-      () => {
-        let unserializedProject = null;
-        timeFunction(
-          () => unserializedProject = gd.Serializer.fromJSObject(fixtureGame),
-          time => console.info(`gd.Serializer.fromJSObject took ${time}ms`)
-        );
-
-        return this.loadFullProject(unserializedProject, () => {
-          unserializedProject.delete();
-        });
-      }
-    );
-  };
-
   toggleProjectManager = () => {
     if (!this.refs.toolbar)
       this.setState({
@@ -465,6 +446,21 @@ export default class MainFrame extends Component {
     );
   };
 
+  openProject = (project, cb = undefined) => {
+    this.setState(
+      {
+        loadingProject: false,
+        editorTabs: closeProjectTabs(
+          this.state.editorTabs,
+          this.state.currentProject
+        ),
+        projectManagerOpen: true,
+        currentProject: project,
+      },
+      cb
+    );
+  };
+
   chooseProject = () => {
     this.props
       .onChooseProject()
@@ -627,7 +623,6 @@ export default class MainFrame extends Component {
               toggleProjectManager={this.toggleProjectManager}
               canOpenProject={!!this.props.onChooseProject}
               openProject={this.chooseProject}
-              loadBuiltinGame={this.loadBuiltinGame}
               requestUpdate={this.props.requestUpdate}
             />
             <Tabs
@@ -667,6 +662,10 @@ export default class MainFrame extends Component {
                 onOpen: filepath => {
                   this.openCreateDialog(false);
                   this.openFromPathOrURL(filepath);
+                },
+                onCreate: project => {
+                  this.openCreateDialog(false);
+                  this.openProject(project);
                 },
               })}
             {!!introDialog &&

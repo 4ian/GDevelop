@@ -16,8 +16,7 @@ export default class LocalProjectOpener {
           properties: ['openFile'],
           message: 'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
           filters: [
-            { name: 'GDevelop project', extensions: ['json'] },
-            { name: 'All Files', extensions: ['*'] },
+            { name: 'GDevelop 5 project', extensions: ['json'] },
           ],
         },
         paths => {

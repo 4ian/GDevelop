@@ -50,10 +50,6 @@ export default class MainFrameToolbar extends Component {
               }
               menuTemplate={[
                 {
-                  label: 'Load builtin game',
-                  click: () => this.props.loadBuiltinGame(),
-                },
-                {
                   label: 'Request update from external editor',
                   click: () => this.props.requestUpdate(),
                 },

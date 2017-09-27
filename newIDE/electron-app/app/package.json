@@ -2,7 +2,7 @@
   "name": "gdevelop-electron-app",
   "productName": "GDevelop IDE",
   "description": "GDevelop IDE running on the Electron runtime",
-  "version": "5.0.0-beta5",
+  "version": "5.0.0-beta6",
   "author": "Florian Rival",
   "license": "MIT",
   "homepage": "http://compilgames.net",

@@ -42,7 +42,6 @@ import SceneEditor from './Editors/SceneEditor';
 import ExternalLayoutEditor from './Editors/ExternalLayoutEditor';
 import StartPage from './Editors/StartPage';
 
-import fixtureGame from '../fixtures/platformer/platformer.json';
 const gd = global.gd;
 
 const styles = {

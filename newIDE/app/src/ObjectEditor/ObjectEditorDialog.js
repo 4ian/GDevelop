@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
-import EmptyMessage from '../UI/EmptyMessage';
 import BehaviorsEditor from '../BehaviorsEditor';
-import { Column, Line } from '../UI/Grid';
 import { Tabs, Tab } from 'material-ui/Tabs';
 
 const styles = {

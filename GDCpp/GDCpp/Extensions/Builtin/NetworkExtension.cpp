@@ -23,8 +23,8 @@ NetworkExtension::NetworkExtension()
     GetAllActions()["JSONToObjectVariableStructure"].SetFunctionName("JSONToObjectVariableStructure").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
 
     GetAllStrExpressions()["ToJSON"].SetFunctionName("VariableStructureToJSON").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
-    GetAllStrExpressions()["GlobalToJSON"].SetFunctionName("VariableStructureToJSON").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
-    GetAllStrExpressions()["ObjectToJSON"].SetFunctionName("ObjectVariableStructureToJSON").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
+    GetAllStrExpressions()["GlobalVarToJSON"].SetFunctionName("VariableStructureToJSON").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
+    GetAllStrExpressions()["ObjectVarToJSON"].SetFunctionName("ObjectVariableStructureToJSON").SetIncludeFile("GDCpp/Extensions/Builtin/NetworkTools.h");
     #endif
 }
 

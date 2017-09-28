@@ -29,8 +29,8 @@ NetworkExtension::NetworkExtension()
     GetAllActions()["JSONToObjectVariableStructure"].SetFunctionName("gdjs.evtTools.network.jsonToObjectVariableStructure");
 
     GetAllStrExpressions()["ToJSON"].SetFunctionName("gdjs.evtTools.network.variableStructureToJSON");
-    GetAllStrExpressions()["GlobalToJSON"].SetFunctionName("gdjs.evtTools.network.variableStructureToJSON");
-    GetAllStrExpressions()["ObjectToJSON"].SetFunctionName("gdjs.evtTools.network.objectVariableStructureToJSON");
+    GetAllStrExpressions()["GlobalVarToJSON"].SetFunctionName("gdjs.evtTools.network.variableStructureToJSON");
+    GetAllStrExpressions()["ObjectVarToJSON"].SetFunctionName("gdjs.evtTools.network.objectVariableStructureToJSON");
 
     StripUnimplementedInstructionsAndExpressions();
 }

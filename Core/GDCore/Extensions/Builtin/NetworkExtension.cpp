@@ -103,14 +103,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
                        "res/conditions/toujours24.png")
         .AddParameter("scenevar", _("The variable to be stringify"));
 
-    extension.AddStrExpression("GlobalToJSON",
+    extension.AddStrExpression("GlobalVarToJSON",
                        _("Convert global variable to JSON"),
                        _("Convert a global variable to JSON"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
         .AddParameter("globalvar", _("The global variable to be stringify"));
 
-    extension.AddStrExpression("ObjectToJSON",
+    extension.AddStrExpression("ObjectVarToJSON",
                        _("Convert object variable to JSON"),
                        _("Convert an object variable to JSON"),
                        _("Conversion"),

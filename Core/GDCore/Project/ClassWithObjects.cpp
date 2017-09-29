@@ -122,6 +122,16 @@ void ClassWithObjects::SwapObjects(std::size_t firstObjectIndex, std::size_t sec
     );
 }
 
+void ClassWithObjects::MoveObject(std::size_t oldIndex, std::size_t newIndex)
+{
+    if ( oldIndex >= initialObjects.size() || newIndex >= initialObjects.size() )
+        return;
+
+    std::unique_ptr<gd::Object> object = std::move(initialObjects[oldIndex]);
+    initialObjects.erase(initialObjects.begin() + oldIndex);
+    initialObjects.insert(initialObjects.begin() + newIndex, std::move(object));
+}
+
 void ClassWithObjects::RemoveObject(const gd::String & name)
 {
     std::vector< std::unique_ptr<gd::Object> >::iterator object = find_if(initialObjects.begin(), initialObjects.end(), bind2nd(ObjectHasName(), name));

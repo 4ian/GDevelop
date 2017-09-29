@@ -79,6 +79,52 @@ gdjs.HowlerSoundManager = function(resources)
     this._musics = {};
     this._freeSounds = []; //Sounds without an assigned channel.
     this._freeMusics = []; //Musics without an assigned channel.
+
+    this._pausedSounds = [];
+    this._paused = false;
+
+    var that = this;
+    this._checkForPause = function() {
+      if (that._paused) {
+        this.pause();
+        that._pausedSounds.push(this);
+      }
+    };
+
+    document.addEventListener("deviceready", function() {
+        // pause/resume sounds in Cordova when the app is being paused/resumed
+        document.addEventListener("pause", function() {
+          var soundList = that._freeSounds.concat(that._freeMusics);
+          for (var key in that._sounds) {
+            if (that._sounds.hasOwnProperty(key)) {
+              soundList.push(that._sounds[key]);
+            }
+          }
+          for (var key in that._musics) {
+            if (that._musics.hasOwnProperty(key)) {
+              soundList.push(that._musics[key]);
+            }
+          }
+          for (var i=0; i < soundList.length; i++) {
+            var sound = soundList[i];
+            if (!sound.paused() && !sound.stopped()) {
+              sound.pause();
+              that._pausedSounds.push(sound);
+            }
+          }
+          that._paused = true;
+        }, false);
+        document.addEventListener("resume", function() {
+          for (var i=0; i < that._pausedSounds.length; i++) {
+            var sound = that._pausedSounds[i];
+            if (!sound.stopped()) {
+              sound.play();
+            }
+          }
+          that._pausedSounds = [];
+          that._paused = false;
+        }, false);
+    });
 };
 
 gdjs.SoundManager = gdjs.HowlerSoundManager; //Register the class to let the engine use it.
@@ -150,6 +196,8 @@ gdjs.HowlerSoundManager.prototype.playSound = function(soundName, loop, volume, 
 	});
 
 	this._storeSoundInArray(this._freeSounds, sound).play();
+
+	sound.on('play', this._checkForPause);
 };
 
 gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function(soundName, channel, loop, volume, pitch) {
@@ -169,6 +217,8 @@ gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function(soundName, chann
 
 	sound.play();
 	this._sounds[channel] = sound;
+
+	sound.on('play', this._checkForPause);
 };
 
 gdjs.HowlerSoundManager.prototype.getSoundOnChannel = function(channel) {
@@ -187,6 +237,8 @@ gdjs.HowlerSoundManager.prototype.playMusic = function(soundName, loop, volume, 
 	});
 
 	this._storeSoundInArray(this._freeMusics, sound).play();
+
+	sound.on('play', this._checkForPause);
 };
 
 gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function(soundName, channel, loop, volume, pitch) {
@@ -207,6 +259,8 @@ gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function(soundName, chann
 
 	music.play();
 	this._musics[channel] = music;
+
+	music.on('play', this._checkForPause);
 };
 
 gdjs.HowlerSoundManager.prototype.getMusicOnChannel = function(channel) {
@@ -243,6 +297,7 @@ gdjs.HowlerSoundManager.prototype.clearAll = function() {
 			delete this._musics[p];
 		}
 	}
+	this._pausedSounds = [];
 }
 
 gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete, resources) {

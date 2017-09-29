@@ -35,7 +35,7 @@ unsigned int ObjectOrGroupFinder::HasObjectOrGroupNamed(const gd::String &name, 
         flag = flag | HasSameName::AsObjectInLayout;
 
     //Tests current scene groups
-    if(layout && HasGroupNamed(name, layout->GetObjectGroups()))
+    if(layout && layout->GetObjectGroups().Has(name))
         flag = flag | HasSameName::AsGroupInLayout;
 
     //Tests the global objects
@@ -43,7 +43,7 @@ unsigned int ObjectOrGroupFinder::HasObjectOrGroupNamed(const gd::String &name, 
         flag = flag | HasSameName::AsGlobalObject;
 
     //Tests global groups
-    if(HasGroupNamed(name, project.GetObjectGroups()))
+    if(project.GetObjectGroups().Has(name))
         flag = flag | HasSameName::AsGlobalGroup;
 
     //Tests other scenes' objects
@@ -63,7 +63,7 @@ unsigned int ObjectOrGroupFinder::HasObjectOrGroupNamed(const gd::String &name, 
                 flag = flag | AsObjectInAnotherLayout;
             }
 
-            if(HasGroupNamed(name, aLayout.GetObjectGroups()))
+            if(aLayout.GetObjectGroups().Has(name))
             {
                 layoutsWithSameObjectName.push_back(aLayout.GetName());
 
@@ -78,12 +78,6 @@ unsigned int ObjectOrGroupFinder::HasObjectOrGroupNamed(const gd::String &name, 
 const std::vector<gd::String>& ObjectOrGroupFinder::GetLayoutsWithSameObjectName() const
 {
     return layoutsWithSameObjectName;
-}
-
-bool ObjectOrGroupFinder::HasGroupNamed(gd::String name, const std::vector<gd::ObjectGroup> & groups) const
-{
-    return std::find_if( groups.begin(), groups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
-            != groups.end();
 }
 
 }

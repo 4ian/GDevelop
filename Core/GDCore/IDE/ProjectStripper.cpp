@@ -15,12 +15,12 @@ namespace gd
 
 void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project & project)
 {
-    project.GetObjectGroups().clear();
+    project.GetObjectGroups().Clear();
     while ( project.GetExternalEventsCount() > 0 ) project.RemoveExternalEvents(project.GetExternalEvents(0).GetName());
 
     for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
     {
-        project.GetLayout(i).GetObjectGroups().clear();
+        project.GetLayout(i).GetObjectGroups().Clear();
         project.GetLayout(i).GetEvents().Clear();
     }
 }

@@ -25,7 +25,7 @@ public:
     {
         SetExtensionInformation("Box3DObject",
                               _("3D Box Object"),
-                              _("Extension allowing to use 3D Box objects."),
+                              _("This Extension enables the use of 3D Box objects."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -149,7 +149,7 @@ public:
 
             obj.AddCondition("ZPosition",
                            _("Z Position"),
-                           _("Compare Z position of a 3D Box."),
+                           _("Compare the Z position of a 3D Box."),
                            _("Z position of _PARAM0_ is _PARAM1__PARAM2_"),
                            _(""),
                            "res/conditions/position24.png",
@@ -164,7 +164,7 @@ public:
 
             obj.AddAction("Yaw",
                            _("Yaw"),
-                           _("Modify Yaw of a 3D Box object."),
+                           _("Modify the Yaw of a 3D Box object."),
                            _("Do _PARAM1__PARAM2_ to yaw of _PARAM0_"),
                            _("Angle"),
                            "res/actions/rotate24.png",
@@ -179,7 +179,7 @@ public:
 
             obj.AddCondition("Yaw",
                            _("Yaw"),
-                           _("Compare Yaw of a 3D Box object."),
+                           _("Compare the Yaw of a 3D Box object."),
                            _("Yaw of _PARAM0_ is _PARAM1__PARAM2_"),
                            _("Angle"),
                            "res/conditions/rotate24.png",
@@ -194,7 +194,7 @@ public:
 
             obj.AddAction("Pitch",
                            _("Pitch"),
-                           _("Modify Pitch of a 3D Box object."),
+                           _("Modify the Pitch of a 3D Box object."),
                            _("Do _PARAM1__PARAM2_ to pitch of _PARAM0_"),
                            _("Angle"),
                            "res/actions/rotate24.png",
@@ -209,7 +209,7 @@ public:
 
             obj.AddCondition("Pitch",
                            _("Pitch"),
-                           _("Compare Pitch of a 3D Box object."),
+                           _("Compare the Pitch of a 3D Box object."),
                            _("Pitch of _PARAM0_ is _PARAM1__PARAM2_"),
                            _("Angle"),
                            "res/conditions/rotate24.png",
@@ -224,7 +224,7 @@ public:
 
             obj.AddAction("Roll",
                            _("Roll"),
-                           _("Modify Roll of a 3D Box object."),
+                           _("Modify the Roll of a 3D Box object."),
                            _("Do _PARAM1__PARAM2_ to roll of _PARAM0_"),
                            _("Angle"),
                            "res/actions/rotate24.png",
@@ -238,7 +238,7 @@ public:
 
             obj.AddCondition("Roll",
                            _("Roll"),
-                           _("Compare Roll of a 3D Box object."),
+                           _("Compare the Roll of a 3D Box object."),
                            _("Roll of _PARAM0_ is _PARAM1__PARAM2_"),
                            _("Angle"),
                            "res/conditions/rotate24.png",

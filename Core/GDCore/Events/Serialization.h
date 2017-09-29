@@ -5,9 +5,9 @@
  */
 #ifndef GDCORE_EVENTS_SERIALIZATION_H
 #define GDCORE_EVENTS_SERIALIZATION_H
-#include "GDCore/Events/Instruction.h"
 #include "GDCore/Serialization/Serializer.h"
 #include <vector>
+namespace gd { class InstructionsList; }
 namespace gd { class Project; }
 namespace gd { class EventsList; }
 
@@ -15,46 +15,37 @@ namespace gd
 {
 
 /**
- * \brief Contains tools for loading and saving events to XML.
+ * \brief Contains tools for loading and saving events to SerializerElement.
  */
 class GD_CORE_API EventsListSerialization
 {
 public:
     /**
-     * \brief Load an events list from a TiXmlElement
+     * \brief Load an events list from a SerializerElement
      * \param project The project the events belongs to.
      * \param list The event list in which the events must be loaded.
-     * \param events The TiXmlElement containing the events
+     * \param events The SerializerElement containing the events
      */
     static void UnserializeEventsFrom(gd::Project & project, gd::EventsList & list, const SerializerElement & events);
 
     /**
-     * \brief Save an events list from a TiXmlElement
+     * \brief Save an events list to a SerializerElement
      * \param list The event list to be saved.
-     * \param events The TiXmlElement in which the events must be saved.
+     * \param events The SerializerElement in which the events must be serialized.
      */
     static void SerializeEventsTo(const gd::EventsList & list, SerializerElement & events);
 
     /**
-     * \brief Load a list of conditions from a TiXmlElement
+     * \brief Unserialize a list of instructions
      */
-    static void OpenConditions(gd::Project & project, gd::InstructionsList & list, const SerializerElement & elem);
+    static void UnserializeInstructionsFrom(gd::Project & project, gd::InstructionsList & list, const SerializerElement & elem);
 
     /**
-     * \brief Load a list of actions from a TiXmlElement
+     * \brief Serialize a list of instructions
      */
-    static void OpenActions(gd::Project & project, gd::InstructionsList & list, const SerializerElement & elem);
+    static void SerializeInstructionsTo(const gd::InstructionsList & list, SerializerElement & elem);
 
-    /**
-     * \brief Save a list of conditions to a TiXmlElement
-     */
-    static void SaveConditions(const gd::InstructionsList & list, SerializerElement & elem);
-
-    /**
-     * \brief Save a list of actions to a TiXmlElement
-     */
-    static void SaveActions(const gd::InstructionsList & list, SerializerElement & elem);
-
+private:
     /**
      * \brief Internal method called when opening events created with GD2.x
      *
@@ -67,7 +58,7 @@ public:
      *
      * Variables related and some storage instructions have been changed.
      */
-    static void UpdateInstructionsFromGD31x(gd::Project & project, gd::InstructionsList & list, bool instructionsAreActions);
+    static void UpdateInstructionsFromGD31x(gd::Project & project, gd::InstructionsList & list);
 };
 
 }

@@ -18,7 +18,7 @@ const styles = {
 
 export default props => (
   <div style={{...styles.containerStyle, ...props.style}}>
-    <span style={styles.messageStyle}>
+    <span style={{...styles.messageStyle, ...props.messageStyle}}>
       {props.children}
     </span>
   </div>

@@ -1,91 +1,163 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import instructionsRenderingService from './InstructionsRenderingService.js';
-const instrLongPressTime = 350;
+import { mapFor } from '../Utils/MapFor';
+import classNames from 'classnames';
+import { selectedArea, selectableArea } from './ClassNames';
+import InstructionsList from './InstructionsList';
+const gd = global.gd;
+const instrFormatter = gd.InstructionSentenceFormatter.get();
+instrFormatter.loadTypesFormattingFromConfig();
+
+const styles = {
+  container: {
+    whiteSpace: 'normal',
+    wordWrap: 'break-word',
+    cursor: 'pointer',
+    marginBottom: 1,
+  },
+  icon: {
+    verticalAlign: 'middle',
+    paddingLeft: 2,
+    paddingRight: 2,
+  },
+  subInstructionsList: {
+    marginLeft: 9,
+    marginTop: 1,
+    borderRight: 'none',
+    borderLeft: '1px solid #d3d3d3',
+  },
+};
 
 export default class Instruction extends Component {
   static propTypes = {
     instruction: PropTypes.object.isRequired,
     isCondition: PropTypes.bool.isRequired,
-    instrsList: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired,
-    callbacks: PropTypes.object.isRequired,
-  }
+    onClick: PropTypes.func.isRequired,
 
-  handleTouch = (event) => {
-    const { callbacks } = this.props;
-    event.stopPropagation();
+    // For potential sub-instructions list:
+    selection: PropTypes.object,
+    onAddNewSubInstruction: PropTypes.func,
+    onSubInstructionClick: PropTypes.func,
+    onSubInstructionDoubleClick: PropTypes.func,
+    onSubParameterClick: PropTypes.func,
+  };
 
-    if (!this.touchStartDate) {
-      this.touchStartDate = Date.now();
-      this.touchTimeout = setTimeout(
-        function() {
-          callbacks.onInstructionLongClicked(this.props);
-        }.bind(this),
-        instrLongPressTime
-      );
-    }
-  }
+  /**
+   * Render the different parts of the text of the instruction.
+   * Parameter can have formatting, be hovered and clicked. The rest
+   * has not particular styling.
+   */
+  _renderInstructionText = metadata => {
+    const { instruction } = this.props;
+    const formattedTexts = instrFormatter.getAsFormattedText(
+      instruction,
+      metadata
+    );
+    const parametersCount = metadata.getParametersCount();
 
-  handleTouchEnd = (event) => {
-    const { callbacks } = this.props;
-    event.stopPropagation();
+    return (
+      <span>
+        {mapFor(0, formattedTexts.size(), i => {
+          const formatting = formattedTexts.getTextFormatting(i);
+          const parameterIndex = formatting.getUserData();
 
-    clearTimeout(this.touchTimeout);
-    if (Date.now() - this.touchStartDate < instrLongPressTime) {
-      callbacks.onInstructionClicked(this.props);
-    }
-    this.touchStartDate = undefined;
-  }
+          const isParameter = parameterIndex >= 0 &&
+            parameterIndex < parametersCount;
+          if (!isParameter)
+            return <span key={i}>{formattedTexts.getString(i)}</span>;
+
+          return (
+            <span
+              key={i}
+              style={{
+                color: 'rgb(' +
+                  formatting.getColorRed() +
+                  ',' +
+                  formatting.getColorGreen() +
+                  ',' +
+                  formatting.getColorBlue() +
+                  ')',
+                fontWeight: formatting.isBold() ? 'bold' : 'normal',
+                fontStyle: formatting.isItalic() ? 'italic' : 'normal',
+              }}
+              className={classNames({
+                [selectableArea]: true,
+              })}
+              onClick={domEvent =>
+                this.props.onParameterClick(domEvent, parameterIndex)}
+            >
+              {formattedTexts.getString(i)}
+            </span>
+          );
+        })}
+      </span>
+    );
+  };
 
   render() {
-    var instruction = this.props.instruction;
-    var rendering = instructionsRenderingService.getInstructionHtml(
-      instruction,
-      this.props.isCondition
-    );
+    var { instruction, isCondition } = this.props;
 
-    var children = [];
-    if (instruction.isInverted()) {
-      children.push(
-        React.createElement('img', {
-          src: 'res/contraire.png',
-          className: 'inverted-icon',
-          key: 'inverted-icon',
-        })
-      );
-    }
-    children.push(
-      React.createElement('img', {
-        src: rendering.icon,
-        className: 'icon',
-        key: 'icon',
-      })
-    );
-    children.push(
-      React.createElement('span', {
-        dangerouslySetInnerHTML: {
-          __html: rendering.html,
-        },
-        className: 'text',
-        key: 'text',
-      })
-    );
+    //TODO: Metadata could be cached for performance boost.
+    const metadata = isCondition
+      ? gd.MetadataProvider.getConditionMetadata(
+          gd.JsPlatform.get(),
+          instruction.getType()
+        )
+      : gd.MetadataProvider.getActionMetadata(
+          gd.JsPlatform.get(),
+          instruction.getType()
+        );
 
-    return React.createElement(
-      'span',
-      {
-        className: 'instruction ' +
-          (instruction.dragging ? 'dragged-instruction ' : '') +
-          (instruction.isInverted() ? 'inverted ' : '') +
-          this.props.className,
-        onMouseDown: this.handleTouch,
-        onMouseUp: this.handleTouchEnd,
-        onTouchStart: this.handleTouch,
-        onTouchMove: this.handleTouch,
-        onTouchEnd: this.handleTouchEnd,
-      },
-      children
+    return (
+      <div
+        style={styles.container}
+        className={classNames({
+          [selectableArea]: true,
+          [selectedArea]: this.props.selected,
+        })}
+        onClick={e => {
+          e.stopPropagation();
+          this.props.onClick();
+        }}
+        onDoubleClick={e => {
+          e.stopPropagation();
+          this.props.onDoubleClick();
+        }}
+        onContextMenu={e => {
+          e.stopPropagation();
+          this.props.onContextMenu(e.clientX, e.clientY);
+        }}
+      >
+        {instruction.isInverted() &&
+          <img
+            src="res/contraire.png"
+            alt="Condition is negated"
+            style={styles.icon}
+            width="20"
+            height="16"
+          />}
+        <img
+          src={metadata.getSmallIconFilename()}
+          style={styles.icon}
+          alt=""
+          width="20"
+          height="16"
+        />
+        {this._renderInstructionText(metadata)}
+        {metadata.canHaveSubInstructions() &&
+          <InstructionsList
+            style={styles.subInstructionsList}
+            instrsList={instruction.getSubInstructions()}
+            areConditions={this.props.isCondition}
+            selection={this.props.selection}
+            onAddNewInstruction={this.props.onAddNewSubInstruction}
+            onInstructionClick={this.props.onSubInstructionClick}
+            onInstructionDoubleClick={this.props.onSubInstructionDoubleClick}
+            onInstructionContextMenu={this.props.onSubInstructionContextMenu}
+            onParameterClick={this.props.onSubParameterClick}
+            addButtonLabel="Add a sub-condition"
+          />}
+      </div>
     );
   }
 }

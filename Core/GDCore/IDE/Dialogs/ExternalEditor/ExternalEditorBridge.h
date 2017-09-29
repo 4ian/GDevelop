@@ -207,7 +207,7 @@ private:
 						// CPU usage while waiting for messages.
 						// Note that this is not done if a message was received, as
 						// other chunks could be received just after.
-						sf::sleep(sf::milliseconds(75));
+						sf::sleep(sf::milliseconds(150));
 					}
 
 					//Send messages

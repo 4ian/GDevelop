@@ -21,7 +21,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(gd::P
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("Toujours",
                  _("Always"),
-                 _("This condition returns always true (or always false if condition is inverted)."),
+                 _("This condition always returns true (or always false, if the condition is inverted)."),
                  _("Always"),
                  _("Other"),
                  "res/conditions/toujours24.png",

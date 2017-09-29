@@ -1,0 +1,150 @@
+/* This overwrite the default react-sortable-tree css to display events list */
+
+.gd-events-sheet .events-tree {
+    font-family: -apple-system, ".SFNSText-Regular", "San Francisco", Roboto, "Segoe UI", "Helvetica Neue", "Lucida Grande", sans-serif;
+    font-size: 14px;
+}
+
+/**
+ * Draggable handle on the left of an event
+ */
+.gd-events-sheet .rst__moveHandle {
+    width: 10px;
+    background: #4ab0e4;
+    border: 1px solid #49AFE4;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+/**
+ * Container of an event line (including the scaffolding lines and the event).
+ */
+.gd-events-sheet .rst__node {
+    display: flex;
+}
+
+.gd-events-sheet .rst__nodeContent {
+    /* Ensure the event take all the space after the scaffolding lines */
+    flex: 1;
+    right: 0;
+
+    min-width: 0; /* But don't shrink scaffolding lines */
+    margin-bottom: 2px; /* Margin after an event */
+}
+
+.gd-events-sheet .rst__row {
+    /* The "landing pad" highlight box is done with positionL absolute.
+     * Ensure it will cover all the event row but not the scaffolding lines.
+     */
+    position: relative;
+}
+
+/**
+ * Container of the content of an event
+ */
+.gd-events-sheet .rst__rowContents {
+    display: flex;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    flex: 1;
+}
+
+.gd-events-sheet .rst__rowWrapper {
+    padding: 0;
+}
+
+.gd-events-sheet .rst__rowLabel {
+    padding: 0;
+    flex: 1;
+    min-width: 0;
+}
+
+.gd-events-sheet .rst__rowTitle {
+    font-weight: normal;
+}
+
+/**
+ * Expand/collapse buttons
+ */
+.gd-events-sheet .rst__collapseButton, .rst__expandButton {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    height: 12px;
+    width: 22px;
+}
+
+.gd-events-sheet .rst__collapseButton:hover:not(:active), .rst__expandButton:hover:not(:active) {
+    background-size: initial !important; /*Avoid buttons size to change*/
+    height: 12px !important; /*Avoid buttons size to change*/
+    width: 22px !important; /*Avoid buttons size to change*/
+}
+
+.gd-events-sheet  .rst__expandButton {
+    background-image: url('./unfold.png');
+    background-position: 11px 3px !important;
+}
+
+.gd-events-sheet  .rst__collapseButton {
+    background-image: url('./fold.png');
+    background-position: center 7px !important;
+}
+
+/**
+ * Lines between events
+ */
+.gd-events-sheet .rst__lineHalfHorizontalRight::before, .rst__lineFullVertical::after, .rst__lineHalfVerticalTop::after, .rst__lineHalfVerticalBottom::after {
+  opacity: 0.3;
+}
+
+/**
+ * Links to add a condition or an action
+ */
+.gd-events-sheet .add-link {
+    opacity: 0.3;
+}
+.gd-events-sheet .add-link:hover {
+    opacity: 0.8;
+}
+
+/**
+ * Selectable area (instructions)
+ */
+.gd-events-sheet .selectable {
+    box-sizing: border-box;
+    border: 1px transparent solid;
+}
+
+.gd-events-sheet .selectable:hover {
+    background-color: rgba(0,0,0, 0.1);
+}
+
+.gd-events-sheet .selectable.selected {
+    background-color: rgba(0,0,0, 0.1);
+    border: 1px #4ab0e4 solid !important;
+}
+
+/**
+ * Large selectable area (events)
+ */
+.gd-events-sheet .large-selectable {
+    box-sizing: border-box;
+    border: 1px transparent solid;
+}
+
+.gd-events-sheet .large-selectable.large-selected {
+    border: 1px #4ab0e4 solid !important;
+}
+
+/**
+ * The background
+ */
+.gd-events-sheet .background {
+    background-color: rgb(247, 247, 247);
+    margin-top: 1px;
+    margin-bottom: 1px;
+}

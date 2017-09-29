@@ -27,7 +27,7 @@ public:
     {
         SetExtensionInformation("Network",
                               _("Network features"),
-                              _("Built-in extension allowing to exchange data on the network between games."),
+                              _("This Built-in extension can exchange data on the network between games."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -61,7 +61,7 @@ public:
 
         AddAction("ListenToPort",
                        _("Initialize data reception"),
-                       _("Initialize the network so as to be able te receive data from other computers."),
+                       _("Initialize the network so you can receive data from other computers."),
                        _("Initialize data reception"),
                        _("Network: Reception"),
                        "CppPlatform/Extensions/networkicon24.png",
@@ -108,7 +108,7 @@ public:
 
         AddAction("ReceivePackets",
                        _("Receive waiting data"),
-                       _("Receive data sent by other computers.\nYou can then access to them with the appropriate expressions."),
+                       _("Receive data sent by other computers.\nYou can then access them with the appropriate expressions."),
                        _("Receive data"),
                        _("Network: Reception"),
                        "CppPlatform/Extensions/networkicon24.png",
@@ -118,21 +118,21 @@ public:
 
         AddAction("ResetReceivedData",
                        _("Delete all received data stored in memory"),
-                       _("Delete every received data stored in memory"),
-                       _("Delete every received data stored in memory"),
+                       _("Delete all received data stored in memory"),
+                       _("Delete all received data stored in memory"),
                        _("Network: Reception"),
                        "CppPlatform/Extensions/networkicon24.png",
                        "CppPlatform/Extensions/networkicon.png")
 
             .SetFunctionName("GDpriv::NetworkExtension::ResetReceivedData").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
-        AddStrExpression("GetReceivedDataString", _("Get the text of a data"), _("Get the text contained in a data"), _("Network: Reception"), "CppPlatform/Extensions/networkicon.png")
+        AddStrExpression("GetReceivedDataString", _("Get the text of a data"), _("Get the text contained in data"), _("Network: Reception"), "CppPlatform/Extensions/networkicon.png")
             .AddParameter("string", _("Name of the data containing the text to get"))
 
             .SetFunctionName("GDpriv::NetworkExtension::GetReceivedDataString").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
-        AddExpression("GetReceivedDataValue", _("Get the value of a data"), _("Get the value contained in a data"), _("Network: Reception"), "CppPlatform/Extensions/networkicon.png")
+        AddExpression("GetReceivedDataValue", _("Get the value of data"), _("Get the value contained in data"), _("Network: Reception"), "CppPlatform/Extensions/networkicon.png")
             .AddParameter("string", _("Name of the data containing the text to get"))
 
             .SetFunctionName("GDpriv::NetworkExtension::GetReceivedDataValue").SetIncludeFile("Network/NetworkManagerFunctions.h");
@@ -143,20 +143,20 @@ public:
             .SetFunctionName("GDpriv::NetworkExtension::GetLastError").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
-        AddStrExpression("GetPublicAddress", _("IP address"), _("Allow to get the public IP Address of the computer."), _("Network"), "CppPlatform/Extensions/networkicon.png")
+        AddStrExpression("GetPublicAddress", _("IP address"), _("Allow getting the public IP Address of the computer."), _("Network"), "CppPlatform/Extensions/networkicon.png")
             .AddParameter("expression", _("Maximum time to wait before getting the address ( in seconds ) ( 0 = no timeout )"), "", true)
 
             .SetFunctionName("GDpriv::NetworkExtension::GetPublicAddress").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
-        AddStrExpression("GetLocalAddress", _("Local IP address ( local/LAN )"), _("Allow to get the public IP Address of the computer."), _("Network"), "CppPlatform/Extensions/networkicon.png")
+        AddStrExpression("GetLocalAddress", _("Local IP address ( local/LAN )"), _("Allow getting the public IP Address of the computer."), _("Network"), "CppPlatform/Extensions/networkicon.png")
 
             .SetFunctionName("GDpriv::NetworkExtension::GetLocalAddress").SetIncludeFile("Network/NetworkManagerFunctions.h");
 
 
         AddAction("GenerateObjectNetworkId",
                        _("Generate objects' identifiers"),
-                       _("Generate automatically identifiers for these objects.\nNote that this action must be preferably used at the start of the scene for example, so as to be sure objects\nhave the same unique identifiers on the different computers."),
+                       _("Generate identifiers automatically for these objects.\nNote that this action must preferably be used at the start of the scene. For example, so you can be sure objects\nhave the same unique identifiers on all participating computers."),
                        _("Generate unique network identifiers for _PARAM0_"),
                        _("Behavior Automatic Network Updater"),
                        "CppPlatform/Extensions/networkicon24.png",
@@ -172,7 +172,7 @@ public:
             gd::BehaviorMetadata & aut = AddBehavior("NetworkBehavior",
                   _("Automatic network update"),
                   _("NetworkUpdater"),
-                  _("Allows to automatically synchronize the objects of a game on the network."),
+                  _("Allows automatically synchronizing the objects of a game on the network."),
                   "",
                   "CppPlatform/Extensions/networkicon32.png",
                   "NetworkBehavior",
@@ -184,7 +184,7 @@ public:
 
             aut.AddAction("SetAsSender",
                            _("Set to send data"),
-                           _("The behavior will send the data of the objects.\nBe sure to have generated identifiers for these objects before."),
+                           _("The behavior will send the data of the objects.\nYou must to generate the identifiers for these objects before this step."),
                            _("Set _PARAM0_ to send data"),
                            _("Behavior Automatic Network Updater"),
                            "CppPlatform/Extensions/networkicon24.png",
@@ -196,7 +196,7 @@ public:
 
             aut.AddAction("SetAsReceiver",
                            _("Set to receive data"),
-                           _("The behavior will receive the data and will update the objects.\nBe sure to have generated identifiers for these objects before."),
+                           _("The behavior will receive the data and will update the objects.\nYou must generate the identifiers for these objects before this step."),
                            _("Set _PARAM0_ to receive data"),
                            _("Behavior Automatic Network Updater"),
                            "CppPlatform/Extensions/networkicon24.png",
@@ -208,7 +208,7 @@ public:
 
             aut.AddAction("SetIdentifier",
                            _("Change object's identifier"),
-                           _("Each object need a unique identifier, the same on all computers, so as to be identified and updated"),
+                           _("Each object needs a unique identifier that's the same on all computers, so it can be identified and updated."),
                            _("Set identifier of _PARAM0_ to _PARAM2_"),
                            _("Behavior Automatic Network Updater"),
                            "CppPlatform/Extensions/networkicon24.png",

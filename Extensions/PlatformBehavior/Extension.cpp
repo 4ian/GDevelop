@@ -16,7 +16,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("PlatformBehavior",
                           _("Platform Behavior"),
-                          _("Allows to use controllable objects which can run and jump on platforms."),
+                          _("This Extension enables the use of controllable objects that can run and jump on platforms."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -24,7 +24,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
         gd::BehaviorMetadata & aut = extension.AddBehavior("PlatformerObjectBehavior",
               _("Platformer character"),
               "PlatformerObject",
-              _("Controllable character which can jump and run on platforms."),
+              _("Controllable character that can jump and run on platforms."),
               "",
               "CppPlatform/Extensions/platformerobjecticon.png",
               "PlatformerObjectBehavior",
@@ -84,7 +84,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddCondition("IsFalling",
                        _("Is falling"),
-                       _("Check if the object is falling.\nNote that the object can be flagged as jumping and falling at the same time: at the end of a jump, the fall speed becomes higher that the jump speed."),
+                       _("Check if the object is falling.\nNote that the object can be flagged as jumping and falling at the same time: at the end of a jump, the fall speed becomes higher than the jump speed."),
                        _("_PARAM0_ is falling"),
                        _(""),
                        "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -284,7 +284,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateLeftKey",
                        _("Simulate left key press"),
-                       _("Simulate a pressing on left key."),
+                       _("Simulate a press of the left key."),
                        _("Simulate pressing Left for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -296,7 +296,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateRightKey",
                        _("Simulate right key press"),
-                       _("Simulate a pressing on right key."),
+                       _("Simulate a press of the right key."),
                        _("Simulate pressing Right for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -308,7 +308,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateUpKey",
                        _("Simulate up key press"),
-                       _("Simulate a pressing on up key (used when on a ladder)."),
+                       _("Simulate a press of the up key (used when on a ladder)."),
                        _("Simulate pressing Up for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -320,7 +320,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateDownKey",
                        _("Simulate down key press"),
-                       _("Simulate a pressing on down key (used when on a ladder)."),
+                       _("Simulate a press of the down key (used when on a ladder)."),
                        _("Simulate pressing Down for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -332,7 +332,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateLadderKey",
                        _("Simulate ladder key press"),
-                       _("Simulate a pressing on ladder key (used to grab a ladder)."),
+                       _("Simulate a press of the ladder key (used to grab a ladder)."),
                        _("Simulate pressing Ladder key for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -344,7 +344,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateJumpKey",
                        _("Simulate jump key press"),
-                       _("Simulate a pressing on jump key."),
+                       _("Simulate a press of the jump key."),
                        _("Simulate pressing Jump key for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -355,7 +355,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateReleaseKey",
                        _("Simulate release key press"),
-                       _("Simulate a pressing on release key (used when grabbing a platform ledge)."),
+                       _("Simulate a press of the release key (used when grabbing a platform ledge)."),
                        _("Simulate pressing Release key for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -366,7 +366,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("SimulateControl",
                        _("Simulate control"),
-                       _("Simulate a pressing on a key.\nValid keys are Left, Right, Jump, Ladder, Up, Down."),
+                       _("Simulate a press of a key.\nValid keys are Left, Right, Jump, Ladder, Up, Down."),
                        _("Simulate pressing _PARAM2_ key for _PARAM0_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -379,7 +379,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("IgnoreDefaultControls",
                        _("Ignore default controls"),
-                       _("De/activate the use of default controls.\nIf deactivated, use the simulate actions to move the object."),
+                       _("De/activate the use of default controls.\nIf deactivated, use the simulated actions to move the object."),
                        _("Ignore default controls for _PARAM0_: _PARAM2_"),
                        _("Controls"),
                        "res/conditions/keyboard24.png",
@@ -425,7 +425,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
         gd::BehaviorMetadata & aut = extension.AddBehavior("PlatformBehavior",
               _("Platform"),
               "Platform",
-              _("Platform on which Platformer characters can run."),
+              _("Platform that Platformer characters can run on."),
               "",
               "CppPlatform/Extensions/platformicon.png",
               "PlatformBehavior",
@@ -437,7 +437,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension & extension)
 
         aut.AddAction("ChangePlatformType",
                        _("Change platform type"),
-                       _("Change the platform type of the object: Platform, Jumpthru or Ladder."),
+                       _("Change the platform type of the object: Platform, Jump-Through, or Ladder."),
                        _("Set platform type of _PARAM0_ to _PARAM2_"),
                        _("Platforms"),
                        "CppPlatform/Extensions/platformicon24.png",

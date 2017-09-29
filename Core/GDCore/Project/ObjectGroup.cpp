@@ -28,53 +28,44 @@ void ObjectGroup::AddObject(const gd::String & name)
 void ObjectGroup::RemoveObject(const gd::String & name)
 {
     memberObjects.erase(std::remove(memberObjects.begin(), memberObjects.end(), name), memberObjects.end());
-    return;
 }
 
-void ObjectGroup::SerializeTo(const std::vector < gd::ObjectGroup > & list, SerializerElement & element)
+void ObjectGroup::RenameObject(const gd::String & oldName, const gd::String & newName)
 {
-    element.ConsiderAsArrayOf("group");
-    for ( std::size_t j = 0;j < list.size();j++ )
+    for(auto & object : memberObjects)
     {
-        SerializerElement & groupElement = element.AddChild("group");
-
-        groupElement.SetAttribute("name", list[j].GetName());
-
-        SerializerElement & objectsElement = groupElement.AddChild("objects");
-        objectsElement.ConsiderAsArrayOf("object");
-        vector < gd::String > allObjects = list[j].GetAllObjectsNames();
-        for ( std::size_t k = 0;k < allObjects.size();k++ )
-            objectsElement.AddChild("object").SetAttribute( "name", allObjects[k] );
+        if (object == oldName) object = newName;
     }
 }
 
-void ObjectGroup::UnserializeFrom(std::vector < gd::ObjectGroup > & list, const SerializerElement & element)
+void ObjectGroup::SerializeTo(SerializerElement & element) const
 {
-    list.clear();
-    element.ConsiderAsArrayOf("group", "Groupe");
-    for (std::size_t i = 0; i < element.GetChildrenCount(); ++i)
+    element.SetAttribute("name", GetName());
+
+    SerializerElement & objectsElement = element.AddChild("objects");
+    objectsElement.ConsiderAsArrayOf("object");
+    for (auto & name : GetAllObjectsNames())
+        objectsElement.AddChild("object").SetAttribute("name", name);
+}
+
+void ObjectGroup::UnserializeFrom(const SerializerElement & element)
+{
+    SetName(element.GetStringAttribute("name", "", "nom"));
+    memberObjects.clear();
+
+    //Compatibility with GD <= 3.3
+    if ( element.HasChild("Objet") )
     {
-        SerializerElement & groupElement = element.GetChild(i);
-        gd::ObjectGroup objectGroup;
-
-        objectGroup.SetName(groupElement.GetStringAttribute("name", "", "nom"));
-
-        //Compatibility with GD <= 3.3
-        if ( groupElement.HasChild("Objet") )
-        {
-            for (std::size_t j = 0; j < groupElement.GetChildrenCount("Objet"); ++j)
-                objectGroup.AddObject(groupElement.GetChild("Objet", j).GetStringAttribute("nom"));
-        }
-        //End of compatibility code
-        else
-        {
-            SerializerElement & objectsElement = groupElement.GetChild("objects");
-            objectsElement.ConsiderAsArrayOf("object");
-            for (std::size_t j = 0; j < objectsElement.GetChildrenCount(); ++j)
-                objectGroup.AddObject(objectsElement.GetChild(j).GetStringAttribute("name"));
-        }
-
-        list.push_back( objectGroup );
+        for (std::size_t j = 0; j < element.GetChildrenCount("Objet"); ++j)
+            AddObject(element.GetChild("Objet", j).GetStringAttribute("nom"));
+    }
+    //End of compatibility code
+    else
+    {
+        SerializerElement & objectsElement = element.GetChild("objects");
+        objectsElement.ConsiderAsArrayOf("object");
+        for (std::size_t j = 0; j < objectsElement.GetChildrenCount(); ++j)
+            AddObject(objectsElement.GetChild(j).GetStringAttribute("name"));
     }
 }
 

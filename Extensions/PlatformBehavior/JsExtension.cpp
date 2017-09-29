@@ -33,12 +33,12 @@ public:
         DeclarePlatformBehaviorExtension(*this);
 
         GetBehaviorMetadata("PlatformBehavior::PlatformBehavior")
-            .SetIncludeFile("PlatformBehavior/platformruntimebehavior.js")
-            .AddIncludeFile("PlatformBehavior/platformerobjectruntimebehavior.js");
+            .SetIncludeFile("Extensions/PlatformBehavior/platformruntimebehavior.js")
+            .AddIncludeFile("Extensions/PlatformBehavior/platformerobjectruntimebehavior.js");
 
         GetBehaviorMetadata("PlatformBehavior::PlatformerObjectBehavior")
-            .SetIncludeFile("PlatformBehavior/platformruntimebehavior.js")
-            .AddIncludeFile("PlatformBehavior/platformerobjectruntimebehavior.js");
+            .SetIncludeFile("Extensions/PlatformBehavior/platformruntimebehavior.js")
+            .AddIncludeFile("Extensions/PlatformBehavior/platformerobjectruntimebehavior.js");
 
         {
 

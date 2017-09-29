@@ -177,7 +177,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("AddForceXY",
                    _("Add a force"),
-                   _("Add a force to an object. The object will move according to all forces it has."),
+                   _("Add a force to an object. The object will move according to all of the forces it has."),
                    _("Add to _PARAM0_ a force of _PARAM1_ p/s on X axis and _PARAM2_ p/s on Y axis"),
                    _("Movement"),
                    "res/actions/force24.png",
@@ -191,7 +191,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("AddForceAL",
                    _("Add a force (angle)"),
-                   _("Add a force to an object. The object will move according to all forces it has. This action creates the force using the specified angle and length."),
+                   _("Add a force to an object. The object will move according to all of the forces it has. This action creates the force using the specified angle and length."),
                    _("Add to _PARAM0_ a force, angle: _PARAM1_ degrees and length: _PARAM2_ pixels"),
                    _("Movement"),
                    "res/actions/force24.png",
@@ -221,8 +221,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .MarkAsAdvanced();
 
     obj.AddAction("AddForceTournePos",
-                   _("Add a force to move around an position"),
-                   _("Add a force to an object to make it rotate around a position.\nNote that the movement is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category \"Position\"."),
+                   _("Add a force to move around a position"),
+                   _("Add a force to an object to make it rotate around a position.\nNote that the movement is not precise, especially if the speed is high.\nTo position an object around a position more precisely, use the actions in the category \"Position\"."),
                    _("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ at _PARAM3_ deg/sec and _PARAM4_ pixels away"),
                    _("Movement"),
                    "res/actions/forceTourne24.png",
@@ -239,7 +239,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("Arreter",
                    _("Stop the object"),
-                   _("Stop the object by deleting all its forces."),
+                   _("Stop the object by deleting all of its forces."),
                    _("Stop the object _PARAM0_"),
                    _("Movement"),
                    "res/actions/arreter24.png",
@@ -263,7 +263,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("ChangePlan",
                    _("Z order"),
-                   _("Modify the z order of an object"),
+                   _("Modify the Z-order of an object"),
                    _("Do _PARAM1__PARAM2_ to z-Order of _PARAM0_"),
                    _("Z order"),
                    "res/actions/planicon24.png",
@@ -276,14 +276,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("ChangeLayer",
                    _("Layer"),
-                   _("Change the layer where is the object."),
+                   _("Move the object to a different layer."),
                    _("Put _PARAM0_ on the layer _PARAM1_"),
                    _("Layers and cameras"),
                    "res/actions/layer24.png",
                    "res/actions/layer.png")
 
         .AddParameter("object", _("Object"))
-        .AddParameter("layer", _("Put on the layer (base layer if empty)")).SetDefaultValue("\"\"")
+        .AddParameter("layer", _("Move it to this layer (base layer if empty)")).SetDefaultValue("\"\"")
         .MarkAsAdvanced();
 
     obj.AddAction("ModVarObjet",
@@ -374,7 +374,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddCondition("Angle",
                    _("Angle"),
-                   _("Compare angle of the specified object."),
+                   _("Compare the angle of the specified object."),
                    _("Angle of _PARAM0_ is _PARAM1__PARAM2_ deg."),
                    _("Angle"),
                    "res/conditions/direction24.png",
@@ -388,7 +388,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddCondition("Plan",
                    _("Compare Z order"),
-                   _("Compare the z-order of the specified object."),
+                   _("Compare the Z-order of the specified object."),
                    _("Z Order of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Z order"),
                    "res/conditions/planicon24.png",
@@ -402,7 +402,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddCondition("Layer",
                    _("Compare layer"),
-                   _("Test if the object is on the specified layer."),
+                   _("Check if the object is on the specified layer."),
                    _("_PARAM0_ is on layer _PARAM1_"),
                    _("Layer"),
                    "res/conditions/layer24.png",
@@ -414,7 +414,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddCondition("Visible",
                    _("Visibility of an object"),
-                   _("Test if an object is not hidden."),
+                   _("Check if an object is visible."),
                    _("The object _PARAM0_ is visible"),
                    _("Visibility"),
                    "res/conditions/visibilite24.png",
@@ -425,7 +425,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddCondition("Invisible",
                    _("Invisibility of an object"),
-                   _("Test if an object is hidden."),
+                   _("Check if an object is hidden."),
                    _("_PARAM0_ is hidden"),
                    _("Visibility"),
                    "res/conditions/visibilite24.png",
@@ -436,7 +436,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddCondition("Arret",
                    _("Object is stopped"),
-                   _("Test if an object does not move"),
+                   _("Check if an object is not moving"),
                    _("_PARAM0_ is stopped"),
                    _("Movement"),
                    "res/conditions/arret24.png",
@@ -460,7 +460,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .SetManipulatedType("number");
 
     obj.AddCondition("AngleOfDisplacement",
-                   _("Angle of moving"),
+                   _("Angle of movement"),
                    _("Compare the angle of displacement of an object"),
                    _("Angle of displacement of _PARAM0_ is _PARAM1_ (tolerance : _PARAM2_ degrees)"),
                    _("Movement"),
@@ -502,7 +502,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddCondition("VarObjetDef",
                    _("Variable defined"),
-                   _("Test "),
+                   _("Check if the variable is defined."),
                    _("Variable _PARAM1 of _PARAM0_ is defined"),
                    _("Variables"),
                    "res/conditions/var24.png",
@@ -553,7 +553,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("AddForceTourne",
                    _("Add a force to move around an object"),
-                   _("Add a force to an object to make it rotate around another.\nNote that the movement is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in category \"Position\"."),
+                   _("Add a force to an object to make it rotate around another.\nNote that the movement is not precise, especially if the speed is high.\nTo position an object around a position more precisely, use the actions in category \"Position\"."),
                    _("Rotate _PARAM0_ around _PARAM1_ at _PARAM2_ deg/sec and _PARAM3_ pixels away"),
                    _("Movement"),
                    "res/actions/forceTourne24.png",
@@ -585,7 +585,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     obj.AddAction("Rebondir",
                    _("Move an object away from another"),
                    _("Move an object away from another, using forces."),
-                   _("Move _PARAM0_ away of _PARAM1_ (only _PARAM0_ will move)"),
+                   _("Move _PARAM0_ away from _PARAM1_ (only _PARAM0_ will move)"),
                    _("Movement"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")
@@ -599,7 +599,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     obj.AddAction("Ecarter",
                    _("Move an object away from another"),
                    _("Move an object away from another without using forces."),
-                   _("Move _PARAM0_ away of _PARAM2_ (only _PARAM0_ will move)"),
+                   _("Move _PARAM0_ away from _PARAM2_ (only _PARAM0_ will move)"),
                    _("Position"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")
@@ -611,8 +611,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     obj.AddAction("SeparateFromObjects",
                    _("Separate two objects"),
-                   _("Move an object away from another using their collision masks.\nBe sure to call this action on a reasonable number of objects so as\nnot to slow down the game."),
-                   _("Move _PARAM0_ away of _PARAM1_ (only _PARAM0_ will move)"),
+                   _("Move an object away from another using their collision masks.\nBe sure to call this action on a reasonable number of objects\nto avoid slowing down the game."),
+                   _("Move _PARAM0_ away from _PARAM1_ (only _PARAM0_ will move)"),
                    _("Position"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")
@@ -704,13 +704,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     extension.AddAction("CreateByName",
                    _("Create an object from its name"),
-                   _("Among the objects of the specified group, the action will create the object with the specified name."),
+                   _("Among the objects of the specified group, this action will create the object with the specified name."),
                    _("Among objects _PARAM1_, create object named _PARAM2_ at position _PARAM3_;_PARAM4_"),
                    _("Objects"),
                    "res/actions/create24.png",
                    "res/actions/create.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectListWithoutPicking", _("Groups containing objects which can be created by the action"))
+        .AddParameter("objectListWithoutPicking", _("Groups containing objects that can be created by the action"))
         .AddParameter("string", _("Text representing the name of the object to create"))
         .AddParameter("expression", _("X position"))
         .AddParameter("expression", _("Y position"))
@@ -730,7 +730,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     extension.AddAction("AjoutHasard",
                    _("Pick a random object"),
-                   _("Pick only one object with this name among all"),
+                   _("Pick only one object with this name, among all"),
                    _("Pick a random _PARAM1_"),
                    _("Objects"),
                    "res/actions/ajouthasard24.png",
@@ -740,9 +740,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .MarkAsSimple();
 
     extension.AddAction("MoveObjects",
-                   _("Apply objects movement"),
-                   _("Moves the objects according to the forces they have. GDevelop call this action at the end of the events by default."),
-                   _("Apply objects movement"),
+                   _("Apply movement to all objects"),
+                   _("Moves all objects according to the forces they have. GDevelop calls this action at the end of the events by default."),
+                   _("Apply movement to all objects"),
                    _("Movement"),
                    "res/actions/doMove24.png",
                    "res/actions/doMove.png")
@@ -788,7 +788,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     extension.AddCondition("AjoutHasard",
                    _("Pick a random object"),
-                   _("Pick only one object with this name among all"),
+                   _("Pick only one object with this name, among all"),
                    _("Pick a random _PARAM1_"),
                    _("Objects"),
                    "res/conditions/ajouthasard24.png",
@@ -825,7 +825,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     extension.AddCondition("CollisionNP", //"CollisionNP" cames from an old condition to test collision between two sprites non precisely.
                    _("Collision"),
-                   _("Test the collision between two objects using their collision mask.\nNote that some objects may not have a collision mask.\nSome others, like Sprite, provide also more precise collision conditions."),
+                   _("Test the collision between two objects using their collision masks.\nNote that some objects may not have collision masks.\nSome others, like Sprite objects, also provide more precise collision conditions."),
                    _("_PARAM0_ is in collision with _PARAM1_"),
                    _("Collision"),
                    "res/conditions/collision24.png",
@@ -837,7 +837,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     extension.AddCondition("EstTourne",
                       _("An object is turned toward another"),
-                      _("Test if an object is turned toward another"),
+                      _("Check if an object is turned toward another"),
                       _("_PARAM0_ is rotated towards _PARAM1_"),
                       _("Angle"),
                       "res/conditions/estTourne24.png",

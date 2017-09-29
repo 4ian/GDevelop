@@ -27,8 +27,8 @@ public:
     {
         DeclareDraggableBehaviorExtension(*this);
 
-        GetBehaviorMetadata("DraggableBehavior::Draggable").SetIncludeFile("DraggableBehavior/draggableruntimebehavior.js");
-        GetAllConditionsForBehavior("DraggableBehavior::Draggable")["DraggableBehavior::Dragged"].SetFunctionName("isDragged").SetIncludeFile("DraggableBehavior/draggableruntimebehavior.js");
+        GetBehaviorMetadata("DraggableBehavior::Draggable").SetIncludeFile("Extensions/DraggableBehavior/draggableruntimebehavior.js");
+        GetAllConditionsForBehavior("DraggableBehavior::Draggable")["DraggableBehavior::Dragged"].SetFunctionName("isDragged").SetIncludeFile("Extensions/DraggableBehavior/draggableruntimebehavior.js");
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };

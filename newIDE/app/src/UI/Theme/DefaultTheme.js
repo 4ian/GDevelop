@@ -47,4 +47,7 @@ export default getMuiTheme({
     height: 32,
     closeButtonWidth: 24,
   },
+  snackbar: {
+    actionColor: gdevelopLightBlue,
+  },
 });

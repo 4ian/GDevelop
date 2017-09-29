@@ -56,15 +56,15 @@ export default class VariablesEditorDialog extends Component {
       (
         <FlatButton
           label="Cancel"
-          primary={true}
+          primary
           onTouchTap={this.props.onCancel}
         />
       ),
       (
         <FlatButton
           label="Apply"
-          primary={true}
-          keyboardFocused={true}
+          primary
+          keyboardFocused
           onTouchTap={this._onApply}
         />
       ),
@@ -74,13 +74,15 @@ export default class VariablesEditorDialog extends Component {
       <Dialog
         noMargin
         actions={actions}
-        modal={true}
+        modal
         open={this.props.open}
         onRequestClose={this.props.onCancel}
-        autoScrollBodyContent={true}
+        autoScrollBodyContent
       >
         <VariablesList
           variablesContainer={this.state.editedVariablesContainer}
+          emptyExplanationMessage={this.props.emptyExplanationMessage}
+          emptyExplanationSecondMessage={this.props.emptyExplanationSecondMessage}
         />
       </Dialog>
     );

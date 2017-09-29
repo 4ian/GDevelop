@@ -38,6 +38,7 @@ export default class MainFrameToolbar extends Component {
               disabled={!this.props.hasProject}
             />}
           {this.props.showProjectIcons &&
+            this.props.canOpenProject &&
             <ToolbarIcon
               onClick={this.props.openProject}
               src="res/ribbon_default/open32.png"
@@ -48,10 +49,6 @@ export default class MainFrameToolbar extends Component {
                 <ToolbarIcon src="res/ribbon_default/bug32.png" />
               }
               menuTemplate={[
-                {
-                  label: 'Load builtin game',
-                  click: () => this.props.loadBuiltinGame(),
-                },
                 {
                   label: 'Request update from external editor',
                   click: () => this.props.requestUpdate(),

@@ -93,3 +93,13 @@ export const sendNewGameCreated = templateName => {
     templateName,
   });
 };
+
+export const sendErrorMessage = (errorMessage, type, rawError) => {
+  if (isDev) return;
+
+  client.recordEvent('error_message', {
+    message: errorMessage,
+    type,
+    rawError,
+  });
+};

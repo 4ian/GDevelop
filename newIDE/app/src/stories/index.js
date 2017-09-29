@@ -6,7 +6,7 @@ import { linkTo } from '@storybook/addon-links';
 
 import Welcome from './Welcome';
 
-import StartPage from '../MainFrame/StartPage';
+import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import LocalCreateDialog from '../ProjectCreation/LocalCreateDialog';
 import { Tabs, Tab } from '../UI/Tabs';
@@ -15,21 +15,48 @@ import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
 import LocalMobileExport from '../Export/LocalMobileExport';
 import LocalS3Export from '../Export/LocalS3Export';
-import Paper from 'material-ui/Paper';
+import TextEditor from '../ObjectEditor/Editors/TextEditor';
+import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
+import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
+import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
+import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
+import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
+import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
+import ObjectsList from '../ObjectsList';
+import InstancePropertiesEditor
+  from '../InstancesEditor/InstancePropertiesEditor';
+import SerializedObjectDisplay from './SerializedObjectDisplay';
+import EventsTree from '../EventsSheet/EventsTree';
+import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
+import InstructionEditor from '../EventsSheet/InstructionEditor';
+import EventsSheet from '../EventsSheet';
+import BehaviorsEditor from '../BehaviorsEditor';
+import ObjectsGroupEditor from '../ObjectsGroupEditor';
+import ObjectsGroupsList from '../ObjectsGroupsList';
 import muiDecorator from './MuiDecorator';
+import paperDecorator from './PaperDecorator';
+import DragDropContextProvider
+  from '../Utils/DragDropHelpers/DragDropContextProvider';
+import {
+  project,
+  shapePainterObject,
+  adMobObject,
+  tiledSpriteObject,
+  panelSpriteObject,
+  textObject,
+  spriteObject,
+  testLayout,
+  testLayoutInstance1,
+  testInstruction,
+  spriteObjectWithBehaviors,
+  group2,
+} from './TestProject';
 
-const fakeProject = {
-  getLastCompilationDirectory: () => '/Fake/Directory'
-}
+import injectTapEventPlugin from 'react-tap-event-plugin';
 
-const fakeGD = {
-  VersionWrapper: {
-    fullString: () => "Fake",
-    major: () => "Fake",
-    minor: () => "Fake",
-  },
-};
-window.gd = fakeGD;
+// Needed for onTouchTap
+// http://stackoverflow.com/a/34015469/988941
+injectTapEventPlugin();
 
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
@@ -74,37 +101,30 @@ storiesOf('Tabs', module)
   ));
 
 storiesOf('LocalExport', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
-      <LocalExport open project={fakeProject} onClose={action('close')} />
-    </Paper>
+    <LocalExport open project={project} onClose={action('close')} />
   ));
 
 storiesOf('LocalS3Export', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Paper>
-      <LocalS3Export open project={fakeProject} onClose={action('close')} />
-    </Paper>
+    <LocalS3Export open project={project} onClose={action('close')} />
   ));
 
 storiesOf('LocalMobileExport', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <Paper>
-      <LocalMobileExport />
-    </Paper>
-  ));
+  .add('default', () => <LocalMobileExport />);
 
 storiesOf('LocalFolderPicker', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <Paper>
-      <LocalFolderPicker floatingLabelText="Export folder" />
-    </Paper>
-  )).add('full width', () => (
-      <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
+  .add('default', () => <LocalFolderPicker floatingLabelText="Export folder" />)
+  .add('full width', () => (
+    <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
   ));
 
 storiesOf('StartPage', module)
@@ -115,11 +135,173 @@ storiesOf('AboutDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <AboutDialog open />);
 
-
 storiesOf('LocalCreateDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCreateDialog open />);
 
+storiesOf('LayoutChooserDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <LayoutChooserDialog open project={project}/>);
+
 storiesOf('DragHandle', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
+
+storiesOf('EventsTree', module).add('default', () => (
+  <DragDropContextProvider>
+    <div className="gd-events-sheet">
+      <EventsTree events={testLayout.getEvents()} selectedEvents={[]} selectedInstructions={[]} />
+    </div>
+  </DragDropContextProvider>
+));
+
+storiesOf('EventsSheet', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <DragDropContextProvider>
+      <EventsSheet
+        project={project}
+        layout={testLayout}
+        events={testLayout.getEvents()}
+      />
+    </DragDropContextProvider>
+  ));
+
+storiesOf('InstructionEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <InstructionEditor
+      project={project}
+      layout={testLayout}
+      isCondition
+      instruction={testInstruction}
+    />
+  ));
+
+storiesOf('TextEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={textObject}>
+      <TextEditor object={textObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('TiledSpriteEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={tiledSpriteObject}>
+      <TiledSpriteEditor object={tiledSpriteObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('PanelSpriteEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={panelSpriteObject}>
+      <PanelSpriteEditor object={panelSpriteObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('SpriteEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={spriteObject}>
+      <SpriteEditor object={spriteObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('ShapePainterEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={shapePainterObject}>
+      <ShapePainterEditor object={shapePainterObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('AdMobEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={adMobObject}>
+      <AdMobEditor object={adMobObject} project={project} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('EmptyEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <EmptyEditor />);
+
+storiesOf('ObjectsList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <div style={{ height: 250 }}>
+        <ObjectsList
+          getThumbnail={() => 'res/unknown32.png'}
+          project={project}
+          objectsContainer={testLayout}
+          onEditObject={action('On edit object')}
+        />
+      </div>
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('InstancePropertiesEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <InstancePropertiesEditor
+        project={project}
+        layout={testLayout}
+        instances={[testLayoutInstance1]}
+      />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('ObjectsGroupEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ObjectsGroupEditor
+      project={project}
+      layout={testLayout}
+      group={group2}
+    />
+  ));
+
+storiesOf('ObjectsGroupsList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <div style={{ height: 250 }}>
+        <ObjectsGroupsList
+          project={project}
+          objectsContainer={testLayout}
+          onEditGroup={() => {}}
+        />
+      </div>
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('BehaviorsEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={spriteObjectWithBehaviors}>
+      <BehaviorsEditor
+        project={project}
+        object={spriteObjectWithBehaviors}
+      />
+    </SerializedObjectDisplay>
+  ));

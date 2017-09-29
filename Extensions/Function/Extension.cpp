@@ -36,7 +36,7 @@ public:
     {
         SetExtensionInformation("Function",
                               _("Function events"),
-                              _("Extension allowing to use events behaving as functions."),
+                              _("This Extension allows you to use events that behave like functions."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -104,7 +104,7 @@ public:
 
         AddEvent("Function",
             _("Function"),
-            _("Function event : An event which is launched only thanks to action \"Launch a function\""),
+            _("Function event : An event that can only be launched by the action named \"Launch a function\""),
             "",
             "res/function.png",
             std::make_shared<FunctionEvent>())
@@ -166,7 +166,7 @@ public:
 
         AddStrExpression("Parameter",
             _("Parameter of the current function"),
-            _("Return the text contained in a parameter of the currently launched function"),
+            _("Return the text contained in a parameter of the currently-launched function"),
             _("Function"),
             "res/function.png")
             .AddParameter("expression", _("Index of the parameter (Parameters start at 0!)"))

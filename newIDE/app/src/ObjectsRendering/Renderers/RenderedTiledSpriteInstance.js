@@ -15,7 +15,7 @@ function RenderedTiledSpriteInstance(
   instance,
   associatedObject,
   pixiContainer,
-  resourcesLoader
+  pixiResourcesLoader
 ) {
   RenderedInstance.call(
     this,
@@ -23,13 +23,15 @@ function RenderedTiledSpriteInstance(
     layout,
     instance,
     associatedObject,
-    pixiContainer
+    pixiContainer,
+    pixiResourcesLoader
   );
 
   //Setup the PIXI object:
   var tiledSprite = gd.asTiledSpriteObject(associatedObject);
+  this._texture = tiledSprite.getTexture();
   this._pixiObject = new PIXI.extras.TilingSprite(
-    resourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
+    this._pixiResourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
     tiledSprite.getWidth(),
     tiledSprite.getHeight()
   );
@@ -53,17 +55,25 @@ RenderedTiledSpriteInstance.getThumbnail = function(
 ) {
   var tiledSprite = gd.asTiledSpriteObject(object);
 
-  return resourcesLoader.getFilename(project, tiledSprite.getTexture());
+  return resourcesLoader.getResourceFullFilename(project, tiledSprite.getTexture());
 };
 
 RenderedTiledSpriteInstance.prototype.update = function() {
+  var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
   if (this._instance.hasCustomSize()) {
     this._pixiObject.width = this._instance.getCustomWidth();
     this._pixiObject.height = this._instance.getCustomHeight();
   } else {
-    var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
     this._pixiObject.width = tiledSprite.getWidth();
     this._pixiObject.height = tiledSprite.getHeight();
+  }
+
+  if (this._texture !== tiledSprite.getTexture()) {
+    this._texture = tiledSprite.getTexture();
+    this._pixiObject.texture = this._pixiResourcesLoader.getPIXITexture(
+      this._project,
+      tiledSprite.getTexture()
+    );
   }
 
   this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;

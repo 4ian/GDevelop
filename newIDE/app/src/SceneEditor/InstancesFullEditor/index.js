@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 
 import ObjectsList from '../../ObjectsList';
+import ObjectsGroupsList from '../../ObjectsGroupsList';
+import ObjectsRenderingService
+  from '../../ObjectsRendering/ObjectsRenderingService';
 import FullSizeInstancesEditor
   from '../../InstancesEditor/FullSizeInstancesEditor';
 import InstancePropertiesEditor
@@ -9,6 +12,8 @@ import InstancesList from '../../InstancesEditor/InstancesList';
 import LayersList from '../../LayersList';
 import LayerRemoveDialog from '../../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
+import ObjectEditorDialog from '../../ObjectEditor/ObjectEditorDialog';
+import ObjectsGroupEditorDialog from '../../ObjectsGroupEditor/ObjectsGroupEditorDialog';
 import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
@@ -22,7 +27,7 @@ import Clipboard from '../../Utils/Clipboard';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import EditorMosaic from '../../UI/EditorMosaic';
+import EditorMosaic, { MosaicWindow } from '../../UI/EditorMosaic';
 import EditorBar from '../../UI/EditorBar';
 import InfoBar from '../../UI/Messages/InfoBar';
 import ContextMenu from '../../UI/Menu/ContextMenu';
@@ -37,9 +42,8 @@ import {
 const gd = global.gd;
 
 export default class InstancesFullEditor extends Component {
-
   static defaultProps = {
-    showAddObjectButton: true,
+    showObjectsList: true,
     setToolbar: () => {},
   };
 
@@ -57,8 +61,11 @@ export default class InstancesFullEditor extends Component {
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
 
+      editedObject: null,
       variablesEditedInstance: null,
       selectedObjectName: null,
+
+      editedGroup: null,
 
       uiSettings: props.initialUiSettings,
       history: getHistoryInitialState(props.initialInstances),
@@ -78,9 +85,11 @@ export default class InstancesFullEditor extends Component {
       <Toolbar
         showPreviewButton={this.props.showPreviewButton}
         onPreview={this.props.onPreview}
-        showAddObjectButton={this.props.showAddObjectButton}
+        showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
-        toggleObjectsList={this.toggleObjectsList}
+        openObjectsList={this.openObjectsList}
+        openObjectsGroupsList={this.openObjectsGroupsList}
+        openProperties={this.openProperties}
         deleteSelection={this.deleteSelection}
         toggleInstancesList={this.toggleInstancesList}
         toggleLayersList={this.toggleLayersList}
@@ -92,6 +101,7 @@ export default class InstancesFullEditor extends Component {
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
         redo={this.redo}
+        onOpenSettings={this.openSceneProperties}
       />
     );
   }
@@ -109,8 +119,27 @@ export default class InstancesFullEditor extends Component {
     }
   }
 
-  toggleObjectsList = () => {
-    this.setState({ objectsListOpen: !this.state.objectsListOpen });
+  openObjectsList = () => {
+    if (!this.editorMosaic) return;
+    if (!this.editorMosaic.openEditor('objects-list')) {
+      this.setState({
+        showObjectsListInfoBar: true,
+      });
+    }
+  };
+
+  openProperties = () => {
+    if (!this.editorMosaic) return;
+    if (!this.editorMosaic.openEditor('properties')) {
+      this.setState({
+        showPropertiesInfoBar: true,
+      });
+    }
+  };
+
+  openObjectsGroupsList = () => {
+    if (!this.editorMosaic) return;
+    this.editorMosaic.openEditor('objects-groups-list');
   };
 
   toggleInstancesList = () => {
@@ -150,6 +179,18 @@ export default class InstancesFullEditor extends Component {
 
   editInstanceVariables = instance => {
     this.setState({ variablesEditedInstance: instance });
+  };
+
+  editLayoutVariables = (open = true) => {
+    this.setState({ layoutVariablesDialogOpen: open });
+  };
+
+  editObject = object => {
+    this.setState({ editedObject: object });
+  };
+
+  editGroup = group => {
+    this.setState({ editedGroup: group });
   };
 
   setUiSettings = uiSettings => {
@@ -282,6 +323,63 @@ export default class InstancesFullEditor extends Component {
     done(true);
   };
 
+  _onDeleteObject = (objectWithScope, done) => {
+    const { object, global } = objectWithScope;
+    const { project, layout } = this.props;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      'Do you want to remove all references to this object in groups and events (actions and conditions using the object)?'
+    );
+
+    if (global) {
+      gd.WholeProjectRefactorer.globalObjectRemoved(
+        project,
+        object.getName(),
+        !!answer
+      );
+    } else {
+      gd.WholeProjectRefactorer.objectRemovedInLayout(
+        project,
+        layout,
+        object.getName(),
+        !!answer
+      );
+    }
+    done(true);
+  };
+
+  _onRenameObject = (objectWithScope, newName, done) => {
+    const { object, global } = objectWithScope;
+    const { project, layout } = this.props;
+
+    if (global) {
+      gd.WholeProjectRefactorer.globalObjectRenamed(
+        project,
+        object.getName(),
+        newName
+      );
+    } else {
+      gd.WholeProjectRefactorer.objectRenamedInLayout(
+        project,
+        layout,
+        object.getName(),
+        newName
+      );
+    }
+    done(true);
+  };
+
+  _onDeleteGroup = (groupWithScope, done) => {
+    //TODO
+    done(true);
+  };
+
+  _onRenameGroup = (groupWithScope, newName, done) => {
+    //TODO
+    done(true);
+  };
+
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.map(instance =>
@@ -345,18 +443,20 @@ export default class InstancesFullEditor extends Component {
   };
 
   render() {
-    const { project, layout, initialInstances } = this.props;
+    const { project, layout, initialInstances, resourceSources } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
     const editors = {
       properties: (
-        <InstancePropertiesEditor
-          project={project}
-          layout={layout}
-          instances={selectedInstances}
-          onInstancesModified={this._onInstancesModified}
-          editInstanceVariables={this.editInstanceVariables}
-        />
+        <MosaicWindow title="Properties">
+          <InstancePropertiesEditor
+            project={project}
+            layout={layout}
+            instances={selectedInstances}
+            onInstancesModified={this._onInstancesModified}
+            editInstanceVariables={this.editInstanceVariables}
+          />
+        </MosaicWindow>
       ),
       'instances-editor': (
         <FullSizeInstancesEditor
@@ -374,35 +474,62 @@ export default class InstancesFullEditor extends Component {
           editorRef={editor => this.editor = editor}
         />
       ),
+      'objects-list': (
+        <MosaicWindow title="Objects">
+          <ObjectsList
+            getThumbnail={ObjectsRenderingService.getThumbnail.bind(
+              ObjectsRenderingService
+            )}
+            project={project}
+            objectsContainer={layout}
+            selectedObjectName={this.state.selectedObjectName}
+            onObjectSelected={this._onObjectSelected}
+            onEditObject={this.props.onEditObject || this.editObject}
+            onDeleteObject={this._onDeleteObject}
+            onRenameObject={this._onRenameObject}
+          />
+        </MosaicWindow>
+      ),
+      'objects-groups-list': (
+        <MosaicWindow title="Objects groups">
+          <ObjectsGroupsList
+            project={project}
+            objectsContainer={layout}
+            onEditGroup={this.editGroup}
+            onDeleteGroup={this._onDeleteGroup}
+            onRenameGroup={this._onRenameGroup}
+          />
+        </MosaicWindow>
+      ),
     };
 
     return (
       <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
         <EditorMosaic
           editors={editors}
-          initialEditorNames={['properties', 'instances-editor']}
+          ref={editorMosaic => this.editorMosaic = editorMosaic}
+          initialEditorNames={
+            this.props.showObjectsList
+              ? ['properties', 'instances-editor', 'objects-list']
+              : ['properties', 'instances-editor']
+          }
         />
-        <Drawer
-          open={this.state.objectsListOpen}
-          openSecondary={true}
-          containerStyle={{ overflow: 'hidden' }}
-        >
-          <EditorBar
-            title="Objects"
-            iconElementLeft={
-              <IconButton onClick={this.toggleObjectsList}>
-                <NavigationClose />
-              </IconButton>
-            }
-          />
-          <ObjectsList
-            freezeUpdate={!this.state.objectsListOpen}
-            project={project}
-            objectsContainer={layout}
-            onObjectSelected={this._onObjectSelected}
-            onEditObject={this.props.onEditObject}
-          />
-        </Drawer>
+        <ObjectEditorDialog
+          open={!!this.state.editedObject}
+          object={this.state.editedObject}
+          project={project}
+          resourceSources={resourceSources}
+          onCancel={() => this.editObject(null)}
+          onApply={() => this.editObject(null)}
+        />
+        <ObjectsGroupEditorDialog
+          open={!!this.state.editedGroup}
+          group={this.state.editedGroup}
+          layout={layout}
+          project={project}
+          onCancel={() => this.editGroup(null)}
+          onApply={() => this.editGroup(null)}
+        />
         <Drawer
           open={this.state.instancesListOpen}
           width={500}
@@ -448,6 +575,14 @@ export default class InstancesFullEditor extends Component {
           message="Touch/click on the scene to add the object"
           show={!!this.state.selectedObjectName}
         />
+        <InfoBar
+          message="Objects panel is already opened: Use it to add and edit objects."
+          show={!!this.state.showObjectsListInfoBar}
+        />
+        <InfoBar
+          message="Properties panel is already opened"
+          show={!!this.state.showPropertiesInfoBar}
+        />
         <SetupGridDialog
           open={this.state.setupGridOpen}
           gridOptions={this.state.uiSettings}
@@ -465,6 +600,7 @@ export default class InstancesFullEditor extends Component {
           }
           onCancel={() => this.editInstanceVariables(null)}
           onApply={() => this.editInstanceVariables(null)}
+          emptyExplanationMessage="Instance variables will override the default values of the variables of the object."
         />
         <LayerRemoveDialog
           open={!!this.state.layerRemoveDialogOpen}
@@ -477,6 +613,16 @@ export default class InstancesFullEditor extends Component {
           layout={layout}
           onClose={() => this.openSceneProperties(false)}
           onApply={() => this.openSceneProperties(false)}
+          onEditVariables={() => this.editLayoutVariables(true)}
+          onOpenMoreSettings={this.props.onOpenMoreSettings}
+        />
+        <VariablesEditorDialog
+          open={!!this.state.layoutVariablesDialogOpen}
+          variablesContainer={layout.getVariables()}
+          onCancel={() => this.editLayoutVariables(false)}
+          onApply={() => this.editLayoutVariables(false)}
+          emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
+          emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
         />
         <ContextMenu
           ref={contextMenu => this.contextMenu = contextMenu}

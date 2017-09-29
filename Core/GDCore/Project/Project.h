@@ -12,11 +12,11 @@
 class wxPropertyGrid;
 class wxPropertyGridEvent;
 class TiXmlElement;
-#include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/ClassWithObjects.h"
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/ObjectGroupsContainer.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
@@ -560,14 +560,14 @@ public:
 
     #if defined(GD_IDE_ONLY)
     /**
-     * \brief Return a reference to the vector containing the project's objects groups.
+     * \brief Return a reference to the project's objects groups.
      */
-    std::vector <ObjectGroup> & GetObjectGroups() { return objectGroups; }
+    ObjectGroupsContainer & GetObjectGroups() { return objectGroups; }
 
     /**
-     * \brief Return a const reference to the vector containing the project's objects groups.
+     * \brief Return a const reference to the project's objects groups.
      */
-    const std::vector <ObjectGroup> & GetObjectGroups() const { return objectGroups; }
+    const ObjectGroupsContainer & GetObjectGroups() const { return objectGroups; }
     #endif
 
     ///@}
@@ -734,7 +734,7 @@ private:
     #if defined(GD_IDE_ONLY)
     bool                                                useExternalSourceFiles; ///< True if game used external source files.
     std::vector < std::unique_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
-    std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
+    gd::ObjectGroupsContainer                            objectGroups; ///< Global objects groups
     gd::String                                         author; ///< Game author name
     gd::String                                         packageName; ///< Game package name
     bool                                                folderProject; ///< True if folder project, false if single file project.

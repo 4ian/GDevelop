@@ -32,7 +32,7 @@ public:
     virtual gd::String GetName() const { return "GDevelop JS platform"; }
     virtual gd::String GetFullName() const { return _("HTML5 (Web and Android games)"); }
     virtual gd::String GetSubtitle() const { return _("HTML5 and javascript based games for web browsers."); }
-    virtual gd::String GetDescription() const { return _("2D games which can be played in a web browser or exported to Android with third-party tools."); }
+    virtual gd::String GetDescription() const { return _("Enables the creation of 2D games that can be played in web browsers. These can also be exported to Android with third-party tools."); }
     virtual gd::String GetIcon() const { return "JsPlatform/icon32.png"; }
 
     /** \brief The name of the function searched in an extension file to create the extension

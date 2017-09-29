@@ -111,6 +111,19 @@ public:
     virtual std::vector < gd::Expression* > GetAllExpressions() { std::vector < gd::Expression* > noExpr; return noExpr;};
     virtual std::vector < const gd::Expression* > GetAllExpressions() const { std::vector < const gd::Expression* > noExpr; return noExpr;};
 
+    /**
+     * \brief Returns the dependencies on source files of the project.
+     * \note Default implementation returns an empty list of dependencies. This is fine for most events that
+     * are not related to adding custom user source code.
+     */
+    virtual const std::vector<gd::String> & GetSourceFileDependencies() const { return emptyDependencies; };
+
+    /**
+     * \brief Returns the name of the source file associated with the event
+     * \note Default implementation returns an empty string. This is fine for most events that
+     * are not related to adding custom user source code.
+     */
+    virtual const gd::String & GetAssociatedGDManagedSourceFile(gd::Project & project) const { return emptySourceFile; };
     ///@}
 
     /** \name Code generation
@@ -268,6 +281,8 @@ private:
     gd::String      type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
 
     static gd::EventsList badSubEvents;
+    static std::vector< gd::String > emptyDependencies;
+    static gd::String emptySourceFile;
 };
 
 /**

@@ -156,6 +156,8 @@ gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.setTexture = function(textur
     this._updateSpritesAndTexturesSize();
     this._updateLocalPositions();
     this.updatePosition();
+    this._spritesContainer.pivot.x = this._object._width / 2;
+    this._spritesContainer.pivot.y = this._object._height / 2;
 };
 
 gdjs.PanelSpriteRuntimeObjectPixiRenderer.prototype.updateWidth = function() {

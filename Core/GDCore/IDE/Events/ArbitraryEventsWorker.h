@@ -36,7 +36,7 @@ public:
 
 private:
     void VisitEventList(gd::EventsList & events);
-    void VisitEvent(gd::BaseEvent & event);
+    bool VisitEvent(gd::BaseEvent & event);
     void VisitInstructionList(gd::InstructionsList & instructions, bool areConditions);
     bool VisitInstruction(gd::Instruction & instruction, bool isCondition);
 
@@ -47,8 +47,9 @@ private:
 
     /**
      * Called to do some work on an event
+     * \return true if the instruction must be deleted from the events list, false otherwise (default).
      */
-    virtual void DoVisitEvent(gd::BaseEvent & event) {};
+    virtual bool DoVisitEvent(gd::BaseEvent & event) { return false; };
 
     /**
      * Called to do some work on an instruction list

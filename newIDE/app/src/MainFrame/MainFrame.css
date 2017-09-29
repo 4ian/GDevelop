@@ -44,8 +44,9 @@ a[href^="ftp://"] {
 }
 
 /* Used for react-sortable-hoc SortableContainer, to make sure the
- * dragged element is visible (and not hidden behind a drawer for example)
+ * dragged element is visible (and not hidden behind a drawer or dialog)
  */
 .sortable-helper {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif; /* Font from the theme*/
   z-index: 9999;
 }

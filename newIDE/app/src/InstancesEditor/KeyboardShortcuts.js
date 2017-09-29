@@ -7,6 +7,7 @@ const DOWN_KEY = 40;
 const BACKSPACE_KEY = 8;
 const DELETE_KEY = 46;
 
+// TODO: This is similar to EventsSheet/KeyboardShortcuts.js and could be merged
 export default class KeyboardShortcuts {
   constructor({ domElement, onDelete, onMove }) {
     this.domElement = domElement;

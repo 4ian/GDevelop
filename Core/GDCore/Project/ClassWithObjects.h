@@ -106,6 +106,11 @@ public:
     void RemoveObject(const gd::String & name);
 
     /**
+     * Change the position of the specified object.
+     */
+    void MoveObject(std::size_t oldIndex, std::size_t newIndex);
+
+    /**
      * \brief Swap the position of the specified objects.
      */
     void SwapObjects(std::size_t firstObjectIndex, std::size_t secondObjectIndex);

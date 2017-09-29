@@ -150,6 +150,15 @@ bool InitialInstancesContainer::SomeInstancesAreOnLayer(const gd::String & layer
     );
 }
 
+bool InitialInstancesContainer::HasInstancesOfObject(const gd::String & objectName)
+{
+    return std::any_of(
+        initialInstances.begin(),
+        initialInstances.end(),
+        [&objectName](const InitialInstance & currentInstance) { return currentInstance.GetObjectName() == objectName; }
+    );
+}
+
 void InitialInstancesContainer::Create(const InitialInstancesContainer & source)
 {
     try

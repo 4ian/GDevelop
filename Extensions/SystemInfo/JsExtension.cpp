@@ -25,7 +25,7 @@ public:
     {
         DeclareSystemInfoExtension(*this);
 
-        GetAllConditions()["SystemInfo::IsMobile"].codeExtraInformation.SetIncludeFile("SystemInfo/systeminfotools.js")
+        GetAllConditions()["SystemInfo::IsMobile"].codeExtraInformation.SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
             .SetFunctionName("gdjs.evtTools.systemInfo.isMobile");
 
         StripUnimplementedInstructionsAndExpressions();

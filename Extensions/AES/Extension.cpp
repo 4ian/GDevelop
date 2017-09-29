@@ -21,16 +21,16 @@ public:
     {
         SetExtensionInformation("AES",
                               _("AES encryption algorithm"),
-                              _("Extension to encrypt files with AES algorithm."),
+                              _("Extension for encrypting files with the AES algorithm."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
         #if defined(GD_IDE_ONLY)
 
         AddAction("EncryptFile",
-                       _("Crypt a file"),
-                       _("Crypt a file with AES."),
-                       _("Crypt file _PARAM0_ to _PARAM1_ with AES"),
+                       _("Encrypt a file"),
+                       _("Encrypt a file with AES."),
+                       _("Encrypt file _PARAM0_ to _PARAM1_ with AES"),
                        _("Encryption"),
                        "CppPlatform/Extensions/AESicon24.png",
                        "CppPlatform/Extensions/AESicon16.png")

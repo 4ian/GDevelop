@@ -143,7 +143,7 @@ export default class LocalS3Export extends Component {
     } = this.state;
 
     return (
-      <Column>
+      <Column noMargin>
         <Line>
           This will export your game and upload it on GDevelop games hosting. The game
           will be free and available for a few days.

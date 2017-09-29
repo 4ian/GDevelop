@@ -39,7 +39,8 @@ yarn #or npm install
 #For Windows:
 node node_modules\electron\cli.js app
 
-#For Linux: TODO, pull request welcome :)
+#For Linux:
+./node_modules/electron/dist/electron app
 ```
 
 ### Development of UI components
@@ -51,7 +52,9 @@ cd newIDE/app
 yarn storybook #or npm run storybook
 ```
 
-## Building the standalone app
+## Building and deploying the standalone app
+
+### Desktop version
 
 ```bash
 cd newIDE/electron-app
@@ -60,17 +63,22 @@ yarn build #or npm run build
 
 This will build and package the Electron app for Windows, macOS and Linux (according to your OS).
 The output are stored inside `newIDE/electron-app/dist` and copied to `Binaries/Output/Release_XXX`.
+Version number is read from `newIDE/electron-app/app/package.json`.
+
+### Webapp version
+
+```bash
+cd newIDE/web-app
+yarn deploy #or npm run deploy
+```
 
 ## Current status
 
-This new editor is still in development and not yet ready to build games from scratch:
+This new editor is still in development and is missing some features:
 
-- [x] Scene editor
-- [x] Export
-- [ ] Events editor
-- [ ] Objects editor (in progress here: https://github.com/4ian/GD/pull/359)
+- [ ] Autocompletion of expressions and parameters in Events editor.
+- [ ] Creating and editing groups of objects
 - [ ] Support for native games
-- [ ] Editor available online
 - [ ] Export with Cocos2d-JS to Android and iOS.
 
 ## Additional help

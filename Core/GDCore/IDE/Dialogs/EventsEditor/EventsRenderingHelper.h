@@ -10,7 +10,7 @@
 #include <wx/html/htmprint.h>
 #include <vector>
 #include "GDCore/Events/InstructionsList.h"
-
+namespace gd { class String; }
 namespace gd { class BaseEvent; }
 namespace gd { class Instruction; }
 namespace gd { class Platform; }

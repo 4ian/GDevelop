@@ -15,7 +15,7 @@ void DeclareInventoryExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("Inventory",
                           _("Inventory"),
-                          _("Provides action and condition to store an inventory with items in memory."),
+                          _("Provides actions and conditions to add an inventory to your game, with items in memory."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -64,7 +64,7 @@ void DeclareInventoryExtension(gd::PlatformExtension & extension)
 
     extension.AddCondition("Has",
                    _("Has an item"),
-                   _("Check that there is at least one of the specified item in the inventory."),
+                   _("Check if at least one of the specified items is in the inventory."),
                    _("Inventory _PARAM1_ contains a _PARAM2_"),
                    _("Inventories"),
                    "CppPlatform/Extensions/Inventoryicon24.png",
@@ -77,7 +77,7 @@ void DeclareInventoryExtension(gd::PlatformExtension & extension)
 
     extension.AddAction("SetMaximum",
                    _("Set a maximum count for an item"),
-                   _("Set the maximum number that can be added in the inventory for the specified item. By default, there is an unlimited number allowed for each item."),
+                   _("Set the maximum number of the specified item that can be added in the inventory. By default, the number allowed for each item is unlimited."),
                    _("Set the maximum count for _PARAM2_ in inventory _PARAM1_ to _PARAM3_"),
                    _("Inventories"),
                    "CppPlatform/Extensions/Inventoryicon24.png",
@@ -105,7 +105,7 @@ void DeclareInventoryExtension(gd::PlatformExtension & extension)
 
     extension.AddCondition("IsFull",
                    _("Item full"),
-                   _("Check if an item has reached the maximum number allowed in the inventory."),
+                   _("Check if an item has reached its maximum number allowed in the inventory."),
                    _("Inventory _PARAM1_ is full of _PARAM2_"),
                    _("Inventories"),
                    "CppPlatform/Extensions/Inventoryicon24.png",
@@ -118,8 +118,8 @@ void DeclareInventoryExtension(gd::PlatformExtension & extension)
 
     extension.AddAction("Equip",
                    _("Equip an item"),
-                   _("Mark an item as being equiped. If the item count is 0 it won't be marked as equiped."),
-                   _("Set _PARAM2_ as equiped in inventory _PARAM1_: _PARAM3_"),
+                   _("Mark an item as being equipped. If the item count is 0, it won't be marked as equipped."),
+                   _("Set _PARAM2_ as equipped in inventory _PARAM1_: _PARAM3_"),
                    _("Inventories"),
                    "CppPlatform/Extensions/Inventoryicon24.png",
                    "CppPlatform/Extensions/Inventoryicon16.png")
@@ -131,8 +131,8 @@ void DeclareInventoryExtension(gd::PlatformExtension & extension)
         .SetFunctionName("InventoryTools::Equip").SetIncludeFile("Inventory/InventoryTools.h");
 
     extension.AddCondition("IsEquipped",
-                   _("Item equiped"),
-                   _("Check if an item is equiped."),
+                   _("Item equipped"),
+                   _("Check if an item is equipped."),
                    _("_PARAM2_ is equipped in inventory _PARAM1_"),
                    _("Inventories"),
                    "CppPlatform/Extensions/Inventoryicon24.png",

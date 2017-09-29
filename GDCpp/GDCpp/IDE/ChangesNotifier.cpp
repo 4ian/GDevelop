@@ -16,7 +16,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCpp/Extensions/CppPlatform.h"
-#include "GDCpp/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/Runtime/Project/Layout.h"
 #include "GDCpp/Runtime/Project/Project.h"
 #include "GDCpp/IDE/CodeCompilationHelpers.h"

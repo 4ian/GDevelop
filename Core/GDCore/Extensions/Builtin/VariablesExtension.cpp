@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
 {
     extension.SetExtensionInformation("BuiltinVariables",
                           _("Variable features"),
-                          _("Built-in extension allowing to manipulate variables"),
+                          _("This Built-in extension allows the manipulation of variables"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -206,10 +206,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .AddParameter("globalvar", _("Variable"))
         .MarkAsAdvanced();
 
-    extension.AddExpression("GlobalVariableChildCount", _("Global variable number of children"), _("Get the number of children from global variable"), _("Variables"), "res/actions/var.png")
+    extension.AddExpression("GlobalVariableChildCount", _("Global variable number of children"), _("Get the number of children of a global variable"), _("Variables"), "res/actions/var.png")
 	.AddParameter("globalvar", _("Variable"));
 
-    extension.AddExpression("VariableChildCount", _("Scene variable number of children"), _("Get the number of children from scene variable"), _("Variables"), "res/actions/var.png")
+    extension.AddExpression("VariableChildCount", _("Scene variable number of children"), _("Get the number of children of a scene variable"), _("Variables"), "res/actions/var.png")
 	.AddParameter("scenevar", _("Variable"));
 
     extension.AddExpression("Variable", _("Scene variables"), _("Scene variables"), _("Variables"), "res/actions/var.png")

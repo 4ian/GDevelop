@@ -13,7 +13,8 @@ function RenderedUnknownInstance(
   layout,
   instance,
   associatedObject,
-  pixiContainer
+  pixiContainer,
+  pixiResourcesLoader
 ) {
   RenderedInstance.call(
     this,
@@ -21,7 +22,8 @@ function RenderedUnknownInstance(
     layout,
     instance,
     associatedObject,
-    pixiContainer
+    pixiContainer,
+    pixiResourcesLoader
   );
 
   //This renderer show a placeholder for the object:

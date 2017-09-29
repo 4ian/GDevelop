@@ -18,4 +18,10 @@ export default {
   addVariableMessage: {
     justifyContent: 'flex-end',
   },
+  emptyExplanation: {
+    justifyContent: 'flex-start',
+  },
+  emptyExplanationMessage: {
+    textAlign: 'left',
+  },
 };

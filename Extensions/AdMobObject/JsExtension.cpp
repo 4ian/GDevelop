@@ -28,7 +28,7 @@ public:
     {
         DeclareAdMobObjectExtension(*this);
 
-        GetObjectMetadata("AdMobObject::AdMob").SetIncludeFile("AdMobObject/admobruntimeobject.js");
+        GetObjectMetadata("AdMobObject::AdMob").SetIncludeFile("Extensions/AdMobObject/admobruntimeobject.js");
 
         GetAllActionsForObject("AdMobObject::AdMob")["AdMobObject::ShowBanner"].SetFunctionName("showBanner");
         GetAllActionsForObject("AdMobObject::AdMob")["AdMobObject::HideBanner"].SetFunctionName("hideBanner");

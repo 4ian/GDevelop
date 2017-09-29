@@ -297,7 +297,7 @@ changesNeedRestart(false)
     StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, Panel3, _("External programs"));
     FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer11->AddGrowableCol(1);
-    StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT6, _("Images\' edition:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT6, _("Image Editor:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     FlexGridSizer11->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     EditeurImageEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
     EditeurImageEdit->SetToolTip(_("Path to the image editing program."));
@@ -312,7 +312,7 @@ changesNeedRestart(false)
     StaticText8 = new wxStaticText(Panel3, ID_STATICTEXT8, _("Temporary deployment directory:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
     FlexGridSizer13->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     DossierTempCompEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
-    DossierTempCompEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nWe must own write permissions on this folder.\nIf empty, the default temporary folder of the system is used."));
+    DossierTempCompEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nYou must have write permissions for this folder.\nIf empty, the default temporary folder of the system is used."));
     FlexGridSizer13->Add(DossierTempCompEdit, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     BrowseDossierTempBt = new wxButton(Panel3, ID_BUTTON4, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer13->Add(BrowseDossierTempBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -322,12 +322,12 @@ changesNeedRestart(false)
     StaticText21 = new wxStaticText(Panel3, ID_STATICTEXT21, _("Temporary folder for compilation:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT21"));
     FlexGridSizer31->Add(StaticText21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     eventsCompilerTempDirEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
-    eventsCompilerTempDirEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nWe must own write permissions on this folder.\nIf empty, the default temporary folder of the system is used."));
+    eventsCompilerTempDirEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nYou must have write permissions for this folder.\nIf empty, the default temporary folder of the system is used."));
     FlexGridSizer31->Add(eventsCompilerTempDirEdit, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     browseCompilationTempDir = new wxButton(Panel3, ID_BUTTON12, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     FlexGridSizer31->Add(browseCompilationTempDir, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer6->Add(FlexGridSizer31, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 0);
-    deleteTemporariesCheck = new wxCheckBox(Panel3, ID_CHECKBOX7, _("Delete temporaries as soon as possible"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
+    deleteTemporariesCheck = new wxCheckBox(Panel3, ID_CHECKBOX7, _("Delete temporary files as soon as possible"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
     deleteTemporariesCheck->SetValue(true);
     StaticBoxSizer6->Add(deleteTemporariesCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
     FlexGridSizer15->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
@@ -337,7 +337,7 @@ changesNeedRestart(false)
     StaticText24 = new wxStaticText(Panel3, ID_STATICTEXT24, _("Directory containing the Java executable:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT24"));
     FlexGridSizer34->Add(StaticText24, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     javaDirEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL8, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
-    javaDirEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nWe must own write permissions on this folder.\nIf empty, the default temporary folder of the system is used."));
+    javaDirEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nYou must have write permissions for this folder.\nIf empty, the default temporary folder of the system is used."));
     FlexGridSizer34->Add(javaDirEdit, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP, 5);
     browseJavaBt = new wxButton(Panel3, ID_BUTTON15, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON15"));
     FlexGridSizer34->Add(browseJavaBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

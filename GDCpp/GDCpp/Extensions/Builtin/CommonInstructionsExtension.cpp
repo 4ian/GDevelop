@@ -19,7 +19,7 @@
 #endif
 #include "GDCpp/Extensions/Builtin/CommonInstructionsExtension.h"
 #include "GDCpp/Extensions/Builtin/CommonInstructionsTools.h"
-#include "GDCpp/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCpp/Events/Builtin/CppCodeEvent.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCore/Project/ObjectGroup.h"
@@ -206,7 +206,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
         .SetCodeGenerator([](gd::BaseEvent & event_, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {
             gd::LinkEvent & event = dynamic_cast<gd::LinkEvent&>(event_);
 
-            //This function is called only when the link refers to external events compiled separately. ( See LinkEvent::Preprocess )
+            //This function is called only when the link refers to external events compiled separately (see below).
             //We must generate code to call these external events.
             gd::String outputCode;
 
@@ -232,7 +232,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 DependenciesAnalyzer analyzer(project, linkedExternalEvents);
                 if (analyzer.ExternalEventsCanBeCompiledForAScene() == scene.GetName()) //Check if the link refers to events
                 {                                                                       //compiled separately.
-                    //There is nothing more to do for now: The code calling the external events will be generated in CodeGen::Generate.
+                    //There is nothing more to do for now:
+                    //The code calling the external events will be generated during code generation (see above)
                     return;
                 }
             }
@@ -247,7 +248,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             gd::String outputCode;
             gd::WhileEvent & event = dynamic_cast<gd::WhileEvent&>(event_);
 
-            //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
+            //Context is "reset" each time the event is repeated (i.e. objects are picked again)
             gd::EventsCodeGenerationContext context;
             context.InheritsFrom(parentContext);
             context.ForbidReuse();
@@ -304,7 +305,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             gd::ExpressionParser parser(repeatNumberExpression);
             if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), scene, callbacks) || repeatCountCode.empty()) repeatCountCode = "0";
 
-            //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
+            //Context is "reset" each time the event is repeated (i.e. objects are picked again)
             gd::EventsCodeGenerationContext context;
             context.InheritsFrom(parentContext);
             context.ForbidReuse();
@@ -352,7 +353,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             for (std::size_t i = 0;i<realObjects.size();++i)
                 parentContext.ObjectsListNeeded(realObjects[i]);
 
-            //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
+            //Context is "reset" each time the event is repeated (i.e. objects are picked again)
             gd::EventsCodeGenerationContext context;
             context.InheritsFrom(parentContext);
             context.ForbidReuse();

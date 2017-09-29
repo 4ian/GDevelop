@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import ToolbarIcon from '../../UI/ToolbarIcon';
 import IconMenu from '../../UI/Menu/IconMenu';
 
-export default class Toolbar extends Component {
+export default class Toolbar extends PureComponent {
   render() {
     return (
       <ToolbarGroup lastChild>
@@ -14,6 +14,21 @@ export default class Toolbar extends Component {
             src="res/ribbon_default/preview32.png"
           />}
         {this.props.showPreviewButton && <ToolbarSeparator />}
+        {this.props.showObjectsList &&
+          <ToolbarIcon
+            onClick={this.props.openObjectsList}
+            src="res/ribbon_default/objects64.png"
+          />}
+        {this.props.showObjectsList &&
+          <ToolbarIcon
+            onClick={this.props.openObjectsGroupsList}
+            src={'res/ribbon_default/objectsgroups64.png'}
+          />}
+        <ToolbarIcon
+          onClick={this.props.openProperties}
+          src="res/ribbon_default/editprop32.png"
+        />
+        <ToolbarSeparator />
         <ToolbarIcon
           onClick={this.props.undo}
           src="res/ribbon_default/undo32.png"
@@ -25,11 +40,6 @@ export default class Toolbar extends Component {
           disabled={!this.props.canRedo}
         />
         <ToolbarSeparator />
-        {this.props.showAddObjectButton &&
-          <ToolbarIcon
-            onClick={this.props.toggleObjectsList}
-            src="res/ribbon_default/add32.png"
-          />}
         <ToolbarIcon
           onClick={this.props.deleteSelection}
           src="res/ribbon_default/deleteselected32.png"

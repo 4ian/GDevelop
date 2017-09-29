@@ -144,6 +144,7 @@ export default class InstancesEditorContainer extends Component {
       project: props.project,
       layout: props.layout,
       instances: props.initialInstances,
+      viewPosition: this.viewPosition,
       onOverInstance: this._onOverInstance,
       onMoveInstance: this._onMoveInstance,
       onMoveInstanceEnd: this._onMoveInstanceEnd,
@@ -196,6 +197,10 @@ export default class InstancesEditorContainer extends Component {
   }
 
   componentWillUnmount() {
+    // This is an antipattern and is theorically not needed, but help
+    // to protect against renders after the component is unmounted.
+    this._unmounted = true;
+
     this.keyboardShortcuts.unmount();
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
@@ -215,6 +220,7 @@ export default class InstancesEditorContainer extends Component {
         nextProps.width,
         nextProps.height
       );
+      this._renderScene(); //Avoid flickering that could happen while waiting for next animation frame.
     }
 
     if (nextProps.options !== this.props.options) {
@@ -245,7 +251,7 @@ export default class InstancesEditorContainer extends Component {
   setZoomFactor(zoomFactor) {
     this.props.onChangeOptions({
       zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
-    })
+    });
   }
 
   _onBackgroundClicked = () => {
@@ -382,6 +388,9 @@ export default class InstancesEditorContainer extends Component {
   };
 
   _renderScene = () => {
+    // Protect against rendering scheduled after the component is unmounted.
+    if (this._unmounted) return;
+
     this.backgroundColor.render();
     this.viewPosition.render();
     this.grid.render();

@@ -148,7 +148,7 @@ std::unique_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene & s
 #if defined(GD_IDE_ONLY)
 gd::String CppPlatform::GetDescription() const
 {
-    return _("Allows to create 2D games which can be compiled and played on Windows or Linux.");
+    return _("Allows you to create 2D games that can be compiled and played on Windows or Linux.");
 }
 
 #if !defined(GD_NO_WX_GUI)

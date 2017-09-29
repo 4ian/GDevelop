@@ -14,14 +14,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
 {
     extension.SetExtensionInformation("BuiltinJoystick",
                           _("Joysticks features"),
-                          _("Built-in extension allowing to use joysticks"),
+                          _("Built-in extension that enables the use of joysticks"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("JoystickButtonDown",
-                   _("A button of a joystick is pressed"),
-                   _("Test if a button of a joystick is pressed."),
+                   _("A button on a joystick is pressed"),
+                   _("Test if a button on a joystick is pressed."),
                    _("The button _PARAM2_ of joystick _PARAM1_ is pressed"),
                    _("Joystick"),
                    "res/conditions/joystick24.png",
@@ -46,7 +46,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
 
     extension.AddAction("GetJoystickAxis",
                    _("Get the value of the axis of a joystick"),
-                   _("Save in the variable the value of the axis of the joystick (from -100 to 100)."),
+                   _("Save the value of the axis of the joystick (from -100 to 100)."),
                    _("Save in _PARAM3_ the value of axis _PARAM2_ of joystick _PARAM1_"),
                    _("Joystick"),
                    "res/actions/joystick24.png",
@@ -54,7 +54,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Joystick number (first joystick: 0)"))
         .AddParameter("joyaxis", _("Axis"))
-        .AddParameter("scenevar", _("Save result to scene variable"))
+        .AddParameter("scenevar", _("Save the result to the scene variable"))
         .SetManipulatedType("number");
 
     extension.AddExpression("GetJoystickAxis",

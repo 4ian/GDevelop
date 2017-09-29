@@ -233,6 +233,11 @@ void GD_API VariableRemoveChild(gd::Variable & variable, const gd::String & chil
     variable.RemoveChild(childName);
 }
 
+void GD_API VariableClearChildren(gd::Variable & variable)
+{
+     variable.ClearChildren();
+}
+
 unsigned int GD_API GetVariableChildCount(gd::Variable & variable)
 {
     if (variable.IsStructure() == false) return 0;

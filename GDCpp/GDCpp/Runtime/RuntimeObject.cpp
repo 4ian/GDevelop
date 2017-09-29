@@ -695,6 +695,11 @@ void RuntimeObject::VariableRemoveChild(gd::Variable & variable, const gd::Strin
     variable.RemoveChild(childName);
 }
 
+void RuntimeObject::VariableClearChildren(gd::Variable & variable)
+{
+    variable.ClearChildren();
+}
+
 unsigned int RuntimeObject::GetVariableChildCount(gd::Variable & variable)
 {
     if (variable.IsStructure() == false) return 0;

@@ -338,6 +338,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("string", _("Child's name"))
         .MarkAsAdvanced();
 
+    obj.AddAction("ObjectVariableClearChildren",
+               _("Clear variable"),
+               _("Remove all the children from the object variable."),
+               _("Clear children from variable _PARAM1_ of _PARAM0_"),
+               _("Variables/Structure"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"))
+        .MarkAsAdvanced();
+
     obj.AddAction("Cache",
                    _("Hide"),
                    _("Hide the specified object."),

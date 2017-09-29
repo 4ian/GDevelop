@@ -186,6 +186,26 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .AddParameter("string", _("Child's name"))
         .MarkAsAdvanced();
 
+    extension.AddAction("VariableClearChildren",
+               _("Clear variable"),
+               _("Remove all the children from the variable."),
+               _("Clear children from variable _PARAM0_"),
+               _("Variables/Structure"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+        .AddParameter("scenevar", _("Variable"))
+        .MarkAsAdvanced();
+
+    extension.AddAction("GlobalVariableClearChildren",
+               _("Clear global variable"),
+               _("Remove all the children from the global variable."),
+               _("Clear children from global variable _PARAM0_"),
+               _("Variables/Global variables/Structure"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+        .AddParameter("globalvar", _("Variable"))
+        .MarkAsAdvanced();
+
     extension.AddExpression("GlobalVariableChildCount", _("Global variable number of children"), _("Get the number of children from global variable"), _("Variables"), "res/actions/var.png")
 	.AddParameter("globalvar", _("Variable"));
 

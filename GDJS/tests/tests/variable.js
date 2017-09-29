@@ -39,4 +39,18 @@ describe('gdjs.variable', function() {
 
 	});
 
+	it('should clear a structure', function(){
+		var structure = new gdjs.Variable( {value : "0"} );
+		structure.getChild("a").setNumber(5);
+		structure.getChild("b").getChild("alpha").setString("Apples");
+
+		expect(structure.hasChild("a")).to.be(true);
+		expect(structure.hasChild("b")).to.be(true);
+		expect(structure.getChild("b").hasChild("alpha")).to.be(true);
+
+		structure.clearChildren();
+		expect(structure.hasChild("a")).to.be(false);
+		expect(structure.hasChild("b")).to.be(false);
+	})
+
 });

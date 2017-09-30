@@ -71,6 +71,15 @@ gdjs.evtTools.common.variableRemoveChild = function(variable, childName) {
 };
 
 /**
+ * @method variableClearChildren
+ * @private
+ * @static
+ */
+gdjs.evtTools.common.variableClearChildren = function(variable) {
+    variable.clearChildren();
+};
+
+/**
  * @method getVariableChildCount
  * @private
  * @static

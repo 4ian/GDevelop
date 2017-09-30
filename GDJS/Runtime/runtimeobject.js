@@ -507,6 +507,17 @@ gdjs.RuntimeObject.variableRemoveChild = function(variable, childName) {
 gdjs.RuntimeObject.prototype.variableRemoveChild = gdjs.RuntimeObject.variableRemoveChild;
 
 /**
+ * @method variableClearChildren
+ * @static
+ * @private
+ * @param variable The variable to be cleared
+ */
+gdjs.RuntimeObject.variableClearChildren = function(variable) {
+    variable.clearChildren();
+};
+gdjs.RuntimeObject.prototype.variableClearChildren = gdjs.RuntimeObject.variableClearChildren;
+
+/**
  * Shortcut to test if a variable exists for the object.
  * @method hasVariable
  * @param name {String} The variable to be tested

@@ -46,6 +46,7 @@ BaseObjectExtension::BaseObjectExtension()
     objectActions["ModVarObjetTxt"].SetFunctionName("ReturnVariable").SetManipulatedType("string");
     objectConditions["ObjectVariableChildExists"].SetFunctionName("VariableChildExists");
     objectActions["ObjectVariableRemoveChild"].SetFunctionName("VariableRemoveChild");
+    objectActions["ObjectVariableClearChildren"].SetFunctionName("VariableClearChildren");
 
     objectActions["Cache"].SetFunctionName("SetHidden");
     objectActions["Montre"].SetFunctionName("SetHidden");

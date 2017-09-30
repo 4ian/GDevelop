@@ -1,0 +1,748 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="95" major="4" minor="0" revision="8" />
+    <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" packageName="com.example.gamename" projectFile="C:\Users\Maciel\Programacion\gits\GD\Binaries\Output\Release_Windows\Examples\Copy_Variables.gdg" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Project</name>
+        <author></author>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="TextObject" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop C++ platform" />
+            <platform name="GDevelop JS platform" />
+        </platforms>
+        <currentPlatform>GDevelop C++ platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources />
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="30" disableInputWhenNotFocused="true" mangledName="Scene" name="Scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="30" standardSortMethod="false" stopSoundsOnStartup="true" title="" v="30">
+            <uiSettings grid="false" gridB="80" gridG="80" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="80" gridWidth="32" snap="true" windowMask="false" zoomFactor="0.701632" />
+            <objectsGroups />
+            <variables>
+                <variable name="Scene">
+                    <children>
+                        <variable name="A" value="5" />
+                        <variable name="B">
+                            <children>
+                                <variable name="alpha">
+                                    <children>
+                                        <variable name="x" value="5.5" />
+                                        <variable name="y" value="-8" />
+                                    </children>
+                                </variable>
+                                <variable name="beta" value="150;255;150" />
+                                <variable name="gamma" value="Apples" />
+                            </children>
+                        </variable>
+                    </children>
+                </variable>
+            </variables>
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="DebugText" width="0.000000" x="400.000000" y="300.000000" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables>
+                        <variable name="ID" value="3" />
+                    </initialVariables>
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="DebugText" width="0.000000" x="20.000000" y="20.000000" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables>
+                        <variable name="ID" value="0" />
+                    </initialVariables>
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="DebugText" width="0.000000" x="400.000000" y="20.000000" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables>
+                        <variable name="ID" value="1" />
+                    </initialVariables>
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="DebugText" width="0.000000" x="20.000000" y="300.000000" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables>
+                        <variable name="ID" value="2" />
+                    </initialVariables>
+                </instance>
+            </instances>
+            <objects>
+                <object bold="false" italic="false" name="DebugText" smoothed="true" type="TextObject::Text" underlined="false">
+                    <variables />
+                    <behaviors />
+                    <string>DebugText</string>
+                    <font></font>
+                    <characterSize>24</characterSize>
+                    <color b="220" g="220" r="220" />
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="128" textB="0" textG="0" textR="0" />
+                    <comment>Update debug text at the beginning (only Scene variable will be drawn because others haven&apos;t childrend)</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="DepartScene" />
+                            <parameters>
+                                <parameter></parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarScene" />
+                            <parameters>
+                                <parameter>Update</parameter>
+                                <parameter>=</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="128" textB="0" textG="0" textR="0" />
+                    <comment>If &quot;A&quot; key is pressed, convert the Scene variable into JSON and parse it into a Global variable, then randomize a child from the Global structure, to identify it</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>a</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="BuiltinCommonInstructions::Once" />
+                            <parameters />
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="JSONToGlobalVariableStructure" />
+                            <parameters>
+                                <parameter>ToJSON(Scene)</parameter>
+                                <parameter>Global</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarGlobal" />
+                            <parameters>
+                                <parameter>Global.B.alpha.x</parameter>
+                                <parameter>=</parameter>
+                                <parameter>Random(1000)</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarScene" />
+                            <parameters>
+                                <parameter>Update</parameter>
+                                <parameter>=</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="128" textB="0" textG="0" textR="0" />
+                    <comment>If &quot;S&quot; key is pressed, convert the Global variable into JSON and parse it into an Object variable, then randomize another child from the Object structure, to identify it</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>s</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>DebugText</parameter>
+                                <parameter>ID</parameter>
+                                <parameter>=</parameter>
+                                <parameter>2</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="BuiltinCommonInstructions::Once" />
+                            <parameters />
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="JSONToObjectVariableStructure" />
+                            <parameters>
+                                <parameter>GlobalVarToJSON(Global)</parameter>
+                                <parameter>DebugText</parameter>
+                                <parameter>Object</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarObjet" />
+                            <parameters>
+                                <parameter>DebugText</parameter>
+                                <parameter>Object.B.alpha.y</parameter>
+                                <parameter>=</parameter>
+                                <parameter>Random(1000)</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarScene" />
+                            <parameters>
+                                <parameter>Update</parameter>
+                                <parameter>=</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="128" textB="0" textG="0" textR="0" />
+                    <comment>If &quot;D&quot; key is pressed, convert the Object variable into JSON (note there are no whitespaces after the &quot;,&quot; before the variable name in the ObjectVarToJSON) and parse it into another scene variable Scene_2</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="KeyPressed" />
+                            <parameters>
+                                <parameter></parameter>
+                                <parameter>d</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="VarObjet" />
+                            <parameters>
+                                <parameter>DebugText</parameter>
+                                <parameter>ID</parameter>
+                                <parameter>=</parameter>
+                                <parameter>2</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                        <condition>
+                            <type inverted="false" value="BuiltinCommonInstructions::Once" />
+                            <parameters />
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="JSONToVariableStructure" />
+                            <parameters>
+                                <parameter>ObjectVarToJSON(DebugText,Object)</parameter>
+                                <parameter>Scene_2</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarScene" />
+                            <parameters>
+                                <parameter>Update</parameter>
+                                <parameter>=</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Comment</type>
+                    <color b="128" g="255" r="128" textB="0" textG="0" textR="0" />
+                    <comment>Time to update the debug text objects, set Update = 0 to update it only once, and start a counter &quot;i&quot; = 0</comment>
+                    <comment2></comment2>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <condition>
+                            <type inverted="false" value="VarScene" />
+                            <parameters>
+                                <parameter>Update</parameter>
+                                <parameter>=</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subConditions />
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action>
+                            <type inverted="false" value="ModVarScene" />
+                            <parameters>
+                                <parameter>Update</parameter>
+                                <parameter>=</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                        <action>
+                            <type inverted="false" value="ModVarScene" />
+                            <parameters>
+                                <parameter>i</parameter>
+                                <parameter>=</parameter>
+                                <parameter>0</parameter>
+                            </parameters>
+                            <subActions />
+                        </action>
+                    </actions>
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="128" g="255" r="128" textB="0" textG="0" textR="0" />
+                            <comment>Repeat 4 times because there are 4 debug objects, in each repeat select the object with ID = i (counter variable)&#x0A;Update the counter variable (i + 1)&#x0A;Clear the temporal variable Temp, otherwise children are kept from one update to another, messing up the test</comment>
+                            <comment2></comment2>
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Repeat</type>
+                            <repeatExpression>4</repeatExpression>
+                            <conditions>
+                                <condition>
+                                    <type inverted="false" value="VarObjet" />
+                                    <parameters>
+                                        <parameter>DebugText</parameter>
+                                        <parameter>ID</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>Variable(i)</parameter>
+                                    </parameters>
+                                    <subConditions />
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action>
+                                    <type inverted="false" value="ModVarScene" />
+                                    <parameters>
+                                        <parameter>i</parameter>
+                                        <parameter>+</parameter>
+                                        <parameter>1</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                                <action>
+                                    <type inverted="false" value="VariableClearChildren" />
+                                    <parameters>
+                                        <parameter>Temp</parameter>
+                                    </parameters>
+                                    <subActions />
+                                </action>
+                            </actions>
+                            <events>
+                                <event disabled="false" folded="false">
+                                    <type>BuiltinCommonInstructions::Comment</type>
+                                    <color b="128" g="255" r="128" textB="0" textG="0" textR="0" />
+                                    <comment>Set starting title in function of the debug object ID, and copy the testing variables into the variable Temp (this way Temp will be equal to one of the variables under test)</comment>
+                                    <comment2></comment2>
+                                </event>
+                                <event disabled="false" folded="false">
+                                    <type>BuiltinCommonInstructions::Standard</type>
+                                    <conditions>
+                                        <condition>
+                                            <type inverted="false" value="VarObjet" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>ID</parameter>
+                                                <parameter>=</parameter>
+                                                <parameter>0</parameter>
+                                            </parameters>
+                                            <subConditions />
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action>
+                                            <type inverted="false" value="TextObject::String" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>=</parameter>
+                                                <parameter>&quot;Scene&quot; + NewLine()</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                        <action>
+                                            <type inverted="false" value="JSONToVariableStructure" />
+                                            <parameters>
+                                                <parameter>ToJSON(Scene)</parameter>
+                                                <parameter>Temp</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                    </actions>
+                                    <events />
+                                </event>
+                                <event disabled="false" folded="false">
+                                    <type>BuiltinCommonInstructions::Standard</type>
+                                    <conditions>
+                                        <condition>
+                                            <type inverted="false" value="VarObjet" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>ID</parameter>
+                                                <parameter>=</parameter>
+                                                <parameter>1</parameter>
+                                            </parameters>
+                                            <subConditions />
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action>
+                                            <type inverted="false" value="TextObject::String" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>=</parameter>
+                                                <parameter>&quot;Global&quot; + NewLine()</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                        <action>
+                                            <type inverted="false" value="JSONToVariableStructure" />
+                                            <parameters>
+                                                <parameter>GlobalVarToJSON(Global)</parameter>
+                                                <parameter>Temp</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                    </actions>
+                                    <events />
+                                </event>
+                                <event disabled="false" folded="false">
+                                    <type>BuiltinCommonInstructions::Standard</type>
+                                    <conditions>
+                                        <condition>
+                                            <type inverted="false" value="VarObjet" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>ID</parameter>
+                                                <parameter>=</parameter>
+                                                <parameter>2</parameter>
+                                            </parameters>
+                                            <subConditions />
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action>
+                                            <type inverted="false" value="TextObject::String" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>=</parameter>
+                                                <parameter>&quot;Object&quot; + NewLine()</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                        <action>
+                                            <type inverted="false" value="JSONToVariableStructure" />
+                                            <parameters>
+                                                <parameter>ObjectVarToJSON(DebugText,Object)</parameter>
+                                                <parameter>Temp</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                    </actions>
+                                    <events />
+                                </event>
+                                <event disabled="false" folded="false">
+                                    <type>BuiltinCommonInstructions::Standard</type>
+                                    <conditions>
+                                        <condition>
+                                            <type inverted="false" value="VarObjet" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>ID</parameter>
+                                                <parameter>=</parameter>
+                                                <parameter>3</parameter>
+                                            </parameters>
+                                            <subConditions />
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action>
+                                            <type inverted="false" value="TextObject::String" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>=</parameter>
+                                                <parameter>&quot;Scene_2&quot; + NewLine()</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                        <action>
+                                            <type inverted="false" value="JSONToVariableStructure" />
+                                            <parameters>
+                                                <parameter>ToJSON(Scene_2)</parameter>
+                                                <parameter>Temp</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                    </actions>
+                                    <events />
+                                </event>
+                                <event disabled="false" folded="false">
+                                    <type>BuiltinCommonInstructions::Comment</type>
+                                    <color b="128" g="255" r="128" textB="0" textG="0" textR="0" />
+                                    <comment>Copy values from variable Test in the debug object, to draw it, one debug object is selected at each iteration and one variable is copy into Temp variable</comment>
+                                    <comment2></comment2>
+                                </event>
+                                <event disabled="false" folded="false">
+                                    <type>BuiltinCommonInstructions::Standard</type>
+                                    <conditions>
+                                        <condition>
+                                            <type inverted="false" value="VariableChildExists" />
+                                            <parameters>
+                                                <parameter>Temp</parameter>
+                                                <parameter>&quot;A&quot;</parameter>
+                                            </parameters>
+                                            <subConditions />
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action>
+                                            <type inverted="false" value="TextObject::String" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>+</parameter>
+                                                <parameter>&quot;____A = &quot; + VariableString(Temp.A) + NewLine()</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                    </actions>
+                                    <events />
+                                </event>
+                                <event disabled="false" folded="false">
+                                    <type>BuiltinCommonInstructions::Standard</type>
+                                    <conditions>
+                                        <condition>
+                                            <type inverted="false" value="VariableChildExists" />
+                                            <parameters>
+                                                <parameter>Temp</parameter>
+                                                <parameter>&quot;B&quot;</parameter>
+                                            </parameters>
+                                            <subConditions />
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action>
+                                            <type inverted="false" value="TextObject::String" />
+                                            <parameters>
+                                                <parameter>DebugText</parameter>
+                                                <parameter>+</parameter>
+                                                <parameter>&quot;____B&quot; + NewLine()</parameter>
+                                            </parameters>
+                                            <subActions />
+                                        </action>
+                                    </actions>
+                                    <events>
+                                        <event disabled="false" folded="false">
+                                            <type>BuiltinCommonInstructions::Standard</type>
+                                            <conditions>
+                                                <condition>
+                                                    <type inverted="false" value="VariableChildExists" />
+                                                    <parameters>
+                                                        <parameter>Temp.B</parameter>
+                                                        <parameter>&quot;alpha&quot;</parameter>
+                                                    </parameters>
+                                                    <subConditions />
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action>
+                                                    <type inverted="false" value="TextObject::String" />
+                                                    <parameters>
+                                                        <parameter>DebugText</parameter>
+                                                        <parameter>+</parameter>
+                                                        <parameter>&quot;________alpha&quot; + NewLine()</parameter>
+                                                    </parameters>
+                                                    <subActions />
+                                                </action>
+                                            </actions>
+                                            <events>
+                                                <event disabled="false" folded="false">
+                                                    <type>BuiltinCommonInstructions::Standard</type>
+                                                    <conditions>
+                                                        <condition>
+                                                            <type inverted="false" value="VariableChildExists" />
+                                                            <parameters>
+                                                                <parameter>Temp.B.alpha</parameter>
+                                                                <parameter>&quot;x&quot;</parameter>
+                                                            </parameters>
+                                                            <subConditions />
+                                                        </condition>
+                                                    </conditions>
+                                                    <actions>
+                                                        <action>
+                                                            <type inverted="false" value="TextObject::String" />
+                                                            <parameters>
+                                                                <parameter>DebugText</parameter>
+                                                                <parameter>+</parameter>
+                                                                <parameter>&quot;____________x = &quot; + VariableString(Temp.B.alpha.x) + NewLine()</parameter>
+                                                            </parameters>
+                                                            <subActions />
+                                                        </action>
+                                                    </actions>
+                                                    <events />
+                                                </event>
+                                                <event disabled="false" folded="false">
+                                                    <type>BuiltinCommonInstructions::Standard</type>
+                                                    <conditions>
+                                                        <condition>
+                                                            <type inverted="false" value="VariableChildExists" />
+                                                            <parameters>
+                                                                <parameter>Temp.B.alpha</parameter>
+                                                                <parameter>&quot;y&quot;</parameter>
+                                                            </parameters>
+                                                            <subConditions />
+                                                        </condition>
+                                                    </conditions>
+                                                    <actions>
+                                                        <action>
+                                                            <type inverted="false" value="TextObject::String" />
+                                                            <parameters>
+                                                                <parameter>DebugText</parameter>
+                                                                <parameter>+</parameter>
+                                                                <parameter>&quot;____________y = &quot; + VariableString(Temp.B.alpha.y) + NewLine()</parameter>
+                                                            </parameters>
+                                                            <subActions />
+                                                        </action>
+                                                    </actions>
+                                                    <events />
+                                                </event>
+                                            </events>
+                                        </event>
+                                        <event disabled="false" folded="false">
+                                            <type>BuiltinCommonInstructions::Standard</type>
+                                            <conditions>
+                                                <condition>
+                                                    <type inverted="false" value="VariableChildExists" />
+                                                    <parameters>
+                                                        <parameter>Temp.B</parameter>
+                                                        <parameter>&quot;beta&quot;</parameter>
+                                                    </parameters>
+                                                    <subConditions />
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action>
+                                                    <type inverted="false" value="TextObject::String" />
+                                                    <parameters>
+                                                        <parameter>DebugText</parameter>
+                                                        <parameter>+</parameter>
+                                                        <parameter>&quot;________beta = &quot; + VariableString(Temp.B.beta) + NewLine()</parameter>
+                                                    </parameters>
+                                                    <subActions />
+                                                </action>
+                                            </actions>
+                                            <events />
+                                        </event>
+                                        <event disabled="false" folded="false">
+                                            <type>BuiltinCommonInstructions::Standard</type>
+                                            <conditions>
+                                                <condition>
+                                                    <type inverted="false" value="VariableChildExists" />
+                                                    <parameters>
+                                                        <parameter>Temp.B</parameter>
+                                                        <parameter>&quot;gamma&quot;</parameter>
+                                                    </parameters>
+                                                    <subConditions />
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action>
+                                                    <type inverted="false" value="TextObject::String" />
+                                                    <parameters>
+                                                        <parameter>DebugText</parameter>
+                                                        <parameter>+</parameter>
+                                                        <parameter>&quot;________gamma = &quot; + VariableString(Temp.B.gamma)</parameter>
+                                                    </parameters>
+                                                    <subActions />
+                                                </action>
+                                            </actions>
+                                            <events />
+                                        </event>
+                                    </events>
+                                </event>
+                            </events>
+                        </event>
+                    </events>
+                </event>
+            </events>
+            <layers>
+                <layer name="New layer" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                    <effects />
+                </layer>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                    <effects />
+                </layer>
+            </layers>
+            <behaviorsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles />
+</project>

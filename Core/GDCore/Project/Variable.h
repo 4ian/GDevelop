@@ -142,6 +142,13 @@ public:
     bool RenameChild(const gd::String & oldName, const gd::String & newName);
 
     /**
+     * \brief Remove all the children.
+     *
+     * If the variable is not a structure, nothing is done.
+     */
+    void ClearChildren();
+
+    /**
      * \brief Get the map containing all the children.
      */
     const std::map<gd::String, Variable> & GetAllChildren() const { return children; }

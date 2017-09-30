@@ -8,6 +8,7 @@
 
 #include <string>
 #include "GDCpp/Runtime/String.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
 
 namespace gd {class Variable;}
 
@@ -24,6 +25,8 @@ void GD_API SendHttpRequest(const gd::String & host, const gd::String & uri, con
 void GD_API DownloadFile( const gd::String & host, const gd::String & uri, const gd::String & outputfilename );
 
 gd::String GD_API VariableStructureToJSON(const gd::Variable & variable);
+gd::String GD_API ObjectVariableStructureToJSON(RuntimeObject * object, const gd::Variable & variable);
 void GD_API JSONToVariableStructure(const gd::String & JSON, gd::Variable & variable);
+void GD_API JSONToObjectVariableStructure(const gd::String & JSON, RuntimeObject * object, gd::Variable & variable);
 
 #endif // NETWORKTOOLS_H

@@ -437,6 +437,7 @@ public:
     static const gd::String& GetVariableString(const gd::Variable & variable) { return variable.GetString(); };
     static bool VariableChildExists(const gd::Variable & variable, const gd::String & childName);
     static void VariableRemoveChild(gd::Variable & variable, const gd::String & childName);
+    static void VariableClearChildren(gd::Variable & variable);
     static unsigned int GetVariableChildCount(gd::Variable & variable);
 
     void SetXY( const char* xOperator, float xValue, const char* yOperator, float yValue );

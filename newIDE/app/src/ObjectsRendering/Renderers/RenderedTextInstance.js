@@ -91,7 +91,7 @@ RenderedTextInstance.prototype.update = function() {
     let font = '';
     if (this._isItalic) font += 'italic ';
     if (this._isBold) font += 'bold ';
-    font += this._characterSize + 'px  ' + this._fontFamily;
+    font += this._characterSize + 'px ' + (this._fontFamily || 'Arial');
 
     this._pixiObject.style.font = font;
 

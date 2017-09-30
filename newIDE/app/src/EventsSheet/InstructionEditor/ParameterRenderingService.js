@@ -1,5 +1,6 @@
 import DefaultField from './ParameterFields/DefaultField';
 import RelationalOperatorField from './ParameterFields/RelationalOperatorField';
+import OperatorField from './ParameterFields/OperatorField';
 import MouseField from './ParameterFields/MouseField';
 import KeyField from './ParameterFields/KeyField';
 import ObjectField from './ParameterFields/ObjectField';
@@ -20,6 +21,7 @@ export default {
     mouse: MouseField,
     object: ObjectField,
     relationalOperator: RelationalOperatorField,
+    operator: OperatorField,
     yesorno: YesNoField,
     trueorfalse: TrueFalseField,
     expression: ExpressionField,

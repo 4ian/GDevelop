@@ -79,6 +79,7 @@ export default class LocalCreateDialog extends Component {
         actions={actions}
         modal={true}
         open={open}
+        autoScrollBodyContent
       >
         <Column noMargin>
           <Line>

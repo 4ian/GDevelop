@@ -7,7 +7,9 @@ import Window from '../Utils/Window';
 
 const styles = {
   toolbar: {
-    flexShrink: 0,
+    flexShrink: 0, // Toolbar height should never be reduced
+    overflowX: 'auto',
+    overflowY: 'hidden',
   },
 };
 

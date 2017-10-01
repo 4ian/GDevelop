@@ -4,11 +4,24 @@ import Close from 'material-ui/svg-icons/navigation/close';
 import FlatButton from 'material-ui/FlatButton';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 
+const styles = {
+  tabsContainerStyle: {
+    maxWidth: '100%',
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  tabTemplateStyle: {
+    height: '100%',
+  },
+}
+
 export class ThemableTabs extends Component {
   render() {
     const { muiTheme, hideLabels, ...tabsProps } = this.props;
     const tabItemContainerStyle = {
-      maxWidth: '100%',
+      maxWidth: '100%', // Tabs should take all width
+      flexShrink: 0, // Tabs height should never be reduced
       overflowX: 'auto',
       display: hideLabels ? 'none' : 'block',
       backgroundColor: muiTheme.closableTabs.backgroundColor,
@@ -21,13 +34,8 @@ export class ThemableTabs extends Component {
 
     return (
       <MaterialUITabs
-        style={{
-          maxWidth: '100%',
-          flex: 1,
-        }}
-        tabTemplateStyle={{
-          height: '100%',
-        }}
+        style={styles.tabsContainerStyle}
+        tabTemplateStyle={styles.tabTemplateStyle}
         contentContainerStyle={contentContainerStyle}
         tabItemContainerStyle={tabItemContainerStyle}
         inkBarStyle={{ display: 'none' }}

@@ -20,7 +20,10 @@ export const makeAddItem = Item => ({ onClick, primaryText, style, ...rest }) =>
       style={{...styles.item, ...style}}
       rightIconButton={
         <IconButton>
-          <Add onClick={onClick}/>
+          <Add onClick={event => {
+            event.stopPropagation();
+            onClick();
+          }}/>
         </IconButton>
       }
       onClick={onClick}

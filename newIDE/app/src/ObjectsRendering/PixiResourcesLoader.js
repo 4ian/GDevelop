@@ -83,7 +83,8 @@ export default class PixiResourcesLoader {
     if (resource.getKind() !== 'image') return invalidTexture;
 
     loadedTextures[resourceName] = PIXI.Texture.fromImage(
-      ResourcesLoader.getResourceFullFilename(project, resourceName)
+      ResourcesLoader.getResourceFullFilename(project, resourceName),
+      true /* Treats request as cross-origin */
     );
 
     PixiResourcesLoader._initializeTexture(

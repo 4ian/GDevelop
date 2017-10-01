@@ -5,7 +5,7 @@ import IconButton from 'material-ui/IconButton';
 import BaseEditor from './BaseEditor';
 import AboutDialog from '../AboutDialog';
 import Window from '../../Utils/Window';
-import { Line, Column } from '../../UI/Grid';
+import { Line } from '../../UI/Grid';
 
 const styles = {
   scrollContainer: {

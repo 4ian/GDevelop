@@ -97,6 +97,7 @@ export default class BehaviorsEditor extends Component {
         object.addNewBehavior(project, type, name);
 
         this.forceUpdate();
+        if (this.props.onSizeUpdated) this.props.onSizeUpdated();
       }
     );
   };
@@ -126,6 +127,7 @@ export default class BehaviorsEditor extends Component {
     if (answer) {
       object.removeBehavior(behaviorName);
       this.forceUpdate();
+      if (this.props.onSizeUpdated) this.props.onSizeUpdated();
     }
   };
 

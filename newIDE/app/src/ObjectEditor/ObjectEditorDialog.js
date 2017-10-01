@@ -99,6 +99,7 @@ export default class ObjectEditorDialog extends Component {
           <BehaviorsEditor
             object={this.props.object}
             project={this.props.project}
+            onSizeUpdated={() => this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
           />}
       </Dialog>
     );

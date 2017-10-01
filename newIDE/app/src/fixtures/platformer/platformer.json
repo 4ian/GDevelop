@@ -102,7 +102,7 @@
         "resources": [
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_stand.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_stand.png",
                 "kind": "image",
                 "name": "p1_stand.png",
                 "smoothed": true,
@@ -110,7 +110,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_jump.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_jump.png",
                 "kind": "image",
                 "name": "p1_jump.png",
                 "smoothed": true,
@@ -118,7 +118,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk01.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk01.png",
                 "kind": "image",
                 "name": "p1_walk01.png",
                 "smoothed": true,
@@ -126,7 +126,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk02.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk02.png",
                 "kind": "image",
                 "name": "p1_walk02.png",
                 "smoothed": true,
@@ -134,7 +134,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk03.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk03.png",
                 "kind": "image",
                 "name": "p1_walk03.png",
                 "smoothed": true,
@@ -142,7 +142,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk04.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk04.png",
                 "kind": "image",
                 "name": "p1_walk04.png",
                 "smoothed": true,
@@ -150,7 +150,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk05.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk05.png",
                 "kind": "image",
                 "name": "p1_walk05.png",
                 "smoothed": true,
@@ -158,7 +158,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk06.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk06.png",
                 "kind": "image",
                 "name": "p1_walk06.png",
                 "smoothed": true,
@@ -166,7 +166,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk07.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk07.png",
                 "kind": "image",
                 "name": "p1_walk07.png",
                 "smoothed": true,
@@ -174,7 +174,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk08.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk08.png",
                 "kind": "image",
                 "name": "p1_walk08.png",
                 "smoothed": true,
@@ -182,7 +182,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk09.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk09.png",
                 "kind": "image",
                 "name": "p1_walk09.png",
                 "smoothed": true,
@@ -190,7 +190,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk10.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk10.png",
                 "kind": "image",
                 "name": "p1_walk10.png",
                 "smoothed": true,
@@ -198,7 +198,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/p1_walk11.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/p1_walk11.png",
                 "kind": "image",
                 "name": "p1_walk11.png",
                 "smoothed": true,
@@ -206,7 +206,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/brickWall.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/brickWall.png",
                 "kind": "image",
                 "name": "brickWall.png",
                 "smoothed": true,
@@ -214,7 +214,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/bridge.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/bridge.png",
                 "kind": "image",
                 "name": "bridge.png",
                 "smoothed": true,
@@ -222,7 +222,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/grassHalfMid.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/grassHalfMid.png",
                 "kind": "image",
                 "name": "grassHalfMid.png",
                 "smoothed": true,
@@ -230,7 +230,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/castleCenter.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/castleCenter.png",
                 "kind": "image",
                 "name": "castleCenter.png",
                 "smoothed": true,
@@ -238,7 +238,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/bridgeLogs.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/bridgeLogs.png",
                 "kind": "image",
                 "name": "bridgeLogs.png",
                 "smoothed": true,
@@ -246,7 +246,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/Left.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/Left.png",
                 "kind": "image",
                 "name": "Left.png",
                 "smoothed": true,
@@ -254,7 +254,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/Right.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/Right.png",
                 "kind": "image",
                 "name": "Right.png",
                 "smoothed": true,
@@ -262,7 +262,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/ladder_mid.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/ladder_mid.png",
                 "kind": "image",
                 "name": "ladder_mid.png",
                 "smoothed": true,
@@ -270,7 +270,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/Grass.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/Grass.png",
                 "kind": "image",
                 "name": "grass.png",
                 "smoothed": true,
@@ -278,7 +278,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/PlayerArea.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/PlayerArea.png",
                 "kind": "image",
                 "name": "PlayerArea.png",
                 "smoothed": true,
@@ -286,7 +286,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/slimeWalk1.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/slimeWalk1.png",
                 "kind": "image",
                 "name": "slimeWalk1.png",
                 "smoothed": true,
@@ -294,7 +294,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/slimeWalk2.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/slimeWalk2.png",
                 "kind": "image",
                 "name": "slimeWalk2.png",
                 "smoothed": true,
@@ -302,7 +302,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/slimeDead.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/slimeDead.png",
                 "kind": "image",
                 "name": "slimeDead.png",
                 "smoothed": true,
@@ -310,7 +310,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/flyFly1.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/flyFly1.png",
                 "kind": "image",
                 "name": "flyFly1.png",
                 "smoothed": true,
@@ -318,7 +318,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/flyFly2.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/flyFly2.png",
                 "kind": "image",
                 "name": "flyFly2.png",
                 "smoothed": true,
@@ -326,7 +326,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/flyDead.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/flyDead.png",
                 "kind": "image",
                 "name": "flyDead.png",
                 "smoothed": true,
@@ -334,7 +334,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/cloud1.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/cloud1.png",
                 "kind": "image",
                 "name": "cloud1.png",
                 "smoothed": false,
@@ -342,7 +342,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/cloud2.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/cloud2.png",
                 "kind": "image",
                 "name": "cloud2.png",
                 "smoothed": false,
@@ -350,7 +350,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/cloud3.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/cloud3.png",
                 "kind": "image",
                 "name": "cloud3.png",
                 "smoothed": false,
@@ -358,7 +358,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/bush.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/bush.png",
                 "kind": "image",
                 "name": "bush.png",
                 "smoothed": true,
@@ -366,7 +366,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/cactus.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/cactus.png",
                 "kind": "image",
                 "name": "cactus.png",
                 "smoothed": true,
@@ -374,7 +374,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/plant.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/plant.png",
                 "kind": "image",
                 "name": "plant.png",
                 "smoothed": true,
@@ -382,7 +382,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/coinGold.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/coinGold.png",
                 "kind": "image",
                 "name": "coinGold.png",
                 "smoothed": true,
@@ -390,7 +390,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/shadedDark06.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/shadedDark06.png",
                 "kind": "image",
                 "name": "shadedDark06.png",
                 "smoothed": true,
@@ -398,7 +398,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/shadedDark05.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/shadedDark05.png",
                 "kind": "image",
                 "name": "shadedDark05.png",
                 "smoothed": true,
@@ -406,7 +406,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/shadedDark45.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/shadedDark45.png",
                 "kind": "image",
                 "name": "shadedDark45.png",
                 "smoothed": true,
@@ -414,7 +414,7 @@
             },
             {
                 "alwaysLoaded": false,
-                "file": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/shadedDark09.png",
+                "file": "https://df5lqcdudryde.cloudfront.net/examples/platformer/shadedDark09.png",
                 "kind": "image",
                 "name": "shadedDark09.png",
                 "smoothed": true,
@@ -3220,7 +3220,7 @@
                     "variables": [],
                     "behaviors": [],
                     "string": "x 0",
-                    "font": "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/Bimbo_JVE.ttf",
+                    "font": "https://df5lqcdudryde.cloudfront.net/examples/platformer/Bimbo_JVE.ttf",
                     "characterSize": 40,
                     "color": {
                         "b": 0,
@@ -3698,7 +3698,7 @@
                             },
                             "parameters": [
                                 "",
-                                "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/jump.wav",
+                                "https://df5lqcdudryde.cloudfront.net/examples/platformer/jump.wav",
                                 "",
                                 "",
                                 ""
@@ -4785,7 +4785,7 @@
                                             },
                                             "parameters": [
                                                 "",
-                                                "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/jump.wav",
+                                                "https://df5lqcdudryde.cloudfront.net/examples/platformer/jump.wav",
                                                 "",
                                                 "",
                                                 ""
@@ -5017,7 +5017,7 @@
                             },
                             "parameters": [
                                 "",
-                                "https://s3-eu-west-1.amazonaws.com/gdevelop-resources/examples/platformer/coin.wav",
+                                "https://df5lqcdudryde.cloudfront.net/examples/platformer/coin.wav",
                                 "",
                                 "",
                                 ""

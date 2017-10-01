@@ -94,6 +94,14 @@ export const sendNewGameCreated = templateName => {
   });
 };
 
+export const sendTutorialOpened = tutorialName => {
+  if (isDev) return;
+
+  client.recordEvent('tutorial_opened', {
+    tutorialName,
+  });
+};
+
 export const sendErrorMessage = (errorMessage, type, rawError) => {
   if (isDev) return;
 

@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
+import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import { sendProgramOpening } from './Utils/Analytics/EventSender';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import registerServiceWorker from './registerServiceWorker';
@@ -13,7 +14,7 @@ import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 // Import for browser only IDE
 import BrowserS3PreviewLauncher from './Export/BrowserS3PreviewLauncher';
 import BrowserExport from './Export/BrowserExport';
-import BrowserCreateDialog from './ProjectCreation/BrowserCreateDialog';
+import BrowserExamples from './ProjectCreation/BrowserExamples';
 import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
 import BrowserSaveDialog from './ProjectsStorage/BrowserSaveDialog';
 import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
@@ -25,7 +26,7 @@ import LocalPreviewLauncher from './Export/LocalPreviewLauncher';
 import LocalExport from './Export/LocalExport';
 import LocalS3Export from './Export/LocalS3Export';
 import LocalMobileExport from './Export/LocalMobileExport';
-import LocalCreateDialog from './ProjectCreation/LocalCreateDialog';
+import LocalExamples from './ProjectCreation/LocalExamples';
 import localResourceSources from './ResourcesEditor/LocalResourceSources';
 import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
 import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
@@ -80,7 +81,9 @@ if (electron) {
               ]}
             />
           }
-          createDialog={<LocalCreateDialog />}
+          createDialog={
+            <CreateProjectDialog examplesComponent={LocalExamples} />
+          }
           introDialog={<LocalIntroDialog />}
           onSaveProject={LocalProjectWriter.saveProject}
           onChooseProject={LocalProjectOpener.chooseProjectFile}
@@ -104,7 +107,7 @@ if (electron) {
           ]}
         />
       }
-      createDialog={<BrowserCreateDialog />}
+      createDialog={<CreateProjectDialog examplesComponent={BrowserExamples} />}
       introDialog={<BrowserIntroDialog />}
       saveDialog={<BrowserSaveDialog />}
       onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}

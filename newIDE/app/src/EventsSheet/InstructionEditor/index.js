@@ -15,6 +15,7 @@ const styles = {
   },
   parametersEditor: {
     flex: 2,
+    display: 'flex',
     paddingLeft: 16,
     paddingRight: 16,
     zIndex: 1, // Put the Paper shadow on the type selector

@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
 import Divider from 'material-ui/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
@@ -66,39 +64,27 @@ export default class LocalCreateDialog extends Component {
   }
 
   render() {
-    const { open, onClose } = this.props;
-    if (!open) return null;
-
-    const actions = [
-      <FlatButton label="Close" primary={false} onTouchTap={onClose} />,
-    ];
-
     return (
-      <Dialog
-        title="Create a new game"
-        actions={actions}
-        modal={true}
-        open={open}
-        autoScrollBodyContent
-      >
-        <Column noMargin>
-          <Line>
-            Choose the game to use as a base:
-          </Line>
-          <Line>
-            <Column expand>
-              <List>
-                <ListItem
-                  primaryText="Platformer"
-                  secondaryText={
-                    <p>
-                      A simple platform game, with coins to collect, moving platforms and enemies.
-                    </p>
-                  }
-                  secondaryTextLines={2}
-                  onClick={() => this.createFromExample('platformer')}
-                />
-                {/* <ListItem
+      <Column noMargin>
+        <Line>
+          <Column>
+            <p>Choose a game to use as a starter:</p>
+          </Column>
+        </Line>
+        <Line>
+          <Column expand noMargin>
+            <List>
+              <ListItem
+                primaryText="Platformer"
+                secondaryText={
+                  <p>
+                    A simple platform game, with coins to collect, moving platforms and enemies.
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => this.createFromExample('platformer')}
+              />
+              {/* <ListItem
                   primaryText="Space Shooter"
                   secondaryText={
                     <p>
@@ -109,21 +95,22 @@ export default class LocalCreateDialog extends Component {
                   secondaryTextLines={2}
                   onClick={() => this.createEmptyGame()}
                 /> */}
-                <ListItem
-                  primaryText="Empty game"
-                  secondaryText={
-                    <p>
-                      Start a new game from scratch.
-                    </p>
-                  }
-                  secondaryTextLines={2}
-                  onClick={() => this.createEmptyGame()}
-                />
-              </List>
-            </Column>
-          </Line>
-          <Divider />
-          <Line expand>
+              <ListItem
+                primaryText="Empty game"
+                secondaryText={
+                  <p>
+                    Start a new game from scratch.
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => this.createEmptyGame()}
+              />
+            </List>
+          </Column>
+        </Line>
+        <Divider />
+        <Line expand>
+          <Column expand>
             <LocalFolderPicker
               fullWidth
               value={this.state.outputPath}
@@ -132,9 +119,9 @@ export default class LocalCreateDialog extends Component {
                   outputPath,
                 })}
             />
-          </Line>
-        </Column>
-      </Dialog>
+          </Column>
+        </Line>
+      </Column>
     );
   }
 }

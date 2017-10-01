@@ -7,10 +7,19 @@ import ParameterRenderingService from './ParameterRenderingService';
 const gd = global.gd;
 
 const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+  },
   emptyContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  parametersContainer: {
+    flex: 1,
+    overflowY: 'auto',
   },
   instructionHeader: {
     display: 'flex',
@@ -65,7 +74,7 @@ export default class InstructionParametersEditor extends Component {
     instruction.setParametersCount(instructionMetadata.getParametersCount());
 
     return (
-      <div style={this.props.style}>
+      <div style={styles.container}>
         <div style={styles.instructionHeader}>
           <img
             src={instructionMetadata.getIconFilename()}
@@ -77,7 +86,7 @@ export default class InstructionParametersEditor extends Component {
           </p>
         </div>
         <Divider />
-        <div key={type}>
+        <div key={type} style={styles.parametersContainer}>
           {mapFor(0, instructionMetadata.getParametersCount(), i => {
             const parameterMetadata = instructionMetadata.getParameter(i);
             const ParameterComponent = ParameterRenderingService.getParameterComponent(

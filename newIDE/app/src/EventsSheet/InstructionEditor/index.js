@@ -23,6 +23,10 @@ const styles = {
 };
 
 export default class InstructionEditor extends Component {
+  componentDidMount() {
+    if (this._typeSelector) this._typeSelector.focus();
+  }
+
   render() {
     const { instruction, isCondition, project, layout } = this.props;
 
@@ -36,6 +40,7 @@ export default class InstructionEditor extends Component {
             instruction.setType(type);
             this.forceUpdate();
           }}
+          ref={typeSelector => this._typeSelector = typeSelector}
         />
         <Paper style={styles.parametersEditor} rounded={false} zDepth={2}>
           <InstructionParametersEditor

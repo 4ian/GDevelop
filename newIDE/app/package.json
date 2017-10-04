@@ -27,7 +27,7 @@
     "lodash.update": "^4.10.2",
     "lodash.values": "^4.3.0",
     "material-ui": "0.18.3",
-    "material-ui-search-bar": "^0.3.0",
+    "material-ui-search-bar": "0.4.0",
     "pixi-simple-gesture": "0.2.2",
     "pixi.js": "3.0.11",
     "prop-types": "^15.5.10",

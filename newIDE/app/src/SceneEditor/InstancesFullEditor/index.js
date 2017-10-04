@@ -442,6 +442,10 @@ export default class InstancesFullEditor extends Component {
       });
   };
 
+  forceUpdateObjectsList = () => {
+    if (this._objectsList) this._objectsList.forceUpdateList();
+  }
+
   render() {
     const { project, layout, initialInstances, resourceSources } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
@@ -487,6 +491,7 @@ export default class InstancesFullEditor extends Component {
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             onRenameObject={this._onRenameObject}
+            ref={objectsList => this._objectsList = objectsList}
           />
         </MosaicWindow>
       ),
@@ -520,7 +525,10 @@ export default class InstancesFullEditor extends Component {
           project={project}
           resourceSources={resourceSources}
           onCancel={() => this.editObject(null)}
-          onApply={() => this.editObject(null)}
+          onApply={() => {
+            this.editObject(null);
+            this.forceUpdateObjectsList();
+          }}
         />
         <ObjectsGroupEditorDialog
           open={!!this.state.editedGroup}

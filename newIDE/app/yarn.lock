@@ -4601,9 +4601,9 @@ material-colors@^1.2.1:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.5.tgz#5292593e6754cb1bcc2b98030e4e0d6a3afc9ea1"
 
-material-ui-search-bar@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/material-ui-search-bar/-/material-ui-search-bar-0.3.0.tgz#ee89d07b75f081bfd5ce0f42dfb9a79862682f45"
+material-ui-search-bar@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/material-ui-search-bar/-/material-ui-search-bar-0.4.0.tgz#e88036d07c6f39c35d718e6111e74778a3255edd"
   dependencies:
     prop-types "^15.5.8"
 

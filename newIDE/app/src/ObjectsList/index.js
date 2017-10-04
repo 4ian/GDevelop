@@ -251,9 +251,13 @@ export default class ObjectsListContainer extends React.Component {
       );
     }
 
+    this.forceUpdateList();
+  };
+
+  forceUpdateList = () => {
     this.forceUpdate();
     this.sortableList.getWrappedInstance().forceUpdateGrid();
-  };
+  }
 
   render() {
     const { project, objectsContainer } = this.props;

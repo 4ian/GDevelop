@@ -36,11 +36,14 @@ export default class GroupEvent extends Component {
   }
 
   edit = () => {
-    this.setState({
-      editing: true,
-    }, () => {
-      if (this._textField) this._textField.focus();
-    });
+    this.setState(
+      {
+        editing: true,
+      },
+      () => {
+        if (this._textField) this._textField.focus();
+      }
+    );
   };
 
   endEditing = () => {
@@ -74,6 +77,7 @@ export default class GroupEvent extends Component {
           ? <TextField
               ref={textField => this._textField = textField}
               value={groupEvent.getName()}
+              hintText="<Enter group name>"
               onBlur={this.endEditing}
               onChange={(e, text) => {
                 groupEvent.setName(text);
@@ -96,7 +100,7 @@ export default class GroupEvent extends Component {
               })}
               style={{ ...styles.title, color: textColor }}
             >
-              {groupEvent.getName()}
+              {groupEvent.getName() || '<Enter group name>'}
             </span>}
       </div>
     );

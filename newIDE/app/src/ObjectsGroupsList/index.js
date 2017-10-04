@@ -178,8 +178,8 @@ export default class GroupsListContainer extends React.Component {
     if (group.getName() === newName) return;
 
     if (
-      objectsContainer.getObjectsGroups().has(newName) ||
-      project.getObjectsGroups().has(newName)
+      objectsContainer.getObjectGroups().has(newName) ||
+      project.getObjectGroups().has(newName)
     ) {
       showWarningBox('Another object with this name already exists');
       return;

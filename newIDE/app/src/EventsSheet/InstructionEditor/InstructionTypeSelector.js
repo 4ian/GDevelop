@@ -25,7 +25,7 @@ const styles = {
   },
 };
 
-export class InstructionTypeList extends Component {
+export class InstructionTypeSelector extends Component {
   constructor(props) {
     super(props);
 
@@ -39,6 +39,10 @@ export class InstructionTypeList extends Component {
     const allInstructions = this._listAllInstructions();
     this.instructionsInfo = allInstructions;
     this.instructionsInfoTree = this._createInstructionsTree(allInstructions);
+  }
+
+  focus = () => {
+    if (this._searchBar) this._searchBar.focus();
   }
 
   _listInstructions(groupPrefix, extensionInstructions) {
@@ -222,6 +226,7 @@ export class InstructionTypeList extends Component {
             })}
           onRequestSearch={this._onSubmitSearch}
           style={styles.searchBar}
+          ref={searchBar => this._searchBar = searchBar}
         />
         <SelectableList
           value={this.props.selectedType}
@@ -241,4 +246,4 @@ export class InstructionTypeList extends Component {
   }
 }
 
-export default makeSelectable(InstructionTypeList);
+export default InstructionTypeSelector;

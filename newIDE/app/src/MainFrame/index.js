@@ -230,7 +230,10 @@ export default class MainFrame extends Component {
       {
         editorTabs: closeLayoutTabs(this.state.editorTabs, layout),
       },
-      () => layout.setName(newName)
+      () => {
+        layout.setName(newName);
+        this.forceUpdate();
+      }
     );
   };
 
@@ -246,7 +249,10 @@ export default class MainFrame extends Component {
           externalLayout
         ),
       },
-      () => externalLayout.setName(newName)
+      () => {
+        externalLayout.setName(newName);
+        this.forceUpdate();
+      }
     );
   };
 
@@ -262,7 +268,10 @@ export default class MainFrame extends Component {
           externalEvents
         ),
       },
-      () => externalEvents.setName(newName)
+      () => {
+        externalEvents.setName(newName);
+        this.forceUpdate();
+      }
     );
   };
 

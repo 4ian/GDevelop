@@ -87,6 +87,7 @@ class Item extends Component {
             if (event.charCode === 13) {
               // enter key pressed
               this.textField.blur();
+              this.props.onRename(event.target.value);
             }
           }}
           fullWidth
@@ -189,7 +190,10 @@ export default class ProjectManager extends React.Component {
                 }
                 onEdit={() => this.props.onOpenLayout(name)}
                 onDelete={() => this.props.onDeleteLayout(layout)}
-                onRename={newName => this.props.onRenameLayout(name, newName)}
+                onRename={newName => {
+                  this.props.onRenameLayout(name, newName);
+                  this._onEditName(null, '');
+                }}
                 onEditName={() => this._onEditName('layout', name)}
               />
             );
@@ -221,8 +225,10 @@ export default class ProjectManager extends React.Component {
                 onEdit={() => this.props.onOpenExternalEvents(name)}
                 onDelete={() =>
                   this.props.onDeleteExternalEvents(externalEvents)}
-                onRename={newName =>
-                  this.props.onRenameExternalEvents(name, newName)}
+                onRename={newName => {
+                  this.props.onRenameExternalEvents(name, newName);
+                  this._onEditName(null, '');
+                }}
                 onEditName={() => this._onEditName('external-events', name)}
               />
             );
@@ -254,8 +260,10 @@ export default class ProjectManager extends React.Component {
                 onEdit={() => this.props.onOpenExternalLayout(name)}
                 onDelete={() =>
                   this.props.onDeleteExternalLayout(externalLayout)}
-                onRename={newName =>
-                  this.props.onRenameExternalLayout(name, newName)}
+                onRename={newName => {
+                  this.props.onRenameExternalLayout(name, newName);
+                  this._onEditName(null, '');
+                }}
                 onEditName={() => this._onEditName('external-layout', name)}
               />
             );

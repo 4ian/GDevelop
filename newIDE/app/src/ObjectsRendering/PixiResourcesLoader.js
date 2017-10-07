@@ -108,7 +108,7 @@ export default class PixiResourcesLoader {
     // Load the given font using CSS Font Loading API.
     const fontFamily = slugs(fontFilename);
     const fullFilename = ResourcesLoader.getFullFilename(project, fontFilename);
-    const fontFace = new FontFace(fontFamily, `url(${fullFilename})`, {});
+    const fontFace = new FontFace(fontFamily, `url("${fullFilename}")`, {});
     document.fonts.add(fontFace);
     return fontFace.load().then(loadedFace => {
       loadedFontFamilies[fontFilename] = fontFamily;

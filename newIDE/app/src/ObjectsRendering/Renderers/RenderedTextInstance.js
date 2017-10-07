@@ -82,8 +82,9 @@ RenderedTextInstance.prototype.update = function() {
         this._fontFamily = fontFamily;
         this._styleFontDirty = true;
       })
-      .catch(() => {
+      .catch(err => {
         // Ignore errors
+        console.warn("Unable to load font family", err);
       });
   }
 

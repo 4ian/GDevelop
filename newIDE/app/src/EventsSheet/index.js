@@ -116,7 +116,7 @@ export default class EventsSheet extends Component {
       return context.eventsList.insertNewEvent(
         project,
         type,
-        context.indexInList
+        context.indexInList + 1
       );
     });
 

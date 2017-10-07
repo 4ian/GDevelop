@@ -84,17 +84,16 @@ export default class LocalCreateDialog extends Component {
                 secondaryTextLines={2}
                 onClick={() => this.createFromExample('platformer')}
               />
-              {/* <ListItem
-                  primaryText="Space Shooter"
-                  secondaryText={
-                    <p>
-                      A side-scrolling shooter where you must defeat incoming enemies with your spaceship.
-                    </p>
-                  }
-                  disabled
-                  secondaryTextLines={2}
-                  onClick={() => this.createEmptyGame()}
-                /> */}
+              <ListItem
+                primaryText="Space Shooter"
+                secondaryText={
+                  <p>
+                    A side-scrolling shooter where you must defeat incoming enemies with your spaceship.
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => this.createFromExample('space-shooter')}
+              />
               <ListItem
                 primaryText="Empty game"
                 secondaryText={

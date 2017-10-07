@@ -12,7 +12,7 @@ export default class LocalCreateDialog extends Component {
           </Column>
         </Line>
         <Line>
-          <Column expand noMargin>
+          <Column expand>
             <FlatButton
               label="Platformer"
               fullWidth
@@ -20,10 +20,10 @@ export default class LocalCreateDialog extends Component {
               onClick={() => this.props.onOpen('internal://platformer')}
             />
             <FlatButton
-              label="Space Shooter - coming soon!"
+              label="Space Shooter"
               fullWidth
               primary
-              disabled
+              onClick={() => this.props.onOpen('internal://space-shooter')}
             />
           </Column>
         </Line>

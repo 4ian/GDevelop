@@ -65,8 +65,7 @@ Binaries/Packaging/logs
 !/scripts/libgettextlib-0-17.dll
 !/scripts/libgettextsrc-0-17.dll
 !/xgettext.exe
-!/Binaries/Output/Release_Windows/locale/libgettextlib-0-17.dll
-!/Binaries/Output/Release_Windows/locale/libgettextsrc-0-17.dll
+!/Binaries/Output/Release_Windows/locale/*.dll
 !/Binaries/Output/Release_Windows/locale/msgcat.exe
 !/Binaries/Output/Release_Windows/locale/msgfmt.exe
 !/ExtLibs/curl.exe

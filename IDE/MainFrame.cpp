@@ -515,6 +515,8 @@ MainFrame::~MainFrame()
 {
     //(*Destroy(MainFrame)
     //*)
+    editorsManager.SetNotebook(NULL);
+    Disconnect( wxID_ANY, wxEVT_ACTIVATE, ( wxObjectEventFunction )&MainFrame::OnActivate );
 
     //Deinitialize the frame manager
     m_mgr.UnInit();

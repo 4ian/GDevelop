@@ -1,4 +1,4 @@
-; Inno Setup installation script for GDevelop.
+; Inno Setup installation script for GDevelop 4.
 
 [Setup]
 AppName=GDevelop
@@ -13,14 +13,14 @@ AllowNoIcons=yes
 LicenseFile=..\Output\Release_Windows\License-en.rtf
 InfoBeforeFile=..\Output\Release_Windows\Informations-en.rtf
 OutputDir=.\
-OutputBaseFilename=gd4090
+OutputBaseFilename=gd4096
 Compression=lzma
 SolidCompression=yes
 SetupIconFile=..\Output\Release_Windows\res\icon.ico
 VersionInfoVersion=4.0
 WizardImageFile=Setup bitmap\wizbmp.bmp
 WizardSmallImageFile=Setup bitmap/smallicon.bmp
-AppCopyright=2008-2016 Florian Rival
+AppCopyright=2008-2017 Florian Rival
 VersionInfoCompany=Florian Rival
 VersionInfoDescription=GDevelop setup
 VersionInfoCopyright=2008-2016 Florian Rival

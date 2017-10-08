@@ -79,20 +79,17 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
             #endif
 
             //Create the destination filename
-            gd::String destinationFile(destinationDirectory + "/" + it->second);
+            gd::String destinationFile = it->second;
             fs.MakeAbsolute(destinationFile, destinationDirectory);
 
-            if ( destinationFile != it->first )
-            {
-                //Be sure the directory exists
-                gd::String dir = fs.DirNameFrom(destinationFile);
-                if ( !fs.DirExists(dir) ) fs.MkDir(dir);
+            //Be sure the directory exists
+            gd::String dir = fs.DirNameFrom(destinationFile);
+            if ( !fs.DirExists(dir) ) fs.MkDir(dir);
 
-                //We can now copy the file
-                if ( !fs.CopyFile(it->first, destinationFile) )
-                {
-                    gd::LogWarning( _( "Unable to copy \"")+it->first+_("\" to \"")+destinationFile+_("\"."));
-                }
+            //We can now copy the file
+            if ( !fs.CopyFile(it->first, destinationFile) )
+            {
+                gd::LogWarning( _( "Unable to copy \"")+it->first+_("\" to \"")+destinationFile+_("\"."));
             }
         }
 

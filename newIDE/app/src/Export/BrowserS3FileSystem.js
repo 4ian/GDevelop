@@ -12,6 +12,10 @@ export default class BrowserS3FileSystem {
     // Store all the objects that should be written on the S3 bucket.
     // Call uploadPendingObjects to send them
     this._pendingUploadObjects = [];
+
+    // Store a set of all external URLs copied so that we can simulate
+    // readDir result.
+    this._allCopiedExternalUrls = new Set();
   }
 
   uploadPendingObjects = () => {
@@ -84,7 +88,10 @@ export default class BrowserS3FileSystem {
   };
   copyFile = (source, dest) => {
     //URL are not copied.
-    if (this._isExternalURL(source)) return true;
+    if (this._isExternalURL(source)) {
+      this._allCopiedExternalUrls.add(source);
+      return true;
+    }
 
     source = this._translateURL(source);
     console.warn('Copy not done from', source, 'to', dest);
@@ -123,17 +130,22 @@ export default class BrowserS3FileSystem {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
-    console.warn('Assume', path, 'is empty for extension', ext);
+    // Simulate ReadDir by returning all external URL s
+    // with the filename matching the extension.
+    this._allCopiedExternalUrls.forEach(url => {
+      const upperCaseUrl = url.toUpperCase();
+      if (upperCaseUrl.indexOf(ext) === upperCaseUrl.length - ext.length) {
+        output.push_back(url);
+      }
+    });
+
     return output;
   };
 
   fileExists = filename => {
     if (this._isExternalURL(filename)) return true;
 
-    // // Do as if the virtual GDJS folder is empty so that the exporter
-    // // keeps the absolute URL.
-    // if (filename.indexOf(gdjsRoot) === 0) return false;
-
+    // Assume all files asked for exists.
     return true;
   };
 

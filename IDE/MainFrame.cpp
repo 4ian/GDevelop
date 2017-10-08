@@ -365,7 +365,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     static int widths[2] = { -1, 175 };
     statusBar->SetFieldsCount(2);
     statusBar->SetStatusWidths(2, widths);
-    statusBar->SetStatusText( "2008-2016", 1 );
+    statusBar->SetStatusText("2008-2017", 1);
     SetStatusBar(statusBar);
 
     std::vector<wxWindow*> controlsToBeDisabledOnPreview; //Used below:

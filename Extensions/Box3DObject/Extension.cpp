@@ -180,7 +180,7 @@ public:
             obj.AddCondition("Yaw",
                            _("Yaw"),
                            _("Compare the Yaw of a 3D Box object."),
-                           _("Yaw of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Yaw angle of _PARAM0_ is _PARAM1__PARAM2_"),
                            _("Angle"),
                            "res/conditions/rotate24.png",
                            "res/conditions/rotate.png")
@@ -210,7 +210,7 @@ public:
             obj.AddCondition("Pitch",
                            _("Pitch"),
                            _("Compare the Pitch of a 3D Box object."),
-                           _("Pitch of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Pitch angle of _PARAM0_ is _PARAM1__PARAM2_"),
                            _("Angle"),
                            "res/conditions/rotate24.png",
                            "res/conditions/rotate.png")
@@ -239,7 +239,7 @@ public:
             obj.AddCondition("Roll",
                            _("Roll"),
                            _("Compare the Roll of a 3D Box object."),
-                           _("Roll of _PARAM0_ is _PARAM1__PARAM2_"),
+                           _("Roll angle of _PARAM0_ is _PARAM1__PARAM2_"),
                            _("Angle"),
                            "res/conditions/rotate24.png",
                            "res/conditions/rotate.png")

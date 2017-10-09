@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
+import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
 
 export default class LocalCreateDialog extends Component {
@@ -17,13 +18,19 @@ export default class LocalCreateDialog extends Component {
               label="Platformer"
               fullWidth
               primary
-              onClick={() => this.props.onOpen('internal://platformer')}
+              onClick={() => {
+                sendNewGameCreated('platformer');
+                this.props.onOpen('internal://platformer');
+              }}
             />
             <FlatButton
               label="Space Shooter"
               fullWidth
               primary
-              onClick={() => this.props.onOpen('internal://space-shooter')}
+              onClick={() => {
+                sendNewGameCreated('space-shooter');
+                this.props.onOpen('internal://space-shooter');
+              }}
             />
           </Column>
         </Line>

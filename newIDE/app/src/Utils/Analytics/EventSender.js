@@ -1,4 +1,6 @@
 import Keen from 'keen-tracking';
+import { getUserUUID } from './UserUUID';
+
 const sessionCookie = Keen.utils.cookie('visitor-stats');
 const sessionTimer = Keen.utils.timer();
 sessionTimer.start();
@@ -12,6 +14,9 @@ var client = new Keen({
 
 client.extendEvents(function() {
   return {
+    user: {
+      uuid: getUserUUID(),
+    },
     page: {
       title: document.title,
       url: document.location.href,

@@ -215,6 +215,11 @@ export class InstructionTypeSelector extends Component {
     });
   };
 
+  //// autofocus on search
+  componentDidMount() {
+    this._searchBar.focus();
+    };
+
   render() {
     return (
       <div style={this.props.style}>

@@ -35,7 +35,7 @@ export default class InstructionEditorDialog extends React.Component {
       <FlatButton
         label="Ok"
         primary={true}
-        //keyboardFocused={true}
+        keyboardFocused={false}
         onTouchTap={this.props.onSubmit}
       />,
     ];

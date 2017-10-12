@@ -215,7 +215,6 @@ export class InstructionTypeSelector extends Component {
     });
   };
 
-  //// autofocus on search
   componentDidMount() {
     this._searchBar.focus();
   };

@@ -169,7 +169,7 @@ public:
             obj.AddCondition("Volume",
                            _("Sound level"),
                            _("Test the sound level of a Sound object."),
-                           _("Th sound level of _PARAM0_ is _PARAM2_ _PARAM1_"),
+                           _("The sound level of _PARAM0_ is _PARAM2_ _PARAM1_"),
                            _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")

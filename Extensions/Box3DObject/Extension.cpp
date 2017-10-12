@@ -163,9 +163,9 @@ public:
 
 
             obj.AddAction("Yaw",
-                           _("Yaw"),
+                           _("Yaw angle"),
                            _("Modify the Yaw of a 3D Box object."),
-                           _("Do _PARAM1__PARAM2_ to yaw of _PARAM0_"),
+                           _("Do _PARAM1__PARAM2_ to yaw angle of _PARAM0_"),
                            _("Angle"),
                            "res/actions/rotate24.png",
                            "res/actions/rotate.png")
@@ -178,7 +178,7 @@ public:
 
 
             obj.AddCondition("Yaw",
-                           _("Yaw"),
+                           _("Yaw angle"),
                            _("Compare the Yaw of a 3D Box object."),
                            _("Yaw angle of _PARAM0_ is _PARAM1__PARAM2_"),
                            _("Angle"),
@@ -193,9 +193,9 @@ public:
 
 
             obj.AddAction("Pitch",
-                           _("Pitch"),
+                           _("Pitch angle"),
                            _("Modify the Pitch of a 3D Box object."),
-                           _("Do _PARAM1__PARAM2_ to pitch of _PARAM0_"),
+                           _("Do _PARAM1__PARAM2_ to pitch angle of _PARAM0_"),
                            _("Angle"),
                            "res/actions/rotate24.png",
                            "res/actions/rotate.png")
@@ -208,7 +208,7 @@ public:
 
 
             obj.AddCondition("Pitch",
-                           _("Pitch"),
+                           _("Pitch angle"),
                            _("Compare the Pitch of a 3D Box object."),
                            _("Pitch angle of _PARAM0_ is _PARAM1__PARAM2_"),
                            _("Angle"),
@@ -223,9 +223,9 @@ public:
 
 
             obj.AddAction("Roll",
-                           _("Roll"),
+                           _("Roll angle"),
                            _("Modify the Roll of a 3D Box object."),
-                           _("Do _PARAM1__PARAM2_ to roll of _PARAM0_"),
+                           _("Do _PARAM1__PARAM2_ to roll angle of _PARAM0_"),
                            _("Angle"),
                            "res/actions/rotate24.png",
                            "res/actions/rotate.png")
@@ -237,7 +237,7 @@ public:
 
 
             obj.AddCondition("Roll",
-                           _("Roll"),
+                           _("Roll angle"),
                            _("Compare the Roll of a 3D Box object."),
                            _("Roll angle of _PARAM0_ is _PARAM1__PARAM2_"),
                            _("Angle"),

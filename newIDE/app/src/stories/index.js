@@ -8,7 +8,7 @@ import Welcome from './Welcome';
 
 import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
-import LocalCreateDialog from '../ProjectCreation/LocalCreateDialog';
+import LocalCreateDialog from '../ProjectCreation/CreateProjectDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';

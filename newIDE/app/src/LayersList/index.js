@@ -85,7 +85,8 @@ class LayersListBody extends Component {
         disabled
         onAdd={() => {
           const name = newNameGenerator('Layer', name =>
-            layersContainer.hasLayerNamed(name));
+            layersContainer.hasLayerNamed(name)
+          );
           layersContainer.insertNewLayer(
             name,
             layersContainer.getLayersCount()
@@ -135,9 +136,12 @@ export default class LayersList extends Component {
           layersContainer={this.props.layersContainer}
           onRemoveLayer={this.props.onRemoveLayer}
           onRenameLayer={this.props.onRenameLayer}
-          onSortEnd={({oldIndex, newIndex}) => {
+          onSortEnd={({ oldIndex, newIndex }) => {
             const layersCount = this.props.layersContainer.getLayersCount();
-            this.props.layersContainer.moveLayer(layersCount - 1 - oldIndex, layersCount - 1 - newIndex);
+            this.props.layersContainer.moveLayer(
+              layersCount - 1 - oldIndex,
+              layersCount - 1 - newIndex
+            );
             this.forceUpdate();
           }}
           helperClass="sortable-helper"

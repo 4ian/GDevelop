@@ -23,17 +23,13 @@ export default class ObjectSelector extends Component {
       layout,
       this.props.allowedObjectType || undefined
     );
-    const objects = list.allObjectsList.map(({
-      object,
-    }) => {
+    const objects = list.allObjectsList.map(({ object }) => {
       return {
         text: object.getName(),
         value: object.getName(),
       };
     });
-    const groups = list.allGroupsList.map(({
-      group,
-    }) => {
+    const groups = list.allGroupsList.map(({ group }) => {
       return {
         text: group.getName(),
         value: group.getName(),
@@ -48,9 +44,10 @@ export default class ObjectSelector extends Component {
   }
 
   hasAValidObject = () => {
-    return this.fullList.filter(
-      choice => this.props.value === choice.text
-    ).length !== 0;
+    return (
+      this.fullList.filter(choice => this.props.value === choice.text)
+        .length !== 0
+    );
   };
 
   render() {
@@ -85,7 +82,7 @@ export default class ObjectSelector extends Component {
         }}
         dataSource={this.fullList}
         filter={fuzzyFilterOrEmpty}
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
         {...rest}
       />
     );

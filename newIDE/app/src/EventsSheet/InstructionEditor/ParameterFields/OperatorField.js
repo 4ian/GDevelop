@@ -17,7 +17,7 @@ export default class OperatorField extends Component {
         floatingLabelText={description}
         value={this.props.value}
         onChange={(e, i, value) => this.props.onChange(value)}
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
       >
         <MenuItem value="=" primaryText="= (set to)" />
         <MenuItem value="+" primaryText="+ (add)" />

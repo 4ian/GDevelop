@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import VariableField from './VariableField';
-import VariablesEditorDialog
-  from '../../../VariablesList/VariablesEditorDialog';
+import VariablesEditorDialog from '../../../VariablesList/VariablesEditorDialog';
 
 export default class ObjectVariableField extends Component {
   state = {
@@ -33,16 +32,17 @@ export default class ObjectVariableField extends Component {
           value={this.props.value}
           onChange={this.props.onChange}
           isInline={this.props.isInline}
-          ref={field => this._field = field}
+          ref={field => (this._field = field)}
           onOpenDialog={() => this.setState({ editorOpen: true })}
         />
-        {this.state.editorOpen &&
+        {this.state.editorOpen && (
           <VariablesEditorDialog
             open={this.state.editorOpen}
             variablesContainer={variablesContainer}
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => this.setState({ editorOpen: false })}
-          />}
+          />
+        )}
       </div>
     );
   }

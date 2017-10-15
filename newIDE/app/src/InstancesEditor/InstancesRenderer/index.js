@@ -2,20 +2,18 @@ import LayerRenderer from './LayerRenderer';
 import PIXI from 'pixi.js';
 
 export default class InstancesRenderer {
-  constructor(
-    {
-      project,
-      layout,
-      instances,
-      viewPosition,
-      onInstanceClicked,
-      onOverInstance,
-      onOutInstance,
-      onMoveInstance,
-      onMoveInstanceEnd,
-      onDownInstance,
-    }
-  ) {
+  constructor({
+    project,
+    layout,
+    instances,
+    viewPosition,
+    onInstanceClicked,
+    onOverInstance,
+    onOutInstance,
+    onMoveInstance,
+    onMoveInstanceEnd,
+    onDownInstance,
+  }) {
     this.project = project;
     this.instances = instances;
     this.layout = layout;
@@ -90,7 +88,7 @@ export default class InstancesRenderer {
 
       let layerRenderer = this.layersRenderers[layerName];
       if (!layerRenderer) {
-        this.layersRenderers[layerName] = (layerRenderer = new LayerRenderer({
+        this.layersRenderers[layerName] = layerRenderer = new LayerRenderer({
           project: this.project,
           layout: this.layout,
           instances: this.instances,
@@ -102,7 +100,7 @@ export default class InstancesRenderer {
           onMoveInstance: this.onMoveInstance,
           onMoveInstanceEnd: this.onMoveInstanceEnd,
           onDownInstance: this.onDownInstance,
-        }));
+        });
         this.pixiContainer.addChild(layerRenderer.getPixiContainer());
       }
 
@@ -139,8 +137,7 @@ export default class InstancesRenderer {
           this.pixiContainer.removeChild(layerRenderer.getPixiContainer());
           layerRenderer.delete();
           delete this.layersRenderers[i];
-        } else
-          layerRenderer.wasUsed = false;
+        } else layerRenderer.wasUsed = false;
       }
     }
   }

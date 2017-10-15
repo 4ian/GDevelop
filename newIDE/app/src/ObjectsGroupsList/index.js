@@ -18,7 +18,11 @@ const AddGroupRow = makeAddItem(ListItem);
 
 const SortableGroupRow = SortableElement(props => {
   const { style, ...otherProps } = props;
-  return <div style={style}><GroupRow {...otherProps} /></div>;
+  return (
+    <div style={style}>
+      <GroupRow {...otherProps} />
+    </div>
+  );
 });
 
 const SortableAddGroupRow = SortableElement(props => {
@@ -35,7 +39,7 @@ class GroupsList extends Component {
 
     return (
       <List
-        ref={list => this.list = list}
+        ref={list => (this.list = list)}
         height={height}
         rowCount={fullList.length}
         rowHeight={listItemHeight}
@@ -54,7 +58,8 @@ class GroupsList extends Component {
             );
           }
 
-          const nameBeingEdited = this.props.renamedGroupWithScope &&
+          const nameBeingEdited =
+            this.props.renamedGroupWithScope &&
             this.props.renamedGroupWithScope.group === groupWithScope.group &&
             this.props.renamedGroupWithScope.global === groupWithScope.global;
 
@@ -128,7 +133,7 @@ export default class GroupsListContainer extends React.Component {
     const name = newNameGenerator(
       'Group',
       name =>
-      objectsContainerGroups.has(name) || project.getObjectGroups().has(name)
+        objectsContainerGroups.has(name) || project.getObjectGroups().has(name)
     );
 
     objectsContainerGroups.insertNew(name, objectsContainerGroups.count());
@@ -198,18 +203,22 @@ export default class GroupsListContainer extends React.Component {
 
     const isInGroupsList = oldIndex < this.containerGroupsList.length;
     if (isInGroupsList) {
-      objectsContainer.getObjectGroups().move(
-        oldIndex,
-        Math.min(newIndex, this.containerGroupsList.length - 1)
-      );
+      objectsContainer
+        .getObjectGroups()
+        .move(
+          oldIndex,
+          Math.min(newIndex, this.containerGroupsList.length - 1)
+        );
     } else {
       const projectOldIndex = oldIndex - this.containerGroupsList.length;
       const projectNewIndex = newIndex - this.containerGroupsList.length;
 
-      project.getObjectGroups().move(
-        projectOldIndex,
-        Math.min(projectNewIndex, this.projectGroupsList.length - 1)
-      );
+      project
+        .getObjectGroups()
+        .move(
+          projectOldIndex,
+          Math.min(projectNewIndex, this.projectGroupsList.length - 1)
+        );
     }
 
     this.forceUpdate();
@@ -240,7 +249,7 @@ export default class GroupsListContainer extends React.Component {
           {({ height, width }) => (
             <SortableGroupsList
               key={listKey}
-              ref={sortableList => this.sortableList = sortableList}
+              ref={sortableList => (this.sortableList = sortableList)}
               fullList={fullList}
               project={project}
               width={width}

@@ -23,14 +23,14 @@ export default class ConfirmCloseDialog extends Component {
       open: false,
     });
     if (this.onHandleAnswer) this.onHandleAnswer(false);
-  }
+  };
 
   handleClose = () => {
     this.setState({
       open: false,
     });
     if (this.onHandleAnswer) this.onHandleAnswer(true);
-  }
+  };
 
   render() {
     const actions = [

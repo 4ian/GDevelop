@@ -1,5 +1,5 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
-import {timeFunction} from '../Utils/TimeFunction.js';
+import { timeFunction } from '../Utils/TimeFunction.js';
 const electron = optionalRequire('electron');
 const Buffer = electron ? electron.remote.require('buffer').Buffer : null;
 
@@ -73,13 +73,16 @@ Bridge.prototype._receive = function(data) {
 
   // Parse the received JSON
   let dataObject;
-  timeFunction(() => {
-    try {
-      dataObject = JSON.parse(data);
-    } catch (ex) {
-      console.warn('Received invalid data (JSON parse failed)', ex);
-    }
-  }, (time) => console.info(`JSON parse took ${time}ms`));
+  timeFunction(
+    () => {
+      try {
+        dataObject = JSON.parse(data);
+      } catch (ex) {
+        console.warn('Received invalid data (JSON parse failed)', ex);
+      }
+    },
+    time => console.info(`JSON parse took ${time}ms`)
+  );
   if (!dataObject) return;
 
   if (this._onReceiveCb) {

@@ -81,9 +81,7 @@ export default class InstructionParametersEditor extends Component {
             alt=""
             style={styles.icon}
           />
-          <p>
-            {instructionMetadata.getDescription()}
-          </p>
+          <p>{instructionMetadata.getDescription()}</p>
         </div>
         <Divider />
         <div key={type} style={styles.parametersContainer}>
@@ -109,11 +107,10 @@ export default class InstructionParametersEditor extends Component {
               />
             );
           })}
-          {this._getNonCodeOnlyParametersCount(instructionMetadata) === 0 &&
-            <EmptyMessage>
-              There is nothing to configure.
-            </EmptyMessage>}
-          {this.props.isCondition &&
+          {this._getNonCodeOnlyParametersCount(instructionMetadata) === 0 && (
+            <EmptyMessage>There is nothing to configure.</EmptyMessage>
+          )}
+          {this.props.isCondition && (
             <Toggle
               label="Invert condition"
               labelPosition="right"
@@ -123,7 +120,8 @@ export default class InstructionParametersEditor extends Component {
                 instruction.setInverted(enabled);
                 this.forceUpdate();
               }}
-            />}
+            />
+          )}
         </div>
       </div>
     );

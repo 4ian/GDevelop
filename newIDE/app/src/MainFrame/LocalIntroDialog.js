@@ -34,15 +34,10 @@ export default class LocalIntroDialog extends Component {
       <Dialog actions={actions} modal={true} open={open}>
         <div>
           <p>
-            This is a
-            {' '}
-            <b>beta version</b>
-            {' '}
-            of GDevelop 5. Some parts of the software are still incomplete or missing.
+            This is a <b>beta version</b> of GDevelop 5. Some parts of the
+            software are still incomplete or missing.
           </p>
-          <p>
-            Any feedback on the forum or contribution on GitHub is welcome!
-          </p>
+          <p>Any feedback on the forum or contribution on GitHub is welcome!</p>
         </div>
       </Dialog>
     );

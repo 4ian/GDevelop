@@ -82,7 +82,9 @@ class EditorMosaic extends Component {
 
 export default EditorMosaic;
 export const MosaicWindow = props => {
-  const toolbarControls = props.toolbarControls || [<CloseButton key="close" />];
+  const toolbarControls = props.toolbarControls || [
+    <CloseButton key="close" />,
+  ];
 
   return <RMMosaicWindow {...props} toolbarControls={toolbarControls} />;
 };

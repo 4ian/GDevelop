@@ -20,7 +20,11 @@ const AddObjectRow = makeAddItem(ListItem);
 
 const SortableObjectRow = SortableElement(props => {
   const { style, ...otherProps } = props;
-  return <div style={style}><ObjectRow {...otherProps} /></div>;
+  return (
+    <div style={style}>
+      <ObjectRow {...otherProps} />
+    </div>
+  );
 });
 
 const SortableAddObjectRow = SortableElement(props => {
@@ -37,7 +41,7 @@ class ObjectsList extends Component {
 
     return (
       <List
-        ref={list => this.list = list}
+        ref={list => (this.list = list)}
         height={height}
         rowCount={fullList.length}
         rowHeight={listItemHeight}
@@ -56,7 +60,8 @@ class ObjectsList extends Component {
             );
           }
 
-          const nameBeingEdited = this.props.renamedObjectWithScope &&
+          const nameBeingEdited =
+            this.props.renamedObjectWithScope &&
             this.props.renamedObjectWithScope.object ===
               objectWithScope.object &&
             this.props.renamedObjectWithScope.global === objectWithScope.global;
@@ -234,8 +239,8 @@ export default class ObjectsListContainer extends React.Component {
   _onMove = (oldIndex, newIndex) => {
     const { project, objectsContainer } = this.props;
 
-    const isInContainerObjectsList = oldIndex <
-      this.containerObjectsList.length;
+    const isInContainerObjectsList =
+      oldIndex < this.containerObjectsList.length;
     if (isInContainerObjectsList) {
       objectsContainer.moveObject(
         oldIndex,
@@ -257,7 +262,7 @@ export default class ObjectsListContainer extends React.Component {
   forceUpdateList = () => {
     this.forceUpdate();
     this.sortableList.getWrappedInstance().forceUpdateGrid();
-  }
+  };
 
   render() {
     const { project, objectsContainer } = this.props;
@@ -283,7 +288,7 @@ export default class ObjectsListContainer extends React.Component {
           {({ height, width }) => (
             <SortableObjectsList
               key={listKey}
-              ref={sortableList => this.sortableList = sortableList}
+              ref={sortableList => (this.sortableList = sortableList)}
               fullList={fullList}
               project={project}
               width={width}
@@ -305,25 +310,27 @@ export default class ObjectsListContainer extends React.Component {
             />
           )}
         </AutoSizer>
-        {this.state.newObjectDialogOpen &&
+        {this.state.newObjectDialogOpen && (
           <NewObjectDialog
             open={this.state.newObjectDialogOpen}
             onClose={() => this.setState({ newObjectDialogOpen: false })}
             onChoose={this.addObject}
             project={project}
-          />}
-        {this.state.variablesEditedObject &&
+          />
+        )}
+        {this.state.variablesEditedObject && (
           <VariablesEditorDialog
             open={!!this.state.variablesEditedObject}
             variablesContainer={
               this.state.variablesEditedObject &&
-                this.state.variablesEditedObject.getVariables()
+              this.state.variablesEditedObject.getVariables()
             }
             onCancel={() => this._onEditVariables(null)}
             onApply={() => this._onEditVariables(null)}
             emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
             emptyExplanationSecondMessage="For example, you can have a variable called Life representing the health of the object."
-          />}
+          />
+        )}
       </Paper>
     );
   }

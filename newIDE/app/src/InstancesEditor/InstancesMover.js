@@ -14,13 +14,21 @@ export default class InstancesResizer {
   _roundXPosition(x) {
     if (!this.options.snap || !this.options.grid) return x;
 
-    return Math.round((x - this.options.gridOffsetX) / this.options.gridWidth) * this.options.gridWidth + this.options.gridOffsetX;
+    return (
+      Math.round((x - this.options.gridOffsetX) / this.options.gridWidth) *
+        this.options.gridWidth +
+      this.options.gridOffsetX
+    );
   }
 
   _roundYPosition(y) {
     if (!this.options.snap || !this.options.grid) return y;
 
-    return Math.round((y - this.options.gridOffsetY) / this.options.gridHeight) * this.options.gridHeight + this.options.gridOffsetY;
+    return (
+      Math.round((y - this.options.gridOffsetY) / this.options.gridHeight) *
+        this.options.gridHeight +
+      this.options.gridOffsetY
+    );
   }
 
   _getMoveDeltaX(followAxis) {
@@ -46,10 +54,10 @@ export default class InstancesResizer {
 
       let initialPosition = this.instancePositions[selectedInstance.ptr];
       if (!initialPosition) {
-        initialPosition = (this.instancePositions[selectedInstance.ptr] = {
+        initialPosition = this.instancePositions[selectedInstance.ptr] = {
           x: selectedInstance.getX(),
           y: selectedInstance.getY(),
-        });
+        };
       }
 
       selectedInstance.setX(

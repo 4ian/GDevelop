@@ -93,7 +93,8 @@ export default class LocalExport extends Component {
     return (
       <Column noMargin>
         <Line>
-          This will export your game to a folder that you can then upload on a website
+          This will export your game to a folder that you can then upload on a
+          website
         </Line>
         <Line>
           <LocalFolderPicker

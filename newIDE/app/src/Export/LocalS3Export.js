@@ -13,7 +13,8 @@ const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const shell = electron ? electron.shell : null;
 
-const deployEndpoint = 'https://nik50aqlp6.execute-api.eu-west-1.amazonaws.com/Production/deploy';
+const deployEndpoint =
+  'https://nik50aqlp6.execute-api.eu-west-1.amazonaws.com/Production/deploy';
 const gamesHost = 'http://gd-games.s3-website-eu-west-1.amazonaws.com';
 
 export default class LocalS3Export extends Component {
@@ -37,7 +38,8 @@ export default class LocalS3Export extends Component {
         this.setState({
           uploadProgress,
           uploadMax,
-        }));
+        })
+      );
       ipcRenderer.on('s3-upload-done', (event, err, prefix) => {
         if (err) return reject(err);
 
@@ -58,7 +60,8 @@ export default class LocalS3Export extends Component {
           params: {
             name: prefix,
           },
-        }))
+        })
+      )
       .then(response => {
         this.setState({
           deployDone: true,
@@ -109,7 +112,8 @@ export default class LocalS3Export extends Component {
       .then(() =>
         this.setState({
           exportStarted: false,
-        }));
+        })
+      );
   };
 
   openURL = () => {
@@ -145,8 +149,8 @@ export default class LocalS3Export extends Component {
     return (
       <Column noMargin>
         <Line>
-          This will export your game and upload it on GDevelop games hosting. The game
-          will be free and available for a few days.
+          This will export your game and upload it on GDevelop games hosting.
+          The game will be free and available for a few days.
         </Line>
         <Line alignItems="center">
           <LinearProgress

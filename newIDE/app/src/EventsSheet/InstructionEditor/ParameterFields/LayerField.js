@@ -73,7 +73,7 @@ export default class LayerField extends Component {
         }))}
         filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
       />
     );
   }

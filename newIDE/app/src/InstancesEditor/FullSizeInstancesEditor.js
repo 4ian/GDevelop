@@ -19,14 +19,15 @@ export default class FullSizeInstancesEditor extends Component {
       >
         <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
           {!!this.state.width &&
-            !!this.state.height &&
-            <InstancesEditorContainer
-              width={this.state.width}
-              height={this.state.height}
-              ref={editor =>
-                this.props.editorRef && this.props.editorRef(editor)}
-              {...this.props}
-            />}
+            !!this.state.height && (
+              <InstancesEditorContainer
+                width={this.state.width}
+                height={this.state.height}
+                ref={editor =>
+                  this.props.editorRef && this.props.editorRef(editor)}
+                {...this.props}
+              />
+            )}
         </div>
       </Measure>
     );

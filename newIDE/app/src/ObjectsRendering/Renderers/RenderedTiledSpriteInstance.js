@@ -55,7 +55,10 @@ RenderedTiledSpriteInstance.getThumbnail = function(
 ) {
   var tiledSprite = gd.asTiledSpriteObject(object);
 
-  return resourcesLoader.getResourceFullFilename(project, tiledSprite.getTexture());
+  return resourcesLoader.getResourceFullFilename(
+    project,
+    tiledSprite.getTexture()
+  );
 };
 
 RenderedTiledSpriteInstance.prototype.update = function() {

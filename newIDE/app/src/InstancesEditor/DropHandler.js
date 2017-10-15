@@ -1,9 +1,9 @@
 export default class SelectionRectangle {
   constructor({ canvas, onDrop }) {
-    canvas.ondragover = (canvas.ondrop = ev => {
+    canvas.ondragover = canvas.ondrop = ev => {
       ev.dataTransfer.dropEffect = 'copy';
       ev.preventDefault();
-    });
+    };
 
     canvas.ondrop = ev => {
       const canvasRect = canvas.getBoundingClientRect();

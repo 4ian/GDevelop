@@ -44,22 +44,22 @@ export default class RepeatEvent extends Component {
     this.state = {
       editing: false,
       anchorEl: null,
-    }
+    };
   }
 
-  edit = (domEvent) => {
+  edit = domEvent => {
     this.setState({
       editing: true,
       anchorEl: domEvent.currentTarget,
     });
-  }
+  };
 
   endEditing = () => {
     this.setState({
       editing: false,
       anchorEl: null,
     });
-  }
+  };
 
   render() {
     var repeatEvent = gd.asRepeatEvent(this.props.event);
@@ -83,11 +83,11 @@ export default class RepeatEvent extends Component {
           })}
           onClick={this.edit}
         >
-          {expression
-            ? `Repeat ${expression} times:`
-            : <i>
-                Click to choose how many times will be repeated
-              </i>}
+          {expression ? (
+            `Repeat ${expression} times:`
+          ) : (
+            <i>Click to choose how many times will be repeated</i>
+          )}
         </div>
         <div style={styles.instructionsContainer}>
           <InstructionsList
@@ -99,7 +99,9 @@ export default class RepeatEvent extends Component {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
-            onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+            onInstructionsListContextMenu={
+              this.props.onInstructionsListContextMenu
+            }
             onParameterClick={this.props.onParameterClick}
           />
           <InstructionsList
@@ -111,7 +113,9 @@ export default class RepeatEvent extends Component {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
-            onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+            onInstructionsListContextMenu={
+              this.props.onInstructionsListContextMenu
+            }
             onParameterClick={this.props.onParameterClick}
           />
         </div>
@@ -124,7 +128,7 @@ export default class RepeatEvent extends Component {
             project={this.props.project}
             layout={this.props.layout}
             value={expression}
-            onChange={(text) => {
+            onChange={text => {
               repeatEvent.setRepeatExpression(text);
               this.props.onUpdate();
             }}

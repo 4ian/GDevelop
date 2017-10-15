@@ -26,9 +26,7 @@ export default class InlinePopover extends Component {
         targetOrigin={{ horizontal: 'middle', vertical: 'top' }}
         onRequestClose={this.props.onRequestClose}
       >
-        <div style={styles.contentContainer}>
-          {this.props.children}
-        </div>
+        <div style={styles.contentContainer}>{this.props.children}</div>
       </Popover>
     );
   }

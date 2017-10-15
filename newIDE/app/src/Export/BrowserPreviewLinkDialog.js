@@ -15,7 +15,10 @@ export default class ExportDialog extends Component {
   _onOpen = value => {
     const windowObjectReference = window.open(this.props.url, '_blank');
     if (!windowObjectReference) {
-      showErrorBox('Unable to open the preview! Be sure that popup are allowed for this website.', undefined);
+      showErrorBox(
+        'Unable to open the preview! Be sure that popup are allowed for this website.',
+        undefined
+      );
     }
     this.props.onClose();
   };
@@ -25,15 +28,15 @@ export default class ExportDialog extends Component {
     if (!open || !url) return null;
 
     const actions = [
-      <FlatButton label="Launch the preview" primary onTouchTap={this._onOpen} />,
+      <FlatButton
+        label="Launch the preview"
+        primary
+        onTouchTap={this._onOpen}
+      />,
     ];
 
     return (
-      <Dialog
-        actions={actions}
-        modal={true}
-        open={open}
-      >
+      <Dialog actions={actions} modal={true} open={open}>
         <Line>
           <Column>
             Your preview is ready! Click on the button to launch the preview.
@@ -41,7 +44,11 @@ export default class ExportDialog extends Component {
         </Line>
         <Line>
           <Column>
-            <span>To skip this dialog and <b>directly open the preview next time</b>, please allow popups to be opened for this website in your browser.</span>
+            <span>
+              To skip this dialog and <b>directly open the preview next time</b>
+              , please allow popups to be opened for this website in your
+              browser.
+            </span>
           </Column>
         </Line>
       </Dialog>

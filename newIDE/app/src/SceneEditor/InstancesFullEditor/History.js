@@ -1,4 +1,7 @@
-import { serializeToJSObject, unserializeFromJSObject } from '../../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../Utils/Serializer';
 
 export const getHistoryInitialState = instances => {
   return {

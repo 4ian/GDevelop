@@ -18,7 +18,11 @@ export default class ListIcon extends Component {
           filter: this.props.disabled ? 'grayscale(100%)' : undefined,
         }}
       >
-        <img alt={this.props.tooltip} src={this.props.src} crossOrigin="anonymous" />
+        <img
+          alt={this.props.tooltip}
+          src={this.props.src}
+          crossOrigin="anonymous"
+        />
       </IconButton>
     );
   }

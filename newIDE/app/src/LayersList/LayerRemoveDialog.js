@@ -26,28 +26,22 @@ export default class VariablesEditorDialog extends Component {
     if (!this.props.layersContainer || !this.props.open) return null;
 
     const actions = [
-      (
-        <FlatButton
-          label="Cancel"
-          secondary={true}
-          keyboardFocused={true}
-          onTouchTap={() => this.props.onClose(false)}
-        />
-      ),
-      (
-        <FlatButton
-          label="Remove objects"
-          secondary={true}
-          onTouchTap={() => this.props.onClose(true, null)}
-        />
-      ),
-      (
-        <FlatButton
-          label="Move objects"
-          primary={true}
-          onTouchTap={() => this.props.onClose(true, this.state.selectedLayer)}
-        />
-      ),
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        keyboardFocused={true}
+        onTouchTap={() => this.props.onClose(false)}
+      />,
+      <FlatButton
+        label="Remove objects"
+        secondary={true}
+        onTouchTap={() => this.props.onClose(true, null)}
+      />,
+      <FlatButton
+        label="Move objects"
+        primary={true}
+        onTouchTap={() => this.props.onClose(true, this.state.selectedLayer)}
+      />,
     ];
 
     const layers = enumerateLayers(this.props.layersContainer);

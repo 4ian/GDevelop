@@ -116,12 +116,9 @@ export default class Window {
         // The 'contextmenu' event is emitted after 'selectionchange' has fired but possibly before the
         // visible selection has changed. Try to wait to show the menu until after that, otherwise the
         // visible selection will update after the menu dismisses and look weird.
-        setTimeout(
-          function() {
-            menu.popup(electron.remote.getCurrentWindow());
-          },
-          30
-        );
+        setTimeout(function() {
+          menu.popup(electron.remote.getCurrentWindow());
+        }, 30);
       });
     } else if (document) {
       document.addEventListener('contextmenu', function(e) {

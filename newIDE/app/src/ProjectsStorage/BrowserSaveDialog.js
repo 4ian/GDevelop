@@ -44,7 +44,8 @@ export default class BrowserSaveDialog extends Component {
       <Dialog actions={actions} modal={true} open={open}>
         <Column noMargin>
           <Line>
-            You can download the file of your game to continue working on it using the full GDevelop version:
+            You can download the file of your game to continue working on it
+            using the full GDevelop version:
           </Line>
           <Line>
             <Column expand>

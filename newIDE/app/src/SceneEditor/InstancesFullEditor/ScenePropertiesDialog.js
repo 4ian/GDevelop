@@ -89,7 +89,7 @@ export default class ScenePropertiesDialog extends Component {
             this.props.onClose();
           }}
         />
-        {this.props.onOpenMoreSettings &&
+        {this.props.onOpenMoreSettings && (
           <RaisedButton
             label="Open advanced settings"
             fullWidth
@@ -97,7 +97,8 @@ export default class ScenePropertiesDialog extends Component {
               this.props.onOpenMoreSettings();
               this.props.onClose();
             }}
-          />}
+          />
+        )}
       </Dialog>
     );
   }

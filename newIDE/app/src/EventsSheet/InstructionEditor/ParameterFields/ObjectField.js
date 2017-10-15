@@ -49,7 +49,7 @@ export default class ObjectField extends Component {
         errorText={this.state.errorText}
         onBlur={this.doValidation}
         openOnFocus={!this.props.isInline}
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
       />
     );
   }

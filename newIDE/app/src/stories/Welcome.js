@@ -5,7 +5,8 @@ const styles = {
     margin: 15,
     maxWidth: 600,
     lineHeight: 1.4,
-    fontFamily: '"Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif',
+    fontFamily:
+      '"Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif',
   },
 
   logo: {
@@ -53,24 +54,21 @@ export default class Welcome extends React.Component {
     return (
       <div style={styles.main}>
         <h1>Welcome to STORYBOOK</h1>
+        <p>This is a UI component dev environment for GDevelop.</p>
         <p>
-          This is a UI component dev environment for GDevelop.
-        </p>
-        <p>
-          We've added some basic stories inside the
-          {' '}
-          <code style={styles.code}>src/stories</code>
-          {' '}
-          directory.
+          We've added some basic stories inside the{' '}
+          <code style={styles.code}>src/stories</code> directory.
           <br />
-          A story is a single state of one or more UI components. You can have as many stories as you want.
+          A story is a single state of one or more UI components. You can have
+          as many stories as you want.
           <br />
           (Basically a story is like a visual test case.)
         </p>
         <p>
           Just like that, you can add your own components as stories.
           <br />
-          Here's how to add your <code style={styles.code}>App</code> component as a story.
+          Here's how to add your <code style={styles.code}>App</code> component
+          as a story.
         </p>
         <div
           style={styles.codeBlock}
@@ -78,16 +76,14 @@ export default class Welcome extends React.Component {
         />
         <p>
           Usually we create stories with smaller UI components in the app.<br />
-          Have a look at the
-          {' '}
+          Have a look at the{' '}
           <a
             style={styles.link}
             href="https://storybooks.js.org/docs/react-storybook/basics/writing-stories"
             target="_blank"
           >
             Writing Stories
-          </a>
-          {' '}
+          </a>{' '}
           section in our documentation.
         </p>
       </div>

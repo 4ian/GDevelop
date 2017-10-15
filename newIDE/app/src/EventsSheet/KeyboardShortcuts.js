@@ -25,7 +25,7 @@ export default class KeyboardShortcuts extends Component {
   _isControlPressed = () => {
     // On OS X, meta key (Apple/Command key) acts as Control key on Windows/Linux.
     return this.metaPressed || this.rawCtrlPressed;
-  }
+  };
 
   _onKeyDown = evt => {
     if (evt.metaKey) this.metaPressed = true;
@@ -59,8 +59,7 @@ export default class KeyboardShortcuts extends Component {
     if (evt.which === SHIFT_KEY) this.shiftPressed = false;
   };
 
-  _onKeyPress = evt => {
-  };
+  _onKeyPress = evt => {};
 
   componentDidMount() {
     if (typeof document === 'undefined') return;

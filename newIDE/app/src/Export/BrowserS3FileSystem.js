@@ -19,13 +19,16 @@ export default class BrowserS3FileSystem {
   }
 
   uploadPendingObjects = () => {
-    return Promise.all(this._pendingUploadObjects.map(this._uploadObject)).then(result => {
-      console.log("Uploaded all objects:", result);
-      this._pendingUploadObjects = [];
-    }, error => {
-      console.error("Can't upload all objects:", error);
-      throw error;
-    });
+    return Promise.all(this._pendingUploadObjects.map(this._uploadObject)).then(
+      result => {
+        console.log('Uploaded all objects:', result);
+        this._pendingUploadObjects = [];
+      },
+      error => {
+        console.error("Can't upload all objects:", error);
+        throw error;
+      }
+    );
   };
 
   _uploadObject = params => {
@@ -83,8 +86,10 @@ export default class BrowserS3FileSystem {
 
     if (fullpath.length === 0) return true;
     fullpath = this._translateURL(fullpath);
-    return (fullpath.length > 0 && fullpath.charAt(0) === '/') ||
-      (fullpath.length > 1 && fullpath.charAt(1) === ':');
+    return (
+      (fullpath.length > 0 && fullpath.charAt(0) === '/') ||
+      (fullpath.length > 1 && fullpath.charAt(1) === ':')
+    );
   };
   copyFile = (source, dest) => {
     //URL are not copied.
@@ -150,9 +155,11 @@ export default class BrowserS3FileSystem {
   };
 
   _isExternalURL = filename => {
-    return filename.substr(0, 7) === 'http://' ||
+    return (
+      filename.substr(0, 7) === 'http://' ||
       filename.substr(0, 8) === 'https://' ||
-      filename.substr(0, 6) === 'ftp://';
+      filename.substr(0, 6) === 'ftp://'
+    );
   };
 
   /**

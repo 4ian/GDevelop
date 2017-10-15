@@ -26,7 +26,7 @@ export default class GroupRow extends React.Component {
   _renderGroupMenu(group) {
     return (
       <IconMenu
-        ref={iconMenu => this._iconMenu = iconMenu}
+        ref={iconMenu => (this._iconMenu = iconMenu)}
         iconButtonElement={
           <IconButton
             onClick={e =>
@@ -57,12 +57,9 @@ export default class GroupRow extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (!prevProps.editingName && this.props.editingName) {
-      setTimeout(
-        () => {
-          if (this.textField) this.textField.focus();
-        },
-        100
-      );
+      setTimeout(() => {
+        if (this.textField) this.textField.focus();
+      }, 100);
     }
   }
 
@@ -74,26 +71,24 @@ export default class GroupRow extends React.Component {
     const { group, style } = this.props;
 
     const groupName = group.getName();
-    const label = this.props.editingName
-      ? <TextField
-          id="rename-object-field"
-          ref={textField => this.textField = textField}
-          defaultValue={groupName}
-          onBlur={e => this.props.onRename(e.target.value)}
-          onKeyPress={event => {
-            if (event.charCode === 13) {
-              // enter key pressed
-              this.textField.blur();
-            }
-          }}
-          fullWidth
-          style={styles.textField}
-        />
-      : <div
-          style={styles.groupName}
-        >
-          {groupName}
-        </div>;
+    const label = this.props.editingName ? (
+      <TextField
+        id="rename-object-field"
+        ref={textField => (this.textField = textField)}
+        defaultValue={groupName}
+        onBlur={e => this.props.onRename(e.target.value)}
+        onKeyPress={event => {
+          if (event.charCode === 13) {
+            // enter key pressed
+            this.textField.blur();
+          }
+        }}
+        fullWidth
+        style={styles.textField}
+      />
+    ) : (
+      <div style={styles.groupName}>{groupName}</div>
+    );
 
     return (
       <ListItem

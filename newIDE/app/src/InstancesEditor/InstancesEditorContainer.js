@@ -69,7 +69,8 @@ export default class InstancesEditorContainer extends Component {
     this.backgroundArea.on('mousedown', this._onBackgroundClicked);
     this.backgroundArea.on('touchstart', this._onBackgroundClicked);
     this.backgroundArea.on('panmove', event =>
-      this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y));
+      this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y)
+    );
     this.backgroundArea.on('panend', event => this._onEndSelectionRectangle());
     this.pixiContainer.addChild(this.backgroundArea);
 
@@ -410,7 +411,7 @@ export default class InstancesEditorContainer extends Component {
     return (
       <SimpleDropTarget>
         <div
-          ref={canvasArea => this.canvasArea = canvasArea}
+          ref={canvasArea => (this.canvasArea = canvasArea)}
           style={{ flex: 1, position: 'absolute', overflow: 'hidden' }}
         />
       </SimpleDropTarget>

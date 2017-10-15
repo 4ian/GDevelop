@@ -26,9 +26,9 @@ export default class InfoBar extends Component {
   }
 
   render() {
-    const hidden = this.props.messageId && localStorage.getItem(
-      `gdevelop.hiddenMessages.${this.props.messageId}`
-    );
+    const hidden =
+      this.props.messageId &&
+      localStorage.getItem(`gdevelop.hiddenMessages.${this.props.messageId}`);
 
     return (
       <Snackbar

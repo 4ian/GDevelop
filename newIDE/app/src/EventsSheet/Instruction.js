@@ -62,8 +62,8 @@ export default class Instruction extends Component {
           const formatting = formattedTexts.getTextFormatting(i);
           const parameterIndex = formatting.getUserData();
 
-          const isParameter = parameterIndex >= 0 &&
-            parameterIndex < parametersCount;
+          const isParameter =
+            parameterIndex >= 0 && parameterIndex < parametersCount;
           if (!isParameter)
             return <span key={i}>{formattedTexts.getString(i)}</span>;
 
@@ -71,7 +71,8 @@ export default class Instruction extends Component {
             <span
               key={i}
               style={{
-                color: 'rgb(' +
+                color:
+                  'rgb(' +
                   formatting.getColorRed() +
                   ',' +
                   formatting.getColorGreen() +
@@ -129,14 +130,15 @@ export default class Instruction extends Component {
           this.props.onContextMenu(e.clientX, e.clientY);
         }}
       >
-        {instruction.isInverted() &&
+        {instruction.isInverted() && (
           <img
             src="res/contraire.png"
             alt="Condition is negated"
             style={styles.icon}
             width="20"
             height="16"
-          />}
+          />
+        )}
         <img
           src={metadata.getSmallIconFilename()}
           style={styles.icon}
@@ -145,7 +147,7 @@ export default class Instruction extends Component {
           height="16"
         />
         {this._renderInstructionText(metadata)}
-        {metadata.canHaveSubInstructions() &&
+        {metadata.canHaveSubInstructions() && (
           <InstructionsList
             style={styles.subInstructionsList}
             instrsList={instruction.getSubInstructions()}
@@ -155,10 +157,13 @@ export default class Instruction extends Component {
             onInstructionClick={this.props.onSubInstructionClick}
             onInstructionDoubleClick={this.props.onSubInstructionDoubleClick}
             onInstructionContextMenu={this.props.onSubInstructionContextMenu}
-            onInstructionsListContextMenu={this.props.onSubInstructionsListContextMenu}
+            onInstructionsListContextMenu={
+              this.props.onSubInstructionsListContextMenu
+            }
             onParameterClick={this.props.onSubParameterClick}
             addButtonLabel="Add a sub-condition"
-          />}
+          />
+        )}
       </div>
     );
   }

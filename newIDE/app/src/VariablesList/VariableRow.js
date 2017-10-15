@@ -8,33 +8,31 @@ import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import styles from './styles';
 
-const Indent = ({width}) => (
+const Indent = ({ width }) => (
   <div style={{ ...styles.indent, width }}>
     <SubdirectoryArrowRight color={styles.indentIconColor} />
   </div>
-)
+);
 
-const VariableRow = (
-  {
-    name,
-    variable,
-    depth,
-    errorText,
-    onBlur,
-    onRemove,
-    onAddChild,
-    onChangeValue,
-    children,
-  }
-) => {
+const VariableRow = ({
+  name,
+  variable,
+  depth,
+  errorText,
+  onBlur,
+  onRemove,
+  onAddChild,
+  onChangeValue,
+  children,
+}) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
 
   const columns = [
-    <TreeTableCell
-      key="name"
-    >
-      {depth > 0 && <Indent width={(depth + 1) * styles.tableChildIndentation} />}
+    <TreeTableCell key="name">
+      {depth > 0 && (
+        <Indent width={(depth + 1) * styles.tableChildIndentation} />
+      )}
       {depth === 0 && <DragHandle />}
       <TextField
         fullWidth
@@ -73,11 +71,7 @@ const VariableRow = (
 
   return (
     <div>
-      <TreeTableRow
-        style={styles.variableRow}
-      >
-        {columns}
-      </TreeTableRow>
+      <TreeTableRow style={styles.variableRow}>{columns}</TreeTableRow>
       {children}
     </div>
   );

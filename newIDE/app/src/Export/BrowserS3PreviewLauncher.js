@@ -14,8 +14,12 @@ const region = 'eu-west-1';
 const destinationBucketBaseUrl = `https://s3-${region}.amazonaws.com/${destinationBucket}/`;
 
 if (!accessKeyId || !secretAccessKey) {
-  console.warn('Either REACT_APP_PREVIEW_S3_ACCESS_KEY_ID or REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY are not defined. Preview in browsers won\'t be working');
-  console.info('Copy .env.dist file to .env and fill the values to fix this warning.')
+  console.warn(
+    "Either REACT_APP_PREVIEW_S3_ACCESS_KEY_ID or REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY are not defined. Preview in browsers won't be working"
+  );
+  console.info(
+    'Copy .env.dist file to .env and fill the values to fix this warning.'
+  );
 }
 
 const awsS3Client = new awsS3({
@@ -42,10 +46,8 @@ export default class BrowserS3PreviewLauncher {
         }
         console.info('GDJS found in ', gdjsRoot);
 
-        const prefix = '' +
-          Date.now() +
-          '-' +
-          Math.floor(Math.random() * 1000000);
+        const prefix =
+          '' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
 
         const outputDir = destinationBucketBaseUrl + prefix;
         const browserS3FileSystem = new BrowserS3FileSystem({
@@ -74,25 +76,26 @@ export default class BrowserS3PreviewLauncher {
   static launchLayoutPreview = (project, layout): Promise<any> => {
     if (!project || !layout) return Promise.reject();
 
-    return BrowserS3PreviewLauncher._prepareExporter().then(({
-      exporter,
-      outputDir,
-      browserS3FileSystem,
-    }) => {
-      exporter.exportLayoutForPixiPreview(project, layout, outputDir);
-      exporter.delete();
-      return browserS3FileSystem
-        .uploadPendingObjects()
-        .then(() => {
-          const finalUrl = outputDir + '/index.html';
-          return BrowserS3PreviewLauncher._openPreviewWindow(project, finalUrl);
-        })
-        .then(({ url, windowObjectReference }) => {
-          if (!windowObjectReference) {
-            return { dialog: <BrowserPreviewLinkDialog url={url} /> };
-          }
-        });
-    });
+    return BrowserS3PreviewLauncher._prepareExporter().then(
+      ({ exporter, outputDir, browserS3FileSystem }) => {
+        exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+        exporter.delete();
+        return browserS3FileSystem
+          .uploadPendingObjects()
+          .then(() => {
+            const finalUrl = outputDir + '/index.html';
+            return BrowserS3PreviewLauncher._openPreviewWindow(
+              project,
+              finalUrl
+            );
+          })
+          .then(({ url, windowObjectReference }) => {
+            if (!windowObjectReference) {
+              return { dialog: <BrowserPreviewLinkDialog url={url} /> };
+            }
+          });
+      }
+    );
   };
 
   static launchExternalLayoutPreview = (

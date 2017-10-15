@@ -116,9 +116,11 @@ export const hasInstructionsListSelected = (
 };
 
 export const hasSomethingSelected = (selection: SelectionState): boolean => {
-  return hasInstructionSelected(selection) ||
+  return (
+    hasInstructionSelected(selection) ||
     hasInstructionsListSelected(selection) ||
-    hasEventSelected(selection);
+    hasEventSelected(selection)
+  );
 };
 
 export const clearSelection = (): SelectionState => {

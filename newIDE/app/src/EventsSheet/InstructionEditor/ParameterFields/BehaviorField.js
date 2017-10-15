@@ -41,12 +41,14 @@ export default class BehaviorField extends Component {
       )
       .toJSArray()
       .filter(behaviorName => {
-        return !this._behaviorTypeAllowed ||
+        return (
+          !this._behaviorTypeAllowed ||
           gd.getTypeOfBehavior(
             this.props.project,
             this.props.layout,
             behaviorName
-          ) === this._behaviorTypeAllowed;
+          ) === this._behaviorTypeAllowed
+        );
       });
   }
 
@@ -57,9 +59,9 @@ export default class BehaviorField extends Component {
   getError = () => {
     if (!this.props.value) return null;
 
-    const isValidChoice = this._behaviorNames.filter(
-      choice => this.props.value === choice
-    ).length !== 0;
+    const isValidChoice =
+      this._behaviorNames.filter(choice => this.props.value === choice)
+        .length !== 0;
 
     if (!isValidChoice) return 'This behavior is not attached to the object';
 
@@ -93,9 +95,10 @@ export default class BehaviorField extends Component {
   render() {
     this._updateBehaviorsList();
 
-    const noBehaviorErrorText = this._behaviorTypeAllowed !== "" ?
-      "The behavior is not attached to this object. Please select another object or add the behavior" :
-      "This object has no behaviors: please add a behavior to the object first";
+    const noBehaviorErrorText =
+      this._behaviorTypeAllowed !== ''
+        ? 'The behavior is not attached to this object. Please select another object or add the behavior'
+        : 'This object has no behaviors: please add a behavior to the object first';
 
     return (
       <AutoComplete
@@ -131,7 +134,7 @@ export default class BehaviorField extends Component {
         filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
         disabled={this._behaviorNames.length <= 1}
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
       />
     );
   }

@@ -2,7 +2,7 @@ import optionalRequire from './OptionalRequire.js';
 const electron = optionalRequire('electron');
 const electronClipboard = electron ? electron.clipboard : null;
 
-let internalClipboard = "";
+let internalClipboard = '';
 
 export default class Clipboard {
   static set(kind, object) {
@@ -19,7 +19,7 @@ export default class Clipboard {
   }
 
   static has(kind) {
-    let text = "";
+    let text = '';
     if (electronClipboard) {
       text = electronClipboard.readText();
     } else {
@@ -32,7 +32,7 @@ export default class Clipboard {
   static get(kind) {
     if (!Clipboard.has(kind)) return null;
 
-    let text = "";
+    let text = '';
     if (electronClipboard) {
       text = electronClipboard.readText();
     } else {

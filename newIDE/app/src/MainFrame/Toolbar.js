@@ -33,19 +33,21 @@ export default class MainFrameToolbar extends Component {
     return (
       <Toolbar style={styles.toolbar}>
         <ToolbarGroup firstChild={true}>
-          {this.props.showProjectIcons &&
+          {this.props.showProjectIcons && (
             <ToolbarIcon
               onClick={this.props.toggleProjectManager}
               src="res/ribbon_default/projectManager32.png"
               disabled={!this.props.hasProject}
-            />}
+            />
+          )}
           {this.props.showProjectIcons &&
-            this.props.canOpenProject &&
-            <ToolbarIcon
-              onClick={this.props.openProject}
-              src="res/ribbon_default/open32.png"
-            />}
-          {this.isDev &&
+            this.props.canOpenProject && (
+              <ToolbarIcon
+                onClick={this.props.openProject}
+                src="res/ribbon_default/open32.png"
+              />
+            )}
+          {this.isDev && (
             <IconMenu
               iconButtonElement={
                 <ToolbarIcon src="res/ribbon_default/bug32.png" />
@@ -56,7 +58,8 @@ export default class MainFrameToolbar extends Component {
                   click: () => this.props.requestUpdate(),
                 },
               ]}
-            />}
+            />
+          )}
           <ToolbarSeparator />
         </ToolbarGroup>
         {this.state.editorToolbar || <ToolbarGroup />}

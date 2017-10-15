@@ -21,11 +21,7 @@ const SortableAddVariableRow = SortableElement(AddVariableRow);
 
 class VariablesListBody extends Component {
   render() {
-    return (
-      <div>
-        {this.props.children}
-      </div>
-    );
+    return <div>{this.props.children}</div>;
   }
 }
 
@@ -108,7 +104,8 @@ export default class VariablesList extends Component {
         }}
         onAddChild={() => {
           const name = newNameGenerator('ChildVariable', name =>
-            variable.hasChild(name));
+            variable.hasChild(name)
+          );
           variable.getChild(name).setString('');
           this.forceUpdate();
         }}
@@ -171,7 +168,8 @@ export default class VariablesList extends Component {
           const variable = new gd.Variable();
           variable.setString('');
           const name = newNameGenerator('Variable', name =>
-            variablesContainer.has(name));
+            variablesContainer.has(name)
+          );
           variablesContainer.insert(name, variable, variablesContainer.count());
           this.forceUpdate();
         }}
@@ -184,9 +182,7 @@ export default class VariablesList extends Component {
           <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
             <TableRow>
               <TableHeaderColumn>Name</TableHeaderColumn>
-              <TableHeaderColumn>
-                Value
-              </TableHeaderColumn>
+              <TableHeaderColumn>Value</TableHeaderColumn>
               <TableRowColumn />
             </TableRow>
           </TableHeader>

@@ -11,7 +11,8 @@ export default class Tutorials extends Component {
         <Line>
           <Column>
             <p>
-              Tutorials are available on GDevelop wiki. Choose a tutorial to read:
+              Tutorials are available on GDevelop wiki. Choose a tutorial to
+              read:
             </p>
           </Column>
         </Line>

@@ -2,9 +2,12 @@ import PIXI from 'pixi.js';
 const gd = global.gd;
 
 export default class SelectionRectangle {
-  constructor(
-    { instances, instanceMeasurer, toSceneCoordinates, toCanvasCoordinates }
-  ) {
+  constructor({
+    instances,
+    instanceMeasurer,
+    toSceneCoordinates,
+    toCanvasCoordinates,
+  }) {
     this.instances = instances;
     this.instanceMeasurer = instanceMeasurer;
     this.toSceneCoordinates = toSceneCoordinates;
@@ -23,8 +26,7 @@ export default class SelectionRectangle {
       const instanceHeight = this.instanceMeasurer.getInstanceHeight(instance);
       const instanceWidth = this.instanceMeasurer.getInstanceWidth(instance);
 
-      if (!this.selectionRectangleStart || !this.selectionRectangleEnd)
-        return;
+      if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return;
 
       const selectionSceneStart = toSceneCoordinates(
         this.selectionRectangleStart.x,

@@ -51,7 +51,8 @@ export default class AboutDialog extends Component {
           />
           <div style={styles.content}>
             <Line>
-              GDevelop {this.appVersionString} based on GDevelop.js {this.gdVersionString}
+              GDevelop {this.appVersionString} based on GDevelop.js{' '}
+              {this.gdVersionString}
             </Line>
           </div>
         </Column>

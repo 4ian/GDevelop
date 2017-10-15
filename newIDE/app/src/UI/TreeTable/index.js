@@ -10,23 +10,15 @@ const styles = {
     alignItems: 'center',
     paddingLeft: 8,
     paddingRight: 8,
-  }
+  },
 };
 
-export const TreeTable = props => (
-  <div>
-    {props.children}
-  </div>
-);
+export const TreeTable = props => <div>{props.children}</div>;
 
 export const TreeTableRow = props => (
-  <div style={{...styles.row, ...props.style}}>
-    {props.children}
-  </div>
+  <div style={{ ...styles.row, ...props.style }}>{props.children}</div>
 );
 
 export const TreeTableCell = props => (
-  <div style={{...styles.cell, ...props.style}}>
-    {props.children}
-  </div>
+  <div style={{ ...styles.cell, ...props.style }}>{props.children}</div>
 );

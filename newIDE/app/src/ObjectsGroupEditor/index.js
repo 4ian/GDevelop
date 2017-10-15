@@ -38,17 +38,26 @@ export default class ObjectsGroupEditor extends Component {
     const { group, project, layout } = this.props;
 
     let type = undefined;
-    group.getAllObjectsNames().toJSArray().forEach(objectName => {
-      const objectType = gd.getTypeOfObject(project, layout, objectName, false);
-      if (type === undefined || objectType === type) type = objectType;
-      else type = '';
-    });
+    group
+      .getAllObjectsNames()
+      .toJSArray()
+      .forEach(objectName => {
+        const objectType = gd.getTypeOfObject(
+          project,
+          layout,
+          objectName,
+          false
+        );
+        if (type === undefined || objectType === type) type = objectType;
+        else type = '';
+      });
 
     let message = '';
     if (type === undefined) {
       message = 'This group is empty';
     } else if (type === '') {
-      message = "This group contains objects of different kinds. You'll only be able to use actions and conditions common to all objects with this group.";
+      message =
+        "This group contains objects of different kinds. You'll only be able to use actions and conditions common to all objects with this group.";
     } else {
       message = `This group contains objects of the same kind (${type}). You can use actions and conditions related to this kind of objects in events with this group.`;
     }
@@ -63,19 +72,22 @@ export default class ObjectsGroupEditor extends Component {
       <div>
         {this._renderExplanation()}
         <List>
-          {group.getAllObjectsNames().toJSArray().map(objectName => {
-            return (
-              <ListItem
-                key={objectName}
-                primaryText={objectName}
-                rightIconButton={
-                  <IconButton onClick={() => this.removeObject(objectName)}>
-                    <Remove />
-                  </IconButton>
-                }
-              />
-            );
-          })}
+          {group
+            .getAllObjectsNames()
+            .toJSArray()
+            .map(objectName => {
+              return (
+                <ListItem
+                  key={objectName}
+                  primaryText={objectName}
+                  rightIconButton={
+                    <IconButton onClick={() => this.removeObject(objectName)}>
+                      <Remove />
+                    </IconButton>
+                  }
+                />
+              );
+            })}
         </List>
         <ObjectSelector
           style={styles.newObjectSelector}

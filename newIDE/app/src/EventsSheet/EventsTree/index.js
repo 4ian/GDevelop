@@ -31,16 +31,13 @@ class EventHeightsCache {
     }
 
     // Notify the component, on the next tick, that heights have changed
-    this.updateTimeoutId = setTimeout(
-      () => {
-        if (this.component) {
-          this.component.onHeightsChanged(() => this.updateTimeoutId = null);
-        } else {
-          this.updateTimeoutId = null;
-        }
-      },
-      0
-    );
+    this.updateTimeoutId = setTimeout(() => {
+      if (this.component) {
+        this.component.onHeightsChanged(() => (this.updateTimeoutId = null));
+      } else {
+        this.updateTimeoutId = null;
+      }
+    }, 0);
   }
 
   setEventHeight(event, height) {
@@ -89,11 +86,11 @@ class EventContainer extends Component {
 
     return (
       <div
-        ref={container => this._container = container}
+        ref={container => (this._container = container)}
         onClick={this.props.onEventClick}
         onContextMenu={this._onEventContextMenu}
       >
-        {EventComponent &&
+        {EventComponent && (
           <EventComponent
             project={project}
             layout={layout}
@@ -106,9 +103,12 @@ class EventContainer extends Component {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
-            onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+            onInstructionsListContextMenu={
+              this.props.onInstructionsListContextMenu
+            }
             onParameterClick={this.props.onParameterClick}
-          />}
+          />
+        )}
       </div>
     );
   }
@@ -209,12 +209,12 @@ export default class EventsTree extends Component {
       path: targetPath,
     });
     const targetNode = target.node;
-    const targetEventsList = targetNode && targetNode.event
-      ? targetNode.event.getSubEvents()
-      : this.props.events;
-    const targetPosition = targetNode && targetNode.children
-      ? targetNode.children.indexOf(node)
-      : 0;
+    const targetEventsList =
+      targetNode && targetNode.event
+        ? targetNode.event.getSubEvents()
+        : this.props.events;
+    const targetPosition =
+      targetNode && targetNode.children ? targetNode.children.indexOf(node) : 0;
 
     // Get the moved event and its list from the moved node.
     const { event, eventsList } = node;
@@ -282,7 +282,7 @@ export default class EventsTree extends Component {
             return this.eventsHeightsCache.getEventHeight(event);
           }}
           reactVirtualizedListProps={{
-            ref: list => this._list = list,
+            ref: list => (this._list = list),
           }}
         />
       </div>

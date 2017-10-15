@@ -88,19 +88,23 @@ export default class ObjectEditorDialog extends Component {
         titleStyle={styles.titleContainer}
       >
         {currentTab === 'properties' &&
-          EditorComponent &&
-          <EditorComponent
-            object={this.props.object}
-            project={this.props.project}
-            resourceSources={this.props.resourceSources}
-            onSizeUpdated={() => this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
-          />}
-        {currentTab === 'behaviors' &&
+          EditorComponent && (
+            <EditorComponent
+              object={this.props.object}
+              project={this.props.project}
+              resourceSources={this.props.resourceSources}
+              onSizeUpdated={() =>
+                this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+            />
+          )}
+        {currentTab === 'behaviors' && (
           <BehaviorsEditor
             object={this.props.object}
             project={this.props.project}
-            onSizeUpdated={() => this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
-          />}
+            onSizeUpdated={() =>
+              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+          />
+        )}
       </Dialog>
     );
   }

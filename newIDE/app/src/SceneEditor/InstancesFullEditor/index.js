@@ -2,12 +2,9 @@ import React, { Component } from 'react';
 
 import ObjectsList from '../../ObjectsList';
 import ObjectsGroupsList from '../../ObjectsGroupsList';
-import ObjectsRenderingService
-  from '../../ObjectsRendering/ObjectsRenderingService';
-import FullSizeInstancesEditor
-  from '../../InstancesEditor/FullSizeInstancesEditor';
-import InstancePropertiesEditor
-  from '../../InstancesEditor/InstancePropertiesEditor';
+import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import FullSizeInstancesEditor from '../../InstancesEditor/FullSizeInstancesEditor';
+import InstancePropertiesEditor from '../../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../../InstancesEditor/InstancesList';
 import LayersList from '../../LayersList';
 import LayerRemoveDialog from '../../LayersList/LayerRemoveDialog';
@@ -275,7 +272,8 @@ export default class InstancesFullEditor extends Component {
   _onSelectInstances = (instances, centerView = true) => {
     this.instancesSelection.clearSelection();
     instances.forEach(instance =>
-      this.instancesSelection.selectInstance(instance));
+      this.instancesSelection.selectInstance(instance)
+    );
 
     if (centerView) {
       this.editor.centerViewOn(instances);
@@ -383,7 +381,8 @@ export default class InstancesFullEditor extends Component {
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.map(instance =>
-      this.props.initialInstances.removeInstance(instance));
+      this.props.initialInstances.removeInstance(instance)
+    );
 
     this.instancesSelection.clearSelection();
     this.editor.clearHighlightedInstance();
@@ -444,7 +443,7 @@ export default class InstancesFullEditor extends Component {
 
   forceUpdateObjectsList = () => {
     if (this._objectsList) this._objectsList.forceUpdateList();
-  }
+  };
 
   render() {
     const { project, layout, initialInstances, resourceSources } = this.props;
@@ -475,7 +474,7 @@ export default class InstancesFullEditor extends Component {
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
           onContextMenu={this._onContextMenu}
-          editorRef={editor => this.editor = editor}
+          editorRef={editor => (this.editor = editor)}
         />
       ),
       'objects-list': (
@@ -491,7 +490,7 @@ export default class InstancesFullEditor extends Component {
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             onRenameObject={this._onRenameObject}
-            ref={objectsList => this._objectsList = objectsList}
+            ref={objectsList => (this._objectsList = objectsList)}
           />
         </MosaicWindow>
       ),
@@ -512,7 +511,7 @@ export default class InstancesFullEditor extends Component {
       <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
         <EditorMosaic
           editors={editors}
-          ref={editorMosaic => this.editorMosaic = editorMosaic}
+          ref={editorMosaic => (this.editorMosaic = editorMosaic)}
           initialEditorNames={
             this.props.showObjectsList
               ? ['properties', 'instances-editor', 'objects-list']
@@ -604,7 +603,7 @@ export default class InstancesFullEditor extends Component {
           open={!!this.state.variablesEditedInstance}
           variablesContainer={
             this.state.variablesEditedInstance &&
-              this.state.variablesEditedInstance.getVariables()
+            this.state.variablesEditedInstance.getVariables()
           }
           onCancel={() => this.editInstanceVariables(null)}
           onApply={() => this.editInstanceVariables(null)}
@@ -633,7 +632,7 @@ export default class InstancesFullEditor extends Component {
           emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
         />
         <ContextMenu
-          ref={contextMenu => this.contextMenu = contextMenu}
+          ref={contextMenu => (this.contextMenu = contextMenu)}
           menuTemplate={[
             {
               label: 'Scene properties',

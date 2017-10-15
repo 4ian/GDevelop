@@ -78,7 +78,8 @@ export default class LocalCreateDialog extends Component {
                 primaryText="Platformer"
                 secondaryText={
                   <p>
-                    A simple platform game, with coins to collect, moving platforms and enemies.
+                    A simple platform game, with coins to collect, moving
+                    platforms and enemies.
                   </p>
                 }
                 secondaryTextLines={2}
@@ -88,7 +89,8 @@ export default class LocalCreateDialog extends Component {
                 primaryText="Space Shooter"
                 secondaryText={
                   <p>
-                    A side-scrolling shooter where you must defeat incoming enemies with your spaceship.
+                    A side-scrolling shooter where you must defeat incoming
+                    enemies with your spaceship.
                   </p>
                 }
                 secondaryTextLines={2}
@@ -96,11 +98,7 @@ export default class LocalCreateDialog extends Component {
               />
               <ListItem
                 primaryText="Empty game"
-                secondaryText={
-                  <p>
-                    Start a new game from scratch.
-                  </p>
-                }
+                secondaryText={<p>Start a new game from scratch.</p>}
                 secondaryTextLines={2}
                 onClick={() => this.createEmptyGame()}
               />

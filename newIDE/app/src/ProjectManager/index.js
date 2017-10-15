@@ -37,12 +37,9 @@ const ProjectStructureItem = props => (
 class Item extends Component {
   componentDidUpdate(prevProps) {
     if (!prevProps.editingName && this.props.editingName) {
-      setTimeout(
-        () => {
-          if (this.textField) this.textField.focus();
-        },
-        100
-      );
+      setTimeout(() => {
+        if (this.textField) this.textField.focus();
+      }, 100);
     }
   }
 
@@ -51,9 +48,9 @@ class Item extends Component {
   };
 
   render() {
-    const rightIconButton = this.props.rightIconButton ||
+    const rightIconButton = this.props.rightIconButton || (
       <IconMenu
-        ref={iconMenu => this._iconMenu = iconMenu}
+        ref={iconMenu => (this._iconMenu = iconMenu)}
         iconButtonElement={
           <IconButton
             onClick={e =>
@@ -76,24 +73,27 @@ class Item extends Component {
             click: () => this.props.onDelete(),
           },
         ]}
-      />;
-    const label = this.props.editingName
-      ? <TextField
-          id="rename-item-field"
-          ref={textField => this.textField = textField}
-          defaultValue={this.props.primaryText}
-          onBlur={e => this.props.onRename(e.target.value)}
-          onKeyPress={event => {
-            if (event.charCode === 13) {
-              // enter key pressed
-              this.textField.blur();
-              this.props.onRename(event.target.value);
-            }
-          }}
-          fullWidth
-          style={styles.itemTextField}
-        />
-      : <div style={styles.itemName}>{this.props.primaryText}</div>;
+      />
+    );
+    const label = this.props.editingName ? (
+      <TextField
+        id="rename-item-field"
+        ref={textField => (this.textField = textField)}
+        defaultValue={this.props.primaryText}
+        onBlur={e => this.props.onRename(e.target.value)}
+        onKeyPress={event => {
+          if (event.charCode === 13) {
+            // enter key pressed
+            this.textField.blur();
+            this.props.onRename(event.target.value);
+          }
+        }}
+        fullWidth
+        style={styles.itemTextField}
+      />
+    ) : (
+      <div style={styles.itemName}>{this.props.primaryText}</div>
+    );
 
     return (
       <ListItem
@@ -160,10 +160,7 @@ export default class ProjectManager extends React.Component {
 
   render() {
     const { project } = this.props;
-    const {
-      renamedItemKind,
-      renamedItemName,
-    } = this.state;
+    const { renamedItemKind, renamedItemName } = this.state;
 
     return (
       <List>
@@ -220,7 +217,7 @@ export default class ProjectManager extends React.Component {
                 primaryText={name}
                 editingName={
                   renamedItemKind === 'external-events' &&
-                    renamedItemName === name
+                  renamedItemName === name
                 }
                 onEdit={() => this.props.onOpenExternalEvents(name)}
                 onDelete={() =>
@@ -255,7 +252,7 @@ export default class ProjectManager extends React.Component {
                 primaryText={name}
                 editingName={
                   renamedItemKind === 'external-layout' &&
-                    renamedItemName === name
+                  renamedItemName === name
                 }
                 onEdit={() => this.props.onOpenExternalLayout(name)}
                 onDelete={() =>

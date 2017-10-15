@@ -93,7 +93,8 @@ export default class BehaviorsEditor extends Component {
         }
 
         const name = newNameGenerator(defaultName, name =>
-          object.hasBehaviorNamed(name));
+          object.hasBehaviorNamed(name)
+        );
         object.addNewBehavior(project, type, name);
 
         this.forceUpdate();
@@ -153,8 +154,7 @@ export default class BehaviorsEditor extends Component {
               <div key={index}>
                 <MiniToolbar>
                   <span style={styles.behaviorTitle}>
-                    Behavior
-                    {' '}
+                    Behavior{' '}
                     <TextField
                       value={behaviorName}
                       hintText="Behavior name"
@@ -172,15 +172,18 @@ export default class BehaviorsEditor extends Component {
                   </span>
                 </MiniToolbar>
                 <div style={styles.propertiesContainer}>
-                  {propertiesSchema.length
-                    ? <PropertiesEditor
-                        schema={propertiesSchema}
-                        instances={[behavior]}
-                      />
-                    : <EmptyMessage>
-                        There is nothing to configure for this behavior.
-                        You can still use events to interact with the object and this behavior.
-                      </EmptyMessage>}
+                  {propertiesSchema.length ? (
+                    <PropertiesEditor
+                      schema={propertiesSchema}
+                      instances={[behavior]}
+                    />
+                  ) : (
+                    <EmptyMessage>
+                      There is nothing to configure for this behavior. You can
+                      still use events to interact with the object and this
+                      behavior.
+                    </EmptyMessage>
+                  )}
                 </div>
               </div>
             );
@@ -191,13 +194,14 @@ export default class BehaviorsEditor extends Component {
               onAdd={this.chooseNewBehavior}
             />
           )}
-        {this.state.newBehaviorDialogOpen &&
+        {this.state.newBehaviorDialogOpen && (
           <NewBehaviorDialog
             open={this.state.newBehaviorDialogOpen}
             onClose={() => this.setState({ newBehaviorDialogOpen: false })}
             onChoose={this.addBehavior}
             project={project}
-          />}
+          />
+        )}
       </div>
     );
   }

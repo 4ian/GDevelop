@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import FullSizeEventsTree from './EventsTree/FullSizeEventsTree';
-import InstructionEditorDialog
-  from './InstructionEditor/InstructionEditorDialog';
+import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import '../UI/Theme/EventsSheet.css';
 import { container } from './ClassNames';
 import Toolbar from './Toolbar';
@@ -249,9 +248,11 @@ export default class EventsSheet extends Component {
   deleteSelection = () => {
     const eventsRemover = new gd.EventsRemover();
     getSelectedEvents(this.state.selection).forEach(event =>
-      eventsRemover.addEventToRemove(event));
+      eventsRemover.addEventToRemove(event)
+    );
     getSelectedInstructions(this.state.selection).forEach(instruction =>
-      eventsRemover.addInstructionToRemove(instruction));
+      eventsRemover.addInstructionToRemove(instruction)
+    );
 
     eventsRemover.launch(this.props.events);
     this.setState(
@@ -272,9 +273,11 @@ export default class EventsSheet extends Component {
     const instructionsList = new gd.InstructionsList();
 
     getSelectedEvents(this.state.selection).forEach(event =>
-      eventsList.insertEvent(event, eventsList.getEventsCount()));
+      eventsList.insertEvent(event, eventsList.getEventsCount())
+    );
     getSelectedInstructions(this.state.selection).forEach(instruction =>
-      instructionsList.insert(instruction, instructionsList.size()));
+      instructionsList.insert(instruction, instructionsList.size())
+    );
 
     Clipboard.set(CLIPBOARD_KIND, {
       eventsList: serializeToJSObject(eventsList),
@@ -292,7 +295,8 @@ export default class EventsSheet extends Component {
 
   pasteEvents = () => {
     if (
-      !hasEventSelected(this.state.selection) || !Clipboard.has(CLIPBOARD_KIND)
+      !hasEventSelected(this.state.selection) ||
+      !Clipboard.has(CLIPBOARD_KIND)
     )
       return;
 
@@ -358,9 +362,11 @@ export default class EventsSheet extends Component {
 
   pasteEventsOrInstructions = () => {
     if (hasEventSelected(this.state.selection)) this.pasteEvents();
-    else if (hasInstructionSelected(this.state.selection)) this.pasteInstructions();
-    else if (hasInstructionsListSelected(this.state.selection)) this.pasteInstructions();
-  }
+    else if (hasInstructionSelected(this.state.selection))
+      this.pasteInstructions();
+    else if (hasInstructionsListSelected(this.state.selection))
+      this.pasteInstructions();
+  };
 
   render() {
     const { project, layout, events } = this.props;
@@ -369,7 +375,7 @@ export default class EventsSheet extends Component {
     return (
       <div className={container}>
         <FullSizeEventsTree
-          eventsTreeRef={eventsTree => this._eventsTree = eventsTree}
+          eventsTreeRef={eventsTree => (this._eventsTree = eventsTree)}
           key={events.ptr}
           events={events}
           project={project}
@@ -400,7 +406,8 @@ export default class EventsSheet extends Component {
           }}
         />
         <KeyboardShortcuts
-          ref={keyboardShortcuts => this._keyboardShortcuts = keyboardShortcuts}
+          ref={keyboardShortcuts =>
+            (this._keyboardShortcuts = keyboardShortcuts)}
           onDelete={() => {
             if (
               this.state.inlineEditing ||
@@ -415,7 +422,7 @@ export default class EventsSheet extends Component {
           onPaste={this.pasteEventsOrInstructions}
         />
         <ContextMenu
-          ref={eventContextMenu => this.eventContextMenu = eventContextMenu}
+          ref={eventContextMenu => (this.eventContextMenu = eventContextMenu)}
           menuTemplate={[
             {
               label: 'Copy',
@@ -442,7 +449,7 @@ export default class EventsSheet extends Component {
         />
         <ContextMenu
           ref={instructionContextMenu =>
-            this.instructionContextMenu = instructionContextMenu}
+            (this.instructionContextMenu = instructionContextMenu)}
           menuTemplate={[
             {
               label: 'Copy',
@@ -469,7 +476,7 @@ export default class EventsSheet extends Component {
         />
         <ContextMenu
           ref={instructionsListContextMenu =>
-            this.instructionsListContextMenu = instructionsListContextMenu}
+            (this.instructionsListContextMenu = instructionsListContextMenu)}
           menuTemplate={[
             {
               label: 'Paste',
@@ -478,7 +485,7 @@ export default class EventsSheet extends Component {
             },
           ]}
         />
-        {this.state.editedInstruction.instruction &&
+        {this.state.editedInstruction.instruction && (
           <InstructionEditorDialog
             project={project}
             layout={layout}
@@ -505,7 +512,8 @@ export default class EventsSheet extends Component {
               this.closeInstructionEditor();
               this._eventsTree.forceEventsUpdate();
             }}
-          />}
+          />
+        )}
       </div>
     );
   }

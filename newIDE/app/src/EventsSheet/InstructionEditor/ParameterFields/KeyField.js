@@ -142,7 +142,7 @@ export default class KeyField extends Component {
         }))}
         filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
       />
     );
   }

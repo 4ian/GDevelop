@@ -22,7 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddAction("PlaySoundCanal",
                    _("Play a sound on a channel"),
                    _("Play a sound (small audio file) on a specific channel,\nso you'll be able to manipulate it."),
-                   _("Play the sound _PARAM1_ on the channel _PARAM2_"),
+                   _("Play the sound _PARAM1_ on the channel _PARAM2_, vol.: _PARAM4_, loop: _PARAM3_"),
                    _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
@@ -70,7 +70,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddAction("PlayMusicCanal",
                    _("Play a music file on a channel"),
                    _("Play a music file on a specific channel,\nso you'll be able to interact with it later."),
-                   _("Play the music _PARAM1_ on channel _PARAM2_"),
+                   _("Play the music _PARAM1_ on channel _PARAM2_, vol.: _PARAM4_, loop: _PARAM3_"),
                    _("Audio/Music on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
@@ -215,7 +215,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddAction("PlaySound",
                    _("Play a sound"),
                    _("Play a sound."),
-                   _("Play the sound _PARAM1_ (volume: _PARAM3_, pitch: _PARAM4_, repeat the sound: _PARAM2_)"),
+                   _("Play the sound _PARAM1_, vol.: _PARAM3_, loop: _PARAM2_)"),
                    _("Audio"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
@@ -229,7 +229,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddAction("PlayMusic",
                    _("Play a music file"),
                    _("Play a music file."),
-                   _("Play the music _PARAM1_ (volume: _PARAM3_, pitch: _PARAM4_, repeat the sound: _PARAM2_)"),
+                   _("Play the music _PARAM1_, vol.: _PARAM3_, loop: _PARAM2_)"),
                    _("Audio"),
                    "res/actions/music24.png",
                    "res/actions/music.png")

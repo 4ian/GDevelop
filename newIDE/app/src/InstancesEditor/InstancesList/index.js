@@ -81,7 +81,7 @@ export default class InstancesList extends Component {
       <AutoSizer>
         {({ height, width }) => (
           <Table
-            ref={table => this.table = table}
+            ref={table => (this.table = table)}
             key={tableKey}
             headerHeight={30}
             height={height}

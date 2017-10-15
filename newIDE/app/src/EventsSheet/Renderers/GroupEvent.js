@@ -73,35 +73,37 @@ export default class GroupEvent extends Component {
         }}
         onClick={this.edit}
       >
-        {this.state.editing
-          ? <TextField
-              ref={textField => this._textField = textField}
-              value={groupEvent.getName()}
-              hintText="<Enter group name>"
-              onBlur={this.endEditing}
-              onChange={(e, text) => {
-                groupEvent.setName(text);
-                this.forceUpdate();
-              }}
-              style={styles.title}
-              inputStyle={{
-                color: textColor,
-                WebkitTextFillColor: textColor,
-              }}
-              underlineFocusStyle={{
-                borderColor: textColor,
-              }}
-              fullWidth
-              id="group-title"
-            />
-          : <span
-              className={classNames({
-                [selectableArea]: true,
-              })}
-              style={{ ...styles.title, color: textColor }}
-            >
-              {groupEvent.getName() || '<Enter group name>'}
-            </span>}
+        {this.state.editing ? (
+          <TextField
+            ref={textField => (this._textField = textField)}
+            value={groupEvent.getName()}
+            hintText="<Enter group name>"
+            onBlur={this.endEditing}
+            onChange={(e, text) => {
+              groupEvent.setName(text);
+              this.forceUpdate();
+            }}
+            style={styles.title}
+            inputStyle={{
+              color: textColor,
+              WebkitTextFillColor: textColor,
+            }}
+            underlineFocusStyle={{
+              borderColor: textColor,
+            }}
+            fullWidth
+            id="group-title"
+          />
+        ) : (
+          <span
+            className={classNames({
+              [selectableArea]: true,
+            })}
+            style={{ ...styles.title, color: textColor }}
+          >
+            {groupEvent.getName() || '<Enter group name>'}
+          </span>
+        )}
       </div>
     );
   }

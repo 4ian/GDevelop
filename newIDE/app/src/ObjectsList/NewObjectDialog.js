@@ -77,7 +77,8 @@ export default class NewObjectDialog extends Component {
       >
         <List>
           {this.state.objectMetadata.map(objectMetadata => {
-            if (objectMetadata.name === '') { // Base object is an "abstract" object
+            if (objectMetadata.name === '') {
+              // Base object is an "abstract" object
               return null;
             }
 
@@ -91,11 +92,7 @@ export default class NewObjectDialog extends Component {
                 }
                 key={objectMetadata.name}
                 primaryText={objectMetadata.fullName}
-                secondaryText={
-                  <p>
-                    {objectMetadata.description}
-                  </p>
-                }
+                secondaryText={<p>{objectMetadata.description}</p>}
                 secondaryTextLines={2}
                 onClick={() => this.props.onChoose(objectMetadata.name)}
               />

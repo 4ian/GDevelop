@@ -40,54 +40,49 @@ const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
   );
 });
 
-const SortableSpriteThumbnail = SortableElement(({
-  sprite,
-  project,
-  resourcesLoader,
-}) => {
-  return (
-    <ImageThumbnail
-      resourceName={sprite.getImageName()}
-      resourcesLoader={resourcesLoader}
-      project={project}
-      style={styles.thumbnailExtraStyle}
-    />
-  );
-});
+const SortableSpriteThumbnail = SortableElement(
+  ({ sprite, project, resourcesLoader }) => {
+    return (
+      <ImageThumbnail
+        resourceName={sprite.getImageName()}
+        resourcesLoader={resourcesLoader}
+        project={project}
+        style={styles.thumbnailExtraStyle}
+      />
+    );
+  }
+);
 
-const SortableList = SortableContainer(({
-  direction,
-  project,
-  resourcesLoader,
-  onAddSprite,
-}) => {
-  const spritesCount = direction.getSpritesCount();
-  return (
-    <div style={styles.spritesList}>
-      {[
-        ...mapFor(0, spritesCount, i => {
-          const sprite = direction.getSprite(i);
-          return (
-            <SortableSpriteThumbnail
-              sprite={sprite}
-              key={i}
-              index={i}
-              resourcesLoader={resourcesLoader}
-              project={project}
-            />
-          );
-        }),
-        <AddSpriteButton
-          displayHint={!direction.getSpritesCount()}
-          key="add-sprite-button"
-          disabled
-          index={spritesCount}
-          onAdd={onAddSprite}
-        />,
-      ]}
-    </div>
-  );
-});
+const SortableList = SortableContainer(
+  ({ direction, project, resourcesLoader, onAddSprite }) => {
+    const spritesCount = direction.getSpritesCount();
+    return (
+      <div style={styles.spritesList}>
+        {[
+          ...mapFor(0, spritesCount, i => {
+            const sprite = direction.getSprite(i);
+            return (
+              <SortableSpriteThumbnail
+                sprite={sprite}
+                key={i}
+                index={i}
+                resourcesLoader={resourcesLoader}
+                project={project}
+              />
+            );
+          }),
+          <AddSpriteButton
+            displayHint={!direction.getSpritesCount()}
+            key="add-sprite-button"
+            disabled
+            index={spritesCount}
+            onAdd={onAddSprite}
+          />,
+        ]}
+      </div>
+    );
+  }
+);
 
 export default class SpritesList extends Component {
   constructor(props) {

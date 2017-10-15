@@ -41,7 +41,7 @@ class MaterialUIContextMenu extends React.Component {
     return (
       <div>
         <div
-          ref={element => this.anchorEl = element}
+          ref={element => (this.anchorEl = element)}
           style={{
             position: 'fixed',
             pointerEvents: 'none',

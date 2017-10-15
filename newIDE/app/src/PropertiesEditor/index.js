@@ -19,8 +19,7 @@ export default class PropertiesEditor extends Component {
 
     if (this.props.onInstancesModified)
       this.props.onInstancesModified(instances);
-    else
-      this.forceUpdate();
+    else this.forceUpdate();
   };
 
   _getFieldValue(instances, field, defaultValue) {
@@ -60,7 +59,8 @@ export default class PropertiesEditor extends Component {
           floatingLabelFixed={true}
           onChange={(event, newValue) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, parseFloat(newValue) || 0));
+              field.setValue(i, parseFloat(newValue) || 0)
+            );
             this._onInstancesModified(this.props.instances);
           }}
           type="number"
@@ -81,7 +81,8 @@ export default class PropertiesEditor extends Component {
           floatingLabelFixed={true}
           onChange={(event, newValue) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, newValue || ''));
+              field.setValue(i, newValue || '')
+            );
             this._onInstancesModified(this.props.instances);
           }}
           fullWidth
@@ -107,7 +108,8 @@ export default class PropertiesEditor extends Component {
           floatingLabelFixed={true}
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, parseFloat(newValue) || 0));
+              field.setValue(i, parseFloat(newValue) || 0)
+            );
             this._onInstancesModified(this.props.instances);
           }}
           fullWidth
@@ -129,7 +131,8 @@ export default class PropertiesEditor extends Component {
           floatingLabelFixed={true}
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, newValue || ''));
+              field.setValue(i, newValue || '')
+            );
             this._onInstancesModified(this.props.instances);
           }}
           fullWidth

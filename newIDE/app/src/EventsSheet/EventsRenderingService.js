@@ -21,8 +21,7 @@ export default {
   getEventComponent: function(event) {
     if (this.components.hasOwnProperty(event.getType()))
       return this.components[event.getType()];
-    else
-      return this.components.unknownEvent;
+    else return this.components.unknownEvent;
   },
   registerEvent: function(eventType, renderFunction) {
     if (!this.components.hasOwnProperty(eventType)) {

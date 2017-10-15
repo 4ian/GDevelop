@@ -18,7 +18,7 @@ function collect(connect, monitor) {
     isOver: monitor.isOver(),
     isOverCurrent: monitor.isOver({ shallow: true }),
     canDrop: monitor.canDrop(),
-    itemType: monitor.getItemType()
+    itemType: monitor.getItemType(),
   };
 }
 const spec = {
@@ -31,7 +31,7 @@ const spec = {
 
     const item = monitor.getItem();
     return { item };
-  }
+  },
 };
 
 export default DropTarget(NativeTypes.TEXT, spec, collect)(SimpleDropTarget);

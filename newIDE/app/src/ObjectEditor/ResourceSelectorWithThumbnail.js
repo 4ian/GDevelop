@@ -3,15 +3,13 @@ import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
 import ResourceSelector from '../ResourcesEditor/ResourceSelector';
 import ImageThumbnail from './ImageThumbnail';
 
-export default (
-  {
-    project,
-    resourceSources,
-    resourceKind,
-    resourceName,
-    onChange,
-  }
-) => {
+export default ({
+  project,
+  resourceSources,
+  resourceKind,
+  resourceName,
+  onChange,
+}) => {
   return (
     <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
       <div style={{ flex: 1 }}>

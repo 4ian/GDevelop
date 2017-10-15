@@ -62,9 +62,12 @@ export default class ExternalLayoutEditor extends BaseEditor {
     if (!externalLayout) return;
 
     externalLayout.setAssociatedLayout(layoutName);
-    this.setState({
-      layoutChooserOpen: false,
-    }, () => this.updateToolbar());
+    this.setState(
+      {
+        layoutChooserOpen: false,
+      },
+      () => this.updateToolbar()
+    );
   };
 
   openLayoutChooser = () => {
@@ -85,10 +88,10 @@ export default class ExternalLayoutEditor extends BaseEditor {
 
     return (
       <div style={styles.container}>
-        {layout &&
+        {layout && (
           <InstancesFullEditor
             {...this.props}
-            ref={editor => this.editor = editor}
+            ref={editor => (this.editor = editor)}
             project={project}
             layout={layout}
             initialInstances={externalLayout.getInitialInstances()}
@@ -98,23 +101,25 @@ export default class ExternalLayoutEditor extends BaseEditor {
             onPreview={() =>
               this.props.onPreview(project, layout, externalLayout)}
             onOpenMoreSettings={this.openLayoutChooser}
-          />}
-        {!layout &&
+          />
+        )}
+        {!layout && (
           <PlaceholderMessage>
-            To edit the external layout, choose the scene in which it will be included:
+            To edit the external layout, choose the scene in which it will be
+            included:
             <RaisedButton
               label="Choose the scene"
               primary
               onClick={this.openLayoutChooser}
             />
           </PlaceholderMessage>
-          }
+        )}
         <LayoutChooserDialog
           title="Choose the associated scene"
           open={this.state.layoutChooserOpen}
           project={project}
           onChoose={this.setAssociatedLayout}
-          onClose={() => this.setState({layoutChooserOpen: false})}
+          onClose={() => this.setState({ layoutChooserOpen: false })}
         />
       </div>
     );

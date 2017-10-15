@@ -9,19 +9,19 @@ import TextField from 'material-ui/TextField';
 import DragHandle from '../UI/DragHandle';
 import styles from './styles';
 
-const LayerRow = (
-  {
-    layerName,
-    nameError,
-    onBlur,
-    onRemove,
-    isVisible,
-    onChangeVisibility,
-  }
-) => (
-  <TableRow style={{
-    backgroundColor: 'white',
-  }}>
+const LayerRow = ({
+  layerName,
+  nameError,
+  onBlur,
+  onRemove,
+  isVisible,
+  onChangeVisibility,
+}) => (
+  <TableRow
+    style={{
+      backgroundColor: 'white',
+    }}
+  >
     <TableRowColumn style={styles.handleColumn}>
       <DragHandle />
     </TableRowColumn>

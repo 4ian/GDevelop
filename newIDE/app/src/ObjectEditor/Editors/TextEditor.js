@@ -17,7 +17,7 @@ const styles = {
   },
   toolbarItem: toolbarItemStyle,
   toolbarText: {
-    marginRight: 5
+    marginRight: 5,
   },
   checkbox: {
     width: 'auto',

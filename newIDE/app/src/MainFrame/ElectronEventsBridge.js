@@ -37,7 +37,7 @@ class ElectronEventsBridge extends Component {
 
   render() {
     return React.cloneElement(this.props.children, {
-      ref: editor => this.editor = editor,
+      ref: editor => (this.editor = editor),
     });
   }
 }

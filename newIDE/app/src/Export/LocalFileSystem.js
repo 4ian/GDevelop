@@ -69,8 +69,10 @@ export default {
 
     if (fullpath.length === 0) return true;
     fullpath = this._translateURL(fullpath);
-    return (fullpath.length > 0 && fullpath.charAt(0) === '/') ||
-      (fullpath.length > 1 && fullpath.charAt(1) === ':');
+    return (
+      (fullpath.length > 0 && fullpath.charAt(0) === '/') ||
+      (fullpath.length > 1 && fullpath.charAt(1) === ':')
+    );
   },
   copyFile: function(source, dest) {
     //URL are not copied.

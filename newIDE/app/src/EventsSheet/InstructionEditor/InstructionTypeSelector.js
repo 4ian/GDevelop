@@ -43,7 +43,7 @@ export class InstructionTypeSelector extends Component {
 
   focus = () => {
     if (this._searchBar) this._searchBar.focus();
-  }
+  };
 
   _listInstructions(groupPrefix, extensionInstructions) {
     //Get the map containing the metadata of the instructions provided by the extension...
@@ -84,11 +84,12 @@ export class InstructionTypeSelector extends Component {
 
       let prefix = '';
       if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-        prefix = extension.getName() === 'BuiltinObject'
-          ? 'Common ' +
+        prefix =
+          extension.getName() === 'BuiltinObject'
+            ? 'Common ' +
               (isCondition ? 'conditions' : 'action') +
               ' for all objects'
-          : extension.getFullName();
+            : extension.getFullName();
         prefix += GROUP_DELIMITER;
       }
 
@@ -152,8 +153,10 @@ export class InstructionTypeSelector extends Component {
 
   _matchCritera(instructionInfo, lowercaseSearch) {
     const { displayedName, fullGroupName } = instructionInfo;
-    return displayedName.toLowerCase().indexOf(lowercaseSearch) !== -1 ||
-      fullGroupName.toLowerCase().indexOf(lowercaseSearch) !== -1;
+    return (
+      displayedName.toLowerCase().indexOf(lowercaseSearch) !== -1 ||
+      fullGroupName.toLowerCase().indexOf(lowercaseSearch) !== -1
+    );
   }
 
   _computeSearchResults = search => {
@@ -163,7 +166,8 @@ export class InstructionTypeSelector extends Component {
         return this.instructionsInfo[key];
       })
       .filter(instructionInfo =>
-        this._matchCritera(instructionInfo, lowercaseSearch));
+        this._matchCritera(instructionInfo, lowercaseSearch)
+      );
   };
 
   _onSubmitSearch = () => {
@@ -217,7 +221,7 @@ export class InstructionTypeSelector extends Component {
 
   componentDidMount() {
     this._searchBar.focus();
-  };
+  }
 
   render() {
     return (
@@ -230,7 +234,7 @@ export class InstructionTypeSelector extends Component {
             })}
           onRequestSearch={this._onSubmitSearch}
           style={styles.searchBar}
-          ref={searchBar => this._searchBar = searchBar}
+          ref={searchBar => (this._searchBar = searchBar)}
         />
         <SelectableList
           value={this.props.selectedType}
@@ -240,7 +244,6 @@ export class InstructionTypeSelector extends Component {
             this.props.onChoose(value);
           }}
         >
-
           {this.state.search
             ? this._renderSearchResults()
             : this._renderTree(this.instructionsInfoTree)}

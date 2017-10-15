@@ -13,7 +13,9 @@ export default class BrowserExport extends Component {
       <div style={{ height: 200 }}>
         <Column>
           <Line>
-            Export is not yet available in GDevelop online version. Instead, download the full GDevelop desktop version to export and publish your game!
+            Export is not yet available in GDevelop online version. Instead,
+            download the full GDevelop desktop version to export and publish
+            your game!
           </Line>
           <Line>
             <RaisedButton

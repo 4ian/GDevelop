@@ -9,8 +9,8 @@ import { mapFor } from '../Utils/MapFor';
  */
 export default (
   properties,
-  getProperties: (instance) => any,
-  onUpdateProperty: (instance, propertyName, newValue) => void,
+  getProperties: instance => any,
+  onUpdateProperty: (instance, propertyName, newValue) => void
 ) => {
   const propertyNames = properties.keys();
   const propertyFields = mapFor(0, propertyNames.size(), i => {
@@ -28,7 +28,9 @@ export default (
       getChoices: valueType === 'choice' ? () => choices : undefined,
       getValue: instance => {
         // Instance custom properties are always stored as string, cast them if necessary
-        const rawValue = getProperties(instance).get(name).getValue();
+        const rawValue = getProperties(instance)
+          .get(name)
+          .getValue();
         if (valueType === 'boolean') {
           return rawValue === 'true';
         } else if (valueType === 'number') {

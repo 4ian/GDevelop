@@ -50,19 +50,18 @@ export default class LocalPreviewLauncher {
   static launchLayoutPreview = (project, layout): Promise<any> => {
     if (!project || !layout) return Promise.reject();
 
-    return LocalPreviewLauncher._prepareExporter().then(({
-      outputDir,
-      exporter,
-    }) => {
-      timeFunction(
-        () => {
-          exporter.exportLayoutForPixiPreview(project, layout, outputDir);
-          exporter.delete();
-          LocalPreviewLauncher._openPreviewWindow(project, outputDir);
-        },
-        time => console.info(`Preview took ${time}ms`)
-      );
-    });
+    return LocalPreviewLauncher._prepareExporter().then(
+      ({ outputDir, exporter }) => {
+        timeFunction(
+          () => {
+            exporter.exportLayoutForPixiPreview(project, layout, outputDir);
+            exporter.delete();
+            LocalPreviewLauncher._openPreviewWindow(project, outputDir);
+          },
+          time => console.info(`Preview took ${time}ms`)
+        );
+      }
+    );
   };
 
   static launchExternalLayoutPreview = (
@@ -72,23 +71,22 @@ export default class LocalPreviewLauncher {
   ): Promise<any> => {
     if (!project || !externalLayout) return Promise.reject();
 
-    return LocalPreviewLauncher._prepareExporter().then(({
-      outputDir,
-      exporter,
-    }) => {
-      timeFunction(
-        () => {
-          exporter.exportExternalLayoutForPixiPreview(
-            project,
-            layout,
-            externalLayout,
-            outputDir
-          );
-          exporter.delete();
-          LocalPreviewLauncher._openPreviewWindow(project, outputDir);
-        },
-        time => console.info(`Preview took ${time}ms`)
-      );
-    });
+    return LocalPreviewLauncher._prepareExporter().then(
+      ({ outputDir, exporter }) => {
+        timeFunction(
+          () => {
+            exporter.exportExternalLayoutForPixiPreview(
+              project,
+              layout,
+              externalLayout,
+              outputDir
+            );
+            exporter.delete();
+            LocalPreviewLauncher._openPreviewWindow(project, outputDir);
+          },
+          time => console.info(`Preview took ${time}ms`)
+        );
+      }
+    );
   };
 }

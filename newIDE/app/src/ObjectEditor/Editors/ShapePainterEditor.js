@@ -94,7 +94,7 @@ export default class PanelSpriteEditor extends Component {
               this.forceUpdate();
             }}
           />
-          <Spacer expand/>
+          <Spacer expand />
         </Line>
       </Column>
     );

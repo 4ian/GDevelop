@@ -22,18 +22,16 @@ export default class BetaIntroDialog extends Component {
       <Dialog actions={actions} modal={true} open={open}>
         <div>
           <p>
-            This is a
-            {' '}
-            <b>beta version</b>
-            {' '}
-            of GDevelop 5 that you can try online.
+            This is a <b>beta version</b> of GDevelop 5 that you can try online.
           </p>
           <p>
-            Choose a <b>new project to create</b> and then <b>open the scene</b> to make changes to the game.
-            You can <b>launch a preview of your game</b> at any time!
+            Choose a <b>new project to create</b> and then <b>open the scene</b>{' '}
+            to make changes to the game. You can{' '}
+            <b>launch a preview of your game</b> at any time!
           </p>
           <p>
-            Download the full version of GDevelop to create your own game without limits!
+            Download the full version of GDevelop to create your own game
+            without limits!
           </p>
         </div>
       </Dialog>

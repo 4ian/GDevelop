@@ -3,8 +3,7 @@ import Paper from 'material-ui/Paper';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
-import propertiesMapToSchema
-  from '../../PropertiesEditor/PropertiesMapToSchema';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
 const styles = {
   container: { display: 'flex', flexDirection: 'column', flex: 1 },

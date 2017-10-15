@@ -26,7 +26,7 @@ export default class ObjectRow extends React.Component {
   _renderObjectMenu(object) {
     return (
       <IconMenu
-        ref={iconMenu => this._iconMenu = iconMenu}
+        ref={iconMenu => (this._iconMenu = iconMenu)}
         iconButtonElement={
           <IconButton
             onClick={e =>
@@ -63,12 +63,9 @@ export default class ObjectRow extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (!prevProps.editingName && this.props.editingName) {
-      setTimeout(
-        () => {
-          if (this.textField) this.textField.focus();
-        },
-        100
-      );
+      setTimeout(() => {
+        if (this.textField) this.textField.focus();
+      }, 100);
     }
   }
 
@@ -80,29 +77,31 @@ export default class ObjectRow extends React.Component {
     const { project, object, selected, style } = this.props;
 
     const objectName = object.getName();
-    const label = this.props.editingName
-      ? <TextField
-          id="rename-object-field"
-          ref={textField => this.textField = textField}
-          defaultValue={objectName}
-          onBlur={e => this.props.onRename(e.target.value)}
-          onKeyPress={event => {
-            if (event.charCode === 13) {
-              // enter key pressed
-              this.textField.blur();
-            }
-          }}
-          fullWidth
-          style={styles.textField}
-        />
-      : <div
-          style={{
-            ...styles.objectName,
-            color: selected ? styles.selectedObjectNameColor : undefined,
-          }}
-        >
-          {objectName}
-        </div>;
+    const label = this.props.editingName ? (
+      <TextField
+        id="rename-object-field"
+        ref={textField => (this.textField = textField)}
+        defaultValue={objectName}
+        onBlur={e => this.props.onRename(e.target.value)}
+        onKeyPress={event => {
+          if (event.charCode === 13) {
+            // enter key pressed
+            this.textField.blur();
+          }
+        }}
+        fullWidth
+        style={styles.textField}
+      />
+    ) : (
+      <div
+        style={{
+          ...styles.objectName,
+          color: selected ? styles.selectedObjectNameColor : undefined,
+        }}
+      >
+        {objectName}
+      </div>
+    );
 
     const itemStyle = {
       ...styles.container,

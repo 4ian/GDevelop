@@ -47,9 +47,7 @@ export default class ForEachEvent extends Component {
           [largeSelectedArea]: this.props.selected,
         })}
       >
-        <div>
-          While these conditions are true:
-        </div>
+        <div>While these conditions are true:</div>
         <InstructionsList
           instrsList={whileEvent.getWhileConditions()}
           selection={this.props.selection}
@@ -60,9 +58,7 @@ export default class ForEachEvent extends Component {
           onInstructionContextMenu={this.props.onInstructionContextMenu}
           onParameterClick={this.props.onParameterClick}
         />
-        <div>
-          Repeat these:
-        </div>
+        <div>Repeat these:</div>
         <div style={styles.instructionsContainer}>
           <InstructionsList
             instrsList={whileEvent.getConditions()}
@@ -73,7 +69,9 @@ export default class ForEachEvent extends Component {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
-            onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+            onInstructionsListContextMenu={
+              this.props.onInstructionsListContextMenu
+            }
             onParameterClick={this.props.onParameterClick}
           />
           <InstructionsList
@@ -85,7 +83,9 @@ export default class ForEachEvent extends Component {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
-            onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+            onInstructionsListContextMenu={
+              this.props.onInstructionsListContextMenu
+            }
             onParameterClick={this.props.onParameterClick}
           />
         </div>

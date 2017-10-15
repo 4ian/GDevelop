@@ -13,29 +13,35 @@ export default class Toolbar extends PureComponent {
       .asPlatform(gd.JsPlatform.get())
       .getAllPlatformExtensions();
 
-    this.allEventsMetadata = flatten(mapFor(0, allExtensions.size(), i => {
-      const extension = allExtensions.get(i);
-      const extensionEvents = extension.getAllEvents();
+    this.allEventsMetadata = flatten(
+      mapFor(0, allExtensions.size(), i => {
+        const extension = allExtensions.get(i);
+        const extensionEvents = extension.getAllEvents();
 
-      return extensionEvents.keys().toJSArray().map(type => {
-        const metadata = extensionEvents.get(type);
-        return {
-          type,
-          fullName: metadata.getFullName(),
-          description: metadata.getDescription(),
-        };
-      });
-    }));
+        return extensionEvents
+          .keys()
+          .toJSArray()
+          .map(type => {
+            const metadata = extensionEvents.get(type);
+            return {
+              type,
+              fullName: metadata.getFullName(),
+              description: metadata.getDescription(),
+            };
+          });
+      })
+    );
   }
 
   render() {
     return (
       <ToolbarGroup lastChild>
-        {this.props.showPreviewButton &&
+        {this.props.showPreviewButton && (
           <ToolbarIcon
             onClick={this.props.onPreview}
             src="res/ribbon_default/preview32.png"
-          />}
+          />
+        )}
         {this.props.showPreviewButton && <ToolbarSeparator />}
         <ToolbarIcon
           onClick={this.props.onAddStandardEvent}
@@ -53,10 +59,10 @@ export default class Toolbar extends PureComponent {
         <IconMenu
           iconButtonElement={<ToolbarIcon src="res/ribbon_default/add32.png" />}
           menuTemplate={this.allEventsMetadata.map(metadata => {
-           return {
-             label: metadata.fullName,
-             click: () => this.props.onAddEvent(metadata.type),
-           }
+            return {
+              label: metadata.fullName,
+              click: () => this.props.onAddEvent(metadata.type),
+            };
           })}
         />
         <ToolbarSeparator />
@@ -84,10 +90,12 @@ export default class Toolbar extends PureComponent {
           src="res/ribbon_default/search32.png"
         />
         {this.props.onOpenSettings && <ToolbarSeparator />}
-        {this.props.onOpenSettings && <ToolbarIcon
-          onClick={this.props.onOpenSettings}
-          src="res/ribbon_default/pref32.png"
-        />}
+        {this.props.onOpenSettings && (
+          <ToolbarIcon
+            onClick={this.props.onOpenSettings}
+            src="res/ribbon_default/pref32.png"
+          />
+        )}
       </ToolbarGroup>
     );
   }

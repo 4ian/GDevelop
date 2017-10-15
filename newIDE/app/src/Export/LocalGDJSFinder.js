@@ -10,7 +10,7 @@ var isDarwin = process && /^darwin/.test(process.platform);
 
 const tryPath = (
   path: string,
-  onExists: (string) => void,
+  onExists: string => void,
   onNoAccess: Function
 ) =>
   fs.access(path, fs.constants.R_OK, err => {
@@ -33,7 +33,14 @@ export const findGDJS = (cb: (?string) => void) => {
     // Or in the resources (for a standalone newIDE)
     tryPath(path.join(appPath, '..', 'GDJS'), cb, () => {
       // Or in the resources when developing with Electron
-      const devPath = path.join(appPath, '..', '..', 'app', 'resources', 'GDJS');
+      const devPath = path.join(
+        appPath,
+        '..',
+        '..',
+        'app',
+        'resources',
+        'GDJS'
+      );
       tryPath(devPath, cb, () => {
         cb(null);
       });

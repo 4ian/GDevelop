@@ -100,27 +100,29 @@ export default class CommentEvent extends Component {
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
         })}
-        ref={container => this._container = container}
+        ref={container => (this._container = container)}
       >
-        {!this.state.editing
-          ? <p
-              className={classNames({
-                [selectableArea]: true,
-              })}
-              onClick={this.edit}
-              key="p"
-              style={{...styles.text, color: `#${textColor}`}}
-              dangerouslySetInnerHTML={{
-                __html: this._getCommentHTML(),
-              }}
-            />
-          : <textarea
-              key="textarea"
-              type="text"
-              style={{ ...styles.textArea, height: this.state.height }}
-              onBlur={this.endEditing}
-              ref={input => this._input = input}
-            />}
+        {!this.state.editing ? (
+          <p
+            className={classNames({
+              [selectableArea]: true,
+            })}
+            onClick={this.edit}
+            key="p"
+            style={{ ...styles.text, color: `#${textColor}` }}
+            dangerouslySetInnerHTML={{
+              __html: this._getCommentHTML(),
+            }}
+          />
+        ) : (
+          <textarea
+            key="textarea"
+            type="text"
+            style={{ ...styles.textArea, height: this.state.height }}
+            onBlur={this.endEditing}
+            ref={input => (this._input = input)}
+          />
+        )}
       </div>
     );
   }

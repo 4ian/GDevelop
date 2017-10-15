@@ -74,16 +74,18 @@ export default class StartPage extends BaseEditor {
               <Paper zDepth={1} style={styles.logoPaper}>
                 <img src="res/GD-logo-simple.png" alt="" style={styles.logo} />
                 <p>
-                  GDevelop is an easy-to-use game creator with no programming language to learn.
+                  GDevelop is an easy-to-use game creator with no programming
+                  language to learn.
                 </p>
               </Paper>
               <Paper zDepth={1} style={styles.buttonsPaper}>
-                {this.props.canOpen &&
+                {this.props.canOpen && (
                   <FlatButton
                     label="Open a project"
                     fullWidth
                     onClick={this.props.onOpen}
-                  />}
+                  />
+                )}
                 <FlatButton
                   label="Create a new project"
                   fullWidth

@@ -1,9 +1,7 @@
 import RenderedUnknownInstance from './Renderers/RenderedUnknownInstance';
 import RenderedSpriteInstance from './Renderers/RenderedSpriteInstance';
-import RenderedTiledSpriteInstance
-  from './Renderers/RenderedTiledSpriteInstance';
-import RenderedPanelSpriteInstance
-  from './Renderers/RenderedPanelSpriteInstance';
+import RenderedTiledSpriteInstance from './Renderers/RenderedTiledSpriteInstance';
+import RenderedPanelSpriteInstance from './Renderers/RenderedPanelSpriteInstance';
 import RenderedAdMobInstance from './Renderers/RenderedAdMobInstance';
 import RenderedTextInstance from './Renderers/RenderedTextInstance';
 import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstance';

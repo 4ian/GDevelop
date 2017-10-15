@@ -38,15 +38,15 @@ export default class SelectionRectangle {
       this.viewPosition.getHeight()
     );
 
-    const startXPos = Math.floor(sceneStartPoint[0] / options.gridWidth) *
-      options.gridWidth;
-    const startYPos = Math.floor(sceneStartPoint[1] / options.gridHeight) *
-      options.gridHeight;
+    const startXPos =
+      Math.floor(sceneStartPoint[0] / options.gridWidth) * options.gridWidth;
+    const startYPos =
+      Math.floor(sceneStartPoint[1] / options.gridHeight) * options.gridHeight;
 
-    const endXPos = Math.ceil(sceneEndPoint[0] / options.gridWidth) *
-      options.gridWidth;
-    const endYPos = Math.ceil(sceneEndPoint[1] / options.gridHeight) *
-      options.gridHeight;
+    const endXPos =
+      Math.ceil(sceneEndPoint[0] / options.gridWidth) * options.gridWidth;
+    const endYPos =
+      Math.ceil(sceneEndPoint[1] / options.gridHeight) * options.gridHeight;
 
     for (
       let Xpos = startXPos + options.gridOffsetX;

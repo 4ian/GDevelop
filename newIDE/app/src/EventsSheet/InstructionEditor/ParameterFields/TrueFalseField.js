@@ -11,7 +11,7 @@ const styles = {
   description: {
     display: 'inline-block',
     marginRight: 5,
-  }
+  },
 };
 
 export default class DefaultField extends Component {

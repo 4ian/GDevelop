@@ -7,15 +7,13 @@ const smallButtonSize = 8;
 const buttonPadding = 5;
 
 export default class InstancesSelection {
-  constructor(
-    {
-      instancesSelection,
-      instanceMeasurer,
-      onResize,
-      onResizeEnd,
-      toCanvasCoordinates,
-    }
-  ) {
+  constructor({
+    instancesSelection,
+    instanceMeasurer,
+    onResize,
+    onResizeEnd,
+    toCanvasCoordinates,
+  }) {
     this.instanceMeasurer = instanceMeasurer;
     this.onResize = onResize;
     this.onResizeEnd = onResizeEnd;
@@ -39,7 +37,7 @@ export default class InstancesSelection {
       () => {
         this.onResizeEnd();
       },
-      "nwse-resize"
+      'nwse-resize'
     );
     this._makeButton(
       this.rightResizeButton,
@@ -49,7 +47,7 @@ export default class InstancesSelection {
       () => {
         this.onResizeEnd();
       },
-      "ew-resize"
+      'ew-resize'
     );
     this._makeButton(
       this.bottomResizeButton,
@@ -59,7 +57,7 @@ export default class InstancesSelection {
       () => {
         this.onResizeEnd();
       },
-      "ns-resize"
+      'ns-resize'
     );
   }
 
@@ -156,13 +154,13 @@ export default class InstancesSelection {
       y1 + (y2 - y1) / 2
     );
     rightResizeButtonPos[0] += buttonPadding;
-    rightResizeButtonPos[1] -= (-smallButtonSize) / 2;
+    rightResizeButtonPos[1] -= -smallButtonSize / 2;
 
     const bottomResizeButtonPos = this.toCanvasCoordinates(
       x1 + (x2 - x1) / 2,
       y2
     );
-    bottomResizeButtonPos[0] -= (-smallButtonSize) / 2;
+    bottomResizeButtonPos[0] -= -smallButtonSize / 2;
     bottomResizeButtonPos[1] += buttonPadding;
 
     this._renderButton(show, this.resizeButton, resizeButtonPos, buttonSize);

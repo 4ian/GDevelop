@@ -47,7 +47,7 @@ export default class KeyboardShortcuts {
   _isControlPressed = () => {
     // On OS X, meta key (Apple/Command key) acts as Control key on Windows/Linux.
     return this.metaPressed || this.rawCtrlPressed;
-  }
+  };
 
   _onKeyDown = evt => {
     if (this.lastDownTarget !== this.domElement) return;

@@ -91,11 +91,7 @@ export default class NewBehaviorDialog extends Component {
                 }
                 key={behaviorMetadata.type}
                 primaryText={behaviorMetadata.fullName}
-                secondaryText={
-                  <p>
-                    {behaviorMetadata.description}
-                  </p>
-                }
+                secondaryText={<p>{behaviorMetadata.description}</p>}
                 secondaryTextLines={2}
                 onClick={() =>
                   this.props.onChoose(

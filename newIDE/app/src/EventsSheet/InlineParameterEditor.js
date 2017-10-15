@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import InlinePopover from './InlinePopover';
-import ParameterRenderingService
-  from './InstructionEditor/ParameterRenderingService';
+import ParameterRenderingService from './InstructionEditor/ParameterRenderingService';
 const gd = global.gd;
 
 export default class InlineParameterEditor extends Component {
@@ -53,17 +52,19 @@ export default class InlineParameterEditor extends Component {
     const ParameterComponent = ParameterRenderingService.getParameterComponent(
       parameterMetadata.getType()
     );
-    this.setState({
-      ParameterComponent,
-      parameterMetadata,
-    }, () => {
-      if (this._field && this._field.focus) this._field.focus();
-    });
+    this.setState(
+      {
+        ParameterComponent,
+        parameterMetadata,
+      },
+      () => {
+        if (this._field && this._field.focus) this._field.focus();
+      }
+    );
   }
 
   render() {
-    if (!this.state.ParameterComponent || !this.props.open)
-      return null;
+    if (!this.state.ParameterComponent || !this.props.open) return null;
 
     const { ParameterComponent } = this.state;
 
@@ -77,13 +78,11 @@ export default class InlineParameterEditor extends Component {
           parameterMetadata={this.state.parameterMetadata}
           project={this.props.project}
           layout={this.props.layout}
-          value={this.props.instruction.getParameter(
-            this.props.parameterIndex
-          )}
+          value={this.props.instruction.getParameter(this.props.parameterIndex)}
           instruction={this.props.instruction}
           key={this.props.instruction.ptr}
           onChange={this.props.onChange}
-          ref={field => this._field = field}
+          ref={field => (this._field = field)}
           isInline
         />
       </InlinePopover>

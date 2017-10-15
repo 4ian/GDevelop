@@ -7,7 +7,7 @@
   "devDependencies": {
     "flow-bin": "^0.46.0",
     "follow-redirects": "^1.2.3",
-    "prettier": "^0.22.0",
+    "prettier": "1.7.0",
     "react-scripts": "1.0.6",
     "shelljs": "^0.7.7"
   },
@@ -52,7 +52,7 @@
     "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js",
     "start": "npm run import-resources && react-scripts start",
     "build": "npm run import-resources && react-scripts build",
-    "format": "prettier --single-quote --trailing-comma es5 --write \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.js\"",
     "test": "react-scripts test --env=jsdom",
     "flow": "flow",
     "analyze-source-map": "source-map-explorer build/static/js/main.*",

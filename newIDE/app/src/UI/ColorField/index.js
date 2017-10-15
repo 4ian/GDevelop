@@ -37,10 +37,10 @@ export default class ColorField extends Component {
           onClick={this.onClick}
           onFocus={this.onClick}
           value=""
-          ref={textField => this.textField = textField}
+          ref={textField => (this.textField = textField)}
         />
         <div style={styles.picker}>
-          <ColorPicker {...this.props} ref={picker => this.picker = picker} />
+          <ColorPicker {...this.props} ref={picker => (this.picker = picker)} />
         </div>
       </div>
     );

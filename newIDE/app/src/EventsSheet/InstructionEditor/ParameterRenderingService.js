@@ -44,7 +44,6 @@ export default {
 
     if (this.components.hasOwnProperty(fieldType))
       return this.components[fieldType];
-    else
-      return this.components.default;
+    else return this.components.default;
   },
 };

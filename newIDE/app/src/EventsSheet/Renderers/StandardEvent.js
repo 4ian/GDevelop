@@ -51,7 +51,9 @@ export default class StandardEvent extends Component {
           onInstructionClick={this.props.onInstructionClick}
           onInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onInstructionContextMenu={this.props.onInstructionContextMenu}
-          onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+          onInstructionsListContextMenu={
+            this.props.onInstructionsListContextMenu
+          }
           onParameterClick={this.props.onParameterClick}
         />
         <InstructionsList
@@ -63,7 +65,9 @@ export default class StandardEvent extends Component {
           onInstructionClick={this.props.onInstructionClick}
           onInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onInstructionContextMenu={this.props.onInstructionContextMenu}
-          onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+          onInstructionsListContextMenu={
+            this.props.onInstructionsListContextMenu
+          }
           onParameterClick={this.props.onParameterClick}
         />
       </div>

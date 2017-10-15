@@ -6,8 +6,7 @@ import IconButton from 'material-ui/IconButton';
 import Drawer from 'material-ui/Drawer';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 
-import DragDropContextProvider
-  from '../Utils/DragDropHelpers/DragDropContextProvider';
+import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
 import Toolbar from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
@@ -128,7 +127,8 @@ export default class MainFrame extends Component {
   addLayout = () => {
     const { currentProject } = this.state;
     const name = newNameGenerator('NewScene', name =>
-      currentProject.hasLayoutNamed(name));
+      currentProject.hasLayoutNamed(name)
+    );
     currentProject.insertNewLayout(name, currentProject.getLayoutsCount());
     this.forceUpdate();
   };
@@ -136,7 +136,8 @@ export default class MainFrame extends Component {
   addExternalLayout = () => {
     const { currentProject } = this.state;
     const name = newNameGenerator('NewExternalLayout', name =>
-      currentProject.hasExternalLayoutNamed(name));
+      currentProject.hasExternalLayoutNamed(name)
+    );
     currentProject.insertNewExternalLayout(
       name,
       currentProject.getExternalLayoutsCount()
@@ -147,7 +148,8 @@ export default class MainFrame extends Component {
   addExternalEvents = () => {
     const { currentProject } = this.state;
     const name = newNameGenerator('NewExternalEvents', name =>
-      currentProject.hasExternalEventsNamed(name));
+      currentProject.hasExternalEventsNamed(name)
+    );
     currentProject.insertNewExternalEvents(
       name,
       currentProject.getExternalEventsCount()
@@ -277,13 +279,15 @@ export default class MainFrame extends Component {
 
   _launchLayoutPreview = (project, layout) =>
     watchPromiseInState(this, 'previewLoading', () =>
-      this._handlePreviewResult(this.props.onLayoutPreview(project, layout)));
+      this._handlePreviewResult(this.props.onLayoutPreview(project, layout))
+    );
 
   _launchExternalLayoutPreview = (project, layout, externalLayout) =>
     watchPromiseInState(this, 'previewLoading', () =>
       this._handlePreviewResult(
         this.props.onExternalLayoutPreview(project, layout, externalLayout)
-      ));
+      )
+    );
 
   _handlePreviewResult = previewPromise => {
     return previewPromise.then(
@@ -342,7 +346,8 @@ export default class MainFrame extends Component {
       : tabsWithSceneEditor;
 
     this.setState({ editorTabs: tabsWithSceneAndEventsEditors }, () =>
-      this.updateToolbar());
+      this.updateToolbar()
+    );
   };
 
   openExternalEvents = name => {
@@ -577,12 +582,10 @@ export default class MainFrame extends Component {
   }
 
   render() {
-    const {
-      currentProject,
-      genericDialog,
-    } = this.state;
+    const { currentProject, genericDialog } = this.state;
     const { exportDialog, createDialog, introDialog, saveDialog } = this.props;
-    const showLoader = this.state.loadingProject ||
+    const showLoader =
+      this.state.loadingProject ||
       this.state.previewLoading ||
       this.props.loading;
 
@@ -604,7 +607,7 @@ export default class MainFrame extends Component {
                   </IconButton>
                 }
               />
-              {currentProject &&
+              {currentProject && (
                 <ProjectManager
                   project={currentProject}
                   onOpenExternalEvents={this.openExternalEvents}
@@ -622,10 +625,11 @@ export default class MainFrame extends Component {
                   onSaveProject={this.save}
                   onCloseProject={this.closeProject}
                   onExportProject={this.openExportDialog}
-                />}
+                />
+              )}
             </Drawer>
             <Toolbar
-              ref={toolbar => this.toolbar = toolbar}
+              ref={toolbar => (this.toolbar = toolbar)}
               showProjectIcons={!this.props.integratedEditor}
               hasProject={!!this.state.currentProject}
               toggleProjectManager={this.toggleProjectManager}
@@ -655,7 +659,7 @@ export default class MainFrame extends Component {
             <LoaderModal show={showLoader} />
             <ConfirmCloseDialog
               ref={confirmCloseDialog =>
-                this.confirmCloseDialog = confirmCloseDialog}
+                (this.confirmCloseDialog = confirmCloseDialog)}
             />
             {!!exportDialog &&
               React.cloneElement(exportDialog, {

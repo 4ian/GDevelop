@@ -81,7 +81,9 @@ export default class InstructionsList extends Component {
           onSubInstructionClick={this.props.onInstructionClick}
           onSubInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onSubInstructionContextMenu={this.props.onInstructionContextMenu}
-          onSubInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+          onSubInstructionsListContextMenu={
+            this.props.onInstructionsListContextMenu
+          }
           onSubParameterClick={this.props.onParameterClick}
         />
       );

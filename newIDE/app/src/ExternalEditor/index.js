@@ -194,7 +194,7 @@ class ExternalEditor extends Component {
   render() {
     return React.cloneElement(this.props.children, {
       loading: this.state.loading,
-      ref: editor => this.editor = editor,
+      ref: editor => (this.editor = editor),
       requestUpdate: () => this.requestUpdate('', true),
       onEditObject: this.editObject,
       integratedEditor: true,

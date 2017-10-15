@@ -17,7 +17,7 @@ export default class DefaultField extends Component {
         value={this.props.value}
         floatingLabelText={description}
         onChange={(e, text) => this.props.onChange(text)}
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
         fullWidth
       />
     );

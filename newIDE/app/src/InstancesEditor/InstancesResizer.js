@@ -20,8 +20,9 @@ export default class InstancesResizer {
   _roundHeight(height) {
     if (!this.options.snap || !this.options.grid) return height;
 
-    return Math.round(height / this.options.gridHeight) *
-      this.options.gridHeight;
+    return (
+      Math.round(height / this.options.gridHeight) * this.options.gridHeight
+    );
   }
 
   _getSizeDeltaX(proportional, initialSize) {
@@ -56,18 +57,22 @@ export default class InstancesResizer {
 
       let initialSize = this.instanceSizes[selectedInstance.ptr];
       if (!initialSize) {
-        initialSize = (this.instanceSizes[selectedInstance.ptr] = {
+        initialSize = this.instanceSizes[selectedInstance.ptr] = {
           width: selectedInstance.getCustomWidth(),
           height: selectedInstance.getCustomHeight(),
-        });
+        };
       }
 
       selectedInstance.setHasCustomSize(true);
       selectedInstance.setCustomWidth(
-        this._roundWidth(initialSize.width + this._getSizeDeltaX(proportional, initialSize))
+        this._roundWidth(
+          initialSize.width + this._getSizeDeltaX(proportional, initialSize)
+        )
       );
       selectedInstance.setCustomHeight(
-        this._roundHeight(initialSize.height + this._getSizeDeltaY(proportional, initialSize))
+        this._roundHeight(
+          initialSize.height + this._getSizeDeltaY(proportional, initialSize)
+        )
       );
     }
   }

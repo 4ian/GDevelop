@@ -39,6 +39,7 @@ export default class Instruction extends Component {
     onAddNewSubInstruction: PropTypes.func,
     onSubInstructionClick: PropTypes.func,
     onSubInstructionDoubleClick: PropTypes.func,
+    onSubInstructionsListContextMenu: PropTypes.func,
     onSubParameterClick: PropTypes.func,
   };
 
@@ -154,6 +155,7 @@ export default class Instruction extends Component {
             onInstructionClick={this.props.onSubInstructionClick}
             onInstructionDoubleClick={this.props.onSubInstructionDoubleClick}
             onInstructionContextMenu={this.props.onSubInstructionContextMenu}
+            onInstructionsListContextMenu={this.props.onSubInstructionsListContextMenu}
             onParameterClick={this.props.onSubParameterClick}
             addButtonLabel="Add a sub-condition"
           />}

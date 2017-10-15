@@ -198,6 +198,10 @@ export default class EventsSheet extends Component {
     );
   };
 
+  openInstructionsListContextMenu = (x, y, instructionsListContext) => {
+    this.instructionsListContextMenu.open(x, y); //TODO: Context
+  }
+
   selectInstruction = instructionContext => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
@@ -336,6 +340,7 @@ export default class EventsSheet extends Component {
           onInstructionClick={this.selectInstruction}
           onInstructionDoubleClick={this.openInstructionEditor}
           onInstructionContextMenu={this.openInstructionContextMenu}
+          onInstructionsListContextMenu={this.openInstructionsListContextMenu}
           onAddNewInstruction={this.openInstructionEditor}
           onParameterClick={this.openParameterEditor}
           onEventClick={this.selectEvent}
@@ -410,6 +415,16 @@ export default class EventsSheet extends Component {
             {
               label: 'Delete',
               click: () => this.deleteSelection(),
+            },
+          ]}
+        />
+        <ContextMenu
+          ref={instructionsListContextMenu =>
+            this.instructionsListContextMenu = instructionsListContextMenu}
+          menuTemplate={[
+            {
+              label: 'Paste',
+              click: () => this.pasteInstructions(),
             },
           ]}
         />

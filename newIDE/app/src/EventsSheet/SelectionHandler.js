@@ -1,4 +1,26 @@
+// @flow
+
 import values from 'lodash.values';
+
+type Event = {
+  ptr: number,
+};
+type Instruction = {
+  ptr: number,
+};
+
+type InstructionContext = {|
+  instruction: Instruction,
+|};
+
+type EventContext = {|
+  event: Event,
+|};
+
+type SelectionState = {
+  selectedInstructions: { [number]: InstructionContext },
+  selectedEvents: { [number]: EventContext },
+};
 
 export const getInitialSelection = () => {
   return {
@@ -7,55 +29,67 @@ export const getInitialSelection = () => {
   };
 };
 
-export const getSelectedEvents = selection => {
+export const getSelectedEvents = (selection: SelectionState): Array<Object> => {
   return values(selection.selectedEvents).map(
-    eventContext => eventContext.event
+    (eventContext: EventContext) => eventContext.event
   );
 };
 
-export const getSelectedEventContexts = selection => {
+export const getSelectedEventContexts = (
+  selection: SelectionState
+): Array<EventContext> => {
   return values(selection.selectedEvents);
 };
 
-export const getSelectedInstructions = selection => {
+export const getSelectedInstructions = (
+  selection: SelectionState
+): Array<Instruction> => {
   return values(selection.selectedInstructions).map(
-    instructionContext => instructionContext.instruction
+    (instructionContext: InstructionContext) => instructionContext.instruction
   );
 };
 
-export const getSelectedInstructionsContexts = selection => {
+export const getSelectedInstructionsContexts = (
+  selection: SelectionState
+): Array<InstructionContext> => {
   return values(selection.selectedInstructions);
 };
 
-export const isEventSelected = (selection, event) => {
+export const isEventSelected = (
+  selection: SelectionState,
+  event: Object
+): boolean => {
   return !!selection.selectedEvents[event.ptr];
 };
 
-export const isInstructionSelected = (selection, instruction) => {
+export const isInstructionSelected = (
+  selection: SelectionState,
+  instruction: Instruction
+): boolean => {
   return !!selection.selectedInstructions[instruction.ptr];
 };
 
-export const hasEventSelected = selection => {
-  return Object.keys(selection.selectedEvents).length;
+export const hasEventSelected = (selection: SelectionState): boolean => {
+  return !!Object.keys(selection.selectedEvents).length;
 };
 
-export const hasInstructionSelected = selection => {
-  return Object.keys(selection.selectedInstructions).length;
+export const hasInstructionSelected = (selection: SelectionState): boolean => {
+  return !!Object.keys(selection.selectedInstructions).length;
 };
 
-export const hasSomethingSelected = selection => {
+export const hasSomethingSelected = (selection: SelectionState): boolean => {
   return hasInstructionSelected(selection) || hasEventSelected(selection);
 };
 
-export const clearSelection = () => {
+export const clearSelection = (): SelectionState => {
   return getInitialSelection();
 };
 
 export const selectEvent = (
-  selection,
-  eventContext,
-  multiSelection = false
-) => {
+  selection: SelectionState,
+  eventContext: EventContext,
+  multiSelection: boolean = false
+): SelectionState => {
   const event = eventContext.event;
   if (isEventSelected(selection, event)) return selection;
 
@@ -70,12 +104,13 @@ export const selectEvent = (
 };
 
 export const selectInstruction = (
-  selection,
-  instructionContext,
-  multiSelection = false
-) => {
-  const instruction = instructionContext.instruction;
-  if (isInstructionSelected(selection, instruction)) return selection;
+  selection: SelectionState,
+  instructionContext: InstructionContext,
+  multiSelection: boolean = false
+): SelectionState => {
+  const instruction: Instruction = instructionContext.instruction;
+  if (isInstructionSelected(selection, instruction))
+    return selection;
 
   const existingSelection = multiSelection ? selection : clearSelection();
   return {

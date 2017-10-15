@@ -28,19 +28,26 @@ export default class InstructionsList extends Component {
     onInstructionClick: PropTypes.func.isRequired,
     onInstructionDoubleClick: PropTypes.func.isRequired,
     onInstructionContextMenu: PropTypes.func.isRequired,
+    onInstructionsListContextMenu: PropTypes.func.isRequired,
     onParameterClick: PropTypes.func.isRequired,
     selection: PropTypes.object.isRequired,
     addButtonLabel: PropTypes.string,
   };
 
   onAddNewInstruction = () => {
-    if (this.props.onAddNewInstruction) this.props.onAddNewInstruction({
-      instrsList: this.props.instrsList,
-      isCondition: this.props.areConditions,
-    });
+    if (this.props.onAddNewInstruction)
+      this.props.onAddNewInstruction({
+        instrsList: this.props.instrsList,
+        isCondition: this.props.areConditions,
+      });
   };
 
   render() {
+    const instructionsListContext = {
+      isCondition: this.props.areConditions,
+      instrsList: this.props.instrsList,
+    };
+
     const instructions = mapFor(0, this.props.instrsList.size(), i => {
       const instruction = this.props.instrsList.get(i);
       const instructionContext = {
@@ -59,32 +66,50 @@ export default class InstructionsList extends Component {
           key={instruction.ptr}
           selected={isInstructionSelected(this.props.selection, instruction)}
           onClick={() => this.props.onInstructionClick(instructionContext)}
-          onDoubleClick={() => this.props.onInstructionDoubleClick(instructionContext)}
-          onContextMenu={(x, y) => this.props.onInstructionContextMenu(x, y, instructionContext)}
-          onParameterClick={(domEvent, parameterIndex) => this.props.onParameterClick({
-            ...instructionContext,
-            parameterIndex,
-            domEvent,
-          })}
-
+          onDoubleClick={() =>
+            this.props.onInstructionDoubleClick(instructionContext)}
+          onContextMenu={(x, y) =>
+            this.props.onInstructionContextMenu(x, y, instructionContext)}
+          onParameterClick={(domEvent, parameterIndex) =>
+            this.props.onParameterClick({
+              ...instructionContext,
+              parameterIndex,
+              domEvent,
+            })}
           selection={this.props.selection}
           onAddNewSubInstruction={this.props.onAddNewInstruction}
           onSubInstructionClick={this.props.onInstructionClick}
           onSubInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onSubInstructionContextMenu={this.props.onInstructionContextMenu}
+          onSubInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
           onSubParameterClick={this.props.onParameterClick}
         />
       );
     });
 
-    const containerStyle = this.props.areConditions ? styles.conditionsContainer :
-      styles.actionsContainer;
+    const containerStyle = this.props.areConditions
+      ? styles.conditionsContainer
+      : styles.actionsContainer;
 
-    const addButtonLabel = this.props.areConditions ? 'Add condition' : 'Add action';
+    const addButtonLabel = this.props.areConditions
+      ? 'Add condition'
+      : 'Add action';
     return (
-      <div style={{...containerStyle, ...this.props.style}}>
+      <div style={{ ...containerStyle, ...this.props.style }}>
         {instructions}
-        <a style={styles.addButton} className="add-link" onClick={this.onAddNewInstruction}>
+        <a
+          style={styles.addButton}
+          className="add-link"
+          onClick={this.onAddNewInstruction}
+          onContextMenu={e => {
+            e.stopPropagation();
+            this.props.onInstructionsListContextMenu(
+              e.clientX,
+              e.clientY,
+              instructionsListContext
+            );
+          }}
+        >
           {this.props.addButtonLabel || addButtonLabel}
         </a>
       </div>

@@ -106,6 +106,7 @@ class EventContainer extends Component {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
+            onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
             onParameterClick={this.props.onParameterClick}
           />}
       </div>
@@ -260,6 +261,7 @@ export default class EventsTree extends Component {
         onEventClick={() => this.props.onEventClick(node)}
         onEventContextMenu={(x, y) => this.props.onEventContextMenu(x, y, node)}
         onInstructionContextMenu={this.props.onInstructionContextMenu}
+        onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
       />
     );
   };

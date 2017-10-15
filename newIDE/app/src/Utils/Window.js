@@ -1,12 +1,8 @@
 import optionalRequire from './OptionalRequire.js';
+import { isWindows } from './Platform';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 const dialog = electron ? electron.remote.dialog : null;
-
-let isWindows = false;
-if (electron) {
-  isWindows = electron.remote.require('electron-is').windows();
-}
 
 export default class Window {
   static setTitle(title) {
@@ -22,7 +18,7 @@ export default class Window {
     if (!electron) return;
 
     let scaleFactor = 1;
-    if (isWindows) {
+    if (isWindows()) {
       // setBounds need to be called with the scale factor of the screen
       // on Windows.
       const rect = { x, y, width, height };

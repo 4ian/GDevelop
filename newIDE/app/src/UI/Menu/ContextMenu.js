@@ -55,7 +55,7 @@ class MaterialUIContextMenu extends React.Component {
           onRequestClose={this._onClose}
           {...this.menuImplementation.getMenuProps()}
         >
-          <Menu desktop>
+          <Menu desktop width={256}>
             {this.menuImplementation.buildFromTemplate(this.props.menuTemplate)}
           </Menu>
         </Popover>

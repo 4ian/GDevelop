@@ -356,6 +356,12 @@ export default class EventsSheet extends Component {
     this._eventsTree.forceEventsUpdate();
   };
 
+  pasteEventsOrInstructions = () => {
+    if (hasEventSelected(this.state.selection)) this.pasteEvents();
+    else if (hasInstructionSelected(this.state.selection)) this.pasteInstructions();
+    else if (hasInstructionsListSelected(this.state.selection)) this.pasteInstructions();
+  }
+
   render() {
     const { project, layout, events } = this.props;
     if (!project) return null;
@@ -404,6 +410,9 @@ export default class EventsSheet extends Component {
 
             this.deleteSelection();
           }}
+          onCopy={this.copySelection}
+          onCut={this.cutSelection}
+          onPaste={this.pasteEventsOrInstructions}
         />
         <ContextMenu
           ref={eventContextMenu => this.eventContextMenu = eventContextMenu}
@@ -411,19 +420,23 @@ export default class EventsSheet extends Component {
             {
               label: 'Copy',
               click: () => this.copySelection(),
+              accelerator: 'CmdOrCtrl+C',
             },
             {
               label: 'Cut',
               click: () => this.cutSelection(),
+              accelerator: 'CmdOrCtrl+X',
             },
             {
               label: 'Paste',
               click: () => this.pasteEvents(),
+              accelerator: 'CmdOrCtrl+V',
             },
             { type: 'separator' },
             {
               label: 'Delete',
               click: () => this.deleteSelection(),
+              accelerator: 'Delete',
             },
           ]}
         />
@@ -434,19 +447,23 @@ export default class EventsSheet extends Component {
             {
               label: 'Copy',
               click: () => this.copySelection(),
+              accelerator: 'CmdOrCtrl+C',
             },
             {
               label: 'Cut',
               click: () => this.cutSelection(),
+              accelerator: 'CmdOrCtrl+X',
             },
             {
               label: 'Paste',
               click: () => this.pasteInstructions(),
+              accelerator: 'CmdOrCtrl+V',
             },
             { type: 'separator' },
             {
               label: 'Delete',
               click: () => this.deleteSelection(),
+              accelerator: 'Delete',
             },
           ]}
         />
@@ -457,6 +474,7 @@ export default class EventsSheet extends Component {
             {
               label: 'Paste',
               click: () => this.pasteInstructions(),
+              accelerator: 'CmdOrCtrl+V',
             },
           ]}
         />

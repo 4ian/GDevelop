@@ -4,6 +4,9 @@ const CTRL_KEY = 17;
 const SHIFT_KEY = 16;
 const BACKSPACE_KEY = 8;
 const DELETE_KEY = 46;
+const C_KEY = 67;
+const X_KEY = 88;
+const V_KEY = 86;
 
 // TODO: This is similar to InstancesEditor/KeyboardShortcuts.js and could be merged
 export default class KeyboardShortcuts extends Component {
@@ -37,6 +40,15 @@ export default class KeyboardShortcuts extends Component {
 
     if (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY) {
       this.props.onDelete();
+    }
+    if (evt.which === C_KEY && this._isControlPressed()) {
+      this.props.onCopy();
+    }
+    if (evt.which === X_KEY && this._isControlPressed()) {
+      this.props.onCut();
+    }
+    if (evt.which === V_KEY && this._isControlPressed()) {
+      this.props.onPaste();
     }
   };
 

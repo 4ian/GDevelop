@@ -20,11 +20,14 @@ import {
   hasSomethingSelected,
   hasEventSelected,
   hasInstructionSelected,
+  hasInstructionsListSelected,
   getSelectedEvents,
   getSelectedInstructions,
   clearSelection,
   getSelectedEventContexts,
   getSelectedInstructionsContexts,
+  getSelectedInstructionsListsContexts,
+  selectInstructionsList,
 } from './SelectionHandler';
 const gd = global.gd;
 
@@ -199,8 +202,20 @@ export default class EventsSheet extends Component {
   };
 
   openInstructionsListContextMenu = (x, y, instructionsListContext) => {
-    this.instructionsListContextMenu.open(x, y); //TODO: Context
-  }
+    this.setState(
+      {
+        selection: selectInstructionsList(
+          this.state.selection,
+          instructionsListContext,
+          false
+        ),
+      },
+      () => {
+        this.updateToolbar();
+        this.instructionsListContextMenu.open(x, y);
+      }
+    );
+  };
 
   selectInstruction = instructionContext => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
@@ -302,7 +317,12 @@ export default class EventsSheet extends Component {
   };
 
   pasteInstructions = () => {
-    if (!hasInstructionSelected(this.state.selection) || !Clipboard.has(CLIPBOARD_KIND)) return;
+    if (
+      (!hasInstructionSelected(this.state.selection) &&
+        !hasInstructionsListSelected(this.state.selection)) ||
+      !Clipboard.has(CLIPBOARD_KIND)
+    )
+      return;
 
     const instructionsList = new gd.InstructionsList();
     unserializeFromJSObject(
@@ -311,12 +331,24 @@ export default class EventsSheet extends Component {
       'unserializeFrom',
       this.props.project
     );
-    getSelectedInstructionsContexts(this.state.selection).forEach(instructionContext => {
+    getSelectedInstructionsContexts(
+      this.state.selection
+    ).forEach(instructionContext => {
       instructionContext.instrsList.insertInstructions(
         instructionsList,
         0,
         instructionsList.size(),
         instructionContext.indexInList
+      );
+    });
+    getSelectedInstructionsListsContexts(
+      this.state.selection
+    ).forEach(instructionsListContext => {
+      instructionsListContext.instrsList.insertInstructions(
+        instructionsList,
+        0,
+        instructionsList.size(),
+        instructionsListContext.instrsList.size()
       );
     });
     instructionsList.delete();

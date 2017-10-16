@@ -347,7 +347,7 @@ void LayersEditorPanel::OnLayerDownClicked(wxCommandEvent& event)
             return;
         }
     }
-    gd::LogWarning(_("Can't find the layer to move  !"));
+    gd::LogWarning(_("Can't find the layer to move !"));
 }
 
 void LayersEditorPanel::OnLayerUpClicked(wxCommandEvent& event)
@@ -373,7 +373,7 @@ void LayersEditorPanel::OnLayerUpClicked(wxCommandEvent& event)
             return;
         }
     }
-    gd::LogWarning(_("Can't find the layer to move  !"));
+    gd::LogWarning(_("Can't find the layer to move !"));
 }
 
 void LayersEditorPanel::OnRefreshClicked(wxCommandEvent& event)

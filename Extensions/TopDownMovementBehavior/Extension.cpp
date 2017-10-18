@@ -59,7 +59,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddAction("SimulateUpKey",
                    _("Simulate up key press"),
-                   _("Simulate a press of up key ( Used when on a ladder )."),
+                   _("Simulate a press of up key."),
                    _("Simulate pressing Up for _PARAM0_"),
                    _("Controls"),
                    "res/conditions/keyboard24.png",
@@ -71,7 +71,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddAction("SimulateDownKey",
                    _("Simulate down key press"),
-                   _("Simulate a press of down key ( Used when on a ladder )."),
+                   _("Simulate a press of down key."),
                    _("Simulate pressing Down for _PARAM0_"),
                    _("Controls"),
                    "res/conditions/keyboard24.png",

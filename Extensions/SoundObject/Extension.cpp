@@ -413,7 +413,7 @@ public:
         AddCondition("ListenerX",
                        _("X position"),
                        _("Test the position of the listener on the X axis."),
-                       _("The listener X position is _PARAM1__PARAM0_"),
+                       _("The listener X position is _PARAM0__PARAM1_"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -426,7 +426,7 @@ public:
         AddCondition("ListenerY",
                        _("Y position"),
                        _("Test the position of the listener on the Y axis."),
-                       _("The listener Y position is _PARAM1__PARAM0_"),
+                       _("The listener Y position is _PARAM0__PARAM1_"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -439,7 +439,7 @@ public:
         AddCondition("ListenerZ",
                        _("Z position"),
                        _("Test the position of the listener on the Z axis."),
-                       _("The listener Z position is _PARAM1__PARAM0_"),
+                       _("The listener Z position is _PARAM0__PARAM1_"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -452,7 +452,7 @@ public:
         AddCondition("ListenerDirectionX",
                        _("X direction"),
                        _("Test the direction of the listener on the X axis."),
-                       _("The listener X direction is _PARAM1__PARAM0_"),
+                       _("The listener X direction is _PARAM0__PARAM1_"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -465,7 +465,7 @@ public:
         AddCondition("ListenerDirectionY",
                        _("Y direction"),
                        _("Test the direction of the listener on the Y axis."),
-                       _("The listener Y direction is _PARAM1__PARAM0_"),
+                       _("The listener Y direction is _PARAM0__PARAM1_"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -481,7 +481,7 @@ public:
         AddCondition("ListenerDirectionZ",
                        _("Z direction"),
                        _("Test the direction of the listener on the Z axis."),
-                       _("The listener Z direction is _PARAM1__PARAM0_"),
+                       _("The listener Z direction is _PARAM0__PARAM1_"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")

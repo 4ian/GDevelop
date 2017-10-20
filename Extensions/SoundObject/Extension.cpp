@@ -370,7 +370,7 @@ public:
         AddAction("ListenerDirectionX",
                        _("Direction on X axis"),
                        _("Change the direction of the listener on the X axis."),
-                       _("Do _PARAM1__PARAM2_ to the direction on the X axis of the listener"),
+                       _("Do _PARAM0__PARAM1_ to the direction on the X axis of the listener"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -384,7 +384,7 @@ public:
         AddAction("ListenerDirectionY",
                        _("Direction on Y axis"),
                        _("Change the direction of the listener on the Y axis."),
-                       _("Do _PARAM1__PARAM2_ to the direction on the Y axis of the listener"),
+                       _("Do _PARAM0__PARAM1_ to the direction on the Y axis of the listener"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
@@ -398,7 +398,7 @@ public:
         AddAction("ListenerDirectionZ",
                        _("Direction on Z axis"),
                        _("Change the direction of the listener on the Z axis."),
-                       _("Do _PARAM1__PARAM2_ to the direction on the Z axis of the listener"),
+                       _("Do _PARAM0__PARAM1_ to the direction on the Z axis of the listener"),
                        _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")

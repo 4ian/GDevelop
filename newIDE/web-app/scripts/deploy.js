@@ -35,7 +35,6 @@ isGitClean().then(clean => {
   shell.rm('-rf', 'dist');
   shell.mkdir('-p', 'dist');
   shell.cp('-r', '../app/build/*', 'dist');
-  shell.rm('dist/static/js/*.map');
 
   if (!args['skip-deploy']) {
     shell.echo('🚄 Uploading the built app to gh-pages...');

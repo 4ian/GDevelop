@@ -403,12 +403,14 @@ export default class InstancesFullEditor extends Component {
     this.contextMenu.open(x, y);
   };
 
-  copySelection = () => {
+  copySelection = ({ useLastCursorPosition } = {}) => {
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    const position = this.editor.getLastContextMenuPosition();
+      const position = useLastCursorPosition
+      ? this.editor.getLastCursorPosition()
+      : this.editor.getLastContextMenuPosition();
     Clipboard.set('instances', {
       x: position[0],
       y: position[1],
@@ -416,16 +418,18 @@ export default class InstancesFullEditor extends Component {
     });
   };
 
-  cutSelection = () => {
-    this.copySelection();
+  cutSelection = (options) => {
+    this.copySelection(options);
     this.deleteSelection();
   };
 
-  paste = () => {
+  paste = ({ useLastCursorPosition } = {}) => {
     const clipboardContent = Clipboard.get('instances');
     if (!clipboardContent) return;
 
-    const position = this.editor.getLastContextMenuPosition();
+    const position = useLastCursorPosition
+      ? this.editor.getLastCursorPosition()
+      : this.editor.getLastContextMenuPosition();
     const { x, y } = clipboardContent;
     clipboardContent.instances
       .map(serializedInstance => {
@@ -474,6 +478,9 @@ export default class InstancesFullEditor extends Component {
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
           onContextMenu={this._onContextMenu}
+          onCopy={() => this.copySelection({ useLastCursorPosition: true })}
+          onCut={() => this.cutSelection({ useLastCursorPosition: true })}
+          onPaste={() => this.paste({ useLastCursorPosition: true })}
           editorRef={editor => (this.editor = editor)}
         />
       ),
@@ -642,14 +649,17 @@ export default class InstancesFullEditor extends Component {
             {
               label: 'Copy',
               click: () => this.copySelection(),
+              accelerator: 'CmdOrCtrl+C',
             },
             {
               label: 'Cut',
               click: () => this.cutSelection(),
+              accelerator: 'CmdOrCtrl+X',
             },
             {
               label: 'Paste',
               click: () => this.paste(),
+              accelerator: 'CmdOrCtrl+V',
             },
           ]}
         />

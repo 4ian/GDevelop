@@ -4,7 +4,7 @@ import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog
 import '../UI/Theme/EventsSheet.css';
 import { container } from './ClassNames';
 import Toolbar from './Toolbar';
-import KeyboardShortcuts from './KeyboardShortcuts';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import Clipboard from '../Utils/Clipboard';
@@ -51,6 +51,25 @@ export default class EventsSheet extends Component {
       inlineEditing: false,
       inlineEditingAnchorEl: null,
     };
+
+    this._keyboardShortcuts = new KeyboardShortcuts({
+      onDelete: () => {
+        if (
+          this.state.inlineEditing ||
+          this.state.editedInstruction.instruction
+        )
+          return;
+
+        this.deleteSelection();
+      },
+      onCopy: this.copySelection,
+      onCut: this.cutSelection,
+      onPaste: this.pasteEventsOrInstructions,
+    });
+  }
+
+  componentWillUnmount() {
+    this._keyboardShortcuts.unmount();
   }
 
   updateToolbar() {
@@ -373,7 +392,12 @@ export default class EventsSheet extends Component {
     if (!project) return null;
 
     return (
-      <div className={container}>
+      <div
+        className={container}
+        onFocus={() => this._keyboardShortcuts.focus()}
+        onBlur={() => this._keyboardShortcuts.blur()}
+        tabIndex={1}
+      >
         <FullSizeEventsTree
           eventsTreeRef={eventsTree => (this._eventsTree = eventsTree)}
           key={events.ptr}
@@ -404,22 +428,6 @@ export default class EventsSheet extends Component {
             instruction.setParameter(parameterIndex, value);
             this.forceUpdate();
           }}
-        />
-        <KeyboardShortcuts
-          ref={keyboardShortcuts =>
-            (this._keyboardShortcuts = keyboardShortcuts)}
-          onDelete={() => {
-            if (
-              this.state.inlineEditing ||
-              this.state.editedInstruction.instruction
-            )
-              return;
-
-            this.deleteSelection();
-          }}
-          onCopy={this.copySelection}
-          onCut={this.cutSelection}
-          onPaste={this.pasteEventsOrInstructions}
         />
         <ContextMenu
           ref={eventContextMenu => (this.eventContextMenu = eventContextMenu)}

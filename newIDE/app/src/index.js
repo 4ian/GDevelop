@@ -6,6 +6,7 @@ import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import { sendProgramOpening } from './Utils/Analytics/EventSender';
+import { installRaven } from './Utils/Analytics/Raven';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import registerServiceWorker from './registerServiceWorker';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
@@ -33,6 +34,8 @@ import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import LocalIntroDialog from './MainFrame/LocalIntroDialog';
 const electron = optionalRequire('electron');
+
+installRaven();
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941

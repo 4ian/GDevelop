@@ -2,8 +2,15 @@ import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 
 const styles = {
+  container: {
+    marginTop: 10,
+  },
   button: {
     margin: 5,
+  },
+  description: {
+    display: 'inline-block',
+    marginRight: 5,
   },
 };
 
@@ -17,8 +24,8 @@ export default class DefaultField extends Component {
       : undefined;
 
     return (
-      <div>
-        {description}
+      <div style={styles.container}>
+        <p style={styles.description}>{description}</p>
         <RaisedButton
           style={styles.button}
           label="Yes"

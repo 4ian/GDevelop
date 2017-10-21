@@ -62,9 +62,12 @@ export default class ExternalEventsEditor extends BaseEditor {
     if (!externalEvents) return;
 
     externalEvents.setAssociatedLayout(layoutName);
-    this.setState({
-      layoutChooserOpen: false,
-    }, () => this.updateToolbar());
+    this.setState(
+      {
+        layoutChooserOpen: false,
+      },
+      () => this.updateToolbar()
+    );
   };
 
   openLayoutChooser = () => {
@@ -74,7 +77,7 @@ export default class ExternalEventsEditor extends BaseEditor {
   };
 
   render() {
-    const { project, externalEventsName  } = this.props;
+    const { project, externalEventsName } = this.props;
     const externalEvents = this.getExternalEvents();
     const layout = this.getLayout();
 
@@ -85,33 +88,35 @@ export default class ExternalEventsEditor extends BaseEditor {
 
     return (
       <div style={styles.container}>
-        {layout && <EventsSheet
-          {...this.props}
-          ref={editor => this.editor = editor}
-          project={project}
-          layout={layout}
-          events={externalEvents.getEvents()}
-          onPreview={() => this.props.onPreview(project, layout)}
-          onOpenSettings={this.openLayoutChooser}
-        />
-        }
-        {!layout &&
+        {layout && (
+          <EventsSheet
+            {...this.props}
+            ref={editor => (this.editor = editor)}
+            project={project}
+            layout={layout}
+            events={externalEvents.getEvents()}
+            onPreview={() => this.props.onPreview(project, layout)}
+            onOpenSettings={this.openLayoutChooser}
+          />
+        )}
+        {!layout && (
           <PlaceholderMessage>
-            To edit the external events, choose the scene in which it will be included:
+            To edit the external events, choose the scene in which it will be
+            included:
             <RaisedButton
               label="Choose the scene"
               primary
               onClick={this.openLayoutChooser}
             />
           </PlaceholderMessage>
-          }
+        )}
         <LayoutChooserDialog
           title="Choose the associated scene"
           helpText="You still need to add a Link event in the scene to import the external events"
           open={this.state.layoutChooserOpen}
           project={project}
           onChoose={this.setAssociatedLayout}
-          onClose={() => this.setState({layoutChooserOpen: false})}
+          onClose={() => this.setState({ layoutChooserOpen: false })}
         />
       </div>
     );

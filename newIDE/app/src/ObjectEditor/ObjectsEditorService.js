@@ -17,11 +17,11 @@ export default {
     Sprite: { component: SpriteEditor },
     'TiledSpriteObject::TiledSprite': { component: TiledSpriteEditor },
     'PanelSpriteObject::PanelSprite': { component: PanelSpriteEditor },
-    'AdMobObject::AdMob': {component: AdMobEditor},
+    'AdMobObject::AdMob': { component: AdMobEditor },
     'TextObject::Text': {
       component: TextEditor,
     },
-    'PrimitiveDrawing::Drawer': {component: ShapePainterEditor},
-    'TextEntryObject::TextEntry': {component: EmptyEditor},
+    'PrimitiveDrawing::Drawer': { component: ShapePainterEditor },
+    'TextEntryObject::TextEntry': { component: EmptyEditor },
   },
 };

@@ -8,7 +8,8 @@ export default class EmptyEditor extends Component {
       <Column>
         <Line>
           <EmptyMessage>
-            This object does not have any specific configuration. Add it on the scene and use events to interact with it.
+            This object does not have any specific configuration. Add it on the
+            scene and use events to interact with it.
           </EmptyMessage>
         </Line>
       </Column>

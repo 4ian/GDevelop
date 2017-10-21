@@ -16,9 +16,12 @@ export default props => {
         justifyContent: 'center',
       }}
     >
-      <Paper zDepth={3} style={{
-        padding: 10,
-      }}>
+      <Paper
+        zDepth={3}
+        style={{
+          padding: 10,
+        }}
+      >
         {props.children}
       </Paper>
     </div>

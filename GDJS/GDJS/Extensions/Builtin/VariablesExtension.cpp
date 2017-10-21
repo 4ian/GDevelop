@@ -48,6 +48,8 @@ VariablesExtension::VariablesExtension()
     GetAllConditions()["GlobalVariableChildExists"].SetFunctionName("gdjs.evtTools.common.variableChildExists");
     GetAllActions()["VariableRemoveChild"].SetFunctionName("gdjs.evtTools.common.variableRemoveChild");
     GetAllActions()["GlobalVariableRemoveChild"].SetFunctionName("gdjs.evtTools.common.variableRemoveChild");
+    GetAllActions()["VariableClearChildren"].SetFunctionName("gdjs.evtTools.common.variableClearChildren");
+    GetAllActions()["GlobalVariableClearChildren"].SetFunctionName("gdjs.evtTools.common.variableClearChildren");
 
     GetAllActions()["ModVarScene"].codeExtraInformation
         .SetCustomCodeGenerator([](gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {

@@ -7,7 +7,9 @@ import Window from '../Utils/Window';
 
 const styles = {
   toolbar: {
-    flexShrink: 0,
+    flexShrink: 0, // Toolbar height should never be reduced
+    overflowX: 'auto',
+    overflowY: 'hidden',
   },
 };
 
@@ -31,33 +33,33 @@ export default class MainFrameToolbar extends Component {
     return (
       <Toolbar style={styles.toolbar}>
         <ToolbarGroup firstChild={true}>
-          {this.props.showProjectIcons &&
+          {this.props.showProjectIcons && (
             <ToolbarIcon
               onClick={this.props.toggleProjectManager}
               src="res/ribbon_default/projectManager32.png"
               disabled={!this.props.hasProject}
-            />}
+            />
+          )}
           {this.props.showProjectIcons &&
-            <ToolbarIcon
-              onClick={this.props.openProject}
-              src="res/ribbon_default/open32.png"
-            />}
-          {this.isDev &&
+            this.props.canOpenProject && (
+              <ToolbarIcon
+                onClick={this.props.openProject}
+                src="res/ribbon_default/open32.png"
+              />
+            )}
+          {this.isDev && (
             <IconMenu
               iconButtonElement={
                 <ToolbarIcon src="res/ribbon_default/bug32.png" />
               }
               menuTemplate={[
                 {
-                  label: 'Load builtin game',
-                  click: () => this.props.loadBuiltinGame(),
-                },
-                {
                   label: 'Request update from external editor',
                   click: () => this.props.requestUpdate(),
                 },
               ]}
-            />}
+            />
+          )}
           <ToolbarSeparator />
         </ToolbarGroup>
         {this.state.editorToolbar || <ToolbarGroup />}

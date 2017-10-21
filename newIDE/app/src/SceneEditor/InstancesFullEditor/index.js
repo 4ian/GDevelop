@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
 
 import ObjectsList from '../../ObjectsList';
-import ObjectsRenderingService
-  from '../../ObjectsRendering/ObjectsRenderingService';
-import FullSizeInstancesEditor
-  from '../../InstancesEditor/FullSizeInstancesEditor';
-import InstancePropertiesEditor
-  from '../../InstancesEditor/InstancePropertiesEditor';
+import ObjectsGroupsList from '../../ObjectsGroupsList';
+import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import FullSizeInstancesEditor from '../../InstancesEditor/FullSizeInstancesEditor';
+import InstancePropertiesEditor from '../../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../../InstancesEditor/InstancesList';
 import LayersList from '../../LayersList';
 import LayerRemoveDialog from '../../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../../ObjectEditor/ObjectEditorDialog';
+import ObjectsGroupEditorDialog from '../../ObjectsGroupEditor/ObjectsGroupEditorDialog';
 import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
@@ -63,6 +62,8 @@ export default class InstancesFullEditor extends Component {
       variablesEditedInstance: null,
       selectedObjectName: null,
 
+      editedGroup: null,
+
       uiSettings: props.initialUiSettings,
       history: getHistoryInitialState(props.initialInstances),
     };
@@ -84,6 +85,7 @@ export default class InstancesFullEditor extends Component {
         showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
         openObjectsList={this.openObjectsList}
+        openObjectsGroupsList={this.openObjectsGroupsList}
         openProperties={this.openProperties}
         deleteSelection={this.deleteSelection}
         toggleInstancesList={this.toggleInstancesList}
@@ -132,6 +134,11 @@ export default class InstancesFullEditor extends Component {
     }
   };
 
+  openObjectsGroupsList = () => {
+    if (!this.editorMosaic) return;
+    this.editorMosaic.openEditor('objects-groups-list');
+  };
+
   toggleInstancesList = () => {
     this.setState({ instancesListOpen: !this.state.instancesListOpen });
   };
@@ -171,8 +178,16 @@ export default class InstancesFullEditor extends Component {
     this.setState({ variablesEditedInstance: instance });
   };
 
+  editLayoutVariables = (open = true) => {
+    this.setState({ layoutVariablesDialogOpen: open });
+  };
+
   editObject = object => {
     this.setState({ editedObject: object });
+  };
+
+  editGroup = group => {
+    this.setState({ editedGroup: group });
   };
 
   setUiSettings = uiSettings => {
@@ -257,7 +272,8 @@ export default class InstancesFullEditor extends Component {
   _onSelectInstances = (instances, centerView = true) => {
     this.instancesSelection.clearSelection();
     instances.forEach(instance =>
-      this.instancesSelection.selectInstance(instance));
+      this.instancesSelection.selectInstance(instance)
+    );
 
     if (centerView) {
       this.editor.centerViewOn(instances);
@@ -352,10 +368,21 @@ export default class InstancesFullEditor extends Component {
     done(true);
   };
 
+  _onDeleteGroup = (groupWithScope, done) => {
+    //TODO
+    done(true);
+  };
+
+  _onRenameGroup = (groupWithScope, newName, done) => {
+    //TODO
+    done(true);
+  };
+
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.map(instance =>
-      this.props.initialInstances.removeInstance(instance));
+      this.props.initialInstances.removeInstance(instance)
+    );
 
     this.instancesSelection.clearSelection();
     this.editor.clearHighlightedInstance();
@@ -376,12 +403,14 @@ export default class InstancesFullEditor extends Component {
     this.contextMenu.open(x, y);
   };
 
-  copySelection = () => {
+  copySelection = ({ useLastCursorPosition } = {}) => {
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    const position = this.editor.getLastContextMenuPosition();
+      const position = useLastCursorPosition
+      ? this.editor.getLastCursorPosition()
+      : this.editor.getLastContextMenuPosition();
     Clipboard.set('instances', {
       x: position[0],
       y: position[1],
@@ -389,16 +418,18 @@ export default class InstancesFullEditor extends Component {
     });
   };
 
-  cutSelection = () => {
-    this.copySelection();
+  cutSelection = (options) => {
+    this.copySelection(options);
     this.deleteSelection();
   };
 
-  paste = () => {
+  paste = ({ useLastCursorPosition } = {}) => {
     const clipboardContent = Clipboard.get('instances');
     if (!clipboardContent) return;
 
-    const position = this.editor.getLastContextMenuPosition();
+    const position = useLastCursorPosition
+      ? this.editor.getLastCursorPosition()
+      : this.editor.getLastContextMenuPosition();
     const { x, y } = clipboardContent;
     clipboardContent.instances
       .map(serializedInstance => {
@@ -412,6 +443,10 @@ export default class InstancesFullEditor extends Component {
         this.props.initialInstances.insertInitialInstance(instance);
         instance.delete();
       });
+  };
+
+  forceUpdateObjectsList = () => {
+    if (this._objectsList) this._objectsList.forceUpdateList();
   };
 
   render() {
@@ -443,7 +478,10 @@ export default class InstancesFullEditor extends Component {
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
           onContextMenu={this._onContextMenu}
-          editorRef={editor => this.editor = editor}
+          onCopy={() => this.copySelection({ useLastCursorPosition: true })}
+          onCut={() => this.cutSelection({ useLastCursorPosition: true })}
+          onPaste={() => this.paste({ useLastCursorPosition: true })}
+          editorRef={editor => (this.editor = editor)}
         />
       ),
       'objects-list': (
@@ -459,6 +497,18 @@ export default class InstancesFullEditor extends Component {
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             onRenameObject={this._onRenameObject}
+            ref={objectsList => (this._objectsList = objectsList)}
+          />
+        </MosaicWindow>
+      ),
+      'objects-groups-list': (
+        <MosaicWindow title="Objects groups">
+          <ObjectsGroupsList
+            project={project}
+            objectsContainer={layout}
+            onEditGroup={this.editGroup}
+            onDeleteGroup={this._onDeleteGroup}
+            onRenameGroup={this._onRenameGroup}
           />
         </MosaicWindow>
       ),
@@ -468,7 +518,7 @@ export default class InstancesFullEditor extends Component {
       <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
         <EditorMosaic
           editors={editors}
-          ref={editorMosaic => this.editorMosaic = editorMosaic}
+          ref={editorMosaic => (this.editorMosaic = editorMosaic)}
           initialEditorNames={
             this.props.showObjectsList
               ? ['properties', 'instances-editor', 'objects-list']
@@ -481,7 +531,18 @@ export default class InstancesFullEditor extends Component {
           project={project}
           resourceSources={resourceSources}
           onCancel={() => this.editObject(null)}
-          onApply={() => this.editObject(null)}
+          onApply={() => {
+            this.editObject(null);
+            this.forceUpdateObjectsList();
+          }}
+        />
+        <ObjectsGroupEditorDialog
+          open={!!this.state.editedGroup}
+          group={this.state.editedGroup}
+          layout={layout}
+          project={project}
+          onCancel={() => this.editGroup(null)}
+          onApply={() => this.editGroup(null)}
         />
         <Drawer
           open={this.state.instancesListOpen}
@@ -549,10 +610,11 @@ export default class InstancesFullEditor extends Component {
           open={!!this.state.variablesEditedInstance}
           variablesContainer={
             this.state.variablesEditedInstance &&
-              this.state.variablesEditedInstance.getVariables()
+            this.state.variablesEditedInstance.getVariables()
           }
           onCancel={() => this.editInstanceVariables(null)}
           onApply={() => this.editInstanceVariables(null)}
+          emptyExplanationMessage="Instance variables will override the default values of the variables of the object."
         />
         <LayerRemoveDialog
           open={!!this.state.layerRemoveDialogOpen}
@@ -565,10 +627,19 @@ export default class InstancesFullEditor extends Component {
           layout={layout}
           onClose={() => this.openSceneProperties(false)}
           onApply={() => this.openSceneProperties(false)}
+          onEditVariables={() => this.editLayoutVariables(true)}
           onOpenMoreSettings={this.props.onOpenMoreSettings}
         />
+        <VariablesEditorDialog
+          open={!!this.state.layoutVariablesDialogOpen}
+          variablesContainer={layout.getVariables()}
+          onCancel={() => this.editLayoutVariables(false)}
+          onApply={() => this.editLayoutVariables(false)}
+          emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
+          emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
+        />
         <ContextMenu
-          ref={contextMenu => this.contextMenu = contextMenu}
+          ref={contextMenu => (this.contextMenu = contextMenu)}
           menuTemplate={[
             {
               label: 'Scene properties',
@@ -578,14 +649,17 @@ export default class InstancesFullEditor extends Component {
             {
               label: 'Copy',
               click: () => this.copySelection(),
+              accelerator: 'CmdOrCtrl+C',
             },
             {
               label: 'Cut',
               click: () => this.cutSelection(),
+              accelerator: 'CmdOrCtrl+X',
             },
             {
               label: 'Paste',
               click: () => this.paste(),
+              accelerator: 'CmdOrCtrl+V',
             },
           ]}
         />

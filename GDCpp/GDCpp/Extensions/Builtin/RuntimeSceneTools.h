@@ -126,6 +126,11 @@ unsigned int GD_API GetVariableChildCount(gd::Variable & variable);
 /**
  * Only used internally by GD events generated code.
  */
+void GD_API VariableClearChildren(gd::Variable & variable);
+
+/**
+ * Only used internally by GD events generated code.
+ */
 gd::Variable & GD_API ReturnVariable(gd::Variable & variable);
 
 /**

@@ -1,11 +1,8 @@
 import optionalRequire from './OptionalRequire.js';
+import { isWindows } from './Platform';
 const electron = optionalRequire('electron');
+const shell = electron ? electron.shell : null;
 const dialog = electron ? electron.remote.dialog : null;
-
-let isWindows = false;
-if (electron) {
-  isWindows = electron.remote.require('electron-is').windows();
-}
 
 export default class Window {
   static setTitle(title) {
@@ -21,7 +18,7 @@ export default class Window {
     if (!electron) return;
 
     let scaleFactor = 1;
-    if (isWindows) {
+    if (isWindows()) {
       // setBounds need to be called with the scale factor of the screen
       // on Windows.
       const rect = { x, y, width, height };
@@ -37,8 +34,8 @@ export default class Window {
         width: Math.round(width / scaleFactor),
         height: Math.round(height / scaleFactor),
       });
-    } catch(err) {
-      console.warn("Unable to change window bounds", err);
+    } catch (err) {
+      console.warn('Unable to change window bounds', err);
     }
     this.show();
   }
@@ -106,7 +103,9 @@ export default class Window {
 
     if (electron) {
       // `remote.require` since `Menu` is a main-process module.
-      var buildEditorContextMenu = electron.remote.require('electron-editor-context-menu');
+      var buildEditorContextMenu = electron.remote.require(
+        'electron-editor-context-menu'
+      );
 
       window.addEventListener('contextmenu', function(e) {
         // Only show the context menu in text editors.
@@ -121,8 +120,8 @@ export default class Window {
           menu.popup(electron.remote.getCurrentWindow());
         }, 30);
       });
-    } else if (window) {
-      window.addEventListener('contextmenu', function(e) {
+    } else if (document) {
+      document.addEventListener('contextmenu', function(e) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) {
           e.preventDefault();
@@ -134,12 +133,22 @@ export default class Window {
     }
   }
 
+  static openExternalURL(url) {
+    if (electron) {
+      shell.openExternal(url);
+      return;
+    }
+
+    window.open(url, '_blank');
+  }
+
   static hasMainMenu() {
     return !!electron;
   }
 
   static isDev() {
-    if (!electron) return true;
+    if (!electron)
+      return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
     return electron.remote.require('electron-is').dev();
   }

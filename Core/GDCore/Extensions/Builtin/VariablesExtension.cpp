@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
 {
     extension.SetExtensionInformation("BuiltinVariables",
                           _("Variable features"),
-                          _("Built-in extension allowing to manipulate variables"),
+                          _("This Built-in extension allows the manipulation of variables"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -186,10 +186,30 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .AddParameter("string", _("Child's name"))
         .MarkAsAdvanced();
 
-    extension.AddExpression("GlobalVariableChildCount", _("Global variable number of children"), _("Get the number of children from global variable"), _("Variables"), "res/actions/var.png")
+    extension.AddAction("VariableClearChildren",
+               _("Clear variable"),
+               _("Remove all the children from the variable."),
+               _("Clear children from variable _PARAM0_"),
+               _("Variables/Structure"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+        .AddParameter("scenevar", _("Variable"))
+        .MarkAsAdvanced();
+
+    extension.AddAction("GlobalVariableClearChildren",
+               _("Clear global variable"),
+               _("Remove all the children from the global variable."),
+               _("Clear children from global variable _PARAM0_"),
+               _("Variables/Global variables/Structure"),
+               "res/actions/var24.png",
+               "res/actions/var.png")
+        .AddParameter("globalvar", _("Variable"))
+        .MarkAsAdvanced();
+
+    extension.AddExpression("GlobalVariableChildCount", _("Global variable number of children"), _("Get the number of children of a global variable"), _("Variables"), "res/actions/var.png")
 	.AddParameter("globalvar", _("Variable"));
 
-    extension.AddExpression("VariableChildCount", _("Scene variable number of children"), _("Get the number of children from scene variable"), _("Variables"), "res/actions/var.png")
+    extension.AddExpression("VariableChildCount", _("Scene variable number of children"), _("Get the number of children of a scene variable"), _("Variables"), "res/actions/var.png")
 	.AddParameter("scenevar", _("Variable"));
 
     extension.AddExpression("Variable", _("Scene variables"), _("Scene variables"), _("Variables"), "res/actions/var.png")

@@ -29,9 +29,9 @@ public:
         DeclareTextEntryObjectExtension(*this);
 
         GetObjectMetadata("TextEntryObject::TextEntry")
-            .SetIncludeFile("TextEntryObject/textentryruntimeobject.js")
-            .AddIncludeFile("TextEntryObject/textentryruntimeobject-pixi-renderer.js")
-            .AddIncludeFile("TextEntryObject/textentryruntimeobject-cocos-renderer.js");
+            .SetIncludeFile("Extensions/TextEntryObject/textentryruntimeobject.js")
+            .AddIncludeFile("Extensions/TextEntryObject/textentryruntimeobject-pixi-renderer.js")
+            .AddIncludeFile("Extensions/TextEntryObject/textentryruntimeobject-cocos-renderer.js");
 
         GetAllActionsForObject("TextEntryObject::TextEntry")["TextEntryObject::String"].SetFunctionName("setString").SetGetter("getString");
         GetAllConditionsForObject("TextEntryObject::TextEntry")["TextEntryObject::String"].SetFunctionName("getString");

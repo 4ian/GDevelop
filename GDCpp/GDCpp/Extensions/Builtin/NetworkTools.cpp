@@ -258,6 +258,11 @@ gd::String GD_API VariableStructureToJSON(const gd::Variable & variable)
     return str;
 }
 
+gd::String GD_API ObjectVariableStructureToJSON(RuntimeObject * object, const gd::Variable & variable)
+{
+  return VariableStructureToJSON(variable);
+}
+
 //Private functions for JSON parsing
 namespace
 {
@@ -469,4 +474,9 @@ void GD_API JSONToVariableStructure(const gd::String & jsonStr, gd::Variable & v
 {
     if ( jsonStr.empty() ) return;
     ::ParseJSONObject(jsonStr.c_str(), 0, variable);
+}
+
+void GD_API JSONToObjectVariableStructure(const gd::String & JSON, RuntimeObject * object, gd::Variable & variable)
+{
+    JSONToVariableStructure(JSON, variable);
 }

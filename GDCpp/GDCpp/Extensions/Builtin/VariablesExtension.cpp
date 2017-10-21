@@ -42,6 +42,9 @@ VariablesExtension::VariablesExtension()
     GetAllActions()["VariableRemoveChild"].SetFunctionName("VariableRemoveChild").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
     GetAllActions()["GlobalVariableRemoveChild"].SetFunctionName("VariableRemoveChild").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
 
+    GetAllActions()["VariableClearChildren"].SetFunctionName("VariableClearChildren").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
+    GetAllActions()["GlobalVariableClearChildren"].SetFunctionName("VariableClearChildren").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
+
     GetAllExpressions()["Variable"].SetFunctionName("GetVariableValue").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
     GetAllStrExpressions()["VariableString"].SetFunctionName("GetVariableString").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
 

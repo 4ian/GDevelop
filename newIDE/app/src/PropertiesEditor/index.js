@@ -6,6 +6,12 @@ import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
+const styles = {
+  checkbox: {
+    marginTop: 10,
+  },
+};
+
 export default class PropertiesEditor extends Component {
   _onInstancesModified = instances => {
     // This properties editor is dealing with fields that are
@@ -13,8 +19,7 @@ export default class PropertiesEditor extends Component {
 
     if (this.props.onInstancesModified)
       this.props.onInstancesModified(instances);
-    else
-      this.forceUpdate();
+    else this.forceUpdate();
   };
 
   _getFieldValue(instances, field, defaultValue) {
@@ -35,6 +40,7 @@ export default class PropertiesEditor extends Component {
         <Checkbox
           label={field.name}
           key={field.name}
+          style={styles.checkbox}
           checked={this._getFieldValue(this.props.instances, field)}
           onCheck={(event, newValue) => {
             this.props.instances.forEach(i => field.setValue(i, !!newValue));
@@ -53,7 +59,8 @@ export default class PropertiesEditor extends Component {
           floatingLabelFixed={true}
           onChange={(event, newValue) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, parseFloat(newValue) || 0));
+              field.setValue(i, parseFloat(newValue) || 0)
+            );
             this._onInstancesModified(this.props.instances);
           }}
           type="number"
@@ -74,7 +81,8 @@ export default class PropertiesEditor extends Component {
           floatingLabelFixed={true}
           onChange={(event, newValue) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, newValue || ''));
+              field.setValue(i, newValue || '')
+            );
             this._onInstancesModified(this.props.instances);
           }}
           fullWidth
@@ -100,7 +108,8 @@ export default class PropertiesEditor extends Component {
           floatingLabelFixed={true}
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, parseFloat(newValue) || 0));
+              field.setValue(i, parseFloat(newValue) || 0)
+            );
             this._onInstancesModified(this.props.instances);
           }}
           fullWidth
@@ -122,7 +131,8 @@ export default class PropertiesEditor extends Component {
           floatingLabelFixed={true}
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, newValue || ''));
+              field.setValue(i, newValue || '')
+            );
             this._onInstancesModified(this.props.instances);
           }}
           fullWidth

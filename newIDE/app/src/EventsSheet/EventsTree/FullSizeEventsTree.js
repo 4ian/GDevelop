@@ -30,14 +30,15 @@ export default class FullSizeEventsTree extends Component {
         onMeasure={({ width, height }) => this.setState({ width, height })}
       >
         <div style={styles.container} className={background}>
-          {this.state.height &&
+          {this.state.height && (
             <EventsTree
               {...this.props}
               height={this.state.height}
               ref={eventsTree =>
                 this.props.eventsTreeRef &&
                 this.props.eventsTreeRef(eventsTree)}
-            />}
+            />
+          )}
         </div>
       </Measure>
     );

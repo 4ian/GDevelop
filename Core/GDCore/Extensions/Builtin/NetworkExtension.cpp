@@ -20,9 +20,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("EnvoiDataNet",
-            _("Send datas to a website"),
-            _("Send datas to a specified web site.\nYou need to set up a .php page on your web site so as to receive this datas.\nEnter here a password, and enter the same in the configuration of your .php page.\nRead the help file to get more informations."),
-            _("Send to _PARAM0_ the following datas : _PARAM2_, _PARAM3_,_PARAM4_,_PARAM5_,_PARAM6_,_PARAM7_"),
+            _("Send data to a website"),
+            _("Send data to a specified web site.\nYou need to set up a .php page on your web site to receive this data.\nEnter a password here, and enter the same password in the configuration of your .php page.\nRead the help file to get more information."),
+            _("Send to _PARAM0_ the following data : _PARAM2_, _PARAM3_,_PARAM4_,_PARAM5_,_PARAM6_,_PARAM7_"),
             _("Network"),
             "res/actions/net24.png",
             "res/actions/net.png")
@@ -63,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
         .AddParameter("string", _("Save as"));
 
     extension.AddAction("JSONToVariableStructure",
-            _("Convert JSON to variable"),
+            _("Convert JSON to a variable"),
             _("Parse a JSON object and store it into a variable"),
             _("Parse JSON string _PARAM0_ and store it into variable _PARAM1_"),
             _("Network"),
@@ -73,12 +73,50 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
         .AddParameter("scenevar", _("Variable where store the JSON object"))
         .MarkAsAdvanced();
 
+    extension.AddAction("JSONToGlobalVariableStructure",
+            _("Convert JSON to global variable"),
+            _("Parse a JSON object and store it into a global variable"),
+            _("Parse JSON string _PARAM0_ and store it into global variable _PARAM1_"),
+            _("Network"),
+            "res/actions/net24.png",
+            "res/actions/net.png")
+        .AddParameter("string", _("JSON string"))
+        .AddParameter("globalvar", _("Global variable where store the JSON object"))
+        .MarkAsAdvanced();
+
+    extension.AddAction("JSONToObjectVariableStructure",
+            _("Convert JSON to object variable"),
+            _("Parse a JSON object and store it into an object variable"),
+            _("Parse JSON string _PARAM0_ and store it into variable _PARAM2_ of _PARAM1_"),
+            _("Network"),
+            "res/actions/net24.png",
+            "res/actions/net.png")
+        .AddParameter("string", _("JSON string"))
+        .AddParameter("objectPtr", _("Object"))
+        .AddParameter("objectvar", _("Object variable where store the JSON object"))
+        .MarkAsAdvanced();
+
     extension.AddStrExpression("ToJSON",
-                       _("Convert to JSON"),
+                       _("Convert variable to JSON"),
                        _("Convert a variable to JSON"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
-        .AddParameter("scenevar", _("The variable to be stringify"));
+        .AddParameter("scenevar", _("The variable to be stringified"));
+
+    extension.AddStrExpression("GlobalVarToJSON",
+                       _("Convert global variable to JSON"),
+                       _("Convert a global variable to JSON"),
+                       _("Conversion"),
+                       "res/conditions/toujours24.png")
+        .AddParameter("globalvar", _("The global variable to be stringified"));
+
+    extension.AddStrExpression("ObjectVarToJSON",
+                       _("Convert object variable to JSON"),
+                       _("Convert an object variable to JSON"),
+                       _("Conversion"),
+                       "res/conditions/toujours24.png")
+        .AddParameter("objectPtr", _("The object with the variable"))
+        .AddParameter("objectvar", _("The object variable to be stringified"));
     #endif
 }
 

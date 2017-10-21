@@ -29,6 +29,7 @@ export default getMuiTheme({
     dataHeight: 24,
     height: 32,
     hoverColor: systemSelectionColor,
+    selectedTextColor: systemSelectionColor,
     padding: 8,
   },
   appBar: {

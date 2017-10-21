@@ -15,14 +15,14 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("TopDownMovementBehavior",
                               _("Top-down movement"),
-                              _("Move objects in 4 or 8 directions"),
+                              _("Move objects with either 4 or 8 directions"),
                               "Florian Rival",
                               "Open source (MIT License)");
 
     gd::BehaviorMetadata & aut = extension.AddBehavior("TopDownMovementBehavior",
           _("Top-down movement (4 or 8 directions)"),
           "TopDownMovement",
-          _("The object can be moved left, up, right, down and optionally diagonals."),
+          _("The object can be moved left, up, right, and down (and, optionally, diagonally)."),
           "",
           "CppPlatform/Extensions/topdownmovementicon.png",
           "TopDownMovementBehavior",
@@ -35,7 +35,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddAction("SimulateLeftKey",
                    _("Simulate left key press"),
-                   _("Simulate a pressing on left key."),
+                   _("Simulate a press of left key."),
                    _("Simulate pressing Left for _PARAM0_"),
                    _("Controls"),
                    "res/conditions/keyboard24.png",
@@ -47,7 +47,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddAction("SimulateRightKey",
                    _("Simulate right key press"),
-                   _("Simulate a pressing on right key."),
+                   _("Simulate a press of right key."),
                    _("Simulate pressing Right for _PARAM0_"),
                    _("Controls"),
                    "res/conditions/keyboard24.png",
@@ -59,7 +59,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddAction("SimulateUpKey",
                    _("Simulate up key press"),
-                   _("Simulate a pressing on up key ( Used when on a ladder )."),
+                   _("Simulate a press of up key."),
                    _("Simulate pressing Up for _PARAM0_"),
                    _("Controls"),
                    "res/conditions/keyboard24.png",
@@ -71,7 +71,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddAction("SimulateDownKey",
                    _("Simulate down key press"),
-                   _("Simulate a pressing on down key ( Used when on a ladder )."),
+                   _("Simulate a press of down key."),
                    _("Simulate pressing Down for _PARAM0_"),
                    _("Controls"),
                    "res/conditions/keyboard24.png",
@@ -83,7 +83,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddAction("SimulateControl",
                    _("Simulate control"),
-                   _("Simulate a pressing on a key.\nValid keys are Left, Right, Up, Down."),
+                   _("Simulate a press of a key.\nValid keys are Left, Right, Up, Down."),
                    _("Simulate pressing _PARAM2_ key for _PARAM0_"),
                    _("Controls"),
                    "res/conditions/keyboard24.png",
@@ -96,7 +96,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddAction("IgnoreDefaultControls",
                    _("Ignore default controls"),
-                   _("De/activate the use of default controls.\nIf deactivated, use the simulate actions to move the object."),
+                   _("De/activate the use of default controls.\nIf deactivated, use the simulated actions to move the object."),
                    _("Ignore default controls for _PARAM0_: _PARAM2_"),
                    _("Controls"),
                    "res/conditions/keyboard24.png",
@@ -272,7 +272,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddAction("AllowDiagonals",
                    _("Diagonals moves"),
-                   _("Allow or restrict diagonal moves"),
+                   _("Allow or restrict diagonal movemment"),
                    _("Allow diagonal moves for _PARAM0_: _PARAM2_"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
@@ -284,8 +284,8 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddCondition("DiagonalsAllowed",
                    _("Diagonals moves"),
-                   _("Return true if the object is allowed to do diagonal moves"),
-                   _("Size of the extra border applied to _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("Return true if the object is allowed to move diagonally"),
+                   _("Allow diagonal moves for _PARAM0_"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
@@ -309,7 +309,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension & extension)
 
     aut.AddCondition("ObjectRotated",
                    _("Object rotated"),
-                   _("Return true if the object is rotated when traveling on its path."),
+                   _("Return true if the object is rotated while traveling on its path."),
                    _("_PARAM0_ is rotated when moving"),
                    _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",

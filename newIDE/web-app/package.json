@@ -1,0 +1,20 @@
+{
+  "name": "gdevelop-web",
+  "version": "1.0.0",
+  "description": "GDevelop IDE running on browsers",
+  "author": "Florian Rival",
+  "homepage": "http://compilgames.net",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build:app": "cd ../app && npm run build",
+    "deploy": "node scripts/deploy.js"
+  },
+  "devDependencies": {
+    "gh-pages": "^1.0.0",
+    "git-rev": "^0.2.1",
+    "is-git-clean": "^1.1.0",
+    "minimist": "^1.2.0",
+    "shelljs": "^0.7.7"
+  }
+}

@@ -11,7 +11,7 @@
 .gd-events-sheet .rst__moveHandle {
     width: 10px;
     background: #4ab0e4;
-    border: none;
+    border: 1px solid #49AFE4;
     box-shadow: none;
     border-radius: 0;
 }
@@ -26,8 +26,9 @@
 .gd-events-sheet .rst__nodeContent {
     /* Ensure the event take all the space after the scaffolding lines */
     flex: 1;
+    right: 0;
+
     min-width: 0; /* But don't shrink scaffolding lines */
-    position: static; /* Reset back to default value, don't use absolute to let flex works*/
     margin-bottom: 2px; /* Margin after an event */
 }
 
@@ -65,6 +66,35 @@
 }
 
 /**
+ * Expand/collapse buttons
+ */
+.gd-events-sheet .rst__collapseButton, .rst__expandButton {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    height: 12px;
+    width: 22px;
+}
+
+.gd-events-sheet .rst__collapseButton:hover:not(:active), .rst__expandButton:hover:not(:active) {
+    background-size: initial !important; /*Avoid buttons size to change*/
+    height: 12px !important; /*Avoid buttons size to change*/
+    width: 22px !important; /*Avoid buttons size to change*/
+}
+
+.gd-events-sheet  .rst__expandButton {
+    background-image: url('./unfold.png');
+    background-position: 11px 3px !important;
+}
+
+.gd-events-sheet  .rst__collapseButton {
+    background-image: url('./fold.png');
+    background-position: center 7px !important;
+}
+
+/**
  * Lines between events
  */
 .gd-events-sheet .rst__lineHalfHorizontalRight::before, .rst__lineFullVertical::after, .rst__lineHalfVerticalTop::after, .rst__lineHalfVerticalBottom::after {
@@ -95,7 +125,7 @@
 
 .gd-events-sheet .selectable.selected {
     background-color: rgba(0,0,0, 0.1);
-    border: 1px #4ab0e4 solid;
+    border: 1px #4ab0e4 solid !important;
 }
 
 /**
@@ -107,7 +137,7 @@
 }
 
 .gd-events-sheet .large-selectable.large-selected {
-    border: 1px #4ab0e4 solid;
+    border: 1px #4ab0e4 solid !important;
 }
 
 /**

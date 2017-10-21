@@ -252,7 +252,7 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
     }
     else
     {
-        gd::LogWarning( _( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
+        gd::LogWarning( _( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access our site.\n\nYou can disable Check for updates in the preferences of GDevelop." ) );
         return;
     }
 

@@ -14,11 +14,9 @@ export default class LocalProjectOpener {
         {
           title: 'Open a project',
           properties: ['openFile'],
-          message: 'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
-          filters: [
-            { name: 'GDevelop project', extensions: ['json'] },
-            { name: 'All Files', extensions: ['*'] },
-          ],
+          message:
+            'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
+          filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
         },
         paths => {
           if (!paths || !paths.length) return resolve(null);
@@ -33,7 +31,7 @@ export default class LocalProjectOpener {
     return new Promise((resolve, reject) => {
       if (!fs) return reject('Not supported');
 
-      fs.readFile(filepath, {encoding: 'utf8'}, (err, data) => {
+      fs.readFile(filepath, { encoding: 'utf8' }, (err, data) => {
         if (err) return reject(err);
 
         try {

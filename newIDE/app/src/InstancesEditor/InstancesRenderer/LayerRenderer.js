@@ -1,25 +1,22 @@
 import gesture from 'pixi-simple-gesture';
-import ObjectsRenderingService
-  from '../../ObjectsRendering/ObjectsRenderingService';
+import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import PIXI from 'pixi.js';
 const gd = global.gd;
 
 export default class LayerRenderer {
-  constructor(
-    {
-      project,
-      layout,
-      layer,
-      viewPosition,
-      instances,
-      onInstanceClicked,
-      onOverInstance,
-      onOutInstance,
-      onMoveInstance,
-      onMoveInstanceEnd,
-      onDownInstance,
-    }
-  ) {
+  constructor({
+    project,
+    layout,
+    layer,
+    viewPosition,
+    instances,
+    onInstanceClicked,
+    onOverInstance,
+    onOutInstance,
+    onMoveInstance,
+    onMoveInstanceEnd,
+    onDownInstance,
+  }) {
     this.project = project;
     this.instances = instances;
     this.layout = layout;
@@ -65,17 +62,21 @@ export default class LayerRenderer {
   }
 
   getInstanceLeft = instance => {
-    return instance.getX() -
+    return (
+      instance.getX() -
       (this.renderedInstances[instance.ptr]
         ? this.renderedInstances[instance.ptr].getOriginX()
-        : 0);
+        : 0)
+    );
   };
 
   getInstanceTop = instance => {
-    return instance.getY() -
+    return (
+      instance.getY() -
       (this.renderedInstances[instance.ptr]
         ? this.renderedInstances[instance.ptr].getOriginY()
-        : 0);
+        : 0)
+    );
   };
 
   getInstanceWidth = instance => {
@@ -104,11 +105,10 @@ export default class LayerRenderer {
         associatedObject = this.layout.getObject(associatedObjectName);
       else if (this.project.hasObjectNamed(associatedObjectName))
         associatedObject = this.project.getObject(associatedObjectName);
-      else
-        return;
+      else return;
 
       //...so let's create a renderer.
-      renderedInstance = (this.renderedInstances[
+      renderedInstance = this.renderedInstances[
         instance.ptr
       ] = ObjectsRenderingService.createNewInstanceRenderer(
         this.project,
@@ -116,7 +116,7 @@ export default class LayerRenderer {
         instance,
         associatedObject,
         this.pixiContainer
-      ));
+      );
 
       renderedInstance._pixiObject.interactive = true;
       gesture.panable(renderedInstance._pixiObject);
@@ -156,10 +156,12 @@ export default class LayerRenderer {
     //TODO: Properly handle rotation
     const left = this.getInstanceLeft(instance);
     const top = this.getInstanceTop(instance);
-    if (left + this.getInstanceWidth(instance) < this.viewTopLeft[0] ||
+    if (
+      left + this.getInstanceWidth(instance) < this.viewTopLeft[0] ||
       top + this.getInstanceHeight(instance) < this.viewTopLeft[1] ||
       left > this.viewBottomRight[0] ||
-      top > this.viewBottomRight[1])
+      top > this.viewBottomRight[1]
+    )
       return false;
 
     return true;
@@ -167,7 +169,10 @@ export default class LayerRenderer {
 
   _computeViewBounds() {
     this.viewTopLeft = this.viewPosition.toSceneCoordinates(0, 0);
-    this.viewBottomRight = this.viewPosition.toSceneCoordinates(this.viewPosition.getWidth(), this.viewPosition.getHeight());
+    this.viewBottomRight = this.viewPosition.toSceneCoordinates(
+      this.viewPosition.getWidth(),
+      this.viewPosition.getHeight()
+    );
   }
 
   render() {
@@ -204,8 +209,7 @@ export default class LayerRenderer {
         if (!renderedInstance.wasUsed) {
           renderedInstance.instanceRemovedFromScene();
           delete this.renderedInstances[i];
-        } else
-          renderedInstance.wasUsed = false;
+        } else renderedInstance.wasUsed = false;
       }
     }
   }

@@ -38,9 +38,11 @@ export default class ViewPosition {
 
     var viewRotation = 0;
     var tmp = x;
-    x = Math.cos(viewRotation / 180 * 3.14159) * x -
+    x =
+      Math.cos(viewRotation / 180 * 3.14159) * x -
       Math.sin(viewRotation / 180 * 3.14159) * y;
-    y = Math.sin(viewRotation / 180 * 3.14159) * tmp +
+    y =
+      Math.sin(viewRotation / 180 * 3.14159) * tmp +
       Math.cos(viewRotation / 180 * 3.14159) * y;
 
     return [x + this.viewX, y + this.viewY];
@@ -56,9 +58,11 @@ export default class ViewPosition {
 
     var viewRotation = -0;
     var tmp = x;
-    x = Math.cos(viewRotation / 180 * 3.14159) * x -
+    x =
+      Math.cos(viewRotation / 180 * 3.14159) * x -
       Math.sin(viewRotation / 180 * 3.14159) * y;
-    y = Math.sin(viewRotation / 180 * 3.14159) * tmp +
+    y =
+      Math.sin(viewRotation / 180 * 3.14159) * tmp +
       Math.cos(viewRotation / 180 * 3.14159) * y;
 
     x *= Math.abs(this._pixiContainer.scale.x);
@@ -90,8 +94,8 @@ export default class ViewPosition {
   }
 
   render() {
-    this._pixiContainer.position.x = (-this.viewX) * this.options.zoomFactor;
-    this._pixiContainer.position.y = (-this.viewY) * this.options.zoomFactor;
+    this._pixiContainer.position.x = -this.viewX * this.options.zoomFactor;
+    this._pixiContainer.position.y = -this.viewY * this.options.zoomFactor;
     this._pixiContainer.position.x += this._width / 2;
     this._pixiContainer.position.y += this._height / 2;
     this._pixiContainer.scale.x = this.options.zoomFactor;

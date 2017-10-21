@@ -46,13 +46,7 @@ const AddAnimationLine = SortableElement(({ onAdd }) => (
 
 class Animation extends Component {
   render() {
-    const {
-      animation,
-      id,
-      project,
-      resourceSources,
-      onRemove,
-    } = this.props;
+    const { animation, id, project, resourceSources, onRemove } = this.props;
 
     return (
       <GridTile>
@@ -60,8 +54,7 @@ class Animation extends Component {
           <DragHandle />
           <span style={styles.animationTitle}>
             Animation #
-            {id}
-            {' '}
+            {id}{' '}
             <TextField
               value={animation.getName()}
               hintText="Optional animation name"
@@ -92,42 +85,44 @@ class Animation extends Component {
 
 const SortableAnimation = SortableElement(Animation);
 
-const SortableAnimationsList = SortableContainer(({
-  spriteObject,
-  onAddAnimation,
-  onRemoveAnimation,
-  onChangeAnimationName,
-  project,
-  resourceSources,
-}) => {
-  return (
-    <GridList style={styles.gridList} cellHeight="auto" cols={1}>
-      {[
-        ...mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const animation = spriteObject.getAnimation(i);
-          return (
-            <SortableAnimation
-              key={i}
-              index={i}
-              id={i}
-              animation={animation}
-              project={project}
-              resourceSources={resourceSources}
-              onRemove={() => onRemoveAnimation(i)}
-              onChangeName={newName => onChangeAnimationName(i, newName)}
-            />
-          );
-        }),
-        <AddAnimationLine
-          onAdd={onAddAnimation}
-          key="add-animation-line"
-          disabled
-          index={spriteObject.getAnimationsCount()}
-        />,
-      ]}
-    </GridList>
-  );
-});
+const SortableAnimationsList = SortableContainer(
+  ({
+    spriteObject,
+    onAddAnimation,
+    onRemoveAnimation,
+    onChangeAnimationName,
+    project,
+    resourceSources,
+  }) => {
+    return (
+      <GridList style={styles.gridList} cellHeight="auto" cols={1}>
+        {[
+          ...mapFor(0, spriteObject.getAnimationsCount(), i => {
+            const animation = spriteObject.getAnimation(i);
+            return (
+              <SortableAnimation
+                key={i}
+                index={i}
+                id={i}
+                animation={animation}
+                project={project}
+                resourceSources={resourceSources}
+                onRemove={() => onRemoveAnimation(i)}
+                onChangeName={newName => onChangeAnimationName(i, newName)}
+              />
+            );
+          }),
+          <AddAnimationLine
+            onAdd={onAddAnimation}
+            key="add-animation-line"
+            disabled
+            index={spriteObject.getAnimationsCount()}
+          />,
+        ]}
+      </GridList>
+    );
+  }
+);
 
 class AnimationsListContainer extends Component {
   onSortEnd = ({ oldIndex, newIndex }) => {
@@ -140,6 +135,7 @@ class AnimationsListContainer extends Component {
     emptyAnimation.setDirectionsCount(1);
     this.props.spriteObject.addAnimation(emptyAnimation);
     this.forceUpdate();
+    this.props.onSizeUpdated();
   };
 
   removeAnimation = i => {
@@ -151,6 +147,7 @@ class AnimationsListContainer extends Component {
     if (answer) {
       this.props.spriteObject.removeAnimation(i);
       this.forceUpdate();
+      this.props.onSizeUpdated();
     }
   };
 
@@ -194,7 +191,7 @@ class AnimationsListContainer extends Component {
 
 export default class PanelSpriteEditor extends Component {
   render() {
-    const { object, project, resourceSources } = this.props;
+    const { object, project, resourceSources, onSizeUpdated } = this.props;
     const spriteObject = gd.asSpriteObject(object);
 
     return (
@@ -202,6 +199,7 @@ export default class PanelSpriteEditor extends Component {
         spriteObject={spriteObject}
         resourceSources={resourceSources}
         project={project}
+        onSizeUpdated={onSizeUpdated}
       />
     );
   }

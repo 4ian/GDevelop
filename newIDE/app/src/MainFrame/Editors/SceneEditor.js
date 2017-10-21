@@ -38,13 +38,11 @@ export default class SceneEditor extends BaseEditor {
     return (
       <InstancesFullEditor
         {...this.props}
-        ref={editor => this.editor = editor}
+        ref={editor => (this.editor = editor)}
         project={project}
         layout={layout}
         initialInstances={layout.getInitialInstances()}
-        initialUiSettings={serializeToJSObject(
-          layout.getAssociatedSettings()
-        )}
+        initialUiSettings={serializeToJSObject(layout.getAssociatedSettings())}
         onPreview={() => this.props.onPreview(project, layout)}
       />
     );

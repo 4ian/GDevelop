@@ -37,7 +37,7 @@ class ColorPicker extends Component {
 
   open = () => {
     this.setState({ displayColorPicker: true });
-  }
+  };
 
   handleClick = () => {
     this.setState({ displayColorPicker: !this.state.displayColorPicker });
@@ -58,18 +58,17 @@ class ColorPicker extends Component {
           <div
             style={{
               ...styles.color,
-              background: `rgba(${this.props.color.r}, ${this.props.color.g}, ${this.props.color.b}, ${this.props.color.a})`,
+              background: `rgba(${this.props.color.r}, ${this.props.color
+                .g}, ${this.props.color.b}, ${this.props.color.a})`,
             }}
           />
         </div>
-        {this.state.displayColorPicker
-          ? <div style={styles.popover}>
-              <div style={styles.cover} onClick={this.handleClose} />
-              <SketchPicker
-                {...this.props}
-              />
-            </div>
-          : null}
+        {this.state.displayColorPicker ? (
+          <div style={styles.popover}>
+            <div style={styles.cover} onClick={this.handleClose} />
+            <SketchPicker {...this.props} />
+          </div>
+        ) : null}
       </div>
     );
   }

@@ -59,7 +59,10 @@ RenderedSpriteInstance.getThumbnail = function(
   if (
     spriteObject.getAnimationsCount() > 0 &&
     spriteObject.getAnimation(0).getDirectionsCount() > 0 &&
-    spriteObject.getAnimation(0).getDirection(0).getSpritesCount() > 0
+    spriteObject
+      .getAnimation(0)
+      .getDirection(0)
+      .getSpritesCount() > 0
   ) {
     const imageName = spriteObject
       .getAnimation(0)
@@ -73,25 +76,27 @@ RenderedSpriteInstance.getThumbnail = function(
 };
 
 RenderedSpriteInstance.prototype.updatePIXISprite = function() {
-  this._pixiObject.anchor.x = this._centerX /
-    this._pixiObject.texture.frame.width;
-  this._pixiObject.anchor.y = this._centerY /
-    this._pixiObject.texture.frame.height;
+  this._pixiObject.anchor.x =
+    this._centerX / this._pixiObject.texture.frame.width;
+  this._pixiObject.anchor.y =
+    this._centerY / this._pixiObject.texture.frame.height;
   this._pixiObject.rotation = this._shouldNotRotate
     ? 0
     : RenderedInstance.toRad(this._instance.getAngle());
   if (this._instance.hasCustomSize()) {
-    this._pixiObject.scale.x = this._instance.getCustomWidth() /
-      this._pixiObject.texture.frame.width;
-    this._pixiObject.scale.y = this._instance.getCustomHeight() /
-      this._pixiObject.texture.frame.height;
+    this._pixiObject.scale.x =
+      this._instance.getCustomWidth() / this._pixiObject.texture.frame.width;
+    this._pixiObject.scale.y =
+      this._instance.getCustomHeight() / this._pixiObject.texture.frame.height;
   } else {
     this._pixiObject.scale.x = 1;
     this._pixiObject.scale.y = 1;
   }
-  this._pixiObject.position.x = this._instance.getX() +
+  this._pixiObject.position.x =
+    this._instance.getX() +
     (this._centerX - this._originX) * Math.abs(this._pixiObject.scale.x);
-  this._pixiObject.position.y = this._instance.getY() +
+  this._pixiObject.position.y =
+    this._instance.getY() +
     (this._centerY - this._originY) * Math.abs(this._pixiObject.scale.y);
 };
 

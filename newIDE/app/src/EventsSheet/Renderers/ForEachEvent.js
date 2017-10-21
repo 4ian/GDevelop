@@ -15,6 +15,7 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
+    borderBottom: '1px solid #d3d3d3',
   },
   instructionsContainer: {
     display: 'flex',
@@ -31,6 +32,7 @@ export default class ForEachEvent extends Component {
     onInstructionClick: PropTypes.func.isRequired,
     onInstructionDoubleClick: PropTypes.func.isRequired,
     onInstructionContextMenu: PropTypes.func.isRequired,
+    onInstructionsListContextMenu: PropTypes.func.isRequired,
     onParameterClick: PropTypes.func.isRequired,
     selection: PropTypes.object.isRequired,
     onUpdate: PropTypes.func.isRequired,
@@ -42,22 +44,22 @@ export default class ForEachEvent extends Component {
     this.state = {
       editing: false,
       anchorEl: null,
-    }
+    };
   }
 
-  edit = (domEvent) => {
+  edit = domEvent => {
     this.setState({
       editing: true,
       anchorEl: domEvent.currentTarget,
     });
-  }
+  };
 
   endEditing = () => {
     this.setState({
       editing: false,
       anchorEl: null,
     });
-  }
+  };
 
   render() {
     var forEachEvent = gd.asForEachEvent(this.props.event);
@@ -81,11 +83,11 @@ export default class ForEachEvent extends Component {
           })}
           onClick={this.edit}
         >
-          {objectName
-            ? `Repeat for each ${objectName} object:`
-            : <i>
-                Click to choose for which objects this event will be repeated
-              </i>}
+          {objectName ? (
+            `Repeat for each ${objectName} object:`
+          ) : (
+            <i>Click to choose for which objects this event will be repeated</i>
+          )}
         </div>
         <div style={styles.instructionsContainer}>
           <InstructionsList
@@ -97,6 +99,9 @@ export default class ForEachEvent extends Component {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
+            onInstructionsListContextMenu={
+              this.props.onInstructionsListContextMenu
+            }
             onParameterClick={this.props.onParameterClick}
           />
           <InstructionsList
@@ -108,6 +113,9 @@ export default class ForEachEvent extends Component {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
+            onInstructionsListContextMenu={
+              this.props.onInstructionsListContextMenu
+            }
             onParameterClick={this.props.onParameterClick}
           />
         </div>
@@ -120,7 +128,7 @@ export default class ForEachEvent extends Component {
             project={this.props.project}
             layout={this.props.layout}
             value={objectName}
-            onChange={(text) => {
+            onChange={text => {
               forEachEvent.setObjectToPick(text);
               this.props.onUpdate();
             }}

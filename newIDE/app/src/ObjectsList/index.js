@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
+import { ListItem } from 'material-ui/List';
 import Paper from 'material-ui/Paper';
 import ObjectRow from './ObjectRow';
-import AddObjectRow from './AddObjectRow';
 import NewObjectDialog from './NewObjectDialog';
+import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import { makeAddItem } from '../UI/ListAddItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjects } from './EnumerateObjects';
 
@@ -14,9 +16,15 @@ const styles = {
   container: { flex: 1, display: 'flex', height: '100%' },
 };
 
+const AddObjectRow = makeAddItem(ListItem);
+
 const SortableObjectRow = SortableElement(props => {
   const { style, ...otherProps } = props;
-  return <div style={style}><ObjectRow {...otherProps} /></div>;
+  return (
+    <div style={style}>
+      <ObjectRow {...otherProps} />
+    </div>
+  );
 });
 
 const SortableAddObjectRow = SortableElement(props => {
@@ -33,7 +41,7 @@ class ObjectsList extends Component {
 
     return (
       <List
-        ref={list => this.list = list}
+        ref={list => (this.list = list)}
         height={height}
         rowCount={fullList.length}
         rowHeight={listItemHeight}
@@ -46,12 +54,14 @@ class ObjectsList extends Component {
                 key={key}
                 style={style}
                 disabled
-                onAdd={this.props.onAddObject}
+                onClick={this.props.onAddObject}
+                primaryText="Click to add an object"
               />
             );
           }
 
-          const nameBeingEdited = this.props.renamedObjectWithScope &&
+          const nameBeingEdited =
+            this.props.renamedObjectWithScope &&
             this.props.renamedObjectWithScope.object ===
               objectWithScope.object &&
             this.props.renamedObjectWithScope.global === objectWithScope.global;
@@ -68,6 +78,8 @@ class ObjectsList extends Component {
                   ? () => this.props.onEditObject(objectWithScope.object)
                   : undefined
               }
+              onEditVariables={() =>
+                this.props.onEditVariables(objectWithScope.object)}
               onEditName={() => this.props.onEditName(objectWithScope)}
               onDelete={() => this.props.onDelete(objectWithScope)}
               onRename={newName =>
@@ -101,6 +113,7 @@ export default class ObjectsListContainer extends React.Component {
     this.state = {
       newObjectDialogOpen: false,
       renamedObjectWithScope: false,
+      variablesEditedObject: null,
     };
   }
 
@@ -114,7 +127,8 @@ export default class ObjectsListContainer extends React.Component {
 
     if (
       this.state.newObjectDialogOpen !== nextState.newObjectDialogOpen ||
-      this.state.renamedObjectWithScope !== nextState.renamedObjectWithScope
+      this.state.renamedObjectWithScope !== nextState.renamedObjectWithScope ||
+      this.state.variablesEditedObject !== nextState.variablesEditedObject
     )
       return true;
 
@@ -134,7 +148,7 @@ export default class ObjectsListContainer extends React.Component {
     const { project, objectsContainer } = this.props;
 
     const name = newNameGenerator(
-      'MyObject',
+      'NewObject',
       name =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
     );
@@ -190,6 +204,12 @@ export default class ObjectsListContainer extends React.Component {
     );
   };
 
+  _onEditVariables = object => {
+    this.setState({
+      variablesEditedObject: object,
+    });
+  };
+
   _onRename = (objectWithScope, newName) => {
     const { object } = objectWithScope;
     const { project, objectsContainer } = this.props;
@@ -219,8 +239,8 @@ export default class ObjectsListContainer extends React.Component {
   _onMove = (oldIndex, newIndex) => {
     const { project, objectsContainer } = this.props;
 
-    const isInContainerObjectsList = oldIndex <
-      this.containerObjectsList.length;
+    const isInContainerObjectsList =
+      oldIndex < this.containerObjectsList.length;
     if (isInContainerObjectsList) {
       objectsContainer.moveObject(
         oldIndex,
@@ -236,6 +256,10 @@ export default class ObjectsListContainer extends React.Component {
       );
     }
 
+    this.forceUpdateList();
+  };
+
+  forceUpdateList = () => {
     this.forceUpdate();
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
@@ -264,7 +288,7 @@ export default class ObjectsListContainer extends React.Component {
           {({ height, width }) => (
             <SortableObjectsList
               key={listKey}
-              ref={sortableList => this.sortableList = sortableList}
+              ref={sortableList => (this.sortableList = sortableList)}
               fullList={fullList}
               project={project}
               width={width}
@@ -276,6 +300,7 @@ export default class ObjectsListContainer extends React.Component {
               onEditObject={this.props.onEditObject}
               onAddObject={() => this.setState({ newObjectDialogOpen: true })}
               onEditName={this._onEditName}
+              onEditVariables={this._onEditVariables}
               onDelete={this._onDelete}
               onRename={this._onRename}
               onSortEnd={({ oldIndex, newIndex }) =>
@@ -285,13 +310,27 @@ export default class ObjectsListContainer extends React.Component {
             />
           )}
         </AutoSizer>
-        {this.state.newObjectDialogOpen &&
+        {this.state.newObjectDialogOpen && (
           <NewObjectDialog
             open={this.state.newObjectDialogOpen}
             onClose={() => this.setState({ newObjectDialogOpen: false })}
             onChoose={this.addObject}
             project={project}
-          />}
+          />
+        )}
+        {this.state.variablesEditedObject && (
+          <VariablesEditorDialog
+            open={!!this.state.variablesEditedObject}
+            variablesContainer={
+              this.state.variablesEditedObject &&
+              this.state.variablesEditedObject.getVariables()
+            }
+            onCancel={() => this._onEditVariables(null)}
+            onApply={() => this._onEditVariables(null)}
+            emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
+            emptyExplanationSecondMessage="For example, you can have a variable called Life representing the health of the object."
+          />
+        )}
       </Paper>
     );
   }

@@ -14,14 +14,14 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("PrimitiveDrawing",
                   _("Primitive drawing"),
-                  _("Extension allowing to draw shapes and manipulate images."),
+                  _("This Extension allows you to draw shapes and manipulate images."),
                   "Florian Rival",
                   "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject<ShapePainterObject>(
                "Drawer", //"Drawer" is kept for compatibility with GD<=3.6.76
                _("Shape painter"),
-               _("Allows to draw simple shapes on the screen"),
+               _("Allows you to draw simple shapes on the screen"),
                "CppPlatform/Extensions/primitivedrawingicon.png");
 
     #if defined(GD_IDE_ONLY)
@@ -64,8 +64,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
 
     obj.AddAction("Line",
                    _("Line"),
-                   _("Draw a line  on screen"),
-                   _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line (thickness  : _PARAM5_) with _PARAM0_"),
+                   _("Draw a line on screen"),
+                   _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line (thickness : _PARAM5_) with _PARAM0_"),
                    _("Drawing"),
                    "res/actions/line24.png",
                    "res/actions/line.png")
@@ -81,7 +81,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
 
     obj.AddAction("FillColor",
                    _("Fill color"),
-                   _("Change the color of filling"),
+                   _("Change the color used when filling"),
                    _("Change fill color of _PARAM0_ to _PARAM1_"),
                    _("Setup"),
                    "res/actions/text24.png",
@@ -135,7 +135,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
 
     obj.AddAction("FillOpacity",
                    _("Fill opacity"),
-                   _("Modify the opacity of filling of future drawings."),
+                   _("Modify the opacity level used when filling future drawings."),
                    _("Do _PARAM1__PARAM2_ to the opacity of filling of _PARAM0_"),
                    _("Setup"),
                    "res/actions/opacity24.png",
@@ -150,8 +150,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("FillOpacity",
                    _("Fill opacity"),
-                   _("Test the value of the opacity of the filling."),
-                   _("The opacity of filling of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Test the value of the opacity level used when filling."),
+                   _("The opacity level when filling of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Setup"),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")

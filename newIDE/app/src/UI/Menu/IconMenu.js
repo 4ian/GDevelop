@@ -14,7 +14,7 @@ export default class GDIconMenu extends Component {
     };
     this.menuImplementation = electron
       ? new ElectronMenuImplementation()
-      : new MaterialUIMenuImplementation();
+      : new MaterialUIMenuImplementation({ onClose: () => {} });
   }
 
   componentWillMount() {
@@ -35,9 +35,19 @@ export default class GDIconMenu extends Component {
     }
   }
 
-  _onTouchTap = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  open = event => {
+    if (!this.iconMenu) return;
+
+    const node = ReactDOM.findDOMNode(this.iconMenu);
+    if (!node) return;
+
+    this.menuImplementation.showMenu(node.getBoundingClientRect());
+    this.iconMenu.open('unkown', event);
+  };
+
+  _onTouchTap = event => {
+    event.preventDefault();
+    event.stopPropagation();
     if (!this.iconMenu) return;
 
     const node = ReactDOM.findDOMNode(this.iconMenu);
@@ -47,13 +57,14 @@ export default class GDIconMenu extends Component {
   };
 
   render() {
-    const {menuTemplate, ...iconMenuProps} = this.props; //eslint-disable-line
+    const { menuTemplate, ...iconMenuProps } = this.props; //eslint-disable-line
 
     return (
       <IconMenu
         {...iconMenuProps}
         onTouchTap={this._onTouchTap}
-        ref={iconMenu => this.iconMenu = iconMenu}
+        ref={iconMenu => (this.iconMenu = iconMenu)}
+        desktop
         {...this.menuImplementation.getMenuProps()}
       >
         {this.state.children}

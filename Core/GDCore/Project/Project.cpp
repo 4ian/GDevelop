@@ -23,6 +23,7 @@
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Project/ImageManager.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
@@ -643,7 +644,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #endif
 
     #if defined(GD_IDE_ONLY)
-    ObjectGroup::UnserializeFrom(GetObjectGroups(), element.GetChild("objectsGroups", 0, "ObjectGroups"));
+    GetObjectGroups().UnserializeFrom(element.GetChild("objectsGroups", 0, "ObjectGroups"));
     #endif
     resourcesManager.UnserializeFrom(element.GetChild( "resources", 0, "Resources" ));
     UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
@@ -770,7 +771,7 @@ void Project::SerializeTo(SerializerElement & element) const
 
     resourcesManager.SerializeTo(element.AddChild("resources"));
     SerializeObjectsTo(element.AddChild("objects"));
-    ObjectGroup::SerializeTo(GetObjectGroups(), element.AddChild("objectsGroups"));
+    GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
     GetVariables().SerializeTo(element.AddChild("variables"));
 
     element.SetAttribute("firstLayout", firstLayout);

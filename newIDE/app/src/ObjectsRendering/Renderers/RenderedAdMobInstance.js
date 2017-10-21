@@ -35,8 +35,8 @@ function RenderedAdMobInstance(
     fill: 'white',
     font: 'bold 18px Arial',
   };
-  this._titleText.position.x = this.getDefaultWidth() / 2 -
-    this._titleText.width / 2;
+  this._titleText.position.x =
+    this.getDefaultWidth() / 2 - this._titleText.width / 2;
 
   this._text = new PIXI.Text(
     'displayed on Android at the top or bottom of the screen'

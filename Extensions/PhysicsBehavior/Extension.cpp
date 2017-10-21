@@ -29,7 +29,7 @@ public:
     {
         SetExtensionInformation("PhysicsBehavior",
                               _("Physics behavior"),
-                              _("Behavior allowing to move objects as if they were subject to the laws of physics."),
+                              _("This extension enables the movement of objects as if they are subject to the laws of physics."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -37,7 +37,7 @@ public:
             gd::BehaviorMetadata & aut = AddBehavior("PhysicsBehavior",
                   _("Physics engine"),
                   _("Physics"),
-                  _("Make objects move as if they were subject to the laws of physics."),
+                  _("Make objects move as if they are subject to the laws of physics."),
                   "",
                   "res/physics32.png",
                   "PhysicsBehavior",
@@ -49,7 +49,7 @@ public:
 
             aut.AddAction("SetStatic",
                            _("Make the object static"),
-                           _("Make object immovable."),
+                           _("Make the object immovable."),
                            _("Make _PARAM0_ static"),
                            _("Movement"),
                            "res/physics24.png",
@@ -61,7 +61,7 @@ public:
 
             aut.AddAction("SetDynamic",
                            _("Make the object dynamic"),
-                           _("Make object dynamic ( affected by forces and other objects )."),
+                           _("Make the object dynamic ( affected by forces and other objects )."),
                            _("Make _PARAM0_ dynamic"),
                            _("Movement"),
                            "res/physics24.png",
@@ -73,7 +73,7 @@ public:
 
             aut.AddCondition("IsDynamic",
                            _("The object is dynamic"),
-                           _("Test if an object is dynamic ( affected by forces and the other objects )."),
+                           _("Test if an object is dynamic ( affected by forces and other objects )."),
                            _("_PARAM0_ is dynamic"),
                            _("Movement"),
                            "res/physics24.png",
@@ -97,7 +97,7 @@ public:
 
             aut.AddAction("AddRevoluteJoint",
                            _("Add a hinge"),
-                           _("Add a hinge about which the object will rotate.\nDistance between hinge and object will remain identical."),
+                           _("Add a hinge that the object will rotate around.\nThe distance between the hinge and the object will remain identical."),
                            _("Add a hinge to _PARAM0_ at _PARAM2_;_PARAM3_"),
                            _("Joints"),
                            "res/physics24.png",
@@ -111,7 +111,7 @@ public:
 
             aut.AddAction("AddRevoluteJointBetweenObjects",
                            _("Add a hinge between two objects"),
-                           _("Add a hinge about which the object will rotate."),
+                           _("Add a hinge that the object will rotate around."),
                            _("Add a hinge between _PARAM0_ and _PARAM2_"),
                            _("Joints"),
                            "res/physics24.png",
@@ -140,7 +140,7 @@ public:
 
             aut.AddAction("SetFreeRotation",
                            _("Make object's rotation free"),
-                           _("Allows object to rotate."),
+                           _("Allows the object to rotate."),
                            _("Allow _PARAM0_ to rotate"),
                            _("Rotation"),
                            "res/physics24.png",
@@ -152,8 +152,8 @@ public:
 
             aut.AddCondition("IsFixedRotation",
                            _("Fixed rotation"),
-                           _("Test if object is rotation fixed."),
-                           _("_PARAM0_ is rotation fixed."),
+                           _("Test if the object's rotation is fixed."),
+                           _("The rotation of _PARAM0_ is fixed."),
                            _("Rotation"),
                            "res/physics24.png",
                            "res/physics16.png")
@@ -163,8 +163,8 @@ public:
                 .SetFunctionName("IsFixedRotation").SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
 
             aut.AddAction("SetAsBullet",
-                           _("Consider as a bullet."),
-                           _("Consider the object as a bullet, so as to have better collision handling."),
+                           _("Treat object like a bullet."),
+                           _("Treat the object like a bullet, so it will have better collision handling."),
                            _("Consider _PARAM0_ as a bullet"),
                            _("Other"),
                            "res/physics24.png",
@@ -175,8 +175,8 @@ public:
                 .SetFunctionName("SetAsBullet").SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
 
             aut.AddAction("DontSetAsBullet",
-                           _("Do not consider as a bullet"),
-                           _("Do not consider object as a bullet, so as to use standard collision handling."),
+                           _("Do not treat object like a bullet"),
+                           _("Do not treat the object like a bullet, so it will use standard collision handling."),
                            _("Do not consider _PARAM0_ as a bullet."),
                            _("Other"),
                            "res/physics24.png",
@@ -187,8 +187,8 @@ public:
                 .SetFunctionName("DontSetAsBullet").SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
 
             aut.AddCondition("IsBullet",
-                           _("Object is considered as a bullet"),
-                           _("Test if object is considered as a bullet"),
+                           _("Object is treated like a bullet"),
+                           _("Test if the object is treated like a bullet"),
                            _("_PARAM0_ is considered as a bullet"),
                            _("Other"),
                            "res/physics24.png",
@@ -214,7 +214,7 @@ public:
 
             aut.AddAction("ApplyImpulseUsingPolarCoordinates",
                            _("Apply an impulse (angle)"),
-                           _("Apply an impulse to an object, using a angle and a length as coordinates."),
+                           _("Apply an impulse to an object, using an angle and a length as coordinates."),
                            _("Apply to _PARAM0_ impulse _PARAM3_ with angle: _PARAM2_\302\260"), //\302\260 <=> DEGREE SIGN
                            _("Displacement"),
                            "res/physics24.png",
@@ -243,7 +243,7 @@ public:
 
             aut.AddAction("ApplyForce",
                            _("Add a force"),
-                           _("Add a force to object"),
+                           _("Add a force to the object"),
                            _("Apply to _PARAM0_ force _PARAM2_;_PARAM3_"),
                            _("Displacement"),
                            "res/physics24.png",
@@ -286,7 +286,7 @@ public:
 
             aut.AddAction("ApplyTorque",
                            _("Add a torque (a rotation)"),
-                           _("Add a torque (a rotation) to object."),
+                           _("Add a torque (a rotation) to the object."),
                            _("Add to _PARAM0_ torque _PARAM2_"),
                            _("Rotation"),
                            "res/physics24.png",
@@ -299,7 +299,7 @@ public:
 
             aut.AddAction("SetLinearVelocity",
                            _("Linear velocity"),
-                           _("Modify velocity of an object."),
+                           _("Modify the velocity of an object."),
                            _("Set linear velocity of _PARAM0_ to _PARAM2_;_PARAM3_"),
                            _("Displacement"),
                            "res/physics24.png",
@@ -313,7 +313,7 @@ public:
 
             aut.AddCondition("LinearVelocityX",
                            _("X component"),
-                           _("Compare the linear velocity on X axis of object."),
+                           _("Compare the linear velocity on the X axis of the object."),
                            _("Linear velocity on X axis of _PARAM0_ is _PARAM2__PARAM3_"),
                            _("Displacement"),
                            "res/physics24.png",
@@ -327,7 +327,7 @@ public:
 
             aut.AddCondition("LinearVelocityY",
                            _("Y component"),
-                           _("Compare the linear velocity on Y axis of object."),
+                           _("Compare the linear velocity on the Y axis of the object."),
                            _("Linear velocity on Y axis of _PARAM0_ is _PARAM2__PARAM3_"),
                            _("Displacement"),
                            "res/physics24.png",
@@ -355,7 +355,7 @@ public:
 
             aut.AddAction("SetAngularVelocity",
                            _("Angular speed"),
-                           _("Modify angular velocity of object."),
+                           _("Modify the angular velocity of the object."),
                            _("Set angular speed of _PARAM0_ to _PARAM2_"),
                            _("Rotation"),
                            "res/physics24.png",
@@ -396,7 +396,7 @@ public:
 
             aut.AddCondition("CollisionWith",
                            _("Collision"),
-                           _("Test if two objects are colliding.\nAttention! Only objects specified in the first parameter will be taken in account by the next actions and conditions, if they are colliding with the other objects."),
+                           _("Test if two objects are colliding.\nAttention! Only objects specified in the first parameter will be taken into account by the next actions and conditions, if they are colliding with the other objects."),
                            _("_PARAM0_ is in collision with a _PARAM2_"),
                            _(""),
                            "res/physics24.png",
@@ -409,8 +409,8 @@ public:
 
             aut.AddAction("SetLinearDamping",
                            _("Linear damping"),
-                           _("Modify linear damping of object."),
-                           _("Put linear damping of _PARAM0_ to _PARAM2_"),
+                           _("Modify the linear damping of the object."),
+                           _("Set linear damping of _PARAM0_ to _PARAM2_"),
                            _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
@@ -422,7 +422,7 @@ public:
 
             aut.AddCondition("AngularDamping",
                            _("Angular damping"),
-                           _("Test object's angular damping"),
+                           _("Test the object's angular damping"),
                            _("Angular damping of _PARAM0_ is _PARAM2__PARAM3_"),
                            _("Displacement"),
                            "res/physics24.png",
@@ -436,7 +436,7 @@ public:
 
             aut.AddAction("SetAngularDamping",
                            _("Angular damping"),
-                           _("Modify angular damping of object."),
+                           _("Modify the angular damping of the object."),
                            _("Set angular damping of _PARAM0_ to _PARAM2_"),
                            _("Displacement"),
                            "res/physics24.png",
@@ -462,9 +462,9 @@ public:
                 .SetFunctionName("SetGravity").SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
 
             aut.AddAction("SetPolygonScaleX",
-                           _("Change collision polygon X scale"),
+                           _("Change the X scale of a collision polygon"),
                            _("Change the X scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
-                           _("Change collision polygon of _PARAM0_ X scale to _PARAM2_"),
+                           _("Change the X scale of the collision polygon of _PARAM0_ to _PARAM2_"),
                            _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
@@ -475,9 +475,9 @@ public:
                 .SetFunctionName("SetPolygonScaleX").SetIncludeFile("PhysicsBehavior/PhysicsBehavior.h");
 
             aut.AddAction("SetPolygonScaleY",
-                           _("Change collision polygon Y scale"),
+                           _("Change the Y scale of a collision polygon"),
                            _("Change the Y scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
-                           _("Change collision polygon of _PARAM0_ Y scale to _PARAM2_"),
+                           _("Change the Y scale of the collision polygon of _PARAM0_ Y to _PARAM2_"),
                            _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
@@ -489,8 +489,8 @@ public:
 
             aut.AddCondition("GetPolygonScaleX",
                            _("Collision polygon X scale"),
-                           _("Test the value of the collision polygon X scale."),
-                           _("Collision polygon of _PARAM0_ X scale is _PARAM2__PARAM3_"),
+                           _("Test the value of the X scale of the collision polygon."),
+                           _("The X scale of the collision polygon of _PARAM0_ is _PARAM2__PARAM3_"),
                            _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
@@ -503,8 +503,8 @@ public:
 
             aut.AddCondition("GetPolygonScaleY",
                            _("Collision polygon Y scale"),
-                           _("Test the value of the collision polygon Y scale."),
-                           _("Collision polygon of _PARAM0_ Y scale is _PARAM2__PARAM3_"),
+                           _("Test the value of the Y scale of the collision polygon."),
+                           _("The Y scale of the collision polygon of _PARAM0_ is _PARAM2__PARAM3_"),
                            _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")

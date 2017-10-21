@@ -53,10 +53,10 @@ RenderedTextInstance.getThumbnail = function(project, resourcesLoader, object) {
 
 RenderedTextInstance.prototype.update = function() {
   const textObject = gd.asTextObject(this._associatedObject);
-  this._pixiObject.position.x = this._instance.getX() +
-    this._pixiObject.width / 2;
-  this._pixiObject.position.y = this._instance.getY() +
-    this._pixiObject.height / 2;
+  this._pixiObject.position.x =
+    this._instance.getX() + this._pixiObject.width / 2;
+  this._pixiObject.position.y =
+    this._instance.getY() + this._pixiObject.height / 2;
   this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
   this._pixiObject.text = textObject.getString();
 
@@ -82,8 +82,9 @@ RenderedTextInstance.prototype.update = function() {
         this._fontFamily = fontFamily;
         this._styleFontDirty = true;
       })
-      .catch(() => {
+      .catch(err => {
         // Ignore errors
+        console.warn('Unable to load font family', err);
       });
   }
 
@@ -91,7 +92,7 @@ RenderedTextInstance.prototype.update = function() {
     let font = '';
     if (this._isItalic) font += 'italic ';
     if (this._isBold) font += 'bold ';
-    font += this._characterSize + 'px  ' + this._fontFamily;
+    font += this._characterSize + 'px ' + (this._fontFamily || 'Arial');
 
     this._pixiObject.style.font = font;
 
@@ -109,13 +110,8 @@ RenderedTextInstance.prototype.update = function() {
     this._colorR = textObject.getColorR();
     this._colorG = textObject.getColorG();
     this._colorB = textObject.getColorB();
-    this._pixiObject.style.fill = 'rgb(' +
-      this._colorR +
-      ',' +
-      this._colorG +
-      ',' +
-      this._colorB +
-      ')';
+    this._pixiObject.style.fill =
+      'rgb(' + this._colorR + ',' + this._colorG + ',' + this._colorB + ')';
 
     // Manually ask the PIXI object to re-render as we changed a style property
     // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/

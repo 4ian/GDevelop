@@ -175,7 +175,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem41 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM4, _("Decompose an animated GIF"), wxEmptyString, wxITEM_NORMAL);
     MenuItem41->SetBitmap(wxBitmap(wxImage(_T("res/importgif.png"))));
     decomposerContextMenu.Append(MenuItem41);
-    MenuItem42 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM5, _("Decompose a RPG Maker character"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem42 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM5, _("Decompose an RPG Maker character"), wxEmptyString, wxITEM_NORMAL);
     MenuItem42->SetBitmap(wxBitmap(wxImage(_T("res/importrpgmaker.png"))));
     decomposerContextMenu.Append(MenuItem42);
     MenuItem43 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM6, _("Decompose a spritesheet"), wxEmptyString, wxITEM_NORMAL);
@@ -365,7 +365,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     static int widths[2] = { -1, 175 };
     statusBar->SetFieldsCount(2);
     statusBar->SetStatusWidths(2, widths);
-    statusBar->SetStatusText( "2008-2016", 1 );
+    statusBar->SetStatusText("2008-2017", 1);
     SetStatusBar(statusBar);
 
     std::vector<wxWindow*> controlsToBeDisabledOnPreview; //Used below:
@@ -515,6 +515,8 @@ MainFrame::~MainFrame()
 {
     //(*Destroy(MainFrame)
     //*)
+    editorsManager.SetNotebook(NULL);
+    Disconnect( wxID_ANY, wxEVT_ACTIVATE, ( wxObjectEventFunction )&MainFrame::OnActivate );
 
     //Deinitialize the frame manager
     m_mgr.UnInit();

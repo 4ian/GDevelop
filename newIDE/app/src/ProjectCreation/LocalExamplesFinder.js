@@ -9,7 +9,7 @@ const process = optionalRequire('process');
 
 const tryPath = (
   path: string,
-  onExists: (string) => void,
+  onExists: string => void,
   onNoAccess: Function
 ) =>
   fs.access(path, fs.constants.R_OK, err => {

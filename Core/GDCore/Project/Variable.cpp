@@ -97,6 +97,12 @@ bool Variable::RenameChild(const gd::String & oldName, const gd::String & newNam
     return true;
 }
 
+void Variable::ClearChildren()
+{
+    if ( !isStructure ) return;
+    children.clear();
+}
+
 void Variable::SerializeTo(SerializerElement & element) const
 {
     if (!isStructure)

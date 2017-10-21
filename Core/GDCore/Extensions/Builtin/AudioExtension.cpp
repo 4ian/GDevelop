@@ -21,8 +21,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     #if defined(GD_IDE_ONLY)
     extension.AddAction("PlaySoundCanal",
                    _("Play a sound on a channel"),
-                   _("Play a sound (small audio file) on a specific channel,\nso as to be able to manipulate it."),
-                   _("Play the sound _PARAM1_ on the channel _PARAM2_"),
+                   _("Play a sound (small audio file) on a specific channel,\nso you'll be able to manipulate it."),
+                   _("Play the sound _PARAM1_ on the channel _PARAM2_, vol.: _PARAM4_, loop: _PARAM3_"),
                    _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
@@ -68,10 +68,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .MarkAsAdvanced();
 
     extension.AddAction("PlayMusicCanal",
-                   _("Play a music on a channel"),
-                   _("Play a music an on specific channel,\nso as to be able to interact with later."),
-                   _("Play the music _PARAM1_ on channel _PARAM2_"),
-                   _("Audio/Musics on channels"),
+                   _("Play a music file on a channel"),
+                   _("Play a music file on a specific channel,\nso you'll be able to interact with it later."),
+                   _("Play the music _PARAM1_ on channel _PARAM2_, vol.: _PARAM4_, loop: _PARAM3_"),
+                   _("Audio/Music on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -86,7 +86,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    _("Stop the music on a channel"),
                    _("Stop the music on the specified channel"),
                    _("Stop the music of channel _PARAM1_"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -97,7 +97,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    _("Pause the music of a channel"),
                    _("Pause the music on the specified channel."),
                    _("Pause the music of channel _PARAM1_"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -108,7 +108,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    _("Play the music of a channel"),
                    _("Play the music of the channel."),
                    _("Play the music of channel _PARAM1_"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -117,7 +117,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
 
     extension.AddAction("ModVolumeSoundCanal",
                    _("Volume of the sound on a channel"),
-                   _("This action modify the volume of the sound on the specified channel. The volume is between 0 and 100."),
+                   _("This action modifies the volume of the sound on the specified channel. The volume is between 0 and 100."),
                    _("Do _PARAM2__PARAM3_ to the volume of the sound on channel _PARAM1_"),
                    _("Audio/Sounds on channels"),
                    "res/actions/sonVolume24.png",
@@ -131,9 +131,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
 
     extension.AddAction("ModVolumeMusicCanal",
                    _("Volume of the music on a channel"),
-                   _("This action modify the volume of the music on the specified channel. The volume is between 0 and 100."),
+                   _("This action modifies the volume of the music on the specified channel. The volume is between 0 and 100."),
                    _("Do _PARAM2__PARAM3_ to the volume of the music on channel _PARAM1_"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/actions/musicVolume24.png",
                    "res/actions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -145,7 +145,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
 
     extension.AddAction("ModGlobalVolume",
                    _("Game global volume"),
-                   _("This action modify the global volume of the game. The volume is between 0 and 100."),
+                   _("This action modifies the global volume of the game. The volume is between 0 and 100."),
                    _("Do _PARAM1__PARAM2_ to global sound level"),
                    _("Audio"),
                    "res/actions/volume24.png",
@@ -158,7 +158,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
 
     extension.AddAction("ModPitchSoundChannel",
                    _("Pitch of the sound of a channel"),
-                   _("This action modify pitch (speed) of the sound on a channel.\n1 is the default pitch."),
+                   _("This action modifies the pitch (speed) of the sound on a channel.\n1 is the default pitch."),
                    _("Do _PARAM2__PARAM3_ to the pitch of the sound on channel _PARAM1_"),
                    _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
@@ -172,9 +172,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
 
     extension.AddAction("ModPitchMusicChannel",
                    _("Pitch of the music on a channel"),
-                   _("This action modify the pitch of the music on the specified channel. 1 is the default pitch"),
+                   _("This action modifies the pitch of the music on the specified channel. 1 is the default pitch"),
                    _("Do _PARAM2__PARAM3_ to the pitch of the music on channel _PARAM1_"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -186,7 +186,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
 
     extension.AddAction("ModPlayingOffsetSoundChannel",
                    _("Playing offset of the sound on a channel"),
-                   _("This action modify the playing offset of the sound on a channel"),
+                   _("This action modifies the playing offset of the sound on a channel"),
                    _("Do _PARAM2__PARAM3_ to the playing offset of the sound on channel _PARAM1_"),
                    _("Audio/Sounds on channels"),
                    "res/actions/son24.png",
@@ -200,9 +200,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
 
     extension.AddAction("ModPlayingOffsetMusicChannel",
                    _("Playing offset of the music on a channel"),
-                   _("This action modify the playing offset of the music on the specified channel"),
+                   _("This action modifies the playing offset of the music on the specified channel"),
                    _("Do _PARAM2__PARAM3_ to the playing offset of the music on channel _PARAM1_"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -215,7 +215,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddAction("PlaySound",
                    _("Play a sound"),
                    _("Play a sound."),
-                   _("Play the sound _PARAM1_"),
+                   _("Play the sound _PARAM1_, vol.: _PARAM3_, loop: _PARAM2_)"),
                    _("Audio"),
                    "res/actions/son24.png",
                    "res/actions/son.png")
@@ -227,9 +227,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .MarkAsSimple();
 
     extension.AddAction("PlayMusic",
-                   _("Play a music"),
-                   _("Play a music."),
-                   _("Play the music _PARAM1_"),
+                   _("Play a music file"),
+                   _("Play a music file."),
+                   _("Play the music _PARAM1_, vol.: _PARAM3_, loop: _PARAM2_)"),
                    _("Audio"),
                    "res/actions/music24.png",
                    "res/actions/music.png")
@@ -241,10 +241,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .MarkAsSimple();
 
     extension.AddCondition("MusicPlaying",
-                   _("A music is being played"),
+                   _("A music file is being played"),
                    _("Test if the music on a channel is being played"),
                    _("Music on channel _PARAM1_ is being played"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/conditions/musicplaying24.png",
                    "res/conditions/musicplaying.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -252,10 +252,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .MarkAsAdvanced();
 
     extension.AddCondition("MusicPaused",
-                   _("A music is paused"),
+                   _("A music file is paused"),
                    _("Test if the music on the specified channel is paused."),
                    _("Music on channel _PARAM1_ is paused"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/conditions/musicpaused24.png",
                    "res/conditions/musicpaused.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -263,10 +263,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .MarkAsAdvanced();
 
     extension.AddCondition("MusicStopped",
-                   _("A music is stopped"),
+                   _("A music file is stopped"),
                    _("Test if the music on the specified channel is stopped."),
                    _("Music on channel _PARAM1_ is stopped"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/conditions/musicstopped24.png",
                    "res/conditions/musicstopped.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -322,9 +322,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
 
     extension.AddCondition("MusicCanalVolume",
                    _("Volume of the music on a channel"),
-                   _("Test the volume of the music on specified channel. The volume is between 0 and 100."),
+                   _("Test the volume of the music on a specified channel. The volume is between 0 and 100."),
                    _("The volume of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -362,9 +362,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
 
     extension.AddCondition("MusicChannelPitch",
                    _("Pitch of the music on a channel"),
-                   _("Test the pitch (speed) of the music on specified channel. 1 is the default pitch."),
-                   _("The volume of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   _("Audio/Musics on channels"),
+                   _("Test the pitch (speed) of the music on a specified channel. 1 is the default pitch."),
+                   _("The pitch of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
+                   _("Audio/Music on channels"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -392,7 +392,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
                    _("Playing offset of the music on a channel"),
                    _("Test the playing offset of the music on the specified channel."),
                    _("The playing offset of the music on channel _PARAM1_ is _PARAM2__PARAM3_"),
-                   _("Audio/Musics on channels"),
+                   _("Audio/Music on channels"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -406,7 +406,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"));
 
-    extension.AddExpression("MusicChannelPlayingOffset", _("Music playing offset"), _("Music playing offset"), _("Musics"), "res/actions/music.png")
+    extension.AddExpression("MusicChannelPlayingOffset", _("Music playing offset"), _("Music playing offset"), _("Music"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"));
 
@@ -414,7 +414,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"));
 
-    extension.AddExpression("MusicChannelVolume", _("Music volume"), _("Music volume"), _("Musics"), "res/actions/music.png")
+    extension.AddExpression("MusicChannelVolume", _("Music volume"), _("Music volume"), _("Music"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"));
 
@@ -422,7 +422,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"));
 
-    extension.AddExpression("MusicChannelPitch", _("Music's pitch"), _("Music's pitch"), _("Musics"), "res/actions/music.png")
+    extension.AddExpression("MusicChannelPitch", _("Music's pitch"), _("Music's pitch"), _("Music"), "res/actions/music.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Channel"));
 

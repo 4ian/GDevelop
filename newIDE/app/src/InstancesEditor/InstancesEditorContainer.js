@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import gesture from 'pixi-simple-gesture';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import SimpleDropTarget from '../Utils/DragDropHelpers/SimpleDropTarget';
 import InstancesRenderer from './InstancesRenderer';
 import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
-import KeyboardShortcuts from './KeyboardShortcuts';
 import HighlightedInstance from './HighlightedInstance';
 import SelectionRectangle from './SelectionRectangle';
 import InstancesResizer from './InstancesResizer';
@@ -14,7 +15,6 @@ import WindowMask from './WindowMask';
 import DropHandler from './DropHandler';
 import BackgroundColor from './BackgroundColor';
 import PIXI from 'pixi.js';
-import SimpleDropTarget from '../Utils/DragDropHelpers/SimpleDropTarget';
 
 export default class InstancesEditorContainer extends Component {
   constructor() {
@@ -22,6 +22,8 @@ export default class InstancesEditorContainer extends Component {
 
     this.lastContextMenuX = 0;
     this.lastContextMenuY = 0;
+    this.lastCursorX = 0;
+    this.lastCursorY = 0;
     this.state = {};
   }
 
@@ -54,7 +56,13 @@ export default class InstancesEditorContainer extends Component {
       }
       event.preventDefault();
     };
-    this.pixiRenderer.view.setAttribute('tabIndex', 1);
+    this.pixiRenderer.view.setAttribute('tabIndex', -1);
+    this.pixiRenderer.view.addEventListener('focus', e => {
+      this.keyboardShortcuts.focus();
+    });
+    this.pixiRenderer.view.addEventListener('blur', e => {
+      this.keyboardShortcuts.blur();
+    });
 
     this.pixiContainer = new PIXI.Container();
 
@@ -66,10 +74,18 @@ export default class InstancesEditorContainer extends Component {
       this.props.height
     );
     gesture.panable(this.backgroundArea);
-    this.backgroundArea.on('mousedown', this._onBackgroundClicked);
-    this.backgroundArea.on('touchstart', this._onBackgroundClicked);
+    this.backgroundArea.on('mousedown', event =>
+      this._onBackgroundClicked(event.data.global.x, event.data.global.y)
+    );
+    this.backgroundArea.on('touchstart', event =>
+      this._onBackgroundClicked(event.data.global.x, event.data.global.y)
+    );
+    this.backgroundArea.on('mousemove', event =>
+      this._onMouseMove(event.data.global.x, event.data.global.y)
+    );
     this.backgroundArea.on('panmove', event =>
-      this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y));
+      this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y)
+    );
     this.backgroundArea.on('panend', event => this._onEndSelectionRectangle());
     this.pixiContainer.addChild(this.backgroundArea);
 
@@ -87,9 +103,11 @@ export default class InstancesEditorContainer extends Component {
     this.pixiContainer.addChild(this.grid.getPixiObject());
 
     this.keyboardShortcuts = new KeyboardShortcuts({
-      domElement: this.pixiRenderer.view,
       onDelete: this.props.onDeleteSelection,
       onMove: this.moveSelection,
+      onCopy: this.props.onCopy,
+      onCut: this.props.onCut,
+      onPaste: this.props.onPaste,
     });
 
     this.dropHandler = new DropHandler({
@@ -197,6 +215,10 @@ export default class InstancesEditorContainer extends Component {
   }
 
   componentWillUnmount() {
+    // This is an antipattern and is theorically not needed, but help
+    // to protect against renders after the component is unmounted.
+    this._unmounted = true;
+
     this.keyboardShortcuts.unmount();
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
@@ -250,7 +272,16 @@ export default class InstancesEditorContainer extends Component {
     });
   }
 
-  _onBackgroundClicked = () => {
+  _onMouseMove = (x, y) => {
+    this.lastCursorX = x;
+    this.lastCursorY = y;
+  }
+
+  _onBackgroundClicked = (x, y) => {
+    this.lastCursorX = x;
+    this.lastCursorY = y;
+    this.pixiRenderer.view.focus();
+
     if (!this.keyboardShortcuts.shouldMultiSelect()) {
       this.props.instancesSelection.clearSelection();
       this.props.onInstancesSelected([]);
@@ -270,7 +301,9 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesSelected(instancesSelected);
   };
 
-  _onInstanceClicked = instance => {};
+  _onInstanceClicked = instance => {
+    this.pixiRenderer.view.focus();
+  };
 
   _onOverInstance = instance => {
     this.highlightedInstance.setInstance(instance);
@@ -383,7 +416,17 @@ export default class InstancesEditorContainer extends Component {
     );
   };
 
+  getLastCursorPosition = () => {
+    return this.viewPosition.toSceneCoordinates(
+      this.lastCursorX,
+      this.lastCursorY
+    );
+  };
+
   _renderScene = () => {
+    // Protect against rendering scheduled after the component is unmounted.
+    if (this._unmounted) return;
+
     this.backgroundColor.render();
     this.viewPosition.render();
     this.grid.render();
@@ -403,7 +446,7 @@ export default class InstancesEditorContainer extends Component {
     return (
       <SimpleDropTarget>
         <div
-          ref={canvasArea => this.canvasArea = canvasArea}
+          ref={canvasArea => (this.canvasArea = canvasArea)}
           style={{ flex: 1, position: 'absolute', overflow: 'hidden' }}
         />
       </SimpleDropTarget>

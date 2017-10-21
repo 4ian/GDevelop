@@ -33,12 +33,13 @@ export default class BaseEditor extends Component {
     return {
       windowTitle: layout.getWindowDefaultTitle(),
       layers: serializeToJSObject(layout, 'serializeLayersTo'),
-      backgroundColor: '' +
+      backgroundColor:
+        '' +
         rgbToHexNumber(
           layout.getBackgroundColorRed(),
           layout.getBackgroundColorGreen(),
           layout.getBackgroundColorBlue()
         ),
     };
-  };
+  }
 }

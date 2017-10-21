@@ -6,6 +6,7 @@
   "author": "Florian Rival",
   "license": "MIT",
   "homepage": "http://compilgames.net",
+  "private": true,
   "scripts": {
     "postinstall": "cd app && npm install",
     "build:app": "cd ../app && npm run build",

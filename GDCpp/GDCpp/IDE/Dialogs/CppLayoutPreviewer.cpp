@@ -205,7 +205,7 @@ void CppLayoutPreviewer::RefreshFromLayout()
     if ( editor.GetLayout().CompilationNeeded() && !CodeCompiler::Get()->HasTaskRelatedTo(editor.GetLayout()) )
     {
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(editor.GetProject(), editor.GetLayout());
-        mainFrameWrapper.GetInfoBar()->ShowMessage(_("Changes made to events will be taken into account when you switch to Edition mode"));
+        mainFrameWrapper.GetInfoBar()->ShowMessage(_("Changes made to events will be taken into account when you switch to Editing mode"));
     }
 
     return; //RefreshFromLayoutSecondPart() will be called by OnUpdate() when appropriate

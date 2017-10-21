@@ -17,7 +17,7 @@ const styles = {
   },
   toolbarItem: toolbarItemStyle,
   toolbarText: {
-    marginRight: 5
+    marginRight: 5,
   },
   checkbox: {
     width: 'auto',
@@ -76,6 +76,15 @@ export default class TextEditor extends Component {
             }}
             style={styles.checkbox}
           />
+          <TextField
+            hintText="Font"
+            fullWidth
+            value={textObject.getFontFilename()}
+            onChange={(e, value) => {
+              textObject.setFontFilename(value);
+              this.forceUpdate();
+            }}
+          />
         </MiniToolbar>
         <Line noMargin>
           <Column expand>
@@ -83,7 +92,7 @@ export default class TextEditor extends Component {
               <TextField
                 hintText="Enter the text to be displayed by the object"
                 fullWidth
-                multiLine={true}
+                multiLine
                 value={textObject.getString()}
                 onChange={(e, value) => {
                   textObject.setString(value);

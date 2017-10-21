@@ -6,12 +6,14 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
+import flatten from 'lodash.flatten';
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';
+import EmptyMessage from '../UI/EmptyMessage';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import VariableRow from './VariableRow';
 import AddVariableRow from './AddVariableRow';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import flatten from 'lodash/flatten';
+import styles from './styles';
 const gd = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
@@ -19,11 +21,7 @@ const SortableAddVariableRow = SortableElement(AddVariableRow);
 
 class VariablesListBody extends Component {
   render() {
-    return (
-      <div>
-        {this.props.children}
-      </div>
-    );
+    return <div>{this.props.children}</div>;
   }
 }
 
@@ -106,12 +104,36 @@ export default class VariablesList extends Component {
         }}
         onAddChild={() => {
           const name = newNameGenerator('ChildVariable', name =>
-            variable.hasChild(name));
+            variable.hasChild(name)
+          );
           variable.getChild(name).setString('');
           this.forceUpdate();
         }}
-        children={isStructure ? this._renderVariableChildren(name, variable, depth) : null}
+        children={
+          isStructure
+            ? this._renderVariableChildren(name, variable, depth)
+            : null
+        }
       />
+    );
+  }
+
+  _renderEmpty() {
+    return (
+      <div>
+        <EmptyMessage
+          style={styles.emptyExplanation}
+          messageStyle={styles.emptyExplanationMessage}
+        >
+          {this.props.emptyExplanationMessage}
+        </EmptyMessage>
+        <EmptyMessage
+          style={styles.emptyExplanation}
+          messageStyle={styles.emptyExplanationMessage}
+        >
+          {this.props.emptyExplanationSecondMessage}
+        </EmptyMessage>
+      </div>
     );
   }
 
@@ -146,7 +168,8 @@ export default class VariablesList extends Component {
           const variable = new gd.Variable();
           variable.setString('');
           const name = newNameGenerator('Variable', name =>
-            variablesContainer.has(name));
+            variablesContainer.has(name)
+          );
           variablesContainer.insert(name, variable, variablesContainer.count());
           this.forceUpdate();
         }}
@@ -159,9 +182,7 @@ export default class VariablesList extends Component {
           <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
             <TableRow>
               <TableHeaderColumn>Name</TableHeaderColumn>
-              <TableHeaderColumn>
-                Value
-              </TableHeaderColumn>
+              <TableHeaderColumn>Value</TableHeaderColumn>
               <TableRowColumn />
             </TableRow>
           </TableHeader>
@@ -176,7 +197,9 @@ export default class VariablesList extends Component {
           useDragHandle
           lockToContainerEdges
         >
-          {containerVariablesTree.concat(addRow)}
+          {!containerVariablesTree.length && this._renderEmpty()}
+          {!!containerVariablesTree.length && containerVariablesTree}
+          {addRow}
         </SortableVariablesListBody>
       </div>
     );

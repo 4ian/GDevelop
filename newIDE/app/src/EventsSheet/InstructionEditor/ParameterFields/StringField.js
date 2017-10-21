@@ -24,7 +24,7 @@ export default class ExpressionField extends Component {
         floatingLabelText={description}
         inputStyle={styles.input}
         onChange={(e, text) => this.props.onChange(text)}
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
         fullWidth
       />
     );

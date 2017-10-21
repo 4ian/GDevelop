@@ -68,6 +68,8 @@ void EditorsNotebookManager::NotifyPageNotDisplayed(wxWindow * newPage)
 
 void EditorsNotebookManager::MainFrameNotDisplayed()
 {
+    if (!notebook) return;
+
 	for (std::size_t k =0;k<notebook->GetPageCount();k++)
 	{
 		wxWindow * page = notebook->GetPage(k);

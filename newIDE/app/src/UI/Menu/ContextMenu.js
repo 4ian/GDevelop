@@ -12,7 +12,9 @@ class MaterialUIContextMenu extends React.Component {
     this.state = {
       open: false,
     };
-    this.menuImplementation = new MaterialUIMenuImplementation();
+    this.menuImplementation = new MaterialUIMenuImplementation({
+      onClose: this._onClose,
+    });
   }
 
   open = (x, y) => {
@@ -39,7 +41,7 @@ class MaterialUIContextMenu extends React.Component {
     return (
       <div>
         <div
-          ref={element => this.anchorEl = element}
+          ref={element => (this.anchorEl = element)}
           style={{
             position: 'fixed',
             pointerEvents: 'none',
@@ -53,7 +55,7 @@ class MaterialUIContextMenu extends React.Component {
           onRequestClose={this._onClose}
           {...this.menuImplementation.getMenuProps()}
         >
-          <Menu>
+          <Menu desktop width={256}>
             {this.menuImplementation.buildFromTemplate(this.props.menuTemplate)}
           </Menu>
         </Popover>

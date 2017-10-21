@@ -150,3 +150,11 @@ gdjs.AdMobRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
     document.removeEventListener('onAdDismiss', this._onAdDismiss, false);
     if (this._bannerDisplayed) this.hideBanner();
 };
+
+gdjs.AdMobRuntimeObject.prototype.setLayer = function(layer) {
+     // No renderable object
+};
+
+gdjs.AdMobRuntimeObject.prototype.setZOrder = function(z) {
+     // No renderable object
+};

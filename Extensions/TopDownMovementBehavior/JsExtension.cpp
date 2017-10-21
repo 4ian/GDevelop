@@ -28,7 +28,7 @@ public:
         DeclareTopDownMovementBehaviorExtension(*this);
 
         GetBehaviorMetadata("TopDownMovementBehavior::TopDownMovementBehavior")
-            .SetIncludeFile("TopDownMovementBehavior/topdownmovementruntimebehavior.js");
+            .SetIncludeFile("Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js");
 
         std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForBehavior("TopDownMovementBehavior::TopDownMovementBehavior");
         std::map<gd::String, gd::InstructionMetadata > & autConditions = GetAllConditionsForBehavior("TopDownMovementBehavior::TopDownMovementBehavior");

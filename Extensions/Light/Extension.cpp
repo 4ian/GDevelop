@@ -26,7 +26,7 @@ public:
     {
         SetExtensionInformation("Light",
                               _("Light"),
-                              _("Allow to display lights and use light obstacles."),
+                              _("This Extension is able to display Lights and use Light obstacles."),
                               "Florian Rival",
                               "Open source (MIT License)");
 
@@ -168,7 +168,7 @@ public:
 
         obj.AddCondition("GlobalLight",
                        _("A light is global"),
-                       _("Return true if light is global"),
+                       _("Return true if a light is global"),
                        _("_PARAM0_ is a global light"),
                        _("Light type"),
                        "CppPlatform/Extensions/lightIcon24.png",

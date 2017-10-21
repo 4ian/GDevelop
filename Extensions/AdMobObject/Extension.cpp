@@ -14,7 +14,7 @@ void DeclareAdMobObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("AdMobObject",
                           _("AdMob banners and interstitial screens"),
-                          _("Display ads banner and interstitial screens powered by AdMob."),
+                          _("Display an ads banner and interstitial screens powered by AdMob."),
                           "Florian Rival",
                           "Open source (MIT License)");
 

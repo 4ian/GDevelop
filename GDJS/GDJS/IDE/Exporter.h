@@ -23,11 +23,7 @@ namespace gdjs
 class Exporter : public gd::ProjectExporter
 {
 public:
-    Exporter(gd::AbstractFileSystem & fileSystem, gd::String gdjsRoot_ = "./JsPlatform") :
-        fs(fileSystem),
-        gdjsRoot(gdjsRoot_)
-    {
-    };
+    Exporter(gd::AbstractFileSystem & fileSystem, gd::String gdjsRoot_ = "./JsPlatform");
     virtual ~Exporter();
 
     /**
@@ -83,10 +79,18 @@ public:
      */
     const gd::String & GetLastError() const { return lastError; };
 
+    /**
+     * \brief Change the directory where code files are generated.
+     *
+     * By default, this is set to a temporary directory.
+     */
+    void SetCodeOutputDirectory(gd::String codeOutputDir_) { codeOutputDir = codeOutputDir_; }
+
 private:
     gd::AbstractFileSystem & fs; ///< The abstract file system to be used for exportation.
     gd::String lastError; ///< The last error that occurred.
     gd::String gdjsRoot; ///< The root directory of GDJS, used to copy runtime files.
+    gd::String codeOutputDir; ///< The directory where JS code is outputted. Will be then copied to the final output directory.
 };
 
 }

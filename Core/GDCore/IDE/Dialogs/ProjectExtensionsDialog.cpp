@@ -103,7 +103,7 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	FlexGridSizer6->AddGrowableCol(0);
 	platformList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(713,106), wxLC_REPORT|wxLC_NO_HEADER, wxDefaultValidator, _T("ID_LISTCTRL1"));
 	FlexGridSizer6->Add(platformList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Right click to add or remove a platform.\nPlatforms which are not used by the project are grayed."), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Right-click to add or remove a platform.\nPlatforms that are not used by the project are grayed."), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -171,9 +171,9 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	FlexGridSizer3->Add(-1,-1,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("More extensions"));
 	FlexGridSizer11 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText6 = new wxStaticText(this, ID_STATICTEXT8, _("A list of extensions provided by others developers is available on the wiki :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	StaticText6 = new wxStaticText(this, ID_STATICTEXT8, _("If you create new extensions for GDevelop, please share them here :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	FlexGridSizer11->Add(StaticText6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Go to the wiki unofficial extensions page"), _("http://compilgames.net/wiki/doku.php/game_develop/extensions"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Go to the Wiki page for unofficial extensions"), _("http://wiki.compilgames.net/doku.php/gdevelop/extensions"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	FlexGridSizer11->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer3->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -191,7 +191,7 @@ ProjectExtensionsDialog::ProjectExtensionsDialog(wxWindow* parent, gd::Project &
 	helpBt->SetToolTip(_("Display help about this window"));
 	FlexGridSizer17->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4->Add(FlexGridSizer17, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Close and reopen scene editors so as to take in account newly added extensions."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("You must close and reopen scene editors for newly-added extensions to become active."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	wxFont StaticText2Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
 	if ( !StaticText2Font.Ok() ) StaticText2Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
 	StaticText2Font.SetStyle(wxFONTSTYLE_ITALIC);

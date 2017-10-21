@@ -23,14 +23,14 @@ public:
     {
         SetExtensionInformation("CommonDialogs",
                               _("Common dialogs"),
-                              _("Extension allowing to display common dialogs ( Message box, open file dialog... )"),
+                              _("This Extension can display common dialogs ( Message box, open file dialog... )"),
                               "Florian Rival",
                               "Open source (MIT License)");
         #if defined(GD_IDE_ONLY)
 
         AddAction("ShowMsgBox",
                        _("Show a message box"),
-                       _("Display a message box with specified text, and a Ok button."),
+                       _("Display a message box with the specified text and an Ok button."),
                        _("Display message \"_PARAM1_\" with title \"_PARAM2_\""),
                        _("Interfaces"),
                        "res/actions/msgbox24.png",
@@ -44,8 +44,8 @@ public:
 
         AddAction("ShowOpenFile",
                        _("Show a window to choose a file"),
-                       _("Display a window allowing to choose a file.\nThe name and the directory of the file will be saved in the specified variable."),
-                       _("Open a window so as to choose a file, and save the result in _PARAM1_"),
+                       _("Display a window that allows a player to choose a file.\nThe name and the directory of the file will be saved in the specified variable."),
+                       _("Open a window for choosing a file, and save the result in _PARAM1_"),
                        _("Interfaces"),
                        "res/actions/openfile24.png",
                        "res/actions/openfile.png")
@@ -59,7 +59,7 @@ public:
 
         AddAction("ShowTextInput",
                        _("Show a window to enter a text"),
-                       _("Show a window allowing to enter a text.\nThe text will be saved in the specified scene variable."),
+                       _("Show a window that allows a player to enter text.\nThe text will be saved in the specified scene variable."),
                        _("Open a text input dialog, and save the result in _PARAM1_"),
                        _("Interfaces"),
                        "res/actions/textenter24.png",
@@ -74,7 +74,7 @@ public:
 
         AddAction("ShowYesNoMsgBox",
                        _("Display a Yes/No message box"),
-                       _("Open a message box allowing to choose Yes or No.\nThe answer ( \"yes\"/\"no\" ) will be saved in the specified variable."),
+                       _("Open a message box that allows a player to choose Yes or No.\nThe answer ( \"yes\"/\"no\" ) will be saved in the specified variable."),
                        _("Open a Yes/No message box, and save the result in _PARAM1_"),
                        _("Interfaces"),
                        "res/actions/msgbox24.png",

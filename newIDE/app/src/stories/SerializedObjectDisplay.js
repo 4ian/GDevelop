@@ -14,7 +14,8 @@ export default class SerializedObjectDisplay extends Component {
       <div>
         {this.props.children}
         <Paper zDepth={2}>
-          Object serialized to JSON: <RaisedButton label="Update" onClick={this.update} />
+          Object serialized to JSON:{' '}
+          <RaisedButton label="Update" onClick={this.update} />
           <pre>
             {JSON.stringify(
               serializeToJSObject(

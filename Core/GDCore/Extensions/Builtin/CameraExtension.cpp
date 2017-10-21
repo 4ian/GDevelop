@@ -14,7 +14,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 {
     extension.SetExtensionInformation("BuiltinCamera",
                           _("Cameras and layers features"),
-                          _("Builtin camera extension"),
+                          _("Built-in camera extension"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -36,8 +36,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddCondition("CameraY",
                    _("Camera center Y position"),
-                   _("Compare the Y position of a the center of a camera."),
-                   _("The Y position of camera _PARAM4_ is _PARAM1__PARAM2_  (layer: _PARAM3_)"),
+                   _("Compare the Y position of the center of a camera."),
+                   _("The Y position of camera _PARAM4_ is _PARAM1__PARAM2_ (layer: _PARAM3_)"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
@@ -51,7 +51,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddAction("CameraX",
                    _("Camera center X position"),
-                   _("Change X position of the center of the specified camera."),
+                   _("Change the X position of the center of the specified camera."),
                    _("Do _PARAM1__PARAM2_ to X position of camera _PARAM4_ (layer: _PARAM3_)"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
@@ -66,7 +66,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddAction("CameraY",
                    _("Camera center Y position"),
-                   _("Change Y position of the center of the specified camera."),
+                   _("Change the Y position of the center of the specified camera."),
                    _("Do _PARAM1__PARAM2_ to Y position of camera _PARAM4_ (layer: _PARAM3_)"),
                    _("Layers and cameras"),
                    "res/conditions/camera24.png",
@@ -126,7 +126,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddAction("RotateCamera",
                    _("Change camera angle"),
-                   _("This action modify the angle of a camera of the specified layer."),
+                   _("This action modifies the angle of a camera in the specified layer."),
                    _("Do _PARAM1__PARAM2_ to angle of camera (layer: _PARAM3_, camera: _PARAM4_)"),
                    _("Layers and cameras"),
                    "res/actions/camera24.png",
@@ -140,7 +140,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddAction("AddCamera",
                    _("Add a camera to a layer"),
-                   _("This action add a camera to a layer"),
+                   _("This action adds a camera to a layer"),
                    _("Add a camera to layer _PARAM1_"),
                    _("Layers and cameras"),
                    "res/actions/camera24.png",
@@ -169,7 +169,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddAction("CameraSize",
                    _("Modify the size of a camera"),
-                   _("This action modify the size of a camera of the specified layer. The zoom will be reset."),
+                   _("This action modifies the size of a camera of the specified layer. The zoom will be reset."),
                    _("Change the size of camera _PARAM2_ of _PARAM1_ to _PARAM3_*_PARAM4_"),
                    _("Layers and cameras"),
                    "res/actions/camera24.png",
@@ -183,7 +183,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddAction("CameraViewport",
                    _("Modify the render zone of a camera"),
-                   _("This action modify the render zone of a camera of the specified layer."),
+                   _("This action modifies the render zone of a camera of the specified layer."),
                    _("Set the render zone of camera _PARAM2_ from layer _PARAM1_ to _PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"),
                    _("Layers and cameras"),
                    "res/actions/camera24.png",
@@ -265,7 +265,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddCondition("LayerVisible",
                    _("Visibility of a layer"),
-                   _("Test if a layer is displayed"),
+                   _("Test if a layer is set as visible."),
                    _("Layer _PARAM1_ is visible"),
                    _("Layers and cameras"),
                    "res/conditions/layer24.png",
@@ -290,7 +290,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddCondition("LayerTimeScale",
                    _("Layer time scale"),
-                   _("Compare the time scale applied on the objects of the layer."),
+                   _("Compare the time scale applied to the objects of the layer."),
                    _("The time scale of layer _PARAM1_ is _PARAM2__PARAM3_"),
                    _("Layers and cameras/Time"),
                    "res/conditions/time24.png",
@@ -304,7 +304,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     extension.AddAction("ChangeLayerTimeScale",
                    _("Change layer time scale"),
-                   _("Change the time scale applied on the objects of the layer."),
+                   _("Change the time scale applied to the objects of the layer."),
                    _("Set time scale of layer _PARAM1_ to _PARAM2_"),
                    _("Layers and cameras/Time"),
                    "res/actions/time24.png",

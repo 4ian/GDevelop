@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
 import SearchBar from 'material-ui-search-bar';
-import keys from 'lodash/keys';
-import update from 'lodash/update';
-import compact from 'lodash/compact';
+import keys from 'lodash.keys';
+import update from 'lodash.update';
+import compact from 'lodash.compact';
 const gd = global.gd;
 
 const GROUP_DELIMITER = '/';
@@ -14,12 +14,18 @@ const styles = {
     margin: '0 auto',
     backgroundColor: 'transparent',
   },
-  groupItemText: {
+  groupListItemText: {
     color: 'rgba(0,0,0,0.54)',
-  }
+  },
+  groupListItem: {
+    borderBottom: '1px solid #f0f0f0', //TODO: Use theme color instead
+  },
+  groupListItemNestedList: {
+    padding: 0,
+  },
 };
 
-export class InstructionTypeList extends Component {
+export class InstructionTypeSelector extends Component {
   constructor(props) {
     super(props);
 
@@ -34,6 +40,10 @@ export class InstructionTypeList extends Component {
     this.instructionsInfo = allInstructions;
     this.instructionsInfoTree = this._createInstructionsTree(allInstructions);
   }
+
+  focus = () => {
+    if (this._searchBar) this._searchBar.focus();
+  };
 
   _listInstructions(groupPrefix, extensionInstructions) {
     //Get the map containing the metadata of the instructions provided by the extension...
@@ -74,11 +84,12 @@ export class InstructionTypeList extends Component {
 
       let prefix = '';
       if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-        prefix = extension.getName() === 'BuiltinObject'
-          ? 'Common ' +
+        prefix =
+          extension.getName() === 'BuiltinObject'
+            ? 'Common ' +
               (isCondition ? 'conditions' : 'action') +
               ' for all objects'
-          : extension.getFullName();
+            : extension.getFullName();
         prefix += GROUP_DELIMITER;
       }
 
@@ -142,8 +153,10 @@ export class InstructionTypeList extends Component {
 
   _matchCritera(instructionInfo, lowercaseSearch) {
     const { displayedName, fullGroupName } = instructionInfo;
-    return displayedName.toLowerCase().indexOf(lowercaseSearch) !== -1 ||
-      fullGroupName.toLowerCase().indexOf(lowercaseSearch) !== -1;
+    return (
+      displayedName.toLowerCase().indexOf(lowercaseSearch) !== -1 ||
+      fullGroupName.toLowerCase().indexOf(lowercaseSearch) !== -1
+    );
   }
 
   _computeSearchResults = search => {
@@ -153,7 +166,8 @@ export class InstructionTypeList extends Component {
         return this.instructionsInfo[key];
       })
       .filter(instructionInfo =>
-        this._matchCritera(instructionInfo, lowercaseSearch));
+        this._matchCritera(instructionInfo, lowercaseSearch)
+      );
   };
 
   _onSubmitSearch = () => {
@@ -179,7 +193,9 @@ export class InstructionTypeList extends Component {
         return (
           <ListItem
             key={key}
-            primaryText={<div style={styles.groupItemText}>{key}</div>}
+            style={styles.groupListItem}
+            nestedListStyle={styles.groupListItemNestedList}
+            primaryText={<div style={styles.groupListItemText}>{key}</div>}
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
             nestedItems={this._renderTree(instructionOrGroup)}
@@ -194,6 +210,7 @@ export class InstructionTypeList extends Component {
       return (
         <ListItem
           key={instructionInfo.type}
+          style={styles.listItem}
           primaryText={instructionInfo.displayedName}
           secondaryText={instructionInfo.fullGroupName}
           value={instructionInfo.type}
@@ -201,6 +218,10 @@ export class InstructionTypeList extends Component {
       );
     });
   };
+
+  componentDidMount() {
+    this._searchBar.focus();
+  }
 
   render() {
     return (
@@ -213,6 +234,7 @@ export class InstructionTypeList extends Component {
             })}
           onRequestSearch={this._onSubmitSearch}
           style={styles.searchBar}
+          ref={searchBar => (this._searchBar = searchBar)}
         />
         <SelectableList
           value={this.props.selectedType}
@@ -222,7 +244,6 @@ export class InstructionTypeList extends Component {
             this.props.onChoose(value);
           }}
         >
-
           {this.state.search
             ? this._renderSearchResults()
             : this._renderTree(this.instructionsInfoTree)}
@@ -232,4 +253,4 @@ export class InstructionTypeList extends Component {
   }
 }
 
-export default makeSelectable(InstructionTypeList);
+export default InstructionTypeSelector;

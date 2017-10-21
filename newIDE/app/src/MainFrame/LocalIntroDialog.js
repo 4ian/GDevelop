@@ -5,7 +5,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
-export default class BetaIntroDialog extends Component {
+export default class LocalIntroDialog extends Component {
   _onOpenGithub() {
     shell.openExternal('https://github.com/4ian/GD');
   }
@@ -34,15 +34,10 @@ export default class BetaIntroDialog extends Component {
       <Dialog actions={actions} modal={true} open={open}>
         <div>
           <p>
-            This is a
-            {' '}
-            <b>beta version</b>
-            {' '}
-            of GDevelop 5. It is unfinished and you can only edit scenes of existing games or examples.
+            This is a <b>beta version</b> of GDevelop 5. Some parts of the
+            software are still incomplete or missing.
           </p>
-          <p>
-            You can still export your game to upload it online in a few clicks!
-          </p>
+          <p>Any feedback on the forum or contribution on GitHub is welcome!</p>
         </div>
       </Dialog>
     );

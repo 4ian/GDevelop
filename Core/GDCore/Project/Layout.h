@@ -11,7 +11,7 @@
 #include <map>
 #include <memory>
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/Project/ObjectGroup.h"
+#include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ClassWithObjects.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Project/VariablesContainer.h"
@@ -140,14 +140,14 @@ public:
     ///@{
 
     /**
-     * Return a reference to the vector containing the layout's objects groups.
+     * Return a reference to the layout's objects groups.
      */
-    std::vector <ObjectGroup> & GetObjectGroups() { return objectGroups; }
+    ObjectGroupsContainer & GetObjectGroups() { return objectGroups; }
 
     /**
-     * Return a const reference to the vector containing the layout's objects groups.
+     * Return a const reference to the layout's objects groups.
      */
-    const std::vector <ObjectGroup> & GetObjectGroups() const { return objectGroups; }
+    const ObjectGroupsContainer & GetObjectGroups() const { return objectGroups; }
 
     ///@}
 
@@ -441,7 +441,7 @@ private:
     gd::VariablesContainer                      variables; ///< Variables list
     gd::InitialInstancesContainer               initialInstances; ///< Initial instances
     std::vector < gd::Layer >                   initialLayers; ///< Initial layers
-    std::vector<ObjectGroup>                    objectGroups; ///< Objects groups
+    ObjectGroupsContainer                       objectGroups; ///< Objects groups
     bool                                        stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
     bool                                        standardSortMethod; ///< True to sort objects using standard sort.
     float                                       oglFOV; ///< OpenGL Field Of View value

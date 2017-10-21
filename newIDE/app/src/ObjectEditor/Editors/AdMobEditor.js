@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { Line, Column } from '../../UI/Grid';
 import PropertiesEditor from '../../PropertiesEditor';
-import propertiesMapToSchema
-  from '../../PropertiesEditor/PropertiesMapToSchema';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
 export default class AdMobEditor extends Component {
   render() {
@@ -18,10 +17,7 @@ export default class AdMobEditor extends Component {
     return (
       <Column>
         <Line>
-          <PropertiesEditor
-            schema={propertiesSchema}
-            instances={[object]}
-          />
+          <PropertiesEditor schema={propertiesSchema} instances={[object]} />
         </Line>
       </Column>
     );

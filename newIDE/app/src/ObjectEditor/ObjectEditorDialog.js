@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
-import EmptyMessage from '../UI/EmptyMessage';
-import { Column, Line } from '../UI/Grid';
+import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from 'material-ui/Tabs';
 
 const styles = {
@@ -67,7 +66,6 @@ export default class ObjectEditorDialog extends Component {
     ];
 
     const EditorComponent = editor.component;
-    // const containerProps = editor.containerProps;
     const { currentTab } = this.state;
 
     return (
@@ -78,42 +76,35 @@ export default class ObjectEditorDialog extends Component {
         noMargin
         modal
         onRequestClose={this.props.onCancel}
-        repositionOnUpdate={false}
         open={this.props.open}
         title={
           <div>
             <Tabs value={currentTab} onChange={this._onChangeTab}>
               <Tab label="Properties" value={'properties'} key={'properties'} />
               <Tab label="Behaviors" value={'behaviors'} key={'behaviors'} />
-              <Tab label="Groups" value={'groups'} key={'groups'} />
             </Tabs>
           </div>
         }
         titleStyle={styles.titleContainer}
       >
         {currentTab === 'properties' &&
-          EditorComponent &&
-          <EditorComponent
+          EditorComponent && (
+            <EditorComponent
+              object={this.props.object}
+              project={this.props.project}
+              resourceSources={this.props.resourceSources}
+              onSizeUpdated={() =>
+                this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+            />
+          )}
+        {currentTab === 'behaviors' && (
+          <BehaviorsEditor
             object={this.props.object}
             project={this.props.project}
-            resourceSources={this.props.resourceSources}
-          />}
-        {currentTab === 'behaviors' &&
-          <Column>
-            <Line>
-              <EmptyMessage>
-                Behaviors are not available yet.
-              </EmptyMessage>
-            </Line>
-          </Column>}
-        {currentTab === 'groups' &&
-          <Column>
-            <Line>
-              <EmptyMessage>
-                Editing groups of objects is not available yet.
-              </EmptyMessage>
-            </Line>
-          </Column>}
+            onSizeUpdated={() =>
+              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+          />
+        )}
       </Dialog>
     );
   }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
+import { rgbToHex } from '../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
   largeSelectableArea,
@@ -80,34 +81,48 @@ export default class CommentEvent extends Component {
   };
 
   render() {
+    const commentEvent = gd.asCommentEvent(this.props.event);
+    const color = rgbToHex(
+      commentEvent.getBackgroundColorRed(),
+      commentEvent.getBackgroundColorGreen(),
+      commentEvent.getBackgroundColorBlue()
+    );
+    const textColor = rgbToHex(
+      commentEvent.getTextColorRed(),
+      commentEvent.getTextColorGreen(),
+      commentEvent.getTextColorBlue()
+    );
+
     return (
       <div
-        style={styles.container}
+        style={{ ...styles.container, backgroundColor: `#${color}` }}
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
         })}
-        ref={container => this._container = container}
+        ref={container => (this._container = container)}
       >
-        {!this.state.editing
-          ? <p
-              className={classNames({
-                [selectableArea]: true,
-              })}
-              onClick={this.edit}
-              key="p"
-              style={styles.text}
-              dangerouslySetInnerHTML={{
-                __html: this._getCommentHTML(),
-              }}
-            />
-          : <textarea
-              key="textarea"
-              type="text"
-              style={{ ...styles.textArea, height: this.state.height }}
-              onBlur={this.endEditing}
-              ref={input => this._input = input}
-            />}
+        {!this.state.editing ? (
+          <p
+            className={classNames({
+              [selectableArea]: true,
+            })}
+            onClick={this.edit}
+            key="p"
+            style={{ ...styles.text, color: `#${textColor}` }}
+            dangerouslySetInnerHTML={{
+              __html: this._getCommentHTML(),
+            }}
+          />
+        ) : (
+          <textarea
+            key="textarea"
+            type="text"
+            style={{ ...styles.textArea, height: this.state.height }}
+            onBlur={this.endEditing}
+            ref={input => (this._input = input)}
+          />
+        )}
       </div>
     );
   }

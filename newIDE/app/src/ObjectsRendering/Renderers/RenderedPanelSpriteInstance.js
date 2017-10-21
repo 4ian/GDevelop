@@ -44,7 +44,6 @@ RenderedPanelSpriteInstance.prototype.update = function() {
   // }
   // this._wasRendered = true;
 
-
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   if (panelSprite.isTiled() !== this._tiled) {
     this.makeObjects();
@@ -77,7 +76,7 @@ RenderedPanelSpriteInstance.prototype.makeObjects = function() {
   this._textureName = panelSprite.getTexture();
   const texture = this._pixiResourcesLoader.getPIXITexture(
     this._project,
-    this._textureName,
+    this._textureName
   );
 
   this._tiled = panelSprite.isTiled();
@@ -121,14 +120,12 @@ RenderedPanelSpriteInstance.prototype._updateLocalPositions = function() {
 
   this._centerSprite.position.x = panelSprite.getLeftMargin();
   this._centerSprite.position.y = panelSprite.getTopMargin();
-  this._borderSprites[0].position.x = this._width -
-    panelSprite.getRightMargin() -
-    extraPixels * 2;
+  this._borderSprites[0].position.x =
+    this._width - panelSprite.getRightMargin() - extraPixels * 2;
   this._borderSprites[0].position.y = panelSprite.getTopMargin();
 
-  this._borderSprites[1].position.x = this._width -
-    this._borderSprites[1].width -
-    extraPixels * 2;
+  this._borderSprites[1].position.x =
+    this._width - this._borderSprites[1].width - extraPixels * 2;
   this._borderSprites[1].position.y = 0;
 
   this._borderSprites[2].position.x = panelSprite.getLeftMargin();
@@ -141,68 +138,52 @@ RenderedPanelSpriteInstance.prototype._updateLocalPositions = function() {
   this._borderSprites[4].position.y = panelSprite.getTopMargin();
 
   this._borderSprites[5].position.x = 0;
-  this._borderSprites[5].position.y = this._height -
-    this._borderSprites[5].height -
-    extraPixels * 2;
+  this._borderSprites[5].position.y =
+    this._height - this._borderSprites[5].height - extraPixels * 2;
 
   this._borderSprites[6].position.x = panelSprite.getLeftMargin();
-  this._borderSprites[6].position.y = this._height -
-    panelSprite.getBottomMargin() -
-    extraPixels * 3; //FIXME: 1 more extra pixel is somewhat needed for pixel perfect alignment
+  this._borderSprites[6].position.y =
+    this._height - panelSprite.getBottomMargin() - extraPixels * 3; //FIXME: 1 more extra pixel is somewhat needed for pixel perfect alignment
 
-  this._borderSprites[7].position.x = this._width -
-    this._borderSprites[7].width -
-    extraPixels * 2;
-  this._borderSprites[7].position.y = this._height -
-    this._borderSprites[7].height -
-    extraPixels * 2;
+  this._borderSprites[7].position.x =
+    this._width - this._borderSprites[7].width - extraPixels * 2;
+  this._borderSprites[7].position.y =
+    this._height - this._borderSprites[7].height - extraPixels * 2;
 };
 
 RenderedPanelSpriteInstance.prototype._updateSpritesAndTexturesSize = function() {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   this._centerSprite.width = Math.max(
-    this._width -
-      panelSprite.getRightMargin() -
-      panelSprite.getLeftMargin(),
+    this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
     0
   );
   this._centerSprite.height = Math.max(
-    this._height -
-      panelSprite.getTopMargin() -
-      panelSprite.getBottomMargin(),
+    this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
     0
   );
 
   //Top, Bottom, Right, Left borders:
   this._borderSprites[0].width = panelSprite.getRightMargin();
   this._borderSprites[0].height = Math.max(
-    this._height -
-      panelSprite.getTopMargin() -
-      panelSprite.getBottomMargin(),
+    this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
     0
   );
 
   this._borderSprites[2].height = panelSprite.getTopMargin();
   this._borderSprites[2].width = Math.max(
-    this._width -
-      panelSprite.getRightMargin() -
-      panelSprite.getLeftMargin(),
+    this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
     0
   );
 
   this._borderSprites[4].width = panelSprite.getLeftMargin();
   this._borderSprites[4].height = Math.max(
-    this._height -
-      panelSprite.getTopMargin() -
-      panelSprite.getBottomMargin(),
+    this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
     0
   );
 
   this._borderSprites[6].height = panelSprite.getBottomMargin();
   this._borderSprites[6].width = Math.max(
-    this._width -
-      panelSprite.getRightMargin() -
-      panelSprite.getLeftMargin(),
+    this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
     0
   );
 
@@ -215,10 +196,11 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
   this._textureName = panelSprite.getTexture();
   const texture = this._pixiResourcesLoader.getPIXITexture(
     this._project,
-    this._textureName,
+    this._textureName
   );
 
-  if (texture.noFrame) { //Post pone texture update if texture is not loaded
+  if (texture.noFrame) {
+    //Post pone texture update if texture is not loaded
     const renderer = this;
     texture.on('update', function() {
       renderer.updateTexture();
@@ -228,7 +210,7 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
     return;
   }
 
-  console.log("Updating PanelSprite instance texture");
+  console.log('Updating PanelSprite instance texture');
   function makeInsideTexture(rect) {
     if (rect.width < 0) rect.width = 0;
     if (rect.height < 0) rect.height = 0;
@@ -394,7 +376,10 @@ RenderedPanelSpriteInstance.getThumbnail = function(
 ) {
   const panelSprite = gd.asPanelSpriteObject(object);
 
-  return resourcesLoader.getResourceFullFilename(project, panelSprite.getTexture());
+  return resourcesLoader.getResourceFullFilename(
+    project,
+    panelSprite.getTexture()
+  );
 };
 
 export default RenderedPanelSpriteInstance;

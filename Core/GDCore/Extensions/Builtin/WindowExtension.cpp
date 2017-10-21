@@ -14,14 +14,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
 {
     extension.SetExtensionInformation("BuiltinWindow",
                           _("Window features"),
-                          _("Built-in extension allowing to manipulate the game's window"),
+                          _("This Built-in extension enables the manipulation of the game's window"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("SetFullScreen",
                    _("De/activate fullscreen"),
-                   _("This action activate or desactivate fullscreen."),
+                   _("This action activates or deactivates fullscreen."),
                    _("Activate fullscreen: _PARAM1_ (keep aspect ratio: _PARAM2_)"),
                    _("Game's window"),
                    "res/actions/fullscreen24.png",
@@ -31,8 +31,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
         .AddParameter("yesorno", _("Keep aspect ratio (HTML5 games only, yes by default)"), "",true).SetDefaultValue("yes");
 
     extension.AddAction("SetWindowMargins",
-                   _("Change window's margins"),
-                   _("This action change the margins, in pixels, of the game's window."),
+                   _("Change the window's margins"),
+                   _("This action changes the margins, in pixels, of the game's window."),
                    _("Set margins of game window to _PARAM1_;_PARAM2_;_PARAM3_;_PARAM4_"),
                    _("Game's window"),
                    "res/actions/window24.png",
@@ -44,8 +44,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
         .AddParameter("expression", _("Left"));
 
     extension.AddAction("SetWindowSize",
-                   _("Change the size of the screen"),
-                   _("This action change the size of the game window."),
+                   _("Change the size of the window"),
+                   _("This action changes the size of the game's window."),
                    _("Change window size: _PARAM1_x_PARAM2_"),
                    _("Game's window"),
                    "res/actions/window24.png",
@@ -53,12 +53,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Width"))
         .AddParameter("expression", _("Height"))
-        .AddParameter("yesorno", _("Use this size as default size for new scene cameras\?\n(Yes to change extend the game area, No to stretch the game to the window's size)."));
+        .AddParameter("yesorno", _("Do you want to use this size as the default size for new scene cameras\?\n(Yes to change the size of the game's viewable area,\nNo to stretch the game to the window's size)."));
 
     extension.AddAction("SetWindowIcon",
-                   _("Change window's icon"),
-                   _("This action change the icon of the game's window."),
-                   _("Use _PARAM1_ as icon for the game's window."),
+                   _("Change the window's icon"),
+                   _("This action changes the icon of the game's window."),
+                   _("Use _PARAM1_ as the icon for the game's window."),
                    _("Game's window"),
                    "res/actions/window24.png",
                    "res/actions/window.png")
@@ -66,8 +66,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(gd::Pla
         .AddParameter("string", _("Name of the image to be used as the icon"));
 
     extension.AddAction("SetWindowTitle",
-                   _("Change window's title"),
-                   _("This action change the title of the game window."),
+                   _("Change the window's title"),
+                   _("This action changes the title of the game's window."),
                    _("Change window title to _PARAM1_"),
                    _("Game's window"),
                    "res/actions/window24.png",

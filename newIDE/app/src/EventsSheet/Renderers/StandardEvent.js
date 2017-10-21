@@ -8,6 +8,7 @@ const gd = global.gd;
 const styles = {
   container: {
     display: 'flex',
+    borderBottom: '1px solid #d3d3d3',
   },
   actionsList: {
     flex: 1,
@@ -21,6 +22,7 @@ export default class StandardEvent extends Component {
     onInstructionClick: PropTypes.func.isRequired,
     onInstructionDoubleClick: PropTypes.func.isRequired,
     onInstructionContextMenu: PropTypes.func.isRequired,
+    onInstructionsListContextMenu: PropTypes.func.isRequired,
     onParameterClick: PropTypes.func.isRequired,
     selection: PropTypes.object.isRequired,
   };
@@ -49,6 +51,9 @@ export default class StandardEvent extends Component {
           onInstructionClick={this.props.onInstructionClick}
           onInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onInstructionContextMenu={this.props.onInstructionContextMenu}
+          onInstructionsListContextMenu={
+            this.props.onInstructionsListContextMenu
+          }
           onParameterClick={this.props.onParameterClick}
         />
         <InstructionsList
@@ -60,6 +65,9 @@ export default class StandardEvent extends Component {
           onInstructionClick={this.props.onInstructionClick}
           onInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onInstructionContextMenu={this.props.onInstructionContextMenu}
+          onInstructionsListContextMenu={
+            this.props.onInstructionsListContextMenu
+          }
           onParameterClick={this.props.onParameterClick}
         />
       </div>

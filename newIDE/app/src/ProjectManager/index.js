@@ -2,15 +2,20 @@ import React, { Component } from 'react';
 import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import { mapFor } from '../Utils/MapFor';
-import ListIcon from './ListIcon';
-import { makeAddItem } from './AddItem';
+import ListIcon from '../UI/ListIcon';
+import { makeAddItem } from '../UI/ListAddItem';
 import Window from '../Utils/Window';
 import IconMenu from '../UI/Menu/IconMenu';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconButton from 'material-ui/IconButton';
 
 const styles = {
-  projectStructureItem: {},
+  projectStructureItem: {
+    borderTop: '1px solid #e0e0e0', //TODO: Use theme color instead
+  },
+  projectStructureItemNestedList: {
+    padding: 0,
+  },
   itemName: {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
@@ -22,28 +27,34 @@ const styles = {
 };
 
 const ProjectStructureItem = props => (
-  <ListItem style={styles.projectStructureItem} {...props} />
+  <ListItem
+    style={styles.projectStructureItem}
+    nestedListStyle={styles.projectStructureItemNestedList}
+    {...props}
+  />
 );
 
 class Item extends Component {
   componentDidUpdate(prevProps) {
     if (!prevProps.editingName && this.props.editingName) {
-      setTimeout(
-        () => {
-          if (this.textField) this.textField.focus();
-        },
-        100
-      );
+      setTimeout(() => {
+        if (this.textField) this.textField.focus();
+      }, 100);
     }
   }
 
+  _onContextMenu = event => {
+    if (this._iconMenu) this._iconMenu.open(event);
+  };
+
   render() {
-    const rightIconButton = this.props.rightIconButton ||
+    const rightIconButton = this.props.rightIconButton || (
       <IconMenu
+        ref={iconMenu => (this._iconMenu = iconMenu)}
         iconButtonElement={
           <IconButton
-            onTouchTap={e =>
-              e.preventDefault() /*Prevent bubbling the event to ListItem*/}
+            onClick={e =>
+              e.stopPropagation() /*Prevent bubbling the event to ListItem*/}
           >
             <MoreVertIcon />
           </IconButton>
@@ -62,36 +73,41 @@ class Item extends Component {
             click: () => this.props.onDelete(),
           },
         ]}
-      />;
-    const label = this.props.editingName
-      ? <TextField
-          id="rename-item-field"
-          ref={textField => this.textField = textField}
-          defaultValue={this.props.primaryText}
-          onBlur={e => this.props.onRename(e.target.value)}
-          onKeyPress={event => {
-            if (event.charCode === 13) {
-              // enter key pressed
-              this.textField.blur();
-            }
-          }}
-          fullWidth
-          style={styles.itemTextField}
-        />
-      : <div style={styles.itemName}>{this.props.primaryText}</div>;
+      />
+    );
+    const label = this.props.editingName ? (
+      <TextField
+        id="rename-item-field"
+        ref={textField => (this.textField = textField)}
+        defaultValue={this.props.primaryText}
+        onBlur={e => this.props.onRename(e.target.value)}
+        onKeyPress={event => {
+          if (event.charCode === 13) {
+            // enter key pressed
+            this.textField.blur();
+            this.props.onRename(event.target.value);
+          }
+        }}
+        fullWidth
+        style={styles.itemTextField}
+      />
+    ) : (
+      <div style={styles.itemName}>{this.props.primaryText}</div>
+    );
 
     return (
       <ListItem
         style={this.props.style}
+        onContextMenu={this._onContextMenu}
         primaryText={label}
         rightIconButton={rightIconButton}
-        onTouchTap={this.props.onEdit}
+        onClick={this.props.onEdit}
       />
     );
   }
 }
 
-const AddItem = makeAddItem(Item);
+const AddItem = makeAddItem(ListItem);
 
 export default class ProjectManager extends React.Component {
   state = {
@@ -144,10 +160,7 @@ export default class ProjectManager extends React.Component {
 
   render() {
     const { project } = this.props;
-    const {
-      renamedItemKind,
-      renamedItemName,
-    } = this.state;
+    const { renamedItemKind, renamedItemName } = this.state;
 
     return (
       <List>
@@ -174,7 +187,10 @@ export default class ProjectManager extends React.Component {
                 }
                 onEdit={() => this.props.onOpenLayout(name)}
                 onDelete={() => this.props.onDeleteLayout(layout)}
-                onRename={(newName) => this.props.onRenameLayout(name, newName)}
+                onRename={newName => {
+                  this.props.onRenameLayout(name, newName);
+                  this._onEditName(null, '');
+                }}
                 onEditName={() => this._onEditName('layout', name)}
               />
             );
@@ -201,12 +217,15 @@ export default class ProjectManager extends React.Component {
                 primaryText={name}
                 editingName={
                   renamedItemKind === 'external-events' &&
-                    renamedItemName === name
+                  renamedItemName === name
                 }
                 onEdit={() => this.props.onOpenExternalEvents(name)}
                 onDelete={() =>
                   this.props.onDeleteExternalEvents(externalEvents)}
-                onRename={(newName) => this.props.onRenameExternalEvents(name, newName)}
+                onRename={newName => {
+                  this.props.onRenameExternalEvents(name, newName);
+                  this._onEditName(null, '');
+                }}
                 onEditName={() => this._onEditName('external-events', name)}
               />
             );
@@ -233,12 +252,15 @@ export default class ProjectManager extends React.Component {
                 primaryText={name}
                 editingName={
                   renamedItemKind === 'external-layout' &&
-                    renamedItemName === name
+                  renamedItemName === name
                 }
                 onEdit={() => this.props.onOpenExternalLayout(name)}
                 onDelete={() =>
                   this.props.onDeleteExternalLayout(externalLayout)}
-                onRename={(newName) => this.props.onRenameExternalLayout(name, newName)}
+                onRename={newName => {
+                  this.props.onRenameExternalLayout(name, newName);
+                  this._onEditName(null, '');
+                }}
                 onEditName={() => this._onEditName('external-layout', name)}
               />
             );

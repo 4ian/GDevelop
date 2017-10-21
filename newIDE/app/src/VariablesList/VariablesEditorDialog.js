@@ -53,21 +53,13 @@ export default class VariablesEditorDialog extends Component {
 
   render() {
     const actions = [
-      (
-        <FlatButton
-          label="Cancel"
-          primary
-          onTouchTap={this.props.onCancel}
-        />
-      ),
-      (
-        <FlatButton
-          label="Apply"
-          primary
-          keyboardFocused
-          onTouchTap={this._onApply}
-        />
-      ),
+      <FlatButton label="Cancel" primary onTouchTap={this.props.onCancel} />,
+      <FlatButton
+        label="Apply"
+        primary
+        keyboardFocused
+        onTouchTap={this._onApply}
+      />,
     ];
 
     return (
@@ -81,6 +73,10 @@ export default class VariablesEditorDialog extends Component {
       >
         <VariablesList
           variablesContainer={this.state.editedVariablesContainer}
+          emptyExplanationMessage={this.props.emptyExplanationMessage}
+          emptyExplanationSecondMessage={
+            this.props.emptyExplanationSecondMessage
+          }
         />
       </Dialog>
     );

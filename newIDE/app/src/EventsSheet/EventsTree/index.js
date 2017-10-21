@@ -6,7 +6,7 @@ import {
 import EventsRenderingService from '../EventsRenderingService';
 import { mapFor } from '../../Utils/MapFor';
 import { eventsTree } from '../ClassNames';
-import findIndex from 'lodash/findIndex';
+import findIndex from 'lodash.findindex';
 import { getInitialSelection, isEventSelected } from '../SelectionHandler';
 
 const indentWidth = 22;
@@ -31,16 +31,13 @@ class EventHeightsCache {
     }
 
     // Notify the component, on the next tick, that heights have changed
-    this.updateTimeoutId = setTimeout(
-      () => {
-        if (this.component) {
-          this.component.onHeightsChanged(() => this.updateTimeoutId = null);
-        } else {
-          this.updateTimeoutId = null;
-        }
-      },
-      0
-    );
+    this.updateTimeoutId = setTimeout(() => {
+      if (this.component) {
+        this.component.onHeightsChanged(() => (this.updateTimeoutId = null));
+      } else {
+        this.updateTimeoutId = null;
+      }
+    }, 0);
   }
 
   setEventHeight(event, height) {
@@ -78,7 +75,7 @@ class EventContainer extends Component {
     this.forceUpdate();
   };
 
-  _onEventContextMenu = (domEvent) => {
+  _onEventContextMenu = domEvent => {
     domEvent.preventDefault();
     this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
   };
@@ -89,11 +86,11 @@ class EventContainer extends Component {
 
     return (
       <div
-        ref={container => this._container = container}
+        ref={container => (this._container = container)}
         onClick={this.props.onEventClick}
         onContextMenu={this._onEventContextMenu}
       >
-        {EventComponent &&
+        {EventComponent && (
           <EventComponent
             project={project}
             layout={layout}
@@ -106,8 +103,12 @@ class EventContainer extends Component {
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
+            onInstructionsListContextMenu={
+              this.props.onInstructionsListContextMenu
+            }
             onParameterClick={this.props.onParameterClick}
-          />}
+          />
+        )}
       </div>
     );
   }
@@ -180,13 +181,15 @@ export default class EventsTree extends Component {
         event,
         eventsList,
         indexInList: i,
-        expanded: true,
+        expanded: !event.isFolded(),
         depth,
         key: event.ptr, //TODO: useless?
         children: this._eventsToTreeData(
           event.getSubEvents(),
-          flatData,
-          depth + 1,
+          // flatData is a flat representation of events, one for each line.
+          // Hence it should not contain the folded events.
+          !event.isFolded() ? flatData : [],
+          depth + 1
         ).treeData,
       };
     });
@@ -206,12 +209,12 @@ export default class EventsTree extends Component {
       path: targetPath,
     });
     const targetNode = target.node;
-    const targetEventsList = targetNode && targetNode.event
-      ? targetNode.event.getSubEvents()
-      : this.props.events;
-    const targetPosition = targetNode && targetNode.children
-      ? targetNode.children.indexOf(node)
-      : 0;
+    const targetEventsList =
+      targetNode && targetNode.event
+        ? targetNode.event.getSubEvents()
+        : this.props.events;
+    const targetPosition =
+      targetNode && targetNode.children ? targetNode.children.indexOf(node) : 0;
 
     // Get the moved event and its list from the moved node.
     const { event, eventsList } = node;
@@ -232,6 +235,13 @@ export default class EventsTree extends Component {
     return true;
   };
 
+  _onVisibilityToggle = ({ node }) => {
+    const { event } = node;
+
+    event.setFolded(!event.isFolded());
+    this.forceEventsUpdate();
+  };
+
   _renderEvent = ({ node }) => {
     const { event, depth } = node;
 
@@ -248,10 +258,10 @@ export default class EventsTree extends Component {
         onInstructionClick={this.props.onInstructionClick}
         onInstructionDoubleClick={this.props.onInstructionDoubleClick}
         onParameterClick={this.props.onParameterClick}
-        onEventClick={() =>
-          this.props.onEventClick(node)}
+        onEventClick={() => this.props.onEventClick(node)}
         onEventContextMenu={(x, y) => this.props.onEventContextMenu(x, y, node)}
         onInstructionContextMenu={this.props.onInstructionContextMenu}
+        onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
       />
     );
   };
@@ -264,6 +274,7 @@ export default class EventsTree extends Component {
           treeData={this.state.treeData}
           scaffoldBlockPxWidth={indentWidth}
           onChange={() => {}}
+          onVisibilityToggle={this._onVisibilityToggle}
           onMoveNode={this._onMoveNode}
           canDrop={this._canDrop}
           rowHeight={({ index }) => {
@@ -271,7 +282,7 @@ export default class EventsTree extends Component {
             return this.eventsHeightsCache.getEventHeight(event);
           }}
           reactVirtualizedListProps={{
-            ref: list => this._list = list,
+            ref: list => (this._list = list),
           }}
         />
       </div>

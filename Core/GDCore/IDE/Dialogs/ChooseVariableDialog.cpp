@@ -146,7 +146,7 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
     toolbar->AddTool( idAddVar, _( "Add a variable" ), gd::SkinHelper::GetIcon("add", 16), _("Add a variable") );
     toolbar->AddTool( idEditVar, _( "Edit the initial value of the variable" ), gd::SkinHelper::GetIcon("edit", 16), _("Edit the initial value of the variable") );
-    toolbar->AddTool( idRenameVar, _( "Rename variable" ), gd::SkinHelper::GetIcon("editname", 16), _("Rename variable") );
+    toolbar->AddTool( idRenameVar, _( "Rename the variable" ), gd::SkinHelper::GetIcon("editname", 16), _("Rename the variable") );
     toolbar->AddTool( idDelVar, _( "Delete the selected variable" ), gd::SkinHelper::GetIcon("delete", 16), _("Delete the selected variable") );
     toolbar->AddSeparator();
     toolbar->AddTool( idMoveUpVar, _( "Move up" ), gd::SkinHelper::GetIcon("up", 16), _("Move up") );

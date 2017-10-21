@@ -20,21 +20,17 @@ export default class SetupGridDialog extends Component {
 
   render() {
     const actions = [
-      (
-        <FlatButton
-          label="Cancel"
-          primary={true}
-          onTouchTap={this.props.onCancel}
-        />
-      ),
-      (
-        <FlatButton
-          label="Apply"
-          primary={true}
-          keyboardFocused={true}
-          onTouchTap={this._onApply}
-        />
-      ),
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onTouchTap={this.props.onCancel}
+      />,
+      <FlatButton
+        label="Apply"
+        primary={true}
+        keyboardFocused={true}
+        onTouchTap={this._onApply}
+      />,
     ];
 
     return (

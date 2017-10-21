@@ -29,30 +29,30 @@ public:
         DeclareTextObjectExtension(*this);
 
         GetObjectMetadata("TextObject::Text")
-            .SetIncludeFile("TextObject/textruntimeobject.js")
-            .AddIncludeFile("TextObject/textruntimeobject-pixi-renderer.js")
-            .AddIncludeFile("TextObject/textruntimeobject-cocos-renderer.js");
+            .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
+            .AddIncludeFile("Extensions/TextObject/textruntimeobject-pixi-renderer.js")
+            .AddIncludeFile("Extensions/TextObject/textruntimeobject-cocos-renderer.js");
 
-        GetAllActionsForObject("TextObject::Text")["TextObject::String"].SetFunctionName("setString").SetGetter("getString").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::String"].SetFunctionName("getString").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllActionsForObject("TextObject::Text")["TextObject::Size"].SetFunctionName("setCharacterSize").SetGetter("getCharacterSize").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::Size"].SetFunctionName("getCharacterSize").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllActionsForObject("TextObject::Text")["TextObject::Angle"].SetFunctionName("setAngle").SetGetter("getAngle").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::Angle"].SetFunctionName("getAngle").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllActionsForObject("TextObject::Text")["TextObject::Opacity"].SetFunctionName("setOpacity").SetGetter("getOpacity").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::Opacity"].SetFunctionName("getOpacity").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::String"].SetFunctionName("setString").SetGetter("getString").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::String"].SetFunctionName("getString").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::Size"].SetFunctionName("setCharacterSize").SetGetter("getCharacterSize").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::Size"].SetFunctionName("getCharacterSize").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::Angle"].SetFunctionName("setAngle").SetGetter("getAngle").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::Angle"].SetFunctionName("getAngle").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::Opacity"].SetFunctionName("setOpacity").SetGetter("getOpacity").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::Opacity"].SetFunctionName("getOpacity").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
-        GetAllActionsForObject("TextObject::Text")["TextObject::SetBold"].SetFunctionName("setBold").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::IsBold"].SetFunctionName("isBold").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::SetBold"].SetFunctionName("setBold").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::IsBold"].SetFunctionName("isBold").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
-        GetAllActionsForObject("TextObject::Text")["TextObject::SetItalic"].SetFunctionName("setItalic").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllConditionsForObject("TextObject::Text")["TextObject::IsItalic"].SetFunctionName("isItalic").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::SetItalic"].SetFunctionName("setItalic").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllConditionsForObject("TextObject::Text")["TextObject::IsItalic"].SetFunctionName("isItalic").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
-        GetAllExpressionsForObject("TextObject::Text")["Opacity"].SetFunctionName("getOpacity").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllExpressionsForObject("TextObject::Text")["Angle"].SetFunctionName("getAngle").SetIncludeFile("TextObject/textruntimeobject.js");
-        GetAllStrExpressionsForObject("TextObject::Text")["String"].SetFunctionName("getString").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllExpressionsForObject("TextObject::Text")["Opacity"].SetFunctionName("getOpacity").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllExpressionsForObject("TextObject::Text")["Angle"].SetFunctionName("getAngle").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+        GetAllStrExpressionsForObject("TextObject::Text")["String"].SetFunctionName("getString").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
-        GetAllActionsForObject("TextObject::Text")["TextObject::ChangeColor"].SetFunctionName("setColor").SetIncludeFile("TextObject/textruntimeobject.js");
+        GetAllActionsForObject("TextObject::Text")["TextObject::ChangeColor"].SetFunctionName("setColor").SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
         //Unimplemented actions and conditions:
         GetAllActionsForObject("TextObject::Text")["TextObject::Font"].SetFunctionName("");

@@ -115,6 +115,22 @@ gdjs.Variable.prototype.removeChild = function(childName) {
 }
 
 /**
+ * Remove all the children.
+ *
+ * If the variable is not a structure, nothing is done.
+ * @method clearChildren
+ */
+gdjs.Variable.prototype.clearChildren = function() {
+	if ( !this._isStructure ) return;
+
+	for ( var child in this._children ) {
+		if ( this._children.hasOwnProperty(child) ){
+			delete this._children[child];
+		}
+	}
+}
+
+/**
  * Get the value of the variable, considered as a number
  * @method getAsNumber
  * @return {Number} The number stored

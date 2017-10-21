@@ -24,14 +24,9 @@ const styles = {
   },
 };
 
-export default ({
-  project,
-  resourceName,
-  resourcesLoader,
-  style,
-}) => {
+export default ({ project, resourceName, resourcesLoader, style }) => {
   return (
-    <div style={{...styles.spriteThumbnail, ...style}}>
+    <div style={{ ...styles.spriteThumbnail, ...style }}>
       <img
         style={styles.spriteThumbnailImage}
         alt={resourceName}

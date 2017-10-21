@@ -8,7 +8,7 @@ import Welcome from './Welcome';
 
 import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
-import LocalCreateDialog from '../ProjectCreation/LocalCreateDialog';
+import LocalCreateDialog from '../ProjectCreation/CreateProjectDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
@@ -23,17 +23,18 @@ import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
 import ObjectsList from '../ObjectsList';
-import InstancePropertiesEditor
-  from '../InstancesEditor/InstancePropertiesEditor';
+import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
 import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
+import BehaviorsEditor from '../BehaviorsEditor';
+import ObjectsGroupEditor from '../ObjectsGroupEditor';
+import ObjectsGroupsList from '../ObjectsGroupsList';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
-import DragDropContextProvider
-  from '../Utils/DragDropHelpers/DragDropContextProvider';
+import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
 import {
   project,
   shapePainterObject,
@@ -45,6 +46,8 @@ import {
   testLayout,
   testLayoutInstance1,
   testInstruction,
+  spriteObjectWithBehaviors,
+  group2,
 } from './TestProject';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -136,7 +139,7 @@ storiesOf('LocalCreateDialog', module)
 
 storiesOf('LayoutChooserDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => <LayoutChooserDialog open project={project}/>);
+  .add('default', () => <LayoutChooserDialog open project={project} />);
 
 storiesOf('DragHandle', module)
   .addDecorator(paperDecorator)
@@ -146,7 +149,11 @@ storiesOf('DragHandle', module)
 storiesOf('EventsTree', module).add('default', () => (
   <DragDropContextProvider>
     <div className="gd-events-sheet">
-      <EventsTree events={testLayout.getEvents()} selectedEvents={[]} selectedInstructions={[]} />
+      <EventsTree
+        events={testLayout.getEvents()}
+        selectedEvents={[]}
+        selectedInstructions={[]}
+      />
     </div>
   </DragDropContextProvider>
 ));
@@ -260,5 +267,36 @@ storiesOf('InstancePropertiesEditor', module)
         layout={testLayout}
         instances={[testLayoutInstance1]}
       />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('ObjectsGroupEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ObjectsGroupEditor project={project} layout={testLayout} group={group2} />
+  ));
+
+storiesOf('ObjectsGroupsList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <div style={{ height: 250 }}>
+        <ObjectsGroupsList
+          project={project}
+          objectsContainer={testLayout}
+          onEditGroup={() => {}}
+        />
+      </div>
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('BehaviorsEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={spriteObjectWithBehaviors}>
+      <BehaviorsEditor project={project} object={spriteObjectWithBehaviors} />
     </SerializedObjectDisplay>
   ));

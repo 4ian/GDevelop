@@ -18,10 +18,10 @@ const styles = {
     paddingRight: 6,
   },
   repeatContainer: {
-      width: 130,
+    width: 130,
   },
   repeatLabel: {
-      whiteSpace: 'nowrap',
+    whiteSpace: 'nowrap',
   },
   spacer: {
     width: 16,

@@ -147,6 +147,8 @@ std::vector<gd::String> NativeFileSystem::ReadDir(const gd::String & path, const
 
 bool NativeFileSystem::CopyFile(const gd::String & file, const gd::String & destination)
 {
+    if (file == destination) return true; //No copy needed
+
     wxLogNull noLogPlease;
     return wxCopyFile( file, destination, true );
 }

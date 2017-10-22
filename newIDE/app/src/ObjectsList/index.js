@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { ListItem } from 'material-ui/List';
 import Paper from 'material-ui/Paper';
+import SearchBar from 'material-ui-search-bar';
 import ObjectRow from './ObjectRow';
 import NewObjectDialog from './NewObjectDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
@@ -9,11 +10,19 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { makeAddItem } from '../UI/ListAddItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import { enumerateObjects } from './EnumerateObjects';
+import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
 
 const listItemHeight = 48;
 const styles = {
-  container: { flex: 1, display: 'flex', height: '100%' },
+  container: {
+    flex: 1,
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+  },
+  listContainer: {
+    flex: 1,
+  }
 };
 
 const AddObjectRow = makeAddItem(ListItem);
@@ -115,6 +124,7 @@ export default class ObjectsListContainer extends React.Component {
       newObjectDialogOpen: false,
       renamedObjectWithScope: false,
       variablesEditedObject: null,
+      searchText: '',
     };
   }
 
@@ -129,7 +139,8 @@ export default class ObjectsListContainer extends React.Component {
     if (
       this.state.newObjectDialogOpen !== nextState.newObjectDialogOpen ||
       this.state.renamedObjectWithScope !== nextState.renamedObjectWithScope ||
-      this.state.variablesEditedObject !== nextState.variablesEditedObject
+      this.state.variablesEditedObject !== nextState.variablesEditedObject ||
+      this.state.searchText !== nextState.searchText
     )
       return true;
 
@@ -267,11 +278,12 @@ export default class ObjectsListContainer extends React.Component {
 
   render() {
     const { project, objectsContainer } = this.props;
+    const { searchText } = this.state;
 
     const lists = enumerateObjects(project, objectsContainer);
-    this.containerObjectsList = lists.containerObjectsList;
-    this.projectObjectsList = lists.projectObjectsList;
-    const allObjectsList = lists.allObjectsList;
+    this.containerObjectsList = filterObjectsList(lists.containerObjectsList, searchText);
+    this.projectObjectsList = filterObjectsList(lists.projectObjectsList, searchText);
+    const allObjectsList = filterObjectsList(lists.allObjectsList, searchText);
     const fullList = allObjectsList.concat({
       key: 'add-objects-row',
       object: null,
@@ -281,36 +293,47 @@ export default class ObjectsListContainer extends React.Component {
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
-    console.log('Render');
 
     return (
       <Paper style={styles.container}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <SortableObjectsList
-              key={listKey}
-              ref={sortableList => (this.sortableList = sortableList)}
-              fullList={fullList}
-              project={project}
-              width={width}
-              height={height}
-              renamedObjectWithScope={this.state.renamedObjectWithScope}
-              getThumbnail={this.props.getThumbnail}
-              selectedObjectName={this.props.selectedObjectName}
-              onObjectSelected={this.props.onObjectSelected}
-              onEditObject={this.props.onEditObject}
-              onAddNewObject={() => this.setState({ newObjectDialogOpen: true })}
-              onEditName={this._onEditName}
-              onEditVariables={this._onEditVariables}
-              onDelete={this._onDelete}
-              onRename={this._onRename}
-              onSortEnd={({ oldIndex, newIndex }) =>
-                this._onMove(oldIndex, newIndex)}
-              helperClass="sortable-helper"
-              distance={30}
-            />
-          )}
-        </AutoSizer>
+        <div style={styles.listContainer}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <SortableObjectsList
+                key={listKey}
+                ref={sortableList => (this.sortableList = sortableList)}
+                fullList={fullList}
+                project={project}
+                width={width}
+                height={height}
+                renamedObjectWithScope={this.state.renamedObjectWithScope}
+                getThumbnail={this.props.getThumbnail}
+                selectedObjectName={this.props.selectedObjectName}
+                onObjectSelected={this.props.onObjectSelected}
+                onEditObject={this.props.onEditObject}
+                onAddNewObject={() =>
+                  this.setState({ newObjectDialogOpen: true })}
+                onEditName={this._onEditName}
+                onEditVariables={this._onEditVariables}
+                onDelete={this._onDelete}
+                onRename={this._onRename}
+                onSortEnd={({ oldIndex, newIndex }) =>
+                  this._onMove(oldIndex, newIndex)}
+                helperClass="sortable-helper"
+                distance={30}
+              />
+            )}
+          </AutoSizer>
+        </div>
+        <SearchBar
+          value={searchText}
+          onRequestSearch={() => {}}
+          onChange={text =>
+            this.setState({
+              searchText: text,
+            })}
+          style={styles.searchBar}
+        />
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog
             open={this.state.newObjectDialogOpen}

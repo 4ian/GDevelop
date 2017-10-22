@@ -1,17 +1,29 @@
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import Paper from 'material-ui/Paper';
+import SearchBar from 'material-ui-search-bar';
 import GroupRow from './GroupRow';
 import { ListItem } from 'material-ui/List';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { makeAddItem } from '../UI/ListAddItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import { enumerateObjectsAndGroups } from '../ObjectsList/EnumerateObjects';
+import {
+  enumerateObjectsAndGroups,
+  filterGroupsList,
+} from '../ObjectsList/EnumerateObjects';
 
 const listItemHeight = 48;
 const styles = {
-  container: { flex: 1, display: 'flex', height: '100%' },
+  container: {
+    flex: 1,
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+  },
+  listContainer: {
+    flex: 1,
+  },
 };
 
 const AddGroupRow = makeAddItem(ListItem);
@@ -103,6 +115,7 @@ export default class GroupsListContainer extends React.Component {
     this.projectGroupsList = [];
     this.state = {
       renamedGroupWithScope: false,
+      searchText: '',
     };
   }
 
@@ -114,7 +127,8 @@ export default class GroupsListContainer extends React.Component {
     // If a change is made, the component won't notice it: you have to manually
     // call forceUpdate.
 
-    if (this.state.renamedGroupWithScope !== nextState.renamedGroupWithScope)
+    if (this.state.renamedGroupWithScope !== nextState.renamedGroupWithScope ||
+        this.state.searchText !== nextState.searchText)
       return true;
 
     if (
@@ -227,11 +241,12 @@ export default class GroupsListContainer extends React.Component {
 
   render() {
     const { project, objectsContainer } = this.props;
+    const { searchText } = this.state;
 
     const lists = enumerateObjectsAndGroups(project, objectsContainer);
-    this.containerGroupsList = lists.containerGroupsList;
-    this.projectGroupsList = lists.projectGroupsList;
-    const allGroupsList = lists.allGroupsList;
+    this.containerGroupsList = filterGroupsList(lists.containerGroupsList);
+    this.projectGroupsList = filterGroupsList(lists.projectGroupsList);
+    const allGroupsList = filterGroupsList(lists.allGroupsList);
     const fullList = allGroupsList.concat({
       key: 'add-groups-row',
       object: null,
@@ -241,32 +256,42 @@ export default class GroupsListContainer extends React.Component {
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
-    console.log('Render');
 
     return (
       <Paper style={styles.container}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <SortableGroupsList
-              key={listKey}
-              ref={sortableList => (this.sortableList = sortableList)}
-              fullList={fullList}
-              project={project}
-              width={width}
-              height={height}
-              renamedGroupWithScope={this.state.renamedGroupWithScope}
-              onEditGroup={this.props.onEditGroup}
-              onAddGroup={this.addGroup}
-              onEditName={this._onEditName}
-              onDelete={this._onDelete}
-              onRename={this._onRename}
-              onSortEnd={({ oldIndex, newIndex }) =>
-                this._onMove(oldIndex, newIndex)}
-              helperClass="sortable-helper"
-              distance={30}
-            />
-          )}
-        </AutoSizer>
+        <div style={styles.listContainer}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <SortableGroupsList
+                key={listKey}
+                ref={sortableList => (this.sortableList = sortableList)}
+                fullList={fullList}
+                project={project}
+                width={width}
+                height={height}
+                renamedGroupWithScope={this.state.renamedGroupWithScope}
+                onEditGroup={this.props.onEditGroup}
+                onAddGroup={this.addGroup}
+                onEditName={this._onEditName}
+                onDelete={this._onDelete}
+                onRename={this._onRename}
+                onSortEnd={({ oldIndex, newIndex }) =>
+                  this._onMove(oldIndex, newIndex)}
+                helperClass="sortable-helper"
+                distance={30}
+              />
+            )}
+          </AutoSizer>
+        </div>
+        <SearchBar
+          value={searchText}
+          onRequestSearch={() => {}}
+          onChange={text =>
+            this.setState({
+              searchText: text,
+            })}
+          style={styles.searchBar}
+        />
       </Paper>
     );
   }

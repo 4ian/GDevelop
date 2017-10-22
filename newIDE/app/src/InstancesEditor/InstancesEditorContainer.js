@@ -108,6 +108,8 @@ export default class InstancesEditorContainer extends Component {
       onCopy: this.props.onCopy,
       onCut: this.props.onCut,
       onPaste: this.props.onPaste,
+      onUndo: this.props.onUndo,
+      onRedo: this.props.onRedo,
     });
 
     this.dropHandler = new DropHandler({

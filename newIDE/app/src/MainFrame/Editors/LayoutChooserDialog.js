@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../../UI/Dialog';
 import { mapFor } from '../../Utils/MapFor';
 
 export default class LayoutChooserDialog extends Component {
@@ -51,7 +51,6 @@ export default class LayoutChooserDialog extends Component {
     return (
       <Dialog
         actions={actions}
-        modal={true}
         open={this.props.open}
         title={this.props.title}
         onRequestClose={this.props.onClose}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
@@ -31,7 +31,7 @@ export default class LocalIntroDialog extends Component {
     ];
 
     return (
-      <Dialog actions={actions} modal={true} open={open}>
+      <Dialog actions={actions} open={open}>
         <div>
           <p>
             This is a <b>beta version</b> of GDevelop 5. Some parts of the

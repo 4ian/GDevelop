@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
 export default class ConfirmCloseDialog extends Component {
@@ -49,8 +49,8 @@ export default class ConfirmCloseDialog extends Component {
     return (
       <Dialog
         title="Close project"
+        onRequestClose={this.handleCancel}
         actions={actions}
-        modal={true}
         open={this.state.open}
       >
         Any changes that has not been saved will be lost.

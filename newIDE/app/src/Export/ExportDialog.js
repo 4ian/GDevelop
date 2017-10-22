@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 
@@ -37,10 +37,10 @@ export default class ExportDialog extends Component {
     return (
       <Dialog
         title="Export project to a standalone game"
+        onRequestClose={onClose}
         actions={actions}
-        modal={true}
         open={open}
-        bodyStyle={styles.content}
+        noMargin
       >
         <Tabs value={this.state.value} onChange={this._onChangeTab}>
           {this.props.tabs.map(({ ExportComponent, name }, index) => (

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Column, Line } from '../UI/Grid';
@@ -41,7 +41,7 @@ export default class BrowserSaveDialog extends Component {
     ];
 
     return (
-      <Dialog actions={actions} modal={true} open={open}>
+      <Dialog actions={actions} open={open} onRequestClose={onClose}>
         <Column noMargin>
           <Line>
             You can download the file of your game to continue working on it

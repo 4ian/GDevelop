@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';
@@ -33,14 +33,12 @@ export default class AboutDialog extends Component {
     return (
       <Dialog
         actions={actions}
-        modal={true}
+        onRequestClose={onClose}
         open={open}
         contentStyle={{
           maxWidth: 535,
         }}
-        bodyStyle={{
-          padding: 0,
-        }}
+        noMargin
       >
         <Column noMargin>
           <img

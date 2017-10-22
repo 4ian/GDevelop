@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import Avatar from 'material-ui/Avatar';
 import { List, ListItem } from 'material-ui/List';
@@ -8,9 +8,6 @@ import flatten from 'lodash.flatten';
 
 const styles = {
   icon: { borderRadius: 0 },
-  content: {
-    padding: 0,
-  },
 };
 
 export default class NewObjectDialog extends Component {
@@ -70,9 +67,9 @@ export default class NewObjectDialog extends Component {
       <Dialog
         title="Add a new object"
         actions={actions}
-        modal
+        onRequestClose={onClose}
         open={open}
-        bodyStyle={styles.content}
+        noMargin
         autoScrollBodyContent
       >
         <List>

@@ -1,17 +1,8 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import Tutorials from './Tutorials';
-
-const styles = {
-  content: {
-    padding: 0,
-  },
-  tabContent: {
-    padding: 24,
-  },
-};
 
 export default class CreateProjectDialog extends Component {
   constructor(props) {
@@ -41,9 +32,9 @@ export default class CreateProjectDialog extends Component {
       <Dialog
         title="Create a new game"
         actions={actions}
-        modal={true}
+        onRequestClose={onClose}
         open={open}
-        bodyStyle={styles.content}
+        noMargin
         autoScrollBodyContent
       >
         <Tabs value={this.state.value} onChange={this._onChangeTab}>

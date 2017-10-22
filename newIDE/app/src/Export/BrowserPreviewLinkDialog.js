@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { Column, Line } from '../UI/Grid';
@@ -36,7 +36,7 @@ export default class ExportDialog extends Component {
     ];
 
     return (
-      <Dialog actions={actions} modal={true} open={open}>
+      <Dialog actions={actions} modal open={open}>
         <Line>
           <Column>
             Your preview is ready! Click on the button to launch the preview.

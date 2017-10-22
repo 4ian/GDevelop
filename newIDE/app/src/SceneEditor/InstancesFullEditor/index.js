@@ -481,6 +481,8 @@ export default class InstancesFullEditor extends Component {
           onCopy={() => this.copySelection({ useLastCursorPosition: true })}
           onCut={() => this.cutSelection({ useLastCursorPosition: true })}
           onPaste={() => this.paste({ useLastCursorPosition: true })}
+          onUndo={this.undo}
+          onRedo={this.redo}
           editorRef={editor => (this.editor = editor)}
         />
       ),
@@ -660,6 +662,17 @@ export default class InstancesFullEditor extends Component {
               label: 'Paste',
               click: () => this.paste(),
               accelerator: 'CmdOrCtrl+V',
+            },
+            { type: 'separator' },
+            {
+              label: 'Undo',
+              click: this.undo,
+              accelerator: 'CmdOrCtrl+Z',
+            },
+            {
+              label: 'Redo',
+              click: this.redo,
+              accelerator: 'CmdOrCtrl+Shift+Z',
             },
           ]}
         />

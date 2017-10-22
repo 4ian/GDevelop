@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import { sendExportLaunched } from '../Utils/Analytics/EventSender';
@@ -130,7 +130,7 @@ export default class LocalExport extends Component {
                 })}
             />,
           ]}
-          modal={true}
+          modal
           open={this.state.exportFinishedDialogOpen}
         >
           You can now upload the game to a web hosting to play to the game.

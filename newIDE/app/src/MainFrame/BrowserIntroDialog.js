@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
 export default class BetaIntroDialog extends Component {
@@ -19,7 +19,7 @@ export default class BetaIntroDialog extends Component {
     ];
 
     return (
-      <Dialog actions={actions} modal={true} open={open}>
+      <Dialog actions={actions} open={open} onRequestClose={onClose}>
         <div>
           <p>
             This is a <b>beta version</b> of GDevelop 5 that you can try online.

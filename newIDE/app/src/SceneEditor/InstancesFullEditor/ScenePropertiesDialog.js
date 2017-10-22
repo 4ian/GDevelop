@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import Dialog from 'material-ui/Dialog';
+import Dialog from '../../UI/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import ColorField from '../../UI/ColorField';
 
@@ -60,7 +60,6 @@ export default class ScenePropertiesDialog extends Component {
     return (
       <Dialog
         actions={actions}
-        modal={true}
         open={this.props.open}
         onRequestClose={this.props.onClose}
         autoScrollBodyContent={true}

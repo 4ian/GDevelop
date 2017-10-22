@@ -7,16 +7,20 @@ const DOWN_KEY = 40;
 const BACKSPACE_KEY = 8;
 const DELETE_KEY = 46;
 const C_KEY = 67;
-const X_KEY = 88;
 const V_KEY = 86;
+const X_KEY = 88;
+const Y_KEY = 89;
+const Z_KEY = 90;
 
 export default class KeyboardShortcuts {
-  constructor({ onDelete, onMove, onCopy, onCut, onPaste }) {
-    this.onDelete = onDelete;
-    this.onMove = onMove;
-    this.onCopy = onCopy;
-    this.onCut = onCut;
-    this.onPaste = onPaste;
+  constructor({ onDelete, onMove, onCopy, onCut, onPaste, onUndo, onRedo }) {
+    this.onDelete = onDelete || this._noop;
+    this.onMove = onMove || this._noop;
+    this.onCopy = onCopy || this._noop;
+    this.onCut = onCut || this._noop;
+    this.onPaste = onPaste || this._noop;
+    this.onUndo = onUndo || this._noop;
+    this.onRedo = onRedo || this._noop;
     this.isFocused = false;
     this.shiftPressed = false;
     this.rawCtrlPressed = false;
@@ -81,14 +85,23 @@ export default class KeyboardShortcuts {
     if (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY) {
       this.onDelete();
     }
-    if (evt.which === C_KEY && this._isControlPressed()) {
+    if (this._isControlPressed() && evt.which === C_KEY) {
       this.onCopy();
     }
-    if (evt.which === X_KEY && this._isControlPressed()) {
+    if (this._isControlPressed() && evt.which === X_KEY) {
       this.onCut();
     }
-    if (evt.which === V_KEY && this._isControlPressed()) {
+    if (this._isControlPressed() && evt.which === V_KEY) {
       this.onPaste();
+    }
+    if (this._isControlPressed() && evt.which === Z_KEY) {
+      this.onUndo();
+    }
+    if (this._isControlPressed() && this.shiftPressed && evt.which === Z_KEY) {
+      this.onRedo();
+    }
+    if (this._isControlPressed() && evt.which === Y_KEY) {
+      this.onRedo();
     }
   };
 
@@ -102,6 +115,8 @@ export default class KeyboardShortcuts {
   };
 
   _onKeyPress = evt => {};
+
+  _noop = () => {};
 
   focus() {
     this.isFocused = true;

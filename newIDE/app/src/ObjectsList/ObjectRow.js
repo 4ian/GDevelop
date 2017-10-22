@@ -46,6 +46,7 @@ export default class ObjectRow extends React.Component {
             enabled: !!this.props.onEditVariables,
             click: () => this.props.onEditVariables(),
           },
+          { type: 'separator' },
           {
             label: 'Rename',
             enabled: !!this.props.onEdit,
@@ -55,6 +56,11 @@ export default class ObjectRow extends React.Component {
             label: 'Delete',
             enabled: !!this.props.onEdit,
             click: () => this.props.onDelete(),
+          },
+          { type: 'separator' },
+          {
+            label: 'Add a new object...',
+            click: () => this.props.onAddNewObject(),
           },
         ]}
       />

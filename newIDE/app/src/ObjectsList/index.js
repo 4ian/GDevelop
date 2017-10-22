@@ -54,7 +54,7 @@ class ObjectsList extends Component {
                 key={key}
                 style={style}
                 disabled
-                onClick={this.props.onAddObject}
+                onClick={this.props.onAddNewObject}
                 primaryText="Click to add an object"
               />
             );
@@ -84,6 +84,7 @@ class ObjectsList extends Component {
               onDelete={() => this.props.onDelete(objectWithScope)}
               onRename={newName =>
                 this.props.onRename(objectWithScope, newName)}
+              onAddNewObject={this.props.onAddNewObject}
               editingName={nameBeingEdited}
               getThumbnail={this.props.getThumbnail}
               selected={objectWithScope.object.getName() === selectedObjectName}
@@ -298,7 +299,7 @@ export default class ObjectsListContainer extends React.Component {
               selectedObjectName={this.props.selectedObjectName}
               onObjectSelected={this.props.onObjectSelected}
               onEditObject={this.props.onEditObject}
-              onAddObject={() => this.setState({ newObjectDialogOpen: true })}
+              onAddNewObject={() => this.setState({ newObjectDialogOpen: true })}
               onEditName={this._onEditName}
               onEditVariables={this._onEditVariables}
               onDelete={this._onDelete}

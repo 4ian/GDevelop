@@ -59,12 +59,15 @@ export default class GDIconMenu extends Component {
   render() {
     const { menuTemplate, ...iconMenuProps } = this.props; //eslint-disable-line
 
+    // Use disableAutoFocus to avoid making TextField lose focus.
+    // See material-ui bug: https://github.com/callemall/material-ui/issues/4387
     return (
       <IconMenu
         {...iconMenuProps}
         onTouchTap={this._onTouchTap}
         ref={iconMenu => (this.iconMenu = iconMenu)}
         desktop
+        disableAutoFocus
         {...this.menuImplementation.getMenuProps()}
       >
         {this.state.children}

@@ -38,6 +38,7 @@ export default class MainFrameToolbar extends Component {
               onClick={this.props.toggleProjectManager}
               src="res/ribbon_default/projectManager32.png"
               disabled={!this.props.hasProject}
+              tooltip="Project manager"
             />
           )}
           {this.props.showProjectIcons &&
@@ -45,6 +46,7 @@ export default class MainFrameToolbar extends Component {
               <ToolbarIcon
                 onClick={this.props.openProject}
                 src="res/ribbon_default/open32.png"
+                tooltip="Open a project"
               />
             )}
           {this.isDev && (

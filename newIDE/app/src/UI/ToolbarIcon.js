@@ -3,9 +3,11 @@ import IconButton from 'material-ui/IconButton';
 
 export default class ToolbarIcon extends Component {
   render() {
+    const { src, tooltip, ...otherProps } = this.props;
+
     return (
       <IconButton
-        {...this.props}
+        {...otherProps}
         iconStyle={{
           //Properly align icons with the rest of the toolbar
           marginLeft: -4,
@@ -14,8 +16,9 @@ export default class ToolbarIcon extends Component {
         }}
       >
         <img
-          alt={this.props.tooltip}
-          src={this.props.src}
+          title={tooltip}
+          alt={tooltip}
+          src={src}
           width={32}
           height={32}
         />

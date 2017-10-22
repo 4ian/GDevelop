@@ -97,6 +97,7 @@ export default class ObjectsGroupEditor extends Component {
           onChange={name => this.setState({ newObjectName: name })}
           onChoose={this.addObject}
           openOnFocus
+          noGroups
           hintText="Choose an object to add to the group"
           fullWidth
         />

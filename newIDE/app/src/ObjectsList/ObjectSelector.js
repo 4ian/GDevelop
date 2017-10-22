@@ -29,12 +29,14 @@ export default class ObjectSelector extends Component {
         value: object.getName(),
       };
     });
-    const groups = list.allGroupsList.map(({ group }) => {
-      return {
-        text: group.getName(),
-        value: group.getName(),
-      };
-    });
+    const groups = props.noGroups
+      ? []
+      : list.allGroupsList.map(({ group }) => {
+          return {
+            text: group.getName(),
+            value: group.getName(),
+          };
+        });
 
     this.fullList = [...objects, { text: '', value: <Divider /> }, ...groups];
   }

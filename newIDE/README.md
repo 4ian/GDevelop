@@ -77,7 +77,6 @@ yarn deploy #or npm run deploy
 This new editor is still in development and is missing some features:
 
 - [ ] Autocompletion of expressions and parameters in Events editor.
-- [ ] Creating and editing groups of objects
 - [ ] Support for native games
 - [ ] Export with Cocos2d-JS to Android and iOS.
 

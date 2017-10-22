@@ -50,6 +50,8 @@ const gd = global.gd;
 const styles = {
   drawerContent: {
     overflowX: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
   },
 };
 

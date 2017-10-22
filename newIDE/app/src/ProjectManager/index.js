@@ -1,15 +1,30 @@
 import React, { Component } from 'react';
 import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
-import { mapFor } from '../Utils/MapFor';
 import ListIcon from '../UI/ListIcon';
 import { makeAddItem } from '../UI/ListAddItem';
 import Window from '../Utils/Window';
 import IconMenu from '../UI/Menu/IconMenu';
+import SearchBar from 'material-ui-search-bar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconButton from 'material-ui/IconButton';
+import {
+  enumerateLayouts,
+  enumerateExternalEvents,
+  enumerateExternalLayouts,
+  filterProjectItemsList,
+} from './EnumerateProjectItems';
 
 const styles = {
+  container: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  list: {
+    flex: 1,
+    overflowY: 'scroll',
+  },
   projectStructureItem: {
     borderTop: '1px solid #e0e0e0', //TODO: Use theme color instead
   },
@@ -113,6 +128,7 @@ export default class ProjectManager extends React.Component {
   state = {
     renamedItemKind: null,
     renamedItemName: '',
+    searchText: '',
   };
 
   _renderMenu() {
@@ -160,119 +176,150 @@ export default class ProjectManager extends React.Component {
 
   render() {
     const { project } = this.props;
-    const { renamedItemKind, renamedItemName } = this.state;
+    const { renamedItemKind, renamedItemName, searchText } = this.state;
+
+    const forceOpen = searchText !== '' ? true : undefined;
 
     return (
-      <List>
-        {this._renderMenu()}
-        <ProjectStructureItem
-          primaryText="Resources"
-          leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
+      <div style={styles.container}>
+        <List style={styles.list}>
+          {this._renderMenu()}
+          <ProjectStructureItem
+            primaryText="Resources"
+            leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
+          />
+          <ProjectStructureItem
+            primaryText="Scenes"
+            leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}
+            initiallyOpen={true}
+            open={forceOpen}
+            primaryTogglesNestedList={true}
+            autoGenerateNestedIndicator={!forceOpen}
+            nestedItems={filterProjectItemsList(
+              enumerateLayouts(project),
+              searchText
+            )
+              .map((layout, i) => {
+                const name = layout.getName();
+                return (
+                  <Item
+                    key={i}
+                    primaryText={name}
+                    editingName={
+                      renamedItemKind === 'layout' && renamedItemName === name
+                    }
+                    onEdit={() => this.props.onOpenLayout(name)}
+                    onDelete={() => this.props.onDeleteLayout(layout)}
+                    onRename={newName => {
+                      this.props.onRenameLayout(name, newName);
+                      this._onEditName(null, '');
+                    }}
+                    onEditName={() => this._onEditName('layout', name)}
+                  />
+                );
+              })
+              .concat(
+                <AddItem
+                  key={'add-scene'}
+                  onClick={this.props.onAddLayout}
+                  primaryText="Click to add a scene"
+                />
+              )}
+          />
+          <ProjectStructureItem
+            primaryText="External events"
+            leftIcon={
+              <ListIcon src="res/ribbon_default/externalevents32.png" />
+            }
+            initiallyOpen={false}
+            open={forceOpen}
+            primaryTogglesNestedList={true}
+            autoGenerateNestedIndicator={!forceOpen}
+            nestedItems={filterProjectItemsList(
+              enumerateExternalEvents(project),
+              searchText
+            )
+              .map((externalEvents, i) => {
+                const name = externalEvents.getName();
+                return (
+                  <Item
+                    key={i}
+                    primaryText={name}
+                    editingName={
+                      renamedItemKind === 'external-events' &&
+                      renamedItemName === name
+                    }
+                    onEdit={() => this.props.onOpenExternalEvents(name)}
+                    onDelete={() =>
+                      this.props.onDeleteExternalEvents(externalEvents)}
+                    onRename={newName => {
+                      this.props.onRenameExternalEvents(name, newName);
+                      this._onEditName(null, '');
+                    }}
+                    onEditName={() => this._onEditName('external-events', name)}
+                  />
+                );
+              })
+              .concat(
+                <AddItem
+                  key={'add-external-events'}
+                  primaryText="Click to add external events"
+                  onClick={this.props.onAddExternalEvents}
+                />
+              )}
+          />
+          <ProjectStructureItem
+            primaryText="External layouts"
+            leftIcon={
+              <ListIcon src="res/ribbon_default/externallayout32.png" />
+            }
+            initiallyOpen={false}
+            open={forceOpen}
+            primaryTogglesNestedList={true}
+            autoGenerateNestedIndicator={!forceOpen}
+            nestedItems={filterProjectItemsList(
+              enumerateExternalLayouts(project),
+              searchText
+            )
+              .map((externalLayout, i) => {
+                const name = externalLayout.getName();
+                return (
+                  <Item
+                    key={i}
+                    primaryText={name}
+                    editingName={
+                      renamedItemKind === 'external-layout' &&
+                      renamedItemName === name
+                    }
+                    onEdit={() => this.props.onOpenExternalLayout(name)}
+                    onDelete={() =>
+                      this.props.onDeleteExternalLayout(externalLayout)}
+                    onRename={newName => {
+                      this.props.onRenameExternalLayout(name, newName);
+                      this._onEditName(null, '');
+                    }}
+                    onEditName={() => this._onEditName('external-layout', name)}
+                  />
+                );
+              })
+              .concat(
+                <AddItem
+                  key={'add-external-layout'}
+                  primaryText="Click to add an external layout"
+                  onClick={this.props.onAddExternalLayout}
+                />
+              )}
+          />
+        </List>
+        <SearchBar
+          value={searchText}
+          onRequestSearch={() => {}}
+          onChange={text =>
+            this.setState({
+              searchText: text,
+            })}
         />
-        <ProjectStructureItem
-          primaryText="Scenes"
-          leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}
-          initiallyOpen={true}
-          primaryTogglesNestedList={true}
-          autoGenerateNestedIndicator={true}
-          nestedItems={mapFor(0, project.getLayoutsCount(), i => {
-            const layout = project.getLayoutAt(i);
-            const name = layout.getName();
-            return (
-              <Item
-                key={i}
-                primaryText={name}
-                editingName={
-                  renamedItemKind === 'layout' && renamedItemName === name
-                }
-                onEdit={() => this.props.onOpenLayout(name)}
-                onDelete={() => this.props.onDeleteLayout(layout)}
-                onRename={newName => {
-                  this.props.onRenameLayout(name, newName);
-                  this._onEditName(null, '');
-                }}
-                onEditName={() => this._onEditName('layout', name)}
-              />
-            );
-          }).concat(
-            <AddItem
-              key={'add-scene'}
-              onClick={this.props.onAddLayout}
-              primaryText="Click to add a scene"
-            />
-          )}
-        />
-        <ProjectStructureItem
-          primaryText="External events"
-          leftIcon={<ListIcon src="res/ribbon_default/externalevents32.png" />}
-          initiallyOpen={false}
-          primaryTogglesNestedList={true}
-          autoGenerateNestedIndicator={true}
-          nestedItems={mapFor(0, project.getExternalEventsCount(), i => {
-            const externalEvents = project.getExternalEventsAt(i);
-            const name = externalEvents.getName();
-            return (
-              <Item
-                key={i}
-                primaryText={name}
-                editingName={
-                  renamedItemKind === 'external-events' &&
-                  renamedItemName === name
-                }
-                onEdit={() => this.props.onOpenExternalEvents(name)}
-                onDelete={() =>
-                  this.props.onDeleteExternalEvents(externalEvents)}
-                onRename={newName => {
-                  this.props.onRenameExternalEvents(name, newName);
-                  this._onEditName(null, '');
-                }}
-                onEditName={() => this._onEditName('external-events', name)}
-              />
-            );
-          }).concat(
-            <AddItem
-              key={'add-external-events'}
-              primaryText="Click to add external events"
-              onClick={this.props.onAddExternalEvents}
-            />
-          )}
-        />
-        <ProjectStructureItem
-          primaryText="External layouts"
-          leftIcon={<ListIcon src="res/ribbon_default/externallayout32.png" />}
-          initiallyOpen={false}
-          primaryTogglesNestedList={true}
-          autoGenerateNestedIndicator={true}
-          nestedItems={mapFor(0, project.getExternalLayoutsCount(), i => {
-            const externalLayout = project.getExternalLayoutAt(i);
-            const name = externalLayout.getName();
-            return (
-              <Item
-                key={i}
-                primaryText={name}
-                editingName={
-                  renamedItemKind === 'external-layout' &&
-                  renamedItemName === name
-                }
-                onEdit={() => this.props.onOpenExternalLayout(name)}
-                onDelete={() =>
-                  this.props.onDeleteExternalLayout(externalLayout)}
-                onRename={newName => {
-                  this.props.onRenameExternalLayout(name, newName);
-                  this._onEditName(null, '');
-                }}
-                onEditName={() => this._onEditName('external-layout', name)}
-              />
-            );
-          }).concat(
-            <AddItem
-              key={'add-external-layout'}
-              primaryText="Click to add an external layout"
-              onClick={this.props.onAddExternalLayout}
-            />
-          )}
-        />
-      </List>
+      </div>
     );
   }
 }

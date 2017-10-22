@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { translate } from 'react-i18next';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
@@ -7,7 +8,7 @@ import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash.flatten';
 const gd = global.gd;
 
-export default class Toolbar extends PureComponent {
+export class Toolbar extends PureComponent {
   componentWillMount() {
     const allExtensions = gd
       .asPlatform(gd.JsPlatform.get())
@@ -34,30 +35,41 @@ export default class Toolbar extends PureComponent {
   }
 
   render() {
+    const { t } = this.props;
+
     return (
       <ToolbarGroup lastChild>
         {this.props.showPreviewButton && (
           <ToolbarIcon
             onClick={this.props.onPreview}
             src="res/ribbon_default/preview32.png"
+            tooltip={t('Launch a preview of the scene')}
           />
         )}
         {this.props.showPreviewButton && <ToolbarSeparator />}
         <ToolbarIcon
           onClick={this.props.onAddStandardEvent}
           src="res/ribbon_default/eventadd32.png"
+          tooltip={t('Add a new empty event')}
         />
         <ToolbarIcon
           onClick={this.props.onAddSubEvent}
           src="res/ribbon_default/subeventadd32.png"
           disabled={!this.props.canAddSubEvent}
+          tooltip={t('Add a sub-event to the selected event')}
         />
         <ToolbarIcon
           onClick={this.props.onAddCommentEvent}
           src="res/ribbon_default/commentaireadd32.png"
+          tooltip={t('Add a comment')}
         />
         <IconMenu
-          iconButtonElement={<ToolbarIcon src="res/ribbon_default/add32.png" />}
+          iconButtonElement={
+            <ToolbarIcon
+              src="res/ribbon_default/add32.png"
+              tooltip={t('Choose and add an event')}
+            />
+          }
           menuTemplate={this.allEventsMetadata.map(metadata => {
             return {
               label: metadata.fullName,
@@ -70,16 +82,19 @@ export default class Toolbar extends PureComponent {
           onClick={this.props.onRemove}
           src="res/ribbon_default/deleteselected32.png"
           disabled={!this.props.canRemove}
+          tooltip={t('Delete the selected event(s)')}
         />
         <ToolbarIcon
           onClick={this.props.undo}
           src="res/ribbon_default/undo32.png"
           disabled={!this.props.canUndo}
+          tooltip={t('Undo the last changes')}
         />
         <ToolbarIcon
           onClick={this.props.redo}
           src="res/ribbon_default/redo32.png"
           disabled={!this.props.canRedo}
+          tooltip={t('Redo the last changes')}
         />
         <ToolbarSeparator />
         <ToolbarIcon
@@ -88,15 +103,19 @@ export default class Toolbar extends PureComponent {
             /*TODO*/
           }}
           src="res/ribbon_default/search32.png"
+          tooltip={t('Search in events')}
         />
         {this.props.onOpenSettings && <ToolbarSeparator />}
         {this.props.onOpenSettings && (
           <ToolbarIcon
             onClick={this.props.onOpenSettings}
             src="res/ribbon_default/pref32.png"
+            tooltip={t('Open settings')}
           />
         )}
       </ToolbarGroup>
     );
   }
 }
+
+export default translate()(Toolbar);

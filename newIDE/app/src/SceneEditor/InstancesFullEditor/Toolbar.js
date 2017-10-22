@@ -1,17 +1,21 @@
 import React, { PureComponent } from 'react';
+import { translate } from 'react-i18next';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import ToolbarIcon from '../../UI/ToolbarIcon';
 import IconMenu from '../../UI/Menu/IconMenu';
 
-export default class Toolbar extends PureComponent {
+export class Toolbar extends PureComponent {
   render() {
+    const { t } = this.props;
+
     return (
       <ToolbarGroup lastChild>
         {this.props.showPreviewButton && (
           <ToolbarIcon
             onClick={this.props.onPreview}
             src="res/ribbon_default/preview32.png"
+            tooltip={t('Launch a preview of the scene')}
           />
         )}
         {this.props.showPreviewButton && <ToolbarSeparator />}
@@ -19,28 +23,33 @@ export default class Toolbar extends PureComponent {
           <ToolbarIcon
             onClick={this.props.openObjectsList}
             src="res/ribbon_default/objects64.png"
+            tooltip={t('Open the objects editor')}
           />
         )}
         {this.props.showObjectsList && (
           <ToolbarIcon
             onClick={this.props.openObjectsGroupsList}
             src={'res/ribbon_default/objectsgroups64.png'}
+            tooltip={t('Open the objects groups editor')}
           />
         )}
         <ToolbarIcon
           onClick={this.props.openProperties}
           src="res/ribbon_default/editprop32.png"
+          tooltip={t('Open the properties panel')}
         />
         <ToolbarSeparator />
         <ToolbarIcon
           onClick={this.props.undo}
           src="res/ribbon_default/undo32.png"
           disabled={!this.props.canUndo}
+          tooltip={t('Undo the last changes')}
         />
         <ToolbarIcon
           onClick={this.props.redo}
           src="res/ribbon_default/redo32.png"
           disabled={!this.props.canRedo}
+          tooltip={t('Redo the last changes')}
         />
         <ToolbarSeparator />
         <ToolbarIcon
@@ -49,23 +58,30 @@ export default class Toolbar extends PureComponent {
           disabled={
             !this.props.instancesSelection.getSelectedInstances().length
           }
+          tooltip={t('Delete the selected instances from the scene')}
         />
         <ToolbarIcon
           onClick={this.props.toggleInstancesList}
           src="res/ribbon_default/ObjectsPositionsList32.png"
+          tooltip={t('Open the list of instances')}
         />
         <ToolbarIcon
           onClick={this.props.toggleLayersList}
           src="res/ribbon_default/layers32.png"
+          tooltip={t('Open the layers editor')}
         />
         <ToolbarSeparator />
         <ToolbarIcon
           onClick={this.props.toggleWindowMask}
           src="res/ribbon_default/windowMask32.png"
+          tooltip={t('Toggle window mask')}
         />
         <IconMenu
           iconButtonElement={
-            <ToolbarIcon src="res/ribbon_default/grid32.png" />
+            <ToolbarIcon
+              src="res/ribbon_default/grid32.png"
+              tooltip={t('Toggle/edit grid')}
+            />
           }
           menuTemplate={[
             {
@@ -81,7 +97,10 @@ export default class Toolbar extends PureComponent {
         />
         <IconMenu
           iconButtonElement={
-            <ToolbarIcon src="res/ribbon_default/zoom32.png" />
+            <ToolbarIcon
+              src="res/ribbon_default/zoom32.png"
+              tooltip={t('Change editor zoom')}
+            />
           }
           menuTemplate={[
             { label: '5%', click: () => this.props.setZoomFactor(0.05) },
@@ -97,3 +116,5 @@ export default class Toolbar extends PureComponent {
     );
   }
 }
+
+export default translate()(Toolbar);

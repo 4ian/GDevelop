@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import './MainFrame.css';
 
+//TODO: Providers should be extracted out from this component
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../UI/i18n';
+
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import IconButton from 'material-ui/IconButton';
 import Drawer from 'material-ui/Drawer';
@@ -121,7 +125,7 @@ export default class MainFrame extends Component {
   setEditorToolbar = editorToolbar => {
     if (!this.toolbar) return;
 
-    this.toolbar.setEditorToolbar(editorToolbar);
+    this.toolbar.getWrappedInstance().setEditorToolbar(editorToolbar);
   };
 
   addLayout = () => {
@@ -592,111 +596,113 @@ export default class MainFrame extends Component {
     return (
       <DragDropContextProvider>
         <MuiThemeProvider muiTheme={defaultTheme}>
-          <div className="main-frame">
-            <ProjectTitlebar project={this.state.currentProject} />
-            <Drawer
-              open={this.state.projectManagerOpen}
-              containerStyle={styles.drawerContent}
-            >
-              <EditorBar
-                title={currentProject ? currentProject.getName() : 'No project'}
-                showMenuIconButton={false}
-                iconElementRight={
-                  <IconButton onClick={this.toggleProjectManager}>
-                    <NavigationClose />
-                  </IconButton>
-                }
-              />
-              {currentProject && (
-                <ProjectManager
-                  project={currentProject}
-                  onOpenExternalEvents={this.openExternalEvents}
-                  onOpenLayout={this.openLayout}
-                  onOpenExternalLayout={this.openExternalLayout}
-                  onAddLayout={this.addLayout}
-                  onAddExternalLayout={this.addExternalLayout}
-                  onAddExternalEvents={this.addExternalEvents}
-                  onDeleteLayout={this.deleteLayout}
-                  onDeleteExternalLayout={this.deleteExternalLayout}
-                  onDeleteExternalEvents={this.deleteExternalEvents}
-                  onRenameLayout={this.renameLayout}
-                  onRenameExternalLayout={this.renameExternalLayout}
-                  onRenameExternalEvents={this.renameExternalEvents}
-                  onSaveProject={this.save}
-                  onCloseProject={this.closeProject}
-                  onExportProject={this.openExportDialog}
+          <I18nextProvider i18n={ i18n }>
+            <div className="main-frame">
+              <ProjectTitlebar project={this.state.currentProject} />
+              <Drawer
+                open={this.state.projectManagerOpen}
+                containerStyle={styles.drawerContent}
+              >
+                <EditorBar
+                  title={currentProject ? currentProject.getName() : 'No project'}
+                  showMenuIconButton={false}
+                  iconElementRight={
+                    <IconButton onClick={this.toggleProjectManager}>
+                      <NavigationClose />
+                    </IconButton>
+                  }
                 />
-              )}
-            </Drawer>
-            <Toolbar
-              ref={toolbar => (this.toolbar = toolbar)}
-              showProjectIcons={!this.props.integratedEditor}
-              hasProject={!!this.state.currentProject}
-              toggleProjectManager={this.toggleProjectManager}
-              canOpenProject={!!this.props.onChooseProject}
-              openProject={this.chooseProject}
-              requestUpdate={this.props.requestUpdate}
-            />
-            <Tabs
-              value={getCurrentTabIndex(this.state.editorTabs)}
-              onChange={this._onChangeEditorTab}
-              hideLabels={!!this.props.integratedEditor}
-            >
-              {getEditors(this.state.editorTabs).map((editorTab, id) => (
-                <Tab
-                  label={editorTab.name}
-                  value={id}
-                  key={editorTab.key}
-                  onActive={() => this._onEditorTabActive(editorTab)}
-                  onClose={() => this._onCloseEditorTab(editorTab)}
-                >
-                  <div style={{ display: 'flex', flex: 1, height: '100%' }}>
-                    {editorTab.render()}
-                  </div>
-                </Tab>
-              ))}
-            </Tabs>
-            <LoaderModal show={showLoader} />
-            <ConfirmCloseDialog
-              ref={confirmCloseDialog =>
-                (this.confirmCloseDialog = confirmCloseDialog)}
-            />
-            {!!exportDialog &&
-              React.cloneElement(exportDialog, {
-                open: this.state.exportDialogOpen,
-                onClose: () => this.openExportDialog(false),
-                project: this.state.currentProject,
-              })}
-            {!!createDialog &&
-              React.cloneElement(createDialog, {
-                open: this.state.createDialogOpen,
-                onClose: () => this.openCreateDialog(false),
-                onOpen: filepath => {
-                  this.openCreateDialog(false);
-                  this.openFromPathOrURL(filepath);
-                },
-                onCreate: project => {
-                  this.openCreateDialog(false);
-                  this.openProject(project);
-                },
-              })}
-            {!!introDialog &&
-              React.cloneElement(introDialog, {
-                open: this.state.introDialogOpen,
-                onClose: () => this._openIntroDialog(false),
-              })}
-            {!!saveDialog &&
-              React.cloneElement(saveDialog, {
-                project: this.state.currentProject,
-                open: this.state.saveDialogOpen,
-                onClose: () => this._openSaveDialog(false),
-              })}
-            {!!genericDialog &&
-              React.cloneElement(genericDialog, {
-                open: this.state.genericDialogOpen,
-                onClose: () => this._openGenericDialog(false),
-              })}
-          </div>
+                {currentProject && (
+                  <ProjectManager
+                    project={currentProject}
+                    onOpenExternalEvents={this.openExternalEvents}
+                    onOpenLayout={this.openLayout}
+                    onOpenExternalLayout={this.openExternalLayout}
+                    onAddLayout={this.addLayout}
+                    onAddExternalLayout={this.addExternalLayout}
+                    onAddExternalEvents={this.addExternalEvents}
+                    onDeleteLayout={this.deleteLayout}
+                    onDeleteExternalLayout={this.deleteExternalLayout}
+                    onDeleteExternalEvents={this.deleteExternalEvents}
+                    onRenameLayout={this.renameLayout}
+                    onRenameExternalLayout={this.renameExternalLayout}
+                    onRenameExternalEvents={this.renameExternalEvents}
+                    onSaveProject={this.save}
+                    onCloseProject={this.closeProject}
+                    onExportProject={this.openExportDialog}
+                  />
+                )}
+              </Drawer>
+              <Toolbar
+                ref={toolbar => (this.toolbar = toolbar)}
+                showProjectIcons={!this.props.integratedEditor}
+                hasProject={!!this.state.currentProject}
+                toggleProjectManager={this.toggleProjectManager}
+                canOpenProject={!!this.props.onChooseProject}
+                openProject={this.chooseProject}
+                requestUpdate={this.props.requestUpdate}
+              />
+              <Tabs
+                value={getCurrentTabIndex(this.state.editorTabs)}
+                onChange={this._onChangeEditorTab}
+                hideLabels={!!this.props.integratedEditor}
+              >
+                {getEditors(this.state.editorTabs).map((editorTab, id) => (
+                  <Tab
+                    label={editorTab.name}
+                    value={id}
+                    key={editorTab.key}
+                    onActive={() => this._onEditorTabActive(editorTab)}
+                    onClose={() => this._onCloseEditorTab(editorTab)}
+                  >
+                    <div style={{ display: 'flex', flex: 1, height: '100%' }}>
+                      {editorTab.render()}
+                    </div>
+                  </Tab>
+                ))}
+              </Tabs>
+              <LoaderModal show={showLoader} />
+              <ConfirmCloseDialog
+                ref={confirmCloseDialog =>
+                  (this.confirmCloseDialog = confirmCloseDialog)}
+              />
+              {!!exportDialog &&
+                React.cloneElement(exportDialog, {
+                  open: this.state.exportDialogOpen,
+                  onClose: () => this.openExportDialog(false),
+                  project: this.state.currentProject,
+                })}
+              {!!createDialog &&
+                React.cloneElement(createDialog, {
+                  open: this.state.createDialogOpen,
+                  onClose: () => this.openCreateDialog(false),
+                  onOpen: filepath => {
+                    this.openCreateDialog(false);
+                    this.openFromPathOrURL(filepath);
+                  },
+                  onCreate: project => {
+                    this.openCreateDialog(false);
+                    this.openProject(project);
+                  },
+                })}
+              {!!introDialog &&
+                React.cloneElement(introDialog, {
+                  open: this.state.introDialogOpen,
+                  onClose: () => this._openIntroDialog(false),
+                })}
+              {!!saveDialog &&
+                React.cloneElement(saveDialog, {
+                  project: this.state.currentProject,
+                  open: this.state.saveDialogOpen,
+                  onClose: () => this._openSaveDialog(false),
+                })}
+              {!!genericDialog &&
+                React.cloneElement(genericDialog, {
+                  open: this.state.genericDialogOpen,
+                  onClose: () => this._openGenericDialog(false),
+                })}
+            </div>
+          </I18nextProvider>
         </MuiThemeProvider>
       </DragDropContextProvider>
     );

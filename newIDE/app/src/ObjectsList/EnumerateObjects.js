@@ -2,25 +2,29 @@
 import { mapFor } from '../Utils/MapFor';
 const gd = global.gd;
 
+//TODO: Object and Group should be moved to a common type definition file
+//for all GDevelop.js
 type Object = {
   getName: Function,
+  setName: Function,
 };
 type Group = {
   getName: Function,
+  setName: Function,
 };
 
-type ObjectWithContext = {|
+export type ObjectWithContext = {|
   object: Object,
   global: boolean,
 |};
 
-type GroupWithContext = {|
+export type GroupWithContext = {|
   group: Group,
   global: boolean,
 |};
 
-type ObjectWithContextList = Array<ObjectWithContext>;
-type GroupWithContextList = Array<GroupWithContext>;
+export type ObjectWithContextList = Array<ObjectWithContext>;
+export type GroupWithContextList = Array<GroupWithContext>;
 
 export const enumerateObjects = (
   project: any,

@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { ListItem } from 'material-ui/List';
@@ -11,6 +12,7 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import { makeAddItem } from '../UI/ListAddItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
+import type { ObjectWithContextList, ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 
 const listItemHeight = 48;
 const styles = {
@@ -40,7 +42,9 @@ const SortableAddObjectRow = SortableElement(props => {
   return <AddObjectRow {...props} />;
 });
 
-class ObjectsList extends Component {
+class ObjectsList extends Component<*,*> {
+  list: any;
+
   forceUpdateGrid() {
     if (this.list) this.list.forceUpdateGrid();
   }
@@ -109,26 +113,30 @@ class ObjectsList extends Component {
 
 const SortableObjectsList = SortableContainer(ObjectsList, { withRef: true });
 
-export default class ObjectsListContainer extends React.Component {
+type StateType = {|
+  newObjectDialogOpen: boolean,
+  renamedObjectWithScope: ?ObjectWithContext,
+  variablesEditedObject: any,
+  searchText: string,
+|};
+
+export default class ObjectsListContainer extends React.Component<*, StateType> {
   static defaultProps = {
     onDeleteObject: (objectWithScope, cb) => cb(true),
     onRenameObject: (objectWithScope, newName, cb) => cb(true),
   };
 
-  constructor(props) {
-    super(props);
+  sortableList: any;
+  containerObjectsList: ObjectWithContextList = [];
+  projectObjectsList: ObjectWithContextList = [];
+  state: StateType = {
+    newObjectDialogOpen: false,
+    renamedObjectWithScope: null,
+    variablesEditedObject: null,
+    searchText: '',
+  };
 
-    this.containerObjectsList = [];
-    this.projectObjectsList = [];
-    this.state = {
-      newObjectDialogOpen: false,
-      renamedObjectWithScope: false,
-      variablesEditedObject: null,
-      searchText: '',
-    };
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps: *, nextState: StateType) {
     // The component is costly to render, so avoid any re-rendering as much
     // as possible.
     // We make the assumption that no changes to objects list is made outside
@@ -156,7 +164,7 @@ export default class ObjectsListContainer extends React.Component {
     return false;
   }
 
-  addObject = objectType => {
+  addObject = (objectType: string) => {
     const { project, objectsContainer } = this.props;
 
     const name = newNameGenerator(
@@ -184,7 +192,7 @@ export default class ObjectsListContainer extends React.Component {
     );
   };
 
-  _onDelete = objectWithScope => {
+  _onDelete = (objectWithScope: ObjectWithContext) => {
     const { object, global } = objectWithScope;
     const { project, objectsContainer } = this.props;
 
@@ -207,7 +215,7 @@ export default class ObjectsListContainer extends React.Component {
     });
   };
 
-  _onEditName = objectWithScope => {
+  _onEditName = (objectWithScope: ?ObjectWithContext) => {
     this.setState(
       {
         renamedObjectWithScope: objectWithScope,
@@ -216,13 +224,13 @@ export default class ObjectsListContainer extends React.Component {
     );
   };
 
-  _onEditVariables = object => {
+  _onEditVariables = (object: any) => {
     this.setState({
       variablesEditedObject: object,
     });
   };
 
-  _onRename = (objectWithScope, newName) => {
+  _onRename = (objectWithScope: ObjectWithContext, newName: string) => {
     const { object } = objectWithScope;
     const { project, objectsContainer } = this.props;
 
@@ -248,7 +256,7 @@ export default class ObjectsListContainer extends React.Component {
     });
   };
 
-  _onMove = (oldIndex, newIndex) => {
+  _onMove = (oldIndex: number, newIndex: number) => {
     const { project, objectsContainer } = this.props;
 
     const isInContainerObjectsList =
@@ -332,7 +340,6 @@ export default class ObjectsListContainer extends React.Component {
             this.setState({
               searchText: text,
             })}
-          style={styles.searchBar}
         />
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog

@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import Paper from 'material-ui/Paper';
@@ -12,6 +13,7 @@ import {
   enumerateObjectsAndGroups,
   filterGroupsList,
 } from '../ObjectsList/EnumerateObjects';
+import type { GroupWithContextList, GroupWithContext } from '../ObjectsList/EnumerateObjects';
 
 const listItemHeight = 48;
 const styles = {
@@ -41,7 +43,9 @@ const SortableAddGroupRow = SortableElement(props => {
   return <AddGroupRow {...props} />;
 });
 
-class GroupsList extends Component {
+class GroupsList extends Component<*,*> {
+  list: any;
+
   forceUpdateGrid() {
     if (this.list) this.list.forceUpdateGrid();
   }
@@ -102,24 +106,26 @@ class GroupsList extends Component {
 
 const SortableGroupsList = SortableContainer(GroupsList, { withRef: true });
 
-export default class GroupsListContainer extends React.Component {
+type StateType = {|
+  renamedGroupWithScope: ?GroupWithContext,
+  searchText: string,
+|};
+
+export default class GroupsListContainer extends React.Component<*, StateType> {
   static defaultProps = {
     onDeleteGroup: (groupWithScope, cb) => cb(true),
     onRenameGroup: (groupWithScope, newName, cb) => cb(true),
   };
 
-  constructor(props) {
-    super(props);
+  sortableList: any;
+  containerGroupsList: GroupWithContextList = [];
+  projectGroupsList: GroupWithContextList = [];
+  state: StateType = {
+    renamedGroupWithScope: null,
+    searchText: '',
+  };
 
-    this.containerGroupsList = [];
-    this.projectGroupsList = [];
-    this.state = {
-      renamedGroupWithScope: false,
-      searchText: '',
-    };
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps: *, nextState: StateType) {
     // The component is costly to render, so avoid any re-rendering as much
     // as possible.
     // We make the assumption that no changes to groups list is made outside
@@ -154,7 +160,7 @@ export default class GroupsListContainer extends React.Component {
     this.forceUpdate();
   };
 
-  _onDelete = groupWithScope => {
+  _onDelete = (groupWithScope: GroupWithContext) => {
     const { group, global } = groupWithScope;
     const { project, objectsContainer } = this.props;
 
@@ -177,7 +183,7 @@ export default class GroupsListContainer extends React.Component {
     });
   };
 
-  _onEditName = groupWithScope => {
+  _onEditName = (groupWithScope: GroupWithContext) => {
     this.setState(
       {
         renamedGroupWithScope: groupWithScope,
@@ -186,7 +192,7 @@ export default class GroupsListContainer extends React.Component {
     );
   };
 
-  _onRename = (groupWithScope, newName) => {
+  _onRename = (groupWithScope: GroupWithContext, newName: string) => {
     const { group } = groupWithScope;
     const { project, objectsContainer } = this.props;
 
@@ -212,7 +218,7 @@ export default class GroupsListContainer extends React.Component {
     });
   };
 
-  _onMove = (oldIndex, newIndex) => {
+  _onMove = (oldIndex: number, newIndex: number) => {
     const { project, objectsContainer } = this.props;
 
     const isInGroupsList = oldIndex < this.containerGroupsList.length;
@@ -244,9 +250,9 @@ export default class GroupsListContainer extends React.Component {
     const { searchText } = this.state;
 
     const lists = enumerateObjectsAndGroups(project, objectsContainer);
-    this.containerGroupsList = filterGroupsList(lists.containerGroupsList);
-    this.projectGroupsList = filterGroupsList(lists.projectGroupsList);
-    const allGroupsList = filterGroupsList(lists.allGroupsList);
+    this.containerGroupsList = filterGroupsList(lists.containerGroupsList, searchText);
+    this.projectGroupsList = filterGroupsList(lists.projectGroupsList, searchText);
+    const allGroupsList = filterGroupsList(lists.allGroupsList, searchText);
     const fullList = allGroupsList.concat({
       key: 'add-groups-row',
       object: null,
@@ -290,7 +296,6 @@ export default class GroupsListContainer extends React.Component {
             this.setState({
               searchText: text,
             })}
-          style={styles.searchBar}
         />
       </Paper>
     );

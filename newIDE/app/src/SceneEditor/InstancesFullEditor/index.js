@@ -276,7 +276,7 @@ export default class InstancesFullEditor extends Component {
     );
 
     if (centerView) {
-      this.editor.centerViewOn(instances);
+      if (this.editor) this.editor.centerViewOn(instances);
     }
     this.forceUpdate();
     this.updateToolbar();
@@ -396,7 +396,7 @@ export default class InstancesFullEditor extends Component {
   };
 
   setZoomFactor = zoomFactor => {
-    this.editor.setZoomFactor(zoomFactor);
+    if (this.editor) this.editor.setZoomFactor(zoomFactor);
   };
 
   _onContextMenu = (x, y) => {
@@ -408,7 +408,7 @@ export default class InstancesFullEditor extends Component {
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-      const position = useLastCursorPosition
+    const position = useLastCursorPosition
       ? this.editor.getLastCursorPosition()
       : this.editor.getLastContextMenuPosition();
     Clipboard.set('instances', {
@@ -418,7 +418,7 @@ export default class InstancesFullEditor extends Component {
     });
   };
 
-  cutSelection = (options) => {
+  cutSelection = options => {
     this.copySelection(options);
     this.deleteSelection();
   };

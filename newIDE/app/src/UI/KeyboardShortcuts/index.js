@@ -6,6 +6,10 @@ const RIGHT_KEY = 39;
 const DOWN_KEY = 40;
 const BACKSPACE_KEY = 8;
 const DELETE_KEY = 46;
+const EQUAL_KEY = 187;
+const MINUS_KEY = 189;
+const NUMPAD_ADD = 107;
+const NUMPAD_SUBSTRACT = 109;
 const C_KEY = 67;
 const V_KEY = 86;
 const X_KEY = 88;
@@ -13,7 +17,17 @@ const Y_KEY = 89;
 const Z_KEY = 90;
 
 export default class KeyboardShortcuts {
-  constructor({ onDelete, onMove, onCopy, onCut, onPaste, onUndo, onRedo }) {
+  constructor({
+    onDelete,
+    onMove,
+    onCopy,
+    onCut,
+    onPaste,
+    onUndo,
+    onRedo,
+    onZoomOut,
+    onZoomIn,
+  }) {
     this.onDelete = onDelete || this._noop;
     this.onMove = onMove || this._noop;
     this.onCopy = onCopy || this._noop;
@@ -21,6 +35,8 @@ export default class KeyboardShortcuts {
     this.onPaste = onPaste || this._noop;
     this.onUndo = onUndo || this._noop;
     this.onRedo = onRedo || this._noop;
+    this.onZoomOut = onZoomOut || this._noop;
+    this.onZoomIn = onZoomIn || this._noop;
     this.isFocused = false;
     this.shiftPressed = false;
     this.rawCtrlPressed = false;
@@ -102,6 +118,18 @@ export default class KeyboardShortcuts {
     }
     if (this._isControlPressed() && evt.which === Y_KEY) {
       this.onRedo();
+    }
+    if (this._isControlPressed() && evt.which === MINUS_KEY) {
+      this.onZoomOut();
+    }
+    if (this._isControlPressed() && evt.which === EQUAL_KEY) {
+      this.onZoomIn();
+    }
+    if (evt.which === NUMPAD_SUBSTRACT) {
+      this.onZoomOut();
+    }
+    if (evt.which === NUMPAD_ADD) {
+      this.onZoomIn();
     }
   };
 

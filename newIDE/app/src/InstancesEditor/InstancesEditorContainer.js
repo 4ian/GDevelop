@@ -102,6 +102,7 @@ export default class InstancesEditorContainer extends Component {
     });
     this.pixiContainer.addChild(this.grid.getPixiObject());
 
+    // TODO: This should probably be moved up in the InstancesFullEditor component.
     this.keyboardShortcuts = new KeyboardShortcuts({
       onDelete: this.props.onDeleteSelection,
       onMove: this.moveSelection,
@@ -110,6 +111,8 @@ export default class InstancesEditorContainer extends Component {
       onPaste: this.props.onPaste,
       onUndo: this.props.onUndo,
       onRedo: this.props.onRedo,
+      onZoomOut: this.props.onZoomOut,
+      onZoomIn: this.props.onZoomIn,
     });
 
     this.dropHandler = new DropHandler({
@@ -277,7 +280,7 @@ export default class InstancesEditorContainer extends Component {
   _onMouseMove = (x, y) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
-  }
+  };
 
   _onBackgroundClicked = (x, y) => {
     this.lastCursorX = x;

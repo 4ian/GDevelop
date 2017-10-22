@@ -98,6 +98,8 @@ export default class InstancesFullEditor extends Component {
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
         redo={this.redo}
+        zoomIn={this.zoomIn}
+        zoomOut={this.zoomOut}
         onOpenSettings={this.openSceneProperties}
       />
     );
@@ -399,6 +401,14 @@ export default class InstancesFullEditor extends Component {
     if (this.editor) this.editor.setZoomFactor(zoomFactor);
   };
 
+  zoomIn = () => {
+    if (this.editor) this.editor.zoomBy(0.1);
+  }
+
+  zoomOut = () => {
+    if (this.editor) this.editor.zoomBy(-0.1);
+  }
+
   _onContextMenu = (x, y) => {
     this.contextMenu.open(x, y);
   };
@@ -483,6 +493,8 @@ export default class InstancesFullEditor extends Component {
           onPaste={() => this.paste({ useLastCursorPosition: true })}
           onUndo={this.undo}
           onRedo={this.redo}
+          onZoomOut={this.zoomOut}
+          onZoomIn={this.zoomIn}
           editorRef={editor => (this.editor = editor)}
         />
       ),

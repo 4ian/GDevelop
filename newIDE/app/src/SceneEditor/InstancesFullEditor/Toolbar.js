@@ -103,6 +103,17 @@ export class Toolbar extends PureComponent {
             />
           }
           menuTemplate={[
+            {
+              label: 'Zoom in',
+              click: this.props.zoomIn,
+              accelerator: 'CmdOrCtrl++',
+            },
+            {
+              label: 'Zoom out',
+              click: this.props.zoomOut,
+              accelerator: 'CmdOrCtrl+-',
+            },
+            { type: 'separator' },
             { label: '5%', click: () => this.props.setZoomFactor(0.05) },
             { label: '10%', click: () => this.props.setZoomFactor(0.1) },
             { label: '25%', click: () => this.props.setZoomFactor(0.25) },

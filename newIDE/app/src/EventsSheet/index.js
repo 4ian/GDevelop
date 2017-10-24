@@ -518,6 +518,17 @@ export default class EventsSheet extends Component {
               click: () => this.deleteSelection(),
               accelerator: 'Delete',
             },
+            { type: 'separator' },
+            {
+              label: 'Undo',
+              click: this.undo,
+              accelerator: 'CmdOrCtrl+Z',
+            },
+            {
+              label: 'Redo',
+              click: this.redo,
+              accelerator: 'CmdOrCtrl+Shift+Z',
+            },
           ]}
         />
         <ContextMenu
@@ -545,6 +556,17 @@ export default class EventsSheet extends Component {
               click: () => this.deleteSelection(),
               accelerator: 'Delete',
             },
+            { type: 'separator' },
+            {
+              label: 'Undo',
+              click: this.undo,
+              accelerator: 'CmdOrCtrl+Z',
+            },
+            {
+              label: 'Redo',
+              click: this.redo,
+              accelerator: 'CmdOrCtrl+Shift+Z',
+            },
           ]}
         />
         <ContextMenu
@@ -555,6 +577,17 @@ export default class EventsSheet extends Component {
               label: 'Paste',
               click: () => this.pasteInstructions(),
               accelerator: 'CmdOrCtrl+V',
+            },
+            { type: 'separator' },
+            {
+              label: 'Undo',
+              click: this.undo,
+              accelerator: 'CmdOrCtrl+Z',
+            },
+            {
+              label: 'Redo',
+              click: this.redo,
+              accelerator: 'CmdOrCtrl+Shift+Z',
             },
           ]}
         />

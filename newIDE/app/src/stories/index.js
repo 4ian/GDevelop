@@ -23,6 +23,7 @@ import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
 import ObjectsList from '../ObjectsList';
+import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
@@ -255,6 +256,33 @@ storiesOf('ObjectsList', module)
         />
       </div>
     </SerializedObjectDisplay>
+  ));
+
+storiesOf('ObjectSelector', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('without groups', () => (
+    <ObjectSelector
+      project={project}
+      layout={testLayout}
+      value=""
+      onChoose={action('onChoose in ObjectSelector')}
+      noGroups
+      hintText="Choose an object to add to the group"
+      fullWidth
+      openOnFocus
+    />
+  ))
+  .add('with groups', () => (
+    <ObjectSelector
+      project={project}
+      layout={testLayout}
+      value=""
+      onChoose={action('onChoose in ObjectSelector')}
+      hintText="Choose an object or a group"
+      fullWidth
+      openOnFocus
+    />
   ));
 
 storiesOf('InstancePropertiesEditor', module)

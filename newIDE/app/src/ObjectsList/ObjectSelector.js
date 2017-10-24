@@ -60,6 +60,7 @@ export default class ObjectSelector extends Component {
       project,
       layout,
       allowedObjectType,
+      noGroups,
       ...rest
     } = this.props;
 

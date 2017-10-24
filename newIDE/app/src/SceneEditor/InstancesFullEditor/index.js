@@ -35,7 +35,7 @@ import {
   canRedo,
   getHistoryInitialState,
   saveToHistory,
-} from './History';
+} from '../../Utils/History';
 const gd = global.gd;
 
 export default class InstancesFullEditor extends Component {

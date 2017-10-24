@@ -13,6 +13,14 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import {
+  undo,
+  redo,
+  canUndo,
+  canRedo,
+  getHistoryInitialState,
+  saveToHistory,
+} from '../Utils/History';
+import {
   getInitialSelection,
   selectEvent,
   selectInstruction,
@@ -33,9 +41,11 @@ const gd = global.gd;
 const CLIPBOARD_KIND = 'EventsAndInstructions';
 
 export default class EventsSheet extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
+      history: getHistoryInitialState(props.events),
+
       editedInstruction: {
         isCondition: true,
         instruction: null,
@@ -47,9 +57,12 @@ export default class EventsSheet extends Component {
         instrsList: null,
         parameterIndex: 0,
       },
+
       selection: getInitialSelection(),
+
       inlineEditing: false,
       inlineEditingAnchorEl: null,
+      inlineEditingChangesMade: false,
     };
 
     this._keyboardShortcuts = new KeyboardShortcuts({
@@ -88,8 +101,8 @@ export default class EventsSheet extends Component {
         onRemove={this.deleteSelection}
         showPreviewButton={this.props.showPreviewButton}
         onPreview={this.props.onPreview}
-        canUndo={false /*TODO*/}
-        canRedo={false /*TODO*/}
+        canUndo={canUndo(this.state.history)}
+        canRedo={canRedo(this.state.history)}
         undo={this.undo}
         redo={this.redo}
         onOpenSettings={this.props.onOpenSettings}
@@ -112,7 +125,9 @@ export default class EventsSheet extends Component {
       }
     });
 
-    this._eventsTree.forceEventsUpdate();
+    this._saveChangesToHistory(() => {
+      this._eventsTree.forceEventsUpdate();
+    });
   };
 
   addNewEvent = (type, context) => {
@@ -141,10 +156,12 @@ export default class EventsSheet extends Component {
       );
     });
 
-    this._eventsTree.forceEventsUpdate(() => {
-      if (!context && !hasEventsSelected) {
-        this._eventsTree.scrollToEvent(newEvents[0]);
-      }
+    this._saveChangesToHistory(() => {
+      this._eventsTree.forceEventsUpdate(() => {
+        if (!context && !hasEventsSelected) {
+          this._eventsTree.scrollToEvent(newEvents[0]);
+        }
+      });
     });
   };
 
@@ -165,7 +182,7 @@ export default class EventsSheet extends Component {
     });
   };
 
-  closeInstructionEditor() {
+  closeInstructionEditor(saveChanges = false) {
     if (this.state.editedInstruction.instruction) {
       this.state.editedInstruction.instruction.delete();
     }
@@ -176,6 +193,10 @@ export default class EventsSheet extends Component {
         instruction: null,
         instrsList: null,
       },
+    }, () => {
+      if (saveChanges) {
+        this._saveChangesToHistory();
+      }
     });
   }
 
@@ -254,17 +275,24 @@ export default class EventsSheet extends Component {
       editedParameter: parameterContext,
       inlineEditing: true,
       inlineEditingAnchorEl: parameterContext.domEvent.currentTarget,
+      inlineEditingChangesMade: false,
     });
   };
 
   closeParameterEditor = () => {
+    if (this.state.inlineEditingChangesMade) {
+      this._saveChangesToHistory();
+    }
+
     this.setState({
       inlineEditing: false,
       inlineEditingAnchorEl: null,
+      inlineEditingChangesMade: false,
     });
   };
 
   deleteSelection = () => {
+    const { events } = this.props;
     const eventsRemover = new gd.EventsRemover();
     getSelectedEvents(this.state.selection).forEach(event =>
       eventsRemover.addEventToRemove(event)
@@ -273,7 +301,7 @@ export default class EventsSheet extends Component {
       eventsRemover.addInstructionToRemove(instruction)
     );
 
-    eventsRemover.launch(this.props.events);
+    eventsRemover.launch(events);
     this.setState(
       {
         selection: clearSelection(),
@@ -281,8 +309,7 @@ export default class EventsSheet extends Component {
         inlineEditingAnchorEl: null,
       },
       () => {
-        this.updateToolbar();
-        this._eventsTree.forceEventsUpdate();
+        this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
       }
     );
   };
@@ -336,7 +363,7 @@ export default class EventsSheet extends Component {
     });
     eventsList.delete();
 
-    this._eventsTree.forceEventsUpdate();
+    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
   };
 
   pasteInstructions = () => {
@@ -376,7 +403,7 @@ export default class EventsSheet extends Component {
     });
     instructionsList.delete();
 
-    this._eventsTree.forceEventsUpdate();
+    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
   };
 
   pasteEventsOrInstructions = () => {
@@ -385,6 +412,42 @@ export default class EventsSheet extends Component {
       this.pasteInstructions();
     else if (hasInstructionsListSelected(this.state.selection))
       this.pasteInstructions();
+  };
+
+  _saveChangesToHistory = (cb: ?Function) => {
+    this.setState(
+      {
+        history: saveToHistory(this.state.history, this.props.events),
+      },
+      () => {
+        this.updateToolbar();
+        if (cb) cb();
+      }
+    );
+  };
+
+  undo = () => {
+    const { events, project } = this.props;
+    const newHistory = undo(this.state.history, events, project);
+
+    // /!\ Events were changed, so any reference to an existing event can now
+    // be invalid. Make sure to immediately trigger a forced update before
+    // any re-render that could use a deleted/invalid event.
+    this._eventsTree.forceEventsUpdate();
+
+    this.setState({ history: newHistory }, () => this.updateToolbar());
+  };
+
+  redo = () => {
+    const { events, project } = this.props;
+    const newHistory = redo(this.state.history, events, project);
+
+    // /!\ Events were changed, so any reference to an existing event can now
+    // be invalid. Make sure to immediately trigger a forced update before
+    // any re-render that could use a deleted/invalid event.
+    this._eventsTree.forceEventsUpdate();
+
+    this.setState({ history: newHistory }, () => this.updateToolbar());
   };
 
   render() {
@@ -426,7 +489,9 @@ export default class EventsSheet extends Component {
           onChange={value => {
             const { instruction, parameterIndex } = this.state.editedParameter;
             instruction.setParameter(parameterIndex, value);
-            this.forceUpdate();
+            this.setState({
+              inlineEditingChangesMade: true,
+            });
           }}
         />
         <ContextMenu
@@ -517,7 +582,7 @@ export default class EventsSheet extends Component {
                 instrsList.insert(instruction, instrsList.size());
               }
 
-              this.closeInstructionEditor();
+              this.closeInstructionEditor(true);
               this._eventsTree.forceEventsUpdate();
             }}
           />

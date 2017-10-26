@@ -25,7 +25,7 @@ export const getHistoryInitialState = serializableObject => {
  * @param {*} history
  */
 export const canRedo = history => {
-  return history.redoHistory.length;
+  return !!history.redoHistory.length;
 };
 
 /**
@@ -33,7 +33,7 @@ export const canRedo = history => {
  * @param {*} history
  */
 export const canUndo = history => {
-  return history.undoHistory.length;
+  return !!history.undoHistory.length;
 };
 
 /**

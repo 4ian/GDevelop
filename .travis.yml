@@ -56,13 +56,9 @@ install:
 
 script:
 #newIDE tests:
-  - cd newIDE/app
-  - npm test
-  - cd ../..
+  - cd newIDE/app && npm test && cd ../..
 #GDJS game engine tests:
-  - cd GDJS/tests
-  - npm test
-  - cd ../..
+  - cd GDJS/tests && npm test && cd ../..
 #GDCore and GDCpp game engine tests:
   - cd .build-tests
   - Core/GDCore_tests

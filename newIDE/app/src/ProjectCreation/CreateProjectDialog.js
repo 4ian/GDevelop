@@ -27,6 +27,8 @@ export default class CreateProjectDialog extends Component {
     ];
 
     const ExamplesComponent = this.props.examplesComponent;
+    if (!ExamplesComponent)
+      throw new Error('examplesComponent is missing for CreateProjectDialog');
 
     return (
       <Dialog

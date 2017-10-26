@@ -5,10 +5,9 @@ import { action } from '@storybook/addon-actions';
 import { linkTo } from '@storybook/addon-links';
 
 import Welcome from './Welcome';
-
 import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
-import LocalCreateDialog from '../ProjectCreation/CreateProjectDialog';
+import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
@@ -36,7 +35,11 @@ import ObjectsGroupsList from '../ObjectsGroupsList';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
-import {
+import injectTapEventPlugin from 'react-tap-event-plugin';
+import { makeTestProject } from '../fixtures/TestProject';
+
+const gd = global.gd;
+const {
   project,
   shapePainterObject,
   adMobObject,
@@ -49,13 +52,13 @@ import {
   testInstruction,
   spriteObjectWithBehaviors,
   group2,
-} from './TestProject';
-
-import injectTapEventPlugin from 'react-tap-event-plugin';
+} = makeTestProject(gd);
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
 injectTapEventPlugin();
+
+const Placeholder = () => <div>Placeholder component</div>;
 
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
@@ -134,9 +137,9 @@ storiesOf('AboutDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <AboutDialog open />);
 
-storiesOf('LocalCreateDialog', module)
+storiesOf('CreateProjectDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => <LocalCreateDialog open />);
+  .add('default', () => <CreateProjectDialog open examplesComponent={Placeholder} />);
 
 storiesOf('LayoutChooserDialog', module)
   .addDecorator(muiDecorator)

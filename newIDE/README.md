@@ -52,6 +52,15 @@ cd newIDE/app
 yarn storybook #or npm run storybook
 ```
 
+### Tests
+
+Unit tests can be launched with this command:
+
+```bash
+cd newIDE/app
+yarn test #or npm run test
+```
+
 ## Building and deploying the standalone app
 
 ### Desktop version

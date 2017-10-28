@@ -10,7 +10,7 @@ const gd = global.gd;
  */
 export const withSerializableObject = (
   WrappedComponent,
-  { newObjectCreator, propName }
+  { newObjectCreator, propName, useProjectToUnserialize }
 ) => {
   return class extends Component {
     constructor(props) {
@@ -40,7 +40,14 @@ export const withSerializableObject = (
 
       const serializedElement = new gd.SerializerElement();
       serializableObject.serializeTo(serializedElement);
-      this.state.serializableObject.unserializeFrom(serializedElement);
+      if (!useProjectToUnserialize) {
+        this.state.serializableObject.unserializeFrom(serializedElement);
+      } else {
+        this.state.serializableObject.unserializeFrom(
+          this.props.project,
+          serializedElement
+        );
+      }
       serializedElement.delete();
     }
 
@@ -49,7 +56,15 @@ export const withSerializableObject = (
 
       const serializedElement = new gd.SerializerElement();
       this.state.serializableObject.serializeTo(serializedElement);
-      this.props[propName].unserializeFrom(serializedElement);
+      if (!useProjectToUnserialize) {
+        this.props[propName].unserializeFrom(serializedElement);
+      } else {
+        console.log(this.props[propName]);
+        this.props[propName].unserializeFrom(
+          this.props.project,
+          serializedElement
+        );
+      }
       serializedElement.delete();
 
       if (this.props.onApply) this.props.onApply();

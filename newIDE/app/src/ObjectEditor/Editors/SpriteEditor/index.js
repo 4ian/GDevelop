@@ -160,7 +160,7 @@ class AnimationsListContainer extends Component {
         : spriteObject.getAnimation(index).getName();
     });
 
-    if (otherNames.filter(name => name === newName).length) {
+    if (newName !== "" && otherNames.filter(name => name === newName).length) {
       showWarningBox(
         'Another animation with this name already exists. Please use another name.'
       );

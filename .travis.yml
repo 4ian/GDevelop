@@ -38,12 +38,10 @@ before_install:
 
 install:
 #Install newIDE tests dependencies
-  - cd newIDE/app
-  - npm install
+  - cd newIDE/app && npm install
   - cd ../..
 #Install GDJS tests dependencies
-  - cd GDJS/tests
-  - npm install
+  - cd GDJS/tests && npm install
   - cd ../..
 #Get the correct version of gcc/g++
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
@@ -56,9 +54,11 @@ install:
 
 script:
 #newIDE tests:
-  - cd newIDE/app && npm test && cd ../..
+  - cd newIDE/app && npm test
+  - cd ../..
 #GDJS game engine tests:
-  - cd GDJS/tests && npm test && cd ../..
+  - cd GDJS/tests && npm test
+  - cd ../..
 #GDCore and GDCpp game engine tests:
   - cd .build-tests
   - Core/GDCore_tests

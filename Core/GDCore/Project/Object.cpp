@@ -154,6 +154,7 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
 {
     //Name and type are already loaded.
     objectVariables.UnserializeFrom(element.GetChild("variables", 0, "Variables"));
+    behaviors.clear();
 
     //Compatibility with GD <= 3.3
     if (element.HasChild("Automatism"))

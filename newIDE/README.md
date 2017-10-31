@@ -84,6 +84,8 @@ This new editor is still in development and is missing some features:
 - [ ] Search in events
 - [ ] More [examples](https://github.com/4ian/GD/blob/master/newIDE/app/src/ProjectCreation/BrowserExamples.js)
 - [ ] More [tutorials](http://wiki.compilgames.net/doku.php/gdevelop5/start)
+- [ ] Add more [keyboard shortcuts](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/KeyboardShortcuts/index.js)
+- [ ] Make drawers movable/draggable like the properties panel and the objects editor
 
 You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
 

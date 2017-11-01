@@ -24,7 +24,6 @@ export default class InstancesEditorContainer extends Component {
     this.lastContextMenuY = 0;
     this.lastCursorX = 0;
     this.lastCursorY = 0;
-    this.state = {};
   }
 
   componentDidMount() {

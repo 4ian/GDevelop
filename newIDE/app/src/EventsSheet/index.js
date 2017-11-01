@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import FullSizeEventsTree from './EventsTree/FullSizeEventsTree';
+import EventsTree from './EventsTree';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import '../UI/Theme/EventsSheet.css';
 import { container } from './ClassNames';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import { passFullSize } from '../UI/FullSizeMeasurer';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import Clipboard from '../Utils/Clipboard';
@@ -39,6 +40,8 @@ import {
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
+
+const FullSizeEventsTree = passFullSize(EventsTree, { useFlex: false });
 
 export default class EventsSheet extends Component {
   constructor(props) {
@@ -462,7 +465,7 @@ export default class EventsSheet extends Component {
         tabIndex={1}
       >
         <FullSizeEventsTree
-          eventsTreeRef={eventsTree => (this._eventsTree = eventsTree)}
+          wrappedComponentRef={eventsTree => (this._eventsTree = eventsTree)}
           key={events.ptr}
           events={events}
           project={project}

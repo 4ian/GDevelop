@@ -53,6 +53,10 @@ export default class InstancesEditorContainer extends Component {
       } else {
         this.viewPosition.scrollBy(0, -event.wheelDelta / 20);
       }
+
+      if (this.props.onViewPositionChanged) {
+        this.props.onViewPositionChanged(this.viewPosition);
+      }
       event.preventDefault();
     };
     this.pixiRenderer.view.setAttribute('tabIndex', -1);
@@ -407,10 +411,17 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesMoved(selectedInstances);
   };
 
+  scrollTo(x, y) {
+    this.viewPosition.scrollTo(x, y);
+  }
+
   centerViewOn(instances) {
     if (!instances.length) return;
 
-    this.viewPosition.scrollTo(instances[instances.length - 1]);
+    this.viewPosition.scrollToInstance(instances[instances.length - 1]);
+    if (this.props.onViewPositionChanged) {
+      this.props.onViewPositionChanged(this.viewPosition);
+    }
   }
 
   getLastContextMenuPosition = () => {
@@ -426,6 +437,10 @@ export default class InstancesEditorContainer extends Component {
       this.lastCursorY
     );
   };
+
+  getViewPosition = () => {
+    return this.viewPosition;
+  }
 
   _renderScene = () => {
     // Protect against rendering scheduled after the component is unmounted.

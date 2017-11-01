@@ -21,6 +21,7 @@ import {
 } from '../../Utils/Serializer';
 import Clipboard from '../../Utils/Clipboard';
 import { passFullSize } from '../../UI/FullSizeMeasurer';
+import { addScrollbars } from '../../InstancesEditor/ScrollbarContainer';
 
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
@@ -39,7 +40,7 @@ import {
 } from '../../Utils/History';
 const gd = global.gd;
 
-const FullSizeInstancesEditor = passFullSize(InstancesEditor, {
+const FullSizeInstancesEditor = passFullSize(addScrollbars(InstancesEditor), {
   useFlex: true,
 });
 

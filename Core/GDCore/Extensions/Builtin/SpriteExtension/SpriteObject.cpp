@@ -47,6 +47,7 @@ void SpriteObject::DoUnserializeFrom(gd::Project & project, const gd::Serializer
 {
     updateIfNotVisible = element.GetBoolAttribute("updateIfNotVisible", true);
 
+    RemoveAllAnimations();
     const gd::SerializerElement & animationsElement = element.GetChild("animations", 0, "Animations");
     animationsElement.ConsiderAsArrayOf("animation", "Animation");
     for (std::size_t i = 0; i < animationsElement.GetChildrenCount(); ++i)

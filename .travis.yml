@@ -37,6 +37,12 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
 
 install:
+#Install newIDE tests dependencies
+  - cd newIDE/app && npm install
+  - cd ../..
+#Install GDJS tests dependencies
+  - cd GDJS/tests && npm install
+  - cd ../..
 #Get the correct version of gcc/g++
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
 #Compile the tests only
@@ -45,15 +51,13 @@ install:
   - cmake -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
   - make -j 4
   - cd ..
-#Install GDJS tests dependencies
-  - cd GDJS/tests
-  - npm install
-  - cd ../..
 
 script:
+#newIDE tests:
+  - cd newIDE/app && npm test
+  - cd ../..
 #GDJS game engine tests:
-  - cd GDJS/tests
-  - npm test
+  - cd GDJS/tests && npm test
   - cd ../..
 #GDCore and GDCpp game engine tests:
   - cd .build-tests

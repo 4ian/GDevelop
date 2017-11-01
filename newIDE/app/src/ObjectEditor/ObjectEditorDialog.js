@@ -1,9 +1,11 @@
+// @flow weak
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
 import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from 'material-ui/Tabs';
+import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 
 const styles = {
   titleContainer: {
@@ -11,61 +13,36 @@ const styles = {
   },
 };
 
-export default class ObjectEditorDialog extends Component {
-  constructor(props) {
-    super(props);
+type StateType = {|
+  currentTab: string,
+|};
 
-    this.state = {
-      editor: null,
-      currentTab: 'properties',
-    };
-  }
+export class ObjectEditorDialog extends Component<*, StateType> {
+  state = {
+    currentTab: 'properties',
+  };
 
-  componentWillMount() {
-    this._loadFrom(this.props.object);
-  }
-
-  componentWillReceiveProps(newProps) {
-    if (
-      (!this.props.open && newProps.open) ||
-      (newProps.open && this.props.object !== newProps.object)
-    ) {
-      this._loadFrom(newProps.object);
-    }
-  }
-
-  _onChangeTab = value => {
+  _onChangeTab = (value: string) => {
     this.setState({
       currentTab: value,
     });
   };
 
-  _onApply = () => {
-    if (this.props.onApply) this.props.onApply();
-  };
-
-  _loadFrom(object) {
-    if (!object) return;
-
-    this.setState({
-      editor: ObjectsEditorService.getEditor(object.getType()),
-    });
-  }
-
   render() {
-    const { editor } = this.state;
-    if (!editor) return null;
-
     const actions = [
+      <FlatButton
+        label="Cancel"
+        onTouchTap={this.props.onCancel}
+      />,
       <FlatButton
         label="Apply"
         primary
         keyboardFocused
-        onTouchTap={this._onApply}
+        onTouchTap={this.props.onApply}
       />,
     ];
 
-    const EditorComponent = editor.component;
+    const EditorComponent = this.props.editorComponent;
     const { currentTab } = this.state;
 
     return (
@@ -107,5 +84,70 @@ export default class ObjectEditorDialog extends Component {
         )}
       </Dialog>
     );
+  }
+}
+
+
+type ContainerStateType = {|
+  dialogComponent: ?Class<*>,
+  editorComponent: ?Class<*>,
+  castToObjectType: ?Function,
+|};
+
+export default class ObjectEditorDialogContainer extends Component<*, *> {
+  state: ContainerStateType = {
+    dialogComponent: null,
+    editorComponent: null,
+    castToObjectType: null,
+  };
+
+  componentWillMount() {
+    this._loadFrom(this.props.object);
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (
+      (!this.props.open && newProps.open) ||
+      (newProps.open && this.props.object !== newProps.object)
+    ) {
+      this._loadFrom(newProps.object);
+    }
+  }
+
+  _loadFrom(object) {
+    if (!object) return;
+
+    const editorConfiguration = ObjectsEditorService.getEditorConfiguration(object.getType());
+    if (!editorConfiguration) {
+      return this.setState({
+        dialogComponent: null,
+        editorComponent: null,
+        castToObjectType: null,
+      });
+    }
+
+    this.setState({
+      dialogComponent: withSerializableObject(ObjectEditorDialog, {
+        propName: 'object',
+        newObjectCreator: editorConfiguration.newObjectCreator,
+        useProjectToUnserialize: true,
+      }),
+      editorComponent: editorConfiguration.component,
+      castToObjectType: editorConfiguration.castToObjectType,
+    });
+  }
+
+  render() {
+    if (!this.props.object || !this.state.dialogComponent) return null;
+
+    const EditorDialog: Class<*> = this.state.dialogComponent;
+    const {editorComponent, castToObjectType} = this.state;
+
+    return <EditorDialog
+      editorComponent={editorComponent}
+      key={this.props.object && this.props.object.ptr}
+      {...this.props}
+      object={castToObjectType(this.props.object)}
+    />
   }
 }

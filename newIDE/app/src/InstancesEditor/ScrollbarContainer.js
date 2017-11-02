@@ -4,25 +4,28 @@ import Slider from 'material-ui/Slider';
 const MATERIAL_UI_SLIDER_WIDTH = 18;
 
 const styles = {
+  container: {
+    overflow: 'hidden',
+  },
   xScrollbar: {
     position: 'absolute',
-    bottom: 0,
+    top: 0,
     left: 0,
     right: 0,
   },
   xSliderStyle: {
-    marginBottom: -MATERIAL_UI_SLIDER_WIDTH / 2,
+    marginTop: -MATERIAL_UI_SLIDER_WIDTH / 2 + 1,
+    marginBottom: 0,
   },
   yScrollbar: {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    right: 0,
+    left: 0,
   },
   ySliderStyle: {
     marginTop: 0,
-    marginLeft: 0,
-    marginRight: -MATERIAL_UI_SLIDER_WIDTH / 2,
+    marginLeft: -MATERIAL_UI_SLIDER_WIDTH / 2,
   },
 };
 
@@ -97,7 +100,7 @@ export const addScrollbars = WrappedEditor => {
       const { wrappedEditorRef, ...otherProps } = this.props;
 
       return (
-        <div>
+        <div style={styles.container}>
           <WrappedEditor
             onViewPositionChanged={this._handleViewPositionChange}
             ref={editorRef => {

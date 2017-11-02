@@ -1,8 +1,15 @@
 /* This overwrite the default React Mosaic theme to make it looks like Material UI AppBar  */
 
-.mosaic-root.mosaic-gd-theme {
+.mosaic-gd-theme.mosaic {
   background-color: #f0f0f0;
   padding: 0;
+}
+
+.mosaic-gd-theme.mosaic .mosaic-root {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
 }
 
 .mosaic-gd-theme .mosaic-window {
@@ -11,6 +18,18 @@
 
 .mosaic-gd-theme .mosaic-window-body {
   display: flex;
+}
+
+/* Mosaic window and tile */
+.mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-window,
+.mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-preview {
+  box-shadow: none;
+}
+
+.mosaic-gd-theme .mosaic-tile {
+  margin: 2px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .mosaic-gd-theme .mosaic-window-toolbar {
@@ -29,6 +48,8 @@
   cursor: move;
 }
 
-.mosaic-root.mosaic-gd-theme .mosaic-window .mosaic-window-toolbar.draggable:hover, .mosaic-root.mosaic-gd-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+/* Hovered titlebar background */
+.mosaic-gd-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
+.mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
   background: #9100ce;
 }

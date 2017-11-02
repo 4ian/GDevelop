@@ -14,14 +14,15 @@ const styles = {
 export default class CloseButton extends Component {
   static contextTypes = {
     mosaicActions: PropTypes.object,
-    getMosaicPath: PropTypes.func,
+    mosaicWindowActions: PropTypes.object,
   };
 
   render() {
+    const { mosaicActions, mosaicWindowActions } = this.context;
     return (
       <IconButton
         onClick={() => {
-          this.context.mosaicActions.remove(this.context.getMosaicPath());
+          mosaicActions.remove(mosaicWindowActions.getPath());
         }}
         style={styles.container}
       >

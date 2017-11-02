@@ -44,6 +44,15 @@ const FullSizeInstancesEditor = passFullSize(addScrollbars(InstancesEditor), {
   useFlex: true,
 });
 
+const styles = {
+  container: {
+    display: 'flex',
+    flex: 1,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+};
+
 export default class InstancesFullEditor extends Component {
   static defaultProps = {
     showObjectsList: true,
@@ -501,7 +510,7 @@ export default class InstancesFullEditor extends Component {
           onRedo={this.redo}
           onZoomOut={this.zoomOut}
           onZoomIn={this.zoomIn}
-          wrappedComponentRef={editor => (this.editor = editor)}
+          wrappedEditorRef={editor => (this.editor = editor)}
         />
       ),
       'objects-list': (
@@ -535,7 +544,7 @@ export default class InstancesFullEditor extends Component {
     };
 
     return (
-      <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
+      <div style={styles.container}>
         <EditorMosaic
           editors={editors}
           ref={editorMosaic => (this.editorMosaic = editorMosaic)}

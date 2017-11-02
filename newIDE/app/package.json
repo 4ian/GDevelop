@@ -42,7 +42,7 @@
     "react-dom": "15.4.2",
     "react-i18next": "^6.0.6",
     "react-measure": "1.4.6",
-    "react-mosaic-component": "^0.4.0",
+    "react-mosaic-component": "1.0.2",
     "react-sortable-hoc": "^0.6.3",
     "react-sortable-tree": "^0.1.21",
     "react-tap-event-plugin": "2.0.1",

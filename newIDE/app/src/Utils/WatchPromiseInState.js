@@ -2,7 +2,7 @@
 import React from 'react';
 
 export const watchPromiseInState = (
-  component: React.Component<*, *, *>,
+  component: React.Component<*, *>,
   stateField: string,
   fn: () => Promise<any>
 ) => {

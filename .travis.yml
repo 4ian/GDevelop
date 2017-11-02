@@ -54,7 +54,9 @@ install:
 
 script:
 #newIDE tests:
-  - cd newIDE/app && npm test
+  - cd newIDE/app
+  - npm test
+  - npm run flow
   - cd ../..
 #GDJS game engine tests:
   - cd GDJS/tests && npm test

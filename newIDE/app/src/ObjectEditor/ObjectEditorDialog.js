@@ -30,10 +30,7 @@ export class ObjectEditorDialog extends Component<*, StateType> {
 
   render() {
     const actions = [
-      <FlatButton
-        label="Cancel"
-        onTouchTap={this.props.onCancel}
-      />,
+      <FlatButton label="Cancel" onTouchTap={this.props.onCancel} />,
       <FlatButton
         label="Apply"
         primary
@@ -87,7 +84,6 @@ export class ObjectEditorDialog extends Component<*, StateType> {
   }
 }
 
-
 type ContainerStateType = {|
   dialogComponent: ?Class<*>,
   editorComponent: ?Class<*>,
@@ -117,7 +113,9 @@ export default class ObjectEditorDialogContainer extends Component<*, *> {
   _loadFrom(object) {
     if (!object) return;
 
-    const editorConfiguration = ObjectsEditorService.getEditorConfiguration(object.getType());
+    const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
+      object.getType()
+    );
     if (!editorConfiguration) {
       return this.setState({
         dialogComponent: null,
@@ -138,16 +136,23 @@ export default class ObjectEditorDialogContainer extends Component<*, *> {
   }
 
   render() {
-    if (!this.props.object || !this.state.dialogComponent) return null;
+    if (
+      !this.props.object ||
+      !this.state.dialogComponent ||
+      !this.state.castToObjectType
+    )
+      return null;
 
     const EditorDialog: Class<*> = this.state.dialogComponent;
-    const {editorComponent, castToObjectType} = this.state;
+    const { editorComponent, castToObjectType } = this.state;
 
-    return <EditorDialog
-      editorComponent={editorComponent}
-      key={this.props.object && this.props.object.ptr}
-      {...this.props}
-      object={castToObjectType(this.props.object)}
-    />
+    return (
+      <EditorDialog
+        editorComponent={editorComponent}
+        key={this.props.object && this.props.object.ptr}
+        {...this.props}
+        object={castToObjectType(this.props.object)}
+      />
+    );
   }
 }

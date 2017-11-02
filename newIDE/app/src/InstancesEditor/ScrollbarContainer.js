@@ -1,5 +1,7 @@
+// @flow
 import React, { Component } from 'react';
 import Slider from 'material-ui/Slider';
+import ViewPosition from './ViewPosition';
 
 const MATERIAL_UI_SLIDER_WIDTH = 18;
 
@@ -29,18 +31,34 @@ const styles = {
   },
 };
 
-//TODO: Type WrappedEditor as ScrollableEditor
+type ScrollableComponent = {
+  scrollTo: (number, number) => void,
+  getViewPosition: () => ViewPosition,
+};
+
+type Props = {
+  wrappedEditorRef: ?(?ScrollableComponent) => void,
+};
+
+type State = {
+  xValue: number,
+  yValue: number,
+  xMin: number,
+  xMax: number,
+  yMin: number,
+  yMax: number,
+};
 
 /**
  * Add scrollbars that track the viewPosition of the wrapped component
- * @param {*} WrappedEditor
+ * @param {*} WrappedComponent
  * @param {*} options
  */
-export const addScrollbars = WrappedEditor => {
-  return class ScrollbarContainer extends Component {
-    _editor = null;
+export const addScrollbars = (WrappedComponent: any) => {
+  return class ScrollbarContainer extends Component<Props, State> {
+    _editor: ?ScrollableComponent = null;
 
-    state = {
+    state: State = {
       xValue: 0,
       yValue: 0,
       xMin: -5000,
@@ -50,32 +68,38 @@ export const addScrollbars = WrappedEditor => {
     };
 
     componentDidMount() {
-      this._handleViewPositionChange(this._editor.getViewPosition());
+      if (this._editor) {
+        this._handleViewPositionChange(this._editor.getViewPosition());
+      }
     }
 
-    _handleXChange = (e, value) => {
+    _handleXChange = (e: any, value: number) => {
       this.setState(
         {
           xValue: value,
         },
         () => {
-          this._editor.scrollTo(this.state.xValue, this.state.yValue); //TODO
+          if (this._editor) {
+            this._editor.scrollTo(this.state.xValue, this.state.yValue);
+          }
         }
       );
     };
 
-    _handleYChange = (e, value) => {
+    _handleYChange = (e: any, value: number) => {
       this.setState(
         {
           yValue: value,
         },
         () => {
-          this._editor.scrollTo(this.state.xValue, this.state.yValue); //TODO
+          if (this._editor) {
+            this._editor.scrollTo(this.state.xValue, this.state.yValue);
+          }
         }
       );
     };
 
-    _setAndAdjust = ({ xValue, yValue }) => {
+    _setAndAdjust = ({ xValue, yValue }: {xValue: number, yValue: number}) => {
       const xMax = Math.max(Math.abs(xValue) + 100, this.state.xMax);
       const yMax = Math.max(Math.abs(yValue) + 100, this.state.yMax);
 
@@ -89,7 +113,7 @@ export const addScrollbars = WrappedEditor => {
       });
     };
 
-    _handleViewPositionChange = viewPosition => {
+    _handleViewPositionChange = (viewPosition: ViewPosition) => {
       this._setAndAdjust({
         xValue: viewPosition.getViewX(),
         yValue: viewPosition.getViewY(),
@@ -101,9 +125,9 @@ export const addScrollbars = WrappedEditor => {
 
       return (
         <div style={styles.container}>
-          <WrappedEditor
+          <WrappedComponent
             onViewPositionChanged={this._handleViewPositionChange}
-            ref={editorRef => {
+            ref={(editorRef: ?ScrollableComponent) => {
               wrappedEditorRef && wrappedEditorRef(editorRef);
               this._editor = editorRef;
             }}

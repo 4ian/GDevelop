@@ -139,12 +139,3 @@
 .gd-events-sheet .large-selectable.large-selected {
     border: 1px #4ab0e4 solid !important;
 }
-
-/**
- * The background
- */
-.gd-events-sheet .background {
-    background-color: #f0f0f0;
-    margin-top: 1px;
-    margin-bottom: 1px;
-}

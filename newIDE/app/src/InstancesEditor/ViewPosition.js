@@ -76,7 +76,12 @@ export default class ViewPosition {
     this.viewY += y;
   }
 
-  scrollTo(instance) {
+  scrollTo(x, y) {
+    this.viewX = x;
+    this.viewY = y;
+  }
+
+  scrollToInstance(instance) {
     this.viewX = instance.getX();
     this.viewY = instance.getY();
   }

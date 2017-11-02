@@ -215,7 +215,7 @@ void EventsEditor::Init(wxWindow* parent)
 	eventPasteMenu->SetBitmap(gd::SkinHelper::GetIcon("paste", 16));
 	eventsContextMenu.Append(eventPasteMenu);
 	eventsContextMenu.AppendSeparator();
-	undoMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM5, _("Cancel\tCtrl-Z"), wxEmptyString, wxITEM_NORMAL);
+	undoMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM5, _("Undo\tCtrl-Z"), wxEmptyString, wxITEM_NORMAL);
 	undoMenu->SetBitmap(gd::SkinHelper::GetIcon("undo", 16));
 	eventsContextMenu.Append(undoMenu);
 	redoMenu = new wxMenuItem((&eventsContextMenu), ID_MENUITEM6, _("Redo\tCtrl-Y"), wxEmptyString, wxITEM_NORMAL);

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import ObjectsList from '../../ObjectsList';
 import ObjectsGroupsList from '../../ObjectsGroupsList';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
-import FullSizeInstancesEditor from '../../InstancesEditor/FullSizeInstancesEditor';
+import InstancesEditor from '../../InstancesEditor';
 import InstancePropertiesEditor from '../../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../../InstancesEditor/InstancesList';
 import LayersList from '../../LayersList';
@@ -20,6 +20,8 @@ import {
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
 import Clipboard from '../../Utils/Clipboard';
+import { passFullSize } from '../../UI/FullSizeMeasurer';
+import { addScrollbars } from '../../InstancesEditor/ScrollbarContainer';
 
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
@@ -37,6 +39,19 @@ import {
   saveToHistory,
 } from '../../Utils/History';
 const gd = global.gd;
+
+const FullSizeInstancesEditor = passFullSize(addScrollbars(InstancesEditor), {
+  useFlex: true,
+});
+
+const styles = {
+  container: {
+    display: 'flex',
+    flex: 1,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+};
 
 export default class InstancesFullEditor extends Component {
   static defaultProps = {
@@ -403,11 +418,11 @@ export default class InstancesFullEditor extends Component {
 
   zoomIn = () => {
     if (this.editor) this.editor.zoomBy(0.1);
-  }
+  };
 
   zoomOut = () => {
     if (this.editor) this.editor.zoomBy(-0.1);
-  }
+  };
 
   _onContextMenu = (x, y) => {
     this.contextMenu.open(x, y);
@@ -495,7 +510,7 @@ export default class InstancesFullEditor extends Component {
           onRedo={this.redo}
           onZoomOut={this.zoomOut}
           onZoomIn={this.zoomIn}
-          editorRef={editor => (this.editor = editor)}
+          wrappedEditorRef={editor => (this.editor = editor)}
         />
       ),
       'objects-list': (
@@ -529,7 +544,7 @@ export default class InstancesFullEditor extends Component {
     };
 
     return (
-      <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
+      <div style={styles.container}>
         <EditorMosaic
           editors={editors}
           ref={editorMosaic => (this.editorMosaic = editorMosaic)}

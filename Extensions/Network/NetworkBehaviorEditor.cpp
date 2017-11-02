@@ -61,7 +61,7 @@ scene(scene_)
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	wxString __wxRadioBoxChoices_1[2] =
 	{
-		_("Send datas"),
+		_("Send data"),
 		_("Receive data")
 	};
 	initialBehaviourList = new wxRadioBox(this, ID_RADIOBOX1, _("Initial behaviour"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));

@@ -1253,6 +1253,24 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
 
         eventIsOnlyForMe = true;
     }
+    else if ( evt.GetModifiers() == wxMOD_CMD ) //Ctrl-xxx
+    {
+        switch ( evt.GetKeyCode() )
+        {
+            case 89: //Ctrl-Y
+            {
+                Redo();
+                break;
+            }
+            case 90: //Ctrl-Z
+            {
+                Undo();
+                break;
+            }
+            default:
+                break;
+        }
+    }
 
     if (eventIsOnlyForMe)
         evt.StopPropagation();

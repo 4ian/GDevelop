@@ -413,6 +413,7 @@ export default class MainFrame extends Component {
             />
           ),
           key: 'start page',
+          closable: false,
         }),
       },
       () => this.updateToolbar()
@@ -656,6 +657,7 @@ export default class MainFrame extends Component {
                     key={editorTab.key}
                     onActive={() => this._onEditorTabActive(editorTab)}
                     onClose={() => this._onCloseEditorTab(editorTab)}
+                    closable={editorTab.closable}
                   >
                     <div style={{ display: 'flex', flex: 1, height: '100%' }}>
                       {editorTab.render()}

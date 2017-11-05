@@ -10,7 +10,7 @@ export const getEditorTabsInitialState = () => {
 
 export const openEditorTab = (
   state,
-  { name, editorCreator, key, dontFocusTab }
+  { name, editorCreator, key, dontFocusTab, closable }
 ) => {
   const existingEditorId = findIndex(
     state.editors,
@@ -31,6 +31,7 @@ export const openEditorTab = (
     editorRef: null,
     name,
     key,
+    closable: typeof closable === "undefined" ? true : !!closable,
   };
 
   return {

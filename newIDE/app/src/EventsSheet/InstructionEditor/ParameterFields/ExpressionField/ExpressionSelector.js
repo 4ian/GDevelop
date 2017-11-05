@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
 import SearchBar from 'material-ui-search-bar';
 import keys from 'lodash.keys';
-import update from 'lodash.update';
-import compact from 'lodash.compact';
+import { enumerateExpressions, createExpressionsTree } from './EnumerateExpressions';
 const gd = global.gd;
 
 const GROUP_DELIMITER = '/';
@@ -25,8 +24,7 @@ const styles = {
   },
 };
 
-//TODO: Rename InstructionTypeSelector to InstructionSelector
-export class InstructionTypeSelector extends Component {
+export class ExpressionSelector extends Component {
   constructor(props) {
     super(props);
 
@@ -37,9 +35,9 @@ export class InstructionTypeSelector extends Component {
   }
 
   componentWillMount() {
-    const allInstructions = this._listAllInstructions();
-    this.instructionsInfo = allInstructions;
-    this.instructionsInfoTree = this._createInstructionsTree(allInstructions);
+    const { allExpressions } = enumerateExpressions('number');
+    this.instructionsInfo = allExpressions;
+    this.instructionsInfoTree = createExpressionsTree(allExpressions);
   }
 
   focus = () => {
@@ -132,25 +130,6 @@ export class InstructionTypeSelector extends Component {
     }
 
     return allInstructions;
-  }
-
-  _createInstructionsTree(allInstructions) {
-    const tree = {};
-    allInstructions.forEach(instructionInfo => {
-      update(
-        tree,
-        compact(instructionInfo.fullGroupName.split(GROUP_DELIMITER)),
-        groupInfo => {
-          const existingGroupInfo = groupInfo || {};
-          return {
-            ...existingGroupInfo,
-            [instructionInfo.displayedName]: instructionInfo,
-          };
-        }
-      );
-    });
-
-    return tree;
   }
 
   _matchCritera(instructionInfo, lowercaseSearch) {
@@ -255,4 +234,4 @@ export class InstructionTypeSelector extends Component {
   }
 }
 
-export default InstructionTypeSelector;
+export default ExpressionSelector;

@@ -87,7 +87,7 @@ export default class InstancesEditorContainer extends Component {
       this._onMouseMove(event.data.global.x, event.data.global.y)
     );
     this.backgroundArea.on('panmove', event =>
-      this._onMakeSelectionRectangle(event.data.global.x, event.data.global.y)
+      this._onPanMove(event.deltaX, event.deltaY, event.data.global.x, event.data.global.y)
     );
     this.backgroundArea.on('panend', event => this._onEndSelectionRectangle());
     this.pixiContainer.addChild(this.backgroundArea);
@@ -296,8 +296,19 @@ export default class InstancesEditorContainer extends Component {
     }
   };
 
-  _onMakeSelectionRectangle = (x, y) => {
-    this.selectionRectangle.makeSelectionRectangle(x, y);
+  _onPanMove = (deltaX, deltaY, x, y) => {
+    if (this.keyboardShortcuts.shouldMoveView()) {
+      const sceneDeltaX = deltaX / this.getZoomFactor();
+      const sceneDeltaY = deltaY / this.getZoomFactor();
+
+      this.viewPosition.scrollBy(-sceneDeltaX, -sceneDeltaY);
+
+      if (this.props.onViewPositionChanged) {
+        this.props.onViewPositionChanged(this.viewPosition);
+      }
+    } else {
+      this.selectionRectangle.makeSelectionRectangle(x, y);
+    }
   };
 
   _onEndSelectionRectangle = () => {
@@ -346,6 +357,15 @@ export default class InstancesEditorContainer extends Component {
   _onMoveInstance = (instance, deltaX, deltaY) => {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
+
+    if (this.keyboardShortcuts.shouldMoveView()) {
+      this.viewPosition.scrollBy(-sceneDeltaX, -sceneDeltaY);
+
+      if (this.props.onViewPositionChanged) {
+        this.props.onViewPositionChanged(this.viewPosition);
+      }
+      return;
+    }
 
     if (!this.props.instancesSelection.isInstanceSelected(instance)) {
       this._onInstanceClicked(instance);

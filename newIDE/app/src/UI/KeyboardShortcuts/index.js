@@ -5,6 +5,7 @@ const UP_KEY = 38;
 const RIGHT_KEY = 39;
 const DOWN_KEY = 40;
 const BACKSPACE_KEY = 8;
+const SPACE_KEY = 32;
 const DELETE_KEY = 46;
 const EQUAL_KEY = 187;
 const MINUS_KEY = 189;
@@ -69,6 +70,10 @@ export default class KeyboardShortcuts {
     return this._isControlPressed();
   }
 
+  shouldMoveView() {
+    return this.spacePressed;
+  }
+
   _isControlPressed = () => {
     // On macOS, meta key (Apple/Command key) acts as Control key on Windows/Linux.
     return this.metaPressed || this.rawCtrlPressed;
@@ -81,6 +86,7 @@ export default class KeyboardShortcuts {
     if (evt.altKey) this.altPressed = true;
     if (evt.which === CTRL_KEY) this.rawCtrlPressed = true;
     if (evt.which === SHIFT_KEY) this.shiftPressed = true;
+    if (evt.which === SPACE_KEY) this.spacePressed = true;
 
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
     if (evt.target && evt.target.closest(textEditorSelectors)) {
@@ -140,6 +146,7 @@ export default class KeyboardShortcuts {
     if (!evt.altKey) this.altPressed = false;
     if (evt.which === CTRL_KEY) this.rawCtrlPressed = false;
     if (evt.which === SHIFT_KEY) this.shiftPressed = false;
+    if (evt.which === SPACE_KEY) this.spacePressed = false;
   };
 
   _onKeyPress = evt => {};

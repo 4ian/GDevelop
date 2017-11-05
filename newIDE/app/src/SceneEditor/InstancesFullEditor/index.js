@@ -271,7 +271,7 @@ export default class InstancesFullEditor extends Component {
   };
 
   _onInstancesSelected = instances => {
-    this.forceUpdate();
+    this.forceUpdatePropertiesEditor();
     this.updateToolbar();
   };
 
@@ -295,7 +295,7 @@ export default class InstancesFullEditor extends Component {
     if (centerView) {
       if (this.editor) this.editor.centerViewOn(instances);
     }
-    this.forceUpdate();
+    this.forceUpdatePropertiesEditor();
     this.updateToolbar();
   };
 
@@ -474,6 +474,10 @@ export default class InstancesFullEditor extends Component {
     if (this._objectsList) this._objectsList.forceUpdateList();
   };
 
+  forceUpdatePropertiesEditor = () => {
+    if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
+  }
+
   render() {
     const { project, layout, initialInstances, resourceSources } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
@@ -487,6 +491,7 @@ export default class InstancesFullEditor extends Component {
             instances={selectedInstances}
             onInstancesModified={this._onInstancesModified}
             editInstanceVariables={this.editInstanceVariables}
+            ref={propertiesEditor => (this._propertiesEditor = propertiesEditor)}
           />
         </MosaicWindow>
       ),

@@ -97,10 +97,10 @@ export default class SpritesList extends Component {
   };
 
   onAddSprite = () => {
-    const { resourceSources, project, direction } = this.props;
+    const { resourceSources, onChooseResource, project, direction } = this.props;
     if (!resourceSources || !resourceSources.length) return;
 
-    resourceSources[0].chooseResources(project).then(resources => {
+    onChooseResource(resourceSources[0].name).then(resources => {
       resources.forEach(resource => {
         project.getResourcesManager().addResource(resource);
 

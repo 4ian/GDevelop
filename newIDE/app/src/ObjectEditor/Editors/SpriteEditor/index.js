@@ -46,7 +46,14 @@ const AddAnimationLine = SortableElement(({ onAdd }) => (
 
 class Animation extends Component {
   render() {
-    const { animation, id, project, resourceSources, onRemove } = this.props;
+    const {
+      animation,
+      id,
+      project,
+      resourceSources,
+      onRemove,
+      onChooseResource,
+    } = this.props;
 
     return (
       <GridTile>
@@ -75,6 +82,7 @@ class Animation extends Component {
               key={i}
               project={project}
               resourceSources={resourceSources}
+              onChooseResource={onChooseResource}
             />
           );
         })}
@@ -93,6 +101,7 @@ const SortableAnimationsList = SortableContainer(
     onChangeAnimationName,
     project,
     resourceSources,
+    onChooseResource,
   }) => {
     return (
       <GridList style={styles.gridList} cellHeight="auto" cols={1}>
@@ -107,6 +116,7 @@ const SortableAnimationsList = SortableContainer(
                 animation={animation}
                 project={project}
                 resourceSources={resourceSources}
+                onChooseResource={onChooseResource}
                 onRemove={() => onRemoveAnimation(i)}
                 onChangeName={newName => onChangeAnimationName(i, newName)}
               />
@@ -141,7 +151,7 @@ class AnimationsListContainer extends Component {
   removeAnimation = i => {
     //eslint-disable-next-line
     const answer = confirm(
-      "Are you sure you want to remove this animation? This can't be undone."
+      "Are you sure you want to remove this animation?"
     );
 
     if (answer) {
@@ -160,7 +170,7 @@ class AnimationsListContainer extends Component {
         : spriteObject.getAnimation(index).getName();
     });
 
-    if (newName !== "" && otherNames.filter(name => name === newName).length) {
+    if (newName !== '' && otherNames.filter(name => name === newName).length) {
       showWarningBox(
         'Another animation with this name already exists. Please use another name.'
       );
@@ -181,6 +191,7 @@ class AnimationsListContainer extends Component {
         onChangeAnimationName={this.changeAnimationName}
         onRemoveAnimation={this.removeAnimation}
         resourceSources={this.props.resourceSources}
+        onChooseResource={this.props.onChooseResource}
         useDragHandle
         lockAxis="y"
         axis="y"
@@ -191,13 +202,20 @@ class AnimationsListContainer extends Component {
 
 export default class PanelSpriteEditor extends Component {
   render() {
-    const { object, project, resourceSources, onSizeUpdated } = this.props;
+    const {
+      object,
+      project,
+      resourceSources,
+      onChooseResource,
+      onSizeUpdated,
+    } = this.props;
     const spriteObject = gd.asSpriteObject(object);
 
     return (
       <AnimationsListContainer
         spriteObject={spriteObject}
         resourceSources={resourceSources}
+        onChooseResource={onChooseResource}
         project={project}
         onSizeUpdated={onSizeUpdated}
       />

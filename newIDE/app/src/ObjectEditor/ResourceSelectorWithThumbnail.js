@@ -6,6 +6,7 @@ import ImageThumbnail from './ImageThumbnail';
 export default ({
   project,
   resourceSources,
+  onChooseResource,
   resourceKind,
   resourceName,
   onChange,
@@ -16,6 +17,7 @@ export default ({
         <ResourceSelector
           project={project}
           resourceSources={resourceSources}
+          onChooseResource={onChooseResource}
           resourceKind={resourceKind}
           fullWidth
           initialResourceName={resourceName}

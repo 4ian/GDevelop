@@ -2,15 +2,12 @@ import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
+import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 
 const styles = {
   autoCompleteTextField: {
     minWidth: 300,
   },
-};
-
-const fuzzyFilterOrEmpty = (searchText, key) => {
-  return !key || AutoComplete.fuzzyFilter(searchText, key);
 };
 
 export default class ObjectSelector extends Component {
@@ -84,7 +81,7 @@ export default class ObjectSelector extends Component {
           }
         }}
         dataSource={this.fullList}
-        filter={fuzzyFilterOrEmpty}
+        filter={fuzzyOrEmptyFilter}
         ref={field => (this._field = field)}
         {...rest}
       />

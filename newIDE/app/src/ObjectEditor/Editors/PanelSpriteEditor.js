@@ -8,7 +8,7 @@ const gd = global.gd;
 
 export default class PanelSpriteEditor extends Component {
   render() {
-    const { object, project, resourceSources } = this.props;
+    const { object, project, resourceSources, onChooseResource } = this.props;
     const panelSpriteObject = gd.asPanelSpriteObject(object);
 
     return (
@@ -17,6 +17,7 @@ export default class PanelSpriteEditor extends Component {
           <ResourceSelectorWithThumbnail
             project={project}
             resourceSources={resourceSources}
+            onChooseResource={onChooseResource}
             resourceKind="image"
             resourceName={panelSpriteObject.getTexture()}
             resourcesLoader={ResourcesLoader}

@@ -7,7 +7,7 @@ const gd = global.gd;
 
 export default class TiledSpriteEditor extends Component {
   render() {
-    const { object, project, resourceSources } = this.props;
+    const { object, project, resourceSources, onChooseResource } = this.props;
     const tiledSpriteObject = gd.asTiledSpriteObject(object);
 
     return (
@@ -16,6 +16,7 @@ export default class TiledSpriteEditor extends Component {
           <ResourceSelectorWithThumbnail
             project={project}
             resourceSources={resourceSources}
+            onChooseResource={onChooseResource}
             resourceKind="image"
             resourceName={tiledSpriteObject.getTexture()}
             resourcesLoader={ResourcesLoader}

@@ -67,6 +67,7 @@ export class ObjectEditorDialog extends Component<*, StateType> {
               object={this.props.object}
               project={this.props.project}
               resourceSources={this.props.resourceSources}
+              onChooseResource={this.props.onChooseResource}
               onSizeUpdated={() =>
                 this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
             />

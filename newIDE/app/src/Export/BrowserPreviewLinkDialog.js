@@ -4,7 +4,7 @@ import FlatButton from 'material-ui/FlatButton';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { Column, Line } from '../UI/Grid';
 
-export default class ExportDialog extends Component {
+export default class BrowserPreviewLinkDialog extends Component {
   constructor(props) {
     super(props);
     this.state = {

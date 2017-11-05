@@ -20,6 +20,7 @@ import BrowserExamples from './ProjectCreation/BrowserExamples';
 import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
 import BrowserSaveDialog from './ProjectsStorage/BrowserSaveDialog';
 import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
+import browserResourceSources from './ResourcesEditor/BrowserResourceSources';
 
 // Import for Electron powered IDE.
 import ExternalEditor from './ExternalEditor';
@@ -116,6 +117,7 @@ if (electron) {
       introDialog={<BrowserIntroDialog />}
       saveDialog={<BrowserSaveDialog />}
       onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}
+      resourceSources={browserResourceSources}
     />
   );
 }

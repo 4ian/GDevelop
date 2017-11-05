@@ -72,6 +72,7 @@ export default class MainFrame extends Component {
       genericDialog: null,
     };
     this.toolbar = null;
+    this._resourceSourceDialogs = {};
   }
 
   componentWillMount() {
@@ -324,6 +325,7 @@ export default class MainFrame extends Component {
           onEditObject={this.props.onEditObject}
           showObjectsList={!this.props.integratedEditor}
           resourceSources={this.props.resourceSources}
+          onChooseResource={this._onChooseResource}
         />
       ),
       key: 'layout ' + name,
@@ -390,6 +392,7 @@ export default class MainFrame extends Component {
               onEditObject={this.props.onEditObject}
               showObjectsList={!this.props.integratedEditor}
               resourceSources={this.props.resourceSources}
+              onChooseResource={this._onChooseResource}
             />
           ),
           key: 'external layout ' + name,
@@ -578,6 +581,17 @@ export default class MainFrame extends Component {
     );
   };
 
+  _onChooseResource = (
+    sourceName,
+    multiSelection = true
+  ): Promise<Array<any>> => {
+    const { currentProject } = this.state;
+    const resourceSourceDialog = this._resourceSourceDialogs[sourceName];
+    if (!resourceSourceDialog) return Promise.resolve([]);
+
+    return resourceSourceDialog.chooseResources(currentProject, multiSelection);
+  };
+
   updateToolbar() {
     const editorTab = getCurrentTab(this.state.editorTabs);
     if (!editorTab || !editorTab.editorRef) {
@@ -590,7 +604,13 @@ export default class MainFrame extends Component {
 
   render() {
     const { currentProject, genericDialog } = this.state;
-    const { exportDialog, createDialog, introDialog, saveDialog } = this.props;
+    const {
+      exportDialog,
+      createDialog,
+      introDialog,
+      saveDialog,
+      resourceSources,
+    } = this.props;
     const showLoader =
       this.state.loadingProject ||
       this.state.previewLoading ||
@@ -599,7 +619,7 @@ export default class MainFrame extends Component {
     return (
       <DragDropContextProvider>
         <MuiThemeProvider muiTheme={defaultTheme}>
-          <I18nextProvider i18n={ i18n }>
+          <I18nextProvider i18n={i18n}>
             <div className="main-frame">
               <ProjectTitlebar project={this.state.currentProject} />
               <Drawer
@@ -607,7 +627,9 @@ export default class MainFrame extends Component {
                 containerStyle={styles.drawerContent}
               >
                 <EditorBar
-                  title={currentProject ? currentProject.getName() : 'No project'}
+                  title={
+                    currentProject ? currentProject.getName() : 'No project'
+                  }
                   showMenuIconButton={false}
                   iconElementRight={
                     <IconButton onClick={this.toggleProjectManager}>
@@ -705,6 +727,13 @@ export default class MainFrame extends Component {
                   open: this.state.genericDialogOpen,
                   onClose: () => this._openGenericDialog(false),
                 })}
+              {resourceSources.map((resourceSource, index) =>
+                React.createElement(resourceSource.component, {
+                  key: resourceSource.name,
+                  ref: dialog =>
+                    (this._resourceSourceDialogs[resourceSource.name] = dialog),
+                })
+              )}
             </div>
           </I18nextProvider>
         </MuiThemeProvider>

@@ -112,11 +112,11 @@ const SortableLayersListBody = SortableContainer(LayersListBody);
 SortableLayersListBody.muiName = 'TableBody';
 
 export default class LayersList extends Component {
-  shouldComponentUpdate() {
+  shouldComponentUpdate(nextProps) {
     // Rendering the component can be costly as it iterates over
     // every layers, so the prop freezeUpdate allow to ask the component to stop
     // updating, for example when hidden.
-    return !this.props.freezeUpdate;
+    return !nextProps.freezeUpdate;
   }
 
   render() {

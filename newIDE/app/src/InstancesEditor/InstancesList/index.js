@@ -4,11 +4,11 @@ import '../../UI/Theme/Table.css';
 const gd = global.gd;
 
 export default class InstancesList extends Component {
-  shouldComponentUpdate() {
+  shouldComponentUpdate(nextProps) {
     // Rendering the component is costly as it iterates over
     // every instances, so the prop freezeUpdate allows to ask the component to stop
     // updating, for example when hidden.
-    return !this.props.freezeUpdate;
+    return !nextProps.freezeUpdate;
   }
 
   componentWillReceiveProps(nextProps) {

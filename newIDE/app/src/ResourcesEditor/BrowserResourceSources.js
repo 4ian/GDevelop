@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
+import ListIcon from '../UI/ListIcon';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
-import Avatar from 'material-ui/Avatar';
 const SelectableList = makeSelectable(List);
 const gd = global.gd;
 
@@ -105,7 +105,7 @@ export default [
               value={url}
               key={url}
               primaryText={nameFromUrl(url)}
-              leftAvatar={<Avatar src={url} style={styles.icon} />}
+              leftAvatar={<ListIcon src={url} />}
             />
           );
         })

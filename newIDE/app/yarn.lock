@@ -5616,14 +5616,14 @@ promise@7.1.1, promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.7, prop-types@^15.5.8:
+prop-types@^15.5.10:
   version "15.5.10"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.10.tgz#2797dfc3126182e3a95e3dfbb2e893ddd7456154"
   dependencies:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
 
-prop-types@^15.5.6, prop-types@^15.5.9, prop-types@^15.6.0:
+prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.5.9, prop-types@^15.6.0:
   version "15.6.0"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.0.tgz#ceaf083022fc46b4a35f69e13ef75aed0d639856"
   dependencies:
@@ -5933,9 +5933,9 @@ react-modal@^1.7.6, react-modal@^1.7.7:
     prop-types "^15.5.7"
     react-dom-factories "^1.0.0"
 
-react-mosaic-component@1.0.2:
+react-mosaic-component@4ian/react-mosaic#fix/is-dragging:
   version "1.0.2"
-  resolved "https://registry.yarnpkg.com/react-mosaic-component/-/react-mosaic-component-1.0.2.tgz#3a2f3e17d0496433a7defc1dc9d1ec009693bde9"
+  resolved "https://codeload.github.com/4ian/react-mosaic/tar.gz/9dd2813b3b85b358a13942b2d6b020a9760e5b4a"
   dependencies:
     classnames "^2.2.5"
     immutability-helper "^2.4.0"

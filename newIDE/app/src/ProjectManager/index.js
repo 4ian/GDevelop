@@ -184,10 +184,10 @@ export default class ProjectManager extends React.Component {
       <div style={styles.container}>
         <List style={styles.list}>
           {this._renderMenu()}
-          <ProjectStructureItem
+          {/* <ProjectStructureItem
             primaryText="Resources"
             leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
-          />
+          /> */}
           <ProjectStructureItem
             primaryText="Scenes"
             leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}

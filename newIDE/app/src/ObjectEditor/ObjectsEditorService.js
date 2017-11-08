@@ -19,11 +19,13 @@ export default {
       component: SpriteEditor,
       newObjectCreator: () => new gd.SpriteObject(''),
       castToObjectType: object => gd.asSpriteObject(object),
+      helpPagePath: "/objects/sprite",
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,
       newObjectCreator: () => new gd.TiledSpriteObject(''),
       castToObjectType: object => gd.asTiledSpriteObject(object),
+      helpPagePath: "/objects/tiled_sprite",
     },
     'PanelSpriteObject::PanelSprite': {
       component: PanelSpriteEditor,
@@ -39,6 +41,7 @@ export default {
       component: TextEditor,
       newObjectCreator: () => new gd.TextObject(''),
       castToObjectType: object => gd.asTextObject(object),
+      helpPagePath: "/objects/text",
     },
     'PrimitiveDrawing::Drawer': {
       component: ShapePainterEditor,

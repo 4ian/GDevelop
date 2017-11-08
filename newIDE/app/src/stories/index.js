@@ -5,6 +5,7 @@ import { action } from '@storybook/addon-actions';
 import { linkTo } from '@storybook/addon-links';
 
 import Welcome from './Welcome';
+import HelpButton from '../UI/HelpButton';
 import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
@@ -100,6 +101,12 @@ storiesOf('Tabs', module)
         <div>Tab 4 content</div>
       </Tab>
     </Tabs>
+  ));
+
+storiesOf('HelpButton', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <HelpButton />
   ));
 
 storiesOf('LocalExport', module)

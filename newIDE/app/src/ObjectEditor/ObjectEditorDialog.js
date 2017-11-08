@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
+import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
@@ -45,6 +46,7 @@ export class ObjectEditorDialog extends Component<*, StateType> {
     return (
       <Dialog
         key={this.props.object && this.props.object.ptr}
+        secondaryActions={<HelpButton helpPagePath={this.props.helpPagePath} />}
         actions={actions}
         autoScrollBodyContent
         noMargin
@@ -89,6 +91,7 @@ type ContainerStateType = {|
   dialogComponent: ?Class<*>,
   editorComponent: ?Class<*>,
   castToObjectType: ?Function,
+  helpPagePath: ?string,
 |};
 
 export default class ObjectEditorDialogContainer extends Component<*, *> {
@@ -96,6 +99,7 @@ export default class ObjectEditorDialogContainer extends Component<*, *> {
     dialogComponent: null,
     editorComponent: null,
     castToObjectType: null,
+    helpPagePath: null,
   };
 
   componentWillMount() {
@@ -132,6 +136,7 @@ export default class ObjectEditorDialogContainer extends Component<*, *> {
         useProjectToUnserialize: true,
       }),
       editorComponent: editorConfiguration.component,
+      helpPagePath: editorConfiguration.helpPagePath,
       castToObjectType: editorConfiguration.castToObjectType,
     });
   }
@@ -145,12 +150,13 @@ export default class ObjectEditorDialogContainer extends Component<*, *> {
       return null;
 
     const EditorDialog: Class<*> = this.state.dialogComponent;
-    const { editorComponent, castToObjectType } = this.state;
+    const { editorComponent, castToObjectType, helpPagePath } = this.state;
 
     return (
       <EditorDialog
         editorComponent={editorComponent}
         key={this.props.object && this.props.object.ptr}
+        helpPagePath={helpPagePath}
         {...this.props}
         object={castToObjectType(this.props.object)}
       />

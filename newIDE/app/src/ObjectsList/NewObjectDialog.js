@@ -5,6 +5,7 @@ import Avatar from 'material-ui/Avatar';
 import { List, ListItem } from 'material-ui/List';
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash.flatten';
+import HelpButton from '../UI/HelpButton';
 
 const styles = {
   icon: { borderRadius: 0 },
@@ -66,6 +67,7 @@ export default class NewObjectDialog extends Component {
     return (
       <Dialog
         title="Add a new object"
+        secondaryActions={<HelpButton helpPagePath="/objects" />}
         actions={actions}
         onRequestClose={onClose}
         open={open}

@@ -47,11 +47,13 @@ export default {
       component: ShapePainterEditor,
       newObjectCreator: () => new gd.ShapePainterObject(''),
       castToObjectType: object => gd.asShapePainterObject(object),
+      helpPagePath: "/objects/shape_painter",
     },
     'TextEntryObject::TextEntry': {
       component: EmptyEditor,
       newObjectCreator: () => new gd.TextEntryObject(''),
       castToObjectType: object => gd.asTextEntryObject(object),
+      helpPagePath: "/objects/text_entry",
     },
   },
 };

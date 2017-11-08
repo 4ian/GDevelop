@@ -25,8 +25,12 @@ const styles = {
     flex: 1,
     overflowY: 'scroll',
   },
+  item: {
+    borderBottom: '1px solid #e0e0e0', //TODO: Use theme color instead
+  },
   projectStructureItem: {
-    borderTop: '1px solid #e0e0e0', //TODO: Use theme color instead
+    backgroundColor: '#f7f7f7', //TODO: Use theme color instead
+    borderBottom: '1px solid #e0e0e0', //TODO: Use theme color instead
   },
   projectStructureItemNestedList: {
     padding: 0,
@@ -112,7 +116,7 @@ class Item extends Component {
 
     return (
       <ListItem
-        style={this.props.style}
+        style={{...styles.item, ...this.props.style}}
         onContextMenu={this._onContextMenu}
         primaryText={label}
         rightIconButton={rightIconButton}
@@ -184,10 +188,10 @@ export default class ProjectManager extends React.Component {
       <div style={styles.container}>
         <List style={styles.list}>
           {this._renderMenu()}
-          <ProjectStructureItem
+          {/* <ProjectStructureItem
             primaryText="Resources"
             leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
-          />
+          /> */}
           <ProjectStructureItem
             primaryText="Scenes"
             leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}

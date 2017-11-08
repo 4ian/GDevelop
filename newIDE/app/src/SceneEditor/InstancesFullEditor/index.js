@@ -81,6 +81,9 @@ export default class InstancesFullEditor extends Component {
 
       uiSettings: props.initialUiSettings,
       history: getHistoryInitialState(props.initialInstances),
+
+      objectDraggedFromList: null,
+      objectDraggedFromListIsOnInstancesEditor: false,
     };
   }
 
@@ -395,6 +398,28 @@ export default class InstancesFullEditor extends Component {
     done(true);
   };
 
+  _onDragObjectFromObjectsList = (objectName) => {
+    // Use a timeout to make sure that the potential mouse up/drop event
+    // was dispatched and handled by the list before resetting the state.
+    setTimeout(() => {
+      console.log("SETSTATE");
+      this.setState({
+        objectDraggedFromList: objectName,
+        objectDraggedFromListIsOnInstancesEditor: false,
+      });
+    }, 0);
+  }
+
+  _onMouseMoveOverInstancesEditor = () => {
+    console.log("Mouse move over instances editor. Dragged:", this.state.objectDraggedFromList)
+    if (this.state.objectDraggedFromList && !this.state.objectDraggedFromListIsOnInstancesEditor) {
+      console.log("set");
+      this.setState({
+        objectDraggedFromListIsOnInstancesEditor: true,
+      }, () => this.forceUpdateObjectsList());
+    }
+  }
+
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.map(instance =>
@@ -482,6 +507,7 @@ export default class InstancesFullEditor extends Component {
     const { project, layout, initialInstances, resourceSources, onChooseResource } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
+    console.log(this.state.objectDraggedFromListIsOnInstancesEditor, "objectDraggedFromListIsOnInstancesEditor");
     const editors = {
       properties: (
         <MosaicWindow title="Properties">
@@ -516,6 +542,8 @@ export default class InstancesFullEditor extends Component {
           onZoomOut={this.zoomOut}
           onZoomIn={this.zoomIn}
           wrappedEditorRef={editor => (this.editor = editor)}
+          draggedObjectName={this.state.objectDraggedFromList}
+          onMouseMove={this._onMouseMoveOverInstancesEditor}
         />
       ),
       'objects-list': (
@@ -531,6 +559,8 @@ export default class InstancesFullEditor extends Component {
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             onRenameObject={this._onRenameObject}
+            onDrag={this._onDragObjectFromObjectsList}
+            disableSort={this.state.objectDraggedFromListIsOnInstancesEditor}
             ref={objectsList => (this._objectsList = objectsList)}
           />
         </MosaicWindow>

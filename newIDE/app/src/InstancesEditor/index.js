@@ -80,6 +80,15 @@ export default class InstancesEditorContainer extends Component {
     this.backgroundArea.on('mousedown', event =>
       this._onBackgroundClicked(event.data.global.x, event.data.global.y)
     );
+    this.pixiRenderer.view.addEventListener('mouseup', event => {
+      console.log("PLOP")
+      console.log(event);
+      console.log(this.props.draggedObjectName)
+    });
+    this.pixiRenderer.view.addEventListener('mousemove', event => {
+      console.log("move");
+      if (this.props.onMouseMove) this.props.onMouseMove(event);
+    });
     this.backgroundArea.on('touchstart', event =>
       this._onBackgroundClicked(event.data.global.x, event.data.global.y)
     );

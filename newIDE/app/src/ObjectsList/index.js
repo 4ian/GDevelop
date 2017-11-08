@@ -12,7 +12,10 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import { makeAddItem } from '../UI/ListAddItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
-import type { ObjectWithContextList, ObjectWithContext } from '../ObjectsList/EnumerateObjects';
+import type {
+  ObjectWithContextList,
+  ObjectWithContext,
+} from '../ObjectsList/EnumerateObjects';
 
 const listItemHeight = 48;
 const styles = {
@@ -24,7 +27,7 @@ const styles = {
   },
   listContainer: {
     flex: 1,
-  }
+  },
 };
 
 const AddObjectRow = makeAddItem(ListItem);
@@ -42,7 +45,7 @@ const SortableAddObjectRow = SortableElement(props => {
   return <AddObjectRow {...props} />;
 });
 
-class ObjectsList extends Component<*,*> {
+class ObjectsList extends Component<*, *> {
   list: any;
 
   forceUpdateGrid() {
@@ -52,6 +55,7 @@ class ObjectsList extends Component<*,*> {
   render() {
     let { height, width, fullList, project, selectedObjectName } = this.props;
 
+    console.log('RENDERList', this.props.disableSort);
     return (
       <List
         ref={list => (this.list = list)}
@@ -102,6 +106,7 @@ class ObjectsList extends Component<*,*> {
               getThumbnail={this.props.getThumbnail}
               selected={objectWithScope.object.getName() === selectedObjectName}
               onObjectSelected={this.props.onObjectSelected}
+              disabled={this.props.disableSort}
             />
           );
         }}
@@ -120,7 +125,10 @@ type StateType = {|
   searchText: string,
 |};
 
-export default class ObjectsListContainer extends React.Component<*, StateType> {
+export default class ObjectsListContainer extends React.Component<
+  *,
+  StateType
+> {
   static defaultProps = {
     onDeleteObject: (objectWithScope, cb) => cb(true),
     onRenameObject: (objectWithScope, newName, cb) => cb(true),
@@ -137,6 +145,7 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
   };
 
   shouldComponentUpdate(nextProps: *, nextState: StateType) {
+    return true;
     // The component is costly to render, so avoid any re-rendering as much
     // as possible.
     // We make the assumption that no changes to objects list is made outside
@@ -152,7 +161,10 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
     )
       return true;
 
-    if (this.props.selectedObjectName !== nextProps.selectedObjectName)
+    if (
+      this.props.selectedObjectName !== nextProps.selectedObjectName ||
+      this.props.disableSort !== nextProps.disableSort
+    )
       return true;
 
     if (
@@ -257,6 +269,9 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
   };
 
   _onMove = (oldIndex: number, newIndex: number) => {
+    console.log("on move with disableSort =", this.props.disableSort);
+    if (this.props.disableSort) return;
+
     const { project, objectsContainer } = this.props;
 
     const isInContainerObjectsList =
@@ -276,7 +291,24 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
       );
     }
 
+    if (this.props.onDrag) this.props.onDrag(null);
     this.forceUpdateList();
+  };
+
+  _onSortStart = (index: number) => {
+    const { project, objectsContainer } = this.props;
+
+    let object = null;
+    const isInContainerObjectsList = index < this.containerObjectsList.length;
+    if (isInContainerObjectsList) {
+      object = objectsContainer.getObjectAt(index);
+    } else {
+      object = project.getObjectAt(index);
+    }
+
+    if (!object) return;
+
+    if (this.props.onDrag) this.props.onDrag(object.getName());
   };
 
   forceUpdateList = () => {
@@ -289,8 +321,14 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
     const { searchText } = this.state;
 
     const lists = enumerateObjects(project, objectsContainer);
-    this.containerObjectsList = filterObjectsList(lists.containerObjectsList, searchText);
-    this.projectObjectsList = filterObjectsList(lists.projectObjectsList, searchText);
+    this.containerObjectsList = filterObjectsList(
+      lists.containerObjectsList,
+      searchText
+    );
+    this.projectObjectsList = filterObjectsList(
+      lists.projectObjectsList,
+      searchText
+    );
     const allObjectsList = filterObjectsList(lists.allObjectsList, searchText);
     const fullList = allObjectsList.concat({
       key: 'add-objects-row',
@@ -302,6 +340,7 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
     // crash the app.
     const listKey = project.ptr + ';' + objectsContainer.ptr;
 
+    console.log('RENDERList', this.props.disableSort);
     return (
       <Paper style={styles.container}>
         <div style={styles.listContainer}>
@@ -325,8 +364,10 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
                 onEditVariables={this._onEditVariables}
                 onDelete={this._onDelete}
                 onRename={this._onRename}
+                onSortStart={({ index }) => this._onSortStart(index)}
                 onSortEnd={({ oldIndex, newIndex }) =>
                   this._onMove(oldIndex, newIndex)}
+                disableSort={this.props.disableSort}
                 helperClass="sortable-helper"
                 distance={30}
               />

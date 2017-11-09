@@ -106,7 +106,7 @@ storiesOf('Tabs', module)
 storiesOf('HelpButton', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <HelpButton />
+    <HelpButton helpPagePath="/test" />
   ));
 
 storiesOf('LocalExport', module)

@@ -49,7 +49,7 @@ export default class InstructionParametersEditor extends Component {
         <EmptyMessage>
           {this.props.isCondition
             ? 'Choose a condition on the left'
-            : 'Choose a condition on the right'}
+            : 'Choose an action on the left'}
         </EmptyMessage>
       </div>
     );

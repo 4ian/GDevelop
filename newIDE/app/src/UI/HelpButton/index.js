@@ -5,6 +5,7 @@ import HelpOutline from 'material-ui/svg-icons/action/help-outline';
 
 type PropsType = {
   helpPagePath: ?string,
+  label?: string,
 };
 
 /**

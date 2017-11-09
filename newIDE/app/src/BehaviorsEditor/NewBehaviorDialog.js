@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
+import HelpButton from '../UI/HelpButton';
 import FlatButton from 'material-ui/FlatButton';
 import Avatar from 'material-ui/Avatar';
 import { List, ListItem } from 'material-ui/List';
@@ -64,13 +65,14 @@ export default class NewBehaviorDialog extends Component {
     if (!open || !project) return null;
 
     const actions = [
-      <FlatButton label="Close" primary={false} onClick={onClose} />,
+      <FlatButton key="close" label="Close" primary={false} onClick={onClose} />,
     ];
 
     return (
       <Dialog
         title="Add a new behavior to the object"
         actions={actions}
+        secondaryActions={<HelpButton helpPagePath="/behaviors" />}
         open={open}
         noMargin
         autoScrollBodyContent

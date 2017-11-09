@@ -23,7 +23,10 @@ const styles = {
 export default props => {
   const { secondaryActions, actions, noMargin, ...otherProps } = props;
   const dialogActions = secondaryActions
-    ? [<div>{secondaryActions}</div>, <div>{actions}</div>]
+    ? [
+        <div key="secondary-actions">{secondaryActions}</div>,
+        <div key="actions">{actions}</div>,
+      ]
     : actions;
 
   return (

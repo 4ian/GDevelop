@@ -31,8 +31,9 @@ export class ObjectEditorDialog extends Component<*, StateType> {
 
   render() {
     const actions = [
-      <FlatButton label="Cancel" onTouchTap={this.props.onCancel} />,
+      <FlatButton key="cancel" label="Cancel" onTouchTap={this.props.onCancel} />,
       <FlatButton
+        key="apply"
         label="Apply"
         primary
         keyboardFocused

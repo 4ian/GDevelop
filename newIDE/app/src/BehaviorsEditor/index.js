@@ -5,10 +5,12 @@ import Delete from 'material-ui/svg-icons/action/delete';
 import IconButton from 'material-ui/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import MiniToolbar from '../UI/MiniToolbar';
+import HelpIcon from '../UI/HelpIcon';
 import PropertiesEditor from '../PropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
+import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 
 const styles = {
   addBehaviorLine: {
@@ -169,6 +171,9 @@ export default class BehaviorsEditor extends Component {
                     >
                       <Delete />
                     </IconButton>
+                    <HelpIcon
+                      helpPagePath={getBehaviorHelpPagePath(behavior)}
+                    />
                   </span>
                 </MiniToolbar>
                 <div style={styles.propertiesContainer}>

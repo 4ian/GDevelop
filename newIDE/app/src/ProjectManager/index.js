@@ -24,6 +24,7 @@ const styles = {
   list: {
     flex: 1,
     overflowY: 'scroll',
+    padding: 0,
   },
   item: {
     borderBottom: '1px solid #e0e0e0', //TODO: Use theme color instead

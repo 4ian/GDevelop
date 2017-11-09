@@ -1,7 +1,7 @@
 {
   "name": "gdevelop-electron",
-  "productName": "GDevelop IDE",
-  "description": "GDevelop IDE running on the Electron runtime",
+  "productName": "GDevelop 5",
+  "description": "GDevelop 5 IDE running on the Electron runtime",
   "version": "1.0.0",
   "author": "Florian Rival",
   "license": "MIT",

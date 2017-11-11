@@ -500,7 +500,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         gd::ExpressionParser parser(parameter);
         if ( !parser.ParseMathExpression(platform, project, scene, callbacks) )
         {
-            cout << "Error :" << parser.firstErrorStr << " in: "<< parameter << endl;
+            cout << "Error :" << parser.GetFirstError() << " in: "<< parameter << endl;
 
             argOutput = "0";
         }
@@ -514,7 +514,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         gd::ExpressionParser parser(parameter);
         if ( !parser.ParseStringExpression(platform, project, scene, callbacks) )
         {
-            cout << "Error in text expression" << parser.firstErrorStr << endl;
+            cout << "Error in text expression" << parser.GetFirstError() << endl;
 
             argOutput = "\"\"";
         }

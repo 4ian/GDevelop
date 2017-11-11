@@ -110,7 +110,7 @@ void VariableCodeGenerationCallbacks::OnChildSubscript(gd::String stringExpressi
     if ( !parser.ParseStringExpression(codeGenerator.GetPlatform(),
     	codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) )
     {
-        cout << "Error in text expression" << parser.firstErrorStr << endl;
+        cout << "Error in text expression" << parser.GetFirstError() << endl;
         argumentCode = "\"\"";
     }
 

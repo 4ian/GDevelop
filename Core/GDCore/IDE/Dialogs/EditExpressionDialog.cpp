@@ -477,8 +477,8 @@ void EditExpressionDialog::TextModified(wxStyledTextEvent& event)
     gd::ExpressionParser expressionParser(expression);
     if ( !expressionParser.ParseMathExpression(project.GetCurrentPlatform(), project, layout, callbacks) )
     {
-        errorTxt->SetLabel(expressionParser.firstErrorStr);
-        lastErrorPos = expressionParser.firstErrorPos;
+        errorTxt->SetLabel(expressionParser.GetFirstError());
+        lastErrorPos = expressionParser.GetFirstErrorPosition();
     }
     else
     {

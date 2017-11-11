@@ -30,7 +30,7 @@ namespace gd
 
     gd::VariableParser parser(parameter);
     if ( !parser.Parse(callbacks) )
-        cout << "Error :" << parser.firstErrorStr << " in: "<< parameter << endl;
+        cout << "Error :" << parser.GetFirstError() << " in: "<< parameter << endl;
 \endcode
  *
  * Here is the parsed grammar:   <br>
@@ -60,6 +60,17 @@ public:
      * \see gd::VariableParserCallbacks
      */
     bool Parse(VariableParserCallbacks & callbacks);
+
+    /**
+     * \brief Return the description of the error that was found
+     */
+    const gd::String & GetFirstError() { return firstErrorStr; }
+
+    /**
+     * \brief Return the position of the error that was found
+     * \return The position, or gd::String::npos if no error is found
+     */
+    size_t GetFirstErrorPosition() { return firstErrorPos; }
 
     gd::String firstErrorStr;
     size_t firstErrorPos;

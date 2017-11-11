@@ -531,7 +531,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
                 ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
                 ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game.GetCurrentPlatform(), game, scene, callbacks)))
             {
-                message = expressionParser.firstErrorStr;
+                message = expressionParser.GetFirstError();
 
                 parametersHaveErrors = true;
                 ParaEdit[i]->SetBackgroundColour(wxColour(255, 194, 191));

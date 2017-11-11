@@ -31,21 +31,31 @@ public:
     virtual ~ExpressionParser() {};
 
     /**
-     * Parse the expression, calling each functor when necessary
+     * \brief Parse the expression, calling each functor when necessary
      * \return True if expression was correctly parsed.
      */
     bool ParseMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks);
 
     /**
-     * Parse the expression, calling each functor when necessary
+     * \brief Parse the expression, calling each functor when necessary
      * \return True if expression was correctly parsed.
      */
     bool ParseStringExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks);
 
-    gd::String firstErrorStr;
-    size_t firstErrorPos;
+    /**
+     * \brief Return the description of the error that was found
+     */
+    const gd::String & GetFirstError() { return firstErrorStr; }
+
+    /**
+     * \brief Return the position of the error that was found
+     * \return The position, or gd::String::npos if no error is found
+     */
+    size_t GetFirstErrorPosition() { return firstErrorPos; }
 
 private:
+    gd::String firstErrorStr;
+    size_t firstErrorPos;
 
     /**
      * Tool function to add a parameter
@@ -103,8 +113,21 @@ public:
     virtual bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
     virtual bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
 
+    /**
+     * \brief Return the description of the error that was found
+     */
+    const gd::String & GetFirstError() { return firstErrorStr; }
+
+    /**
+     * \brief Return the position of the error that was found
+     * \return The position, or gd::String::npos if no error is found
+     */
+    size_t GetFirstErrorPosition() { return firstErrorPos; }
+
+protected:
     gd::String firstErrorStr;
     size_t firstErrorPos;
+
 private:
     /**
      * \brief Set the return type of the expression: Done by ExpressionParser according to

@@ -169,8 +169,8 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const gd::Platfor
     if ( !parser.ParseMathExpression(platform, project, layout, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
-        firstErrorStr = callbacks.firstErrorStr;
-        firstErrorPos = callbacks.firstErrorPos;
+        firstErrorStr = callbacks.GetFirstError();
+        firstErrorPos = callbacks.GetFirstErrorPosition();
         #endif
         return false;
     }
@@ -188,8 +188,8 @@ bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const gd::Platfor
     if ( !parser.ParseStringExpression(platform, project, layout, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
-        firstErrorStr = callbacks.firstErrorStr;
-        firstErrorPos = callbacks.firstErrorPos;
+        firstErrorStr = callbacks.GetFirstError();
+        firstErrorPos = callbacks.GetFirstErrorPosition();
         #endif
         return false;
     }

@@ -28,8 +28,8 @@ bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const gd::Pla
     if ( !parser.ParseMathExpression(platform, project, layout, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
-        firstErrorStr = callbacks.firstErrorStr;
-        firstErrorPos = callbacks.firstErrorPos;
+        firstErrorStr = callbacks.GetFirstError();
+        firstErrorPos = callbacks.GetFirstErrorPosition();
         #endif
         return false;
     }
@@ -45,8 +45,8 @@ bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(const gd::Pla
     if ( !parser.ParseStringExpression(platform, project, layout, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
-        firstErrorStr = callbacks.firstErrorStr;
-        firstErrorPos = callbacks.firstErrorPos;
+        firstErrorStr = callbacks.GetFirstError();
+        firstErrorPos = callbacks.GetFirstErrorPosition();
         #endif
         return false;
     }

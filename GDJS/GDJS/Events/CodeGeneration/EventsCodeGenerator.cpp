@@ -539,7 +539,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         gd::VariableParser parser(parameter);
         if ( !parser.Parse(callbacks) )
         {
-            cout << "Error :" << parser.firstErrorStr << " in: "<< parameter << endl;
+            cout << "Error :" << parser.GetFirstError() << " in: "<< parameter << endl;
             argOutput = "gdjs.VariablesContainer.badVariable";
         }
     }
@@ -550,7 +550,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         gd::VariableParser parser(parameter);
         if ( !parser.Parse(callbacks) )
         {
-            cout << "Error :" << parser.firstErrorStr << " in: "<< parameter << endl;
+            cout << "Error :" << parser.GetFirstError() << " in: "<< parameter << endl;
             argOutput = "gdjs.VariablesContainer.badVariable";
         }
     }
@@ -566,7 +566,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
         gd::VariableParser parser(parameter);
         if ( !parser.Parse(callbacks) )
         {
-            cout << "Error :" << parser.firstErrorStr << " in: "<< parameter << endl;
+            cout << "Error :" << parser.GetFirstError() << " in: "<< parameter << endl;
             argOutput = "gdjs.VariablesContainer.badVariable";
         }
     }

@@ -11,11 +11,12 @@ type PropsType = {
  * The icon that can be used in any dialog to open a help page
  */
 export default (props: PropsType) => {
-  if (!props.helpPagePath) return null;
+  const { helpPagePath } = props;
+  if (!helpPagePath) return null;
 
   return (
     <IconButton
-      onClick={() => window.open(`http://wiki.compilgames.net/doku.php/gdevelop5${props.helpPagePath}`, 'blank') }
+      onClick={() => window.open(`http://wiki.compilgames.net/doku.php/gdevelop5${helpPagePath}`, 'blank') }
     >
       <HelpOutline />
     </IconButton>

@@ -120,6 +120,11 @@ export default class LayersList extends Component {
   }
 
   render() {
+    // Force the list to be mounted again if layersContainer
+    // has been changed. Avoid accessing to invalid objects that could
+    // crash the app.
+    const listKey = this.props.layersContainer.ptr;
+
     return (
       <Table selectable={false}>
         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
@@ -133,6 +138,7 @@ export default class LayersList extends Component {
           </TableRow>
         </TableHeader>
         <SortableLayersListBody
+          key={listKey}
           layersContainer={this.props.layersContainer}
           onRemoveLayer={this.props.onRemoveLayer}
           onRenameLayer={this.props.onRenameLayer}

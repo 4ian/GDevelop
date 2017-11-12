@@ -49,7 +49,6 @@ Links
 ### Related projects and games
 
 * [GDevelop.js](https://github.com/4ian/GDevelop.js) is a binding to use GDevelop engine in Javascript. Used for newIDE.
-* [GDevApp.com](https://gdevapp.com) is a radically innovative online game creator, compatible with GDevelop. It is based on GDevelop.js and can be used on any browser, including iOS and Android.
 * [Lil BUB's HELLO EARTH](http://lilbub.com/game) is a retro 8-bit mobile video game featuring [Lil BUB](http://lilbub.com). It's created with GDevelop and made up of equal parts science, magic, and heart.
 
   ![Lil Bub](http://compilgames.net/assets/bub/screenshots-background.jpg "GDevelop logo")

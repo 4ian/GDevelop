@@ -19,7 +19,7 @@ export const openEditorTab = (
   if (existingEditorId !== -1) {
     return {
       ...state,
-      currentTab: existingEditorId,
+      currentTab: dontFocusTab ? state.currentTab : existingEditorId,
     };
   }
 

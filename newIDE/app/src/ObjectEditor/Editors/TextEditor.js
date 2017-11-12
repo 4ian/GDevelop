@@ -12,7 +12,7 @@ const toolbarItemStyle = {
 
 const styles = {
   sizeTextField: {
-    width: 50,
+    width: 90,
     ...toolbarItemStyle,
   },
   toolbarItem: toolbarItemStyle,

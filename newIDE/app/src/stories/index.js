@@ -19,6 +19,7 @@ import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
+import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
@@ -220,12 +221,16 @@ storiesOf('PanelSpriteEditor', module)
     </SerializedObjectDisplay>
   ));
 
-storiesOf('SpriteEditor', module)
+storiesOf('SpriteEditor and related editors', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('SpriteEditor', () => (
     <SerializedObjectDisplay object={spriteObject}>
       <SpriteEditor object={spriteObject} project={project} />
+    </SerializedObjectDisplay>
+  )).add('PointsEditor', () => (
+    <SerializedObjectDisplay object={spriteObject}>
+      <PointsEditor object={spriteObject} />
     </SerializedObjectDisplay>
   ));
 

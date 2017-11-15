@@ -56,6 +56,17 @@ export const makeTestProject = gd => {
     sprite2.setImageName('pixi');
     const sprite3 = new gd.Sprite();
     sprite3.setImageName('icon128.png');
+
+    // Add a few points to the first sprite:
+    sprite1.getOrigin().setX(10);
+    sprite1.getOrigin().setY(20);
+    sprite1.getCenter().setX(100);
+    sprite1.getCenter().setY(200);
+    const headCustomPoint = new gd.Point("Head");
+    headCustomPoint.setX(40);
+    headCustomPoint.setY(50);
+    sprite1.addPoint(headCustomPoint);
+
     animation.getDirection(0).addSprite(sprite1);
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);

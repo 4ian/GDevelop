@@ -66,6 +66,7 @@ export default class PointsEditor extends Component {
               const animation = spriteObject.getAnimation(i);
               return (
                 <MenuItem
+                  key={i}
                   value={i}
                   primaryText={`Animation #${i} ${animation.getName()}`}
                 />
@@ -80,7 +81,13 @@ export default class PointsEditor extends Component {
                 onChange={(e, i, value) => this.chooseDirection(value)}
               >
                 {mapFor(0, animation.getDirectionsCount(), i => {
-                  return <MenuItem value={i} primaryText={`Direction #${i}`} />;
+                  return (
+                    <MenuItem
+                      value={i}
+                      key={i}
+                      primaryText={`Direction #${i}`}
+                    />
+                  );
                 })}
               </SelectField>
             )}
@@ -91,14 +98,20 @@ export default class PointsEditor extends Component {
               onChange={(e, i, value) => this.chooseSprite(value)}
             >
               {mapFor(0, direction.getSpritesCount(), i => {
-                return <MenuItem value={i} primaryText={`Frame #${i}`} />;
+                return (
+                  <MenuItem value={i} key={i} primaryText={`Frame #${i}`} />
+                );
               })}
             </SelectField>
           )}
         </Line>
         <Line>
-            {!!sprite && <PointsList pointsContainer={sprite} />}
-            {!sprite && <EmptyMessage>Choose an animation and frame to edit the points</EmptyMessage>}
+          {!!sprite && <PointsList pointsContainer={sprite} />}
+          {!sprite && (
+            <EmptyMessage>
+              Choose an animation and frame to edit the points
+            </EmptyMessage>
+          )}
         </Line>
       </Column>
     );

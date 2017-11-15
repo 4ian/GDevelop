@@ -9,9 +9,11 @@ import {
 } from 'material-ui/Table';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../../../../Utils/NewNameGenerator';
+import { mapVector } from '../../../../Utils/MapFor';
 import styles from './styles';
 import PointRow from './PointRow';
 import AddPointRow from './AddPointRow';
+const gd = global.gd;
 
 const SortableAddPointRow = SortableElement(AddPointRow);
 const SortablePointRow = SortableElement(PointRow);
@@ -24,74 +26,85 @@ class PointsListBody extends Component {
     };
   }
 
-  updateOriginPointX = (newValue) => {
-      this.props.pointsContainer.getOrigin().setX(newValue);
-      this.forceUpdate();
-  }
+  updateOriginPointX = newValue => {
+    this.props.pointsContainer.getOrigin().setX(newValue);
+    this.forceUpdate();
+  };
 
-  updateOriginPointY = (newValue) => {
-      this.props.pointsContainer.getOrigin().setY(newValue);
-      this.forceUpdate();
-  }
+  updateOriginPointY = newValue => {
+    this.props.pointsContainer.getOrigin().setY(newValue);
+    this.forceUpdate();
+  };
 
-updateCenterPointX = (newValue) => {
+  updateCenterPointX = newValue => {
     this.props.pointsContainer.getCenter().setX(newValue);
     this.forceUpdate();
-}
+  };
 
-updateCenterPointY = (newValue) => {
+  updateCenterPointY = newValue => {
     this.props.pointsContainer.getCenter().setY(newValue);
     this.forceUpdate();
-}
+  };
+
+  updatePointX = (point, newValue) => {
+    point.setX(newValue);
+    this.forceUpdate();
+  };
+
+  updatePointY = (point, newValue) => {
+    point.setY(newValue);
+    this.forceUpdate();
+  };
 
   render() {
     const { pointsContainer } = this.props;
 
-    const pointsRows = [];
-    // const pointsCount = pointsContainer.getPointsCount();
-    // const pointsRows = mapReverseFor(0, pointsCount, i => {
-    //   const point = pointsContainer.getPointAt(i);
-    //   const pointName = point.getName();
+    const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
+    const pointsRows = mapVector(nonDefaultPoints, (point, i) => {
+      const pointName = point.getName();
 
-    //   return (
-    //     <SortablePointRow
-    //       index={i}
-    //       key={'point-' + pointName}
-    //       pointX={point.getX()}
-    //       pointY={point.getY()}
-    //       pointName={pointName}
-    //       nameError={this.state.nameErrors[pointName]}
-    //       onBlur={event => {
-    //         const newName = event.target.value;
-    //         if (pointName === newName) return;
+      return (
+        <SortablePointRow
+          index={i}
+          disabled
+          key={'point-' + pointName}
+          pointX={point.getX()}
+          pointY={point.getY()}
+          onChangePointX={newValue => this.updatePointX(point, newValue)}
+          onChangePointY={newValue => this.updatePointY(point, newValue)}
+          pointName={pointName}
+          nameError={this.state.nameErrors[pointName]}
+          onBlur={event => {
+            const newName = event.target.value;
+            if (pointName === newName) return;
 
-    //         let success = true;
-    //         if (pointsContainer.hasPointNamed(newName)) {
-    //           success = false;
-    //         } else {
-    //           point.setName(newName);
-    //         }
+            let success = true;
+            if (pointsContainer.hasPoint(newName)) {
+              success = false;
+            } else {
+              point.setName(newName);
+            }
 
-    //         this.setState({
-    //           nameErrors: {
-    //             ...this.state.nameErrors,
-    //             [pointName]: !success,
-    //           },
-    //         });
-    //       }}
-    //       onRemove={() => {
-    //         //eslint-disable-next-line
-    //         const answer = confirm(
-    //           "Are you sure you want to remove this point? This can't be undone."
-    //         );
-    //         if (!answer) return;
+            this.setState({
+              nameErrors: {
+                ...this.state.nameErrors,
+                [pointName]: !success,
+              },
+            });
+          }}
+          onRemove={() => {
+            //eslint-disable-next-line
+            const answer = confirm(
+              "Are you sure you want to remove this point? This can't be undone."
+            );
+            if (!answer) return;
 
-    //         pointsContainer.delPoint(pointName);
-    //         this.forceUpdate();
-    //       }}
-    //     />
-    //   );
-    // });
+            pointsContainer.delPoint(pointName);
+            this.forceUpdate();
+          }}
+        />
+      );
+    });
 
     const originPoint = pointsContainer.getOrigin();
     const centerPoint = pointsContainer.getCenter();
@@ -123,18 +136,17 @@ updateCenterPointY = (newValue) => {
 
     const addRow = (
       <SortableAddPointRow
+        index={0}
         key={'add-point-row'}
         disabled
         onAdd={() => {
           const name = newNameGenerator('Point', name =>
             pointsContainer.hasPoint(name)
           );
-          throw new Error('Unimplemented: add point');
-          //   pointsContainer.insertNewPoint(
-          //     name,
-          //     pointsContainer.getPointsCount()
-          //   );
-          //   this.forceUpdate();
+          const point = new gd.Point(name);
+          pointsContainer.addPoint(point);
+          point.delete();
+          this.forceUpdate();
         }}
       />
     );

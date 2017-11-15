@@ -40,7 +40,7 @@ const PointRow = ({
         value={pointX}
         id="point-x"
         onChange={(e, value) =>
-          onChangePointX(parseFloat(value, 10))}
+          onChangePointX(parseFloat(value || 0, 10))}
       />
     </TableRowColumn>
     <TableRowColumn style={styles.coordinateColumn}>
@@ -48,7 +48,7 @@ const PointRow = ({
         value={pointY}
         id="point-y"
         onChange={(e, value) =>
-          onChangePointY(parseFloat(value, 10))}
+          onChangePointY(parseFloat(value || 0, 10))}
       />
     </TableRowColumn>
     <TableRowColumn style={styles.toolColumn}>

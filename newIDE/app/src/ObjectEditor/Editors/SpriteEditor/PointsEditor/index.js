@@ -5,6 +5,7 @@ import EmptyMessage from '../../../../UI/EmptyMessage';
 import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PointsList from './PointsList';
+import ImageThumbnail from '../../../ImageThumbnail';
 const gd = global.gd;
 
 export default class PointsEditor extends Component {
@@ -36,7 +37,7 @@ export default class PointsEditor extends Component {
   };
 
   render() {
-    const { object } = this.props;
+    const { object, resourcesLoader, project } = this.props;
     const { animationIndex, directionIndex, spriteIndex } = this.state;
     const spriteObject = gd.asSpriteObject(object);
 
@@ -55,8 +56,15 @@ export default class PointsEditor extends Component {
     const sprite = hasValidSprite ? direction.getSprite(spriteIndex) : null;
 
     return (
-      <Column>
-        <Line>
+      <div noMargin>
+        <Line justifyContent="center">
+          <ImageThumbnail
+            resourceName={hasValidSprite ? sprite.getImageName() : ''}
+            resourcesLoader={resourcesLoader}
+            project={project}
+          />
+        </Line>
+        <Line justifyContent="center">
           <SelectField
             floatingLabelText="Animation"
             value={this.state.animationIndex}
@@ -105,15 +113,13 @@ export default class PointsEditor extends Component {
             </SelectField>
           )}
         </Line>
-        <Line>
-          {!!sprite && <PointsList pointsContainer={sprite} />}
-          {!sprite && (
-            <EmptyMessage>
-              Choose an animation and frame to edit the points
-            </EmptyMessage>
-          )}
-        </Line>
-      </Column>
+        {!!sprite && <PointsList pointsContainer={sprite} />}
+        {!sprite && (
+          <EmptyMessage>
+            Choose an animation and frame to edit the points
+          </EmptyMessage>
+        )}
+      </div>
     );
   }
 }

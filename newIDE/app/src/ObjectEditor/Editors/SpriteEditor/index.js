@@ -6,11 +6,15 @@ import Add from 'material-ui/svg-icons/content/add';
 import Delete from 'material-ui/svg-icons/action/delete';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
 import { mapFor } from '../../../Utils/MapFor';
+import Dialog from '../../../UI/Dialog';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
+import ResourcesLoader from '../../../ObjectsRendering/ResourcesLoader';
+import PointsEditor from './PointsEditor';
 
 const gd = global.gd;
 
@@ -150,9 +154,7 @@ class AnimationsListContainer extends Component {
 
   removeAnimation = i => {
     //eslint-disable-next-line
-    const answer = confirm(
-      "Are you sure you want to remove this animation?"
-    );
+    const answer = confirm('Are you sure you want to remove this animation?');
 
     if (answer) {
       this.props.spriteObject.removeAnimation(i);
@@ -200,7 +202,24 @@ class AnimationsListContainer extends Component {
   }
 }
 
-export default class PanelSpriteEditor extends Component {
+export default class SpriteEditor extends Component {
+  state = {
+    pointsEditorOpen: false,
+  };
+
+  constructor(props) {
+    super(props);
+
+    //TOOD: Pass resourcesLoader to SpritesList?
+    this.resourcesLoader = ResourcesLoader;
+  }
+
+  openPointsEditor = (open = true) => {
+    this.setState({
+      pointsEditorOpen: open,
+    });
+  };
+
   render() {
     const {
       object,
@@ -212,13 +231,42 @@ export default class PanelSpriteEditor extends Component {
     const spriteObject = gd.asSpriteObject(object);
 
     return (
-      <AnimationsListContainer
-        spriteObject={spriteObject}
-        resourceSources={resourceSources}
-        onChooseResource={onChooseResource}
-        project={project}
-        onSizeUpdated={onSizeUpdated}
-      />
+      <div>
+        <FlatButton
+          label="Points editor"
+          primary={false}
+          onClick={this.openPointsEditor}
+        />
+        <AnimationsListContainer
+          spriteObject={spriteObject}
+          resourceSources={resourceSources}
+          onChooseResource={onChooseResource}
+          project={project}
+          onSizeUpdated={onSizeUpdated}
+        />
+        {this.state.pointsEditorOpen && (
+          <Dialog
+            actions={
+              <FlatButton
+                label="Close"
+                primary
+                onClick={() => this.openPointsEditor(false)}
+              />
+            }
+            autoScrollBodyContent
+            noMargin
+            modal
+            onRequestClose={() => this.openPointsEditor(false)}
+            open={this.state.pointsEditorOpen}
+          >
+            <PointsEditor
+              object={spriteObject}
+              resourcesLoader={this.resourcesLoader}
+              project={project}
+            />
+          </Dialog>
+        )}
+      </div>
     );
   }
 }

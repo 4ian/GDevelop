@@ -37,6 +37,7 @@ import ObjectsGroupsList from '../ObjectsGroupsList';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
+import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import { makeTestProject } from '../fixtures/TestProject';
 
@@ -230,7 +231,7 @@ storiesOf('SpriteEditor and related editors', module)
     </SerializedObjectDisplay>
   )).add('PointsEditor', () => (
     <SerializedObjectDisplay object={spriteObject}>
-      <PointsEditor object={spriteObject} />
+      <PointsEditor object={spriteObject} project={project} resourcesLoader={ResourcesLoader} />
     </SerializedObjectDisplay>
   ));
 

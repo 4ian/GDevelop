@@ -68,13 +68,13 @@ gdjs.Polygon.prototype.computeEdges = function() {
 		else v2 = this.vertices[i + 1];
 
 		this.edges[i][0] = v2[0] - v1[0];
-        this.edges[i][1] = v2[1] - v1[1];
+		this.edges[i][1] = v2[1] - v1[1];
 	}
 };
 
 gdjs.Polygon.prototype.isConvex = function() {
 	this.computeEdges();
-	edgesLen = this.edges.length;
+	var edgesLen = this.edges.length;
 
 	if ( edgesLen < 3 ) {
 		return false;
@@ -87,7 +87,7 @@ gdjs.Polygon.prototype.isConvex = function() {
 		if ( (zCrossProduct > 0) !== zProductIsPositive ) return false;
 	}
 
-	var lastZCrossProduct = this.edges[edgesLen-1][0]*this.edges[0][1] - this.edges[edgesLen][1]*this.edges[0][0];
+	var lastZCrossProduct = this.edges[edgesLen-1][0]*this.edges[0][1] - this.edges[edgesLen-1][1]*this.edges[0][0];
 	if ( (lastZCrossProduct > 0) !== zProductIsPositive ) return false;
 
 	return true;

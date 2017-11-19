@@ -21,7 +21,7 @@ const PointRow = ({
 }) => (
   <TableRow style={styles.pointRow}>
     <TableRowColumn style={styles.handleColumn}>
-      <DragHandle />
+      {/* <DragHandle /> Reordering point is not supported for now */}
     </TableRowColumn>
     <TableRowColumn>
       <TextField

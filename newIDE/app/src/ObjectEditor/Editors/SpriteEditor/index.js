@@ -7,6 +7,13 @@ import Delete from 'material-ui/svg-icons/action/delete';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+  ToolbarTitle,
+} from 'material-ui/Toolbar';
 import { mapFor } from '../../../Utils/MapFor';
 import Dialog from '../../../UI/Dialog';
 import EmptyMessage from '../../../UI/EmptyMessage';
@@ -220,6 +227,10 @@ export default class SpriteEditor extends Component {
     });
   };
 
+  openHitboxesEditor = (open = true) => {
+    alert("Hitboxes editor is not ready yet! We're working on it and it will be available soon.");
+  }
+
   render() {
     const {
       object,
@@ -232,11 +243,23 @@ export default class SpriteEditor extends Component {
 
     return (
       <div>
-        <FlatButton
-          label="Points editor"
-          primary={false}
-          onClick={this.openPointsEditor}
-        />
+        <Toolbar>
+          <ToolbarGroup firstChild />
+          <ToolbarGroup lastChild>
+            <RaisedButton
+              label="Edit hitboxes"
+              primary={false}
+              onClick={this.openHitboxesEditor}
+              disabled={spriteObject.getAnimationsCount() === 0}
+            />
+            <RaisedButton
+              label="Edit points"
+              primary={false}
+              onClick={this.openPointsEditor}
+              disabled={spriteObject.getAnimationsCount() === 0}
+            />
+          </ToolbarGroup>
+        </Toolbar>
         <AnimationsListContainer
           spriteObject={spriteObject}
           resourceSources={resourceSources}

@@ -209,10 +209,7 @@ export default class PointsList extends Component {
           pointsContainer={this.props.pointsContainer}
           onPointsUpdated={this.props.onPointsUpdated}
           onSortEnd={({ oldIndex, newIndex }) => {
-              //TODO
-            // const pointsCount = this.props.pointsContainer.getPointsCount();
-            // this.props.pointsContainer.movePoint(oldIndex, newIndex);
-            // this.forceUpdate();
+            // Reordering points is not supported for now
           }}
           helperClass="sortable-helper"
           useDragHandle

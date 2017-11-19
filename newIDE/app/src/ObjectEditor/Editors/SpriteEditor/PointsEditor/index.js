@@ -18,6 +18,7 @@ export default class PointsEditor extends Component {
 
   _onPointsUpdated = () => {
     this.forceUpdate(); // Refresh the preview
+    if (this.props.onPointsUpdated) this.props.onPointsUpdated();
   };
 
   chooseAnimation = index => {

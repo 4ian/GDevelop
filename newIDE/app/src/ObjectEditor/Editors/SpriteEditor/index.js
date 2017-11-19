@@ -263,6 +263,8 @@ export default class SpriteEditor extends Component {
               object={spriteObject}
               resourcesLoader={this.resourcesLoader}
               project={project}
+              onPointsUpdated={() =>
+                this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
             />
           </Dialog>
         )}

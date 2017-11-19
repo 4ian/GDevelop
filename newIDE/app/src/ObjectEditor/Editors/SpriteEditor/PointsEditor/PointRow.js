@@ -17,10 +17,7 @@ const PointRow = ({
   onChangePointY,
 }) => (
   <TableRow
-    style={{
-      /* TODO */
-      backgroundColor: 'white',
-    }}
+    style={styles.pointRow}
   >
     <TableRowColumn style={styles.handleColumn}>
       <DragHandle />
@@ -38,6 +35,7 @@ const PointRow = ({
     <TableRowColumn style={styles.coordinateColumn}>
       <TextField
         value={pointX}
+        type="number"
         id="point-x"
         onChange={(e, value) =>
           onChangePointX(parseFloat(value || 0, 10))}
@@ -46,6 +44,7 @@ const PointRow = ({
     <TableRowColumn style={styles.coordinateColumn}>
       <TextField
         value={pointY}
+        type="number"
         id="point-y"
         onChange={(e, value) =>
           onChangePointY(parseFloat(value || 0, 10))}

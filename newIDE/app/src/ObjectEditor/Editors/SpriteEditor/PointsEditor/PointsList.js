@@ -29,31 +29,37 @@ class PointsListBody extends Component {
   updateOriginPointX = newValue => {
     this.props.pointsContainer.getOrigin().setX(newValue);
     this.forceUpdate();
+    this.props.onPointsUpdated();
   };
 
   updateOriginPointY = newValue => {
     this.props.pointsContainer.getOrigin().setY(newValue);
     this.forceUpdate();
+    this.props.onPointsUpdated();
   };
 
   updateCenterPointX = newValue => {
     this.props.pointsContainer.getCenter().setX(newValue);
     this.forceUpdate();
+    this.props.onPointsUpdated();
   };
 
   updateCenterPointY = newValue => {
     this.props.pointsContainer.getCenter().setY(newValue);
     this.forceUpdate();
+    this.props.onPointsUpdated();
   };
 
   updatePointX = (point, newValue) => {
     point.setX(newValue);
     this.forceUpdate();
+    this.props.onPointsUpdated();
   };
 
   updatePointY = (point, newValue) => {
     point.setY(newValue);
     this.forceUpdate();
+    this.props.onPointsUpdated();
   };
 
   render() {
@@ -185,6 +191,7 @@ export default class PointsList extends Component {
         </TableHeader>
         <SortablePointsListBody
           pointsContainer={this.props.pointsContainer}
+          onPointsUpdated={this.props.onPointsUpdated}
           onSortEnd={({ oldIndex, newIndex }) => {
               //TODO
             // const pointsCount = this.props.pointsContainer.getPointsCount();

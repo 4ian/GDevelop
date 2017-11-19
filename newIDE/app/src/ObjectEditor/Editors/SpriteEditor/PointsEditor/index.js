@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import EmptyMessage from '../../../../UI/EmptyMessage';
-import { Line, Column } from '../../../../UI/Grid';
+import { Line } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PointsList from './PointsList';
-import ImageThumbnail from '../../../ImageThumbnail';
+import PointsPreview from './PointsPreview';
+import ImagePreview from '../../../ImagePreview';
 const gd = global.gd;
 
 export default class PointsEditor extends Component {
@@ -13,6 +14,10 @@ export default class PointsEditor extends Component {
     animationIndex: 0,
     directionIndex: 0,
     spriteIndex: 0,
+  };
+
+  _onPointsUpdated = () => {
+    this.forceUpdate(); // Refresh the preview
   };
 
   chooseAnimation = index => {
@@ -58,11 +63,13 @@ export default class PointsEditor extends Component {
     return (
       <div noMargin>
         <Line justifyContent="center">
-          <ImageThumbnail
+          <ImagePreview
             resourceName={hasValidSprite ? sprite.getImageName() : ''}
             resourcesLoader={resourcesLoader}
             project={project}
-          />
+          >
+            {hasValidSprite && <PointsPreview pointsContainer={sprite} />}
+          </ImagePreview>
         </Line>
         <Line justifyContent="center">
           <SelectField
@@ -113,7 +120,12 @@ export default class PointsEditor extends Component {
             </SelectField>
           )}
         </Line>
-        {!!sprite && <PointsList pointsContainer={sprite} />}
+        {!!sprite && (
+          <PointsList
+            pointsContainer={sprite}
+            onPointsUpdated={this._onPointsUpdated}
+          />
+        )}
         {!sprite && (
           <EmptyMessage>
             Choose an animation and frame to edit the points

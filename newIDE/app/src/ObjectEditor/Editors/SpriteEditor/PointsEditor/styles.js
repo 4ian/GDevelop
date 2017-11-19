@@ -11,4 +11,7 @@ export default {
     toolColumn: {
       width: 48,
     },
+    pointRow: {
+      backgroundColor: 'white',
+    }
   };

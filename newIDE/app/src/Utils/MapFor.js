@@ -13,3 +13,7 @@ export const mapReverseFor = (start, end, func) => {
   }
   return result;
 };
+
+export const mapVector = (cppVector, func) => {
+  return mapFor(0, cppVector.size(), i => func(cppVector.at(i), i));
+};

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
+import HelpButton from '../UI/HelpButton';
 import FlatButton from 'material-ui/FlatButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 
@@ -39,6 +40,7 @@ export default class ExportDialog extends Component {
         title="Export project to a standalone game"
         onRequestClose={onClose}
         actions={actions}
+        secondaryActions={<HelpButton helpPagePath="/publishing" />}
         open={open}
         noMargin
       >

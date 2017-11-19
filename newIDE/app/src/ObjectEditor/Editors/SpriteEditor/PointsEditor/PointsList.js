@@ -26,40 +26,39 @@ class PointsListBody extends Component {
     };
   }
 
-  updateOriginPointX = newValue => {
-    this.props.pointsContainer.getOrigin().setX(newValue);
+  _onPointsUpdated() {
     this.forceUpdate();
     this.props.onPointsUpdated();
+  }
+
+  updateOriginPointX = newValue => {
+    this.props.pointsContainer.getOrigin().setX(newValue);
+    this._onPointsUpdated();
   };
 
   updateOriginPointY = newValue => {
     this.props.pointsContainer.getOrigin().setY(newValue);
-    this.forceUpdate();
-    this.props.onPointsUpdated();
+    this._onPointsUpdated();
   };
 
   updateCenterPointX = newValue => {
     this.props.pointsContainer.getCenter().setX(newValue);
-    this.forceUpdate();
-    this.props.onPointsUpdated();
+    this._onPointsUpdated();
   };
 
   updateCenterPointY = newValue => {
     this.props.pointsContainer.getCenter().setY(newValue);
-    this.forceUpdate();
-    this.props.onPointsUpdated();
+    this._onPointsUpdated();
   };
 
   updatePointX = (point, newValue) => {
     point.setX(newValue);
-    this.forceUpdate();
-    this.props.onPointsUpdated();
+    this._onPointsUpdated();
   };
 
   updatePointY = (point, newValue) => {
     point.setY(newValue);
-    this.forceUpdate();
-    this.props.onPointsUpdated();
+    this._onPointsUpdated();
   };
 
   render() {
@@ -106,7 +105,7 @@ class PointsListBody extends Component {
             if (!answer) return;
 
             pointsContainer.delPoint(pointName);
-            this.forceUpdate();
+            this._onPointsUpdated();
           }}
         />
       );
@@ -132,11 +131,28 @@ class PointsListBody extends Component {
         index={1}
         key={'center-point-row'}
         pointName="Center"
+        isAutomatic={pointsContainer.isDefaultCenterPoint()}
         pointX={centerPoint.getX()}
         pointY={centerPoint.getY()}
         onChangePointX={this.updateCenterPointX}
         onChangePointY={this.updateCenterPointY}
         disabled
+        onEdit={
+          pointsContainer.isDefaultCenterPoint()
+            ? () => {
+                pointsContainer.setDefaultCenterPoint(false);
+                this._onPointsUpdated();
+              }
+            : null
+        }
+        onRemove={
+          !pointsContainer.isDefaultCenterPoint()
+            ? () => {
+                pointsContainer.setDefaultCenterPoint(true);
+                this._onPointsUpdated();
+              }
+            : null
+        }
       />
     );
 
@@ -152,7 +168,7 @@ class PointsListBody extends Component {
           const point = new gd.Point(name);
           pointsContainer.addPoint(point);
           point.delete();
-          this.forceUpdate();
+          this._onPointsUpdated();
         }}
       />
     );

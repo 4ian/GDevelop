@@ -8,35 +8,49 @@ const styles = {
 };
 
 export default class PointsPreview extends React.Component {
-  _renderPoint = (point, src) => {
+  _renderPoint = (name, x, y, imageSrc = undefined) => {
     return (
       <img
-        src={src || 'res/point.png'}
+        src={imageSrc || 'res/point.png'}
         style={{
           position: 'absolute',
-          left: point.getX(),
-          top: point.getY(),
+          left: x,
+          top: y,
           transform: 'translate(-6px, -5px)',
         }}
         alt=""
-        key={point.getName()}
+        key={name}
       />
     );
   };
 
   render() {
-    const { pointsContainer } = this.props;
+    const { pointsContainer, imageWidth, imageHeight } = this.props;
 
     const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
     const points = mapVector(nonDefaultPoints, (point, i) =>
-      this._renderPoint(point)
+      this._renderPoint(point.getName(), point.getX(), point.getY())
     );
+
+    const originPoint = pointsContainer.getOrigin();
+    const centerPoint = pointsContainer.getCenter();
+    const automaticCenterPosition = pointsContainer.isDefaultCenterPoint();
 
     return (
       <div style={styles.container}>
         {points}
-        {this._renderPoint(pointsContainer.getOrigin(), 'res/originPoint.png')}
-        {this._renderPoint(pointsContainer.getCenter(), 'res/centerPoint.png')}
+        {this._renderPoint(
+          'Origin',
+          originPoint.getX(),
+          originPoint.getY(),
+          'res/originPoint.png'
+        )}
+        {this._renderPoint(
+          'Center',
+          !automaticCenterPosition ? centerPoint.getX() : imageWidth / 2,
+          !automaticCenterPosition ? centerPoint.getY() : imageHeight / 2,
+          'res/centerPoint.png'
+        )}
       </div>
     );
   }

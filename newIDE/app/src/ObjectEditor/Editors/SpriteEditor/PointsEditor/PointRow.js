@@ -2,6 +2,7 @@ import React from 'react';
 import { TableRow, TableRowColumn } from 'material-ui/Table';
 import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
+import ModeEdit from 'material-ui/svg-icons/editor/mode-edit';
 import TextField from 'material-ui/TextField';
 import DragHandle from '../../../../UI/DragHandle';
 import styles from './styles';
@@ -15,10 +16,10 @@ const PointRow = ({
   pointY,
   onChangePointX,
   onChangePointY,
+  onEdit,
+  isAutomatic,
 }) => (
-  <TableRow
-    style={styles.pointRow}
-  >
+  <TableRow style={styles.pointRow}>
     <TableRowColumn style={styles.handleColumn}>
       <DragHandle />
     </TableRowColumn>
@@ -33,27 +34,38 @@ const PointRow = ({
       />
     </TableRowColumn>
     <TableRowColumn style={styles.coordinateColumn}>
-      <TextField
-        value={pointX}
-        type="number"
-        id="point-x"
-        onChange={(e, value) =>
-          onChangePointX(parseFloat(value || 0, 10))}
-      />
+      {!isAutomatic ? (
+        <TextField
+          value={pointX}
+          type="number"
+          id="point-x"
+          onChange={(e, value) => onChangePointX(parseFloat(value || 0, 10))}
+        />
+      ) : (
+        <p>(auto)</p>
+      )}
     </TableRowColumn>
     <TableRowColumn style={styles.coordinateColumn}>
-      <TextField
-        value={pointY}
-        type="number"
-        id="point-y"
-        onChange={(e, value) =>
-          onChangePointY(parseFloat(value || 0, 10))}
-      />
+      {!isAutomatic ? (
+        <TextField
+          value={pointY}
+          type="number"
+          id="point-y"
+          onChange={(e, value) => onChangePointY(parseFloat(value || 0, 10))}
+        />
+      ) : (
+        <p>(auto)</p>
+      )}
     </TableRowColumn>
     <TableRowColumn style={styles.toolColumn}>
       {!!onRemove && (
         <IconButton onTouchTap={onRemove}>
           <Delete />
+        </IconButton>
+      )}
+      {!!onEdit && (
+        <IconButton onTouchTap={onEdit}>
+          <ModeEdit />
         </IconButton>
       )}
     </TableRowColumn>

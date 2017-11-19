@@ -68,12 +68,16 @@ export default class ImagePreview extends React.Component {
       children,
     } = this.props;
 
+    const {
+      imageHeight, imageWidth
+    } = this.state;
+
     const overlayStyle = {
       ...styles.overlayContainer,
       width: this.state.imageWidth,
       height: this.state.imageHeight,
     };
-    const canDisplayOverlays = !!this.state.imageWidth && !!this.state.imageHeight;
+    const canDisplayOverlays = !!imageWidth && !!imageHeight;
 
     return (
       <div
@@ -99,7 +103,10 @@ export default class ImagePreview extends React.Component {
             <div
               style={overlayStyle}
             >
-              {children}
+              {React.cloneElement(children, {
+                imageWidth,
+                imageHeight,
+              })}
             </div>
           )}
       </div>

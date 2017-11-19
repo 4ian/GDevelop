@@ -131,7 +131,7 @@ public:
      * \warning If the image has not been loaded (using LoadImage) and the center point is set as automatic,
      * the returned point won't be correct.
      */
-    inline Point & GetCenter() { automaticCentre = false; return centre; }
+    inline Point & GetCenter() { return centre; }
 
     /**
      * \brief Return true if the center point is automatically computed.

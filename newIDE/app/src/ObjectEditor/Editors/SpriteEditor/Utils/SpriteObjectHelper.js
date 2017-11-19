@@ -84,6 +84,12 @@ export const haveSamePoints = (sprite1, sprite2) => {
   if (sprite1.isDefaultCenterPoint() !== sprite2.isDefaultCenterPoint())
     return false;
 
+  if (
+    sprite1.getAllNonDefaultPoints().size() !==
+    sprite2.getAllNonDefaultPoints().size()
+  )
+    return false;
+
   return every(
     mapVector(sprite1.getAllNonDefaultPoints(), sprite1Point => {
       if (!sprite2.hasPoint(sprite1Point.getName())) return false;

@@ -8,12 +8,6 @@ import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
-import {
-  Toolbar,
-  ToolbarGroup,
-  ToolbarSeparator,
-  ToolbarTitle,
-} from 'material-ui/Toolbar';
 import { mapFor } from '../../../Utils/MapFor';
 import Dialog from '../../../UI/Dialog';
 import EmptyMessage from '../../../UI/EmptyMessage';
@@ -35,25 +29,32 @@ const styles = {
   animationTools: {
     flexShrink: 0,
   },
-  addAnimationLine: {
+  lastLine: {
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  addAnimation: {
+    display: 'flex',
   },
   addAnimationText: {
     justifyContent: 'flex-end',
   },
 };
 
-const AddAnimationLine = SortableElement(({ onAdd }) => (
-  <div style={styles.addAnimationLine}>
-    <EmptyMessage style={styles.addAnimationText}>
-      Click to add an animation:
-    </EmptyMessage>
-    <IconButton onClick={onAdd}>
-      <Add />
-    </IconButton>
+const AddAnimationLine = ({ onAdd, extraTools }) => (
+  <div style={styles.lastLine}>
+    {extraTools}
+    <div style={styles.addAnimation}>
+      <EmptyMessage style={styles.addAnimationText}>
+        Click to add an animation:
+      </EmptyMessage>
+      <IconButton onClick={onAdd}>
+        <Add />
+      </IconButton>
+    </div>
   </div>
-));
+);
 
 class Animation extends Component {
   render() {
@@ -64,6 +65,7 @@ class Animation extends Component {
       resourceSources,
       onRemove,
       onChooseResource,
+      resourcesLoader,
     } = this.props;
 
     return (
@@ -92,6 +94,7 @@ class Animation extends Component {
               direction={direction}
               key={i}
               project={project}
+              resourcesLoader={resourcesLoader}
               resourceSources={resourceSources}
               onChooseResource={onChooseResource}
             />
@@ -111,8 +114,10 @@ const SortableAnimationsList = SortableContainer(
     onRemoveAnimation,
     onChangeAnimationName,
     project,
+    resourcesLoader,
     resourceSources,
     onChooseResource,
+    extraBottomTools,
   }) => {
     return (
       <GridList style={styles.gridList} cellHeight="auto" cols={1}>
@@ -126,6 +131,7 @@ const SortableAnimationsList = SortableContainer(
                 id={i}
                 animation={animation}
                 project={project}
+                resourcesLoader={resourcesLoader}
                 resourceSources={resourceSources}
                 onChooseResource={onChooseResource}
                 onRemove={() => onRemoveAnimation(i)}
@@ -138,6 +144,7 @@ const SortableAnimationsList = SortableContainer(
             key="add-animation-line"
             disabled
             index={spriteObject.getAnimationsCount()}
+            extraTools={extraBottomTools}
           />,
         ]}
       </GridList>
@@ -199,8 +206,10 @@ class AnimationsListContainer extends Component {
         onAddAnimation={this.addAnimation}
         onChangeAnimationName={this.changeAnimationName}
         onRemoveAnimation={this.removeAnimation}
+        resourcesLoader={this.props.resourcesLoader}
         resourceSources={this.props.resourceSources}
         onChooseResource={this.props.onChooseResource}
+        extraBottomTools={this.props.extraBottomTools}
         useDragHandle
         lockAxis="y"
         axis="y"
@@ -217,7 +226,6 @@ export default class SpriteEditor extends Component {
   constructor(props) {
     super(props);
 
-    //TOOD: Pass resourcesLoader to SpritesList?
     this.resourcesLoader = ResourcesLoader;
   }
 
@@ -228,8 +236,10 @@ export default class SpriteEditor extends Component {
   };
 
   openHitboxesEditor = (open = true) => {
-    alert("Hitboxes editor is not ready yet! We're working on it and it will be available soon.");
-  }
+    alert(
+      "Hitboxes editor is not ready yet! We're working on it and it will be available soon."
+    );
+  };
 
   render() {
     const {
@@ -243,29 +253,29 @@ export default class SpriteEditor extends Component {
 
     return (
       <div>
-        <Toolbar>
-          <ToolbarGroup firstChild />
-          <ToolbarGroup lastChild>
-            <RaisedButton
-              label="Edit hitboxes"
-              primary={false}
-              onClick={this.openHitboxesEditor}
-              disabled={spriteObject.getAnimationsCount() === 0}
-            />
-            <RaisedButton
-              label="Edit points"
-              primary={false}
-              onClick={this.openPointsEditor}
-              disabled={spriteObject.getAnimationsCount() === 0}
-            />
-          </ToolbarGroup>
-        </Toolbar>
         <AnimationsListContainer
           spriteObject={spriteObject}
+          resourcesLoader={this.resourcesLoader}
           resourceSources={resourceSources}
           onChooseResource={onChooseResource}
           project={project}
           onSizeUpdated={onSizeUpdated}
+          extraBottomTools={
+            <div>
+              <RaisedButton
+                label="Edit hitboxes"
+                primary={false}
+                onClick={() => this.openHitboxesEditor(true)}
+                disabled={spriteObject.getAnimationsCount() === 0}
+              />
+              <RaisedButton
+                label="Edit points"
+                primary={false}
+                onClick={() => this.openPointsEditor(true)}
+                disabled={spriteObject.getAnimationsCount() === 0}
+              />
+            </div>
+          }
         />
         {this.state.pointsEditorOpen && (
           <Dialog

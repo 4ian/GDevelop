@@ -3,7 +3,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
 import EmptyMessage from '../../../../UI/EmptyMessage';
-import { Line } from '../../../../UI/Grid';
+import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PointsList from './PointsList';
 import PointsPreview from './PointsPreview';
@@ -97,7 +97,6 @@ export default class PointsEditor extends Component {
       samePointsForAnimations: every(
         mapFor(0, spriteObject.getAnimationsCount(), i => {
           const otherAnimation = spriteObject.getAnimation(i);
-
           return allSpritesHaveSamePointsAs(sprite, otherAnimation);
         })
       ),
@@ -174,8 +173,7 @@ export default class PointsEditor extends Component {
     );
 
     return (
-      <div noMargin>
-        <Line>
+      <div>
           <ImagePreview
             resourceName={hasValidSprite ? sprite.getImageName() : ''}
             resourcesLoader={resourcesLoader}
@@ -183,73 +181,76 @@ export default class PointsEditor extends Component {
           >
             {hasValidSprite && <PointsPreview pointsContainer={sprite} />}
           </ImagePreview>
-        </Line>
-        <Toggle
-          label="Use same points for all animations"
-          labelPosition="right"
-          toggled={samePointsForAnimations}
-          onToggle={(e, checked) =>
-            this._onToggleSamePointsForAnimation(checked)}
-        />
         <Line>
-          {!samePointsForAnimations && (
-            <SelectField
-              floatingLabelText="Animation"
-              value={this.state.animationIndex}
-              onChange={(e, i, value) => this.chooseAnimation(value)}
-            >
-              {mapFor(0, spriteObject.getAnimationsCount(), i => {
-                const animation = spriteObject.getAnimation(i);
-                return (
-                  <MenuItem
-                    key={i}
-                    value={i}
-                    primaryText={`Animation #${i} ${animation.getName()}`}
-                  />
-                );
-              })}
-            </SelectField>
-          )}
-          {!samePointsForAnimations &&
-            hasValidAnimation &&
-            animation.getDirectionsCount() > 1 && (
-              <SelectField
-                floatingLabelText="Direction"
-                value={this.state.directionIndex}
-                onChange={(e, i, value) => this.chooseDirection(value)}
-              >
-                {mapFor(0, animation.getDirectionsCount(), i => {
-                  return (
-                    <MenuItem
-                      value={i}
-                      key={i}
-                      primaryText={`Direction #${i}`}
-                    />
-                  );
-                })}
-              </SelectField>
-            )}
-          {!samePointsForSprites &&
-            hasValidDirection && (
-              <SelectField
-                floatingLabelText="Frame"
-                value={this.state.spriteIndex}
-                onChange={(e, i, value) => this.chooseSprite(value)}
-              >
-                {mapFor(0, direction.getSpritesCount(), i => {
-                  return (
-                    <MenuItem value={i} key={i} primaryText={`Frame #${i}`} />
-                  );
-                })}
-              </SelectField>
-            )}
+          <Column expand>
+            <Toggle
+              label="Share same points for all animations"
+              labelPosition="right"
+              toggled={samePointsForAnimations}
+              onToggle={(e, checked) =>
+                this._onToggleSamePointsForAnimation(checked)}
+            />
+            <Line>
+              {!samePointsForAnimations && (
+                <SelectField
+                  floatingLabelText="Animation"
+                  value={this.state.animationIndex}
+                  onChange={(e, i, value) => this.chooseAnimation(value)}
+                >
+                  {mapFor(0, spriteObject.getAnimationsCount(), i => {
+                    const animation = spriteObject.getAnimation(i);
+                    return (
+                      <MenuItem
+                        key={i}
+                        value={i}
+                        primaryText={`Animation #${i} ${animation.getName()}`}
+                      />
+                    );
+                  })}
+                </SelectField>
+              )}
+              {!samePointsForAnimations &&
+                hasValidAnimation &&
+                animation.getDirectionsCount() > 1 && (
+                  <SelectField
+                    floatingLabelText="Direction"
+                    value={this.state.directionIndex}
+                    onChange={(e, i, value) => this.chooseDirection(value)}
+                  >
+                    {mapFor(0, animation.getDirectionsCount(), i => {
+                      return (
+                        <MenuItem
+                          value={i}
+                          key={i}
+                          primaryText={`Direction #${i}`}
+                        />
+                      );
+                    })}
+                  </SelectField>
+                )}
+              {!samePointsForSprites &&
+                hasValidDirection && (
+                  <SelectField
+                    floatingLabelText="Frame"
+                    value={this.state.spriteIndex}
+                    onChange={(e, i, value) => this.chooseSprite(value)}
+                  >
+                    {mapFor(0, direction.getSpritesCount(), i => {
+                      return (
+                        <MenuItem value={i} key={i} primaryText={`Frame #${i}`} />
+                      );
+                    })}
+                  </SelectField>
+                )}
+            </Line>
+            <Toggle
+              label="Share same points for all sprites of the animation"
+              labelPosition="right"
+              toggled={samePointsForSprites}
+              onToggle={(e, checked) => this._onToggleSamePointsForSprites(checked)}
+            />
+          </Column>
         </Line>
-        <Toggle
-          label="Use same points for all sprites of the animation"
-          labelPosition="right"
-          toggled={samePointsForSprites}
-          onToggle={(e, checked) => this._onToggleSamePointsForSprites(checked)}
-        />
         {!!sprite && (
           <PointsList
             pointsContainer={sprite}

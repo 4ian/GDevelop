@@ -5,7 +5,6 @@ import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
-import ResourcesLoader from '../../../ObjectsRendering/ResourcesLoader';
 import ImageThumbnail, { thumbnailContainerStyle } from '../../ImageThumbnail';
 const gd = global.gd;
 
@@ -85,12 +84,6 @@ const SortableList = SortableContainer(
 );
 
 export default class SpritesList extends Component {
-  constructor(props) {
-    super(props);
-
-    this.resourcesLoader = ResourcesLoader;
-  }
-
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.direction.moveSprite(oldIndex, newIndex);
     this.forceUpdate();
@@ -120,7 +113,7 @@ export default class SpritesList extends Component {
           <DirectionTools direction={this.props.direction} />
         </MiniToolbar>
         <SortableList
-          resourcesLoader={this.resourcesLoader}
+          resourcesLoader={this.props.resourcesLoader}
           direction={this.props.direction}
           project={this.props.project}
           onSortEnd={this.onSortEnd}

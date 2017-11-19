@@ -4,7 +4,6 @@ import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
 import ModeEdit from 'material-ui/svg-icons/editor/mode-edit';
 import TextField from 'material-ui/TextField';
-import DragHandle from '../../../../UI/DragHandle';
 import styles from './styles';
 
 const PointRow = ({

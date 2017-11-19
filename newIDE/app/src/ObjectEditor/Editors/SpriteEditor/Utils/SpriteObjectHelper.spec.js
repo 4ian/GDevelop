@@ -7,29 +7,38 @@ describe('History', () => {
     const sprite2 = new gd.Sprite();
 
     expect(haveSamePoints(sprite1, sprite2)).toBe(true);
+    expect(haveSamePoints(sprite2, sprite1)).toBe(true);
     sprite1.getOrigin().setX(40);
     expect(haveSamePoints(sprite1, sprite2)).toBe(false);
+    expect(haveSamePoints(sprite2, sprite1)).toBe(false);
     sprite2.getOrigin().setX(40);
     expect(haveSamePoints(sprite1, sprite2)).toBe(true);
+    expect(haveSamePoints(sprite2, sprite1)).toBe(true);
 
     sprite1.setDefaultCenterPoint(false);
     expect(haveSamePoints(sprite1, sprite2)).toBe(false);
+    expect(haveSamePoints(sprite2, sprite1)).toBe(false);
     sprite2.setDefaultCenterPoint(false);
     expect(haveSamePoints(sprite1, sprite2)).toBe(true);
+    expect(haveSamePoints(sprite2, sprite1)).toBe(true);
 
     const customPoint1 = new gd.Point("CustomPoint");
     sprite1.addPoint(customPoint1);
     customPoint1.delete();
     expect(haveSamePoints(sprite1, sprite2)).toBe(false);
+    expect(haveSamePoints(sprite2, sprite1)).toBe(false);
     const customPoint2 = new gd.Point("CustomPoint");
     sprite2.addPoint(customPoint2);
     customPoint2.delete();
     expect(haveSamePoints(sprite1, sprite2)).toBe(true);
+    expect(haveSamePoints(sprite2, sprite1)).toBe(true);
 
     sprite1.getPoint("CustomPoint").setY(10);
     expect(haveSamePoints(sprite1, sprite2)).toBe(false);
+    expect(haveSamePoints(sprite2, sprite1)).toBe(false);
     sprite2.getPoint("CustomPoint").setY(10);
     expect(haveSamePoints(sprite1, sprite2)).toBe(true);
+    expect(haveSamePoints(sprite2, sprite1)).toBe(true);
   });
 
   it('can tell if all sprites of animations have the exact same points', () => {

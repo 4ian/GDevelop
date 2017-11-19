@@ -224,6 +224,10 @@ export const makeTestProject = gd => {
   project.insertObject(globalTextObject, 0);
   project.insertObject(globalTiledSpriteObject, 0);
 
+  // External events
+  const testExternalEvents1 = project.insertNewExternalEvents('TestExternalEvents1', 0);
+  const testExternalEvents2 = project.insertNewExternalEvents('TestExternalEvents2', 1);
+
   return {
     project,
     shapePainterObject,
@@ -238,5 +242,7 @@ export const makeTestProject = gd => {
     group2,
     testLayoutInstance1,
     testInstruction,
+    testExternalEvents1,
+    testExternalEvents2,
   };
 };

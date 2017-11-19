@@ -22,6 +22,7 @@ import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
 import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
+import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterFields/ExternalEventsField';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
 import ObjectsList from '../ObjectsList';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
@@ -36,6 +37,7 @@ import ObjectsGroupEditor from '../ObjectsGroupEditor';
 import ObjectsGroupsList from '../ObjectsGroupsList';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
+import ValueStateHolder from './ValueStateHolder';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
 import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -116,6 +118,15 @@ storiesOf('LocalExport', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LocalExport open project={project} onClose={action('close')} />
+  ));
+
+storiesOf('ParameterFields', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('ExternalEventsField', () => (
+    <ValueStateHolder initialValue={'Test'}>
+      <ExternalEventsField project={project} />
+    </ValueStateHolder>
   ));
 
 storiesOf('LocalS3Export', module)

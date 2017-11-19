@@ -7,7 +7,7 @@ import {
   selectableArea,
 } from '../ClassNames';
 import InlinePopover from '../InlinePopover';
-import DefaultField from '../InstructionEditor/ParameterFields/DefaultField';
+import ExternalEventsField from '../InstructionEditor/ParameterFields/ExternalEventsField';
 const gd = global.gd;
 
 const styles = {
@@ -27,6 +27,8 @@ export default class LinkEvent extends Component {
     event: PropTypes.object.isRequired,
   };
 
+  _externalEventsField = null;
+
   constructor(props) {
     super(props);
 
@@ -40,6 +42,8 @@ export default class LinkEvent extends Component {
     this.setState({
       editing: true,
       anchorEl: domEvent.currentTarget,
+    }, () => {
+      if (this._externalEventsField) this._externalEventsField.focus();
     });
   };
 
@@ -78,15 +82,15 @@ export default class LinkEvent extends Component {
           anchorEl={this.state.anchorEl}
           onRequestClose={this.endEditing}
         >
-          <DefaultField
+          <ExternalEventsField
             project={this.props.project}
-            layout={this.props.layout}
             value={target}
             onChange={text => {
               linkEvent.setTarget(text);
               this.props.onUpdate();
             }}
             isInline
+            ref={externalEventsField => this._externalEventsField = externalEventsField}
           />
         </InlinePopover>
       </div>

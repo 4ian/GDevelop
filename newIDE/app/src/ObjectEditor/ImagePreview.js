@@ -52,7 +52,6 @@ export default class ImagePreview extends React.Component {
   _handleImageLoaded = (e, t) => {
     const imgElement = e.target;
 
-    console.log(imgElement);
     this.setState({
       imageWidth: imgElement ? imgElement.clientWidth : 0,
       imageHeight: imgElement ? imgElement.clientHeight : 0,

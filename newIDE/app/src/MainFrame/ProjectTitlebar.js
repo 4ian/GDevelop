@@ -4,7 +4,7 @@ import Window from '../Utils/Window';
 export default class ProjectTitlebar extends Component {
   render() {
     const { project } = this.props;
-    const titleElements = ['GDevelop'];
+    const titleElements = ['GDevelop 5'];
     if (project)
       titleElements.push(project.getProjectFile() || project.getName());
 

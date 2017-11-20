@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
+import SearchBar from 'material-ui-search-bar';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import IconButton from 'material-ui/IconButton';
 import ListIcon from '../UI/ListIcon';
 import { makeAddItem } from '../UI/ListAddItem';
 import Window from '../Utils/Window';
 import IconMenu from '../UI/Menu/IconMenu';
-import SearchBar from 'material-ui-search-bar';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import IconButton from 'material-ui/IconButton';
+import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import ProjectPropertiesDialog from './ProjectPropertiesDialog';
 import {
   enumerateLayouts,
   enumerateExternalEvents,
@@ -117,7 +119,7 @@ class Item extends Component {
 
     return (
       <ListItem
-        style={{...styles.item, ...this.props.style}}
+        style={{ ...styles.item, ...this.props.style }}
         onContextMenu={this._onContextMenu}
         primaryText={label}
         rightIconButton={rightIconButton}
@@ -143,7 +145,7 @@ export default class ProjectManager extends React.Component {
 
     return (
       <ProjectStructureItem
-        primaryText="Options"
+        primaryText="Menu"
         leftIcon={<ListIcon src="res/ribbon_default/new32.png" />}
         initiallyOpen={true}
         primaryTogglesNestedList={true}
@@ -193,6 +195,29 @@ export default class ProjectManager extends React.Component {
             primaryText="Resources"
             leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
           /> */}
+          <ProjectStructureItem
+            primaryText="Game settings"
+            leftIcon={
+              <ListIcon src="res/ribbon_default/projectManager32.png" />
+            }
+            initiallyOpen={true}
+            primaryTogglesNestedList={true}
+            autoGenerateNestedIndicator={true}
+            nestedItems={[
+              <ListItem
+                key="properties"
+                primaryText="Properties"
+                leftIcon={<ListIcon src="res/ribbon_default/editprop32.png" />}
+                onTouchTap={() => this.setState({ projectPropertiesDialogOpen: true })}
+              />,
+              <ListItem
+                key="global-variables"
+                primaryText="Global variables"
+                leftIcon={<ListIcon src="res/ribbon_default/editname32.png" />}
+                onTouchTap={() => this.setState({ variablesEditorOpen: true })}
+              />,
+            ]}
+          />
           <ProjectStructureItem
             primaryText="Scenes"
             leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}
@@ -324,6 +349,26 @@ export default class ProjectManager extends React.Component {
               searchText: text,
             })}
         />
+        {this.state.variablesEditorOpen && (
+          <VariablesEditorDialog
+            open={this.state.variablesEditorOpen}
+            variablesContainer={project.getVariables()}
+            onCancel={() => this.setState({ variablesEditorOpen: false })}
+            onApply={() => this.setState({ variablesEditorOpen: false })}
+            emptyExplanationMessage="Global variables are variables that are shared amongst all the scenes of the game."
+            emptyExplanationSecondMessage="For example, you can have a variable called UnlockedLevelsCount representing the number of levels unlocked by the player."
+          />
+        )}
+        {this.state.projectPropertiesDialogOpen && (
+          <ProjectPropertiesDialog
+            open={this.state.projectPropertiesDialogOpen}
+            project={project}
+            onClose={() =>
+              this.setState({ projectPropertiesDialogOpen: false })}
+            onApply={() =>
+              this.setState({ projectPropertiesDialogOpen: false })}
+          />
+        )}
       </div>
     );
   }

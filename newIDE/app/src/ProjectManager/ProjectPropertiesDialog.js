@@ -62,41 +62,47 @@ export default class ProjectPropertiesDialog extends Component {
         contentStyle={{ width: '350px' }}
       >
         <TextField
-            floatingLabelText="Game name"
-            fullWidth
-            type="text"
-            value={this.state.name}
-            onChange={(e, value) => this.setState({ name: value })}
+          floatingLabelText="Game name"
+          fullWidth
+          type="text"
+          value={this.state.name}
+          onChange={(e, value) => this.setState({ name: value })}
         />
         <TextField
           floatingLabelText="Game's window width"
           fullWidth
           type="number"
           value={this.state.windowDefaultWidth}
-          onChange={(e, value) => this.setState({ windowDefaultWidth: Math.max(0, parseInt(value, 10)) })}
+          onChange={(e, value) =>
+            this.setState({
+              windowDefaultWidth: Math.max(0, parseInt(value, 10)),
+            })}
         />
         <TextField
           floatingLabelText="Game's window height"
           fullWidth
           type="number"
           value={this.state.windowDefaultHeight}
-          onChange={(e, value) => this.setState({ windowDefaultHeight: Math.max(0, parseInt(value, 10)) })}
+          onChange={(e, value) =>
+            this.setState({
+              windowDefaultHeight: Math.max(0, parseInt(value, 10)),
+            })}
         />
         <TextField
-            floatingLabelText="Author name"
-            fullWidth
-            hintText="Your name"
-            type="text"
-            value={this.state.author}
-            onChange={(e, value) => this.setState({ author: value })}
+          floatingLabelText="Author name"
+          fullWidth
+          hintText="Your name"
+          type="text"
+          value={this.state.author}
+          onChange={(e, value) => this.setState({ author: value })}
         />
         <TextField
-            floatingLabelText="Package name (for iOS and Android)"
-            fullWidth
-            hint="com.example.mygame"
-            type="text"
-            value={this.state.packageName}
-            onChange={(e, value) => this.setState({ packageName: value })}
+          floatingLabelText="Package name (for iOS and Android)"
+          fullWidth
+          hintText="com.example.mygame"
+          type="text"
+          value={this.state.packageName}
+          onChange={(e, value) => this.setState({ packageName: value })}
         />
       </Dialog>
     );

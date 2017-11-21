@@ -200,7 +200,7 @@ export default class ProjectManager extends React.Component {
             leftIcon={
               <ListIcon src="res/ribbon_default/projectManager32.png" />
             }
-            initiallyOpen={true}
+            initiallyOpen={false}
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
             nestedItems={[

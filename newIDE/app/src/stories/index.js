@@ -40,6 +40,7 @@ import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
 import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
+import VariablesList from '../VariablesList';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import { makeTestProject } from '../fixtures/TestProject';
 
@@ -353,5 +354,14 @@ storiesOf('BehaviorsEditor', module)
   .add('default', () => (
     <SerializedObjectDisplay object={spriteObjectWithBehaviors}>
       <BehaviorsEditor project={project} object={spriteObjectWithBehaviors} />
+    </SerializedObjectDisplay>
+  ));
+
+storiesOf('VariablesList', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SerializedObjectDisplay object={testLayout}>
+      <VariablesList variablesContainer={testLayout.getVariables()} />
     </SerializedObjectDisplay>
   ));

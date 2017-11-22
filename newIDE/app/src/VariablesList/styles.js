@@ -13,7 +13,6 @@ export default {
   indentIconColor: '#DDD',
   variableRow: {
     backgroundColor: 'white',
-    height: 42,
   },
   addVariableMessage: {
     justifyContent: 'flex-end',

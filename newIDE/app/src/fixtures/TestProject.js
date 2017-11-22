@@ -133,6 +133,16 @@ export const makeTestProject = gd => {
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
 
+  //Add a few variables
+  const testLayoutVariables = testLayout.getVariables();
+  testLayoutVariables.insert("Variable1", new gd.Variable(), 0).setString("A multiline\nstr value");
+  testLayoutVariables.insert("Variable2", new gd.Variable(), 1).setString("123456");
+  const variable3 = new gd.Variable();
+  variable3.getChild("Child1").setString("Child1 str value");
+  variable3.getChild("Child2").setString("7891011");
+  variable3.getChild("Child3").getChild("SubChild1").setString("Hello\nMultiline\nWorld");
+  testLayoutVariables.insert("Variable3", variable3, 2);
+
   //Create a few events
   //Add a new "standard" event to the scene:
   var evt = testLayout

@@ -103,7 +103,7 @@ export default class MainFrame extends Component {
     });
   };
 
-  openFromPathOrURL = url => {
+  openFromPathOrURL = (url, cb) => {
     this.props.onReadFromPathOrURL(url).then(
       projectObject => {
         this.setState({ loadingProject: true }, () =>
@@ -114,9 +114,12 @@ export default class MainFrame extends Component {
               serializedProject.delete();
 
               this.state.currentProject.setProjectFile(url);
-              this.setState({
-                loadingProject: false,
-              });
+              this.setState(
+                {
+                  loadingProject: false,
+                },
+                cb
+              );
             });
           })
         );
@@ -490,7 +493,9 @@ export default class MainFrame extends Component {
       .then(filepath => {
         if (!filepath) return;
 
-        this.openFromPathOrURL(filepath);
+        this.openFromPathOrURL(filepath, () =>
+          this.openSceneOrProjectManager()
+        );
       })
       .catch(() => {});
   };
@@ -518,6 +523,17 @@ export default class MainFrame extends Component {
 
       this.closeProject(cb);
     });
+  };
+
+  openSceneOrProjectManager = () => {
+    const { currentProject } = this.state;
+    if (!currentProject) return;
+
+    if (currentProject.getLayoutsCount() === 1) {
+      this.openLayout(currentProject.getLayoutAt(0).getName());
+    } else {
+      this.openProjectManager();
+    }
   };
 
   openExportDialog = (open = true) => {
@@ -690,11 +706,15 @@ export default class MainFrame extends Component {
                   onClose: () => this.openCreateDialog(false),
                   onOpen: filepath => {
                     this.openCreateDialog(false);
-                    this.openFromPathOrURL(filepath);
+                    this.openFromPathOrURL(filepath, () =>
+                      this.openSceneOrProjectManager()
+                    );
                   },
                   onCreate: project => {
                     this.openCreateDialog(false);
-                    this.loadFromProject(project);
+                    this.loadFromProject(project, () =>
+                      this.openSceneOrProjectManager()
+                    );
                   },
                 })}
               {!!introDialog &&

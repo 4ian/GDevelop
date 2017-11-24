@@ -125,6 +125,12 @@ export default class MainFrame extends Component {
       });
   };
 
+  openProjectManager = (open = true) => {
+    this.setState({
+      projectManagerOpen: open,
+    });
+  }
+
   setEditorToolbar = editorToolbar => {
     if (!this.toolbar) return;
 
@@ -409,10 +415,13 @@ export default class MainFrame extends Component {
           name: 'Start Page',
           editorCreator: () => (
             <StartPage
+              project={this.state.currentProject}
               setToolbar={this.setEditorToolbar}
               canOpen={!!this.props.onChooseProject}
               onOpen={this.chooseProject}
               onCreate={() => this.openCreateDialog()}
+              onOpenProjectManager={() => this.openProjectManager()}
+              onCloseProject={() => this.closeProject()}
             />
           ),
           key: 'start page',
@@ -516,9 +525,9 @@ export default class MainFrame extends Component {
     this.confirmCloseDialog.show(closeProject => {
       if (!closeProject || !this.state.currentProject) return;
 
+      this.openProjectManager(false);
       this.setState(
         {
-          projectManagerOpen: false,
           editorTabs: closeProjectTabs(
             this.state.editorTabs,
             this.state.currentProject

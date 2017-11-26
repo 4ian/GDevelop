@@ -21,6 +21,7 @@ import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
 import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
+import ImageThumbnail from '../ObjectEditor/ImageThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterFields/ExternalEventsField';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
@@ -110,9 +111,7 @@ storiesOf('Tabs', module)
 
 storiesOf('HelpButton', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <HelpButton helpPagePath="/test" />
-  ));
+  .add('default', () => <HelpButton helpPagePath="/test" />);
 
 storiesOf('LocalExport', module)
   .addDecorator(paperDecorator)
@@ -160,7 +159,9 @@ storiesOf('AboutDialog', module)
 
 storiesOf('CreateProjectDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => <CreateProjectDialog open examplesComponent={Placeholder} />);
+  .add('default', () => (
+    <CreateProjectDialog open examplesComponent={Placeholder} />
+  ));
 
 storiesOf('LayoutChooserDialog', module)
   .addDecorator(muiDecorator)
@@ -241,9 +242,14 @@ storiesOf('SpriteEditor and related editors', module)
     <SerializedObjectDisplay object={spriteObject}>
       <SpriteEditor object={spriteObject} project={project} />
     </SerializedObjectDisplay>
-  )).add('PointsEditor', () => (
+  ))
+  .add('PointsEditor', () => (
     <SerializedObjectDisplay object={spriteObject}>
-      <PointsEditor object={spriteObject} project={project} resourcesLoader={ResourcesLoader} />
+      <PointsEditor
+        object={spriteObject}
+        project={project}
+        resourcesLoader={ResourcesLoader}
+      />
     </SerializedObjectDisplay>
   ));
 
@@ -263,6 +269,24 @@ storiesOf('AdMobEditor', module)
     <SerializedObjectDisplay object={adMobObject}>
       <AdMobEditor object={adMobObject} project={project} />
     </SerializedObjectDisplay>
+  ));
+
+storiesOf('ImageThumbnail', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ImageThumbnail
+      project={project}
+      resourceName="res/icon128.png"
+      resourcesLoader={ResourcesLoader}
+    />
+  )).add('selectable', () => (
+    <ImageThumbnail
+      selectable
+      project={project}
+      resourceName="res/icon128.png"
+      resourcesLoader={ResourcesLoader}
+    />
   ));
 
 storiesOf('EmptyEditor', module)

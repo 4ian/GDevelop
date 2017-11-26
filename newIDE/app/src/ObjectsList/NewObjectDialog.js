@@ -60,15 +60,11 @@ export default class NewObjectDialog extends Component {
     const { project, open, onClose } = this.props;
     if (!open || !project) return null;
 
-    const actions = [
-      <FlatButton label="Close" primary={false} onClick={onClose} />,
-    ];
-
     return (
       <Dialog
         title="Add a new object"
         secondaryActions={<HelpButton helpPagePath="/objects" />}
-        actions={actions}
+        actions={<FlatButton label="Close" primary={false} onClick={onClose} />}
         onRequestClose={onClose}
         open={open}
         noMargin

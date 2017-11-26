@@ -1,4 +1,9 @@
-import { haveSamePoints, allSpritesHaveSamePointsAs, copyAnimationsSpritePoints } from './SpriteObjectHelper';
+import {
+  haveSamePoints,
+  allSpritesHaveSamePointsAs,
+  copyAnimationsSpritePoints,
+  deleteSpritesFromAnimation,
+} from './SpriteObjectHelper';
 const gd = global.gd;
 
 describe('History', () => {
@@ -22,21 +27,21 @@ describe('History', () => {
     expect(haveSamePoints(sprite1, sprite2)).toBe(true);
     expect(haveSamePoints(sprite2, sprite1)).toBe(true);
 
-    const customPoint1 = new gd.Point("CustomPoint");
+    const customPoint1 = new gd.Point('CustomPoint');
     sprite1.addPoint(customPoint1);
     customPoint1.delete();
     expect(haveSamePoints(sprite1, sprite2)).toBe(false);
     expect(haveSamePoints(sprite2, sprite1)).toBe(false);
-    const customPoint2 = new gd.Point("CustomPoint");
+    const customPoint2 = new gd.Point('CustomPoint');
     sprite2.addPoint(customPoint2);
     customPoint2.delete();
     expect(haveSamePoints(sprite1, sprite2)).toBe(true);
     expect(haveSamePoints(sprite2, sprite1)).toBe(true);
 
-    sprite1.getPoint("CustomPoint").setY(10);
+    sprite1.getPoint('CustomPoint').setY(10);
     expect(haveSamePoints(sprite1, sprite2)).toBe(false);
     expect(haveSamePoints(sprite2, sprite1)).toBe(false);
-    sprite2.getPoint("CustomPoint").setY(10);
+    sprite2.getPoint('CustomPoint').setY(10);
     expect(haveSamePoints(sprite1, sprite2)).toBe(true);
     expect(haveSamePoints(sprite2, sprite1)).toBe(true);
   });
@@ -72,13 +77,13 @@ describe('History', () => {
     const emptySprite = new gd.Sprite();
     const spriteWithCustomPoints = new gd.Sprite();
 
-    const point = new gd.Point("CustomPoint");
+    const point = new gd.Point('CustomPoint');
     spriteWithCustomPoints.addPoint(point);
     point.delete();
     spriteWithCustomPoints.setDefaultCenterPoint(false);
     spriteWithCustomPoints.getCenter().setY(5);
-    spriteWithCustomPoints.getPoint("CustomPoint").setX(1);
-    spriteWithCustomPoints.getPoint("CustomPoint").setY(2);
+    spriteWithCustomPoints.getPoint('CustomPoint').setX(1);
+    spriteWithCustomPoints.getPoint('CustomPoint').setY(2);
 
     animation1.getDirection(0).addSprite(emptySprite);
     animation1.getDirection(0).addSprite(spriteWithCustomPoints);
@@ -87,11 +92,63 @@ describe('History', () => {
     const animation2 = new gd.Animation();
     animation2.getDirection(0).addSprite(emptySprite);
     copyAnimationsSpritePoints(spriteWithCustomPoints, animation2);
-    expect(allSpritesHaveSamePointsAs(spriteWithCustomPoints, animation2)).toBe(true);
+    expect(allSpritesHaveSamePointsAs(spriteWithCustomPoints, animation2)).toBe(
+      true
+    );
 
-    copyAnimationsSpritePoints(animation1.getDirection(0).getSprite(1), animation1);
-    expect(haveSamePoints(animation1.getDirection(0).getSprite(0), spriteWithCustomPoints)).toBe(true);
-    expect(haveSamePoints(animation1.getDirection(0).getSprite(1), spriteWithCustomPoints)).toBe(true);
-    expect(haveSamePoints(animation1.getDirection(0).getSprite(2), spriteWithCustomPoints)).toBe(true);
+    copyAnimationsSpritePoints(
+      animation1.getDirection(0).getSprite(1),
+      animation1
+    );
+    expect(
+      haveSamePoints(
+        animation1.getDirection(0).getSprite(0),
+        spriteWithCustomPoints
+      )
+    ).toBe(true);
+    expect(
+      haveSamePoints(
+        animation1.getDirection(0).getSprite(1),
+        spriteWithCustomPoints
+      )
+    ).toBe(true);
+    expect(
+      haveSamePoints(
+        animation1.getDirection(0).getSprite(2),
+        spriteWithCustomPoints
+      )
+    ).toBe(true);
+  });
+
+  it('can remove sprites using the sprites pointers', () => {
+    const animation1 = new gd.Animation();
+    animation1.setUseMultipleDirections(true);
+    animation1.setDirectionsCount(2);
+    const emptySprite = new gd.Sprite();
+    animation1.getDirection(0).addSprite(emptySprite);
+    animation1.getDirection(0).addSprite(emptySprite);
+    animation1.getDirection(0).addSprite(emptySprite);
+    animation1.getDirection(1).addSprite(emptySprite);
+    animation1.getDirection(1).addSprite(emptySprite);
+
+    const sprite1 = animation1.getDirection(0).getSprite(0);
+    const sprite2 = animation1.getDirection(0).getSprite(1);
+    const sprite3 = animation1.getDirection(0).getSprite(2);
+    sprite1.setImageName('sprite1.png');
+    sprite2.setImageName('sprite2.png');
+    sprite3.setImageName('sprite3.png');
+    deleteSpritesFromAnimation(animation1, {
+      [sprite1.ptr]: true,
+      [sprite3.ptr]: true,
+    });
+
+    expect(animation1.getDirection(0).getSpritesCount()).toBe(1);
+    expect(
+      animation1
+        .getDirection(0)
+        .getSprite(0)
+        .getImageName()
+    ).toBe('sprite2.png');
+    expect(animation1.getDirection(1).getSpritesCount()).toBe(2);
   });
 });

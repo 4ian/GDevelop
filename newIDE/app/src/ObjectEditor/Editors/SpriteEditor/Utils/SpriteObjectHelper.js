@@ -117,3 +117,24 @@ export const allSpritesHaveSamePointsAs = (originalSprite, animation) => {
     })
   );
 };
+
+export const deleteSpritesFromAnimation = (animation, spritePtrs) => {
+  mapFor(0, animation.getDirectionsCount(), i => {
+    const direction = animation.getDirection(i);
+
+    const spritesToDelete = mapFor(0, direction.getSpritesCount(), j => {
+      const sprite = direction.getSprite(j);
+
+      return !!spritePtrs[sprite.ptr];
+    });
+
+    // Iterate from the end to the beginning to avoid invalidating indexes.
+    for (
+      let spriteIndex = direction.getSpritesCount() - 1;
+      spriteIndex >= 0;
+      spriteIndex--
+    ) {
+      if (spritesToDelete[spriteIndex]) direction.removeSprite(spriteIndex);
+    }
+  });
+};

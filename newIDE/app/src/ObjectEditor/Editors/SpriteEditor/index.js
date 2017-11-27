@@ -13,9 +13,11 @@ import Dialog from '../../../UI/Dialog';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
+import ContextMenu from '../../../UI/Menu/ContextMenu';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ObjectsRendering/ResourcesLoader';
 import PointsEditor from './PointsEditor';
+import { deleteSpritesFromAnimation } from './Utils/SpriteObjectHelper';
 
 const gd = global.gd;
 
@@ -66,6 +68,9 @@ class Animation extends Component {
       onRemove,
       onChooseResource,
       resourcesLoader,
+      onSpriteContextMenu,
+      selectedSprites,
+      onSelectSprite,
     } = this.props;
 
     return (
@@ -97,6 +102,9 @@ class Animation extends Component {
               resourcesLoader={resourcesLoader}
               resourceSources={resourceSources}
               onChooseResource={onChooseResource}
+              onSpriteContextMenu={onSpriteContextMenu}
+              selectedSprites={selectedSprites}
+              onSelectSprite={onSelectSprite}
             />
           );
         })}
@@ -118,6 +126,9 @@ const SortableAnimationsList = SortableContainer(
     resourceSources,
     onChooseResource,
     extraBottomTools,
+    onSpriteContextMenu,
+    selectedSprites,
+    onSelectSprite,
   }) => {
     return (
       <GridList style={styles.gridList} cellHeight="auto" cols={1}>
@@ -136,6 +147,9 @@ const SortableAnimationsList = SortableContainer(
                 onChooseResource={onChooseResource}
                 onRemove={() => onRemoveAnimation(i)}
                 onChangeName={newName => onChangeAnimationName(i, newName)}
+                onSpriteContextMenu={onSpriteContextMenu}
+                selectedSprites={selectedSprites}
+                onSelectSprite={onSelectSprite}
               />
             );
           }),
@@ -153,6 +167,10 @@ const SortableAnimationsList = SortableContainer(
 );
 
 class AnimationsListContainer extends Component {
+  state = {
+    selectedSprites: {},
+  };
+
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.spriteObject.moveAnimation(oldIndex, newIndex);
     this.forceUpdate();
@@ -196,24 +214,66 @@ class AnimationsListContainer extends Component {
     this.forceUpdate();
   };
 
+  deleteSelection = () => {
+    const { spriteObject } = this.props;
+
+    mapFor(0, spriteObject.getAnimationsCount(), index => {
+      const animation = spriteObject.getAnimation(index);
+      deleteSpritesFromAnimation(animation, this.state.selectedSprites);
+    });
+
+    this.setState({
+      selectedSprites: {},
+    });
+  };
+
+  openSpriteContextMenu = (x, y, sprite, index) => {
+    this.selectSprite(sprite, true);
+    this.spriteContextMenu.open(x, y);
+  };
+
+  selectSprite = (sprite, selected) => {
+    this.setState({
+      selectedSprites: {
+        ...this.state.selectedSprites,
+        [sprite.ptr]: selected,
+      },
+    });
+  };
+
   render() {
     return (
-      <SortableAnimationsList
-        spriteObject={this.props.spriteObject}
-        helperClass="sortable-helper"
-        project={this.props.project}
-        onSortEnd={this.onSortEnd}
-        onAddAnimation={this.addAnimation}
-        onChangeAnimationName={this.changeAnimationName}
-        onRemoveAnimation={this.removeAnimation}
-        resourcesLoader={this.props.resourcesLoader}
-        resourceSources={this.props.resourceSources}
-        onChooseResource={this.props.onChooseResource}
-        extraBottomTools={this.props.extraBottomTools}
-        useDragHandle
-        lockAxis="y"
-        axis="y"
-      />
+      <div>
+        <SortableAnimationsList
+          spriteObject={this.props.spriteObject}
+          helperClass="sortable-helper"
+          project={this.props.project}
+          onSortEnd={this.onSortEnd}
+          onAddAnimation={this.addAnimation}
+          onChangeAnimationName={this.changeAnimationName}
+          onRemoveAnimation={this.removeAnimation}
+          onSpriteContextMenu={this.openSpriteContextMenu}
+          selectedSprites={this.state.selectedSprites}
+          onSelectSprite={this.selectSprite}
+          resourcesLoader={this.props.resourcesLoader}
+          resourceSources={this.props.resourceSources}
+          onChooseResource={this.props.onChooseResource}
+          extraBottomTools={this.props.extraBottomTools}
+          useDragHandle
+          lockAxis="y"
+          axis="y"
+        />
+        <ContextMenu
+          ref={spriteContextMenu =>
+            (this.spriteContextMenu = spriteContextMenu)}
+          menuTemplate={[
+            {
+              label: 'Delete',
+              click: () => this.deleteSelection(),
+            },
+          ]}
+        />
+      </div>
     );
   }
 }

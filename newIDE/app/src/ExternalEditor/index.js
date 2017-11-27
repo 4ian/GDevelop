@@ -164,7 +164,7 @@ class ExternalEditor extends Component<Props, State> {
               ' milliseconds.'
           );
 
-          this.editor.loadFullProject(this._serializedObject, () => {
+          this.editor.loadFromSerializedProject(this._serializedObject, () => {
             this._serializedObject.delete();
             this._serializedObject = null;
 

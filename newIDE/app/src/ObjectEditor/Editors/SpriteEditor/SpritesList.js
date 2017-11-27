@@ -40,9 +40,13 @@ const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
 });
 
 const SortableSpriteThumbnail = SortableElement(
-  ({ sprite, project, resourcesLoader }) => {
+  ({ sprite, project, resourcesLoader, selected, onSelect, onContextMenu }) => {
     return (
       <ImageThumbnail
+        selectable
+        selected={selected}
+        onSelect={onSelect}
+        onContextMenu={onContextMenu}
         resourceName={sprite.getImageName()}
         resourcesLoader={resourcesLoader}
         project={project}
@@ -53,7 +57,15 @@ const SortableSpriteThumbnail = SortableElement(
 );
 
 const SortableList = SortableContainer(
-  ({ direction, project, resourcesLoader, onAddSprite }) => {
+  ({
+    direction,
+    project,
+    resourcesLoader,
+    onAddSprite,
+    selectedSprites,
+    onSelectSprite,
+    onSpriteContextMenu,
+  }) => {
     const spritesCount = direction.getSpritesCount();
     return (
       <div style={styles.spritesList}>
@@ -63,8 +75,11 @@ const SortableList = SortableContainer(
             return (
               <SortableSpriteThumbnail
                 sprite={sprite}
-                key={i}
+                key={sprite.ptr}
                 index={i}
+                selected={!!selectedSprites[sprite.ptr]}
+                onContextMenu={(x, y) => onSpriteContextMenu(x, y, sprite)}
+                onSelect={(selected) => onSelectSprite(sprite, selected)}
                 resourcesLoader={resourcesLoader}
                 project={project}
               />
@@ -90,7 +105,12 @@ export default class SpritesList extends Component {
   };
 
   onAddSprite = () => {
-    const { resourceSources, onChooseResource, project, direction } = this.props;
+    const {
+      resourceSources,
+      onChooseResource,
+      project,
+      direction,
+    } = this.props;
     if (!resourceSources || !resourceSources.length) return;
 
     onChooseResource(resourceSources[0].name).then(resources => {
@@ -118,6 +138,9 @@ export default class SpritesList extends Component {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
+          selectedSprites={this.props.selectedSprites}
+          onSelectSprite={this.props.onSelectSprite}
+          onSpriteContextMenu={this.props.onSpriteContextMenu}
           helperClass="sortable-helper"
           lockAxis="x"
           axis="x"

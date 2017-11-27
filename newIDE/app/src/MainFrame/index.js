@@ -80,29 +80,78 @@ export default class MainFrame extends Component {
     if (this.props.introDialog && !Window.isDev()) this._openIntroDialog(true);
   }
 
-  loadFullProject = (serializedProject, cb) => {
+  loadFromSerializedProject = (serializedProject, cb) => {
+    timeFunction(
+      () => {
+        const newProject = gd.ProjectHelper.createNewGDJSProject();
+        newProject.unserializeFrom(serializedProject);
+
+        this.closeProject(() => this.loadFromProject(newProject, cb));
+      },
+      time => console.info(`Unserialization took ${time} ms`)
+    );
+  };
+
+  loadFromProject = (project, cb = undefined) => {
+    this.closeProject(() => {
+      this.setState(
+        {
+          currentProject: project,
+        },
+        cb
+      );
+    });
+  };
+
+  openFromPathOrURL = (url, cb) => {
+    this.props.onReadFromPathOrURL(url).then(
+      projectObject => {
+        this.setState({ loadingProject: true }, () =>
+          setTimeout(() => {
+            const serializedProject = gd.Serializer.fromJSObject(projectObject);
+
+            this.loadFromSerializedProject(serializedProject, () => {
+              serializedProject.delete();
+
+              this.state.currentProject.setProjectFile(url);
+              this.setState(
+                {
+                  loadingProject: false,
+                },
+                cb
+              );
+            });
+          })
+        );
+      },
+      err => {
+        showErrorBox(
+          'Unable to read this project. Please try again later or with another save of the project.',
+          err
+        );
+        return;
+      }
+    );
+  };
+
+  closeProject = cb => {
+    if (!this.state.currentProject) return cb();
+
+    this.openProjectManager(false);
     this.setState(
       {
-        loadingProject: true,
+        editorTabs: closeProjectTabs(
+          this.state.editorTabs,
+          this.state.currentProject
+        ),
       },
       () => {
-        timeFunction(
-          () => {
-            const { currentProject } = this.state;
-            if (currentProject) currentProject.delete();
-
-            const newProject = gd.ProjectHelper.createNewGDJSProject();
-            newProject.unserializeFrom(serializedProject);
-
-            this.setState(
-              {
-                currentProject: newProject,
-                loadingProject: false,
-              },
-              cb
-            );
+        this.state.currentProject.delete();
+        this.setState(
+          {
+            currentProject: null,
           },
-          time => console.info(`Unserialization took ${time} ms`)
+          cb
         );
       }
     );
@@ -123,6 +172,12 @@ export default class MainFrame extends Component {
       this.setState({
         projectManagerOpen: !this.state.projectManagerOpen,
       });
+  };
+
+  openProjectManager = (open = true) => {
+    this.setState({
+      projectManagerOpen: open,
+    });
   };
 
   setEditorToolbar = editorToolbar => {
@@ -409,10 +464,13 @@ export default class MainFrame extends Component {
           name: 'Start Page',
           editorCreator: () => (
             <StartPage
+              project={this.state.currentProject}
               setToolbar={this.setEditorToolbar}
               canOpen={!!this.props.onChooseProject}
               onOpen={this.chooseProject}
               onCreate={() => this.openCreateDialog()}
+              onOpenProjectManager={() => this.openProjectManager()}
+              onCloseProject={() => this.askToCloseProject()}
             />
           ),
           key: 'start page',
@@ -429,68 +487,15 @@ export default class MainFrame extends Component {
     });
   };
 
-  openFromPathOrURL = url => {
-    this.props.onReadFromPathOrURL(url).then(
-      projectObject => {
-        this.setState(
-          {
-            loadingProject: true,
-            editorTabs: closeProjectTabs(
-              this.state.editorTabs,
-              this.state.currentProject
-            ),
-          },
-          () =>
-            setTimeout(() => {
-              const serializedObject = gd.Serializer.fromJSObject(
-                projectObject
-              );
-
-              this.loadFullProject(serializedObject, () => {
-                serializedObject.delete();
-
-                this.state.currentProject.setProjectFile(url);
-                this.setState({
-                  loadingProject: false,
-                  projectManagerOpen: true,
-                });
-              });
-            }),
-          10 // Let some time for the loader to be shown
-        );
-      },
-      err => {
-        showErrorBox(
-          'Unable to read this project. Please try again later or with another save of the project.',
-          err
-        );
-        return;
-      }
-    );
-  };
-
-  openProject = (project, cb = undefined) => {
-    this.setState(
-      {
-        loadingProject: false,
-        editorTabs: closeProjectTabs(
-          this.state.editorTabs,
-          this.state.currentProject
-        ),
-        projectManagerOpen: true,
-        currentProject: project,
-      },
-      cb
-    );
-  };
-
   chooseProject = () => {
     this.props
       .onChooseProject()
       .then(filepath => {
         if (!filepath) return;
 
-        this.openFromPathOrURL(filepath);
+        this.openFromPathOrURL(filepath, () =>
+          this.openSceneOrProjectManager()
+        );
       })
       .catch(() => {});
   };
@@ -510,28 +515,25 @@ export default class MainFrame extends Component {
     }
   };
 
-  closeProject = () => {
+  askToCloseProject = cb => {
     if (!this.state.currentProject) return;
 
     this.confirmCloseDialog.show(closeProject => {
       if (!closeProject || !this.state.currentProject) return;
 
-      this.setState(
-        {
-          projectManagerOpen: false,
-          editorTabs: closeProjectTabs(
-            this.state.editorTabs,
-            this.state.currentProject
-          ),
-        },
-        () => {
-          this.state.currentProject.delete();
-          this.setState({
-            currentProject: null,
-          });
-        }
-      );
+      this.closeProject(cb);
     });
+  };
+
+  openSceneOrProjectManager = () => {
+    const { currentProject } = this.state;
+    if (!currentProject) return;
+
+    if (currentProject.getLayoutsCount() === 1) {
+      this.openLayout(currentProject.getLayoutAt(0).getName());
+    } else {
+      this.openProjectManager();
+    }
   };
 
   openExportDialog = (open = true) => {
@@ -653,7 +655,7 @@ export default class MainFrame extends Component {
                     onRenameExternalLayout={this.renameExternalLayout}
                     onRenameExternalEvents={this.renameExternalEvents}
                     onSaveProject={this.save}
-                    onCloseProject={this.closeProject}
+                    onCloseProject={this.askToCloseProject}
                     onExportProject={this.openExportDialog}
                   />
                 )}
@@ -704,11 +706,15 @@ export default class MainFrame extends Component {
                   onClose: () => this.openCreateDialog(false),
                   onOpen: filepath => {
                     this.openCreateDialog(false);
-                    this.openFromPathOrURL(filepath);
+                    this.openFromPathOrURL(filepath, () =>
+                      this.openSceneOrProjectManager()
+                    );
                   },
                   onCreate: project => {
                     this.openCreateDialog(false);
-                    this.openProject(project);
+                    this.loadFromProject(project, () =>
+                      this.openSceneOrProjectManager()
+                    );
                   },
                 })}
               {!!introDialog &&

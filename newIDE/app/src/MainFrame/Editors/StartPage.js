@@ -66,6 +66,8 @@ export default class StartPage extends BaseEditor {
   };
 
   render() {
+    const { project, canOpen, onOpen, onCreate, onOpenProjectManager, onCloseProject } = this.props;
+
     return (
       <div style={styles.scrollContainer}>
         <div style={styles.innerContainer}>
@@ -79,18 +81,28 @@ export default class StartPage extends BaseEditor {
                 </p>
               </Paper>
               <Paper zDepth={1} style={styles.buttonsPaper}>
-                {this.props.canOpen && (
+                {!project && canOpen && (
                   <FlatButton
                     label="Open a project"
                     fullWidth
-                    onClick={this.props.onOpen}
+                    onClick={onOpen}
                   />
                 )}
-                <FlatButton
+                {!project && (<FlatButton
                   label="Create a new project"
                   fullWidth
-                  onClick={this.props.onCreate}
-                />
+                  onClick={onCreate}
+                />)}
+                {!!project && (<FlatButton
+                  label="Open Project Manager"
+                  fullWidth
+                  onClick={onOpenProjectManager}
+                />)}
+                {!!project && (<FlatButton
+                  label="Close project"
+                  fullWidth
+                  onClick={onCloseProject}
+                />)}
               </Paper>
             </div>
           </Line>

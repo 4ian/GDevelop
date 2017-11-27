@@ -109,7 +109,6 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
 
         //Prepare the export directory
         fs.MkDir(exportDir);
-        fs.ClearDir(exportDir);
         std::vector<gd::String> includesFiles;
 
         gd::Project exportedProject = project;

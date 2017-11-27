@@ -11,12 +11,13 @@ import LocalFolderPicker from '../UI/LocalFolderPicker';
 import HelpButton from '../UI/HelpButton';
 import assignIn from 'lodash.assignin';
 import optionalRequire from '../Utils/OptionalRequire';
+import Window from '../Utils/Window';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
-export default class LocalExport extends Component {
+export default class LocalCordovaExport extends Component {
   state = {
     exportFinishedDialogOpen: false,
     outputDir: '',
@@ -60,9 +61,9 @@ export default class LocalExport extends Component {
     const outputDir = this.state.outputDir;
     project.setLastCompilationDirectory(outputDir);
 
-    LocalExport.prepareExporter()
+    LocalCordovaExport.prepareExporter()
       .then(({ exporter }) => {
-        const exportForCordova = false;
+        const exportForCordova = true;
         exporter.exportWholePixiProject(
           project,
           outputDir,
@@ -83,6 +84,10 @@ export default class LocalExport extends Component {
     shell.openItem(this.state.outputDir);
   };
 
+  openPhoneGapBuild = () => {
+    Window.openExternalURL('https://build.phonegap.com');
+  };
+
   render() {
     const { project } = this.props;
     if (!project) return null;
@@ -90,8 +95,17 @@ export default class LocalExport extends Component {
     return (
       <Column noMargin>
         <Line>
-          This will export your game to a folder that you can then upload on a
-          website or on game hosting like itch.io.
+          <Column noMargin>
+            <p>
+              This will export your game as a Cordova project. Cordova is a
+              technology that enables HTML5 games to be packaged for <b>iOS</b>,{' '}
+              <b>Android</b> and more.
+            </p>
+            <p>
+              Third-party tools like <b>Adobe PhoneGap Build</b> allow game
+              developers to bundle their games using Cordova.
+            </p>
+          </Column>
         </Line>
         <Line>
           <LocalFolderPicker
@@ -135,7 +149,21 @@ export default class LocalExport extends Component {
           modal
           open={this.state.exportFinishedDialogOpen}
         >
-          You can now upload the game to a web hosting to play to the game.
+          <p>
+            You can now compress and upload the game to <b>PhoneGap Build</b>{' '}
+            which will compile it for you to an iOS and Android app.
+          </p>
+          <p>
+            You can also compile the game by yourself using Cordova command-line
+            tool to iOS (XCode is required) or Android (Android SDK is
+            required).
+          </p>
+          <RaisedButton
+            fullWidth
+            primary
+            onTouchTap={() => this.openPhoneGapBuild()}
+            label="Open PhoneGap Build"
+          />
         </Dialog>
       </Column>
     );

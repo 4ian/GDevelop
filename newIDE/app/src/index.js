@@ -28,7 +28,8 @@ import optionalRequire from './Utils/OptionalRequire.js';
 import LocalPreviewLauncher from './Export/LocalPreviewLauncher';
 import LocalExport from './Export/LocalExport';
 import LocalS3Export from './Export/LocalS3Export';
-import LocalMobileExport from './Export/LocalMobileExport';
+import LocalCordovaExport from './Export/LocalCordovaExport';
+import LocalCocos2dExport from './Export/LocalCocos2dExport';
 import LocalExamples from './ProjectCreation/LocalExamples';
 import localResourceSources from './ResourcesEditor/LocalResourceSources';
 import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
@@ -81,8 +82,13 @@ if (electron) {
                   ExportComponent: LocalExport,
                 },
                 {
-                  name: 'Export to iOS/Android app',
-                  ExportComponent: LocalMobileExport,
+                  name: 'iOS/Android app',
+                  ExportComponent: LocalCordovaExport,
+                },
+                {
+                  name: 'Cocos2d-JS',
+                  ExportComponent: LocalCocos2dExport,
+                  advanced: true,
                 },
               ]}
             />

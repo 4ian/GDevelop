@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
+import Toggle from 'material-ui/Toggle';
 import { sendExportLaunched } from '../Utils/Analytics/EventSender';
 import { Column, Line, Spacer } from '../UI/Grid';
+import HelpButton from '../UI/HelpButton';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import HelpButton from '../UI/HelpButton';
 import assignIn from 'lodash.assignin';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
@@ -16,10 +17,11 @@ const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
-export default class LocalExport extends Component {
+export default class LocalCocos2dExport extends Component {
   state = {
     exportFinishedDialogOpen: false,
     outputDir: '',
+    debugMode: false,
   };
 
   componentDidMount() {
@@ -55,27 +57,21 @@ export default class LocalExport extends Component {
     const { project } = this.props;
     if (!project) return;
 
-    sendExportLaunched('local');
+    sendExportLaunched('local-cocos2d');
 
-    const outputDir = this.state.outputDir;
+    const { outputDir, debugMode } = this.state;
     project.setLastCompilationDirectory(outputDir);
 
-    LocalExport.prepareExporter()
+    LocalCocos2dExport.prepareExporter()
       .then(({ exporter }) => {
-        const exportForCordova = false;
-        exporter.exportWholePixiProject(
-          project,
-          outputDir,
-          false,
-          exportForCordova
-        );
+        exporter.exportWholeCocos2dProject(project, debugMode, outputDir);
         exporter.delete();
         this.setState({
           exportFinishedDialogOpen: true,
         });
       })
       .catch(err => {
-        showErrorBox('Unable to export the game', err);
+        showErrorBox('Unable to export the game with Cocos2d-JS', err);
       });
   };
 
@@ -90,8 +86,9 @@ export default class LocalExport extends Component {
     return (
       <Column noMargin>
         <Line>
-          This will export your game to a folder that you can then upload on a
-          website or on game hosting like itch.io.
+          This will export your game using Cocos2d-JS game engine. The game can
+          be compiled for Android or iOS if you install Cocos2d-JS developer
+          tools.
         </Line>
         <Line>
           <LocalFolderPicker
@@ -99,6 +96,17 @@ export default class LocalExport extends Component {
             defaultPath={project.getLastCompilationDirectory()}
             onChange={value => this.setState({ outputDir: value })}
             fullWidth
+          />
+        </Line>
+        <Line>
+          <Toggle
+            onToggle={(e, check) =>
+              this.setState({
+                debugMode: check,
+              })}
+            toggled={this.state.debugMode}
+            labelPosition="right"
+            label="Debug mode (show FPS counter and stats in the bottom left)"
           />
         </Line>
         <Line>
@@ -135,7 +143,9 @@ export default class LocalExport extends Component {
           modal
           open={this.state.exportFinishedDialogOpen}
         >
-          You can now upload the game to a web hosting to play to the game.
+          You can now upload the game to a web hosting or use Cocos2d-JS command
+          line tools to export it to other platforms like iOS (XCode is
+          required) or Android (Android SDK is required).
         </Dialog>
       </Column>
     );

@@ -25,10 +25,10 @@ shell.cp('-r', '../app/build/*', 'app/www');
 if (isDarwin) {
   shell.exec(path.join('node_modules', '.bin', 'build') + ' --mac ${packageFlag}');
   shell.mkdir('-p', gdBinariesOutputDir + '/Release_Darwin/newIDE');
-  shell.rm('-rf', gdBinariesOutputDir + '/Release_Darwin/newIDE/GDevelop IDE.app');
+  shell.rm('-rf', gdBinariesOutputDir + '/Release_Darwin/newIDE/GDevelop 5.app');
   shell.cp(
     '-rf',
-    './dist/mac/GDevelop IDE.app',
+    './dist/mac/GDevelop 5.app',
     gdBinariesOutputDir + '/Release_Darwin/newIDE'
   );
 }

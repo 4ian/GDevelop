@@ -56,7 +56,7 @@ export default class LocalCordovaExport extends Component {
     const { project } = this.props;
     if (!project) return;
 
-    sendExportLaunched('local');
+    sendExportLaunched('local-cordova');
 
     const outputDir = this.state.outputDir;
     project.setLastCompilationDirectory(outputDir);

@@ -2,6 +2,7 @@
 import React from 'react';
 import HelpOutline from 'material-ui/svg-icons/action/help-outline';
 import IconButton from 'material-ui/IconButton';
+import { getHelpLink } from '../../Utils/HelpLink';
 
 type PropsType = {
   helpPagePath: ?string,
@@ -16,7 +17,7 @@ export default (props: PropsType) => {
 
   return (
     <IconButton
-      onClick={() => window.open(`http://wiki.compilgames.net/doku.php/gdevelop5${helpPagePath}`, 'blank') }
+      onClick={() => window.open(getHelpLink(helpPagePath), 'blank') }
     >
       <HelpOutline />
     </IconButton>

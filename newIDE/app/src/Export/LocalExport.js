@@ -8,9 +8,10 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import HelpButton from '../UI/HelpButton';
 import assignIn from 'lodash.assignin';
 import optionalRequire from '../Utils/OptionalRequire';
+import Window from '../Utils/Window';
+import { getHelpLink } from '../Utils/HelpLink';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -83,6 +84,14 @@ export default class LocalExport extends Component {
     shell.openItem(this.state.outputDir);
   };
 
+  openItchioHelp = () => {
+    Window.openExternalURL(getHelpLink('/publishing/publishing-to-itch-io'));
+  };
+
+  openLearnMore = () => {
+    Window.openExternalURL(getHelpLink('/publishing'));
+  };
+
   render() {
     const { project } = this.props;
     if (!project) return null;
@@ -129,13 +138,23 @@ export default class LocalExport extends Component {
                 })}
             />,
           ]}
-          secondaryActions={
-            <HelpButton key="help" helpPagePath="/publishing" />
-          }
           modal
           open={this.state.exportFinishedDialogOpen}
         >
-          You can now upload the game to a web hosting to play to the game.
+          <p>
+            You can now upload the game to a web hosting to play to the game.
+          </p>
+          <RaisedButton
+            fullWidth
+            primary
+            onTouchTap={() => this.openItchioHelp()}
+            label="Publish your game on Itch.io"
+          />
+          <FlatButton
+            fullWidth
+            onTouchTap={() => this.openLearnMore()}
+            label="Learn more about publishing"
+          />
         </Dialog>
       </Column>
     );

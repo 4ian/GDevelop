@@ -3,6 +3,7 @@ import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import HelpOutline from 'material-ui/svg-icons/action/help-outline';
 import Window from '../../Utils/Window';
+import { getHelpLink } from '../../Utils/HelpLink';
 
 type PropsType = {
   helpPagePath: ?string,
@@ -19,9 +20,7 @@ export default (props: PropsType) => {
     <FlatButton
       onTouchTap={() => {
         if (props.helpPagePath) {
-          Window.openExternalURL(
-            `http://wiki.compilgames.net/doku.php/gdevelop5${props.helpPagePath}`
-          );
+          Window.openExternalURL(getHelpLink(props.helpPagePath));
         }
       }}
       target="_blank"

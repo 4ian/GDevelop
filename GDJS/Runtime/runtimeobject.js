@@ -1204,15 +1204,15 @@ gdjs.RuntimeObject.prototype.cursorOnObject = function(runtimeScene) {
 
 /**
  * \brief Check if a point is inside the object collision hitboxes.
- * @method pointCollision
+ * @method isCollidingWithPoint
+ * @param pointX The point x coordinate.
+ * @param pointY The point y coordinate.
  * @return true if the point is inside the object collision hitboxes.
- * \param x The point x coordinate.
- * \param y The point y coordinate.
  */
-gdjs.RuntimeObject.prototype.pointCollision = function(pointX, pointY) {
+gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
     var hitBoxes = this.getHitBoxes();
     for(var i = 0; i < this.hitBoxes.length; ++i) {
-       if ( gdjs.Polygon.pointInside(hitBoxes[i], pointX, pointY) )
+       if ( gdjs.Polygon.isPointInside(hitBoxes[i], pointX, pointY) )
             return true;
     }
 

@@ -264,13 +264,14 @@ gdjs.Polygon.distance = function(minA, maxA, minB, maxB)
  *
  * Uses <a href="https://wrf.ecse.rpi.edu//Research/Short_Notes/pnpoly.html">PNPOLY</a> by W. Randolph Franklin.
  *
- * @method pointInside
+ * @method isPointInside
  * @static
- * @return {Boolean} true if the point is inside the polygon
+ * @param poly {Polygon} The polygon to test
  * @param x {Number} The point x coordinate
  * @param y {Number} The point y coordinate
+ * @return {Boolean} true if the point is inside the polygon
  */
-gdjs.Polygon.pointInside = function(poly, x, y)
+gdjs.Polygon.isPointInside = function(poly, x, y)
 {
     var inside = false;
     var vi, vj;

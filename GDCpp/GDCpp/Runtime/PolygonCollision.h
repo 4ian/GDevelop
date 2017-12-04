@@ -42,7 +42,7 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2);
  *
  * \ingroup GameEngine
  */
-bool GD_API PointInPolygon(Polygon2d & poly, float x, float y);
+bool GD_API IsPointInsidePolygon(Polygon2d & poly, float x, float y);
 
 #endif // POLYGONCOLLISION_H
 

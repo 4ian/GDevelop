@@ -379,11 +379,11 @@ bool RuntimeObject::IsCollidingWith(RuntimeObject * obj2)
     return false;
 }
 
-bool RuntimeObject::PointCollision(float pointX, float pointY){
+bool RuntimeObject::IsCollidingWithPoint(float pointX, float pointY){
     vector<Polygon2d> hitBoxes = GetHitBoxes();
     for (std::size_t i = 0; i < hitBoxes.size(); ++i)
     {
-        if ( PointInPolygon(hitBoxes[i], pointX, pointY) )
+        if ( IsPointInsidePolygon(hitBoxes[i], pointX, pointY) )
             return true;
     }
 

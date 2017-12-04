@@ -225,11 +225,11 @@ public:
 
     /**
      * \brief Check if a point is inside the object collision hitboxes.
-     * \param x The point x coordinate.
-     * \param y The point y coordinate.
+     * \param pointX The point x coordinate.
+     * \param pointY The point y coordinate.
      * \return true if the point is inside the object collision hitboxes.
      */
-    bool PointCollision(float pointX, float pointY);
+    bool IsCollidingWithPoint(float pointX, float pointY);
 
     /**
      * \brief Check collision with each object of the list using their hitboxes, and move the object

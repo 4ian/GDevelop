@@ -128,3 +128,19 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
 
     return result;
 }
+
+bool GD_API IsPointInsidePolygon(Polygon2d & poly, float x, float y)
+{
+    bool inside = false;
+    sf::Vector2f vi, vj;
+
+    for (std::size_t i = 0, j = poly.vertices.size()-1; i < poly.vertices.size(); j = i++)
+    {
+        vi = poly.vertices[i];
+        vj = poly.vertices[j];
+        if ( ((vi.y>y) != (vj.y>y)) && (x < (vj.x-vi.x) * (y-vi.y) / (vj.y-vi.y) + vi.x) )
+            inside = !inside;
+    }
+    
+    return inside;
+}

@@ -224,6 +224,14 @@ public:
     bool IsCollidingWith(RuntimeObject * other);
 
     /**
+     * \brief Check if a point is inside the object collision hitboxes.
+     * \param pointX The point x coordinate.
+     * \param pointY The point y coordinate.
+     * \return true if the point is inside the object collision hitboxes.
+     */
+    bool IsCollidingWithPoint(float pointX, float pointY);
+
+    /**
      * \brief Check collision with each object of the list using their hitboxes, and move the object
      * according to the sum of the move vector returned by each collision test.
      * \note Bounding circles of objects are *not* checked.

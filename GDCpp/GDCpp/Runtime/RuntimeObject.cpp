@@ -379,6 +379,17 @@ bool RuntimeObject::IsCollidingWith(RuntimeObject * obj2)
     return false;
 }
 
+bool RuntimeObject::IsCollidingWithPoint(float pointX, float pointY){
+    vector<Polygon2d> hitBoxes = GetHitBoxes();
+    for (std::size_t i = 0; i < hitBoxes.size(); ++i)
+    {
+        if ( IsPointInsidePolygon(hitBoxes[i], pointX, pointY) )
+            return true;
+    }
+
+    return false;
+}
+
 void RuntimeObject::SeparateObjectsWithoutForces( std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     vector<RuntimeObject*> objects2;

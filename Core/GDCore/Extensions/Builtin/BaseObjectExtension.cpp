@@ -621,6 +621,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddParameter("objectList", _("Objects"))
         .MarkAsSimple();
 
+    obj.AddCondition("CollisionPoint",
+                   _("Point inside object"),
+                   _("Test if a point is inside the object collision masks."),
+                   _("_PARAM1_;_PARAM2_ is inside _PARAM0_"),
+                   _("Collision"),
+                   "res/conditions/collisionPoint24.png",
+                   "res/conditions/collisionPoint.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("X position of the point"))
+        .AddParameter("expression", _("Y position of the point"))
+        .MarkAsSimple();
+
     obj.AddExpression("X", _("X position"), _("X position of the object"), _("Position"), "res/actions/position.png")
         .AddParameter("object", _("Object"));
 

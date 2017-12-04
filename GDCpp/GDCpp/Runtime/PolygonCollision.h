@@ -33,5 +33,16 @@ struct CollisionResult
  */
 CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2);
 
+/**
+ * Check if a point is inside a polygon.
+ *
+ * Uses PNPOLY by W. Randolph Franklin (https://wrf.ecse.rpi.edu//Research/Short_Notes/pnpoly.html)
+ *
+ * \return true if the point is inside the polygon
+ *
+ * \ingroup GameEngine
+ */
+bool GD_API IsPointInsidePolygon(Polygon2d & poly, float x, float y);
+
 #endif // POLYGONCOLLISION_H
 

@@ -6,7 +6,7 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
-import flatten from 'lodash.flatten';
+import flatten from 'lodash/flatten';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';
 import EmptyMessage from '../UI/EmptyMessage';

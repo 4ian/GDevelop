@@ -3,20 +3,23 @@ import ReactDOM from 'react-dom';
 import TextField from 'material-ui/TextField';
 import Popover, { PopoverAnimationVertical } from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
-import Menu from 'material-ui/Menu';
 import RaisedButton from 'material-ui/RaisedButton';
-import MenuItem from 'material-ui/MenuItem';
 import Cursores from 'cursores';
-import {
-  enumerateExpressions,
-  filterExpressions,
-} from './EnumerateExpressions';
+import ExpressionSelector from '../../InstructionOrExpressionSelector/ExpressionSelector';
 const gd = global.gd;
 
 const styles = {
   container: {
     display: 'flex',
     alignItems: 'baseline',
+  },
+  textFieldContainer: {
+    flex: 1,
+  },
+  expressionSelector: {
+    maxHeight: 250,
+    overflowY: 'scroll',
+    backgroundColor: 'white',
   },
   input: {
     fontFamily: '"Lucida Console", Monaco, monospace',
@@ -31,7 +34,10 @@ export default class ExpressionField extends Component {
   _fieldElement = null;
   _inputElement = null;
   //TODO: Factor \s\+\-\/\*\:\[\]\(\)\,\.
-  cursores = new Cursores(/(?:^|[\s\+\-\/\*\:\[\]\(\)\,\.])([^\s\+\-\/\*\:\[\]\(\)\,\.]+)/, /([^\s\+\-\/\*\:\[\]\(\)\,\.]*)/);
+  cursores = new Cursores(
+    /(?:^|[\s\+\-\/\*\:\[\]\(\)\,\.])([^\s\+\-\/\*\:\[\]\(\)\,\.]+)/,
+    /([^\s\+\-\/\*\:\[\]\(\)\,\.]*)/
+  );
   state = {
     open: false,
     completions: [],
@@ -42,8 +48,6 @@ export default class ExpressionField extends Component {
       this._fieldElement = ReactDOM.findDOMNode(this._field);
       this._inputElement = this._field.getInputNode();
     }
-
-    this._allExpressions = enumerateExpressions('number').allExpressions;
   }
 
   focus() {
@@ -54,7 +58,7 @@ export default class ExpressionField extends Component {
     this.setState({
       open: true,
     });
-  }
+  };
 
   _handleFocus = event => {
     // This prevents ghost click.
@@ -93,14 +97,8 @@ export default class ExpressionField extends Component {
     event.preventDefault();
   };
 
-  _handleExpressionChosen = (event, child) => {
-    console.log('_handleExpressionChosen');
-    const index = parseInt(child.key, 10);
-    console.log(index);
-    console.log(this.state.completions);
-    const enumeratedExpression = this.state.completions[index];
-    console.log('enumeratedExpression', enumeratedExpression);
-    if (!enumeratedExpression) return;
+  _handleExpressionChosen = (expressionInfo) => {
+    console.log(expressionInfo);
 
     if (!this._inputElement) return;
     const cursorPosition = this._inputElement.selectionStart;
@@ -110,27 +108,36 @@ export default class ExpressionField extends Component {
     const newValue = this.cursores.replace(
       value,
       cursorPosition,
-      enumeratedExpression.name
+      expressionInfo.name
     );
     if (this.props.onChange) this.props.onChange(newValue);
     setTimeout(() => {
       if (this._field) this._field.focus();
-      if (this._inputElement) this._inputElement.setSelectionRange(cursorPosition, cursorPosition);
+      if (this._inputElement)
+        this._inputElement.setSelectionRange(cursorPosition, cursorPosition);
     });
   };
 
   getError = () => {
     const { project, layout } = this.props;
 
-    const callbacks = new gd.CallbacksForExpressionCorrectnessTesting(project, layout);
+    const callbacks = new gd.CallbacksForExpressionCorrectnessTesting(
+      project,
+      layout
+    );
     const parser = new gd.ExpressionParser(this.props.value);
-    const isValid = parser.parseMathExpression(project.getCurrentPlatform(), project, layout, callbacks);
+    const isValid = parser.parseMathExpression(
+      project.getCurrentPlatform(),
+      project,
+      layout,
+      callbacks
+    );
     const error = parser.getFirstError();
     parser.delete();
     callbacks.delete();
 
     return isValid ? null : error;
-  }
+  };
 
   doValidation = () => {
     this.setState({ errorText: this.getError() });
@@ -142,44 +149,53 @@ export default class ExpressionField extends Component {
       ? parameterMetadata.getDescription()
       : undefined;
 
+
+    const popoverStyle = {
+      width: this._fieldElement ? this._fieldElement.clientWidth : 'auto',
+    };
+
     return (
       <div style={styles.container}>
-        <TextField
-          value={this.props.value}
-          floatingLabelText={description}
-          inputStyle={styles.input}
-          onChange={this._handleChange}
-          ref={field => (this._field = field)}
-          onFocus={this._handleFocus}
-          onBlur={this._handleBlur}
-          fullWidth
-        />
+        <div style={styles.textFieldContainer}>
+          <TextField
+            value={this.props.value}
+            floatingLabelText={description}
+            inputStyle={styles.input}
+            onChange={this._handleChange}
+            ref={field => (this._field = field)}
+            onFocus={this._handleFocus}
+            onBlur={this._handleBlur}
+            fullWidth
+          />
+          {this._fieldElement && (
+            <Popover
+              style={popoverStyle}
+              open={this.state.open}
+              canAutoPosition={false}
+              anchorEl={this._fieldElement}
+              useLayerForClickAway={false}
+              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+              targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+              onRequestClose={this._handleRequestClose}
+              animation={PopoverAnimationVertical}
+            >
+              <ExpressionSelector
+                style={styles.expressionSelector}
+                selectedType=""
+                onChoose={(type, expression) => {
+                  console.log(type, expression)
+                  this._handleExpressionChosen(expression);
+                }}
+              />
+            </Popover>
+          )}
+        </div>
         <RaisedButton
           icon={<Functions />}
           primary
           style={styles.moreButton}
           onClick={this._openExpressionPopover}
         />
-        {this._fieldElement && (
-          <Popover
-            open={this.state.open}
-            canAutoPosition={false}
-            anchorEl={this._fieldElement}
-            useLayerForClickAway={false}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            targetOrigin={{ horizontal: 'left', vertical: 'top' }}
-            onRequestClose={this._handleRequestClose}
-            animation={PopoverAnimationVertical}
-          >
-            <Menu
-              disableAutoFocus={this.state.focusTextField}
-              onItemTouchTap={this._handleExpressionChosen}
-              onMouseDown={this._handleMouseDown}
-            >
-              {this._renderCompletionMenuItems()}
-            </Menu>
-          </Popover>
-        )}
       </div>
     );
   }

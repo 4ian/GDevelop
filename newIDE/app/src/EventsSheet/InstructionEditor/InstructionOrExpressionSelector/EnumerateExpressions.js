@@ -1,6 +1,4 @@
 // @flow weak
-import update from 'lodash.update';
-import compact from 'lodash.compact';
 const gd = global.gd;
 
 const GROUP_DELIMITER = '/';
@@ -26,7 +24,7 @@ const enumerateExtensionExpressions = (
 
     var parameters = [];
     for (var i = 0; i < exprMetadata.getParametersCount(); i++) {
-      if (objectMetadata && i == 0) continue;
+      if (objectMetadata && i === 0) continue;
       if (behaviorMetadata && i <= 1) continue; //Skip object and behavior parameters
       if (exprMetadata.getParameter(i).isCodeOnly()) continue;
 
@@ -39,6 +37,7 @@ const enumerateExtensionExpressions = (
 
     allExpressions.push({
       type: expressionsTypes.get(j),
+      name: expressionsTypes.get(j),
       displayedName,
       fullGroupName,
       metadata: exprMetadata,
@@ -104,9 +103,9 @@ export const enumerateExpressions = (type = 'number') => {
     }
 
     //Behaviors expressions:
-    for (var j = 0; j < allBehaviorsTypes.size(); ++j) {
+    for (var k = 0; k < allBehaviorsTypes.size(); ++k) {
       var autoMetadata = extension.getBehaviorMetadata(
-        allBehaviorsTypes.get(j)
+        allBehaviorsTypes.get(k)
       );
       behaviorsExpressions.push.apply(
         behaviorsExpressions,
@@ -114,7 +113,7 @@ export const enumerateExpressions = (type = 'number') => {
           prefix,
           allBehaviorExpressionsGetter.call(
             extension,
-            allBehaviorsTypes.get(j)
+            allBehaviorsTypes.get(k)
           ),
           undefined,
           autoMetadata
@@ -146,23 +145,4 @@ export const filterExpressions = (list, searchText) => {
           .indexOf(lowercaseSearchText) !== -1
       );
     });
-}
-
-export const createExpressionsTree = (allExpressions) => {
-  const tree = {};
-  allExpressions.forEach(expressionInfo => {
-    update(
-      tree,
-      compact(expressionInfo.fullGroupName.split(GROUP_DELIMITER)),
-      groupInfo => {
-        const existingGroupInfo = groupInfo || {};
-        return {
-          ...existingGroupInfo,
-          [expressionInfo.displayedName]: expressionInfo,
-        };
-      }
-    );
-  });
-
-  return tree;
 }

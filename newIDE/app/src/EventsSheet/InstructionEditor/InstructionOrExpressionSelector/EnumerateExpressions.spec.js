@@ -1,4 +1,5 @@
-import { enumerateExpressions, filterExpressions, createExpressionsTree } from './EnumerateExpressions';
+import { enumerateExpressions, filterExpressions } from './EnumerateExpressions';
+import { createTree } from './CreateTree';
 
 describe('EnumerateObjects', () => {
   it('can enumerate and filter expressions', () => {
@@ -23,6 +24,6 @@ describe('EnumerateObjects', () => {
     const {
       objectsExpressions,
     } = enumerateExpressions('number');
-    expect(createExpressionsTree(objectsExpressions)).toMatchSnapshot();
+    expect(createTree(objectsExpressions)).toMatchSnapshot();
   })
 });

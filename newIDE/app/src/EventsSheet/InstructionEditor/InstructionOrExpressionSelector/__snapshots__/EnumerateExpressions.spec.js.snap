@@ -11,6 +11,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5954072,
         },
+        "name": "Angle",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -26,6 +27,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5954328,
         },
+        "name": "ForceX",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -39,6 +41,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5954664,
         },
+        "name": "ForceY",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -52,6 +55,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5955040,
         },
+        "name": "ForceAngle",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -65,6 +69,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5955416,
         },
+        "name": "ForceLength",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -80,6 +85,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5958184,
         },
+        "name": "Distance",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -97,6 +103,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5958792,
         },
+        "name": "SqDistance",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -114,6 +121,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5953688,
         },
+        "name": "X",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -127,6 +135,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5953880,
         },
+        "name": "Y",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -142,6 +151,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5956760,
         },
+        "name": "Height",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -155,6 +165,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5956168,
         },
+        "name": "Width",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -170,6 +181,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5959224,
         },
+        "name": "Variable",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -187,6 +199,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5959656,
         },
+        "name": "VariableChildCount",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -206,6 +219,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 5957432,
         },
+        "name": "ZOrder",
         "objectMetadata": ObjectMetadata {
           "ptr": 5913668,
         },
@@ -223,6 +237,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6004352,
         },
+        "name": "Animation",
         "objectMetadata": ObjectMetadata {
           "ptr": 5950172,
         },
@@ -236,6 +251,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6005680,
         },
+        "name": "AnimationSpeedScale",
         "objectMetadata": ObjectMetadata {
           "ptr": 5950172,
         },
@@ -249,6 +265,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6005208,
         },
+        "name": "Sprite",
         "objectMetadata": ObjectMetadata {
           "ptr": 5950172,
         },
@@ -264,6 +281,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6003544,
         },
+        "name": "Direction",
         "objectMetadata": ObjectMetadata {
           "ptr": 5950172,
         },
@@ -279,6 +297,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6002328,
         },
+        "name": "PointX",
         "objectMetadata": ObjectMetadata {
           "ptr": 5950172,
         },
@@ -296,6 +315,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6002808,
         },
+        "name": "PointY",
         "objectMetadata": ObjectMetadata {
           "ptr": 5950172,
         },
@@ -315,6 +335,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6006632,
         },
+        "name": "ScaleY",
         "objectMetadata": ObjectMetadata {
           "ptr": 5950172,
         },
@@ -328,6 +349,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6006072,
         },
+        "name": "ScaleX",
         "objectMetadata": ObjectMetadata {
           "ptr": 5950172,
         },
@@ -345,6 +367,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6299080,
         },
+        "name": "Opacity",
         "objectMetadata": ObjectMetadata {
           "ptr": 6283324,
         },
@@ -360,6 +383,7 @@ Object {
         "metadata": ExpressionMetadata {
           "ptr": 6299536,
         },
+        "name": "Angle",
         "objectMetadata": ObjectMetadata {
           "ptr": 6283324,
         },

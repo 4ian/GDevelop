@@ -94,8 +94,8 @@
     json-loader "^0.5.7"
     json-stringify-safe "^5.0.1"
     json5 "^0.5.1"
-    lodash.flattendeep "^4.4.0"
-    lodash.pick "^4.4.0"
+    lodash/flattendeep "^4.4.0"
+    lodash/pick "^4.4.0"
     postcss-flexbugs-fixes "^3.2.0"
     postcss-loader "^2.0.8"
     prop-types "^15.6.0"
@@ -126,9 +126,9 @@
     global "^4.3.2"
     json-stringify-safe "^5.0.1"
     keycode "^2.1.8"
-    lodash.debounce "^4.0.8"
-    lodash.pick "^4.4.0"
-    lodash.sortby "^4.7.0"
+    lodash/debounce "^4.0.8"
+    lodash/pick "^4.4.0"
+    lodash/sortby "^4.7.0"
     mantra-core "^1.7.0"
     podda "^1.2.2"
     prop-types "^15.6.0"
@@ -848,7 +848,7 @@ babel-plugin-minify-dead-code-elimination@^0.2.0:
     babel-helper-evaluate-path "^0.2.0"
     babel-helper-mark-eval-scopes "^0.2.0"
     babel-helper-remove-or-void "^0.2.0"
-    lodash.some "^4.6.0"
+    lodash/some "^4.6.0"
 
 babel-plugin-minify-flip-comparisons@^0.2.0:
   version "0.2.0"
@@ -1394,7 +1394,7 @@ babel-preset-minify@^0.2.0:
     babel-plugin-transform-remove-undefined "^0.2.0"
     babel-plugin-transform-simplify-comparison-operators "^6.8.5"
     babel-plugin-transform-undefined-to-void "^6.8.3"
-    lodash.isplainobject "^4.0.6"
+    lodash/isplainobject "^4.0.6"
 
 babel-preset-react-app@^3.0.0, babel-preset-react-app@^3.1.0:
   version "3.1.0"
@@ -1841,8 +1841,8 @@ caniuse-api@^1.5.2:
   dependencies:
     browserslist "^1.0.1"
     caniuse-db "^1.0.30000346"
-    lodash.memoize "^4.1.0"
-    lodash.uniq "^4.3.0"
+    lodash/memoize "^4.1.0"
+    lodash/uniq "^4.3.0"
 
 caniuse-db@^1.0.30000346, caniuse-db@^1.0.30000525, caniuse-db@^1.0.30000527, caniuse-db@^1.0.30000624:
   version "1.0.30000631"
@@ -2318,7 +2318,7 @@ css-loader@0.28.1:
     css-selector-tokenizer "^0.7.0"
     cssnano ">=2.6.1 <4"
     loader-utils "^1.0.2"
-    lodash.camelcase "^4.3.0"
+    lodash/camelcase "^4.3.0"
     object-assign "^4.0.1"
     postcss "^5.0.6"
     postcss-modules-extract-imports "^1.0.0"
@@ -2337,7 +2337,7 @@ css-loader@^0.28.7:
     cssnano ">=2.6.1 <4"
     icss-utils "^2.1.0"
     loader-utils "^1.0.2"
-    lodash.camelcase "^4.3.0"
+    lodash/camelcase "^4.3.0"
     object-assign "^4.0.1"
     postcss "^5.0.6"
     postcss-modules-extract-imports "^1.0.0"
@@ -2960,7 +2960,7 @@ eslint-plugin-import@2.2.0:
     eslint-import-resolver-node "^0.2.0"
     eslint-module-utils "^2.0.0"
     has "^1.0.1"
-    lodash.cond "^4.3.0"
+    lodash/cond "^4.3.0"
     minimatch "^3.0.3"
     pkg-up "^1.0.0"
 
@@ -4872,130 +4872,98 @@ lodash-es@^4.2.1:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.4.tgz#dcc1d7552e150a0640073ba9cb31d70f032950e7"
 
-lodash._getnative@^3.0.0:
+lodash/_getnative@^3.0.0:
   version "3.9.1"
-  resolved "https://registry.yarnpkg.com/lodash._getnative/-/lodash._getnative-3.9.1.tgz#570bc7dede46d61cdcde687d65d3eecbaa3aaff5"
+  resolved "https://registry.yarnpkg.com/lodash/_getnative/-/lodash/_getnative-3.9.1.tgz#570bc7dede46d61cdcde687d65d3eecbaa3aaff5"
 
-lodash._reinterpolate@~3.0.0:
+lodash/_reinterpolate@~3.0.0:
   version "3.0.0"
-  resolved "https://registry.yarnpkg.com/lodash._reinterpolate/-/lodash._reinterpolate-3.0.0.tgz#0ccf2d89166af03b3663c796538b75ac6e114d9d"
+  resolved "https://registry.yarnpkg.com/lodash/_reinterpolate/-/lodash/_reinterpolate-3.0.0.tgz#0ccf2d89166af03b3663c796538b75ac6e114d9d"
 
-lodash.assignin@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/lodash.assignin/-/lodash.assignin-4.2.0.tgz#ba8df5fb841eb0a3e8044232b0e263a8dc6a28a2"
-
-lodash.camelcase@^4.3.0:
+lodash/camelcase@^4.3.0:
   version "4.3.0"
-  resolved "https://registry.yarnpkg.com/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
+  resolved "https://registry.yarnpkg.com/lodash/camelcase/-/lodash/camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
 
-lodash.compact@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/lodash.compact/-/lodash.compact-3.0.1.tgz#540ce3837745975807471e16b4a2ba21e7256ca5"
-
-lodash.cond@^4.3.0:
+lodash/cond@^4.3.0:
   version "4.5.2"
-  resolved "https://registry.yarnpkg.com/lodash.cond/-/lodash.cond-4.5.2.tgz#f471a1da486be60f6ab955d17115523dd1d255d5"
+  resolved "https://registry.yarnpkg.com/lodash/cond/-/lodash/cond-4.5.2.tgz#f471a1da486be60f6ab955d17115523dd1d255d5"
 
-lodash.debounce@^4.0.8:
+lodash/debounce@^4.0.8:
   version "4.0.8"
-  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
+  resolved "https://registry.yarnpkg.com/lodash/debounce/-/lodash/debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
 
-lodash.defaults@^4.2.0:
+lodash/defaults@^4.2.0:
   version "4.2.0"
-  resolved "https://registry.yarnpkg.com/lodash.defaults/-/lodash.defaults-4.2.0.tgz#d09178716ffea4dde9e5fb7b37f6f0802274580c"
+  resolved "https://registry.yarnpkg.com/lodash/defaults/-/lodash/defaults-4.2.0.tgz#d09178716ffea4dde9e5fb7b37f6f0802274580c"
 
-lodash.every@^4.6.0:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/lodash.every/-/lodash.every-4.6.0.tgz#eb89984bebc4364279bb3aefbbd1ca19bfa6c6a7"
-
-lodash.findindex@^4.6.0:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/lodash.findindex/-/lodash.findindex-4.6.0.tgz#a3245dee61fb9b6e0624b535125624bb69c11106"
-
-lodash.flatten@^4.4.0:
+lodash/flattendeep@^4.4.0:
   version "4.4.0"
-  resolved "https://registry.yarnpkg.com/lodash.flatten/-/lodash.flatten-4.4.0.tgz#f31c22225a9632d2bbf8e4addbef240aa765a61f"
+  resolved "https://registry.yarnpkg.com/lodash/flattendeep/-/lodash/flattendeep-4.4.0.tgz#fb030917f86a3134e5bc9bec0d69e0013ddfedb2"
 
-lodash.flattendeep@^4.4.0:
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/lodash.flattendeep/-/lodash.flattendeep-4.4.0.tgz#fb030917f86a3134e5bc9bec0d69e0013ddfedb2"
-
-lodash.isarguments@^3.0.0:
+lodash/isarguments@^3.0.0:
   version "3.1.0"
-  resolved "https://registry.yarnpkg.com/lodash.isarguments/-/lodash.isarguments-3.1.0.tgz#2f573d85c6a24289ff00663b491c1d338ff3458a"
+  resolved "https://registry.yarnpkg.com/lodash/isarguments/-/lodash/isarguments-3.1.0.tgz#2f573d85c6a24289ff00663b491c1d338ff3458a"
 
-lodash.isarray@^3.0.0:
+lodash/isarray@^3.0.0:
   version "3.0.4"
-  resolved "https://registry.yarnpkg.com/lodash.isarray/-/lodash.isarray-3.0.4.tgz#79e4eb88c36a8122af86f844aa9bcd851b5fbb55"
+  resolved "https://registry.yarnpkg.com/lodash/isarray/-/lodash/isarray-3.0.4.tgz#79e4eb88c36a8122af86f844aa9bcd851b5fbb55"
 
-lodash.isequal@^4.4.0:
+lodash/isequal@^4.4.0:
   version "4.5.0"
-  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+  resolved "https://registry.yarnpkg.com/lodash/isequal/-/lodash/isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
 
-lodash.isplainobject@^4.0.6:
+lodash/isplainobject@^4.0.6:
   version "4.0.6"
-  resolved "https://registry.yarnpkg.com/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz#7c526a52d89b45c45cc690b88163be0497f550cb"
+  resolved "https://registry.yarnpkg.com/lodash/isplainobject/-/lodash/isplainobject-4.0.6.tgz#7c526a52d89b45c45cc690b88163be0497f550cb"
 
-lodash.keys@^3.1.2:
+lodash/keys@^3.1.2:
   version "3.1.2"
-  resolved "https://registry.yarnpkg.com/lodash.keys/-/lodash.keys-3.1.2.tgz#4dbc0472b156be50a0b286855d1bd0b0c656098a"
+  resolved "https://registry.yarnpkg.com/lodash/keys/-/lodash/keys-3.1.2.tgz#4dbc0472b156be50a0b286855d1bd0b0c656098a"
   dependencies:
-    lodash._getnative "^3.0.0"
-    lodash.isarguments "^3.0.0"
-    lodash.isarray "^3.0.0"
+    lodash/_getnative "^3.0.0"
+    lodash/isarguments "^3.0.0"
+    lodash/isarray "^3.0.0"
 
-lodash.keys@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/lodash.keys/-/lodash.keys-4.2.0.tgz#a08602ac12e4fb83f91fc1fb7a360a4d9ba35205"
-
-lodash.memoize@^4.1.0:
+lodash/memoize@^4.1.0:
   version "4.1.2"
-  resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
+  resolved "https://registry.yarnpkg.com/lodash/memoize/-/lodash/memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
 
-lodash.merge@^4.6.0:
+lodash/merge@^4.6.0:
   version "4.6.0"
-  resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.0.tgz#69884ba144ac33fe699737a6086deffadd0f89c5"
+  resolved "https://registry.yarnpkg.com/lodash/merge/-/lodash/merge-4.6.0.tgz#69884ba144ac33fe699737a6086deffadd0f89c5"
 
-lodash.pick@^4.4.0:
+lodash/pick@^4.4.0:
   version "4.4.0"
-  resolved "https://registry.yarnpkg.com/lodash.pick/-/lodash.pick-4.4.0.tgz#52f05610fff9ded422611441ed1fc123a03001b3"
+  resolved "https://registry.yarnpkg.com/lodash/pick/-/lodash/pick-4.4.0.tgz#52f05610fff9ded422611441ed1fc123a03001b3"
 
-lodash.some@^4.6.0:
+lodash/some@^4.6.0:
   version "4.6.0"
-  resolved "https://registry.yarnpkg.com/lodash.some/-/lodash.some-4.6.0.tgz#1bb9f314ef6b8baded13b549169b2a945eb68e4d"
+  resolved "https://registry.yarnpkg.com/lodash/some/-/lodash/some-4.6.0.tgz#1bb9f314ef6b8baded13b549169b2a945eb68e4d"
 
-lodash.sortby@^4.7.0:
+lodash/sortby@^4.7.0:
   version "4.7.0"
-  resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
+  resolved "https://registry.yarnpkg.com/lodash/sortby/-/lodash/sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
 
-lodash.template@^4.4.0:
+lodash/template@^4.4.0:
   version "4.4.0"
-  resolved "https://registry.yarnpkg.com/lodash.template/-/lodash.template-4.4.0.tgz#e73a0385c8355591746e020b99679c690e68fba0"
+  resolved "https://registry.yarnpkg.com/lodash/template/-/lodash/template-4.4.0.tgz#e73a0385c8355591746e020b99679c690e68fba0"
   dependencies:
-    lodash._reinterpolate "~3.0.0"
-    lodash.templatesettings "^4.0.0"
+    lodash/_reinterpolate "~3.0.0"
+    lodash/templatesettings "^4.0.0"
 
-lodash.templatesettings@^4.0.0:
+lodash/templatesettings@^4.0.0:
   version "4.1.0"
-  resolved "https://registry.yarnpkg.com/lodash.templatesettings/-/lodash.templatesettings-4.1.0.tgz#2b4d4e95ba440d915ff08bc899e4553666713316"
+  resolved "https://registry.yarnpkg.com/lodash/templatesettings/-/lodash/templatesettings-4.1.0.tgz#2b4d4e95ba440d915ff08bc899e4553666713316"
   dependencies:
-    lodash._reinterpolate "~3.0.0"
+    lodash/_reinterpolate "~3.0.0"
 
-lodash.throttle@^4.0.1, lodash.throttle@^4.1.1:
+lodash/throttle@^4.0.1, lodash/throttle@^4.1.1:
   version "4.1.1"
-  resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
+  resolved "https://registry.yarnpkg.com/lodash/throttle/-/lodash/throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
 
-lodash.uniq@^4.3.0:
+lodash/uniq@^4.3.0:
   version "4.5.0"
-  resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
-
-lodash.update@^4.10.2:
-  version "4.10.2"
-  resolved "https://registry.yarnpkg.com/lodash.update/-/lodash.update-4.10.2.tgz#9da9985cf06646f5226bca8e276d58bee0db8796"
-
-lodash.values@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/lodash.values/-/lodash.values-4.3.0.tgz#a3a6c2b0ebecc5c2cba1c17e6e620fe81b53d347"
+  resolved "https://registry.yarnpkg.com/lodash/uniq/-/lodash/uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
 
 lodash@4.x.x, "lodash@>=3.5 <5", lodash@^4.0.0, lodash@^4.0.1, lodash@^4.12.0, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.17.2, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0:
   version "4.17.4"
@@ -5082,8 +5050,8 @@ material-ui@0.18.3:
     babel-runtime "^6.23.0"
     inline-style-prefixer "^3.0.2"
     keycode "^2.1.8"
-    lodash.merge "^4.6.0"
-    lodash.throttle "^4.1.1"
+    lodash/merge "^4.6.0"
+    lodash/throttle "^4.1.1"
     prop-types "^15.5.7"
     react-event-listener "^0.4.5"
     react-transition-group "^1.1.2"
@@ -6362,7 +6330,7 @@ react-dnd-scrollzone@^4.0.0:
   resolved "https://registry.yarnpkg.com/react-dnd-scrollzone/-/react-dnd-scrollzone-4.0.0.tgz#d707170c0cd3b7ab3d991dd6a8cc0b3712454139"
   dependencies:
     hoist-non-react-statics "^1.2.0"
-    lodash.throttle "^4.0.1"
+    lodash/throttle "^4.0.1"
     prop-types "^15.5.9"
     raf "^3.2.0"
     react-display-name "^0.2.0"
@@ -6474,7 +6442,7 @@ react-komposer@^2.0.0:
   dependencies:
     babel-runtime "^6.11.6"
     hoist-non-react-statics "^1.2.0"
-    lodash.pick "^4.4.0"
+    lodash/pick "^4.4.0"
     react-stubber "^1.0.0"
     shallowequal "^0.2.2"
 
@@ -6567,7 +6535,7 @@ react-sortable-tree@^0.1.21:
   version "0.1.21"
   resolved "https://registry.yarnpkg.com/react-sortable-tree/-/react-sortable-tree-0.1.21.tgz#26a05de2012ffa46a5a4db2b71274371257daeb8"
   dependencies:
-    lodash.isequal "^4.4.0"
+    lodash/isequal "^4.4.0"
     prop-types "^15.5.8"
     react-dnd "^2.1.4"
     react-dnd-html5-backend "^2.1.2"
@@ -7198,7 +7166,7 @@ shallowequal@0.2.x, shallowequal@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/shallowequal/-/shallowequal-0.2.2.tgz#1e32fd5bcab6ad688a4812cb0cc04efc75c7014e"
   dependencies:
-    lodash.keys "^3.1.2"
+    lodash/keys "^3.1.2"
 
 shebang-command@^1.2.0:
   version "1.2.0"
@@ -7603,8 +7571,8 @@ sw-precache@^5.0.0:
     dom-urls "^1.1.0"
     es6-promise "^4.0.5"
     glob "^7.1.1"
-    lodash.defaults "^4.2.0"
-    lodash.template "^4.4.0"
+    lodash/defaults "^4.2.0"
+    lodash/template "^4.4.0"
     meow "^3.7.0"
     mkdirp "^0.5.1"
     pretty-bytes "^4.0.2"

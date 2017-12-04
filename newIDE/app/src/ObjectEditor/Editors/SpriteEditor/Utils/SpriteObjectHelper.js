@@ -1,5 +1,5 @@
 import { mapVector, mapFor } from '../../../../Utils/MapFor';
-import every from 'lodash.every';
+import every from 'lodash/every';
 
 /**
  * Return the specified animation, direction and sprite for a SpriteObject.

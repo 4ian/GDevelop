@@ -45,6 +45,7 @@ import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
 import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
+import ParameterRenderingService from '../EventsSheet/InstructionEditor/ParameterRenderingService';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import { makeTestProject } from '../fixtures/TestProject';
 
@@ -121,7 +122,7 @@ storiesOf('ParameterFields', module)
   .addDecorator(muiDecorator)
   .add('ExpressionField', () => (
     <ValueStateHolder initialValue={'MySpriteObject.X() + MouseX("", 0)'}>
-      <ExpressionField project={project} layout={testLayout} />
+      <ExpressionField project={project} layout={testLayout} parameterRenderingService={ParameterRenderingService} />
     </ValueStateHolder>
   ));
 

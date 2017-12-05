@@ -1,3 +1,4 @@
+// @flow weak
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import TextField from 'material-ui/TextField';
@@ -5,6 +6,9 @@ import Popover, { PopoverAnimationVertical } from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
 import RaisedButton from 'material-ui/RaisedButton';
 import ExpressionSelector from '../../InstructionOrExpressionSelector/ExpressionSelector';
+import ExpressionParametersEditorDialog from './ExpressionParametersEditorDialog';
+import { formatExpressionCall } from './FormatExpressionCall';
+import { type InstructionOrExpressionInformation } from '../../InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
 const gd = global.gd;
 
 const styles = {
@@ -28,14 +32,23 @@ const styles = {
   },
 };
 
-export default class ExpressionField extends Component {
+type State = {|
+  popoverOpen: boolean,
+  parametersDialogOpen: boolean,
+  selectedExpressionInfo: ?InstructionOrExpressionInformation,
+  errorText: ?string,
+|};
+
+export default class ExpressionField extends Component<*, State> {
   _field = null;
   _fieldElement = null;
   _inputElement = null;
 
   state = {
-    open: false,
-    completions: [],
+    popoverOpen: false,
+    parametersDialogOpen: false,
+    selectedExpressionInfo: null,
+    errorText: null,
   };
 
   componentDidMount() {
@@ -51,29 +64,24 @@ export default class ExpressionField extends Component {
 
   _openExpressionPopover = () => {
     this.setState({
-      open: true,
+      popoverOpen: true,
     });
   };
 
   _handleFocus = event => {
     // This prevents ghost click.
     event.preventDefault();
-
-    this.setState({
-      focusTextField: true,
-    });
   };
 
   _handleBlur = () => {
     this.setState({
-      focusTextField: false,
-      open: false,
+      popoverOpen: false,
     });
   };
 
   _handleRequestClose = () => {
     this.setState({
-      open: false,
+      popoverOpen: false,
     });
   };
 
@@ -87,14 +95,22 @@ export default class ExpressionField extends Component {
   };
 
   _handleExpressionChosen = expressionInfo => {
+    this.setState({
+      popoverOpen: false,
+      parametersDialogOpen: true,
+      selectedExpressionInfo: expressionInfo,
+    });
+  };
+
+  insertExpression = (expressionInfo, parameterValues) => {
     if (!this._inputElement) return;
     const cursorPosition = this._inputElement.selectionStart;
 
+    const functionCall = formatExpressionCall(expressionInfo, parameterValues);
+
     const { value } = this.props;
     const newValue =
-      value.substr(0, cursorPosition) +
-      expressionInfo.name +
-      value.substr(cursorPosition);
+      value.substr(0, cursorPosition) + functionCall + value.substr(cursorPosition);
 
     if (this.props.onChange) this.props.onChange(newValue);
     setTimeout(() => {
@@ -104,7 +120,7 @@ export default class ExpressionField extends Component {
         if (this._inputElement)
           this._inputElement.setSelectionRange(
             cursorPosition,
-            cursorPosition + expressionInfo.name.length
+            cursorPosition + functionCall.length
           );
       }, 5);
     }, 5);
@@ -136,7 +152,7 @@ export default class ExpressionField extends Component {
   };
 
   render() {
-    const { parameterMetadata } = this.props;
+    const { parameterMetadata, project, layout, parameterRenderingService } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -161,7 +177,7 @@ export default class ExpressionField extends Component {
           {this._fieldElement && (
             <Popover
               style={popoverStyle}
-              open={this.state.open}
+              open={this.state.popoverOpen}
               canAutoPosition={false}
               anchorEl={this._fieldElement}
               useLayerForClickAway={false}
@@ -186,6 +202,34 @@ export default class ExpressionField extends Component {
           style={styles.moreButton}
           onClick={this._openExpressionPopover}
         />
+        {this.state.parametersDialogOpen &&
+          this.state.selectedExpressionInfo && (
+            <ExpressionParametersEditorDialog
+              open={true}
+              project={project}
+              layout={layout}
+              expressionMetadata={this.state.selectedExpressionInfo.metadata}
+              onDone={parameterValues => {
+                if (!this.state.selectedExpressionInfo) return;
+
+                this.insertExpression(
+                  this.state.selectedExpressionInfo,
+                  parameterValues
+                );
+                this.setState({
+                  parametersDialogOpen: false,
+                  selectedExpressionInfo: null,
+                });
+              }}
+              onRequestClose={() => {
+                this.setState({
+                  parametersDialogOpen: false,
+                  selectedExpressionInfo: null,
+                });
+              }}
+              parameterRenderingService={parameterRenderingService}
+            />
+          )}
       </div>
     );
   }

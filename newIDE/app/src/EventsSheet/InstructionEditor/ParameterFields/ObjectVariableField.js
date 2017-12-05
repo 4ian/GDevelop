@@ -12,11 +12,14 @@ export default class ObjectVariableField extends Component {
   }
 
   render() {
-    const { project, layout } = this.props;
+    const { project, layout, instructionOrExpression } = this.props;
 
     let variablesContainer = null;
-    if (this.props.instruction.getParametersCount() > 0) {
-      const objectName = this.props.instruction.getParameter(0);
+    if (
+      instructionOrExpression &&
+      instructionOrExpression.getParametersCount() > 0
+    ) {
+      const objectName = instructionOrExpression.getParameter(0);
       if (layout.hasObjectNamed(objectName)) {
         variablesContainer = layout.getObject(objectName).getVariables();
       } else if (project.hasObjectNamed(objectName)) {

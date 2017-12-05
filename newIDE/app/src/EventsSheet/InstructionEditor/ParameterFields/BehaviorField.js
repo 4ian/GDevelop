@@ -29,9 +29,14 @@ export default class BehaviorField extends Component {
   }
 
   _updateBehaviorsList() {
-    if (this.props.instruction.getParametersCount() === 0) return;
+    const { instructionOrExpression } = this.props;
+    if (
+      !instructionOrExpression ||
+      instructionOrExpression.getParametersCount() === 0
+    )
+      return;
 
-    const objectName = this.props.instruction.getParameter(0);
+    const objectName = instructionOrExpression.getParameter(0);
     this._behaviorNames = gd
       .getBehaviorsOfObject(
         this.props.project,
@@ -73,9 +78,14 @@ export default class BehaviorField extends Component {
   };
 
   componentWillUpdate() {
-    if (this.props.instruction.getParametersCount() === 0) return;
+    const { instructionOrExpression } = this.props;
+    if (
+      !instructionOrExpression ||
+      instructionOrExpression.getParametersCount() === 0
+    )
+      return;
 
-    const objectName = this.props.instruction.getParameter(0);
+    const objectName = instructionOrExpression.getParameter(0);
     this._behaviorNames = gd
       .getBehaviorsOfObject(
         this.props.project,

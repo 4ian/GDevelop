@@ -4,7 +4,6 @@ import TextField from 'material-ui/TextField';
 import Popover, { PopoverAnimationVertical } from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
 import RaisedButton from 'material-ui/RaisedButton';
-import Cursores from 'cursores';
 import ExpressionSelector from '../../InstructionOrExpressionSelector/ExpressionSelector';
 const gd = global.gd;
 
@@ -33,11 +32,7 @@ export default class ExpressionField extends Component {
   _field = null;
   _fieldElement = null;
   _inputElement = null;
-  //TODO: Factor \s\+\-\/\*\:\[\]\(\)\,\.
-  cursores = new Cursores(
-    /(?:^|[\s\+\-\/\*\:\[\]\(\)\,\.])([^\s\+\-\/\*\:\[\]\(\)\,\.]+)/,
-    /([^\s\+\-\/\*\:\[\]\(\)\,\.]*)/
-  );
+
   state = {
     open: false,
     completions: [],
@@ -83,39 +78,36 @@ export default class ExpressionField extends Component {
   };
 
   _handleChange = (e, text) => {
-    this.setState({
-      open: true,
-    });
-
     if (this.props.onChange) this.props.onChange(text);
-    this._updateCompletions();
   };
 
   _handleMenuMouseDown = event => {
-    console.log('_handleMenuMouseDown');
     // Keep the TextField focused
     event.preventDefault();
   };
 
-  _handleExpressionChosen = (expressionInfo) => {
-    console.log(expressionInfo);
-
+  _handleExpressionChosen = expressionInfo => {
     if (!this._inputElement) return;
     const cursorPosition = this._inputElement.selectionStart;
-    console.log(cursorPosition);
-    const { value } = this.props;
 
-    const newValue = this.cursores.replace(
-      value,
-      cursorPosition,
-      expressionInfo.name
-    );
+    const { value } = this.props;
+    const newValue =
+      value.substr(0, cursorPosition) +
+      expressionInfo.name +
+      value.substr(cursorPosition);
+
     if (this.props.onChange) this.props.onChange(newValue);
     setTimeout(() => {
       if (this._field) this._field.focus();
-      if (this._inputElement)
-        this._inputElement.setSelectionRange(cursorPosition, cursorPosition);
-    });
+
+      setTimeout(() => {
+        if (this._inputElement)
+          this._inputElement.setSelectionRange(
+            cursorPosition,
+            cursorPosition + expressionInfo.name.length
+          );
+      }, 5);
+    }, 5);
   };
 
   getError = () => {
@@ -148,7 +140,6 @@ export default class ExpressionField extends Component {
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
-
 
     const popoverStyle = {
       width: this._fieldElement ? this._fieldElement.clientWidth : 'auto',
@@ -183,7 +174,6 @@ export default class ExpressionField extends Component {
                 style={styles.expressionSelector}
                 selectedType=""
                 onChoose={(type, expression) => {
-                  console.log(type, expression)
                   this._handleExpressionChosen(expression);
                 }}
               />

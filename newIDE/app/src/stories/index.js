@@ -43,6 +43,8 @@ import ValueStateHolder from './ValueStateHolder';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
 import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
 import VariablesList from '../VariablesList';
+import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
+import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import { makeTestProject } from '../fixtures/TestProject';
 
@@ -206,6 +208,18 @@ storiesOf('EventsSheet', module)
     </DragDropContextProvider>
   ));
 
+storiesOf('ExpressionSelector', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ExpressionSelector selectedType="" onChoose={action('Expression chosen')} />
+  ));
+
+storiesOf('InstructionSelector', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <InstructionSelector selectedType="" onChoose={action('Instruction chosen')} />
+  ));
+
 storiesOf('InstructionEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -290,7 +304,8 @@ storiesOf('ImageThumbnail', module)
       resourceName="res/icon128.png"
       resourcesLoader={ResourcesLoader}
     />
-  )).add('selectable', () => (
+  ))
+  .add('selectable', () => (
     <ImageThumbnail
       selectable
       project={project}

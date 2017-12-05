@@ -44,7 +44,6 @@ export const enumerateInstructions = (
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
 
-    //TODO: Factor with EnumerateExpressions.js
     let prefix = '';
     if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
       prefix =

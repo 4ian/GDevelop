@@ -63,7 +63,6 @@ export const enumerateExpressions = (type = 'number') => {
     var allObjectsTypes = extension.getExtensionObjectsTypes();
     var allBehaviorsTypes = extension.getBehaviorsTypes();
 
-    //TODO: Factor with InstructionTypeSelector.js
     let prefix = '';
     if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
       prefix =

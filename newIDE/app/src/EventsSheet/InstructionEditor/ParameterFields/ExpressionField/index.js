@@ -74,6 +74,7 @@ export default class ExpressionField extends Component<*, State> {
   };
 
   _handleBlur = () => {
+    this.doValidation();
     this.setState({
       popoverOpen: false,
     });

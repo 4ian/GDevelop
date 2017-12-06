@@ -12,7 +12,7 @@ describe('HelpButton', () => {
     behaviorsExpressions,
   } = enumerateExpressions('number');
 
-  it('should properly format a free function', () => {
+  it('properly format a free function, with one or more arguments', () => {
     const countExpression = filterExpressions(freeExpressions, 'Count')[0];
     expect(formatExpressionCall(countExpression, ['MyObject'])).toBe(
       'Count(MyObject)'
@@ -24,7 +24,14 @@ describe('HelpButton', () => {
     );
   });
 
-  it('should properly format an object function', () => {
+  it('properly format a free function, with "code-only" parameters', () => {
+    const cameraHeightExpression = filterExpressions(freeExpressions, 'CameraHeight')[0];
+    expect(formatExpressionCall(cameraHeightExpression, ['', '"My layer"', "0"])).toBe(
+      'CameraHeight("My layer", 0)'
+    );
+  });
+
+  it('properly format an object function', () => {
     const variableStringExpression = filterExpressions(
       objectsExpressions,
       'Variable'
@@ -34,14 +41,14 @@ describe('HelpButton', () => {
     ).toBe('MyObject.Variable(Variable1)');
   });
 
-  it('should properly format an object function with an argument', () => {
+  it('properly format an object function with an argument', () => {
     const pointXExpression = filterExpressions(objectsExpressions, 'PointX')[0];
     expect(
       formatExpressionCall(pointXExpression, ['MyObject', 'MyPoint'])
     ).toBe('MyObject.PointX(MyPoint)');
   });
 
-  it('should properly format an object behavior function', () => {
+  it('properly format an object behavior function', () => {
     const variableStringExpression = filterExpressions(
       behaviorsExpressions,
       'JumpSpeed'

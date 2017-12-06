@@ -25,6 +25,7 @@ import ImageThumbnail from '../ObjectEditor/ImageThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterFields/ExternalEventsField';
 import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
+import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
 import ObjectsList from '../ObjectsList';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
@@ -128,6 +129,15 @@ storiesOf('ParameterFields', module)
         parameterRenderingService={ParameterRenderingService}
       />
     </ValueStateHolder>
+  ))
+  .add('StringField', () => (
+    <ValueStateHolder initialValue={'ToString(0) + "Test" + NewLine() + VariableString(MyVar)'}>
+      <StringField
+        project={project}
+        layout={testLayout}
+        parameterRenderingService={ParameterRenderingService}
+      />
+    </ValueStateHolder>
   ));
 
 storiesOf('LocalExport', module)
@@ -215,10 +225,17 @@ storiesOf('EventsSheet', module)
 
 storiesOf('ExpressionSelector', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('number', () => (
     <ExpressionSelector
       selectedType=""
+      expressionType="number"
       onChoose={action('Expression chosen')}
+    />
+  )).add('string', () => (
+    <ExpressionSelector
+      selectedType=""
+      expressionType="string"
+      onChoose={action('(String) Expression chosen')}
     />
   ));
 

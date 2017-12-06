@@ -74,7 +74,7 @@ export default class ExpressionField extends Component<*, State> {
   };
 
   _handleBlur = () => {
-    this.doValidation();
+    this._doValidation();
     this.setState({
       popoverOpen: false,
     });
@@ -111,7 +111,9 @@ export default class ExpressionField extends Component<*, State> {
 
     const { value } = this.props;
     const newValue =
-      value.substr(0, cursorPosition) + functionCall + value.substr(cursorPosition);
+      value.substr(0, cursorPosition) +
+      functionCall +
+      value.substr(cursorPosition);
 
     if (this.props.onChange) this.props.onChange(newValue);
     setTimeout(() => {
@@ -127,15 +129,21 @@ export default class ExpressionField extends Component<*, State> {
     }, 5);
   };
 
-  getError = () => {
-    const { project, layout } = this.props;
+  _getError = () => {
+    const { project, layout, expressionType } = this.props;
 
     const callbacks = new gd.CallbacksForExpressionCorrectnessTesting(
       project,
       layout
     );
     const parser = new gd.ExpressionParser(this.props.value);
-    const isValid = parser.parseMathExpression(
+
+    const parseFunction =
+      expressionType === 'string'
+        ? parser.parseStringExpression
+        : parser.parseMathExpression;
+
+    const isValid = parseFunction(
       project.getCurrentPlatform(),
       project,
       layout,
@@ -148,12 +156,19 @@ export default class ExpressionField extends Component<*, State> {
     return isValid ? null : error;
   };
 
-  doValidation = () => {
-    this.setState({ errorText: this.getError() });
+  _doValidation = () => {
+    this.setState({ errorText: this._getError() });
   };
 
   render() {
-    const { parameterMetadata, project, layout, parameterRenderingService } = this.props;
+    const {
+      value,
+      expressionType,
+      parameterMetadata,
+      project,
+      layout,
+      parameterRenderingService,
+    } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -166,13 +181,14 @@ export default class ExpressionField extends Component<*, State> {
       <div style={styles.container}>
         <div style={styles.textFieldContainer}>
           <TextField
-            value={this.props.value}
+            value={value}
             floatingLabelText={description}
             inputStyle={styles.input}
             onChange={this._handleChange}
             ref={field => (this._field = field)}
             onFocus={this._handleFocus}
             onBlur={this._handleBlur}
+            errorText={this.state.errorText}
             fullWidth
           />
           {this._fieldElement && (
@@ -193,6 +209,7 @@ export default class ExpressionField extends Component<*, State> {
                 onChoose={(type, expression) => {
                   this._handleExpressionChosen(expression);
                 }}
+                expressionType={expressionType}
               />
             </Popover>
           )}

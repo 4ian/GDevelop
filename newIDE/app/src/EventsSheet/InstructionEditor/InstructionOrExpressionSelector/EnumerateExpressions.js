@@ -50,7 +50,7 @@ const enumerateExtensionExpressions = (
   return allExpressions;
 };
 
-export const enumerateExpressions = (type = 'number') => {
+export const enumerateExpressions = (type) => {
   const freeExpressions = [];
   const objectsExpressions = [];
   const behaviorsExpressions = [];

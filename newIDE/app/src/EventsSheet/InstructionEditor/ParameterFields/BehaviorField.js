@@ -61,7 +61,7 @@ export default class BehaviorField extends Component {
     if (this._field) this._field.focus();
   }
 
-  getError = () => {
+  _getError = () => {
     if (!this.props.value) return null;
 
     const isValidChoice =
@@ -73,8 +73,8 @@ export default class BehaviorField extends Component {
     return null;
   };
 
-  doValidation = () => {
-    this.setState({ errorText: this.getError() });
+  _doValidation = () => {
+    this.setState({ errorText: this._getError() });
   };
 
   componentDidUpdate() {
@@ -120,7 +120,7 @@ export default class BehaviorField extends Component {
           this.setState({ errorText: null });
           this.props.onChange(value);
         }}
-        onBlur={this.doValidation}
+        onBlur={this._doValidation}
         onNewRequest={data => {
           // Note that data may be a string or a {text, value} object.
           if (typeof data === 'string') {

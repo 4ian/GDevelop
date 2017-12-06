@@ -10,8 +10,12 @@ export default class ExpressionSelector extends Component<*, *> {
   instructionsInfo: Array<InstructionOrExpressionInformation> = [];
   instructionsInfoTree: InstructionOrExpressionTreeNode = null;
 
+  static defaultProps = {
+    expressionType: 'number',
+  };
+
   componentWillMount() {
-    const { allExpressions } = enumerateExpressions('number');
+    const { allExpressions } = enumerateExpressions(this.props.expressionType);
     this.instructionsInfo = allExpressions;
     this.instructionsInfoTree = createTree(allExpressions);
   }

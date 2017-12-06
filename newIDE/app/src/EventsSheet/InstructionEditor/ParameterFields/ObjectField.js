@@ -21,15 +21,15 @@ export default class ObjectField extends Component {
     if (this._field) this._field.focus();
   }
 
-  getError = () => {
+  _getError = () => {
     if (this._field && !this._field.hasAValidObject())
       return "The object does not exist or can't be used here";
 
     return null;
   };
 
-  doValidation = () => {
-    this.setState({ errorText: this.getError() });
+  _doValidation = () => {
+    this.setState({ errorText: this._getError() });
   };
 
   render() {
@@ -47,7 +47,7 @@ export default class ObjectField extends Component {
         floatingLabelText={this._description}
         fullWidth
         errorText={this.state.errorText}
-        onBlur={this.doValidation}
+        onBlur={this._doValidation}
         openOnFocus={!this.props.isInline}
         ref={field => (this._field = field)}
       />

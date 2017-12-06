@@ -14,7 +14,7 @@ const gd = global.gd;
 const styles = {
   container: {
     display: 'flex',
-    alignItems: 'baseline',
+    alignItems: 'flex-start',
   },
   textFieldContainer: {
     flex: 1,
@@ -27,7 +27,12 @@ const styles = {
   input: {
     fontFamily: '"Lucida Console", Monaco, monospace',
   },
-  moreButton: {
+  functionsButton: {
+    marginTop: 7, //Properly align with the text field
+    marginLeft: 10,
+  },
+  functionsButtonWithDescription: {
+    marginTop: 33, //Properly align with the text field
     marginLeft: 10,
   },
 };
@@ -143,7 +148,8 @@ export default class ExpressionField extends Component<*, State> {
         ? parser.parseStringExpression
         : parser.parseMathExpression;
 
-    const isValid = parseFunction(
+    const isValid = parseFunction.call(
+      parser,
       project.getCurrentPlatform(),
       project,
       layout,
@@ -217,7 +223,7 @@ export default class ExpressionField extends Component<*, State> {
         <RaisedButton
           icon={<Functions />}
           primary
-          style={styles.moreButton}
+          style={description ? styles.functionsButtonWithDescription : styles.functionsButton}
           onClick={this._openExpressionPopover}
         />
         {this.state.parametersDialogOpen &&

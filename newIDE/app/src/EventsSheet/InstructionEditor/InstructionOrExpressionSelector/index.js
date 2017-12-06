@@ -100,6 +100,9 @@ export class InstructionOrExpressionSelector extends Component {
           primaryText={instructionInfo.displayedName}
           secondaryText={instructionInfo.fullGroupName}
           value={instructionInfo.type}
+          onClick={() => {
+            this.props.onChoose(instructionInfo.type, instructionInfo);
+          }}
         />
       );
     });

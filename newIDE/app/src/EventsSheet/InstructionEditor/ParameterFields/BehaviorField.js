@@ -77,7 +77,7 @@ export default class BehaviorField extends Component {
     this.setState({ errorText: this.getError() });
   };
 
-  componentWillUpdate() {
+  componentDidUpdate() {
     const { instructionOrExpression } = this.props;
     if (
       !instructionOrExpression ||
@@ -85,16 +85,8 @@ export default class BehaviorField extends Component {
     )
       return;
 
-    const objectName = instructionOrExpression.getParameter(0);
-    this._behaviorNames = gd
-      .getBehaviorsOfObject(
-        this.props.project,
-        this.props.layout,
-        objectName,
-        true
-      )
-      .toJSArray();
-
+    // This is a bit hacky:
+    // force the behavior selection if there is only one selectable behavior
     if (this._behaviorNames.length === 1) {
       if (this.props.value !== this._behaviorNames[0]) {
         this.props.onChange(this._behaviorNames[0]);

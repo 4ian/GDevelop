@@ -116,6 +116,7 @@ export const makeTestProject = gd => {
   testLayout.insertObject(tiledSpriteObject, 0);
   testLayout.insertObject(panelSpriteObject, 0);
   testLayout.insertObject(spriteObject, 0);
+  testLayout.insertObject(spriteObjectWithBehaviors, 0);
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');

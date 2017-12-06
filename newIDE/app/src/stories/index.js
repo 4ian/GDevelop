@@ -122,7 +122,11 @@ storiesOf('ParameterFields', module)
   .addDecorator(muiDecorator)
   .add('ExpressionField', () => (
     <ValueStateHolder initialValue={'MySpriteObject.X() + MouseX("", 0)'}>
-      <ExpressionField project={project} layout={testLayout} parameterRenderingService={ParameterRenderingService} />
+      <ExpressionField
+        project={project}
+        layout={testLayout}
+        parameterRenderingService={ParameterRenderingService}
+      />
     </ValueStateHolder>
   ));
 
@@ -212,13 +216,19 @@ storiesOf('EventsSheet', module)
 storiesOf('ExpressionSelector', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ExpressionSelector selectedType="" onChoose={action('Expression chosen')} />
+    <ExpressionSelector
+      selectedType=""
+      onChoose={action('Expression chosen')}
+    />
   ));
 
 storiesOf('InstructionSelector', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <InstructionSelector selectedType="" onChoose={action('Instruction chosen')} />
+    <InstructionSelector
+      selectedType=""
+      onChoose={action('Instruction chosen')}
+    />
   ));
 
 storiesOf('InstructionEditor', module)

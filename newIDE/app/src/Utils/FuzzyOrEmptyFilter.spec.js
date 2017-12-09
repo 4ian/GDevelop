@@ -1,4 +1,4 @@
-import { fuzzyOrEmptyFilter } from '../FuzzyOrEmptyFilter';
+import { fuzzyOrEmptyFilter } from './FuzzyOrEmptyFilter';
 
 describe('FuzzyOrEmptyFilter', () => {
   it('filter as expected', () => {

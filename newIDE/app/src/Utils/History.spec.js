@@ -5,8 +5,8 @@ import {
   saveToHistory,
   undo,
   redo,
-} from '../History';
-import { makeTestProject } from '../../fixtures/TestProject';
+} from './History';
+import { makeTestProject } from '../fixtures/TestProject';
 const gd = global.gd;
 
 describe('History', () => {

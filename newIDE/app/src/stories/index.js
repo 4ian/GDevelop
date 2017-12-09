@@ -166,7 +166,7 @@ storiesOf('LocalS3Export', module)
 storiesOf('LocalCordovaExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => <LocalCordovaExport />);
+  .add('default', () => <LocalCordovaExport project={project} />);
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)

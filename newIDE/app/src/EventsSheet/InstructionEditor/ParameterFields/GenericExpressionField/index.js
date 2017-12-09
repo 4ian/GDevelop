@@ -20,7 +20,7 @@ const styles = {
     flex: 1,
   },
   expressionSelector: {
-    maxHeight: 250,
+    maxHeight: 350,
     overflowY: 'scroll',
     backgroundColor: 'white',
   },

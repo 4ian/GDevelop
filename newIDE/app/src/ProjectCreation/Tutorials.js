@@ -3,6 +3,7 @@ import FlatButton from 'material-ui/FlatButton';
 import { Column, Line } from '../UI/Grid';
 import { sendTutorialOpened } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
+import { getHelpLink } from '../Utils/HelpLink';
 
 export default class Tutorials extends Component {
   render() {
@@ -25,8 +26,17 @@ export default class Tutorials extends Component {
               onClick={() => {
                 sendTutorialOpened('Platformer');
                 Window.openExternalURL(
-                  'http://wiki.compilgames.net/doku.php/gdevelop5/tutorials/platform-game/start'
+                  getHelpLink('/tutorials/platform-game/start')
                 );
+              }}
+            />
+            <FlatButton
+              label="Make a simple tank shooter game from scratch"
+              fullWidth
+              primary
+              onClick={() => {
+                sendTutorialOpened('Tank Shooter');
+                Window.openExternalURL(getHelpLink('/tutorials/tank-shooter'));
               }}
             />
             <FlatButton

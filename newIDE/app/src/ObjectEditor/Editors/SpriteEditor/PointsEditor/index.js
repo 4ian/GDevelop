@@ -13,7 +13,7 @@ import {
   allSpritesHaveSamePointsAs,
   copyAnimationsSpritePoints,
 } from '../Utils/SpriteObjectHelper';
-import every from 'lodash.every';
+import every from 'lodash/every';
 const gd = global.gd;
 
 export default class PointsEditor extends Component {

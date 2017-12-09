@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Paper from 'material-ui/Paper';
-import InstructionTypeSelector from './InstructionTypeSelector.js';
+import InstructionSelector from './InstructionOrExpressionSelector/InstructionSelector.js';
 import InstructionParametersEditor from './InstructionParametersEditor.js';
 
 const styles = {
@@ -32,7 +32,7 @@ export default class InstructionEditor extends Component {
 
     return (
       <div style={styles.container}>
-        <InstructionTypeSelector
+        <InstructionSelector
           style={styles.typeSelector}
           isCondition={isCondition}
           selectedType={instruction.getType()}

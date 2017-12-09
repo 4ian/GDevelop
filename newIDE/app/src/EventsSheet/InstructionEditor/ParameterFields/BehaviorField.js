@@ -29,9 +29,14 @@ export default class BehaviorField extends Component {
   }
 
   _updateBehaviorsList() {
-    if (this.props.instruction.getParametersCount() === 0) return;
+    const { instructionOrExpression } = this.props;
+    if (
+      !instructionOrExpression ||
+      instructionOrExpression.getParametersCount() === 0
+    )
+      return;
 
-    const objectName = this.props.instruction.getParameter(0);
+    const objectName = instructionOrExpression.getParameter(0);
     this._behaviorNames = gd
       .getBehaviorsOfObject(
         this.props.project,
@@ -56,7 +61,7 @@ export default class BehaviorField extends Component {
     if (this._field) this._field.focus();
   }
 
-  getError = () => {
+  _getError = () => {
     if (!this.props.value) return null;
 
     const isValidChoice =
@@ -68,23 +73,20 @@ export default class BehaviorField extends Component {
     return null;
   };
 
-  doValidation = () => {
-    this.setState({ errorText: this.getError() });
+  _doValidation = () => {
+    this.setState({ errorText: this._getError() });
   };
 
-  componentWillUpdate() {
-    if (this.props.instruction.getParametersCount() === 0) return;
+  componentDidUpdate() {
+    const { instructionOrExpression } = this.props;
+    if (
+      !instructionOrExpression ||
+      instructionOrExpression.getParametersCount() === 0
+    )
+      return;
 
-    const objectName = this.props.instruction.getParameter(0);
-    this._behaviorNames = gd
-      .getBehaviorsOfObject(
-        this.props.project,
-        this.props.layout,
-        objectName,
-        true
-      )
-      .toJSArray();
-
+    // This is a bit hacky:
+    // force the behavior selection if there is only one selectable behavior
     if (this._behaviorNames.length === 1) {
       if (this.props.value !== this._behaviorNames[0]) {
         this.props.onChange(this._behaviorNames[0]);
@@ -118,7 +120,7 @@ export default class BehaviorField extends Component {
           this.setState({ errorText: null });
           this.props.onChange(value);
         }}
-        onBlur={this.doValidation}
+        onBlur={this._doValidation}
         onNewRequest={data => {
           // Note that data may be a string or a {text, value} object.
           if (typeof data === 'string') {

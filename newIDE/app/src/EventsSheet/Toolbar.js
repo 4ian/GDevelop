@@ -5,7 +5,7 @@ import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import IconMenu from '../UI/Menu/IconMenu';
 import { mapFor } from '../Utils/MapFor';
-import flatten from 'lodash.flatten';
+import flatten from 'lodash/flatten';
 const gd = global.gd;
 
 export class Toolbar extends PureComponent {

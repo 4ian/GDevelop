@@ -8,7 +8,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import assignIn from 'lodash.assignin';
+import assignIn from 'lodash/assignIn';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';

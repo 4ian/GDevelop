@@ -13,7 +13,7 @@ import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
-import LocalMobileExport from '../Export/LocalMobileExport';
+import LocalCordovaExport from '../Export/LocalCordovaExport';
 import LocalS3Export from '../Export/LocalS3Export';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
@@ -24,6 +24,8 @@ import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ImageThumbnail from '../ObjectEditor/ImageThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterFields/ExternalEventsField';
+import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
+import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
 import ObjectsList from '../ObjectsList';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
@@ -42,6 +44,9 @@ import ValueStateHolder from './ValueStateHolder';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
 import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
 import VariablesList from '../VariablesList';
+import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
+import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
+import ParameterRenderingService from '../EventsSheet/InstructionEditor/ParameterRenderingService';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import { makeTestProject } from '../fixtures/TestProject';
 
@@ -113,6 +118,28 @@ storiesOf('HelpButton', module)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpButton helpPagePath="/test" />);
 
+storiesOf('ParameterFields', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('ExpressionField', () => (
+    <ValueStateHolder initialValue={'MySpriteObject.X() + MouseX("", 0)'}>
+      <ExpressionField
+        project={project}
+        layout={testLayout}
+        parameterRenderingService={ParameterRenderingService}
+      />
+    </ValueStateHolder>
+  ))
+  .add('StringField', () => (
+    <ValueStateHolder initialValue={'ToString(0) + "Test" + NewLine() + VariableString(MyVar)'}>
+      <StringField
+        project={project}
+        layout={testLayout}
+        parameterRenderingService={ParameterRenderingService}
+      />
+    </ValueStateHolder>
+  ));
+
 storiesOf('LocalExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -136,10 +163,10 @@ storiesOf('LocalS3Export', module)
     <LocalS3Export open project={project} onClose={action('close')} />
   ));
 
-storiesOf('LocalMobileExport', module)
+storiesOf('LocalCordovaExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => <LocalMobileExport />);
+  .add('default', () => <LocalCordovaExport />);
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
@@ -194,6 +221,31 @@ storiesOf('EventsSheet', module)
         events={testLayout.getEvents()}
       />
     </DragDropContextProvider>
+  ));
+
+storiesOf('ExpressionSelector', module)
+  .addDecorator(muiDecorator)
+  .add('number', () => (
+    <ExpressionSelector
+      selectedType=""
+      expressionType="number"
+      onChoose={action('Expression chosen')}
+    />
+  )).add('string', () => (
+    <ExpressionSelector
+      selectedType=""
+      expressionType="string"
+      onChoose={action('(String) Expression chosen')}
+    />
+  ));
+
+storiesOf('InstructionSelector', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <InstructionSelector
+      selectedType=""
+      onChoose={action('Instruction chosen')}
+    />
   ));
 
 storiesOf('InstructionEditor', module)
@@ -280,7 +332,8 @@ storiesOf('ImageThumbnail', module)
       resourceName="res/icon128.png"
       resourcesLoader={ResourcesLoader}
     />
-  )).add('selectable', () => (
+  ))
+  .add('selectable', () => (
     <ImageThumbnail
       selectable
       project={project}

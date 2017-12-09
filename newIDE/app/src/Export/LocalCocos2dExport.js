@@ -10,7 +10,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import assignIn from 'lodash.assignin';
+import assignIn from 'lodash/assignIn';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;

@@ -79,10 +79,11 @@ export default class InlineParameterEditor extends Component {
           project={this.props.project}
           layout={this.props.layout}
           value={this.props.instruction.getParameter(this.props.parameterIndex)}
-          instruction={this.props.instruction}
+          instructionOrExpression={this.props.instruction}
           key={this.props.instruction.ptr}
           onChange={this.props.onChange}
           ref={field => (this._field = field)}
+          parameterRenderingService={ParameterRenderingService}
           isInline
         />
       </InlinePopover>

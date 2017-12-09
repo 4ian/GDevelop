@@ -1,6 +1,6 @@
 // @flow
 
-import values from 'lodash.values';
+import values from 'lodash/values';
 
 type Event = {
   ptr: number,

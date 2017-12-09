@@ -6,7 +6,7 @@ import {
 import EventsRenderingService from '../EventsRenderingService';
 import { mapFor } from '../../Utils/MapFor';
 import { eventsTree } from '../ClassNames';
-import findIndex from 'lodash.findindex';
+import findIndex from 'lodash/findIndex';
 import { getInitialSelection, isEventSelected } from '../SelectionHandler';
 
 const indentWidth = 22;

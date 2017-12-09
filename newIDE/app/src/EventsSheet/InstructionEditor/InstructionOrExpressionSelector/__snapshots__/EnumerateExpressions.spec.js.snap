@@ -1,0 +1,180 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EnumerateObjects can create the tree of some instructions 1`] = `
+Object {
+  "Common expressions for all objects": Object {
+    "Angle": Object {
+      "Angle": Object {
+        "displayedName": "Angle",
+        "fullGroupName": "Common expressions for all objects/Angle",
+        "name": "Angle",
+        "type": "Angle",
+      },
+    },
+    "Movement": Object {
+      "Average X coordinates of forces": Object {
+        "displayedName": "Average X coordinates of forces",
+        "fullGroupName": "Common expressions for all objects/Movement",
+        "name": "ForceX",
+        "type": "ForceX",
+      },
+      "Average Y coordinates of forces": Object {
+        "displayedName": "Average Y coordinates of forces",
+        "fullGroupName": "Common expressions for all objects/Movement",
+        "name": "ForceY",
+        "type": "ForceY",
+      },
+      "Average angle of the forces": Object {
+        "displayedName": "Average angle of the forces",
+        "fullGroupName": "Common expressions for all objects/Movement",
+        "name": "ForceAngle",
+        "type": "ForceAngle",
+      },
+      "Average length of the forces": Object {
+        "displayedName": "Average length of the forces",
+        "fullGroupName": "Common expressions for all objects/Movement",
+        "name": "ForceLength",
+        "type": "ForceLength",
+      },
+    },
+    "Position": Object {
+      "Distance between two objects": Object {
+        "displayedName": "Distance between two objects",
+        "fullGroupName": "Common expressions for all objects/Position",
+        "name": "Distance",
+        "type": "Distance",
+      },
+      "Square distance between two objects": Object {
+        "displayedName": "Square distance between two objects",
+        "fullGroupName": "Common expressions for all objects/Position",
+        "name": "SqDistance",
+        "type": "SqDistance",
+      },
+      "X position": Object {
+        "displayedName": "X position",
+        "fullGroupName": "Common expressions for all objects/Position",
+        "name": "X",
+        "type": "X",
+      },
+      "Y position": Object {
+        "displayedName": "Y position",
+        "fullGroupName": "Common expressions for all objects/Position",
+        "name": "Y",
+        "type": "Y",
+      },
+    },
+    "Size": Object {
+      "Height": Object {
+        "displayedName": "Height",
+        "fullGroupName": "Common expressions for all objects/Size",
+        "name": "Height",
+        "type": "Height",
+      },
+      "Width": Object {
+        "displayedName": "Width",
+        "fullGroupName": "Common expressions for all objects/Size",
+        "name": "Width",
+        "type": "Width",
+      },
+    },
+    "Variables": Object {
+      "Object's variable": Object {
+        "displayedName": "Object's variable",
+        "fullGroupName": "Common expressions for all objects/Variables",
+        "name": "Variable",
+        "type": "Variable",
+      },
+      "Object's variable number of children": Object {
+        "displayedName": "Object's variable number of children",
+        "fullGroupName": "Common expressions for all objects/Variables",
+        "name": "VariableChildCount",
+        "type": "VariableChildCount",
+      },
+    },
+    "Visibility": Object {
+      "Z order": Object {
+        "displayedName": "Z order",
+        "fullGroupName": "Common expressions for all objects/Visibility",
+        "name": "ZOrder",
+        "type": "ZOrder",
+      },
+    },
+  },
+  "Sprite": Object {
+    "Animations and images": Object {
+      "Animation": Object {
+        "displayedName": "Animation",
+        "fullGroupName": "Sprite/Animations and images",
+        "name": "Animation",
+        "type": "Animation",
+      },
+      "Animation speed scale": Object {
+        "displayedName": "Animation speed scale",
+        "fullGroupName": "Sprite/Animations and images",
+        "name": "AnimationSpeedScale",
+        "type": "AnimationSpeedScale",
+      },
+      "Image": Object {
+        "displayedName": "Image",
+        "fullGroupName": "Sprite/Animations and images",
+        "name": "Sprite",
+        "type": "Sprite",
+      },
+    },
+    "Direction": Object {
+      "Direction": Object {
+        "displayedName": "Direction",
+        "fullGroupName": "Sprite/Direction",
+        "name": "Direction",
+        "type": "Direction",
+      },
+    },
+    "Position": Object {
+      "X position of a point": Object {
+        "displayedName": "X position of a point",
+        "fullGroupName": "Sprite/Position",
+        "name": "PointX",
+        "type": "PointX",
+      },
+      "Y position of a point": Object {
+        "displayedName": "Y position of a point",
+        "fullGroupName": "Sprite/Position",
+        "name": "PointY",
+        "type": "PointY",
+      },
+    },
+    "Size": Object {
+      "Scale of the height of an object": Object {
+        "displayedName": "Scale of the height of an object",
+        "fullGroupName": "Sprite/Size",
+        "name": "ScaleY",
+        "type": "ScaleY",
+      },
+      "Scale of the width of an object": Object {
+        "displayedName": "Scale of the width of an object",
+        "fullGroupName": "Sprite/Size",
+        "name": "ScaleX",
+        "type": "ScaleX",
+      },
+    },
+  },
+  "Text object": Object {
+    "Opacity": Object {
+      "Opacity": Object {
+        "displayedName": "Opacity",
+        "fullGroupName": "Text object/Opacity",
+        "name": "Opacity",
+        "type": "Opacity",
+      },
+    },
+    "Rotation": Object {
+      "Angle": Object {
+        "displayedName": "Angle",
+        "fullGroupName": "Text object/Rotation",
+        "name": "Angle",
+        "type": "Angle",
+      },
+    },
+  },
+}
+`;

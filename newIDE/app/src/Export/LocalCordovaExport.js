@@ -9,7 +9,7 @@ import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import HelpButton from '../UI/HelpButton';
-import assignIn from 'lodash.assignin';
+import assignIn from 'lodash/assignIn';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
 const electron = optionalRequire('electron');

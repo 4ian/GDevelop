@@ -1076,9 +1076,9 @@ locate-path@^2.0.0:
     p-locate "^2.0.0"
     path-exists "^3.0.0"
 
-lodash.toarray@^4.4.0:
+lodash/toarray@^4.4.0:
   version "4.4.0"
-  resolved "https://registry.yarnpkg.com/lodash.toarray/-/lodash.toarray-4.4.0.tgz#24c4bfcd6b2fba38bfd0594db1179d8e9b656561"
+  resolved "https://registry.yarnpkg.com/lodash/toarray/-/lodash/toarray-4.4.0.tgz#24c4bfcd6b2fba38bfd0594db1179d8e9b656561"
 
 loud-rejection@^1.0.0:
   version "1.6.0"
@@ -1199,7 +1199,7 @@ node-emoji@^1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/node-emoji/-/node-emoji-1.8.1.tgz#6eec6bfb07421e2148c75c6bba72421f8530a826"
   dependencies:
-    lodash.toarray "^4.4.0"
+    lodash/toarray "^4.4.0"
 
 noop-logger@^0.1.1:
   version "0.1.1"

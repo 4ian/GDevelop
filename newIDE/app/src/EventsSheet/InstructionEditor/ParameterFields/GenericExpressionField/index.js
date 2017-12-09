@@ -220,12 +220,18 @@ export default class ExpressionField extends Component<*, State> {
             </Popover>
           )}
         </div>
-        <RaisedButton
-          icon={<Functions />}
-          primary
-          style={description ? styles.functionsButtonWithDescription : styles.functionsButton}
-          onClick={this._openExpressionPopover}
-        />
+        {!this.props.isInline && (
+          <RaisedButton
+            icon={<Functions />}
+            primary
+            style={
+              description
+                ? styles.functionsButtonWithDescription
+                : styles.functionsButton
+            }
+            onClick={this._openExpressionPopover}
+          />
+        )}
         {this.state.parametersDialogOpen &&
           this.state.selectedExpressionInfo && (
             <ExpressionParametersEditorDialog

@@ -5,225 +5,97 @@ Object {
   "Common expressions for all objects": Object {
     "Angle": Object {
       "Angle": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Angle",
         "fullGroupName": "Common expressions for all objects/Angle",
-        "metadata": ExpressionMetadata {
-          "ptr": 5954072,
-        },
         "name": "Angle",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "Angle",
       },
     },
     "Movement": Object {
       "Average X coordinates of forces": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Average X coordinates of forces",
         "fullGroupName": "Common expressions for all objects/Movement",
-        "metadata": ExpressionMetadata {
-          "ptr": 5954328,
-        },
         "name": "ForceX",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "ForceX",
       },
       "Average Y coordinates of forces": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Average Y coordinates of forces",
         "fullGroupName": "Common expressions for all objects/Movement",
-        "metadata": ExpressionMetadata {
-          "ptr": 5954664,
-        },
         "name": "ForceY",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "ForceY",
       },
       "Average angle of the forces": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Average angle of the forces",
         "fullGroupName": "Common expressions for all objects/Movement",
-        "metadata": ExpressionMetadata {
-          "ptr": 5955040,
-        },
         "name": "ForceAngle",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "ForceAngle",
       },
       "Average length of the forces": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Average length of the forces",
         "fullGroupName": "Common expressions for all objects/Movement",
-        "metadata": ExpressionMetadata {
-          "ptr": 5955416,
-        },
         "name": "ForceLength",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "ForceLength",
       },
     },
     "Position": Object {
       "Distance between two objects": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Distance between two objects",
         "fullGroupName": "Common expressions for all objects/Position",
-        "metadata": ExpressionMetadata {
-          "ptr": 5958184,
-        },
         "name": "Distance",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [
-          ParameterMetadata {
-            "ptr": 5958524,
-          },
-        ],
         "type": "Distance",
       },
       "Square distance between two objects": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Square distance between two objects",
         "fullGroupName": "Common expressions for all objects/Position",
-        "metadata": ExpressionMetadata {
-          "ptr": 5958792,
-        },
         "name": "SqDistance",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [
-          ParameterMetadata {
-            "ptr": 5959124,
-          },
-        ],
         "type": "SqDistance",
       },
       "X position": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "X position",
         "fullGroupName": "Common expressions for all objects/Position",
-        "metadata": ExpressionMetadata {
-          "ptr": 5953688,
-        },
         "name": "X",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "X",
       },
       "Y position": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Y position",
         "fullGroupName": "Common expressions for all objects/Position",
-        "metadata": ExpressionMetadata {
-          "ptr": 5953880,
-        },
         "name": "Y",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "Y",
       },
     },
     "Size": Object {
       "Height": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Height",
         "fullGroupName": "Common expressions for all objects/Size",
-        "metadata": ExpressionMetadata {
-          "ptr": 5956760,
-        },
         "name": "Height",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "Height",
       },
       "Width": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Width",
         "fullGroupName": "Common expressions for all objects/Size",
-        "metadata": ExpressionMetadata {
-          "ptr": 5956168,
-        },
         "name": "Width",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "Width",
       },
     },
     "Variables": Object {
       "Object's variable": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Object's variable",
         "fullGroupName": "Common expressions for all objects/Variables",
-        "metadata": ExpressionMetadata {
-          "ptr": 5959224,
-        },
         "name": "Variable",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [
-          ParameterMetadata {
-            "ptr": 5959444,
-          },
-        ],
         "type": "Variable",
       },
       "Object's variable number of children": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Object's variable number of children",
         "fullGroupName": "Common expressions for all objects/Variables",
-        "metadata": ExpressionMetadata {
-          "ptr": 5959656,
-        },
         "name": "VariableChildCount",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [
-          ParameterMetadata {
-            "ptr": 5960068,
-          },
-        ],
         "type": "VariableChildCount",
       },
     },
     "Visibility": Object {
       "Z order": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Z order",
         "fullGroupName": "Common expressions for all objects/Visibility",
-        "metadata": ExpressionMetadata {
-          "ptr": 5957432,
-        },
         "name": "ZOrder",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5913668,
-        },
-        "parameters": Array [],
         "type": "ZOrder",
       },
     },
@@ -231,129 +103,57 @@ Object {
   "Sprite": Object {
     "Animations and images": Object {
       "Animation": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Animation",
         "fullGroupName": "Sprite/Animations and images",
-        "metadata": ExpressionMetadata {
-          "ptr": 6004352,
-        },
         "name": "Animation",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5950172,
-        },
-        "parameters": Array [],
         "type": "Animation",
       },
       "Animation speed scale": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Animation speed scale",
         "fullGroupName": "Sprite/Animations and images",
-        "metadata": ExpressionMetadata {
-          "ptr": 6005680,
-        },
         "name": "AnimationSpeedScale",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5950172,
-        },
-        "parameters": Array [],
         "type": "AnimationSpeedScale",
       },
       "Image": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Image",
         "fullGroupName": "Sprite/Animations and images",
-        "metadata": ExpressionMetadata {
-          "ptr": 6005208,
-        },
         "name": "Sprite",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5950172,
-        },
-        "parameters": Array [],
         "type": "Sprite",
       },
     },
     "Direction": Object {
       "Direction": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Direction",
         "fullGroupName": "Sprite/Direction",
-        "metadata": ExpressionMetadata {
-          "ptr": 6003544,
-        },
         "name": "Direction",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5950172,
-        },
-        "parameters": Array [],
         "type": "Direction",
       },
     },
     "Position": Object {
       "X position of a point": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "X position of a point",
         "fullGroupName": "Sprite/Position",
-        "metadata": ExpressionMetadata {
-          "ptr": 6002328,
-        },
         "name": "PointX",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5950172,
-        },
-        "parameters": Array [
-          ParameterMetadata {
-            "ptr": 6002668,
-          },
-        ],
         "type": "PointX",
       },
       "Y position of a point": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Y position of a point",
         "fullGroupName": "Sprite/Position",
-        "metadata": ExpressionMetadata {
-          "ptr": 6002808,
-        },
         "name": "PointY",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5950172,
-        },
-        "parameters": Array [
-          ParameterMetadata {
-            "ptr": 6003148,
-          },
-        ],
         "type": "PointY",
       },
     },
     "Size": Object {
       "Scale of the height of an object": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Scale of the height of an object",
         "fullGroupName": "Sprite/Size",
-        "metadata": ExpressionMetadata {
-          "ptr": 6006632,
-        },
         "name": "ScaleY",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5950172,
-        },
-        "parameters": Array [],
         "type": "ScaleY",
       },
       "Scale of the width of an object": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Scale of the width of an object",
         "fullGroupName": "Sprite/Size",
-        "metadata": ExpressionMetadata {
-          "ptr": 6006072,
-        },
         "name": "ScaleX",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 5950172,
-        },
-        "parameters": Array [],
         "type": "ScaleX",
       },
     },
@@ -361,33 +161,17 @@ Object {
   "Text object": Object {
     "Opacity": Object {
       "Opacity": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Opacity",
         "fullGroupName": "Text object/Opacity",
-        "metadata": ExpressionMetadata {
-          "ptr": 6299080,
-        },
         "name": "Opacity",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 6283324,
-        },
-        "parameters": Array [],
         "type": "Opacity",
       },
     },
     "Rotation": Object {
       "Angle": Object {
-        "behaviorMetadata": undefined,
         "displayedName": "Angle",
         "fullGroupName": "Text object/Rotation",
-        "metadata": ExpressionMetadata {
-          "ptr": 6299536,
-        },
         "name": "Angle",
-        "objectMetadata": ObjectMetadata {
-          "ptr": 6283324,
-        },
-        "parameters": Array [],
         "type": "Angle",
       },
     },

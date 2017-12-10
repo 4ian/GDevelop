@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import Timer from 'material-ui/svg-icons/image/timer';
+import FlatButton from 'material-ui/FlatButton';
 import Checkbox from 'material-ui/Checkbox';
 import Repeat from 'material-ui/svg-icons/av/repeat';
+import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import TextField from 'material-ui/TextField';
+import Dialog from '../../../UI/Dialog';
+import AnimationPreview from './AnimationPreview';
 
 const styles = {
   container: {
@@ -15,6 +19,7 @@ const styles = {
     width: 75,
   },
   timeIcon: {
+    paddingLeft: 6,
     paddingRight: 6,
   },
   repeatContainer: {
@@ -31,16 +36,10 @@ const styles = {
 const formatTime = time => Number(time.toFixed(6));
 
 export default class DirectionTools extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      timeBetweenFrames: formatTime(
-        this.props.direction.getTimeBetweenFrames()
-      ),
-      timeError: false,
-    };
-  }
+  state = {
+    timeBetweenFrames: formatTime(this.props.direction.getTimeBetweenFrames()),
+    timeError: false,
+  };
 
   componentWillReceiveProps(newProps) {
     this.setState({
@@ -73,11 +72,22 @@ export default class DirectionTools extends Component {
     this.forceUpdate();
   };
 
+  openPreview = open => {
+    this.setState({
+      previewOpen: open,
+    });
+  };
+
   render() {
-    const { direction } = this.props;
+    const { direction, resourcesLoader, project } = this.props;
 
     return (
       <div style={styles.container}>
+        <FlatButton
+          label="Preview"
+          icon={<PlayArrow />}
+          onClick={() => this.openPreview(true)}
+        />
         <Timer style={styles.timeIcon} />
         <TextField
           value={this.state.timeBetweenFrames}
@@ -97,6 +107,28 @@ export default class DirectionTools extends Component {
             labelStyle={styles.repeatLabel}
           />
         </div>
+        {this.state.previewOpen && (
+          <Dialog
+            actions={
+              <FlatButton
+                label="Close"
+                primary
+                onClick={() => this.openPreview(false)}
+              />
+            }
+            autoScrollBodyContent
+            noMargin
+            modal
+            onRequestClose={() => this.openPreview(false)}
+            open={this.state.previewOpen}
+          >
+            <AnimationPreview
+              spritesContainer={direction}
+              resourcesLoader={resourcesLoader}
+              project={project}
+            />
+          </Dialog>
+        )}
       </div>
     );
   }

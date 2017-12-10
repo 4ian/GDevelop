@@ -26,7 +26,7 @@ const styles = {
   },
   box: {
     border: '1px solid black',
-  }
+  },
 };
 
 export default class ImagePreview extends React.Component {
@@ -67,9 +67,7 @@ export default class ImagePreview extends React.Component {
       children,
     } = this.props;
 
-    const {
-      imageHeight, imageWidth
-    } = this.state;
+    const { imageHeight, imageWidth } = this.state;
 
     const overlayStyle = {
       ...styles.overlayContainer,
@@ -93,15 +91,11 @@ export default class ImagePreview extends React.Component {
             onLoad={this._handleImageLoaded}
           />
         )}
-        {canDisplayOverlays && (
-            <div
-              style={{...overlayStyle, ...styles.box}}
-            />
-          )}
-        {canDisplayOverlays && (
-            <div
-              style={overlayStyle}
-            >
+        {canDisplayOverlays &&
+          children && <div style={{ ...overlayStyle, ...styles.box }} />}
+        {canDisplayOverlays &&
+          children && (
+            <div style={overlayStyle}>
               {React.cloneElement(children, {
                 imageWidth,
                 imageHeight,

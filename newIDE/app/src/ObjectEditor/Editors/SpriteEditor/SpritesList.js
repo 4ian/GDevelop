@@ -79,7 +79,7 @@ const SortableList = SortableContainer(
                 index={i}
                 selected={!!selectedSprites[sprite.ptr]}
                 onContextMenu={(x, y) => onSpriteContextMenu(x, y, sprite)}
-                onSelect={(selected) => onSelectSprite(sprite, selected)}
+                onSelect={selected => onSelectSprite(sprite, selected)}
                 resourcesLoader={resourcesLoader}
                 project={project}
               />
@@ -130,7 +130,11 @@ export default class SpritesList extends Component {
     return (
       <div>
         <MiniToolbar justifyContent="flex-end" smallest>
-          <DirectionTools direction={this.props.direction} />
+          <DirectionTools
+            direction={this.props.direction}
+            resourcesLoader={this.props.resourcesLoader}
+            project={this.props.project}
+          />
         </MiniToolbar>
         <SortableList
           resourcesLoader={this.props.resourcesLoader}

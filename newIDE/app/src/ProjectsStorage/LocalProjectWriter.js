@@ -7,7 +7,7 @@ export default class LocalProjectWriter {
     if (!fs) return cb('Not supported');
 
     try {
-      const content = JSON.stringify(serializeToJSObject(project));
+      const content = JSON.stringify(serializeToJSObject(project), null, 2);
       fs.writeFile(filepath, content, cb);
     } catch (e) {
       return cb(e);

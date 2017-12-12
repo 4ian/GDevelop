@@ -69,8 +69,8 @@ class ObjectsList extends Component<*, *> {
         rowCount={fullList.length}
         rowHeight={listItemHeight}
         rowRenderer={({ index, key, style }) => {
-          const objectWithScope = fullList[index];
-          if (objectWithScope.key === 'add-objects-row') {
+          const objectWithContext = fullList[index];
+          if (objectWithContext.key === 'add-objects-row') {
             return (
               <SortableAddObjectRow
                 index={fullList.length}
@@ -86,34 +86,37 @@ class ObjectsList extends Component<*, *> {
           const nameBeingEdited =
             this.props.renamedObjectWithScope &&
             this.props.renamedObjectWithScope.object ===
-              objectWithScope.object &&
-            this.props.renamedObjectWithScope.global === objectWithScope.global;
+              objectWithContext.object &&
+            this.props.renamedObjectWithScope.global ===
+              objectWithContext.global;
 
           return (
             <SortableObjectRow
               index={index}
-              key={objectWithScope.object.ptr}
+              key={objectWithContext.object.ptr}
               project={project}
-              object={objectWithScope.object}
+              object={objectWithContext.object}
               style={style}
               onEdit={
                 this.props.onEditObject
-                  ? () => this.props.onEditObject(objectWithScope.object)
+                  ? () => this.props.onEditObject(objectWithContext.object)
                   : undefined
               }
               onEditVariables={() =>
-                this.props.onEditVariables(objectWithScope.object)}
-              onEditName={() => this.props.onEditName(objectWithScope)}
-              onDelete={() => this.props.onDelete(objectWithScope)}
-              onCopyObject={() => this.props.onCopyObject(objectWithScope)}
-              onCutObject={() => this.props.onCutObject(objectWithScope)}
-              onPaste={() => this.props.onPaste(objectWithScope)}
+                this.props.onEditVariables(objectWithContext.object)}
+              onEditName={() => this.props.onEditName(objectWithContext)}
+              onDelete={() => this.props.onDelete(objectWithContext)}
+              onCopyObject={() => this.props.onCopyObject(objectWithContext)}
+              onCutObject={() => this.props.onCutObject(objectWithContext)}
+              onPaste={() => this.props.onPaste(objectWithContext)}
               onRename={newName =>
-                this.props.onRename(objectWithScope, newName)}
+                this.props.onRename(objectWithContext, newName)}
               onAddNewObject={this.props.onAddNewObject}
               editingName={nameBeingEdited}
               getThumbnail={this.props.getThumbnail}
-              selected={objectWithScope.object.getName() === selectedObjectName}
+              selected={
+                objectWithContext.object.getName() === selectedObjectName
+              }
               onObjectSelected={this.props.onObjectSelected}
             />
           );
@@ -138,8 +141,13 @@ export default class ObjectsListContainer extends React.Component<
   StateType
 > {
   static defaultProps = {
-    onDeleteObject: (objectWithScope, cb) => cb(true),
-    onRenameObject: (objectWithScope, newName, cb) => cb(true),
+    onDeleteObject: (objectWithContext: ObjectWithContext, cb: Function) =>
+      cb(true),
+    onRenameObject: (
+      objectWithContext: ObjectWithContext,
+      newName: string,
+      cb: Function
+    ) => cb(true),
   };
 
   sortableList: any;
@@ -208,8 +216,8 @@ export default class ObjectsListContainer extends React.Component<
     );
   };
 
-  _deleteObject = (objectWithScope: ObjectWithContext) => {
-    const { object, global } = objectWithScope;
+  _deleteObject = (objectWithContext: ObjectWithContext) => {
+    const { object, global } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
     //eslint-disable-next-line
@@ -218,7 +226,7 @@ export default class ObjectsListContainer extends React.Component<
     );
     if (!answer) return;
 
-    this.props.onDeleteObject(objectWithScope, doRemove => {
+    this.props.onDeleteObject(objectWithContext, doRemove => {
       if (!doRemove) return;
 
       if (global) {
@@ -231,8 +239,8 @@ export default class ObjectsListContainer extends React.Component<
     });
   };
 
-  _copyObject = (objectWithScope: ObjectWithContext) => {
-    const { object } = objectWithScope;
+  _copyObject = (objectWithContext: ObjectWithContext) => {
+    const { object } = objectWithContext;
     Clipboard.set(CLIPBOARD_KIND, {
       type: object.getType(),
       name: object.getName(),
@@ -240,15 +248,15 @@ export default class ObjectsListContainer extends React.Component<
     });
   };
 
-  _cutObject = (objectWithScope: ObjectWithContext) => {
-    this._copyObject(objectWithScope);
-    this._deleteObject(objectWithScope);
+  _cutObject = (objectWithContext: ObjectWithContext) => {
+    this._copyObject(objectWithContext);
+    this._deleteObject(objectWithContext);
   };
 
-  _paste = (objectWithScope: ObjectWithContext) => {
+  _paste = (objectWithContext: ObjectWithContext) => {
     if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
-    const { object: pasteObject, global } = objectWithScope;
+    const { object: pasteObject, global } = objectWithContext;
     const { object: copiedObject, type, name } = Clipboard.get(CLIPBOARD_KIND);
     const { project, objectsContainer } = this.props;
 
@@ -282,10 +290,10 @@ export default class ObjectsListContainer extends React.Component<
     this.forceUpdate();
   };
 
-  _editName = (objectWithScope: ?ObjectWithContext) => {
+  _editName = (objectWithContext: ?ObjectWithContext) => {
     this.setState(
       {
-        renamedObjectWithScope: objectWithScope,
+        renamedObjectWithScope: objectWithContext,
       },
       () => this.sortableList.getWrappedInstance().forceUpdateGrid()
     );
@@ -297,8 +305,8 @@ export default class ObjectsListContainer extends React.Component<
     });
   };
 
-  _rename = (objectWithScope: ObjectWithContext, newName: string) => {
-    const { object } = objectWithScope;
+  _rename = (objectWithContext: ObjectWithContext, newName: string) => {
+    const { object } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
     this.setState({
@@ -315,7 +323,7 @@ export default class ObjectsListContainer extends React.Component<
       return;
     }
 
-    this.props.onRenameObject(objectWithScope, newName, doRename => {
+    this.props.onRenameObject(objectWithContext, newName, doRename => {
       if (!doRename) return;
 
       object.setName(newName);

@@ -338,8 +338,8 @@ export default class InstancesFullEditor extends Component {
     done(true);
   };
 
-  _onDeleteObject = (objectWithScope, done) => {
-    const { object, global } = objectWithScope;
+  _onDeleteObject = (objectWithContext, done) => {
+    const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
     //eslint-disable-next-line
@@ -364,8 +364,8 @@ export default class InstancesFullEditor extends Component {
     done(true);
   };
 
-  _onRenameObject = (objectWithScope, newName, done) => {
-    const { object, global } = objectWithScope;
+  _onRenameObject = (objectWithContext, newName, done) => {
+    const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
     if (global) {

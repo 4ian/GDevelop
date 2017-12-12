@@ -120,7 +120,7 @@ gdjs.Polygon.createRectangle = function(width, height) {
 
 /**
  * Do a collision test between two polygons.<br>
- * Please note that polygons must <b>convexes</b>!
+ * Please note that polygons must be <b>convexes</b>!
  *
  * Uses <a href="http://en.wikipedia.org/wiki/Hyperplane_separation_theorem">Separating Axis Theorem </a>.<br>
  * Based on <a href="http://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection">this</a>
@@ -132,7 +132,32 @@ gdjs.Polygon.createRectangle = function(width, height) {
  * @param p1 {polygon} The first polygon
  * @param p2 {polygon} The second polygon
  */
-gdjs.Polygon.collisionTest = function(p1,p2) {
+gdjs.Polygon.collisionTest = function(p1, p2) {
+
+		if(p1.vertices.length < 2 || p2.vertices.length < 2)
+    {
+        var result = gdjs.Polygon.collisionTest._statics.result;
+        result.collision = false;
+        result.move_axis[0] = 0;
+        result.move_axis[1] = 0;
+        return result;
+    }
+
+    // If one of the "polygons" is a circle, use the right function
+    if (p1.vertices.length === 2 || p2.vertices.length === 2)
+    {
+        if ( p1.vertices.length !== 2 ) {
+            return gdjs.Polygon.polygonCircleCollisionTest(p1, p2);
+        } else if ( p2.vertices.length !== 2 ) {
+            var result =  gdjs.Polygon.polygonCircleCollisionTest(p2, p1);
+            result.move_axis[0] *= -1; // Invert the moving direction, p1 is moving
+            result.move_axis[1] *= -1;
+            return result;
+        } else {
+            return gdjs.Polygon.circleCircleCollisionTest(p1, p2);
+        }
+    }
+
     //Algorithm core :
 
     p1.computeEdges();
@@ -170,7 +195,7 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
         gdjs.Polygon.project(axis, p1, minMaxA); //Do projection on the axis.
         gdjs.Polygon.project(axis, p2, minMaxB);
 
-        //If the projections on the axis do not overlap, then their is no collision
+        //If the projections on the axis do not overlap, then there is no collision
         if (gdjs.Polygon.distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]) > 0) {
             result.collision = false;
             result.move_axis[0] = 0;
@@ -201,6 +226,139 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
     //Add the magnitude to the move axis.
     result.move_axis[0] = move_axis[0] * minDist;
     result.move_axis[1] = move_axis[1] * minDist;
+
+    return result;
+};
+
+/**
+ * Do a collision test between a polygon and a circle.<br>
+ * Please note that the polygon must be <b>convex</b>!
+ *
+ * Uses Separating Axis Theorem
+ *
+ * @method polygonCircleCollisionTest
+ * @static
+ * @return {Boolean} true if the polygon and the circle are overlapping
+ * @param poly {polygon} The polygon
+ * @param circle {polygon} The circle
+ */
+gdjs.Polygon.polygonCircleCollisionTest = function(poly, circle) {
+    poly.computeEdges();
+
+    var edge = gdjs.Polygon.collisionTest._statics.edge;
+    var move_axis = gdjs.Polygon.collisionTest._statics.move_axis;
+    var result = gdjs.Polygon.collisionTest._statics.result;
+    var minDist = Number.MAX_VALUE;
+
+    var circleX = circle.vertices[0][0];
+    var circleY = circle.vertices[0][1];
+    var radius = Math.sqrt((circleX - circle.vertices[1][0])*(circleX - circle.vertices[1][0]) +
+                           (circleY - circle.vertices[1][1])*(circleY - circle.vertices[1][1])); 
+    
+    for (var i = 0; i < poly.vertices.length + 1; i++)
+    {
+        if ( i < poly.vertices.length ) {
+            edge = poly.edges[i];
+        } else { // The last axis to test is the "closest vertex -> circle center" vector
+            var closestSqDist = Number.MAX_VALUE;
+            var closestVertex = -1;
+            for (var j = 0; j < poly.vertices.length; j++) {
+                var sqDist = (circleX - poly.vertices[j][0])*(circleX - poly.vertices[j][0]) +
+                             (circleY - poly.vertices[j][1])*(circleY - poly.vertices[j][1]);
+                if ( sqDist < closestSqDist ) {
+                    closestSqDist = sqDist;
+                    closestVertex = j;
+                }
+            }
+            // Invert the edge -> axis transform, so the axis will be circle -> vertex
+            if ( closestVertex !== -1 ) {
+                edge[0] = circleY - poly.vertices[closestVertex][1];
+                edge[1] = poly.vertices[closestVertex][0] - circleX;
+            }
+        }
+
+        var axis = gdjs.Polygon.collisionTest._statics.axis;
+        axis[0] = -edge[1];
+        axis[1] = edge[0];
+        gdjs.Polygon.normalise(axis);
+
+        var minMaxA = gdjs.Polygon.collisionTest._statics.minMaxA;
+        gdjs.Polygon.project(axis, poly, minMaxA);
+
+        var minMaxB = gdjs.Polygon.collisionTest._statics.minMaxB;
+        var dp = gdjs.Polygon.dotProduct(axis, circle.vertices[0]);
+        minMaxB[0] = dp - radius;
+        minMaxB[1] = dp + radius;
+
+        if ( gdjs.Polygon.distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]) > 0 ) {
+            result.collision = false;
+            result.move_axis[0] = 0;
+            result.move_axis[1] = 0;
+
+            return result;
+        }
+
+        var dist = Math.abs(gdjs.Polygon.distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]));
+
+        if ( dist < minDist ) {
+            minDist = dist;
+            move_axis[0] = axis[0];
+            move_axis[1] = axis[1];
+        }
+    }
+
+    result.collision = true;
+
+    var polyCenter = poly.computeCenter();
+    var d = [polyCenter[0]-circleX, polyCenter[1]-circleY];
+    if ( gdjs.Polygon.dotProduct(d, move_axis) < 0 ) {
+        move_axis[0] = -move_axis[0];
+        move_axis[1] = -move_axis[1];
+    }
+
+    result.move_axis[0] = move_axis[0] * minDist;
+    result.move_axis[1] = move_axis[1] * minDist;
+
+    return result;
+};
+
+/**
+ * Do a collision test between two circles.<br>
+ *
+ * @method circleCircleCollisionTest
+ * @static
+ * @return {Boolean} true if the circles are overlapping
+ * @param c1 {polygon} The first circle
+ * @param c2 {polygon} The second circle
+ */
+gdjs.Polygon.circleCircleCollisionTest = function(c1, c2) {
+    var result = gdjs.Polygon.collisionTest._statics.result;
+
+    var x1 = c1.vertices[0][0];
+    var y1 = c1.vertices[0][1];
+    var x2 = c2.vertices[0][0];
+    var y2 = c2.vertices[0][1];
+    var radius1 = Math.sqrt((c1.vertices[1][0]-x1)*(c1.vertices[1][0]-x1) + 
+                            (c1.vertices[1][1]-y1)*(c1.vertices[1][1]-y1));
+    var radius2 = Math.sqrt((c2.vertices[1][0]-x2)*(c2.vertices[1][0]-x2) + 
+                            (c2.vertices[1][1]-y2)*(c2.vertices[1][1]-y2));
+
+    var sqDist = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
+
+    if ( sqDist > (radius1+radius2)*(radius1+radius2) ) {
+        result.collision = false;
+        result.move_axis[0] = 0;
+        result.move_axis[1] = 0;
+
+        return result;
+    }
+
+    var moveDist = radius1 + radius2 - Math.sqrt(sqDist);
+    var moveDir = [x1-x2, y1-y2];
+    gdjs.Polygon.normalise(moveDir);
+    result.collision = true;
+    result.move_axis[0] = moveDir[0] * moveDist;
+    result.move_axis[1] = moveDir[1] * moveDist;
 
     return result;
 };

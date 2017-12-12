@@ -8,11 +8,21 @@ import ObjectRow from './ObjectRow';
 import NewObjectDialog from './NewObjectDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import Clipboard from '../Utils/Clipboard';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { makeAddItem } from '../UI/ListAddItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
-import type { ObjectWithContextList, ObjectWithContext } from '../ObjectsList/EnumerateObjects';
+import type {
+  ObjectWithContextList,
+  ObjectWithContext,
+} from '../ObjectsList/EnumerateObjects';
+
+const CLIPBOARD_KIND = 'Object';
 
 const listItemHeight = 48;
 const styles = {
@@ -24,7 +34,7 @@ const styles = {
   },
   listContainer: {
     flex: 1,
-  }
+  },
 };
 
 const AddObjectRow = makeAddItem(ListItem);
@@ -42,7 +52,7 @@ const SortableAddObjectRow = SortableElement(props => {
   return <AddObjectRow {...props} />;
 });
 
-class ObjectsList extends Component<*,*> {
+class ObjectsList extends Component<*, *> {
   list: any;
 
   forceUpdateGrid() {
@@ -95,6 +105,9 @@ class ObjectsList extends Component<*,*> {
                 this.props.onEditVariables(objectWithScope.object)}
               onEditName={() => this.props.onEditName(objectWithScope)}
               onDelete={() => this.props.onDelete(objectWithScope)}
+              onCopyObject={() => this.props.onCopyObject(objectWithScope)}
+              onCutObject={() => this.props.onCutObject(objectWithScope)}
+              onPaste={() => this.props.onPaste(objectWithScope)}
               onRename={newName =>
                 this.props.onRename(objectWithScope, newName)}
               onAddNewObject={this.props.onAddNewObject}
@@ -120,7 +133,10 @@ type StateType = {|
   searchText: string,
 |};
 
-export default class ObjectsListContainer extends React.Component<*, StateType> {
+export default class ObjectsListContainer extends React.Component<
+  *,
+  StateType
+> {
   static defaultProps = {
     onDeleteObject: (objectWithScope, cb) => cb(true),
     onRenameObject: (objectWithScope, newName, cb) => cb(true),
@@ -192,7 +208,7 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
     );
   };
 
-  _onDelete = (objectWithScope: ObjectWithContext) => {
+  _deleteObject = (objectWithScope: ObjectWithContext) => {
     const { object, global } = objectWithScope;
     const { project, objectsContainer } = this.props;
 
@@ -215,7 +231,58 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
     });
   };
 
-  _onEditName = (objectWithScope: ?ObjectWithContext) => {
+  _copyObject = (objectWithScope: ObjectWithContext) => {
+    const { object } = objectWithScope;
+    Clipboard.set(CLIPBOARD_KIND, {
+      type: object.getType(),
+      name: object.getName(),
+      object: serializeToJSObject(object),
+    });
+  };
+
+  _cutObject = (objectWithScope: ObjectWithContext) => {
+    this._copyObject(objectWithScope);
+    this._deleteObject(objectWithScope);
+  };
+
+  _paste = (objectWithScope: ObjectWithContext) => {
+    if (!Clipboard.has(CLIPBOARD_KIND)) return;
+
+    const { object: pasteObject, global } = objectWithScope;
+    const { object: copiedObject, type, name } = Clipboard.get(CLIPBOARD_KIND);
+    const { project, objectsContainer } = this.props;
+
+    const newName = newNameGenerator(
+      'CopyOf' + name,
+      name =>
+        objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
+    );
+
+    const newObject = global
+      ? project.insertNewObject(
+          project,
+          type,
+          newName,
+          project.getObjectPosition(pasteObject.getName())
+        )
+      : objectsContainer.insertNewObject(
+          project,
+          type,
+          newName,
+          objectsContainer.getObjectPosition(pasteObject.getName())
+        );
+
+    unserializeFromJSObject(
+      newObject,
+      copiedObject,
+      'unserializeFrom',
+      project
+    );
+
+    this.forceUpdate();
+  };
+
+  _editName = (objectWithScope: ?ObjectWithContext) => {
     this.setState(
       {
         renamedObjectWithScope: objectWithScope,
@@ -224,13 +291,13 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
     );
   };
 
-  _onEditVariables = (object: any) => {
+  _editVariables = (object: any) => {
     this.setState({
       variablesEditedObject: object,
     });
   };
 
-  _onRename = (objectWithScope: ObjectWithContext, newName: string) => {
+  _rename = (objectWithScope: ObjectWithContext, newName: string) => {
     const { object } = objectWithScope;
     const { project, objectsContainer } = this.props;
 
@@ -256,7 +323,7 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
     });
   };
 
-  _onMove = (oldIndex: number, newIndex: number) => {
+  _move = (oldIndex: number, newIndex: number) => {
     const { project, objectsContainer } = this.props;
 
     const isInContainerObjectsList =
@@ -289,8 +356,14 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
     const { searchText } = this.state;
 
     const lists = enumerateObjects(project, objectsContainer);
-    this.containerObjectsList = filterObjectsList(lists.containerObjectsList, searchText);
-    this.projectObjectsList = filterObjectsList(lists.projectObjectsList, searchText);
+    this.containerObjectsList = filterObjectsList(
+      lists.containerObjectsList,
+      searchText
+    );
+    this.projectObjectsList = filterObjectsList(
+      lists.projectObjectsList,
+      searchText
+    );
     const allObjectsList = filterObjectsList(lists.allObjectsList, searchText);
     const fullList = allObjectsList.concat({
       key: 'add-objects-row',
@@ -319,14 +392,17 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
                 selectedObjectName={this.props.selectedObjectName}
                 onObjectSelected={this.props.onObjectSelected}
                 onEditObject={this.props.onEditObject}
+                onCopyObject={this._copyObject}
+                onCutObject={this._cutObject}
+                onPaste={this._paste}
                 onAddNewObject={() =>
                   this.setState({ newObjectDialogOpen: true })}
-                onEditName={this._onEditName}
-                onEditVariables={this._onEditVariables}
-                onDelete={this._onDelete}
-                onRename={this._onRename}
+                onEditName={this._editName}
+                onEditVariables={this._editVariables}
+                onDelete={this._deleteObject}
+                onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>
-                  this._onMove(oldIndex, newIndex)}
+                  this._move(oldIndex, newIndex)}
                 helperClass="sortable-helper"
                 distance={30}
               />
@@ -356,8 +432,8 @@ export default class ObjectsListContainer extends React.Component<*, StateType> 
               this.state.variablesEditedObject &&
               this.state.variablesEditedObject.getVariables()
             }
-            onCancel={() => this._onEditVariables(null)}
-            onApply={() => this._onEditVariables(null)}
+            onCancel={() => this._editVariables(null)}
+            onApply={() => this._editVariables(null)}
             emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
             emptyExplanationSecondMessage="For example, you can have a variable called Life representing the health of the object."
           />

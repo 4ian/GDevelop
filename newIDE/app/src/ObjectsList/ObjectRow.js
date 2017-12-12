@@ -62,6 +62,19 @@ export default class ObjectRow extends React.Component {
             label: 'Add a new object...',
             click: () => this.props.onAddNewObject(),
           },
+          { type: 'separator' },
+          {
+            label: 'Copy',
+            click: () => this.props.onCopyObject(),
+          },
+          {
+            label: 'Cut',
+            click: () => this.props.onCutObject(),
+          },
+          {
+            label: 'Paste',
+            click: () => this.props.onPaste(),
+          },
         ]}
       />
     );

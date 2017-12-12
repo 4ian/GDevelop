@@ -134,7 +134,7 @@ gdjs.Polygon.createRectangle = function(width, height) {
  */
 gdjs.Polygon.collisionTest = function(p1, p2) {
 
-		if(p1.vertices.length < 2 || p2.vertices.length < 2)
+    if(p1.vertices.length < 2 || p2.vertices.length < 2)
     {
         var result = gdjs.Polygon.collisionTest._statics.result;
         result.collision = false;

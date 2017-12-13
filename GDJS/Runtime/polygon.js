@@ -219,6 +219,88 @@ gdjs.Polygon.collisionTest._statics = {
 	}
 };
 
+gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
+{
+    var p = gdjs.Polygon.raycastTest._statics.p;
+    var q = gdjs.Polygon.raycastTest._statics.q;
+    var r = gdjs.Polygon.raycastTest._statics.r;
+    var s = gdjs.Polygon.raycastTest._statics.s;
+    var axis = gdjs.Polygon.raycastTest._statics.axis;
+    var result = gdjs.Polygon.raycastTest._statics.result;
+    result.collision = false;
+    result.point[0] = 0;
+    result.point[1] = 0;
+
+
+    if ( poly.vertices.length < 2 )
+    {
+        return result;
+    }
+
+    if ( poly.vertices.length == 2 )
+    {
+        // TODO Circle raycasting
+    }
+    else
+    {
+        // Polygon raycasting
+        poly.computeEdges();
+
+        var minSqDist = Number.MAX_VALUE;
+
+        // ray segment: p + t*r, with p = start and r = end - start
+        p[0] = startX;
+        p[1] = startY;
+        r[0] = endX - startX;
+        r[1] = endY - startY;
+
+        for(var i=0; i<poly.edges.length; i++)
+        {
+            // edge segment: q + u*s
+            q[0] = poly.vertices[i][0];
+            q[1] = poly.vertices[i][1];
+            s[0] = poly.edges[i][0];
+            s[1] = poly.edges[i][1];
+
+            var deltaQP = [q[0] - p[0], q[1] - p[1]];
+            var crossRS = crossProduct(r, s);
+            var t = crossProduct(deltaQP, s) / crossRS;
+            var u = crossProduct(deltaQP, r) / crossRS;
+
+            if ( crossRS !== 0 && 0<==t && t<==1 && 0<==u && u<==1 )
+            {
+                var x = p[0] + t*r[0];
+                var y = p[1] + t*r[1];
+                var dist = x*x + y*y
+                if ( dist < minSqDist ) {
+                    minSqDist = dist;
+                    result.collision = true;
+                    result.point.x = x;
+                    result.point.y = y;
+                }
+            }
+            else if ( crossRS === 0 && crossProduct(deltaQP, r) === 0)
+            {
+                // TODO Collinear
+            }
+        }
+
+        return result;
+    }
+};
+
+gdjs.Polygon.raycastTest._statics = {
+    p: [0,0],
+    q: [0,0],
+    r: [0,0],
+    s: [0,0],
+    axis: [0,0],
+    result: {
+        collision: false,
+        point: [0, 0]
+    }
+}
+
 //Tools functions :
 gdjs.Polygon.normalise = function(v)
 {
@@ -235,6 +317,13 @@ gdjs.Polygon.dotProduct = function(a, b)
     var dp = a[0]*b[0] + a[1]*b[1];
 
     return dp;
+}
+
+gdjs.Polygon.crossProduct = function(a, b)
+{
+    var cp = a[0]*b[1] - a[1]*b[0];
+
+    return cp;
 }
 
 gdjs.Polygon.project = function(axis, p, result)

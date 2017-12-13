@@ -101,6 +101,7 @@ BaseObjectExtension::BaseObjectExtension()
     GetAllConditions()["CollisionNP"]
         .AddCodeOnlyParameter("currentScene", "") //We need an extra parameter pointing to the scene.
         .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
+    GetAllConditions()["Raycast"].SetFunctionName("gdjs.evtTools.object.raycastObject");
     GetAllConditions()["Distance"].SetFunctionName("gdjs.evtTools.object.distanceTest");
     GetAllConditions()["SeDirige"].SetFunctionName("gdjs.evtTools.object.movesTowardTest");
     GetAllConditions()["EstTourne"].SetFunctionName("gdjs.evtTools.object.turnedTowardTest");

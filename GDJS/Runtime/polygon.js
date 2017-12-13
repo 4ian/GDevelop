@@ -431,6 +431,16 @@ gdjs.Polygon.distance = function(minA, maxA, minB, maxB)
  */
 gdjs.Polygon.isPointInside = function(poly, x, y)
 {
+    if ( poly.vertices.length === 2 )
+    {
+        var circleX = poly.vertices[0][0];
+        var circleY = poly.vertices[0][1];
+        var sqRadius = (circleX - poly.vertices[1][0])*(circleX - poly.vertices[1][0]) +
+                       (circleY - poly.vertices[1][1])*(circleY - poly.vertices[1][1]);
+        
+        return (x-circleX)*(x-circleX) + (y-circleY)*(y-circleY) <= sqRadius;
+    }
+
     var inside = false;
     var vi, vj;
     for (var i = 0, j = poly.vertices.length-1; i < poly.vertices.length; j = i++) {

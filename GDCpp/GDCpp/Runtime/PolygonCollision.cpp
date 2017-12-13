@@ -162,19 +162,15 @@ CollisionResult GD_API PolygonCircleCollisionTest(Polygon2d & poly, Polygon2d & 
             edge = poly.edges[i];
         } else { // The last "edge" to test is the circle center -> closest vertex
             float closestSqDist = FLT_MAX;
-            int closestVertex = -1;
+            sf::Vector2f vertexToCircle;
             for (int j = 0; j < poly.vertices.size(); j++) {
-                float sqDist = (circleX - poly.vertices[j].x)*(circleX - poly.vertices[j].x) +
-                               (circleY - poly.vertices[j].y)*(circleY - poly.vertices[j].y);
+                vertexToCircle = circle.vertices[0] - poly.vertices[j];
+                float sqDist = vertexToCircle.x*vertexToCircle.x + vertexToCircle.y*vertexToCircle.y;
                 if ( sqDist < closestSqDist ) {
                     closestSqDist = sqDist;
-                    closestVertex = j;
+                    edge.x = vertexToCircle.y;
+                    edge.y = -vertexToCircle.x;
                 }
-            }
-
-            if ( closestVertex != -1 ) {
-                edge.x = circleY - poly.vertices[closestVertex].y;
-                edge.y = poly.vertices[closestVertex].x - circleX;
             }
         }
 
@@ -224,14 +220,14 @@ CollisionResult GD_API CircleCircleCollisionTest(Polygon2d & c1, Polygon2d & c2)
     float y1 = c1.vertices[0].y;
     float x2 = c2.vertices[0].x;
     float y2 = c2.vertices[0].y;
-    float radius1 = sqrt((c1.vertices[1].x-x1)*(c1.vertices[1].x-x1) + 
-                         (c1.vertices[1].y-y1)*(c1.vertices[1].y-y1));
-    float radius2 = sqrt((c2.vertices[1].x-x2)*(c2.vertices[1].x-x2) + 
-                         (c2.vertices[1].y-y2)*(c2.vertices[1].y-y2));
+    float radii = sqrt((c1.vertices[1].x-x1)*(c1.vertices[1].x-x1) + 
+                       (c1.vertices[1].y-y1)*(c1.vertices[1].y-y1)) +
+                  sqrt((c2.vertices[1].x-x2)*(c2.vertices[1].x-x2) + 
+                       (c2.vertices[1].y-y2)*(c2.vertices[1].y-y2));
 
     float sqDist = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
 
-    if ( sqDist > (radius1+radius2)*(radius1+radius2) ){
+    if ( sqDist > (radii)*(radii) ){
         result.collision = false;
         result.move_axis.x = 0.0f;
         result.move_axis.y = 0.0f;
@@ -239,7 +235,7 @@ CollisionResult GD_API CircleCircleCollisionTest(Polygon2d & c1, Polygon2d & c2)
         return result;
     }
 
-    float moveDist = radius1 + radius2 - sqrt(sqDist);
+    float moveDist = radii - sqrt(sqDist);
     sf::Vector2f moveDir(x1-x2, y1-y2);
     normalise(moveDir);
     result.collision = true;
@@ -251,6 +247,16 @@ CollisionResult GD_API CircleCircleCollisionTest(Polygon2d & c1, Polygon2d & c2)
 
 bool GD_API IsPointInsidePolygon(Polygon2d & poly, float x, float y)
 {
+    if ( poly.vertices.size() == 2 )
+    {
+        float circleX = poly.vertices[0].x;
+        float circleY = poly.vertices[0].y;
+        float sqRadius = (circleX - poly.vertices[1].x)*(circleX - poly.vertices[1].x) +
+                         (circleY - poly.vertices[1].y)*(circleY - poly.vertices[1].y);
+        
+        return (x-circleX)*(x-circleX) + (y-circleY)*(y-circleY) <= sqRadius;
+    }
+
     bool inside = false;
     sf::Vector2f vi, vj;
 

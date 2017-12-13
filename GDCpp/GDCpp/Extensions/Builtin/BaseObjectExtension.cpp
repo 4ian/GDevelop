@@ -106,6 +106,7 @@ BaseObjectExtension::BaseObjectExtension()
     GetAllConditions()["NbObjet"].SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
     GetAllConditions()["CollisionNP"].SetFunctionName("HitBoxesCollision").SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
     GetAllConditions()["EstTourne"].SetFunctionName("ObjectsTurnedToward").SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
+    // GetAllConditions()["Raycast"].SetFunctionName("RaycastObject").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
 
     GetAllExpressions()["Count"].SetFunctionName("PickedObjectsCount").SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
     #endif

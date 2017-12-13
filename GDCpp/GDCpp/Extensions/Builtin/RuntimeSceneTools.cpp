@@ -208,6 +208,35 @@ bool GD_API PickNearestObject(std::map <gd::String, std::vector<RuntimeObject*> 
     return true;
 }
 
+// bool GD_API RaycastObject(std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, double angle, double dist, const gd::Variable & resultX, const gd::Variable & resultY, bool inverted)
+// {
+//     double minSqDist = 0;
+//     bool first = true;
+//     RuntimeObject * matchObject = NULL;
+//     for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+//     {
+//         if ( it->second == NULL ) continue;
+//         auto list = *it->second;
+
+//         for (std::size_t i = 0;i<list.size();++i)
+//         {
+//             double value = list[i]->GetSqDistanceTo(x, y);
+//             if (first || ((value < best) ^ inverted)) {
+//                 matchObject = list[i];
+//                 best = value;
+//             }
+
+//             first = false;
+//         }
+//     }
+
+//     if (!matchObject)
+//         return false;
+
+//     PickOnly(pickedObjectLists, matchObject);
+//     return true;
+// }
+
 bool GD_API SceneVariableExists(RuntimeScene & scene, const gd::String & variable)
 {
     return scene.GetVariables().Has(variable);

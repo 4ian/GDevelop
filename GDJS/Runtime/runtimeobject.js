@@ -1150,6 +1150,29 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
     return false;
 };
 
+gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist) {
+
+    var objW = this.getWidth();
+    var objH = this.getHeight();
+    var diffX = this.getDrawableX()+this.getCenterX() - x;
+    var diffY = this.getDrawableY()+this.getCenterY() - y;
+    var boundingRadius = Math.sqrt(objW*objW + objH*objH)/2.0;
+    if ( Math.sqrt(diffX*diffX + diffY*diffY) > boundingRadius + dist )
+        return false;
+
+    var endX = x + dist*cos(angle*3.14159/180.0);
+    var endY = y + dist*sin(angle*3.14159/180.0);
+    var hitBoxes = this.getHitBoxes();
+    for (var i=0; i<hitBoxes.length; i++) { 
+        return gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
+    }
+
+    var result = gdjs.Polygon.raycastTest._statics.result;
+    result.collision = false;
+
+    return result;
+};
+
 /**
  * Check the distance between two objects.
  * @method distanceTest

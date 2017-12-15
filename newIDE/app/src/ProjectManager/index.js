@@ -198,6 +198,76 @@ export default class ProjectManager extends React.Component {
       'unserializeFrom',
       project
     );
+    newLayout.setName(newName);
+
+    this.forceUpdate();
+  };
+
+  _copyExternalEvents = externalEvents => {
+    Clipboard.set(EXTERNAL_EVENTS_CLIPBOARD_KIND, {
+      externalEvents: serializeToJSObject(externalEvents),
+      name: externalEvents.getName(),
+    });
+  };
+
+  _cutExternalEvents = externalEvents => {
+    this._copyExternalEvents(externalEvents);
+    this.props.onDeleteExternalEvents(externalEvents);
+  };
+
+  _pasteExternalEvents = index => {
+    if (!Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)) return;
+
+    const { externalEvents: copiedExternalEvents, name } = Clipboard.get(
+      EXTERNAL_EVENTS_CLIPBOARD_KIND
+    );
+    const { project } = this.props;
+
+    const newName = newNameGenerator('CopyOf' + name, name =>
+      project.hasExternalEventsNamed(name)
+    );
+
+    const newExternalEvents = project.insertNewExternalEvents(newName, index);
+
+    unserializeFromJSObject(
+      newExternalEvents,
+      copiedExternalEvents,
+      'unserializeFrom',
+      project
+    );
+    newExternalEvents.setName(newName);
+
+    this.forceUpdate();
+  };
+
+  _copyExternalLayout = externalLayout => {
+    Clipboard.set(EXTERNAL_LAYOUT_CLIPBOARD_KIND, {
+      externalLayout: serializeToJSObject(externalLayout),
+      name: externalLayout.getName(),
+    });
+  };
+
+  _cutExternalLayout = externalLayout => {
+    this._copyExternalLayout(externalLayout);
+    this.props.onDeleteExternalLayout(externalLayout);
+  };
+
+  _pasteExternalLayout = index => {
+    if (!Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)) return;
+
+    const { externalLayout: copiedExternalLayout, name } = Clipboard.get(
+      EXTERNAL_LAYOUT_CLIPBOARD_KIND
+    );
+    const { project } = this.props;
+
+    const newName = newNameGenerator('CopyOf' + name, name =>
+      project.hasExternalLayoutNamed(name)
+    );
+
+    const newExternalLayout = project.insertNewExternalLayout(newName, index);
+
+    unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
+    newExternalLayout.setName(newName);
 
     this.forceUpdate();
   };
@@ -348,6 +418,9 @@ export default class ProjectManager extends React.Component {
                       this._onEditName(null, '');
                     }}
                     onEditName={() => this._onEditName('external-events', name)}
+                    onCopy={() => this._copyExternalEvents(externalEvents)}
+                    onCut={() => this._cutExternalEvents(externalEvents)}
+                    onPaste={() => this._pasteExternalEvents(i)}
                   />
                 );
               })
@@ -390,6 +463,9 @@ export default class ProjectManager extends React.Component {
                       this._onEditName(null, '');
                     }}
                     onEditName={() => this._onEditName('external-layout', name)}
+                    onCopy={() => this._copyExternalLayout(externalLayout)}
+                    onCut={() => this._cutExternalLayout(externalLayout)}
+                    onPaste={() => this._pasteExternalLayout(i)}
                   />
                 );
               })

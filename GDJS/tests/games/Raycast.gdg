@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project firstLayout="">
+    <gdVersion build="96" major="4" minor="0" revision="135" />
+    <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" packageName="com.example.gamename" projectFile="C:\Users\Maciel\Programacion\gits\GD\GDJS\tests\games\Raycast.gdg" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+        <name>Project</name>
+        <author></author>
+        <windowWidth>400</windowWidth>
+        <windowHeight>300</windowHeight>
+        <latestCompilationDirectory></latestCompilationDirectory>
+        <maxFPS>60</maxFPS>
+        <minFPS>10</minFPS>
+        <verticalSync>false</verticalSync>
+        <extensions>
+            <extension name="BuiltinObject" />
+            <extension name="BuiltinAudio" />
+            <extension name="BuiltinVariables" />
+            <extension name="BuiltinTime" />
+            <extension name="BuiltinMouse" />
+            <extension name="BuiltinKeyboard" />
+            <extension name="BuiltinJoystick" />
+            <extension name="BuiltinCamera" />
+            <extension name="BuiltinWindow" />
+            <extension name="BuiltinFile" />
+            <extension name="BuiltinNetwork" />
+            <extension name="BuiltinScene" />
+            <extension name="BuiltinAdvanced" />
+            <extension name="Sprite" />
+            <extension name="BuiltinCommonInstructions" />
+            <extension name="BuiltinCommonConversions" />
+            <extension name="BuiltinStringInstructions" />
+            <extension name="BuiltinMathematicalTools" />
+            <extension name="BuiltinExternalLayouts" />
+            <extension name="PrimitiveDrawing" />
+        </extensions>
+        <platforms>
+            <platform name="GDevelop JS platform" />
+        </platforms>
+        <currentPlatform>GDevelop JS platform</currentPlatform>
+    </properties>
+    <resources>
+        <resources>
+            <resource alwaysLoaded="false" file="Grass.png" kind="image" name="Grass.png" smoothed="true" userAdded="true" />
+            <resource alwaysLoaded="false" file="spship2.png" kind="image" name="spship2.png" smoothed="true" userAdded="false" />
+            <resource alwaysLoaded="false" file="Shape1.png" kind="image" name="Shape1.png" smoothed="true" userAdded="false" />
+            <resource alwaysLoaded="false" file="Pea-Happy.png" kind="image" name="Pea-Happy.png" smoothed="true" userAdded="false" />
+        </resources>
+        <resourceFolders />
+    </resources>
+    <objects />
+    <objectsGroups />
+    <variables />
+    <layouts>
+        <layout b="30" disableInputWhenNotFocused="true" mangledName="Scene" name="Scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="30" standardSortMethod="false" stopSoundsOnStartup="true" title="" v="30">
+            <uiSettings grid="false" gridB="80" gridG="80" gridHeight="70" gridOffsetX="0" gridOffsetY="20" gridR="80" gridWidth="70" snap="true" windowMask="false" zoomFactor="1.391885" />
+            <objectsGroups>
+                <group name="Colliders">
+                    <objects>
+                        <object name="Quad" />
+                        <object name="Circle" />
+                        <object name="Triangle" />
+                        <object name="Polygon" />
+                    </objects>
+                </group>
+            </objectsGroups>
+            <variables />
+            <instances>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Player" width="0.000000" x="199.063065" y="149.320938" zOrder="2">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="80.000000" layer="" locked="false" name="Quad" width="80.000000" x="246.705933" y="212.292755" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="187.155807" y="37.701031" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="157.403275" y="263.996765" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="32.689121" y="48.477802" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="108.126335" y="17.584469" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="325.212219" y="106.484894" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="111.251595" y="232.307541" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="332.282593" y="22.613647" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="272.274597" y="147.940628" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="7.230614" y="272.390564" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="100.000000" layer="" locked="false" name="Circle" width="100.000000" x="18.591335" y="78.514206" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Circle" width="0.000000" x="5.659197" y="2.358517" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Circle" width="0.000000" x="349.078369" y="59.834511" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Circle" width="0.000000" x="155.815277" y="215.738190" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Drawer" width="0.000000" x="237.000183" y="107.970665" zOrder="5">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="336.280762" y="243.652557" zOrder="1">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Circle" width="0.000000" x="124.203461" y="57.679169" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="195.330048" y="259.563660" zOrder="3">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="63.853691" y="27.504265" zOrder="3">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="305.971375" y="168.320496" zOrder="3">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="229.097198" y="174.068100" zOrder="3">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="240.592422" y="16.727512" zOrder="3">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Polygon" width="50.000000" x="11.406837" y="183.407883" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="27.728058" layer="" locked="false" name="Polygon" width="50.000000" x="356.262939" y="256.689789" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+                <instance angle="0.000000" customSize="true" height="70.893356" layer="" locked="false" name="Polygon" width="29.883392" x="280.825653" y="23.193504" zOrder="4">
+                    <numberProperties />
+                    <stringProperties />
+                    <initialVariables />
+                </instance>
+            </instances>
+            <objects>
+                <object name="Player" type="Sprite" updateIfNotVisible="true">
+                    <variables />
+                    <behaviors />
+                    <animations>
+                        <animation name="" useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Pea-Happy.png">
+                                            <points />
+                                            <originPoint name="origine" x="18.000000" y="18.000000" />
+                                            <centerPoint automatic="true" name="centre" x="18.500000" y="18.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="0.000000" />
+                                                    <vertice x="37.000000" y="37.000000" />
+                                                    <vertice x="0.000000" y="37.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Quad" type="Sprite" updateIfNotVisible="true">
+                    <variables />
+                    <behaviors />
+                    <animations>
+                        <animation name="" useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="false" image="Grass.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="35.000000" y="35.000000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="70.000000" y="0.000000" />
+                                                    <vertice x="70.000000" y="70.000000" />
+                                                    <vertice x="0.000000" y="70.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Circle" type="Sprite" updateIfNotVisible="false">
+                    <variables />
+                    <behaviors />
+                    <animations>
+                        <animation name="" useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="true" image="Pea-Happy.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="18.500000" y="18.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="18.000000" y="18.000000" />
+                                                    <vertice x="36.000000" y="18.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Drawer" type="PrimitiveDrawing::Drawer">
+                    <variables />
+                    <behaviors />
+                    <fillOpacity>255</fillOpacity>
+                    <outlineSize>0</outlineSize>
+                    <outlineOpacity>0</outlineOpacity>
+                    <fillColor b="255" g="255" r="255" />
+                    <outlineColor b="255" g="34" r="250" />
+                    <absoluteCoordinates>true</absoluteCoordinates>
+                </object>
+                <object name="Triangle" type="Sprite" updateIfNotVisible="false">
+                    <variables />
+                    <behaviors />
+                    <animations>
+                        <animation name="" useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="true" image="spship2.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="41.500000" y="41.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="0.000000" />
+                                                    <vertice x="83.000000" y="42.000000" />
+                                                    <vertice x="0.000000" y="83.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+                <object name="Polygon" type="Sprite" updateIfNotVisible="false">
+                    <variables />
+                    <behaviors />
+                    <animations>
+                        <animation name="" useMultipleDirections="false">
+                            <directions>
+                                <direction looping="false" timeBetweenFrames="1.000000">
+                                    <sprites>
+                                        <sprite hasCustomCollisionMask="true" image="Shape1.png">
+                                            <points />
+                                            <originPoint name="origine" x="0.000000" y="0.000000" />
+                                            <centerPoint automatic="true" name="centre" x="89.000000" y="64.500000" />
+                                            <customCollisionMask>
+                                                <polygon>
+                                                    <vertice x="0.000000" y="47.000000" />
+                                                    <vertice x="77.000000" y="0.000000" />
+                                                    <vertice x="175.000000" y="11.000000" />
+                                                    <vertice x="178.000000" y="56.000000" />
+                                                    <vertice x="160.000000" y="96.000000" />
+                                                    <vertice x="104.000000" y="129.000000" />
+                                                    <vertice x="7.000000" y="103.000000" />
+                                                </polygon>
+                                            </customCollisionMask>
+                                        </sprite>
+                                    </sprites>
+                                </direction>
+                            </directions>
+                        </animation>
+                    </animations>
+                </object>
+            </objects>
+            <events>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions />
+                    <actions>
+                        <instruction>
+                            <type inverted="false" value="ChangeColor" />
+                            <parameters>
+                                <parameter>Colliders</parameter>
+                                <parameter>&quot;255;255;255&quot;</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::FillColor" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>&quot;200;200;250&quot;</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::FillOpacity" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>=</parameter>
+                                <parameter>50</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::Circle" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>Player.X()</parameter>
+                                <parameter>Player.Y()</parameter>
+                                <parameter>200</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <instruction>
+                            <type inverted="true" value="Raycast" />
+                            <parameters>
+                                <parameter>Colliders</parameter>
+                                <parameter>Player.X()</parameter>
+                                <parameter>Player.Y()</parameter>
+                                <parameter>ToDeg(atan2(MouseY(&quot;&quot;,0)-Player.Y(), MouseX(&quot;&quot;,0)-Player.X()))</parameter>
+                                <parameter>200</parameter>
+                                <parameter>x</parameter>
+                                <parameter>y</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                    </conditions>
+                    <actions>
+                        <instruction>
+                            <type inverted="false" value="SetAngle" />
+                            <parameters>
+                                <parameter>Colliders</parameter>
+                                <parameter>+</parameter>
+                                <parameter>90 * TimeDelta()</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::FillColor" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>&quot;255;0;0&quot;</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::FillOpacity" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>=</parameter>
+                                <parameter>100</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::Line" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>Player.X()</parameter>
+                                <parameter>Player.Y()</parameter>
+                                <parameter>Variable(x)</parameter>
+                                <parameter>Variable(y)</parameter>
+                                <parameter>0.5</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::Circle" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>Variable(x)</parameter>
+                                <parameter>Variable(y)</parameter>
+                                <parameter>2</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                    </actions>
+                    <events />
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <instruction>
+                            <type inverted="false" value="Raycast" />
+                            <parameters>
+                                <parameter>Colliders</parameter>
+                                <parameter>Player.X()</parameter>
+                                <parameter>Player.Y()</parameter>
+                                <parameter>ToDeg(atan2(MouseY(&quot;&quot;,0)-Player.Y(), MouseX(&quot;&quot;,0)-Player.X()))</parameter>
+                                <parameter>200</parameter>
+                                <parameter>x</parameter>
+                                <parameter>y</parameter>
+                                <parameter></parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                    </conditions>
+                    <actions>
+                        <instruction>
+                            <type inverted="false" value="ChangeColor" />
+                            <parameters>
+                                <parameter>Colliders</parameter>
+                                <parameter>&quot;50;100;50&quot;</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::FillColor" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>&quot;0;255;0&quot;</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::FillOpacity" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>=</parameter>
+                                <parameter>100</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::Line" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>Player.X()</parameter>
+                                <parameter>Player.Y()</parameter>
+                                <parameter>Variable(x)</parameter>
+                                <parameter>Variable(y)</parameter>
+                                <parameter>0.5</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
+                            <type inverted="false" value="PrimitiveDrawing::Circle" />
+                            <parameters>
+                                <parameter>Drawer</parameter>
+                                <parameter>Variable(x)</parameter>
+                                <parameter>Variable(y)</parameter>
+                                <parameter>1</parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                    </actions>
+                    <events />
+                </event>
+            </events>
+            <layers>
+                <layer name="" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                    <effects />
+                </layer>
+                <layer name="Debug" visibility="true">
+                    <cameras>
+                        <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
+                    </cameras>
+                    <effects />
+                </layer>
+            </layers>
+            <behaviorsSharedData />
+        </layout>
+    </layouts>
+    <externalEvents />
+    <externalLayouts />
+    <externalSourceFiles>
+        <sourceFile filename="C:\Users\Maciel\AppData\Local\Temp/GDTemporaries/GD0x67750b8SourceFile.cpp" gdManaged="true" language="C++" />
+        <sourceFile filename="C:\Users\Maciel\AppData\Local\Temp/GDTemporaries/GD0x6830850SourceFile.cpp" gdManaged="true" language="C++" />
+    </externalSourceFiles>
+</project>

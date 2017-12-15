@@ -219,18 +219,23 @@ gdjs.Polygon.collisionTest._statics = {
 	}
 };
 
+/**
+ * Do a raycast test.<br>
+ * Please note that polygons must be <b>convexes</b>!
+ *
+ * @method raycastTest
+ * @static
+ * @param poly {Polygon} The polygon to test
+ * @param startX {Number} The raycast start point X
+ * @param startY {Number} The raycast start point Y
+ * @param endX {Number} The raycast end point X
+ * @param endY {Number} The raycast end point Y
+ * @return A raycast result with the collision points and distances
+ */
 gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
 {
-    var p = gdjs.Polygon.raycastTest._statics.p;
-    var q = gdjs.Polygon.raycastTest._statics.q;
-    var r = gdjs.Polygon.raycastTest._statics.r;
-    var s = gdjs.Polygon.raycastTest._statics.s;
-    var axis = gdjs.Polygon.raycastTest._statics.axis;
     var result = gdjs.Polygon.raycastTest._statics.result;
     result.collision = false;
-    result.point[0] = 0;
-    result.point[1] = 0;
-
 
     if ( poly.vertices.length < 2 )
     {
@@ -239,12 +244,73 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
 
     if ( poly.vertices.length == 2 )
     {
-        // TODO Circle raycasting
+        var circleX = poly.vertices[0][0];
+        var circleY = poly.vertices[0][1];
+        var sqRadius = (circleX - poly.vertices[1][0])*(circleX - poly.vertices[1][0]) +
+                       (circleY - poly.vertices[1][1])*(circleY - poly.vertices[1][1]);
+        var dx = endX - startX;
+        var dy = endY - startY;
+
+        var a = dx*dx + dy*dy;
+        var b = 2*(dx*(startX - circleX) + dy*(startY - circleY));
+        var c = (startX - circleX)*(startX - circleX) + (startY - circleY)*(startY - circleY) - sqRadius;
+        var det = b*b - 4*a*c;
+
+        if ( a === 0 || det < 0 ) return result;
+
+        if ( det === 0 )
+        {
+            var t = -b/(2*a);
+            if ( 0 <= t  && t <= 1 ) {
+                result.closeX = startX + t*dx;
+                result.closeY = startY + t*dy;
+                result.closeSqDist = t*t*a;
+                result.farX = result.closeX;
+                result.farY = result.closeY;
+                result.farSqDist = result.closeSqDist;
+                result.collision = true;
+            }
+        }
+        else
+        {
+            var sqDet = Math.sqrt(det);
+
+            var t = (-b + sqDet)/(2*a);
+            if ( 0 <= t && t <= 1 ) {
+                result.closeX = startX + t*dx;
+                result.closeY = startY + t*dy;
+                result.closeSqDist = t*t*a;
+                result.farX = result.closeX;
+                result.farY = result.closeY;
+                result.farSqDist = result.closeSqDist;
+                result.collision = true;
+            }
+
+            t = (-b - sqDet)/(2*a);
+            if ( 0 <= t && t <= 1 ){
+                result.closeX = startX + t*dx;
+                result.closeY = startY + t*dy;
+                result.closeSqDist = t*t*a;
+                if ( !result.collision ) {
+                    result.farX = result.closeX;
+                    result.farY = result.closeY;
+                    result.farSqDist = result.closeSqDist;
+                }
+                result.collision = true;
+            }
+        }
+
+        return result;
     }
     else
     {
         // Polygon raycasting
         poly.computeEdges();
+
+        var p = gdjs.Polygon.raycastTest._statics.p;
+        var q = gdjs.Polygon.raycastTest._statics.q;
+        var r = gdjs.Polygon.raycastTest._statics.r;
+        var s = gdjs.Polygon.raycastTest._statics.s;
 
         var minSqDist = Number.MAX_VALUE;
 
@@ -263,23 +329,38 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
             s[1] = poly.edges[i][1];
 
             var deltaQP = [q[0] - p[0], q[1] - p[1]];
-            var crossRS = crossProduct(r, s);
-            var t = crossProduct(deltaQP, s) / crossRS;
-            var u = crossProduct(deltaQP, r) / crossRS;
+            var crossRS = gdjs.Polygon.crossProduct(r, s);
+            var t = gdjs.Polygon.crossProduct(deltaQP, s) / crossRS;
+            var u = gdjs.Polygon.crossProduct(deltaQP, r) / crossRS;
+            
 
-            if ( crossRS !== 0 && 0<==t && t<==1 && 0<==u && u<==1 )
+            if ( crossRS !== 0 && 0<=t && t<=1 && 0<=u && u<=1 )
             {
                 var x = p[0] + t*r[0];
                 var y = p[1] + t*r[1];
-                var dist = x*x + y*y
-                if ( dist < minSqDist ) {
-                    minSqDist = dist;
+                
+                var sqDist = (x-startX)*(x-startX) + (y-startY)*(y-startY);
+                if ( sqDist < minSqDist )
+                {
+                    if ( result.collision === false ){
+                        result.farX = x;
+                        result.farY = y;
+                        result.farSqDist = sqDist;
+                    }
+                    minSqDist = sqDist;
                     result.collision = true;
-                    result.point.x = x;
-                    result.point.y = y;
+                    result.closeX = x;
+                    result.closeY = y;
+                    result.closeSqDist = sqDist;
+                }
+                else
+                {
+                    result.farX = x;
+                    result.farY = y;
+                    result.farSqDist = sqDist;
                 }
             }
-            else if ( crossRS === 0 && crossProduct(deltaQP, r) === 0)
+            else if ( crossRS === 0 && gdjs.Polygon.crossProduct(deltaQP, r) === 0)
             {
                 // TODO Collinear
             }
@@ -294,7 +375,6 @@ gdjs.Polygon.raycastTest._statics = {
     q: [0,0],
     r: [0,0],
     s: [0,0],
-    axis: [0,0],
     result: {
         collision: false,
         point: [0, 0]

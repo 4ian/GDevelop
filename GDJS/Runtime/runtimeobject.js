@@ -1150,8 +1150,17 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
     return false;
 };
 
-gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist) {
-
+/**
+ * @method raycastTest
+ * @static
+ * @param x {Number} The raycast source X
+ * @param y {Number} The raycast source Y
+ * @param angle {Number} The raycast angle
+ * @param dist {Number} The raycast max distance
+ * @param closest {Boolean} Get the closest or farthest collision mask result
+ * @return A raycast result with the collision points and distances
+ */
+gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist, closest) {
     var objW = this.getWidth();
     var objH = this.getHeight();
     var diffX = this.getDrawableX()+this.getCenterX() - x;
@@ -1160,16 +1169,28 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist) {
     if ( Math.sqrt(diffX*diffX + diffY*diffY) > boundingRadius + dist )
         return false;
 
-    var endX = x + dist*cos(angle*3.14159/180.0);
-    var endY = y + dist*sin(angle*3.14159/180.0);
-    var hitBoxes = this.getHitBoxes();
-    for (var i=0; i<hitBoxes.length; i++) { 
-        return gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
-    }
-
     var result = gdjs.Polygon.raycastTest._statics.result;
     result.collision = false;
+    
+    var endX = x + dist*Math.cos(angle*3.14159/180.0);
+    var endY = y + dist*Math.sin(angle*3.14159/180.0);
+    var testSqDist = closest ? 0 : Number.MAX_VALUE;
 
+    var hitBoxes = this.getHitBoxes();
+    for (var i=0; i<hitBoxes.length; i++) {
+        var res =  gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
+        if ( res.collision ) {
+            if ( closest && res.closeSqDist < testSqDist ) {
+                testSqDist = res.closeSqDist;
+                result = res;
+            }
+            else if ( !closest && res.farSqDist > testSqDist ) {
+                testSqDist = res.farSqDist;
+                result = res;
+            }
+        }
+    }
+    
     return result;
 };
 

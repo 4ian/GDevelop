@@ -867,13 +867,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
                    _("Collision"),
                    "res/conditions/collision24.png",
                    "res/conditions/collision.png")
-        .AddParameter("objectList", _("Objects to test")),
-        .AddParameter("expression", _("Source X")),
-        .AddParameter("expression", _("Source Y")),
-        .AddParameter("expression", _("Angle")),
-        .AddParameter("expression", _("Max distance")),
-        .AddParameter("scenevar", _("Result X")),
-        .AddParameter("scenevar", _("Result Y")),
+        .AddParameter("objectList", _("Objects to test"))
+        .AddParameter("expression", _("Source X"))
+        .AddParameter("expression", _("Source Y"))
+        .AddParameter("expression", _("Angle"))
+        .AddParameter("expression", _("Max distance"))
+        .AddParameter("scenevar", _("Result X"))
+        .AddParameter("scenevar", _("Result Y"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsAdvanced();
 

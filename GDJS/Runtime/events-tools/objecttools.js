@@ -318,30 +318,33 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
 
 gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, resultX, resultY, inverted) {
     var matchObject = null;
-    var minSqDist = inverted ? 0 : dist*dist;
+    var testSqDist = inverted ? 0 : dist*dist;
     var rx = 0;
     var ry = 0;
-    var first = true;
+
     var lists = gdjs.staticArray(gdjs.evtTools.object.raycastObject);
     objectsLists.values(lists);
-    for(var i = 0, len = lists.length;i<len;++i) {
+    for (var i = 0; i < lists.length; i++) {
         var list = lists[i];
 
-        for(var j = 0;j < list.length;++j) {
+        for (var j = 0; j < list.length; j++) {
             var object = list[j];
-            var result = object.raycastTest(x, y, angle, dist);
-            if( first || result.collision )
-            {
-                var distance = object.getSqDistanceTo(result.point[0], result.point[1]);
-                if ( distance <= minSqDist ^ inverted ) {
-                    minSqDist = distance;
+            var result = object.raycastTest(x, y, angle, dist, !inverted);
+            
+            if( result.collision ) {
+                if ( !inverted && (result.closeSqDist <= testSqDist) ) {
+                    testSqDist = result.closeSqDist;
                     matchObject = object;
-                    rx = result.point[0];
-                    ry = result.point[1];
+                    rx = result.closeX;
+                    ry = result.closeY;
+                }
+                else if ( inverted && (result.farSqDist >= testSqDist) && (result.farSqDist <= dist*dist) ) {
+                    testSqDist = result.farSqDist;
+                    matchObject = object;
+                    rx = result.farX;
+                    ry = result.farY;
                 }
             }
-
-            first = false;
         }
     }
 

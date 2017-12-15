@@ -65,6 +65,8 @@ yarn test #or npm run test
 
 ### Desktop version
 
+Update version number which is read in `newIDE/electron-app/app/package.json`.
+
 ```bash
 cd newIDE/electron-app
 yarn build #or npm run build
@@ -72,7 +74,6 @@ yarn build #or npm run build
 
 This will build and package the Electron app for Windows, macOS and Linux (according to your OS).
 The output are stored inside `newIDE/electron-app/dist` and copied to `Binaries/Output/Release_XXX`.
-Version number is read from `newIDE/electron-app/app/package.json`.
 
 ### Webapp version
 

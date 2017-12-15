@@ -16,6 +16,16 @@ import {
   enumerateExternalLayouts,
   filterProjectItemsList,
 } from './EnumerateProjectItems';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import Clipboard from '../Utils/Clipboard';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+
+const LAYOUT_CLIPBOARD_KIND = 'Layout';
+const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
+const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
 
 const styles = {
   container: {
@@ -94,6 +104,19 @@ class Item extends Component {
             label: 'Delete',
             click: () => this.props.onDelete(),
           },
+          { type: 'separator' },
+          {
+            label: 'Copy',
+            click: () => this.props.onCopy(),
+          },
+          {
+            label: 'Cut',
+            click: () => this.props.onCut(),
+          },
+          {
+            label: 'Paste',
+            click: () => this.props.onPaste(),
+          },
         ]}
       />
     );
@@ -138,6 +161,47 @@ export default class ProjectManager extends React.Component {
     searchText: '',
   };
 
+  _onEditName = (kind, name) => {
+    this.setState({
+      renamedItemKind: kind,
+      renamedItemName: name,
+    });
+  };
+
+  _copyLayout = layout => {
+    Clipboard.set(LAYOUT_CLIPBOARD_KIND, {
+      layout: serializeToJSObject(layout),
+      name: layout.getName(),
+    });
+  };
+
+  _cutLayout = layout => {
+    this._copyLayout(layout);
+    this.props.onDeleteLayout(layout);
+  };
+
+  _pasteLayout = index => {
+    if (!Clipboard.has(LAYOUT_CLIPBOARD_KIND)) return;
+
+    const { layout: copiedLayout, name } = Clipboard.get(LAYOUT_CLIPBOARD_KIND);
+    const { project } = this.props;
+
+    const newName = newNameGenerator('CopyOf' + name, name =>
+      project.hasLayoutNamed(name)
+    );
+
+    const newLayout = project.insertNewLayout(newName, index);
+
+    unserializeFromJSObject(
+      newLayout,
+      copiedLayout,
+      'unserializeFrom',
+      project
+    );
+
+    this.forceUpdate();
+  };
+
   _renderMenu() {
     // If there is already a main menu (as the native one made with
     // Electron), don't show it in the Project Manager.
@@ -174,13 +238,6 @@ export default class ProjectManager extends React.Component {
     );
   }
 
-  _onEditName = (kind, name) => {
-    this.setState({
-      renamedItemKind: kind,
-      renamedItemName: name,
-    });
-  };
-
   render() {
     const { project } = this.props;
     const { renamedItemKind, renamedItemName, searchText } = this.state;
@@ -208,7 +265,8 @@ export default class ProjectManager extends React.Component {
                 key="properties"
                 primaryText="Properties"
                 leftIcon={<ListIcon src="res/ribbon_default/editprop32.png" />}
-                onTouchTap={() => this.setState({ projectPropertiesDialogOpen: true })}
+                onTouchTap={() =>
+                  this.setState({ projectPropertiesDialogOpen: true })}
               />,
               <ListItem
                 key="global-variables"
@@ -245,6 +303,9 @@ export default class ProjectManager extends React.Component {
                       this._onEditName(null, '');
                     }}
                     onEditName={() => this._onEditName('layout', name)}
+                    onCopy={() => this._copyLayout(layout)}
+                    onCut={() => this._cutLayout(layout)}
+                    onPaste={() => this._pasteLayout(i)}
                   />
                 );
               })

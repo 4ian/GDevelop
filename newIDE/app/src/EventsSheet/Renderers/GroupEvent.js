@@ -11,7 +11,7 @@ const gd = global.gd;
 
 const styles = {
   container: {
-    height: 60,
+    height: 40,
     display: 'flex',
     alignItems: 'center',
     padding: 5,

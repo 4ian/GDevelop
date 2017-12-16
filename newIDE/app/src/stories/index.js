@@ -221,6 +221,7 @@ storiesOf('EventsSheet', module)
         project={project}
         layout={testLayout}
         events={testLayout.getEvents()}
+        onOpenExternalEvents={action("Open external events")}
       />
     </DragDropContextProvider>
   ));

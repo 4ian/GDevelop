@@ -40,6 +40,7 @@ export default class EventsEditor extends BaseEditor {
         layout={layout}
         events={layout.getEvents()}
         onPreview={() => this.props.onPreview(project, layout)}
+        onOpenExternalEvents={this.props.onOpenExternalEvents}
       />
     );
   }

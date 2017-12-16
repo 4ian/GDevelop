@@ -107,6 +107,8 @@ class EventContainer extends Component {
               this.props.onInstructionsListContextMenu
             }
             onParameterClick={this.props.onParameterClick}
+            onOpenExternalEvents={this.props.onOpenExternalEvents}
+            onOpenLayout={this.props.onOpenLayout}
           />
         )}
       </div>
@@ -262,6 +264,8 @@ export default class EventsTree extends Component {
         onEventContextMenu={(x, y) => this.props.onEventContextMenu(x, y, node)}
         onInstructionContextMenu={this.props.onInstructionContextMenu}
         onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
+        onOpenExternalEvents={this.props.onOpenExternalEvents}
+        onOpenLayout={this.props.onOpenLayout}
       />
     );
   };

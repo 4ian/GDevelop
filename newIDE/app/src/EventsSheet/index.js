@@ -457,7 +457,7 @@ export default class EventsSheet extends Component {
   };
 
   render() {
-    const { project, layout, events } = this.props;
+    const { project, layout, events, onOpenExternalEvents, onOpenLayout } = this.props;
     if (!project) return null;
 
     return (
@@ -484,6 +484,8 @@ export default class EventsSheet extends Component {
           onEventContextMenu={this.openEventContextMenu}
           onAddNewEvent={context =>
             this.addNewEvent('BuiltinCommonInstructions::Standard', context)}
+          onOpenExternalEvents={onOpenExternalEvents}
+          onOpenLayout={onOpenLayout}
         />
         <InlineParameterEditor
           open={this.state.inlineEditing}

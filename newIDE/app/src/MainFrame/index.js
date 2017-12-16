@@ -7,6 +7,7 @@ import Providers from './Providers';
 
 import IconButton from 'material-ui/IconButton';
 import Drawer from 'material-ui/Drawer';
+import Snackbar from 'material-ui/Snackbar';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 
 import Toolbar from './Toolbar';
@@ -66,6 +67,8 @@ type State = {|
   projectManagerOpen: boolean,
   editorTabs: EditorTabsState,
   genericDialog: null,
+  snackMessage: string,
+  snackMessageOpen: boolean,
 |};
 
 export default class MainFrame extends Component<*, State> {
@@ -81,6 +84,8 @@ export default class MainFrame extends Component<*, State> {
     projectManagerOpen: false,
     editorTabs: getEditorTabsInitialState(),
     genericDialog: null,
+    snackMessage: '',
+    snackMessageOpen: false,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
@@ -402,7 +407,13 @@ export default class MainFrame extends Component<*, State> {
     );
   };
 
-  openLayout = (name: string, openEventsEditor: boolean = true) => {
+  openLayout = (
+    name: string,
+    {
+      openEventsEditor = true,
+      openSceneEditor = true,
+    }: { openEventsEditor: boolean, openSceneEditor: boolean } = {}
+  ) => {
     const sceneEditorOptions = {
       name,
       editorCreator: () => (
@@ -429,16 +440,21 @@ export default class MainFrame extends Component<*, State> {
           setToolbar={this.setEditorToolbar}
           onPreview={this._launchLayoutPreview}
           showPreviewButton={!!this.props.onLayoutPreview}
+          onOpenExternalEvents={this.openExternalEvents}
+          onOpenLayout={name =>
+            this.openLayout(name, {
+              openEventsEditor: true,
+              openSceneEditor: false,
+            })}
         />
       ),
       key: 'layout events ' + name,
-      dontFocusTab: true,
+      dontFocusTab: openSceneEditor,
     };
 
-    const tabsWithSceneEditor = openEditorTab(
-      this.state.editorTabs,
-      sceneEditorOptions
-    );
+    const tabsWithSceneEditor = openSceneEditor
+      ? openEditorTab(this.state.editorTabs, sceneEditorOptions)
+      : this.state.editorTabs;
     const tabsWithSceneAndEventsEditors = openEventsEditor
       ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
       : tabsWithSceneEditor;
@@ -458,6 +474,12 @@ export default class MainFrame extends Component<*, State> {
               project={this.state.currentProject}
               externalEventsName={name}
               setToolbar={this.setEditorToolbar}
+              onOpenExternalEvents={this.openExternalEvents}
+              onOpenLayout={name =>
+                this.openLayout(name, {
+                  openEventsEditor: true,
+                  openSceneEditor: false,
+                })}
             />
           ),
           key: 'external events ' + name,
@@ -541,12 +563,17 @@ export default class MainFrame extends Component<*, State> {
     if (this.props.saveDialog) {
       this._openSaveDialog();
     } else {
-      this.props.onSaveProject(this.state.currentProject).catch(err => {
-        showErrorBox(
-          'Unable to save the project! Please try again by choosing another location.',
-          err
-        );
-      });
+      this.props.onSaveProject(this.state.currentProject).then(
+        () => {
+          this._showSnackMessage('Project properly saved');
+        },
+        err => {
+          showErrorBox(
+            'Unable to save the project! Please try again by choosing another location.',
+            err
+          );
+        }
+      );
     }
   };
 
@@ -567,7 +594,10 @@ export default class MainFrame extends Component<*, State> {
     if (!currentProject) return;
 
     if (currentProject.getLayoutsCount() === 1) {
-      this.openLayout(currentProject.getLayoutAt(0).getName());
+      this.openLayout(currentProject.getLayoutAt(0).getName(), {
+        openSceneEditor: true,
+        openEventsEditor: true,
+      });
     } else {
       this.openProjectManager();
     }
@@ -640,6 +670,17 @@ export default class MainFrame extends Component<*, State> {
 
     editorTab.editorRef.updateToolbar();
   }
+
+  _showSnackMessage = (snackMessage: string) =>
+    this.setState({
+      snackMessage,
+      snackMessageOpen: true,
+    });
+
+  _closeSnackMessage = () =>
+    this.setState({
+      snackMessageOpen: false,
+    });
 
   render() {
     const { currentProject, genericDialog } = this.state;
@@ -726,6 +767,14 @@ export default class MainFrame extends Component<*, State> {
           <ConfirmCloseDialog
             ref={confirmCloseDialog =>
               (this.confirmCloseDialog = confirmCloseDialog)}
+          />
+          <Snackbar
+            open={this.state.snackMessageOpen}
+            message={this.state.snackMessage}
+            action="Ok"
+            autoHideDuration={3000}
+            onActionClick={this._closeSnackMessage}
+            onRequestClose={this._closeSnackMessage}
           />
           {!!exportDialog &&
             React.cloneElement(exportDialog, {

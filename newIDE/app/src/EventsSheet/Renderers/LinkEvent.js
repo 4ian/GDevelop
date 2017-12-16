@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
+import IconButton from 'material-ui/IconButton';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -8,6 +10,7 @@ import {
 } from '../ClassNames';
 import InlinePopover from '../InlinePopover';
 import ExternalEventsField from '../InstructionEditor/ParameterFields/ExternalEventsField';
+import { showWarningBox } from '../../UI/Messages/MessageBox';
 const gd = global.gd;
 
 const styles = {
@@ -50,6 +53,22 @@ export default class LinkEvent extends Component {
     );
   };
 
+  openTarget = () => {
+    const { project, event, onOpenLayout, onOpenExternalEvents } = this.props;
+    const linkEvent = gd.asLinkEvent(event);
+    const target = linkEvent.getTarget();
+
+    if (project.hasExternalEventsNamed(target)) {
+      onOpenExternalEvents(target);
+    } else if (project.hasLayoutNamed(target)) {
+      onOpenLayout(target);
+    } else {
+      showWarningBox(
+        'The specified external events do not exist in the game. Be sure that the name is correctly spelled or create them using the project manager.'
+      );
+    }
+  };
+
   endEditing = () => {
     this.setState({
       editing: false,
@@ -58,7 +77,7 @@ export default class LinkEvent extends Component {
   };
 
   render() {
-    var linkEvent = gd.asLinkEvent(this.props.event);
+    const linkEvent = gd.asLinkEvent(this.props.event);
     const target = linkEvent.getTarget();
 
     return (
@@ -80,6 +99,9 @@ export default class LinkEvent extends Component {
             {target || '< Enter the name of external events >'}
           </i>
         </span>
+        <IconButton onTouchTap={this.openTarget} disabled={!target}>
+          <OpenInNew />
+        </IconButton>
         <InlinePopover
           open={this.state.editing}
           anchorEl={this.state.anchorEl}

@@ -62,7 +62,8 @@
         "__tuple": "cpp",
         "hash_map": "cpp",
         "hash_set": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "__nullptr": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

@@ -5,6 +5,8 @@
 declare type gdProject = Object;
 declare type gdLayout = Object;
 declare type gdExternalLayout = Object;
+declare type gdExternalEvents = Object;
+declare type gdSerializerElement = Object;
 
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = Object;

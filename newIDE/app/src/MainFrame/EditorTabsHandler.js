@@ -1,7 +1,22 @@
+// @flow
+
 import React from 'react';
 import findIndex from 'lodash/findIndex';
 
-export const getEditorTabsInitialState = () => {
+export type EditorTab = {|
+  render: () => React$Element<*>,
+  editorRef: ?any,
+  name: string,
+  key: string,
+  closable: boolean,
+|};
+
+export type EditorTabsState = {
+  editors: Array<EditorTab>,
+  currentTab: number,
+};
+
+export const getEditorTabsInitialState = (): EditorTabsState => {
   return {
     editors: [],
     currentTab: 0,
@@ -9,9 +24,21 @@ export const getEditorTabsInitialState = () => {
 };
 
 export const openEditorTab = (
-  state,
-  { name, editorCreator, key, dontFocusTab, closable }
-) => {
+  state: EditorTabsState,
+  {
+    name,
+    editorCreator,
+    key,
+    dontFocusTab,
+    closable,
+  }: {
+    name: string,
+    editorCreator: () => React$Element<*>,
+    key: string,
+    dontFocusTab?: boolean,
+    closable?: boolean,
+  }
+): EditorTabsState => {
   const existingEditorId = findIndex(
     state.editors,
     editor => editor.key === key
@@ -41,18 +68,24 @@ export const openEditorTab = (
   };
 };
 
-export const changeCurrentTab = (state, newTabId) => {
+export const changeCurrentTab = (
+  state: EditorTabsState,
+  newTabId: number
+): EditorTabsState => {
   return {
     ...state,
     currentTab: Math.max(0, Math.min(newTabId, state.editors.length - 1)),
   };
 };
 
-export const closeAll = () => {
+export const closeAll = (): EditorTabsState => {
   return getEditorTabsInitialState();
 };
 
-export const closeEditorTab = (state, editorTab) => {
+export const closeEditorTab = (
+  state: EditorTabsState,
+  editorTab: EditorTab
+): EditorTabsState => {
   return changeCurrentTab(
     {
       ...state,
@@ -62,19 +95,19 @@ export const closeEditorTab = (state, editorTab) => {
   );
 };
 
-export const getEditors = state => {
+export const getEditors = (state: EditorTabsState) => {
   return state.editors;
 };
 
-export const getCurrentTabIndex = state => {
+export const getCurrentTabIndex = (state: EditorTabsState) => {
   return state.currentTab;
 };
 
-export const getCurrentTab = state => {
+export const getCurrentTab = (state: EditorTabsState) => {
   return state.editors[state.currentTab];
 };
 
-export const closeProjectTabs = (state, project) => {
+export const closeProjectTabs = (state: EditorTabsState, project: ?gdProject) => {
   return changeCurrentTab(
     {
       ...state,
@@ -90,7 +123,7 @@ export const closeProjectTabs = (state, project) => {
   );
 };
 
-export const closeLayoutTabs = (state, layout) => {
+export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
   return changeCurrentTab(
     {
       ...state,
@@ -107,7 +140,10 @@ export const closeLayoutTabs = (state, layout) => {
   );
 };
 
-export const closeExternalLayoutTabs = (state, externalLayout) => {
+export const closeExternalLayoutTabs = (
+  state: EditorTabsState,
+  externalLayout: gdExternalLayout
+) => {
   return changeCurrentTab(
     {
       ...state,
@@ -124,7 +160,10 @@ export const closeExternalLayoutTabs = (state, externalLayout) => {
   );
 };
 
-export const closeExternalEventsTabs = (state, externalEvents) => {
+export const closeExternalEventsTabs = (
+  state: EditorTabsState,
+  externalEvents: gdExternalEvents
+) => {
   return changeCurrentTab(
     {
       ...state,

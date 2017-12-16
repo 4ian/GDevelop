@@ -1,3 +1,5 @@
+// @flow
+
 import React, { Component } from 'react';
 import './MainFrame.css';
 
@@ -28,6 +30,8 @@ import {
   closeLayoutTabs,
   closeExternalLayoutTabs,
   closeExternalEventsTabs,
+  type EditorTabsState,
+  type EditorTab,
 } from './EditorTabsHandler';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timeFunction } from '../Utils/TimeFunction';
@@ -50,7 +54,21 @@ const styles = {
   },
 };
 
-export default class MainFrame extends Component {
+type State = {|
+  createDialogOpen: boolean,
+  exportDialogOpen: boolean,
+  introDialogOpen: boolean,
+  saveDialogOpen: boolean,
+  genericDialogOpen: boolean,
+  loadingProject: boolean,
+  previewLoading: boolean,
+  currentProject: ?gdProject,
+  projectManagerOpen: boolean,
+  editorTabs: EditorTabsState,
+  genericDialog: null,
+|};
+
+export default class MainFrame extends Component<*, State> {
   state = {
     createDialogOpen: false,
     exportDialogOpen: false,
@@ -65,6 +83,7 @@ export default class MainFrame extends Component {
     genericDialog: null,
   };
   toolbar = null;
+  confirmCloseDialog: any = null;
   _resourceSourceDialogs = {};
 
   componentWillMount() {
@@ -72,7 +91,10 @@ export default class MainFrame extends Component {
     if (this.props.introDialog && !Window.isDev()) this._openIntroDialog(true);
   }
 
-  loadFromSerializedProject = (serializedProject, cb) => {
+  loadFromSerializedProject = (
+    serializedProject: gdSerializerElement,
+    cb: Function
+  ) => {
     timeFunction(
       () => {
         const newProject = gd.ProjectHelper.createNewGDJSProject();
@@ -84,7 +106,7 @@ export default class MainFrame extends Component {
     );
   };
 
-  loadFromProject = (project, cb = undefined) => {
+  loadFromProject = (project: gdProject, cb: Function) => {
     this.closeProject(() => {
       this.setState(
         {
@@ -95,7 +117,7 @@ export default class MainFrame extends Component {
     });
   };
 
-  openFromPathOrURL = (url, cb) => {
+  openFromPathOrURL = (url: string, cb: Function) => {
     this.props.onReadFromPathOrURL(url).then(
       projectObject => {
         this.setState({ loadingProject: true }, () =>
@@ -105,7 +127,9 @@ export default class MainFrame extends Component {
             this.loadFromSerializedProject(serializedProject, () => {
               serializedProject.delete();
 
-              this.state.currentProject.setProjectFile(url);
+              if (this.state.currentProject)
+                this.state.currentProject.setProjectFile(url);
+
               this.setState(
                 {
                   loadingProject: false,
@@ -126,7 +150,7 @@ export default class MainFrame extends Component {
     );
   };
 
-  closeProject = cb => {
+  closeProject = (cb: Function) => {
     if (!this.state.currentProject) return cb();
 
     this.openProjectManager(false);
@@ -138,7 +162,7 @@ export default class MainFrame extends Component {
         ),
       },
       () => {
-        this.state.currentProject.delete();
+        if (this.state.currentProject) this.state.currentProject.delete();
         this.setState(
           {
             currentProject: null,
@@ -166,13 +190,13 @@ export default class MainFrame extends Component {
       });
   };
 
-  openProjectManager = (open = true) => {
+  openProjectManager = (open: boolean = true) => {
     this.setState({
       projectManagerOpen: open,
     });
   };
 
-  setEditorToolbar = editorToolbar => {
+  setEditorToolbar = (editorToolbar: any) => {
     if (!this.toolbar) return;
 
     this.toolbar.getWrappedInstance().setEditorToolbar(editorToolbar);
@@ -180,6 +204,8 @@ export default class MainFrame extends Component {
 
   addLayout = () => {
     const { currentProject } = this.state;
+    if (!currentProject) return;
+
     const name = newNameGenerator('NewScene', name =>
       currentProject.hasLayoutNamed(name)
     );
@@ -189,6 +215,8 @@ export default class MainFrame extends Component {
 
   addExternalLayout = () => {
     const { currentProject } = this.state;
+    if (!currentProject) return;
+
     const name = newNameGenerator('NewExternalLayout', name =>
       currentProject.hasExternalLayoutNamed(name)
     );
@@ -201,6 +229,8 @@ export default class MainFrame extends Component {
 
   addExternalEvents = () => {
     const { currentProject } = this.state;
+    if (!currentProject) return;
+
     const name = newNameGenerator('NewExternalEvents', name =>
       currentProject.hasExternalEventsNamed(name)
     );
@@ -211,8 +241,9 @@ export default class MainFrame extends Component {
     this.forceUpdate();
   };
 
-  deleteLayout = layout => {
+  deleteLayout = (layout: gdLayout) => {
     const { currentProject } = this.state;
+    if (!currentProject) return;
 
     //eslint-disable-next-line
     const answer = confirm(
@@ -231,8 +262,9 @@ export default class MainFrame extends Component {
     );
   };
 
-  deleteExternalLayout = externalLayout => {
+  deleteExternalLayout = (externalLayout: gdExternalLayout) => {
     const { currentProject } = this.state;
+    if (!currentProject) return;
 
     //eslint-disable-next-line
     const answer = confirm(
@@ -254,8 +286,9 @@ export default class MainFrame extends Component {
     );
   };
 
-  deleteExternalEvents = externalEvents => {
+  deleteExternalEvents = (externalEvents: gdExternalEvents) => {
     const { currentProject } = this.state;
+    if (!currentProject) return;
 
     //eslint-disable-next-line
     const answer = confirm(
@@ -277,8 +310,10 @@ export default class MainFrame extends Component {
     );
   };
 
-  renameLayout = (oldName, newName) => {
+  renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = this.state;
+    if (!currentProject) return;
+
     if (!currentProject.hasLayoutNamed(oldName)) return;
 
     const layout = currentProject.getLayout(oldName);
@@ -293,8 +328,10 @@ export default class MainFrame extends Component {
     );
   };
 
-  renameExternalLayout = (oldName, newName) => {
+  renameExternalLayout = (oldName: string, newName: string) => {
     const { currentProject } = this.state;
+    if (!currentProject) return;
+
     if (!currentProject.hasExternalLayoutNamed(oldName)) return;
 
     const externalLayout = currentProject.getExternalLayout(oldName);
@@ -312,8 +349,10 @@ export default class MainFrame extends Component {
     );
   };
 
-  renameExternalEvents = (oldName, newName) => {
+  renameExternalEvents = (oldName: string, newName: string) => {
     const { currentProject } = this.state;
+    if (!currentProject) return;
+
     if (!currentProject.hasExternalEventsNamed(oldName)) return;
 
     const externalEvents = currentProject.getExternalEvents(oldName);
@@ -331,21 +370,25 @@ export default class MainFrame extends Component {
     );
   };
 
-  _launchLayoutPreview = (project, layout) =>
+  _launchLayoutPreview = (project: gdProject, layout: gdLayout) =>
     watchPromiseInState(this, 'previewLoading', () =>
       this._handlePreviewResult(this.props.onLayoutPreview(project, layout))
     );
 
-  _launchExternalLayoutPreview = (project, layout, externalLayout) =>
+  _launchExternalLayoutPreview = (
+    project: gdProject,
+    layout: gdLayout,
+    externalLayout: gdExternalLayout
+  ) =>
     watchPromiseInState(this, 'previewLoading', () =>
       this._handlePreviewResult(
         this.props.onExternalLayoutPreview(project, layout, externalLayout)
       )
     );
 
-  _handlePreviewResult = previewPromise => {
+  _handlePreviewResult = (previewPromise: Promise<any>): Promise<void> => {
     return previewPromise.then(
-      result => {
+      (result: any) => {
         if (result && result.dialog) {
           this.setState({
             genericDialog: result.dialog,
@@ -353,13 +396,13 @@ export default class MainFrame extends Component {
           });
         }
       },
-      err => {
+      (err: any) => {
         showErrorBox('Unable to launch the preview!', err);
       }
     );
   };
 
-  openLayout = (name, openEventsEditor = true) => {
+  openLayout = (name: string, openEventsEditor: boolean = true) => {
     const sceneEditorOptions = {
       name,
       editorCreator: () => (
@@ -405,7 +448,7 @@ export default class MainFrame extends Component {
     );
   };
 
-  openExternalEvents = name => {
+  openExternalEvents = (name: string) => {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
@@ -424,7 +467,7 @@ export default class MainFrame extends Component {
     );
   };
 
-  openExternalLayout = name => {
+  openExternalLayout = (name: string) => {
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
@@ -473,7 +516,7 @@ export default class MainFrame extends Component {
     );
   };
 
-  openCreateDialog = (open = true) => {
+  openCreateDialog = (open: boolean = true) => {
     this.setState({
       createDialogOpen: open,
     });
@@ -507,13 +550,15 @@ export default class MainFrame extends Component {
     }
   };
 
-  askToCloseProject = cb => {
+  askToCloseProject = (cb: ?Function) => {
     if (!this.state.currentProject) return;
 
     this.confirmCloseDialog.show(closeProject => {
       if (!closeProject || !this.state.currentProject) return;
 
-      this.closeProject(cb);
+      const noop = () => {};
+      const callback = cb || noop;
+      this.closeProject(callback);
     });
   };
 
@@ -528,32 +573,32 @@ export default class MainFrame extends Component {
     }
   };
 
-  openExportDialog = (open = true) => {
+  openExportDialog = (open: boolean = true) => {
     this.setState({
       exportDialogOpen: open,
     });
   };
 
-  _openIntroDialog = (open = true) => {
+  _openIntroDialog = (open: boolean = true) => {
     this.setState({
       introDialogOpen: open,
     });
   };
 
-  _openSaveDialog = (open = true) => {
+  _openSaveDialog = (open: boolean = true) => {
     this.setState({
       saveDialogOpen: open,
     });
   };
 
-  _openGenericDialog = (open = true) => {
+  _openGenericDialog = (open: boolean = true) => {
     this.setState({
       genericDialogOpen: open,
       genericDialog: null,
     });
   };
 
-  _onChangeEditorTab = value => {
+  _onChangeEditorTab = (value: number) => {
     this.setState(
       {
         editorTabs: changeCurrentTab(this.state.editorTabs, value),
@@ -562,11 +607,11 @@ export default class MainFrame extends Component {
     );
   };
 
-  _onEditorTabActive = editorTab => {
+  _onEditorTabActive = (editorTab: EditorTab) => {
     this.updateToolbar();
   };
 
-  _onCloseEditorTab = editorTab => {
+  _onCloseEditorTab = (editorTab: EditorTab) => {
     this.setState(
       {
         editorTabs: closeEditorTab(this.state.editorTabs, editorTab),
@@ -576,8 +621,8 @@ export default class MainFrame extends Component {
   };
 
   _onChooseResource = (
-    sourceName,
-    multiSelection = true
+    sourceName: string,
+    multiSelection: boolean = true
   ): Promise<Array<any>> => {
     const { currentProject } = this.state;
     const resourceSourceDialog = this._resourceSourceDialogs[sourceName];

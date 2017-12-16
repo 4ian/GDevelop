@@ -221,7 +221,7 @@ gdjs.Polygon.collisionTest._statics = {
 
 /**
  * Do a raycast test.<br>
- * Please note that polygons must be <b>convexes</b>!
+ * Please note that the polygon must be <b>convex</b>!
  *
  * @method raycastTest
  * @static
@@ -230,7 +230,7 @@ gdjs.Polygon.collisionTest._statics = {
  * @param startY {Number} The raycast start point Y
  * @param endX {Number} The raycast end point X
  * @param endY {Number} The raycast end point Y
- * @return A raycast result with the collision points and distances
+ * @return A raycast result with the contact points and distances
  */
 gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
 {
@@ -261,7 +261,7 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
         if ( det === 0 )
         {
             var t = -b/(2*a);
-            if ( 0 <= t  && t <= 1 ) {
+            if ( 0 <= t && t <= 1 ) {
                 result.closeX = startX + t*dx;
                 result.closeY = startY + t*dy;
                 result.closeSqDist = t*t*a;
@@ -334,7 +334,11 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
             var u = gdjs.Polygon.crossProduct(deltaQP, r) / crossRS;
             
 
-            if ( crossRS !== 0 && 0<=t && t<=1 && 0<=u && u<=1 )
+            if ( crossRS === 0 && gdjs.Polygon.crossProduct(deltaQP, r) === 0)
+            {
+                // TODO Collinear
+            }
+            else if ( crossRS !== 0 && 0<=t && t<=1 && 0<=u && u<=1 )
             {
                 var x = p[0] + t*r[0];
                 var y = p[1] + t*r[1];
@@ -342,16 +346,16 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
                 var sqDist = (x-startX)*(x-startX) + (y-startY)*(y-startY);
                 if ( sqDist < minSqDist )
                 {
-                    if ( result.collision === false ){
+                    if ( !result.collision ){
                         result.farX = x;
                         result.farY = y;
                         result.farSqDist = sqDist;
                     }
                     minSqDist = sqDist;
-                    result.collision = true;
                     result.closeX = x;
                     result.closeY = y;
                     result.closeSqDist = sqDist;
+                    result.collision = true;
                 }
                 else
                 {
@@ -359,10 +363,6 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
                     result.farY = y;
                     result.farSqDist = sqDist;
                 }
-            }
-            else if ( crossRS === 0 && gdjs.Polygon.crossProduct(deltaQP, r) === 0)
-            {
-                // TODO Collinear
             }
         }
 

@@ -19,6 +19,15 @@ struct CollisionResult
     sf::Vector2f move_axis;
 };
 
+struct RaycastResult
+{
+    bool collision;
+    sf::Vector2f closePoint;
+    float closeSqDist;
+    sf::Vector2f farPoint;
+    float farSqDist;
+};
+
 /**
  * Do a collision test between the two polygons.
  * \warning Polygons must convexes.
@@ -32,6 +41,16 @@ struct CollisionResult
  * \ingroup GameEngine
  */
 CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2);
+
+/**
+ * Do a raycast test.
+ * \warning Polygon must be convex.
+ *
+ * \return A raycast result with the contact points and distances
+ *
+ * \ingroup GameEngine
+ */
+RaycastResult GD_API PolygonRaycastTest(Polygon2d & poly, float startX, float startY, float endX, float endY);
 
 /**
  * Check if a point is inside a polygon.

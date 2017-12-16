@@ -15,13 +15,7 @@ export default class ToolbarIcon extends Component {
           filter: this.props.disabled ? 'grayscale(100%)' : undefined,
         }}
       >
-        <img
-          title={tooltip}
-          alt={tooltip}
-          src={src}
-          width={32}
-          height={32}
-        />
+        <img title={tooltip} alt={tooltip} src={src} width={32} height={32} />
       </IconButton>
     );
   }

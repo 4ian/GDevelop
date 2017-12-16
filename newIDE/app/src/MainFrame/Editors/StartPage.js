@@ -66,7 +66,14 @@ export default class StartPage extends BaseEditor {
   };
 
   render() {
-    const { project, canOpen, onOpen, onCreate, onOpenProjectManager, onCloseProject } = this.props;
+    const {
+      project,
+      canOpen,
+      onOpen,
+      onCreate,
+      onOpenProjectManager,
+      onCloseProject,
+    } = this.props;
 
     return (
       <div style={styles.scrollContainer}>
@@ -81,28 +88,35 @@ export default class StartPage extends BaseEditor {
                 </p>
               </Paper>
               <Paper zDepth={1} style={styles.buttonsPaper}>
-                {!project && canOpen && (
+                {!project &&
+                  canOpen && (
+                    <FlatButton
+                      label="Open a project"
+                      fullWidth
+                      onClick={onOpen}
+                    />
+                  )}
+                {!project && (
                   <FlatButton
-                    label="Open a project"
+                    label="Create a new project"
                     fullWidth
-                    onClick={onOpen}
+                    onClick={onCreate}
                   />
                 )}
-                {!project && (<FlatButton
-                  label="Create a new project"
-                  fullWidth
-                  onClick={onCreate}
-                />)}
-                {!!project && (<FlatButton
-                  label="Open Project Manager"
-                  fullWidth
-                  onClick={onOpenProjectManager}
-                />)}
-                {!!project && (<FlatButton
-                  label="Close project"
-                  fullWidth
-                  onClick={onCloseProject}
-                />)}
+                {!!project && (
+                  <FlatButton
+                    label="Open Project Manager"
+                    fullWidth
+                    onClick={onOpenProjectManager}
+                  />
+                )}
+                {!!project && (
+                  <FlatButton
+                    label="Close project"
+                    fullWidth
+                    onClick={onCloseProject}
+                  />
+                )}
               </Paper>
             </div>
           </Line>

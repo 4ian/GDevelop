@@ -11,7 +11,7 @@ const styles = {
   explanations: {
     textAlign: 'center',
     margin: 20,
-  }
+  },
 };
 
 const publicImageUrls = [
@@ -76,11 +76,8 @@ const publicImageUrls = [
 
 const nameFromUrl = (url: string): string => {
   const urlParts = url.split('/');
-  return urlParts[urlParts.length - 1].replace(
-    '.png',
-    ''
-  );
-}
+  return urlParts[urlParts.length - 1].replace('.png', '');
+};
 
 export default [
   {
@@ -108,7 +105,7 @@ export default [
               leftAvatar={<ListIcon src={url} />}
             />
           );
-        })
+        });
       }
 
       chooseResources = (
@@ -178,7 +175,10 @@ export default [
             autoScrollBodyContent
           >
             <div style={styles.explanations}>
-            <p>Adding images from Dropbox, Google Drive... is coming soon! Download GDevelop desktop version to use your own assets.</p>
+              <p>
+                Adding images from Dropbox, Google Drive... is coming soon!
+                Download GDevelop desktop version to use your own assets.
+              </p>
             </div>
             <SelectableList
               value={this.state.chosenImageUrl}

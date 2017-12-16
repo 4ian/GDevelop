@@ -34,10 +34,7 @@ export default class ConfirmCloseDialog extends Component {
 
   render() {
     const actions = [
-      <FlatButton
-        label="Cancel"
-        onTouchTap={this.handleCancel}
-      />,
+      <FlatButton label="Cancel" onTouchTap={this.handleCancel} />,
       <FlatButton
         label="Close project"
         primary={true}

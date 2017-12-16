@@ -121,9 +121,7 @@ export class InstructionOrExpressionSelector extends Component {
           style={styles.searchBar}
           ref={searchBar => (this._searchBar = searchBar)}
         />
-        <SelectableList
-          value={this.props.selectedType}
-        >
+        <SelectableList value={this.props.selectedType}>
           {this.state.search
             ? this._renderSearchResults()
             : this._renderTree(this.props.instructionsInfoTree)}

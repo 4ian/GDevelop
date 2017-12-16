@@ -15,19 +15,21 @@ export const createTree = (
   allExpressions: Array<InstructionOrExpressionInformation>
 ): InstructionOrExpressionTreeNode => {
   const tree = {};
-  allExpressions.forEach((expressionInfo: InstructionOrExpressionInformation) => {
-    update(
-      tree,
-      compact(expressionInfo.fullGroupName.split(GROUP_DELIMITER)),
-      groupInfo => {
-        const existingGroupInfo = groupInfo || {};
-        return {
-          ...existingGroupInfo,
-          [expressionInfo.displayedName]: expressionInfo,
-        };
-      }
-    );
-  });
+  allExpressions.forEach(
+    (expressionInfo: InstructionOrExpressionInformation) => {
+      update(
+        tree,
+        compact(expressionInfo.fullGroupName.split(GROUP_DELIMITER)),
+        groupInfo => {
+          const existingGroupInfo = groupInfo || {};
+          return {
+            ...existingGroupInfo,
+            [expressionInfo.displayedName]: expressionInfo,
+          };
+        }
+      );
+    }
+  );
 
   return tree;
 };

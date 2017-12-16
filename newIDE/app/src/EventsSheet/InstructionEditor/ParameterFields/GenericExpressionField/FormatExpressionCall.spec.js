@@ -25,10 +25,13 @@ describe('HelpButton', () => {
   });
 
   it('properly format a free function, with "code-only" parameters', () => {
-    const cameraHeightExpression = filterExpressions(freeExpressions, 'CameraHeight')[0];
-    expect(formatExpressionCall(cameraHeightExpression, ['', '"My layer"', "0"])).toBe(
-      'CameraHeight("My layer", 0)'
-    );
+    const cameraHeightExpression = filterExpressions(
+      freeExpressions,
+      'CameraHeight'
+    )[0];
+    expect(
+      formatExpressionCall(cameraHeightExpression, ['', '"My layer"', '0'])
+    ).toBe('CameraHeight("My layer", 0)');
   });
 
   it('properly format an object function', () => {

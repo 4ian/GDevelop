@@ -45,7 +45,6 @@ export class ObjectsGroupEditorDialog extends Component {
   }
 }
 
-
 export default withSerializableObject(ObjectsGroupEditorDialog, {
   newObjectCreator: () => new gd.ObjectGroup(),
   propName: 'group',

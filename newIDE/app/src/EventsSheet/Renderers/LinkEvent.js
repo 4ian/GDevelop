@@ -39,12 +39,15 @@ export default class LinkEvent extends Component {
   }
 
   edit = domEvent => {
-    this.setState({
-      editing: true,
-      anchorEl: domEvent.currentTarget,
-    }, () => {
-      if (this._externalEventsField) this._externalEventsField.focus();
-    });
+    this.setState(
+      {
+        editing: true,
+        anchorEl: domEvent.currentTarget,
+      },
+      () => {
+        if (this._externalEventsField) this._externalEventsField.focus();
+      }
+    );
   };
 
   endEditing = () => {
@@ -90,7 +93,8 @@ export default class LinkEvent extends Component {
               this.props.onUpdate();
             }}
             isInline
-            ref={externalEventsField => this._externalEventsField = externalEventsField}
+            ref={externalEventsField =>
+              (this._externalEventsField = externalEventsField)}
           />
         </InlinePopover>
       </div>

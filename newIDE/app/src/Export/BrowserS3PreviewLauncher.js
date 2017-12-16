@@ -73,7 +73,10 @@ export default class BrowserS3PreviewLauncher {
     });
   };
 
-  static launchLayoutPreview = (project: gdProject, layout: gdLayout): Promise<any> => {
+  static launchLayoutPreview = (
+    project: gdProject,
+    layout: gdLayout
+  ): Promise<any> => {
     if (!project || !layout) return Promise.reject();
 
     return BrowserS3PreviewLauncher._prepareExporter().then(

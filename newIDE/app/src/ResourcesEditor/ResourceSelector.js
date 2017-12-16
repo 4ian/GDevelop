@@ -27,7 +27,9 @@ export default class ResourceSelector extends Component {
         .filter(source => source.kind === this.props.resourceKind)
         .map(source => ({
           text: '',
-          value: <MenuItem primaryText={source.displayName} rightIcon={<Add />} />,
+          value: (
+            <MenuItem primaryText={source.displayName} rightIcon={<Add />} />
+          ),
           onClick: () => this._addFrom(source),
         })),
       {

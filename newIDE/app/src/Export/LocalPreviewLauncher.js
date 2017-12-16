@@ -47,7 +47,10 @@ export default class LocalPreviewLauncher {
     });
   };
 
-  static launchLayoutPreview = (project: gdProject, layout: gdLayout): Promise<any> => {
+  static launchLayoutPreview = (
+    project: gdProject,
+    layout: gdLayout
+  ): Promise<any> => {
     if (!project || !layout) return Promise.reject();
 
     return LocalPreviewLauncher._prepareExporter().then(

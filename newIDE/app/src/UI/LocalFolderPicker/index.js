@@ -21,7 +21,7 @@ const styles = {
   },
 };
 
-export default class LocalFolderPicker extends Component<*,*> {
+export default class LocalFolderPicker extends Component<*, *> {
   onChooseFolder = () => {
     if (!dialog || !electron) return;
 

@@ -71,7 +71,8 @@ class EditorMosaic extends Component {
   render() {
     return (
       <MosaicWithoutDragDropContext
-        renderTile={(editorName, path) => React.cloneElement(this.props.editors[editorName], { path })}
+        renderTile={(editorName, path) =>
+          React.cloneElement(this.props.editors[editorName], { path })}
         className="mosaic-blueprint-theme mosaic-gd-theme"
         value={this.state.mosaicNode}
         onChange={this._onChange}

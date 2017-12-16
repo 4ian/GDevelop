@@ -131,7 +131,9 @@ storiesOf('ParameterFields', module)
     </ValueStateHolder>
   ))
   .add('StringField', () => (
-    <ValueStateHolder initialValue={'ToString(0) + "Test" + NewLine() + VariableString(MyVar)'}>
+    <ValueStateHolder
+      initialValue={'ToString(0) + "Test" + NewLine() + VariableString(MyVar)'}
+    >
       <StringField
         project={project}
         layout={testLayout}
@@ -231,7 +233,8 @@ storiesOf('ExpressionSelector', module)
       expressionType="number"
       onChoose={action('Expression chosen')}
     />
-  )).add('string', () => (
+  ))
+  .add('string', () => (
     <ExpressionSelector
       selectedType=""
       expressionType="string"

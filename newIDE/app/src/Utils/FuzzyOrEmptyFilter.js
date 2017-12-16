@@ -7,5 +7,5 @@ import AutoComplete from 'material-ui/AutoComplete';
  * @param {*} key
  */
 export const fuzzyOrEmptyFilter = (searchText, key) => {
-    return !key || AutoComplete.fuzzyFilter(searchText, key);
+  return !key || AutoComplete.fuzzyFilter(searchText, key);
 };

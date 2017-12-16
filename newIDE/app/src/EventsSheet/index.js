@@ -190,17 +190,20 @@ export default class EventsSheet extends Component {
       this.state.editedInstruction.instruction.delete();
     }
 
-    this.setState({
-      editedInstruction: {
-        isCondition: true,
-        instruction: null,
-        instrsList: null,
+    this.setState(
+      {
+        editedInstruction: {
+          isCondition: true,
+          instruction: null,
+          instrsList: null,
+        },
       },
-    }, () => {
-      if (saveChanges) {
-        this._saveChangesToHistory();
+      () => {
+        if (saveChanges) {
+          this._saveChangesToHistory();
+        }
       }
-    });
+    );
   }
 
   selectEvent = eventContext => {

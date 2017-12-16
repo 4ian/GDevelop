@@ -24,8 +24,14 @@ describe('EnumerateObjects', () => {
       allObjectsList,
     } = enumerateObjects(project, testLayout);
 
-    expect(filterObjectsList(containerObjectsList, "myshapepainterobject")).toHaveLength(1);
-    expect(filterObjectsList(projectObjectsList, "myshapepainterobject")).toHaveLength(0);
-    expect(filterObjectsList(allObjectsList, "myshapepainterobject")).toHaveLength(1);
+    expect(
+      filterObjectsList(containerObjectsList, 'myshapepainterobject')
+    ).toHaveLength(1);
+    expect(
+      filterObjectsList(projectObjectsList, 'myshapepainterobject')
+    ).toHaveLength(0);
+    expect(
+      filterObjectsList(allObjectsList, 'myshapepainterobject')
+    ).toHaveLength(1);
   });
 });

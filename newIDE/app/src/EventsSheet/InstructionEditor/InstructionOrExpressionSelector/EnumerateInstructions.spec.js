@@ -15,5 +15,5 @@ describe('EnumerateInstructions', () => {
   it('can create the tree of instructions', () => {
     const instructions = enumerateInstructions('number');
     expect(createTree(instructions)).toMatchSnapshot();
-  })
+  });
 });

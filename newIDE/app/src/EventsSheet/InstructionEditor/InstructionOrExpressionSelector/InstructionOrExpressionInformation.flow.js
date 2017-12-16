@@ -1,3 +1,5 @@
+//@flow
+
 export type InstructionOrExpressionInformation = {
   type: string,
   name?: string, //For expressions

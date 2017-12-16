@@ -5,6 +5,7 @@ node_modules
 
 # testing
 coverage
+flow-coverage
 
 # production
 build
@@ -23,3 +24,4 @@ public/res
 public/CppPlatform
 public/JsPlatform
 resources/GDJS
+

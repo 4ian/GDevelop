@@ -8,7 +8,7 @@ import { type InstructionOrExpressionInformation } from './InstructionOrExpressi
 export default class ExpressionSelector extends Component<*, *> {
   _selector: any = null;
   instructionsInfo: Array<InstructionOrExpressionInformation> = [];
-  instructionsInfoTree: InstructionOrExpressionTreeNode = null;
+  instructionsInfoTree: ?InstructionOrExpressionTreeNode = null;
 
   static defaultProps = {
     expressionType: 'number',

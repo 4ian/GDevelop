@@ -1,3 +1,4 @@
+//TODO: Factor with styles.js from PointsEditor.
 export default {
   handleColumn: {
     width: 24,

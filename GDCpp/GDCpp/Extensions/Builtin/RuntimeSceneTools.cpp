@@ -22,6 +22,9 @@
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Project/Variable.h"
 #include "GDCpp/Extensions/CppPlatform.h"
+#include "GDCpp/Runtime/PolygonCollision.h"
+#include "GDCpp/Runtime/Polygon2d.h"
+#include <iostream>
 
 gd::String GD_API GetSceneName(RuntimeScene & scene)
 {
@@ -208,34 +211,47 @@ bool GD_API PickNearestObject(std::map <gd::String, std::vector<RuntimeObject*> 
     return true;
 }
 
-// bool GD_API RaycastObject(std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, double x, double y, double angle, double dist, const gd::Variable & resultX, const gd::Variable & resultY, bool inverted)
-// {
-//     double minSqDist = 0;
-//     bool first = true;
-//     RuntimeObject * matchObject = NULL;
-//     for (auto it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
-//     {
-//         if ( it->second == NULL ) continue;
-//         auto list = *it->second;
+bool GD_API RaycastObject(std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, float x, float y, float angle, float dist, gd::Variable & varX, gd::Variable & varY, bool inverted)
+{
+    RuntimeObject * matchObject = NULL;
+    float testSqDist = inverted ? 0 : dist*dist;
+    float resultX = 0.0f;
+    float resultY = 0.0f;
+    for (auto it = pickedObjectLists.begin(); it != pickedObjectLists.end(); ++it)
+    {
+        if ( it->second == NULL ) continue;
+        auto list = *it->second;
 
-//         for (std::size_t i = 0;i<list.size();++i)
-//         {
-//             double value = list[i]->GetSqDistanceTo(x, y);
-//             if (first || ((value < best) ^ inverted)) {
-//                 matchObject = list[i];
-//                 best = value;
-//             }
+        for (std::size_t i = 0; i < list.size(); ++i)
+        {
 
-//             first = false;
-//         }
-//     }
+            RaycastResult result = list[i]->RaycastTest(x, y, angle, dist, !inverted);
 
-//     if (!matchObject)
-//         return false;
+            if( result.collision ) {
+                if ( !inverted && (result.closeSqDist <= testSqDist) ) {
+                    testSqDist = result.closeSqDist;
+                    matchObject = list[i];
+                    resultX = result.closePoint.x;
+                    resultY = result.closePoint.y;
+                }
+                else if ( inverted && (result.farSqDist >= testSqDist) ) {
+                    testSqDist = result.farSqDist;
+                    matchObject = list[i];
+                    resultX = result.farPoint.x;
+                    resultY = result.farPoint.y;
+                }
+            }
+        }
+    }
 
-//     PickOnly(pickedObjectLists, matchObject);
-//     return true;
-// }
+    if ( !matchObject )
+        return false;
+
+    PickOnly(pickedObjectLists, matchObject);
+    varX.SetValue(resultX);
+    varY.SetValue(resultY);
+    return true;
+}
 
 bool GD_API SceneVariableExists(RuntimeScene & scene, const gd::String & variable)
 {

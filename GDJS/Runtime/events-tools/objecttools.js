@@ -316,11 +316,11 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
     return true;
 };
 
-gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, resultX, resultY, inverted) {
+gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, varX, varY, inverted) {
     var matchObject = null;
     var testSqDist = inverted ? 0 : dist*dist;
-    var rx = 0;
-    var ry = 0;
+    var resultX = 0;
+    var resultY = 0;
 
     var lists = gdjs.staticArray(gdjs.evtTools.object.raycastObject);
     objectsLists.values(lists);
@@ -335,25 +335,25 @@ gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, r
                 if ( !inverted && (result.closeSqDist <= testSqDist) ) {
                     testSqDist = result.closeSqDist;
                     matchObject = object;
-                    rx = result.closeX;
-                    ry = result.closeY;
+                    resultX = result.closeX;
+                    resultY = result.closeY;
                 }
-                else if ( inverted && (result.farSqDist >= testSqDist) && (result.farSqDist <= dist*dist) ) {
+                else if ( inverted && (result.farSqDist >= testSqDist) ) {
                     testSqDist = result.farSqDist;
                     matchObject = object;
-                    rx = result.farX;
-                    ry = result.farY;
+                    resultX = result.farX;
+                    resultY = result.farY;
                 }
             }
         }
     }
 
-    if (!matchObject)
+    if ( !matchObject )
         return false;
 
     gdjs.evtTools.object.pickOnly(objectsLists, matchObject);
-    resultX.setNumber(rx);
-    resultY.setNumber(ry);
+    varX.setNumber(resultX);
+    varY.setNumber(resultY);
     return true;
 };
 

@@ -1157,8 +1157,8 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
  * @param y {Number} The raycast source Y
  * @param angle {Number} The raycast angle
  * @param dist {Number} The raycast max distance
- * @param closest {Boolean} Get the closest or farthest collision mask result
- * @return A raycast result with the collision points and distances
+ * @param closest {Boolean} Get the closest or farthest collision mask result?
+ * @return A raycast result with the contact points and distances
  */
 gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist, closest) {
     var objW = this.getWidth();
@@ -1166,25 +1166,28 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist, closest) 
     var diffX = this.getDrawableX()+this.getCenterX() - x;
     var diffY = this.getDrawableY()+this.getCenterY() - y;
     var boundingRadius = Math.sqrt(objW*objW + objH*objH)/2.0;
-    if ( Math.sqrt(diffX*diffX + diffY*diffY) > boundingRadius + dist )
-        return false;
 
     var result = gdjs.Polygon.raycastTest._statics.result;
     result.collision = false;
+
+    if ( Math.sqrt(diffX*diffX + diffY*diffY) > boundingRadius + dist )
+        return result;
+
     
     var endX = x + dist*Math.cos(angle*3.14159/180.0);
     var endY = y + dist*Math.sin(angle*3.14159/180.0);
-    var testSqDist = closest ? 0 : Number.MAX_VALUE;
+    // var testSqDist = closest ? 0 : Number.MAX_VALUE;
+    var testSqDist = closest ? dist*dist : 0;
 
     var hitBoxes = this.getHitBoxes();
     for (var i=0; i<hitBoxes.length; i++) {
         var res =  gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
         if ( res.collision ) {
-            if ( closest && res.closeSqDist < testSqDist ) {
+            if ( closest && (res.closeSqDist < testSqDist) ) {
                 testSqDist = res.closeSqDist;
                 result = res;
             }
-            else if ( !closest && res.farSqDist > testSqDist ) {
+            else if ( !closest && (res.farSqDist > testSqDist) && (res.farSqDist <= dist*dist) ) {
                 testSqDist = res.farSqDist;
                 result = res;
             }
@@ -1192,15 +1195,6 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist, closest) 
     }
     
     return result;
-};
-
-/**
- * Check the distance between two objects.
- * @method distanceTest
- * @static
- */
-gdjs.RuntimeObject.distanceTest = function(obj1, obj2, distance) {
-    return obj1.getSqDistanceToObject(obj2) <= distance;
 };
 
 /**
@@ -1217,6 +1211,15 @@ gdjs.RuntimeObject.prototype.insideObject = function(x, y) {
         && this.getDrawableY() <= y
         && this.getDrawableY() + this.getHeight() >= y;
 }
+
+/**
+ * Check the distance between two objects.
+ * @method distanceTest
+ * @static
+ */
+gdjs.RuntimeObject.distanceTest = function(obj1, obj2, distance) {
+    return obj1.getSqDistanceToObject(obj2) <= distance;
+};
 
 /**
  * Return true if the cursor, or any touch, is on the object.

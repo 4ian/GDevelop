@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="96" major="4" minor="0" revision="135" />
+    <gdVersion build="96" major="4" minor="0" revision="136" />
     <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" packageName="com.example.gamename" projectFile="C:\Users\Maciel\Programacion\gits\GD\GDJS\tests\games\Raycast.gdg" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Project</name>
         <author></author>
-        <windowWidth>400</windowWidth>
-        <windowHeight>300</windowHeight>
+        <windowWidth>800</windowWidth>
+        <windowHeight>600</windowHeight>
         <latestCompilationDirectory></latestCompilationDirectory>
         <maxFPS>60</maxFPS>
         <minFPS>10</minFPS>
@@ -34,6 +34,7 @@
         </extensions>
         <platforms>
             <platform name="GDevelop JS platform" />
+            <platform name="GDevelop C++ platform" />
         </platforms>
         <currentPlatform>GDevelop JS platform</currentPlatform>
     </properties>
@@ -51,7 +52,7 @@
     <variables />
     <layouts>
         <layout b="30" disableInputWhenNotFocused="true" mangledName="Scene" name="Scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="30" standardSortMethod="false" stopSoundsOnStartup="true" title="" v="30">
-            <uiSettings grid="false" gridB="80" gridG="80" gridHeight="70" gridOffsetX="0" gridOffsetY="20" gridR="80" gridWidth="70" snap="true" windowMask="false" zoomFactor="1.391885" />
+            <uiSettings grid="false" gridB="80" gridG="80" gridHeight="70" gridOffsetX="0" gridOffsetY="20" gridR="80" gridWidth="70" snap="true" windowMask="false" zoomFactor="0.754867" />
             <objectsGroups>
                 <group name="Colliders">
                     <objects>
@@ -64,132 +65,132 @@
             </objectsGroups>
             <variables />
             <instances>
-                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Player" width="0.000000" x="199.063065" y="149.320938" zOrder="2">
+                <instance angle="0.000000" customSize="true" height="64.000000" layer="" locked="false" name="Player" width="64.000000" x="400.000000" y="300.000000" zOrder="2">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="80.000000" layer="" locked="false" name="Quad" width="80.000000" x="246.705933" y="212.292755" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="160.000000" layer="" locked="false" name="Quad" width="160.000000" x="511.653046" y="426.899933" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="187.155807" y="37.701031" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="642.864868" y="20.479473" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="157.403275" y="263.996765" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="340.216797" y="524.969666" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="32.689121" y="48.477802" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="52.560143" y="106.766174" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="108.126335" y="17.584469" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="202.182587" y="29.507092" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="325.212219" y="106.484894" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="550.417358" y="268.102661" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="111.251595" y="232.307541" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="259.622040" y="466.785736" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="332.282593" y="22.613647" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="640.945984" y="188.205658" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="272.274597" y="147.940628" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="80.000000" layer="" locked="false" name="Quad" width="80.000000" x="330.563049" y="69.781281" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="7.230614" y="272.390564" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="13.854311" y="547.935608" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="100.000000" layer="" locked="false" name="Circle" width="100.000000" x="18.591335" y="78.514206" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="200.000000" layer="" locked="false" name="Circle" width="200.000000" x="30.513973" y="183.168365" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Circle" width="0.000000" x="5.659197" y="2.358517" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="64.000000" layer="" locked="false" name="Circle" width="64.000000" x="22.880741" y="14.281113" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Circle" width="0.000000" x="349.078369" y="59.834511" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="64.000000" layer="" locked="false" name="Circle" width="64.000000" x="694.834351" y="81.030281" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Circle" width="0.000000" x="155.815277" y="215.738190" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="64.000000" layer="" locked="false" name="Circle" width="64.000000" x="321.407257" y="436.969086" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Drawer" width="0.000000" x="237.000183" y="107.970665" zOrder="5">
+                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Drawer" width="0.000000" x="467.504181" y="221.897949" zOrder="5">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="20.000000" layer="" locked="false" name="Quad" width="20.000000" x="336.280762" y="243.652557" zOrder="1">
+                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Quad" width="40.000000" x="687.335632" y="495.352386" zOrder="1">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="Circle" width="0.000000" x="124.203461" y="57.679169" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="64.000000" layer="" locked="false" name="Circle" width="64.000000" x="231.507050" y="134.513855" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="195.330048" y="259.563660" zOrder="3">
+                <instance angle="0.000000" customSize="true" height="60.000000" layer="" locked="false" name="Triangle" width="60.000000" x="432.457794" y="17.137005" zOrder="3">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="63.853691" y="27.504265" zOrder="3">
+                <instance angle="0.000000" customSize="true" height="60.000000" layer="" locked="false" name="Triangle" width="60.000000" x="119.492599" y="63.272141" zOrder="3">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="305.971375" y="168.320496" zOrder="3">
+                <instance angle="0.000000" customSize="true" height="60.000000" layer="" locked="false" name="Triangle" width="60.000000" x="625.232666" y="333.912476" zOrder="3">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="229.097198" y="174.068100" zOrder="3">
+                <instance angle="0.000000" customSize="true" height="60.000000" layer="" locked="false" name="Triangle" width="60.000000" x="476.822723" y="355.556915" zOrder="3">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="30.000000" layer="" locked="false" name="Triangle" width="30.000000" x="240.592422" y="16.727512" zOrder="3">
+                <instance angle="0.000000" customSize="true" height="60.000000" layer="" locked="false" name="Triangle" width="60.000000" x="404.859680" y="522.776550" zOrder="3">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="40.000000" layer="" locked="false" name="Polygon" width="50.000000" x="11.406837" y="183.407883" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="80.000000" layer="" locked="false" name="Polygon" width="100.000000" x="19.355259" y="383.442963" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="27.728058" layer="" locked="false" name="Polygon" width="50.000000" x="356.262939" y="256.689789" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="50.000000" layer="" locked="false" name="Polygon" width="100.000000" x="723.214783" y="536.209045" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="70.893356" layer="" locked="false" name="Polygon" width="29.883392" x="280.825653" y="23.193504" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="140.000000" layer="" locked="false" name="Polygon" width="60.000000" x="517.953369" y="37.765617" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
@@ -345,6 +346,51 @@
             <events>
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
+                    <conditions>
+                        <instruction>
+                            <type inverted="false" value="DepartScene" />
+                            <parameters>
+                                <parameter></parameter>
+                            </parameters>
+                            <subInstructions />
+                        </instruction>
+                    </conditions>
+                    <actions />
+                    <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Repeat</type>
+                            <repeatExpression>300</repeatExpression>
+                            <conditions />
+                            <actions>
+                                <instruction>
+                                    <type inverted="false" value="Create" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Polygon</parameter>
+                                        <parameter>Random(200)</parameter>
+                                        <parameter>Random(200)</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
+                                    <type inverted="false" value="Create" />
+                                    <parameters>
+                                        <parameter></parameter>
+                                        <parameter>Circle</parameter>
+                                        <parameter>500 + Random(300)</parameter>
+                                        <parameter>400 + Random(200)</parameter>
+                                        <parameter></parameter>
+                                    </parameters>
+                                    <subInstructions />
+                                </instruction>
+                            </actions>
+                            <events />
+                        </event>
+                    </events>
+                </event>
+                <event disabled="false" folded="false">
+                    <type>BuiltinCommonInstructions::Standard</type>
                     <conditions />
                     <actions>
                         <instruction>
@@ -378,7 +424,7 @@
                                 <parameter>Drawer</parameter>
                                 <parameter>Player.X()</parameter>
                                 <parameter>Player.Y()</parameter>
-                                <parameter>200</parameter>
+                                <parameter>400</parameter>
                             </parameters>
                             <subInstructions />
                         </instruction>
@@ -395,7 +441,7 @@
                                 <parameter>Player.X()</parameter>
                                 <parameter>Player.Y()</parameter>
                                 <parameter>ToDeg(atan2(MouseY(&quot;&quot;,0)-Player.Y(), MouseX(&quot;&quot;,0)-Player.X()))</parameter>
-                                <parameter>200</parameter>
+                                <parameter>400</parameter>
                                 <parameter>x</parameter>
                                 <parameter>y</parameter>
                                 <parameter></parameter>
@@ -409,7 +455,7 @@
                             <parameters>
                                 <parameter>Colliders</parameter>
                                 <parameter>+</parameter>
-                                <parameter>90 * TimeDelta()</parameter>
+                                <parameter>10 * TimeDelta()</parameter>
                             </parameters>
                             <subInstructions />
                         </instruction>
@@ -438,7 +484,7 @@
                                 <parameter>Player.Y()</parameter>
                                 <parameter>Variable(x)</parameter>
                                 <parameter>Variable(y)</parameter>
-                                <parameter>0.5</parameter>
+                                <parameter>1</parameter>
                             </parameters>
                             <subInstructions />
                         </instruction>
@@ -448,7 +494,7 @@
                                 <parameter>Drawer</parameter>
                                 <parameter>Variable(x)</parameter>
                                 <parameter>Variable(y)</parameter>
-                                <parameter>2</parameter>
+                                <parameter>3</parameter>
                             </parameters>
                             <subInstructions />
                         </instruction>
@@ -465,7 +511,7 @@
                                 <parameter>Player.X()</parameter>
                                 <parameter>Player.Y()</parameter>
                                 <parameter>ToDeg(atan2(MouseY(&quot;&quot;,0)-Player.Y(), MouseX(&quot;&quot;,0)-Player.X()))</parameter>
-                                <parameter>200</parameter>
+                                <parameter>400</parameter>
                                 <parameter>x</parameter>
                                 <parameter>y</parameter>
                                 <parameter></parameter>
@@ -507,7 +553,7 @@
                                 <parameter>Player.Y()</parameter>
                                 <parameter>Variable(x)</parameter>
                                 <parameter>Variable(y)</parameter>
-                                <parameter>0.5</parameter>
+                                <parameter>1</parameter>
                             </parameters>
                             <subInstructions />
                         </instruction>
@@ -517,7 +563,7 @@
                                 <parameter>Drawer</parameter>
                                 <parameter>Variable(x)</parameter>
                                 <parameter>Variable(y)</parameter>
-                                <parameter>1</parameter>
+                                <parameter>2</parameter>
                             </parameters>
                             <subInstructions />
                         </instruction>

@@ -87,7 +87,12 @@ export default class InstancesEditorContainer extends Component {
       this._onMouseMove(event.data.global.x, event.data.global.y)
     );
     this.backgroundArea.on('panmove', event =>
-      this._onPanMove(event.deltaX, event.deltaY, event.data.global.x, event.data.global.y)
+      this._onPanMove(
+        event.deltaX,
+        event.deltaY,
+        event.data.global.x,
+        event.data.global.y
+      )
     );
     this.backgroundArea.on('panend', event => this._onEndSelectionRectangle());
     this.pixiContainer.addChild(this.backgroundArea);
@@ -460,7 +465,7 @@ export default class InstancesEditorContainer extends Component {
 
   getViewPosition = () => {
     return this.viewPosition;
-  }
+  };
 
   _renderScene = () => {
     // Protect against rendering scheduled after the component is unmounted.

@@ -50,7 +50,7 @@ const enumerateExtensionExpressions = (
   return allExpressions;
 };
 
-export const enumerateExpressions = (type) => {
+export const enumerateExpressions = type => {
   const freeExpressions = [];
   const objectsExpressions = [];
   const behaviorsExpressions = [];
@@ -85,7 +85,10 @@ export const enumerateExpressions = (type) => {
     //Free expressions
     freeExpressions.push.apply(
       freeExpressions,
-      enumerateExtensionExpressions(prefix, allFreeExpressionsGetter.call(extension))
+      enumerateExtensionExpressions(
+        prefix,
+        allFreeExpressionsGetter.call(extension)
+      )
     );
 
     //Objects expressions:
@@ -134,14 +137,13 @@ export const enumerateExpressions = (type) => {
 };
 
 export const filterExpressions = (list, searchText) => {
-    if (!searchText) return list;
-    const lowercaseSearchText = searchText.toLowerCase();
+  if (!searchText) return list;
+  const lowercaseSearchText = searchText.toLowerCase();
 
-    return list.filter(enumeratedExpression => {
-      return (
-        enumeratedExpression.type
-          .toLowerCase()
-          .indexOf(lowercaseSearchText) !== -1
-      );
-    });
-}
+  return list.filter(enumeratedExpression => {
+    return (
+      enumeratedExpression.type.toLowerCase().indexOf(lowercaseSearchText) !==
+      -1
+    );
+  });
+};

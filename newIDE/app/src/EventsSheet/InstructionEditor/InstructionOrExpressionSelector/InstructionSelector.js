@@ -13,7 +13,7 @@ type Props = {
 export default class InstructionSelector extends Component<Props, *> {
   _selector: any = null;
   instructionsInfo: Array<InstructionOrExpressionInformation> = [];
-  instructionsInfoTree: InstructionOrExpressionTreeNode = null;
+  instructionsInfoTree: ?InstructionOrExpressionTreeNode = null;
 
   componentWillMount() {
     const allInstructions = enumerateInstructions(this.props.isCondition);

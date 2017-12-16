@@ -13,7 +13,10 @@ import {
   enumerateObjectsAndGroups,
   filterGroupsList,
 } from '../ObjectsList/EnumerateObjects';
-import type { GroupWithContextList, GroupWithContext } from '../ObjectsList/EnumerateObjects';
+import type {
+  GroupWithContextList,
+  GroupWithContext,
+} from '../ObjectsList/EnumerateObjects';
 
 const listItemHeight = 48;
 const styles = {
@@ -43,7 +46,7 @@ const SortableAddGroupRow = SortableElement(props => {
   return <AddGroupRow {...props} />;
 });
 
-class GroupsList extends Component<*,*> {
+class GroupsList extends Component<*, *> {
   list: any;
 
   forceUpdateGrid() {
@@ -60,8 +63,8 @@ class GroupsList extends Component<*,*> {
         rowCount={fullList.length}
         rowHeight={listItemHeight}
         rowRenderer={({ index, key, style }) => {
-          const groupWithScope = fullList[index];
-          if (groupWithScope.key === 'add-groups-row') {
+          const groupWithContext = fullList[index];
+          if (groupWithContext.key === 'add-groups-row') {
             return (
               <SortableAddGroupRow
                 index={fullList.length}
@@ -76,24 +79,25 @@ class GroupsList extends Component<*,*> {
 
           const nameBeingEdited =
             this.props.renamedGroupWithScope &&
-            this.props.renamedGroupWithScope.group === groupWithScope.group &&
-            this.props.renamedGroupWithScope.global === groupWithScope.global;
+            this.props.renamedGroupWithScope.group === groupWithContext.group &&
+            this.props.renamedGroupWithScope.global === groupWithContext.global;
 
           return (
             <SortableGroupRow
               index={index}
-              key={groupWithScope.group.ptr}
+              key={groupWithContext.group.ptr}
               project={project}
-              group={groupWithScope.group}
+              group={groupWithContext.group}
               style={style}
               onEdit={
                 this.props.onEditGroup
-                  ? () => this.props.onEditGroup(groupWithScope.group)
+                  ? () => this.props.onEditGroup(groupWithContext.group)
                   : undefined
               }
-              onEditName={() => this.props.onEditName(groupWithScope)}
-              onDelete={() => this.props.onDelete(groupWithScope)}
-              onRename={newName => this.props.onRename(groupWithScope, newName)}
+              onEditName={() => this.props.onEditName(groupWithContext)}
+              onDelete={() => this.props.onDelete(groupWithContext)}
+              onRename={newName =>
+                this.props.onRename(groupWithContext, newName)}
               editingName={nameBeingEdited}
             />
           );
@@ -113,8 +117,13 @@ type StateType = {|
 
 export default class GroupsListContainer extends React.Component<*, StateType> {
   static defaultProps = {
-    onDeleteGroup: (groupWithScope, cb) => cb(true),
-    onRenameGroup: (groupWithScope, newName, cb) => cb(true),
+    onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) =>
+      cb(true),
+    onRenameGroup: (
+      groupWithContext: GroupWithContext,
+      newName: string,
+      cb: Function
+    ) => cb(true),
   };
 
   sortableList: any;
@@ -133,8 +142,10 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
     // If a change is made, the component won't notice it: you have to manually
     // call forceUpdate.
 
-    if (this.state.renamedGroupWithScope !== nextState.renamedGroupWithScope ||
-        this.state.searchText !== nextState.searchText)
+    if (
+      this.state.renamedGroupWithScope !== nextState.renamedGroupWithScope ||
+      this.state.searchText !== nextState.searchText
+    )
       return true;
 
     if (
@@ -160,8 +171,8 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
     this.forceUpdate();
   };
 
-  _onDelete = (groupWithScope: GroupWithContext) => {
-    const { group, global } = groupWithScope;
+  _onDelete = (groupWithContext: GroupWithContext) => {
+    const { group, global } = groupWithContext;
     const { project, objectsContainer } = this.props;
 
     //eslint-disable-next-line
@@ -170,7 +181,7 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
     );
     if (!answer) return;
 
-    this.props.onDeleteGroup(groupWithScope, doRemove => {
+    this.props.onDeleteGroup(groupWithContext, doRemove => {
       if (!doRemove) return;
 
       if (global) {
@@ -183,17 +194,17 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
     });
   };
 
-  _onEditName = (groupWithScope: GroupWithContext) => {
+  _onEditName = (groupWithContext: GroupWithContext) => {
     this.setState(
       {
-        renamedGroupWithScope: groupWithScope,
+        renamedGroupWithScope: groupWithContext,
       },
       () => this.sortableList.getWrappedInstance().forceUpdateGrid()
     );
   };
 
-  _onRename = (groupWithScope: GroupWithContext, newName: string) => {
-    const { group } = groupWithScope;
+  _onRename = (groupWithContext: GroupWithContext, newName: string) => {
+    const { group } = groupWithContext;
     const { project, objectsContainer } = this.props;
 
     this.setState({
@@ -210,7 +221,7 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
       return;
     }
 
-    this.props.onRenameGroup(groupWithScope, newName, doRename => {
+    this.props.onRenameGroup(groupWithContext, newName, doRename => {
       if (!doRename) return;
 
       group.setName(newName);
@@ -250,8 +261,14 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
     const { searchText } = this.state;
 
     const lists = enumerateObjectsAndGroups(project, objectsContainer);
-    this.containerGroupsList = filterGroupsList(lists.containerGroupsList, searchText);
-    this.projectGroupsList = filterGroupsList(lists.projectGroupsList, searchText);
+    this.containerGroupsList = filterGroupsList(
+      lists.containerGroupsList,
+      searchText
+    );
+    this.projectGroupsList = filterGroupsList(
+      lists.projectGroupsList,
+      searchText
+    );
     const allGroupsList = filterGroupsList(lists.allGroupsList, searchText);
     const fullList = allGroupsList.concat({
       key: 'add-groups-row',

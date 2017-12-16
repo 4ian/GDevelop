@@ -99,7 +99,13 @@ export const addScrollbars = (WrappedComponent: any) => {
       );
     };
 
-    _setAndAdjust = ({ xValue, yValue }: {xValue: number, yValue: number}) => {
+    _setAndAdjust = ({
+      xValue,
+      yValue,
+    }: {
+      xValue: number,
+      yValue: number,
+    }) => {
       const xMax = Math.max(Math.abs(xValue) + 100, this.state.xMax);
       const yMax = Math.max(Math.abs(yValue) + 100, this.state.yMax);
 

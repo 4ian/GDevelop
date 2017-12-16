@@ -37,7 +37,12 @@ export default class ExpressionParametersEditorDialog extends Component<
   }
 
   render() {
-    const { project, layout, expressionMetadata, parameterRenderingService } = this.props;
+    const {
+      project,
+      layout,
+      expressionMetadata,
+      parameterRenderingService,
+    } = this.props;
 
     return (
       <Dialog

@@ -65,7 +65,12 @@ export default class NewBehaviorDialog extends Component {
     if (!open || !project) return null;
 
     const actions = [
-      <FlatButton key="close" label="Close" primary={false} onClick={onClose} />,
+      <FlatButton
+        key="close"
+        label="Close"
+        primary={false}
+        onClick={onClose}
+      />,
     ];
 
     return (

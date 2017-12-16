@@ -174,13 +174,13 @@ export default class PointsEditor extends Component {
 
     return (
       <div>
-          <ImagePreview
-            resourceName={hasValidSprite ? sprite.getImageName() : ''}
-            resourcesLoader={resourcesLoader}
-            project={project}
-          >
-            {hasValidSprite && <PointsPreview pointsContainer={sprite} />}
-          </ImagePreview>
+        <ImagePreview
+          resourceName={hasValidSprite ? sprite.getImageName() : ''}
+          resourcesLoader={resourcesLoader}
+          project={project}
+        >
+          {hasValidSprite && <PointsPreview pointsContainer={sprite} />}
+        </ImagePreview>
         <Line>
           <Column expand>
             <Toggle
@@ -237,7 +237,11 @@ export default class PointsEditor extends Component {
                   >
                     {mapFor(0, direction.getSpritesCount(), i => {
                       return (
-                        <MenuItem value={i} key={i} primaryText={`Frame #${i}`} />
+                        <MenuItem
+                          value={i}
+                          key={i}
+                          primaryText={`Frame #${i}`}
+                        />
                       );
                     })}
                   </SelectField>
@@ -247,7 +251,8 @@ export default class PointsEditor extends Component {
               label="Share same points for all sprites of the animation"
               labelPosition="right"
               toggled={samePointsForSprites}
-              onToggle={(e, checked) => this._onToggleSamePointsForSprites(checked)}
+              onToggle={(e, checked) =>
+                this._onToggleSamePointsForSprites(checked)}
             />
           </Column>
         </Line>

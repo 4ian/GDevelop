@@ -1,7 +1,4 @@
-import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from './Serializer';
+import { serializeToJSObject, unserializeFromJSObject } from './Serializer';
 
 // Tools function to keep track of the history of changes made
 // on a serializable object from libGD.js
@@ -63,7 +60,12 @@ export const undo = (history, serializableObject, project = undefined) => {
   }
 
   const newCurrent = history.undoHistory[history.undoHistory.length - 1];
-  unserializeFromJSObject(serializableObject, newCurrent, 'unserializeFrom', project);
+  unserializeFromJSObject(
+    serializableObject,
+    newCurrent,
+    'unserializeFrom',
+    project
+  );
 
   return {
     undoHistory: history.undoHistory.slice(0, -1),
@@ -86,7 +88,12 @@ export const redo = (history, serializableObject, project = undefined) => {
   }
 
   const newCurrent = history.redoHistory[history.redoHistory.length - 1];
-  unserializeFromJSObject(serializableObject, newCurrent, 'unserializeFrom', project);
+  unserializeFromJSObject(
+    serializableObject,
+    newCurrent,
+    'unserializeFrom',
+    project
+  );
 
   return {
     undoHistory: [...history.undoHistory, history.current],

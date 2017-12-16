@@ -31,7 +31,7 @@ export const openEditorTab = (
     editorRef: null,
     name,
     key,
-    closable: typeof closable === "undefined" ? true : !!closable,
+    closable: typeof closable === 'undefined' ? true : !!closable,
   };
 
   return {

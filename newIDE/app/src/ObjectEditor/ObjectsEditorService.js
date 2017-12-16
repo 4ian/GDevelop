@@ -19,13 +19,13 @@ export default {
       component: SpriteEditor,
       newObjectCreator: () => new gd.SpriteObject(''),
       castToObjectType: object => gd.asSpriteObject(object),
-      helpPagePath: "/objects/sprite",
+      helpPagePath: '/objects/sprite',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,
       newObjectCreator: () => new gd.TiledSpriteObject(''),
       castToObjectType: object => gd.asTiledSpriteObject(object),
-      helpPagePath: "/objects/tiled_sprite",
+      helpPagePath: '/objects/tiled_sprite',
     },
     'PanelSpriteObject::PanelSprite': {
       component: PanelSpriteEditor,
@@ -41,19 +41,19 @@ export default {
       component: TextEditor,
       newObjectCreator: () => new gd.TextObject(''),
       castToObjectType: object => gd.asTextObject(object),
-      helpPagePath: "/objects/text",
+      helpPagePath: '/objects/text',
     },
     'PrimitiveDrawing::Drawer': {
       component: ShapePainterEditor,
       newObjectCreator: () => new gd.ShapePainterObject(''),
       castToObjectType: object => gd.asShapePainterObject(object),
-      helpPagePath: "/objects/shape_painter",
+      helpPagePath: '/objects/shape_painter',
     },
     'TextEntryObject::TextEntry': {
       component: EmptyEditor,
       newObjectCreator: () => new gd.TextEntryObject(''),
       castToObjectType: object => gd.asTextEntryObject(object),
-      helpPagePath: "/objects/text_entry",
+      helpPagePath: '/objects/text_entry',
     },
   },
 };

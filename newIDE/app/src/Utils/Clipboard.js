@@ -32,7 +32,7 @@ export default class Clipboard {
     return text.indexOf(kind) === 12; /// 12 is the position of '000kind' value
   }
 
-  static get(kind: ClipboardKind): ?any {
+  static get(kind: ClipboardKind): any {
     if (!Clipboard.has(kind)) return null;
 
     let text = '';

@@ -476,10 +476,16 @@ export default class InstancesFullEditor extends Component {
 
   forceUpdatePropertiesEditor = () => {
     if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
-  }
+  };
 
   render() {
-    const { project, layout, initialInstances, resourceSources, onChooseResource } = this.props;
+    const {
+      project,
+      layout,
+      initialInstances,
+      resourceSources,
+      onChooseResource,
+    } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
     const editors = {
@@ -491,7 +497,8 @@ export default class InstancesFullEditor extends Component {
             instances={selectedInstances}
             onInstancesModified={this._onInstancesModified}
             editInstanceVariables={this.editInstanceVariables}
-            ref={propertiesEditor => (this._propertiesEditor = propertiesEditor)}
+            ref={propertiesEditor =>
+              (this._propertiesEditor = propertiesEditor)}
           />
         </MosaicWindow>
       ),

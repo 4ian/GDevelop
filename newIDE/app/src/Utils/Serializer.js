@@ -2,9 +2,6 @@
 
 const gd = global.gd;
 
-type gdProject = Object;
-type gdSerializable = Object;
-
 /**
  * Tool function to save a serializable object to a JS object.
  * Most gd.* objects are "serializable", meaning they have a serializeTo

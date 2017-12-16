@@ -29,7 +29,7 @@ const awsS3Client = new awsS3({
 });
 
 export default class BrowserS3PreviewLauncher {
-  static _openPreviewWindow = (project, url): any => {
+  static _openPreviewWindow = (project: gdProject, url: string): any => {
     const windowObjectReference = window.open(url, `_blank`);
     return {
       url,
@@ -73,7 +73,10 @@ export default class BrowserS3PreviewLauncher {
     });
   };
 
-  static launchLayoutPreview = (project, layout): Promise<any> => {
+  static launchLayoutPreview = (
+    project: gdProject,
+    layout: gdLayout
+  ): Promise<any> => {
     if (!project || !layout) return Promise.reject();
 
     return BrowserS3PreviewLauncher._prepareExporter().then(
@@ -99,9 +102,9 @@ export default class BrowserS3PreviewLauncher {
   };
 
   static launchExternalLayoutPreview = (
-    project,
-    layout,
-    externalLayout
+    project: gdProject,
+    layout: gdLayout,
+    externalLayout: gdExternalLayout
   ): Promise<any> => {
     return Promise.reject('Not implemented');
   };

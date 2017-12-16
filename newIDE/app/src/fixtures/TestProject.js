@@ -31,17 +31,11 @@ export const makeTestProject = gd => {
   project.getResourcesManager().addResource(audioResource1);
 
   // Create and expose some objects
-  const shapePainterObject = new gd.ShapePainterObject(
-    'MyShapePainterObject'
-  );
+  const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
   const adMobObject = new gd.AdMobObject('MyAdMobObject');
   const textObject = new gd.TextObject('MyTextObject');
-  const tiledSpriteObject = new gd.TiledSpriteObject(
-    'MyTiledSpriteObject'
-  );
-  const panelSpriteObject = new gd.PanelSpriteObject(
-    'MyPanelSpriteObject'
-  );
+  const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
+  const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
   const spriteObject = new gd.SpriteObject('MySpriteObject');
   const spriteObjectWithBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithBehaviors'
@@ -62,7 +56,7 @@ export const makeTestProject = gd => {
     sprite1.getOrigin().setY(20);
     sprite1.getCenter().setX(100);
     sprite1.getCenter().setY(200);
-    const headCustomPoint = new gd.Point("Head");
+    const headCustomPoint = new gd.Point('Head');
     headCustomPoint.setX(40);
     headCustomPoint.setY(50);
     sprite1.addPoint(headCustomPoint);
@@ -136,13 +130,20 @@ export const makeTestProject = gd => {
 
   //Add a few variables
   const testLayoutVariables = testLayout.getVariables();
-  testLayoutVariables.insert("Variable1", new gd.Variable(), 0).setString("A multiline\nstr value");
-  testLayoutVariables.insert("Variable2", new gd.Variable(), 1).setString("123456");
+  testLayoutVariables
+    .insert('Variable1', new gd.Variable(), 0)
+    .setString('A multiline\nstr value');
+  testLayoutVariables
+    .insert('Variable2', new gd.Variable(), 1)
+    .setString('123456');
   const variable3 = new gd.Variable();
-  variable3.getChild("Child1").setString("Child1 str value");
-  variable3.getChild("Child2").setString("7891011");
-  variable3.getChild("Child3").getChild("SubChild1").setString("Hello\nMultiline\nWorld");
-  testLayoutVariables.insert("Variable3", variable3, 2);
+  variable3.getChild('Child1').setString('Child1 str value');
+  variable3.getChild('Child2').setString('7891011');
+  variable3
+    .getChild('Child3')
+    .getChild('SubChild1')
+    .setString('Hello\nMultiline\nWorld');
+  testLayoutVariables.insert('Variable3', variable3, 2);
 
   //Create a few events
   //Add a new "standard" event to the scene:
@@ -236,8 +237,14 @@ export const makeTestProject = gd => {
   project.insertObject(globalTiledSpriteObject, 0);
 
   // External events
-  const testExternalEvents1 = project.insertNewExternalEvents('TestExternalEvents1', 0);
-  const testExternalEvents2 = project.insertNewExternalEvents('TestExternalEvents2', 1);
+  const testExternalEvents1 = project.insertNewExternalEvents(
+    'TestExternalEvents1',
+    0
+  );
+  const testExternalEvents2 = project.insertNewExternalEvents(
+    'TestExternalEvents2',
+    1
+  );
 
   return {
     project,

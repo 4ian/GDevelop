@@ -20,6 +20,8 @@ export const formatExpressionCall = (
   expressionInfo: InstructionOrExpressionInformation,
   parameterValues: ParameterValues
 ): string => {
+  const functionName = expressionInfo.name || '';
+
   if (expressionInfo.objectMetadata) {
     const [objectName, ...otherParameters] = parameterValues;
 
@@ -27,7 +29,7 @@ export const formatExpressionCall = (
       otherParameters,
       expressionInfo.metadata
     ).join(', ');
-    return `${objectName}.${expressionInfo.name}(${functionArgs})`;
+    return `${objectName}.${functionName}(${functionArgs})`;
   } else if (expressionInfo.behaviorMetadata) {
     const [objectName, behaviorName, ...otherParameters] = parameterValues;
 
@@ -35,12 +37,12 @@ export const formatExpressionCall = (
       otherParameters,
       expressionInfo.metadata
     ).join(', ');
-    return `${objectName}.${behaviorName}::${expressionInfo.name}(${functionArgs})`;
+    return `${objectName}.${behaviorName}::${functionName}(${functionArgs})`;
   } else {
     const functionArgs = filterOutCodeOnlyParameters(
       parameterValues,
       expressionInfo.metadata
     ).join(', ');
-    return `${expressionInfo.name}(${functionArgs})`;
+    return `${functionName}(${functionArgs})`;
   }
 };

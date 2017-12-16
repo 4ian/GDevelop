@@ -133,6 +133,11 @@ Object {
         "fullGroupName": "Common conditions for all objects/Collision",
         "type": "CollisionNP",
       },
+      "Point inside object": Object {
+        "displayedName": "Point inside object",
+        "fullGroupName": "Common conditions for all objects/Collision",
+        "type": "CollisionPoint",
+      },
     },
     "Layer": Object {
       "Compare layer": Object {
@@ -1762,6 +1767,11 @@ Array [
     "displayedName": "Behavior activated",
     "fullGroupName": "Common conditions for all objects/Behaviors",
     "type": "BehaviorActivated",
+  },
+  Object {
+    "displayedName": "Point inside object",
+    "fullGroupName": "Common conditions for all objects/Collision",
+    "type": "CollisionPoint",
   },
   Object {
     "displayedName": "Compare layer",

@@ -11,7 +11,7 @@ const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
 const gd = global.gd;
 
 export default class LocalPreviewLauncher {
-  static _openPreviewWindow = (project, gamePath): void => {
+  static _openPreviewWindow = (project: gdProject, gamePath: string): void => {
     if (!BrowserWindow) return;
 
     const win = new BrowserWindow({
@@ -47,7 +47,10 @@ export default class LocalPreviewLauncher {
     });
   };
 
-  static launchLayoutPreview = (project, layout): Promise<any> => {
+  static launchLayoutPreview = (
+    project: gdProject,
+    layout: gdLayout
+  ): Promise<any> => {
     if (!project || !layout) return Promise.reject();
 
     return LocalPreviewLauncher._prepareExporter().then(
@@ -65,9 +68,9 @@ export default class LocalPreviewLauncher {
   };
 
   static launchExternalLayoutPreview = (
-    project,
-    layout,
-    externalLayout
+    project: gdProject,
+    layout: gdLayout,
+    externalLayout: gdExternalLayout
   ): Promise<any> => {
     if (!project || !externalLayout) return Promise.reject();
 

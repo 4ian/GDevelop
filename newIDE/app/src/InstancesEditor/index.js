@@ -15,6 +15,7 @@ import WindowMask from './WindowMask';
 import DropHandler from './DropHandler';
 import BackgroundColor from './BackgroundColor';
 import PIXI from 'pixi.js';
+import FpsLimiter from './FpsLimiter';
 
 export default class InstancesEditorContainer extends Component {
   constructor() {
@@ -24,6 +25,8 @@ export default class InstancesEditorContainer extends Component {
     this.lastContextMenuY = 0;
     this.lastCursorX = 0;
     this.lastCursorY = 0;
+
+    this.fpsLimiter = new FpsLimiter(28);
   }
 
   componentDidMount() {
@@ -251,7 +254,10 @@ export default class InstancesEditorContainer extends Component {
         nextProps.width,
         nextProps.height
       );
-      this._renderScene(); //Avoid flickering that could happen while waiting for next animation frame.
+
+      // Avoid flickering that could happen while waiting for next animation frame.
+      this.fpsLimiter.forceNextUpdate();
+      this._renderScene();
     }
 
     if (nextProps.options !== this.props.options) {
@@ -471,16 +477,19 @@ export default class InstancesEditorContainer extends Component {
     // Protect against rendering scheduled after the component is unmounted.
     if (this._unmounted) return;
 
-    this.backgroundColor.render();
-    this.viewPosition.render();
-    this.grid.render();
-    this.instancesRenderer.render();
-    this.highlightedInstance.render();
-    this.selectedInstances.render();
-    this.selectionRectangle.render();
-    this.windowBorder.render();
-    this.windowMask.render();
-    this.pixiRenderer.render(this.pixiContainer);
+    // Avoid killing the CPU by limiting the rendering calls.
+    if (this.fpsLimiter.shouldUpdate()) {
+      this.backgroundColor.render();
+      this.viewPosition.render();
+      this.grid.render();
+      this.instancesRenderer.render();
+      this.highlightedInstance.render();
+      this.selectedInstances.render();
+      this.selectionRectangle.render();
+      this.windowBorder.render();
+      this.windowMask.render();
+      this.pixiRenderer.render(this.pixiContainer);
+    }
     this.nextFrame = requestAnimationFrame(this._renderScene);
   };
 

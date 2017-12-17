@@ -4,14 +4,10 @@ import ParameterRenderingService from './InstructionEditor/ParameterRenderingSer
 const gd = global.gd;
 
 export default class InlineParameterEditor extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      isValid: false,
-      parameterMetadata: null,
-    };
-  }
+  state = {
+    isValid: false,
+    parameterMetadata: null,
+  };
 
   componentWillReceiveProps(newProps) {
     if (

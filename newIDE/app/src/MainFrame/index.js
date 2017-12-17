@@ -771,9 +771,7 @@ export default class MainFrame extends Component<*, State> {
           <Snackbar
             open={this.state.snackMessageOpen}
             message={this.state.snackMessage}
-            action="Ok"
             autoHideDuration={3000}
-            onActionClick={this._closeSnackMessage}
             onRequestClose={this._closeSnackMessage}
           />
           {!!exportDialog &&

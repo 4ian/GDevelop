@@ -21,14 +21,10 @@ const styles = {
  */
 export const passFullSize = (WrappedComponent, { useFlex }) => {
   return class FullSizeMeasurer extends Component {
-    constructor() {
-      super();
-
-      this.state = {
-        width: 0,
-        height: 0,
-      };
-    }
+    state = {
+      width: undefined,
+      height: undefined,
+    };
 
     render() {
       const { wrappedComponentRef, ...otherProps } = this.props;
@@ -40,8 +36,8 @@ export const passFullSize = (WrappedComponent, { useFlex }) => {
           <div
             style={useFlex ? styles.flexContainer : styles.absoluteContainer}
           >
-            {!!this.state.width &&
-              !!this.state.height && (
+            {this.state.width !== undefined &&
+              this.state.height !== undefined && (
                 <WrappedComponent
                   width={this.state.width}
                   height={this.state.height}

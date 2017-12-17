@@ -283,6 +283,8 @@ export default class EventsTree extends Component {
           canDrop={this._canDrop}
           rowHeight={({ index }) => {
             const event = this.state.flatData[index];
+            if (!event) return 0;
+
             return this.eventsHeightsCache.getEventHeight(event);
           }}
           reactVirtualizedListProps={{

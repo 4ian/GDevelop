@@ -633,7 +633,7 @@ export default class MainFrame extends Component<*, State> {
       {
         editorTabs: changeCurrentTab(this.state.editorTabs, value),
       },
-      () => this.updateToolbar()
+      () => this._onEditorTabActive(getCurrentTab(this.state.editorTabs))
     );
   };
 

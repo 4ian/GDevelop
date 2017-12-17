@@ -95,15 +95,15 @@ export const closeEditorTab = (
   );
 };
 
-export const getEditors = (state: EditorTabsState) => {
+export const getEditors = (state: EditorTabsState): Array<EditorTab> => {
   return state.editors;
 };
 
-export const getCurrentTabIndex = (state: EditorTabsState) => {
+export const getCurrentTabIndex = (state: EditorTabsState): number => {
   return state.currentTab;
 };
 
-export const getCurrentTab = (state: EditorTabsState) => {
+export const getCurrentTab = (state: EditorTabsState): EditorTab => {
   return state.editors[state.currentTab];
 };
 

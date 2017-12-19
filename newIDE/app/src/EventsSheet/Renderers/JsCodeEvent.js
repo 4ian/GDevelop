@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import { rgbToHex } from '../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
   largeSelectableArea,
@@ -10,33 +8,41 @@ import {
 } from '../ClassNames';
 const gd = global.gd;
 
+const fontFamily = '"Lucida Console", Monaco, monospace';
+
 const styles = {
   container: {
     minHeight: 30,
     display: 'flex',
-    backgroundColor: '#fbf3d9',
+    flexDirection: 'column',
+    backgroundColor: 'white',
+  },
+  wrappingText: {
+    fontFamily,
+    paddingLeft: 5,
+    paddingRight: 5,
+    margin: 0,
   },
   text: {
     flex: 1,
     whiteSpace: 'pre-line',
     margin: 0,
-    padding: 5,
+    paddingLeft: 4 * 5,
+    paddingRight: 5,
+    fontFamily,
   },
   textArea: {
-    padding: 5,
+    paddingLeft: 4 * 5,
+    paddingRight: 5,
     flex: 1,
     boxSizing: 'border-box',
     width: '100%',
     fontSize: 14,
+    fontFamily,
   },
 };
 
-export default class CommentEvent extends Component {
-  static propTypes = {
-    event: PropTypes.object.isRequired,
-    onUpdate: PropTypes.func.isRequired,
-  };
-
+export default class JsCodeEvent extends Component {
   state = {
     editing: false,
   };
@@ -50,14 +56,14 @@ export default class CommentEvent extends Component {
       () => {
         const input = ReactDOM.findDOMNode(this._input);
         input.focus();
-        input.value = gd.asCommentEvent(this.props.event).getComment();
+        input.value = gd.asJsCodeEvent(this.props.event).getInlineCode();
       }
     );
   };
 
   endEditing = () => {
-    const commentEvent = gd.asCommentEvent(this.props.event);
-    commentEvent.setComment(ReactDOM.findDOMNode(this._input).value);
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    jsCodeEvent.setInlineCode(ReactDOM.findDOMNode(this._input).value);
     this.setState(
       {
         editing: false,
@@ -66,38 +72,21 @@ export default class CommentEvent extends Component {
     );
   };
 
-  _getCommentHTML = () => {
-    const commentEvent = gd.asCommentEvent(this.props.event);
-    return commentEvent
-      .getComment()
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br>');
-  };
-
   render() {
-    const commentEvent = gd.asCommentEvent(this.props.event);
-    const color = rgbToHex(
-      commentEvent.getBackgroundColorRed(),
-      commentEvent.getBackgroundColorGreen(),
-      commentEvent.getBackgroundColorBlue()
-    );
-    const textColor = rgbToHex(
-      commentEvent.getTextColorRed(),
-      commentEvent.getTextColorGreen(),
-      commentEvent.getTextColorBlue()
-    );
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    const functionStart = '(function(runtimeScene, objects) {';
+    const functionEnd = '})(runtimeScene, objects);';
 
     return (
       <div
-        style={{ ...styles.container, backgroundColor: `#${color}` }}
+        style={styles.container}
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
         })}
         ref={container => (this._container = container)}
       >
+        <p style={styles.wrappingText}>{functionStart}</p>
         {!this.state.editing ? (
           <p
             className={classNames({
@@ -105,11 +94,10 @@ export default class CommentEvent extends Component {
             })}
             onClick={this.edit}
             key="p"
-            style={{ ...styles.text, color: `#${textColor}` }}
-            dangerouslySetInnerHTML={{
-              __html: this._getCommentHTML(),
-            }}
-          />
+            style={styles.text}
+          >
+            {jsCodeEvent.getInlineCode()}
+          </p>
         ) : (
           <textarea
             key="textarea"
@@ -119,6 +107,7 @@ export default class CommentEvent extends Component {
             ref={input => (this._input = input)}
           />
         )}
+        <p style={styles.wrappingText}>{functionEnd}</p>
       </div>
     );
   }

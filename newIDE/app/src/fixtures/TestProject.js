@@ -168,9 +168,16 @@ export const makeTestProject = gd => {
   var evt7 = testLayout
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Link', 6);
+  var evt8 = testLayout
+    .getEvents()
+    .insertNewEvent(project, 'BuiltinCommonInstructions::JsCode', 7);
 
   const groupEvent = gd.asGroupEvent(evt6);
   groupEvent.setName('Group #1');
+
+  const jsCodeEvent = gd.asJsCodeEvent(evt8);
+  jsCodeEvent.setInlineCode('console.log("Hello, World!");')
+  jsCodeEvent.setParameterObjects('MyObject');
 
   const makeKeyPressedCondition = () => {
     const condition = new gd.Instruction();

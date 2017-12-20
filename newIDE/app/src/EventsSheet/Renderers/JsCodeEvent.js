@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
+import InlinePopover from '../InlinePopover';
+import ObjectField from '../InstructionEditor/ParameterFields/ObjectField';
 import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
 } from '../ClassNames';
+import { getHelpLink } from '../../Utils/HelpLink';
+import Window from '../../Utils/Window';
 const gd = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
@@ -40,11 +44,20 @@ const styles = {
     fontSize: 14,
     fontFamily,
   },
+  comment: {
+    color: '#777',
+  },
+  commentLink: {
+    cursor: 'pointer',
+    color: '#777',
+    textDecoration: 'underline',
+  },
 };
 
 export default class JsCodeEvent extends Component {
   state = {
     editing: false,
+    anchorEl: null,
   };
 
   edit = () => {
@@ -72,10 +85,59 @@ export default class JsCodeEvent extends Component {
     );
   };
 
+  editObject = domEvent => {
+    this.setState({
+      editingObject: true,
+      anchorEl: domEvent.currentTarget,
+    });
+  };
+
+  endObjectEditing = () => {
+    this.setState({
+      editingObject: false,
+      anchorEl: null,
+    });
+  };
+
+  openHelp = () => {
+    Window.openExternalURL(getHelpLink('/events/js-code'));
+  };
+
   render() {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
-    const functionStart = '(function(runtimeScene, objects) {';
-    const functionEnd = '})(runtimeScene, objects);';
+    const parameterObjects = jsCodeEvent.getParameterObjects();
+    const objects = (
+      <span
+        className={classNames({
+          [selectableArea]: true,
+        })}
+        onClick={this.editObject}
+      >
+        {parameterObjects
+          ? `, objects /*${parameterObjects}*/`
+          : ' /* No objects selected, only pass the scene as argument */'}
+      </span>
+    );
+    const functionStart = (
+      <p style={styles.wrappingText}>
+        <span>{'(function(runtimeScene'}</span>
+        {objects}
+        <span>{') {'}</span>
+      </p>
+    );
+    const functionEnd = (
+      <p style={styles.wrappingText}>
+        <span>{'})(runtimeScene'}</span>
+        {objects}
+        <span>{');'}</span>
+        <span style={styles.comment}>
+          {' // '}
+          <a onClick={this.openHelp} style={styles.commentLink}>
+            Read the documentation and help
+          </a>
+        </span>
+      </p>
+    );
 
     return (
       <div
@@ -86,7 +148,7 @@ export default class JsCodeEvent extends Component {
         })}
         ref={container => (this._container = container)}
       >
-        <p style={styles.wrappingText}>{functionStart}</p>
+        {functionStart}
         {!this.state.editing ? (
           <p
             className={classNames({
@@ -107,7 +169,23 @@ export default class JsCodeEvent extends Component {
             ref={input => (this._input = input)}
           />
         )}
-        <p style={styles.wrappingText}>{functionEnd}</p>
+        {functionEnd}
+        <InlinePopover
+          open={this.state.editingObject}
+          anchorEl={this.state.anchorEl}
+          onRequestClose={this.endObjectEditing}
+        >
+          <ObjectField
+            project={this.props.project}
+            layout={this.props.layout}
+            value={parameterObjects}
+            onChange={text => {
+              jsCodeEvent.setParameterObjects(text);
+              this.props.onUpdate();
+            }}
+            isInline
+          />
+        </InlinePopover>
       </div>
     );
   }

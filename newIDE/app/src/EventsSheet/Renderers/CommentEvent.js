@@ -37,13 +37,9 @@ export default class CommentEvent extends Component {
     onUpdate: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      editing: false,
-    };
-  }
+  state = {
+    editing: false,
+  };
 
   edit = () => {
     this.setState(

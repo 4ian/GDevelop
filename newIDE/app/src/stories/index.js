@@ -201,17 +201,19 @@ storiesOf('DragHandle', module)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
 
-storiesOf('EventsTree', module).add('default', () => (
-  <DragDropContextProvider>
-    <div className="gd-events-sheet">
-      <EventsTree
-        events={testLayout.getEvents()}
-        selectedEvents={[]}
-        selectedInstructions={[]}
-      />
-    </div>
-  </DragDropContextProvider>
-));
+storiesOf('EventsTree', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <DragDropContextProvider>
+      <div className="gd-events-sheet">
+        <EventsTree
+          events={testLayout.getEvents()}
+          selectedEvents={[]}
+          selectedInstructions={[]}
+        />
+      </div>
+    </DragDropContextProvider>
+  ));
 
 storiesOf('EventsSheet', module)
   .addDecorator(muiDecorator)
@@ -221,7 +223,7 @@ storiesOf('EventsSheet', module)
         project={project}
         layout={testLayout}
         events={testLayout.getEvents()}
-        onOpenExternalEvents={action("Open external events")}
+        onOpenExternalEvents={action('Open external events')}
       />
     </DragDropContextProvider>
   ));

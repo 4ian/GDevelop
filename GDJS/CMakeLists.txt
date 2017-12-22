@@ -103,7 +103,7 @@ ELSE()
 	ELSE()
 		add_custom_target(GDJS_Runtime
 			ALL
-			COMMAND sh "CopyRuntimeToGD.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/JsPlatform/Runtime
+			COMMAND bash "CopyRuntimeToGD.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/JsPlatform/Runtime
 			WORKING_DIRECTORY ${GD_base_dir}/GDJS/scripts)
 	ENDIF()
 ENDIF()

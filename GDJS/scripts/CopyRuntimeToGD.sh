@@ -1,3 +1,4 @@
+#!/bin/bash
 #Get the destination, or copy by default to release directory
 DESTINATION=../../Binaries/Output/Release_Linux/JsPlatform/Runtime/
 if [ "$(uname)" == "Darwin" ]; then

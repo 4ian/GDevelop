@@ -1,11 +1,11 @@
 import React from 'react';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 
 const styles = {
   messageStyle: {
     opacity: 0.4,
     textAlign: 'center',
     fontSize: '13px',
-    textShadow: '1px 1px 0px white',
   },
   containerStyle: {
     display: 'flex',
@@ -16,10 +16,20 @@ const styles = {
   },
 };
 
-export default props => (
+const ThemableEmptyMessage = props => (
   <div style={{ ...styles.containerStyle, ...props.style }}>
-    <span style={{ ...styles.messageStyle, ...props.messageStyle }}>
+    <span
+      style={{
+        ...styles.messageStyle,
+        textShadow: `1px 1px 0px ${props.muiTheme.emptyMessage.shadowColor}`,
+        ...props.messageStyle,
+      }}
+    >
       {props.children}
     </span>
   </div>
 );
+
+const EmptyMessage = muiThemeable()(ThemableEmptyMessage);
+
+export default EmptyMessage;

@@ -22,7 +22,6 @@ const styles = {
   expressionSelector: {
     maxHeight: 350,
     overflowY: 'scroll',
-    backgroundColor: 'white',
   },
   input: {
     fontFamily: '"Lucida Console", Monaco, monospace',

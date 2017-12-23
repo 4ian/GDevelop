@@ -17,32 +17,20 @@ export default class GDIconMenu extends Component {
       : new MaterialUIMenuImplementation({ onClose: () => {} });
   }
 
-  componentWillMount() {
-    this.setState({
-      children: this.menuImplementation.buildFromTemplate(
-        this.props.menuTemplate
-      ),
-    });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.menuTemplate !== nextProps.menuTemplate) {
-      this.setState({
-        children: this.menuImplementation.buildFromTemplate(
-          nextProps.menuTemplate
-        ),
-      });
-    }
-  }
-
   open = event => {
     if (!this.iconMenu) return;
 
     const node = ReactDOM.findDOMNode(this.iconMenu);
     if (!node) return;
 
+    this.setState({
+      children: this.menuImplementation.buildFromTemplate(
+        this.props.buildMenuTemplate()
+      ),
+    });
     this.menuImplementation.showMenu(node.getBoundingClientRect());
-    this.iconMenu.open('unkown', event);
+
+    this.iconMenu.open('unknown', event);
   };
 
   _onTouchTap = event => {
@@ -53,11 +41,16 @@ export default class GDIconMenu extends Component {
     const node = ReactDOM.findDOMNode(this.iconMenu);
     if (!node) return;
 
+    this.setState({
+      children: this.menuImplementation.buildFromTemplate(
+        this.props.buildMenuTemplate()
+      ),
+    });
     this.menuImplementation.showMenu(node.getBoundingClientRect());
   };
 
   render() {
-    const { menuTemplate, ...iconMenuProps } = this.props; //eslint-disable-line
+    const { buildMenuTemplate, ...iconMenuProps } = this.props; //eslint-disable-line
 
     // Use disableAutoFocus to avoid making TextField lose focus.
     // See material-ui bug: https://github.com/callemall/material-ui/issues/4387

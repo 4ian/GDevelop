@@ -26,6 +26,7 @@ const awsS3Client = new awsS3({
   accessKeyId: accessKeyId,
   secretAccessKey: secretAccessKey,
   region: region,
+  correctClockSkew: true,
 });
 
 export default class BrowserS3PreviewLauncher {

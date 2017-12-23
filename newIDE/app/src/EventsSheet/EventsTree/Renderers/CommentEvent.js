@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import { rgbToHex } from '../../Utils/ColorTransformer';
+import { rgbToHex } from '../../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
   largeSelectableArea,

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
 import SearchBar from 'material-ui-search-bar';
 import keys from 'lodash/keys';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 const SelectableList = makeSelectable(List);
 
 const styles = {
@@ -9,18 +10,12 @@ const styles = {
     margin: '0 auto',
     backgroundColor: 'transparent',
   },
-  groupListItemText: {
-    color: 'rgba(0,0,0,0.54)',
-  },
-  groupListItem: {
-    borderBottom: '1px solid #f0f0f0', //TODO: Use theme color instead
-  },
   groupListItemNestedList: {
     padding: 0,
   },
 };
 
-export class InstructionOrExpressionSelector extends Component {
+class ThemableInstructionOrExpressionSelector extends Component {
   state = {
     search: '',
     searchResults: [],
@@ -61,6 +56,8 @@ export class InstructionOrExpressionSelector extends Component {
   };
 
   _renderTree(instructionInfoTree) {
+    const { muiTheme } = this.props;
+
     return Object.keys(instructionInfoTree).map(key => {
       const instructionOrGroup = instructionInfoTree[key];
 
@@ -79,9 +76,9 @@ export class InstructionOrExpressionSelector extends Component {
         return (
           <ListItem
             key={key}
-            style={styles.groupListItem}
+            style={{borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`}}
             nestedListStyle={styles.groupListItemNestedList}
-            primaryText={<div style={styles.groupListItemText}>{key}</div>}
+            primaryText={<div style={{color: muiTheme.listItem.groupTextColor}}>{key}</div>}
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
             nestedItems={this._renderTree(instructionOrGroup)}
@@ -109,8 +106,15 @@ export class InstructionOrExpressionSelector extends Component {
   };
 
   render() {
+    const { muiTheme, selectedType, instructionsInfoTree, style } = this.props;
+
     return (
-      <div style={this.props.style}>
+      <div
+        style={{
+          backgroundColor: muiTheme.list.itemsBackgroundColor,
+          ...style,
+        }}
+      >
         <SearchBar
           onChange={text =>
             this.setState({
@@ -121,14 +125,17 @@ export class InstructionOrExpressionSelector extends Component {
           style={styles.searchBar}
           ref={searchBar => (this._searchBar = searchBar)}
         />
-        <SelectableList value={this.props.selectedType}>
+        <SelectableList value={selectedType}>
           {this.state.search
             ? this._renderSearchResults()
-            : this._renderTree(this.props.instructionsInfoTree)}
+            : this._renderTree(instructionsInfoTree)}
         </SelectableList>
       </div>
     );
   }
 }
 
+const InstructionOrExpressionSelector = muiThemeable()(
+  ThemableInstructionOrExpressionSelector
+);
 export default InstructionOrExpressionSelector;

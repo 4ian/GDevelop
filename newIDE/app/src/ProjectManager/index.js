@@ -4,6 +4,7 @@ import TextField from 'material-ui/TextField';
 import SearchBar from 'material-ui-search-bar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconButton from 'material-ui/IconButton';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 import ListIcon from '../UI/ListIcon';
 import { makeAddItem } from '../UI/ListAddItem';
 import Window from '../Utils/Window';
@@ -38,13 +39,6 @@ const styles = {
     overflowY: 'scroll',
     padding: 0,
   },
-  item: {
-    borderBottom: '1px solid #e0e0e0', //TODO: Use theme color instead
-  },
-  projectStructureItem: {
-    backgroundColor: '#f7f7f7', //TODO: Use theme color instead
-    borderBottom: '1px solid #e0e0e0', //TODO: Use theme color instead
-  },
   projectStructureItemNestedList: {
     padding: 0,
   },
@@ -58,15 +52,20 @@ const styles = {
   },
 };
 
-const ProjectStructureItem = props => (
+const ThemableProjectStructureItem = ({ muiTheme, ...otherProps }) => (
   <ListItem
-    style={styles.projectStructureItem}
+    style={{
+      backgroundColor: muiTheme.listItem.groupBackgroundColor,
+      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+    }}
     nestedListStyle={styles.projectStructureItemNestedList}
-    {...props}
+    {...otherProps}
   />
 );
 
-class Item extends Component {
+const ProjectStructureItem = muiThemeable()(ThemableProjectStructureItem);
+
+class ThemableItem extends Component {
   componentDidUpdate(prevProps) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {
@@ -91,7 +90,7 @@ class Item extends Component {
             <MoreVertIcon />
           </IconButton>
         }
-        menuTemplate={[
+        buildMenuTemplate={() => [
           {
             label: 'Edit',
             click: () => this.props.onEdit(),
@@ -115,6 +114,7 @@ class Item extends Component {
           },
           {
             label: 'Paste',
+            enabled: this.props.canPaste(),
             click: () => this.props.onPaste(),
           },
         ]}
@@ -142,7 +142,11 @@ class Item extends Component {
 
     return (
       <ListItem
-        style={{ ...styles.item, ...this.props.style }}
+        style={{
+          borderBottom: `1px solid ${this.props.muiTheme.listItem
+            .separatorColor}`,
+          ...this.props.style,
+        }}
         onContextMenu={this._onContextMenu}
         primaryText={label}
         rightIconButton={rightIconButton}
@@ -151,6 +155,8 @@ class Item extends Component {
     );
   }
 }
+
+const Item = muiThemeable()(ThemableItem);
 
 const AddItem = makeAddItem(ListItem);
 
@@ -303,6 +309,12 @@ export default class ProjectManager extends React.Component {
             leftIcon={<ListIcon src="res/ribbon_default/export32.png" />}
             onTouchTap={() => this.props.onExportProject()}
           />,
+          <ListItem
+            key="preferences"
+            primaryText="Preferences"
+            leftIcon={<ListIcon src="res/ribbon_default/pref32.png" />}
+            onTouchTap={() => this.props.onOpenPreferences()}
+          />,
         ]}
       />
     );
@@ -376,6 +388,7 @@ export default class ProjectManager extends React.Component {
                     onCopy={() => this._copyLayout(layout)}
                     onCut={() => this._cutLayout(layout)}
                     onPaste={() => this._pasteLayout(i)}
+                    canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
                   />
                 );
               })
@@ -421,6 +434,8 @@ export default class ProjectManager extends React.Component {
                     onCopy={() => this._copyExternalEvents(externalEvents)}
                     onCut={() => this._cutExternalEvents(externalEvents)}
                     onPaste={() => this._pasteExternalEvents(i)}
+                    canPaste={() =>
+                      Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)}
                   />
                 );
               })
@@ -466,6 +481,8 @@ export default class ProjectManager extends React.Component {
                     onCopy={() => this._copyExternalLayout(externalLayout)}
                     onCut={() => this._cutExternalLayout(externalLayout)}
                     onPaste={() => this._pasteExternalLayout(i)}
+                    canPaste={() =>
+                      Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)}
                   />
                 );
               })

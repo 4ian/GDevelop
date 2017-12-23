@@ -1,6 +1,9 @@
 import optionalRequire from '../../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 
+/**
+ * Wraps an Electron Menu
+ */
 export default class ElectronMenuImplementation {
   buildFromTemplate(template) {
     this.menuTemplate = template;

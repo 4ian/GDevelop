@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { mapFor } from '../Utils/MapFor';
+import { mapFor } from '../../Utils/MapFor';
 import classNames from 'classnames';
 import { selectedArea, selectableArea } from './ClassNames';
 import InstructionsList from './InstructionsList';

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Instruction from './Instruction.js';
-import { mapFor } from '../Utils/MapFor';
-import { isInstructionSelected } from './SelectionHandler';
+import Instruction from './Instruction';
+import { mapFor } from '../../Utils/MapFor';
+import { isInstructionSelected } from '../SelectionHandler';
 
 const styles = {
   conditionsContainer: {

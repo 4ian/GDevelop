@@ -6,6 +6,7 @@ import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirectory-arrow-right';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
 
 const Indent = ({ width }) => (
@@ -14,7 +15,7 @@ const Indent = ({ width }) => (
   </div>
 );
 
-const VariableRow = ({
+const ThemableVariableRow = ({
   name,
   variable,
   depth,
@@ -24,6 +25,7 @@ const VariableRow = ({
   onAddChild,
   onChangeValue,
   children,
+  muiTheme,
 }) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
@@ -71,10 +73,15 @@ const VariableRow = ({
 
   return (
     <div>
-      <TreeTableRow style={styles.variableRow}>{columns}</TreeTableRow>
+      <TreeTableRow
+        style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
+      >
+        {columns}
+      </TreeTableRow>
       {children}
     </div>
   );
 };
 
+const VariableRow = muiThemeable()(ThemableVariableRow);
 export default VariableRow;

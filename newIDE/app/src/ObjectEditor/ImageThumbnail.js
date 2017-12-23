@@ -1,5 +1,6 @@
 import React from 'react';
 import Checkbox from 'material-ui/Checkbox';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -20,9 +21,6 @@ const styles = {
     ...thumbnailContainerStyle,
     background: 'url("res/transparentback.png") repeat',
   },
-  selectedSpriteThumbnailBorder: {
-    borderColor: '#4ab0e4', //TODO: Use theme color instead
-  },
   spriteThumbnailImage: {
     maxWidth: SPRITE_SIZE,
     maxHeight: SPRITE_SIZE,
@@ -38,7 +36,7 @@ const styles = {
   },
 };
 
-export default ({
+const ThemableImageThumbnail = ({
   project,
   resourceName,
   resourcesLoader,
@@ -47,12 +45,15 @@ export default ({
   selected,
   onSelect,
   onContextMenu,
+  muiTheme,
 }) => {
   return (
     <div
       style={{
         ...styles.spriteThumbnail,
-        ...(selected && styles.selectedSpriteThumbnailBorder),
+        borderColor: selected
+          ? muiTheme.imageThumbnail.selectedBorderColor
+          : undefined,
         ...style,
       }}
       onContextMenu={e => {
@@ -76,3 +77,6 @@ export default ({
     </div>
   );
 };
+
+const ImageThumbnail = muiThemeable()(ThemableImageThumbnail);
+export default ImageThumbnail;

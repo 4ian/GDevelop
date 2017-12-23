@@ -4,9 +4,10 @@ import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
 import ModeEdit from 'material-ui/svg-icons/editor/mode-edit';
 import TextField from 'material-ui/TextField';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
 
-const PointRow = ({
+const ThemablePointRow = ({
   pointName,
   nameError,
   onBlur,
@@ -17,8 +18,11 @@ const PointRow = ({
   onChangePointY,
   onEdit,
   isAutomatic,
+  muiTheme,
 }) => (
-  <TableRow style={styles.pointRow}>
+  <TableRow style={{
+    backgroundColor: muiTheme.list.itemsBackgroundColor,
+  }}>
     <TableRowColumn style={styles.handleColumn}>
       {/* <DragHandle /> Reordering point is not supported for now */}
     </TableRowColumn>
@@ -71,4 +75,7 @@ const PointRow = ({
   </TableRow>
 );
 
+const PointRow = muiThemeable()(
+  ThemablePointRow
+);
 export default PointRow;

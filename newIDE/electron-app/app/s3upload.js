@@ -1,5 +1,5 @@
 const s3 = require('s3');
-const awsS3 = require('aws-sdk/clients/s3'); //TODO: Remove this useless package
+const awsS3 = require('aws-sdk/clients/s3');
 
 const destinationBucket = `gd-games-in`;
 const accessKeyId = 'AKIAJPLGZ22GBISUYFJQ';
@@ -16,6 +16,7 @@ module.exports = {
       accessKeyId: accessKeyId,
       secretAccessKey: secretAccessKey,
       region: region,
+      correctClockSkew: true,
     });
     const s3Client = s3.createClient({
       s3Client: awsS3Client,

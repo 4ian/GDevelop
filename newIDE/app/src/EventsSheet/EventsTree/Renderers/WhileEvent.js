@@ -1,14 +1,8 @@
 import React, { Component } from 'react';
-import InstructionsList from '../InstructionsList.js';
+import InstructionsList from '../InstructionsList';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {
-  largeSelectedArea,
-  largeSelectableArea,
-  selectableArea,
-} from '../ClassNames';
-import InlinePopover from '../InlinePopover';
-import ObjectField from '../InstructionEditor/ParameterFields/ObjectField';
+import { largeSelectedArea, largeSelectableArea } from '../ClassNames';
 const gd = global.gd;
 
 const styles = {
@@ -38,37 +32,13 @@ export default class ForEachEvent extends Component {
     onUpdate: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      editing: false,
-      anchorEl: null,
-    };
-  }
-
-  edit = domEvent => {
-    this.setState({
-      editing: true,
-      anchorEl: domEvent.currentTarget,
-    });
-  };
-
-  endEditing = () => {
-    this.setState({
-      editing: false,
-      anchorEl: null,
-    });
-  };
-
   render() {
-    var forEachEvent = gd.asForEachEvent(this.props.event);
+    var whileEvent = gd.asWhileEvent(this.props.event);
 
     const conditionsListSyle = {
       width: `calc(35vw - ${this.props.leftIndentWidth}px)`,
     };
 
-    const objectName = forEachEvent.getObjectToPick();
     return (
       <div
         style={styles.container}
@@ -77,21 +47,21 @@ export default class ForEachEvent extends Component {
           [largeSelectedArea]: this.props.selected,
         })}
       >
-        <div
-          className={classNames({
-            [selectableArea]: true,
-          })}
-          onClick={this.edit}
-        >
-          {objectName ? (
-            `Repeat for each ${objectName} object:`
-          ) : (
-            <i>Click to choose for which objects this event will be repeated</i>
-          )}
-        </div>
+        <div>While these conditions are true:</div>
+        <InstructionsList
+          instrsList={whileEvent.getWhileConditions()}
+          selection={this.props.selection}
+          areConditions
+          onAddNewInstruction={this.props.onAddNewInstruction}
+          onInstructionClick={this.props.onInstructionClick}
+          onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+          onInstructionContextMenu={this.props.onInstructionContextMenu}
+          onParameterClick={this.props.onParameterClick}
+        />
+        <div>Repeat these:</div>
         <div style={styles.instructionsContainer}>
           <InstructionsList
-            instrsList={forEachEvent.getConditions()}
+            instrsList={whileEvent.getConditions()}
             style={conditionsListSyle}
             selection={this.props.selection}
             areConditions
@@ -105,7 +75,7 @@ export default class ForEachEvent extends Component {
             onParameterClick={this.props.onParameterClick}
           />
           <InstructionsList
-            instrsList={forEachEvent.getActions()}
+            instrsList={whileEvent.getActions()}
             style={styles.actionsList}
             selection={this.props.selection}
             areConditions={false}
@@ -119,22 +89,6 @@ export default class ForEachEvent extends Component {
             onParameterClick={this.props.onParameterClick}
           />
         </div>
-        <InlinePopover
-          open={this.state.editing}
-          anchorEl={this.state.anchorEl}
-          onRequestClose={this.endEditing}
-        >
-          <ObjectField
-            project={this.props.project}
-            layout={this.props.layout}
-            value={objectName}
-            onChange={text => {
-              forEachEvent.setObjectToPick(text);
-              this.props.onUpdate();
-            }}
-            isInline
-          />
-        </InlinePopover>
       </div>
     );
   }

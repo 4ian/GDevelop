@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import InlinePopover from '../InlinePopover';
-import ObjectField from '../InstructionEditor/ParameterFields/ObjectField';
+import InlinePopover from '../../InlinePopover';
+import ObjectField from '../../InstructionEditor/ParameterFields/ObjectField';
 import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
 } from '../ClassNames';
-import { getHelpLink } from '../../Utils/HelpLink';
-import Window from '../../Utils/Window';
+import { getHelpLink } from '../../../Utils/HelpLink';
+import Window from '../../../Utils/Window';
 const gd = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';

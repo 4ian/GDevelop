@@ -1,6 +1,7 @@
 // @flow
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import './Mosaic.css';
+import './EventsSheet.css';
 
 const gdevelopPurple = '#9100ce';
 const gdevelopLightBlue = '#4ab0e4';
@@ -78,6 +79,7 @@ const theme = {
     backgroundColor,
   },
   mosaicRootClassName: 'mosaic-gd-default-theme',
+  eventsSheetRootClassName: 'gd-events-sheet-default-theme',
 };
 
 export type Theme = $Exact<typeof theme>;

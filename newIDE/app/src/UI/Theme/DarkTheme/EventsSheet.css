@@ -1,0 +1,35 @@
+/* This overwrite the default react-sortable-tree css to display events list.
+ * This is only the style of the layout of the tree. The rest is in the theme.
+ */
+
+.gd-events-sheet-dark-theme .events-tree {
+    font-family: -apple-system, ".SFNSText-Regular", "San Francisco", Roboto, "Segoe UI", "Helvetica Neue", "Lucida Grande", sans-serif !important;
+    font-size: 14px !important;
+}
+
+/**
+ * Draggable handle on the left of an event
+ */
+.gd-events-sheet-dark-theme .rst__moveHandle {
+    background: #4ab0e4  !important;
+    border: 1px solid #49AFE4  !important;
+}
+
+/**
+ * Selectable area (instructions)
+ */
+.gd-events-sheet-dark-theme .selectable:hover {
+    background-color: rgba(0,0,0, 0.1);
+}
+
+.gd-events-sheet-dark-theme .selectable.selected {
+    background-color: rgba(0,0,0, 0.1);
+    border: 1px #4ab0e4 solid !important;
+}
+
+/**
+ * Large selectable area (events)
+ */
+.gd-events-sheet-dark-theme .large-selectable.large-selected {
+    border: 1px #4ab0e4 solid !important;
+}

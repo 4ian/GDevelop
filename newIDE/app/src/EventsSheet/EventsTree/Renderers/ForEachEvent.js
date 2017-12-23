@@ -7,8 +7,8 @@ import {
   largeSelectableArea,
   selectableArea,
 } from '../ClassNames';
-import InlinePopover from '../InlinePopover';
-import DefaultField from '../InstructionEditor/ParameterFields/DefaultField';
+import InlinePopover from '../../InlinePopover';
+import ObjectField from '../../InstructionEditor/ParameterFields/ObjectField';
 const gd = global.gd;
 
 const styles = {
@@ -25,7 +25,7 @@ const styles = {
   },
 };
 
-export default class RepeatEvent extends Component {
+export default class ForEachEvent extends Component {
   static propTypes = {
     event: PropTypes.object.isRequired,
     onAddNewInstruction: PropTypes.func.isRequired,
@@ -62,13 +62,13 @@ export default class RepeatEvent extends Component {
   };
 
   render() {
-    var repeatEvent = gd.asRepeatEvent(this.props.event);
+    var forEachEvent = gd.asForEachEvent(this.props.event);
 
     const conditionsListSyle = {
       width: `calc(35vw - ${this.props.leftIndentWidth}px)`,
     };
 
-    const expression = repeatEvent.getRepeatExpression();
+    const objectName = forEachEvent.getObjectToPick();
     return (
       <div
         style={styles.container}
@@ -83,15 +83,15 @@ export default class RepeatEvent extends Component {
           })}
           onClick={this.edit}
         >
-          {expression ? (
-            `Repeat ${expression} times:`
+          {objectName ? (
+            `Repeat for each ${objectName} object:`
           ) : (
-            <i>Click to choose how many times will be repeated</i>
+            <i>Click to choose for which objects this event will be repeated</i>
           )}
         </div>
         <div style={styles.instructionsContainer}>
           <InstructionsList
-            instrsList={repeatEvent.getConditions()}
+            instrsList={forEachEvent.getConditions()}
             style={conditionsListSyle}
             selection={this.props.selection}
             areConditions
@@ -105,7 +105,7 @@ export default class RepeatEvent extends Component {
             onParameterClick={this.props.onParameterClick}
           />
           <InstructionsList
-            instrsList={repeatEvent.getActions()}
+            instrsList={forEachEvent.getActions()}
             style={styles.actionsList}
             selection={this.props.selection}
             areConditions={false}
@@ -124,12 +124,12 @@ export default class RepeatEvent extends Component {
           anchorEl={this.state.anchorEl}
           onRequestClose={this.endEditing}
         >
-          <DefaultField
+          <ObjectField
             project={this.props.project}
             layout={this.props.layout}
-            value={expression}
+            value={objectName}
             onChange={text => {
-              repeatEvent.setRepeatExpression(text);
+              forEachEvent.setObjectToPick(text);
               this.props.onUpdate();
             }}
             isInline

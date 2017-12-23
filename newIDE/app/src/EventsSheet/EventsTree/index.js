@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
+import muiThemeable from 'material-ui/styles/muiThemeable';
+import findIndex from 'lodash/findIndex';
 import {
   SortableTreeWithoutDndContext as SortableTree,
   getNodeAtPath,
 } from 'react-sortable-tree';
-import EventsRenderingService from '../EventsRenderingService';
 import { mapFor } from '../../Utils/MapFor';
-import { eventsTree } from '../ClassNames';
-import findIndex from 'lodash/findIndex';
 import { getInitialSelection, isEventSelected } from '../SelectionHandler';
+import EventsRenderingService from './EventsRenderingService';
+import { eventsTree } from './ClassNames';
+import './style.css'
 
 const indentWidth = 22;
 
@@ -122,7 +124,7 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
  * Display a tree of event. Builtin on react-sortable-tree so that event
  * can be drag'n'dropped and events rows are virtualized.
  */
-export default class EventsTree extends Component {
+class ThemableEventsTree extends Component {
   static defaultProps = {
     selection: getInitialSelection(),
   };
@@ -271,10 +273,12 @@ export default class EventsTree extends Component {
   };
 
   render() {
+    const { height, muiTheme } = this.props;
+
     return (
-      <div style={{ height: this.props.height || 400 }}>
+      <div style={{ height: height || 400 }}>
         <SortableTree
-          className={eventsTree}
+          className={`${eventsTree} ${muiTheme.eventsSheetRootClassName}`}
           treeData={this.state.treeData}
           scaffoldBlockPxWidth={indentWidth}
           onChange={() => {}}
@@ -295,3 +299,6 @@ export default class EventsTree extends Component {
     );
   }
 }
+
+const EventsTree = muiThemeable()(ThemableEventsTree);
+export default EventsTree;

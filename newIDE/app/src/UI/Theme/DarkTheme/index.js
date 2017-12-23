@@ -2,6 +2,7 @@
 import { type Theme } from '../DefaultTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import './Mosaic.css';
+import './EventsSheet.css';
 
 const almostWhite = '#EEE';
 const gdevelopDarkBlue = '#3c4698';
@@ -85,6 +86,7 @@ const theme: Theme = {
     backgroundColor,
   },
   mosaicRootClassName: 'mosaic-gd-dark-theme',
+  eventsSheetRootClassName: 'gd-events-sheet-dark-theme',
 };
 
 export default getMuiTheme(theme);

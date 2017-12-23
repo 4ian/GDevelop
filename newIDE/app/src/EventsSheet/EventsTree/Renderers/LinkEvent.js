@@ -8,9 +8,9 @@ import {
   largeSelectableArea,
   selectableArea,
 } from '../ClassNames';
-import InlinePopover from '../InlinePopover';
-import ExternalEventsField from '../InstructionEditor/ParameterFields/ExternalEventsField';
-import { showWarningBox } from '../../UI/Messages/MessageBox';
+import InlinePopover from '../../InlinePopover';
+import ExternalEventsField from '../../InstructionEditor/ParameterFields/ExternalEventsField';
+import { showWarningBox } from '../../../UI/Messages/MessageBox';
 const gd = global.gd;
 
 const styles = {

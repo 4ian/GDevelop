@@ -2,7 +2,13 @@ import React, { Component } from 'react';
 import InstructionsList from '../InstructionsList.js';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { largeSelectedArea, largeSelectableArea } from '../ClassNames';
+import {
+  largeSelectedArea,
+  largeSelectableArea,
+  selectableArea,
+} from '../ClassNames';
+import InlinePopover from '../../InlinePopover';
+import DefaultField from '../../InstructionEditor/ParameterFields/DefaultField';
 const gd = global.gd;
 
 const styles = {
@@ -19,7 +25,7 @@ const styles = {
   },
 };
 
-export default class ForEachEvent extends Component {
+export default class RepeatEvent extends Component {
   static propTypes = {
     event: PropTypes.object.isRequired,
     onAddNewInstruction: PropTypes.func.isRequired,
@@ -32,13 +38,37 @@ export default class ForEachEvent extends Component {
     onUpdate: PropTypes.func.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      editing: false,
+      anchorEl: null,
+    };
+  }
+
+  edit = domEvent => {
+    this.setState({
+      editing: true,
+      anchorEl: domEvent.currentTarget,
+    });
+  };
+
+  endEditing = () => {
+    this.setState({
+      editing: false,
+      anchorEl: null,
+    });
+  };
+
   render() {
-    var whileEvent = gd.asWhileEvent(this.props.event);
+    var repeatEvent = gd.asRepeatEvent(this.props.event);
 
     const conditionsListSyle = {
       width: `calc(35vw - ${this.props.leftIndentWidth}px)`,
     };
 
+    const expression = repeatEvent.getRepeatExpression();
     return (
       <div
         style={styles.container}
@@ -47,21 +77,21 @@ export default class ForEachEvent extends Component {
           [largeSelectedArea]: this.props.selected,
         })}
       >
-        <div>While these conditions are true:</div>
-        <InstructionsList
-          instrsList={whileEvent.getWhileConditions()}
-          selection={this.props.selection}
-          areConditions
-          onAddNewInstruction={this.props.onAddNewInstruction}
-          onInstructionClick={this.props.onInstructionClick}
-          onInstructionDoubleClick={this.props.onInstructionDoubleClick}
-          onInstructionContextMenu={this.props.onInstructionContextMenu}
-          onParameterClick={this.props.onParameterClick}
-        />
-        <div>Repeat these:</div>
+        <div
+          className={classNames({
+            [selectableArea]: true,
+          })}
+          onClick={this.edit}
+        >
+          {expression ? (
+            `Repeat ${expression} times:`
+          ) : (
+            <i>Click to choose how many times will be repeated</i>
+          )}
+        </div>
         <div style={styles.instructionsContainer}>
           <InstructionsList
-            instrsList={whileEvent.getConditions()}
+            instrsList={repeatEvent.getConditions()}
             style={conditionsListSyle}
             selection={this.props.selection}
             areConditions
@@ -75,7 +105,7 @@ export default class ForEachEvent extends Component {
             onParameterClick={this.props.onParameterClick}
           />
           <InstructionsList
-            instrsList={whileEvent.getActions()}
+            instrsList={repeatEvent.getActions()}
             style={styles.actionsList}
             selection={this.props.selection}
             areConditions={false}
@@ -89,6 +119,22 @@ export default class ForEachEvent extends Component {
             onParameterClick={this.props.onParameterClick}
           />
         </div>
+        <InlinePopover
+          open={this.state.editing}
+          anchorEl={this.state.anchorEl}
+          onRequestClose={this.endEditing}
+        >
+          <DefaultField
+            project={this.props.project}
+            layout={this.props.layout}
+            value={expression}
+            onChange={text => {
+              repeatEvent.setRepeatExpression(text);
+              this.props.onUpdate();
+            }}
+            isInline
+          />
+        </InlinePopover>
       </div>
     );
   }

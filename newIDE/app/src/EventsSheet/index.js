@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import EventsTree from './EventsTree';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
-import '../UI/Theme/EventsSheet.css';
-import { container } from './ClassNames';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { passFullSize } from '../UI/FullSizeMeasurer';
@@ -462,7 +460,7 @@ export default class EventsSheet extends Component {
 
     return (
       <div
-        className={container}
+        className="gd-events-sheet"
         onFocus={() => this._keyboardShortcuts.focus()}
         onBlur={() => this._keyboardShortcuts.blur()}
         tabIndex={1}

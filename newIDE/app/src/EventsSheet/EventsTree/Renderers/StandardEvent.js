@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import InstructionsList from '../InstructionsList.js';
+import InstructionsList from '../InstructionsList';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { largeSelectedArea, largeSelectableArea } from '../ClassNames';

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import {
   MosaicWindow as RMMosaicWindow,
-  MosaicWithoutDragDropContext,
+  MosaicWithoutDragDropContext as RMMosaicWithoutDragDropContext,
   getLeaves,
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
@@ -39,7 +39,21 @@ const addRightNode = (currentNode, newNode, splitPercentage) => {
   };
 };
 
-class ThemableEditorMosaic extends Component {
+const ThemableMosaicWithoutDragDropContext = (props) =>
+  <RMMosaicWithoutDragDropContext
+    className={`${props.muiTheme.mosaicRootClassName} mosaic-blueprint-theme mosaic-gd-theme`}
+    {...props}
+  />;
+
+const MosaicWithoutDragDropContext = muiThemeable()(ThemableMosaicWithoutDragDropContext);
+
+/**
+ * @class EditorMosaic
+ *
+ * Can be used to create a mosaic of resizable editors.
+ * Must be used inside a component wrapped in a DragDropContext.
+ */
+export default class ThemableEditorMosaic extends Component {
   constructor(props) {
     super(props);
 
@@ -65,27 +79,17 @@ class ThemableEditorMosaic extends Component {
   _onChange = mosaicNode => this.setState({ mosaicNode });
 
   render() {
-    const { editors, muiTheme } = this.props;
+    const { editors } = this.props;
     return (
       <MosaicWithoutDragDropContext
         renderTile={(editorName, path) =>
           React.cloneElement(editors[editorName], { path })}
-        className={`${muiTheme.mosaicRootClassName} mosaic-blueprint-theme mosaic-gd-theme`}
         value={this.state.mosaicNode}
         onChange={this._onChange}
       />
     );
   }
 }
-
-/**
- * @class EditorMosaic
- *
- * Can be used to create a mosaic of resizable editors.
- * Must be used inside a component wrapped in a DragDropContext.
- */
-const EditorMosaic = muiThemeable()(ThemableEditorMosaic);
-export default EditorMosaic;
 
 /**
  * @class EditorWindow

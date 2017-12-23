@@ -5,6 +5,8 @@ import ListIcon from '../UI/ListIcon';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import Clipboard from '../Utils/Clipboard';
+import { CLIPBOARD_KIND } from './ClipboardKind';
 
 const styles = {
   container: {
@@ -35,7 +37,7 @@ export default class ObjectRow extends React.Component {
             <MoreVertIcon />
           </IconButton>
         }
-        menuTemplate={[
+        buildMenuTemplate={() => [
           {
             label: 'Edit object',
             enabled: !!this.props.onEdit,
@@ -73,6 +75,7 @@ export default class ObjectRow extends React.Component {
           },
           {
             label: 'Paste',
+            enabled: Clipboard.has(CLIPBOARD_KIND),
             click: () => this.props.onPaste(),
           },
         ]}

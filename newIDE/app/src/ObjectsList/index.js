@@ -21,8 +21,7 @@ import type {
   ObjectWithContextList,
   ObjectWithContext,
 } from '../ObjectsList/EnumerateObjects';
-
-const CLIPBOARD_KIND = 'Object';
+import { CLIPBOARD_KIND } from './ClipboardKind';
 
 const listItemHeight = 48;
 const styles = {

@@ -22,7 +22,6 @@ export default class SetupGridDialog extends Component {
     const actions = [
       <FlatButton
         label="Cancel"
-        primary={true}
         onTouchTap={this.props.onCancel}
       />,
       <FlatButton

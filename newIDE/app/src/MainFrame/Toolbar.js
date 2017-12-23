@@ -57,7 +57,7 @@ export class MainFrameToolbar extends Component {
               iconButtonElement={
                 <ToolbarIcon src="res/ribbon_default/bug32.png" />
               }
-              menuTemplate={[
+              buildMenuTemplate={() => [
                 {
                   label: 'Request update from external editor',
                   click: () => this.props.requestUpdate(),

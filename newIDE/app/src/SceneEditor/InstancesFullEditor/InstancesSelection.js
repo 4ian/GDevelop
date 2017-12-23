@@ -1,15 +1,18 @@
+// @flow
 const gd = global.gd;
 
 export default class InstancesSelection {
-  constructor() {
-    this.selection = [];
+  selection: Array<gdInitialInstance> = [];
+
+  hasSelectedInstances() {
+    return !!this.getSelectedInstances().length;
   }
 
   getSelectedInstances() {
     return this.selection;
   }
 
-  isInstanceSelected(instance) {
+  isInstanceSelected(instance: gdInitialInstance) {
     for (var i = 0; i < this.selection.length; i++) {
       if (gd.compare(this.selection[i], instance)) return true;
     }
@@ -21,7 +24,7 @@ export default class InstancesSelection {
     this.selection.length = 0;
   }
 
-  selectInstance(instance, multiselect) {
+  selectInstance(instance: gdInitialInstance, multiselect: boolean) {
     if (this.isInstanceSelected(instance)) {
       if (multiselect) this.unselectInstance(instance);
 
@@ -32,13 +35,13 @@ export default class InstancesSelection {
     this.selection.push(instance);
   }
 
-  selectInstances(instances, multiselect) {
+  selectInstances(instances: [gdInitialInstance], multiselect: boolean) {
     if (!multiselect) this.clearSelection();
 
     instances.forEach(instance => this.selectInstance(instance, true));
   }
 
-  unselectInstance(instance) {
+  unselectInstance(instance: gdInitialInstance) {
     if (this.isInstanceSelected(instance)) {
       var i = this.selection.length - 1;
       while (i >= -1 && this.selection[i].ptr !== instance.ptr) {

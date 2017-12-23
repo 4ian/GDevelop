@@ -70,12 +70,13 @@ export class Toolbar extends PureComponent {
               tooltip={t('Choose and add an event')}
             />
           }
-          menuTemplate={this.allEventsMetadata.map(metadata => {
-            return {
-              label: metadata.fullName,
-              click: () => this.props.onAddEvent(metadata.type),
-            };
-          })}
+          buildMenuTemplate={() =>
+            this.allEventsMetadata.map(metadata => {
+              return {
+                label: metadata.fullName,
+                click: () => this.props.onAddEvent(metadata.type),
+              };
+            })}
         />
         <ToolbarSeparator />
         <ToolbarIcon

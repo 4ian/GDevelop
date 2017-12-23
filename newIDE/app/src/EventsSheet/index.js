@@ -504,7 +504,7 @@ export default class EventsSheet extends Component {
         />
         <ContextMenu
           ref={eventContextMenu => (this.eventContextMenu = eventContextMenu)}
-          menuTemplate={[
+          buildMenuTemplate={() => [
             {
               label: 'Copy',
               click: () => this.copySelection(),
@@ -518,6 +518,7 @@ export default class EventsSheet extends Component {
             {
               label: 'Paste',
               click: () => this.pasteEvents(),
+              enabled: Clipboard.has(CLIPBOARD_KIND),
               accelerator: 'CmdOrCtrl+V',
             },
             { type: 'separator' },
@@ -530,11 +531,13 @@ export default class EventsSheet extends Component {
             {
               label: 'Undo',
               click: this.undo,
+              enabled: canUndo(this.state.history),
               accelerator: 'CmdOrCtrl+Z',
             },
             {
               label: 'Redo',
               click: this.redo,
+              enabled: canRedo(this.state.history),
               accelerator: 'CmdOrCtrl+Shift+Z',
             },
           ]}
@@ -542,7 +545,7 @@ export default class EventsSheet extends Component {
         <ContextMenu
           ref={instructionContextMenu =>
             (this.instructionContextMenu = instructionContextMenu)}
-          menuTemplate={[
+          buildMenuTemplate={() => [
             {
               label: 'Copy',
               click: () => this.copySelection(),
@@ -556,6 +559,7 @@ export default class EventsSheet extends Component {
             {
               label: 'Paste',
               click: () => this.pasteInstructions(),
+              enabled: Clipboard.has(CLIPBOARD_KIND),
               accelerator: 'CmdOrCtrl+V',
             },
             { type: 'separator' },
@@ -568,11 +572,13 @@ export default class EventsSheet extends Component {
             {
               label: 'Undo',
               click: this.undo,
+              enabled: canUndo(this.state.history),
               accelerator: 'CmdOrCtrl+Z',
             },
             {
               label: 'Redo',
               click: this.redo,
+              enabled: canRedo(this.state.history),
               accelerator: 'CmdOrCtrl+Shift+Z',
             },
           ]}
@@ -580,21 +586,24 @@ export default class EventsSheet extends Component {
         <ContextMenu
           ref={instructionsListContextMenu =>
             (this.instructionsListContextMenu = instructionsListContextMenu)}
-          menuTemplate={[
+          buildMenuTemplate={() => [
             {
               label: 'Paste',
               click: () => this.pasteInstructions(),
+              enabled: Clipboard.has(CLIPBOARD_KIND),
               accelerator: 'CmdOrCtrl+V',
             },
             { type: 'separator' },
             {
               label: 'Undo',
               click: this.undo,
+              enabled: canUndo(this.state.history),
               accelerator: 'CmdOrCtrl+Z',
             },
             {
               label: 'Redo',
               click: this.redo,
+              enabled: canRedo(this.state.history),
               accelerator: 'CmdOrCtrl+Shift+Z',
             },
           ]}

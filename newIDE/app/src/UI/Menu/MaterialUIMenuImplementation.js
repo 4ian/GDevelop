@@ -26,6 +26,18 @@ const adaptAcceleratorString = (accelerator: string): string => {
   }
 };
 
+/**
+ * Construct items for material-ui's Menu, using a template which
+ * is partially supporting the Electron Menu API (https://github.com/electron/electron/blob/master/docs/api/menu-item.md).
+ *
+ * Supported options are:
+ *  - click
+ *  - type ('separator' and 'checkbox')
+ *  - label
+ *  - accelerator
+ *  - enabled
+ *  - checked (when `type` is 'checkbox')
+ */
 export default class MaterialUIMenuImplementation {
   constructor({ onClose }) {
     this._onClose = onClose;
@@ -35,24 +47,43 @@ export default class MaterialUIMenuImplementation {
     return template.map((item, id) => {
       if (item.type === 'separator') {
         return <Divider key={'separator' + id} />;
+      } else if (item.type === 'checkbox') {
+        return (
+          <MenuItem
+            key={item.label}
+            primaryText={item.label}
+            secondaryText={
+              item.accelerator
+                ? adaptAcceleratorString(item.accelerator)
+                : undefined
+            }
+            checked={item.checked}
+            insetChildren={!item.checked}
+            disabled={item.enabled === false}
+            onTouchTap={() => {
+              item.click();
+              this._onClose();
+            }}
+          />
+        );
+      } else {
+        return (
+          <MenuItem
+            key={item.label}
+            primaryText={item.label}
+            secondaryText={
+              item.accelerator
+                ? adaptAcceleratorString(item.accelerator)
+                : undefined
+            }
+            disabled={item.enabled === false}
+            onTouchTap={() => {
+              item.click();
+              this._onClose();
+            }}
+          />
+        );
       }
-
-      return (
-        <MenuItem
-          key={item.label}
-          primaryText={item.label}
-          secondaryText={
-            item.accelerator
-              ? adaptAcceleratorString(item.accelerator)
-              : undefined
-          }
-          disabled={item.enabled === false}
-          onTouchTap={() => {
-            item.click();
-            this._onClose();
-          }}
-        />
-      );
     });
   }
 

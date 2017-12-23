@@ -266,7 +266,7 @@ class AnimationsListContainer extends Component {
         <ContextMenu
           ref={spriteContextMenu =>
             (this.spriteContextMenu = spriteContextMenu)}
-          menuTemplate={[
+          buildMenuTemplate={() => [
             {
               label: 'Delete',
               click: () => this.deleteSelection(),

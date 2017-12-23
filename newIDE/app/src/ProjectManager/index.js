@@ -91,7 +91,7 @@ class Item extends Component {
             <MoreVertIcon />
           </IconButton>
         }
-        menuTemplate={[
+        buildMenuTemplate={() => [
           {
             label: 'Edit',
             click: () => this.props.onEdit(),
@@ -115,6 +115,7 @@ class Item extends Component {
           },
           {
             label: 'Paste',
+            enabled: this.props.canPaste(),
             click: () => this.props.onPaste(),
           },
         ]}
@@ -376,6 +377,7 @@ export default class ProjectManager extends React.Component {
                     onCopy={() => this._copyLayout(layout)}
                     onCut={() => this._cutLayout(layout)}
                     onPaste={() => this._pasteLayout(i)}
+                    canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
                   />
                 );
               })
@@ -421,6 +423,7 @@ export default class ProjectManager extends React.Component {
                     onCopy={() => this._copyExternalEvents(externalEvents)}
                     onCut={() => this._cutExternalEvents(externalEvents)}
                     onPaste={() => this._pasteExternalEvents(i)}
+                    canPaste={() => Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)}
                   />
                 );
               })
@@ -466,6 +469,7 @@ export default class ProjectManager extends React.Component {
                     onCopy={() => this._copyExternalLayout(externalLayout)}
                     onCut={() => this._cutExternalLayout(externalLayout)}
                     onPaste={() => this._pasteExternalLayout(i)}
+                    canPaste={() => Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)}
                   />
                 );
               })

@@ -83,9 +83,11 @@ export class Toolbar extends PureComponent {
               tooltip={t('Toggle/edit grid')}
             />
           }
-          menuTemplate={[
+          buildMenuTemplate={() => [
             {
-              label: 'Toggle grid',
+              type: 'checkbox',
+              label: 'Show grid',
+              checked: this.props.isGridShown(),
               click: () => this.props.toggleGrid(),
             },
             { type: 'separator' },
@@ -102,7 +104,7 @@ export class Toolbar extends PureComponent {
               tooltip={t('Change editor zoom')}
             />
           }
-          menuTemplate={[
+          buildMenuTemplate={() => [
             {
               label: 'Zoom in',
               click: this.props.zoomIn,

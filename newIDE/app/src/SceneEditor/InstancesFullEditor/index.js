@@ -40,6 +40,8 @@ import {
 } from '../../Utils/History';
 const gd = global.gd;
 
+const INSTANCES_CLIPBOARD_KIND = 'Instances';
+
 const FullSizeInstancesEditor = passFullSize(addScrollbars(InstancesEditor), {
   useFlex: true,
 });
@@ -107,6 +109,7 @@ export default class InstancesFullEditor extends Component {
         toggleLayersList={this.toggleLayersList}
         toggleWindowMask={this.toggleWindowMask}
         toggleGrid={this.toggleGrid}
+        isGridShown={() => !!this.state.uiSettings.grid}
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
         canUndo={canUndo(this.state.history)}
@@ -436,7 +439,7 @@ export default class InstancesFullEditor extends Component {
     const position = useLastCursorPosition
       ? this.editor.getLastCursorPosition()
       : this.editor.getLastContextMenuPosition();
-    Clipboard.set('instances', {
+    Clipboard.set(INSTANCES_CLIPBOARD_KIND, {
       x: position[0],
       y: position[1],
       instances: serializedSelection,
@@ -449,7 +452,7 @@ export default class InstancesFullEditor extends Component {
   };
 
   paste = ({ useLastCursorPosition } = {}) => {
-    const clipboardContent = Clipboard.get('instances');
+    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
     if (!clipboardContent) return;
 
     const position = useLastCursorPosition
@@ -682,7 +685,7 @@ export default class InstancesFullEditor extends Component {
         />
         <ContextMenu
           ref={contextMenu => (this.contextMenu = contextMenu)}
-          menuTemplate={[
+          buildMenuTemplate={() => [
             {
               label: 'Scene properties',
               click: () => this.openSceneProperties(true),
@@ -691,27 +694,32 @@ export default class InstancesFullEditor extends Component {
             {
               label: 'Copy',
               click: () => this.copySelection(),
+              enabled: this.instancesSelection.hasSelectedInstances(),
               accelerator: 'CmdOrCtrl+C',
             },
             {
               label: 'Cut',
               click: () => this.cutSelection(),
+              enabled: this.instancesSelection.hasSelectedInstances(),
               accelerator: 'CmdOrCtrl+X',
             },
             {
               label: 'Paste',
               click: () => this.paste(),
+              enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
               accelerator: 'CmdOrCtrl+V',
             },
             { type: 'separator' },
             {
               label: 'Undo',
               click: this.undo,
+              enabled: canUndo(this.state.history),
               accelerator: 'CmdOrCtrl+Z',
             },
             {
               label: 'Redo',
               click: this.redo,
+              enabled: canRedo(this.state.history),
               accelerator: 'CmdOrCtrl+Shift+Z',
             },
           ]}

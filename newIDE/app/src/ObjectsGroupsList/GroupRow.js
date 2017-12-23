@@ -35,7 +35,7 @@ export default class GroupRow extends React.Component {
             <MoreVertIcon />
           </IconButton>
         }
-        menuTemplate={[
+        buildMenuTemplate={()=> [
           {
             label: 'Edit group',
             click: () => this.props.onEdit(group),

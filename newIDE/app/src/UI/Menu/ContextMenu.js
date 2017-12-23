@@ -56,7 +56,9 @@ class MaterialUIContextMenu extends React.Component {
           {...this.menuImplementation.getMenuProps()}
         >
           <Menu desktop width={256}>
-            {this.menuImplementation.buildFromTemplate(this.props.menuTemplate)}
+            {this.menuImplementation.buildFromTemplate(
+              this.props.buildMenuTemplate()
+            )}
           </Menu>
         </Popover>
       </div>
@@ -68,16 +70,10 @@ class ElectronContextMenu extends React.Component {
   constructor(props) {
     super(props);
     this.menuImplementation = new ElectronMenuImplementation();
-    this.menuImplementation.buildFromTemplate(props.menuTemplate);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.menuTemplate !== nextProps.menuTemplate) {
-      this.menuImplementation.buildFromTemplate(nextProps.menuTemplate);
-    }
   }
 
   open = (x, y) => {
+    this.menuImplementation.buildFromTemplate(this.props.buildMenuTemplate());
     this.menuImplementation.showMenu({
       left: x || 0,
       top: y || 0,

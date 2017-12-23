@@ -66,7 +66,7 @@ exports[`StartPage renders the start page with a project 1`] = `
         >
           <img
             alt=""
-            src="res/GD-logo-simple.png"
+            src="res/GD-logo-big.png"
             style={
               Object {
                 "width": "100%",
@@ -673,7 +673,7 @@ exports[`StartPage renders the start page with no project opened 1`] = `
         >
           <img
             alt=""
-            src="res/GD-logo-simple.png"
+            src="res/GD-logo-big.png"
             style={
               Object {
                 "width": "100%",

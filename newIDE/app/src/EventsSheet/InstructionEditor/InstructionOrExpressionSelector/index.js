@@ -10,9 +10,6 @@ const styles = {
     margin: '0 auto',
     backgroundColor: 'transparent',
   },
-  groupListItemText: {
-    color: 'rgba(0,0,0,0.54)',
-  },
   groupListItemNestedList: {
     padding: 0,
   },
@@ -81,7 +78,7 @@ class ThemableInstructionOrExpressionSelector extends Component {
             key={key}
             style={{borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`}}
             nestedListStyle={styles.groupListItemNestedList}
-            primaryText={<div style={styles.groupListItemText}>{key}</div>}
+            primaryText={<div style={{color: muiTheme.listItem.groupTextColor}}>{key}</div>}
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
             nestedItems={this._renderTree(instructionOrGroup)}

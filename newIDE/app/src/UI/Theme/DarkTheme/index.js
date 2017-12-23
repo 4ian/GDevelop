@@ -72,6 +72,7 @@ const theme: Theme = {
   },
   listItem: {
     groupBackgroundColor: backgroundColor,
+    groupTextColor: '#AAA',
     separatorColor: '#303030',
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: '#ffffff',

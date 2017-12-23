@@ -65,6 +65,7 @@ const theme = {
   },
   listItem: {
     groupBackgroundColor: backgroundColor,
+    groupTextColor: 'rgba(0,0,0,0.54)',
     separatorColor: '#e0e0e0',
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: '#ffffff',
@@ -73,7 +74,7 @@ const theme = {
     shadowColor: '#FFFFFF'
   },
   logo: {
-    src: "res/GD-logo-simple.png",
+    src: "res/GD-logo-big.png",
   },
   startPage: {
     backgroundColor,

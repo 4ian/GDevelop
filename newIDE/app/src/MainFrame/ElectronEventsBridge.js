@@ -33,6 +33,10 @@ class ElectronEventsBridge extends Component {
       'main-menu-open-start-page',
       event => this.editor && this.editor.openStartPage()
     );
+    ipcRenderer.on(
+      'main-menu-open-preferences',
+      event => this.editor && this.editor.openPreferences()
+    );
   }
 
   render() {

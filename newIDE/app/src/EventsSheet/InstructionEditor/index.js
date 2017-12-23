@@ -11,7 +11,6 @@ const styles = {
   typeSelector: {
     flex: 1,
     overflowY: 'scroll',
-    backgroundColor: 'white',
   },
   parametersEditor: {
     flex: 2,

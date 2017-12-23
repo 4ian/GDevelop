@@ -8,57 +8,68 @@ const package = require('./package.json');
  * to the electron renderer process (see ElectronEventsBridge).
  * @param {BrowserWindow} window
  */
-const buildMainMenuFor = (window) => {
+const buildMainMenuFor = window => {
   const fileTemplate = {
-      label: 'File',
-      submenu: [
-        {
-          label: 'Create a new project...',
-          accelerator: 'CommandOrControl+N',
-          click() {
-            window.webContents.send('main-menu-create');
-          },
+    label: 'File',
+    submenu: [
+      {
+        label: 'Create a new project...',
+        accelerator: 'CommandOrControl+N',
+        click() {
+          window.webContents.send('main-menu-create');
         },
-        { type: 'separator' },
-        {
-          label: 'Open...',
-          accelerator: 'CommandOrControl+O',
-          click() {
-            window.webContents.send('main-menu-open');
-          },
+      },
+      { type: 'separator' },
+      {
+        label: 'Open...',
+        accelerator: 'CommandOrControl+O',
+        click() {
+          window.webContents.send('main-menu-open');
         },
-        { type: 'separator' },
-        {
-          label: 'Save',
-          accelerator: 'CommandOrControl+S',
-          click() {
-            window.webContents.send('main-menu-save');
-          },
+      },
+      { type: 'separator' },
+      {
+        label: 'Save',
+        accelerator: 'CommandOrControl+S',
+        click() {
+          window.webContents.send('main-menu-save');
         },
-        {
-          label: 'Save as...',
-          enabled: false, // Unimplemented
-          click() {
-            window.webContents.send('main-menu-save-as');
-          },
+      },
+      {
+        label: 'Save as...',
+        enabled: false, // TODO: Unimplemented for now
+        click() {
+          window.webContents.send('main-menu-save-as');
         },
-        { type: 'separator' },
-        {
-          label: 'Export (web, iOS, Android)...',
-          click() {
-            window.webContents.send('main-menu-export');
-          },
+      },
+      { type: 'separator' },
+      {
+        label: 'Export (web, iOS, Android)...',
+        click() {
+          window.webContents.send('main-menu-export');
         },
-        { type: 'separator' },
-        {
-          label: 'Close',
-          accelerator: 'CommandOrControl+W',
-          click() {
-            window.webContents.send('main-menu-close');
-          },
+      },
+      { type: 'separator' },
+      {
+        label: 'Close',
+        accelerator: 'CommandOrControl+W',
+        click() {
+          window.webContents.send('main-menu-close');
         },
-      ],
+      },
+    ],
   };
+  if (process.platform !== 'darwin') {
+    fileTemplate.submenu.push(
+      { type: 'separator' },
+      {
+        label: 'Preferences',
+        click() {
+          window.webContents.send('main-menu-open-preferences');
+        },
+      }
+    );
+  }
 
   const editTemplate = {
     label: 'Edit',
@@ -78,12 +89,12 @@ const buildMainMenuFor = (window) => {
   const viewTemplate = {
     label: 'View',
     submenu: [
-        {
-          label: 'Show Start Page',
-          click() {
-            window.webContents.send('main-menu-open-start-page');
-          },
+      {
+        label: 'Show Start Page',
+        click() {
+          window.webContents.send('main-menu-open-start-page');
         },
+      },
       { role: 'toggledevtools' },
       { type: 'separator' },
       { role: 'togglefullscreen' },
@@ -107,13 +118,26 @@ const buildMainMenuFor = (window) => {
     ],
   };
 
-  const template = [fileTemplate, editTemplate, viewTemplate, windowTemplate, helpTemplate];
+  const template = [
+    fileTemplate,
+    editTemplate,
+    viewTemplate,
+    windowTemplate,
+    helpTemplate,
+  ];
 
   if (process.platform === 'darwin') {
     template.unshift({
       label: app.getName(),
       submenu: [
         { role: 'about' },
+        { type: 'separator' },
+        {
+          label: 'Preferences',
+          click() {
+            window.webContents.send('main-menu-open-preferences');
+          },
+        },
         { type: 'separator' },
         { role: 'services', submenu: [] },
         { type: 'separator' },
@@ -143,5 +167,5 @@ const buildMainMenuFor = (window) => {
   }
 
   return Menu.buildFromTemplate(template);
-}
+};
 module.exports = { buildMainMenuFor };

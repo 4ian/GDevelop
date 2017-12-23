@@ -1,4 +1,6 @@
+// @flow
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import './Mosaic.css';
 
 const gdevelopPurple = '#9100ce';
 const gdevelopLightBlue = '#4ab0e4';
@@ -7,14 +9,15 @@ const gdevelopDarkBlue = '#3c4698';
 const systemSelectionColor = '#4c92ff'; //OS X selection
 
 const backgroundColor = '#f7f7f7';
+const canvasColor = '#f0f0f0';
 
-export default getMuiTheme({
+const theme = {
   fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', //OS X font
   palette: {
     primary1Color: gdevelopLightBlue,
     primary2Color: gdevelopDarkBlue,
     accent1Color: gdevelopPurple,
-    canvasColor: '#f0f0f0',
+    canvasColor,
   },
   avatar: {
     backgroundColor: 'transparent',
@@ -39,6 +42,11 @@ export default getMuiTheme({
     height: 32,
     iconButtonSize: 24,
   },
+  snackbar: {
+    actionColor: gdevelopLightBlue,
+  },
+
+  // GDevelop specific variables:
   closableTabs: {
     backgroundColor: backgroundColor,
     textColor: '#878787',
@@ -48,7 +56,29 @@ export default getMuiTheme({
     height: 32,
     closeButtonWidth: 24,
   },
-  snackbar: {
-    actionColor: gdevelopLightBlue,
+  imageThumbnail: {
+    selectedBorderColor: systemSelectionColor,
   },
-});
+  list: {
+    itemsBackgroundColor: '#FFFFFF',
+  },
+  listItem: {
+    groupBackgroundColor: backgroundColor,
+    separatorColor: '#e0e0e0',
+    selectedBackgroundColor: systemSelectionColor,
+    selectedTextColor: '#ffffff',
+  },
+  emptyMessage: {
+    shadowColor: '#FFFFFF'
+  },
+  logo: {
+    src: "res/GD-logo-simple.png",
+  },
+  startPage: {
+    backgroundColor,
+  },
+  mosaicRootClassName: 'mosaic-gd-default-theme',
+};
+
+export type Theme = $Exact<typeof theme>;
+export default getMuiTheme(theme);

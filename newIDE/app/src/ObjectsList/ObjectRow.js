@@ -7,11 +7,9 @@ import TextField from 'material-ui/TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import Clipboard from '../Utils/Clipboard';
 import { CLIPBOARD_KIND } from './ClipboardKind';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 
 const styles = {
-  container: {
-    borderBottom: '1px solid #e0e0e0', //TODO: Use theme color instead
-  },
   objectName: {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
@@ -20,11 +18,9 @@ const styles = {
   textField: {
     top: -16,
   },
-  selectedBackgroundColor: '#4ab0e4', //TODO: Use theme color instead
-  selectedObjectNameColor: '#FFF',
 };
 
-export default class ObjectRow extends React.Component {
+class ThemableObjectRow extends React.Component {
   _renderObjectMenu(object) {
     return (
       <IconMenu
@@ -96,7 +92,7 @@ export default class ObjectRow extends React.Component {
   };
 
   render() {
-    const { project, object, selected, style } = this.props;
+    const { project, object, selected, style, muiTheme } = this.props;
 
     const objectName = object.getName();
     const label = this.props.editingName ? (
@@ -118,7 +114,7 @@ export default class ObjectRow extends React.Component {
       <div
         style={{
           ...styles.objectName,
-          color: selected ? styles.selectedObjectNameColor : undefined,
+          color: selected ? muiTheme.listItem.selectedTextColor : undefined,
         }}
       >
         {objectName}
@@ -126,8 +122,10 @@ export default class ObjectRow extends React.Component {
     );
 
     const itemStyle = {
-      ...styles.container,
-      backgroundColor: selected ? styles.selectedBackgroundColor : undefined,
+      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+      backgroundColor: selected
+        ? muiTheme.listItem.selectedBackgroundColor
+        : undefined,
     };
 
     return (
@@ -147,3 +145,6 @@ export default class ObjectRow extends React.Component {
     );
   }
 }
+
+const ObjectRow = muiThemeable()(ThemableObjectRow);
+export default ObjectRow;

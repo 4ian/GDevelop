@@ -4,11 +4,9 @@ import IconMenu from '../UI/Menu/IconMenu';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 
 const styles = {
-  container: {
-    borderBottom: '1px solid #e0e0e0', //TODO: Use theme color instead
-  },
   groupName: {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
@@ -17,12 +15,9 @@ const styles = {
   textField: {
     top: -16,
   },
-  selectedBackgroundColor: '#4ab0e4', //TODO: Use theme color instead
-  selectedObjectNameColor: '#FFF',
 };
 
-// TODO: Factor with ObjectRow (same except that there is no icon)?
-export default class GroupRow extends React.Component {
+class ThemableGroupRow extends React.Component {
   _renderGroupMenu(group) {
     return (
       <IconMenu
@@ -68,7 +63,7 @@ export default class GroupRow extends React.Component {
   };
 
   render() {
-    const { group, style } = this.props;
+    const { group, style, muiTheme } = this.props;
 
     const groupName = group.getName();
     const label = this.props.editingName ? (
@@ -90,9 +85,13 @@ export default class GroupRow extends React.Component {
       <div style={styles.groupName}>{groupName}</div>
     );
 
+    const itemStyle = {
+      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+    };
+
     return (
       <ListItem
-        style={{ ...styles.container, ...style }}
+        style={{ ...itemStyle, ...style }}
         onContextMenu={this._onContextMenu}
         primaryText={label}
         rightIconButton={this._renderGroupMenu(group)}
@@ -103,3 +102,7 @@ export default class GroupRow extends React.Component {
     );
   }
 }
+
+const GroupRow = muiThemeable()(ThemableGroupRow);
+export default GroupRow;
+

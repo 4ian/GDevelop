@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { InstructionOrExpressionSelector } from './index';
+import InstructionOrExpressionSelector from './index';
 import { createTree, type InstructionOrExpressionTreeNode } from './CreateTree';
 import { enumerateInstructions } from './EnumerateInstructions';
 import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';

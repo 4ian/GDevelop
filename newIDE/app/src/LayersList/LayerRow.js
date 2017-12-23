@@ -6,20 +6,22 @@ import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
 import TextField from 'material-ui/TextField';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 import DragHandle from '../UI/DragHandle';
 import styles from './styles';
 
-const LayerRow = ({
+const ThemableLayerRow = ({
   layerName,
   nameError,
   onBlur,
   onRemove,
   isVisible,
   onChangeVisibility,
+  muiTheme,
 }) => (
   <TableRow
     style={{
-      backgroundColor: 'white',
+      backgroundColor: muiTheme.list.itemsBackgroundColor,
     }}
   >
     <TableRowColumn style={styles.handleColumn}>
@@ -50,4 +52,7 @@ const LayerRow = ({
   </TableRow>
 );
 
+const LayerRow = muiThemeable()(
+  ThemableLayerRow
+);
 export default LayerRow;

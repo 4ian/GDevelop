@@ -12,6 +12,7 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 
 import Toolbar from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
+import PreferencesDialog from './Preferences/PreferencesDialog';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
 import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
@@ -44,6 +45,12 @@ import ExternalEventsEditor from './Editors/ExternalEventsEditor';
 import SceneEditor from './Editors/SceneEditor';
 import ExternalLayoutEditor from './Editors/ExternalLayoutEditor';
 import StartPage from './Editors/StartPage';
+import {
+  type PreferencesState,
+  getThemeName,
+  setThemeName,
+  getDefaultPreferences,
+} from './Preferences/PreferencesHandler';
 
 const gd = global.gd;
 
@@ -69,6 +76,8 @@ type State = {|
   genericDialog: null,
   snackMessage: string,
   snackMessageOpen: boolean,
+  preferencesDialogOpen: boolean,
+  preferences: PreferencesState,
 |};
 
 export default class MainFrame extends Component<*, State> {
@@ -86,10 +95,13 @@ export default class MainFrame extends Component<*, State> {
     genericDialog: null,
     snackMessage: '',
     snackMessageOpen: false,
+    preferencesDialogOpen: false,
+    preferences: getDefaultPreferences(),
   };
   toolbar = null;
   confirmCloseDialog: any = null;
   _resourceSourceDialogs = {};
+  _providers = null;
 
   componentWillMount() {
     if (!this.props.integratedEditor) this.openStartPage();
@@ -628,6 +640,12 @@ export default class MainFrame extends Component<*, State> {
     });
   };
 
+  openPreferences = (open: boolean = true) => {
+    this.setState({
+      preferencesDialogOpen: open,
+    });
+  };
+
   _onChangeEditorTab = (value: number) => {
     this.setState(
       {
@@ -683,7 +701,12 @@ export default class MainFrame extends Component<*, State> {
     });
 
   render() {
-    const { currentProject, genericDialog } = this.state;
+    const {
+      currentProject,
+      genericDialog,
+      projectManagerOpen,
+      preferences,
+    } = this.state;
     const {
       exportDialog,
       createDialog,
@@ -697,11 +720,11 @@ export default class MainFrame extends Component<*, State> {
       this.props.loading;
 
     return (
-      <Providers>
+      <Providers themeName={getThemeName(preferences)}>
         <div className="main-frame">
-          <ProjectTitlebar project={this.state.currentProject} />
+          <ProjectTitlebar project={currentProject} />
           <Drawer
-            open={this.state.projectManagerOpen}
+            open={projectManagerOpen}
             containerStyle={styles.drawerContent}
           >
             <EditorBar
@@ -731,6 +754,7 @@ export default class MainFrame extends Component<*, State> {
                 onSaveProject={this.save}
                 onCloseProject={this.askToCloseProject}
                 onExportProject={this.openExportDialog}
+                onOpenPreferences={() => this.openPreferences(true)}
               />
             )}
           </Drawer>
@@ -767,6 +791,15 @@ export default class MainFrame extends Component<*, State> {
           <ConfirmCloseDialog
             ref={confirmCloseDialog =>
               (this.confirmCloseDialog = confirmCloseDialog)}
+          />
+          <PreferencesDialog
+            open={this.state.preferencesDialogOpen}
+            themeName={getThemeName(preferences)}
+            onChangeTheme={themeName =>
+              this.setState({
+                preferences: setThemeName(preferences, themeName),
+              })}
+            onClose={() => this.openPreferences(false)}
           />
           <Snackbar
             open={this.state.snackMessageOpen}

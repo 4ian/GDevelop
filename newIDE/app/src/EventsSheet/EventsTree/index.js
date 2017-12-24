@@ -2,60 +2,17 @@ import React, { Component } from 'react';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import findIndex from 'lodash/findIndex';
 import {
-  SortableTreeWithoutDndContext as SortableTree,
+  SortableTreeWithoutDndContext,
   getNodeAtPath,
 } from 'react-sortable-tree';
 import { mapFor } from '../../Utils/MapFor';
 import { getInitialSelection, isEventSelected } from '../SelectionHandler';
 import EventsRenderingService from './EventsRenderingService';
+import EventHeightsCache from './EventHeightsCache';
 import { eventsTree } from './ClassNames';
 import './style.css'
 
 const indentWidth = 22;
-
-/**
- * Store the height of events and notify a component whenever
- * heights have changed.
- * Needed for EventsTree as we need to tell it when heights have changed
- * so it can recompute the internal row heights of the react-virtualized List.
- */
-class EventHeightsCache {
-  eventHeights = {};
-  component = null;
-
-  constructor(component) {
-    this.component = component;
-  }
-
-  _notifyComponent() {
-    if (this.updateTimeoutId) {
-      return; // An update is already scheduled.
-    }
-
-    // Notify the component, on the next tick, that heights have changed
-    this.updateTimeoutId = setTimeout(() => {
-      if (this.component) {
-        this.component.onHeightsChanged(() => (this.updateTimeoutId = null));
-      } else {
-        this.updateTimeoutId = null;
-      }
-    }, 0);
-  }
-
-  setEventHeight(event, height) {
-    const cachedHeight = this.eventHeights[event.ptr];
-    if (!cachedHeight || cachedHeight !== height) {
-      // console.log(event.ptr, 'has a new height', height, 'old:', cachedHeight);
-      this._notifyComponent();
-    }
-
-    this.eventHeights[event.ptr] = height;
-  }
-
-  getEventHeight(event) {
-    return this.eventHeights[event.ptr] || 60;
-  }
-}
 
 /**
  * The component containing an event.
@@ -120,11 +77,14 @@ class EventContainer extends Component {
 
 const getNodeKey = ({ treeIndex }) => treeIndex;
 
+const ThemableSortableTree = ({muiTheme, ...otherProps}) => <SortableTreeWithoutDndContext className={`${eventsTree} ${muiTheme.eventsSheetRootClassName}`} {...otherProps}/>
+const SortableTree = muiThemeable()(ThemableSortableTree);
+
 /**
  * Display a tree of event. Builtin on react-sortable-tree so that event
  * can be drag'n'dropped and events rows are virtualized.
  */
-class ThemableEventsTree extends Component {
+export default class ThemableEventsTree extends Component {
   static defaultProps = {
     selection: getInitialSelection(),
   };
@@ -273,12 +233,11 @@ class ThemableEventsTree extends Component {
   };
 
   render() {
-    const { height, muiTheme } = this.props;
+    const { height } = this.props;
 
     return (
       <div style={{ height: height || 400 }}>
         <SortableTree
-          className={`${eventsTree} ${muiTheme.eventsSheetRootClassName}`}
           treeData={this.state.treeData}
           scaffoldBlockPxWidth={indentWidth}
           onChange={() => {}}
@@ -299,6 +258,3 @@ class ThemableEventsTree extends Component {
     );
   }
 }
-
-const EventsTree = muiThemeable()(ThemableEventsTree);
-export default EventsTree;

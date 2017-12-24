@@ -143,13 +143,13 @@ void InstructionSentenceFormatter::LoadTypesFormattingFromConfig()
 {
     //Load default configuration
     typesFormatting.clear();
-    typesFormatting["expression"].SetColor(99, 0, 0).SetBold();
-    typesFormatting["object"].SetColor(19, 81, 0).SetBold();
-    typesFormatting["behavior"].SetColor(19, 81, 0).SetBold();
-    typesFormatting["operator"].SetColor(64, 81, 79).SetBold();
-    typesFormatting["objectvar"].SetColor(44, 69, 99).SetBold();
-    typesFormatting["scenevar"].SetColor(44, 69, 99).SetBold();
-    typesFormatting["globalvar"].SetColor(44, 69, 99).SetBold();
+    typesFormatting["expression"].SetColor(27, 143, 1).SetBold();
+    typesFormatting["object"].SetColor(182, 97, 10).SetBold();
+    typesFormatting["behavior"].SetColor(119, 119, 119).SetBold();
+    typesFormatting["operator"].SetColor(55, 131, 211).SetBold();
+    typesFormatting["objectvar"].SetColor(131, 55, 162).SetBold();
+    typesFormatting["scenevar"].SetColor(131, 55, 162).SetBold();
+    typesFormatting["globalvar"].SetColor(131, 55, 162).SetBold();
 
     //Load any existing custom configuration
     #if !defined(GD_NO_WX_GUI)

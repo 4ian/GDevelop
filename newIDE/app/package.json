@@ -34,7 +34,7 @@
     "react-dnd": "2.5.4",
     "react-dnd-html5-backend": "2.5.4",
     "react-dom": "^15.6.2",
-    "react-i18next": "^6.0.6",
+    "react-i18next": "6.2.0",
     "react-measure": "1.4.7",
     "react-mosaic-component": "1.0.3",
     "react-sortable-hoc": "0.6.7",

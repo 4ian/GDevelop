@@ -18,7 +18,7 @@ export default (props: PropsType) => {
 
   return (
     <FlatButton
-      onTouchTap={() => {
+      onClick={() => {
         if (props.helpPagePath) {
           Window.openExternalURL(getHelpLink(props.helpPagePath));
         }

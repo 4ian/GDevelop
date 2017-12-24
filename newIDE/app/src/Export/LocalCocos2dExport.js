@@ -114,7 +114,7 @@ export default class LocalCocos2dExport extends Component {
           <RaisedButton
             label="Export"
             primary={true}
-            onTouchTap={this.launchExport}
+            onClick={this.launchExport}
             disabled={!this.state.outputDir}
           />
         </Line>
@@ -125,13 +125,13 @@ export default class LocalCocos2dExport extends Component {
               key="open"
               label="Open folder"
               primary={true}
-              onTouchTap={this.openExportFolder}
+              onClick={this.openExportFolder}
             />,
             <FlatButton
               key="close"
               label="Close"
               primary={false}
-              onTouchTap={() =>
+              onClick={() =>
                 this.setState({
                   exportFinishedDialogOpen: false,
                 })}

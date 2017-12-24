@@ -31,13 +31,13 @@ export default class LayoutChooserDialog extends Component {
       <FlatButton
         label="Cancel"
         primary={false}
-        onTouchTap={this.props.onClose}
+        onClick={this.props.onClose}
       />,
       <FlatButton
         label="Choose"
         primary={true}
         keyboardFocused={true}
-        onTouchTap={() => this.props.onChoose(this.state.selectedLayoutName)}
+        onClick={() => this.props.onChoose(this.state.selectedLayoutName)}
         disabled={!this.state.selectedLayoutName}
       />,
     ];

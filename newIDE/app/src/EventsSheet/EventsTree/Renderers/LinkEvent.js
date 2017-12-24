@@ -99,7 +99,7 @@ export default class LinkEvent extends Component {
             {target || '< Enter the name of external events >'}
           </i>
         </span>
-        <IconButton onTouchTap={this.openTarget} disabled={!target}>
+        <IconButton onClick={this.openTarget} disabled={!target}>
           <OpenInNew />
         </IconButton>
         <InlinePopover

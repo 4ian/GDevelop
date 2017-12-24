@@ -30,17 +30,17 @@ export default class VariablesEditorDialog extends Component {
         label="Cancel"
         secondary={true}
         keyboardFocused={true}
-        onTouchTap={() => this.props.onClose(false)}
+        onClick={() => this.props.onClose(false)}
       />,
       <FlatButton
         label="Remove objects"
         secondary={true}
-        onTouchTap={() => this.props.onClose(true, null)}
+        onClick={() => this.props.onClose(true, null)}
       />,
       <FlatButton
         label="Move objects"
         primary={true}
-        onTouchTap={() => this.props.onClose(true, this.state.selectedLayer)}
+        onClick={() => this.props.onClose(true, this.state.selectedLayer)}
       />,
     ];
 

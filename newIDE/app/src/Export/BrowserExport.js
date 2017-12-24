@@ -19,7 +19,7 @@ export default class BrowserExport extends Component {
           </Line>
           <Line>
             <RaisedButton
-              onTouchTap={this.openWebsite}
+              onClick={this.openWebsite}
               primary
               label="Download GDevelop"
             />

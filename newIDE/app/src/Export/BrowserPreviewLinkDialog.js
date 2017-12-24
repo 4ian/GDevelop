@@ -31,7 +31,7 @@ export default class BrowserPreviewLinkDialog extends Component {
       <FlatButton
         label="Launch the preview"
         primary
-        onTouchTap={this._onOpen}
+        onClick={this._onOpen}
       />,
     ];
 

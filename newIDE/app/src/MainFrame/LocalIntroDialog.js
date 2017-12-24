@@ -20,14 +20,14 @@ export default class LocalIntroDialog extends Component {
       <FlatButton
         label="Follow the Roadmap on Trello"
         primary={false}
-        onTouchTap={this._onOpenTrello}
+        onClick={this._onOpenTrello}
       />,
       <FlatButton
         label="Contribute on GitHub"
         primary={false}
-        onTouchTap={this._onOpenGithub}
+        onClick={this._onOpenGithub}
       />,
-      <FlatButton label="Ok" primary={true} onTouchTap={onClose} />,
+      <FlatButton label="Ok" primary={true} onClick={onClose} />,
     ];
 
     return (

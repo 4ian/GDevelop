@@ -33,7 +33,7 @@ export default class GDIconMenu extends Component {
     this.iconMenu.open('unknown', event);
   };
 
-  _onTouchTap = event => {
+  _onClick = event => {
     event.preventDefault();
     event.stopPropagation();
     if (!this.iconMenu) return;
@@ -57,7 +57,7 @@ export default class GDIconMenu extends Component {
     return (
       <IconMenu
         {...iconMenuProps}
-        onTouchTap={this._onTouchTap}
+        onClick={this._onClick}
         ref={iconMenu => (this.iconMenu = iconMenu)}
         desktop
         disableAutoFocus

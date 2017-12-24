@@ -23,14 +23,11 @@ class ThemableGroupRow extends React.Component {
       <IconMenu
         ref={iconMenu => (this._iconMenu = iconMenu)}
         iconButtonElement={
-          <IconButton
-            onClick={e =>
-              e.stopPropagation() /*Prevent bubbling the event to ListItem*/}
-          >
+          <IconButton>
             <MoreVertIcon />
           </IconButton>
         }
-        buildMenuTemplate={()=> [
+        buildMenuTemplate={() => [
           {
             label: 'Edit group',
             click: () => this.props.onEdit(group),
@@ -105,4 +102,3 @@ class ThemableGroupRow extends React.Component {
 
 const GroupRow = muiThemeable()(ThemableGroupRow);
 export default GroupRow;
-

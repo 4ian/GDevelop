@@ -21,7 +21,7 @@ export default class PreferencesDialog extends Component<Props, State> {
   render() {
     const { open, onClose } = this.props;
     const actions = [
-      <FlatButton label="Close" primary={false} onTouchTap={onClose} />,
+      <FlatButton label="Close" primary={false} onClick={onClose} />,
     ];
 
     return (

@@ -47,13 +47,13 @@ export default class ScenePropertiesDialog extends Component {
       <FlatButton
         label="Cancel"
         primary={false}
-        onTouchTap={this.props.onClose}
+        onClick={this.props.onClose}
       />,
       <FlatButton
         label="Apply"
         primary={true}
         keyboardFocused={true}
-        onTouchTap={this._onApply}
+        onClick={this._onApply}
       />,
     ];
 
@@ -83,7 +83,7 @@ export default class ScenePropertiesDialog extends Component {
         <RaisedButton
           label="Edit scene variables"
           fullWidth
-          onTouchTap={() => {
+          onClick={() => {
             this.props.onEditVariables();
             this.props.onClose();
           }}
@@ -92,7 +92,7 @@ export default class ScenePropertiesDialog extends Component {
           <RaisedButton
             label="Open advanced settings"
             fullWidth
-            onTouchTap={() => {
+            onClick={() => {
               this.props.onOpenMoreSettings();
               this.props.onClose();
             }}

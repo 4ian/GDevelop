@@ -62,12 +62,12 @@ const ThemablePointRow = ({
     </TableRowColumn>
     <TableRowColumn style={styles.toolColumn}>
       {!!onRemove && (
-        <IconButton onTouchTap={onRemove}>
+        <IconButton onClick={onRemove}>
           <Delete />
         </IconButton>
       )}
       {!!onEdit && (
-        <IconButton onTouchTap={onEdit}>
+        <IconButton onClick={onEdit}>
           <ModeEdit />
         </IconButton>
       )}

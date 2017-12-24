@@ -115,7 +115,7 @@ export default class LocalExport extends Component {
           <RaisedButton
             label="Export"
             primary={true}
-            onTouchTap={this.launchExport}
+            onClick={this.launchExport}
             disabled={!this.state.outputDir}
           />
         </Line>
@@ -126,13 +126,13 @@ export default class LocalExport extends Component {
               key="open"
               label="Open folder"
               primary={true}
-              onTouchTap={this.openExportFolder}
+              onClick={this.openExportFolder}
             />,
             <FlatButton
               key="close"
               label="Close"
               primary={false}
-              onTouchTap={() =>
+              onClick={() =>
                 this.setState({
                   exportFinishedDialogOpen: false,
                 })}
@@ -147,12 +147,12 @@ export default class LocalExport extends Component {
           <RaisedButton
             fullWidth
             primary
-            onTouchTap={() => this.openItchioHelp()}
+            onClick={() => this.openItchioHelp()}
             label="Publish your game on Itch.io"
           />
           <FlatButton
             fullWidth
-            onTouchTap={() => this.openLearnMore()}
+            onClick={() => this.openLearnMore()}
             label="Learn more about publishing"
           />
         </Dialog>

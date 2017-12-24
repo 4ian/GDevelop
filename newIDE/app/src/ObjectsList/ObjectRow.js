@@ -27,8 +27,6 @@ class ThemableObjectRow extends React.Component {
         ref={iconMenu => (this._iconMenu = iconMenu)}
         iconButtonElement={
           <IconButton
-            onClick={e =>
-              e.stopPropagation() /*Prevent bubbling the event to ListItem*/}
           >
             <MoreVertIcon />
           </IconButton>

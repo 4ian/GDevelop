@@ -13,9 +13,9 @@ export default class BetaIntroDialog extends Component {
       <FlatButton
         label="Download full GDevelop desktop version"
         primary={false}
-        onTouchTap={this._onOpenWebsite}
+        onClick={this._onOpenWebsite}
       />,
-      <FlatButton label="Ok" primary={true} onTouchTap={onClose} />,
+      <FlatButton label="Ok" primary={true} onClick={onClose} />,
     ];
 
     return (

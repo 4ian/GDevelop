@@ -8,12 +8,12 @@ const gd = global.gd;
 export class VariablesEditorDialog extends Component {
   render() {
     const actions = [
-      <FlatButton label="Cancel" onTouchTap={this.props.onCancel} />,
+      <FlatButton label="Cancel" onClick={this.props.onCancel} />,
       <FlatButton
         label="Apply"
         primary
         keyboardFocused
-        onTouchTap={this.props.onApply}
+        onClick={this.props.onApply}
       />,
     ];
 

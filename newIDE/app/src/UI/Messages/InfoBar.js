@@ -36,7 +36,7 @@ export default class InfoBar extends Component {
         message={this.props.message}
         onRequestClose={() => this.setState({ dismissed: true })}
         action="Got it"
-        onActionTouchTap={this.handleGotIt}
+        onActionClick={this.handleGotIt}
       />
     );
   }

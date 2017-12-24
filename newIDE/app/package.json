@@ -13,11 +13,10 @@
     "shelljs": "^0.7.7"
   },
   "dependencies": {
-    "@storybook/react": "3.2.14",
+    "@storybook/react": "3.2.19",
     "aws-sdk": "^2.100.0",
     "axios": "^0.16.1",
     "classnames": "^2.2.5",
-    "cursores": "^1.0.1",
     "element-closest": "^2.0.2",
     "flat": "2.0.1",
     "fontfaceobserver": "^2.0.13",
@@ -31,7 +30,6 @@
     "prop-types": "^15.5.10",
     "raven-js": "^3.19.1",
     "react": "15.4.2",
-    "react-addons-perf": "15.4.2",
     "react-color": "2.11.7",
     "react-dnd": "2.3.0",
     "react-dnd-html5-backend": "2.3.0",

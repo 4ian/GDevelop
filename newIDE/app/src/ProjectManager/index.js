@@ -83,8 +83,7 @@ class ThemableItem extends Component {
       <IconMenu
         ref={iconMenu => (this._iconMenu = iconMenu)}
         iconButtonElement={
-          <IconButton
-          >
+          <IconButton>
             <MoreVertIcon />
           </IconButton>
         }

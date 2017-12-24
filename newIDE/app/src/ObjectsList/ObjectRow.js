@@ -26,8 +26,7 @@ class ThemableObjectRow extends React.Component {
       <IconMenu
         ref={iconMenu => (this._iconMenu = iconMenu)}
         iconButtonElement={
-          <IconButton
-          >
+          <IconButton>
             <MoreVertIcon />
           </IconButton>
         }

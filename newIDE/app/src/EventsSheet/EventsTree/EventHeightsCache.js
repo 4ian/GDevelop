@@ -34,7 +34,7 @@ export default class EventHeightsCache {
     }, 0);
   }
 
-  setEventHeight(event: gdEvent, height: number) {
+  setEventHeight(event: gdBaseEvent, height: number) {
     const cachedHeight = this.eventHeights[event.ptr];
     if (!cachedHeight || cachedHeight !== height) {
       // console.log(event.ptr, 'has a new height', height, 'old:', cachedHeight);
@@ -44,7 +44,7 @@ export default class EventHeightsCache {
     this.eventHeights[event.ptr] = height;
   }
 
-  getEventHeight(event): number {
+  getEventHeight(event: gdBaseEvent): number {
     return this.eventHeights[event.ptr] || 60;
   }
 }

@@ -281,7 +281,7 @@ export default class InstancesFullEditor extends Component {
   _onInstancesMoved = instances => {
     this.setState({
       history: saveToHistory(this.state.history, this.props.initialInstances),
-    });
+    }, () => this.forceUpdatePropertiesEditor());
   };
 
   _onInstancesModified = instances => {
@@ -411,7 +411,10 @@ export default class InstancesFullEditor extends Component {
       {
         history: saveToHistory(this.state.history, this.props.initialInstances),
       },
-      () => this.updateToolbar()
+      () => {
+        this.updateToolbar();
+        this.forceUpdatePropertiesEditor();
+      }
     );
   };
 

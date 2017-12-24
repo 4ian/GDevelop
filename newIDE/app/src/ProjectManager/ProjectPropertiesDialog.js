@@ -43,13 +43,13 @@ export default class ProjectPropertiesDialog extends Component {
       <FlatButton
         label="Cancel"
         primary={false}
-        onTouchTap={this.props.onClose}
+        onClick={this.props.onClose}
       />,
       <FlatButton
         label="Apply"
         primary={true}
         keyboardFocused={true}
-        onTouchTap={this._onApply}
+        onClick={this._onApply}
       />,
     ];
 

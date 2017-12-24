@@ -43,7 +43,7 @@ export default class ExportDialog extends Component {
         title="Export project to a standalone game"
         onRequestClose={onClose}
         actions={
-          <FlatButton label="Close" primary={false} onTouchTap={onClose} />
+          <FlatButton label="Close" primary={false} onClick={onClose} />
         }
         secondaryActions={[
           <HelpButton key="help" helpPagePath="/publishing" />,
@@ -52,7 +52,7 @@ export default class ExportDialog extends Component {
               key="toggle-experimental"
               icon={<Visibility />}
               primary={false}
-              onTouchTap={() => this._showExperimental(true)}
+              onClick={() => this._showExperimental(true)}
               label="Show experimental exports"
             />
           ) : (
@@ -60,7 +60,7 @@ export default class ExportDialog extends Component {
               key="toggle-experimental"
               icon={<VisibilityOff />}
               primary={false}
-              onTouchTap={() => this._showExperimental(false)}
+              onClick={() => this._showExperimental(false)}
               label="Hide experimental exports"
             />
           ),

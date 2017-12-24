@@ -23,7 +23,7 @@ export default class CreateProjectDialog extends Component {
     if (!open) return null;
 
     const actions = [
-      <FlatButton label="Close" primary={false} onTouchTap={onClose} />,
+      <FlatButton label="Close" primary={false} onClick={onClose} />,
     ];
 
     const ExamplesComponent = this.props.examplesComponent;

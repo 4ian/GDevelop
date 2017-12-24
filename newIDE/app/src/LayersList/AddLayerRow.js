@@ -10,7 +10,7 @@ const AddLayerRow = ({ onAdd }) => (
     <TableRowColumn />
     <TableRowColumn style={styles.visibleColumn} />
     <TableRowColumn style={styles.toolColumn}>
-      <IconButton onTouchTap={onAdd}>
+      <IconButton onClick={onAdd}>
         <Add />
       </IconButton>
     </TableRowColumn>

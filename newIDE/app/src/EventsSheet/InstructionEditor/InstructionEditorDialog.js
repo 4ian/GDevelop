@@ -30,13 +30,13 @@ export default class InstructionEditorDialog extends React.Component {
       <FlatButton
         label="Cancel"
         primary={false}
-        onTouchTap={this.props.onCancel}
+        onClick={this.props.onCancel}
       />,
       <FlatButton
         label="Ok"
         primary={true}
         keyboardFocused={false}
-        onTouchTap={this.props.onSubmit}
+        onClick={this.props.onSubmit}
       />,
     ];
 

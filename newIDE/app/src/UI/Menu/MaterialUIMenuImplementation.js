@@ -60,7 +60,7 @@ export default class MaterialUIMenuImplementation {
             checked={item.checked}
             insetChildren={!item.checked}
             disabled={item.enabled === false}
-            onTouchTap={() => {
+            onClick={() => {
               item.click();
               this._onClose();
             }}
@@ -77,7 +77,7 @@ export default class MaterialUIMenuImplementation {
                 : undefined
             }
             disabled={item.enabled === false}
-            onTouchTap={() => {
+            onClick={() => {
               item.click();
               this._onClose();
             }}

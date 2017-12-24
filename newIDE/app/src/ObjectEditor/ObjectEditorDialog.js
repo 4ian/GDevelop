@@ -34,14 +34,14 @@ export class ObjectEditorDialog extends Component<*, StateType> {
       <FlatButton
         key="cancel"
         label="Cancel"
-        onTouchTap={this.props.onCancel}
+        onClick={this.props.onCancel}
       />,
       <FlatButton
         key="apply"
         label="Apply"
         primary
         keyboardFocused
-        onTouchTap={this.props.onApply}
+        onClick={this.props.onApply}
       />,
     ];
 

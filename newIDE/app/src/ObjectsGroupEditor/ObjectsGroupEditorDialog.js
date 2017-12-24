@@ -14,13 +14,13 @@ export class ObjectsGroupEditorDialog extends Component {
       <FlatButton
         label="Cancel"
         keyboardFocused
-        onTouchTap={this.props.onCancel}
+        onClick={this.props.onCancel}
       />,
       <FlatButton
         label="Apply"
         primary
         keyboardFocused
-        onTouchTap={this.props.onApply}
+        onClick={this.props.onApply}
       />,
     ];
 

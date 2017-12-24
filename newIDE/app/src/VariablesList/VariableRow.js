@@ -62,10 +62,10 @@ const ThemableVariableRow = ({
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>
-      <IconButton onTouchTap={onRemove}>
+      <IconButton onClick={onRemove}>
         <Delete />
       </IconButton>
-      <IconButton onTouchTap={onAddChild}>
+      <IconButton onClick={onAddChild}>
         <AddCircle />
       </IconButton>
     </TreeTableCell>

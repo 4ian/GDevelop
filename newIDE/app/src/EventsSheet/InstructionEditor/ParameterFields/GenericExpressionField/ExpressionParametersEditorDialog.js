@@ -29,11 +29,11 @@ export default class ExpressionParametersEditorDialog extends Component<
   };
 
   componentWillMount() {
-    this.state = {
+    this.setState({
       parameterValues: Array(
         this.props.expressionMetadata.getParametersCount()
       ).fill(''),
-    };
+    });
   }
 
   render() {

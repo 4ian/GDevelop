@@ -25,9 +25,9 @@ export default class AboutDialog extends Component {
       <FlatButton
         label="GDevelop Website"
         primary={false}
-        onTouchTap={() => Window.openExternalURL('http://compilgames.net')}
+        onClick={() => Window.openExternalURL('http://compilgames.net')}
       />,
-      <FlatButton label="Close" primary={false} onTouchTap={onClose} />,
+      <FlatButton label="Close" primary={false} onClick={onClose} />,
     ];
 
     return (

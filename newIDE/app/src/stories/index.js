@@ -47,7 +47,6 @@ import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/InstructionEditor/ParameterRenderingService';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import { makeTestProject } from '../fixtures/TestProject';
 
 const gd = global.gd;
@@ -65,10 +64,6 @@ const {
   spriteObjectWithBehaviors,
   group2,
 } = makeTestProject(gd);
-
-// Needed for onTouchTap
-// http://stackoverflow.com/a/34015469/988941
-injectTapEventPlugin();
 
 const Placeholder = () => <div>Placeholder component</div>;
 

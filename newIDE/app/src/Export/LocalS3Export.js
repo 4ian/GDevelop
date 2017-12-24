@@ -127,7 +127,7 @@ export default class LocalS3Export extends Component {
         <Spacer />
         <TextField value={this.state.url} style={{ flex: 1 }} />
         <Spacer />
-        <RaisedButton label="Open" primary={true} onTouchTap={this.openURL} />
+        <RaisedButton label="Open" primary={true} onClick={this.openURL} />
       </Line>
     );
   };
@@ -167,7 +167,7 @@ export default class LocalS3Export extends Component {
           <RaisedButton
             label="Export and upload my game"
             primary={true}
-            onTouchTap={this.launchExport}
+            onClick={this.launchExport}
             disabled={exportStarted}
           />
         </Line>

@@ -8,7 +8,6 @@ import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import { sendProgramOpening } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { installFullstory } from './Utils/Analytics/Fullstory';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import registerServiceWorker from './registerServiceWorker';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
@@ -40,10 +39,6 @@ const electron = optionalRequire('electron');
 
 installRaven();
 installFullstory();
-
-// Needed for onTouchTap
-// http://stackoverflow.com/a/34015469/988941
-injectTapEventPlugin();
 
 Window.setUpContextMenu();
 

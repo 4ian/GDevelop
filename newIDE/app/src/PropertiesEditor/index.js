@@ -152,7 +152,7 @@ export default class PropertiesEditor extends Component {
         fullWidth
         primary
         label={field.getLabel(this.props.instances[0])}
-        onTouchTap={() => field.onClick(this.props.instances[0])}
+        onClick={() => field.onClick(this.props.instances[0])}
       />
     );
   };

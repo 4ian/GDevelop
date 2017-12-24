@@ -59,7 +59,6 @@ export const withSerializableObject = (
       if (!useProjectToUnserialize) {
         this.props[propName].unserializeFrom(serializedElement);
       } else {
-        console.log(this.props[propName]);
         this.props[propName].unserializeFrom(
           this.props.project,
           serializedElement

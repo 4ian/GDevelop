@@ -14,7 +14,7 @@ const VariableRow = ({ onAdd }) => (
       </EmptyMessage>
     </TreeTableCell>
     <TreeTableCell style={styles.toolColumn}>
-      <IconButton onTouchTap={onAdd}>
+      <IconButton onClick={onAdd}>
         <Add />
       </IconButton>
     </TreeTableCell>

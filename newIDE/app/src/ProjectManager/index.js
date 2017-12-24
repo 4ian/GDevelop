@@ -83,10 +83,7 @@ class ThemableItem extends Component {
       <IconMenu
         ref={iconMenu => (this._iconMenu = iconMenu)}
         iconButtonElement={
-          <IconButton
-            onClick={e =>
-              e.stopPropagation() /*Prevent bubbling the event to ListItem*/}
-          >
+          <IconButton>
             <MoreVertIcon />
           </IconButton>
         }
@@ -295,25 +292,25 @@ export default class ProjectManager extends React.Component {
             key="save"
             primaryText="Save"
             leftIcon={<ListIcon src="res/ribbon_default/save32.png" />}
-            onTouchTap={() => this.props.onSaveProject()}
+            onClick={() => this.props.onSaveProject()}
           />,
           <ListItem
             key="close"
             primaryText="Close"
             leftIcon={<ListIcon src="res/ribbon_default/close32.png" />}
-            onTouchTap={() => this.props.onCloseProject()}
+            onClick={() => this.props.onCloseProject()}
           />,
           <ListItem
             key="export"
             primaryText="Export"
             leftIcon={<ListIcon src="res/ribbon_default/export32.png" />}
-            onTouchTap={() => this.props.onExportProject()}
+            onClick={() => this.props.onExportProject()}
           />,
           <ListItem
             key="preferences"
             primaryText="Preferences"
             leftIcon={<ListIcon src="res/ribbon_default/pref32.png" />}
-            onTouchTap={() => this.props.onOpenPreferences()}
+            onClick={() => this.props.onOpenPreferences()}
           />,
         ]}
       />
@@ -347,14 +344,14 @@ export default class ProjectManager extends React.Component {
                 key="properties"
                 primaryText="Properties"
                 leftIcon={<ListIcon src="res/ribbon_default/editprop32.png" />}
-                onTouchTap={() =>
+                onClick={() =>
                   this.setState({ projectPropertiesDialogOpen: true })}
               />,
               <ListItem
                 key="global-variables"
                 primaryText="Global variables"
                 leftIcon={<ListIcon src="res/ribbon_default/editname32.png" />}
-                onTouchTap={() => this.setState({ variablesEditorOpen: true })}
+                onClick={() => this.setState({ variablesEditorOpen: true })}
               />,
             ]}
           />

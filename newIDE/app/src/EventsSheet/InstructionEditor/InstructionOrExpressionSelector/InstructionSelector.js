@@ -11,7 +11,6 @@ type Props = {
 };
 
 export default class InstructionSelector extends Component<Props, *> {
-  _selector: any = null;
   instructionsInfo: Array<InstructionOrExpressionInformation> = [];
   instructionsInfoTree: ?InstructionOrExpressionTreeNode = null;
 
@@ -21,14 +20,9 @@ export default class InstructionSelector extends Component<Props, *> {
     this.instructionsInfoTree = createTree(allInstructions);
   }
 
-  focus = () => {
-    if (this._selector) this._selector.focus();
-  };
-
   render() {
     return (
       <InstructionOrExpressionSelector
-        ref={selector => (this._selector = selector)}
         instructionsInfo={this.instructionsInfo}
         instructionsInfoTree={this.instructionsInfoTree}
         {...this.props}

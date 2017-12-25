@@ -2,14 +2,17 @@ import React, { Component } from 'react';
 import InstructionsList from '../InstructionsList';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { largeSelectedArea, largeSelectableArea } from '../ClassNames';
+import {
+  largeSelectedArea,
+  largeSelectableArea,
+  executableEventContainer,
+} from '../ClassNames';
 const gd = global.gd;
 
 const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    borderBottom: '1px solid #d3d3d3',
   },
   instructionsContainer: {
     display: 'flex',
@@ -45,6 +48,7 @@ export default class ForEachEvent extends Component {
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
+          [executableEventContainer]: true,
         })}
       >
         <div>While these conditions are true:</div>

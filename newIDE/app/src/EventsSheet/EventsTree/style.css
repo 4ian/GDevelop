@@ -1,10 +1,5 @@
 /* This overwrite the default react-sortable-tree css to display events list */
 
-.gd-events-sheet .events-tree {
-    font-family: -apple-system, ".SFNSText-Regular", "San Francisco", Roboto, "Segoe UI", "Helvetica Neue", "Lucida Grande", sans-serif;
-    font-size: 14px;
-}
-
 /**
  * Draggable handle on the left of an event
  */

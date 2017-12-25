@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { mapFor } from '../../Utils/MapFor';
 import classNames from 'classnames';
-import { selectedArea, selectableArea } from './ClassNames';
+import { selectedArea, selectableArea, subInstructionsContainer, instructionParameter } from './ClassNames';
 import InstructionsList from './InstructionsList';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
@@ -19,12 +19,6 @@ const styles = {
     verticalAlign: 'middle',
     paddingLeft: 2,
     paddingRight: 2,
-  },
-  subInstructionsList: {
-    marginLeft: 9,
-    marginTop: 1,
-    borderRight: 'none',
-    borderLeft: '1px solid #d3d3d3',
   },
 };
 
@@ -61,29 +55,20 @@ export default class Instruction extends Component {
         {mapFor(0, formattedTexts.size(), i => {
           const formatting = formattedTexts.getTextFormatting(i);
           const parameterIndex = formatting.getUserData();
-
           const isParameter =
             parameterIndex >= 0 && parameterIndex < parametersCount;
+
           if (!isParameter)
             return <span key={i}>{formattedTexts.getString(i)}</span>;
 
+          const parameterType = metadata.getParameter(parameterIndex).getType();
           return (
             <span
               key={i}
-              style={{
-                color:
-                  'rgb(' +
-                  formatting.getColorRed() +
-                  ',' +
-                  formatting.getColorGreen() +
-                  ',' +
-                  formatting.getColorBlue() +
-                  ')',
-                fontWeight: formatting.isBold() ? 'bold' : 'normal',
-                fontStyle: formatting.isItalic() ? 'italic' : 'normal',
-              }}
               className={classNames({
                 [selectableArea]: true,
+                [instructionParameter]: true,
+                [parameterType]: true,
               })}
               onClick={domEvent =>
                 this.props.onParameterClick(domEvent, parameterIndex)}
@@ -149,7 +134,7 @@ export default class Instruction extends Component {
         {this._renderInstructionText(metadata)}
         {metadata.canHaveSubInstructions() && (
           <InstructionsList
-            style={styles.subInstructionsList}
+            extraClassName={subInstructionsContainer}
             instrsList={instruction.getSubInstructions()}
             areConditions={this.props.isCondition}
             selection={this.props.selection}

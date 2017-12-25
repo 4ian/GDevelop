@@ -3,18 +3,9 @@ import PropTypes from 'prop-types';
 import Instruction from './Instruction';
 import { mapFor } from '../../Utils/MapFor';
 import { isInstructionSelected } from '../SelectionHandler';
+import { actionsContainer, conditionsContainer } from './ClassNames';
 
 const styles = {
-  conditionsContainer: {
-    paddingLeft: 5,
-    paddingRight: 5,
-    background: '#f1f2f2',
-    borderRight: '1px solid #d3d3d3',
-  },
-  actionsContainer: {
-    paddingLeft: 5,
-    paddingRight: 5,
-  },
   addButton: {
     cursor: 'pointer',
   },
@@ -43,16 +34,26 @@ export default class InstructionsList extends Component {
   };
 
   render() {
-    const instructionsListContext = {
-      isCondition: this.props.areConditions,
-      instrsList: this.props.instrsList,
-    };
+    const {
+      addButtonLabel,
+      areConditions,
+      extraClassName,
+      instrsList,
+      onAddNewInstruction,
+      onInstructionClick,
+      onInstructionContextMenu,
+      onInstructionDoubleClick,
+      onInstructionsListContextMenu,
+      onParameterClick,
+      selection,
+      style,
+    } = this.props;
 
-    const instructions = mapFor(0, this.props.instrsList.size(), i => {
-      const instruction = this.props.instrsList.get(i);
+    const instructions = mapFor(0, instrsList.size(), i => {
+      const instruction = instrsList.get(i);
       const instructionContext = {
-        isCondition: this.props.areConditions,
-        instrsList: this.props.instrsList,
+        isCondition: areConditions,
+        instrsList: instrsList,
         instruction,
         indexInList: i,
       };
@@ -60,44 +61,49 @@ export default class InstructionsList extends Component {
       return (
         <Instruction
           instruction={instruction}
-          isCondition={this.props.areConditions}
-          instrsList={this.props.instrsList}
+          isCondition={areConditions}
+          instrsList={instrsList}
           index={i}
           key={instruction.ptr}
-          selected={isInstructionSelected(this.props.selection, instruction)}
-          onClick={() => this.props.onInstructionClick(instructionContext)}
+          selected={isInstructionSelected(selection, instruction)}
+          onClick={() => onInstructionClick(instructionContext)}
           onDoubleClick={() =>
-            this.props.onInstructionDoubleClick(instructionContext)}
+            onInstructionDoubleClick(instructionContext)}
           onContextMenu={(x, y) =>
-            this.props.onInstructionContextMenu(x, y, instructionContext)}
+            onInstructionContextMenu(x, y, instructionContext)}
           onParameterClick={(domEvent, parameterIndex) =>
-            this.props.onParameterClick({
+            onParameterClick({
               ...instructionContext,
               parameterIndex,
               domEvent,
             })}
-          selection={this.props.selection}
-          onAddNewSubInstruction={this.props.onAddNewInstruction}
-          onSubInstructionClick={this.props.onInstructionClick}
-          onSubInstructionDoubleClick={this.props.onInstructionDoubleClick}
-          onSubInstructionContextMenu={this.props.onInstructionContextMenu}
+          selection={selection}
+          onAddNewSubInstruction={onAddNewInstruction}
+          onSubInstructionClick={onInstructionClick}
+          onSubInstructionDoubleClick={onInstructionDoubleClick}
+          onSubInstructionContextMenu={onInstructionContextMenu}
           onSubInstructionsListContextMenu={
-            this.props.onInstructionsListContextMenu
+            onInstructionsListContextMenu
           }
-          onSubParameterClick={this.props.onParameterClick}
+          onSubParameterClick={onParameterClick}
         />
       );
     });
 
-    const containerStyle = this.props.areConditions
-      ? styles.conditionsContainer
-      : styles.actionsContainer;
-
-    const addButtonLabel = this.props.areConditions
+    const instructionsListContext = {
+      isCondition: areConditions,
+      instrsList: instrsList,
+    };
+    const addButtonDefaultLabel = areConditions
       ? 'Add condition'
       : 'Add action';
     return (
-      <div style={{ ...containerStyle, ...this.props.style }}>
+      <div
+        className={`${areConditions
+          ? conditionsContainer
+          : actionsContainer} ${extraClassName || ''}`}
+        style={style}
+      >
         {instructions}
         <a
           style={styles.addButton}
@@ -105,14 +111,14 @@ export default class InstructionsList extends Component {
           onClick={this.onAddNewInstruction}
           onContextMenu={e => {
             e.stopPropagation();
-            this.props.onInstructionsListContextMenu(
+            onInstructionsListContextMenu(
               e.clientX,
               e.clientY,
               instructionsListContext
             );
           }}
         >
-          {this.props.addButtonLabel || addButtonLabel}
+          {addButtonLabel || addButtonDefaultLabel}
         </a>
       </div>
     );

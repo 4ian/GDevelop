@@ -63,7 +63,11 @@
         "hash_map": "cpp",
         "hash_set": "cpp",
         "system_error": "cpp",
-        "__nullptr": "cpp"
+        "__nullptr": "cpp",
+        "__functional_base": "cpp",
+        "__functional_base_03": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

@@ -5,7 +5,10 @@ import './Mosaic.css';
 import './EventsSheet.css';
 
 const almostWhite = '#EEE';
+const lightWhite = '#DDD';
+const notSoWhite = '#CCC';
 const gdevelopDarkBlue = '#3c4698';
+const blue = '#2C5FD2';
 
 const systemSelectionColor = '#4c92ff'; //OS X selection
 
@@ -15,20 +18,25 @@ const canvasColor = '#303030';
 const theme: Theme = {
   fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', //OS X font
   palette: {
-    primary1Color: gdevelopDarkBlue,
-    primary2Color: gdevelopDarkBlue,
+    primary1Color: blue,
+    primary2Color: blue,
     accent1Color: almostWhite,
     canvasColor,
-    textColor: '#DDD',
-    secondaryTextColor: '#CCC',
-    alternateTextColor: '#CCC',
-    borderColor: '#888888',
+    textColor: lightWhite,
+    secondaryTextColor: notSoWhite,
+    alternateTextColor: '#444',
+    borderColor: '#444444',
     disabledColor: '#888888',
     pickerHeaderColor: '#444444',
     clockCircleColor: '#444444',
   },
   avatar: {
     backgroundColor: 'transparent',
+  },
+  tabs: {
+    backgroundColor: gdevelopDarkBlue,
+    textColor: lightWhite,
+    selectedTextColor: almostWhite,
   },
   toolbar: {
     backgroundColor: backgroundColor,
@@ -45,13 +53,14 @@ const theme: Theme = {
   },
   appBar: {
     color: gdevelopDarkBlue,
+    textColor: almostWhite,
   },
   button: {
     height: 32,
     iconButtonSize: 24,
   },
   snackbar: {
-    actionColor: gdevelopDarkBlue,
+    actionColor: blue,
   },
 
   // GDevelop specific variables:
@@ -59,7 +68,7 @@ const theme: Theme = {
     backgroundColor: backgroundColor,
     textColor: '#878787',
     selectedBackgroundColor: gdevelopDarkBlue,
-    selectedTextColor: '#ffffff',
+    selectedTextColor: almostWhite,
     width: 200,
     height: 32,
     closeButtonWidth: 24,
@@ -75,7 +84,7 @@ const theme: Theme = {
     groupTextColor: '#AAA',
     separatorColor: '#303030',
     selectedBackgroundColor: systemSelectionColor,
-    selectedTextColor: '#ffffff',
+    selectedTextColor: almostWhite,
   },
   emptyMessage: {
     shadowColor: '#000'

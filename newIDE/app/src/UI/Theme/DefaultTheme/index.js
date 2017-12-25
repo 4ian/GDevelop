@@ -23,6 +23,9 @@ const theme = {
   avatar: {
     backgroundColor: 'transparent',
   },
+  tabs: {
+    backgroundColor: gdevelopLightBlue,
+  },
   toolbar: {
     backgroundColor: backgroundColor,
     separatorColor: '#cecece',

@@ -11,6 +11,10 @@
     border-radius: 0;
 }
 
+.gd-events-sheet .events-tree {
+    height: 100%;
+}
+
 /**
  * Container of an event line (including the scaffolding lines and the event).
  */

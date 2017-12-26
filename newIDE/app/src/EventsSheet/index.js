@@ -35,6 +35,7 @@ import {
   getSelectedInstructionsListsContexts,
   selectInstructionsList,
 } from './SelectionHandler';
+import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -455,7 +456,13 @@ export default class EventsSheet extends Component {
   };
 
   render() {
-    const { project, layout, events, onOpenExternalEvents, onOpenLayout } = this.props;
+    const {
+      project,
+      layout,
+      events,
+      onOpenExternalEvents,
+      onOpenLayout,
+    } = this.props;
     if (!project) return null;
 
     return (
@@ -485,6 +492,7 @@ export default class EventsSheet extends Component {
           onOpenExternalEvents={onOpenExternalEvents}
           onOpenLayout={onOpenLayout}
         />
+        {events && events.getEventsCount() === 0 && <EmptyEventsPlaceholder />}
         <InlineParameterEditor
           open={this.state.inlineEditing}
           anchorEl={this.state.inlineEditingAnchorEl}

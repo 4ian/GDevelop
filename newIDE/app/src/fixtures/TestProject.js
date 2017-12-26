@@ -253,6 +253,9 @@ export const makeTestProject = gd => {
     1
   );
 
+  // Empty layout
+  const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
+
   return {
     project,
     shapePainterObject,
@@ -269,5 +272,6 @@ export const makeTestProject = gd => {
     testInstruction,
     testExternalEvents1,
     testExternalEvents2,
+    emptyLayout,
   };
 };

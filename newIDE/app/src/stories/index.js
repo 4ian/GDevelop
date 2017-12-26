@@ -47,6 +47,7 @@ import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/InstructionEditor/ParameterRenderingService';
+import {ErrorFallbackComponent} from '../UI/ErrorBoundary';
 import { makeTestProject } from '../fixtures/TestProject';
 
 const gd = global.gd;
@@ -63,6 +64,7 @@ const {
   testInstruction,
   spriteObjectWithBehaviors,
   group2,
+  emptyLayout,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -218,6 +220,16 @@ storiesOf('EventsSheet', module)
         project={project}
         layout={testLayout}
         events={testLayout.getEvents()}
+        onOpenExternalEvents={action('Open external events')}
+      />
+    </DragDropContextProvider>
+  ))
+  .add('empty (no events)', () => (
+    <DragDropContextProvider>
+      <EventsSheet
+        project={project}
+        layout={emptyLayout}
+        events={emptyLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
       />
     </DragDropContextProvider>
@@ -442,4 +454,11 @@ storiesOf('VariablesList', module)
     <SerializedObjectDisplay object={testLayout}>
       <VariablesList variablesContainer={testLayout.getVariables()} />
     </SerializedObjectDisplay>
+  ));
+
+storiesOf('ErrorBoundary', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ErrorFallbackComponent />
   ));

@@ -51,6 +51,7 @@ import {
   setThemeName,
   getDefaultPreferences,
 } from './Preferences/PreferencesHandler';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const gd = global.gd;
 
@@ -782,7 +783,9 @@ export default class MainFrame extends Component<*, State> {
                 closable={editorTab.closable}
               >
                 <div style={{ display: 'flex', flex: 1, height: '100%' }}>
-                  {editorTab.render()}
+                  <ErrorBoundary>
+                    {editorTab.render()}
+                  </ErrorBoundary>
                 </div>
               </Tab>
             ))}

@@ -13,7 +13,7 @@ type PropsType = {
 /**
  * The button that can be used in any dialog to open a help page
  */
-export default (props: PropsType) => {
+const HelpButton = (props: PropsType) => {
   if (!props.helpPagePath) return null;
 
   return (
@@ -29,3 +29,5 @@ export default (props: PropsType) => {
     />
   );
 };
+
+export default HelpButton;

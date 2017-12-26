@@ -10,7 +10,7 @@ import { getInitialSelection, isEventSelected } from '../SelectionHandler';
 import EventsRenderingService from './EventsRenderingService';
 import EventHeightsCache from './EventHeightsCache';
 import { eventsTree } from './ClassNames';
-import './style.css'
+import './style.css';
 
 const indentWidth = 22;
 
@@ -77,7 +77,12 @@ class EventContainer extends Component {
 
 const getNodeKey = ({ treeIndex }) => treeIndex;
 
-const ThemableSortableTree = ({muiTheme, ...otherProps}) => <SortableTreeWithoutDndContext className={`${eventsTree} ${muiTheme.eventsSheetRootClassName}`} {...otherProps}/>
+const ThemableSortableTree = ({ muiTheme, ...otherProps }) => (
+  <SortableTreeWithoutDndContext
+    className={`${eventsTree} ${muiTheme.eventsSheetRootClassName}`}
+    {...otherProps}
+  />
+);
 const SortableTree = muiThemeable()(ThemableSortableTree);
 
 /**
@@ -107,7 +112,7 @@ export default class ThemableEventsTree extends Component {
    */
   onHeightsChanged(cb) {
     this.forceUpdate(() => {
-      this._list.wrappedInstance.recomputeRowHeights();
+      if (this._list) this._list.wrappedInstance.recomputeRowHeights();
       if (cb) cb();
     });
   }
@@ -118,14 +123,14 @@ export default class ThemableEventsTree extends Component {
    */
   forceEventsUpdate(cb) {
     this.setState(this._eventsToTreeData(this.props.events), () => {
-      this._list.wrappedInstance.recomputeRowHeights();
+      if (this._list) this._list.wrappedInstance.recomputeRowHeights();
       if (cb) cb();
     });
   }
 
   scrollToEvent(event) {
     const row = this._getEventRow(event);
-    if (row !== -1) this._list.wrappedInstance.scrollToRow(row);
+    if (row !== -1 && this._list) this._list.wrappedInstance.scrollToRow(row);
   }
 
   _getEventRow(searchedEvent) {

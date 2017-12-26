@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@storybook/react": "3.2.19",
+    "auth0-lock": "^11.0.0",
     "aws-sdk": "^2.100.0",
     "axios": "^0.16.1",
     "classnames": "2.2.5",

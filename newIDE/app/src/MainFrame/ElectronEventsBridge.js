@@ -37,6 +37,10 @@ class ElectronEventsBridge extends Component {
       'main-menu-open-preferences',
       event => this.editor && this.editor.openPreferences()
     );
+    ipcRenderer.on(
+      'main-menu-open-profile',
+      event => this.editor && this.editor.openProfile()
+    );
   }
 
   render() {

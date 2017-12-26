@@ -17,6 +17,7 @@ import ConfirmCloseDialog from './ConfirmCloseDialog';
 import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
+import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { Tabs, Tab } from '../UI/Tabs';
@@ -79,6 +80,7 @@ type State = {|
   snackMessageOpen: boolean,
   preferencesDialogOpen: boolean,
   preferences: PreferencesState,
+  profileDialogOpen: boolean,
 |};
 
 export default class MainFrame extends Component<*, State> {
@@ -98,6 +100,7 @@ export default class MainFrame extends Component<*, State> {
     snackMessageOpen: false,
     preferencesDialogOpen: false,
     preferences: getDefaultPreferences(),
+    profileDialogOpen: false,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
@@ -647,6 +650,12 @@ export default class MainFrame extends Component<*, State> {
     });
   };
 
+  openProfile = (open: boolean = true) => {
+    this.setState({
+      profileDialogOpen: open,
+    });
+  };
+
   _onChangeEditorTab = (value: number) => {
     this.setState(
       {
@@ -707,6 +716,7 @@ export default class MainFrame extends Component<*, State> {
       genericDialog,
       projectManagerOpen,
       preferences,
+      profileDialogOpen,
     } = this.state;
     const {
       exportDialog,
@@ -714,6 +724,7 @@ export default class MainFrame extends Component<*, State> {
       introDialog,
       saveDialog,
       resourceSources,
+      authentification,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -794,6 +805,11 @@ export default class MainFrame extends Component<*, State> {
           <ConfirmCloseDialog
             ref={confirmCloseDialog =>
               (this.confirmCloseDialog = confirmCloseDialog)}
+          />
+          <ProfileDialog
+            open={profileDialogOpen}
+            authentification={authentification}
+            onClose={() => this.openProfile(false)}
           />
           <PreferencesDialog
             open={this.state.preferencesDialogOpen}

@@ -63,6 +63,12 @@ const buildMainMenuFor = window => {
     fileTemplate.submenu.push(
       { type: 'separator' },
       {
+        label: 'My profile',
+        click() {
+          window.webContents.send('main-menu-open-profile');
+        },
+      },
+      {
         label: 'Preferences',
         click() {
           window.webContents.send('main-menu-open-preferences');
@@ -132,6 +138,12 @@ const buildMainMenuFor = window => {
       submenu: [
         { role: 'about' },
         { type: 'separator' },
+        {
+          label: 'My profile',
+          click() {
+            window.webContents.send('main-menu-open-profile');
+          },
+        },
         {
           label: 'Preferences',
           click() {

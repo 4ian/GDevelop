@@ -5,6 +5,7 @@ import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
+import Authentification from './Profile/Authentification';
 import { sendProgramOpening } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { installFullstory } from './Utils/Analytics/Fullstory';
@@ -42,6 +43,7 @@ installFullstory();
 
 Window.setUpContextMenu();
 
+const authentification = new Authentification();
 let app = null;
 
 if (electron) {
@@ -96,6 +98,7 @@ if (electron) {
           onChooseProject={LocalProjectOpener.chooseProjectFile}
           onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
           resourceSources={localResourceSources}
+          authentification={authentification}
         />
       </ElectronEventsBridge>
     );
@@ -119,6 +122,7 @@ if (electron) {
       saveDialog={<BrowserSaveDialog />}
       onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}
       resourceSources={browserResourceSources}
+      authentification={authentification}
     />
   );
 }

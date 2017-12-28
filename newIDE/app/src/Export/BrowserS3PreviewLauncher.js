@@ -4,23 +4,17 @@ import BrowserS3FileSystem from './BrowserS3FileSystem';
 import BrowserPreviewLinkDialog from './BrowserPreviewLinkDialog';
 import { findGDJS } from './BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
+import { GDevelopGamesPreview } from '../Utils/GDevelopServices/ApiConfigs';
+const awsS3 = require('aws-sdk/clients/s3');
 const gd = global.gd;
 
-const awsS3 = require('aws-sdk/clients/s3');
-const destinationBucket = `gd-games-preview`;
-const accessKeyId = process.env.REACT_APP_PREVIEW_S3_ACCESS_KEY_ID;
-const secretAccessKey = process.env.REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY;
-const region = 'eu-west-1';
-const destinationBucketBaseUrl = `https://s3-${region}.amazonaws.com/${destinationBucket}/`;
-
-if (!accessKeyId || !secretAccessKey) {
-  console.warn(
-    "Either REACT_APP_PREVIEW_S3_ACCESS_KEY_ID or REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY are not defined. Preview in browsers won't be working"
-  );
-  console.info(
-    'Copy .env.dist file to .env and fill the values to fix this warning.'
-  );
-}
+const {
+  destinationBucket,
+  accessKeyId,
+  secretAccessKey,
+  region,
+  destinationBucketBaseUrl,
+} = GDevelopGamesPreview;
 
 const awsS3Client = new awsS3({
   accessKeyId: accessKeyId,

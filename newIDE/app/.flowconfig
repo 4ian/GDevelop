@@ -1,5 +1,6 @@
 [ignore]
 <PROJECT_ROOT>/resources/.*
+<PROJECT_ROOT>/node_modules/auth0-lock/node_modules/fbjs/flow/include/PromiseMap.js
 
 [include]
 

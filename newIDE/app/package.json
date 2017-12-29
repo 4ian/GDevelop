@@ -18,6 +18,7 @@
     "aws-sdk": "^2.100.0",
     "axios": "^0.16.1",
     "classnames": "2.2.5",
+    "date-fns": "^1.29.0",
     "element-closest": "2.0.2",
     "flat": "2.0.1",
     "fontfaceobserver": "2.0.13",

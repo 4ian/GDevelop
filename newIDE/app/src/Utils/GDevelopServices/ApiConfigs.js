@@ -1,4 +1,5 @@
 // @flow
+const isDev = process.env.NODE_ENV === 'development';
 
 const gdevelopGamesPreviewRegion = 'eu-west-1';
 const gdevelopGamesPreviewBucket = 'gd-games-preview';
@@ -41,5 +42,11 @@ export const Auth0Config = {
       },
       redirect: false,
     },
-  }
+  },
+};
+
+export const GDevelopUsageApi = {
+  baseUrl: isDev
+    ? 'https://tc1jkfw4ul.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://qe7jiozpz9.execute-api.us-east-1.amazonaws.com/live',
 };

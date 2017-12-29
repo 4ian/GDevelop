@@ -14,6 +14,7 @@ import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
 import LocalCordovaExport from '../Export/LocalCordovaExport';
+import LocalOnlineCordovaExport from '../Export/LocalOnlineCordovaExport';
 import LocalS3Export from '../Export/LocalS3Export';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
@@ -49,6 +50,8 @@ import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrE
 import ParameterRenderingService from '../EventsSheet/InstructionEditor/ParameterRenderingService';
 import {ErrorFallbackComponent} from '../UI/ErrorBoundary';
 import { makeTestProject } from '../fixtures/TestProject';
+import CreateProfile from '../Profile/CreateProfile';
+import ProfileDetails from '../Profile/ProfileDetails';
 
 const gd = global.gd;
 const {
@@ -166,6 +169,11 @@ storiesOf('LocalCordovaExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCordovaExport project={project} />);
+
+storiesOf('LocalOnlineCordovaExport', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <LocalOnlineCordovaExport project={project} />);
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
@@ -461,4 +469,24 @@ storiesOf('ErrorBoundary', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ErrorFallbackComponent />
+  ));
+
+storiesOf('CreateProfile', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <CreateProfile onLogin={action('login')} />
+  ));
+
+storiesOf('ProfileDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('profile', () => (
+    <ProfileDetails profile={{
+      nickname: 'Florian',
+      picture: '"https://s.gravatar.com/avatar/d6fc8df7ddfe938cc379c53bfb5645fc?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Ffl.png',
+    }} />
+  ))
+  .add('loading', () => (
+    <ProfileDetails profile={null} />
   ));

@@ -2,11 +2,23 @@
 
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
+import { Tabs, Tab } from 'material-ui/Tabs';
 import Dialog from '../UI/Dialog';
-import { Column, Line } from '../UI/Grid';
-import Window from '../Utils/Window';
-import Authentification, { type Profile } from './Authentification';
+import { Column } from '../UI/Grid';
+import Authentification, {
+  type Profile,
+} from '../Utils/GDevelopServices/Authentification';
+import CreateProfile from './CreateProfile';
+import ProfileDetails from './ProfileDetails';
+import {
+  getUserUsages,
+  type Usages,
+  type Subscription,
+  getUserSubscription,
+} from '../Utils/GDevelopServices/Usage';
+import EmptyMessage from '../UI/EmptyMessage';
+import UsagesDetails from './UsagesDetails';
+import SubscriptionDetails from './SubscriptionDetails';
 
 type Props = {|
   open: boolean,
@@ -15,14 +27,20 @@ type Props = {|
 |};
 
 type State = {|
+  currentTab: string,
   authenticated: boolean,
   profile: ?Profile,
+  usages: ?Usages,
+  subscription: ?Subscription,
 |};
 
-export default class PreferencesDialog extends Component<Props, State> {
+export default class ProfileDialog extends Component<Props, State> {
   state = {
+    currentTab: 'profile',
     authenticated: false,
     profile: null,
+    usages: null,
+    subscription: null,
   };
 
   componentWillMount() {
@@ -32,24 +50,36 @@ export default class PreferencesDialog extends Component<Props, State> {
           ? this.props.authentification.isAuthenticated()
           : false,
       });
+    }
 
+    if (this.props.open) {
       this.fetchUserProfile();
     }
   }
 
+  componentWillReceiveProps(newProps: Props) {
+    if (!this.props.open && newProps.open) {
+      this.fetchUserProfile();
+    }
+  }
+
+  _onChangeTab = (newTab: string) =>
+    this.setState({
+      currentTab: newTab,
+    });
+
   fetchUserProfile() {
-    console.log('Fetching');
     const { authentification } = this.props;
     if (!authentification) return;
 
-    authentification.getUserInfo((err, profile) => {
-      console.log('YOP', profile);
+    authentification.getUserInfo((err, profile: ?Profile) => {
       if (err && err.unauthenticated) {
         return this.setState({
           authenticated: false,
           profile: null,
+          usages: null,
         });
-      } else if (err) {
+      } else if (err || !profile) {
         console.log('Unable to fetch user profile', err);
         return;
       }
@@ -57,13 +87,23 @@ export default class PreferencesDialog extends Component<Props, State> {
       this.setState({
         profile,
       });
+
+      Promise.all([
+        getUserUsages(authentification, profile.sub),
+        getUserSubscription(authentification, profile.sub),
+      ]).then(([usages, subscription]) => {
+        this.setState({
+          usages,
+          subscription,
+        });
+      });
     });
   }
 
   login = () => {
     if (this.props.authentification)
       this.props.authentification.login({
-        onHide: () => console.log('hidden'),
+        onHide: () => {},
         onAuthenticated: arg => {
           this.setState({
             authenticated: true,
@@ -71,7 +111,7 @@ export default class PreferencesDialog extends Component<Props, State> {
 
           this.fetchUserProfile();
         },
-        onAuthorizationError: err => console.log('Authentification error', err),
+        onAuthorizationError: () => {},
       });
   };
 
@@ -84,38 +124,51 @@ export default class PreferencesDialog extends Component<Props, State> {
   };
 
   render() {
-    const { authenticated, profile } = this.state;
+    const { authenticated, profile, usages, subscription } = this.state;
     const { open, onClose } = this.props;
     const actions = [
-      <FlatButton label="Close" primary={false} onClick={onClose} />,
+      <FlatButton
+        label="Close"
+        key="close"
+        primary={false}
+        onClick={onClose}
+      />,
     ];
 
     return (
       <Dialog
         actions={actions}
+        secondaryActions={
+          authenticated && profile
+            ? [<FlatButton label="Logout" key="logout" onClick={this.logout} />]
+            : []
+        }
         onRequestClose={onClose}
         open={open}
-        title="My profile"
+        noMargin
       >
-        <Column>
-          <Line>
-            {authenticated && profile ? (
-              <div>
-                You're logged in as {profile.nickname}. Welcome!
-                <RaisedButton label="Logout" onClick={this.logout} />
-              </div>
+        <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
+          <Tab label="My Profile" value="profile">
+            {authenticated ? (
+              <Column noMargin>
+                <ProfileDetails profile={profile} />
+                <SubscriptionDetails subscription={subscription} />
+              </Column>
             ) : (
-              <div>
-                <RaisedButton
-                  label="Create my profile"
-                  onClick={this.login}
-                  primary
-                />
-                <FlatButton label="Login" onClick={this.login} />
-              </div>
+              <CreateProfile onLogin={this.login} />
             )}
-          </Line>
-        </Column>
+          </Tab>
+          <Tab label="Online services usage" value="usage">
+            {authenticated ? (
+              <UsagesDetails usages={usages} />
+            ) : (
+              <EmptyMessage>
+                Register to see the usage that you've made of the online
+                services
+              </EmptyMessage>
+            )}
+          </Tab>
+        </Tabs>
       </Dialog>
     );
   }

@@ -1,32 +1,21 @@
 // @flow
 import Auth0Lock from 'auth0-lock';
-
-const AUTH_CONFIG = {
-  domain: '4ian.eu.auth0.com',
-  clientId: 'vpsTe5CLJNp7K4nM1nQHzpkentyIZX5U',
-};
+import { Auth0Config } from './ApiConfigs';
 
 export type Profile = {
+  sub: string, // This represents the userId
   nickname: string,
+  picture: string,
+  email: string,
+  email_verified: boolean,
 };
 
-export default class Auth {
-  lock = new Auth0Lock(AUTH_CONFIG.clientId, AUTH_CONFIG.domain, {
-    autoclose: true,
-    theme: {
-      logo:
-        'https://raw.githubusercontent.com/4ian/GD/gh-pages/res/icon128linux.png',
-      primaryColor: '#4ab0e4',
-    },
-    auth: {
-      responseType: 'token id_token',
-      audience: `https://${AUTH_CONFIG.domain}/userinfo`,
-      params: {
-        scope: 'openid profile email',
-      },
-      redirect: false,
-    },
-  });
+export default class Authentification {
+  lock = new Auth0Lock(
+    Auth0Config.clientId,
+    Auth0Config.domain,
+    Auth0Config.lockOptions
+  );
 
   constructor() {
     this._handleAuthentication();
@@ -41,7 +30,6 @@ export default class Auth {
     onAuthenticated: Function,
     onAuthorizationError: Function,
   }) {
-    // Call the show method to display the widget.
     const noop = () => {};
     this.lock.show();
     this.lock.on('hide', onHide || noop);
@@ -66,7 +54,7 @@ export default class Auth {
       localStorage.setItem('id_token', authResult.idToken);
       localStorage.setItem('expires_at', expiresAt);
     }
-  }
+  };
 
   getUserInfo = (cb: (any, ?Profile) => void) => {
     if (!this.isAuthenticated()) cb({ unauthenticated: true });
@@ -80,13 +68,21 @@ export default class Auth {
       console.log('Unable to fetch user info', err);
       cb({ unknownError: true });
     }
-  }
+  };
 
   logout = () => {
     // Clear access token and ID token from local storage
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
+  };
+
+  getAuthorizationHeader = () => {
+    try {
+      return 'Bearer ' + (localStorage.getItem('id_token') || '');
+    } catch (e) {
+      return ''
+    }
   }
 
   isAuthenticated = (): boolean => {
@@ -102,5 +98,5 @@ export default class Auth {
 
     let expiresAt = JSON.parse(storedContent);
     return new Date().getTime() < expiresAt;
-  }
+  };
 }

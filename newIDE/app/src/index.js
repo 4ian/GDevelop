@@ -5,7 +5,7 @@ import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
-import Authentification from './Profile/Authentification';
+import Authentification from './Utils/GDevelopServices/Authentification';
 import { sendProgramOpening } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { installFullstory } from './Utils/Analytics/Fullstory';

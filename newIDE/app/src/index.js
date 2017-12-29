@@ -28,6 +28,7 @@ import optionalRequire from './Utils/OptionalRequire.js';
 import LocalPreviewLauncher from './Export/LocalPreviewLauncher';
 import LocalExport from './Export/LocalExport';
 import LocalS3Export from './Export/LocalS3Export';
+import LocalOnlineCordovaExport from './Export/LocalOnlineCordovaExport';
 import LocalCordovaExport from './Export/LocalCordovaExport';
 import LocalCocos2dExport from './Export/LocalCocos2dExport';
 import LocalExamples from './ProjectCreation/LocalExamples';
@@ -85,6 +86,11 @@ if (electron) {
                 {
                   name: 'Cocos2d-JS',
                   ExportComponent: LocalCocos2dExport,
+                  advanced: true,
+                },
+                {
+                  name: 'Android app',
+                  ExportComponent: LocalOnlineCordovaExport,
                   advanced: true,
                 },
               ]}

@@ -14,7 +14,7 @@ import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExport';
 import LocalCordovaExport from '../Export/LocalCordovaExport';
-import LocalOnlineCordovaExport from '../Export/LocalOnlineCordovaExport';
+import Progress from '../Export/LocalOnlineCordovaExport/Progress';
 import LocalS3Export from '../Export/LocalS3Export';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
@@ -48,7 +48,7 @@ import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/InstructionEditor/ParameterRenderingService';
-import {ErrorFallbackComponent} from '../UI/ErrorBoundary';
+import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import { makeTestProject } from '../fixtures/TestProject';
 import CreateProfile from '../Profile/CreateProfile';
 import ProfileDetails from '../Profile/ProfileDetails';
@@ -173,7 +173,12 @@ storiesOf('LocalCordovaExport', module)
 storiesOf('LocalOnlineCordovaExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => <LocalOnlineCordovaExport project={project} />);
+  .add('Progress (not started)', () => <Progress exportStep={''} />)
+  .add('Progress (export)', () => <Progress exportStep={'export'} />)
+  .add('Progress (compress)', () => <Progress exportStep={'compress'} />)
+  .add('Progress (upload)', () => <Progress exportStep={'upload'} />)
+  .add('Progress (build)', () => <Progress exportStep={'build'} />)
+  .add('Progress (done)', () => <Progress exportStep={'done'} />);
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
@@ -467,26 +472,23 @@ storiesOf('VariablesList', module)
 storiesOf('ErrorBoundary', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ErrorFallbackComponent />
-  ));
+  .add('default', () => <ErrorFallbackComponent />);
 
 storiesOf('CreateProfile', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <CreateProfile onLogin={action('login')} />
-  ));
+  .add('default', () => <CreateProfile onLogin={action('login')} />);
 
 storiesOf('ProfileDetails', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('profile', () => (
-    <ProfileDetails profile={{
-      nickname: 'Florian',
-      picture: '"https://s.gravatar.com/avatar/d6fc8df7ddfe938cc379c53bfb5645fc?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Ffl.png',
-    }} />
+    <ProfileDetails
+      profile={{
+        nickname: 'Florian',
+        picture:
+          '"https://s.gravatar.com/avatar/d6fc8df7ddfe938cc379c53bfb5645fc?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Ffl.png',
+      }}
+    />
   ))
-  .add('loading', () => (
-    <ProfileDetails profile={null} />
-  ));
+  .add('loading', () => <ProfileDetails profile={null} />);

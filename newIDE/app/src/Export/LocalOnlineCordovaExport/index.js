@@ -9,6 +9,10 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
 import localFileSystem from '../LocalFileSystem';
 import Progress from './Progress';
+import { archiveFolder } from './Archiver';
+import optionalRequire from '../../Utils/OptionalRequire.js';
+const path = optionalRequire('path');
+const os = optionalRequire('os');
 
 const gd = global.gd;
 
@@ -50,7 +54,7 @@ export default class LocalOnlineCordovaExport extends Component<*, State> {
 
         resolve({
           exporter,
-          outputDir: fileSystem.getTempDir() + '/OnlineCordovaExport',
+          outputDir: path.join(fileSystem.getTempDir(), 'OnlineCordovaExport'),
         });
       });
     });
@@ -80,16 +84,23 @@ export default class LocalOnlineCordovaExport extends Component<*, State> {
   };
 
   launchCompression = (outputDir: string): Promise<string> => {
-    return Promise.resolve("TODO");
-  }
+    const archiveOutputDir = os.tmpdir();
+    return archiveFolder({
+      path: outputDir,
+      outputFilename: path.join(archiveOutputDir, 'game-archive.zip'),
+    });
+  };
 
   launchUpload = (exportDir: string): Promise<string> => {
     return Promise.resolve('TODO');
-  }
+  };
 
   launchBuild = (uploadBucketKey: string): Promise<Object> => {
-    return Promise.resolve({downloadUrl: 'http://test.com', logsUrl: 'http://test.com/logs'});
-  }
+    return Promise.resolve({
+      downloadUrl: 'http://test.com',
+      logsUrl: 'http://test.com/logs',
+    });
+  };
 
   launchWholeExport = () => {
     sendExportLaunched('local-online-cordova');
@@ -97,28 +108,32 @@ export default class LocalOnlineCordovaExport extends Component<*, State> {
     this.setState({
       exportStep: 'export',
     });
-    this.launchExport().then(outputDir => {
-      this.setState({
-        exportStep: 'compress',
+    this.launchExport()
+      .then(outputDir => {
+        this.setState({
+          exportStep: 'compress',
+        });
+        return this.launchCompression(outputDir);
+      })
+      .then(outputFile => {
+        this.setState({
+          exportStep: 'upload',
+        });
+        return this.launchUpload(outputFile);
+      })
+      .then((uploadBucketKey: string) => {
+        this.setState({
+          exportStep: 'build',
+        });
+        return this.launchBuild(uploadBucketKey);
+      })
+      .then(({ downloadUrl, logsUrl }) => {
+        this.setState({
+          exportStep: 'done',
+          downloadUrl,
+          logsUrl,
+        });
       });
-      return this.launchCompression(outputDir);
-    }).then(outputFile => {
-      this.setState({
-        exportStep: 'upload',
-      });
-      return this.launchUpload(outputFile);
-    }).then((uploadBucketKey: string) => {
-      this.setState({
-        exportStep: 'build',
-      });
-      return this.launchBuild(uploadBucketKey);
-    }).then(({downloadUrl, logsUrl}) => {
-      this.setState({
-        exportStep: 'done',
-        downloadUrl,
-        logsUrl,
-      });
-    })
   };
 
   render() {
@@ -137,7 +152,11 @@ export default class LocalOnlineCordovaExport extends Component<*, State> {
           />
         </Line>
         <Line>
-          <Progress exportStep={exportStep} downloadUrl={downloadUrl} logsUrl={logsUrl} />
+          <Progress
+            exportStep={exportStep}
+            downloadUrl={downloadUrl}
+            logsUrl={logsUrl}
+          />
         </Line>
       </Column>
     );

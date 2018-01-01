@@ -30,17 +30,17 @@ export default class LocalS3Export extends Component {
   }
 
   _uploadToS3 = localDir => {
-    ipcRenderer.removeAllListeners('s3-upload-progress');
-    ipcRenderer.removeAllListeners('s3-upload-done');
+    ipcRenderer.removeAllListeners('s3-folder-upload-progress');
+    ipcRenderer.removeAllListeners('s3-folder-upload-done');
 
     return new Promise((resolve, reject) => {
-      ipcRenderer.on('s3-upload-progress', (event, uploadProgress, uploadMax) =>
+      ipcRenderer.on('s3-folder-upload-progress', (event, uploadProgress, uploadMax) =>
         this.setState({
           uploadProgress,
           uploadMax,
         })
       );
-      ipcRenderer.on('s3-upload-done', (event, err, prefix) => {
+      ipcRenderer.on('s3-folder-upload-done', (event, err, prefix) => {
         if (err) return reject(err);
 
         this.setState({
@@ -48,7 +48,7 @@ export default class LocalS3Export extends Component {
         });
         resolve(prefix);
       });
-      ipcRenderer.send('s3-upload', localDir);
+      ipcRenderer.send('s3-folder-upload', localDir);
     });
   };
 

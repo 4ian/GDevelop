@@ -831,6 +831,7 @@ export default class MainFrame extends Component<*, State> {
               open: this.state.exportDialogOpen,
               onClose: () => this.openExportDialog(false),
               project: this.state.currentProject,
+              authentification,
             })}
           {!!createDialog &&
             React.cloneElement(createDialog, {

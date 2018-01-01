@@ -50,3 +50,9 @@ export const GDevelopUsageApi = {
     ? 'https://tc1jkfw4ul.execute-api.us-east-1.amazonaws.com/dev'
     : 'https://qe7jiozpz9.execute-api.us-east-1.amazonaws.com/live',
 };
+
+export const GDevelopBuildApi = {
+  baseUrl: isDev
+    ? 'https://ppvvhs48j1.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://21fixz45y2.execute-api.us-east-1.amazonaws.com/live',
+};

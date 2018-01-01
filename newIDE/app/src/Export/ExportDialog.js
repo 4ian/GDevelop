@@ -34,7 +34,7 @@ export default class ExportDialog extends Component {
   };
 
   render() {
-    const { project, open, onClose } = this.props;
+    const { project, open, onClose, authentification } = this.props;
     const { showExperimental } = this.state;
     if (!open || !project) return null;
 
@@ -42,9 +42,7 @@ export default class ExportDialog extends Component {
       <Dialog
         title="Export project to a standalone game"
         onRequestClose={onClose}
-        actions={
-          <FlatButton label="Close" primary={false} onClick={onClose} />
-        }
+        actions={<FlatButton label="Close" primary={false} onClick={onClose} />}
         secondaryActions={[
           <HelpButton key="help" helpPagePath="/publishing" />,
           !showExperimental ? (
@@ -74,7 +72,10 @@ export default class ExportDialog extends Component {
               (!advanced || showExperimental) && (
                 <Tab label={name} value={index} key={index}>
                   <div style={styles.tabContent}>
-                    <ExportComponent project={this.props.project} />
+                    <ExportComponent
+                      project={this.props.project}
+                      authentification={authentification}
+                    />
                   </div>
                 </Tab>
               )

@@ -40,4 +40,39 @@ module.exports = {
       onDone(null, prefix);
     });
   },
+
+  /**
+   * Upload the specified file to GDevelop
+   * Amazon S3 inbound bucket.
+   */
+  uploadArchiveToBucket: (localFile, onProgress, onDone) => {
+    const awsS3Client = new awsS3({
+      accessKeyId: accessKeyId,
+      secretAccessKey: secretAccessKey,
+      region: region,
+      correctClockSkew: true,
+    });
+    const s3Client = s3.createClient({
+      s3Client: awsS3Client,
+    });
+
+    const timestamp = '' + Date.now();
+    const prefix = 'game-archive-' + timestamp;
+    const filename = 'game-archive.zip';
+
+    var uploader = s3Client.uploadFile({
+      localFile,
+      s3Params: {
+        Bucket: destinationBucket,
+        Key: prefix + '/' + filename,
+      },
+    });
+    uploader.on('error', onDone);
+    uploader.on('progress', function() {
+      onProgress(uploader.progressAmount, uploader.progressTotal);
+    });
+    uploader.on('end', function() {
+      onDone(null, prefix + '/' + filename);
+    });
+  },
 };

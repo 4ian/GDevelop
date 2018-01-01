@@ -5,7 +5,7 @@ const Menu = electron.Menu;
 const parseArgs = require('minimist');
 const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
-const { uploadGameFolderToBucket } = require('./s3upload');
+const { uploadGameFolderToBucket, uploadArchiveToBucket } = require('./s3upload');
 const { buildMainMenuFor } = require('./main-menu');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -80,16 +80,32 @@ app.on('ready', function() {
     mainWindow = null;
   });
 
-  ipcMain.on('s3-upload', (event, localDir) => {
+  ipcMain.on('s3-folder-upload', (event, localDir) => {
     console.log('Received event s3-upload with localDir=', localDir);
 
     uploadGameFolderToBucket(
       localDir,
       (current, max) => {
-        event.sender.send('s3-upload-progress', current, max);
+        event.sender.send('s3-folder-upload-progress', current, max);
       },
       (err, prefix) => {
-        event.sender.send('s3-upload-done', err, prefix);
+        event.sender.send('s3-folder-upload-done', err, prefix);
+      }
+    );
+  });
+
+  ipcMain.on('s3-file-upload', (event, localFile) => {
+    console.log('Received event s3-file-upload with localFile=', localFile);
+
+    uploadArchiveToBucket(
+      localFile,
+      (current, max) => {
+        console.log(current, max);
+        event.sender.send('s3-file-upload-progress', current, max);
+      },
+      (err, prefix) => {
+        console.log("DONE")
+        event.sender.send('s3-file-upload-done', err, prefix);
       }
     );
   });

@@ -40,7 +40,9 @@ export default ({ exportStep, downloadUrl, onDownload, uploadMax, uploadProgress
           <Line alignItems="center" expand>
             <LinearProgress
               style={{ flex: 1 }}
-              mode="indeterminate"
+              max={uploadMax}
+              value={uploadProgress}
+              mode="determinate"
             />
           </Line>
         )}
@@ -66,8 +68,8 @@ export default ({ exportStep, downloadUrl, onDownload, uploadMax, uploadProgress
           <Spacer />
           <RaisedButton
             label="Download"
-            primary={true}
-            onClick={this.onDownload}
+            primary
+            onClick={onDownload}
           />
         </Line>
         <Line expand>

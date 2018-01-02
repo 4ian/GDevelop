@@ -1,0 +1,80 @@
+
+/**
+GDevelop - Skeleton Object Extension
+Copyright (c) 2017-2018 Franco Maciel (francomaciel10@gmail.com)
+This project is released under the MIT License.
+*/
+
+#include <SFML/Graphics.hpp>
+#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCore/Tools/Localization.h"
+#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#include "GDCpp/Runtime/ImageManager.h"
+#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCpp/Runtime/Project/InitialInstance.h"
+#include "GDCpp/Runtime/CommonTools.h"
+#include "SkeletonObject.h"
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include <wx/bitmap.h>
+
+sf::Texture SkeletonObject::edittimeIconImage;
+sf::Sprite SkeletonObject::edittimeIcon;
+#endif
+
+SkeletonObject::SkeletonObject(gd::String name_) :
+    Object(name_)
+{
+}
+
+std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties(gd::Project & project) const
+{
+    std::map<gd::String, gd::PropertyDescriptor> properties;
+    properties[_("Main filename")].SetValue(filename);
+
+    return properties;
+}
+
+bool SkeletonObject::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
+{
+    if (name == _("Main filename")) filename = value;
+
+    return true;
+}
+
+void SkeletonObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
+{
+    filename = element.GetStringAttribute("mainFilename");
+}
+
+void SkeletonObject::DoSerializeTo(gd::SerializerElement & element) const
+{
+    element.SetAttribute("mainFilename", filename);
+}
+
+#if !defined(GD_NO_WX_GUI)
+void SkeletonObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
+{
+    edittimeIcon.setPosition(instance.GetX(), instance.GetY());
+    renderTarget.draw(edittimeIcon);
+}
+
+void SkeletonObject::LoadEdittimeIcon()
+{
+    edittimeIconImage.loadFromFile("JsPlatform/Extensions/admobicon.png");
+    edittimeIcon.setTexture(edittimeIconImage);
+}
+
+bool SkeletonObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
+{
+    thumbnail = wxBitmap("JsPlatform/Extensions/admobicon24.png", wxBITMAP_TYPE_ANY);
+
+    return true;
+}
+#endif
+
+gd::Object * CreateSkeletonObject(gd::String name)
+{
+    return new SkeletonObject(name);
+}

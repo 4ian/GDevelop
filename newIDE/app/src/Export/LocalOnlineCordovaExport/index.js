@@ -8,7 +8,11 @@ import {
   buildCordovaAndroid,
   getUrl,
 } from '../../Utils/GDevelopServices/Build';
-import { Column, Line, Spacer } from '../../UI/Grid';
+import {
+  withUserProfile,
+  type WithUserProfileProps,
+} from '../../Profile/UserProfileContainer';
+import { Column, Line } from '../../UI/Grid';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
 import localFileSystem from '../LocalFileSystem';
@@ -16,6 +20,8 @@ import Progress from './Progress';
 import { archiveFolder } from './Archiver';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 import Window from '../../Utils/Window';
+import CreateProfile from '../../Profile/CreateProfile';
+import LimitDisplayer from '../../Profile/LimitDisplayer';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
@@ -40,7 +46,11 @@ type State = {
   errored: boolean,
 };
 
-export default class LocalOnlineCordovaExport extends Component<*, State> {
+type Props = WithUserProfileProps & {
+  project: gdProject,
+};
+
+class LocalOnlineCordovaExport extends Component<Props, State> {
   state = {
     exportStep: '',
     downloadUrl: '',
@@ -135,12 +145,12 @@ export default class LocalOnlineCordovaExport extends Component<*, State> {
   };
 
   launchBuild = (uploadBucketKey: string): Promise<Object> => {
-    const { authentification } = this.props;
+    const { authentification, profile } = this.props;
+    if (!profile || !authentification) return Promise.reject();
 
-    //TODO: get user id
     return buildCordovaAndroid(
       authentification,
-      'TODO',
+      profile.sub,
       uploadBucketKey
     ).then(build => {
       const { apkKey, logsKey } = build;
@@ -210,7 +220,7 @@ export default class LocalOnlineCordovaExport extends Component<*, State> {
 
   _download = () => {
     Window.openExternalURL(this.state.downloadUrl);
-  }
+  };
 
   render() {
     const {
@@ -220,18 +230,43 @@ export default class LocalOnlineCordovaExport extends Component<*, State> {
       uploadMax,
       uploadProgress,
     } = this.state;
-    const { project } = this.props;
+    const {
+      project,
+      authenticated,
+      onLogin,
+      subscription,
+      limits,
+    } = this.props;
     if (!project) return null;
 
     return (
       <Column noMargin>
         <Line>
-          <RaisedButton
-            label="Build for Android"
-            primary
-            onClick={this.launchWholeExport}
-          />
+          Packaging your game for Android will create an APK file that can be
+          installed on Android phones, based on Cordova framework.
         </Line>
+        {authenticated && (
+          <Line justifyContent="flex-end">
+            <RaisedButton
+              label="Package for Android"
+              primary
+              onClick={this.launchWholeExport}
+            />
+          </Line>
+        )}
+        {authenticated && (
+          <LimitDisplayer
+            subscription={subscription}
+            limit={limits ? limits['cordova-build'] : null}
+            onChangeSubscription={() => console.log("TODO")}
+          />
+        )}
+        {!authenticated && (
+          <CreateProfile
+            message="Create an account to build your game for Android in one-click:"
+            onLogin={onLogin}
+          />
+        )}
         <Line>
           <Progress
             exportStep={exportStep}
@@ -246,3 +281,7 @@ export default class LocalOnlineCordovaExport extends Component<*, State> {
     );
   }
 }
+
+export default withUserProfile({ fetchLimits: true, fetchSubscription: true })(
+  LocalOnlineCordovaExport
+);

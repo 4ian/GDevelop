@@ -56,7 +56,7 @@ export default class Authentification {
     }
   };
 
-  getUserInfo = (cb: (any, ?Profile) => void) => {
+  getUserProfile = (cb: (any, ?Profile) => void) => {
     if (!this.isAuthenticated()) cb({ unauthenticated: true });
 
     try {

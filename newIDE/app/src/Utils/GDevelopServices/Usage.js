@@ -18,12 +18,14 @@ export type Subscription = {
   updatedAt: number,
 };
 
+export type Limit = {
+  limitReached: boolean,
+  current: number,
+  max: number,
+};
+
 export type Limits = {
-  [string]: {
-    limitReached: boolean,
-    current: number,
-    max: number,
-  },
+  [string]: Limit,
 };
 
 export const getSubscriptionPlans = () => ([
@@ -80,5 +82,5 @@ export const getUserLimits = (
         Authorization: authentification.getAuthorizationHeader(),
       },
     })
-    .then(response => response.data);
+    .then(response => response.data.limits);
 };

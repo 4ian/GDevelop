@@ -20,7 +20,7 @@ type Props = {
 export default ({ profile }: Props) =>
   profile ? (
     <Column>
-      <Line>
+      <Line alignItems="center">
         <Avatar src={profile.picture} />
         <span style={styles.title}>You are connect as {profile.nickname}</span>
       </Line>

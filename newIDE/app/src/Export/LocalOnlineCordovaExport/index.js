@@ -5,8 +5,10 @@ import assignIn from 'lodash/assignIn';
 import RaisedButton from 'material-ui/RaisedButton';
 import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
 import {
+  type Build,
   buildCordovaAndroid,
   getUrl,
+  getBuild,
 } from '../../Utils/GDevelopServices/Build';
 import {
   withUserProfile,
@@ -20,6 +22,7 @@ import Progress from './Progress';
 import { archiveFolder } from './Archiver';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 import Window from '../../Utils/Window';
+import { delay } from '../../Utils/Delay';
 import CreateProfile from '../../Profile/CreateProfile';
 import LimitDisplayer from '../../Profile/LimitDisplayer';
 const path = optionalRequire('path');
@@ -34,15 +37,17 @@ export type LocalOnlineCordovaExportStep =
   | 'export'
   | 'compress'
   | 'upload'
+  | 'waiting-for-build'
   | 'build'
   | 'done';
 
 type State = {
   exportStep: LocalOnlineCordovaExportStep,
-  downloadUrl: string,
-  logsUrl: string,
+  build: ?Build,
   uploadProgress: number,
   uploadMax: number,
+  buildMax: number,
+  buildProgress: number,
   errored: boolean,
 };
 
@@ -53,10 +58,11 @@ type Props = WithUserProfileProps & {
 class LocalOnlineCordovaExport extends Component<Props, State> {
   state = {
     exportStep: '',
-    downloadUrl: '',
-    logsUrl: '',
+    build: null,
     uploadProgress: 0,
     uploadMax: 0,
+    buildProgress: 0,
+    buildMax: 0,
     errored: false,
   };
 
@@ -144,7 +150,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     });
   };
 
-  launchBuild = (uploadBucketKey: string): Promise<Object> => {
+  launchBuild = (uploadBucketKey: string): Promise<string> => {
     const { authentification, profile } = this.props;
     if (!profile || !authentification) return Promise.reject();
 
@@ -153,18 +159,39 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       profile.sub,
       uploadBucketKey
     ).then(build => {
-      const { apkKey, logsKey } = build;
-
-      if (build.status !== 'complete') throw new Error('Build errored');
-      if (!apkKey || !logsKey) {
-        throw new Error('Missing artifacts');
-      }
-
-      return {
-        downloadUrl: getUrl(apkKey),
-        logsUrl: getUrl(logsKey),
-      };
+      return build.id;
     });
+  };
+
+  pollBuild = async (buildId: string): Promise<Build> => {
+    const { authentification, profile } = this.props;
+    if (!profile || !authentification) return Promise.reject();
+
+    try {
+      let build = null;
+      let tries = 0;
+      const waitTime = 1000;
+      const maxWaitTime = 100000;
+      do {
+        await delay(waitTime);
+        build = await getBuild(authentification, profile.sub, buildId);
+        this.setState({
+          build,
+          buildMax: maxWaitTime,
+          buildProgress: tries * waitTime,
+        });
+        tries += 1;
+      } while (
+        build &&
+        build.status === 'pending' &&
+        tries * waitTime < maxWaitTime
+      );
+
+      if (build.status !== 'complete') throw build;
+      return build;
+    } catch (err) {
+      throw err;
+    }
   };
 
   launchWholeExport = () => {
@@ -205,30 +232,42 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       }, handleError('Error while compressing the game.'))
       .then((uploadBucketKey: string) => {
         this.setState({
-          exportStep: 'build',
+          exportStep: 'waiting-for-build',
         });
         return this.launchBuild(uploadBucketKey);
       }, handleError('Error while uploading the game. Check your internet connection or try again later.'))
-      .then(({ downloadUrl, logsUrl }) => {
+      .then(buildId => {
+        this.setState({
+          exportStep: 'build',
+        });
+
+        return this.pollBuild(buildId);
+      }, handleError('Error while lauching for the build of the game.'))
+      .then(build => {
         this.setState({
           exportStep: 'done',
-          downloadUrl,
-          logsUrl,
+          build,
         });
+        this.props.onRefreshUserProfile();
       }, handleError('Error while building the game.'));
   };
 
   _download = () => {
-    Window.openExternalURL(this.state.downloadUrl);
+    const { build } = this.state;
+    if (!build || !build.apkKey) return;
+
+    Window.openExternalURL(getUrl(build.apkKey));
   };
 
   render() {
     const {
       exportStep,
-      downloadUrl,
-      logsUrl,
+      build,
       uploadMax,
       uploadProgress,
+      buildMax,
+      buildProgress,
+      errored,
     } = this.state;
     const {
       project,
@@ -239,6 +278,11 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     } = this.props;
     if (!project) return null;
 
+    const buildLimit = limits ? limits['cordova-build'] : null;
+    const disableBuild =
+      (!errored && exportStep !== '' && exportStep !== 'done') ||
+      (buildLimit && buildLimit.limitReached);
+
     return (
       <Column noMargin>
         <Line>
@@ -246,19 +290,20 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
           installed on Android phones, based on Cordova framework.
         </Line>
         {authenticated && (
-          <Line justifyContent="flex-end">
+          <Line justifyContent="center">
             <RaisedButton
               label="Package for Android"
               primary
               onClick={this.launchWholeExport}
+              disabled={disableBuild}
             />
           </Line>
         )}
         {authenticated && (
           <LimitDisplayer
             subscription={subscription}
-            limit={limits ? limits['cordova-build'] : null}
-            onChangeSubscription={() => console.log("TODO")}
+            limit={buildLimit}
+            onChangeSubscription={() => console.log('TODO')}
           />
         )}
         {!authenticated && (
@@ -270,11 +315,14 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
         <Line>
           <Progress
             exportStep={exportStep}
-            downloadUrl={downloadUrl}
-            logsUrl={logsUrl}
+            downloadUrl={build && build.apkKey ? getUrl(build.apkKey) : null}
+            logsUrl={build && build.logsKey ? getUrl(build.logsKey) : null}
             onDownload={this._download}
             uploadMax={uploadMax}
             uploadProgress={uploadProgress}
+            buildMax={buildMax}
+            buildProgress={buildProgress}
+            errored={errored}
           />
         </Line>
       </Column>

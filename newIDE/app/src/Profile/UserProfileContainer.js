@@ -42,6 +42,7 @@ export type WithUserProfileProps = {|
   subscription: ?Subscription,
   onLogout: () => void,
   onLogin: () => void,
+  onRefreshUserProfile: () => void,
 |};
 
 export const withUserProfile = (
@@ -79,7 +80,7 @@ export const withUserProfile = (
       }
     }
 
-    _fetchUserProfile() {
+    _fetchUserProfile = () => {
       const { authentification } = this.props;
       if (!authentification) return;
 
@@ -158,6 +159,7 @@ export const withUserProfile = (
           limits={this.state.limits}
           onLogin={this._login}
           onLogout={this._logout}
+          onRefreshUserProfile={this._fetchUserProfile}
           {...otherProps}
         />
       );

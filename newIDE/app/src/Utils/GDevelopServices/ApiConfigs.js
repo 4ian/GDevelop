@@ -38,7 +38,7 @@ export const Auth0Config = {
       responseType: 'token id_token',
       audience: `https://4ian.eu.auth0.com/userinfo`,
       params: {
-        scope: 'openid profile email',
+        scope: 'openid profile email offline_access',
       },
       redirect: false,
     },
@@ -47,8 +47,8 @@ export const Auth0Config = {
 
 export const GDevelopUsageApi = {
   baseUrl: isDev
-    ? 'https://tc1jkfw4ul.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://qe7jiozpz9.execute-api.us-east-1.amazonaws.com/live',
+    ? 'https://dwjjhr5k76.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://0sm32zmich.execute-api.us-east-1.amazonaws.com/live',
 };
 
 export const GDevelopBuildApi = {

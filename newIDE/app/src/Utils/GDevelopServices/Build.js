@@ -12,7 +12,7 @@ export type Build = {
   bucket?: string,
   logsKey?: string,
   apkKey?: string,
-  status: 'pending' | 'complete',
+  status: 'pending' | 'complete' | 'errored',
   type: 'cordova-build',
   createdAt: number,
   updatedAt: number,
@@ -36,5 +36,22 @@ export const buildCordovaAndroid = (
         },
       }
     )
+    .then(response => response.data);
+};
+
+export const getBuild = (
+  authentification: Authentification,
+  userId: string,
+  buildId: string
+): Promise<Build> => {
+  return axios
+    .get(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authentification.getAuthorizationHeader(),
+      },
+    })
     .then(response => response.data);
 };

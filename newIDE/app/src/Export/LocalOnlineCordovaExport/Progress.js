@@ -6,14 +6,25 @@ import LinearProgress from 'material-ui/LinearProgress';
 import TextField from 'material-ui/TextField';
 import { Line, Spacer } from '../../UI/Grid';
 
-export default ({ exportStep, downloadUrl, onDownload, uploadMax, uploadProgress }) => (
+export default ({
+  exportStep,
+  downloadUrl,
+  onDownload,
+  uploadMax,
+  uploadProgress,
+  buildMax,
+  buildProgress,
+  errored,
+}) => (
   <Stepper
     activeStep={
       exportStep === 'export'
         ? 0
-        : exportStep === 'upload' || exportStep === 'compress'
+        : exportStep === 'compress' || exportStep === 'upload'
           ? 1
-          : exportStep === 'build' ? 2 : exportStep === 'done' ? 3 : undefined
+          : exportStep === 'waiting-for-build' || exportStep === 'build'
+            ? 2
+            : exportStep === 'done' ? 3 : undefined
     }
     orientation="vertical"
   >
@@ -30,7 +41,12 @@ export default ({ exportStep, downloadUrl, onDownload, uploadMax, uploadProgress
     <Step>
       <StepLabel>Upload to build service</StepLabel>
       <StepContent>
-        {exportStep === 'compress' ? (
+        {errored ? (
+          <p>
+            Can't upload your game to the build service. Please check your
+            internet connection or try again later
+          </p>
+        ) : exportStep === 'compress' ? (
           <Line alignItems="center">
             <CircularProgress size={20} />
             <Spacer />
@@ -51,11 +67,26 @@ export default ({ exportStep, downloadUrl, onDownload, uploadMax, uploadProgress
     <Step>
       <StepLabel>Build</StepLabel>
       <StepContent>
-        <Line alignItems="center">
-          <CircularProgress size={20} />
-          <Spacer />
-          <p>Building...</p>
-        </Line>
+        {errored ? (
+          <p>
+            Something wrong happened :(
+          </p>
+        ) : exportStep === 'waiting-for-build' ? (
+          <Line alignItems="center">
+            <CircularProgress size={20} />
+            <Spacer />
+            <p>Waiting for build to start...</p>
+          </Line>
+        ) : (
+          <Line alignItems="center" expand>
+            <LinearProgress
+              style={{ flex: 1 }}
+              max={buildMax}
+              value={buildProgress}
+              mode="determinate"
+            />
+          </Line>
+        )}
       </StepContent>
     </Step>
     <Step>
@@ -66,11 +97,7 @@ export default ({ exportStep, downloadUrl, onDownload, uploadMax, uploadProgress
           <Spacer />
           <TextField value={downloadUrl} style={{ flex: 1 }} />
           <Spacer />
-          <RaisedButton
-            label="Download"
-            primary
-            onClick={onDownload}
-          />
+          <RaisedButton label="Download" primary onClick={onDownload} />
         </Line>
         <Line expand>
           You can download it on your Android phone and install it.

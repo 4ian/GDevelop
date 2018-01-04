@@ -177,7 +177,10 @@ storiesOf('LocalOnlineCordovaExport', module)
   .add('Progress (export)', () => <Progress exportStep={'export'} />)
   .add('Progress (compress)', () => <Progress exportStep={'compress'} />)
   .add('Progress (upload)', () => <Progress exportStep={'upload'} />)
+  .add('Progress (upload) (errored)', () => <Progress exportStep={'upload'} errored />)
+  .add('Progress (waiting-for-build)', () => <Progress exportStep={'waiting-for-build'} />)
   .add('Progress (build)', () => <Progress exportStep={'build'} />)
+  .add('Progress (build) (errored)', () => <Progress exportStep={'build'} errored />)
   .add('Progress (done)', () => <Progress exportStep={'done'} />);
 
 storiesOf('LocalFolderPicker', module)

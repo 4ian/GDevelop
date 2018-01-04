@@ -65,6 +65,7 @@ export default class ExportDialog extends Component {
         ]}
         open={open}
         noMargin
+        autoScrollBodyContent
       >
         <Tabs value={this.state.value} onChange={this._onChangeTab}>
           {this.props.tabs.map(

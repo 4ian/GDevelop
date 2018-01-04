@@ -16,7 +16,6 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 
 type Props = { usages: ?Usages };
 
-//TODO: Do a CircularProgress component that is centered?
 export default ({ usages }: Props) => (
   <Column noMargin>
     <Line>

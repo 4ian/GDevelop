@@ -52,6 +52,16 @@ import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import { makeTestProject } from '../fixtures/TestProject';
 import CreateProfile from '../Profile/CreateProfile';
 import ProfileDetails from '../Profile/ProfileDetails';
+import LimitDisplayer from '../Profile/LimitDisplayer';
+import {
+  subscriptionForIndieUser,
+  limitsForIndieUser,
+  limitsReached,
+  noSubscription,
+  usagesForIndieUser,
+} from '../fixtures/GDevelopServicesTestData';
+import SubscriptionDetails from '../Profile/SubscriptionDetails';
+import UsagesDetails from '../Profile/UsagesDetails';
 
 const gd = global.gd;
 const {
@@ -177,10 +187,16 @@ storiesOf('LocalOnlineCordovaExport', module)
   .add('Progress (export)', () => <Progress exportStep={'export'} />)
   .add('Progress (compress)', () => <Progress exportStep={'compress'} />)
   .add('Progress (upload)', () => <Progress exportStep={'upload'} />)
-  .add('Progress (upload) (errored)', () => <Progress exportStep={'upload'} errored />)
-  .add('Progress (waiting-for-build)', () => <Progress exportStep={'waiting-for-build'} />)
+  .add('Progress (upload) (errored)', () => (
+    <Progress exportStep={'upload'} errored />
+  ))
+  .add('Progress (waiting-for-build)', () => (
+    <Progress exportStep={'waiting-for-build'} />
+  ))
   .add('Progress (build)', () => <Progress exportStep={'build'} />)
-  .add('Progress (build) (errored)', () => <Progress exportStep={'build'} errored />)
+  .add('Progress (build) (errored)', () => (
+    <Progress exportStep={'build'} errored />
+  ))
   .add('Progress (done)', () => <Progress exportStep={'done'} />);
 
 storiesOf('LocalFolderPicker', module)
@@ -482,6 +498,24 @@ storiesOf('CreateProfile', module)
   .addDecorator(muiDecorator)
   .add('default', () => <CreateProfile onLogin={action('login')} />);
 
+storiesOf('LimitDisplayer', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LimitDisplayer
+      subscription={subscriptionForIndieUser}
+      limit={limitsForIndieUser['cordova-build']}
+      onChangeSubscription={action('change subscription')}
+    />
+  ))
+  .add('limit reached', () => (
+    <LimitDisplayer
+      subscription={subscriptionForIndieUser}
+      limit={limitsReached['cordova-build']}
+      onChangeSubscription={action('change subscription')}
+    />
+  ));
+
 storiesOf('ProfileDetails', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -495,3 +529,19 @@ storiesOf('ProfileDetails', module)
     />
   ))
   .add('loading', () => <ProfileDetails profile={null} />);
+
+storiesOf('SubscriptionDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SubscriptionDetails subscription={subscriptionForIndieUser} />
+  ))
+  .add('limit reached', () => (
+    <SubscriptionDetails subscription={noSubscription} />
+  ));
+
+storiesOf('UsagesDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <UsagesDetails usages={usagesForIndieUser} />)
+  .add('empty', () => <UsagesDetails usages={[]} />);

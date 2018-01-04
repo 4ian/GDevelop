@@ -62,6 +62,7 @@ import {
 } from '../fixtures/GDevelopServicesTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
+import SubscriptionDialog from '../Profile/SubscriptionDialog';
 
 const gd = global.gd;
 const {
@@ -514,6 +515,13 @@ storiesOf('LimitDisplayer', module)
       limit={limitsReached['cordova-build']}
       onChangeSubscription={action('change subscription')}
     />
+  ))
+  .add('limit reached without subscription', () => (
+    <LimitDisplayer
+      subscription={noSubscription}
+      limit={limitsReached['cordova-build']}
+      onChangeSubscription={action('change subscription')}
+    />
   ));
 
 storiesOf('ProfileDetails', module)
@@ -545,3 +553,14 @@ storiesOf('UsagesDetails', module)
   .addDecorator(muiDecorator)
   .add('default', () => <UsagesDetails usages={usagesForIndieUser} />)
   .add('empty', () => <UsagesDetails usages={[]} />);
+
+storiesOf('SubscriptionDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SubscriptionDialog
+      subscription={subscriptionForIndieUser}
+      open
+      onClose={action('on close')}
+    />
+  ));

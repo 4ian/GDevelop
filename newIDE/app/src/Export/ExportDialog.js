@@ -34,7 +34,13 @@ export default class ExportDialog extends Component {
   };
 
   render() {
-    const { project, open, onClose, authentification } = this.props;
+    const {
+      project,
+      open,
+      onClose,
+      authentification,
+      onChangeSubscription,
+    } = this.props;
     const { showExperimental } = this.state;
     if (!open || !project) return null;
 
@@ -76,6 +82,7 @@ export default class ExportDialog extends Component {
                     <ExportComponent
                       project={this.props.project}
                       authentification={authentification}
+                      onChangeSubscription={onChangeSubscription}
                     />
                   </div>
                 </Tab>

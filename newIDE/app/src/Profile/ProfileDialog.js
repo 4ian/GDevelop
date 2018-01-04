@@ -19,6 +19,7 @@ import LimitDisplayer from './LimitDisplayer';
 type Props = {|
   open: boolean,
   onClose: Function,
+  onChangeSubscription: Function,
 |} & WithUserProfileProps;
 
 type State = {|
@@ -46,6 +47,7 @@ class ProfileDialog extends Component<Props, State> {
       onClose,
       onLogout,
       onLogin,
+      onChangeSubscription,
     } = this.props;
     const actions = [
       <FlatButton
@@ -74,7 +76,10 @@ class ProfileDialog extends Component<Props, State> {
             {authenticated ? (
               <Column noMargin>
                 <ProfileDetails profile={profile} />
-                <SubscriptionDetails subscription={subscription} />
+                <SubscriptionDetails
+                  subscription={subscription}
+                  onChangeSubscription={onChangeSubscription}
+                />
               </Column>
             ) : (
               <CreateProfile onLogin={onLogin} />
@@ -87,7 +92,7 @@ class ProfileDialog extends Component<Props, State> {
                   <LimitDisplayer
                     subscription={subscription}
                     limit={limits ? limits['cordova-build'] : null}
-                    onChangeSubscription={() => console.log('TODO')}
+                    onChangeSubscription={onChangeSubscription}
                   />
                 </Column>
                 <UsagesDetails usages={usages} />

@@ -30,11 +30,28 @@ export type Limits = {
 
 export const getSubscriptionPlans = () => ([
   {
-    planId: 'gdevelop-indie',
+    planId: 'gdevelop-pro',
+    name: 'GDevelop Pro',
+    monthlyPriceInEuros: 7,
+    smallDescription: 'Ideal for advanced game makers',
+    description: 'Allow to package your game for Android up to 70 times a day.',
+    moreDescription1: 'You\'ll also have access to online packaging for Windows, macOS and Linux when it\'s ready.',
   },
   {
-    planId: 'gdevelop-pro',
-  }
+    planId: 'gdevelop-indie',
+    name: 'GDevelop Indie',
+    monthlyPriceInEuros: 2,
+    smallDescription: 'Ideal for beginners',
+    description: 'Allow to package your game for Android up to 10 times a day.',
+    moreDescription1: 'You\'ll also have access to online packaging for Windows, macOS and Linux when it\'s ready.',
+  },
+  {
+    planId: '',
+    name: 'No subscription',
+    monthlyPriceInEuros: 0,
+    smallDescription: '',
+    description: 'You can use GDevelop for free, but online packaging for Android is limited to twice a day.'
+  },
 ])
 
 export const getUserUsages = (

@@ -4,13 +4,13 @@ import { Column, Line } from '../UI/Grid';
 import { type Subscription } from '../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
 
 type Props = {
   subscription: ?Subscription,
+  onChangeSubscription: Function,
 };
 
-export default ({ subscription }: Props) =>
+export default ({ subscription, onChangeSubscription }: Props) =>
   subscription && subscription.planId ? (
     <Column>
       <Line>
@@ -20,9 +20,12 @@ export default ({ subscription }: Props) =>
           Android in one-click!
         </p>
       </Line>
-      <Line>
-        <RaisedButton label="Upgrade/change" disabled />
-        <FlatButton label="Cancel subscription" disabled />
+      <Line justifyContent="center">
+        <RaisedButton
+          label="Upgrade/change"
+          primary
+          onClick={onChangeSubscription}
+        />
       </Line>
     </Column>
   ) : subscription && !subscription.planId ? (
@@ -33,8 +36,12 @@ export default ({ subscription }: Props) =>
           services, including building your game for Android in one-click!
         </p>
       </Line>
-      <Line>
-        <RaisedButton label="Choose a subscription" disabled />
+      <Line justifyContent="center">
+        <RaisedButton
+          label="Choose a subscription"
+          primary
+          onClick={onChangeSubscription}
+        />
       </Line>
     </Column>
   ) : (

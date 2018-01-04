@@ -53,6 +53,7 @@ type State = {
 
 type Props = WithUserProfileProps & {
   project: gdProject,
+  onChangeSubscription: Function,
 };
 
 class LocalOnlineCordovaExport extends Component<Props, State> {
@@ -275,6 +276,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       onLogin,
       subscription,
       limits,
+      onChangeSubscription,
     } = this.props;
     if (!project) return null;
 
@@ -303,7 +305,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
           <LimitDisplayer
             subscription={subscription}
             limit={buildLimit}
-            onChangeSubscription={() => console.log('TODO')}
+            onChangeSubscription={onChangeSubscription}
           />
         )}
         {!authenticated && (

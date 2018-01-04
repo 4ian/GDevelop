@@ -53,6 +53,7 @@ import {
   getDefaultPreferences,
 } from './Preferences/PreferencesHandler';
 import ErrorBoundary from '../UI/ErrorBoundary';
+import SubscriptionDialog from '../Profile/SubscriptionDialog';
 
 const gd = global.gd;
 
@@ -81,6 +82,7 @@ type State = {|
   preferencesDialogOpen: boolean,
   preferences: PreferencesState,
   profileDialogOpen: boolean,
+  subscriptionDialogOpen: boolean,
 |};
 
 export default class MainFrame extends Component<*, State> {
@@ -101,6 +103,7 @@ export default class MainFrame extends Component<*, State> {
     preferencesDialogOpen: false,
     preferences: getDefaultPreferences(),
     profileDialogOpen: false,
+    subscriptionDialogOpen: false,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
@@ -656,6 +659,12 @@ export default class MainFrame extends Component<*, State> {
     });
   };
 
+  openSubscription = (open: boolean = true) => {
+    this.setState({
+      subscriptionDialogOpen: open,
+    });
+  };
+
   _onChangeEditorTab = (value: number) => {
     this.setState(
       {
@@ -717,6 +726,7 @@ export default class MainFrame extends Component<*, State> {
       projectManagerOpen,
       preferences,
       profileDialogOpen,
+      subscriptionDialogOpen,
     } = this.state;
     const {
       exportDialog,
@@ -794,9 +804,7 @@ export default class MainFrame extends Component<*, State> {
                 closable={editorTab.closable}
               >
                 <div style={{ display: 'flex', flex: 1, height: '100%' }}>
-                  <ErrorBoundary>
-                    {editorTab.render()}
-                  </ErrorBoundary>
+                  <ErrorBoundary>{editorTab.render()}</ErrorBoundary>
                 </div>
               </Tab>
             ))}
@@ -810,6 +818,12 @@ export default class MainFrame extends Component<*, State> {
             open={profileDialogOpen}
             authentification={authentification}
             onClose={() => this.openProfile(false)}
+            onChangeSubscription={() => this.openSubscription(true)}
+          />
+          <SubscriptionDialog
+            onClose={() => this.openSubscription(false)}
+            open={subscriptionDialogOpen}
+            authentification={authentification}
           />
           <PreferencesDialog
             open={this.state.preferencesDialogOpen}
@@ -830,6 +844,10 @@ export default class MainFrame extends Component<*, State> {
             React.cloneElement(exportDialog, {
               open: this.state.exportDialogOpen,
               onClose: () => this.openExportDialog(false),
+              onChangeSubscription: () => {
+                this.openExportDialog(false);
+                this.openSubscription(true);
+              },
               project: this.state.currentProject,
               authentification,
             })}

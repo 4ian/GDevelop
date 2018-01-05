@@ -3,6 +3,10 @@
 import Window from '../../Utils/Window';
 import { sendErrorMessage } from '../../Utils/Analytics/EventSender';
 
+export const showMessageBox = (message: string) => {
+  Window.showMessageBox(message, 'info');
+};
+
 export const showErrorBox = (message: string, rawError: any) => {
   Window.showMessageBox(message, 'error');
   sendErrorMessage(message, 'error', rawError);

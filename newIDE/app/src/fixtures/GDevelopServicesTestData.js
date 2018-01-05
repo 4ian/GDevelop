@@ -4,6 +4,15 @@ import {
   type Subscription,
   type Limits,
 } from '../Utils/GDevelopServices/Usage';
+import { type Profile } from '../Utils/GDevelopServices/Authentification';
+
+export const profileForIndieUser: Profile = {
+  sub: 'indie-user',
+  nickname: 'IndieUser',
+  picture: '',
+  email: 'indie-user@example.com',
+  email_verified: true,
+};
 
 export const usagesForIndieUser: Usages = [
   {
@@ -34,7 +43,7 @@ export const subscriptionForIndieUser: Subscription = {
 };
 
 export const noSubscription: Subscription = {
-  planId: '',
+  planId: null,
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'no-subscription-user',

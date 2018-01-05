@@ -56,3 +56,11 @@ export const GDevelopBuildApi = {
     ? 'https://ppvvhs48j1.execute-api.us-east-1.amazonaws.com/dev'
     : 'https://21fixz45y2.execute-api.us-east-1.amazonaws.com/live',
 };
+
+export const StripeCheckoutConfig = {
+  key: isDev
+    ? 'pk_test_4N7HfDWDds6ejCkxVM7fvvLr'
+    : 'pk_live_4N7H3nYlkZV4ylpKlzhmM8fN',
+  image:
+    'https://raw.githubusercontent.com/4ian/GD/gh-pages/res/icon128linux.png',
+};

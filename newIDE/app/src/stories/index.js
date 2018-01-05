@@ -59,6 +59,7 @@ import {
   limitsReached,
   noSubscription,
   usagesForIndieUser,
+  profileForIndieUser,
 } from '../fixtures/GDevelopServicesTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
@@ -559,7 +560,15 @@ storiesOf('SubscriptionDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SubscriptionDialog
+      profile={profileForIndieUser}
       subscription={subscriptionForIndieUser}
+      open
+      onClose={action('on close')}
+    />
+  )).add('loading (no profile/subscription)', () => (
+    <SubscriptionDialog
+      profile={null}
+      subscription={null}
       open
       onClose={action('on close')}
     />

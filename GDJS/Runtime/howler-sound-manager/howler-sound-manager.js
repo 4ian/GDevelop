@@ -75,6 +75,8 @@ gdjs.HowlerSoundManager = function(resources)
     this._resources = resources;
     this._availableResources = {}; //Map storing "audio" resources for faster access.
 
+    this._globalVolume = 100;
+
     this._sounds = {};
     this._musics = {};
     this._freeSounds = []; //Sounds without an assigned channel.
@@ -268,11 +270,14 @@ gdjs.HowlerSoundManager.prototype.getMusicOnChannel = function(channel) {
 };
 
 gdjs.HowlerSoundManager.prototype.setGlobalVolume = function(volume) {
-	Howler.volume(volume/100);
+	this._globalVolume = volume;
+	if (this._globalVolume > 100) this._globalVolume = 100;
+	if (this._globalVolume < 0) this._globalVolume = 0;
+	Howler.volume(this._globalVolume/100);
 };
 
 gdjs.HowlerSoundManager.prototype.getGlobalVolume = function() {
-	return Howler.volume()*100;
+	return this._globalVolume;
 };
 
 gdjs.HowlerSoundManager.prototype.clearAll = function() {

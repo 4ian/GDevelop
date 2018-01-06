@@ -36,7 +36,11 @@ private:
     void DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element) override;
     void DoSerializeTo(gd::SerializerElement & element) const override;
 
-    gd::String filename;
+    gd::String skeletalDataFilename;
+    gd::String rootArmatureName;
+    gd::String textureDataFilename;
+    gd::String textureName;
+    gd::String apiName;
 
     #if !defined(GD_NO_WX_GUI)
     static sf::Texture edittimeIconImage;

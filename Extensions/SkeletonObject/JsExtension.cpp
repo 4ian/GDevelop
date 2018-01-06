@@ -28,9 +28,16 @@ public:
     {
         DeclareSkeletonObjectExtension(*this);
 
-        GetObjectMetadata("SkeletonObject::Skeleton").SetIncludeFile("Extensions/SkeletonObject/skeletonruntimeobject.js");
+        GetObjectMetadata("SkeletonObject::Skeleton")
+            .SetIncludeFile("Extensions/SkeletonObject/Gskeletonruntimeobject.js")
+            .SetIncludeFile("Extensions/SkeletonObject/Fskeletonanimation.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Eskeletonarmature.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Dskeletonslot.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Cskeletonbone.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Bskeletontransform.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Askeletonruntimeobject-pixi-renderer.js");
 
-        GetAllActionsForObject("SkeletonObject::Skeleton")["SkeletonObject::SayHello"].SetFunctionName("sayHello");
+        GetAllActionsForObject("SkeletonObject::Skeleton")["SkeletonObject::SetSlotPositionX"].SetFunctionName("setSlotX").SetGetter("getSlotX");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

@@ -31,26 +31,45 @@ SkeletonObject::SkeletonObject(gd::String name_) :
 std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties(gd::Project & project) const
 {
     std::map<gd::String, gd::PropertyDescriptor> properties;
-    properties[_("Main filename")].SetValue(filename);
+    properties[_("Skeletal data filename")].SetValue(skeletalDataFilename);
+    properties[_("Main armature name")].SetValue(rootArmatureName);
+    properties[_("Texture data filename")].SetValue(textureDataFilename);
+    properties[_("Texture")].SetValue(textureName);
+    properties[_("API")]
+        .SetValue(apiName)
+        .SetType("Choice")
+        .AddExtraInfo("DragonBones");
 
     return properties;
 }
 
 bool SkeletonObject::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
 {
-    if (name == _("Main filename")) filename = value;
+    if (name == _("Skeletal data filename")) skeletalDataFilename = value;
+    if (name == _("Main armature name")) rootArmatureName = value;
+    if (name == _("Texture data filename")) textureDataFilename = value;
+    if (name == _("Texture")) textureName = value;
+    if (name == _("API")) apiName = value;
 
     return true;
 }
 
 void SkeletonObject::DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element)
 {
-    filename = element.GetStringAttribute("mainFilename");
+    skeletalDataFilename = element.GetStringAttribute("skeletalDataFilename");
+    rootArmatureName = element.GetStringAttribute("rootArmatureName");
+    textureDataFilename = element.GetStringAttribute("textureDataFilename");
+    textureName = element.GetStringAttribute("textureName");
+    apiName = element.GetStringAttribute("apiName");
 }
 
 void SkeletonObject::DoSerializeTo(gd::SerializerElement & element) const
 {
-    element.SetAttribute("mainFilename", filename);
+    element.SetAttribute("skeletalDataFilename", skeletalDataFilename);
+    element.SetAttribute("rootArmatureName", rootArmatureName);
+    element.SetAttribute("textureDataFilename", textureDataFilename);
+    element.SetAttribute("textureName", textureName);
+    element.SetAttribute("apiName", apiName);
 }
 
 #if !defined(GD_NO_WX_GUI)

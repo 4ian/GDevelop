@@ -329,12 +329,12 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete
 	var that = this;
     for(var i = 0;i<files.length;++i) {
         (function(audioFile) {
-            var sound = new Howl({
-              src: [audioFile], //TODO: ogg, mp3...
-              preload: true,
-              onload: onLoad.bind(that, audioFile),
-              onloaderror: onLoad.bind(that, audioFile)
-            });
+            var sound = new XMLHttpRequest();
+            sound.addEventListener('load', onLoad.bind(that, audioFile));
+            sound.addEventListener('error', onLoad.bind(that, audioFile));
+            sound.addEventListener('abort', onLoad.bind(that, audioFile));
+            sound.open('GET', audioFile);
+            sound.send();
         })(files[i]);
     }
 }

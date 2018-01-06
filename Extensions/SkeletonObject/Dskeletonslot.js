@@ -7,176 +7,47 @@ This project is released under the MIT License.
 
 
 /**
- * The SkeletonRuntimeObject imports and displays skeletal animations files.
+ * The SkeletonSlot display images transformed by itself and bones.
  *
  * @namespace gdjs
- * @class SkeletonRuntimeObject
- * @extends RuntimeObject
- * @namespace gdjs
+ * @class SkeletonSlot
+ * @extends gdjs.SkeletonTransform
  */
-gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
-    gdjs.RuntimeObject.call(this, runtimeScene, objectData);
-    
-    console.log("width: ", objectData.width);
-    console.log("height: ", objectData);
+function gdjs.SkeletonSlot(armature){
+    gdjs.SkeletonTransform.call(this);
+    this.name = "";
+    this.armature = armature;
+    this.type = SLOT_UNDEFINED;
+    this.defaultZ = 0;
+    this.defaultR = 255;
+    this.defaultG = 255;
+    this.defaultB = 255;
+    this.defaultAlpha = 1.0;
+    this.defaultVisible = true;
+    this.z = this.defaultZ;
+    this.r = this.defaultR;
+    this.g = this.defaultG;
+    this.b = this.defaultB;
+    this.alpha = this.defaultAlpha;
+    this.visible = this.defaultVisible;
+    this.renderer = new gdjs.SkeletonSlotRenderer();
+    this._updateRender = false;
+    this.aabb = gdjs.Polygon.createRectangle(0, 0);
 
-    this.rootArmature = new gdjs.SkeletonArmature(this);
-    this.animationPlaying = true;
-    this.animationSmooth = true;
-    this.timeScale = 1.0;
-    this.renderer = new gdjs.SkeletonRuntimeObjectRenderer();
-    
-    var skeletalData = this.renderer.getData(objectData.skeletalDataFilename);
-    if(objectData.apiName === "DragonBones"){
-        // Load the sub-textures
-        this.renderer.loadDragonBones(runtimeScene, objectData.textureDataFilename, objectData.textureName);
-        // Main loader
-        this.loadDragonBones(runtimeScene, skeletalData, objectData.rootArmatureName);
-    }
-};
+    // Polygon only
+    this.polygons = [];
 
-gdjs.SkeletonRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.SkeletonRuntimeObject.thisIsARuntimeObjectConstructor = "SkeletonObject::Skeleton";
+    // Mesh only
+    this.defaultVertices = []; // original vertices location (relative to mesh slot)
+    this.vertices = []; // same as defaultVertices, but modified on animations
+    this.skinned = false; // is the mesh skinned?
+    this.skinBones = []; // skinning bones
+    this.skinBonesMatricesInverses = []; // bones inverse local matrices (relative to mesh slot)
+    this.vertexBones = []; // list of bone indices (on this.skinBones) for each vertex
+    this.vertexWeights = []; // list of weights for each vertex
+    this.worldMatrixInverse = null; // precomputed mesh slot inverse world matrix
 
-gdjs.SkeletonRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
-    if(initialInstanceData.customSize){
-        this.setWidth(initialInstanceData.width);
-        this.setHeight(initialInstanceData.height);
-    }
-};
-
-gdjs.SkeletonRuntimeObject.prototype.sayHello = function(){
-    console.log(this);
-};
-
-gdjs.SkeletonRuntimeObject.prototype.loadDragonBones = function(runtimeScene, skeletalData, rootArmatureName){
-    // Get the root armature with the given name
-    for(var i=0; i<skeletalData.armature.length; i++){
-        if(skeletalData.armature[i].name === rootArmatureName){
-            this.rootArmature.loadDragonBones(skeletalData, i, this.renderer.textures);
-        }
-    }
-    // If name was not found, get the first armature
-    if(!this.rootArmature.loaded && skeletalData.armature.length > 0){
-        this.rootArmature.loadDragonBones(skeletalData, 0, this.renderer.textures);
-    }
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setX = function(x){
-    this.x = x;
-    this.rootArmature.setPos(x, this.y);
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setY = function(y){
-    this.y = y;
-    this.rootArmature.setPos(this.x, y);
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setAngle = function(angle){
-    this.angle = angle;
-    this.rootArmature.setRot(angle);
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setScaleX = function(scaleX){
-    this.scaleX = scaleX;
-    this.rootArmature.setScale(scaleX, this.scaleY);
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setScaleY = function(scaleY){
-    this.scaleY = scaleY;
-    this.rootArmature.setScale(this.scaleX, scaleY);
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setWidth = function(width){
-    this.setScaleY(height / this.rootArmature.getWidth());
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setHeight = function(height){
-    this.setScaleY(height / this.rootArmature.getWidth());
-};
-
-gdjs.SkeletonRuntimeObject.prototype.getRendererObject = function(){
-    return this.rootArmature.getRendererObject();
-};
-
-gdjs.SkeletonRuntimeObject.prototype.getHitBoxes = function(){
-    return [this.rootArmature.getAABB()];
-};
-
-gdjs.SkeletonRuntimeObject.prototype.update = function(runtimeScene){
-
-    var delta = this.getElapsedTime(runtimeScene) / 1000.0;
-
-    // this.rootArmature.update();
-
-    if(this.animationPlaying){
-        // this.rootArmature.updateAnimation(delta*this.timeScale, this.smoothAnimation);
-    }
-};
-
-gdjs.SkeletonRuntimeObject.prototype.getTimescale = function(timeScale){
-    this.timeScale = timeScale < 0 ? 0 : timeScale; // Suport negative timeScale (backward) ?
-};
-
-gdjs.SkeletonRuntimeObject.prototype.pauseAnimation = function(){
-    this.animationPlaying = false;
-};
-
-gdjs.SkeletonRuntimeObject.prototype.unpauseAnimation = function(){
-    this.animationPlaying = true;
-};
-
-gdjs.SkeletonRuntimeObject.prototype.isAnimationPaused = function(){
-    return !this.animationPlaying;
-};
-
-gdjs.SkeletonRuntimeObject.prototype.isAnimationSmooth = function(){
-    return this.animationSmooth;
-};
-
-gdjs.SkeletonRuntimeObject.prototype.isAnimationSmooth = function(){
-    return this.animationSmooth;
-};
-
-gdjs.SkeletonRuntimeObject.prototype.getCurrentAnimation = function(){
-    return this.rootArmature.getCurrentAnimation();
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setAnimation = function(newAnimation, blendTime=0, loops=-1){
-    this.rootArmature.setAnimation(newAnimation, blendTime, loops);
-};
-
-gdjs.SkeletonRuntimeObject.prototype.getCurrentAnimationName = function(){
-    return this.rootArmature.getCurrentAnimationName();
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setAnimationName = function(newAnimation, blendTime=0, loops=-1){
-    this.rootArmature.setAnimationName(newAnimation, blendTime, loops);
-};
-
-gdjs.SkeletonRuntimeObject.prototype.resetCurrentAnimation = function(){
-    this.rootArmature.resetCurrentAnimation();
-};
-
-gdjs.SkeletonRuntimeObject.prototype.getSlot = function(slotPath){
-    return null;
-};
-
-gdjs.SkeletonRuntimeObject.prototype.getBone = function(bonePath){
-    return null;
-};
-
-gdjs.SkeletonRuntimeObject.prototype.getSlotX = function(slotPath){
-    return 0;
-};
-
-gdjs.SkeletonRuntimeObject.prototype.setSlotX = function(slotPath, x){
-};
-
-gdjs.SkeletonRuntimeObject.prototype.slotCollidesWithObject = function(slotPath, object){
-    return false;
-};
-
-gdjs.SkeletonRuntimeObject.prototype.slotCollidesWithSlot = function(slotPath1, slotPath2){
-    return false;
-};
+    // Armature only
+    this.childArmature = null;
+}
+gdjs.SkeletonSlot.prototype = Object.create(gdjs.SkeletonTransform.prototype);

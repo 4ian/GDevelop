@@ -34,14 +34,6 @@ gdjs.SkeletonRuntimeObjectPixiRenderer.prototype.loadDragonBones = function(runt
 
 
 
-/**
- * The SkeletonRuntimeObjectPixiRenderer hol.
- *
- * @namespace gdjs
- * @class SkeletonRuntimeObject
- * @extends RuntimeObject
- * @namespace gdjs
- */
 gdjs.SkeletonArmaturePixiRenderer = function()
 {
     this.container = new PIXI.Container();
@@ -64,3 +56,11 @@ gdjs.SkeletonArmaturePixiRenderer.prototype.addRenderer = function(renderer){
 gdjs.SkeletonArmaturePixiRenderer.prototype.sortRenderers = function(){
     this.container.children.sort(function(a, b){ return a.z - b.z; });
 };
+
+
+
+gdjs.SkeletonSlotPixiRenderer = function()
+{
+    this.renderObject = null;
+};
+gdjs.SkeletonSlotRenderer = gdjs.SkeletonSlotPixiRenderer;

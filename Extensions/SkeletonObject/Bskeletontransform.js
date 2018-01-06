@@ -7,16 +7,15 @@ This project is released under the MIT License.
 
 
 /**
- * The SkeletonMatrix hold the basic transformation data in a matrix form.
+ * The SkeletonMatrix holds the basic transformation data in a matrix form.
  *
  * @namespace gdjs
  * @class SkeletonMatrix
- * @namespace gdjs
  */
 gdjs.SkeletonMatrix = function(a=1, b=0, tx=0, c=0, d=1, ty=0){
 	this.a = a; this.b = b; this.tx = tx;
 	this.c = c; this.d = d; this.ty = ty;
-	this.a31 = 0;   this.a32 = 0;   this.a33 = 1;
+	this.u = 0; this.v = 0; this.w  = 1;
 }
 
 gdjs.SkeletonMatrix.prototype.translation = function(x, y){
@@ -39,15 +38,17 @@ gdjs.SkeletonMatrix.prototype.scale = function(sx, sy){
 
 gdjs.SkeletonMatrix.prototype.clone = function(){
 	return new gdjs.SkeletonMatrix(this.a, this.b, this.tx,
-					  this.c, this.d, this.ty,
-					  this.a31, this.a32, this.a33);
+								   this.c, this.d, this.ty,
+								   this.u, this.v, this.w );
 }
 
 gdjs.SkeletonMatrix.prototype.mul = function(m){
-	return new gdjs.SkeletonMatrix(this.a*m.a + this.b*m.c, this.a*m.b + this.b*m.d,
-					  this.a*m.tx + this.b*m.ty + this.tx,
-					  this.c*m.a + this.d*m.c, this.c*m.b + this.d*m.d,
-					  this.c*m.tx + this.d*m.ty + this.ty);
+	return new gdjs.SkeletonMatrix(this.a*m.a + this.b*m.c,
+								   this.a*m.b + this.b*m.d,
+								   this.a*m.tx + this.b*m.ty + this.tx,
+								   this.c*m.a + this.d*m.c,
+								   this.c*m.b + this.d*m.d,
+								   this.c*m.tx + this.d*m.ty + this.ty);
 }
 
 gdjs.SkeletonMatrix.prototype.mulVec = function(v){
@@ -57,20 +58,28 @@ gdjs.SkeletonMatrix.prototype.mulVec = function(v){
 
 gdjs.SkeletonMatrix.prototype.inverse = function(){
 	var det_inv = 1.0 / (this.a*this.d - this.b*this.c);
-	return new gdjs.SkeletonMatrix( this.d*det_inv, - this.b*det_inv,
-					  (this.b*this.ty - this.d*this.tx)*det_inv,
-					  -this.c*det_inv,   this.a*det_inv,
-					  (this.c*this.tx - this.a*this.ty)*det_inv);
+	return new gdjs.SkeletonMatrix( this.d*det_inv,
+								   -this.b*det_inv,
+								   (this.b*this.ty - this.d*this.tx)*det_inv,
+								   -this.c*det_inv,
+								    this.a*det_inv,
+								   (this.c*this.tx - this.a*this.ty)*det_inv);
 }
 
 gdjs.SkeletonMatrix.prototype.str = function(){
 	return "|" + this.a.toFixed(2) + ", " + this.b.toFixed(2) + ", " + this.tx.toFixed(2) + "|\n" +
 		   "|" + this.c.toFixed(2) + ", " + this.d.toFixed(2) + ", " + this.ty.toFixed(2) + "|\n" +
-		   "|" + this.a31.toFixed(2) + ", " + this.a32.toFixed(2) + ", " + this.a33.toFixed(2) + "|\n";
+		   "|" + this.u.toFixed(2) + ", " + this.v.toFixed(2) + ", " + this.w.toFixed(2) + "|\n";
 }
 
 
 
+/**
+ * The SkeletonTransform is the basic class for transformable objects as bones, slots and armatures.
+ *
+ * @namespace gdjs
+ * @class SkeletonTransform
+ */
 gdjs.SkeletonTransform = function(x=0, y=0, rot=0, sx=1, sy=1){
 	this.parent = null;
 	this.children = [];
@@ -231,7 +240,7 @@ gdjs.SkeletonTransform.prototype.updateParentsTransform = function(){
 gdjs.SkeletonTransform.prototype.transformPolygon = function(polygon){
 	this.updateParentsTransform();
 
-	var worldPoly = new Polygon();
+	var worldPoly = new gdjs.Polygon();
 	for(var i=0; i<polygon.vertices.length; i++){
 		worldPoly.vertices.push(this.worldMatrix.mulVec(polygon.vertices[i]));
 	}

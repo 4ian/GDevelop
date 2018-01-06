@@ -12,13 +12,9 @@ This project is released under the MIT License.
  * @namespace gdjs
  * @class SkeletonRuntimeObject
  * @extends RuntimeObject
- * @namespace gdjs
  */
 gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
-    
-    console.log("width: ", objectData.width);
-    console.log("height: ", objectData);
 
     this.rootArmature = new gdjs.SkeletonArmature(this);
     this.animationPlaying = true;
@@ -34,7 +30,6 @@ gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
         this.loadDragonBones(runtimeScene, skeletalData, objectData.rootArmatureName);
     }
 };
-
 gdjs.SkeletonRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
 gdjs.SkeletonRuntimeObject.thisIsARuntimeObjectConstructor = "SkeletonObject::Skeleton";
 

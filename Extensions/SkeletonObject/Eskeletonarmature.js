@@ -10,9 +10,8 @@ This project is released under the MIT License.
  * The SkeletonArmature hold the bones and slots/attachments as well as its animations.
  *
  * @namespace gdjs
- * @class SkeletonRuntimeObject
- * @extends RuntimeObject
- * @namespace gdjs
+ * @class SkeletonArmature
+ * @extends gdjs.SkeletonTransform
  */
 gdjs.SkeletonArmature = function(skeleton, parentArmature=null, parentSlot=null){
 	gdjs.SkeletonTransform.call(this);
@@ -32,7 +31,6 @@ gdjs.SkeletonArmature = function(skeleton, parentArmature=null, parentSlot=null)
 	this._updateZ = false;
 	this._loaded = false;
 };
-
 gdjs.SkeletonArmature.prototype = Object.create(gdjs.SkeletonTransform.prototype);
 
 gdjs.SkeletonArmature.prototype.loadDragonBones = function(skeletalData, index, textures){

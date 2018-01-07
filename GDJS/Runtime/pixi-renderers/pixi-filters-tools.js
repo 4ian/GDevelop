@@ -22,13 +22,13 @@ gdjs.NightPixiFilter = function() {
       opacity: { type: '1f', value: 1 }
   };
 
-  PIXI.AbstractFilter.call(this,
+  PIXI.Filter.call(this,
     vertexShader,
     fragmentShader,
     uniforms
   );
 }
-gdjs.NightPixiFilter.prototype = Object.create(PIXI.AbstractFilter.prototype);
+gdjs.NightPixiFilter.prototype = Object.create(PIXI.Filter.prototype);
 gdjs.NightPixiFilter.prototype.constructor = gdjs.NightPixiFilter;
 
 gdjs.LightNightPixiFilter = function() {
@@ -51,13 +51,13 @@ gdjs.LightNightPixiFilter = function() {
       opacity: { type: '1f', value: 1 }
   };
 
-  PIXI.AbstractFilter.call(this,
+  PIXI.Filter.call(this,
     vertexShader,
     fragmentShader,
     uniforms
   );
 }
-gdjs.LightNightPixiFilter.prototype = Object.create(PIXI.AbstractFilter.prototype);
+gdjs.LightNightPixiFilter.prototype = Object.create(PIXI.Filter.prototype);
 gdjs.LightNightPixiFilter.prototype.constructor = gdjs.LightNightPixiFilter;
 
 gdjs.PixiFiltersTools._filters = {

@@ -146,6 +146,26 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
 	for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
 		gdjs.callbacksRuntimeSceneUnloaded[i](this);
 	}
+
+    this._layers = new Hashtable();
+    this._variables = new gdjs.VariablesContainer();
+    this._initialBehaviorSharedData = new Hashtable();
+    this._objects = new Hashtable();
+    this._instances = new Hashtable();
+    this._instancesCache = new Hashtable();
+    this._initialObjectsData = null;
+    this._eventsFunction = null;
+    this._objectsCtor = new Hashtable();
+    this._allInstancesList = [];
+    this._instancesRemoved = [];
+
+    this._renderer = new gdjs.RuntimeSceneRenderer(this, this._runtimeGame ? this._runtimeGame.getRenderer() : null);
+    this._lastId = 0;
+    this._eventsContext = null;
+
+    this._isLoaded = false;
+
+    this.onCanvasResized();
 };
 
 /**

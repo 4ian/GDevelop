@@ -123,7 +123,7 @@ gdjs.HowlerSoundManager = function(resources)
               sound.play();
             }
           }
-          that._pausedSounds = [];
+          that._pausedSounds.length = 0;
           that._paused = false;
         }, false);
     });
@@ -205,7 +205,7 @@ gdjs.HowlerSoundManager.prototype.playSound = function(soundName, loop, volume, 
 gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function(soundName, channel, loop, volume, pitch) {
 	var	oldSound = this._sounds[channel];
 	if (oldSound) {
-		oldSound.stop();
+		oldSound.unload();
 	}
 
 	var soundFile = this._getFileFromSoundName(soundName);
@@ -246,7 +246,7 @@ gdjs.HowlerSoundManager.prototype.playMusic = function(soundName, loop, volume, 
 gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function(soundName, channel, loop, volume, pitch) {
 	var	oldMusic = this._musics[channel];
 	if (oldMusic) {
-		oldMusic.stop();
+		oldMusic.unload();
 	}
 
 	var soundFile = this._getFileFromSoundName(soundName);
@@ -282,32 +282,31 @@ gdjs.HowlerSoundManager.prototype.getGlobalVolume = function() {
 
 gdjs.HowlerSoundManager.prototype.clearAll = function() {
 	for (var i = 0;i<this._freeSounds.length;++i)  {
-		if (this._freeSounds[i]) this._freeSounds[i].stop();
+		if (this._freeSounds[i]) this._freeSounds[i].unload();
 	}
 	for (var i = 0;i<this._freeMusics.length;++i)  {
-		if (this._freeMusics[i]) this._freeMusics[i].stop();
+		if (this._freeMusics[i]) this._freeMusics[i].unload();
 	}
 	this._freeSounds.length = 0;
 	this._freeMusics.length = 0;
 
 	for (var p in this._sounds) {
 		if (this._sounds.hasOwnProperty(p) && this._sounds[p]) {
-			this._sounds[p].stop();
+			this._sounds[p].unload();
 			delete this._sounds[p];
 		}
 	}
 	for (var p in this._musics) {
 		if (this._musics.hasOwnProperty(p) && this._musics[p]) {
-			this._musics[p].stop();
+			this._musics[p].unload();
 			delete this._musics[p];
 		}
 	}
-	this._pausedSounds = [];
+	this._pausedSounds.length = 0;
 }
 
 gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete, resources) {
 	resources = resources || this._resources;
-
     var files = [];
 	for(var i = 0, len = resources.length;i<len;++i) {
 		var res = resources[i];
@@ -324,10 +323,8 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete
 
     var loaded = 0;
     function onLoad(audioFile) {
-        console.log("loaded" + audioFile);
         loaded++;
         if (loaded === files.length) {
-            console.log("All audio loaded");
             return onComplete();
         }
 
@@ -337,13 +334,12 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete
 	var that = this;
     for(var i = 0;i<files.length;++i) {
         (function(audioFile) {
-            console.log("Loading" + audioFile)
-            var sound = new Howl({
-              src: [audioFile], //TODO: ogg, mp3...
-              preload: true,
-              onload: onLoad.bind(that, audioFile),
-              onloaderror: onLoad.bind(that, audioFile)
-            });
+            var sound = new XMLHttpRequest();
+            sound.addEventListener('load', onLoad.bind(that, audioFile));
+            sound.addEventListener('error', onLoad.bind(that, audioFile));
+            sound.addEventListener('abort', onLoad.bind(that, audioFile));
+            sound.open('GET', audioFile);
+            sound.send();
         })(files[i]);
     }
 }

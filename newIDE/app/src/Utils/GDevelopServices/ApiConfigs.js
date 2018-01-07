@@ -1,6 +1,12 @@
 // @flow
 const isDev = process.env.NODE_ENV === 'development';
 
+export const GDevelopHostingApi = {
+  deployEndpoint:
+    'https://nik50aqlp6.execute-api.eu-west-1.amazonaws.com/Production/deploy',
+  gamesHost: 'http://gd-games.s3-website-eu-west-1.amazonaws.com',
+};
+
 const gdevelopGamesPreviewRegion = 'eu-west-1';
 const gdevelopGamesPreviewBucket = 'gd-games-preview';
 

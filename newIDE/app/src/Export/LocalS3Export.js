@@ -7,15 +7,12 @@ import LocalExport from './LocalExport';
 import optionalRequire from '../Utils/OptionalRequire';
 import { Column, Line, Spacer } from '../UI/Grid';
 import LinearProgress from 'material-ui/LinearProgress';
+import { GDevelopHostingApi } from '../Utils/GDevelopServices/ApiConfigs';
 import TextField from 'material-ui/TextField';
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const shell = electron ? electron.shell : null;
-
-const deployEndpoint =
-  'https://nik50aqlp6.execute-api.eu-west-1.amazonaws.com/Production/deploy';
-const gamesHost = 'http://gd-games.s3-website-eu-west-1.amazonaws.com';
 
 export default class LocalS3Export extends Component {
   constructor(props) {
@@ -54,8 +51,8 @@ export default class LocalS3Export extends Component {
 
   _deploy = prefix => {
     return sleep(200)
-      .then(() =>
-        axios(deployEndpoint, {
+      .then(() => //TODO: Move this to a GDevelopServices/Hosting.js file
+        axios(GDevelopHostingApi.deployEndpoint, {
           method: 'post',
           params: {
             name: prefix,
@@ -101,8 +98,9 @@ export default class LocalS3Export extends Component {
       .then(() => this._uploadToS3(outputDir))
       .then(uploadPrefix => this._deploy(uploadPrefix))
       .then(deployPrefix => {
+        //TODO: Move this to a function getURL in a GDevelopServices/Hosting.js file.
         this.setState({
-          url: `${gamesHost}/${deployPrefix}`,
+          url: `${GDevelopHostingApi.gamesHost}/${deployPrefix}`,
         });
       })
       .catch(err => {

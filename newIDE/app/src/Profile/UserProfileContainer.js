@@ -84,46 +84,54 @@ export const withUserProfile = (
       const { authentification } = this.props;
       if (!authentification) return;
 
-      authentification.getUserProfile((err, profile: ?Profile) => {
-        if (err && err.unauthenticated) {
-          return this.setState({
-            authenticated: false,
-            profile: null,
-            usages: null,
-            limits: null,
-            subscription: null,
-          });
-        } else if (err || !profile) {
-          console.log('Unable to fetch user profile', err);
+      authentification.ensureAuthenticated((error) => {
+        if (error && !error.userCancelled) {
+          console.error("Unable to ensure that the user is authenticated", error);
+        } else if (error && error.ensureCancelled) {
           return;
         }
 
-        this.setState({
-          authenticated: true,
-          profile,
-        });
+        authentification.getUserProfile((err, profile: ?Profile) => {
+          if (err && err.unauthenticated) {
+            return this.setState({
+              authenticated: false,
+              profile: null,
+              usages: null,
+              limits: null,
+              subscription: null,
+            });
+          } else if (err || !profile) {
+            console.log('Unable to fetch user profile', err);
+            return;
+          }
 
-        if (fetchUsages)
-          getUserUsages(authentification, profile.sub).then(usages =>
-            this.setState({
-              usages,
-            })
-          );
-        if (fetchSubscription)
-          getUserSubscription(
-            authentification,
-            profile.sub
-          ).then(subscription =>
-            this.setState({
-              subscription,
-            })
-          );
-        if (fetchLimits)
-          getUserLimits(authentification, profile.sub).then(limits =>
-            this.setState({
-              limits,
-            })
-          );
+          this.setState({
+            authenticated: true,
+            profile,
+          });
+
+          if (fetchUsages)
+            getUserUsages(authentification, profile.sub).then(usages =>
+              this.setState({
+                usages,
+              })
+            );
+          if (fetchSubscription)
+            getUserSubscription(
+              authentification,
+              profile.sub
+            ).then(subscription =>
+              this.setState({
+                subscription,
+              })
+            );
+          if (fetchLimits)
+            getUserLimits(authentification, profile.sub).then(limits =>
+              this.setState({
+                limits,
+              })
+            );
+        });
       });
     }
 
@@ -131,7 +139,7 @@ export const withUserProfile = (
       if (this.props.authentification)
         this.props.authentification.login({
           onHide: () => {},
-          onAuthenticated: arg => {
+          onAuthenticated: () => {
             this._fetchUserProfile();
           },
           onAuthorizationError: () => {},

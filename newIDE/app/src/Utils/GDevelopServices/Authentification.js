@@ -17,8 +17,24 @@ export default class Authentification {
     Auth0Config.lockOptions
   );
 
+  _noop = () => {};
+  _onHide: Function = this._noop;
+  _onAuthenticated: Function = this._noop;
+  _onAuthorizationError: Function = this._noop;
+
   constructor() {
-    this._handleAuthentication();
+    // One time set up of Auth0 lock callback, as there is no
+    // way to unregister a callback
+    this.lock.on('authenticated', this._setSession);
+    this.lock.on('authorization_error', err => {
+      console.error(
+        'There was an authorization error while authenticating',
+        err
+      );
+    });
+    this.lock.on('hide', () => this._onHide());
+    this.lock.on('authenticated', () => this._onAuthenticated());
+    this.lock.on('authorization_error', err => this._onAuthorizationError(err));
   }
 
   login({
@@ -30,30 +46,56 @@ export default class Authentification {
     onAuthenticated: Function,
     onAuthorizationError: Function,
   }) {
-    const noop = () => {};
+    this._onHide = onHide || this._noop;
+    this._onAuthenticated = onAuthenticated || this._noop;
+    this._onAuthorizationError = onAuthorizationError || this._noop;
     this.lock.show();
-    this.lock.on('hide', onHide || noop);
-    this.lock.on('authenticated', onAuthenticated || noop);
-    this.lock.on('authorization_error', onAuthorizationError || noop);
   }
 
-  _handleAuthentication() {
-    this.lock.on('authenticated', this._setSession);
-    this.lock.on('authorization_error', err => {
-      console.log(err);
-    });
-  }
+  ensureAuthenticated = (cb: Function) => {
+    if (this.isAuthenticated()) return cb(null);
+
+    this.lock.checkSession(
+      Auth0Config.lockOptions.auth,
+      (error, authResult) => {
+        this.login({
+          onHide: () => cb({ userCancelled: true }),
+          onAuthenticated: () => cb(null),
+          onAuthorizationError: error => cb(error),
+        });
+
+        // This code should works and avoid having to show the login dialog again,
+        // but for some reason authResult is always empty :/
+        // if (error || !authResult) {
+        //   this.login({
+        //     onHide: () => cb({ userCancelled: true }),
+        //     onAuthenticated: () => cb(null),
+        //     onAuthorizationError: error => cb(error),
+        //   });
+        // } else {
+        //   this._setSession(authResult);
+        //   cb(null);
+        // }
+      }
+    );
+  };
 
   _setSession = (authResult: any) => {
-    if (authResult && authResult.accessToken && authResult.idToken) {
-      // Set the time that the access token will expire at
-      let expiresAt = JSON.stringify(
-        authResult.expiresIn * 1000 + new Date().getTime()
+    if (!authResult || !authResult.accessToken || !authResult.idToken) {
+      console.log(
+        'Missing information when trying to store user session',
+        authResult
       );
-      localStorage.setItem('access_token', authResult.accessToken);
-      localStorage.setItem('id_token', authResult.idToken);
-      localStorage.setItem('expires_at', expiresAt);
+      return;
     }
+
+    // Set the time that the access token will expire at
+    let expiresAt = JSON.stringify(
+      authResult.expiresIn * 1000 + new Date().getTime()
+    );
+    localStorage.setItem('access_token', authResult.accessToken);
+    localStorage.setItem('id_token', authResult.idToken);
+    localStorage.setItem('expires_at', expiresAt);
   };
 
   getUserProfile = (cb: (any, ?Profile) => void) => {
@@ -81,9 +123,9 @@ export default class Authentification {
     try {
       return 'Bearer ' + (localStorage.getItem('id_token') || '');
     } catch (e) {
-      return ''
+      return '';
     }
-  }
+  };
 
   isAuthenticated = (): boolean => {
     // Check whether the current time is past the

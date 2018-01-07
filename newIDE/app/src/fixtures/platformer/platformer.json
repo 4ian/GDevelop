@@ -10,7 +10,7 @@
         "folderProject": false,
         "linuxExecutableFilename": "",
         "macExecutableFilename": "",
-        "packageName": "",
+        "packageName": "com.example.platformer",
         "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/src/fixtures/platformer/platformer.json",
         "useExternalSourceFiles": false,
         "winExecutableFilename": "",

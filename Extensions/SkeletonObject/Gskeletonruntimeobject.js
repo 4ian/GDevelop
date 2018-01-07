@@ -20,14 +20,14 @@ gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
     this.animationPlaying = true;
     this.animationSmooth = true;
     this.timeScale = 1.0;
+    this.scaleX = 1.0;
+    this.scaleY = 1.0;
     this.renderer = new gdjs.SkeletonRuntimeObjectRenderer();
     
     var skeletalData = this.renderer.getData(objectData.skeletalDataFilename);
     if(objectData.apiName === "DragonBones"){
-        // Load the sub-textures
-        this.renderer.loadDragonBones(runtimeScene, objectData.textureDataFilename, objectData.textureName);
         // Main loader
-        this.loadDragonBones(runtimeScene, skeletalData, objectData.rootArmatureName);
+        this.loadDragonBones(runtimeScene, skeletalData, objectData);
     }
 };
 gdjs.SkeletonRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
@@ -40,14 +40,12 @@ gdjs.SkeletonRuntimeObject.prototype.extraInitializationFromInitialInstance = fu
     }
 };
 
-gdjs.SkeletonRuntimeObject.prototype.sayHello = function(){
-    console.log(this);
-};
-
-gdjs.SkeletonRuntimeObject.prototype.loadDragonBones = function(runtimeScene, skeletalData, rootArmatureName){
+gdjs.SkeletonRuntimeObject.prototype.loadDragonBones = function(runtimeScene, skeletalData, objectData){
+    // Load the sub-textures
+    this.renderer.loadDragonBones(runtimeScene, objectData);
     // Get the root armature with the given name
     for(var i=0; i<skeletalData.armature.length; i++){
-        if(skeletalData.armature[i].name === rootArmatureName){
+        if(skeletalData.armature[i].name === objectData.rootArmatureName){
             this.rootArmature.loadDragonBones(skeletalData, i, this.renderer.textures);
         }
     }
@@ -55,6 +53,7 @@ gdjs.SkeletonRuntimeObject.prototype.loadDragonBones = function(runtimeScene, sk
     if(!this.rootArmature.loaded && skeletalData.armature.length > 0){
         this.rootArmature.loadDragonBones(skeletalData, 0, this.renderer.textures);
     }
+    this.rootArmature.renderer.putInScene(this, runtimeScene);
 };
 
 gdjs.SkeletonRuntimeObject.prototype.setX = function(x){
@@ -83,11 +82,11 @@ gdjs.SkeletonRuntimeObject.prototype.setScaleY = function(scaleY){
 };
 
 gdjs.SkeletonRuntimeObject.prototype.setWidth = function(width){
-    this.setScaleY(height / this.rootArmature.getWidth());
+    this.setScaleX(width / this.rootArmature.getDefaultWidth());
 };
 
 gdjs.SkeletonRuntimeObject.prototype.setHeight = function(height){
-    this.setScaleY(height / this.rootArmature.getWidth());
+    this.setScaleY(height / this.rootArmature.getDefaultHeight());
 };
 
 gdjs.SkeletonRuntimeObject.prototype.getRendererObject = function(){
@@ -99,18 +98,15 @@ gdjs.SkeletonRuntimeObject.prototype.getHitBoxes = function(){
 };
 
 gdjs.SkeletonRuntimeObject.prototype.update = function(runtimeScene){
-
     var delta = this.getElapsedTime(runtimeScene) / 1000.0;
-
-    // this.rootArmature.update();
-
     if(this.animationPlaying){
-        // this.rootArmature.updateAnimation(delta*this.timeScale, this.smoothAnimation);
+        this.rootArmature.updateAnimation(delta*this.timeScale);
     }
+    this.rootArmature.update();
 };
 
 gdjs.SkeletonRuntimeObject.prototype.getTimescale = function(timeScale){
-    this.timeScale = timeScale < 0 ? 0 : timeScale; // Suport negative timeScale (backward) ?
+    this.timeScale = timeScale < 0 ? 0 : timeScale; // Support negative timeScale (backward) ?
 };
 
 gdjs.SkeletonRuntimeObject.prototype.pauseAnimation = function(){

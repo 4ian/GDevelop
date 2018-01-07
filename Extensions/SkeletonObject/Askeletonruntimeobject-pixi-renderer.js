@@ -15,9 +15,9 @@ gdjs.SkeletonRuntimeObjectPixiRenderer.prototype.getData = function(dataName){
     return PIXI.loader.resources[dataName].data;
 };
 
-gdjs.SkeletonRuntimeObjectPixiRenderer.prototype.loadDragonBones = function(runtimeScene, textureDataName, textureName){
-    var textureData = this.getData(textureDataName);
-    var texture = runtimeScene.getGame().getImageManager().getPIXITexture(textureName);
+gdjs.SkeletonRuntimeObjectPixiRenderer.prototype.loadDragonBones = function(runtimeScene, objectData){
+    var textureData = this.getData(objectData.textureDataFilename);
+    var texture = runtimeScene.getGame().getImageManager().getPIXITexture(objectData.textureName);
     
     for(var i=0; i<textureData.SubTexture.length; i++){
         var subTex = textureData.SubTexture[i];
@@ -40,9 +40,8 @@ gdjs.SkeletonArmaturePixiRenderer = function()
 };
 gdjs.SkeletonArmatureRenderer = gdjs.SkeletonArmaturePixiRenderer;
 
-gdjs.SkeletonArmaturePixiRenderer.prototype.loadSceneData = function(runtimeScene){
-    // var texture = runtimeScene.getGame().getImageManager().getPIXITexture(textureName);
-    // runtimeScene.getLayer("").getRenderer().addRendererObject(this._tiledSprite, runtimeObject.getZOrder());
+gdjs.SkeletonArmaturePixiRenderer.prototype.putInScene = function(runtimeObject, runtimeScene){
+    runtimeScene.getLayer("").getRenderer().addRendererObject(this.container, runtimeObject.getZOrder());
 };
 
 gdjs.SkeletonArmaturePixiRenderer.prototype.getRendererObject = function(){
@@ -64,3 +63,35 @@ gdjs.SkeletonSlotPixiRenderer = function()
     this.renderObject = null;
 };
 gdjs.SkeletonSlotRenderer = gdjs.SkeletonSlotPixiRenderer;
+
+gdjs.SkeletonSlotPixiRenderer.prototype.getRendererObject = function(){
+    return this.renderer;
+}
+
+gdjs.SkeletonSlotPixiRenderer.prototype.loadAsSprite = function(texture){
+    this.renderer = new PIXI.Sprite(texture);
+    this.renderer.pivot = new PIXI.Point(this.renderer.width/2.0, this.renderer.height/2.0);
+    this.renderer.z = 0;
+};
+
+gdjs.SkeletonSlotPixiRenderer.prototype.getWidth = function(){
+    return this.renderer.width;
+};
+
+gdjs.SkeletonSlotPixiRenderer.prototype.getHeight = function(){
+    return this.renderer.height;
+};
+
+gdjs.SkeletonSlotPixiRenderer.prototype.setPos = function(x, y){
+    this.renderer.x = x;
+    this.renderer.y = y;
+}
+
+gdjs.SkeletonSlotPixiRenderer.prototype.setRotation = function(angle){
+    this.renderer.rotation = angle;
+}
+
+gdjs.SkeletonSlotPixiRenderer.prototype.setScale = function(sx, sy){
+    this.renderer.scale.x = sx;
+    this.renderer.scale.y = sy;
+}

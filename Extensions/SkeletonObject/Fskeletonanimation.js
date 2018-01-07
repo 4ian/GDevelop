@@ -12,7 +12,7 @@ This project is released under the MIT License.
  * @namespace gdjs
  * @class SkeletonAnimation
  */
-gdjs.SkeletonAnimation = function(fps, armature){
+gdjs.SkeletonAnimation = function(armature, fps){
     this.fps = fps <= 0 || !fps ? 30 : fps;
     this.armature = armature;
     this.name = "";
@@ -28,13 +28,18 @@ gdjs.SkeletonAnimation = function(fps, armature){
     this.zOrderAnimator = new gdjs.SkeletonZOrderAnimator(this.armature.slots);
     this.blending = false;
     this.blendTime = 0.0;
-    this.blendDuration = 0.0; // in seconds
+    this.blendDuration = 0.0; // In seconds
     this.blendBones = [];
     this.blendSlots = [];
     this.blendMeshes = [];
 };
 
+gdjs.SkeletonAnimation.prototype.loadDragonBones = function(animationData){
+    this.name = animationData.name;
+};
 
+gdjs.SkeletonAnimation.prototype.update = function(delta){
+};
 
 gdjs.SkeletonZOrderAnimator = function(slots){
 };

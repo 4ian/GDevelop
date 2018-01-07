@@ -30,7 +30,7 @@ public:
 
         GetObjectMetadata("SkeletonObject::Skeleton")
             .SetIncludeFile("Extensions/SkeletonObject/Gskeletonruntimeobject.js")
-            .SetIncludeFile("Extensions/SkeletonObject/Fskeletonanimation.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Fskeletonanimation.js")
             .AddIncludeFile("Extensions/SkeletonObject/Eskeletonarmature.js")
             .AddIncludeFile("Extensions/SkeletonObject/Dskeletonslot.js")
             .AddIncludeFile("Extensions/SkeletonObject/Cskeletonbone.js")

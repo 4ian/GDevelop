@@ -74,7 +74,7 @@ gdjs.SkeletonArmature.prototype.loadDragonBones = function(skeletalData, index, 
 	for(var i=0; i<armatureData.skin[0].slot.length; i++){
 		var skinData = armatureData.skin[0].slot[i];
 		var slot = this.slotsMap[skinData.name];
-		this.slotsMap[skinData.name].loadDragonBonesSkinData(armatureData.skin[0], i, skeletalData, this.bones, textures);
+		this.slotsMap[skinData.name].loadDragonBonesSkinData(armatureData.skin[0].slot, i, skeletalData, this.bones, textures);
 	}
 	// Get all the animations
 	for(var i=0; i<armatureData.animation.length; i++){

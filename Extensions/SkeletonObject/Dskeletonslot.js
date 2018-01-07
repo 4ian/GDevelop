@@ -70,7 +70,7 @@ gdjs.SkeletonSlot.prototype.loadDragonBonesSlotData = function(slotData){
 };
 
 gdjs.SkeletonSlot.prototype.loadDragonBonesSkinData = function(skinDatas, index, skeletalData, bones, textures){
-    var skinData = skinDatas.slot[index];
+    var skinData = skinDatas[index];
     
     var transformData = skinData.display[0].transform;
     this.x = transformData.hasOwnProperty("x") ? transformData.x : 0;
@@ -104,10 +104,10 @@ gdjs.SkeletonSlot.prototype.loadDragonBonesSkinData = function(skinDatas, index,
 };
 
 gdjs.SkeletonSlot.prototype.resetState = function(){
-    //~ this.setZ(this.defaultZ);
-    //~ this.setColor(this.defaultR, this.defaultG, this.defaultB);
-    //~ this.setAlpha(this.defaultAlpha);
-    //~ this.setVisible(this.defaultVisible);
+    this.setZ(this.defaultZ);
+    this.setColor(this.defaultR, this.defaultG, this.defaultB);
+    this.setAlpha(this.defaultAlpha);
+    this.setVisible(this.defaultVisible);
     if(this.type === gdjs.SkeletonSlot.SLOT_MESH){
         var verts = [];
         var updateList = [];
@@ -118,6 +118,96 @@ gdjs.SkeletonSlot.prototype.resetState = function(){
         //~ this.setVertices(verts, updateList);
     }
 };
+
+gdjs.SkeletonSlot.prototype.setZ = function(z){
+    this.z = z;
+    if(this.type === gdjs.SkeletonSlot.SLOT_IMAGE || this.type === gdjs.SkeletonSlot.SLOT_MESH){
+        this.renderer.setZ(z);
+    }
+};
+
+gdjs.SkeletonSlot.prototype.getColor = function(){
+    if(!this.armature.parentSlot){
+        return [this.r, this.g, this.b];
+    }
+
+    var armatureColor = this.armature.parentSlot.getColor();
+    return [this.r * armatureColor[0] / 255,
+            this.g * armatureColor[1] / 255,
+            this.b * armatureColor[2] / 255];
+};
+
+gdjs.SkeletonSlot.prototype.setColor = function(r, g, b){
+    if(this.r !== r || this.g !== g || this.b !== b){
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.updateRendererColor();
+    }
+};
+
+gdjs.SkeletonSlot.prototype.updateRendererColor = function(){
+    if(this.type === gdjs.SkeletonSlot.SLOT_IMAGE || this.type === gdjs.SkeletonSlot.SLOT_MESH){
+        this.renderer.setColor(this.getColor());
+    }
+    else if(this.type === gdjs.SkeletonSlot.SLOT_ARMATURE && this.childArmature){
+        for(var i=0; i<this.childArmature.slots.length; i++){
+            this.childArmature.slots[i].updateRendererColor();
+        }
+    }
+};
+
+gdjs.SkeletonSlot.prototype.getAlpha = function(){
+    if(!this.armature.parentSlot){
+        return this.alpha;
+    }
+    var armatureAlpha = this.armature.parentSlot.getAlpha();
+    return (this.alpha * armatureAlpha);
+};
+
+gdjs.SkeletonSlot.prototype.setAlpha = function(alpha){
+    if(this.alpha !== alpha){
+        this.alpha = alpha;
+        this.updateRendererAlpha();
+    }
+};
+
+gdjs.SkeletonSlot.prototype.updateRendererAlpha = function(){
+    if(this.type === gdjs.SkeletonSlot.SLOT_IMAGE || this.type === gdjs.SkeletonSlot.SLOT_MESH){
+        this.renderer.setAlpha(this.getAlpha());
+    }
+    else if(this.type === gdjs.SkeletonSlot.SLOT_ARMATURE && this.childArmature){
+        for(var i=0; i<this.childArmature.slots.length; i++){
+            this.childArmature.slots[i].updateRendererAlpha();
+        }
+    }
+}
+
+gdjs.SkeletonSlot.prototype.getVisible = function(){
+    if(!this.armature.parentSlot){
+        return this.visible;
+    }
+    var armatureVisible = this.armature.parentSlot.getVisible();
+    return (this.visible && armatureVisible);
+}
+
+gdjs.SkeletonSlot.prototype.setVisible = function(visible){
+    if(this.visible !== visible){
+        this.visible = visible;
+        this.updateRendererVisible();
+    }
+}
+
+gdjs.SkeletonSlot.prototype.updateRendererVisible = function(){
+    if(this.type === gdjs.SkeletonSlot.SLOT_IMAGE || this.type === gdjs.SkeletonSlot.SLOT_MESH){
+        this.renderer.setVisible(this.getVisible());
+    }
+    else if(this.type === gdjs.SkeletonSlot.SLOT_ARMATURE && this.childArmature){
+        for(var i=0; i<this.childArmature.slots.length; i++){
+            this.childArmature.slots[slot_name].updateRendererVisible();
+        }
+    }
+}
 
 gdjs.SkeletonSlot.prototype.update = function(){
     gdjs.SkeletonTransform.prototype.update.call(this);

@@ -66,7 +66,7 @@ gdjs.SkeletonSlotRenderer = gdjs.SkeletonSlotPixiRenderer;
 
 gdjs.SkeletonSlotPixiRenderer.prototype.getRendererObject = function(){
     return this.renderer;
-}
+};
 
 gdjs.SkeletonSlotPixiRenderer.prototype.loadAsSprite = function(texture){
     this.renderer = new PIXI.Sprite(texture);
@@ -85,13 +85,29 @@ gdjs.SkeletonSlotPixiRenderer.prototype.getHeight = function(){
 gdjs.SkeletonSlotPixiRenderer.prototype.setPos = function(x, y){
     this.renderer.x = x;
     this.renderer.y = y;
-}
+};
 
 gdjs.SkeletonSlotPixiRenderer.prototype.setRotation = function(angle){
     this.renderer.rotation = angle;
-}
+};
 
 gdjs.SkeletonSlotPixiRenderer.prototype.setScale = function(sx, sy){
     this.renderer.scale.x = sx;
     this.renderer.scale.y = sy;
-}
+};
+
+gdjs.SkeletonSlotPixiRenderer.prototype.setZ = function(z){
+    this.renderer.z = z;
+};
+
+gdjs.SkeletonSlotPixiRenderer.prototype.setColor = function(color){
+    this.renderer.tint = (color[0] << 16) + (color[1] << 8) + color[2];
+};
+
+gdjs.SkeletonSlotPixiRenderer.prototype.setAlpha = function(alpha){
+    this.renderer.alpha = alpha;
+};
+
+gdjs.SkeletonSlotPixiRenderer.prototype.setVisible = function(visible){
+    this.renderer.visible = visible;
+};

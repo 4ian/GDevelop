@@ -63,6 +63,9 @@ app.on('ready', function() {
   if (isDev) {
     // Development (server hosted by npm run start)
     mainWindow.loadURL('http://localhost:3000');
+    // Define an entry in your /etc/host and use it instead of localhost
+    // to work with Auth0 authentification during development.
+    // mainWindow.loadURL('http://gdevelop.local:3000');
     mainWindow.openDevTools();
   } else {
     // Production (with npm run build)
@@ -100,11 +103,9 @@ app.on('ready', function() {
     uploadArchiveToBucket(
       localFile,
       (current, max) => {
-        console.log(current, max);
         event.sender.send('s3-file-upload-progress', current, max);
       },
       (err, prefix) => {
-        console.log("DONE")
         event.sender.send('s3-file-upload-done', err, prefix);
       }
     );

@@ -74,6 +74,21 @@ gdjs.SkeletonSlotPixiRenderer.prototype.loadAsSprite = function(texture){
     this.renderer.z = 0;
 };
 
+gdjs.SkeletonSlotPixiRenderer.prototype.loadAsMesh = function(texture, vertices, uvs, triangles){
+	this.renderer = new PIXI.mesh.Mesh(texture,
+									   new Float32Array(vertices),
+									   new Float32Array(uvs),
+									   new Uint16Array(triangles),
+									   PIXI.mesh.Mesh.DRAW_MODES.TRIANGLES);
+
+	this.renderer.uploadUvTransform = true;
+	this.renderer.z = 0;
+
+	// TODO
+	// this.render.cacheAsBitmap = true;
+	// meshes won't fully work with current PIXI version
+};
+
 gdjs.SkeletonSlotPixiRenderer.prototype.getWidth = function(){
     return this.renderer.width;
 };
@@ -101,13 +116,21 @@ gdjs.SkeletonSlotPixiRenderer.prototype.setZ = function(z){
 };
 
 gdjs.SkeletonSlotPixiRenderer.prototype.setColor = function(color){
-    this.renderer.tint = (color[0] << 16) + (color[1] << 8) + color[2];
+	this.renderer.tint = (color[0] << 16) + (color[1] << 8) + color[2];
 };
 
 gdjs.SkeletonSlotPixiRenderer.prototype.setAlpha = function(alpha){
-    this.renderer.alpha = alpha;
+	this.renderer.alpha = alpha;
 };
 
 gdjs.SkeletonSlotPixiRenderer.prototype.setVisible = function(visible){
-    this.renderer.visible = visible;
+	this.renderer.visible = visible;
+};
+
+// Mesh only
+gdjs.SkeletonSlotPixiRenderer.prototype.setVertices = function(vertices, updateList){
+	for(var i=0; i<updateList.length; i++){
+		this.renderer.vertices[2*updateList[i]]     = vertices[i][0];
+		this.renderer.vertices[2*updateList[i] + 1] = vertices[i][1];
+	}
 };

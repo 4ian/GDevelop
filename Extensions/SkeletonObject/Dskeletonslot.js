@@ -52,11 +52,11 @@ gdjs.SkeletonSlot = function(armature){
 }
 gdjs.SkeletonSlot.prototype = Object.create(gdjs.SkeletonTransform.prototype);
 
-gdjs.SkeletonSlot.SLOT_UNDEFINED = 0;
-gdjs.SkeletonSlot.SLOT_IMAGE = 1;
-gdjs.SkeletonSlot.SLOT_MESH = 2;
-gdjs.SkeletonSlot.SLOT_POLYGON = 3;
-gdjs.SkeletonSlot.SLOT_ARMATURE = 4;
+gdjs.SkeletonSlot.SLOT_UNDEFINED = -1;
+gdjs.SkeletonSlot.SLOT_IMAGE = 0;
+gdjs.SkeletonSlot.SLOT_MESH = 1;
+gdjs.SkeletonSlot.SLOT_POLYGON = 2;
+gdjs.SkeletonSlot.SLOT_ARMATURE = 3;
 
 gdjs.SkeletonSlot.prototype.loadDragonBonesSlotData = function(slotData){
     this.name = slotData.name;

@@ -88,7 +88,7 @@ gdjs.SkeletonArmature.prototype.loadDragonBones = function(skeletalData, index, 
 };
 
 gdjs.SkeletonArmature.prototype.updateAnimation = function(delta){
-	var animation = this.getCurrentAnimation();
+	var animation = this._getCurrentAnimation();
 	if(animation){
 		animation.update(delta);
 	}
@@ -110,7 +110,7 @@ gdjs.SkeletonArmature.prototype.setRenderers = function(){
 	}
 };
 
-gdjs.SkeletonArmature.prototype.getCurrentAnimation = function(){
+gdjs.SkeletonArmature.prototype._getCurrentAnimation = function(){
 	if(this.currentAnimation >= 0 && this.currentAnimation < this.animations.length){
 		return this.animations[this.currentAnimation];
 	}
@@ -129,24 +129,76 @@ gdjs.SkeletonArmature.prototype.getDefaultHeight = function(){
 	return this.aabb.vertices[2][1] - this.aabb.vertices[1][1];
 };
 
-gdjs.SkeletonArmature.prototype.getCurrentAnimationIndex = function(){
+gdjs.SkeletonArmature.prototype.getCurrentAnimation = function(){
 	return this.currentAnimation;
 };
 
-gdjs.SkeletonArmature.prototype.setAnimationIndex = function(newAnimation, blendTime, loops){
+gdjs.SkeletonArmature.prototype.setAnimation = function(newAnimation, blendTime, loops){
+	if(newAnimation >= 0 && newAnimation < this.animations.length && newAnimation !== this.currentAnimation){
+		this.resetState();
+		var oldAnimation = this.currentAnimation;
+		this.currentAnimation = newAnimation;
+		this.animations[this.currentAnimation].reset(loops);
+		if(blendTime > 0 && oldAnimation >= 0 && oldAnimation < this.animations.length){
+			this.animations[this.currentAnimation].blendFrom(this.animations[oldAnimation], blendTime);
+		}
+		for(var i=0; i<this.slots.length; i++){
+			if(this.slots[i].type === gdjs.SkeletonSlot.SLOT_ARMATURE){
+				var childArmature = this.slots[i].childArmature;
+				if(blendTime > 0){
+					var childAnimation = "";
+					var animators = this.animations[this.currentAnimation].armatureAnimators;
+					for(var j=0; j<animators.length; j++){
+						if(animators[j].target === childArmature){
+							if(animators[j].channelAction.frames.length > 0 &&
+							   animators[j].channelAction.frames[0] === 0)
+							{
+								for(var k=0; k<animators[j].actionsLists[0].length; k++)
+								{
+									if(animators[j].actionsLists[0][k].type === gdjs.SkeletonActionChannel.EVENT_PLAY ||
+									   animators[j].actionsLists[0][k].type === gdjs.SkeletonActionChannel.EVENT_PLAYSINGLE)
+									{
+										childAnimation = animators[j].actionsLists[0][k].value;
+									}
+								}
+							}
+							break;
+						}
+					}
+					childArmature.setAnimationName(childAnimation, blendTime, -1);
+				}
+				else{
+					childArmature.currentAnimation = -1;
+				}
+			}
+		}
+		this.animations[this.currentAnimation].update(0);
+	}
 };
 
 gdjs.SkeletonArmature.prototype.getCurrentAnimationName = function(){
-	for(var animationName in this.animationsMap){
-		if(this.animationsMap[animationName] === this.currentAnimation){
-			return animationName;
-		}
-	}
+	var animation = this._getCurrentAnimation();
+	if(animation) return animation.name;
 	return "";
 };
 
 gdjs.SkeletonArmature.prototype.setAnimationName = function(newAnimation, blendTime, loops){
+	if(newAnimation in this.animationsMap){
+		this.setAnimation(this.animationsMap[newAnimation], blendTime, loops);
+	}
 };
 
 gdjs.SkeletonArmature.prototype.resetCurrentAnimation = function(){
+	var animation = this._getCurrentAnimation();
+	if(animation) animation.reset();
+};
+
+gdjs.SkeletonArmature.prototype.resetState = function(){
+	for(var i=0; i<this.bones.length; i++){
+		this.bones[i].resetState();
+	}
+	for(var i=0; i<this.slots.length; i++){
+		this.slots[i].resetState();
+	}
+	this.renderer.sortRenderers();
 };

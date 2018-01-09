@@ -109,6 +109,10 @@ gdjs.SkeletonRuntimeObject.prototype.getTimescale = function(timeScale){
     this.timeScale = timeScale < 0 ? 0 : timeScale; // Support negative timeScale (backward) ?
 };
 
+gdjs.SkeletonRuntimeObject.prototype.isAnimationPaused = function(){
+    return !this.animationPlaying;
+};
+
 gdjs.SkeletonRuntimeObject.prototype.pauseAnimation = function(){
     this.animationPlaying = false;
 };
@@ -117,16 +121,12 @@ gdjs.SkeletonRuntimeObject.prototype.unpauseAnimation = function(){
     this.animationPlaying = true;
 };
 
-gdjs.SkeletonRuntimeObject.prototype.isAnimationPaused = function(){
-    return !this.animationPlaying;
-};
-
 gdjs.SkeletonRuntimeObject.prototype.isAnimationSmooth = function(){
     return this.animationSmooth;
 };
 
-gdjs.SkeletonRuntimeObject.prototype.isAnimationSmooth = function(){
-    return this.animationSmooth;
+gdjs.SkeletonRuntimeObject.prototype.setAnimationSmooth = function(smooth){
+    this.animationSmooth = smooth;
 };
 
 gdjs.SkeletonRuntimeObject.prototype.getCurrentAnimation = function(){

@@ -147,6 +147,8 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
 		gdjs.callbacksRuntimeSceneUnloaded[i](this);
 	}
 
+	// It should not be necessary to reset these variables, but this help
+	// ensuring that all memory related to the RuntimeScene is released immediately.
     this._layers = new Hashtable();
     this._variables = new gdjs.VariablesContainer();
     this._initialBehaviorSharedData = new Hashtable();

@@ -70,7 +70,7 @@ gdjs.PixiFiltersTools._filters = {
             if (parameterName !== 'intensity' &&
                 parameterName !== 'opacity') return;
 
-            filter.uniforms[parameterName].value = value;
+            filter.uniforms[parameterName] = value;
         },
     },
     LightNight: {
@@ -81,7 +81,7 @@ gdjs.PixiFiltersTools._filters = {
         updateParameter: function(filter, parameterName, value) {
             if (parameterName !== 'opacity') return;
 
-            filter.uniforms.opacity.value = value;
+            filter.uniforms.opacity = value;
         },
     },
     Sepia: {

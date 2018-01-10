@@ -37,6 +37,8 @@ import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
 import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import LocalIntroDialog from './MainFrame/LocalIntroDialog';
+import CompositeExporter from './Export/CompositeExporter';
+import LocalOnlineElectronExport from './Export/LocalOnlineElectronExport';
 const electron = optionalRequire('electron');
 
 installRaven();
@@ -72,25 +74,48 @@ if (electron) {
             <ExportDialog
               tabs={[
                 {
-                  name: 'Upload online',
-                  ExportComponent: LocalS3Export,
+                  name: 'Web',
+                  ExportComponent: props => (
+                    <CompositeExporter
+                      {...props}
+                      exporters={[
+                        {
+                          name: 'Upload online',
+                          ExportComponent: LocalS3Export,
+                        },
+                        {
+                          name: 'Local folder',
+                          ExportComponent: LocalExport,
+                        },
+                      ]}
+                    />
+                  ),
                 },
                 {
-                  name: 'Export to a folder',
-                  ExportComponent: LocalExport,
+                  name: 'iOS & Android',
+                  ExportComponent: props => (
+                    <CompositeExporter
+                      {...props}
+                      exporters={[
+                        {
+                          name: 'Automatic packaging',
+                          ExportComponent: LocalOnlineCordovaExport,
+                        },
+                        {
+                          name: 'Manual',
+                          ExportComponent: LocalCordovaExport,
+                        },
+                      ]}
+                    />
+                  ),
                 },
                 {
-                  name: 'iOS/Android app',
-                  ExportComponent: LocalCordovaExport,
+                  name: 'Windows/macOS/Linux',
+                  ExportComponent: LocalOnlineElectronExport,
                 },
                 {
                   name: 'Cocos2d-JS',
                   ExportComponent: LocalCocos2dExport,
-                  advanced: true,
-                },
-                {
-                  name: 'Android app',
-                  ExportComponent: LocalOnlineCordovaExport,
                   advanced: true,
                 },
               ]}

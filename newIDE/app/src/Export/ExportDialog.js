@@ -11,7 +11,10 @@ const styles = {
     padding: 0,
   },
   tabContent: {
-    padding: 24,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 24,
+    paddingRight: 24,
   },
 };
 

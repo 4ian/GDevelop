@@ -3,13 +3,14 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
 import CircularProgress from 'material-ui/CircularProgress';
 import LinearProgress from 'material-ui/LinearProgress';
-import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
 import { Line, Spacer } from '../../UI/Grid';
 
 export default ({
   exportStep,
   downloadUrl,
   onDownload,
+  onDownloadLogs,
   uploadMax,
   uploadProgress,
   buildMax,
@@ -92,12 +93,9 @@ export default ({
     <Step>
       <StepLabel>Download</StepLabel>
       <StepContent>
-        <Line alignItems="baseline" expand>
-          You game is available here:
-          <Spacer />
-          <TextField value={downloadUrl} style={{ flex: 1 }} />
-          <Spacer />
+        <Line>
           <RaisedButton label="Download" primary onClick={onDownload} />
+          <FlatButton label="See logs" onClick={onDownloadLogs} />
         </Line>
         <Line expand>
           You can download it on your Android phone and install it.

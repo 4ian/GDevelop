@@ -260,6 +260,13 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     Window.openExternalURL(getUrl(build.apkKey));
   };
 
+  _downloadLogs = () => {
+    const { build } = this.state;
+    if (!build || !build.logsKey) return;
+
+    Window.openExternalURL(getUrl(build.logsKey));
+  };
+
   render() {
     const {
       exportStep,
@@ -320,6 +327,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
             downloadUrl={build && build.apkKey ? getUrl(build.apkKey) : null}
             logsUrl={build && build.logsKey ? getUrl(build.logsKey) : null}
             onDownload={this._download}
+            onDownloadLogs={this._downloadLogs}
             uploadMax={uploadMax}
             uploadProgress={uploadProgress}
             buildMax={buildMax}

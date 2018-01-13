@@ -4,7 +4,6 @@ import Paper from 'material-ui/Paper';
 import IconButton from 'material-ui/IconButton';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import BaseEditor from './BaseEditor';
-import AboutDialog from '../AboutDialog';
 import Window from '../../Utils/Window';
 import { Line } from '../../UI/Grid';
 
@@ -58,12 +57,6 @@ class ThemableStartPage extends BaseEditor {
     if (this.props.setToolbar) this.props.setToolbar(null);
   }
 
-  _openAboutDialog = (open = true) => {
-    this.setState({
-      aboutDialogOpen: open,
-    });
-  };
-
   render() {
     const {
       project,
@@ -73,6 +66,7 @@ class ThemableStartPage extends BaseEditor {
       onOpenProjectManager,
       onCloseProject,
       muiTheme,
+      onOpenAboutDialog,
     } = this.props;
 
     return (
@@ -135,7 +129,7 @@ class ThemableStartPage extends BaseEditor {
             <div>
               <FlatButton
                 label="About GDevelop"
-                onClick={() => this._openAboutDialog(true)}
+                onClick={onOpenAboutDialog}
               />
               <FlatButton
                 label="Gdevelop Forums"
@@ -165,10 +159,6 @@ class ThemableStartPage extends BaseEditor {
               />
             </div>
           </Line>
-          <AboutDialog
-            open={this.state.aboutDialogOpen}
-            onClose={() => this._openAboutDialog(false)}
-          />
         </div>
       </div>
     );

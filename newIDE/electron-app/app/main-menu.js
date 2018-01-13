@@ -123,6 +123,17 @@ const buildMainMenuFor = window => {
       },
     ],
   };
+  if (process.platform !== 'darwin') {
+    fileTemplate.submenu.push(
+      { type: 'separator' },
+      {
+        label: 'About GDevelop',
+        click() {
+          window.webContents.send('main-menu-open-about');
+        },
+      },
+    );
+  }
 
   const template = [
     fileTemplate,
@@ -136,7 +147,12 @@ const buildMainMenuFor = window => {
     template.unshift({
       label: app.getName(),
       submenu: [
-        { role: 'about' },
+        {
+          label: 'About GDevelop',
+          click() {
+            window.webContents.send('main-menu-open-about');
+          },
+        },
         { type: 'separator' },
         {
           label: 'My profile',

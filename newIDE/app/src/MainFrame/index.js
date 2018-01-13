@@ -14,6 +14,7 @@ import Toolbar from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
+import AboutDialog, { type UpdateStatus } from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
@@ -83,6 +84,8 @@ type State = {|
   preferences: PreferencesState,
   profileDialogOpen: boolean,
   subscriptionDialogOpen: boolean,
+  updateStatus: UpdateStatus,
+  aboutDialogOpen: boolean,
 |};
 
 export default class MainFrame extends Component<*, State> {
@@ -104,6 +107,8 @@ export default class MainFrame extends Component<*, State> {
     preferences: getDefaultPreferences(),
     profileDialogOpen: false,
     subscriptionDialogOpen: false,
+    updateStatus: { message: '', status: 'unknown' },
+    aboutDialogOpen: false,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
@@ -547,6 +552,7 @@ export default class MainFrame extends Component<*, State> {
               onCreate={() => this.openCreateDialog()}
               onOpenProjectManager={() => this.openProjectManager()}
               onCloseProject={() => this.askToCloseProject()}
+              onOpenAboutDialog={() => this.openAboutDialog()}
             />
           ),
           key: 'start page',
@@ -708,6 +714,27 @@ export default class MainFrame extends Component<*, State> {
     editorTab.editorRef.updateToolbar();
   }
 
+  openAboutDialog = (open: boolean = true) => {
+    this.setState({
+      aboutDialogOpen: open,
+    });
+  };
+
+  setUpdateStatus = (status: UpdateStatus) => {
+    this.setState({
+      updateStatus: status,
+    });
+  };
+
+  simulateUpdateDownloaded = () =>
+    this.setUpdateStatus({
+      status: 'update-downloaded',
+      message: 'update-downloaded',
+      info: {
+        releaseName: 'Fake update',
+      },
+    });
+
   _showSnackMessage = (snackMessage: string) =>
     this.setState({
       snackMessage,
@@ -727,6 +754,8 @@ export default class MainFrame extends Component<*, State> {
       preferences,
       profileDialogOpen,
       subscriptionDialogOpen,
+      updateStatus,
+      aboutDialogOpen,
     } = this.state;
     const {
       exportDialog,
@@ -788,6 +817,7 @@ export default class MainFrame extends Component<*, State> {
             canOpenProject={!!this.props.onChooseProject}
             openProject={this.chooseProject}
             requestUpdate={this.props.requestUpdate}
+            simulateUpdateDownloaded={this.simulateUpdateDownloaded}
           />
           <Tabs
             value={getCurrentTabIndex(this.state.editorTabs)}
@@ -813,26 +843,6 @@ export default class MainFrame extends Component<*, State> {
           <ConfirmCloseDialog
             ref={confirmCloseDialog =>
               (this.confirmCloseDialog = confirmCloseDialog)}
-          />
-          <ProfileDialog
-            open={profileDialogOpen}
-            authentification={authentification}
-            onClose={() => this.openProfile(false)}
-            onChangeSubscription={() => this.openSubscription(true)}
-          />
-          <SubscriptionDialog
-            onClose={() => this.openSubscription(false)}
-            open={subscriptionDialogOpen}
-            authentification={authentification}
-          />
-          <PreferencesDialog
-            open={this.state.preferencesDialogOpen}
-            themeName={getThemeName(preferences)}
-            onChangeTheme={themeName =>
-              this.setState({
-                preferences: setThemeName(preferences, themeName),
-              })}
-            onClose={() => this.openPreferences(false)}
           />
           <Snackbar
             open={this.state.snackMessageOpen}
@@ -891,6 +901,31 @@ export default class MainFrame extends Component<*, State> {
                 (this._resourceSourceDialogs[resourceSource.name] = dialog),
             })
           )}
+          <ProfileDialog
+            open={profileDialogOpen}
+            authentification={authentification}
+            onClose={() => this.openProfile(false)}
+            onChangeSubscription={() => this.openSubscription(true)}
+          />
+          <SubscriptionDialog
+            onClose={() => this.openSubscription(false)}
+            open={subscriptionDialogOpen}
+            authentification={authentification}
+          />
+          <PreferencesDialog
+            open={this.state.preferencesDialogOpen}
+            themeName={getThemeName(preferences)}
+            onChangeTheme={themeName =>
+              this.setState({
+                preferences: setThemeName(preferences, themeName),
+              })}
+            onClose={() => this.openPreferences(false)}
+          />
+          <AboutDialog
+            open={aboutDialogOpen}
+            onClose={() => this.openAboutDialog(false)}
+            updateStatus={updateStatus}
+          />
         </div>
       </Providers>
     );

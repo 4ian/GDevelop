@@ -46,6 +46,7 @@ export const Auth0Config = {
       params: {
         scope: 'openid profile email offline_access',
       },
+      redirectUrl: 'https://4ian.github.io/GD',
       redirect: false,
     },
     languageDictionary: {

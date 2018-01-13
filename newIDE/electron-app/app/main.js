@@ -5,8 +5,21 @@ const Menu = electron.Menu;
 const parseArgs = require('minimist');
 const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
-const { uploadGameFolderToBucket, uploadArchiveToBucket } = require('./s3upload');
+const autoUpdater = require('electron-updater').autoUpdater;
+const log = require('electron-log');
+const {
+  uploadGameFolderToBucket,
+  uploadArchiveToBucket,
+} = require('./s3upload');
 const { buildMainMenuFor } = require('./main-menu');
+
+// Logs made with electron-logs can be found
+// on Linux: ~/.config/<app name>/log.log
+// on OS X: ~/Library/Logs/<app name>/log.log
+// on Windows: %USERPROFILE%\AppData\Roaming\<app name>\log.log
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+log.info('GDevelop Electron app starting...');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -84,7 +97,7 @@ app.on('ready', function() {
   });
 
   ipcMain.on('s3-folder-upload', (event, localDir) => {
-    console.log('Received event s3-upload with localDir=', localDir);
+    log.info('Received event s3-upload with localDir=', localDir);
 
     uploadGameFolderToBucket(
       localDir,
@@ -98,7 +111,7 @@ app.on('ready', function() {
   });
 
   ipcMain.on('s3-file-upload', (event, localFile) => {
-    console.log('Received event s3-file-upload with localFile=', localFile);
+    log.info('Received event s3-file-upload with localFile=', localFile);
 
     uploadArchiveToBucket(
       localFile,
@@ -109,5 +122,65 @@ app.on('ready', function() {
         event.sender.send('s3-file-upload-done', err, prefix);
       }
     );
+  });
+
+  // This will immediately download an update, then install when the
+  // app quits.
+  autoUpdater.checkForUpdatesAndNotify();
+
+  function sendUpdateStatus(status) {
+    log.info(status);
+    if (mainWindow) mainWindow.webContents.send('update-status', status);
+  }
+  autoUpdater.on('checking-for-update', () => {
+    sendUpdateStatus({
+      message: 'Checking for update...',
+      status: 'checking-for-update',
+    });
+  });
+  autoUpdater.on('update-available', info => {
+    sendUpdateStatus({
+      message: 'Update available.',
+      status: 'update-available',
+    });
+  });
+  autoUpdater.on('update-not-available', info => {
+    sendUpdateStatus({
+      message: 'Update not available.',
+      status: 'update-not-available',
+    });
+  });
+  autoUpdater.on('error', err => {
+    sendUpdateStatus({
+      message: 'Error in auto-updater. ' + err,
+      status: 'error',
+      err,
+    });
+  });
+  autoUpdater.on('download-progress', progressObj => {
+    let logMessage = 'Download speed: ' + progressObj.bytesPerSecond;
+    logMessage = logMessage + ' - Downloaded ' + progressObj.percent + '%';
+    logMessage =
+      logMessage +
+      ' (' +
+      progressObj.transferred +
+      '/' +
+      progressObj.total +
+      ')';
+    sendUpdateStatus({
+      message: logMessage,
+      status: 'download-progress',
+      bytesPerSecond,
+      percent,
+      transferred,
+      total,
+    });
+  });
+  autoUpdater.on('update-downloaded', info => {
+    sendUpdateStatus({
+      message: 'Update downloaded',
+      status: 'update-downloaded',
+      info,
+    });
   });
 });

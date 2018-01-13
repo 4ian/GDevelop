@@ -1,6 +1,6 @@
 // @flow
 
-import optionalRequire from '../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 const fs = optionalRequire('fs');

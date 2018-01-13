@@ -17,7 +17,7 @@ type Props = {
 };
 
 export default ({ message, onLogin }: Props) => (
-  <Column>
+  <Column noMargin>
     <Line>
       <p>
         {message ||

@@ -3,28 +3,28 @@
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
 import RaisedButton from 'material-ui/RaisedButton';
-import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
+import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {
   type Build,
   buildCordovaAndroid,
   getUrl,
   getBuild,
-} from '../../Utils/GDevelopServices/Build';
+} from '../../../Utils/GDevelopServices/Build';
 import {
   withUserProfile,
   type WithUserProfileProps,
-} from '../../Profile/UserProfileContainer';
-import { Column, Line } from '../../UI/Grid';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
+} from '../../../Profile/UserProfileContainer';
+import { Column, Line } from '../../../UI/Grid';
+import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
 import localFileSystem from '../LocalFileSystem';
 import Progress from './Progress';
 import { archiveFolder } from './Archiver';
-import optionalRequire from '../../Utils/OptionalRequire.js';
-import Window from '../../Utils/Window';
-import { delay } from '../../Utils/Delay';
-import CreateProfile from '../../Profile/CreateProfile';
-import LimitDisplayer from '../../Profile/LimitDisplayer';
+import optionalRequire from '../../../Utils/OptionalRequire.js';
+import Window from '../../../Utils/Window';
+import { delay } from '../../../Utils/Delay';
+import CreateProfile from '../../../Profile/CreateProfile';
+import LimitDisplayer from '../../../Profile/LimitDisplayer';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');

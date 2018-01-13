@@ -4,7 +4,7 @@ import BrowserS3FileSystem from './BrowserS3FileSystem';
 import BrowserPreviewLinkDialog from './BrowserPreviewLinkDialog';
 import { findGDJS } from './BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
-import { GDevelopGamesPreview } from '../Utils/GDevelopServices/ApiConfigs';
+import { GDevelopGamesPreview } from '../../Utils/GDevelopServices/ApiConfigs';
 const awsS3 = require('aws-sdk/clients/s3');
 const gd = global.gd;
 

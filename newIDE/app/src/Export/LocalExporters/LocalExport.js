@@ -1,23 +1,23 @@
 import React, { Component } from 'react';
-import Dialog from '../UI/Dialog';
+import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
-import { sendExportLaunched } from '../Utils/Analytics/EventSender';
-import { Column, Line, Spacer } from '../UI/Grid';
-import { showErrorBox } from '../UI/Messages/MessageBox';
+import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
+import { Column, Line, Spacer } from '../../UI/Grid';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
-import LocalFolderPicker from '../UI/LocalFolderPicker';
-import HelpButton from '../UI/HelpButton';
+import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
-import optionalRequire from '../Utils/OptionalRequire';
-import Window from '../Utils/Window';
+import optionalRequire from '../../Utils/OptionalRequire';
+import Window from '../../Utils/Window';
+import { getHelpLink } from '../../Utils/HelpLink';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
-export default class LocalCordovaExport extends Component {
+export default class LocalExport extends Component {
   state = {
     exportFinishedDialogOpen: false,
     outputDir: '',
@@ -56,14 +56,14 @@ export default class LocalCordovaExport extends Component {
     const { project } = this.props;
     if (!project) return;
 
-    sendExportLaunched('local-cordova');
+    sendExportLaunched('local');
 
     const outputDir = this.state.outputDir;
     project.setLastCompilationDirectory(outputDir);
 
-    LocalCordovaExport.prepareExporter()
+    LocalExport.prepareExporter()
       .then(({ exporter }) => {
-        const exportForCordova = true;
+        const exportForCordova = false;
         exporter.exportWholePixiProject(
           project,
           outputDir,
@@ -84,8 +84,12 @@ export default class LocalCordovaExport extends Component {
     shell.openItem(this.state.outputDir);
   };
 
-  openPhoneGapBuild = () => {
-    Window.openExternalURL('https://build.phonegap.com');
+  openItchioHelp = () => {
+    Window.openExternalURL(getHelpLink('/publishing/publishing-to-itch-io'));
+  };
+
+  openLearnMore = () => {
+    Window.openExternalURL(getHelpLink('/publishing'));
   };
 
   render() {
@@ -95,17 +99,8 @@ export default class LocalCordovaExport extends Component {
     return (
       <Column noMargin>
         <Line>
-          <Column noMargin>
-            <p>
-              This will export your game as a Cordova project. Cordova is a
-              technology that enables HTML5 games to be packaged for <b>iOS</b>,{' '}
-              <b>Android</b> and more.
-            </p>
-            <p>
-              Third-party tools like <b>Adobe PhoneGap Build</b> allow game
-              developers to bundle their games using Cordova.
-            </p>
-          </Column>
+          This will export your game to a folder that you can then upload on a
+          website or on game hosting like itch.io.
         </Line>
         <Line>
           <LocalFolderPicker
@@ -143,26 +138,22 @@ export default class LocalCordovaExport extends Component {
                 })}
             />,
           ]}
-          secondaryActions={
-            <HelpButton key="help" helpPagePath="/publishing" />
-          }
           modal
           open={this.state.exportFinishedDialogOpen}
         >
           <p>
-            You can now compress and upload the game to <b>PhoneGap Build</b>{' '}
-            which will compile it for you to an iOS and Android app.
-          </p>
-          <p>
-            You can also compile the game by yourself using Cordova command-line
-            tool to iOS (XCode is required) or Android (Android SDK is
-            required).
+            You can now upload the game to a web hosting to play to the game.
           </p>
           <RaisedButton
             fullWidth
             primary
-            onClick={() => this.openPhoneGapBuild()}
-            label="Open PhoneGap Build"
+            onClick={() => this.openItchioHelp()}
+            label="Publish your game on Itch.io"
+          />
+          <FlatButton
+            fullWidth
+            onClick={() => this.openLearnMore()}
+            label="Learn more about publishing"
           />
         </Dialog>
       </Column>

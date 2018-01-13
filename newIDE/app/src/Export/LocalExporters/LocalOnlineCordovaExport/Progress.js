@@ -4,7 +4,7 @@ import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
 import CircularProgress from 'material-ui/CircularProgress';
 import LinearProgress from 'material-ui/LinearProgress';
 import FlatButton from 'material-ui/FlatButton';
-import { Line, Spacer } from '../../UI/Grid';
+import { Line, Spacer } from '../../../UI/Grid';
 
 export default ({
   exportStep,

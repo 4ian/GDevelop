@@ -48,6 +48,9 @@ export const Auth0Config = {
       },
       redirect: false,
     },
+    languageDictionary: {
+      title: "Log in to continue"
+    },
   },
 };
 

@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
-import Window from '../Utils/Window';
-import PlaceholderMessage from '../UI/PlaceholderMessage';
+import Window from '../../Utils/Window';
+import PlaceholderMessage from '../../UI/PlaceholderMessage';
 
 export default class LocalOnlineElectronExport extends React.Component<*, *> {
   _openGithub() {

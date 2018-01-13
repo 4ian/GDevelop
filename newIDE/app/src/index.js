@@ -14,31 +14,25 @@ import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
 // Import for browser only IDE
-import BrowserS3PreviewLauncher from './Export/BrowserS3PreviewLauncher';
-import BrowserExport from './Export/BrowserExport';
 import BrowserExamples from './ProjectCreation/BrowserExamples';
 import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
 import BrowserSaveDialog from './ProjectsStorage/BrowserSaveDialog';
 import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
 import browserResourceSources from './ResourcesEditor/BrowserResourceSources';
+import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
+import { getBrowserExporters } from './Export/BrowserExporters';
 
 // Import for Electron powered IDE.
 import ExternalEditor from './ExternalEditor';
 import optionalRequire from './Utils/OptionalRequire.js';
-import LocalPreviewLauncher from './Export/LocalPreviewLauncher';
-import LocalExport from './Export/LocalExport';
-import LocalS3Export from './Export/LocalS3Export';
-import LocalOnlineCordovaExport from './Export/LocalOnlineCordovaExport';
-import LocalCordovaExport from './Export/LocalCordovaExport';
-import LocalCocos2dExport from './Export/LocalCocos2dExport';
 import LocalExamples from './ProjectCreation/LocalExamples';
 import localResourceSources from './ResourcesEditor/LocalResourceSources';
 import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
 import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
+import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
+import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import LocalIntroDialog from './MainFrame/LocalIntroDialog';
-import CompositeExporter from './Export/CompositeExporter';
-import LocalOnlineElectronExport from './Export/LocalOnlineElectronExport';
 const electron = optionalRequire('electron');
 
 installRaven();
@@ -70,57 +64,7 @@ if (electron) {
           onExternalLayoutPreview={
             LocalPreviewLauncher.launchExternalLayoutPreview
           }
-          exportDialog={
-            <ExportDialog
-              tabs={[
-                {
-                  name: 'Web',
-                  ExportComponent: props => (
-                    <CompositeExporter
-                      {...props}
-                      exporters={[
-                        {
-                          name: 'Upload online',
-                          ExportComponent: LocalS3Export,
-                        },
-                        {
-                          name: 'Local folder',
-                          ExportComponent: LocalExport,
-                        },
-                      ]}
-                    />
-                  ),
-                },
-                {
-                  name: 'iOS & Android',
-                  ExportComponent: props => (
-                    <CompositeExporter
-                      {...props}
-                      exporters={[
-                        {
-                          name: 'Automatic packaging',
-                          ExportComponent: LocalOnlineCordovaExport,
-                        },
-                        {
-                          name: 'Manual',
-                          ExportComponent: LocalCordovaExport,
-                        },
-                      ]}
-                    />
-                  ),
-                },
-                {
-                  name: 'Windows/macOS/Linux',
-                  ExportComponent: LocalOnlineElectronExport,
-                },
-                {
-                  name: 'Cocos2d-JS',
-                  ExportComponent: LocalCocos2dExport,
-                  advanced: true,
-                },
-              ]}
-            />
-          }
+          exportDialog={<ExportDialog exporters={getLocalExporters()} />}
           createDialog={
             <CreateProjectDialog examplesComponent={LocalExamples} />
           }
@@ -140,12 +84,7 @@ if (electron) {
       onLayoutPreview={BrowserS3PreviewLauncher.launchLayoutPreview}
       exportDialog={
         <ExportDialog
-          tabs={[
-            {
-              name: 'Export your game (coming soon)',
-              ExportComponent: BrowserExport,
-            },
-          ]}
+          exporters={getBrowserExporters()}
         />
       }
       createDialog={<CreateProjectDialog examplesComponent={BrowserExamples} />}

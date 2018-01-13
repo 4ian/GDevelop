@@ -82,7 +82,9 @@ class ProfileDialog extends Component<Props, State> {
                 />
               </Column>
             ) : (
-              <CreateProfile onLogin={onLogin} />
+              <Column>
+                <CreateProfile onLogin={onLogin} />
+              </Column>
             )}
           </Tab>
           <Tab label="Online services usage" value="usage">

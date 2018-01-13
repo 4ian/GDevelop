@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
-import { Column, Line } from '../UI/Grid';
-import Window from '../Utils/Window';
+import { Column, Line } from '../../UI/Grid';
+import Window from '../../Utils/Window';
 
 export default class BrowserExport extends Component {
   openWebsite = () => {

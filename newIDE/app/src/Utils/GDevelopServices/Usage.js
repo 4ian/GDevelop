@@ -72,15 +72,18 @@ export const getUserUsages = (
   authentification: Authentification,
   userId: string
 ): Promise<Usages> => {
-  return axios
-    .get(`${GDevelopUsageApi.baseUrl}/usage`, {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authentification.getAuthorizationHeader(),
-      },
-    })
+  return authentification
+    .getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopUsageApi.baseUrl}/usage`, {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
     .then(response => response.data);
 };
 
@@ -88,15 +91,18 @@ export const getUserLimits = (
   authentification: Authentification,
   userId: string
 ): Promise<Limits> => {
-  return axios
-    .get(`${GDevelopUsageApi.baseUrl}/limits`, {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authentification.getAuthorizationHeader(),
-      },
-    })
+  return authentification
+    .getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopUsageApi.baseUrl}/limits`, {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
     .then(response => response.data.limits);
 };
 
@@ -104,15 +110,18 @@ export const getUserSubscription = (
   authentification: Authentification,
   userId: string
 ): Promise<Subscription> => {
-  return axios
-    .get(`${GDevelopUsageApi.baseUrl}/subscription`, {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authentification.getAuthorizationHeader(),
-      },
-    })
+  return authentification
+    .getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopUsageApi.baseUrl}/subscription`, {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
     .then(response => response.data);
 };
 
@@ -121,14 +130,21 @@ export const changeUserSubscription = (
   userId: string,
   newSubscriptionDetails: { planId: string | null, stripeToken?: any }
 ): Promise<Subscription> => {
-  return axios
-    .post(`${GDevelopUsageApi.baseUrl}/subscription`, newSubscriptionDetails, {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authentification.getAuthorizationHeader(),
-      },
-    })
+  return authentification
+    .getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopUsageApi.baseUrl}/subscription`,
+        newSubscriptionDetails,
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
     .then(response => response.data);
 };

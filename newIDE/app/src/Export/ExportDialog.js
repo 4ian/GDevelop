@@ -70,11 +70,12 @@ export default class ExportDialog extends Component {
           chosenExporterKey && (
             <FlatButton
               label="Back"
+              key="back"
               primary={false}
               onClick={() => this.chooseExporter('')}
             />
           ),
-          <FlatButton label="Close" primary={false} onClick={onClose} />,
+          <FlatButton label="Close" key="close" primary={false} onClick={onClose} />,
         ]}
         secondaryActions={[
           <HelpButton key="help" helpPagePath="/publishing" />,

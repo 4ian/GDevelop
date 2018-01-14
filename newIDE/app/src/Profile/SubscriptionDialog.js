@@ -3,7 +3,6 @@
 import React, { Component } from 'react';
 import { Card, CardActions, CardHeader } from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
-import CircularProgress from 'material-ui/CircularProgress';
 import Dialog from '../UI/Dialog';
 import {
   withUserProfile,
@@ -19,6 +18,7 @@ import { StripeCheckoutConfig } from '../Utils/GDevelopServices/ApiConfigs';
 import RaisedButton from 'material-ui/RaisedButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import { showMessageBox, showErrorBox } from '../UI/Messages/MessageBox';
+import LeftLoader from '../UI/LeftLoader';
 
 const styles = {
   descriptionText: {
@@ -46,12 +46,6 @@ type State = {|
   isLoading: boolean,
 |};
 
-const LeftLoader = ({ children, isLoading }) => (
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    {isLoading && <CircularProgress size={20} style={{ marginRight: 5 }} />}
-    {children}
-  </div>
-);
 
 class SubscriptionDialog extends Component<Props, State> {
   state = { isLoading: false };
@@ -71,7 +65,7 @@ class SubscriptionDialog extends Component<Props, State> {
       // We already have a stripe customer, change the subscription without
       // asking for the user card.
       this.setState({ isLoading: true });
-      changeUserSubscription(authentification, profile.sub, {
+      changeUserSubscription(authentification, profile.uid, {
         planId: plan.planId,
       }).then(
         () => this.handleNewSubscriptionSuccess(plan),
@@ -86,9 +80,9 @@ class SubscriptionDialog extends Component<Props, State> {
           key: StripeCheckoutConfig.key,
           image: StripeCheckoutConfig.image,
           locale: 'auto',
-          token: function(stripeToken) {
+          token: (stripeToken) => {
             this.setState({ isLoading: true });
-            changeUserSubscription(authentification, profile.sub, {
+            changeUserSubscription(authentification, profile.uid, {
               planId: plan.planId,
               stripeToken,
             }).then(
@@ -102,6 +96,7 @@ class SubscriptionDialog extends Component<Props, State> {
           name: plan.name,
           description: 'Monthly subscription',
           currency: 'eur',
+          email: profile.email,
           amount: plan.monthlyPriceInEuros * 100,
         });
       }

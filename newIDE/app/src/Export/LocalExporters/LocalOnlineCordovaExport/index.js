@@ -153,11 +153,12 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
 
   launchBuild = (uploadBucketKey: string): Promise<string> => {
     const { authentification, profile } = this.props;
-    if (!profile || !authentification) return Promise.reject();
+    if (!profile || !authentification)
+      return Promise.reject(new Error('User is not authenticated'));
 
     return buildCordovaAndroid(
       authentification,
-      profile.sub,
+      profile.uid,
       uploadBucketKey
     ).then(build => {
       return build.id;
@@ -166,7 +167,8 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
 
   pollBuild = async (buildId: string): Promise<Build> => {
     const { authentification, profile } = this.props;
-    if (!profile || !authentification) return Promise.reject();
+    if (!profile || !authentification)
+      return Promise.reject(new Error('User is not authenticated'));
 
     try {
       let build = null;
@@ -175,7 +177,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       const maxWaitTime = 100000;
       do {
         await delay(waitTime);
-        build = await getBuild(authentification, profile.sub, buildId);
+        build = await getBuild(authentification, profile.uid, buildId);
         this.setState({
           build,
           buildMax: maxWaitTime,
@@ -243,7 +245,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
         });
 
         return this.pollBuild(buildId);
-      }, handleError('Error while lauching for the build of the game.'))
+      }, handleError('Error while lauching the build of the game.'))
       .then(build => {
         this.setState({
           exportStep: 'done',

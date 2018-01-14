@@ -23,18 +23,21 @@ export const buildCordovaAndroid = (
   userId: string,
   key: string
 ): Promise<Build> => {
-  return axios
-    .post(
-      `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
-        userId
-      )}&key=${encodeURIComponent(key)}&type=cordova-build`,
-      null,
-      {
-        params: {},
-        headers: {
-          Authorization: authentification.getAuthorizationHeader(),
-        },
-      }
+  return authentification
+    .getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
+          userId
+        )}&key=${encodeURIComponent(key)}&type=cordova-build`,
+        null,
+        {
+          params: {},
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
     )
     .then(response => response.data);
 };
@@ -44,14 +47,17 @@ export const getBuild = (
   userId: string,
   buildId: string
 ): Promise<Build> => {
-  return axios
-    .get(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
-      params: {
-        userId,
-      },
-      headers: {
-        Authorization: authentification.getAuthorizationHeader(),
-      },
-    })
+  return authentification
+    .getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
     .then(response => response.data);
 };

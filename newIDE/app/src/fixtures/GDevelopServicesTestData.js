@@ -7,11 +7,10 @@ import {
 import { type Profile } from '../Utils/GDevelopServices/Authentification';
 
 export const profileForIndieUser: Profile = {
-  sub: 'indie-user',
-  nickname: 'IndieUser',
+  uid: 'indie-user',
   picture: '',
   email: 'indie-user@example.com',
-  email_verified: true,
+  emailVerified: true,
 };
 
 export const usagesForIndieUser: Usages = [

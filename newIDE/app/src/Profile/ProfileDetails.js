@@ -22,7 +22,7 @@ export default ({ profile }: Props) =>
     <Column>
       <Line alignItems="center">
         <Avatar src={profile.picture} />
-        <span style={styles.title}>You are connect as {profile.nickname}</span>
+        <span style={styles.title}>You are connect as {profile.email}</span>
       </Line>
       <Line>
         <p>With your account, you can access to GDevelop online services.</p>

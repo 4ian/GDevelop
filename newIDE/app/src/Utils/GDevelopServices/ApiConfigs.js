@@ -30,30 +30,14 @@ if (
   );
 }
 
-export const Auth0Config = {
-  domain: '4ian.eu.auth0.com',
-  clientId: 'vpsTe5CLJNp7K4nM1nQHzpkentyIZX5U',
-  lockOptions: {
-    autoclose: true,
-    theme: {
-      logo:
-        'https://raw.githubusercontent.com/4ian/GD/gh-pages/res/icon128linux.png',
-      primaryColor: '#4ab0e4',
-    },
-    auth: {
-      responseType: 'token id_token',
-      audience: `https://4ian.eu.auth0.com/userinfo`,
-      params: {
-        scope: 'openid profile email offline_access',
-      },
-      redirectUrl: 'https://4ian.github.io/GD',
-      redirect: false,
-    },
-    languageDictionary: {
-      title: "Log in to continue"
-    },
-  },
-};
+export const GDevelopFirebaseConfig = {
+  apiKey: "AIzaSyAnX9QMacrIl3yo4zkVFEVhDppGVDDewBc",
+  authDomain: "gdevelop-services.firebaseapp.com",
+  databaseURL: "https://gdevelop-services.firebaseio.com",
+  projectId: "gdevelop-services",
+  storageBucket: "gdevelop-services.appspot.com",
+  messagingSenderId: "44882707384"
+};;
 
 export const GDevelopUsageApi = {
   baseUrl: isDev

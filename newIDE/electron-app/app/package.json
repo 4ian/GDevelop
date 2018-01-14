@@ -8,6 +8,7 @@
   "homepage": "http://compilgames.net",
   "main": "main.js",
   "dependencies": {
+    "archiver": "^2.1.1",
     "aws-sdk": "^2.58.0",
     "electron-editor-context-menu": "^1.1.1",
     "electron-is": "^2.4.0",

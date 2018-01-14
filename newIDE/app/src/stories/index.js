@@ -12,10 +12,10 @@ import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import LocalExport from '../Export/LocalExport';
-import LocalCordovaExport from '../Export/LocalCordovaExport';
-import Progress from '../Export/LocalOnlineCordovaExport/Progress';
-import LocalS3Export from '../Export/LocalS3Export';
+import LocalExport from '../Export/LocalExporters/LocalExport';
+import LocalCordovaExport from '../Export/LocalExporters/LocalCordovaExport';
+import Progress from '../Export/LocalExporters/LocalOnlineCordovaExport/Progress';
+import LocalS3Export from '../Export/LocalExporters/LocalS3Export';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
@@ -64,6 +64,7 @@ import {
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
+import LoginDialog from '../Profile/LoginDialog';
 
 const gd = global.gd;
 const {
@@ -531,7 +532,7 @@ storiesOf('ProfileDetails', module)
   .add('profile', () => (
     <ProfileDetails
       profile={{
-        nickname: 'Florian',
+        email: 'test@example.com',
         picture:
           '"https://s.gravatar.com/avatar/d6fc8df7ddfe938cc379c53bfb5645fc?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Ffl.png',
       }}
@@ -565,11 +566,80 @@ storiesOf('SubscriptionDialog', module)
       open
       onClose={action('on close')}
     />
-  )).add('loading (no profile/subscription)', () => (
+  ))
+  .add('loading (no profile/subscription)', () => (
     <SubscriptionDialog
       profile={null}
       subscription={null}
       open
       onClose={action('on close')}
+    />
+  ));
+
+storiesOf('LoginDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+    />
+  ))
+  .add('login in progress', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress
+      createAccountInProgress={false}
+    />
+  ))
+  .add('create account in progress', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress
+    />
+  ))
+  .add('weak-password error', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      error={{
+        code: 'auth/weak-password',
+      }}
+    />
+  ))
+  .add('invalid-email error', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      error={{
+        code: 'auth/invalid-email',
+      }}
+    />
+  ))
+  .add('Reset password', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      resetPasswordDialogOpen
+    />
+  ))
+  .add('Reset password (invalid-action-code error)', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      resetPasswordDialogOpen
+      resetError={{ code: 'auth/invalid-action-code' }}
     />
   ));

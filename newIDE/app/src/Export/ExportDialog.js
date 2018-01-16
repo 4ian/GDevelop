@@ -9,7 +9,7 @@ import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
 
 const styles = {
   icon: { width: 40, height: 40 },
-  disabledItem: { opacity : 0.6 },
+  disabledItem: { opacity: 0.6 },
   content: { padding: 24 },
 };
 
@@ -75,10 +75,18 @@ export default class ExportDialog extends Component {
               onClick={() => this.chooseExporter('')}
             />
           ),
-          <FlatButton label="Close" key="close" primary={false} onClick={onClose} />,
+          <FlatButton
+            label="Close"
+            key="close"
+            primary={false}
+            onClick={onClose}
+          />,
         ]}
         secondaryActions={[
-          <HelpButton key="help" helpPagePath="/publishing" />,
+          <HelpButton
+            key="help"
+            helpPagePath={(exporter && exporter.helpPage) || '/publishing'}
+          />,
           !chosenExporterKey &&
             (!showExperimental ? (
               <FlatButton

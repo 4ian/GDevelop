@@ -1,3 +1,4 @@
+const fs = require('fs');
 const s3 = require('s3');
 const awsS3 = require('aws-sdk/clients/s3');
 
@@ -18,6 +19,8 @@ module.exports = {
       region: region,
       correctClockSkew: true,
     });
+
+    // TODO: Switch to a more robust module for uploading files
     const s3Client = s3.createClient({
       s3Client: awsS3Client,
     });
@@ -52,27 +55,23 @@ module.exports = {
       region: region,
       correctClockSkew: true,
     });
-    const s3Client = s3.createClient({
-      s3Client: awsS3Client,
-    });
 
     const timestamp = '' + Date.now();
     const prefix = 'game-archive-' + timestamp;
     const filename = 'game-archive.zip';
+    var body = fs.createReadStream(localFile);
 
-    var uploader = s3Client.uploadFile({
-      localFile,
-      s3Params: {
+    awsS3Client
+      .upload({
+        Body: body,
         Bucket: destinationBucket,
         Key: prefix + '/' + filename,
-      },
-    });
-    uploader.on('error', onDone);
-    uploader.on('progress', function() {
-      onProgress(uploader.progressAmount, uploader.progressTotal);
-    });
-    uploader.on('end', function() {
-      onDone(null, prefix + '/' + filename);
-    });
+      })
+      .on('httpUploadProgress', function(progress) {
+        onProgress(progress.loaded, progress.total || 0);
+      })
+      .send(function(err, data) {
+        onDone(err, prefix + '/' + filename);
+      });
   },
 };

@@ -174,7 +174,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       let build = null;
       let tries = 0;
       const waitTime = 1000;
-      const maxWaitTime = 100000;
+      const maxWaitTime = 200000;
       do {
         await delay(waitTime);
         build = await getBuild(authentification, profile.uid, buildId);

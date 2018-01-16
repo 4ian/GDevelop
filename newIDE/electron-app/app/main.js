@@ -12,6 +12,7 @@ const {
   uploadArchiveToBucket,
 } = require('./s3upload');
 const { buildMainMenuFor } = require('./main-menu');
+const throttle = require('lodash.throttle');
 
 // Logs made with electron-logs can be found
 // on Linux: ~/.config/<app name>/log.log
@@ -115,9 +116,9 @@ app.on('ready', function() {
 
     uploadArchiveToBucket(
       localFile,
-      (current, max) => {
+      throttle((current, max) => {
         event.sender.send('s3-file-upload-progress', current, max);
-      },
+      }, 300),
       (err, prefix) => {
         event.sender.send('s3-file-upload-done', err, prefix);
       }

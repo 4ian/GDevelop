@@ -21,11 +21,11 @@ export default ({ message, onLogin }: Props) => (
     <Line>
       <p>
         {message ||
-          'You are not connected. Create a profile and connect to access to GDevelop online services, like building your game for Android in one click!'}
+          'You are not connected. Create an account and connect to access to GDevelop online services, like building your game for Android in one click!'}
       </p>
     </Line>
     <Line justifyContent="center" alignItems="center">
-      <RaisedButton label="Create my profile" onClick={onLogin} primary />
+      <RaisedButton label="Create my account" onClick={onLogin} primary />
       <span style={styles.orDivider}>or</span>
       <FlatButton label="Login" onClick={onLogin} />
     </Line>

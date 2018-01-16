@@ -42,9 +42,9 @@ export default class Authentification {
   createAccount = (form: LoginForm): Promise<void> => {
     return firebase
       .auth()
-      .createUserWithEmailAndPassword(form.email, form.password)
-      .then(result => {
-        // User will be stored by onAuthStateChanged
+      .createUserAndRetrieveDataWithEmailAndPassword(form.email, form.password)
+      .then(userCredentials => {
+        this.user = userCredentials.user;
       })
       .catch(error => {
         console.error('Error while creating account:', error);
@@ -55,9 +55,9 @@ export default class Authentification {
   login = (form: LoginForm): Promise<void> => {
     return firebase
       .auth()
-      .signInWithEmailAndPassword(form.email, form.password)
-      .then(result => {
-        // User will be stored by onAuthStateChanged
+      .signInAndRetrieveDataWithEmailAndPassword(form.email, form.password)
+      .then(userCredentials => {
+        this.user = userCredentials.user;
       })
       .catch(error => {
         console.error('Error while login:', error);

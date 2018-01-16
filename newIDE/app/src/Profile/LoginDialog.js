@@ -99,6 +99,7 @@ export default class LoginDialog extends Component<Props, State> {
 
     return (
       <Dialog
+        title="Login or create a GDevelop account"
         actions={actions}
         secondaryActions={[
           <RightLoader

@@ -8,6 +8,7 @@ import { Column } from '../UI/Grid';
 import CreateProfile from './CreateProfile';
 import ProfileDetails from './ProfileDetails';
 import EmptyMessage from '../UI/EmptyMessage';
+import HelpButton from '../UI/HelpButton';
 import UsagesDetails from './UsagesDetails';
 import SubscriptionDetails from './SubscriptionDetails';
 import {
@@ -62,9 +63,10 @@ class ProfileDialog extends Component<Props, State> {
       <Dialog
         actions={actions}
         secondaryActions={
-          authenticated && profile
-            ? [<FlatButton label="Logout" key="logout" onClick={onLogout} />]
-            : []
+          [
+            <HelpButton key="help" helpPagePath="/interface/profile" />,
+            (authenticated && profile) && <FlatButton label="Logout" key="logout" onClick={onLogout} />,
+          ]
         }
         onRequestClose={onClose}
         open={open}

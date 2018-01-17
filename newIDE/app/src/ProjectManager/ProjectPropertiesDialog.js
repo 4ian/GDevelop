@@ -104,6 +104,13 @@ export default class ProjectPropertiesDialog extends Component {
           value={this.state.packageName}
           onChange={(e, value) => this.setState({ packageName: value })}
         />
+        <TextField
+          floatingLabelText="Icon"
+          fullWidth
+          type="text"
+          disabled
+          value="Coming soon"
+        />
       </Dialog>
     );
   }

@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import Dialog from '../UI/Dialog';
+import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Toggle from 'material-ui/Toggle';
-import { sendExportLaunched } from '../Utils/Analytics/EventSender';
-import { Column, Line, Spacer } from '../UI/Grid';
-import HelpButton from '../UI/HelpButton';
-import { showErrorBox } from '../UI/Messages/MessageBox';
+import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
+import { Column, Line, Spacer } from '../../UI/Grid';
+import HelpButton from '../../UI/HelpButton';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
-import LocalFolderPicker from '../UI/LocalFolderPicker';
+import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
-import optionalRequire from '../Utils/OptionalRequire';
+import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 

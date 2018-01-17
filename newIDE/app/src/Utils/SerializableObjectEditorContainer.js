@@ -10,7 +10,7 @@ const gd = global.gd;
  */
 export const withSerializableObject = (
   WrappedComponent,
-  { newObjectCreator, propName, useProjectToUnserialize }
+  { newObjectCreator, propName, useProjectToUnserialize } //TODO: Refactor
 ) => {
   return class extends Component {
     constructor(props) {

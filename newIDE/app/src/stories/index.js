@@ -12,9 +12,10 @@ import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import LocalExport from '../Export/LocalExport';
-import LocalCordovaExport from '../Export/LocalCordovaExport';
-import LocalS3Export from '../Export/LocalS3Export';
+import LocalExport from '../Export/LocalExporters/LocalExport';
+import LocalCordovaExport from '../Export/LocalExporters/LocalCordovaExport';
+import Progress from '../Export/LocalExporters/LocalOnlineCordovaExport/Progress';
+import LocalS3Export from '../Export/LocalExporters/LocalS3Export';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
@@ -47,8 +48,23 @@ import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/InstructionEditor/ParameterRenderingService';
-import {ErrorFallbackComponent} from '../UI/ErrorBoundary';
+import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import { makeTestProject } from '../fixtures/TestProject';
+import CreateProfile from '../Profile/CreateProfile';
+import ProfileDetails from '../Profile/ProfileDetails';
+import LimitDisplayer from '../Profile/LimitDisplayer';
+import {
+  subscriptionForIndieUser,
+  limitsForIndieUser,
+  limitsReached,
+  noSubscription,
+  usagesForIndieUser,
+  profileForIndieUser,
+} from '../fixtures/GDevelopServicesTestData';
+import SubscriptionDetails from '../Profile/SubscriptionDetails';
+import UsagesDetails from '../Profile/UsagesDetails';
+import SubscriptionDialog from '../Profile/SubscriptionDialog';
+import LoginDialog from '../Profile/LoginDialog';
 
 const gd = global.gd;
 const {
@@ -167,6 +183,25 @@ storiesOf('LocalCordovaExport', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCordovaExport project={project} />);
 
+storiesOf('LocalOnlineCordovaExport', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('Progress (not started)', () => <Progress exportStep={''} />)
+  .add('Progress (export)', () => <Progress exportStep={'export'} />)
+  .add('Progress (compress)', () => <Progress exportStep={'compress'} />)
+  .add('Progress (upload)', () => <Progress exportStep={'upload'} />)
+  .add('Progress (upload) (errored)', () => (
+    <Progress exportStep={'upload'} errored />
+  ))
+  .add('Progress (waiting-for-build)', () => (
+    <Progress exportStep={'waiting-for-build'} />
+  ))
+  .add('Progress (build)', () => <Progress exportStep={'build'} />)
+  .add('Progress (build) (errored)', () => (
+    <Progress exportStep={'build'} errored />
+  ))
+  .add('Progress (done)', () => <Progress exportStep={'done'} />);
+
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -181,7 +216,13 @@ storiesOf('StartPage', module)
 
 storiesOf('AboutDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => <AboutDialog open />);
+  .add('default', () => (
+    <AboutDialog
+      open
+      onClose={action('close')}
+      updateStatus={{ message: '', status: 'unknown' }}
+    />
+  ));
 
 storiesOf('CreateProjectDialog', module)
   .addDecorator(muiDecorator)
@@ -459,6 +500,152 @@ storiesOf('VariablesList', module)
 storiesOf('ErrorBoundary', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
+  .add('default', () => <ErrorFallbackComponent />);
+
+storiesOf('CreateProfile', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <CreateProfile onLogin={action('login')} />);
+
+storiesOf('LimitDisplayer', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
   .add('default', () => (
-    <ErrorFallbackComponent />
+    <LimitDisplayer
+      subscription={subscriptionForIndieUser}
+      limit={limitsForIndieUser['cordova-build']}
+      onChangeSubscription={action('change subscription')}
+    />
+  ))
+  .add('limit reached', () => (
+    <LimitDisplayer
+      subscription={subscriptionForIndieUser}
+      limit={limitsReached['cordova-build']}
+      onChangeSubscription={action('change subscription')}
+    />
+  ))
+  .add('limit reached without subscription', () => (
+    <LimitDisplayer
+      subscription={noSubscription}
+      limit={limitsReached['cordova-build']}
+      onChangeSubscription={action('change subscription')}
+    />
+  ));
+
+storiesOf('ProfileDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('profile', () => (
+    <ProfileDetails
+      profile={{
+        email: 'test@example.com',
+        picture:
+          '"https://s.gravatar.com/avatar/d6fc8df7ddfe938cc379c53bfb5645fc?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Ffl.png',
+      }}
+    />
+  ))
+  .add('loading', () => <ProfileDetails profile={null} />);
+
+storiesOf('SubscriptionDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SubscriptionDetails subscription={subscriptionForIndieUser} />
+  ))
+  .add('limit reached', () => (
+    <SubscriptionDetails subscription={noSubscription} />
+  ));
+
+storiesOf('UsagesDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <UsagesDetails usages={usagesForIndieUser} />)
+  .add('empty', () => <UsagesDetails usages={[]} />);
+
+storiesOf('SubscriptionDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SubscriptionDialog
+      profile={profileForIndieUser}
+      subscription={subscriptionForIndieUser}
+      open
+      onClose={action('on close')}
+    />
+  ))
+  .add('loading (no profile/subscription)', () => (
+    <SubscriptionDialog
+      profile={null}
+      subscription={null}
+      open
+      onClose={action('on close')}
+    />
+  ));
+
+storiesOf('LoginDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+    />
+  ))
+  .add('login in progress', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress
+      createAccountInProgress={false}
+    />
+  ))
+  .add('create account in progress', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress
+    />
+  ))
+  .add('weak-password error', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      error={{
+        code: 'auth/weak-password',
+      }}
+    />
+  ))
+  .add('invalid-email error', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      error={{
+        code: 'auth/invalid-email',
+      }}
+    />
+  ))
+  .add('Reset password', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      resetPasswordDialogOpen
+    />
+  ))
+  .add('Reset password (invalid-action-code error)', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      resetPasswordDialogOpen
+      resetError={{ code: 'auth/invalid-action-code' }}
+    />
   ));

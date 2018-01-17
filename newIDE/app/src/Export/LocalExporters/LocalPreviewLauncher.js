@@ -1,8 +1,8 @@
 // @flow
 
 import localFileSystem from './LocalFileSystem';
-import optionalRequire from '../Utils/OptionalRequire';
-import { timeFunction } from '../Utils/TimeFunction';
+import optionalRequire from '../../Utils/OptionalRequire';
+import { timeFunction } from '../../Utils/TimeFunction';
 import { findGDJS } from './LocalGDJSFinder';
 import assignIn from 'lodash/assignIn';
 const electron = optionalRequire('electron');

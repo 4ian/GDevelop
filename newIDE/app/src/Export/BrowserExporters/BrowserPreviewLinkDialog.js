@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Dialog from '../UI/Dialog';
+import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import { showErrorBox } from '../UI/Messages/MessageBox';
-import { Column, Line } from '../UI/Grid';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { Column, Line } from '../../UI/Grid';
 
 export default class BrowserPreviewLinkDialog extends Component {
   constructor(props) {

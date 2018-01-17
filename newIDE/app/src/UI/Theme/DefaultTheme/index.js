@@ -49,6 +49,7 @@ const theme = {
   snackbar: {
     actionColor: gdevelopLightBlue,
   },
+  stepper: {},
 
   // GDevelop specific variables:
   closableTabs: {
@@ -74,10 +75,10 @@ const theme = {
     selectedTextColor: '#ffffff',
   },
   emptyMessage: {
-    shadowColor: '#FFFFFF'
+    shadowColor: '#FFFFFF',
   },
   logo: {
-    src: "res/GD-logo-big.png",
+    src: 'res/GD-logo-big.png',
   },
   startPage: {
     backgroundColor,

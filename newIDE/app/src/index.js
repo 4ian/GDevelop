@@ -5,6 +5,7 @@ import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
+import Authentification from './Utils/GDevelopServices/Authentification';
 import { sendProgramOpening } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { installFullstory } from './Utils/Analytics/Fullstory';
@@ -13,26 +14,23 @@ import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
 // Import for browser only IDE
-import BrowserS3PreviewLauncher from './Export/BrowserS3PreviewLauncher';
-import BrowserExport from './Export/BrowserExport';
 import BrowserExamples from './ProjectCreation/BrowserExamples';
 import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
 import BrowserSaveDialog from './ProjectsStorage/BrowserSaveDialog';
 import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
 import browserResourceSources from './ResourcesEditor/BrowserResourceSources';
+import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
+import { getBrowserExporters } from './Export/BrowserExporters';
 
 // Import for Electron powered IDE.
 import ExternalEditor from './ExternalEditor';
 import optionalRequire from './Utils/OptionalRequire.js';
-import LocalPreviewLauncher from './Export/LocalPreviewLauncher';
-import LocalExport from './Export/LocalExport';
-import LocalS3Export from './Export/LocalS3Export';
-import LocalCordovaExport from './Export/LocalCordovaExport';
-import LocalCocos2dExport from './Export/LocalCocos2dExport';
 import LocalExamples from './ProjectCreation/LocalExamples';
 import localResourceSources from './ResourcesEditor/LocalResourceSources';
 import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
 import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
+import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
+import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import LocalIntroDialog from './MainFrame/LocalIntroDialog';
 const electron = optionalRequire('electron');
@@ -42,6 +40,7 @@ installFullstory();
 
 Window.setUpContextMenu();
 
+const authentification = new Authentification();
 let app = null;
 
 if (electron) {
@@ -65,29 +64,7 @@ if (electron) {
           onExternalLayoutPreview={
             LocalPreviewLauncher.launchExternalLayoutPreview
           }
-          exportDialog={
-            <ExportDialog
-              tabs={[
-                {
-                  name: 'Upload online',
-                  ExportComponent: LocalS3Export,
-                },
-                {
-                  name: 'Export to a folder',
-                  ExportComponent: LocalExport,
-                },
-                {
-                  name: 'iOS/Android app',
-                  ExportComponent: LocalCordovaExport,
-                },
-                {
-                  name: 'Cocos2d-JS',
-                  ExportComponent: LocalCocos2dExport,
-                  advanced: true,
-                },
-              ]}
-            />
-          }
+          exportDialog={<ExportDialog exporters={getLocalExporters()} />}
           createDialog={
             <CreateProjectDialog examplesComponent={LocalExamples} />
           }
@@ -96,6 +73,7 @@ if (electron) {
           onChooseProject={LocalProjectOpener.chooseProjectFile}
           onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
           resourceSources={localResourceSources}
+          authentification={authentification}
         />
       </ElectronEventsBridge>
     );
@@ -106,12 +84,7 @@ if (electron) {
       onLayoutPreview={BrowserS3PreviewLauncher.launchLayoutPreview}
       exportDialog={
         <ExportDialog
-          tabs={[
-            {
-              name: 'Export your game (coming soon)',
-              ExportComponent: BrowserExport,
-            },
-          ]}
+          exporters={getBrowserExporters()}
         />
       }
       createDialog={<CreateProjectDialog examplesComponent={BrowserExamples} />}
@@ -119,6 +92,7 @@ if (electron) {
       saveDialog={<BrowserSaveDialog />}
       onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}
       resourceSources={browserResourceSources}
+      authentification={authentification}
     />
   );
 }

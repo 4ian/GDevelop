@@ -1,4 +1,4 @@
-import optionalRequire from '../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire.js';
 var fs = optionalRequire('fs-extra');
 var path = optionalRequire('path');
 var os = optionalRequire('os');

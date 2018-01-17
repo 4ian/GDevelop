@@ -62,6 +62,10 @@ export class MainFrameToolbar extends Component {
                   label: 'Request update from external editor',
                   click: () => this.props.requestUpdate(),
                 },
+                {
+                  label: 'Simulate update downloaded',
+                  click: () => this.props.simulateUpdateDownloaded(),
+                },
               ]}
             />
           )}

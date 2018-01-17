@@ -69,15 +69,21 @@ It's possible to create new themes for the UI. See [this file](https://github.co
 
 ### Desktop version
 
-Update version number which is read in `newIDE/electron-app/app/package.json`.
+First, update version number which is read in `newIDE/electron-app/app/package.json`.
 
 ```bash
 cd newIDE/electron-app
 yarn build #or npm run build
 ```
 
-This will build and package the Electron app for Windows, macOS and Linux (according to your OS).
-The output are stored inside `newIDE/electron-app/dist` and copied to `Binaries/Output/Release_XXX`.
+This will build and package the Electron app for Windows, macOS and Linux (according to your OS). The output are stored inside `newIDE/electron-app/dist`.
+
+To build artifacts for all platforms and publish to a draft GitHub release:
+
+```
+GH_TOKEN=xxx yarn build --mac --win --linux tar.gz --publish always
+```
+
 
 ### Webapp version
 

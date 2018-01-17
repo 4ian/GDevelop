@@ -6,10 +6,11 @@
   "author": "Florian Rival",
   "license": "MIT",
   "homepage": "http://compilgames.net",
+  "repository": "github:4ian/GD",
   "private": true,
   "scripts": {
     "postinstall": "cd app && npm install",
-    "build:app": "cd ../app && npm run build",
+    "app-build": "node scripts/app-build.js",
     "build": "node scripts/build.js"
   },
   "build": {
@@ -26,11 +27,12 @@
     ],
     "mac": {
       "category": "public.app-category.developer-tools"
-    }
+    },
+    "publish": [{"provider": "github"}]
   },
   "devDependencies": {
     "electron": "1.7.9",
-    "electron-builder": "19.46.9",
+    "electron-builder": "19.53.4",
     "minimist": "^1.2.0",
     "shelljs": "^0.7.7"
   },

@@ -216,7 +216,13 @@ storiesOf('StartPage', module)
 
 storiesOf('AboutDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => <AboutDialog open />);
+  .add('default', () => (
+    <AboutDialog
+      open
+      onClose={action('close')}
+      updateStatus={{ message: '', status: 'unknown' }}
+    />
+  ));
 
 storiesOf('CreateProjectDialog', module)
   .addDecorator(muiDecorator)

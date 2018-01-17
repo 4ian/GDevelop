@@ -16,6 +16,7 @@
     "@storybook/react": "3.2.19",
     "aws-sdk": "^2.100.0",
     "axios": "^0.16.1",
+    "blueimp-md5": "^2.10.0",
     "classnames": "2.2.5",
     "date-fns": "^1.29.0",
     "element-closest": "2.0.2",

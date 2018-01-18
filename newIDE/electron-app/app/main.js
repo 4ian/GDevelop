@@ -171,10 +171,10 @@ app.on('ready', function() {
     sendUpdateStatus({
       message: logMessage,
       status: 'download-progress',
-      bytesPerSecond,
-      percent,
-      transferred,
-      total,
+      bytesPerSecond: progressObj.bytesPerSecond,
+      percent: progressObj.percent,
+      transferred: progressObj.transferred,
+      total: progressObj.total,
     });
   });
   autoUpdater.on('update-downloaded', info => {

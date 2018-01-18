@@ -1,5 +1,5 @@
 {
-  "name": "gdevelop-electron",
+  "name": "gdevelop",
   "productName": "GDevelop 5",
   "description": "GDevelop 5 IDE running on the Electron runtime",
   "version": "1.0.0",
@@ -14,7 +14,7 @@
     "build": "node scripts/build.js"
   },
   "build": {
-    "appId": "com.gdevelop.ide",
+    "appId": "com.gdevelop-app.ide",
     "extraResources": [
       {
         "from": "../app/resources/examples",

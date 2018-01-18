@@ -1,5 +1,6 @@
+// @flow
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { translate, type TranslatorProps } from 'react-i18next';
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
@@ -14,17 +15,27 @@ const styles = {
   },
 };
 
-export class MainFrameToolbar extends Component {
-  constructor() {
-    super();
-    this.isDev = Window.isDev();
+type Props = {
+  showProjectIcons: boolean,
+  hasProject: boolean,
+  toggleProjectManager: boolean,
+  requestUpdate: Function,
+  simulateUpdateDownloaded: Function,
+  exportProject: Function,
+} & TranslatorProps;
 
-    this.state = {
-      editorToolbar: null,
-    };
-  }
+type State = {
+  editorToolbar: any,
+}
 
-  setEditorToolbar(editorToolbar) {
+export class MainFrameToolbar extends Component<Props, State> {
+  state = {
+    editorToolbar: null,
+  };
+
+  isDev = Window.isDev();
+
+  setEditorToolbar(editorToolbar: any) {
     this.setState({
       editorToolbar,
     });
@@ -44,12 +55,12 @@ export class MainFrameToolbar extends Component {
               tooltip={t('Project manager')}
             />
           )}
-          {this.props.showProjectIcons &&
-            this.props.canOpenProject && (
+          {this.props.showProjectIcons && (
               <ToolbarIcon
-                onClick={this.props.openProject}
-                src="res/ribbon_default/open32.png"
-                tooltip={t('Open a project')}
+                onClick={this.props.exportProject}
+                src="res/ribbon_default/export32.png"
+                disabled={!this.props.hasProject}
+                tooltip={t('Export the game (Web, Android, iOS...)')}
               />
             )}
           {this.isDev && (

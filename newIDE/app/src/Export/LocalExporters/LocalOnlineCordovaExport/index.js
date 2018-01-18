@@ -269,6 +269,12 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     Window.openExternalURL(getUrl(build.logsKey));
   };
 
+  _onChangeSubscription = () => {
+    const { onChangeSubscription } = this.props;
+
+    onChangeSubscription();
+  };
+
   render() {
     const {
       exportStep,
@@ -285,7 +291,6 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       onLogin,
       subscription,
       limits,
-      onChangeSubscription,
     } = this.props;
     if (!project) return null;
 
@@ -314,7 +319,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
           <LimitDisplayer
             subscription={subscription}
             limit={buildLimit}
-            onChangeSubscription={onChangeSubscription}
+            onChangeSubscription={this._onChangeSubscription}
           />
         )}
         {!authenticated && (

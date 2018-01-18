@@ -86,6 +86,7 @@ type State = {|
   subscriptionDialogOpen: boolean,
   updateStatus: UpdateStatus,
   aboutDialogOpen: boolean,
+  onSubscriptionDialogClosed: ?Function,
 |};
 
 export default class MainFrame extends Component<*, State> {
@@ -109,6 +110,7 @@ export default class MainFrame extends Component<*, State> {
     subscriptionDialogOpen: false,
     updateStatus: { message: '', status: 'unknown' },
     aboutDialogOpen: false,
+    onSubscriptionDialogClosed: null,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
@@ -228,6 +230,7 @@ export default class MainFrame extends Component<*, State> {
   setEditorToolbar = (editorToolbar: any) => {
     if (!this.toolbar) return;
 
+    // $FlowFixMe
     this.toolbar.getWrappedInstance().setEditorToolbar(editorToolbar);
   };
 
@@ -665,9 +668,10 @@ export default class MainFrame extends Component<*, State> {
     });
   };
 
-  openSubscription = (open: boolean = true) => {
+  openSubscription = (open: boolean = true, onDone: ?Function = null) => {
     this.setState({
       subscriptionDialogOpen: open,
+      onSubscriptionDialogClosed: onDone,
     });
   };
 
@@ -814,8 +818,7 @@ export default class MainFrame extends Component<*, State> {
             showProjectIcons={!this.props.integratedEditor}
             hasProject={!!this.state.currentProject}
             toggleProjectManager={this.toggleProjectManager}
-            canOpenProject={!!this.props.onChooseProject}
-            openProject={this.chooseProject}
+            exportProject={() => this.openExportDialog(true)}
             requestUpdate={this.props.requestUpdate}
             simulateUpdateDownloaded={this.simulateUpdateDownloaded}
           />
@@ -854,9 +857,9 @@ export default class MainFrame extends Component<*, State> {
             React.cloneElement(exportDialog, {
               open: this.state.exportDialogOpen,
               onClose: () => this.openExportDialog(false),
-              onChangeSubscription: () => {
+              onChangeSubscription: (onDone: ?Function) => {
                 this.openExportDialog(false);
-                this.openSubscription(true);
+                this.openSubscription(true, onDone);
               },
               project: this.state.currentProject,
               authentification,
@@ -905,10 +908,14 @@ export default class MainFrame extends Component<*, State> {
             open={profileDialogOpen}
             authentification={authentification}
             onClose={() => this.openProfile(false)}
-            onChangeSubscription={() => this.openSubscription(true)}
+            onChangeSubscription={(onDone) => this.openSubscription(true, onDone)}
           />
           <SubscriptionDialog
-            onClose={() => this.openSubscription(false)}
+            onClose={() => {
+              this.openSubscription(false);
+              if (this.state.onSubscriptionDialogClosed)
+                this.state.onSubscriptionDialogClosed();
+            }}
             open={subscriptionDialogOpen}
             authentification={authentification}
           />

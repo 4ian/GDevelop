@@ -9,7 +9,7 @@ import { getTheme } from '../UI/Theme';
 
 type Props = {|
   themeName: string,
-  children: React.Node,
+  children: React$Element<*>,
 |};
 
 /**

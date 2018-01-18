@@ -37,6 +37,14 @@ class ProfileDialog extends Component<Props, State> {
       currentTab: newTab,
     });
 
+  _onChangeSubscription = () => {
+    const { onChangeSubscription, onRefreshUserProfile } = this.props;
+
+    onChangeSubscription(() => {
+      onRefreshUserProfile();
+    });
+  };
+
   render() {
     const {
       authenticated,
@@ -48,7 +56,6 @@ class ProfileDialog extends Component<Props, State> {
       onClose,
       onLogout,
       onLogin,
-      onChangeSubscription,
     } = this.props;
     const actions = [
       <FlatButton
@@ -62,12 +69,13 @@ class ProfileDialog extends Component<Props, State> {
     return (
       <Dialog
         actions={actions}
-        secondaryActions={
-          [
-            <HelpButton key="help" helpPagePath="/interface/profile" />,
-            (authenticated && profile) && <FlatButton label="Logout" key="logout" onClick={onLogout} />,
-          ]
-        }
+        secondaryActions={[
+          <HelpButton key="help" helpPagePath="/interface/profile" />,
+          authenticated &&
+            profile && (
+              <FlatButton label="Logout" key="logout" onClick={onLogout} />
+            ),
+        ]}
         onRequestClose={onClose}
         open={open}
         noMargin
@@ -80,7 +88,7 @@ class ProfileDialog extends Component<Props, State> {
                 <ProfileDetails profile={profile} />
                 <SubscriptionDetails
                   subscription={subscription}
-                  onChangeSubscription={onChangeSubscription}
+                  onChangeSubscription={this._onChangeSubscription}
                 />
               </Column>
             ) : (
@@ -96,7 +104,7 @@ class ProfileDialog extends Component<Props, State> {
                   <LimitDisplayer
                     subscription={subscription}
                     limit={limits ? limits['cordova-build'] : null}
-                    onChangeSubscription={onChangeSubscription}
+                    onChangeSubscription={this._onChangeSubscription}
                   />
                 </Column>
                 <UsagesDetails usages={usages} />

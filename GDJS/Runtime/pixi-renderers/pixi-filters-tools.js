@@ -86,12 +86,14 @@ gdjs.PixiFiltersTools._filters = {
     },
     Sepia: {
         makeFilter: function() {
-            return new PIXI.filters.SepiaFilter();
+            var colorMatrix = new PIXI.filters.ColorMatrixFilter();
+            colorMatrix.sepia();
+            return colorMatrix;
         },
         updateParameter: function(filter, parameterName, value) {
             if (parameterName !== 'opacity') return;
 
-            filter.sepia = value;
+            filter.alpha = value;
         },
     },
 };

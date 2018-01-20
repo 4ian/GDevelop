@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
+import Subheader from 'material-ui/Subheader';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
@@ -74,6 +75,7 @@ export default class LocalCreateDialog extends Component {
         <Line>
           <Column expand noMargin>
             <List>
+              <Subheader>Starters</Subheader>
               <ListItem
                 primaryText="Platformer"
                 secondaryText={
@@ -101,6 +103,19 @@ export default class LocalCreateDialog extends Component {
                 secondaryText={<p>Start a new game from scratch.</p>}
                 secondaryTextLines={2}
                 onClick={() => this.createEmptyGame()}
+              />
+              <Subheader>Examples</Subheader>
+              <ListItem
+                primaryText="Pathfinding"
+                secondaryText={<p>Example showing how to move a tank avoiding obstacles on the battlefield.</p>}
+                secondaryTextLines={2}
+                onClick={() => this.createFromExample('pathfinding')}
+              />
+              <ListItem
+                primaryText="Zombie laser"
+                secondaryText={<p>Example with procedural terrain generation, laser with Shape painter object and usage of pathfinding to move zombies toward the player.</p>}
+                secondaryTextLines={2}
+                onClick={() => this.createFromExample('zombie-laser')}
               />
             </List>
           </Column>

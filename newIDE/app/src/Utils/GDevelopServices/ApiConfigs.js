@@ -42,13 +42,13 @@ export const GDevelopFirebaseConfig = {
 export const GDevelopUsageApi = {
   baseUrl: isDev
     ? 'https://dwjjhr5k76.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://0sm32zmich.execute-api.us-east-1.amazonaws.com/live',
+    : 'https://api.gdevelop-app.com/usage',
 };
 
 export const GDevelopBuildApi = {
   baseUrl: isDev
     ? 'https://ppvvhs48j1.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://21fixz45y2.execute-api.us-east-1.amazonaws.com/live',
+    : 'https://api.gdevelop-app.com/build',
 };
 
 export const StripeCheckoutConfig = {

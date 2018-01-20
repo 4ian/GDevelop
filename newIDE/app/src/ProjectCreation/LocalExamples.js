@@ -117,6 +117,12 @@ export default class LocalCreateDialog extends Component {
                 secondaryTextLines={2}
                 onClick={() => this.createFromExample('zombie-laser')}
               />
+              <ListItem
+                primaryText="Parallax background"
+                secondaryText={<p>Very simple example showing how to have a background with multiple layers and a parallax effect.</p>}
+                secondaryTextLines={2}
+                onClick={() => this.createFromExample('parallax')}
+              />
             </List>
           </Column>
         </Line>

@@ -425,6 +425,84 @@ Object {
       },
     },
   },
+  "Pathfinding behavior": Object {
+    "Destination reached": Object {
+      "displayedName": "Destination reached",
+      "fullGroupName": "Pathfinding behavior/",
+      "type": "PathfindingBehavior::DestinationReached",
+    },
+    "Obstacles": Object {
+      "Cost": Object {
+        "displayedName": "Cost",
+        "fullGroupName": "Pathfinding behavior/Obstacles",
+        "type": "PathfindingBehavior::Cost",
+      },
+      "Is object impassable?": Object {
+        "displayedName": "Is object impassable?",
+        "fullGroupName": "Pathfinding behavior/Obstacles",
+        "type": "PathfindingBehavior::IsImpassable",
+      },
+    },
+    "Path": Object {
+      "Acceleration": Object {
+        "displayedName": "Acceleration",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::Acceleration",
+      },
+      "Angular maximum speed": Object {
+        "displayedName": "Angular maximum speed",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::AngularMaxSpeed",
+      },
+      "Diagonals moves": Object {
+        "displayedName": "Diagonals moves",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::DiagonalsAllowed",
+      },
+      "Extra border": Object {
+        "displayedName": "Extra border",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::ExtraBorder",
+      },
+      "Maximum speed": Object {
+        "displayedName": "Maximum speed",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::MaxSpeed",
+      },
+      "Object rotated": Object {
+        "displayedName": "Object rotated",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::ObjectRotated",
+      },
+      "Rotation offset": Object {
+        "displayedName": "Rotation offset",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::AngleOffset",
+      },
+      "Speed": Object {
+        "displayedName": "Speed",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::Speed",
+      },
+    },
+    "Path found": Object {
+      "displayedName": "Path found",
+      "fullGroupName": "Pathfinding behavior/",
+      "type": "PathfindingBehavior::PathFound",
+    },
+    "Virtual grid": Object {
+      "Height of the virtual grid": Object {
+        "displayedName": "Height of the virtual grid",
+        "fullGroupName": "Pathfinding behavior/Virtual grid",
+        "type": "PathfindingBehavior::CellHeight",
+      },
+      "Width of the virtual grid": Object {
+        "displayedName": "Width of the virtual grid",
+        "fullGroupName": "Pathfinding behavior/Virtual grid",
+        "type": "PathfindingBehavior::CellWidth",
+      },
+    },
+  },
   "Platform Behavior": Object {
     "Is falling": Object {
       "displayedName": "Is falling",
@@ -1703,6 +1781,71 @@ Array [
     "fullGroupName": "Shopify",
     "type": "Shopify::GetCheckoutUrlForProduct",
   },
+  Object {
+    "displayedName": "Acceleration",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::Acceleration",
+  },
+  Object {
+    "displayedName": "Diagonals moves",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AllowDiagonals",
+  },
+  Object {
+    "displayedName": "Rotation offset",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AngleOffset",
+  },
+  Object {
+    "displayedName": "Angular maximum speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AngularMaxSpeed",
+  },
+  Object {
+    "displayedName": "Height of the cells",
+    "fullGroupName": "Pathfinding behavior/Virtual grid",
+    "type": "PathfindingBehavior::CellHeight",
+  },
+  Object {
+    "displayedName": "Width of the cells",
+    "fullGroupName": "Pathfinding behavior/Virtual grid",
+    "type": "PathfindingBehavior::CellWidth",
+  },
+  Object {
+    "displayedName": "Extra border",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::ExtraBorder",
+  },
+  Object {
+    "displayedName": "Maximum speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::MaxSpeed",
+  },
+  Object {
+    "displayedName": "Rotate the object",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::RotateObject",
+  },
+  Object {
+    "displayedName": "Move to a position",
+    "fullGroupName": "Pathfinding behavior/",
+    "type": "PathfindingBehavior::SetDestination",
+  },
+  Object {
+    "displayedName": "Speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::Speed",
+  },
+  Object {
+    "displayedName": "Cost",
+    "fullGroupName": "Pathfinding behavior/Obstacles",
+    "type": "PathfindingBehavior::Cost",
+  },
+  Object {
+    "displayedName": "Should object be impassable?",
+    "fullGroupName": "Pathfinding behavior/Obstacles",
+    "type": "PathfindingBehavior::SetImpassable",
+  },
 ]
 `;
 
@@ -2377,6 +2520,76 @@ Array [
     "displayedName": "Is a mobile device",
     "fullGroupName": "System information",
     "type": "SystemInfo::IsMobile",
+  },
+  Object {
+    "displayedName": "Acceleration",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::Acceleration",
+  },
+  Object {
+    "displayedName": "Rotation offset",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AngleOffset",
+  },
+  Object {
+    "displayedName": "Angular maximum speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AngularMaxSpeed",
+  },
+  Object {
+    "displayedName": "Height of the virtual grid",
+    "fullGroupName": "Pathfinding behavior/Virtual grid",
+    "type": "PathfindingBehavior::CellHeight",
+  },
+  Object {
+    "displayedName": "Width of the virtual grid",
+    "fullGroupName": "Pathfinding behavior/Virtual grid",
+    "type": "PathfindingBehavior::CellWidth",
+  },
+  Object {
+    "displayedName": "Destination reached",
+    "fullGroupName": "Pathfinding behavior/",
+    "type": "PathfindingBehavior::DestinationReached",
+  },
+  Object {
+    "displayedName": "Diagonals moves",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::DiagonalsAllowed",
+  },
+  Object {
+    "displayedName": "Extra border",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::ExtraBorder",
+  },
+  Object {
+    "displayedName": "Maximum speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::MaxSpeed",
+  },
+  Object {
+    "displayedName": "Object rotated",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::ObjectRotated",
+  },
+  Object {
+    "displayedName": "Path found",
+    "fullGroupName": "Pathfinding behavior/",
+    "type": "PathfindingBehavior::PathFound",
+  },
+  Object {
+    "displayedName": "Speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::Speed",
+  },
+  Object {
+    "displayedName": "Cost",
+    "fullGroupName": "Pathfinding behavior/Obstacles",
+    "type": "PathfindingBehavior::Cost",
+  },
+  Object {
+    "displayedName": "Is object impassable?",
+    "fullGroupName": "Pathfinding behavior/Obstacles",
+    "type": "PathfindingBehavior::IsImpassable",
   },
 ]
 `;

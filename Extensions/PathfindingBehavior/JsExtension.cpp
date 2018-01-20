@@ -7,27 +7,23 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-
 #include <iostream>
+
+void DeclarePathfindingBehaviorExtension(gd::PlatformExtension & extension);
 
 /**
  * \brief This class declares information about the JS extension.
  */
-class JsExtension : public gd::PlatformExtension
+class PathfindingBehaviorJsExtension : public gd::PlatformExtension
 {
 public:
 
     /**
      * \brief Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    JsExtension()
+    PathfindingBehaviorJsExtension()
     {
-        SetExtensionInformation("PathfindingBehavior",
-                              _("Pathfinding behavior"),
-                              _("Compute paths for objects avoiding obstacles."),
-                              "Florian Rival",
-                              "Open source (MIT License)");
-        CloneExtension("GDevelop C++ platform", "PathfindingBehavior");
+        DeclarePathfindingBehaviorExtension(*this);
 
         GetBehaviorMetadata("PathfindingBehavior::PathfindingBehavior")
             .SetIncludeFile("Extensions/PathfindingBehavior/pathfindingruntimebehavior.js")
@@ -106,11 +102,17 @@ public:
     };
 };
 
+#if defined(EMSCRIPTEN)
+extern "C" gd::PlatformExtension * CreateGDJSPathfindingBehaviorExtension() {
+    return new PathfindingBehaviorJsExtension;
+}
+#else
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
-    return new JsExtension;
+    return new PathfindingBehaviorJsExtension;
 }
+#endif
 #endif

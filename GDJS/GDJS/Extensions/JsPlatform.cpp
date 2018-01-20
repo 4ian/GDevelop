@@ -137,6 +137,7 @@ gd::PlatformExtension * CreateGDJSInventoryExtension();
 gd::PlatformExtension * CreateGDJSLinkedObjectsExtension();
 gd::PlatformExtension * CreateGDJSSystemInfoExtension();
 gd::PlatformExtension * CreateGDJSShopifyExtension();
+gd::PlatformExtension * CreateGDJSPathfindingBehaviorExtension();
 }
 #endif
 
@@ -183,6 +184,7 @@ JsPlatform::JsPlatform() :
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSLinkedObjectsExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSSystemInfoExtension())); std::cout.flush();
     AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSShopifyExtension())); std::cout.flush();
+    AddExtension(std::shared_ptr<gd::PlatformExtension>(CreateGDJSPathfindingBehaviorExtension())); std::cout.flush();
     #endif
     std::cout << "done." << std::endl;
 };

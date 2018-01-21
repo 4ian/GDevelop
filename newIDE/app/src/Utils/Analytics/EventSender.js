@@ -117,3 +117,11 @@ export const sendErrorMessage = (errorMessage, type, rawError) => {
     rawError,
   });
 };
+
+export const sendSignupDone = email => {
+  if (isDev) return;
+
+  client.recordEvent('signup', {
+    email,
+  });
+};

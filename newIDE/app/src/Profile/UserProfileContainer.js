@@ -17,6 +17,7 @@ import Authentification, {
 import LoginDialog from './LoginDialog';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import { sendSignupDone } from '../Utils/Analytics/EventSender';
 
 type Props = {
   open: boolean,
@@ -181,6 +182,7 @@ export const withUserProfile = (
           () => {
             this._fetchUserProfile();
             this.openLogin(false);
+            sendSignupDone(form.email);
           },
           (loginError: LoginError) => {
             this.setState({

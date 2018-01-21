@@ -56,6 +56,9 @@ public:
      * Called when user wants to edit the behavior.
      */
     virtual void EditBehavior( wxWindow* parent, gd::Project & project_, gd::Layout * layout_, gd::MainFrameWrapper & mainFrameWrapper_ );
+
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
+    virtual bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project);
     #endif
 
     /**

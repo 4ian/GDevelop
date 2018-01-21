@@ -47,6 +47,19 @@ export default class LocalCreateDialog extends Component {
               />
               <Subheader>Examples</Subheader>
               <ListItem
+                primaryText="Physics"
+                secondaryText={
+                  <p>
+                    Example showing how to configure physics behavior on objects and use events to detect collisions.
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('physics');
+                  this.props.onOpen('internal://physics');
+                }}
+              />
+              <ListItem
                 primaryText="Pathfinding"
                 secondaryText={
                   <p>

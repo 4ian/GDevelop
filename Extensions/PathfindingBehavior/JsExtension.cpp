@@ -7,7 +7,6 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-#include <iostream>
 
 void DeclarePathfindingBehaviorExtension(gd::PlatformExtension & extension);
 
@@ -99,6 +98,7 @@ public:
         }
 
         StripUnimplementedInstructionsAndExpressions();
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 

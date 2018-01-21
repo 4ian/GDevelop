@@ -503,6 +503,78 @@ Object {
       },
     },
   },
+  "Physics behavior": Object {
+    "Collision": Object {
+      "displayedName": "Collision",
+      "fullGroupName": "Physics behavior/",
+      "type": "PhysicsBehavior::CollisionWith",
+    },
+    "Collision polygon": Object {
+      "Collision polygon X scale": Object {
+        "displayedName": "Collision polygon X scale",
+        "fullGroupName": "Physics behavior/Collision polygon",
+        "type": "PhysicsBehavior::GetPolygonScaleX",
+      },
+      "Collision polygon Y scale": Object {
+        "displayedName": "Collision polygon Y scale",
+        "fullGroupName": "Physics behavior/Collision polygon",
+        "type": "PhysicsBehavior::GetPolygonScaleY",
+      },
+    },
+    "Displacement": Object {
+      "Angular damping": Object {
+        "displayedName": "Angular damping",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::AngularDamping",
+      },
+      "Linear damping": Object {
+        "displayedName": "Linear damping",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::LinearDamping",
+      },
+      "Linear speed": Object {
+        "displayedName": "Linear speed",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::LinearVelocity",
+      },
+      "X component": Object {
+        "displayedName": "X component",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::LinearVelocityX",
+      },
+      "Y component": Object {
+        "displayedName": "Y component",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::LinearVelocityY",
+      },
+    },
+    "Movement": Object {
+      "The object is dynamic": Object {
+        "displayedName": "The object is dynamic",
+        "fullGroupName": "Physics behavior/Movement",
+        "type": "PhysicsBehavior::IsDynamic",
+      },
+    },
+    "Other": Object {
+      "Object is treated like a bullet": Object {
+        "displayedName": "Object is treated like a bullet",
+        "fullGroupName": "Physics behavior/Other",
+        "type": "PhysicsBehavior::IsBullet",
+      },
+    },
+    "Rotation": Object {
+      "Angular speed": Object {
+        "displayedName": "Angular speed",
+        "fullGroupName": "Physics behavior/Rotation",
+        "type": "PhysicsBehavior::AngularVelocity",
+      },
+      "Fixed rotation": Object {
+        "displayedName": "Fixed rotation",
+        "fullGroupName": "Physics behavior/Rotation",
+        "type": "PhysicsBehavior::IsFixedRotation",
+      },
+    },
+  },
   "Platform Behavior": Object {
     "Is falling": Object {
       "displayedName": "Is falling",
@@ -1846,6 +1918,121 @@ Array [
     "fullGroupName": "Pathfinding behavior/Obstacles",
     "type": "PathfindingBehavior::SetImpassable",
   },
+  Object {
+    "displayedName": "Add a gear between two objects",
+    "fullGroupName": "Physics behavior/Joints",
+    "type": "PhysicsBehavior::ActAddGearJointBetweenObjects",
+  },
+  Object {
+    "displayedName": "Add a hinge",
+    "fullGroupName": "Physics behavior/Joints",
+    "type": "PhysicsBehavior::AddRevoluteJoint",
+  },
+  Object {
+    "displayedName": "Add a hinge between two objects",
+    "fullGroupName": "Physics behavior/Joints",
+    "type": "PhysicsBehavior::AddRevoluteJointBetweenObjects",
+  },
+  Object {
+    "displayedName": "Add a force",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyForce",
+  },
+  Object {
+    "displayedName": "Apply a force toward a position",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyForceTowardPosition",
+  },
+  Object {
+    "displayedName": "Apply a force ( angle )",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyForceUsingPolarCoordinates",
+  },
+  Object {
+    "displayedName": "Apply an impulse",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyImpulse",
+  },
+  Object {
+    "displayedName": "Apply an impulse toward a position",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyImpulseTowardPosition",
+  },
+  Object {
+    "displayedName": "Apply an impulse (angle)",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyImpulseUsingPolarCoordinates",
+  },
+  Object {
+    "displayedName": "Add a torque (a rotation)",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::ApplyTorque",
+  },
+  Object {
+    "displayedName": "Do not treat object like a bullet",
+    "fullGroupName": "Physics behavior/Other",
+    "type": "PhysicsBehavior::DontSetAsBullet",
+  },
+  Object {
+    "displayedName": "Angular damping",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::SetAngularDamping",
+  },
+  Object {
+    "displayedName": "Angular speed",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::SetAngularVelocity",
+  },
+  Object {
+    "displayedName": "Treat object like a bullet.",
+    "fullGroupName": "Physics behavior/Other",
+    "type": "PhysicsBehavior::SetAsBullet",
+  },
+  Object {
+    "displayedName": "Make the object dynamic",
+    "fullGroupName": "Physics behavior/Movement",
+    "type": "PhysicsBehavior::SetDynamic",
+  },
+  Object {
+    "displayedName": "Fix rotation",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::SetFixedRotation",
+  },
+  Object {
+    "displayedName": "Make object's rotation free",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::SetFreeRotation",
+  },
+  Object {
+    "displayedName": "Gravity",
+    "fullGroupName": "Physics behavior/Global options",
+    "type": "PhysicsBehavior::SetGravity",
+  },
+  Object {
+    "displayedName": "Linear damping",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::SetLinearDamping",
+  },
+  Object {
+    "displayedName": "Linear velocity",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::SetLinearVelocity",
+  },
+  Object {
+    "displayedName": "Change the X scale of a collision polygon",
+    "fullGroupName": "Physics behavior/Collision polygon",
+    "type": "PhysicsBehavior::SetPolygonScaleX",
+  },
+  Object {
+    "displayedName": "Change the Y scale of a collision polygon",
+    "fullGroupName": "Physics behavior/Collision polygon",
+    "type": "PhysicsBehavior::SetPolygonScaleY",
+  },
+  Object {
+    "displayedName": "Make the object static",
+    "fullGroupName": "Physics behavior/Movement",
+    "type": "PhysicsBehavior::SetStatic",
+  },
 ]
 `;
 
@@ -2590,6 +2777,66 @@ Array [
     "displayedName": "Is object impassable?",
     "fullGroupName": "Pathfinding behavior/Obstacles",
     "type": "PathfindingBehavior::IsImpassable",
+  },
+  Object {
+    "displayedName": "Angular damping",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::AngularDamping",
+  },
+  Object {
+    "displayedName": "Angular speed",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::AngularVelocity",
+  },
+  Object {
+    "displayedName": "Collision",
+    "fullGroupName": "Physics behavior/",
+    "type": "PhysicsBehavior::CollisionWith",
+  },
+  Object {
+    "displayedName": "Collision polygon X scale",
+    "fullGroupName": "Physics behavior/Collision polygon",
+    "type": "PhysicsBehavior::GetPolygonScaleX",
+  },
+  Object {
+    "displayedName": "Collision polygon Y scale",
+    "fullGroupName": "Physics behavior/Collision polygon",
+    "type": "PhysicsBehavior::GetPolygonScaleY",
+  },
+  Object {
+    "displayedName": "Object is treated like a bullet",
+    "fullGroupName": "Physics behavior/Other",
+    "type": "PhysicsBehavior::IsBullet",
+  },
+  Object {
+    "displayedName": "The object is dynamic",
+    "fullGroupName": "Physics behavior/Movement",
+    "type": "PhysicsBehavior::IsDynamic",
+  },
+  Object {
+    "displayedName": "Fixed rotation",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::IsFixedRotation",
+  },
+  Object {
+    "displayedName": "Linear damping",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::LinearDamping",
+  },
+  Object {
+    "displayedName": "Linear speed",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::LinearVelocity",
+  },
+  Object {
+    "displayedName": "X component",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::LinearVelocityX",
+  },
+  Object {
+    "displayedName": "Y component",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::LinearVelocityY",
   },
 ]
 `;

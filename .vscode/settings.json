@@ -67,7 +67,10 @@
         "__functional_base": "cpp",
         "__functional_base_03": "cpp",
         "chrono": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "atomic": "cpp",
+        "locale": "cpp",
+        "string_view": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

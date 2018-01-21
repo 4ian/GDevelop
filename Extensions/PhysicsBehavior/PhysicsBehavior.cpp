@@ -7,6 +7,7 @@ This project is released under the MIT License.
 
 #include "PhysicsBehavior.h"
 #include <string>
+#include "GDCore/Tools/Localization.h"
 #include "Box2D/Box2D.h"
 #include "Triangulation/triangulate.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
@@ -17,6 +18,10 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/Project/Project.h"
 #include "GDCpp/Runtime/Project/Layout.h"
 #include "RuntimeScenePhysicsDatas.h"
+#if defined(GD_IDE_ONLY)
+#include <map>
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#endif
 
 #undef GetObject
 
@@ -100,10 +105,6 @@ void PhysicsBehavior::DoStepPostEvents(RuntimeScene & scene)
     float newHeight = object->GetHeight();
     if ( (int)objectOldWidth != (int)newWidth || (int)objectOldHeight != (int)newHeight )
     {
-        /*std::cout << "Changed:" << (int)objectOldWidth << "!=" << (int)newWidth << std::endl;
-        std::cout << "Changed:" << (int)objectOldHeight << "!=" << (int)newHeight << std::endl;
-        std::cout << "( Object name:" << object->GetName() << std::endl;*/
-
         double oldAngularVelocity = body->GetAngularVelocity();
         b2Vec2 oldVelocity = body->GetLinearVelocity();
 
@@ -700,6 +701,76 @@ void PhysicsBehavior::UnserializeFrom(const gd::SerializerElement & element)
     SetPolygonCoords(PhysicsBehavior::GetCoordsVectorFromString(coordsStr, '/', ';'));
 }
 
+#if defined(GD_IDE_ONLY)
+std::map<gd::String, gd::PropertyDescriptor> PhysicsBehavior::GetProperties(gd::Project & project) const
+{
+    std::map<gd::String, gd::PropertyDescriptor> properties;
+
+    gd::String shapeTypeStr = _("Box (rectangle)");
+    if (shapeType == Box) shapeTypeStr = _("Box (rectangle)");
+    else if (shapeType == Circle) shapeTypeStr = _("Circle");
+    else if (shapeType == CustomPolygon) shapeTypeStr = _("Custom polygon");
+
+    properties[_("Shape")]
+        .SetValue(shapeTypeStr)
+        .SetType("Choice")
+        .AddExtraInfo(_("Box (rectangle)"))
+        .AddExtraInfo(_("Circle"));
+
+    properties[_("Dynamic object")].SetValue(dynamic ? "true" : "false").SetType("Boolean");
+    properties[_("Fixed rotation")].SetValue(fixedRotation ? "true" : "false").SetType("Boolean");
+    properties[_("Consider as bullet (better collision handling)")].SetValue(isBullet ? "true" : "false").SetType("Boolean");
+    properties[_("Mass density")].SetValue(gd::String::From(massDensity));
+    properties[_("Friction")].SetValue(gd::String::From(averageFriction));
+    properties[_("Restitution (elasticity)")].SetValue(gd::String::From(averageRestitution));
+    properties[_("Linear Damping")].SetValue(gd::String::From(linearDamping));
+    properties[_("Angular Damping")].SetValue(gd::String::From(angularDamping));
+    properties[_("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS")].SetValue("");
+
+    return properties;
+}
+
+bool PhysicsBehavior::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
+{
+    if (name == _("Shape"))
+    {
+        if (value == _("Box (rectangle)"))
+            shapeType = Box;
+        else if (value == _("Circle"))
+            shapeType = Circle;
+        else if (value == _("Custom polygon"))
+            shapeType = CustomPolygon;
+    }
+    if ( name == _("Dynamic object") ) {
+        dynamic = (value != "0");
+    }
+    if ( name == _("Fixed rotation") ) {
+        fixedRotation = (value != "0");
+    }
+    if ( name == _("Consider as bullet (better collision handling)") ) {
+        isBullet = (value != "0");
+    }
+    if ( name == _("Mass density") ) {
+        massDensity = value.To<float>();
+    }
+    if ( name == _("Friction") ) {
+        averageFriction = value.To<float>();
+    }
+    if ( name == _("Restitution (elasticity)") ) {
+        averageRestitution = value.To<float>();
+    }
+    if ( name == _("Linear Damping") ) {
+        if ( value.To<float>() < 0 ) return false;
+        linearDamping = value.To<float>();
+    }
+    if ( name == _("Angular Damping") ) {
+        if ( value.To<float>() < 0 ) return false;
+        angularDamping = value.To<float>();
+    }
+
+    return true;
+}
+#endif
 
 gd::String PhysicsBehavior::GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char32_t coordsSep, char32_t composantSep)
 {

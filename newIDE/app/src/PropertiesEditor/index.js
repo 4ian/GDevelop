@@ -35,6 +35,8 @@ export default class PropertiesEditor extends Component {
   }
 
   _renderEditField = field => {
+    if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
+
     if (field.valueType === 'boolean') {
       return (
         <Checkbox

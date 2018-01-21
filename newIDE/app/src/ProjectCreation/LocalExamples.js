@@ -106,6 +106,12 @@ export default class LocalCreateDialog extends Component {
               />
               <Subheader>Examples</Subheader>
               <ListItem
+                primaryText="Physics"
+                secondaryText={<p>Example showing how to configure physics behavior on objects and use events to detect collisions.</p>}
+                secondaryTextLines={2}
+                onClick={() => this.createFromExample('physics')}
+              />
+              <ListItem
                 primaryText="Pathfinding"
                 secondaryText={<p>Example showing how to move a tank avoiding obstacles on the battlefield.</p>}
                 secondaryTextLines={2}

@@ -8,6 +8,7 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import LinearProgress from 'material-ui/LinearProgress';
 import { GDevelopHostingApi } from '../../Utils/GDevelopServices/ApiConfigs';
+import { makeTimestampedId } from '../../Utils/TimestampedId';
 import TextField from 'material-ui/TextField';
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
@@ -82,7 +83,7 @@ export default class LocalS3Export extends Component {
       deployDone: false,
     });
 
-    const outputDir = os.tmpdir() + '/GDS3Export';
+    const outputDir = os.tmpdir() + '/GDS3Export-' + makeTimestampedId();
     LocalExport.prepareExporter()
       .then(({ exporter }) => {
         const exportForCordova = false;

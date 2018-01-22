@@ -5,14 +5,23 @@ const awsS3 = require('aws-sdk/clients/s3');
 const { makeTimestampedId } = require('./Utils/TimestampedId');
 const recursive = require('recursive-readdir');
 
+const accessKeyId = process.env.UPLOAD_S3_ACCESS_KEY_ID;
+const secretAccessKey = process.env.UPLOAD_S3_SECRET_ACCESS_KEY;
 const destinationBucket = `gd-games-in`;
-const accessKeyId = 'AKIAJPLGZ22GBISUYFJQ';
-const secretAccessKey = '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';
 const region = 'eu-west-1';
 const mime = {
   '.js': 'text/javascript',
   '.html': 'text/html',
 };
+
+if (!accessKeyId || !secretAccessKey) {
+  console.warn(
+    "⚠️ Either UPLOAD_S3_ACCESS_KEY_ID or UPLOAD_S3_SECRET_ACCESS_KEY are not defined. Upload won't be working."
+  );
+  console.info(
+    'ℹ️ Copy .env.dist file to .env and fill the values to fix this warning.'
+  );
+}
 
 module.exports = {
   /**
@@ -20,6 +29,11 @@ module.exports = {
    * Amazon S3 inbound bucket.
    */
   uploadGameFolderToBucket: (localDir, onProgress, onDone) => {
+    if (!accessKeyId || !secretAccessKey) {
+      onDone('Missing S3 configuration');
+      return;
+    }
+
     const awsS3Client = new awsS3({
       accessKeyId: accessKeyId,
       secretAccessKey: secretAccessKey,
@@ -73,6 +87,11 @@ module.exports = {
    * Amazon S3 inbound bucket.
    */
   uploadArchiveToBucket: (localFile, onProgress, onDone) => {
+    if (!accessKeyId || !secretAccessKey) {
+      onDone('Missing S3 configuration');
+      return;
+    }
+
     const awsS3Client = new awsS3({
       accessKeyId: accessKeyId,
       secretAccessKey: secretAccessKey,

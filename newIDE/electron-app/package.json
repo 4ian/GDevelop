@@ -28,7 +28,11 @@
     "mac": {
       "category": "public.app-category.developer-tools"
     },
-    "publish": [{"provider": "github"}]
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ]
   },
   "devDependencies": {
     "electron": "1.7.9",
@@ -37,6 +41,7 @@
     "shelljs": "^0.7.7"
   },
   "dependencies": {
+    "dotenv": "^4.0.0",
     "electron-is": "^2.4.0"
   }
 }

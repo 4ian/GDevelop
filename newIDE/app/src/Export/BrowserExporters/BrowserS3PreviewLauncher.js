@@ -5,6 +5,7 @@ import BrowserPreviewLinkDialog from './BrowserPreviewLinkDialog';
 import { findGDJS } from './BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
 import { GDevelopGamesPreview } from '../../Utils/GDevelopServices/ApiConfigs';
+import { makeTimestampedId } from '../../Utils/TimestampedId';
 const awsS3 = require('aws-sdk/clients/s3');
 const gd = global.gd;
 
@@ -41,8 +42,7 @@ export default class BrowserS3PreviewLauncher {
         }
         console.info('GDJS found in ', gdjsRoot);
 
-        const prefix =
-          '' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
+        const prefix = makeTimestampedId();
 
         const outputDir = destinationBucketBaseUrl + prefix;
         const browserS3FileSystem = new BrowserS3FileSystem({

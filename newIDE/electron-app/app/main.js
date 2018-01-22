@@ -10,8 +10,8 @@ const log = require('electron-log');
 const {
   uploadGameFolderToBucket,
   uploadArchiveToBucket,
-} = require('./s3upload');
-const { buildMainMenuFor } = require('./main-menu');
+} = require('./S3Upload');
+const { buildMainMenuFor } = require('./MainMenu');
 const throttle = require('lodash.throttle');
 
 // Logs made with electron-logs can be found
@@ -102,9 +102,9 @@ app.on('ready', function() {
 
     uploadGameFolderToBucket(
       localDir,
-      (current, max) => {
+      throttle((current, max) => {
         event.sender.send('s3-folder-upload-progress', current, max);
-      },
+      }, 200),
       (err, prefix) => {
         event.sender.send('s3-folder-upload-done', err, prefix);
       }

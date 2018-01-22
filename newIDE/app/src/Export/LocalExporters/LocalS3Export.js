@@ -31,11 +31,13 @@ export default class LocalS3Export extends Component {
     ipcRenderer.removeAllListeners('s3-folder-upload-done');
 
     return new Promise((resolve, reject) => {
-      ipcRenderer.on('s3-folder-upload-progress', (event, uploadProgress, uploadMax) =>
-        this.setState({
-          uploadProgress,
-          uploadMax,
-        })
+      ipcRenderer.on(
+        's3-folder-upload-progress',
+        (event, uploadProgress, uploadMax) =>
+          this.setState({
+            uploadProgress,
+            uploadMax,
+          })
       );
       ipcRenderer.on('s3-folder-upload-done', (event, err, prefix) => {
         if (err) return reject(err);
@@ -51,7 +53,8 @@ export default class LocalS3Export extends Component {
 
   _deploy = prefix => {
     return sleep(200)
-      .then(() => //TODO: Move this to a GDevelopServices/Hosting.js file
+      .then(() =>
+        //TODO: Move this to a GDevelopServices/Hosting.js file
         axios(GDevelopHostingApi.deployEndpoint, {
           method: 'post',
           params: {

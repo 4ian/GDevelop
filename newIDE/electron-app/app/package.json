@@ -2,7 +2,7 @@
   "name": "gdevelop",
   "productName": "GDevelop 5",
   "description": "GDevelop 5 IDE running on the Electron runtime",
-  "version": "5.0.0-beta21",
+  "version": "5.0.0-beta22",
   "author": "Florian Rival",
   "license": "MIT",
   "homepage": "http://compilgames.net",
@@ -18,6 +18,7 @@
     "fs-extra": "^3.0.1",
     "lodash.throttle": "^4.1.1",
     "minimist": "^1.2.0",
-    "recursive-readdir": "^2.2.1"
+    "recursive-readdir": "^2.2.1",
+    "dotenv": "^4.0.0"
   }
 }

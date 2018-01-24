@@ -9,6 +9,9 @@ import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import HelpButton from '../../UI/HelpButton';
+import { displaySanityCheck } from '../SanityChecker';
+import { getSanityMessages } from '../SanityChecker/CordovaSanityChecker';
+import { translate, type TranslatorProps } from 'react-i18next';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 import Window from '../../Utils/Window';
@@ -17,7 +20,7 @@ const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
-export default class LocalCordovaExport extends Component {
+class LocalCordovaExport extends Component {
   state = {
     exportFinishedDialogOpen: false,
     outputDir: '',
@@ -53,10 +56,12 @@ export default class LocalCordovaExport extends Component {
   };
 
   launchExport = () => {
-    const { project } = this.props;
+    const { t, project } = this.props;
     if (!project) return;
 
     sendExportLaunched('local-cordova');
+
+    if (!displaySanityCheck(t, getSanityMessages(t, project))) return;
 
     const outputDir = this.state.outputDir;
     project.setLastCompilationDirectory(outputDir);
@@ -89,7 +94,7 @@ export default class LocalCordovaExport extends Component {
   };
 
   render() {
-    const { project } = this.props;
+    const { t, project } = this.props;
     if (!project) return null;
 
     return (
@@ -125,7 +130,7 @@ export default class LocalCordovaExport extends Component {
           />
         </Line>
         <Dialog
-          title="Export finished"
+          title={t('Export finished')}
           actions={[
             <FlatButton
               key="open"
@@ -162,10 +167,12 @@ export default class LocalCordovaExport extends Component {
             fullWidth
             primary
             onClick={() => this.openPhoneGapBuild()}
-            label="Open PhoneGap Build"
+            label={t('Open PhoneGap Build')}
           />
         </Dialog>
       </Column>
     );
   }
 }
+
+export default translate()(LocalCordovaExport);

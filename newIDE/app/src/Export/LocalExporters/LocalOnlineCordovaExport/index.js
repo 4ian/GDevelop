@@ -25,6 +25,9 @@ import Window from '../../../Utils/Window';
 import { delay } from '../../../Utils/Delay';
 import CreateProfile from '../../../Profile/CreateProfile';
 import LimitDisplayer from '../../../Profile/LimitDisplayer';
+import { displaySanityCheck } from '../../SanityChecker';
+import { getSanityMessages } from '../../SanityChecker/CordovaSanityChecker';
+import { translate, type TranslatorProps } from 'react-i18next';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
@@ -51,7 +54,7 @@ type State = {
   errored: boolean,
 };
 
-type Props = WithUserProfileProps & {
+type Props = WithUserProfileProps & TranslatorProps & {
   project: gdProject,
   onChangeSubscription: Function,
 };
@@ -97,7 +100,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   };
 
   launchExport = (): Promise<string> => {
-    const { project } = this.props;
+    const { project, t } = this.props;
     if (!project) return Promise.reject();
 
     return LocalOnlineCordovaExport.prepareExporter()
@@ -114,7 +117,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
         return outputDir;
       })
       .catch(err => {
-        showErrorBox('Unable to export the game', err);
+        showErrorBox(t('Unable to export the game'), err);
         throw err;
       });
   };
@@ -198,7 +201,11 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   };
 
   launchWholeExport = () => {
+    const { t, project } = this.props;
     sendExportLaunched('local-online-cordova');
+
+    if (!displaySanityCheck(t, getSanityMessages(t, project)))
+      return;
 
     const handleError = (message: string) => err => {
       if (!this.state.errored) {
@@ -226,33 +233,33 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
           exportStep: 'compress',
         });
         return this.launchCompression(outputDir);
-      }, handleError('Error while exporting the game.'))
+      }, handleError(t('Error while exporting the game.')))
       .then(outputFile => {
         this.setState({
           exportStep: 'upload',
         });
         return this.launchUpload(outputFile);
-      }, handleError('Error while compressing the game.'))
+      }, handleError(t('Error while compressing the game.')))
       .then((uploadBucketKey: string) => {
         this.setState({
           exportStep: 'waiting-for-build',
         });
         return this.launchBuild(uploadBucketKey);
-      }, handleError('Error while uploading the game. Check your internet connection or try again later.'))
+      }, handleError(t('Error while uploading the game. Check your internet connection or try again later.')))
       .then(buildId => {
         this.setState({
           exportStep: 'build',
         });
 
         return this.pollBuild(buildId);
-      }, handleError('Error while lauching the build of the game.'))
+      }, handleError(t('Error while lauching the build of the game.')))
       .then(build => {
         this.setState({
           exportStep: 'done',
           build,
         });
         this.props.onRefreshUserProfile();
-      }, handleError('Error while building the game.'));
+      }, handleError(t('Error while building the game.')));
   };
 
   _download = () => {
@@ -291,6 +298,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       onLogin,
       subscription,
       limits,
+      t,
     } = this.props;
     if (!project) return null;
 
@@ -302,13 +310,12 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     return (
       <Column noMargin>
         <Line>
-          Packaging your game for Android will create an APK file that can be
-          installed on Android phones, based on Cordova framework.
+          {t("Packaging your game for Android will create an APK file that can be installed on Android phones, based on Cordova framework.")}
         </Line>
         {authenticated && (
           <Line justifyContent="center">
             <RaisedButton
-              label="Package for Android"
+              label={t("Package for Android")}
               primary
               onClick={this.launchWholeExport}
               disabled={disableBuild}
@@ -324,7 +331,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
         )}
         {!authenticated && (
           <CreateProfile
-            message="Create an account to build your game for Android in one-click:"
+            message={t("Create an account to build your game for Android in one-click:")}
             onLogin={onLogin}
           />
         )}
@@ -347,6 +354,6 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   }
 }
 
-export default withUserProfile({ fetchLimits: true, fetchSubscription: true })(
+export default translate()(withUserProfile({ fetchLimits: true, fetchSubscription: true })(
   LocalOnlineCordovaExport
-);
+));

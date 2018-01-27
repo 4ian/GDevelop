@@ -8,7 +8,6 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import some from 'lodash/some';
-const gd = global.gd;
 
 export default class ScenePropertiesDialog extends Component {
   constructor(props) {

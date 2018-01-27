@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import Dialog from '../../UI/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
+import Dialog from '../../UI/Dialog';
 import ColorField from '../../UI/ColorField';
+import EmptyMessage from '../../UI/EmptyMessage';
+import PropertiesEditor from '../../PropertiesEditor';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import some from 'lodash/some';
+const gd = global.gd;
 
 export default class ScenePropertiesDialog extends Component {
   constructor(props) {
@@ -43,19 +48,48 @@ export default class ScenePropertiesDialog extends Component {
   };
 
   render() {
+    const { layout, project } = this.props;
     const actions = [
+      // TODO: Add support for cancelling modifications made to BehaviorSharedData
+      // (either by enhancing a function like propertiesMapToSchema or using copies)
+      // and then re-enable cancel button.
+      // <FlatButton
+      //   label="Cancel"
+      //   primary={false}
+      //   onClick={this.props.onClose}
+      // />,
       <FlatButton
-        label="Cancel"
-        primary={false}
-        onClick={this.props.onClose}
-      />,
-      <FlatButton
-        label="Apply"
+        label="Ok"
         primary={true}
         keyboardFocused={true}
         onClick={this._onApply}
       />,
     ];
+
+    const allBehaviorSharedDataNames = layout
+      .getAllBehaviorSharedDataNames()
+      .toJSArray();
+
+    const propertiesEditors = allBehaviorSharedDataNames.map(name => {
+      const sharedData = layout.getBehaviorSharedData(name);
+
+      const properties = sharedData.getProperties(project);
+      const propertiesSchema = propertiesMapToSchema(
+        properties,
+        sharedData => sharedData.getProperties(project),
+        (sharedData, name, value) =>
+          sharedData.updateProperty(name, value, project)
+      );
+
+      return (
+        !!propertiesSchema.length && (
+          <PropertiesEditor
+            schema={propertiesSchema}
+            instances={[sharedData]}
+          />
+        )
+      );
+    });
 
     return (
       <Dialog
@@ -88,6 +122,13 @@ export default class ScenePropertiesDialog extends Component {
             this.props.onClose();
           }}
         />
+        {!some(propertiesEditors) && (
+          <EmptyMessage>
+            Any additional properties will appear here if you add behaviors to
+            objects, like Physics behavior.
+          </EmptyMessage>
+        )}
+        {propertiesEditors}
         {this.props.onOpenMoreSettings && (
           <RaisedButton
             label="Open advanced settings"

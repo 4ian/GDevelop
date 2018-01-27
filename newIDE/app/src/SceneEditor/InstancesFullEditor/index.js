@@ -682,6 +682,7 @@ export default class InstancesFullEditor extends Component {
         />
         <ScenePropertiesDialog
           open={!!this.state.scenePropertiesDialogOpen}
+          project={project}
           layout={layout}
           onClose={() => this.openSceneProperties(false)}
           onApply={() => this.openSceneProperties(false)}

@@ -17,7 +17,7 @@ This project is released under the MIT License.
 class ScenePhysicsDatas : public gd::BehaviorsSharedData
 {
 public:
-    ScenePhysicsDatas() : BehaviorsSharedData(), gravityX(0), gravityY(0), scaleX(100), scaleY(100)
+    ScenePhysicsDatas() : BehaviorsSharedData(), gravityX(0), gravityY(9), scaleX(100), scaleY(100)
     {
     };
     virtual ~ScenePhysicsDatas() {};

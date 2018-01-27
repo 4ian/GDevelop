@@ -279,9 +279,12 @@ export default class InstancesFullEditor extends Component {
   };
 
   _onInstancesMoved = instances => {
-    this.setState({
-      history: saveToHistory(this.state.history, this.props.initialInstances),
-    }, () => this.forceUpdatePropertiesEditor());
+    this.setState(
+      {
+        history: saveToHistory(this.state.history, this.props.initialInstances),
+      },
+      () => this.forceUpdatePropertiesEditor()
+    );
   };
 
   _onInstancesModified = instances => {
@@ -476,6 +479,11 @@ export default class InstancesFullEditor extends Component {
       });
   };
 
+  updateBehaviorsSharedData = () => {
+    const { layout, project } = this.props;
+    layout.updateBehaviorsSharedData(project);
+  };
+
   forceUpdateObjectsList = () => {
     if (this._objectsList) this._objectsList.forceUpdateList();
   };
@@ -544,6 +552,7 @@ export default class InstancesFullEditor extends Component {
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             onRenameObject={this._onRenameObject}
+            onObjectPasted={() => this.updateBehaviorsSharedData()}
             ref={objectsList => (this._objectsList = objectsList)}
           />
         </MosaicWindow>
@@ -581,6 +590,7 @@ export default class InstancesFullEditor extends Component {
           onCancel={() => this.editObject(null)}
           onApply={() => {
             this.editObject(null);
+            this.updateBehaviorsSharedData();
             this.forceUpdateObjectsList();
           }}
         />

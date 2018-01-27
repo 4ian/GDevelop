@@ -29,6 +29,7 @@ namespace gd
 {
 
 gd::Layer Layout::badLayer;
+gd::BehaviorsSharedData Layout::badBehaviorSharedData;
 
 Layout::Layout(const Layout & other)
 {
@@ -73,6 +74,53 @@ void Layout::SetName(const gd::String & name_)
     name = name_;
     mangledName = gd::SceneNameMangler::GetMangledSceneName(name);
 };
+
+bool Layout::HasBehaviorSharedData(const gd::String & behaviorName)
+{
+    return behaviorsInitialSharedDatas.find(behaviorName) != behaviorsInitialSharedDatas.end();
+}
+
+std::vector <gd::String> Layout::GetAllBehaviorSharedDataNames() const
+{
+    std::vector < gd::String > allNames;
+
+    for (auto & it : behaviorsInitialSharedDatas)
+    	allNames.push_back(it.first);
+
+    return allNames;
+}
+
+const gd::BehaviorsSharedData & Layout::GetBehaviorSharedData(const gd::String & behaviorName) const
+{
+    auto it = behaviorsInitialSharedDatas.find(behaviorName);
+    if (it != behaviorsInitialSharedDatas.end())
+        return *it->second;
+
+    return badBehaviorSharedData;
+}
+
+gd::BehaviorsSharedData & Layout::GetBehaviorSharedData(const gd::String & behaviorName)
+{
+    auto it = behaviorsInitialSharedDatas.find(behaviorName);
+    if (it != behaviorsInitialSharedDatas.end())
+        return *it->second;
+
+    return badBehaviorSharedData;
+}
+
+std::shared_ptr<gd::BehaviorsSharedData> Layout::GetBehaviorSharedDataSmartPtr(const gd::String & behaviorName)
+{
+    auto it = behaviorsInitialSharedDatas.find(behaviorName);
+    if (it != behaviorsInitialSharedDatas.end())
+        return it->second;
+
+    return std::shared_ptr<gd::BehaviorsSharedData>();
+}
+
+const std::map < gd::String, std::shared_ptr<gd::BehaviorsSharedData> > & Layout::GetAllBehaviorSharedData() const
+{
+    return behaviorsInitialSharedDatas;
+}
 
 gd::Layer & Layout::GetLayer(const gd::String & name)
 {

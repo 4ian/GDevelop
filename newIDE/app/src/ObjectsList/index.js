@@ -257,7 +257,7 @@ export default class ObjectsListContainer extends React.Component<
 
     const { object: pasteObject, global } = objectWithContext;
     const { object: copiedObject, type, name } = Clipboard.get(CLIPBOARD_KIND);
-    const { project, objectsContainer } = this.props;
+    const { project, objectsContainer, onObjectPasted } = this.props;
 
     const newName = newNameGenerator(
       'CopyOf' + name,
@@ -287,6 +287,7 @@ export default class ObjectsListContainer extends React.Component<
     );
 
     this.forceUpdate();
+    if (onObjectPasted) onObjectPasted(newObject);
   };
 
   _editName = (objectWithContext: ?ObjectWithContext) => {

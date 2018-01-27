@@ -11,7 +11,7 @@ import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import HelpButton from '../../UI/HelpButton';
 import { displaySanityCheck } from '../SanityChecker';
 import { getSanityMessages } from '../SanityChecker/CordovaSanityChecker';
-import { translate, type TranslatorProps } from 'react-i18next';
+import { translate } from 'react-i18next';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 import Window from '../../Utils/Window';

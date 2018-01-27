@@ -322,13 +322,13 @@ PathBehaviorEditor::PathBehaviorEditor(wxWindow* parent, gd::Project & game_, gd
 	followAngleCheck->SetValue(behavior.FollowAngle());
 
     //Setup shared datas
-	if ( !scene || scene->behaviorsInitialSharedDatas.find(behavior.GetName()) == scene->behaviorsInitialSharedDatas.end())
+	if (!scene || !scene->HasBehaviorSharedData(behavior.GetName()))
 	{
 	    gd::LogError(_("Unable to access to shared datas."));
 	    return;
 	}
 
-	sharedDatas = std::dynamic_pointer_cast<ScenePathDatas>(scene->behaviorsInitialSharedDatas[behavior.GetName()]);
+	sharedDatas = std::dynamic_pointer_cast<ScenePathDatas>(scene->GetBehaviorSharedDataSmartPtr(behavior.GetName()));
 
     if ( sharedDatas == std::shared_ptr<ScenePathDatas>() )
     {

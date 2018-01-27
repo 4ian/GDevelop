@@ -202,6 +202,7 @@ export default class ProjectManager extends React.Component {
       project
     );
     newLayout.setName(newName);
+    newLayout.updateBehaviorsSharedData(project);
 
     this.forceUpdate();
   };

@@ -70,7 +70,8 @@
         "ratio": "cpp",
         "atomic": "cpp",
         "locale": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "__string": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

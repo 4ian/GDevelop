@@ -241,7 +241,11 @@ export default class MainFrame extends Component<*, State> {
     const name = newNameGenerator('NewScene', name =>
       currentProject.hasLayoutNamed(name)
     );
-    currentProject.insertNewLayout(name, currentProject.getLayoutsCount());
+    const newLayout = currentProject.insertNewLayout(
+      name,
+      currentProject.getLayoutsCount()
+    );
+    newLayout.updateBehaviorsSharedData(currentProject);
     this.forceUpdate();
   };
 
@@ -908,7 +912,7 @@ export default class MainFrame extends Component<*, State> {
             open={profileDialogOpen}
             authentification={authentification}
             onClose={() => this.openProfile(false)}
-            onChangeSubscription={(onDone) => this.openSubscription(true, onDone)}
+            onChangeSubscription={onDone => this.openSubscription(true, onDone)}
           />
           <SubscriptionDialog
             onClose={() => {

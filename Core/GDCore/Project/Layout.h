@@ -253,14 +253,44 @@ public:
     ///@}
 
     /**
-     * Make sure that the scene had an instance of shared data for
+     * This ensures that the scene had an instance of shared data for
      * every behavior of every object that can be used on the scene
-     * ( i.e. the objects of the scene and the global objects )
+     * (i.e. the objects of the scene and the global objects)
      *
      * Must be called when a behavior have been added/deleted
      * or when a scene have been added to a project.
      */
     void UpdateBehaviorsSharedData(gd::Project & project);
+
+    /**
+     * \brief Get the names of all shared data stored for behaviors
+     */
+    std::vector <gd::String> GetAllBehaviorSharedDataNames() const;
+
+    /**
+     * \brief Check if shared data are stored for a behavior
+     */
+    bool HasBehaviorSharedData(const gd::String & behaviorName);
+
+    /**
+     * \brief Get the shared data stored for a behavior
+     */
+    const gd::BehaviorsSharedData & GetBehaviorSharedData(const gd::String & behaviorName) const;
+
+    /**
+     * \brief Get the shared data stored for a behavior
+     */
+    gd::BehaviorsSharedData & GetBehaviorSharedData(const gd::String & behaviorName);
+
+    /**
+     * \brief Get a map of all shared data stored for behaviors
+     */
+    const std::map < gd::String, std::shared_ptr<gd::BehaviorsSharedData> > & GetAllBehaviorSharedData() const;
+
+    /**
+     * \brief Get the (smart pointer to the) shared data stored for a behavior.
+     */
+    std::shared_ptr<gd::BehaviorsSharedData> GetBehaviorSharedDataSmartPtr(const gd::String & behaviorName);
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -357,9 +387,6 @@ public:
     void UnserializeFrom(gd::Project & project, const SerializerElement & element);
     ///@}
 
-    //TODO: Send this to private part.
-    std::map < gd::String, std::shared_ptr<gd::BehaviorsSharedData> > behaviorsInitialSharedDatas; ///< Initial shared datas of behaviors
-
     //TODO: GD C++ Platform specific code below
     #if defined(GD_IDE_ONLY)
     /** \name Events compilation and bitcode management
@@ -442,6 +469,7 @@ private:
     gd::InitialInstancesContainer               initialInstances; ///< Initial instances
     std::vector < gd::Layer >                   initialLayers; ///< Initial layers
     ObjectGroupsContainer                       objectGroups; ///< Objects groups
+    std::map < gd::String, std::shared_ptr<gd::BehaviorsSharedData> > behaviorsInitialSharedDatas; ///< Initial shared datas of behaviors
     bool                                        stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
     bool                                        standardSortMethod; ///< True to sort objects using standard sort.
     float                                       oglFOV; ///< OpenGL Field Of View value
@@ -449,6 +477,7 @@ private:
     float                                       oglZFar; ///< OpenGL Far Z position
     bool                                        disableInputWhenNotFocused; /// If set to true, the input must be disabled when the window do not have the focus.
     static gd::Layer                            badLayer; ///< Null object, returned when GetLayer can not find an appropriate layer.
+    static gd::BehaviorsSharedData              badBehaviorSharedData; ///< Null object, returned when GetBehaviorSharedData can not find the specified behavior shared data.
     #if defined(GD_IDE_ONLY)
     EventsList                                  events; ///< Scene events
     gd::LayoutEditorCanvasOptions               associatedSettings;

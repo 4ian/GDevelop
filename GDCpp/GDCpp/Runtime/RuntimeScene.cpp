@@ -450,7 +450,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     //Behaviors shared data
     std::cout << ".";
-    behaviorsSharedDatas.LoadFrom(scene.behaviorsInitialSharedDatas);
+    behaviorsSharedDatas.LoadFrom(scene.GetAllBehaviorSharedData());
 
     std::cout << ".";
     //Extensions specific initialization

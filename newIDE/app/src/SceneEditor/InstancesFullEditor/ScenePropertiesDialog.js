@@ -59,6 +59,7 @@ export default class ScenePropertiesDialog extends Component {
       // />,
       <FlatButton
         label="Ok"
+        key="ok"
         primary={true}
         keyboardFocused={true}
         onClick={this._onApply}

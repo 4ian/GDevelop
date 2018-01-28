@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import TextField from 'material-ui/TextField';
+import SemiControlledTextField from './SemiControlledTextField';
 import Checkbox from 'material-ui/Checkbox';
 import Subheader from 'material-ui/Subheader';
 import FlatButton from 'material-ui/FlatButton';
@@ -53,13 +53,13 @@ export default class PropertiesEditor extends Component {
       );
     } else if (field.valueType === 'number') {
       return (
-        <TextField
+        <SemiControlledTextField
           value={this._getFieldValue(this.props.instances, field)}
           key={field.name}
           id={field.name}
           floatingLabelText={field.name}
-          floatingLabelFixed={true}
-          onChange={(event, newValue) => {
+          floatingLabelFixed
+          onChange={newValue => {
             this.props.instances.forEach(i =>
               field.setValue(i, parseFloat(newValue) || 0)
             );
@@ -72,16 +72,17 @@ export default class PropertiesEditor extends Component {
       );
     } else {
       return (
-        <TextField
+        <SemiControlledTextField
           value={this._getFieldValue(
             this.props.instances,
             field,
             '(Multiple values)'
           )}
           key={field.name}
+          id={field.name}
           floatingLabelText={field.name}
-          floatingLabelFixed={true}
-          onChange={(event, newValue) => {
+          floatingLabelFixed
+          onChange={newValue => {
             this.props.instances.forEach(i =>
               field.setValue(i, newValue || '')
             );
@@ -107,7 +108,7 @@ export default class PropertiesEditor extends Component {
           value={this._getFieldValue(this.props.instances, field)}
           key={field.name}
           floatingLabelText={field.name}
-          floatingLabelFixed={true}
+          floatingLabelFixed
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
               field.setValue(i, parseFloat(newValue) || 0)
@@ -130,7 +131,7 @@ export default class PropertiesEditor extends Component {
           )}
           key={field.name}
           floatingLabelText={field.name}
-          floatingLabelFixed={true}
+          floatingLabelFixed
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
               field.setValue(i, newValue || '')

@@ -47,6 +47,7 @@ import ExternalEventsEditor from './Editors/ExternalEventsEditor';
 import SceneEditor from './Editors/SceneEditor';
 import ExternalLayoutEditor from './Editors/ExternalLayoutEditor';
 import StartPage from './Editors/StartPage';
+import ResourcesEditor from './Editors/ResourcesEditor';
 import {
   type PreferencesState,
   getThemeName,
@@ -545,6 +546,36 @@ export default class MainFrame extends Component<*, State> {
     );
   };
 
+  openResources = () => {
+    this.setState(
+      {
+        editorTabs: openEditorTab(this.state.editorTabs, {
+          name: 'Resources',
+          editorCreator: () => (
+            <ResourcesEditor
+              project={this.state.currentProject}
+              setToolbar={this.setEditorToolbar}
+              onDeleteResource={(resource: gdResource, cb: boolean => void) => {
+                // TODO: Project wide refactoring of objects/events using the resource
+                cb(true);
+              }}
+              onRenameResource={(
+                resource: gdResource,
+                newName: string,
+                cb: boolean => void
+              ) => {
+                // TODO: Project wide refactoring of objects/events using the resource
+                cb(true);
+              }}
+            />
+          ),
+          key: 'resources',
+        }),
+      },
+      () => this.updateToolbar()
+    );
+  };
+
   openStartPage = () => {
     this.setState(
       {
@@ -814,6 +845,7 @@ export default class MainFrame extends Component<*, State> {
                 onCloseProject={this.askToCloseProject}
                 onExportProject={this.openExportDialog}
                 onOpenPreferences={() => this.openPreferences(true)}
+                onOpenResources={() => this.openResources(true)}
               />
             )}
           </Drawer>

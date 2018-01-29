@@ -18,7 +18,7 @@ import BrowserExamples from './ProjectCreation/BrowserExamples';
 import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
 import BrowserSaveDialog from './ProjectsStorage/BrowserSaveDialog';
 import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
-import browserResourceSources from './ResourcesEditor/BrowserResourceSources';
+import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
 import { getBrowserExporters } from './Export/BrowserExporters';
 
@@ -26,7 +26,7 @@ import { getBrowserExporters } from './Export/BrowserExporters';
 import ExternalEditor from './ExternalEditor';
 import optionalRequire from './Utils/OptionalRequire.js';
 import LocalExamples from './ProjectCreation/LocalExamples';
-import localResourceSources from './ResourcesEditor/LocalResourceSources';
+import localResourceSources from './ResourcesList/LocalResourceSources';
 import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
 import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';

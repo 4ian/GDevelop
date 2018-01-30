@@ -141,7 +141,7 @@ void ImageManager::LoadPermanentImages()
     //so as not to unload images that could be still present.
     std::map < gd::String, std::shared_ptr<SFMLTextureWrapper> > newPermanentlyLoadedImages;
 
-    std::vector<gd::String> resources = resourcesManager->GetAllResourcesList();
+    std::vector<gd::String> resources = resourcesManager->GetAllResourceNames();
     for ( std::size_t i = 0;i <resources.size();i++ )
     {
         try

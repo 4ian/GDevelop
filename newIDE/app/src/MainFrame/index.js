@@ -845,7 +845,7 @@ export default class MainFrame extends Component<*, State> {
                 onCloseProject={this.askToCloseProject}
                 onExportProject={this.openExportDialog}
                 onOpenPreferences={() => this.openPreferences(true)}
-                onOpenResources={() => this.openResources(true)}
+                onOpenResources={() => this.openResources()}
               />
             )}
           </Drawer>

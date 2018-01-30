@@ -40,7 +40,7 @@ export default class ResourceSelector extends Component {
   }
 
   _loadFrom(resourcesManager) {
-    this.allResourcesNames = resourcesManager.getAllResourcesList().toJSArray();
+    this.allResourcesNames = resourcesManager.getAllResourceNames().toJSArray();
     if (this.props.resourceKind) {
       this.allResourcesNames = this.allResourcesNames.filter(resourceName => {
         return (

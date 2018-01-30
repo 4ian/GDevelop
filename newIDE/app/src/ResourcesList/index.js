@@ -1,18 +1,11 @@
 // @flow
-import React, { Component } from 'react';
+import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import Paper from 'material-ui/Paper';
 import SearchBar from 'material-ui-search-bar';
-import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard from '../Utils/Clipboard';
-import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
-const CLIPBOARD_KIND = 'Resource';
 
 const styles = {
   container: {
@@ -76,95 +69,21 @@ export default class ResourcesList extends React.Component<Props, State> {
     return false;
   }
 
-  addResource = (objectType: string) => {
-    // const { project, objectsContainer } = this.props;
-    // const name = newNameGenerator(
-    //   'NewObject',
-    //   name =>
-    //     objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
-    // );
-    // const object = objectsContainer.insertNewObject(
-    //   project,
-    //   objectType,
-    //   name,
-    //   objectsContainer.getObjectsCount()
-    // );
-    // this.setState(
-    //   {
-    //     newObjectDialogOpen: false,
-    //   },
-    //   () => {
-    //     if (this.props.onEditResource) {
-    //       this.props.onEditResource(object);
-    //     }
-    //   }
-    // );
-  };
-
   _deleteResource = (resource: gdResource) => {
-    // const { object, global } = resource;
-    // const { project, objectsContainer } = this.props;
-    // //eslint-disable-next-line
-    // const answer = confirm(
-    //   "Are you sure you want to remove this object? This can't be undone."
-    // );
-    // if (!answer) return;
-    // this.props.onDeleteResource(resource, doRemove => {
-    //   if (!doRemove) return;
-    //   if (global) {
-    //     project.removeObject(object.getName());
-    //   } else {
-    //     objectsContainer.removeObject(object.getName());
-    //   }
-    //   this.forceUpdate();
-    // });
-  };
+    const { project } = this.props;
 
-  _copyResource = (resource: gdResource) => {
-    //     const { object } = resource;
-    //     Clipboard.set(CLIPBOARD_KIND, {
-    //       type: object.getType(),
-    //       name: object.getName(),
-    //       object: serializeToJSObject(object),
-    //     });
-  };
+    //eslint-disable-next-line
+    const answer = confirm(
+      "Are you sure you want to remove this resource? This can't be undone."
+    );
+    if (!answer) return;
 
-  _cutResource = (resource: gdResource) => {
-    //     this._copyResource(resource);
-    //     this._deleteResource(resource);
-  };
+    this.props.onDeleteResource(resource, doRemove => {
+      if (!doRemove) return;
 
-  _pasteResource = (resource: gdResource) => {
-    //     if (!Clipboard.has(CLIPBOARD_KIND)) return;
-    //     const { object: pasteObject, global } = resource;
-    //     const { object: copiedObject, type, name } = Clipboard.get(CLIPBOARD_KIND);
-    //     const { project, objectsContainer, onObjectPasted } = this.props;
-    //     const newName = newNameGenerator(
-    //       'CopyOf' + name,
-    //       name =>
-    //         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
-    //     );
-    //     const newObject = global
-    //       ? project.insertNewObject(
-    //           project,
-    //           type,
-    //           newName,
-    //           project.getObjectPosition(pasteObject.getName())
-    //         )
-    //       : objectsContainer.insertNewObject(
-    //           project,
-    //           type,
-    //           newName,
-    //           objectsContainer.getObjectPosition(pasteObject.getName())
-    //         );
-    //     unserializeFromJSObject(
-    //       newObject,
-    //       copiedObject,
-    //       'unserializeFrom',
-    //       project
-    //     );
-    //     this.forceUpdate();
-    //     if (onObjectPasted) onObjectPasted(newObject);
+      project.getResourcesManager().removeResource(resource.getName());
+      this.forceUpdate();
+    });
   };
 
   _editName = (resource: ?gdResource) => {
@@ -197,25 +116,9 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   _move = (oldIndex: number, newIndex: number) => {
-    // const { project, objectsContainer } = this.props;
+    const { project } = this.props;
 
-    // const isInContainerResourcesList =
-    //   oldIndex < this.containerResourcesList.length;
-    // if (isInContainerResourcesList) {
-    //   objectsContainer.moveObject(
-    //     oldIndex,
-    //     Math.min(newIndex, this.containerResourcesList.length - 1)
-    //   );
-    // } else {
-    //   const projectOldIndex = oldIndex - this.containerResourcesList.length;
-    //   const projectNewIndex = newIndex - this.containerResourcesList.length;
-
-    //   project.moveObject(
-    //     projectOldIndex,
-    //     Math.min(projectNewIndex, this.projectResourcesList.length - 1)
-    //   );
-    // }
-
+    project.getResourcesManager().moveResource(oldIndex, newIndex);
     this.forceUpdateList();
   };
 
@@ -227,44 +130,12 @@ export default class ResourcesList extends React.Component<Props, State> {
   _renderResourceMenuTemplate = (resource: gdResource) => {
     return [
       {
-        label: 'Edit resource',
-        enabled: false,
-        click: () => {
-          /*TODO*/
-        },
-      },
-      { type: 'separator' },
-      {
         label: 'Rename',
         click: () => this._editName(resource),
       },
       {
         label: 'Delete',
         click: () => this._deleteResource(resource),
-      },
-      { type: 'separator' },
-      {
-        label: 'Add a new resource...',
-        enabled: false,
-        click: () => {
-          /*TODO*/
-        },
-      },
-      { type: 'separator' },
-      {
-        label: 'Copy',
-        enabled: false,
-        click: () => this._copyResource(resource),
-      },
-      {
-        label: 'Cut',
-        enabled: false,
-        click: () => this._cutResource(resource),
-      },
-      {
-        label: 'Paste',
-        enabled: Clipboard.has(CLIPBOARD_KIND),
-        click: () => this._pasteResource(resource),
       },
     ];
   };
@@ -275,13 +146,10 @@ export default class ResourcesList extends React.Component<Props, State> {
 
     const resourcesManager = project.getResourcesManager();
     const allResourcesList = resourcesManager
-      .getAllResourcesList() // TODO: This should be renamed to getAllResourcesNames
+      .getAllResourceNames()
       .toJSArray()
       .map(resourceName => resourcesManager.getResource(resourceName));
     const filteredList = filterResourcesList(allResourcesList, searchText);
-    const fullList = filteredList.concat({
-      key: 'add-item-row',
-    });
 
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
@@ -296,11 +164,10 @@ export default class ResourcesList extends React.Component<Props, State> {
               <SortableVirtualizedItemList
                 key={listKey}
                 ref={sortableList => (this.sortableList = sortableList)}
-                fullList={fullList}
+                fullList={filteredList}
                 width={width}
                 height={height}
                 renamedItem={this.state.renamedResource}
-                onAddNewItem={() => {}}
                 onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>
                   this._move(oldIndex, newIndex)}

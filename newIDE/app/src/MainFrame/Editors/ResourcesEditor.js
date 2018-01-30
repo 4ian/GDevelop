@@ -8,7 +8,7 @@ export default class ResourcesEditor extends BaseEditor {
   }
 
   render() {
-    const { project, layoutName } = this.props;
+    const { project } = this.props;
 
     return (
       <ResourcesList

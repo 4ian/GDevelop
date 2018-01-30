@@ -131,6 +131,7 @@ gd::Layer & Layout::GetLayer(const gd::String & name)
 
     return badLayer;
 }
+
 const gd::Layer & Layout::GetLayer(const gd::String & name) const
 {
     std::vector<gd::Layer>::const_iterator layer = find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name));
@@ -140,14 +141,17 @@ const gd::Layer & Layout::GetLayer(const gd::String & name) const
 
     return badLayer;
 }
+
 gd::Layer & Layout::GetLayer(std::size_t index)
 {
     return initialLayers[index];
 }
+
 const gd::Layer & Layout::GetLayer (std::size_t index) const
 {
     return initialLayers[index];
 }
+
 std::size_t Layout::GetLayersCount() const
 {
     return initialLayers.size();

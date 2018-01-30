@@ -945,7 +945,7 @@ void ResourcesEditor::Refresh()
         gd::ResourceFolder & folder = project.GetResourcesManager().GetFolder(folders[i]);
         wxTreeItemId folderItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), folders[i], -1, -1, new gd::TreeItemStringData("Folder", folders[i] ));
 
-        std::vector<gd::String> resources = folder.GetAllResourcesList();
+        std::vector<gd::String> resources = folder.GetAllResourceNames();
         for (std::size_t j=0;j<resources.size();++j)
         {
             gd::Resource & resource = folder.GetResource(resources[j]);
@@ -959,7 +959,7 @@ void ResourcesEditor::Refresh()
 
     //All images
     allImagesItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), _("All images"), -1,-1, new gd::TreeItemStringData("BaseFolder", "" ));
-    std::vector<gd::String> resources = project.GetResourcesManager().GetAllResourcesList();
+    std::vector<gd::String> resources = project.GetResourcesManager().GetAllResourceNames();
     for ( std::size_t i = 0;i <resources.size();i++ )
     {
         gd::Resource & resource = project.GetResourcesManager().GetResource(resources[i]);

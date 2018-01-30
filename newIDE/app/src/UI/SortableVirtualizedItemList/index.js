@@ -33,7 +33,7 @@ type ItemsListProps = {
   width: number,
   fullList: Array<Item>,
   selectedItem: ?Item,
-  onAddNewItem: () => void,
+  onAddNewItem?: () => void,
   onRename: (Item, string) => void,
   getThumbnail?: Item => string,
   onItemSelected: Item => void,

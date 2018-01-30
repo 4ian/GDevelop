@@ -105,7 +105,7 @@ bool ResourcesManager::HasResource(const gd::String & name) const
     return false;
 }
 
-std::vector<gd::String> ResourcesManager::GetAllResourcesList()
+std::vector<gd::String> ResourcesManager::GetAllResourceNames()
 {
     std::vector<gd::String> allResources;
     for (std::size_t i = 0;i<resources.size();++i)
@@ -146,7 +146,7 @@ bool ResourcesManager::AddResource(const gd::String & name, const gd::String & f
     return true;
 }
 
-std::vector<gd::String> ResourceFolder::GetAllResourcesList()
+std::vector<gd::String> ResourceFolder::GetAllResourceNames()
 {
     std::vector<gd::String> allResources;
     for (std::size_t i = 0;i<resources.size();++i)
@@ -349,6 +349,25 @@ bool ResourcesManager::MoveResourceUpInList(const gd::String & name)
 bool ResourcesManager::MoveResourceDownInList(const gd::String & name)
 {
     return gd::MoveResourceDownInList(resources, name);
+}
+
+std::size_t ResourcesManager::GetResourcePosition(const gd::String & name) const
+{
+    for (std::size_t i = 0;i<resources.size();++i)
+    {
+        if (resources[i]->GetName() == name) return i;
+    }
+    return gd::String::npos;
+}
+
+void ResourcesManager::MoveResource(std::size_t oldIndex, std::size_t newIndex)
+{
+    if ( oldIndex >= resources.size() || newIndex >= resources.size() )
+        return;
+
+    auto resource = resources[oldIndex];
+    resources.erase(resources.begin() + oldIndex);
+    resources.insert(resources.begin() + newIndex, resource);
 }
 
 bool ResourcesManager::MoveFolderUpInList(const gd::String & name)

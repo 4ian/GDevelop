@@ -5,6 +5,7 @@ import ResourcePropertiesEditor from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import InfoBar from '../UI/Messages/InfoBar';
+import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
 
 const styles = {
   container: {
@@ -39,6 +40,7 @@ export default class InstancesFullEditor extends React.Component<Props, State> {
   editorMosaic: ?EditorMosaic = null;
   _propertiesEditor: ?ResourcePropertiesEditor = null;
   _resourcesList: ?ResourcesList = null;
+  resourcesLoader = ResourcesLoader;
   state = {
     showPropertiesInfoBar: false,
     selectedResource: null,
@@ -96,6 +98,7 @@ export default class InstancesFullEditor extends React.Component<Props, State> {
         selectedResource,
       },
       () => {
+        if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
         this.updateToolbar();
       }
     );
@@ -111,6 +114,8 @@ export default class InstancesFullEditor extends React.Component<Props, State> {
           <ResourcePropertiesEditor
             key={selectedResource ? selectedResource.ptr : undefined}
             resources={selectedResource ? [selectedResource] : []}
+            project={project}
+            resourcesLoader={this.resourcesLoader}
             ref={propertiesEditor =>
               (this._propertiesEditor = propertiesEditor)}
           />

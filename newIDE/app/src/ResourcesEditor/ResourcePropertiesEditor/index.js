@@ -3,12 +3,28 @@ import * as React from 'react';
 import Paper from 'material-ui/Paper';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
+import ImagePreview from '../../ObjectEditor/ImagePreview'; //TODO: Move ImagePreview out of ObjectEditor
+import ResourceLoader from '../../ObjectsRendering/ResourcesLoader';
 
 const styles = {
-  container: { display: 'flex', flexDirection: 'column', flex: 1 },
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    width: '100%',
+  },
+  imagePreview: { flex: 1 },
+  propertiesContainer: {
+    padding: 10,
+    overflowY: 'scroll',
+    overflowX: 'hidden',
+    flex: 2,
+  },
 };
 
 type Props = {|
+  project: gdProject,
+  resourcesLoader: ResourceLoader,
   resources: Array<gdResource>,
 |};
 
@@ -48,11 +64,25 @@ export default class ResourcePropertiesEditor extends React.Component<
 
     return (
       <div
-        style={{ padding: 10, overflowY: 'scroll', overflowX: 'hidden' }}
+        style={styles.propertiesContainer}
         key={resources.map(resource => '' + resource.ptr).join(';')}
       >
         <PropertiesEditor schema={this.schema} instances={resources} />
       </div>
+    );
+  }
+
+  _renderPreview() {
+    const { resources, project, resourcesLoader } = this.props;
+    if (!resources || !resources.length) return;
+
+    return (
+      <ImagePreview
+        style={styles.imagePreview}
+        resourceName={resources[0].getName()}
+        resourcesLoader={resourcesLoader}
+        project={project}
+      />
     );
   }
 
@@ -61,6 +91,7 @@ export default class ResourcePropertiesEditor extends React.Component<
 
     return (
       <Paper style={styles.container}>
+        {this._renderPreview()}
         {!resources || !resources.length
           ? this._renderEmpty()
           : this._renderResourcesProperties()}

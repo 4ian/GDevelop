@@ -1,17 +1,17 @@
 import React from 'react';
 import BaseEditor from './BaseEditor';
-import ResourcesList from '../../ResourcesList';
+import ResourcesFullEditor from '../../ResourcesEditor';
 
 export default class ResourcesEditor extends BaseEditor {
   updateToolbar() {
-    // TODO
+    if (this.editor) this.editor.updateToolbar();
   }
 
   render() {
     const { project } = this.props;
 
     return (
-      <ResourcesList
+      <ResourcesFullEditor
         {...this.props}
         ref={editor => (this.editor = editor)}
         project={project}

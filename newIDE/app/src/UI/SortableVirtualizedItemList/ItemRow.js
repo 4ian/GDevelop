@@ -105,7 +105,7 @@ class ThemableItemRow extends React.Component<Props, *> {
           if (!this.props.onItemSelected) return;
           if (this.props.editingName) return;
 
-          this.props.onItemSelected(selected ? '' : itemName);
+          this.props.onItemSelected(selected ? null : item);
         }}
       />
     );

@@ -24,15 +24,17 @@ type State = {|
   searchText: string,
 |};
 
-type Props = {
+type Props = {|
   project: gdProject,
-  onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,
+  selectedResource: ?gdResource,
+  onSelectResource: (resource: gdResource) => void,
+  onDeleteResource: (resource: gdResource) => void,
   onRenameResource: (
     resource: gdResource,
     newName: string,
     cb: (boolean) => void
   ) => void,
-};
+|};
 
 export default class ResourcesList extends React.Component<Props, State> {
   static defaultProps = {
@@ -70,20 +72,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   }
 
   _deleteResource = (resource: gdResource) => {
-    const { project } = this.props;
-
-    //eslint-disable-next-line
-    const answer = confirm(
-      "Are you sure you want to remove this resource? This can't be undone."
-    );
-    if (!answer) return;
-
-    this.props.onDeleteResource(resource, doRemove => {
-      if (!doRemove) return;
-
-      project.getResourcesManager().removeResource(resource.getName());
-      this.forceUpdate();
-    });
+    this.props.onDeleteResource(resource);
   };
 
   _editName = (resource: ?gdResource) => {
@@ -141,7 +130,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   render() {
-    const { project } = this.props;
+    const { project, selectedResource, onSelectResource } = this.props;
     const { searchText } = this.state;
 
     const resourcesManager = project.getResourcesManager();
@@ -167,6 +156,8 @@ export default class ResourcesList extends React.Component<Props, State> {
                 fullList={filteredList}
                 width={width}
                 height={height}
+                selectedItem={selectedResource}
+                onItemSelected={onSelectResource}
                 renamedItem={this.state.renamedResource}
                 onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>

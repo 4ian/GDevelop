@@ -36,7 +36,7 @@ type ItemsListProps = {
   onAddNewItem?: () => void,
   onRename: (Item, string) => void,
   getThumbnail?: Item => string,
-  onItemSelected: Item => void,
+  onItemSelected: ?Item => void,
   renamedItem: ?Item,
   addNewItemLabel: React.Node | string,
   buildMenuTemplate: Item => any,
@@ -86,7 +86,7 @@ class ItemsList extends React.Component<ItemsListProps, *> {
           return (
             <SortableItemRow
               index={index}
-              key={item.key}
+              key={key}
               item={item}
               style={style}
               onRename={newName => this.props.onRename(item, newName)}

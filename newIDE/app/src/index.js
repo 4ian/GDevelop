@@ -9,7 +9,7 @@ import Authentification from './Utils/GDevelopServices/Authentification';
 import { sendProgramOpening } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { installFullstory } from './Utils/Analytics/Fullstory';
-import registerServiceWorker from './registerServiceWorker';
+import { unregister } from './registerServiceWorker';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
@@ -98,5 +98,6 @@ if (electron) {
 }
 
 ReactDOM.render(app, document.getElementById('root'));
-registerServiceWorker();
+// registerServiceWorker();
+unregister();
 sendProgramOpening();

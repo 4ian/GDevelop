@@ -539,8 +539,6 @@ storiesOf('ProfileDetails', module)
     <ProfileDetails
       profile={{
         email: 'test@example.com',
-        picture:
-          '"https://s.gravatar.com/avatar/d6fc8df7ddfe938cc379c53bfb5645fc?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Ffl.png',
       }}
     />
   ))

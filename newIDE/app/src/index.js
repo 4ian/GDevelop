@@ -1,3 +1,4 @@
+// @flow
 import 'element-closest';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -6,7 +7,7 @@ import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import Authentification from './Utils/GDevelopServices/Authentification';
-import { sendProgramOpening } from './Utils/Analytics/EventSender';
+import { sendProgramOpening, installAnalyticsEvents } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { installFullstory } from './Utils/Analytics/Fullstory';
 import { unregister } from './registerServiceWorker';
@@ -35,12 +36,14 @@ import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import LocalIntroDialog from './MainFrame/LocalIntroDialog';
 const electron = optionalRequire('electron');
 
+
+const authentification = new Authentification();
+installAnalyticsEvents(authentification);
 installRaven();
 installFullstory();
 
 Window.setUpContextMenu();
 
-const authentification = new Authentification();
 let app = null;
 
 if (electron) {
@@ -97,7 +100,10 @@ if (electron) {
   );
 }
 
-ReactDOM.render(app, document.getElementById('root'));
+const rootElement = document.getElementById('root');
+if (rootElement) ReactDOM.render(app, rootElement);
+else console.error("No root element defined in index.html");
+
 // registerServiceWorker();
 unregister();
 sendProgramOpening();

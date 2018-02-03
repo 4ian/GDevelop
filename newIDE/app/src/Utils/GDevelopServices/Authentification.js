@@ -4,7 +4,7 @@ import { GDevelopFirebaseConfig } from './ApiConfigs';
 
 export type Profile = {
   uid: string, // This represents the userId
-  picture: string,
+  providerId: string,
   email: string,
   emailVerified: boolean,
 };
@@ -74,6 +74,10 @@ export default class Authentification {
 
     console.log('User found', this.user);
     cb(null, this.user);
+  };
+
+  getUserProfileSync = (): ?Profile => {
+    return this.user;
   };
 
   logout = () => {

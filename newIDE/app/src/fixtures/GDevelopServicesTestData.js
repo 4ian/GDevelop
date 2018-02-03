@@ -8,7 +8,7 @@ import { type Profile } from '../Utils/GDevelopServices/Authentification';
 
 export const profileForIndieUser: Profile = {
   uid: 'indie-user',
-  picture: '',
+  providerId: 'fake-provider.com',
   email: 'indie-user@example.com',
   emailVerified: true,
 };

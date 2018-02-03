@@ -66,7 +66,11 @@ export default class ResourcesList extends React.Component<Props, State> {
     )
       return true;
 
-    if (this.props.project !== nextProps.project) return true;
+    if (
+      this.props.project !== nextProps.project ||
+      this.props.selectedResource !== nextProps.selectedResource
+    )
+      return true;
 
     return false;
   }

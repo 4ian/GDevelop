@@ -108,9 +108,15 @@ export default class InstancesFullEditor extends React.Component<Props, State> {
     const { project, onRenameResource } = this.props;
     const { selectedResource } = this.state;
 
+    console.log(selectedResource);
+
     const editors = {
       properties: (
-        <MosaicWindow title="Properties">
+        <MosaicWindow
+          title="Properties"
+          // Pass resources to force MosaicWindow update when selectedResource is changed
+          resources={selectedResource ? [selectedResource] : []}
+        >
           <ResourcePropertiesEditor
             key={selectedResource ? selectedResource.ptr : undefined}
             resources={selectedResource ? [selectedResource] : []}

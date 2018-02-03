@@ -3,6 +3,10 @@ import Keen from 'keen-tracking';
 import Window from '../Window';
 import { getUserUUID } from './UserUUID';
 import Authentification from '../GDevelopServices/Authentification';
+import {
+  getProgramOpeningCount,
+  incrementProgramOpeningCount,
+} from './LocalStats';
 
 const isDev = Window.isDev();
 let client = null;
@@ -28,6 +32,9 @@ export const installAnalyticsEvents = (authentification: Authentification) => {
         providerId: userProfile ? userProfile.providerId : undefined,
         email: userProfile ? userProfile.email : undefined,
         emailVerified: userProfile ? userProfile.emailVerified : undefined,
+      },
+      localStats: {
+        programOpeningCount: getProgramOpeningCount(),
       },
       page: {
         title: document.title,
@@ -91,6 +98,7 @@ export const installAnalyticsEvents = (authentification: Authentification) => {
 export const sendProgramOpening = () => {
   if (isDev || !client) return;
 
+  incrementProgramOpeningCount();
   client.recordEvent('program_opening');
 };
 
@@ -120,7 +128,11 @@ export const sendTutorialOpened = (tutorialName: string) => {
   });
 };
 
-export const sendErrorMessage = (errorMessage: string, type: string, rawError: any) => {
+export const sendErrorMessage = (
+  errorMessage: string,
+  type: string,
+  rawError: any
+) => {
   if (isDev || !client) return;
 
   client.recordEvent('error_message', {

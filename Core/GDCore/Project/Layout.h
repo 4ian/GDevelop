@@ -172,37 +172,37 @@ public:
 
     /** \name Layout layers management
      * Members functions related to layout layers management.
-     * TODO: This should be moved to a separate class
+     * TODO: This could be moved to a separate class
      */
     ///@{
 
     /**
-     * Must return true if the layer called "name" exists.
+     * \brief Return true if the layer called "name" exists.
      */
     bool HasLayerNamed(const gd::String & name) const;
 
     /**
-     * Must return a reference to the layer called "name".
+     * \brief Return a reference to the layer called "name".
      */
     Layer & GetLayer(const gd::String & name);
 
     /**
-     * Must return a reference to the layer called "name".
+     * \brief Return a reference to the layer called "name".
      */
     const Layer & GetLayer(const gd::String & name) const;
 
     /**
-     * Must return a reference to the layer at position "index" in the layers list
+     * \brief Return a reference to the layer at position "index" in the layers list
      */
     Layer & GetLayer(std::size_t index);
 
     /**
-     * Must return a reference to the layer at position "index" in the layers list
+     * \brief Return a reference to the layer at position "index" in the layers list
      */
-    const Layer & GetLayer (std::size_t index) const;
+    const Layer & GetLayer(std::size_t index) const;
 
     /**
-     * Must return the position of the layer called "name" in the layers list
+     * \brief Return the position of the layer called "name" in the layers list
      */
     std::size_t GetLayerPosition(const gd::String & name) const;
 

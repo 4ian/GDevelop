@@ -293,9 +293,9 @@ public:
     std::shared_ptr<Resource> CreateResource(const gd::String & kind);
 
     /**
-     * \brief Get a list containing the name of all of the resources.
+     * \brief Get a list containing the names of all resources.
      */
-    std::vector<gd::String> GetAllResourcesList();
+    std::vector<gd::String> GetAllResourceNames();
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -325,6 +325,11 @@ public:
     void RenameResource(const gd::String & oldName, const gd::String & newName);
 
     /**
+     * \brief Return the position of the layer called "name" in the layers list
+     */
+    std::size_t GetResourcePosition(const gd::String & name) const;
+
+    /**
      * \brief Move a resource up in the list
      */
     bool MoveResourceUpInList(const gd::String & name);
@@ -333,6 +338,11 @@ public:
      * \brief Move a resource down in the list
      */
     bool MoveResourceDownInList(const gd::String & name);
+
+    /**
+     * Change the position of the specified resource.
+     */
+    void MoveResource(std::size_t oldIndex, std::size_t newIndex);
 
     /**
      * \brief Return true if the folder exists.
@@ -445,7 +455,7 @@ public:
     /**
      * Get a list containing the name of all of the resources.
      */
-    virtual std::vector<gd::String> GetAllResourcesList();
+    virtual std::vector<gd::String> GetAllResourceNames();
 
     /**
      * Move a resource up in the list

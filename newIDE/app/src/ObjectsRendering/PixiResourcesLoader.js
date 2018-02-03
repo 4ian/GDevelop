@@ -22,7 +22,7 @@ export default class PixiResourcesLoader {
     const resourcesManager = project.getResourcesManager();
     const loader = PIXI.loader;
 
-    const resourcesList = resourcesManager.getAllResourcesList().toJSArray();
+    const resourcesList = resourcesManager.getAllResourceNames().toJSArray();
     const allResources = {};
     resourcesList.forEach(resourceName => {
       const resource = resourcesManager.getResource(resourceName);

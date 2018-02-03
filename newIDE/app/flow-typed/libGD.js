@@ -13,6 +13,7 @@ declare type gdExternalEvents = EmscriptenObject;
 declare type gdSerializerElement = EmscriptenObject;
 declare type gdInitialInstance = EmscriptenObject;
 declare type gdBaseEvent = EmscriptenObject;
+declare type gdResource = EmscriptenObject;
 
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = EmscriptenObject;

@@ -1,6 +1,6 @@
 import React from 'react';
 import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
-import ResourceSelector from '../ResourcesEditor/ResourceSelector';
+import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ImageThumbnail from './ImageThumbnail';
 
 export default ({

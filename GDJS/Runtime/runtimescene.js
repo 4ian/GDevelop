@@ -161,7 +161,6 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
     this._allInstancesList = [];
     this._instancesRemoved = [];
 
-    this._renderer = new gdjs.RuntimeSceneRenderer(this, this._runtimeGame ? this._runtimeGame.getRenderer() : null);
     this._lastId = 0;
     this._eventsContext = null;
 

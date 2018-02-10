@@ -16,6 +16,7 @@ class TiXmlElement;
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
@@ -118,6 +119,16 @@ public:
      * \see gd::Project::SetLastCompilationDirectory
      */
     const gd::String & GetLastCompilationDirectory() const {return latestCompilationDirectory;}
+
+    /**
+     * \brief Return a reference to platform assets of the project (icons, splashscreen...).
+     */
+    gd::PlatformSpecificAssets & GetPlatformSpecificAssets() { return platformSpecificAssets; }
+
+    /**
+     * \brief Return a reference to platform assets of the project (icons, splashscreen...).
+     */
+    const gd::PlatformSpecificAssets & GetPlatformSpecificAssets() const { return platformSpecificAssets; }
 #endif
 
     /**
@@ -741,6 +752,7 @@ private:
     gd::String                                         gameFile; ///< File of the game
     gd::String                                         latestCompilationDirectory; ///< File of the game
     gd::Platform*                                       currentPlatform; ///< The platform being used to edit the project.
+    gd::PlatformSpecificAssets                          platformSpecificAssets;
     std::vector < std::unique_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.
     mutable unsigned int                                GDMinorVersion; ///< The GD minor version used the last time the project was saved.

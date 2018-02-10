@@ -10,29 +10,29 @@
                 "${workspaceRoot}/Extensions",
                 "${workspaceRoot}/Core",
                 "${workspaceRoot}/ExtLibs/SFML/include",
-                "/usr/local/lib/wx/include/osx_cocoa-unicode-3.0",
-                "/usr/local/include/wx-3.0",
-                "/usr/include/machine",
-                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                 "/usr/local/include",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/8.0.0/include",
+                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                "/usr/include"
+                "/usr/include",
+                "${workspaceRoot}"
             ],
             "defines": [
                 "GD_IDE_ONLY",
                 "__WXMAC__",
                 "__WXOSX__",
                 "__WXOSX_COCOA__",
-                "GD_CORE_API=\" \"",
+                "GD_CORE_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "GD_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "GD_EXTENSION_API=\/* Macro used to export classes on Windows, please ignore *\/",
                 "WXUSINGDLL"
             ],
+            "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
                     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                     "/usr/local/include",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/8.0.0/include",
+                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include",
                     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                     "/usr/include",
                     "${workspaceRoot}"
@@ -40,7 +40,6 @@
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
             },
-            "intelliSenseMode": "clang-x64",
             "macFrameworkPath": [
                 "/System/Library/Frameworks",
                 "/Library/Frameworks"
@@ -50,10 +49,27 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceRoot}",
+                "${workspaceRoot}/IDE",
+                "${workspaceRoot}/GDCpp",
+                "${workspaceRoot}/GDJS",
+                "${workspaceRoot}/Extensions",
+                "${workspaceRoot}/Core",
+                "${workspaceRoot}/ExtLibs/SFML/include",
                 "/usr/include",
-                "/usr/local/include"
+                "/usr/local/include",
+                "${workspaceRoot}"
             ],
-            "defines": [],
+            "defines": [
+                "GD_IDE_ONLY",
+                "__WXMAC__",
+                "__WXOSX__",
+                "__WXOSX_COCOA__",
+                "GD_CORE_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "GD_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "GD_EXTENSION_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "WXUSINGDLL"
+            ],
+            "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
                     "/usr/include",
@@ -62,19 +78,34 @@
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
-            },
-            "intelliSenseMode": "clang-x64"
+            }
         },
         {
             "name": "Win32",
             "includePath": [
                 "${workspaceRoot}",
-                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include"
+                "${workspaceRoot}/IDE",
+                "${workspaceRoot}/GDCpp",
+                "${workspaceRoot}/GDJS",
+                "${workspaceRoot}/Extensions",
+                "${workspaceRoot}/Core",
+                "${workspaceRoot}/ExtLibs/SFML/include",
+                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
+                "${workspaceRoot}"
             ],
             "defines": [
                 "_DEBUG",
-                "UNICODE"
+                "UNICODE",
+                "GD_IDE_ONLY",
+                "__WXMAC__",
+                "__WXOSX__",
+                "__WXOSX_COCOA__",
+                "GD_CORE_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "GD_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "GD_EXTENSION_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "WXUSINGDLL"
             ],
+            "intelliSenseMode": "msvc-x64",
             "browse": {
                 "path": [
                     "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
@@ -82,8 +113,7 @@
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
-            },
-            "intelliSenseMode": "msvc-x64"
+            }
         }
     ],
     "version": 3

@@ -87,6 +87,18 @@ public:
     const gd::String & GetPackageName() const { return packageName; }
 
     /**
+     * \brief Change the project orientation (in particular when exported with Cordova).
+     * This has no effect on desktop and web browsers.
+     * \param orientation The orientation to use ("default", "landscape", "portrait").
+     */
+    void SetOrientation(const gd::String & orientation_) { orientation = orientation_; };
+
+    /**
+     * \brief Get project orientation ("default", "landscape", "portrait").
+     */
+    const gd::String & GetOrientation() const { return orientation; }
+
+    /**
      * Called when project file has changed.
      */
     void SetProjectFile(const gd::String & file) { gameFile = file; }
@@ -748,6 +760,7 @@ private:
     gd::ObjectGroupsContainer                            objectGroups; ///< Global objects groups
     gd::String                                         author; ///< Game author name
     gd::String                                         packageName; ///< Game package name
+    gd::String                                         orientation; ///< Lock game orientation (on mobile devices). "default", "landscape" or "portrait".
     bool                                                folderProject; ///< True if folder project, false if single file project.
     gd::String                                         gameFile; ///< File of the game
     gd::String                                         latestCompilationDirectory; ///< File of the game

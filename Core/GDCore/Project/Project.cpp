@@ -61,6 +61,7 @@ Project::Project() :
     #if defined(GD_IDE_ONLY)
     name(_("Project")),
     packageName("com.example.gamename"),
+    orientation("landscape"),
     folderProject(false),
     #endif
     windowWidth(800),
@@ -531,6 +532,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #if defined(GD_IDE_ONLY)
     SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
     SetPackageName(propElement.GetStringAttribute("packageName"));
+    SetOrientation(propElement.GetStringAttribute("orientation", "default"));
     SetFolderProject(propElement.GetBoolAttribute("folderProject"));
     SetProjectFile(propElement.GetStringAttribute("projectFile"));
     SetLastCompilationDirectory(propElement.GetChild("latestCompilationDirectory", 0, "LatestCompilationDirectory").GetValue().GetString());
@@ -744,6 +746,7 @@ void Project::SerializeTo(SerializerElement & element) const
     propElement.SetAttribute("projectFile", gameFile);
     propElement.SetAttribute("folderProject", folderProject);
     propElement.SetAttribute("packageName", packageName);
+    propElement.SetAttribute("orientation", orientation);
     platformSpecificAssets.SerializeTo(propElement.AddChild("platformSpecificAssets"));
     propElement.SetAttribute("winExecutableFilename", winExecutableFilename);
     propElement.SetAttribute("winExecutableIconFile", winExecutableIconFile);
@@ -1022,6 +1025,7 @@ void Project::Init(const gd::Project & game)
     #if defined(GD_IDE_ONLY)
     author = game.author;
     packageName = game.packageName;
+    orientation = game.orientation;
     folderProject = game.folderProject;
     latestCompilationDirectory = game.latestCompilationDirectory;
     platformSpecificAssets = game.platformSpecificAssets;

@@ -166,7 +166,7 @@ bool ExporterHelper::ExportCordovaConfigFile(const gd::Project & project, gd::St
     gd::String str = fs.ReadFile(gdjsRoot + "/Runtime/Cordova/config.xml")
         .FindAndReplace("GDJS_PROJECTNAME", project.GetName())
         .FindAndReplace("GDJS_PACKAGENAME", project.GetPackageName())
-        .FindAndReplace("GDJS_ORIENTATION", "default")
+        .FindAndReplace("GDJS_ORIENTATION", project.GetOrientation())
         // Android icons
         .FindAndReplace("GDJS_ICON_ANDROID_36", getIconFilename("android", "icon-36"))
         .FindAndReplace("GDJS_ICON_ANDROID_48", getIconFilename("android", "icon-48"))

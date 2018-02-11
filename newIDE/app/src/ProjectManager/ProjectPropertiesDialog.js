@@ -2,6 +2,8 @@
 import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import Dialog from '../UI/Dialog';
 
 type Props = {|
@@ -17,6 +19,7 @@ type State = {|
   name: string,
   author: string,
   packageName: string,
+  orientation: string,
 |};
 
 export default class ProjectPropertiesDialog extends React.Component<
@@ -35,6 +38,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       name: project.getName(),
       author: project.getAuthor(),
       packageName: project.getPackageName(),
+      orientation: project.getOrientation(),
     };
   }
 
@@ -55,12 +59,14 @@ export default class ProjectPropertiesDialog extends React.Component<
       name,
       author,
       packageName,
+      orientation,
     } = this.state;
     project.setDefaultWidth(windowDefaultWidth);
     project.setDefaultHeight(windowDefaultHeight);
     project.setName(name);
     project.setAuthor(author);
     project.setPackageName(packageName);
+    project.setOrientation(orientation);
 
     this.props.onApply();
   };
@@ -85,6 +91,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       windowDefaultHeight,
       author,
       packageName,
+      orientation,
     } = this.state;
 
     return (
@@ -137,6 +144,16 @@ export default class ProjectPropertiesDialog extends React.Component<
           value={packageName}
           onChange={(e, value) => this.setState({ packageName: value })}
         />
+        <SelectField
+          fullWidth
+          floatingLabelText="Device orientation (for iOS and Android)"
+          value={orientation}
+          onChange={(e, i, value) => this.setState({orientation: value})}
+        >
+          <MenuItem value="default" primaryText="Platform default" />
+          <MenuItem value="landscape" primaryText="Landscape" />
+          <MenuItem value="portrait" primaryText="Portrait" />
+        </SelectField>
       </Dialog>
     );
   }

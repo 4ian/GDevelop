@@ -174,6 +174,23 @@ bool ExporterHelper::ExportCordovaConfigFile(const gd::Project & project, gd::St
         .FindAndReplace("GDJS_ICON_ANDROID_96", getIconFilename("android", "icon-96"))
         .FindAndReplace("GDJS_ICON_ANDROID_144", getIconFilename("android", "icon-144"))
         .FindAndReplace("GDJS_ICON_ANDROID_192", getIconFilename("android", "icon-192"))
+        // iOS icons
+        .FindAndReplace("GDJS_ICON_IOS_180", getIconFilename("ios", "icon-180"))
+        .FindAndReplace("GDJS_ICON_IOS_60", getIconFilename("ios", "icon-60"))
+        .FindAndReplace("GDJS_ICON_IOS_120", getIconFilename("ios", "icon-120"))
+        .FindAndReplace("GDJS_ICON_IOS_76", getIconFilename("ios", "icon-76"))
+        .FindAndReplace("GDJS_ICON_IOS_152", getIconFilename("ios", "icon-152"))
+        .FindAndReplace("GDJS_ICON_IOS_40", getIconFilename("ios", "icon-40"))
+        .FindAndReplace("GDJS_ICON_IOS_80", getIconFilename("ios", "icon-80"))
+        .FindAndReplace("GDJS_ICON_IOS_57", getIconFilename("ios", "icon-57"))
+        .FindAndReplace("GDJS_ICON_IOS_114", getIconFilename("ios", "icon-114"))
+        .FindAndReplace("GDJS_ICON_IOS_72", getIconFilename("ios", "icon-72"))
+        .FindAndReplace("GDJS_ICON_IOS_144", getIconFilename("ios", "icon-144"))
+        .FindAndReplace("GDJS_ICON_IOS_167", getIconFilename("ios", "icon-167"))
+        .FindAndReplace("GDJS_ICON_IOS_29", getIconFilename("ios", "icon-29"))
+        .FindAndReplace("GDJS_ICON_IOS_58", getIconFilename("ios", "icon-58"))
+        .FindAndReplace("GDJS_ICON_IOS_50", getIconFilename("ios", "icon-50"))
+        .FindAndReplace("GDJS_ICON_IOS_100", getIconFilename("ios", "icon-100"))
         ;
 
     if (!fs.WriteToFile(exportDir + "/config.xml", str))
@@ -211,14 +228,14 @@ bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String 
         std::vector<gd::String> noIncludesInThisFile;
         if (!CompleteIndexFile(str, customCss, customHtml, exportDir, noIncludesInThisFile, ""))
         {
-            lastError = "Unable to complete Cocos2d index.html file.";
+            lastError = "Unable to complete Cocos2d-JS index.html file.";
             return false;
         }
 
         //Write the index.html file
         if (!fs.WriteToFile(exportDir + "/index.html", str))
         {
-            lastError = "Unable to write Cocos2d index.html file.";
+            lastError = "Unable to write Cocos2d-JS index.html file.";
             return false;
         }
     }
@@ -244,7 +261,7 @@ bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String 
 
         if (!fs.WriteToFile(exportDir + "/project.json", str))
         {
-            lastError = "Unable to write Cocos2d project.json file.";
+            lastError = "Unable to write Cocos2d-JS project.json file.";
             return false;
         }
     }

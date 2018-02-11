@@ -15,7 +15,7 @@ import MiniToolbar from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
 import ContextMenu from '../../../UI/Menu/ContextMenu';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
-import ResourcesLoader from '../../../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
 import { deleteSpritesFromAnimation } from './Utils/SpriteObjectHelper';
 

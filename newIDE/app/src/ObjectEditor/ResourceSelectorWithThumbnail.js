@@ -1,5 +1,5 @@
 import React from 'react';
-import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ImageThumbnail from './ImageThumbnail';
 

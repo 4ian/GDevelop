@@ -1,7 +1,6 @@
 import React from 'react';
 import Checkbox from 'material-ui/Checkbox';
 import muiThemeable from 'material-ui/styles/muiThemeable';
-import { getUncachedUrl } from '../Utils/CacheBuster';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -65,9 +64,7 @@ const ThemableImageThumbnail = ({
       <img
         style={styles.spriteThumbnailImage}
         alt={resourceName}
-        src={getUncachedUrl(
-          resourcesLoader.getResourceFullFilename(project, resourceName)
-        )}
+        src={resourcesLoader.getResourceFullUrl(project, resourceName)}
         crossOrigin="anonymous"
       />
       {selectable && (

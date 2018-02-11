@@ -57,6 +57,7 @@ import {
 } from './Preferences/PreferencesHandler';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
+import ResourcesLoader from '../ResourcesLoader/index';
 
 const gd = global.gd;
 
@@ -143,6 +144,11 @@ export default class MainFrame extends Component<*, State> {
 
   loadFromProject = (project: gdProject, cb: Function) => {
     this.closeProject(() => {
+      // Make sure that the ResourcesLoader cache is emptied, so that
+      // the URL to a resource with a name in the old project is not re-used
+      // for another resource with the same name in the new project.
+      ResourcesLoader.burstUrlsCache();
+
       this.setState(
         {
           currentProject: project,
@@ -855,7 +861,8 @@ export default class MainFrame extends Component<*, State> {
                 onExportProject={this.openExportDialog}
                 onOpenPreferences={() => this.openPreferences(true)}
                 onOpenResources={() => this.openResources()}
-                onOpenPlatformSpecificAssets={() => this.openPlatformSpecificAssets()}
+                onOpenPlatformSpecificAssets={() =>
+                  this.openPlatformSpecificAssets()}
               />
             )}
           </Drawer>

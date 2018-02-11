@@ -5,7 +5,7 @@ import ResourcePropertiesEditor from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import InfoBar from '../UI/Messages/InfoBar';
-import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 
 const styles = {
   container: {

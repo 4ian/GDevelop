@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
-import { getUncachedUrl } from '../Utils/CacheBuster';
-import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 
 const MARGIN = 50;
 
@@ -72,9 +71,8 @@ export default class ImagePreview extends React.Component<Props, State> {
       errored: false,
       imageWidth: null,
       imageHeight: null,
-      imageSource: getUncachedUrl(
-        resourcesLoader.getResourceFullFilename(project, resourceName)
-      ),
+      imageSource:
+        resourcesLoader.getResourceFullUrl(project, resourceName),
     };
   }
 

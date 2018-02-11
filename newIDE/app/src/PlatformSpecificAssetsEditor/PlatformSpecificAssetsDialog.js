@@ -5,7 +5,7 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from '../UI/Dialog';
 import { Line } from '../UI/Grid';
-import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ObjectEditor/ResourceSelectorWithThumbnail';
 import {
   type ResourceSource,
@@ -13,7 +13,6 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import { burstCache } from '../Utils/CacheBuster';
 const gd = global.gd;
 
 type Props = {|
@@ -141,7 +140,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
           createOrUpdateResource(`ios-icon-${size}.png`)
         );
 
-        burstCache();
+        ResourcesLoader.burstUrlsCache();
         setTimeout(() => {
           this.setState({
             androidIconResourceNames: androidSizes.map(

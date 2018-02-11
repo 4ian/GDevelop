@@ -1,6 +1,7 @@
+// @flow
 import slugs from 'slugs';
 import PIXI from 'pixi.js';
-import ResourcesLoader from './ResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 const gd = global.gd;
 
@@ -9,7 +10,7 @@ const loadedTextures = {};
 const invalidTexture = PIXI.Texture.fromImage('res/error48.png');
 
 export default class PixiResourcesLoader {
-  static _initializeTexture(resource, texture) {
+  static _initializeTexture(resource: gdResource, texture: any) {
     if (resource.getKind() !== 'image') return;
 
     const imageResource = gd.asImageResource(resource);
@@ -18,7 +19,11 @@ export default class PixiResourcesLoader {
     }
   }
 
-  static loadTextures(project, onProgress, onComplete) {
+  static loadTextures(
+    project: gdProject,
+    onProgress: (number, number) => void,
+    onComplete: () => void
+  ) {
     const resourcesManager = project.getResourcesManager();
     const loader = PIXI.loader;
 
@@ -26,7 +31,7 @@ export default class PixiResourcesLoader {
     const allResources = {};
     resourcesList.forEach(resourceName => {
       const resource = resourcesManager.getResource(resourceName);
-      const filename = ResourcesLoader.getResourceFullFilename(
+      const filename = ResourcesLoader.getResourceFullUrl(
         project,
         resourceName
       );
@@ -72,7 +77,7 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  static getPIXITexture(project, resourceName) {
+  static getPIXITexture(project: gdProject, resourceName: string) {
     if (loadedTextures[resourceName]) {
       return loadedTextures[resourceName];
     }
@@ -84,7 +89,7 @@ export default class PixiResourcesLoader {
     if (resource.getKind() !== 'image') return invalidTexture;
 
     loadedTextures[resourceName] = PIXI.Texture.fromImage(
-      ResourcesLoader.getResourceFullFilename(project, resourceName),
+      ResourcesLoader.getResourceFullUrl(project, resourceName),
       true /* Treats request as cross-origin */
     );
 
@@ -100,14 +105,17 @@ export default class PixiResourcesLoader {
    * @returns a Promise that resolves with the font-family to be used
    * to render a text with the font.
    */
-  static loadFontFamily(project, fontFilename) {
+  static loadFontFamily(
+    project: gdProject,
+    fontFilename: string
+  ): Promise<string> {
     // Avoid reloading a font if it's already cached
     if (loadedFontFamilies[fontFilename]) {
       return Promise.resolve(loadedFontFamilies[fontFilename]);
     }
 
     const fontFamily = slugs(fontFilename);
-    const fullFilename = ResourcesLoader.getFullFilename(project, fontFilename);
+    const fullFilename = ResourcesLoader.getFullUrl(project, fontFilename);
     return loadFontFace(
       fontFamily,
       `url("${fullFilename}")`,
@@ -124,7 +132,7 @@ export default class PixiResourcesLoader {
    * The font won't be loaded.
    * @returns The font-family to be used to render a text with the font.
    */
-  static getFontFamily(project, fontFilename) {
+  static getFontFamily(project: gdProject, fontFilename: string) {
     if (loadedFontFamilies[fontFilename]) {
       return loadedFontFamilies[fontFilename];
     }

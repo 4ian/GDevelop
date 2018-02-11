@@ -11,7 +11,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
-import { resizeImage } from './ImageResizer';
+import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { burstCache } from '../Utils/CacheBuster';
 const gd = global.gd;
@@ -33,7 +33,6 @@ type State = {|
 const androidSizes = [192, 144, 96, 72, 48, 36];
 const iosSizes = [
   180,
-  167,
   167,
   152,
   144,
@@ -198,11 +197,18 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         autoScrollBodyContent
       >
         <Line justifyContent="center">
-          <RaisedButton
-            primary
-            label="Generate icons from a file"
-            onClick={this._generateFromFile}
-          />
+          {isResizeSupported() ? (
+            <RaisedButton
+              primary
+              label="Generate icons from a file"
+              onClick={this._generateFromFile}
+            />
+          ) : (
+            <p>
+              Download GDevelop desktop version to generate the Android and iOS
+              icons of your game.
+            </p>
+          )}
         </Line>
         <p>Android icons:</p>
         {androidSizes.map((size, index) => (

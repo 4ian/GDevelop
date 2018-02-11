@@ -2,6 +2,8 @@
 import optionalRequire from '../Utils/OptionalRequire';
 const Jimp = optionalRequire('jimp');
 
+export const isResizeSupported = () => !!Jimp;
+
 export const resizeImage = (
   inputFile: string,
   outputFile: string,

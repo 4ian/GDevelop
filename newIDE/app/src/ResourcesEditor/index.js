@@ -108,8 +108,6 @@ export default class InstancesFullEditor extends React.Component<Props, State> {
     const { project, onRenameResource } = this.props;
     const { selectedResource } = this.state;
 
-    console.log(selectedResource);
-
     const editors = {
       properties: (
         <MosaicWindow

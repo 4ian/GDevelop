@@ -156,10 +156,25 @@ bool ExporterHelper::ExportPixiIndexFile(gd::String source, gd::String exportDir
 
 bool ExporterHelper::ExportCordovaConfigFile(const gd::Project & project, gd::String exportDir)
 {
+    auto & platformSpecificAssets = project.GetPlatformSpecificAssets();
+    auto & resourceManager = project.GetResourcesManager();
+    auto getIconFilename = [&resourceManager, &platformSpecificAssets](const gd::String & platform, const gd::String & name) {
+        const gd::String & file = resourceManager.GetResource(platformSpecificAssets.Get(platform, name)).GetFile();
+        return file.empty() ? "" : "www/" + file;
+    };
+
     gd::String str = fs.ReadFile(gdjsRoot + "/Runtime/Cordova/config.xml")
         .FindAndReplace("GDJS_PROJECTNAME", project.GetName())
         .FindAndReplace("GDJS_PACKAGENAME", project.GetPackageName())
-        .FindAndReplace("GDJS_ORIENTATION", "default");
+        .FindAndReplace("GDJS_ORIENTATION", "default")
+        // Android icons
+        .FindAndReplace("GDJS_ICON_ANDROID_36", getIconFilename("android", "icon-36"))
+        .FindAndReplace("GDJS_ICON_ANDROID_48", getIconFilename("android", "icon-48"))
+        .FindAndReplace("GDJS_ICON_ANDROID_72", getIconFilename("android", "icon-72"))
+        .FindAndReplace("GDJS_ICON_ANDROID_96", getIconFilename("android", "icon-96"))
+        .FindAndReplace("GDJS_ICON_ANDROID_144", getIconFilename("android", "icon-144"))
+        .FindAndReplace("GDJS_ICON_ANDROID_192", getIconFilename("android", "icon-192"))
+        ;
 
     if (!fs.WriteToFile(exportDir + "/config.xml", str))
     {

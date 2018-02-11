@@ -12,7 +12,7 @@ export type Build = {
   bucket?: string,
   logsKey?: string,
   apkKey?: string,
-  status: 'pending' | 'complete' | 'errored',
+  status: 'pending' | 'complete' | 'error',
   type: 'cordova-build',
   createdAt: number,
   updatedAt: number,

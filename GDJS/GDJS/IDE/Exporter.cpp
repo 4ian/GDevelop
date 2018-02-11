@@ -97,8 +97,9 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
     bool minify, bool exportForCordova)
 {
     ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
+    gd::Project exportedProject = project;
 
-    auto exportProject = [this, &project, &minify,
+    auto exportProject = [this, &exportedProject, &minify,
         &exportForCordova, &helper](gd::String exportDir)
     {
         wxProgressDialog * progressDialogPtr = NULL;
@@ -110,8 +111,6 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         //Prepare the export directory
         fs.MkDir(exportDir);
         std::vector<gd::String> includesFiles;
-
-        gd::Project exportedProject = project;
 
         //Export the resources (before generating events as some resources filenames may be updated)
         helper.ExportResources(fs, exportedProject, exportDir, progressDialogPtr);
@@ -168,10 +167,11 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
     {
         //Prepare the export directory
         fs.MkDir(exportDir);
-        if (!helper.ExportCordovaConfigFile(project, exportDir))
-            return false;
 
         if (!exportProject(exportDir + "/www"))
+            return false;
+
+        if (!helper.ExportCordovaConfigFile(exportedProject, exportDir))
             return false;
     } else {
         if (!exportProject(exportDir))

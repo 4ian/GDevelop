@@ -10,6 +10,7 @@ export default ({
   resourceKind,
   resourceName,
   onChange,
+  floatingLabelText,
 }) => {
   return (
     <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
@@ -22,6 +23,7 @@ export default ({
           fullWidth
           initialResourceName={resourceName}
           onChange={onChange}
+          floatingLabelText={floatingLabelText}
         />
       </div>
       <ImageThumbnail

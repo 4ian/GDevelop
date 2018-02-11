@@ -1,13 +1,12 @@
+// @flow
 import optionalRequire from '../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
 class FilenamesCache {
-  constructor() {
-    this.projectCache = {};
-  }
+  projectCache = {};
 
-  _getProjectCache(project) {
+  _getProjectCache(project: gdProject) {
     const cache = this.projectCache[project.ptr];
     if (!cache) {
       return (this.projectCache[project.ptr] = {});
@@ -16,12 +15,12 @@ class FilenamesCache {
     return cache;
   }
 
-  getSystemFilename(project, filename) {
+  getSystemFilename(project: gdProject, filename: string) {
     const cache = this._getProjectCache(project);
     return cache[filename];
   }
 
-  cacheSystemFilename(project, filename, systemFilename) {
+  cacheSystemFilename(project: gdProject, filename: string, systemFilename: string) {
     const cache = this._getProjectCache(project);
     return (cache[filename] = systemFilename);
   }
@@ -30,7 +29,7 @@ class FilenamesCache {
 export default class ResourceLoader {
   static _cache = new FilenamesCache();
 
-  static isURL(filename) {
+  static isURL(filename: string) {
     return (
       filename.indexOf('http://') === 0 ||
       filename.indexOf('https://') === 0 ||
@@ -41,7 +40,7 @@ export default class ResourceLoader {
   /**
    * Get the fully qualified URL/filename for a filename relative to the project.
    */
-  static getFullFilename(project, filename) {
+  static getFullFilename(project: gdProject, filename: string) {
     const cachedSystemFilename = ResourceLoader._cache.getSystemFilename(
       project,
       filename
@@ -70,7 +69,7 @@ export default class ResourceLoader {
   /**
    * Get the fully qualified URL/filename associated with the given resource.
    */
-  static getResourceFullFilename(project, resourceName) {
+  static getResourceFullFilename(project: gdProject, resourceName: string) {
     if (project.getResourcesManager().hasResource(resourceName)) {
       const resourceRelativePath = project
         .getResourcesManager()

@@ -20,6 +20,14 @@ export default class ResourceSelector extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.initialResourceName !== this.props.initialResourceName) {
+      this.setState({
+        resourceName: nextProps.initialResourceName || '',
+      });
+    }
+  }
+
   _getDefaultItems() {
     const sources = this.props.resourceSources || [];
     return [

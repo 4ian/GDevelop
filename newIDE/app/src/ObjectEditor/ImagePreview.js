@@ -1,4 +1,5 @@
 import React from 'react';
+import { getUncachedUrl } from '../Utils/CacheBuster';
 
 const MARGIN = 50;
 
@@ -86,9 +87,12 @@ export default class ImagePreview extends React.Component {
           <img
             style={styles.spriteThumbnailImage}
             alt={resourceName}
-            src={resourcesLoader.getResourceFullFilename(project, resourceName)}
+            src={getUncachedUrl(
+              resourcesLoader.getResourceFullFilename(project, resourceName)
+            )}
             onError={this._handleError}
             onLoad={this._handleImageLoaded}
+            crossOrigin="anonymous"
           />
         )}
         {canDisplayOverlays &&

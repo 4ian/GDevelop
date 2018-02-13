@@ -156,10 +156,42 @@ bool ExporterHelper::ExportPixiIndexFile(gd::String source, gd::String exportDir
 
 bool ExporterHelper::ExportCordovaConfigFile(const gd::Project & project, gd::String exportDir)
 {
+    auto & platformSpecificAssets = project.GetPlatformSpecificAssets();
+    auto & resourceManager = project.GetResourcesManager();
+    auto getIconFilename = [&resourceManager, &platformSpecificAssets](const gd::String & platform, const gd::String & name) {
+        const gd::String & file = resourceManager.GetResource(platformSpecificAssets.Get(platform, name)).GetFile();
+        return file.empty() ? "" : "www/" + file;
+    };
+
     gd::String str = fs.ReadFile(gdjsRoot + "/Runtime/Cordova/config.xml")
         .FindAndReplace("GDJS_PROJECTNAME", project.GetName())
         .FindAndReplace("GDJS_PACKAGENAME", project.GetPackageName())
-        .FindAndReplace("GDJS_ORIENTATION", "default");
+        .FindAndReplace("GDJS_ORIENTATION", project.GetOrientation())
+        // Android icons
+        .FindAndReplace("GDJS_ICON_ANDROID_36", getIconFilename("android", "icon-36"))
+        .FindAndReplace("GDJS_ICON_ANDROID_48", getIconFilename("android", "icon-48"))
+        .FindAndReplace("GDJS_ICON_ANDROID_72", getIconFilename("android", "icon-72"))
+        .FindAndReplace("GDJS_ICON_ANDROID_96", getIconFilename("android", "icon-96"))
+        .FindAndReplace("GDJS_ICON_ANDROID_144", getIconFilename("android", "icon-144"))
+        .FindAndReplace("GDJS_ICON_ANDROID_192", getIconFilename("android", "icon-192"))
+        // iOS icons
+        .FindAndReplace("GDJS_ICON_IOS_180", getIconFilename("ios", "icon-180"))
+        .FindAndReplace("GDJS_ICON_IOS_60", getIconFilename("ios", "icon-60"))
+        .FindAndReplace("GDJS_ICON_IOS_120", getIconFilename("ios", "icon-120"))
+        .FindAndReplace("GDJS_ICON_IOS_76", getIconFilename("ios", "icon-76"))
+        .FindAndReplace("GDJS_ICON_IOS_152", getIconFilename("ios", "icon-152"))
+        .FindAndReplace("GDJS_ICON_IOS_40", getIconFilename("ios", "icon-40"))
+        .FindAndReplace("GDJS_ICON_IOS_80", getIconFilename("ios", "icon-80"))
+        .FindAndReplace("GDJS_ICON_IOS_57", getIconFilename("ios", "icon-57"))
+        .FindAndReplace("GDJS_ICON_IOS_114", getIconFilename("ios", "icon-114"))
+        .FindAndReplace("GDJS_ICON_IOS_72", getIconFilename("ios", "icon-72"))
+        .FindAndReplace("GDJS_ICON_IOS_144", getIconFilename("ios", "icon-144"))
+        .FindAndReplace("GDJS_ICON_IOS_167", getIconFilename("ios", "icon-167"))
+        .FindAndReplace("GDJS_ICON_IOS_29", getIconFilename("ios", "icon-29"))
+        .FindAndReplace("GDJS_ICON_IOS_58", getIconFilename("ios", "icon-58"))
+        .FindAndReplace("GDJS_ICON_IOS_50", getIconFilename("ios", "icon-50"))
+        .FindAndReplace("GDJS_ICON_IOS_100", getIconFilename("ios", "icon-100"))
+        ;
 
     if (!fs.WriteToFile(exportDir + "/config.xml", str))
     {
@@ -196,14 +228,14 @@ bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String 
         std::vector<gd::String> noIncludesInThisFile;
         if (!CompleteIndexFile(str, customCss, customHtml, exportDir, noIncludesInThisFile, ""))
         {
-            lastError = "Unable to complete Cocos2d index.html file.";
+            lastError = "Unable to complete Cocos2d-JS index.html file.";
             return false;
         }
 
         //Write the index.html file
         if (!fs.WriteToFile(exportDir + "/index.html", str))
         {
-            lastError = "Unable to write Cocos2d index.html file.";
+            lastError = "Unable to write Cocos2d-JS index.html file.";
             return false;
         }
     }
@@ -229,7 +261,7 @@ bool ExporterHelper::ExportCocos2dFiles(const gd::Project & project, gd::String 
 
         if (!fs.WriteToFile(exportDir + "/project.json", str))
         {
-            lastError = "Unable to write Cocos2d project.json file.";
+            lastError = "Unable to write Cocos2d-JS project.json file.";
             return false;
         }
     }

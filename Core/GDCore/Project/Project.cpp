@@ -61,6 +61,7 @@ Project::Project() :
     #if defined(GD_IDE_ONLY)
     name(_("Project")),
     packageName("com.example.gamename"),
+    orientation("landscape"),
     folderProject(false),
     #endif
     windowWidth(800),
@@ -531,9 +532,11 @@ void Project::UnserializeFrom(const SerializerElement & element)
     #if defined(GD_IDE_ONLY)
     SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
     SetPackageName(propElement.GetStringAttribute("packageName"));
+    SetOrientation(propElement.GetStringAttribute("orientation", "default"));
     SetFolderProject(propElement.GetBoolAttribute("folderProject"));
     SetProjectFile(propElement.GetStringAttribute("projectFile"));
     SetLastCompilationDirectory(propElement.GetChild("latestCompilationDirectory", 0, "LatestCompilationDirectory").GetValue().GetString());
+    platformSpecificAssets.UnserializeFrom(propElement.GetChild("platformSpecificAssets"));
     winExecutableFilename = propElement.GetStringAttribute("winExecutableFilename");
     winExecutableIconFile = propElement.GetStringAttribute("winExecutableIconFile");
     linuxExecutableFilename = propElement.GetStringAttribute("linuxExecutableFilename");
@@ -743,6 +746,8 @@ void Project::SerializeTo(SerializerElement & element) const
     propElement.SetAttribute("projectFile", gameFile);
     propElement.SetAttribute("folderProject", folderProject);
     propElement.SetAttribute("packageName", packageName);
+    propElement.SetAttribute("orientation", orientation);
+    platformSpecificAssets.SerializeTo(propElement.AddChild("platformSpecificAssets"));
     propElement.SetAttribute("winExecutableFilename", winExecutableFilename);
     propElement.SetAttribute("winExecutableIconFile", winExecutableIconFile);
     propElement.SetAttribute("linuxExecutableFilename", linuxExecutableFilename);
@@ -815,6 +820,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     //Add project resources
     worker.ExposeResources(&GetResourcesManager());
+    platformSpecificAssets.ExposeResources(worker);
     #if !defined(GD_NO_WX_GUI)
     gd::SafeYield::Do();
     #endif
@@ -1019,8 +1025,10 @@ void Project::Init(const gd::Project & game)
     #if defined(GD_IDE_ONLY)
     author = game.author;
     packageName = game.packageName;
+    orientation = game.orientation;
     folderProject = game.folderProject;
     latestCompilationDirectory = game.latestCompilationDirectory;
+    platformSpecificAssets = game.platformSpecificAssets;
     objectGroups = game.objectGroups;
 
     GDMajorVersion = game.GDMajorVersion;

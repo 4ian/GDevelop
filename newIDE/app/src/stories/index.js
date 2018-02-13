@@ -43,7 +43,7 @@ import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
-import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';

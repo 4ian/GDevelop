@@ -4,7 +4,7 @@ import Paper from 'material-ui/Paper';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import ImagePreview from '../../ObjectEditor/ImagePreview'; //TODO: Move ImagePreview out of ObjectEditor
-import ResourceLoader from '../../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../../ResourcesLoader';
 
 const styles = {
   container: {
@@ -24,7 +24,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
-  resourcesLoader: ResourceLoader,
+  resourcesLoader: typeof ResourcesLoader,
   resources: Array<gdResource>,
 |};
 

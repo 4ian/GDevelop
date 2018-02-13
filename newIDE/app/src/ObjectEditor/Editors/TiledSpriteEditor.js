@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
 import { Line, Column } from '../../UI/Grid';
-import ResourcesLoader from '../../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourceSelectorWithThumbnail';
 const gd = global.gd;
 

@@ -16,6 +16,7 @@ import PreferencesDialog from './Preferences/PreferencesDialog';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
 import AboutDialog, { type UpdateStatus } from './AboutDialog';
 import ProjectManager from '../ProjectManager';
+import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
 import ProfileDialog from '../Profile/ProfileDialog';
@@ -56,6 +57,7 @@ import {
 } from './Preferences/PreferencesHandler';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
+import ResourcesLoader from '../ResourcesLoader/index';
 
 const gd = global.gd;
 
@@ -88,6 +90,7 @@ type State = {|
   updateStatus: UpdateStatus,
   aboutDialogOpen: boolean,
   onSubscriptionDialogClosed: ?Function,
+  platformSpecificAssetsDialogOpen: boolean,
 |};
 
 export default class MainFrame extends Component<*, State> {
@@ -112,6 +115,7 @@ export default class MainFrame extends Component<*, State> {
     updateStatus: { message: '', status: 'unknown' },
     aboutDialogOpen: false,
     onSubscriptionDialogClosed: null,
+    platformSpecificAssetsDialogOpen: false,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
@@ -140,6 +144,11 @@ export default class MainFrame extends Component<*, State> {
 
   loadFromProject = (project: gdProject, cb: Function) => {
     this.closeProject(() => {
+      // Make sure that the ResourcesLoader cache is emptied, so that
+      // the URL to a resource with a name in the old project is not re-used
+      // for another resource with the same name in the new project.
+      ResourcesLoader.burstUrlsCache();
+
       this.setState(
         {
           currentProject: project,
@@ -759,6 +768,12 @@ export default class MainFrame extends Component<*, State> {
     });
   };
 
+  openPlatformSpecificAssets = (open: boolean = true) => {
+    this.setState({
+      platformSpecificAssetsDialogOpen: open,
+    });
+  };
+
   setUpdateStatus = (status: UpdateStatus) => {
     this.setState({
       updateStatus: status,
@@ -846,6 +861,8 @@ export default class MainFrame extends Component<*, State> {
                 onExportProject={this.openExportDialog}
                 onOpenPreferences={() => this.openPreferences(true)}
                 onOpenResources={() => this.openResources()}
+                onOpenPlatformSpecificAssets={() =>
+                  this.openPlatformSpecificAssets()}
               />
             )}
           </Drawer>
@@ -928,6 +945,16 @@ export default class MainFrame extends Component<*, State> {
               open: this.state.saveDialogOpen,
               onClose: () => this._openSaveDialog(false),
             })}
+          {!!this.state.currentProject && (
+            <PlatformSpecificAssetsDialog
+              project={this.state.currentProject}
+              open={this.state.platformSpecificAssetsDialogOpen}
+              onApply={() => this.openPlatformSpecificAssets(false)}
+              onClose={() => this.openPlatformSpecificAssets(false)}
+              resourceSources={resourceSources}
+              onChooseResource={this._onChooseResource}
+            />
+          )}
           {!!genericDialog &&
             React.cloneElement(genericDialog, {
               open: this.state.genericDialogOpen,

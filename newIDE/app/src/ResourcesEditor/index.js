@@ -5,7 +5,7 @@ import ResourcePropertiesEditor from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import InfoBar from '../UI/Messages/InfoBar';
-import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 
 const styles = {
   container: {
@@ -107,8 +107,6 @@ export default class InstancesFullEditor extends React.Component<Props, State> {
   render() {
     const { project, onRenameResource } = this.props;
     const { selectedResource } = this.state;
-
-    console.log(selectedResource);
 
     const editors = {
       properties: (

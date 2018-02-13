@@ -161,17 +161,17 @@ const Item = muiThemeable()(ThemableItem);
 
 const AddItem = makeAddItem(ListItem);
 
-type Props = {
+type Props = {|
   project: gdProject,
-  onDeleteLayout: (gdLayout) => void,
-  onDeleteExternalEvents: (gdExternalEvents) => void,
-  onDeleteExternalLayout: (gdExternalLayout) => void,
+  onDeleteLayout: gdLayout => void,
+  onDeleteExternalEvents: gdExternalEvents => void,
+  onDeleteExternalLayout: gdExternalLayout => void,
   onRenameLayout: (string, string) => void,
   onRenameExternalEvents: (string, string) => void,
   onRenameExternalLayout: (string, string) => void,
-  onOpenLayout: (string) => void,
-  onOpenExternalEvents: (string) => void,
-  onOpenExternalLayout: (string) => void,
+  onOpenLayout: string => void,
+  onOpenExternalEvents: string => void,
+  onOpenExternalLayout: string => void,
   onSaveProject: () => void,
   onCloseProject: () => void,
   onExportProject: () => void,
@@ -180,14 +180,15 @@ type Props = {
   onAddLayout: () => void,
   onAddExternalEvents: () => void,
   onAddExternalLayout: () => void,
-};
+  onOpenPlatformSpecificAssets: () => void,
+|};
 
 type State = {|
   renamedItemKind: ?string,
-    renamedItemName: string,
-    searchText: string,
-    projectPropertiesDialogOpen: boolean,
-variablesEditorOpen: boolean,
+  renamedItemName: string,
+  searchText: string,
+  projectPropertiesDialogOpen: boolean,
+  variablesEditorOpen: boolean,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
@@ -384,6 +385,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText="Global variables"
                 leftIcon={<ListIcon src="res/ribbon_default/editname32.png" />}
                 onClick={() => this.setState({ variablesEditorOpen: true })}
+              />,
+              <ListItem
+                key="icons"
+                primaryText="Icons"
+                leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
+                onClick={() => this.props.onOpenPlatformSpecificAssets()}
               />,
               <ListItem
                 key="resources"

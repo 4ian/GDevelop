@@ -1,25 +1,48 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import Dialog from '../UI/Dialog';
 
-export default class ProjectPropertiesDialog extends Component {
-  constructor(props) {
+type Props = {|
+  project: gdProject,
+  open: boolean,
+  onClose: Function,
+  onApply: Function,
+|};
+
+type State = {|
+  windowDefaultWidth: number,
+  windowDefaultHeight: number,
+  name: string,
+  author: string,
+  packageName: string,
+  orientation: string,
+|};
+
+export default class ProjectPropertiesDialog extends React.Component<
+  Props,
+  State
+> {
+  constructor(props: Props) {
     super(props);
-    this.state = { ...this._loadFrom(props.project) };
+    this.state = this._loadFrom(props.project);
   }
 
-  _loadFrom(project) {
+  _loadFrom(project: gdProject): State {
     return {
       windowDefaultWidth: project.getMainWindowDefaultWidth(),
       windowDefaultHeight: project.getMainWindowDefaultHeight(),
       name: project.getName(),
       author: project.getAuthor(),
       packageName: project.getPackageName(),
+      orientation: project.getOrientation(),
     };
   }
 
-  componentWillReceiveProps(newProps) {
+  componentWillReceiveProps(newProps: Props) {
     if (
       (!this.props.open && newProps.open) ||
       (newProps.open && this.props.project !== newProps.project)
@@ -30,12 +53,22 @@ export default class ProjectPropertiesDialog extends Component {
 
   _onApply = () => {
     const { project } = this.props;
-    project.setDefaultWidth(this.state.windowDefaultWidth);
-    project.setDefaultHeight(this.state.windowDefaultHeight);
-    project.setName(this.state.name);
-    project.setAuthor(this.state.author);
-    project.setPackageName(this.state.packageName);
-    if (this.props.onApply) this.props.onApply();
+    const {
+      windowDefaultWidth,
+      windowDefaultHeight,
+      name,
+      author,
+      packageName,
+      orientation,
+    } = this.state;
+    project.setDefaultWidth(windowDefaultWidth);
+    project.setDefaultHeight(windowDefaultHeight);
+    project.setName(name);
+    project.setAuthor(author);
+    project.setPackageName(packageName);
+    project.setOrientation(orientation);
+
+    this.props.onApply();
   };
 
   render() {
@@ -52,6 +85,14 @@ export default class ProjectPropertiesDialog extends Component {
         onClick={this._onApply}
       />,
     ];
+    const {
+      name,
+      windowDefaultWidth,
+      windowDefaultHeight,
+      author,
+      packageName,
+      orientation,
+    } = this.state;
 
     return (
       <Dialog
@@ -59,20 +100,19 @@ export default class ProjectPropertiesDialog extends Component {
         open={this.props.open}
         onRequestClose={this.props.onClose}
         autoScrollBodyContent={true}
-        contentStyle={{ width: '350px' }}
       >
         <TextField
           floatingLabelText="Game name"
           fullWidth
           type="text"
-          value={this.state.name}
+          value={name}
           onChange={(e, value) => this.setState({ name: value })}
         />
         <TextField
           floatingLabelText="Game's window width"
           fullWidth
           type="number"
-          value={this.state.windowDefaultWidth}
+          value={windowDefaultWidth}
           onChange={(e, value) =>
             this.setState({
               windowDefaultWidth: Math.max(0, parseInt(value, 10)),
@@ -82,7 +122,7 @@ export default class ProjectPropertiesDialog extends Component {
           floatingLabelText="Game's window height"
           fullWidth
           type="number"
-          value={this.state.windowDefaultHeight}
+          value={windowDefaultHeight}
           onChange={(e, value) =>
             this.setState({
               windowDefaultHeight: Math.max(0, parseInt(value, 10)),
@@ -93,7 +133,7 @@ export default class ProjectPropertiesDialog extends Component {
           fullWidth
           hintText="Your name"
           type="text"
-          value={this.state.author}
+          value={author}
           onChange={(e, value) => this.setState({ author: value })}
         />
         <TextField
@@ -101,16 +141,19 @@ export default class ProjectPropertiesDialog extends Component {
           fullWidth
           hintText="com.example.mygame"
           type="text"
-          value={this.state.packageName}
+          value={packageName}
           onChange={(e, value) => this.setState({ packageName: value })}
         />
-        <TextField
-          floatingLabelText="Icon"
+        <SelectField
           fullWidth
-          type="text"
-          disabled
-          value="Coming soon"
-        />
+          floatingLabelText="Device orientation (for iOS and Android)"
+          value={orientation}
+          onChange={(e, i, value) => this.setState({orientation: value})}
+        >
+          <MenuItem value="default" primaryText="Platform default" />
+          <MenuItem value="landscape" primaryText="Landscape" />
+          <MenuItem value="portrait" primaryText="Portrait" />
+        </SelectField>
       </Dialog>
     );
   }

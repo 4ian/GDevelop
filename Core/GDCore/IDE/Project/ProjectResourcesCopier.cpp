@@ -45,7 +45,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
     #endif
 
     auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
-    std::cout << "Copying all ressources from " << projectDirectory << " to " << destinationDirectory;
+    std::cout << "Copying all ressources from " << projectDirectory << " to " << destinationDirectory << "..." << std::endl;
 
     //Get the resources to be copied
     gd::ResourcesMergingHelper resourcesMergingHelper(fs);

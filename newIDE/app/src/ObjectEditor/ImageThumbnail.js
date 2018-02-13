@@ -58,7 +58,7 @@ const ThemableImageThumbnail = ({
       }}
       onContextMenu={e => {
         e.stopPropagation();
-        onContextMenu(e.clientX, e.clientY);
+        if (onContextMenu) onContextMenu(e.clientX, e.clientY);
       }}
     >
       <img

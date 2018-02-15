@@ -242,68 +242,68 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
         return result;
     }
 
-    if ( poly.vertices.length == 2 )
-    {
-        var circleX = poly.vertices[0][0];
-        var circleY = poly.vertices[0][1];
-        var sqRadius = (circleX - poly.vertices[1][0])*(circleX - poly.vertices[1][0]) +
-                       (circleY - poly.vertices[1][1])*(circleY - poly.vertices[1][1]);
-        var dx = endX - startX;
-        var dy = endY - startY;
+    // if ( poly.vertices.length == 2 )
+    // {
+    //     var circleX = poly.vertices[0][0];
+    //     var circleY = poly.vertices[0][1];
+    //     var sqRadius = (circleX - poly.vertices[1][0])*(circleX - poly.vertices[1][0]) +
+    //                    (circleY - poly.vertices[1][1])*(circleY - poly.vertices[1][1]);
+    //     var dx = endX - startX;
+    //     var dy = endY - startY;
 
-        var a = dx*dx + dy*dy;
-        var b = 2*(dx*(startX - circleX) + dy*(startY - circleY));
-        var c = (startX - circleX)*(startX - circleX) + (startY - circleY)*(startY - circleY) - sqRadius;
-        var det = b*b - 4*a*c;
+    //     var a = dx*dx + dy*dy;
+    //     var b = 2*(dx*(startX - circleX) + dy*(startY - circleY));
+    //     var c = (startX - circleX)*(startX - circleX) + (startY - circleY)*(startY - circleY) - sqRadius;
+    //     var det = b*b - 4*a*c;
 
-        if ( a === 0 || det < 0 ) return result;
+    //     if ( a === 0 || det < 0 ) return result;
 
-        if ( det === 0 )
-        {
-            var t = -b/(2*a);
-            if ( 0 <= t && t <= 1 ) {
-                result.closeX = startX + t*dx;
-                result.closeY = startY + t*dy;
-                result.closeSqDist = t*t*a;
-                result.farX = result.closeX;
-                result.farY = result.closeY;
-                result.farSqDist = result.closeSqDist;
-                result.collision = true;
-            }
-        }
-        else
-        {
-            var sqDet = Math.sqrt(det);
+    //     if ( det === 0 )
+    //     {
+    //         var t = -b/(2*a);
+    //         if ( 0 <= t && t <= 1 ) {
+    //             result.closeX = startX + t*dx;
+    //             result.closeY = startY + t*dy;
+    //             result.closeSqDist = t*t*a;
+    //             result.farX = result.closeX;
+    //             result.farY = result.closeY;
+    //             result.farSqDist = result.closeSqDist;
+    //             result.collision = true;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         var sqDet = Math.sqrt(det);
 
-            var t = (-b + sqDet)/(2*a);
-            if ( 0 <= t && t <= 1 ) {
-                result.closeX = startX + t*dx;
-                result.closeY = startY + t*dy;
-                result.closeSqDist = t*t*a;
-                result.farX = result.closeX;
-                result.farY = result.closeY;
-                result.farSqDist = result.closeSqDist;
-                result.collision = true;
-            }
+    //         var t = (-b + sqDet)/(2*a);
+    //         if ( 0 <= t && t <= 1 ) {
+    //             result.closeX = startX + t*dx;
+    //             result.closeY = startY + t*dy;
+    //             result.closeSqDist = t*t*a;
+    //             result.farX = result.closeX;
+    //             result.farY = result.closeY;
+    //             result.farSqDist = result.closeSqDist;
+    //             result.collision = true;
+    //         }
 
-            t = (-b - sqDet)/(2*a);
-            if ( 0 <= t && t <= 1 ){
-                result.closeX = startX + t*dx;
-                result.closeY = startY + t*dy;
-                result.closeSqDist = t*t*a;
-                if ( !result.collision ) {
-                    result.farX = result.closeX;
-                    result.farY = result.closeY;
-                    result.farSqDist = result.closeSqDist;
-                }
-                result.collision = true;
-            }
-        }
+    //         t = (-b - sqDet)/(2*a);
+    //         if ( 0 <= t && t <= 1 ){
+    //             result.closeX = startX + t*dx;
+    //             result.closeY = startY + t*dy;
+    //             result.closeSqDist = t*t*a;
+    //             if ( !result.collision ) {
+    //                 result.farX = result.closeX;
+    //                 result.farY = result.closeY;
+    //                 result.farSqDist = result.closeSqDist;
+    //             }
+    //             result.collision = true;
+    //         }
+    //     }
 
-        return result;
-    }
-    else
-    {
+    //     return result;
+    // }
+    // else
+    // {
         // Polygon raycasting
         poly.computeEdges();
 
@@ -367,7 +367,7 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
         }
 
         return result;
-    }
+    // }
 };
 
 gdjs.Polygon.raycastTest._statics = {
@@ -377,7 +377,12 @@ gdjs.Polygon.raycastTest._statics = {
     s: [0,0],
     result: {
         collision: false,
-        point: [0, 0]
+        closeX: 0,
+        closeY: 0,
+        closeSqDist: 0,
+        farX: 0,
+        farY: 0,
+        farSqDist: 0
     }
 }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="96" major="4" minor="0" revision="136" />
+    <gdVersion build="96" major="4" minor="0" revision="137" />
     <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" packageName="com.example.gamename" projectFile="C:\Users\Maciel\Programacion\gits\GD\GDJS\tests\games\Raycast.gdg" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Project</name>
         <author></author>
@@ -57,7 +57,7 @@
                 <group name="Colliders">
                     <objects>
                         <object name="Quad" />
-                        <object name="Circle" />
+                        <object name="Line" />
                         <object name="Triangle" />
                         <object name="Polygon" />
                     </objects>
@@ -120,22 +120,22 @@
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="200.000000" layer="" locked="false" name="Circle" width="200.000000" x="30.513973" y="183.168365" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="4.000000" layer="" locked="false" name="Line" width="200.000000" x="42.436562" y="348.760468" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="64.000000" layer="" locked="false" name="Circle" width="64.000000" x="22.880741" y="14.281113" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="2.000000" layer="" locked="false" name="Line" width="64.000000" x="22.880741" y="14.281113" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="64.000000" layer="" locked="false" name="Circle" width="64.000000" x="694.834351" y="81.030281" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="2.000000" layer="" locked="false" name="Line" width="64.000000" x="694.834351" y="81.030281" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="64.000000" layer="" locked="false" name="Circle" width="64.000000" x="321.407257" y="436.969086" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="2.000000" layer="" locked="false" name="Line" width="64.000000" x="321.407257" y="436.969086" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
@@ -150,7 +150,7 @@
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="true" height="64.000000" layer="" locked="false" name="Circle" width="64.000000" x="231.507050" y="134.513855" zOrder="4">
+                <instance angle="0.000000" customSize="true" height="2.000000" layer="" locked="false" name="Line" width="64.000000" x="231.507050" y="134.513855" zOrder="4">
                     <numberProperties />
                     <stringProperties />
                     <initialVariables />
@@ -251,7 +251,7 @@
                         </animation>
                     </animations>
                 </object>
-                <object name="Circle" type="Sprite" updateIfNotVisible="false">
+                <object name="Line" type="Sprite" updateIfNotVisible="false">
                     <variables />
                     <behaviors />
                     <animations>
@@ -265,7 +265,7 @@
                                             <centerPoint automatic="true" name="centre" x="18.500000" y="18.500000" />
                                             <customCollisionMask>
                                                 <polygon>
-                                                    <vertice x="18.000000" y="18.000000" />
+                                                    <vertice x="0.000000" y="18.000000" />
                                                     <vertice x="36.000000" y="18.000000" />
                                                 </polygon>
                                             </customCollisionMask>
@@ -377,7 +377,7 @@
                                     <type inverted="false" value="Create" />
                                     <parameters>
                                         <parameter></parameter>
-                                        <parameter>Circle</parameter>
+                                        <parameter>Line</parameter>
                                         <parameter>500 + Random(300)</parameter>
                                         <parameter>400 + Random(200)</parameter>
                                         <parameter></parameter>

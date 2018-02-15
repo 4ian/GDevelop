@@ -147,79 +147,77 @@ RaycastResult GD_API PolygonRaycastTest(Polygon2d & poly, float startX, float st
         return result;
     }
 
-    if ( poly.vertices.size() == 2 )
-    {
-        float circleX = poly.vertices[0].x;
-        float circleY = poly.vertices[0].y;
-        float sqRadius = (circleX - poly.vertices[1].x)*(circleX - poly.vertices[1].x) +
-                         (circleY - poly.vertices[1].y)*(circleY - poly.vertices[1].y);
-        float dx = endX - startX;
-        float dy = endY - startY;
+    // if ( poly.vertices.size() == 2 )
+    // {
+    //     float circleX = poly.vertices[0].x;
+    //     float circleY = poly.vertices[0].y;
+    //     float sqRadius = (circleX - poly.vertices[1].x)*(circleX - poly.vertices[1].x) +
+    //                      (circleY - poly.vertices[1].y)*(circleY - poly.vertices[1].y);
+    //     float dx = endX - startX;
+    //     float dy = endY - startY;
 
-        float a = dx*dx + dy*dy;
-        float b = 2*(dx*(startX - circleX) + dy*(startY - circleY));
-        float c = (startX - circleX)*(startX - circleX) + (startY - circleY)*(startY - circleY) - sqRadius;
-        float det = b*b - 4*a*c;
+    //     float a = dx*dx + dy*dy;
+    //     float b = 2*(dx*(startX - circleX) + dy*(startY - circleY));
+    //     float c = (startX - circleX)*(startX - circleX) + (startY - circleY)*(startY - circleY) - sqRadius;
+    //     float det = b*b - 4*a*c;
 
-        if ( a == 0 || det < 0 ) return result;
+    //     if ( a == 0 || det < 0 ) return result;
 
-        if ( det == 0 )
-        {
-            float t = -b/(2*a);
-            if ( 0 <= t && t <= 1 ) {
-                result.closePoint.x = startX + t*dx;
-                result.closePoint.y = startY + t*dy;
-                result.closeSqDist = t*t*a;
-                result.farPoint = result.closePoint;
-                result.farSqDist = result.closeSqDist;
-                result.collision = true;
-            }
-        }
-        else
-        {
-            float sqDet = sqrt(det);
+    //     if ( det == 0 )
+    //     {
+    //         float t = -b/(2*a);
+    //         if ( 0 <= t && t <= 1 ) {
+    //             result.closePoint.x = startX + t*dx;
+    //             result.closePoint.y = startY + t*dy;
+    //             result.closeSqDist = t*t*a;
+    //             result.farPoint = result.closePoint;
+    //             result.farSqDist = result.closeSqDist;
+    //             result.collision = true;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         float sqDet = sqrt(det);
 
-            float t = (-b + sqDet)/(2*a);
-            if ( 0 <= t && t <= 1 ) {
-                result.closePoint.x = startX + t*dx;
-                result.closePoint.y = startY + t*dy;
-                result.closeSqDist = t*t*a;
-                result.farPoint = result.closePoint;
-                result.farSqDist = result.closeSqDist;
-                result.collision = true;
-            }
+    //         float t = (-b + sqDet)/(2*a);
+    //         if ( 0 <= t && t <= 1 ) {
+    //             result.closePoint.x = startX + t*dx;
+    //             result.closePoint.y = startY + t*dy;
+    //             result.closeSqDist = t*t*a;
+    //             result.farPoint = result.closePoint;
+    //             result.farSqDist = result.closeSqDist;
+    //             result.collision = true;
+    //         }
 
-            t = (-b - sqDet)/(2*a);
-            if ( 0 <= t && t <= 1 ){
-                result.closePoint.x = startX + t*dx;
-                result.closePoint.y = startY + t*dy;
-                result.closeSqDist = t*t*a;
-                if ( !result.collision ) {
-                    result.farPoint = result.closePoint;
-                    result.farSqDist = result.closeSqDist;
-                }
-                result.collision = true;
-            }
-        }
+    //         t = (-b - sqDet)/(2*a);
+    //         if ( 0 <= t && t <= 1 ){
+    //             result.closePoint.x = startX + t*dx;
+    //             result.closePoint.y = startY + t*dy;
+    //             result.closeSqDist = t*t*a;
+    //             if ( !result.collision ) {
+    //                 result.farPoint = result.closePoint;
+    //                 result.farSqDist = result.closeSqDist;
+    //             }
+    //             result.collision = true;
+    //         }
+    //     }
 
-        return result;
-    }
-    else
-    {
+    //     return result;
+    // }
+    // else
+    // {
         // Polygon raycasting
         poly.ComputeEdges();
 
         sf::Vector2f p, q, r, s;
-
         float minSqDist = FLT_MAX;
-
         // ray segment: p + t*r, with p = start and r = end - start
         p.x = startX;
         p.y = startY;
         r.x = endX - startX;
         r.y = endY - startY;
 
-        for(int i=0; i<poly.edges.size(); i++)
+        for( int i=0; i<poly.edges.size(); i++ )
         {
             // edge segment: q + u*s
             q = poly.vertices[i];
@@ -231,7 +229,7 @@ RaycastResult GD_API PolygonRaycastTest(Polygon2d & poly, float startX, float st
             float u = crossProduct(deltaQP, r) / crossRS;
             
 
-            if ( crossRS == 0 && crossProduct(deltaQP, r) == 0)
+            if ( crossRS == 0 && crossProduct(deltaQP, r) == 0 )
             {
                 // TODO Collinear
             }
@@ -260,7 +258,7 @@ RaycastResult GD_API PolygonRaycastTest(Polygon2d & poly, float startX, float st
         }
 
         return result;
-    }
+    // }
 }
 
 bool GD_API IsPointInsidePolygon(Polygon2d & poly, float x, float y)

@@ -6,6 +6,7 @@
  */
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#include <cmath>
 #include "GDCore/IDE/Dialogs/PolygonEditionHelper.h"
 
 namespace gd
@@ -39,7 +40,16 @@ void PolygonEditionHelper::OnPaint(std::vector<Polygon2d> &mask, wxDC &dc, wxPoi
         if ( i == selectedPolygon )
             dc.SetBrush(wxBrush(wxColour(255,255,255), wxBRUSHSTYLE_FDIAGONAL_HATCH));
 
-        dc.DrawPolygon(&list, offset.x, offset.y);
+        if ( mask[i].vertices.size() == 2 )
+        {
+            float radius = sqrt(pow(mask[i].vertices[1].x - mask[i].vertices[0].x, 2) +
+                                pow(mask[i].vertices[1].y - mask[i].vertices[0].y, 2));
+            dc.DrawCircle(mask[i].vertices[0].x + offset.x, mask[i].vertices[0].y + offset.y, radius);
+        }
+        else
+        {
+            dc.DrawPolygon(&list, offset.x, offset.y);
+        }
         for (std::size_t j = 0; j<mask[i].vertices.size();++j)
         {
             dc.SetBrush(wxBrush(wxColour(128,128,228), wxBRUSHSTYLE_SOLID));

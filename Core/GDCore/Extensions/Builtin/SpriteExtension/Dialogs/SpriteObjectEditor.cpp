@@ -447,6 +447,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
     pointsList->InsertColumn(2, _("Y"), wxLIST_FORMAT_LEFT, 35);
 
     wxImageList * maskIconList = new wxImageList(16,16);
+    maskIconList->Add(wxBitmap("res/circle.png",wxBITMAP_TYPE_ANY));
     maskIconList->Add(wxBitmap("res/triangle.png",wxBITMAP_TYPE_ANY));
     maskIconList->Add(wxBitmap("res/rectangle.png",wxBITMAP_TYPE_ANY));
     maskIconList->Add(wxBitmap("res/polygon.png",wxBITMAP_TYPE_ANY));
@@ -835,25 +836,27 @@ void SpriteObjectEditor::RefreshCollisionMasks()
             for (std::size_t i = 0;i<mask.size();++i)
             {
                 wxTreeListItem polygonItem;
-                if ( mask[i].vertices.size() == 3)
-                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Triangle"), 0, 0);
+                if ( mask[i].vertices.size() == 2)
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Circle"), 0, 0);
+                else if ( mask[i].vertices.size() == 3)
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Triangle"), 1, 1);
                 else if ( mask[i].vertices.size() == 4)
-                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Quad"), 1, 1);
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Quad"), 2, 2);
                 else
-                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Polygon"), 2, 2);
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Polygon"), 3, 3);
 
                 //Associate with the item the polygon #
                 maskTree->SetItemData(polygonItem, new wxStringClientData(gd::String::From(i)));
 
-                if ( !mask[i].IsConvex() )
+                if ( !mask[i].IsConvex() && mask[i].vertices.size() != 2)
                 {
-                    maskTree->SetItemImage(polygonItem, 4, 4);
+                    maskTree->SetItemImage(polygonItem, 5, 5);
                     maskTree->SetItemText(polygonItem, maskTree->GetItemText(polygonItem)+" "+_("( INVALID : The polygon is not convex )"));
                 }
 
                 for (std::size_t j = 0;j<mask[i].vertices.size();++j)
                 {
-                    wxTreeListItem pointItem = maskTree->AppendItem(polygonItem, _("Vertice"), 3,3);
+                    wxTreeListItem pointItem = maskTree->AppendItem(polygonItem, _("Vertice"), 4, 4);
                     maskTree->SetItemText(pointItem, 1, gd::String::From(mask[i].vertices[j].x));
                     maskTree->SetItemText(pointItem, 2, gd::String::From(mask[i].vertices[j].y));
 
@@ -1543,9 +1546,9 @@ void SpriteObjectEditor::OnDeleteMaskClick(wxCommandEvent& event)
         if ( polygonEditionHelper.GetSelectedPoint() < mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() )
         {
             //Make sure not to delete a vertice if the polygon has 3 vertices
-            if ( mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() <= 3 )
+            if ( mask[polygonEditionHelper.GetSelectedPolygon()].vertices.size() <= 2 )
             {
-                if (wxMessageBox(_("A polygon can not have less than 3 vertices.\nDo you want to delete the entire polygon\?"), _("Delete the polygon\?"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
+                if (wxMessageBox(_("A hitbox can't have less than 2 vertices.\nDo you want to delete the entire polygon\?"), _("Delete the polygon\?"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
                 {
                     mask.erase(mask.begin()+polygonEditionHelper.GetSelectedPolygon());
                 }

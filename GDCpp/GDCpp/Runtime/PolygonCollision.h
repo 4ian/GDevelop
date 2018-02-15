@@ -21,7 +21,7 @@ struct CollisionResult
 
 /**
  * Do a collision test between the two polygons.
- * \warning Polygons must convexes.
+ * \warning Polygons must be convexes.
  *
  * Uses Separating Axis Theorem ( http://en.wikipedia.org/wiki/Hyperplane_separation_theorem )
  * Based on http://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection
@@ -32,6 +32,27 @@ struct CollisionResult
  * \ingroup GameEngine
  */
 CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2);
+
+/**
+ * Do a collision test between the a polygon and a circle.
+ * \warning The polygon must be convex.
+ *
+ * Uses Separating Axis Theorem
+ *
+ * \return true if the polygon and the circle are overlapping
+ *
+ * \ingroup GameEngine
+ */
+CollisionResult GD_API PolygonCircleCollisionTest(Polygon2d & poly, Polygon2d & circle);
+
+/**
+ * Do a collision test between two circles.
+ *
+ * \return true if circles are overlapping
+ *
+ * \ingroup GameEngine
+ */
+CollisionResult GD_API CircleCircleCollisionTest(Polygon2d & c1, Polygon2d & c2);
 
 /**
  * Check if a point is inside a polygon.

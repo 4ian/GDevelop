@@ -7,14 +7,14 @@ This project is released under the MIT License.
 
 
 /**
- * The SkeletonArmature hold the bones and slots/attachments as well as its animations.
+ * The Armature holds the bones and slots/attachments as well as its animations.
  *
- * @namespace gdjs
- * @class SkeletonArmature
- * @extends gdjs.SkeletonTransform
+ * @namespace gdjs.sk
+ * @class Armature
+ * @extends gdjs.sk.Transform
  */
-gdjs.SkeletonArmature = function(skeleton, parentArmature=null, parentSlot=null){
-	gdjs.SkeletonTransform.call(this);
+gdjs.sk.Armature = function(skeleton, parentArmature=null, parentSlot=null){
+	gdjs.sk.Transform.call(this);
 	this.skeleton = skeleton;
 	this.parentArmature = parentArmature;
 	this.parentSlot = parentSlot;
@@ -27,13 +27,13 @@ gdjs.SkeletonArmature = function(skeleton, parentArmature=null, parentSlot=null)
 	this.animationsMap = {};
 	this.currentAnimation = -1;
 	this.aabb = gdjs.Polygon.createRectangle(0, 0);
-	this.renderer = new gdjs.SkeletonArmatureRenderer();
+	this.renderer = new gdjs.sk.ArmatureRenderer();
 	this._updateZ = false;
 	this._loaded = false;
 };
-gdjs.SkeletonArmature.prototype = Object.create(gdjs.SkeletonTransform.prototype);
+gdjs.sk.Armature.prototype = Object.create(gdjs.sk.Transform.prototype);
 
-gdjs.SkeletonArmature.prototype.loadDragonBones = function(skeletalData, index, textures){
+gdjs.sk.Armature.prototype.loadDragonBones = function(skeletalData, index, textures){
 	var armatureData = skeletalData.armature[index];
 	this.name = armatureData.name;
 	this.loaded = true;
@@ -46,7 +46,7 @@ gdjs.SkeletonArmature.prototype.loadDragonBones = function(skeletalData, index, 
 
 	// Get all the bones
 	for(var i=0; i<armatureData.bone.length; i++){
-		var bone = new gdjs.SkeletonBone(this);
+		var bone = new gdjs.sk.Bone(this);
 		bone.loadDragonBones(armatureData.bone[i]);
 		this.bones.push(bone);
 		this.bonesMap[armatureData.bone[i].name] = bone;
@@ -60,11 +60,11 @@ gdjs.SkeletonArmature.prototype.loadDragonBones = function(skeletalData, index, 
 			this.addChild(this.bonesMap[armatureData.bone[i].name]);
 		}
 	}
-	//~ this.update();
+	this.update();
 
 	// Get all the slots
 	for(var i=0; i<armatureData.slot.length; i++){
-		var slot = new gdjs.SkeletonSlot(this)
+		var slot = new gdjs.sk.Slot(this)
 		this.slots.push(slot);
 		this.slotsMap[armatureData.slot[i].name] = slot;
 		this.bonesMap[armatureData.slot[i].parent].addChild(slot);
@@ -78,7 +78,7 @@ gdjs.SkeletonArmature.prototype.loadDragonBones = function(skeletalData, index, 
 	}
 	// Get all the animations
 	for(var i=0; i<armatureData.animation.length; i++){
-		var animation = new gdjs.SkeletonAnimation(this, armatureData.frameRate);
+		var animation = new gdjs.sk.Animation(this, armatureData.frameRate);
 		animation.loadDragonBones(armatureData.animation[i]);
 		this.animations.push(animation);
 		this.animationsMap[animation.name] = i;
@@ -87,53 +87,53 @@ gdjs.SkeletonArmature.prototype.loadDragonBones = function(skeletalData, index, 
 	this.setRenderers();
 };
 
-gdjs.SkeletonArmature.prototype.updateAnimation = function(delta){
+gdjs.sk.Armature.prototype.updateAnimation = function(delta){
 	var animation = this._getCurrentAnimation();
 	if(animation){
 		animation.update(delta);
 	}
 };
 
-gdjs.SkeletonArmature.prototype.getRendererObject = function(){
+gdjs.sk.Armature.prototype.getRendererObject = function(){
 	return this.renderer.getRendererObject();
 };
 
-gdjs.SkeletonArmature.prototype.setRenderers = function(){
+gdjs.sk.Armature.prototype.setRenderers = function(){
 	for(var i=0; i<this.slots.length; i++){
-		if(this.slots[i].type === gdjs.SkeletonSlot.SLOT_IMAGE || this.slots[i].type === gdjs.SkeletonSlot.SLOT_MESH){
+		if(this.slots[i].type === gdjs.sk.SLOT_IMAGE || this.slots[i].type === gdjs.sk.SLOT_MESH){
 			this.renderer.addRenderer(this.slots[i].renderer);
 
 		}
-		else if(this.slots[i].type === gdjs.SkeletonSlot.SLOT_ARMATURE){
+		else if(this.slots[i].type === gdjs.sk.SLOT_ARMATURE){
 			this.renderer.addRenderer(this.slots[i].childArmature.renderer);
 		}
 	}
 };
 
-gdjs.SkeletonArmature.prototype._getCurrentAnimation = function(){
+gdjs.sk.Armature.prototype._getCurrentAnimation = function(){
 	if(this.currentAnimation >= 0 && this.currentAnimation < this.animations.length){
 		return this.animations[this.currentAnimation];
 	}
 	return null;
 };
 
-gdjs.SkeletonArmature.prototype.getAABB = function(){
+gdjs.sk.Armature.prototype.getAABB = function(){
 	return this.transformPolygon(this.aabb);
 };
 
-gdjs.SkeletonArmature.prototype.getDefaultWidth = function(){
+gdjs.sk.Armature.prototype.getDefaultWidth = function(){
 	return this.aabb.vertices[1][0] - this.aabb.vertices[0][0];
 };
 
-gdjs.SkeletonArmature.prototype.getDefaultHeight = function(){
+gdjs.sk.Armature.prototype.getDefaultHeight = function(){
 	return this.aabb.vertices[2][1] - this.aabb.vertices[1][1];
 };
 
-gdjs.SkeletonArmature.prototype.getCurrentAnimation = function(){
+gdjs.sk.Armature.prototype.getCurrentAnimation = function(){
 	return this.currentAnimation;
 };
 
-gdjs.SkeletonArmature.prototype.setAnimation = function(newAnimation, blendTime, loops){
+gdjs.sk.Armature.prototype.setAnimation = function(newAnimation, blendTime, loops){
 	if(newAnimation >= 0 && newAnimation < this.animations.length && newAnimation !== this.currentAnimation){
 		this.resetState();
 		var oldAnimation = this.currentAnimation;
@@ -143,7 +143,7 @@ gdjs.SkeletonArmature.prototype.setAnimation = function(newAnimation, blendTime,
 			this.animations[this.currentAnimation].blendFrom(this.animations[oldAnimation], blendTime);
 		}
 		for(var i=0; i<this.slots.length; i++){
-			if(this.slots[i].type === gdjs.SkeletonSlot.SLOT_ARMATURE){
+			if(this.slots[i].type === gdjs.sk.SLOT_ARMATURE){
 				var childArmature = this.slots[i].childArmature;
 				if(blendTime > 0){
 					var childAnimation = "";
@@ -155,8 +155,8 @@ gdjs.SkeletonArmature.prototype.setAnimation = function(newAnimation, blendTime,
 							{
 								for(var k=0; k<animators[j].actionsLists[0].length; k++)
 								{
-									if(animators[j].actionsLists[0][k].type === gdjs.SkeletonActionChannel.EVENT_PLAY ||
-									   animators[j].actionsLists[0][k].type === gdjs.SkeletonActionChannel.EVENT_PLAYSINGLE)
+									if(animators[j].actionsLists[0][k].type === gdjs.sk.EVENT_PLAY ||
+									   animators[j].actionsLists[0][k].type === gdjs.sk.EVENT_PLAYSINGLE)
 									{
 										childAnimation = animators[j].actionsLists[0][k].value;
 									}
@@ -176,24 +176,24 @@ gdjs.SkeletonArmature.prototype.setAnimation = function(newAnimation, blendTime,
 	}
 };
 
-gdjs.SkeletonArmature.prototype.getCurrentAnimationName = function(){
+gdjs.sk.Armature.prototype.getCurrentAnimationName = function(){
 	var animation = this._getCurrentAnimation();
 	if(animation) return animation.name;
 	return "";
 };
 
-gdjs.SkeletonArmature.prototype.setAnimationName = function(newAnimation, blendTime, loops){
+gdjs.sk.Armature.prototype.setAnimationName = function(newAnimation, blendTime, loops){
 	if(newAnimation in this.animationsMap){
 		this.setAnimation(this.animationsMap[newAnimation], blendTime, loops);
 	}
 };
 
-gdjs.SkeletonArmature.prototype.resetCurrentAnimation = function(){
+gdjs.sk.Armature.prototype.resetCurrentAnimation = function(){
 	var animation = this._getCurrentAnimation();
 	if(animation) animation.reset();
 };
 
-gdjs.SkeletonArmature.prototype.resetState = function(){
+gdjs.sk.Armature.prototype.resetState = function(){
 	for(var i=0; i<this.bones.length; i++){
 		this.bones[i].resetState();
 	}
@@ -202,3 +202,17 @@ gdjs.SkeletonArmature.prototype.resetState = function(){
 	}
 	this.renderer.sortRenderers();
 };
+
+gdjs.sk.Armature.prototype.resetState = function(){
+	for(var i=0; i<this.bones.length; i++){
+		this.bones[i].resetState();
+	}
+	for(var i=0; i<this.slots.length; i++){
+		this.slots[i].resetState();
+	}
+	this.renderer.sortRenderers();
+};
+
+gdjs.sk.Armature.prototype.updateZOrder = function(){
+	this.renderer.sortRenderers();
+}

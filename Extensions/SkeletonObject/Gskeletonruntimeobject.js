@@ -16,7 +16,7 @@ This project is released under the MIT License.
 gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-    this.rootArmature = new gdjs.SkeletonArmature(this);
+    this.rootArmature = new gdjs.sk.Armature(this);
     this.animationPlaying = true;
     this.animationSmooth = true;
     this.timeScale = 1.0;
@@ -38,6 +38,11 @@ gdjs.SkeletonRuntimeObject.prototype.extraInitializationFromInitialInstance = fu
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
     }
+    // this.setScaleX(0.6);
+    // this.setScaleY(0.15);
+    // this.setAnimation(0);
+    // this.setTimescale(0.2);
+    // this.setAnimation(3, 5, 3);
 };
 
 gdjs.SkeletonRuntimeObject.prototype.loadDragonBones = function(runtimeScene, skeletalData, objectData){
@@ -105,7 +110,11 @@ gdjs.SkeletonRuntimeObject.prototype.update = function(runtimeScene){
     this.rootArmature.update();
 };
 
-gdjs.SkeletonRuntimeObject.prototype.getTimescale = function(timeScale){
+gdjs.SkeletonRuntimeObject.prototype.getTimescale = function(){
+    return this.timeScale;
+};
+
+gdjs.SkeletonRuntimeObject.prototype.setTimescale = function(timeScale){
     this.timeScale = timeScale < 0 ? 0 : timeScale; // Support negative timeScale (backward) ?
 };
 

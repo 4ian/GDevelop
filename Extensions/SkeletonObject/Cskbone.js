@@ -7,14 +7,14 @@ This project is released under the MIT License.
 
 
 /**
- * The SkeletonBone holds basic transform data in a hierarchy tree.
+ * The Bone holds basic transform data in a hierarchy tree.
  *
- * @namespace gdjs
- * @class SkeletonBone
- * @extends gdjs.SkeletonTransform
+ * @namespace gdjs.sk
+ * @class Bone
+ * @extends gdjs.sk.Transform
  */
-gdjs.SkeletonBone = function(armature){
-    gdjs.SkeletonTransform.call(this);
+gdjs.sk.Bone = function(armature){
+    gdjs.sk.Transform.call(this);
     this.armature = armature;
     this.name = "";
     this.length = 0;
@@ -24,9 +24,9 @@ gdjs.SkeletonBone = function(armature){
     this.restSx = 1;
     this.restSy = 1;
 };
-gdjs.SkeletonBone.prototype = Object.create(gdjs.SkeletonTransform.prototype);
+gdjs.sk.Bone.prototype = Object.create(gdjs.sk.Transform.prototype);
 
-gdjs.SkeletonBone.prototype.loadDragonBones = function(boneData){
+gdjs.sk.Bone.prototype.loadDragonBones = function(boneData){
     this.name = boneData.name;
     this.length = boneData.hasOwnProperty("length") ? boneData.length : 0; // Debug only
     
@@ -43,13 +43,13 @@ gdjs.SkeletonBone.prototype.loadDragonBones = function(boneData){
     this.resetState();
 };
 
-gdjs.SkeletonBone.prototype.resetState = function(){
+gdjs.sk.Bone.prototype.resetState = function(){
     this.setPos(0, 0);
     this.setRot(0);
     this.setScale(1, 1);
 };
 
-gdjs.SkeletonBone.prototype.setPos = function(x, y){
+gdjs.sk.Bone.prototype.setPos = function(x, y){
     var prevX = this.x;
     var prevY = this.y;
     this.x = this.restX + x;
@@ -59,7 +59,7 @@ gdjs.SkeletonBone.prototype.setPos = function(x, y){
     }
 };
 
-gdjs.SkeletonBone.prototype.setRot = function(angle){
+gdjs.sk.Bone.prototype.setRot = function(angle){
     var prevRot = this.rot;
     this.rot = this.restRot + angle*Math.PI/180.0;
     if(this.rot !== prevRot){
@@ -67,7 +67,7 @@ gdjs.SkeletonBone.prototype.setRot = function(angle){
     }
 };
 
-gdjs.SkeletonBone.prototype.setScale = function(sx, sy){
+gdjs.sk.Bone.prototype.setScale = function(sx, sy){
     var prevSx = this.sx;
     var prevSy = this.sy;
     this.sx = this.restSx * sx;

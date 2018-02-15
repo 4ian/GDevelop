@@ -30,12 +30,12 @@ public:
 
         GetObjectMetadata("SkeletonObject::Skeleton")
             .SetIncludeFile("Extensions/SkeletonObject/Gskeletonruntimeobject.js")
-            .AddIncludeFile("Extensions/SkeletonObject/Fskeletonanimation.js")
-            .AddIncludeFile("Extensions/SkeletonObject/Eskeletonarmature.js")
-            .AddIncludeFile("Extensions/SkeletonObject/Dskeletonslot.js")
-            .AddIncludeFile("Extensions/SkeletonObject/Cskeletonbone.js")
-            .AddIncludeFile("Extensions/SkeletonObject/Bskeletontransform.js")
-            .AddIncludeFile("Extensions/SkeletonObject/Askeletonruntimeobject-pixi-renderer.js");
+            .AddIncludeFile("Extensions/SkeletonObject/Fskanimation.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Eskarmature.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Dskslot.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Cskbone.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Bskeletonruntimeobject-pixi-renderer.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Ask.js");
 
         GetAllActionsForObject("SkeletonObject::Skeleton")["SkeletonObject::SetSlotPositionX"].SetFunctionName("setSlotX").SetGetter("getSlotX");
 

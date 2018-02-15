@@ -5,45 +5,65 @@ Copyright (c) 2017-2018 Franco Maciel (francomaciel10@gmail.com)
 This project is released under the MIT License.
 */
 
+ /**
+ * @namespace gdjs.sk
+ */
+gdjs.sk = gdjs.sk || {
+	// Cached loaded skeletons per object
+	loadedSkeletons: {},
+	// Some useful constants
+	SLOT_UNDEFINED: -1,
+	SLOT_IMAGE: 0,
+	SLOT_MESH: 1,
+	SLOT_POLYGON: 2,
+	SLOT_ARMATURE: 3,
+	EASING_CONST: 0,
+	EASING_LINEAR: 1,
+	EASING_CURVE: 2,
+	EVENT_STOP: 0,
+	EVENT_PLAY: 1,
+	EVENT_PLAYSINGLE: 2
+};
+
 
 /**
- * The SkeletonMatrix holds the basic transformation data in a matrix form.
+ * The Matrix holds the basic transformation data in a matrix form.
  *
- * @namespace gdjs
- * @class SkeletonMatrix
+ * @namespace gdjs.sk
+ * @class Matrix
  */
-gdjs.SkeletonMatrix = function(a=1, b=0, tx=0, c=0, d=1, ty=0){
+gdjs.sk.Matrix = function(a=1, b=0, tx=0, c=0, d=1, ty=0){
 	this.a = a; this.b = b; this.tx = tx;
 	this.c = c; this.d = d; this.ty = ty;
 	this.u = 0; this.v = 0; this.w  = 1;
 }
 
-gdjs.SkeletonMatrix.prototype.translation = function(x, y){
+gdjs.sk.Matrix.prototype.translation = function(x, y){
 	this.tx = x;
 	this.ty = y;
 	return this;
 }
 
-gdjs.SkeletonMatrix.prototype.rotation = function(angle){
+gdjs.sk.Matrix.prototype.rotation = function(angle){
 	this.a = Math.cos(angle); this.b = -Math.sin(angle);
 	this.c = Math.sin(angle); this.d =  Math.cos(angle);
 	return this;
 }
 
-gdjs.SkeletonMatrix.prototype.scale = function(sx, sy){
+gdjs.sk.Matrix.prototype.scale = function(sx, sy){
 	this.a = sx;
 	this.d = sy;
 	return this;
 }
 
-gdjs.SkeletonMatrix.prototype.clone = function(){
-	return new gdjs.SkeletonMatrix(this.a, this.b, this.tx,
+gdjs.sk.Matrix.prototype.clone = function(){
+	return new gdjs.sk.Matrix(this.a, this.b, this.tx,
 								   this.c, this.d, this.ty,
 								   this.u, this.v, this.w );
 }
 
-gdjs.SkeletonMatrix.prototype.mul = function(m){
-	return new gdjs.SkeletonMatrix(this.a*m.a + this.b*m.c,
+gdjs.sk.Matrix.prototype.mul = function(m){
+	return new gdjs.sk.Matrix(this.a*m.a + this.b*m.c,
 								   this.a*m.b + this.b*m.d,
 								   this.a*m.tx + this.b*m.ty + this.tx,
 								   this.c*m.a + this.d*m.c,
@@ -51,14 +71,14 @@ gdjs.SkeletonMatrix.prototype.mul = function(m){
 								   this.c*m.tx + this.d*m.ty + this.ty);
 }
 
-gdjs.SkeletonMatrix.prototype.mulVec = function(v){
+gdjs.sk.Matrix.prototype.mulVec = function(v){
 	return [this.a*v[0] + this.b*v[1] + this.tx,
 			this.c*v[0] + this.d*v[1] + this.ty];
 }
 
-gdjs.SkeletonMatrix.prototype.inverse = function(){
+gdjs.sk.Matrix.prototype.inverse = function(){
 	var det_inv = 1.0 / (this.a*this.d - this.b*this.c);
-	return new gdjs.SkeletonMatrix( this.d*det_inv,
+	return new gdjs.sk.Matrix( this.d*det_inv,
 								   -this.b*det_inv,
 								   (this.b*this.ty - this.d*this.tx)*det_inv,
 								   -this.c*det_inv,
@@ -66,7 +86,7 @@ gdjs.SkeletonMatrix.prototype.inverse = function(){
 								   (this.c*this.tx - this.a*this.ty)*det_inv);
 }
 
-gdjs.SkeletonMatrix.prototype.str = function(){
+gdjs.sk.Matrix.prototype.str = function(){
 	return "|" + this.a.toFixed(2) + ", " + this.b.toFixed(2) + ", " + this.tx.toFixed(2) + "|\n" +
 		   "|" + this.c.toFixed(2) + ", " + this.d.toFixed(2) + ", " + this.ty.toFixed(2) + "|\n" +
 		   "|" + this.u.toFixed(2) + ", " + this.v.toFixed(2) + ", " + this.w.toFixed(2) + "|\n";
@@ -75,12 +95,12 @@ gdjs.SkeletonMatrix.prototype.str = function(){
 
 
 /**
- * The SkeletonTransform is the basic class for transformable objects as bones, slots and armatures.
+ * The Transform is the basic class for transformable objects as bones, slots and armatures.
  *
- * @namespace gdjs
- * @class SkeletonTransform
+ * @namespace gdjs.sk
+ * @class Transform
  */
-gdjs.SkeletonTransform = function(x=0, y=0, rot=0, sx=1, sy=1){
+gdjs.sk.Transform = function(x=0, y=0, rot=0, sx=1, sy=1){
 	this.parent = null;
 	this.children = [];
 	this.x = x;
@@ -88,8 +108,8 @@ gdjs.SkeletonTransform = function(x=0, y=0, rot=0, sx=1, sy=1){
 	this.rot = rot * Math.PI / 180.0;
 	this.sx = sx;
 	this.sy = sy;
-	this.matrix = new gdjs.SkeletonMatrix();
-	this.worldMatrix = new gdjs.SkeletonMatrix();
+	this.matrix = new gdjs.sk.Matrix();
+	this.worldMatrix = new gdjs.sk.Matrix();
 	this._updateMatrix = true;
 	this._updateWorldMatrix = false;
 	this.inheritTranslation = true;
@@ -97,12 +117,12 @@ gdjs.SkeletonTransform = function(x=0, y=0, rot=0, sx=1, sy=1){
 	this.inheritScale = true;
 }
 
-gdjs.SkeletonTransform.prototype.addChild = function(child){
+gdjs.sk.Transform.prototype.addChild = function(child){
 	this.children.push(child);
 	child.reparent(this);
 }
 
-gdjs.SkeletonTransform.prototype.reparent = function(parent){
+gdjs.sk.Transform.prototype.reparent = function(parent){
 	if(this.parent){
 		this.parent.removeChild(this);
 	}
@@ -110,14 +130,14 @@ gdjs.SkeletonTransform.prototype.reparent = function(parent){
 	this._updateWorldMatrix = true;
 }
 
-gdjs.SkeletonTransform.prototype.removeChild = function(child){
+gdjs.sk.Transform.prototype.removeChild = function(child){
 	var index = this.children.indexOf(child);
 	if(index > -1){
 		this.children.splice(index, 1);
 	}
 }
 
-gdjs.SkeletonTransform.prototype.setPos = function(x, y){
+gdjs.sk.Transform.prototype.setPos = function(x, y){
 	if(this.x !== x || this.y !== y){
 		this.x = x;
 		this.y = y;
@@ -125,7 +145,7 @@ gdjs.SkeletonTransform.prototype.setPos = function(x, y){
 	}
 }
 
-gdjs.SkeletonTransform.prototype.setRot = function(angle){
+gdjs.sk.Transform.prototype.setRot = function(angle){
 	angle *= Math.PI / 180.0;
 	if(this.rot !== angle){
 		this.rot = angle;
@@ -133,7 +153,7 @@ gdjs.SkeletonTransform.prototype.setRot = function(angle){
 	}
 }
 
-gdjs.SkeletonTransform.prototype.setScale = function(sx, sy){
+gdjs.sk.Transform.prototype.setScale = function(sx, sy){
 	if(this.sx !== sx || this.sy !== sy){
 		this.sx = sx;
 		this.sy = sy;
@@ -141,24 +161,24 @@ gdjs.SkeletonTransform.prototype.setScale = function(sx, sy){
 	}
 }
 
-gdjs.SkeletonTransform.prototype.move = function(x, y){
+gdjs.sk.Transform.prototype.move = function(x, y){
 	this.x += x;
 	this.y += y;
 	this._updateMatrix = true;
 }
 
-gdjs.SkeletonTransform.prototype.rotate = function(angle){
+gdjs.sk.Transform.prototype.rotate = function(angle){
 	this.rot += angle * Math.PI / 180.0;
 	this._updateMatrix = true;
 }
 
-gdjs.SkeletonTransform.prototype.scale = function(sx, sy){
+gdjs.sk.Transform.prototype.scale = function(sx, sy){
 	this.sx *= sx;
 	this.sy *= sy;
 	this._updateMatrix = true;
 }
 
-gdjs.SkeletonTransform.prototype.update = function(){
+gdjs.sk.Transform.prototype.update = function(){
 	this.updateTransform();
 
 	for(var i=0; i<this.children.length; i++){
@@ -166,7 +186,7 @@ gdjs.SkeletonTransform.prototype.update = function(){
 	}
 }
 
-gdjs.SkeletonTransform.prototype.updateTransform = function(){
+gdjs.sk.Transform.prototype.updateTransform = function(){
 	var sin_rot, cos_rot;
 	if(this._updateMatrix || this._updateWorldMatrix){
 		sin_rot = Math.sin(this.rot);
@@ -174,9 +194,9 @@ gdjs.SkeletonTransform.prototype.updateTransform = function(){
 	}
 
 	if(this._updateMatrix){
-		this.matrix = new gdjs.SkeletonMatrix(this.sx*cos_rot,-this.sy*sin_rot, this.x,
-											  this.sx*sin_rot, this.sy*cos_rot, this.y,
-															0,				 0,		 1);
+		this.matrix = new gdjs.sk.Matrix(this.sx*cos_rot,-this.sy*sin_rot, this.x,
+										 this.sx*sin_rot, this.sy*cos_rot, this.y,
+													   0,				0,		1);
 	}
 	if(this._updateMatrix || this._updateWorldMatrix){
 		if(!this.parent){
@@ -186,7 +206,7 @@ gdjs.SkeletonTransform.prototype.updateTransform = function(){
 			this.worldMatrix = this.parent.worldMatrix.mul(this.matrix);
 
 			if(!this.inheritRotation || !this.inheritScale){
-				if(this.inheritScale){ // non iherited rotation
+				if(this.inheritScale){ // Non iherited rotation
 					var worldSx = Math.sqrt(this.worldMatrix.a*this.worldMatrix.a +
 						   					this.worldMatrix.c*this.worldMatrix.c);
 					var worldSy = Math.sqrt(this.worldMatrix.b*this.worldMatrix.b +
@@ -196,7 +216,7 @@ gdjs.SkeletonTransform.prototype.updateTransform = function(){
 					this.worldMatrix.c =  worldSx*sin_rot;
 					this.worldMatrix.d =  worldSy*cos_rot;
 				}
-				else if(this.inheritRotation){ // non inherited scale
+				else if(this.inheritRotation){ // Non inherited scale
 					var worldSx = Math.sqrt(this.worldMatrix.a*this.worldMatrix.a +
 						   					this.worldMatrix.c*this.worldMatrix.c);
 					var worldSy = Math.sqrt(this.worldMatrix.b*this.worldMatrix.b +
@@ -206,7 +226,7 @@ gdjs.SkeletonTransform.prototype.updateTransform = function(){
 					this.worldMatrix.c *= this.sx / worldSx;
 					this.worldMatrix.d *= this.sy / worldSy;
 				}
-				else{ // non inherited rotation and scale
+				else{ // Non inherited rotation nor scale
 					this.worldMatrix.a =  this.sx*cos_rot;
 					this.worldMatrix.b = -this.sy*sin_rot;
 					this.worldMatrix.c =  this.sx*sin_rot;
@@ -230,14 +250,14 @@ gdjs.SkeletonTransform.prototype.updateTransform = function(){
 	this._updateWorldMatrix = false;
 }
 
-gdjs.SkeletonTransform.prototype.updateParentsTransform = function(){
+gdjs.sk.Transform.prototype.updateParentsTransform = function(){
 	if(this.parent){
 		this.parent.updateParentsTransform();
 	}
 	this.updateTransform();
 }
 
-gdjs.SkeletonTransform.prototype.transformPolygon = function(polygon){
+gdjs.sk.Transform.prototype.transformPolygon = function(polygon){
 	this.updateParentsTransform();
 
 	var worldPoly = new gdjs.Polygon();

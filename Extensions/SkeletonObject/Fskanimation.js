@@ -7,12 +7,12 @@ This project is released under the MIT License.
 
 
 /**
- * The SkeletonAnimation holds information to transform bones and slots through time.
+ * The Animation holds information to transform bones and slots through time.
  *
- * @namespace gdjs
- * @class SkeletonAnimation
+ * @namespace gdjs.sk
+ * @class Animation
  */
-gdjs.SkeletonAnimation = function(armature, fps){
+gdjs.sk.Animation = function(armature, fps){
     this.fps = fps <= 0 || !fps ? 30 : fps;
     this.armature = armature;
     this.name = "";
@@ -25,7 +25,7 @@ gdjs.SkeletonAnimation = function(armature, fps){
     this.slotAnimators = [];
     this.meshAnimators = [];
     this.armatureAnimators = [];
-    this.zOrderAnimator = new gdjs.SkeletonZOrderAnimator(this.armature.slots);
+    this.zOrderAnimator = new gdjs.sk.ZOrderAnimator(this.armature.slots);
     this.blending = false;
     this.blendTime = 0.0;
     this.blendDuration = 0.0; // In seconds
@@ -34,13 +34,15 @@ gdjs.SkeletonAnimation = function(armature, fps){
     this.blendMeshes = [];
 };
 
-gdjs.SkeletonAnimation.prototype.loadDragonBones = function(animationData){
+gdjs.sk.Animation.prototype.loadDragonBones = function(animationData){
     this.name = animationData.name;
 	this.defaultPlayTimes = animationData.playTimes;
 	this.duration = animationData.duration;
 
+	console.log(this.name);
+
 	for(var i=0; i<animationData.bone.length; i++){
-		var boneAnimator = new gdjs.SkeletonBoneAnimator();
+		var boneAnimator = new gdjs.sk.BoneAnimator();
 		boneAnimator.loadDragonBones(animationData.bone[i], this.armature.bonesMap);
 		if(boneAnimator.isAnimated()){
 			this.boneAnimators.push(boneAnimator);
@@ -48,7 +50,7 @@ gdjs.SkeletonAnimation.prototype.loadDragonBones = function(animationData){
 	}
 
 	for(var i=0; i<animationData.slot.length; i++){
-		var slotAnimator = new gdjs.SkeletonSlotAnimator();
+		var slotAnimator = new gdjs.sk.SlotAnimator();
 		slotAnimator.loadDragonBones(animationData.slot[i], this.armature.slotsMap);
 		if(slotAnimator.isAnimated()){
 			this.slotAnimators.push(slotAnimator);
@@ -56,7 +58,7 @@ gdjs.SkeletonAnimation.prototype.loadDragonBones = function(animationData){
 	}
 
 	for(var i=0; i<animationData.slot.length; i++){
-		var armatureAnimator = new gdjs.SkeletonArmatureAnimator();
+		var armatureAnimator = new gdjs.sk.ArmatureAnimator();
 		armatureAnimator.loadDragonBones(animationData.slot[i], this.armature.slotsMap);
 		if(armatureAnimator.isAnimated()){
 			this.armatureAnimators.push(armatureAnimator);
@@ -65,7 +67,7 @@ gdjs.SkeletonAnimation.prototype.loadDragonBones = function(animationData){
 
 	// Meshes not supported until PIXI lib update
 	//~ for(var i=0; i<animationData.ffd.length; i++){
-		//~ var meshAnimator = new gdjs.SkeletonMeshAnimator();
+		//~ var meshAnimator = new gdjs.sk.MeshAnimator();
 		//~ meshAnimator.loadDragonBones(animationData.ffd[i], this.armature.slotsMap);
 		//~ if(meshAnimator.isAnimated()){
 			//~ this.meshAnimators.push(meshAnimator);
@@ -77,7 +79,7 @@ gdjs.SkeletonAnimation.prototype.loadDragonBones = function(animationData){
 	}
 };
 
-gdjs.SkeletonAnimation.prototype.update = function(delta){
+gdjs.sk.Animation.prototype.update = function(delta){
 	if(this.blending){
 		this.updateBlending(delta);
 		return;
@@ -122,7 +124,7 @@ gdjs.SkeletonAnimation.prototype.update = function(delta){
 	}
 };
 
-gdjs.SkeletonAnimation.prototype.updateBlending = function(delta){
+gdjs.sk.Animation.prototype.updateBlending = function(delta){
 	this.blendTime += delta;
 
 	if(this.blendTime > this.blendDuration){
@@ -144,7 +146,7 @@ gdjs.SkeletonAnimation.prototype.updateBlending = function(delta){
 	}
 };
 
-gdjs.SkeletonAnimation.prototype.getFrame = function(time){
+gdjs.sk.Animation.prototype.getFrame = function(time){
 	var frame = time * this.fps;
 	if(!this.armature.skeleton.animationSmooth){
 		frame = Math.round(frame);
@@ -152,7 +154,7 @@ gdjs.SkeletonAnimation.prototype.getFrame = function(time){
 	return frame;
 };
 
-gdjs.SkeletonAnimation.prototype.reset = function(loops=-1){
+gdjs.sk.Animation.prototype.reset = function(loops=-1){
 	this.playTimes = loops < 0 ? this.defaultPlayTimes : loops;
 	this.playedTimes = 0;
 	this.time = 0.0;
@@ -168,21 +170,21 @@ gdjs.SkeletonAnimation.prototype.reset = function(loops=-1){
 	this.update(0);
 };
 
-gdjs.SkeletonAnimation.prototype.blendFrom = function(other, blendDuration){
+gdjs.sk.Animation.prototype.blendFrom = function(other, blendDuration){
 	this.blending = true;
 	this.blendDuration = blendDuration;
 
 	var firstList = other.blending ? other.blendBones : other.boneAnimators;
-	this.blendAnimators(firstList, this.boneAnimators, this.blendBones, gdjs.SkeletonBoneAnimator);
+	this.blendAnimators(firstList, this.boneAnimators, this.blendBones, gdjs.sk.BoneAnimator);
 
 	firstList = other.blending ? other.blendSlots : other.slotAnimators;
-	this.blendAnimators(firstList, this.slotAnimators, this.blendSlots, gdjs.SkeletonSlotAnimator);
+	this.blendAnimators(firstList, this.slotAnimators, this.blendSlots, gdjs.sk.SlotAnimator);
 
 	firstList = other.blending ? other.blendMeshes : other.meshAnimators;
-	this.blendAnimators(firstList, this.meshAnimators, this.blendMeshes, gdjs.SkeletonMeshAnimator);
+	this.blendAnimators(firstList, this.meshAnimators, this.blendMeshes, gdjs.sk.MeshAnimator);
 }
 
-gdjs.SkeletonAnimation.prototype.blendAnimators = function(firstList, secondList, listToPush, animatorClass){
+gdjs.sk.Animation.prototype.blendAnimators = function(firstList, secondList, listToPush, animatorClass){
 	for(var i=0; i<firstList.length + secondList.length; i++){
 		var first, second;
 		if(i < firstList.length){
@@ -202,18 +204,14 @@ gdjs.SkeletonAnimation.prototype.blendAnimators = function(firstList, secondList
 
 
 
-gdjs.SkeletonKeyChannel = function(){
+gdjs.sk.KeyChannel = function(){
 	this.values = [];
 	this.frames = [];
 	this.easings = [];
 	this.curve = undefined;
 };
 
-gdjs.SkeletonKeyChannel.EASING_CONST = 0;
-gdjs.SkeletonKeyChannel.EASING_LINEAR = 1;
-gdjs.SkeletonKeyChannel.EASING_CURVE = 2;
-
-gdjs.SkeletonKeyChannel.prototype.getKey = function(frame, asAngle=false){
+gdjs.sk.KeyChannel.prototype.getKey = function(frame, asAngle=false){
 	if(this.frames.length === 1){
 		return this.values[0];
 	}
@@ -223,14 +221,14 @@ gdjs.SkeletonKeyChannel.prototype.getKey = function(frame, asAngle=false){
 	for(var i=0; i<this.frames.length-1; i++){
 		if(this.frames[i] <= frame && frame < this.frames[i+1]){
 
-			if(this.easings[i] === gdjs.SkeletonKeyChannel.EASING_CONST){
+			if(this.easings[i] === gdjs.sk.EASING_CONST){
 				return this.values[i];
 			}
-			else if(this.easings[i] === gdjs.SkeletonKeyChannel.EASING_LINEAR){
+			else if(this.easings[i] === gdjs.sk.EASING_LINEAR){
 				var frame_n = (frame - this.frames[i]) / (this.frames[i+1] - this.frames[i]);
 				return this.values[i] + frame_n * (this.values[i+1] - this.values[i]);
 			}
-			else if(this.easings[i] === gdjs.SkeletonKeyChannel.EASING_CURVE){
+			else if(this.easings[i] === gdjs.sk.EASING_CURVE){
 				return this.values[i]; // TODO Curves
 			}
 			break;
@@ -238,7 +236,7 @@ gdjs.SkeletonKeyChannel.prototype.getKey = function(frame, asAngle=false){
 	}
 };
 
-gdjs.SkeletonKeyChannel.prototype.isEmpty = function(defaultValue){
+gdjs.sk.KeyChannel.prototype.isEmpty = function(defaultValue){
 	for(var i=0; i<this.values.length; i++){
 		if(this.values[i] !== defaultValue){
 			return false;
@@ -248,14 +246,14 @@ gdjs.SkeletonKeyChannel.prototype.isEmpty = function(defaultValue){
 };
 
 
-gdjs.SkeletonFloatChannel = function(){
-	gdjs.SkeletonKeyChannel.call(this);
+gdjs.sk.FloatChannel = function(){
+	gdjs.sk.KeyChannel.call(this);
 	this.defaultValue = 0;
 };
 
-gdjs.SkeletonFloatChannel.prototype = Object.create(gdjs.SkeletonKeyChannel.prototype);
+gdjs.sk.FloatChannel.prototype = Object.create(gdjs.sk.KeyChannel.prototype);
 
-gdjs.SkeletonFloatChannel.prototype.loadDragonBones = function(channelData, key, defaultValue){
+gdjs.sk.FloatChannel.prototype.loadDragonBones = function(channelData, key, defaultValue){
 	this.defaultValue = defaultValue;
 	this.frames.push(0);
 
@@ -274,14 +272,14 @@ gdjs.SkeletonFloatChannel.prototype.loadDragonBones = function(channelData, key,
 
 		if(channelData[i].hasOwnProperty("tweenEasing")){
 			if(channelData[i].tweenEasing === 0){
-				this.easings.push(gdjs.SkeletonKeyChannel.EASING_LINEAR);
+				this.easings.push(gdjs.sk.EASING_LINEAR);
 			}
 			else{
-				this.easings.push(gdjs.SkeletonKeyChannel.EASING_CURVE);
+				this.easings.push(gdjs.sk.EASING_CURVE);
 			}
 		}
 		else{
-			this.easings.push(gdjs.SkeletonKeyChannel.EASING_CONST);
+			this.easings.push(gdjs.sk.EASING_CONST);
 		}
 	}
 
@@ -293,29 +291,29 @@ gdjs.SkeletonFloatChannel.prototype.loadDragonBones = function(channelData, key,
 	}
 };
 
-gdjs.SkeletonFloatChannel.prototype.isEmpty = function(){
-	return gdjs.SkeletonKeyChannel.prototype.isEmpty.call(this, this.defaultValue);
+gdjs.sk.FloatChannel.prototype.isEmpty = function(){
+	return gdjs.sk.KeyChannel.prototype.isEmpty.call(this, this.defaultValue);
 };
 
-gdjs.SkeletonFloatChannel.prototype.blend = function(x0, x1, duration){
+gdjs.sk.FloatChannel.prototype.blend = function(x0, x1, duration){
 	this.values.length = 2;
 	this.values[0] = x0;
 	this.values[1] = x1;
 	this.frames.length = 2;
 	this.frames[0] = 0;
 	this.frames[1] = duration;
-	this.easings.push(gdjs.SkeletonKeyChannel.EASING_LINEAR);
+	this.easings.push(gdjs.sk.EASING_LINEAR);
 };
 
 
-gdjs.SkeletonColorChannel = function(){
-	gdjs.SkeletonKeyChannel.call(this);
+gdjs.sk.ColorChannel = function(){
+	gdjs.sk.KeyChannel.call(this);
 	this.defaultValue = [255, 255, 255];
 };
 
-gdjs.SkeletonColorChannel.prototype = Object.create(gdjs.SkeletonKeyChannel.prototype);
+gdjs.sk.ColorChannel.prototype = Object.create(gdjs.sk.KeyChannel.prototype);
 
-gdjs.SkeletonColorChannel.prototype.loadDragonBones = function(channelData, defaultValue){
+gdjs.sk.ColorChannel.prototype.loadDragonBones = function(channelData, defaultValue){
 	this.defaultValue = defaultValue;
 	this.frames.push(0);
 
@@ -348,14 +346,14 @@ gdjs.SkeletonColorChannel.prototype.loadDragonBones = function(channelData, defa
 
 		if(channelData[i].hasOwnProperty("tweenEasing")){
 			if(channelData[i].tweenEasing === 0){
-				this.easings.push(gdjs.SkeletonKeyChannel.EASING_LINEAR);
+				this.easings.push(gdjs.sk.EASING_LINEAR);
 			}
 			else{
-				this.easings.push(gdjs.SkeletonKeyChannel.EASING_CURVE);
+				this.easings.push(gdjs.sk.EASING_CURVE);
 			}
 		}
 		else{
-			this.easings.push(gdjs.SkeletonKeyChannel.EASING_CONST);
+			this.easings.push(gdjs.sk.EASING_CONST);
 		}
 	}
 
@@ -367,7 +365,7 @@ gdjs.SkeletonColorChannel.prototype.loadDragonBones = function(channelData, defa
 	}
 };
 
-gdjs.SkeletonColorChannel.prototype.decomposeAlpha = function(alphaChannel){
+gdjs.sk.ColorChannel.prototype.decomposeAlpha = function(alphaChannel){
 	for(var i=0; i<this.values.length; i++){
 		if(this.values[i].length < 4){
 			return;
@@ -383,7 +381,7 @@ gdjs.SkeletonColorChannel.prototype.decomposeAlpha = function(alphaChannel){
 	}
 };
 
-gdjs.SkeletonColorChannel.prototype.getKey = function(frame){
+gdjs.sk.ColorChannel.prototype.getKey = function(frame){
 	if(this.frames.length === 1){
 		return this.values[0];
 	}
@@ -393,10 +391,10 @@ gdjs.SkeletonColorChannel.prototype.getKey = function(frame){
 	for(var i=0; i<this.frames.length-1; i++){
 		if(this.frames[i] <= frame && frame < this.frames[i+1]){
 
-			if(this.easings[i] === gdjs.SkeletonKeyChannel.EASING_CONST){
+			if(this.easings[i] === gdjs.sk.EASING_CONST){
 				return this.values[i];
 			}
-			else if(this.easings[i] === gdjs.SkeletonKeyChannel.EASING_LINEAR){
+			else if(this.easings[i] === gdjs.sk.EASING_LINEAR){
 				var color = [];
 				var frame_n = (frame - this.frames[i]) / (this.frames[i+1] - this.frames[i]);
 				for(var j=0; j<3; j++){
@@ -404,7 +402,7 @@ gdjs.SkeletonColorChannel.prototype.getKey = function(frame){
 				}
 				return color;
 			}
-			else if(this.easings[i] === gdjs.SkeletonKeyChannel.EASING_CURVE){
+			else if(this.easings[i] === gdjs.sk.EASING_CURVE){
 				return this.values[i]; // TODO Curves
 			}
 			break;
@@ -412,7 +410,7 @@ gdjs.SkeletonColorChannel.prototype.getKey = function(frame){
 	}
 };
 
-gdjs.SkeletonColorChannel.prototype.isEmpty = function(){
+gdjs.sk.ColorChannel.prototype.isEmpty = function(){
 	for(var i=0; i<this.values.length; i++){
 		for(var j=0; j<3; j++){
 			if(this.values[i][j] !== this.defaultValue[j]){
@@ -423,25 +421,25 @@ gdjs.SkeletonColorChannel.prototype.isEmpty = function(){
 	return true;
 };
 
-gdjs.SkeletonColorChannel.prototype.blend = function(color0, color1, duration){
+gdjs.sk.ColorChannel.prototype.blend = function(color0, color1, duration){
 	this.values.length = 2;
 	this.values[0] = color0;
 	this.values[1] = color1;
 	this.frames.length = 2;
 	this.frames[0] = 0;
 	this.frames[1] = duration;
-	this.easings.push(gdjs.SkeletonKeyChannel.EASING_LINEAR);
+	this.easings.push(gdjs.sk.EASING_LINEAR);
 };
 
 
-gdjs.SkeletonBoolChannel = function(){
-	gdjs.SkeletonKeyChannel.call(this);
+gdjs.sk.BoolChannel = function(){
+	gdjs.sk.KeyChannel.call(this);
 	this.defaultValue = true;
 };
 
-gdjs.SkeletonBoolChannel.prototype = Object.create(gdjs.SkeletonKeyChannel.prototype);
+gdjs.sk.BoolChannel.prototype = Object.create(gdjs.sk.KeyChannel.prototype);
 
-gdjs.SkeletonBoolChannel.prototype.loadDragonBones = function(channelData, key, defaultValue){
+gdjs.sk.BoolChannel.prototype.loadDragonBones = function(channelData, key, defaultValue){
 	this.defaultValue = defaultValue;
 	this.frames.push(0);
 
@@ -462,7 +460,7 @@ gdjs.SkeletonBoolChannel.prototype.loadDragonBones = function(channelData, key, 
 			this.frames.push(this.frames[i] + channelData[i].duration);
 		}
 
-		this.easings.push(gdjs.SkeletonKeyChannel.EASING_CONST);
+		this.easings.push(gdjs.sk.EASING_CONST);
 	}
 
 	if(this.frames.length > this.values.length && this.frames.length >= 2){
@@ -473,30 +471,30 @@ gdjs.SkeletonBoolChannel.prototype.loadDragonBones = function(channelData, key, 
 	}
 };
 
-gdjs.SkeletonBoolChannel.prototype.isEmpty = function(){
-	return gdjs.SkeletonKeyChannel.prototype.isEmpty.call(this, this.defaultValue);
+gdjs.sk.BoolChannel.prototype.isEmpty = function(){
+	return gdjs.sk.KeyChannel.prototype.isEmpty.call(this, this.defaultValue);
 };
 
-gdjs.SkeletonBoolChannel.prototype.blend = function(bool0, bool1, duration){
+gdjs.sk.BoolChannel.prototype.blend = function(bool0, bool1, duration){
 	this.values.length = 2;
 	this.values[0] = bool0;
 	this.values[1] = bool1;
 	this.frames.length = 2;
 	this.frames[0] = 0;
 	this.frames[1] = duration;
-	this.easings.push(gdjs.SkeletonKeyChannel.EASING_CONST);
+	this.easings.push(gdjs.sk.EASING_CONST);
 };
 
 
-gdjs.SkeletonVertexArrayChannel = function(){
-	gdjs.SkeletonKeyChannel.call(this);
+gdjs.sk.VertexArrayChannel = function(){
+	gdjs.sk.KeyChannel.call(this);
 	this.defaultValue = [];
 	this.verticesToUpdate = [];
 };
 
-gdjs.SkeletonVertexArrayChannel.prototype = Object.create(gdjs.SkeletonKeyChannel.prototype);
+gdjs.sk.VertexArrayChannel.prototype = Object.create(gdjs.sk.KeyChannel.prototype);
 
-gdjs.SkeletonVertexArrayChannel.prototype.loadDragonBones = function(channelData, vertexLength){
+gdjs.sk.VertexArrayChannel.prototype.loadDragonBones = function(channelData, vertexLength){
 
 	this.defaultValue = [];
 	for(var i=0; i<vertexLength; i++){
@@ -523,14 +521,14 @@ gdjs.SkeletonVertexArrayChannel.prototype.loadDragonBones = function(channelData
 
 		if(channelData[i].hasOwnProperty("tweenEasing")){
 			if(channelData[i].tweenEasing === 0){
-				this.easings.push(gdjs.SkeletonKeyChannel.EASING_LINEAR);
+				this.easings.push(gdjs.sk.EASING_LINEAR);
 			}
 			else{
-				this.easings.push(gdjs.SkeletonKeyChannel.EASING_CURVE);
+				this.easings.push(gdjs.sk.EASING_CURVE);
 			}
 		}
 		else{
-			this.easings.push(gdjs.SkeletonKeyChannel.EASING_CONST);
+			this.easings.push(gdjs.sk.EASING_CONST);
 		}
 	}
 
@@ -561,7 +559,7 @@ gdjs.SkeletonVertexArrayChannel.prototype.loadDragonBones = function(channelData
 	this.values = optimizedValues;
 };
 
-gdjs.SkeletonVertexArrayChannel.prototype.getKey = function(frame){
+gdjs.sk.VertexArrayChannel.prototype.getKey = function(frame){
 	if(this.frames.length === 1){
 		return this.values[0];
 	}
@@ -571,10 +569,10 @@ gdjs.SkeletonVertexArrayChannel.prototype.getKey = function(frame){
 	for(var i=0; i<this.frames.length-1; i++){
 		if(this.frames[i] <= frame && frame < this.frames[i+1]){
 
-			if(this.easings[i] === gdjs.SkeletonKeyChannel.EASING_CONST){
+			if(this.easings[i] === gdjs.sk.EASING_CONST){
 				return this.values[i];
 			}
-			else if(this.easings[i] === gdjs.SkeletonKeyChannel.EASING_LINEAR){
+			else if(this.easings[i] === gdjs.sk.EASING_LINEAR){
 				var vertices = [];
 				var frame_n = (frame - this.frames[i]) / (this.frames[i+1] - this.frames[i]);
 				for(var j=0; j<this.verticesToUpdate.length; j++){
@@ -583,7 +581,7 @@ gdjs.SkeletonVertexArrayChannel.prototype.getKey = function(frame){
 				}
 				return vertices;
 			}
-			else if(this.easings[i] === gdjs.SkeletonKeyChannel.EASING_CURVE){
+			else if(this.easings[i] === gdjs.sk.EASING_CURVE){
 				return this.values[i]; // TODO Curves
 			}
 			break;
@@ -591,11 +589,11 @@ gdjs.SkeletonVertexArrayChannel.prototype.getKey = function(frame){
 	}
 };
 
-gdjs.SkeletonVertexArrayChannel.prototype.isEmpty = function(){
+gdjs.sk.VertexArrayChannel.prototype.isEmpty = function(){
 	return (this.verticesToUpdate.length === 0);
 };
 
-gdjs.SkeletonVertexArrayChannel.prototype.blend = function(verts0, update0, verts1, update1, duration){
+gdjs.sk.VertexArrayChannel.prototype.blend = function(verts0, update0, verts1, update1, duration){
 	var verticesToUpdate = [];
 	var vertices0 = [];
 	var vertices1 = [];
@@ -625,23 +623,19 @@ gdjs.SkeletonVertexArrayChannel.prototype.blend = function(verts0, update0, vert
 	this.frames.length = 2;
 	this.frames[0] = 0;
 	this.frames[1] = duration;
-	this.easings.push(gdjs.SkeletonKeyChannel.EASING_LINEAR);
+	this.easings.push(gdjs.sk.EASING_LINEAR);
 	this.verticesToUpdate = verticesToUpdate;
 };
 
 
 
-gdjs.SkeletonActionChannel = function(){
+gdjs.sk.ActionChannel = function(){
 	this.frames = [];
 	this.actionsLists = [];
 	this._currentFrame = -1;
 };
 
-gdjs.SkeletonActionChannel.EVENT_STOP = 0;
-gdjs.SkeletonActionChannel.EVENT_PLAY = 1;
-gdjs.SkeletonActionChannel.EVENT_PLAYSINGLE = 2;
-
-gdjs.SkeletonActionChannel.prototype.loadDragonBones = function(channelData){
+gdjs.sk.ActionChannel.prototype.loadDragonBones = function(channelData){
 	this.frames.push(0);
 
 	for(var i=0; i<channelData.length; i++){
@@ -650,17 +644,17 @@ gdjs.SkeletonActionChannel.prototype.loadDragonBones = function(channelData){
 		if(channelData[i].hasOwnProperty("actions")){
 			for(var j=0; j<channelData[i].actions.length; j++){
 				if(channelData[i].actions[j].hasOwnProperty("gotoAndPlay")){
-					actions.push({type: gdjs.SkeletonActionChannel.EVENT_PLAY,
+					actions.push({type: gdjs.sk.EVENT_PLAY,
 								  value: channelData[i].actions[j].gotoAndPlay});
 				}
 				else if(channelData[i].actions[j].hasOwnProperty("gotoAndStop")){
-					actions.push({type: gdjs.SkeletonActionChannel.EVENT_PLAYSINGLE,
+					actions.push({type: gdjs.sk.EVENT_PLAYSINGLE,
 								  value: channelData[i].actions[j].gotoAndStop});
 				}
 			}
 		}
 		if(actions.length === 0){
-			actions.push({type: gdjs.SkeletonActionChannel.EVENT_STOP, value: ""});
+			actions.push({type: gdjs.sk.EVENT_STOP, value: ""});
 		}
 		this.actionsLists.push(actions);
 
@@ -679,14 +673,14 @@ gdjs.SkeletonActionChannel.prototype.loadDragonBones = function(channelData){
 		this.actionsLists.push(actions);
 	}
 	if(this.frames.length === 1 && this.actionsLists.length === 0){
-		this.actionsLists.push([{type: gdjs.SkeletonActionChannel.EVENT_STOP, value: ""}]); // empty list of actions
+		this.actionsLists.push([{type: gdjs.sk.EVENT_STOP, value: ""}]); // empty list of actions
 	}
 };
 
-gdjs.SkeletonActionChannel.prototype.isEmpty = function(){
+gdjs.sk.ActionChannel.prototype.isEmpty = function(){
 	for(var i=0; i<this.actionsLists.length; i++){
 		for(var j=0; j<this.actionsLists[i].length; j++){
-			if(this.actionsLists[i][j].type !== gdjs.SkeletonActionChannel.EVENT_STOP){
+			if(this.actionsLists[i][j].type !== gdjs.sk.EVENT_STOP){
 				return false;
 			}
 		}
@@ -695,7 +689,7 @@ gdjs.SkeletonActionChannel.prototype.isEmpty = function(){
 	return true;
 };
 
-gdjs.SkeletonActionChannel.prototype.getKeysToBeginning = function(){
+gdjs.sk.ActionChannel.prototype.getKeysToBeginning = function(){
 	var actions = this.getKeys(this.frames[this.frames.length - 1]);
 	if(this.frames[0] === 0){
 		for(var i=0; i<this.actionsLists[0].length; i++){
@@ -707,7 +701,7 @@ gdjs.SkeletonActionChannel.prototype.getKeysToBeginning = function(){
 	return actions;
 };
 
-gdjs.SkeletonActionChannel.prototype.getKeys = function(frame){
+gdjs.sk.ActionChannel.prototype.getKeys = function(frame){
 	var actions = [];
 	for(var i=0; i<this.frames.length; i++){
 		if(this.frames[i] > this._currentFrame && this.frames[i] <= frame){
@@ -723,13 +717,13 @@ gdjs.SkeletonActionChannel.prototype.getKeys = function(frame){
 
 
 
-gdjs.SkeletonBoneAnimator = function(){
+gdjs.sk.BoneAnimator = function(){
 	this.target = null;
-	this.channelX = new gdjs.SkeletonFloatChannel();
-	this.channelY = new gdjs.SkeletonFloatChannel();
-	this.channelRot = new gdjs.SkeletonFloatChannel();
-	this.channelSclX = new gdjs.SkeletonFloatChannel();
-	this.channelSclY = new gdjs.SkeletonFloatChannel();
+	this.channelX = new gdjs.sk.FloatChannel();
+	this.channelY = new gdjs.sk.FloatChannel();
+	this.channelRot = new gdjs.sk.FloatChannel();
+	this.channelSclX = new gdjs.sk.FloatChannel();
+	this.channelSclY = new gdjs.sk.FloatChannel();
 	this._updateTransforms = true;
 	this.lastX = 0.0;
 	this.lastY = 0.0;
@@ -738,7 +732,7 @@ gdjs.SkeletonBoneAnimator = function(){
 	this.lastSclY = 1.0;
 }; 
 
-gdjs.SkeletonBoneAnimator.prototype.loadDragonBones = function(boneAnimData, bones){
+gdjs.sk.BoneAnimator.prototype.loadDragonBones = function(boneAnimData, bones){
 	this.target = bones[boneAnimData.name];
 
 	this.channelX.loadDragonBones(boneAnimData.translateFrame, "x", 0);
@@ -770,7 +764,7 @@ gdjs.SkeletonBoneAnimator.prototype.loadDragonBones = function(boneAnimData, bon
 	}
 };
 
-gdjs.SkeletonBoneAnimator.prototype.setFrame = function(frame){
+gdjs.sk.BoneAnimator.prototype.setFrame = function(frame){
 	if(this._updateTransforms){
 		this.lastX = this.channelX.getKey(frame);
 		this.lastY = this.channelY.getKey(frame);
@@ -783,11 +777,11 @@ gdjs.SkeletonBoneAnimator.prototype.setFrame = function(frame){
 	}
 };
 
-gdjs.SkeletonBoneAnimator.prototype.isAnimated = function(){
+gdjs.sk.BoneAnimator.prototype.isAnimated = function(){
 	return this._updateTransforms;
 };
 
-gdjs.SkeletonBoneAnimator.prototype.blendFrom = function(first, second, duration){
+gdjs.sk.BoneAnimator.prototype.blendFrom = function(first, second, duration){
 	this.target = first ? first.target : second.target;
 	var x0 = first ? first.lastX : 0.0;
 	var y0 = first ? first.lastY : 0.0;
@@ -808,11 +802,11 @@ gdjs.SkeletonBoneAnimator.prototype.blendFrom = function(first, second, duration
 
 
 
-gdjs.SkeletonSlotAnimator = function(){
+gdjs.sk.SlotAnimator = function(){
 	this.target = undefined;
-	this.channelColor = new gdjs.SkeletonColorChannel();
-	this.channelAlpha = new gdjs.SkeletonFloatChannel();
-	this.channelVisible = new gdjs.SkeletonBoolChannel();
+	this.channelColor = new gdjs.sk.ColorChannel();
+	this.channelAlpha = new gdjs.sk.FloatChannel();
+	this.channelVisible = new gdjs.sk.BoolChannel();
 	this._updateColor = true;
 	this._updateAlpha = true;
 	this._updateVisible = true;
@@ -821,7 +815,7 @@ gdjs.SkeletonSlotAnimator = function(){
 	this.lastVisible = true;
 };
 
-gdjs.SkeletonSlotAnimator.prototype.loadDragonBones = function(slotAnimData, slots){
+gdjs.sk.SlotAnimator.prototype.loadDragonBones = function(slotAnimData, slots){
 	this.target = slots[slotAnimData.name];
 
 	this.channelColor.loadDragonBones(slotAnimData.colorFrame, [this.target.defaultR,
@@ -850,7 +844,7 @@ gdjs.SkeletonSlotAnimator.prototype.loadDragonBones = function(slotAnimData, slo
 	this.lastVisible = this.target.defaultVisible;
 };
 
-gdjs.SkeletonSlotAnimator.prototype.setFrame = function(frame){
+gdjs.sk.SlotAnimator.prototype.setFrame = function(frame){
 	if(this._updateColor){
 		this.lastColor = this.channelColor.getKey(frame);
 		this.target.setColor(...this.lastColor);
@@ -868,11 +862,11 @@ gdjs.SkeletonSlotAnimator.prototype.setFrame = function(frame){
 	}
 };
 
-gdjs.SkeletonSlotAnimator.prototype.isAnimated = function(){
+gdjs.sk.SlotAnimator.prototype.isAnimated = function(){
 	return (this._updateColor || this._updateAlpha || this._updateVisible || this.target.skinned);
 };
 
-gdjs.SkeletonSlotAnimator.prototype.blendFrom = function(first, second, duration){
+gdjs.sk.SlotAnimator.prototype.blendFrom = function(first, second, duration){
 	this.target = first ? first.target : second.target;
 	var color0 = first ? first.lastColor : [this.target.defaultR, this.target.defaultG, this.target.defaultB];
 	var alpha0 = first ? first.lastAlpha : this.target.defaultAlpha;
@@ -887,14 +881,14 @@ gdjs.SkeletonSlotAnimator.prototype.blendFrom = function(first, second, duration
 
 
 
-gdjs.SkeletonMeshAnimator = function(){
+gdjs.sk.MeshAnimator = function(){
 	this.target = undefined;
-	this.channelVertices = new gdjs.SkeletonVertexArrayChannel();
+	this.channelVertices = new gdjs.sk.VertexArrayChannel();
 	this._updateVertices = true;
 	this.lastVertices = [];
 };
 
-gdjs.SkeletonMeshAnimator.prototype.loadDragonBones = function(ffdAnimData, slots){
+gdjs.sk.MeshAnimator.prototype.loadDragonBones = function(ffdAnimData, slots){
 	this.target = slots[ffdAnimData.slot];
 
 	this.channelVertices.loadDragonBones(ffdAnimData.frame, this.target.defaultVertices.length);
@@ -904,16 +898,16 @@ gdjs.SkeletonMeshAnimator.prototype.loadDragonBones = function(ffdAnimData, slot
 	}
 };
 
-gdjs.SkeletonMeshAnimator.prototype.isAnimated = function(){
+gdjs.sk.MeshAnimator.prototype.isAnimated = function(){
 	return this._updateVertices;
 };
 
-gdjs.SkeletonMeshAnimator.prototype.setFrame = function(frame){
+gdjs.sk.MeshAnimator.prototype.setFrame = function(frame){
 	this.lastVertices = this.channelVertices.getKey(frame);
 	this.target.setVertices(this.lastVertices, this.channelVertices.verticesToUpdate);
 };
 
-gdjs.SkeletonMeshAnimator.prototype.blendFrom = function(first, second, duration){
+gdjs.sk.MeshAnimator.prototype.blendFrom = function(first, second, duration){
 	this.target = first ? first.target : second.target;
 	var verts0 = first ? first.lastVertices : [];
 	var update0 = first ? first.channelVertices.verticesToUpdate : [];
@@ -924,7 +918,7 @@ gdjs.SkeletonMeshAnimator.prototype.blendFrom = function(first, second, duration
 
 
 
-gdjs.SkeletonZOrderAnimator = function(slots){
+gdjs.sk.ZOrderAnimator = function(slots){
 	this.values = [];
 	this.frames = [];
 	this.target = [];
@@ -938,7 +932,7 @@ gdjs.SkeletonZOrderAnimator = function(slots){
 	this.target.sort(function(a, b){ return a.defaultZ - b.defaultZ; });
 };
 
-gdjs.SkeletonZOrderAnimator.prototype.loadDragonBones = function(zOrderAnimData){
+gdjs.sk.ZOrderAnimator.prototype.loadDragonBones = function(zOrderAnimData){
 	this.frames.push(0);
 
 	// Default slots z
@@ -1003,7 +997,7 @@ gdjs.SkeletonZOrderAnimator.prototype.loadDragonBones = function(zOrderAnimData)
 	}
 };
 
-gdjs.SkeletonZOrderAnimator.prototype.setFrame = function(frame){
+gdjs.sk.ZOrderAnimator.prototype.setFrame = function(frame){
 	var zValues;
 	var frameToSet = this._lastFrameSet;
 
@@ -1034,19 +1028,19 @@ gdjs.SkeletonZOrderAnimator.prototype.setFrame = function(frame){
 	}
 };
 
-gdjs.SkeletonZOrderAnimator.prototype.isAnimated = function(){
+gdjs.sk.ZOrderAnimator.prototype.isAnimated = function(){
 	return this._updateZOrder;
 };
 
 
 
-gdjs.SkeletonArmatureAnimator = function(){
+gdjs.sk.ArmatureAnimator = function(){
 	this.target = undefined;
-	this.channelAction = new gdjs.SkeletonActionChannel();
+	this.channelAction = new gdjs.sk.ActionChannel();
 	this._updateAction = true;
 };
 
-gdjs.SkeletonArmatureAnimator.prototype.loadDragonBones = function(slotAnimData, slots){
+gdjs.sk.ArmatureAnimator.prototype.loadDragonBones = function(slotAnimData, slots){
 	this.target = slots[slotAnimData.name];
 
 	this.channelAction.loadDragonBones(slotAnimData.displayFrame);
@@ -1058,43 +1052,43 @@ gdjs.SkeletonArmatureAnimator.prototype.loadDragonBones = function(slotAnimData,
 	
 };
 
-gdjs.SkeletonArmatureAnimator.prototype.runToBeginning = function(frame){
+gdjs.sk.ArmatureAnimator.prototype.runToBeginning = function(frame){
 	var actions = this.channelAction.getKeysToBeginning();
 	if(actions.length > 0){
 		this.runActions(actions);
 	}
 };
 
-gdjs.SkeletonArmatureAnimator.prototype.runToFrame = function(frame){
+gdjs.sk.ArmatureAnimator.prototype.runToFrame = function(frame){
 	var actions = this.channelAction.getKeys(frame);
 	if(actions.length > 0){
 		this.runActions(actions);
 	}
 };
 
-gdjs.SkeletonArmatureAnimator.prototype.runActions = function(actions){
+gdjs.sk.ArmatureAnimator.prototype.runActions = function(actions){
 	for(var i=0; i<actions.length; i++){
-		if(actions[i].type === gdjs.SkeletonActionChannel.EVENT_STOP){
+		if(actions[i].type === gdjs.sk.EVENT_STOP){
 			this.target.childArmature.resetState();
 			this.target.childArmature.currentAnimation = -1;
 		}
-		else if(actions[i].type === gdjs.SkeletonActionChannel.EVENT_PLAY){
+		else if(actions[i].type === gdjs.sk.EVENT_PLAY){
 			this.target.childArmature.setAnimationName(actions[i].value);
 		}
-		else if(actions[i].type === gdjs.SkeletonActionChannel.EVENT_PLAYSINGLE){
+		else if(actions[i].type === gdjs.sk.EVENT_PLAYSINGLE){
 			this.target.childArmature.setAnimationName(actions[i].value, 1);
 		}
 	}
 };
 
-gdjs.SkeletonArmatureAnimator.prototype.isAnimated = function(){
+gdjs.sk.ArmatureAnimator.prototype.isAnimated = function(){
 	return this._updateAction;
 };
 
-gdjs.SkeletonArmatureAnimator.prototype.reset = function(){
+gdjs.sk.ArmatureAnimator.prototype.reset = function(){
 	this.channelAction._currentFrame = -1;
 };
 
-gdjs.SkeletonArmatureAnimator.prototype.updateAnimation = function(delta, smooth){
+gdjs.sk.ArmatureAnimator.prototype.updateAnimation = function(delta, smooth){
 	this.target.childArmature.updateAnimation(delta, smooth);
 };

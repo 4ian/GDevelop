@@ -34,47 +34,48 @@ gdjs.SkeletonRuntimeObjectPixiRenderer.prototype.loadDragonBones = function(runt
 
 
 
-gdjs.SkeletonArmaturePixiRenderer = function()
+gdjs.sk.ArmaturePixiRenderer = function()
 {
     this.container = new PIXI.Container();
 };
-gdjs.SkeletonArmatureRenderer = gdjs.SkeletonArmaturePixiRenderer;
+gdjs.sk.ArmatureRenderer = gdjs.sk.ArmaturePixiRenderer;
 
-gdjs.SkeletonArmaturePixiRenderer.prototype.putInScene = function(runtimeObject, runtimeScene){
+gdjs.sk.ArmaturePixiRenderer.prototype.putInScene = function(runtimeObject, runtimeScene){
     runtimeScene.getLayer("").getRenderer().addRendererObject(this.container, runtimeObject.getZOrder());
 };
 
-gdjs.SkeletonArmaturePixiRenderer.prototype.getRendererObject = function(){
+gdjs.sk.ArmaturePixiRenderer.prototype.getRendererObject = function(){
     return this.container;
 };
 
-gdjs.SkeletonArmaturePixiRenderer.prototype.addRenderer = function(renderer){
+gdjs.sk.ArmaturePixiRenderer.prototype.addRenderer = function(renderer){
     this.container.addChild(renderer.getRendererObject());
 };
 
-gdjs.SkeletonArmaturePixiRenderer.prototype.sortRenderers = function(){
+gdjs.sk.ArmaturePixiRenderer.prototype.sortRenderers = function(){
     this.container.children.sort(function(a, b){ return a.z - b.z; });
 };
 
 
 
-gdjs.SkeletonSlotPixiRenderer = function()
+gdjs.sk.SlotPixiRenderer = function()
 {
-    this.renderObject = null;
+    this.renderer = null;
 };
-gdjs.SkeletonSlotRenderer = gdjs.SkeletonSlotPixiRenderer;
+gdjs.sk.SlotRenderer = gdjs.sk.SlotPixiRenderer;
 
-gdjs.SkeletonSlotPixiRenderer.prototype.getRendererObject = function(){
+gdjs.sk.SlotPixiRenderer.prototype.getRendererObject = function(){
     return this.renderer;
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.loadAsSprite = function(texture){
+gdjs.sk.SlotPixiRenderer.prototype.loadAsSprite = function(texture){
     this.renderer = new PIXI.Sprite(texture);
     this.renderer.pivot = new PIXI.Point(this.renderer.width/2.0, this.renderer.height/2.0);
     this.renderer.z = 0;
+    // console.log(this.renderer);
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.loadAsMesh = function(texture, vertices, uvs, triangles){
+gdjs.sk.SlotPixiRenderer.prototype.loadAsMesh = function(texture, vertices, uvs, triangles){
 	this.renderer = new PIXI.mesh.Mesh(texture,
 									   new Float32Array(vertices),
 									   new Float32Array(uvs),
@@ -89,46 +90,56 @@ gdjs.SkeletonSlotPixiRenderer.prototype.loadAsMesh = function(texture, vertices,
 	// meshes won't fully work with current PIXI version
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.getWidth = function(){
+gdjs.sk.SlotPixiRenderer.prototype.getWidth = function(){
     return this.renderer.width;
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.getHeight = function(){
+gdjs.sk.SlotPixiRenderer.prototype.getHeight = function(){
     return this.renderer.height;
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.setPos = function(x, y){
+gdjs.sk.SlotPixiRenderer.prototype.setPos = function(x, y){
     this.renderer.x = x;
     this.renderer.y = y;
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.setRotation = function(angle){
+gdjs.sk.SlotPixiRenderer.prototype.setRotation = function(angle){
     this.renderer.rotation = angle;
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.setScale = function(sx, sy){
+gdjs.sk.SlotPixiRenderer.prototype.setScale = function(sx, sy){
     this.renderer.scale.x = sx;
     this.renderer.scale.y = sy;
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.setZ = function(z){
+gdjs.sk.SlotPixiRenderer.prototype.skewSupported = function(){
+    return true;
+};
+
+gdjs.sk.SlotPixiRenderer.prototype.setSkew = function(skewX, skewY){
+    this.renderer.skew.x = skewX;
+    this.renderer.skew.y = skewY;
+};
+
+
+gdjs.sk.SlotPixiRenderer.prototype.setZ = function(z){
     this.renderer.z = z;
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.setColor = function(color){
+gdjs.sk.SlotPixiRenderer.prototype.setColor = function(color){
 	this.renderer.tint = (color[0] << 16) + (color[1] << 8) + color[2];
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.setAlpha = function(alpha){
+gdjs.sk.SlotPixiRenderer.prototype.setAlpha = function(alpha){
 	this.renderer.alpha = alpha;
 };
 
-gdjs.SkeletonSlotPixiRenderer.prototype.setVisible = function(visible){
+gdjs.sk.SlotPixiRenderer.prototype.setVisible = function(visible){
 	this.renderer.visible = visible;
 };
 
 // Mesh only
-gdjs.SkeletonSlotPixiRenderer.prototype.setVertices = function(vertices, updateList){
+gdjs.sk.SlotPixiRenderer.prototype.setVertices = function(vertices, updateList){
 	for(var i=0; i<updateList.length; i++){
 		this.renderer.vertices[2*updateList[i]]     = vertices[i][0];
 		this.renderer.vertices[2*updateList[i] + 1] = vertices[i][1];

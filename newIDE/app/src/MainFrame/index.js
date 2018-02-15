@@ -19,6 +19,7 @@ import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
+import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -996,6 +997,7 @@ export default class MainFrame extends Component<*, State> {
             onClose={() => this.openAboutDialog(false)}
             updateStatus={updateStatus}
           />
+          <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
         </div>
       </Providers>
     );

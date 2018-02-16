@@ -45,6 +45,7 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2);
 /**
  * Do a raycast test.
  * \warning Polygon must be convex.
+ * For some theory check "Find the Intersection Point of Two Line Segments" (https://www.codeproject.com/Tips/862988/Find-the-Intersection-Point-of-Two-Line-Segments)
  *
  * \return A raycast result with the contact points and distances
  *

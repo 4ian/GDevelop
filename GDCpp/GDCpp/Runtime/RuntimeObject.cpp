@@ -4,7 +4,6 @@
  * This project is released under the MIT License.
  */
 #include <cstring>
-// #include <cfloat>
 #include <cmath>
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Extensions/Builtin/MathematicalTools.h"

@@ -1176,7 +1176,6 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist, closest) 
     
     var endX = x + dist*Math.cos(angle*3.14159/180.0);
     var endY = y + dist*Math.sin(angle*3.14159/180.0);
-    // var testSqDist = closest ? 0 : Number.MAX_VALUE;
     var testSqDist = closest ? dist*dist : 0;
 
     var hitBoxes = this.getHitBoxes();

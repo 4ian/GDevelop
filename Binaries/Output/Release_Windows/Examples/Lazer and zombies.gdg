@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="84" major="3" minor="6" revision="0" />
-    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+    <gdVersion build="96" major="4" minor="0" revision="139" />
+    <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" packageName="" projectFile="C:\Users\Maciel\Programacion\gits\GD\Binaries\Output\Release_Windows\Examples\Lazer and zombies.gdg" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Project</name>
         <author></author>
         <windowWidth>800</windowWidth>
@@ -34,7 +34,7 @@
             <extension name="PrimitiveDrawing" />
             <extension name="ParticleSystem" />
             <extension name="Light" />
-            <extension name="PathfindingAutomatism" />
+            <extension name="PathfindingBehavior" />
         </extensions>
         <platforms>
             <platform name="GDevelop C++ platform" />
@@ -61,7 +61,7 @@
     <variables />
     <layouts>
         <layout b="0" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="49" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="62">
-            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <uiSettings grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
             <objectsGroups>
                 <group name="LaserObstacle">
                     <objects>
@@ -84,11 +84,6 @@
                     <stringProperties />
                     <initialVariables />
                 </instance>
-                <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="LaserEnd" width="0.000000" x="540.258301" y="277.929047" zOrder="0">
-                    <numberProperties />
-                    <stringProperties />
-                    <initialVariables />
-                </instance>
                 <instance angle="0.000000" customSize="false" height="0.000000" layer="" locked="false" name="LaserEndParticles" width="0.000000" x="552.000000" y="267.000000" zOrder="0">
                     <numberProperties />
                     <stringProperties />
@@ -106,11 +101,11 @@
                 </instance>
             </instances>
             <objects>
-                <object name="Hero" type="Sprite">
+                <object name="Hero" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <animations>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -266,7 +261,7 @@
                                 </direction>
                             </directions>
                         </animation>
-                        <animation useMultipleDirections="true">
+                        <animation name="" useMultipleDirections="true">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites />
@@ -296,14 +291,14 @@
                         </animation>
                     </animations>
                 </object>
-                <object name="Wall" type="Sprite">
+                <object name="Wall" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms>
-                        <automatism name="LightObstacle" type="Light::LightObstacleAutomatism" />
-                        <automatism cost="2.000000" impassable="true" name="PathfindingObstacle" type="PathfindingAutomatism::PathfindingObstacleAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior name="LightObstacle" type="Light::LightObstacleBehavior" />
+                        <behavior cost="2.000000" impassable="true" name="PathfindingObstacle" type="PathfindingBehavior::PathfindingObstacleBehavior" />
+                    </behaviors>
                     <animations>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -443,7 +438,7 @@
                                 </direction>
                             </directions>
                         </animation>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -583,7 +578,7 @@
                                 </direction>
                             </directions>
                         </animation>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -725,13 +720,13 @@
                         </animation>
                     </animations>
                 </object>
-                <object name="Zombie" type="Sprite">
+                <object name="Zombie" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms>
-                        <automatism acceleration="400.000000" allowDiagonals="true" angleOffset="0.000000" angularMaxSpeed="180.000000" cellHeight="20" cellWidth="20" extraBorder="0.000000" maxSpeed="200.000000" name="Pathfinding" rotateObject="true" type="PathfindingAutomatism::PathfindingAutomatism" />
-                    </automatisms>
+                    <behaviors>
+                        <behavior acceleration="400.000000" allowDiagonals="true" angleOffset="0.000000" angularMaxSpeed="180.000000" cellHeight="20" cellWidth="20" extraBorder="0.000000" maxSpeed="200.000000" name="Pathfinding" rotateObject="true" type="PathfindingBehavior::PathfindingBehavior" />
+                    </behaviors>
                     <animations>
-                        <animation useMultipleDirections="false">
+                        <animation name="" useMultipleDirections="false">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -875,7 +870,7 @@
                 </object>
                 <object name="LaserDrawer" type="PrimitiveDrawing::Drawer">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <fillOpacity>150</fillOpacity>
                     <outlineSize>1</outlineSize>
                     <outlineOpacity>150</outlineOpacity>
@@ -883,67 +878,19 @@
                     <outlineColor b="0" g="0" r="234" />
                     <absoluteCoordinates>true</absoluteCoordinates>
                 </object>
-                <object name="LaserEnd" type="Sprite">
-                    <variables />
-                    <automatisms />
-                    <animations>
-                        <animation useMultipleDirections="true">
-                            <directions>
-                                <direction looping="false" timeBetweenFrames="1.000000">
-                                    <sprites>
-                                        <sprite hasCustomCollisionMask="true" image="Camera.png">
-                                            <points />
-                                            <originPoint name="origine" x="4.000000" y="4.000000" />
-                                            <centerPoint automatic="true" name="centre" x="5.000000" y="5.000000" />
-                                            <customCollisionMask>
-                                                <polygon>
-                                                    <vertice x="3.500000" y="3.500000" />
-                                                    <vertice x="8.500000" y="3.500000" />
-                                                    <vertice x="8.500000" y="8.500000" />
-                                                    <vertice x="3.500000" y="8.500000" />
-                                                </polygon>
-                                            </customCollisionMask>
-                                        </sprite>
-                                    </sprites>
-                                </direction>
-                                <direction looping="false" timeBetweenFrames="1.000000">
-                                    <sprites />
-                                </direction>
-                                <direction looping="false" timeBetweenFrames="1.000000">
-                                    <sprites />
-                                </direction>
-                                <direction looping="false" timeBetweenFrames="1.000000">
-                                    <sprites />
-                                </direction>
-                                <direction looping="false" timeBetweenFrames="1.000000">
-                                    <sprites />
-                                </direction>
-                                <direction looping="false" timeBetweenFrames="1.000000">
-                                    <sprites />
-                                </direction>
-                                <direction looping="false" timeBetweenFrames="1.000000">
-                                    <sprites />
-                                </direction>
-                                <direction looping="false" timeBetweenFrames="1.000000">
-                                    <sprites />
-                                </direction>
-                            </directions>
-                        </animation>
-                    </animations>
-                </object>
                 <object additive="true" alphaParam="Mutable" angleParam="Mutable" blueParam="Mutable" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="120.000000" emitterForceMax="75.000000" emitterForceMin="60.000000" emitterXDirection="0.000001" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="200.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Mutable" maxParticleNb="100" name="LaserEndParticles" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="51.000000" particleBlue2="0.000000" particleEditionSimpleMode="true" particleGravityX="-0.000000" particleGravityY="-0.000000" particleGravityZ="0.000000" particleGreen1="51.000000" particleGreen2="0.000000" particleLifeTimeMax="1.500000" particleLifeTimeMin="0.500000" particleRed1="255.000000" particleRed2="255.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Mutable" rendererParam1="0.200000" rendererParam2="1.000000" rendererType="Line" sizeParam="Mutable" tank="-1.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="3.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
                 <object colorB="255" colorG="255" colorR="255" globalColorA="255" globalColorB="63" globalColorG="63" globalColorR="63" globalLight="true" intensity="150.000000" name="GlobalLight" quality="16" radius="400.000000" type="Light::Light">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
-                <object name="Background" type="Sprite">
+                <object name="Background" type="Sprite" updateIfNotVisible="true">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <animations>
-                        <animation useMultipleDirections="true">
+                        <animation name="" useMultipleDirections="true">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -985,7 +932,7 @@
                                 </direction>
                             </directions>
                         </animation>
-                        <animation useMultipleDirections="true">
+                        <animation name="" useMultipleDirections="true">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -1027,7 +974,7 @@
                                 </direction>
                             </directions>
                         </animation>
-                        <animation useMultipleDirections="true">
+                        <animation name="" useMultipleDirections="true">
                             <directions>
                                 <direction looping="false" timeBetweenFrames="1.000000">
                                     <sprites>
@@ -1073,19 +1020,19 @@
                 </object>
                 <object bold="false" italic="false" name="GameOver" smoothed="true" type="TextObject::Text" underlined="false">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <string>You&apos;ve been eaten!</string>
                     <font></font>
                     <characterSize>35</characterSize>
-                    <color b="0" g="0" r="64" />
+                    <color b="0" g="0" r="202" />
                 </object>
                 <object additive="true" alphaParam="Mutable" angleParam="Mutable" blueParam="Mutable" destroyWhenNoParticles="true" emissionEditionSimpleMode="false" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="20.000000" emitterForceMin="10.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="300.000000" friction="2.000000" gravityEditionSimpleMode="false" greenParam="Mutable" maxParticleNb="5000" name="ZombieDeath" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="51.000000" particleBlue2="128.000000" particleEditionSimpleMode="true" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="-50.000000" particleGreen1="51.000000" particleGreen2="128.000000" particleLifeTimeMax="2.500000" particleLifeTimeMin="0.500000" particleRed1="255.000000" particleRed2="128.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Mutable" rendererParam1="5.000000" rendererParam2="5.000000" rendererType="Quad" sizeParam="Mutable" tank="300.000000" textureParticleName="ExplosionTexture.png" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
                 <object bold="false" italic="false" name="NewObject" smoothed="true" type="TextObject::Text" underlined="false">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                     <string>Text</string>
                     <font></font>
                     <characterSize>20</characterSize>
@@ -1096,55 +1043,48 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="false" value="DepartScene" />
                             <parameters>
                                 <parameter></parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
-                            <type inverted="false" value="Cache" />
-                            <parameters>
-                                <parameter>LaserEnd</parameter>
-                            </parameters>
-                            <subActions />
-                        </action>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="Cache" />
                             <parameters>
                                 <parameter>GameOver</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events />
                 </event>
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="false" value="VarScene" />
                             <parameters>
                                 <parameter>GameOver</parameter>
                                 <parameter>=</parameter>
                                 <parameter>0</parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="TourneVersPos" />
                             <parameters>
                                 <parameter>Hero</parameter>
                                 <parameter>MouseX(&quot;&quot;,0)</parameter>
                                 <parameter>MouseY(&quot;&quot;,0)</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events />
                 </event>
@@ -1157,190 +1097,221 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="false" value="SourisBouton" />
                             <parameters>
                                 <parameter></parameter>
                                 <parameter>Left</parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="ParticleSystem::Flow" />
                             <parameters>
                                 <parameter>LaserEndParticles</parameter>
                                 <parameter>=</parameter>
                                 <parameter>200</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
-                        <action>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
                             <type inverted="false" value="ParticleSystem::EmitterXDirection" />
                             <parameters>
                                 <parameter>LaserEndParticles</parameter>
                                 <parameter>=</parameter>
                                 <parameter>-cos(Hero.Direction()/180*3.14159)</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
-                        <action>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
                             <type inverted="false" value="ParticleSystem::EmitterYDirection" />
                             <parameters>
                                 <parameter>LaserEndParticles</parameter>
                                 <parameter>=</parameter>
                                 <parameter>-sin(Hero.Direction()/180*3.14159)</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>No contact by default</comment>
+                            <comment2></comment2>
+                        </event>
                         <event disabled="false" folded="false">
                             <type>BuiltinCommonInstructions::Standard</type>
                             <conditions />
                             <actions>
-                                <action>
-                                    <type inverted="false" value="MettreXY" />
-                                    <parameters>
-                                        <parameter>LaserEnd</parameter>
-                                        <parameter>=</parameter>
-                                        <parameter>Hero.PointX(Barrel)</parameter>
-                                        <parameter>=</parameter>
-                                        <parameter>Hero.PointY(Barrel)</parameter>
-                                    </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                <instruction>
                                     <type inverted="false" value="ModVarScene" />
                                     <parameters>
-                                        <parameter>LaserStep</parameter>
+                                        <parameter>Contact</parameter>
                                         <parameter>=</parameter>
                                         <parameter>0</parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
-                                    <type inverted="false" value="ModVarScene" />
-                                    <parameters>
-                                        <parameter>LaserCollision</parameter>
-                                        <parameter>=</parameter>
-                                        <parameter>0</parameter>
-                                    </parameters>
-                                    <subActions />
-                                </action>
+                                    <subInstructions />
+                                </instruction>
                             </actions>
                             <events />
                         </event>
                         <event disabled="false" folded="false">
                             <type>BuiltinCommonInstructions::Comment</type>
                             <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
-                            <comment>Position step by step the end of the laser as long as we do not reach an obstacle</comment>
+                            <comment>If there is a contact, save contact position in ContactX and ContactY.</comment>
                             <comment2></comment2>
                         </event>
-                        <event disabled="false" folded="false" infiniteLoopWarning="true">
-                            <type>BuiltinCommonInstructions::While</type>
-                            <whileConditions>
-                                <condition>
-                                    <type inverted="false" value="VarScene" />
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <instruction>
+                                    <type inverted="false" value="Raycast" />
                                     <parameters>
-                                        <parameter>LaserStep</parameter>
-                                        <parameter>&lt;</parameter>
-                                        <parameter>100</parameter>
-                                    </parameters>
-                                    <subConditions />
-                                </condition>
-                                <condition>
-                                    <type inverted="false" value="VarScene" />
-                                    <parameters>
-                                        <parameter>LaserCollision</parameter>
-                                        <parameter>=</parameter>
-                                        <parameter>0</parameter>
-                                    </parameters>
-                                    <subConditions />
-                                </condition>
-                            </whileConditions>
-                            <conditions />
-                            <actions>
-                                <action>
-                                    <type inverted="false" value="ModVarScene" />
-                                    <parameters>
-                                        <parameter>LaserStep</parameter>
-                                        <parameter>+</parameter>
-                                        <parameter>1</parameter>
-                                    </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
-                                    <type inverted="false" value="MettreAutourPos" />
-                                    <parameters>
-                                        <parameter>LaserEnd</parameter>
+                                        <parameter>LaserObstacle</parameter>
                                         <parameter>Hero.PointX(Barrel)</parameter>
                                         <parameter>Hero.PointY(Barrel)</parameter>
-                                        <parameter>Variable(LaserStep)*8</parameter>
                                         <parameter>Hero.Direction()</parameter>
+                                        <parameter>800</parameter>
+                                        <parameter>ContactX</parameter>
+                                        <parameter>ContactY</parameter>
+                                        <parameter></parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
+                                    <subInstructions />
+                                </instruction>
+                            </conditions>
+                            <actions>
+                                <instruction>
+                                    <type inverted="false" value="ModVarScene" />
+                                    <parameters>
+                                        <parameter>Contact</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>1</parameter>
+                                    </parameters>
+                                    <subInstructions />
+                                </instruction>
                             </actions>
                             <events>
                                 <event disabled="false" folded="false">
+                                    <type>BuiltinCommonInstructions::Comment</type>
+                                    <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                                    <comment>There is a contact, and the raycasted object is a Zombie, kill it</comment>
+                                    <comment2></comment2>
+                                </event>
+                                <event disabled="false" folded="false">
                                     <type>BuiltinCommonInstructions::Standard</type>
                                     <conditions>
-                                        <condition>
-                                            <type inverted="false" value="Collision" />
+                                        <instruction>
+                                            <type inverted="false" value="NbObjet" />
                                             <parameters>
-                                                <parameter>LaserEnd</parameter>
-                                                <parameter>LaserObstacle</parameter>
-                                                <parameter></parameter>
-                                                <parameter></parameter>
-                                                <parameter></parameter>
+                                                <parameter>Zombie</parameter>
+                                                <parameter>&gt;</parameter>
+                                                <parameter>0</parameter>
                                             </parameters>
-                                            <subConditions />
-                                        </condition>
+                                            <subInstructions />
+                                        </instruction>
                                     </conditions>
                                     <actions>
-                                        <action>
-                                            <type inverted="false" value="ModVarScene" />
+                                        <instruction>
+                                            <type inverted="false" value="Create" />
                                             <parameters>
-                                                <parameter>LaserCollision</parameter>
-                                                <parameter>=</parameter>
-                                                <parameter>1</parameter>
+                                                <parameter></parameter>
+                                                <parameter>ZombieDeath</parameter>
+                                                <parameter>Zombie.X()</parameter>
+                                                <parameter>Zombie.Y()</parameter>
+                                                <parameter></parameter>
                                             </parameters>
-                                            <subActions />
-                                        </action>
+                                            <subInstructions />
+                                        </instruction>
+                                        <instruction>
+                                            <type inverted="false" value="Delete" />
+                                            <parameters>
+                                                <parameter>Zombie</parameter>
+                                                <parameter>Pathfinding</parameter>
+                                            </parameters>
+                                            <subInstructions />
+                                        </instruction>
                                     </actions>
                                     <events />
                                 </event>
                             </events>
                         </event>
                         <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>If there is no contact, set ContactX and ContactY far away to draw the laser later</comment>
+                            <comment2></comment2>
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Standard</type>
+                            <conditions>
+                                <instruction>
+                                    <type inverted="false" value="VarScene" />
+                                    <parameters>
+                                        <parameter>Contact</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                    <subInstructions />
+                                </instruction>
+                            </conditions>
+                            <actions>
+                                <instruction>
+                                    <type inverted="false" value="ModVarScene" />
+                                    <parameters>
+                                        <parameter>ContactX</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>Hero.PointX(Barrel) + 800*cos(Hero.Angle()*3.14159/180.0)</parameter>
+                                    </parameters>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
+                                    <type inverted="false" value="ModVarScene" />
+                                    <parameters>
+                                        <parameter>ContactY</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>Hero.PointY(Barrel) + 800*sin(Hero.Angle()*3.14159/180.0)</parameter>
+                                    </parameters>
+                                    <subInstructions />
+                                </instruction>
+                            </actions>
+                            <events />
+                        </event>
+                        <event disabled="false" folded="false">
+                            <type>BuiltinCommonInstructions::Comment</type>
+                            <color b="109" g="230" r="255" textB="0" textG="0" textR="0" />
+                            <comment>Draw the laser and set the particles position</comment>
+                            <comment2></comment2>
+                        </event>
+                        <event disabled="false" folded="false">
                             <type>BuiltinCommonInstructions::Standard</type>
                             <conditions />
                             <actions>
-                                <action>
+                                <instruction>
                                     <type inverted="false" value="PrimitiveDrawing::Line" />
                                     <parameters>
                                         <parameter>LaserDrawer</parameter>
                                         <parameter>Hero.PointX(Barrel)</parameter>
                                         <parameter>Hero.PointY(Barrel)</parameter>
-                                        <parameter>LaserEnd.X()</parameter>
-                                        <parameter>LaserEnd.Y()</parameter>
+                                        <parameter>Variable(ContactX)</parameter>
+                                        <parameter>Variable(ContactY)</parameter>
                                         <parameter>4</parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="MettreXY" />
                                     <parameters>
                                         <parameter>LaserEndParticles</parameter>
                                         <parameter>=</parameter>
-                                        <parameter>LaserEnd.X()</parameter>
+                                        <parameter>Variable(ContactX)</parameter>
                                         <parameter>=</parameter>
-                                        <parameter>LaserEnd.Y()</parameter>
+                                        <parameter>Variable(ContactY)</parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
+                                    <subInstructions />
+                                </instruction>
                             </actions>
                             <events />
                         </event>
@@ -1349,25 +1320,25 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="true" value="SourisBouton" />
                             <parameters>
                                 <parameter></parameter>
                                 <parameter>Left</parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="ParticleSystem::Flow" />
                             <parameters>
                                 <parameter>LaserEndParticles</parameter>
                                 <parameter>=</parameter>
                                 <parameter>0</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events />
                 </event>
@@ -1380,39 +1351,39 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="false" value="Timer" />
                             <parameters>
                                 <parameter></parameter>
                                 <parameter>1</parameter>
                                 <parameter>&quot;ZombieCreation&quot;</parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
-                        <condition>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
                             <type inverted="true" value="DepartScene" />
                             <parameters>
                                 <parameter></parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="ResetTimer" />
                             <parameters>
                                 <parameter></parameter>
                                 <parameter>&quot;ZombieCreation&quot;</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events>
                         <event disabled="false" folded="false">
                             <type>BuiltinCommonInstructions::Standard</type>
                             <conditions />
                             <actions>
-                                <action>
+                                <instruction>
                                     <type inverted="false" value="Create" />
                                     <parameters>
                                         <parameter></parameter>
@@ -1421,9 +1392,9 @@
                                         <parameter>-500</parameter>
                                         <parameter></parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="Create" />
                                     <parameters>
                                         <parameter></parameter>
@@ -1432,9 +1403,9 @@
                                         <parameter>Random(2000)-500</parameter>
                                         <parameter></parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="Create" />
                                     <parameters>
                                         <parameter></parameter>
@@ -1443,9 +1414,9 @@
                                         <parameter>1500</parameter>
                                         <parameter></parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="Create" />
                                     <parameters>
                                         <parameter></parameter>
@@ -1454,8 +1425,8 @@
                                         <parameter>Random(2000)-500</parameter>
                                         <parameter></parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
+                                    <subInstructions />
+                                </instruction>
                             </actions>
                             <events />
                         </event>
@@ -1464,18 +1435,18 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
-                            <type inverted="true" value="PathfindingAutomatism::PathFound" />
+                        <instruction>
+                            <type inverted="true" value="PathfindingBehavior::PathFound" />
                             <parameters>
                                 <parameter>Zombie</parameter>
                                 <parameter>Pathfinding</parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
-                            <type inverted="false" value="PathfindingAutomatism::SetDestination" />
+                        <instruction>
+                            <type inverted="false" value="PathfindingBehavior::SetDestination" />
                             <parameters>
                                 <parameter>Zombie</parameter>
                                 <parameter>Pathfinding</parameter>
@@ -1483,77 +1454,39 @@
                                 <parameter>Hero.X()</parameter>
                                 <parameter>Hero.Y()</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events />
                 </event>
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
-                            <type inverted="true" value="PathfindingAutomatism::PathFound" />
+                        <instruction>
+                            <type inverted="true" value="PathfindingBehavior::PathFound" />
                             <parameters>
                                 <parameter>Zombie</parameter>
                                 <parameter>Pathfinding</parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="Delete" />
                             <parameters>
                                 <parameter>Zombie</parameter>
                                 <parameter>Pathfinding</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events />
                 </event>
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
-                            <type inverted="false" value="CollisionNP" />
-                            <parameters>
-                                <parameter>Zombie</parameter>
-                                <parameter>LaserEnd</parameter>
-                                <parameter></parameter>
-                                <parameter></parameter>
-                                <parameter></parameter>
-                            </parameters>
-                            <subConditions />
-                        </condition>
-                    </conditions>
-                    <actions>
-                        <action>
-                            <type inverted="false" value="Create" />
-                            <parameters>
-                                <parameter></parameter>
-                                <parameter>ZombieDeath</parameter>
-                                <parameter>Zombie.X()</parameter>
-                                <parameter>Zombie.Y()</parameter>
-                                <parameter></parameter>
-                            </parameters>
-                            <subActions />
-                        </action>
-                        <action>
-                            <type inverted="false" value="Delete" />
-                            <parameters>
-                                <parameter>Zombie</parameter>
-                                <parameter></parameter>
-                            </parameters>
-                            <subActions />
-                        </action>
-                    </actions>
-                    <events />
-                </event>
-                <event disabled="false" folded="false">
-                    <type>BuiltinCommonInstructions::Standard</type>
-                    <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="false" value="Collision" />
                             <parameters>
                                 <parameter>Zombie</parameter>
@@ -1562,19 +1495,19 @@
                                 <parameter></parameter>
                                 <parameter></parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="ModVarScene" />
                             <parameters>
                                 <parameter>GameOver</parameter>
                                 <parameter>=</parameter>
                                 <parameter>1</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events />
                 </event>
@@ -1587,26 +1520,26 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="false" value="VarScene" />
                             <parameters>
                                 <parameter>GameOver</parameter>
                                 <parameter>=</parameter>
                                 <parameter>1</parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="ChangeTimeScale" />
                             <parameters>
                                 <parameter></parameter>
                                 <parameter>0</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
-                        <action>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
                             <type inverted="false" value="ZoomCamera" />
                             <parameters>
                                 <parameter></parameter>
@@ -1614,16 +1547,16 @@
                                 <parameter></parameter>
                                 <parameter></parameter>
                             </parameters>
-                            <subActions />
-                        </action>
-                        <action>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
                             <type inverted="false" value="Montre" />
                             <parameters>
                                 <parameter>GameOver</parameter>
                                 <parameter></parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events />
                 </event>
@@ -1636,13 +1569,13 @@
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="false" value="DepartScene" />
                             <parameters>
                                 <parameter></parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions />
                     <events>
@@ -1657,7 +1590,7 @@
                             <repeatExpression>35+Random(5)</repeatExpression>
                             <conditions />
                             <actions>
-                                <action>
+                                <instruction>
                                     <type inverted="false" value="Create" />
                                     <parameters>
                                         <parameter></parameter>
@@ -1666,35 +1599,35 @@
                                         <parameter>Random(700)</parameter>
                                         <parameter></parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="ChangeAnimation" />
                                     <parameters>
                                         <parameter>Background</parameter>
                                         <parameter>=</parameter>
                                         <parameter>Random(2)</parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="ChangePlan" />
                                     <parameters>
                                         <parameter>Background</parameter>
                                         <parameter>=</parameter>
                                         <parameter>-10</parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="Opacity" />
                                     <parameters>
                                         <parameter>Background</parameter>
                                         <parameter>=</parameter>
                                         <parameter>155+Random(100)</parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
+                                    <subInstructions />
+                                </instruction>
                             </actions>
                             <events />
                         </event>
@@ -1703,7 +1636,7 @@
                             <repeatExpression>15+Random(3)</repeatExpression>
                             <conditions />
                             <actions>
-                                <action>
+                                <instruction>
                                     <type inverted="false" value="Create" />
                                     <parameters>
                                         <parameter></parameter>
@@ -1712,36 +1645,36 @@
                                         <parameter>0</parameter>
                                         <parameter></parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="ChangeAnimation" />
                                     <parameters>
                                         <parameter>Wall</parameter>
                                         <parameter>=</parameter>
                                         <parameter>Random(2)</parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="ChangePlan" />
                                     <parameters>
                                         <parameter>Wall</parameter>
                                         <parameter>=</parameter>
                                         <parameter>-8</parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="ChangeDirection" />
                                     <parameters>
                                         <parameter>Wall</parameter>
                                         <parameter>=</parameter>
                                         <parameter>Random(360)</parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
-                                <action>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
                                     <type inverted="false" value="MettreAutour" />
                                     <parameters>
                                         <parameter>Wall</parameter>
@@ -1750,8 +1683,8 @@
                                         <parameter>Random(360)</parameter>
                                         <parameter></parameter>
                                     </parameters>
-                                    <subActions />
-                                </action>
+                                    <subInstructions />
+                                </instruction>
                             </actions>
                             <events />
                         </event>
@@ -1763,18 +1696,20 @@
                     <cameras>
                         <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
                     </cameras>
+                    <effects />
                 </layer>
                 <layer name="Interface" visibility="true">
                     <cameras>
                         <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
                     </cameras>
+                    <effects />
                 </layer>
             </layers>
-            <automatismsSharedData>
-                <automatismSharedData name="LightObstacle" type="Light::LightObstacleAutomatism" />
-                <automatismSharedData name="Pathfinding" type="PathfindingAutomatism::PathfindingAutomatism" />
-                <automatismSharedData name="PathfindingObstacle" type="PathfindingAutomatism::PathfindingObstacleAutomatism" />
-            </automatismsSharedData>
+            <behaviorsSharedData>
+                <behaviorSharedData name="LightObstacle" type="Light::LightObstacleBehavior" />
+                <behaviorSharedData name="Pathfinding" type="PathfindingBehavior::PathfindingBehavior" />
+                <behaviorSharedData name="PathfindingObstacle" type="PathfindingBehavior::PathfindingObstacleBehavior" />
+            </behaviorsSharedData>
         </layout>
     </layouts>
     <externalEvents />

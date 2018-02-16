@@ -7,7 +7,6 @@
 #include "GDCpp/Runtime/Polygon2d.h"
 #include <cmath>
 #include <cfloat>
-#include <iostream>
 
 namespace
 {
@@ -147,118 +146,55 @@ RaycastResult GD_API PolygonRaycastTest(Polygon2d & poly, float startX, float st
         return result;
     }
 
-    // if ( poly.vertices.size() == 2 )
-    // {
-    //     float circleX = poly.vertices[0].x;
-    //     float circleY = poly.vertices[0].y;
-    //     float sqRadius = (circleX - poly.vertices[1].x)*(circleX - poly.vertices[1].x) +
-    //                      (circleY - poly.vertices[1].y)*(circleY - poly.vertices[1].y);
-    //     float dx = endX - startX;
-    //     float dy = endY - startY;
+    poly.ComputeEdges();
+    sf::Vector2f p, q, r, s;
+    float minSqDist = FLT_MAX;
 
-    //     float a = dx*dx + dy*dy;
-    //     float b = 2*(dx*(startX - circleX) + dy*(startY - circleY));
-    //     float c = (startX - circleX)*(startX - circleX) + (startY - circleY)*(startY - circleY) - sqRadius;
-    //     float det = b*b - 4*a*c;
+    // ray segment: p + t*r, with p = start and r = end - start
+    p.x = startX;
+    p.y = startY;
+    r.x = endX - startX;
+    r.y = endY - startY;
 
-    //     if ( a == 0 || det < 0 ) return result;
-
-    //     if ( det == 0 )
-    //     {
-    //         float t = -b/(2*a);
-    //         if ( 0 <= t && t <= 1 ) {
-    //             result.closePoint.x = startX + t*dx;
-    //             result.closePoint.y = startY + t*dy;
-    //             result.closeSqDist = t*t*a;
-    //             result.farPoint = result.closePoint;
-    //             result.farSqDist = result.closeSqDist;
-    //             result.collision = true;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         float sqDet = sqrt(det);
-
-    //         float t = (-b + sqDet)/(2*a);
-    //         if ( 0 <= t && t <= 1 ) {
-    //             result.closePoint.x = startX + t*dx;
-    //             result.closePoint.y = startY + t*dy;
-    //             result.closeSqDist = t*t*a;
-    //             result.farPoint = result.closePoint;
-    //             result.farSqDist = result.closeSqDist;
-    //             result.collision = true;
-    //         }
-
-    //         t = (-b - sqDet)/(2*a);
-    //         if ( 0 <= t && t <= 1 ){
-    //             result.closePoint.x = startX + t*dx;
-    //             result.closePoint.y = startY + t*dy;
-    //             result.closeSqDist = t*t*a;
-    //             if ( !result.collision ) {
-    //                 result.farPoint = result.closePoint;
-    //                 result.farSqDist = result.closeSqDist;
-    //             }
-    //             result.collision = true;
-    //         }
-    //     }
-
-    //     return result;
-    // }
-    // else
-    // {
-        // Polygon raycasting
-        poly.ComputeEdges();
-
-        sf::Vector2f p, q, r, s;
-        float minSqDist = FLT_MAX;
-        // ray segment: p + t*r, with p = start and r = end - start
-        p.x = startX;
-        p.y = startY;
-        r.x = endX - startX;
-        r.y = endY - startY;
-
-        for( int i=0; i<poly.edges.size(); i++ )
+    for( int i=0; i<poly.edges.size(); i++ )
+    {
+        // edge segment: q + u*s
+        q = poly.vertices[i];
+        s = poly.edges[i];
+        sf::Vector2f deltaQP = q - p;
+        float crossRS = crossProduct(r, s);
+        float t = crossProduct(deltaQP, s) / crossRS;
+        float u = crossProduct(deltaQP, r) / crossRS;
+        
+        if ( crossRS == 0 && crossProduct(deltaQP, r) == 0 )
         {
-            // edge segment: q + u*s
-            q = poly.vertices[i];
-            s = poly.edges[i];
-
-            sf::Vector2f deltaQP = q - p;
-            float crossRS = crossProduct(r, s);
-            float t = crossProduct(deltaQP, s) / crossRS;
-            float u = crossProduct(deltaQP, r) / crossRS;
+            // TODO Collinear
+        }
+        else if ( crossRS != 0 && 0<=t && t<=1 && 0<=u && u<=1 )
+        {
+            sf::Vector2f point = p + t*r;
             
-
-            if ( crossRS == 0 && crossProduct(deltaQP, r) == 0 )
+            float sqDist = (point.x-startX)*(point.x-startX) + (point.y-startY)*(point.y-startY);
+            if ( sqDist < minSqDist )
             {
-                // TODO Collinear
-            }
-            else if ( crossRS != 0 && 0<=t && t<=1 && 0<=u && u<=1 )
-            {
-                sf::Vector2f point = p + t*r;
-                
-                float sqDist = (point.x-startX)*(point.x-startX) + (point.y-startY)*(point.y-startY);
-                if ( sqDist < minSqDist )
-                {
-                    if ( !result.collision ){
-                        result.farPoint = point;
-                        result.farSqDist = sqDist;
-                    }
-                    minSqDist = sqDist;
-                    result.closePoint = point;
-                    result.closeSqDist = sqDist;
-                    result.collision = true;
-                }
-                else
-                {
+                if ( !result.collision ){
                     result.farPoint = point;
                     result.farSqDist = sqDist;
                 }
+                minSqDist = sqDist;
+                result.closePoint = point;
+                result.closeSqDist = sqDist;
+                result.collision = true;
+            }
+            else
+            {
+                result.farPoint = point;
+                result.farSqDist = sqDist;
             }
         }
+    }
 
-        return result;
-    // }
+    return result;
 }
 
 bool GD_API IsPointInsidePolygon(Polygon2d & poly, float x, float y)

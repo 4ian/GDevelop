@@ -1152,7 +1152,6 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
 
 /**
  * @method raycastTest
- * @static
  * @param x {Number} The raycast source X
  * @param y {Number} The raycast source Y
  * @param angle {Number} The raycast angle

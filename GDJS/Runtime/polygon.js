@@ -250,7 +250,7 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
     var s = gdjs.Polygon.raycastTest._statics.s;
     var minSqDist = Number.MAX_VALUE;
 
-    // ray segment: p + t*r, with p = start and r = end - start
+    // Ray segment: p + t*r, with p = start and r = end - start
     p[0] = startX;
     p[1] = startY;
     r[0] = endX - startX;
@@ -258,20 +258,58 @@ gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
 
     for(var i=0; i<poly.edges.length; i++)
     {
-        // edge segment: q + u*s
+        // Edge segment: q + u*s
         q[0] = poly.vertices[i][0];
         q[1] = poly.vertices[i][1];
         s[0] = poly.edges[i][0];
         s[1] = poly.edges[i][1];
-        var deltaQP = [q[0] - p[0], q[1] - p[1]];
+        var deltaQP = gdjs.Polygon.raycastTest._statics.deltaQP;
+        deltaQP[0] = q[0] - p[0];
+        deltaQP[1] = q[1] - p[1];
         var crossRS = gdjs.Polygon.crossProduct(r, s);
         var t = gdjs.Polygon.crossProduct(deltaQP, s) / crossRS;
         var u = gdjs.Polygon.crossProduct(deltaQP, r) / crossRS;
-        
-        if ( crossRS === 0 && gdjs.Polygon.crossProduct(deltaQP, r) === 0)
+
+        // Collinear
+        if ( Math.abs(crossRS) <= 0.0001 && Math.abs(gdjs.Polygon.crossProduct(deltaQP, r)) <= 0.0001 )
         {
-            // TODO Collinear
+            // Project the ray and the edge to work on floats, keeping linearity through t
+            var axis = gdjs.Polygon.raycastTest._statics.axis;
+            axis[0] = r[0];
+            axis[1] = r[1];
+            gdjs.Polygon.normalise(axis);
+            var rayA = 0;
+            var rayB = gdjs.Polygon.dotProduct(axis, r);
+            var edgeA = gdjs.Polygon.dotProduct(axis, deltaQP);
+            var edgeB = gdjs.Polygon.dotProduct(axis, [deltaQP[0] + s[0], deltaQP[1] + s[1]]);
+            // Get overlapping range
+            var minOverlap = Math.max(Math.min(rayA, rayB), Math.min(edgeA, edgeB));
+            var maxOverlap = Math.min(Math.max(rayA, rayB), Math.max(edgeA, edgeB));
+            if( minOverlap > maxOverlap ){
+                return result;
+            }
+            result.collision = true;
+            // Zero distance ray
+            if( rayB === 0 ){
+                result.closeX = startX;
+                result.closeY = startY;
+                result.closeSqDist = 0;
+                result.farX = startX;
+                result.farY = startY;
+                result.farSqDist = 0;
+            }
+            var t1 = minOverlap / Math.abs(rayB);
+            var t2 = maxOverlap / Math.abs(rayB);
+            result.closeX = startX + t1*r[0];
+            result.closeY = startY + t1*r[1];
+            result.closeSqDist = t1*t1*(r[0]*r[0] + r[1]*r[1]);
+            result.farX = startX + t2*r[0];
+            result.farY = startY + t2*r[1];
+            result.farSqDist = t2*t2*(r[0]*r[0] + r[1]*r[1]);
+
+            return result;
         }
+        // One point intersection
         else if ( crossRS !== 0 && 0<=t && t<=1 && 0<=u && u<=1 )
         {
             var x = p[0] + t*r[0];
@@ -308,6 +346,8 @@ gdjs.Polygon.raycastTest._statics = {
     q: [0,0],
     r: [0,0],
     s: [0,0],
+    deltaQP: [0,0],
+    axis: [0,0],
     result: {
         collision: false,
         closeX: 0,

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="96" major="4" minor="0" revision="137" />
+    <gdVersion build="96" major="4" minor="0" revision="140" />
     <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" packageName="com.example.gamename" projectFile="C:\Users\Maciel\Programacion\gits\GD\GDJS\tests\games\Raycast.gdg" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Project</name>
         <author></author>
@@ -381,6 +381,15 @@
                                         <parameter>500 + Random(300)</parameter>
                                         <parameter>400 + Random(200)</parameter>
                                         <parameter></parameter>
+                                    </parameters>
+                                    <subInstructions />
+                                </instruction>
+                                <instruction>
+                                    <type inverted="false" value="ChangeScaleHeight" />
+                                    <parameters>
+                                        <parameter>Line</parameter>
+                                        <parameter>=</parameter>
+                                        <parameter>0.1</parameter>
                                     </parameters>
                                     <subInstructions />
                                 </instruction>

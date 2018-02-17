@@ -862,7 +862,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     extension.AddCondition("Raycast",
                    _("Raycast"),
-                   _("Sends a ray from the given source position and angle, intersecting the closest object.\nThe instersected object will become the only one taken into account.\nIf the condition is inverted, the object to intrsect will be the farthest one within the radius."),
+                   _("Sends a ray from the given source position and angle, intersecting the closest object.\nThe instersected object will become the only one taken into account.\nIf the condition is inverted, the object to be intersected will be the farthest one within the ray radius."),
                    _("Raycast _PARAM0_ from _PARAM1_;_PARAM2_, and save the result in _PARAM5_, _PARAM6_"),
                    _("Collision"),
                    "res/conditions/raycast24.png",

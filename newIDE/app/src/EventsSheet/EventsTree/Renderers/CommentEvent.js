@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+// @flow
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
+import { type EventRendererProps } from './EventRenderer.flow'
 import { rgbToHex } from '../../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
@@ -31,33 +32,46 @@ const styles = {
   },
 };
 
-export default class CommentEvent extends Component {
-  static propTypes = {
-    event: PropTypes.object.isRequired,
-    onUpdate: PropTypes.func.isRequired,
-  };
+type State = {|
+  editing: boolean,
+  height: number,
+|};
 
+export default class CommentEvent extends React.Component<EventRendererProps, State> {
   state = {
     editing: false,
+    height: 0,
   };
 
+  _container: ?any;
+  _input: ?any;
+
   edit = () => {
+    if (!this._container) return;
+
     this.setState(
       {
         editing: true,
         height: this._container.offsetHeight,
       },
       () => {
-        const input = ReactDOM.findDOMNode(this._input);
-        input.focus();
-        input.value = gd.asCommentEvent(this.props.event).getComment();
+        // $FlowFixMe
+        const input: ?HTMLInputElement = ReactDOM.findDOMNode(this._input);
+        if (input) {
+          input.focus();
+          input.value = gd.asCommentEvent(this.props.event).getComment();
+        }
       }
     );
   };
 
   endEditing = () => {
     const commentEvent = gd.asCommentEvent(this.props.event);
-    commentEvent.setComment(ReactDOM.findDOMNode(this._input).value);
+
+    // $FlowFixMe
+    const input: ?HTMLInputElement = ReactDOM.findDOMNode(this._input);
+    if (input) commentEvent.setComment(input.value);
+
     this.setState(
       {
         editing: false,

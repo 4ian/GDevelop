@@ -40,7 +40,7 @@ class EventContainer extends Component {
   };
 
   render() {
-    const { event, project, layout } = this.props;
+    const { event, project, layout, disabled } = this.props;
     const EventComponent = EventsRenderingService.getEventComponent(event);
 
     return (
@@ -68,6 +68,9 @@ class EventContainer extends Component {
             onParameterClick={this.props.onParameterClick}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
             onOpenLayout={this.props.onOpenLayout}
+            disabled={
+              disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
+            }
           />
         )}
       </div>
@@ -140,10 +143,17 @@ export default class ThemableEventsTree extends Component {
     );
   }
 
-  _eventsToTreeData = (eventsList, flatData = [], depth = 0) => {
+  _eventsToTreeData = (
+    eventsList,
+    flatData = [],
+    depth = 0,
+    parentDisabled = false
+  ) => {
     const treeData = mapFor(0, eventsList.getEventsCount(), i => {
       const event = eventsList.getEventAt(i);
       flatData.push(event);
+
+      const disabled = parentDisabled || event.isDisabled();
 
       return {
         title: this._renderEvent,
@@ -151,6 +161,7 @@ export default class ThemableEventsTree extends Component {
         eventsList,
         indexInList: i,
         expanded: !event.isFolded(),
+        disabled,
         depth,
         key: event.ptr, //TODO: useless?
         children: this._eventsToTreeData(
@@ -158,7 +169,8 @@ export default class ThemableEventsTree extends Component {
           // flatData is a flat representation of events, one for each line.
           // Hence it should not contain the folded events.
           !event.isFolded() ? flatData : [],
-          depth + 1
+          depth + 1,
+          disabled
         ).treeData,
       };
     });
@@ -212,7 +224,7 @@ export default class ThemableEventsTree extends Component {
   };
 
   _renderEvent = ({ node }) => {
-    const { event, depth } = node;
+    const { event, depth, disabled } = node;
 
     return (
       <EventContainer
@@ -233,6 +245,9 @@ export default class ThemableEventsTree extends Component {
         onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
         onOpenExternalEvents={this.props.onOpenExternalEvents}
         onOpenLayout={this.props.onOpenLayout}
+        disabled={
+          disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
+        }
       />
     );
   };

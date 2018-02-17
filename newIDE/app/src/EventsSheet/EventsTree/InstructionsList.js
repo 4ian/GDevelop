@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+// @flow
+import * as React from 'react';
 import Instruction from './Instruction';
 import { mapFor } from '../../Utils/MapFor';
 import { isInstructionSelected } from '../SelectionHandler';
@@ -11,20 +11,42 @@ const styles = {
   },
 };
 
-export default class InstructionsList extends Component {
-  static propTypes = {
-    instrsList: PropTypes.object.isRequired,
-    areConditions: PropTypes.bool.isRequired,
-    onAddNewInstruction: PropTypes.func.isRequired,
-    onInstructionClick: PropTypes.func.isRequired,
-    onInstructionDoubleClick: PropTypes.func.isRequired,
-    onInstructionContextMenu: PropTypes.func.isRequired,
-    onInstructionsListContextMenu: PropTypes.func.isRequired,
-    onParameterClick: PropTypes.func.isRequired,
-    selection: PropTypes.object.isRequired,
-    addButtonLabel: PropTypes.string,
-  };
+export type InstructionsListContext = {
+  instrsList: gdInstructionsList,
+  isCondition: boolean,
+};
 
+export type InstructionContext = InstructionsListContext & {
+  instruction: gdInstruction,
+  indexInList: number,
+};
+
+export type ParameterContext = InstructionContext & {
+  parameterIndex: number,
+  domEvent: any,
+};
+
+type Props = {
+  instrsList: gdInstructionsList,
+  areConditions: boolean,
+  onAddNewInstruction: InstructionsListContext => void,
+  onInstructionClick: InstructionContext => void,
+  onInstructionDoubleClick: InstructionContext => void,
+  onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
+  onInstructionsListContextMenu: (
+    x: number,
+    y: number,
+    InstructionsListContext
+  ) => void,
+  onParameterClick: ParameterContext => void,
+  selection: any,
+  addButtonLabel?: string,
+  extraClassName?: string,
+  style?: Object,
+  disabled: boolean,
+};
+
+export default class InstructionsList extends React.Component<Props, *> {
   onAddNewInstruction = () => {
     if (this.props.onAddNewInstruction)
       this.props.onAddNewInstruction({
@@ -47,6 +69,7 @@ export default class InstructionsList extends Component {
       onParameterClick,
       selection,
       style,
+      disabled,
     } = this.props;
 
     const instructions = mapFor(0, instrsList.size(), i => {
@@ -67,8 +90,7 @@ export default class InstructionsList extends Component {
           key={instruction.ptr}
           selected={isInstructionSelected(selection, instruction)}
           onClick={() => onInstructionClick(instructionContext)}
-          onDoubleClick={() =>
-            onInstructionDoubleClick(instructionContext)}
+          onDoubleClick={() => onInstructionDoubleClick(instructionContext)}
           onContextMenu={(x, y) =>
             onInstructionContextMenu(x, y, instructionContext)}
           onParameterClick={(domEvent, parameterIndex) =>
@@ -82,10 +104,9 @@ export default class InstructionsList extends Component {
           onSubInstructionClick={onInstructionClick}
           onSubInstructionDoubleClick={onInstructionDoubleClick}
           onSubInstructionContextMenu={onInstructionContextMenu}
-          onSubInstructionsListContextMenu={
-            onInstructionsListContextMenu
-          }
+          onSubInstructionsListContextMenu={onInstructionsListContextMenu}
           onSubParameterClick={onParameterClick}
+          disabled={disabled}
         />
       );
     });

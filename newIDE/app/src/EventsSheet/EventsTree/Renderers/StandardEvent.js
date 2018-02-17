@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import InstructionsList from '../InstructionsList';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
   largeSelectableArea,
   executableEventContainer,
 } from '../ClassNames';
+import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
 
 const styles = {
@@ -18,18 +19,10 @@ const styles = {
   },
 };
 
-export default class StandardEvent extends Component {
-  static propTypes = {
-    event: PropTypes.object.isRequired,
-    onAddNewInstruction: PropTypes.func.isRequired,
-    onInstructionClick: PropTypes.func.isRequired,
-    onInstructionDoubleClick: PropTypes.func.isRequired,
-    onInstructionContextMenu: PropTypes.func.isRequired,
-    onInstructionsListContextMenu: PropTypes.func.isRequired,
-    onParameterClick: PropTypes.func.isRequired,
-    selection: PropTypes.object.isRequired,
-  };
-
+export default class StandardEvent extends React.Component<
+  EventRendererProps,
+  *
+> {
   render() {
     var standardEvent = gd.asStandardEvent(this.props.event);
 
@@ -59,6 +52,7 @@ export default class StandardEvent extends Component {
             this.props.onInstructionsListContextMenu
           }
           onParameterClick={this.props.onParameterClick}
+          disabled={this.props.disabled}
         />
         <InstructionsList
           instrsList={standardEvent.getActions()}
@@ -73,6 +67,7 @@ export default class StandardEvent extends Component {
             this.props.onInstructionsListContextMenu
           }
           onParameterClick={this.props.onParameterClick}
+          disabled={this.props.disabled}
         />
       </div>
     );

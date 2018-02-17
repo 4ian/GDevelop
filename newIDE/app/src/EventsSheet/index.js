@@ -296,6 +296,13 @@ export default class EventsSheet extends Component {
     });
   };
 
+  toggleDisabled = () => {
+    getSelectedEvents(this.state.selection).forEach(event =>
+      event.setDisabled(!event.isDisabled())
+    );
+    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
+  }
+
   deleteSelection = () => {
     const { events } = this.props;
     const eventsRemover = new gd.EventsRemover();
@@ -528,6 +535,10 @@ export default class EventsSheet extends Component {
               accelerator: 'CmdOrCtrl+V',
             },
             { type: 'separator' },
+            {
+              label: 'Toggle disabled',
+              click: () => this.toggleDisabled(),
+            },
             {
               label: 'Delete',
               click: () => this.deleteSelection(),

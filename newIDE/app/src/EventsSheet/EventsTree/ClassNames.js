@@ -1,3 +1,4 @@
+// @flow
 export const selectableArea = 'selectable';
 export const selectedArea = 'selected';
 
@@ -9,6 +10,7 @@ export const actionsContainer = 'actions-container';
 export const conditionsContainer = 'conditions-container';
 export const subInstructionsContainer = 'sub-instructions-container';
 export const instructionParameter = 'instruction-parameter';
+export const disabledText = 'disabled-text';
 
 export const background = 'background';
 

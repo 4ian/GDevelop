@@ -125,3 +125,11 @@
     box-sizing: border-box;
     border: 1px transparent solid;
 }
+
+/**
+ * Disabled text
+ */
+.gd-events-sheet .disabled-text {
+    text-decoration: line-through;
+    opacity: 0.6;
+}

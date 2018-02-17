@@ -1,15 +1,17 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import InstructionsList from '../InstructionsList.js';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
   executableEventContainer,
+  disabledText,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import DefaultField from '../../InstructionEditor/ParameterFields/DefaultField';
+import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
 
 const styles = {
@@ -25,29 +27,13 @@ const styles = {
   },
 };
 
-export default class RepeatEvent extends Component {
-  static propTypes = {
-    event: PropTypes.object.isRequired,
-    onAddNewInstruction: PropTypes.func.isRequired,
-    onInstructionClick: PropTypes.func.isRequired,
-    onInstructionDoubleClick: PropTypes.func.isRequired,
-    onInstructionContextMenu: PropTypes.func.isRequired,
-    onInstructionsListContextMenu: PropTypes.func.isRequired,
-    onParameterClick: PropTypes.func.isRequired,
-    selection: PropTypes.object.isRequired,
-    onUpdate: PropTypes.func.isRequired,
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
+export default class RepeatEvent extends React.Component<EventRendererProps, *> {
+state = {
       editing: false,
       anchorEl: null,
     };
-  }
 
-  edit = domEvent => {
+  edit = (domEvent: any) => {
     this.setState({
       editing: true,
       anchorEl: domEvent.currentTarget,
@@ -81,6 +67,7 @@ export default class RepeatEvent extends Component {
         <div
           className={classNames({
             [selectableArea]: true,
+            [disabledText]: this.props.disabled,
           })}
           onClick={this.edit}
         >
@@ -104,6 +91,7 @@ export default class RepeatEvent extends Component {
               this.props.onInstructionsListContextMenu
             }
             onParameterClick={this.props.onParameterClick}
+            disabled={this.props.disabled}
           />
           <InstructionsList
             instrsList={repeatEvent.getActions()}
@@ -118,6 +106,7 @@ export default class RepeatEvent extends Component {
               this.props.onInstructionsListContextMenu
             }
             onParameterClick={this.props.onParameterClick}
+            disabled={this.props.disabled}
           />
         </div>
         <InlinePopover

@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+// @flow
+import * as React from 'react';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import IconButton from 'material-ui/IconButton';
 import classNames from 'classnames';
@@ -11,6 +11,7 @@ import {
 import InlinePopover from '../../InlinePopover';
 import ExternalEventsField from '../../InstructionEditor/ParameterFields/ExternalEventsField';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
+import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
 
 const styles = {
@@ -25,23 +26,15 @@ const styles = {
   },
 };
 
-export default class LinkEvent extends Component {
-  static propTypes = {
-    event: PropTypes.object.isRequired,
-  };
-
+export default class LinkEvent extends React.Component<EventRendererProps, *> {
   _externalEventsField = null;
 
-  constructor(props) {
-    super(props);
+  state = {
+    editing: false,
+    anchorEl: null,
+  };
 
-    this.state = {
-      editing: false,
-      anchorEl: null,
-    };
-  }
-
-  edit = domEvent => {
+  edit = (domEvent: any) => {
     this.setState(
       {
         editing: true,

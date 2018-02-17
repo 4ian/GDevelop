@@ -15,5 +15,9 @@ declare type gdInitialInstance = EmscriptenObject;
 declare type gdBaseEvent = EmscriptenObject;
 declare type gdResource = EmscriptenObject;
 
+declare type gdInstruction = EmscriptenObject;
+declare type gdInstructionMetadata = EmscriptenObject;
+declare type gdInstructionsList = EmscriptenObject;
+
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = EmscriptenObject;

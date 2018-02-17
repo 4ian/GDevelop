@@ -1172,10 +1172,9 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist, closest) 
 
     if ( Math.sqrt(diffX*diffX + diffY*diffY) > boundingRadius + dist )
         return result;
-
     
-    var endX = x + dist*Math.cos(angle*3.14159/180.0);
-    var endY = y + dist*Math.sin(angle*3.14159/180.0);
+    var endX = x + dist*Math.cos(angle*Math.PI/180.0);
+    var endY = y + dist*Math.sin(angle*Math.PI/180.0);
     var testSqDist = closest ? dist*dist : 0;
 
     var hitBoxes = this.getHitBoxes();

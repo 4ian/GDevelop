@@ -60,7 +60,7 @@ export default class AboutDialog extends Component<Props, *> {
       <FlatButton
         label="GDevelop Website"
         primary={false}
-        onClick={() => Window.openExternalURL('http://compilgames.net')}
+        onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
       />,
       <FlatButton label="Close" primary={false} onClick={onClose} />,
     ];

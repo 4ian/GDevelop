@@ -35,7 +35,7 @@ export default class BrowserSaveDialog extends Component {
       <FlatButton
         label="Download GDevelop desktop version"
         primary={false}
-        onClick={() => Window.openExternalURL('http://compilgames.net')}
+        onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
       />,
       <FlatButton label="Close" primary={false} onClick={onClose} />,
     ];

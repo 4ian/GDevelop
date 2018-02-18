@@ -5,7 +5,7 @@
   "version": "5.0.0-beta25",
   "author": "Florian Rival",
   "license": "MIT",
-  "homepage": "http://compilgames.net",
+  "homepage": "http://gdevelop-app.com",
   "main": "main.js",
   "dependencies": {
     "archiver": "^2.1.1",

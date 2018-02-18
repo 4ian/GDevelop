@@ -5,7 +5,7 @@ import Window from '../../Utils/Window';
 
 export default class BrowserExport extends Component {
   openWebsite = () => {
-    Window.openExternalURL('http://compilgames.net');
+    Window.openExternalURL('http://gdevelop-app.com');
   };
 
   render() {

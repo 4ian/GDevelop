@@ -18,6 +18,7 @@ export default class LocalPreviewLauncher {
       width: project.getMainWindowDefaultWidth(),
       height: project.getMainWindowDefaultHeight(),
       title: `Preview of ${project.getName()}`,
+      backgroundColor: '#000000',
     });
     win.loadURL(`file://${gamePath}/index.html`);
   };

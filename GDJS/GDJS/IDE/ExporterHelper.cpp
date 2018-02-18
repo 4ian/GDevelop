@@ -58,9 +58,10 @@ static void GenerateFontsDeclaration(gd::AbstractFileSystem & fs, const gd::Stri
         css += urlPrefix + relativeFile;
         css +="') format('truetype'); }";
 
+        // Use the font for a dummy text to trigger immediate load of the font at game startup
         html += "<div style=\"font-family: 'gdjs_font_";
         html += relativeFile;
-        html += "';\">.</div>";
+        html += "'; color: black;\">.</div>";
     }
 }
 
@@ -369,6 +370,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project & project, gd::String outputDi
     //First, do not forget common includes (they must be included before events generated code files).
     InsertUnique(includesFiles, "libs/jshashtable.js");
     InsertUnique(includesFiles, "gd.js");
+    InsertUnique(includesFiles, "gd-splash-image.js");
     InsertUnique(includesFiles, "libs/hshg.js");
     InsertUnique(includesFiles, "libs/rbush.js");
     InsertUnique(includesFiles, "inputmanager.js");

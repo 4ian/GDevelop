@@ -13,3 +13,7 @@ gdjs.LoadingScreenRenderer = gdjs.LoadingScreenCocosRenderer; //Register the cla
 gdjs.LoadingScreenCocosRenderer.prototype.render = function(percent) {
     console.log("Loading " + percent + "%");
 };
+
+gdjs.LoadingScreenCocosRenderer.prototype.unload = function() {
+    // Nothing to do
+};

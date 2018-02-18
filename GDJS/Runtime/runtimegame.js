@@ -249,6 +249,7 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
             loadingScreen.render(Math.floor((allAssetsTotal - total + count)
                 / allAssetsTotal * 100));
         }, function() {
+            loadingScreen.unload();
             callback();
         });
     });

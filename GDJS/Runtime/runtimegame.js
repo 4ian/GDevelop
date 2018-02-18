@@ -13,38 +13,44 @@
  * @param data The object (usually stored in data.json) containing the full project data
  * @param spec Optional object for specifiying additional options: {forceFullscreen: ...}
  */
-gdjs.RuntimeGame = function(data, spec)
-{
-    spec = spec || {};
+gdjs.RuntimeGame = function(data, spec) {
+  spec = spec || {};
 
-    this._variables = new gdjs.VariablesContainer(data.variables);
-    this._data = data;
-    this._imageManager = new gdjs.ImageManager(data.resources ? data.resources.resources : undefined);
-    this._soundManager = new gdjs.SoundManager(data.resources ? data.resources.resources : undefined);
-    this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
+  this._variables = new gdjs.VariablesContainer(data.variables);
+  this._data = data;
+  this._imageManager = new gdjs.ImageManager(
+    data.resources ? data.resources.resources : undefined
+  );
+  this._soundManager = new gdjs.SoundManager(
+    data.resources ? data.resources.resources : undefined
+  );
+  this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
-    this._defaultWidth = data.properties.windowWidth; //Default size for scenes cameras
-    this._defaultHeight = data.properties.windowHeight;
-    this._originalWidth = data.properties.windowWidth; //Original size of the game, won't be changed.
-    this._originalHeight = data.properties.windowHeight;
-    this._renderer = new gdjs.RuntimeGameRenderer(this,
-        this._defaultWidth, this._defaultHeight,
-        spec.forceFullscreen || false);
+  this._defaultWidth = data.properties.windowWidth; //Default size for scenes cameras
+  this._defaultHeight = data.properties.windowHeight;
+  this._originalWidth = data.properties.windowWidth; //Original size of the game, won't be changed.
+  this._originalHeight = data.properties.windowHeight;
+  this._renderer = new gdjs.RuntimeGameRenderer(
+    this,
+    this._defaultWidth,
+    this._defaultHeight,
+    spec.forceFullscreen || false
+  );
 
-    //Game loop management (see startGameLoop method)
-    this._sceneStack = new gdjs.SceneStack(this);
-    this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
+  //Game loop management (see startGameLoop method)
+  this._sceneStack = new gdjs.SceneStack(this);
+  this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
 
-    //Inputs :
-    this._inputManager = new gdjs.InputManager();
+  //Inputs :
+  this._inputManager = new gdjs.InputManager();
 
-    //Allow to specify an external layout to insert in the first scene:
-    this._injectExternalLayout = spec.injectExternalLayout || "";
+  //Allow to specify an external layout to insert in the first scene:
+  this._injectExternalLayout = spec.injectExternalLayout || '';
 };
 
 gdjs.RuntimeGame.prototype.getRenderer = function() {
-    return this._renderer;
-}
+  return this._renderer;
+};
 
 /**
  * Get the variables of the RuntimeGame.
@@ -52,7 +58,7 @@ gdjs.RuntimeGame.prototype.getRenderer = function() {
  * @return a variablesContainer object.
  */
 gdjs.RuntimeGame.prototype.getVariables = function() {
-	return this._variables;
+  return this._variables;
 };
 
 /**
@@ -61,7 +67,7 @@ gdjs.RuntimeGame.prototype.getVariables = function() {
  * @return {gdjs.SoundManager} The sound manager.
  */
 gdjs.RuntimeGame.prototype.getSoundManager = function() {
-    return this._soundManager;
+  return this._soundManager;
 };
 
 /**
@@ -70,7 +76,7 @@ gdjs.RuntimeGame.prototype.getSoundManager = function() {
  * @return {gdjs.ImageManager} The image manager.
  */
 gdjs.RuntimeGame.prototype.getImageManager = function() {
-	return this._imageManager;
+  return this._imageManager;
 };
 
 /**
@@ -79,7 +85,7 @@ gdjs.RuntimeGame.prototype.getImageManager = function() {
  * @return The input manager owned by the game
  */
 gdjs.RuntimeGame.prototype.getInputManager = function() {
-    return this._inputManager;
+  return this._inputManager;
 };
 
 /**
@@ -88,7 +94,7 @@ gdjs.RuntimeGame.prototype.getInputManager = function() {
  * @return The object associated to the game.
  */
 gdjs.RuntimeGame.prototype.getGameData = function() {
-	return this._data;
+  return this._data;
 };
 
 /**
@@ -99,20 +105,20 @@ gdjs.RuntimeGame.prototype.getGameData = function() {
  * @return The data associated to the scene.
  */
 gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
-	var scene = undefined;
-	for(var i = 0, len = this._data.layouts.length;i<len;++i) {
-		var sceneData = this._data.layouts[i];
+  var scene = undefined;
+  for (var i = 0, len = this._data.layouts.length; i < len; ++i) {
+    var sceneData = this._data.layouts[i];
 
-		if ( sceneName === undefined || sceneData.name === sceneName ) {
-			scene = sceneData;
-			break;
-		}
-	}
+    if (sceneName === undefined || sceneData.name === sceneName) {
+      scene = sceneData;
+      break;
+    }
+  }
 
-	if ( scene === undefined )
-		console.warn("The game has no scene called \""+sceneName+"\"");
+  if (scene === undefined)
+    console.warn('The game has no scene called "' + sceneName + '"');
 
-	return scene;
+  return scene;
 };
 
 /**
@@ -123,17 +129,17 @@ gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
  * @return true if the scene exists. If sceneName is undefined, true if the game has a scene.
  */
 gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
-	var isTrue = false;
-	for(var i = 0, len = this._data.layouts.length;i<len;++i) {
-		var sceneData = this._data.layouts[i];
+  var isTrue = false;
+  for (var i = 0, len = this._data.layouts.length; i < len; ++i) {
+    var sceneData = this._data.layouts[i];
 
-		if ( sceneName === undefined || sceneData.name == sceneName ) {
-			isTrue = true;
-			break;
-		}
-	}
+    if (sceneName === undefined || sceneData.name == sceneName) {
+      isTrue = true;
+      break;
+    }
+  }
 
-	return isTrue;
+  return isTrue;
 };
 
 /**
@@ -144,17 +150,17 @@ gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
  * @return The data associated to the external layout or null if not found.
  */
 gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
-    var externalLayout = null;
-	for(var i = 0, len = this._data.externalLayouts.length;i<len;++i) {
-		var layoutData = this._data.externalLayouts[i];
+  var externalLayout = null;
+  for (var i = 0, len = this._data.externalLayouts.length; i < len; ++i) {
+    var layoutData = this._data.externalLayouts[i];
 
-        if ( layoutData.name === name ) {
-            externalLayout = layoutData;
-            break;
-        }
+    if (layoutData.name === name) {
+      externalLayout = layoutData;
+      break;
     }
+  }
 
-    return externalLayout;
+  return externalLayout;
 };
 
 /**
@@ -163,7 +169,7 @@ gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
  * @return The data associated to the global objects.
  */
 gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
-	return this._data.objects || [];
+  return this._data.objects || [];
 };
 
 /**
@@ -173,7 +179,7 @@ gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
  * @method getOriginalWidth
  */
 gdjs.RuntimeGame.prototype.getOriginalWidth = function() {
-    return this._originalWidth;
+  return this._originalWidth;
 };
 
 /**
@@ -183,7 +189,7 @@ gdjs.RuntimeGame.prototype.getOriginalWidth = function() {
  * @method getOriginalHeight
  */
 gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
-    return this._originalHeight;
+  return this._originalHeight;
 };
 
 /**
@@ -192,7 +198,7 @@ gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
  * @method getDefaultWidth
  */
 gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
-    return this._defaultWidth;
+  return this._defaultWidth;
 };
 
 /**
@@ -201,7 +207,7 @@ gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
  * @method getDefaultHeight
  */
 gdjs.RuntimeGame.prototype.getDefaultHeight = function() {
-    return this._defaultHeight;
+  return this._defaultHeight;
 };
 
 /**
@@ -211,7 +217,7 @@ gdjs.RuntimeGame.prototype.getDefaultHeight = function() {
  * @param width {Number} The new default width
  */
 gdjs.RuntimeGame.prototype.setDefaultWidth = function(width) {
-    this._defaultWidth = width;
+  this._defaultWidth = width;
 };
 
 /**
@@ -221,7 +227,7 @@ gdjs.RuntimeGame.prototype.setDefaultWidth = function(width) {
  * @param height {Number} The new default height
  */
 gdjs.RuntimeGame.prototype.setDefaultHeight = function(height) {
-    this._defaultHeight = height;
+  this._defaultHeight = height;
 };
 
 /**
@@ -230,7 +236,7 @@ gdjs.RuntimeGame.prototype.setDefaultHeight = function(height) {
  * @method getMinimalFramerate
  */
 gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
-	return this._minFPS;
+  return this._minFPS;
 };
 
 /**
@@ -238,61 +244,73 @@ gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
  * @method loadAllAssets
  */
 gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
-    var loadingScreen = new gdjs.LoadingScreenRenderer(this.getRenderer());
-    var allAssetsTotal = this._data.resources.resources.length;
+  var loadingScreen = new gdjs.LoadingScreenRenderer(
+    this.getRenderer(),
+    this._data.properties.loadingScreen
+  );
+  var allAssetsTotal = this._data.resources.resources.length;
 
-    var that = this;
-    this._imageManager.loadTextures(function (count, total) {
-        loadingScreen.render(Math.floor(count / allAssetsTotal * 100));
-    }, function() {
-        that._soundManager.preloadAudio(function (count, total) {
-            loadingScreen.render(Math.floor((allAssetsTotal - total + count)
-                / allAssetsTotal * 100));
-        }, function() {
-            loadingScreen.unload();
-            callback();
-        });
-    });
+  var that = this;
+  this._imageManager.loadTextures(
+    function(count, total) {
+      loadingScreen.render(Math.floor(count / allAssetsTotal * 100));
+    },
+    function() {
+      that._soundManager.preloadAudio(
+        function(count, total) {
+          loadingScreen.render(
+            Math.floor((allAssetsTotal - total + count) / allAssetsTotal * 100)
+          );
+        },
+        function() {
+          loadingScreen.unload();
+          callback();
+        }
+      );
+    }
+  );
 };
 
 gdjs.RuntimeGame.prototype.startGameLoop = function() {
-    if ( !this.hasScene() ) {
-        console.log("The game has no scene.");
-        return;
+  if (!this.hasScene()) {
+    console.log('The game has no scene.');
+    return;
+  }
+
+  //Load the first scene
+  var firstSceneName = gdjs.projectData.firstLayout;
+  this._sceneStack.push(
+    this.hasScene(firstSceneName) ? firstSceneName : this.getSceneData().name,
+    this._injectExternalLayout
+  );
+
+  //Uncomment to profile the first x frames of the game.
+  // var x = 500;
+  // var startTime = Date.now();
+  // console.profile("Stepping for " + x + " frames")
+  // for(var i = 0; i < x; ++i) {
+  //     this._sceneStack.step(16);
+  // }
+  // console.profileEnd();
+  // var time = Date.now() - startTime;
+  // console.log("Took", time, "ms");
+  // return;
+
+  //The standard game loop
+  var that = this;
+  this._renderer.startGameLoop(function(elapsedTime) {
+    //Manage resize events.
+    if (that._notifySceneForResize) {
+      that._sceneStack.onRendererResized();
+      that._notifySceneForResize = false;
     }
 
-    //Load the first scene
-    var firstSceneName = gdjs.projectData.firstLayout;
-    this._sceneStack.push(this.hasScene(firstSceneName) ? firstSceneName : this.getSceneData().name,
-        this._injectExternalLayout);
+    //Render and step the scene.
+    if (that._sceneStack.step(elapsedTime)) {
+      that.getInputManager().onFrameEnded();
+      return true;
+    }
 
-    //Uncomment to profile the first x frames of the game.
-    // var x = 500;
-    // var startTime = Date.now();
-    // console.profile("Stepping for " + x + " frames")
-    // for(var i = 0; i < x; ++i) {
-    //     this._sceneStack.step(16);
-    // }
-    // console.profileEnd();
-    // var time = Date.now() - startTime;
-    // console.log("Took", time, "ms");
-    // return;
-
-    //The standard game loop
-    var that = this;
-    this._renderer.startGameLoop(function(elapsedTime) {
-        //Manage resize events.
-        if (that._notifySceneForResize) {
-            that._sceneStack.onRendererResized();
-            that._notifySceneForResize = false;
-        }
-
-        //Render and step the scene.
-        if (that._sceneStack.step(elapsedTime)) {
-            that.getInputManager().onFrameEnded();
-            return true;
-        }
-
-        return false;
-    });
+    return false;
+  });
 };

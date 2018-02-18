@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-gdjs.LoadingScreenCocosRenderer = function(runtimeGamePixiRenderer)
+gdjs.LoadingScreenCocosRenderer = function(runtimeGamePixiRenderer, loadingScreenSetup)
 {
 }
 

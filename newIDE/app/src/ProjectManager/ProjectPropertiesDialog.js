@@ -2,6 +2,7 @@
 import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Dialog from '../UI/Dialog';
@@ -20,6 +21,7 @@ type State = {|
   author: string,
   packageName: string,
   orientation: string,
+  showGDevelopSplash: boolean,
 |};
 
 export default class ProjectPropertiesDialog extends React.Component<
@@ -39,6 +41,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       author: project.getAuthor(),
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
+      showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
     };
   }
 
@@ -60,6 +63,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       author,
       packageName,
       orientation,
+      showGDevelopSplash,
     } = this.state;
     project.setDefaultWidth(windowDefaultWidth);
     project.setDefaultHeight(windowDefaultHeight);
@@ -67,6 +71,7 @@ export default class ProjectPropertiesDialog extends React.Component<
     project.setAuthor(author);
     project.setPackageName(packageName);
     project.setOrientation(orientation);
+    project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
 
     this.props.onApply();
   };
@@ -92,6 +97,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       author,
       packageName,
       orientation,
+      showGDevelopSplash,
     } = this.state;
 
     return (
@@ -148,12 +154,21 @@ export default class ProjectPropertiesDialog extends React.Component<
           fullWidth
           floatingLabelText="Device orientation (for iOS and Android)"
           value={orientation}
-          onChange={(e, i, value) => this.setState({orientation: value})}
+          onChange={(e, i, value) => this.setState({ orientation: value })}
         >
           <MenuItem value="default" primaryText="Platform default" />
           <MenuItem value="landscape" primaryText="Landscape" />
           <MenuItem value="portrait" primaryText="Portrait" />
         </SelectField>
+        <Checkbox
+          label="Display GDevelop splash at startup (in exported game)"
+          checked={showGDevelopSplash}
+          onCheck={(e, checked) => {
+            this.setState({
+              showGDevelopSplash: checked,
+            });
+          }}
+        />
       </Dialog>
     );
   }

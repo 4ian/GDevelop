@@ -1,4 +1,4 @@
-gdjs.LoadingScreenPixiRenderer = function(runtimeGamePixiRenderer) {
+gdjs.LoadingScreenPixiRenderer = function(runtimeGamePixiRenderer, loadingScreenSetup) {
   this._pixiRenderer = runtimeGamePixiRenderer.getPIXIRenderer();
   this._loadingScreen = new PIXI.Container();
 
@@ -9,7 +9,7 @@ gdjs.LoadingScreenPixiRenderer = function(runtimeGamePixiRenderer) {
   });
   this._loadingScreen.addChild(this._progressText);
 
-  if (true) {
+  if (loadingScreenSetup && loadingScreenSetup.showGDevelopSplash) {
     this._madeWithText = new PIXI.Text('Made with', {
       font: '30px Arial',
       fill: '#FFFFFF',

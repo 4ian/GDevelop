@@ -80,6 +80,9 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project & project, gd::Layou
 
     gd::Project exportedProject = project;
 
+    // Always disable the splash for preview
+    exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
+
     //Export resources (*before* generating events as some resources filenames may be updated)
     ExportResources(fs, exportedProject, exportDir);
     //Generate events code

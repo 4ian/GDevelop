@@ -12,6 +12,11 @@ const {
   uploadGameFolderToBucket,
   uploadArchiveToBucket,
 } = require('./S3Upload');
+const {
+  serveFolder,
+  stopServer,
+  getLocalNetworkIps,
+} = require('./ServeFolder');
 const { buildMainMenuFor } = require('./MainMenu');
 const throttle = require('lodash.throttle');
 
@@ -96,6 +101,7 @@ app.on('ready', function() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
+    stopServer(() => {});
   });
 
   ipcMain.on('s3-folder-upload', (event, localDir) => {
@@ -124,6 +130,31 @@ app.on('ready', function() {
         event.sender.send('s3-file-upload-done', err, prefix);
       }
     );
+  });
+
+  ipcMain.on('serve-folder', (event, options) => {
+    log.info('Received event to server folder with options=', options);
+
+    serveFolder(
+      options,
+      (err) => {
+        event.sender.send('serve-folder-done', err);
+      }
+    );
+  });
+
+  ipcMain.on('stop-server', (event) => {
+    log.info('Received event to stop server');
+
+    stopServer(
+      (err) => {
+        event.sender.send('stop-server-done', err);
+      }
+    );
+  });
+
+  ipcMain.on('get-local-network-ips', (event) => {
+    event.sender.send('local-network-ips', getLocalNetworkIps());
   });
 
   // This will immediately download an update, then install when the

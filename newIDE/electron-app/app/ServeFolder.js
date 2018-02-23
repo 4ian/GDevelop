@@ -1,29 +1,59 @@
-const serve = require('serve');
+const liveServer = require('live-server');
 const ip = require('ip');
-var os = require('os');
+const os = require('os');
+const net = require('net');
 
-let server = null;
+let currentServerParams = null;
+
+const getAvailablePort = startingAt => {
+  const getNextAvailablePort = (currentPort, cb) => {
+    const server = net.createServer();
+    server.listen(currentPort, () => {
+      server.once('close', () => {
+        cb(currentPort);
+      });
+      server.close();
+    });
+    server.on('error', () => {
+      getNextAvailablePort(++currentPort, cb);
+    });
+  };
+
+  return new Promise(resolve => {
+    getNextAvailablePort(startingAt, resolve);
+  });
+};
 
 module.exports = {
   /**
    * Start a server to serve a folder
    */
-  serveFolder: ({ localDir, port }, onDone) => {
-    if (server) server.stop();
+  serveFolder: ({ root }, onDone) => {
+    if (currentServerParams && currentServerParams.root === root)
+    {
+      onDone(null, currentServerParams);
+      return;
+    }
 
-    server = serve(localDir, {
-      port: port,
-      clipless: true,
-    });
-    onDone();
+    liveServer.shutdown();
+    getAvailablePort(2929).then(port => {
+      currentServerParams = {
+        port,
+        root,
+        open: false,
+        wait: 1000,
+      };
+      liveServer.start(currentServerParams);
+      onDone(null, currentServerParams);
+    }, err => onDone(err));
   },
 
   /**
    * Stop any running server
    */
   stopServer: onDone => {
-    if (server) server.stop();
-    server = null;
+    liveServer.shutdown();
+    currentServerParams = null;
 
     onDone();
   },

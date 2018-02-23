@@ -16,6 +16,7 @@ import LocalExport from '../Export/LocalExporters/LocalExport';
 import LocalCordovaExport from '../Export/LocalExporters/LocalCordovaExport';
 import Progress from '../Export/LocalExporters/LocalOnlineCordovaExport/Progress';
 import LocalS3Export from '../Export/LocalExporters/LocalS3Export';
+import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
@@ -645,5 +646,20 @@ storiesOf('LoginDialog', module)
       createAccountInProgress={false}
       resetPasswordDialogOpen
       resetError={{ code: 'auth/invalid-action-code' }}
+    />
+  ));
+
+storiesOf('LocalNetworkPreviewDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LocalNetworkPreviewDialog open url="192.168.0.1:2929" />
+  ))
+  .add('waiting for url', () => <LocalNetworkPreviewDialog open />)
+  .add('error', () => (
+    <LocalNetworkPreviewDialog
+      open
+      url="192.168.0.1:2929"
+      error={{ message: 'Oops' }}
     />
   ));

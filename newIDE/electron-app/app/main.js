@@ -137,8 +137,8 @@ app.on('ready', function() {
 
     serveFolder(
       options,
-      (err) => {
-        event.sender.send('serve-folder-done', err);
+      (err, serverParams) => {
+        event.sender.send('serve-folder-done', err, serverParams);
       }
     );
   });

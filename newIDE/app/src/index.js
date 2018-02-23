@@ -7,7 +7,10 @@ import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import Authentification from './Utils/GDevelopServices/Authentification';
-import { sendProgramOpening, installAnalyticsEvents } from './Utils/Analytics/EventSender';
+import {
+  sendProgramOpening,
+  installAnalyticsEvents,
+} from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { installFullstory } from './Utils/Analytics/Fullstory';
 import { unregister } from './registerServiceWorker';
@@ -36,7 +39,6 @@ import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import LocalIntroDialog from './MainFrame/LocalIntroDialog';
 const electron = optionalRequire('electron');
 
-
 const authentification = new Authentification();
 installAnalyticsEvents(authentification);
 installRaven();
@@ -56,17 +58,18 @@ if (electron) {
         editor={appArguments['editor']}
         editedElementName={appArguments['edited-element-name']}
       >
-        <MainFrame resourceSources={localResourceSources} />
+        <MainFrame
+          resourceSources={localResourceSources}
+          authentification={authentification}
+          onReadFromPathOrURL={() => Promise.reject("Should never be called")}
+        />
       </ExternalEditor>
     );
   } else {
     app = (
       <ElectronEventsBridge>
         <MainFrame
-          onLayoutPreview={LocalPreviewLauncher.launchLayoutPreview}
-          onExternalLayoutPreview={
-            LocalPreviewLauncher.launchExternalLayoutPreview
-          }
+          previewLauncher={<LocalPreviewLauncher />}
           exportDialog={<ExportDialog exporters={getLocalExporters()} />}
           createDialog={
             <CreateProjectDialog examplesComponent={LocalExamples} />
@@ -84,12 +87,8 @@ if (electron) {
 } else {
   app = (
     <MainFrame
-      onLayoutPreview={BrowserS3PreviewLauncher.launchLayoutPreview}
-      exportDialog={
-        <ExportDialog
-          exporters={getBrowserExporters()}
-        />
-      }
+      previewLauncher={<BrowserS3PreviewLauncher />}
+      exportDialog={<ExportDialog exporters={getBrowserExporters()} />}
       createDialog={<CreateProjectDialog examplesComponent={BrowserExamples} />}
       introDialog={<BrowserIntroDialog />}
       saveDialog={<BrowserSaveDialog />}
@@ -102,7 +101,7 @@ if (electron) {
 
 const rootElement = document.getElementById('root');
 if (rootElement) ReactDOM.render(app, rootElement);
-else console.error("No root element defined in index.html");
+else console.error('No root element defined in index.html');
 
 // registerServiceWorker();
 unregister();

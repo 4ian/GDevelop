@@ -102,7 +102,9 @@ export default class EventsSheet extends Component {
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
         showPreviewButton={this.props.showPreviewButton}
-        onPreview={this.props.onPreview}
+        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+        onPreview={() => this.props.onPreview({})}
+        onNetworkPreview={() => this.props.onPreview({networkPreview: true})}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}

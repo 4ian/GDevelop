@@ -50,7 +50,7 @@ export const openEditorTab = (
     };
   }
 
-  const editorTab = {
+  const editorTab: EditorTab = {
     render: () =>
       React.cloneElement(editorCreator(), {
         ref: editorRef => (editorTab.editorRef = editorRef),

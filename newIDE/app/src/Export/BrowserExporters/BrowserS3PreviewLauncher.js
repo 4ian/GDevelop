@@ -41,7 +41,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   state = {
     showPreviewLinkDialog: false,
     url: null,
-  }
+  };
 
   _openPreviewWindow = (project: gdProject, url: string): any => {
     const windowObjectReference = window.open(url, `_blank`);
@@ -121,7 +121,33 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     externalLayout: gdExternalLayout,
     options: PreviewOptions
   ): Promise<any> => {
-    return Promise.reject('Not implemented');
+    if (!project || !layout || !externalLayout) return Promise.reject();
+
+    return this._prepareExporter().then(
+      ({ exporter, outputDir, browserS3FileSystem }) => {
+        exporter.exportExternalLayoutForPixiPreview(
+          project,
+          layout,
+          externalLayout,
+          outputDir
+        );
+        exporter.delete();
+        return browserS3FileSystem
+          .uploadPendingObjects()
+          .then(() => {
+            const finalUrl = outputDir + '/index.html';
+            return this._openPreviewWindow(project, finalUrl);
+          })
+          .then(({ url, windowObjectReference }) => {
+            if (!windowObjectReference) {
+              this.setState({
+                showPreviewLinkDialog: true,
+                url,
+              });
+            }
+          });
+      }
+    );
   };
 
   render() {

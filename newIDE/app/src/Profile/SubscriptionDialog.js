@@ -16,6 +16,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import { showMessageBox, showErrorBox } from '../UI/Messages/MessageBox';
 import LeftLoader from '../UI/LeftLoader';
+import PlaceholderMessage from '../UI/PlaceholderMessage';
 
 const styles = {
   descriptionText: {
@@ -209,6 +210,21 @@ export default class SubscriptionDialog extends Component<Props, State> {
               for secure payment. No credit card data is stored by GDevelop:
               everything is managed by Stripe secure infrastructure.
             </EmptyMessage>
+            {!userProfile.authenticated && (
+              <PlaceholderMessage>
+                <p>
+                  Create a GDevelop account to continue. It's free and you'll be
+                  able to access to online services like one-click build for
+                  Android:
+                </p>
+                <RaisedButton
+                  label="Create my account"
+                  primary
+                  onClick={userProfile.onLogin}
+                />
+                <FlatButton label="Not now, thanks" onClick={onClose} />
+              </PlaceholderMessage>
+            )}
           </Dialog>
         )}
       </UserProfileContext.Consumer>

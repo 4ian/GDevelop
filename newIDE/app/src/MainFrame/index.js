@@ -1011,9 +1011,8 @@ export default class MainFrame extends React.Component<Props, State> {
             React.cloneElement(previewLauncher, {
               ref: (previewLauncher: ?PreviewLauncher) =>
                 (this._previewLauncher = previewLauncher),
-              onExport: () => {
-                this.openExportDialog(true);
-              },
+              onExport: () => this.openExportDialog(true),
+              onChangeSubscription: () => this.openSubscription(true),
             })}
           {resourceSources.map((resourceSource, index) => {
             // $FlowFixMe

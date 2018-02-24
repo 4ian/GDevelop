@@ -8,18 +8,18 @@ import LocalNetworkPreviewDialog from './LocalNetworkPreviewDialog';
 import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import { findLocalIp } from './LocalIpFinder';
-import SubscriptionCheckDialog from '../../../Profile/SubscriptionCheckDialog';
-import Authentification from '../../../Utils/GDevelopServices/Authentification';
+import SubscriptionChecker from '../../../Profile/SubscriptionChecker';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
 const gd = global.gd;
 
-type Props = {
+type Props = {|
   onExport?: () => void,
-  authentification: ?Authentification,
-};
+  onChangeSubscription?: () => void,
+|};
+
 type State = {
   networkPreviewDialogOpen: boolean,
   networkPreviewHost: ?string,
@@ -48,7 +48,7 @@ export default class LocalPreviewLauncher extends React.Component<
     previewGamePath: null,
     previewBrowserWindowConfig: null,
   };
-  _subscriptionCheckDialog = null;
+  _subscriptionChecker: ?SubscriptionChecker = null;
 
   _openPreviewBrowserWindow = () => {
     if (
@@ -99,6 +99,8 @@ export default class LocalPreviewLauncher extends React.Component<
                 networkPreviewPort: serverParams.port,
               });
             }
+
+            setTimeout(() => this._checkSubscription());
           });
           ipcRenderer.on('local-network-ips', (event, ipAddresses) => {
             this.setState({
@@ -145,7 +147,6 @@ export default class LocalPreviewLauncher extends React.Component<
     options: PreviewOptions
   ): Promise<any> => {
     if (!project || !layout) return Promise.reject();
-    if (!this._checkOptions()) return Promise.resolve();
 
     return this._prepareExporter().then(({ outputDir, exporter }) => {
       timeFunction(
@@ -166,7 +167,6 @@ export default class LocalPreviewLauncher extends React.Component<
     options: PreviewOptions
   ): Promise<any> => {
     if (!project || !externalLayout) return Promise.reject();
-    if (!this._checkOptions()) return Promise.resolve();
 
     return this._prepareExporter().then(({ outputDir, exporter }) => {
       timeFunction(
@@ -185,11 +185,11 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
-  _checkOptions = (options: PreviewOptions) => {
-    if (!this._subscriptionCheckDialog) return true;
+  _checkSubscription = (options: PreviewOptions) => {
+    if (!this._subscriptionChecker) return true;
 
-    return this._subscriptionCheckDialog.checkHasSubscription();
-  }
+    return this._subscriptionChecker.checkHasSubscription();
+  };
 
   render() {
     const {
@@ -200,6 +200,15 @@ export default class LocalPreviewLauncher extends React.Component<
     } = this.state;
     return (
       <React.Fragment>
+        <SubscriptionChecker
+          ref={subscriptionChecker =>
+            (this._subscriptionChecker = subscriptionChecker)}
+          onChangeSubscription={() => {
+            this.setState({ networkPreviewDialogOpen: false });
+            if (this.props.onChangeSubscription)
+              this.props.onChangeSubscription();
+          }}
+        />
         <LocalNetworkPreviewDialog
           open={networkPreviewDialogOpen}
           url={
@@ -211,11 +220,6 @@ export default class LocalPreviewLauncher extends React.Component<
           onClose={() => this.setState({ networkPreviewDialogOpen: false })}
           onExport={this.props.onExport}
           onRunPreviewLocally={this._openPreviewBrowserWindow}
-        />
-        <SubscriptionCheckDialog
-          authentification={this.props.authentification}
-          wrappedComponentRef={subscriptionCheckDialog =>
-            (this._subscriptionCheckDialog = subscriptionCheckDialog)}
         />
       </React.Fragment>
     );

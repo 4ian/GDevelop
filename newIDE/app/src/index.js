@@ -69,7 +69,7 @@ if (electron) {
     app = (
       <ElectronEventsBridge>
         <MainFrame
-          previewLauncher={<LocalPreviewLauncher />}
+          previewLauncher={<LocalPreviewLauncher authentification={authentification} />}
           exportDialog={<ExportDialog exporters={getLocalExporters()} />}
           createDialog={
             <CreateProjectDialog examplesComponent={LocalExamples} />

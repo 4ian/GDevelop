@@ -8,6 +8,8 @@ import LocalNetworkPreviewDialog from './LocalNetworkPreviewDialog';
 import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import { findLocalIp } from './LocalIpFinder';
+import SubscriptionCheckDialog from '../../../Profile/SubscriptionCheckDialog';
+import Authentification from '../../../Utils/GDevelopServices/Authentification';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -16,6 +18,7 @@ const gd = global.gd;
 
 type Props = {
   onExport?: () => void,
+  authentification: ?Authentification,
 };
 type State = {
   networkPreviewDialogOpen: boolean,
@@ -45,6 +48,7 @@ export default class LocalPreviewLauncher extends React.Component<
     previewGamePath: null,
     previewBrowserWindowConfig: null,
   };
+  _subscriptionCheckDialog = null;
 
   _openPreviewBrowserWindow = () => {
     if (
@@ -141,6 +145,7 @@ export default class LocalPreviewLauncher extends React.Component<
     options: PreviewOptions
   ): Promise<any> => {
     if (!project || !layout) return Promise.reject();
+    if (!this._checkOptions()) return Promise.resolve();
 
     return this._prepareExporter().then(({ outputDir, exporter }) => {
       timeFunction(
@@ -161,6 +166,7 @@ export default class LocalPreviewLauncher extends React.Component<
     options: PreviewOptions
   ): Promise<any> => {
     if (!project || !externalLayout) return Promise.reject();
+    if (!this._checkOptions()) return Promise.resolve();
 
     return this._prepareExporter().then(({ outputDir, exporter }) => {
       timeFunction(
@@ -179,6 +185,12 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
+  _checkOptions = (options: PreviewOptions) => {
+    if (!this._subscriptionCheckDialog) return true;
+
+    return this._subscriptionCheckDialog.checkHasSubscription();
+  }
+
   render() {
     const {
       networkPreviewDialogOpen,
@@ -187,18 +199,25 @@ export default class LocalPreviewLauncher extends React.Component<
       networkPreviewError,
     } = this.state;
     return (
-      <LocalNetworkPreviewDialog
-        open={networkPreviewDialogOpen}
-        url={
-          networkPreviewHost && networkPreviewPort
-            ? `${networkPreviewHost}:${networkPreviewPort}`
-            : null
-        }
-        error={networkPreviewError}
-        onClose={() => this.setState({ networkPreviewDialogOpen: false })}
-        onExport={this.props.onExport}
-        onRunPreviewLocally={this._openPreviewBrowserWindow}
-      />
+      <React.Fragment>
+        <LocalNetworkPreviewDialog
+          open={networkPreviewDialogOpen}
+          url={
+            networkPreviewHost && networkPreviewPort
+              ? `${networkPreviewHost}:${networkPreviewPort}`
+              : null
+          }
+          error={networkPreviewError}
+          onClose={() => this.setState({ networkPreviewDialogOpen: false })}
+          onExport={this.props.onExport}
+          onRunPreviewLocally={this._openPreviewBrowserWindow}
+        />
+        <SubscriptionCheckDialog
+          authentification={this.props.authentification}
+          wrappedComponentRef={subscriptionCheckDialog =>
+            (this._subscriptionCheckDialog = subscriptionCheckDialog)}
+        />
+      </React.Fragment>
     );
   }
 }

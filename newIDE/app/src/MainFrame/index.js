@@ -96,7 +96,6 @@ type State = {|
   subscriptionDialogOpen: boolean,
   updateStatus: UpdateStatus,
   aboutDialogOpen: boolean,
-  onSubscriptionDialogClosed: ?Function,
   platformSpecificAssetsDialogOpen: boolean,
 |};
 
@@ -138,7 +137,6 @@ export default class MainFrame extends React.Component<Props, State> {
     subscriptionDialogOpen: false,
     updateStatus: { message: '', status: 'unknown' },
     aboutDialogOpen: false,
-    onSubscriptionDialogClosed: null,
     platformSpecificAssetsDialogOpen: false,
   };
   toolbar = null;
@@ -758,10 +756,9 @@ export default class MainFrame extends React.Component<Props, State> {
     });
   };
 
-  openSubscription = (open: boolean = true, onDone: ?Function = null) => {
+  openSubscription = (open: boolean = true) => {
     this.setState({
       subscriptionDialogOpen: open,
-      onSubscriptionDialogClosed: onDone,
     });
   };
 
@@ -872,7 +869,10 @@ export default class MainFrame extends React.Component<Props, State> {
       this.props.loading;
 
     return (
-      <Providers themeName={getThemeName(preferences)}>
+      <Providers
+        themeName={getThemeName(preferences)}
+        authentification={authentification}
+      >
         <div className="main-frame">
           <ProjectTitlebar project={currentProject} />
           <Drawer
@@ -957,9 +957,9 @@ export default class MainFrame extends React.Component<Props, State> {
             React.cloneElement(exportDialog, {
               open: this.state.exportDialogOpen,
               onClose: () => this.openExportDialog(false),
-              onChangeSubscription: (onDone: ?Function) => {
+              onChangeSubscription: () => {
                 this.openExportDialog(false);
-                this.openSubscription(true, onDone);
+                this.openSubscription(true);
               },
               project: this.state.currentProject,
               authentification,
@@ -1029,18 +1029,14 @@ export default class MainFrame extends React.Component<Props, State> {
           })}
           <ProfileDialog
             open={profileDialogOpen}
-            authentification={authentification}
             onClose={() => this.openProfile(false)}
-            onChangeSubscription={onDone => this.openSubscription(true, onDone)}
+            onChangeSubscription={() => this.openSubscription(true)}
           />
           <SubscriptionDialog
             onClose={() => {
               this.openSubscription(false);
-              if (this.state.onSubscriptionDialogClosed)
-                this.state.onSubscriptionDialogClosed();
             }}
             open={subscriptionDialogOpen}
-            authentification={authentification}
           />
           <PreferencesDialog
             open={this.state.preferencesDialogOpen}

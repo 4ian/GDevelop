@@ -11,23 +11,20 @@ import EmptyMessage from '../UI/EmptyMessage';
 import HelpButton from '../UI/HelpButton';
 import UsagesDetails from './UsagesDetails';
 import SubscriptionDetails from './SubscriptionDetails';
-import {
-  withUserProfile,
-  type WithUserProfileProps,
-} from './UserProfileContainer';
+import UserProfileContext, { type UserProfile } from './UserProfileContext';
 import LimitDisplayer from './LimitDisplayer';
 
 type Props = {|
   open: boolean,
   onClose: Function,
   onChangeSubscription: Function,
-|} & WithUserProfileProps;
+|};
 
 type State = {|
   currentTab: string,
 |};
 
-class ProfileDialog extends Component<Props, State> {
+export default class ProfileDialog extends Component<Props, State> {
   state = {
     currentTab: 'profile',
   };
@@ -37,26 +34,8 @@ class ProfileDialog extends Component<Props, State> {
       currentTab: newTab,
     });
 
-  _onChangeSubscription = () => {
-    const { onChangeSubscription, onRefreshUserProfile } = this.props;
-
-    onChangeSubscription(() => {
-      onRefreshUserProfile();
-    });
-  };
-
   render() {
-    const {
-      authenticated,
-      profile,
-      usages,
-      subscription,
-      limits,
-      open,
-      onClose,
-      onLogout,
-      onLogin,
-    } = this.props;
+    const { open, onClose } = this.props;
     const actions = [
       <FlatButton
         label="Close"
@@ -67,63 +46,69 @@ class ProfileDialog extends Component<Props, State> {
     ];
 
     return (
-      <Dialog
-        actions={actions}
-        secondaryActions={[
-          <HelpButton key="help" helpPagePath="/interface/profile" />,
-          authenticated &&
-            profile && (
-              <FlatButton label="Logout" key="logout" onClick={onLogout} />
-            ),
-        ]}
-        onRequestClose={onClose}
-        open={open}
-        noMargin
-        autoScrollBodyContent
-      >
-        <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
-          <Tab label="My Profile" value="profile">
-            {authenticated ? (
-              <Column noMargin>
-                <ProfileDetails profile={profile} />
-                <SubscriptionDetails
-                  subscription={subscription}
-                  onChangeSubscription={this._onChangeSubscription}
-                />
-              </Column>
-            ) : (
-              <Column>
-                <CreateProfile onLogin={onLogin} />
-              </Column>
-            )}
-          </Tab>
-          <Tab label="Online services usage" value="usage">
-            {authenticated ? (
-              <Column noMargin>
-                <Column>
-                  <LimitDisplayer
-                    subscription={subscription}
-                    limit={limits ? limits['cordova-build'] : null}
-                    onChangeSubscription={this._onChangeSubscription}
+      <UserProfileContext.Consumer>
+        {(userProfile: UserProfile) => (
+          <Dialog
+            actions={actions}
+            secondaryActions={[
+              <HelpButton key="help" helpPagePath="/interface/profile" />,
+              userProfile.authenticated &&
+                userProfile.profile && (
+                  <FlatButton
+                    label="Logout"
+                    key="logout"
+                    onClick={userProfile.onLogout}
                   />
-                </Column>
-                <UsagesDetails usages={usages} />
-              </Column>
-            ) : (
-              <EmptyMessage>
-                Register to see the usage that you've made of the online
-                services
-              </EmptyMessage>
-            )}
-          </Tab>
-        </Tabs>
-      </Dialog>
+                ),
+            ]}
+            onRequestClose={onClose}
+            open={open}
+            noMargin
+            autoScrollBodyContent
+          >
+            <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
+              <Tab label="My Profile" value="profile">
+                {userProfile.authenticated ? (
+                  <Column noMargin>
+                    <ProfileDetails profile={userProfile.profile} />
+                    <SubscriptionDetails
+                      subscription={userProfile.subscription}
+                      onChangeSubscription={this.props.onChangeSubscription}
+                    />
+                  </Column>
+                ) : (
+                  <Column>
+                    <CreateProfile onLogin={userProfile.onLogin} />
+                  </Column>
+                )}
+              </Tab>
+              <Tab label="Online services usage" value="usage">
+                {userProfile.authenticated ? (
+                  <Column noMargin>
+                    <Column>
+                      <LimitDisplayer
+                        subscription={userProfile.subscription}
+                        limit={
+                          userProfile.limits
+                            ? userProfile.limits['cordova-build']
+                            : null
+                        }
+                        onChangeSubscription={this.props.onChangeSubscription}
+                      />
+                    </Column>
+                    <UsagesDetails usages={userProfile.usages} />
+                  </Column>
+                ) : (
+                  <EmptyMessage>
+                    Register to see the usage that you've made of the online
+                    services
+                  </EmptyMessage>
+                )}
+              </Tab>
+            </Tabs>
+          </Dialog>
+        )}
+      </UserProfileContext.Consumer>
     );
   }
 }
-
-export default withUserProfile({
-  fetchUsages: true,
-  fetchLimits: true,
-  fetchSubscription: true,
-})(ProfileDialog);

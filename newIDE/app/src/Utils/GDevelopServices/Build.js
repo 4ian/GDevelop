@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios';
-import type Authentification from './Authentification';
 import { GDevelopBuildApi } from './ApiConfigs';
 
 export const getUrl = (key: string) =>
@@ -19,12 +18,11 @@ export type Build = {
 };
 
 export const buildCordovaAndroid = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string,
   key: string
 ): Promise<Build> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.post(
         `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
@@ -43,12 +41,11 @@ export const buildCordovaAndroid = (
 };
 
 export const getBuild = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string,
   buildId: string
 ): Promise<Build> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
         params: {

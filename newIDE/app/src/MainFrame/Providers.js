@@ -6,9 +6,12 @@ import i18n from '../UI/i18n';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { getTheme } from '../UI/Theme';
+import UserProfileProvider from '../Profile/UserProfileProvider';
+import Authentification from '../Utils/GDevelopServices/Authentification';
 
 type Props = {|
   themeName: string,
+  authentification: Authentification,
   children: React$Element<*>,
 |};
 
@@ -23,7 +26,11 @@ export default class Providers extends React.Component<Props, *> {
     return (
       <DragDropContextProvider>
         <MuiThemeProvider muiTheme={theme}>
-          <I18nextProvider i18n={i18n}>{this.props.children}</I18nextProvider>
+          <I18nextProvider i18n={i18n}>
+            <UserProfileProvider authentification={this.props.authentification}>
+              {this.props.children}
+            </UserProfileProvider>
+          </I18nextProvider>
         </MuiThemeProvider>
       </DragDropContextProvider>
     );

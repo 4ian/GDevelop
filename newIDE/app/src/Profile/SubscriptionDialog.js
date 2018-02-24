@@ -4,10 +4,7 @@ import React, { Component } from 'react';
 import { Card, CardActions, CardHeader } from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
-import {
-  withUserProfile,
-  type WithUserProfileProps,
-} from './UserProfileContainer';
+import UserProfileContext, { UserProfile } from './UserProfileContext';
 import { Column, Line } from '../UI/Grid';
 import {
   getSubscriptionPlans,
@@ -40,35 +37,34 @@ const styles = {
 type Props = {|
   open: boolean,
   onClose: Function,
-|} & WithUserProfileProps;
+|};
 
 type State = {|
   isLoading: boolean,
 |};
 
-
-class SubscriptionDialog extends Component<Props, State> {
+export default class SubscriptionDialog extends Component<Props, State> {
   state = { isLoading: false };
   stripeCheckoutHandler: null;
 
-  choosePlan = (plan: PlanDetails) => {
-    const { authentification, subscription, profile } = this.props;
-    if (!authentification || !profile || !subscription) return;
+  choosePlan = (userProfile: UserProfile, plan: PlanDetails) => {
+    const { getAuthorizationHeader, subscription, profile } = userProfile;
+    if (!profile || !subscription) return;
 
     if (subscription.stripeCustomerId) {
       //eslint-disable-next-line
       const answer = confirm(
-        "Are you sure you want to subscribe to this new plan?"
+        'Are you sure you want to subscribe to this new plan?'
       );
       if (!answer) return;
 
       // We already have a stripe customer, change the subscription without
       // asking for the user card.
       this.setState({ isLoading: true });
-      changeUserSubscription(authentification, profile.uid, {
+      changeUserSubscription(getAuthorizationHeader, profile.uid, {
         planId: plan.planId,
       }).then(
-        () => this.handleNewSubscriptionSuccess(plan),
+        () => this.handleNewSubscriptionSuccess(userProfile, plan),
         this.handleNewSubscriptionFailure
       );
     } else {
@@ -80,13 +76,13 @@ class SubscriptionDialog extends Component<Props, State> {
           key: StripeCheckoutConfig.key,
           image: StripeCheckoutConfig.image,
           locale: 'auto',
-          token: (stripeToken) => {
+          token: stripeToken => {
             this.setState({ isLoading: true });
-            changeUserSubscription(authentification, profile.uid, {
+            changeUserSubscription(getAuthorizationHeader, profile.uid, {
               planId: plan.planId,
               stripeToken,
             }).then(
-              () => this.handleNewSubscriptionSuccess(plan),
+              () => this.handleNewSubscriptionSuccess(userProfile, plan),
               this.handleNewSubscriptionFailure
             );
           },
@@ -103,8 +99,11 @@ class SubscriptionDialog extends Component<Props, State> {
     }
   };
 
-  handleNewSubscriptionSuccess = (plan: PlanDetails) => {
-    this.props.onRefreshUserProfile();
+  handleNewSubscriptionSuccess = (
+    userProfile: UserProfile,
+    plan: PlanDetails
+  ) => {
+    userProfile.onRefreshUserProfile();
     this.setState({ isLoading: false });
     if (plan.planId) {
       showMessageBox(
@@ -125,90 +124,94 @@ class SubscriptionDialog extends Component<Props, State> {
     );
   };
 
-  _renderPrice(plan) {
-    return plan.monthlyPriceInEuros
+  _renderPrice(plan: PlanDetails) {
+    return !plan.monthlyPriceInEuros
       ? 'Free'
       : `${plan.monthlyPriceInEuros}€/month`;
   }
 
+  _isLoading = (userProfile: UserProfile) =>
+    !userProfile.subscription || !userProfile.profile || this.state.isLoading;
+
   render() {
-    const { open, onClose, subscription, profile } = this.props;
-    const actions = [
-      <FlatButton
-        label="Close"
-        key="close"
-        primary={false}
-        onClick={onClose}
-      />,
-    ];
-    const isLoading = !subscription || !profile || this.state.isLoading;
+    const { open, onClose } = this.props;
 
     return (
-      <Dialog
-        actions={actions}
-        onRequestClose={onClose}
-        open={open}
-        noMargin
-        autoScrollBodyContent
-      >
-        <Column>
-          <Line>
-            <p>
-              Get a subscription to package your games for Android. With a
-              subscription, you're also supporting the development of GDevelop,
-              an open-source software!
-            </p>
-          </Line>
-        </Column>
-        {getSubscriptionPlans().map(plan => (
-          <Card key={plan.planId || ''} style={styles.card}>
-            <CardHeader
-              title={
-                <span>
-                  <b>{plan.name}</b> - {plan.monthlyPriceInEuros}€/month
-                </span>
-              }
-              subtitle={plan.smallDescription}
-            />
-            <p style={styles.descriptionText}>{plan.description || ''}</p>
-            <p style={styles.descriptionText}>{plan.moreDescription1 || ''}</p>
-            <CardActions style={styles.actions}>
-              {subscription && subscription.planId === plan.planId ? (
-                <FlatButton
-                  disabled
-                  label="This is your current plan"
-                  onClick={() => this.choosePlan(plan)}
+      <UserProfileContext.Consumer>
+        {(userProfile: UserProfile) => (
+          <Dialog
+            actions={[
+              <FlatButton
+                label="Close"
+                key="close"
+                primary={false}
+                onClick={onClose}
+              />,
+            ]}
+            onRequestClose={onClose}
+            open={open}
+            noMargin
+            autoScrollBodyContent
+          >
+            <Column>
+              <Line>
+                <p>
+                  Get a subscription to package your games for Android. With a
+                  subscription, you're also supporting the development of
+                  GDevelop, an open-source software!
+                </p>
+              </Line>
+            </Column>
+            {getSubscriptionPlans().map(plan => (
+              <Card key={plan.planId || ''} style={styles.card}>
+                <CardHeader
+                  title={
+                    <span>
+                      <b>{plan.name}</b> - {this._renderPrice(plan)}
+                    </span>
+                  }
+                  subtitle={plan.smallDescription}
                 />
-              ) : plan.planId ? (
-                <LeftLoader isLoading={isLoading}>
-                  <RaisedButton
-                    primary
-                    disabled={isLoading}
-                    label="Choose this plan"
-                    onClick={() => this.choosePlan(plan)}
-                  />
-                </LeftLoader>
-              ) : (
-                <LeftLoader isLoading={isLoading}>
-                  <FlatButton
-                    label="Choose"
-                    onClick={() => this.choosePlan(plan)}
-                  />
-                </LeftLoader>
-              )}
-            </CardActions>
-          </Card>
-        ))}
-        <EmptyMessage>
-          Subscriptions can be stopped at any time. GDevelop uses Stripe.com for
-          secure payment. No credit card data is stored by GDevelop: everything
-          is managed by Stripe secure infrastructure.
-        </EmptyMessage>
-      </Dialog>
+                <p style={styles.descriptionText}>{plan.description || ''}</p>
+                <p style={styles.descriptionText}>
+                  {plan.moreDescription1 || ''}
+                </p>
+                <CardActions style={styles.actions}>
+                  {userProfile.subscription &&
+                  userProfile.subscription.planId === plan.planId ? (
+                    <FlatButton
+                      disabled
+                      label="This is your current plan"
+                      onClick={() => this.choosePlan(userProfile, plan)}
+                    />
+                  ) : plan.planId ? (
+                    <LeftLoader isLoading={this._isLoading(userProfile)}>
+                      <RaisedButton
+                        primary
+                        disabled={this._isLoading(userProfile)}
+                        label="Choose this plan"
+                        onClick={() => this.choosePlan(userProfile, plan)}
+                      />
+                    </LeftLoader>
+                  ) : (
+                    <LeftLoader isLoading={this._isLoading(userProfile)}>
+                      <FlatButton
+                        label="Choose"
+                        onClick={() => this.choosePlan(userProfile, plan)}
+                      />
+                    </LeftLoader>
+                  )}
+                </CardActions>
+              </Card>
+            ))}
+            <EmptyMessage>
+              Subscriptions can be stopped at any time. GDevelop uses Stripe.com
+              for secure payment. No credit card data is stored by GDevelop:
+              everything is managed by Stripe secure infrastructure.
+            </EmptyMessage>
+          </Dialog>
+        )}
+      </UserProfileContext.Consumer>
     );
   }
 }
-
-export default withUserProfile({
-  fetchSubscription: true,
-})(SubscriptionDialog);

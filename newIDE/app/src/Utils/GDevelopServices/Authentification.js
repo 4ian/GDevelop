@@ -27,6 +27,7 @@ export type LoginError = {
 
 export default class Authentification {
   user = null;
+  _onUserChangeCb: ?() => void = null;
 
   constructor() {
     firebase.initializeApp(GDevelopFirebaseConfig);
@@ -36,8 +37,14 @@ export default class Authentification {
       } else {
         this.user = null;
       }
+
+      if (this._onUserChangeCb) this._onUserChangeCb();
     });
   }
+
+  onUserChange = (cb: () => void) => {
+    this._onUserChangeCb = cb;
+  };
 
   createAccount = (form: LoginForm): Promise<void> => {
     return firebase

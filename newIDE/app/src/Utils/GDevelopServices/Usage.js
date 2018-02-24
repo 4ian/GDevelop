@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios';
-import type Authentification from './Authentification';
 import { GDevelopUsageApi } from './ApiConfigs';
 
 export type Usage = {
@@ -20,11 +19,11 @@ export type Subscription = {|
   stripeCustomerId?: string,
 |};
 
-export type Limit = {
+export type Limit = {|
   limitReached: boolean,
   current: number,
   max: number,
-};
+|};
 
 export type Limits = {
   [string]: Limit,
@@ -69,11 +68,10 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
 ];
 
 export const getUserUsages = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Usages> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopUsageApi.baseUrl}/usage`, {
         params: {
@@ -88,11 +86,10 @@ export const getUserUsages = (
 };
 
 export const getUserLimits = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Limits> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopUsageApi.baseUrl}/limits`, {
         params: {
@@ -107,11 +104,10 @@ export const getUserLimits = (
 };
 
 export const getUserSubscription = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Subscription> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopUsageApi.baseUrl}/subscription`, {
         params: {
@@ -126,12 +122,11 @@ export const getUserSubscription = (
 };
 
 export const changeUserSubscription = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string,
   newSubscriptionDetails: { planId: string | null, stripeToken?: any }
 ): Promise<Subscription> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.post(
         `${GDevelopUsageApi.baseUrl}/subscription`,

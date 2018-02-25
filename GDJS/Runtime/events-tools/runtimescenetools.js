@@ -108,13 +108,13 @@ gdjs.evtTools.runtimeScene.getTime = function(runtimeScene, what) {
     else if ( what === "sec" )
         return now.getSeconds();
     else if ( what === "mday" )
-        return now.getdate();
+        return now.getDate();
     else if ( what === "mon" )
         return now.getMonth();
     else if ( what === "year" )
         return now.getFullYear() - 1900; //Conform to the C way of returning years.
     else if ( what === "wday" )
-        return now.getday();
+        return now.getDay();
     else if ( what === "yday" ) {
         var start = new Date(now.getFullYear(), 0, 0);
         var diff = now - start;

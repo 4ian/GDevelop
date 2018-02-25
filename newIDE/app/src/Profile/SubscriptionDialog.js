@@ -190,8 +190,8 @@ export default class SubscriptionDialog extends Component<Props, State> {
                   }
                   subtitle={plan.smallDescription}
                 />
-                {plan.descriptionBullets.map(bulletText => (
-                  <Line noMargin alignItems="center">
+                {plan.descriptionBullets.map((bulletText, index) => (
+                  <Line noMargin alignItems="center" key={index}>
                     <CheckCircle style={styles.bulletIcon} />
                     <p style={styles.bulletText}>{bulletText}</p>
                   </Line>

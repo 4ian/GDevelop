@@ -47,6 +47,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     descriptionBullets: [
       'Allow to package your game for Android up to 70 times a day.',
       'Use Live Preview over Wifi to quickly test your game on mobiles and tablets',
+      'Immerse your players by removing GDevelop logo when the game loads',
     ],
     extraDescription:
       "You'll also have access to online packaging for Windows, macOS and Linux when it's ready.",
@@ -59,6 +60,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     descriptionBullets: [
       'Allow to package your game for Android up to 10 times a day.',
       'Use Live Preview over Wifi to quickly test your game on mobiles and tablets',
+      'Immerse your players by removing GDevelop logo when the game loads',
     ],
     extraDescription:
       "You'll also have access to online packaging for Windows, macOS and Linux when it's ready.",

@@ -1,5 +1,4 @@
 const liveServer = require('live-server');
-const ip = require('ip');
 const os = require('os');
 const net = require('net');
 

@@ -138,6 +138,11 @@ Object {
         "fullGroupName": "Common conditions for all objects/Collision",
         "type": "CollisionPoint",
       },
+      "Raycast": Object {
+        "displayedName": "Raycast",
+        "fullGroupName": "Common conditions for all objects/Collision",
+        "type": "Raycast",
+      },
     },
     "Layer": Object {
       "Compare layer": Object {
@@ -2072,6 +2077,11 @@ Array [
     "displayedName": "Pick nearest object",
     "fullGroupName": "Common conditions for all objects/Objects",
     "type": "PickNearest",
+  },
+  Object {
+    "displayedName": "Raycast",
+    "fullGroupName": "Common conditions for all objects/Collision",
+    "type": "Raycast",
   },
   Object {
     "displayedName": "An object is moving toward another",
